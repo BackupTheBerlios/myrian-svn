@@ -13,14 +13,28 @@ import org.apache.log4j.Logger;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2004/02/24 $
+ * @version $Revision: #14 $ $Date: 2004/02/27 $
  **/
 
 class Code {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#13 $ by $Author: rhs $, $DateTime: 2004/02/24 19:43:59 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#14 $ by $Author: rhs $, $DateTime: 2004/02/27 18:00:19 $";
 
     private static final Logger s_log = Logger.getLogger(Code.class);
+
+    static final String TRUE = "1 = 1";
+    static final String NULL = "null";
+
+    static String join(Collection objs, String sep) {
+        StringBuffer result = new StringBuffer();
+        for (Iterator it = objs.iterator(); it.hasNext(); ) {
+            result.append(it.next());
+            if (it.hasNext()) {
+                result.append(sep);
+            }
+        }
+        return result.toString();
+    }
 
     static String[] names(Column[] columns, String alias) {
         String[] result = new String[columns.length];

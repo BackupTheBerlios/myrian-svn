@@ -13,12 +13,12 @@ import java.util.*;
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2004/02/27 $
+ * @version $Revision: #14 $ $Date: 2004/02/27 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#13 $ by $Author: rhs $, $DateTime: 2004/02/27 16:35:42 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#14 $ by $Author: rhs $, $DateTime: 2004/02/27 18:00:19 $";
 
     private Object m_value;
 
@@ -70,7 +70,7 @@ public class Literal extends Expression {
 
     private static void convert(Object value, List result, Root root) {
         if (value == null) {
-            result.add("null");
+            result.add(Code.NULL);
         } else if (value instanceof Boolean) {
             if (value.equals(Boolean.TRUE)) {
                 result.add("'1'");

@@ -6,12 +6,12 @@ import java.util.*;
  * Equals
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2004/02/27 $
+ * @version $Revision: #12 $ $Date: 2004/02/27 $
  **/
 
 public class Equals extends BinaryCondition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Equals.java#11 $ by $Author: rhs $, $DateTime: 2004/02/27 16:35:42 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Equals.java#12 $ by $Author: rhs $, $DateTime: 2004/02/27 18:00:19 $";
 
     public Equals(Expression left, Expression right) {
         super(left, right);
@@ -75,17 +75,53 @@ public class Equals extends BinaryCondition {
     }
 
     static String emit(Generator gen, Expression lexpr, Expression rexpr) {
-        String left = lexpr.emit(gen);
-        String right = rexpr.emit(gen);
+        List left = new ArrayList();
+        List right = new ArrayList();
 
-        if ("null".equals(left)) {
-            return right + " is " + left;
-        } else if ("null".equals(right)) {
-            return left + " is " + right;
-        } else if (left.equals(right)) {
-            return "1 = 1";
+        if (gen.hasFrame(lexpr) && gen.hasFrame(rexpr)) {
+            QFrame lframe = gen.getFrame(lexpr);
+            QFrame rframe = gen.getFrame(rexpr);
+            if (!lframe.isSelect() && !rframe.isSelect()) {
+                List lvals = lframe.getValues();
+                List rvals = rframe.getValues();
+                if (lvals.size() != rvals.size()) {
+                    throw new IllegalStateException
+                        ("signature missmatch: " + lvals + ", " + rvals);
+                }
+                for (int i = 0; i < lvals.size(); i++) {
+                    left.add("" + (QValue) lvals.get(i));
+                    right.add("" + (QValue) rvals.get(i));
+                }
+            } else {
+                // XXX: we can to do something smarter than this for
+                // multi column selects
+                left.add(lexpr.emit(gen));
+                right.add(rexpr.emit(gen));
+            }
         } else {
-            return left + " = " + right;
+            left.add(lexpr.emit(gen));
+            right.add(rexpr.emit(gen));
+        }
+
+        List conds = new ArrayList();
+        for (int i = 0; i < left.size(); i++) {
+            String l = (String) left.get(i);
+            String r = (String) right.get(i);
+            if (Code.NULL.equals(l)) {
+                conds.add(r + " is " + l);
+            } else if (Code.NULL.equals(r)) {
+                conds.add(l + " is " + r);
+            } else if (l.equals(r)) {
+                // do nothing
+            } else {
+                conds.add(l + " = " + r);
+            }
+        }
+
+        if (conds.isEmpty()) {
+            return Code.TRUE;
+        } else {
+            return Code.join(conds, " and ");
         }
     }
 

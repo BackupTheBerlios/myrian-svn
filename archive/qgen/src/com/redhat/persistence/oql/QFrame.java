@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/02/27 $
+ * @version $Revision: #6 $ $Date: 2004/02/27 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#5 $ by $Author: rhs $, $DateTime: 2004/02/27 16:35:42 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#6 $ by $Author: rhs $, $DateTime: 2004/02/27 18:00:19 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -233,15 +233,15 @@ class QFrame {
     }
 
     private String join(List exprs, String sep) {
-        StringBuffer buf = new StringBuffer();
+        List emitted = new ArrayList();
         for (Iterator it = exprs.iterator(); it.hasNext(); ) {
             Expression e = (Expression) it.next();
-            buf.append(e.emit(m_generator));
-            if (it.hasNext()) {
-                buf.append(sep);
+            String sql = e.emit(m_generator);
+            if (!Code.TRUE.equals(sql)) {
+                emitted.add(sql);
             }
         }
-        return buf.toString();
+        return Code.join(emitted, sep);
     }
 
     private List getOrders() {
