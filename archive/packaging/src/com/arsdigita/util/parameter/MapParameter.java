@@ -24,13 +24,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/MapParameter.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/MapParameter.java#3 $
  */
 public class MapParameter extends AbstractParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/MapParameter.java#2 $" +
-        "$Author: rhs $" +
-        "$DateTime: 2003/10/21 23:00:37 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/MapParameter.java#3 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/10/22 16:13:26 $";
 
     private final ArrayList m_params;
 
@@ -64,16 +64,15 @@ public class MapParameter extends AbstractParameter {
         return m_params.iterator();
     }
 
-    public final Object read(final ParameterReader reader,
-                             final ErrorList errors) {
+    protected Object doRead(final ParameterReader reader,
+                            final ErrorList errors) {
         final HashMap map = new HashMap();
-
         final Iterator params = m_params.iterator();
 
         while (params.hasNext()) {
             final Parameter param = (Parameter) params.next();
+            final Object value = param.read(reader, errors);
 
-            Object value = param.read(reader, errors);
             if (value != null) {
                 map.put(param, value);
             }
@@ -82,22 +81,19 @@ public class MapParameter extends AbstractParameter {
         return map;
     }
 
-    public final void validate(final Object value, final ErrorList errors) {
+    protected void doValidate(final Object value, final ErrorList errors) {
         final HashMap map = (HashMap) value;
-
         final Iterator params = m_params.iterator();
 
         while (params.hasNext()) {
             final Parameter param = (Parameter) params.next();
-            if (map.containsKey(param)) {
-                param.validate(map.get(param), errors);
-            }
+
+            param.validate(map.get(param), errors);
         }
     }
 
-    public final void write(final ParameterWriter writer, final Object value) {
+    protected void doWrite(final ParameterWriter writer, final Object value) {
         final HashMap map = (HashMap) value;
-
         final Iterator params = m_params.iterator();
 
         while (params.hasNext()) {

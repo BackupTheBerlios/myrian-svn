@@ -24,13 +24,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#13 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#14 $
  */
 public abstract class AbstractParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#13 $" +
-        "$Author: rhs $" +
-        "$DateTime: 2003/10/21 22:55:05 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#14 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/10/22 16:13:26 $";
 
     private final String m_name;
     private final Class m_type;
@@ -88,31 +88,31 @@ public abstract class AbstractParameter implements Parameter {
     // Lifecycle events
     //
 
-    public Object read(final ParameterReader reader,
-                       final ErrorList errors) {
+    public final Object read(final ParameterReader reader,
+                             final ErrorList errors) {
         if (Assert.isEnabled()) {
             Assert.exists(reader, ParameterReader.class);
             Assert.exists(errors, ErrorList.class);
         }
 
+        return doRead(reader, errors);
+    }
+
+    protected Object doRead(final ParameterReader reader,
+                            final ErrorList errors) {
         final String string = reader.read(this, errors);
 
         if (string == null) {
             return null;
         } else {
-            final Object value = unmarshal(string, errors);
-
-            if (isRequired() && value == null) {
-                final ParameterError error = new ParameterError
-                    (this, "The value must not be null");
-                errors.add(error);
-            }
-
-            return value;
+            return unmarshal(string, errors);
         }
     }
 
+    // value != null
     protected Object unmarshal(final String value, final ErrorList errors) {
+        Assert.exists(value, String.class);
+
         try {
             return Converters.convert(m_type, value);
         } catch (ConversionException ce) {
@@ -121,21 +121,51 @@ public abstract class AbstractParameter implements Parameter {
         }
     }
 
-    // XXX to find and root out the old signature.
-    protected final Object unmarshal(final String value, final List errors) {
-        return null;
+    public final void validate(Object value, final ErrorList errors) {
+        Assert.exists(errors, ErrorList.class);
+
+        if (value == null) {
+            value = getDefaultValue();
+        }
+
+        if (isRequired() && value == null) {
+            final ParameterError error = new ParameterError
+                (this, "The value must not be null");
+            errors.add(error);
+            return;
+        }
+
+        if (isRequired() && value != null) {
+            doValidate(value, errors);
+            return;
+        }
+
+        if (!isRequired() && value == null) {
+            // Do nothing
+        }
+
+        if (!isRequired() && value != null) {
+            doValidate(value, errors);
+            return;
+        }
     }
 
-    public void validate(final Object value, final ErrorList errors) {
+    // value != null
+    protected void doValidate(final Object value, final ErrorList errors) {
+        Assert.exists(value, Object.class);
+
         // Nothing
     }
 
-    // XXX to find and root out the old signature.
-    protected final void validate(final Object value, final List errors) {
-        // Nothing
+    public final void write(final ParameterWriter writer, final Object value) {
+        Assert.exists(writer);
+
+        // XXX what to do about nulls here?
+
+        doWrite(writer, value);
     }
 
-    public void write(final ParameterWriter writer, final Object value) {
+    protected void doWrite(final ParameterWriter writer, final Object value) {
         writer.write(this, marshal(value));
     }
 
@@ -148,6 +178,6 @@ public abstract class AbstractParameter implements Parameter {
     }
 
     public String toString() {
-        return super.toString() + " [" + getName() + "," + isRequired() + "]";
+        return super.toString() + "," + getName() + "," + isRequired();
     }
 }
