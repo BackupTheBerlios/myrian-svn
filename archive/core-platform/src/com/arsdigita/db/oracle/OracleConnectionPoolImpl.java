@@ -29,19 +29,28 @@ import org.apache.log4j.Category;
  * Connection pooling class using Oracle implementation.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#1 $ $DateTime: 2002/05/12 18:23:13 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#2 $ $DateTime: 2002/06/10 19:04:44 $
  * @since  
  * 
  */
 
 public class OracleConnectionPoolImpl extends BaseConnectionPool {
 
-    private static final String versionId = "$Author: dennis $ - $Date: 2002/05/12 $ $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#1 $";
+    private static final String versionId = "$Author: jorris $ - $Date: 2002/06/10 $ $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#2 $";
 
     private static OracleDataSource ods = null;
 
     private static Category cat = Category.getInstance(OracleConnectionPoolImpl.class.getName());
-	 
+
+    private static boolean s_useFixFor901 = false;
+
+    public static void setUseFixFor901(final boolean flag) {
+        s_useFixFor901 = flag;
+        if (flag == true) {
+            cat.warn("Executing fix for oracle 901.");
+        }
+    }
+
     public void setConnectionInfo(String url, String username,
                                   String password) throws SQLException { 
         try {
@@ -61,7 +70,13 @@ public class OracleConnectionPoolImpl extends BaseConnectionPool {
     protected java.sql.Connection getNewConnection() 
             throws java.sql.SQLException {
         try { 
-            return ods.getConnection();
+            java.sql.Connection con = ods.getConnection();
+            if (s_useFixFor901) {
+                java.sql.PreparedStatement stmt = con.prepareStatement( "alter session set \"_push_join_union_view\" = false");
+                stmt.execute();
+            }
+            return con;
+
         } catch (SQLException e) {
             cat.error("Error getting new connection", e);
             SQLExceptionHandler.throwSQLException(e);

@@ -28,7 +28,7 @@ public class Initializer
 
     private Configuration m_conf = new Configuration();
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#2 $ by $Author: jorris $, $DateTime: 2002/06/10 19:04:44 $";
 
     public Initializer() throws InitializationException {
         m_conf.initParameter("jdbcUrl", 
@@ -69,6 +69,9 @@ public class Initializer
                              "Meaning is determined by the particular " +
                              "connection pool in use.",
                              String.class);
+        m_conf.initParameter("useFixForOracle901",
+                             "Turns on a fix specific to oracle 9.0.1. Corrects qctcte1 bug",
+                             String.class);
     }
 
     public Configuration getConfiguration() {
@@ -90,12 +93,18 @@ public class Initializer
         String driverSpecificParam1 = 
             (String)m_conf.getParameter("driverSpecificParam1");
 
+        String useFixForOracle901 = (String) m_conf.getParameter("useFixForOracle901");
+
         if ( dbPool == null ) {
             dbPool = "com.arsdigita.db.oracle.OracleConnectionPoolImpl";
         }
 
         if ( sImpl == null ) {
             sImpl = "com.arsdigita.db.oracle.OracleSequenceImpl";
+        }
+
+        if (null != useFixForOracle901 &&  useFixForOracle901.equals("true")) {
+            com.arsdigita.db.oracle.OracleConnectionPoolImpl.setUseFixFor901(true);
         }
 
         if (retryLimit == null) {
