@@ -60,7 +60,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/02/24 $
+ * @version $Revision: #4 $ $Date: 2004/03/03 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -736,24 +736,37 @@ public class Session {
                 return (PropertyMap) obj;
             }
 
-            OID oid = ((DataObjectImpl) obj).getOID();
-            PropertyMap result = new PropertyMap(getObjectType(obj));
-            for (Iterator it = oid.getProperties().entrySet().iterator();
-                 it.hasNext(); ) {
-                Map.Entry me = (Map.Entry) it.next();
-                result.put(getObjectType(obj)
-                           .getProperty((String) me.getKey()), me.getValue());
+            final DataObjectImpl dobj = (DataObjectImpl) obj;
+
+            if (dobj.p_pMap == null) {
+                final PropertyMap pMap = new PropertyMap(getObjectType(obj));
+                final Iterator it =
+                    dobj.getOID().getProperties().entrySet().iterator();
+
+                while (it.hasNext()) {
+                    Map.Entry me = (Map.Entry) it.next();
+                    pMap.put(getObjectType(obj)
+                             .getProperty((String) me.getKey()), me.getValue());
+                }
+                dobj.p_pMap = pMap;
             }
-            return result;
+            return dobj.p_pMap;
         }
 
-        public com.redhat.persistence.metadata.ObjectType getObjectType
-            (Object obj) {
+        public com.redhat.persistence.metadata.ObjectType
+            getObjectType(Object obj) {
+
             if (obj instanceof PropertyMap) {
                 return ((PropertyMap) obj).getObjectType();
             }
-            return C.type(this.getRoot(),
-                          ((DataObjectImpl) obj).getObjectType());
+
+            final DataObjectImpl dobj = (DataObjectImpl) obj;
+            if (dobj.p_objectType== null) {
+                dobj.p_objectType =
+                    C.type(this.getRoot(), dobj.getObjectType());
+            }
+
+            return dobj.p_objectType;
         }
     }
 

@@ -15,12 +15,12 @@ import java.io.*;
  * SQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/03/03 $
+ * @version $Revision: #5 $ $Date: 2004/03/03 $
  */
 
 public class SQLParser {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/common/SQLParser.jj#4 $ by $Author: rhs $, $DateTime: 2004/03/03 00:12:51 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/common/SQLParser.jj#5 $ by $Author: rhs $, $DateTime: 2004/03/03 18:47:37 $";
 
     public static interface Mapper {
         Path map(Path path);
@@ -188,12 +188,12 @@ TOKEN [IGNORE_CASE]:
   | <ELSE: "else">
   | <END: "end">
   | <AS: "as">
+  | <FROM: "from"> // we don't treat this as a clause because of ANSI date syntax e.g., extract(epoch from ...)
 // Clause beginnings
   | <SELECT: "select">
   | <INSERT_INTO: "insert" <WS> "into">
   | <UPDATE: "update">
   | <DELETE_FROM: "delete" <WS> "from">
-  | <FROM: "from">
   | <WHERE: "where">
   | <WITH: "with">
   | <START_WITH: "start" <WS> "with">
@@ -250,7 +250,8 @@ void symbol() :
 }
 {
  (
-    t = <PERIOD>
+    t = <FROM> // see comment above
+  | t = <PERIOD>
   | t = <SEMI>
   | t = <CAST>
   | t = <QUESTION_MARK>
@@ -312,7 +313,6 @@ void clauseStart() :
   | t = <INSERT_INTO>
   | t = <UPDATE>
   | t = <DELETE_FROM>
-  | t = <FROM>
   | t = <WHERE>
   | t = <WITH>
   | t = <START_WITH>

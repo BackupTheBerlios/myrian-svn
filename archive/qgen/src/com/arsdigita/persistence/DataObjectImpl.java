@@ -17,8 +17,10 @@ package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.metadata.Property;
+import com.redhat.persistence.PropertyMap;
 import com.redhat.persistence.ProtoException;
 import com.redhat.persistence.Session;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,18 +28,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 /**
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/01/29 $
+ * @version $Revision: #3 $ $Date: 2004/03/03 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataObjectImpl.java#2 $ by $Author: ashah $, $DateTime: 2004/01/29 12:35:08 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataObjectImpl.java#3 $ by $Author: rhs $, $DateTime: 2004/03/03 18:47:37 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -50,6 +53,11 @@ class DataObjectImpl implements DataObject {
     private boolean m_valid = true;
     // originating transaction has terminated
     private boolean m_transactionDone = false;
+
+    // package-scoped, written and read by Session
+    PropertyMap p_pMap;
+     // package-scoped, read/written by Session
+    com.redhat.persistence.metadata.ObjectType p_objectType;
 
     private final class ObserverEntry {
 
@@ -400,6 +408,9 @@ class DataObjectImpl implements DataObject {
     }
 
     public void specialize(ObjectType subtype) {
+        p_pMap = null;
+        p_objectType = null;
+
         validate();
         m_oid.specialize(subtype);
     }

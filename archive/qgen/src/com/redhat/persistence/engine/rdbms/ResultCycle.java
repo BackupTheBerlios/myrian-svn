@@ -15,6 +15,8 @@
 
 package com.redhat.persistence.engine.rdbms;
 
+import com.arsdigita.util.WrappedError;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.apache.log4j.Logger;
@@ -23,12 +25,12 @@ import org.apache.log4j.Logger;
  * ResultCycle
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/03/03 $
  **/
 
 class ResultCycle {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/ResultCycle.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/ResultCycle.java#2 $ by $Author: rhs $, $DateTime: 2004/03/03 18:47:37 $";
 
     private static final Logger LOG = Logger.getLogger(ResultCycle.class);
 
@@ -45,7 +47,7 @@ class ResultCycle {
         m_engine = engine;
         m_rs = rs;
         m_cycle = cycle;
-        if (LOG.isDebugEnabled()) {
+        if (LOG.isInfoEnabled()) {
             m_trace = new Throwable();
         } else {
             m_trace = null;
@@ -55,11 +57,11 @@ class ResultCycle {
     protected void finalize() {
         if (m_rs != null) {
             LOG.warn("ResultSet  was not closed.  " +
-                     "Turn on debug logging for " + this.getClass() +
+                     "Turn on INFO logging for " + this.getClass() +
                      " to see the stack trace for this ResultSet.");
 
             if (m_trace != null) {
-                LOG.debug("The ResultSet was created at: ", m_trace);
+                LOG.info("The ResultSet was created at: ", m_trace);
             }
 
             m_rs = null;
@@ -75,9 +77,9 @@ class ResultCycle {
     }
 
     public boolean next() {
-	if (m_rs == null) {
-	    throw new IllegalStateException("result set closed");
-	}
+        if (m_rs == null) {
+            throw new IllegalStateException("result set closed");
+        }
         try {
             if (m_cycle != null) { m_cycle.beginNext(); }
             boolean result = m_rs.next();
@@ -86,25 +88,25 @@ class ResultCycle {
             return result;
         } catch (SQLException e) {
             if (m_cycle != null) { m_cycle.endNext(e); }
-            throw new Error(e.getMessage());
+            throw new WrappedError(e);
         }
     }
 
     public void close() {
         if (m_rs == null) { return; }
         try {
-	    if (LOG.isDebugEnabled()) {
-		LOG.debug("Closing Statement because resultset was closed.");
-	    }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Closing Statement because resultset was closed.");
+            }
             if (m_cycle != null) { m_cycle.beginClose(); }
-	    m_rs.getStatement().close();
+            m_rs.getStatement().close();
             m_rs.close();
             if (m_cycle != null) { m_cycle.endClose(); }
             m_rs = null;
-	    m_engine.release();
+            m_engine.release();
         } catch (SQLException e) {
             if (m_cycle != null) { m_cycle.endClose(e); }
-            throw new Error(e.getMessage());
+            throw new WrappedError(e);
         }
     }
 

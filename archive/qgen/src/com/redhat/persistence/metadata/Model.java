@@ -21,12 +21,12 @@ import java.util.HashMap;
  * Model
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/03/03 $
  **/
 
 public class Model {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/metadata/Model.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/metadata/Model.java#2 $ by $Author: rhs $, $DateTime: 2004/03/03 18:47:37 $";
 
     private static final HashMap MODELS = new HashMap();
 
@@ -64,12 +64,19 @@ public class Model {
         return result;
     }
 
-    private Model m_parent;
-    private String m_name;
+    private final Model m_parent;
+    private final String m_name;
+    private final String m_qualifiedName;
 
     private Model(Model parent, String name) {
         m_parent = parent;
         m_name = name;
+        if (m_parent == null) {
+            m_qualifiedName = m_name;
+        } else {
+            m_qualifiedName = m_parent.getQualifiedName() + "." + m_name;
+        }
+
     }
 
     public Model getParent() {
@@ -81,11 +88,7 @@ public class Model {
     }
 
     public String getQualifiedName() {
-        if (m_parent == null) {
-            return m_name;
-        } else {
-            return m_parent.getQualifiedName() + "." + m_name;
-        }
+        return  m_qualifiedName;
     }
 
 }

@@ -26,24 +26,30 @@ import java.util.List;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/12/30 $
+ * @version $Revision: #3 $ $Date: 2004/03/03 $
  **/
 
 public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/metadata/ObjectType.java#2 $ by $Author: rhs $, $DateTime: 2003/12/30 22:29:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/metadata/ObjectType.java#3 $ by $Author: rhs $, $DateTime: 2004/03/03 18:47:37 $";
 
-    private Model m_model;
-    private String m_name;
+    private final Model m_model;
+    private final String m_name;
+    private final String m_qualifiedName;
     private Class m_class;
-    private ObjectType m_super;
-    private Mist m_properties = new Mist(this);
-    private ArrayList m_immediates = new ArrayList();
+    private final ObjectType m_super;
+    private final Mist m_properties = new Mist(this);
+    private final ArrayList m_immediates = new ArrayList();
 
     public ObjectType(Model model, String name, ObjectType supertype) {
         m_model = model;
         m_name = name;
         m_super = supertype;
+        if (m_model == null) {
+            m_qualifiedName = m_name;
+        } else {
+            m_qualifiedName = m_model.getQualifiedName() + "." + m_name;
+        }
     }
 
     public Root getRoot() {
@@ -67,11 +73,7 @@ public class ObjectType extends Element {
     }
 
     public String getQualifiedName() {
-        if (m_model == null) {
-            return m_name;
-        } else {
-            return m_model.getQualifiedName() + "." + m_name;
-        }
+        return m_qualifiedName;
     }
 
     public ObjectType getSupertype() {

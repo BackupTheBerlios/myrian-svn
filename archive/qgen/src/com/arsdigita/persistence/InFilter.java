@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -15,6 +15,7 @@
 
 package com.arsdigita.persistence;
 
+import com.arsdigita.db.DbHelper;
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.metadata.MetadataException;
 import com.redhat.persistence.metadata.ObjectMap;
@@ -28,14 +29,14 @@ import org.apache.log4j.Logger;
  * InFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/03/03 $
  **/
 
 class InFilter extends FilterImpl implements Filter {
 
     private static Logger s_log = Logger.getLogger(InFilter.class);
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/InFilter.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/InFilter.java#2 $ by $Author: rhs $, $DateTime: 2004/03/03 18:47:37 $";
 
     private Root m_root;
     private String m_prop;
@@ -88,10 +89,25 @@ class InFilter extends FilterImpl implements Filter {
                 (m_root, block, "no such path: " + subProp);
         }
 
-        return "exists ( select RAW[subquery_id] from (select RAW[" +
-            subcol.getPath() + "] as RAW[subquery_id] from (" +
-            m_query + ") RAW[insub1] ) RAW[insub2] where " +
-            "RAW[insub2.subquery_id] = " + m_prop + ")";
-    }
+        final int currentDB = DbHelper.getDatabase();
+        final StringBuffer sb = new StringBuffer();
 
+        if (currentDB == DbHelper.DB_POSTGRES) {
+            sb.append("exists ( select RAW[subquery_id] from (select RAW[");
+            sb.append(subcol.getPath());
+            sb.append("] as RAW[subquery_id] from (");
+            sb.append(m_query);
+            sb.append(") RAW[insub1] ) RAW[insub2] where ");
+            sb.append("RAW[insub2.subquery_id] = ");
+            sb.append(m_prop).append(")");
+        } else if (currentDB == DbHelper.DB_ORACLE) {
+            sb.append(m_prop).append(" in (select RAW[");
+            sb.append(subcol.getPath()).append("] from (");
+            sb.append(m_query).append(") RAW[insub])");
+        } else {
+            throw new IllegalStateException
+                ("Unknown database: " + DbHelper.getDatabaseName(currentDB));
+        }
+        return sb.toString();
+    }
 }

@@ -15,6 +15,7 @@
 
 package com.redhat.persistence.pdl;
 
+import com.arsdigita.util.*;
 import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.pdl.nodes.*;
@@ -28,12 +29,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/02/06 $
+ * @version $Revision: #4 $ $Date: 2004/03/03 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/pdl/PDL.java#3 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/pdl/PDL.java#4 $ by $Author: rhs $, $DateTime: 2004/03/03 18:47:37 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -55,7 +56,7 @@ public class PDL {
             FileNd file = p.file(filename);
             m_ast.add(AST.FILES, file);
         } catch (ParseException e) {
-            throw new Error(filename + ": " + e.getMessage());
+            throw new WrappedError(filename, e);
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -15,61 +15,51 @@
 
 package com.redhat.persistence.common;
 
-import java.util.HashMap;
+import com.arsdigita.util.ConcurrentDict;
 
 /**
  * Path
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/03/03 $
  **/
 
 public class Path {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/common/Path.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/common/Path.java#2 $ by $Author: rhs $, $DateTime: 2004/03/03 18:47:37 $";
 
-    private static final HashMap PATHS = new HashMap();
+    //special case the id path since it shows up so often
+    private static final Path ID_PATH = new Path(null, "id");
+
+    private static final ConcurrentDict DICT =
+        new ConcurrentDict(new Supplier());
+
+    private Path m_parent;  // initialized lazily from m_basename;
+    private final String m_basename;
+    private final String m_name;
+
+    private Path(String basename, String name) {
+        m_basename = basename;
+        m_name = name;
+    }
 
     public static final Path get(String path) {
-        if (path == null) {
-            return null;
+        if ("id".equals(path)) {
+            return ID_PATH;
         }
-
-        Path result;
-
-        synchronized (PATHS) {
-            if (PATHS.containsKey(path)) {
-                result = (Path) PATHS.get(path);
-            } else {
-                int dot = path.lastIndexOf('.');
-                Path parent;
-                String name;
-                if (dot > -1) {
-                    parent = get(path.substring(0, dot));
-                    name = path.substring(dot + 1);
-                } else {
-                    parent = null;
-                    name = path;
-                }
-
-                result = new Path(parent, name);
-                PATHS.put(path, result);
-            }
-        }
-
-        return result;
+        return (Path) DICT.get(path);
     }
 
     public static final Path add(String p1, String p2) {
-	return Path.add(Path.get(p1), Path.get(p2));
+        return Path.get(concat(p1, p2));
     }
 
     public static final Path add(Path p1, String p2) {
-        return Path.add(p1, Path.get(p2));
+        return p1==null ? Path.get(p2) : Path.get(concat(p1.getPath(), p2));
     }
 
     public static final Path add(String p1, Path p2) {
-        return Path.add(Path.get(p1), p2);
+        return p2==null ? Path.get(p1): Path.get(concat(p1, p2.getPath()));
     }
 
     public static final Path add(Path p1, Path p2) {
@@ -78,7 +68,7 @@ public class Path {
         } else if (p2 == null) {
             return p1;
         } else {
-            return Path.get(p1.getPath() + "." + p2.getPath());
+            return Path.get(concat(p1.getPath(),p2.getPath()));
         }
     }
 
@@ -90,16 +80,17 @@ public class Path {
         }
     }
 
-    private Path m_parent;
-    private String m_name;
-
-    private Path(Path parent, String name) {
-        m_parent = parent;
-        m_name = name;
-    }
-
     public Path getParent() {
-        return m_parent;
+        if (m_basename == null) {
+            return null;
+        }
+
+        synchronized(this) {
+            if (m_parent == null ) {
+                m_parent = Path.get(m_basename);
+            }
+            return m_parent;
+        }
     }
 
     public boolean isAncestor(Path path) {
@@ -122,7 +113,7 @@ public class Path {
             if (parent == null) {
                 return path.getName();
             } else {
-                return parent + "." + path.getName();
+                return concat(parent, path.getName());
             }
         }
     }
@@ -136,10 +127,10 @@ public class Path {
     }
 
     public String getPath() {
-        if (m_parent == null) {
+        if (m_basename == null) {
             return m_name;
         } else {
-            return m_parent + "." + m_name;
+            return concat(m_basename, m_name);
         }
     }
 
@@ -147,4 +138,28 @@ public class Path {
         return getPath();
     }
 
+    private static String concat(String s1, String s2) {
+        if (s1 == null ) {
+            return s2;
+        } else if (s2 == null ) {
+            return s1;
+        } else {
+            StringBuffer sb = new StringBuffer(s1.length() + s2.length() + 1);
+            sb.append(s1).append(".").append(s2);
+            return sb.toString();
+        }
+    }
+
+    private static class Supplier implements ConcurrentDict.EntrySupplier {
+        public Object supply(Object key) {
+            String path = (String) key;
+
+            final int dot = path.lastIndexOf('.');
+            if (dot > -1) {
+                return new Path(path.substring(0, dot), path.substring(dot + 1));
+            } else {
+                return new Path(null, path);
+            }
+        }
+    }
 }

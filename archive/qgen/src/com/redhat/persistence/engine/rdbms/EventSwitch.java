@@ -32,12 +32,12 @@ import org.apache.log4j.Logger;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/02/06 $
+ * @version $Revision: #4 $ $Date: 2004/03/03 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#3 $ by $Author: rhs $, $DateTime: 2004/02/06 17:14:57 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#4 $ by $Author: rhs $, $DateTime: 2004/03/03 18:47:37 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 

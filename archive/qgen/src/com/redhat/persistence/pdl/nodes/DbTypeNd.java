@@ -15,16 +15,18 @@
 
 package com.redhat.persistence.pdl.nodes;
 
+import com.arsdigita.util.WrappedError;
+
 /**
  * DbType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/03/03 $
  **/
 
 public class DbTypeNd extends Node {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/pdl/nodes/DbTypeNd.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/pdl/nodes/DbTypeNd.java#2 $ by $Author: rhs $, $DateTime: 2004/03/03 18:47:37 $";
 
     public static final Field NAME =
         new Field(DbTypeNd.class, "name", IdentifierNd.class, 1, 1);
@@ -55,11 +57,11 @@ public class DbTypeNd extends Node {
             java.lang.reflect.Field f = types.getField(type);
             return f.getInt(null);
         } catch (ClassNotFoundException e) {
-            throw new Error(e.getMessage());
+            throw new WrappedError(e);
         } catch (NoSuchFieldException e) {
-            throw new Error(e.getMessage());
+            throw new WrappedError(e);
         } catch (IllegalAccessException e) {
-            throw new Error(e.getMessage());
+            throw new WrappedError(e);
         }
     }
 
