@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/oracle-se/upgrade/6.0.0-6.1.0/update-host-unique-index.sql#1 $
--- $DateTime: 2004/01/05 16:08:50 $
+-- $Id: //core-platform/dev/sql/ccm-core/postgres/upgrade/6.0.1-6.1.0/update-host-unique-index.sql#1 $
+-- $DateTime: 2004/01/15 18:48:26 $
 
 -- Drop old unique index on server name
 alter table web_hosts drop constraint web_hosts_server_name_u_frlsu;
