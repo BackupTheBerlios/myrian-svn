@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/formbuilder/ProcessListener.pdl#8 $ 
-// $DateTime: 2003/08/15 13:46:34 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/formbuilder/ProcessListener.pdl#9 $ 
+// $DateTime: 2003/11/13 23:58:28 $
 
 model com.arsdigita.formbuilder;
 
@@ -28,7 +28,7 @@ object type ProcessListener extends ACSObject {
 
 
 association {
-    FormSection[1..1] form = join bebop_process_listeners.listener_id 
+    FormSection[0..1] form = join bebop_process_listeners.listener_id
                                to bebop_form_process_listeners.listener_id,
                              join bebop_form_process_listeners.form_section_id 
                                to bebop_form_sections.form_section_id;
