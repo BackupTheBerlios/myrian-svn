@@ -190,7 +190,7 @@
     from object_grants
     where object_id = v_object_id;
 
-    if FOUND then
+    if (v_has_children > 0) then
         update object_grants
         set n_grants = n_grants +1
         where object_id = v_object_id;
