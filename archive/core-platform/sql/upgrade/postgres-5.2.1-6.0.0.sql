@@ -11,9 +11,11 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.1-6.0.0.sql#3 $
--- $DateTime: 2003/07/14 08:16:34 $
+-- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.1-6.0.0.sql#4 $
+-- $DateTime: 2003/07/21 01:44:28 $
 
+
+\i ../postgres/upgrade/5.2.0-5.3.0/alter-lucene.sql
 
 begin;
 

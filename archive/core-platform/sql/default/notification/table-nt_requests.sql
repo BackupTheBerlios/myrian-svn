@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/notification/table-nt_requests.sql#4 $
--- $DateTime: 2003/05/01 17:50:37 $
+-- $Id: //core-platform/dev/sql/default/notification/table-nt_requests.sql#5 $
+-- $DateTime: 2003/07/21 01:44:28 $
 
 
 create table nt_requests (
