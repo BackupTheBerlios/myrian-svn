@@ -33,12 +33,12 @@ import org.apache.log4j.Logger;
  * Should be subclassed with database-specific initialization.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #4 $
+ * @version $Revision: #5 $
  * @since 4.6
  */
 public abstract class DbExceptionHandlerBaseImpl implements DbExceptionHandler {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DbExceptionHandlerBaseImpl.java#4 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DbExceptionHandlerBaseImpl.java#5 $";
 
     private static final Logger s_cat = Logger.getLogger(DbExceptionHandlerBaseImpl.class.getName());
 
@@ -71,62 +71,33 @@ public abstract class DbExceptionHandlerBaseImpl implements DbExceptionHandler {
     }
 
     /**
-     * This method throws a more-specific SQLException
+     * This method wraps the given exception with a more-specific SQLException
      * (subclass of com.arsdigita.db.DbException) if one is available.
      *
      * @param e The SQLException to process.
-     * @throws SQLException The passed-in SQLException, re-created as a more
-     *         specific type if possible.
-     */
-    public void throwSQLException(SQLException e) throws SQLException {
+     **/
+
+    public SQLException wrap(SQLException e) {
         // TODO: See if Oracle provides a better API for identifying error #?
         Class c = getExceptionClass(e.getMessage());
         if (c != null) {
             try {
                 DbException newException = (DbException)(c.newInstance());
                 newException.setRootCause(e);
-                throw newException;
+                return newException;
             } catch (InstantiationException err) {
                 s_cat.warn("InstantiationException throwing DbException " +
                            c + ", throwing SQLException instead.");
-                throw e;
+                return e;
             } catch (IllegalAccessException err) {
                 s_cat.warn("IllegalAccessException throwing DbException " +
                            c + ", throwing SQLException instead.");
-                throw e;
+                return e;
             }
         } else {
             // no specific error type found
-            throw e;
+            return e;
         }
     }
 
-    /**
-     * This method throws a new SQLException, or a specific subtype
-     * if one is available for the specified message.
-     *
-     * @param msg The message for the new SQLException.
-     * @throws SQLException with the passed-in msg.
-     */
-    public void throwSQLException(String msg) throws SQLException {
-        Class c = getExceptionClass(msg);
-        if (c != null) {
-            try {
-                DbException newException = (DbException)(c.newInstance());
-                newException.setRootCause(msg);
-                throw newException;
-            } catch (InstantiationException err) {
-                s_cat.warn("InstantiationException throwing DbException " +
-                           c + ", throwing SQLException instead.");
-                throw new SQLException(msg);
-            } catch (IllegalAccessException err) {
-                s_cat.warn("IllegalAccessException throwing DbException " +
-                           c + ", throwing SQLException instead.");
-                throw new SQLException(msg);
-            }
-        } else {
-            // no specific error type found
-            throw new SQLException(msg);
-        }
-    }
 }

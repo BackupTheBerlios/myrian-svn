@@ -25,12 +25,12 @@ import java.util.Properties;
  * a "real" implementation of java.sql.Driver
  *
  * @author <a href="mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/10/04 $
  * @since 4.5
  */
 class Driver implements java.sql.Driver {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Driver.java#3 $ $Author: dennis $ $Date: 2002/08/14 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Driver.java#4 $ $Author: rhs $ $Date: 2002/10/04 $";
 
     // The Driver object we wrap
     private java.sql.Driver driver;
@@ -50,8 +50,7 @@ class Driver implements java.sql.Driver {
         try {
             return driver.acceptsURL(url);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw SQLExceptionHandler.wrap(e);
         }
     }
 
@@ -63,8 +62,7 @@ class Driver implements java.sql.Driver {
         try {
             return com.arsdigita.db.Connection.wrap(driver.connect(url, info), null);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw SQLExceptionHandler.wrap(e);
         }
     }
 
@@ -90,8 +88,7 @@ class Driver implements java.sql.Driver {
         try {
             return driver.getPropertyInfo(url, info);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw SQLExceptionHandler.wrap(e);
         }
     }
 

@@ -42,12 +42,12 @@ import org.apache.log4j.Logger;
  * </ul>
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/10/04 $
  * @since 4.5
  */
 public class ResultSet implements java.sql.ResultSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/ResultSet.java#4 $ $Author: dennis $ $Date: 2002/08/14 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/ResultSet.java#5 $ $Author: rhs $ $Date: 2002/10/04 $";
 
     private static final Logger s_cat = Logger.getLogger(com.arsdigita.db.ResultSet.class.getName());
 
@@ -83,8 +83,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.absolute(row);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -96,8 +95,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.afterLast();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -109,8 +107,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.beforeFirst();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -122,8 +119,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.cancelRowUpdates();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -134,8 +130,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.clearWarnings();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -158,8 +153,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.close();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
         fireClosedListeners();
         if (s_cat.isDebugEnabled()) {
@@ -206,8 +200,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.deleteRow();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -221,8 +214,7 @@ public class ResultSet implements java.sql.ResultSet {
         } catch (SQLException e) {
             s_cat.warn("Could not retrieve the column named: \"" +
                        columnName + "\"");
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -233,8 +225,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.first();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -247,8 +238,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getArray(i);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -261,8 +251,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getArray(colName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -274,8 +263,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getAsciiStream(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -287,8 +275,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getAsciiStream(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -301,8 +288,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getBigDecimal(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -314,8 +300,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getBigDecimal(columnIndex, scale);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -328,8 +313,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getBigDecimal(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -341,8 +325,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getBigDecimal(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -356,8 +339,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getBinaryStream(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -369,8 +351,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getBinaryStream(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -383,8 +364,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getBlob(i);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -397,8 +377,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getBlob(colName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -411,8 +390,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getBoolean(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -425,8 +403,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getBoolean(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -439,8 +416,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getByte(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -453,8 +429,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getByte(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -467,8 +442,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getBytes(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -481,8 +455,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getBytes(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -494,8 +467,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getCharacterStream(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -507,8 +479,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getCharacterStream(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -521,8 +492,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getClob(i);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -535,8 +505,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getClob(colName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -547,8 +516,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getConcurrency();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -560,8 +528,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getCursorName();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -574,8 +541,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getDate(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -588,8 +554,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getDate(columnIndex, cal);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -602,8 +567,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getDate(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -616,8 +580,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getDate(columnName, cal);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -630,8 +593,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getDouble(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -644,8 +606,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getDouble(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -656,8 +617,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getFetchDirection();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -668,8 +628,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getFetchSize();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -682,8 +641,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getFloat(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -696,8 +654,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getFloat(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -710,8 +667,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getInt(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -724,8 +680,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getInt(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -738,8 +693,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getLong(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -752,8 +706,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getLong(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -765,8 +718,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getMetaData();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -779,8 +731,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getObject(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -793,8 +744,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getObject(i, map);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -807,8 +757,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getObject(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -821,8 +770,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getObject(colName, map);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -835,8 +783,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getRef(i);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -849,8 +796,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getRef(colName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -859,8 +805,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getRow();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -873,8 +818,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getShort(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -887,8 +831,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getShort(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -909,8 +852,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getString(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -923,8 +865,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getString(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -937,8 +878,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getTime(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -951,8 +891,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getTime(columnIndex, cal);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -965,8 +904,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getTime(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -979,8 +917,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getTime(columnName, cal);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -993,8 +930,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getTimestamp(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1009,8 +945,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getTimestamp(columnIndex, cal);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1022,8 +957,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getTimestamp(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1038,8 +972,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getTimestamp(columnName, cal);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1050,8 +983,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getType();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1062,8 +994,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getUnicodeStream(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1075,8 +1006,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getUnicodeStream(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1088,8 +1018,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.getWarnings();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1101,8 +1030,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.insertRow();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1114,8 +1042,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.isAfterLast();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1127,8 +1054,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.isBeforeFirst();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1140,8 +1066,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.isFirst();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1153,8 +1078,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.isLast();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1165,8 +1089,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.last();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1178,8 +1101,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.moveToCurrentRow();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1190,8 +1112,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.moveToInsertRow();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1202,8 +1123,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.next();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1215,8 +1135,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.previous();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1228,8 +1147,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.refreshRow();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1241,8 +1159,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.relative(rows);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1253,8 +1170,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.rowDeleted();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1265,8 +1181,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.rowInserted();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1277,8 +1192,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.rowUpdated();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1290,8 +1204,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.setFetchDirection(direction);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1304,8 +1217,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.setFetchSize(rows);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1317,8 +1229,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateAsciiStream(columnIndex, x, length);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1330,8 +1241,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateAsciiStream(columnName, x, length);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1344,8 +1254,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateBigDecimal(columnIndex, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1358,8 +1267,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateBigDecimal(columnName, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1371,8 +1279,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateBinaryStream(columnIndex, x, length);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1384,8 +1291,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateBinaryStream(columnName, x, length);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1396,8 +1302,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateBoolean(columnIndex, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1409,8 +1314,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateBoolean(columnName, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1421,8 +1325,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateByte(columnIndex, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1433,8 +1336,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateByte(columnName, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1445,8 +1347,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateBytes(columnIndex, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1457,8 +1358,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateBytes(columnName, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1471,8 +1371,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateCharacterStream(columnIndex, x, length);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1486,8 +1385,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateCharacterStream(columnName, reader, length);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1498,8 +1396,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateDate(columnIndex, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1510,8 +1407,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateDate(columnName, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1522,8 +1418,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateDouble(columnIndex, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1534,8 +1429,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateDouble(columnName, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1546,8 +1440,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateFloat(columnIndex, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1558,8 +1451,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateFloat(columnName, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1570,8 +1462,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateInt(columnIndex, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1582,8 +1473,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateInt(columnName, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1594,8 +1484,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateLong(columnIndex, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1606,8 +1495,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateLong(columnName, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1618,8 +1506,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateNull(columnIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1630,8 +1517,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateNull(columnName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1642,8 +1528,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateObject(columnIndex, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1655,8 +1540,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateObject(columnIndex, x, scale);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1667,8 +1551,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateObject(columnName, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1680,8 +1563,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateObject(columnName, x, scale);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1693,8 +1575,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateRow();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1705,8 +1586,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateShort(columnIndex, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1717,8 +1597,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateShort(columnName, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1729,8 +1608,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateString(columnIndex, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1741,8 +1619,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateString(columnName, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1753,8 +1630,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateTime(columnIndex, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1765,8 +1641,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateTime(columnName, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1779,8 +1654,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateTimestamp(columnIndex, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1793,8 +1667,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             m_rset.updateTimestamp(columnName, x);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1806,8 +1679,7 @@ public class ResultSet implements java.sql.ResultSet {
         try {
             return m_rset.wasNull();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 
@@ -1850,8 +1722,7 @@ public class ResultSet implements java.sql.ResultSet {
                 return new com.arsdigita.db.ResultSet(stmt, rset);
             }
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw conn.wrap(e);
         }
     }
 
@@ -1878,8 +1749,7 @@ public class ResultSet implements java.sql.ResultSet {
                 l.resultSetClosed(event);
             }
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_stmt.m_conn.wrap(e);
         }
     }
 }

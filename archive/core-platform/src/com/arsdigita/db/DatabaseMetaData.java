@@ -23,12 +23,12 @@ import java.sql.SQLException;
  * that wraps a "real" implementation of java.sql.DatabaseMetaData
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/10/04 $
  * @since 4.5
  */
 public class DatabaseMetaData implements java.sql.DatabaseMetaData {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DatabaseMetaData.java#3 $ $Author: dennis $ $Date: 2002/08/14 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DatabaseMetaData.java#4 $ $Author: rhs $ $Date: 2002/10/04 $";
 
     // the object we wrap
     private java.sql.DatabaseMetaData m_metaData;
@@ -53,8 +53,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.allProceduresAreCallable();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -66,8 +65,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.allTablesAreSelectable();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -80,8 +78,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.dataDefinitionCausesTransactionCommit();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -93,8 +90,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.dataDefinitionIgnoredInTransactions();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -106,8 +102,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.deletesAreDetected(type);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -119,8 +114,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.doesMaxRowSizeIncludeBlobs();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -142,8 +136,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
                                                                     nullable);
             return ResultSet.wrap(m_conn, rs);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -154,8 +147,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return ResultSet.wrap(m_conn, m_metaData.getCatalogs());
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -166,8 +158,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getCatalogSeparator();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -178,8 +169,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getCatalogTerm();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -200,8 +190,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
                                                                    columnNamePattern);
             return ResultSet.wrap(m_conn, rs);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -221,8 +210,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
                                                           columnNamePattern);
             return ResultSet.wrap(m_conn, rs);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -259,8 +247,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
                                                                  foreignTable);
             return ResultSet.wrap(m_conn, rs);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -271,8 +258,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getDatabaseProductName();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -283,8 +269,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getDatabaseProductVersion();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -296,8 +281,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getDefaultTransactionIsolation();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -322,8 +306,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getDriverName();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -334,8 +317,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getDriverVersion();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -352,8 +334,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
                                                                table);
             return ResultSet.wrap(m_conn, rs);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -365,8 +346,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getExtraNameCharacters();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -378,8 +358,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getIdentifierQuoteString();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -396,8 +375,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
             java.sql.ResultSet rs = m_metaData.getImportedKeys(catalog, schema, table);
             return ResultSet.wrap(m_conn, rs);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -414,8 +392,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
                                                             approximate);
             return ResultSet.wrap(m_conn, rs);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -427,8 +404,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxBinaryLiteralLength();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -439,8 +415,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxCatalogNameLength();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -451,8 +426,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxCharLiteralLength();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -463,8 +437,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxColumnNameLength();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -476,8 +449,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxColumnsInGroupBy();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -488,8 +460,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxColumnsInIndex();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -501,8 +472,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxColumnsInOrderBy();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -513,8 +483,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxColumnsInSelect();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -525,8 +494,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxColumnsInTable();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -538,8 +506,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxConnections();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -550,8 +517,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxCursorNameLength();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -563,8 +529,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxIndexLength();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -575,8 +540,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxProcedureNameLength();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -587,8 +551,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxRowSize();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -599,8 +562,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxSchemaNameLength();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -611,8 +573,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxStatementLength();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -624,8 +585,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxStatements();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -636,8 +596,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxTableNameLength();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -648,8 +607,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxTablesInSelect();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -660,8 +618,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getMaxUserNameLength();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -672,8 +629,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getNumericFunctions();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -688,8 +644,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
                                                               table);
             return ResultSet.wrap(m_conn, rs);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -710,8 +665,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
                                                columnNamePattern);
             return ResultSet.wrap(m_conn, rs);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -728,8 +682,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
                                                              procedureNamePattern);
             return ResultSet.wrap(m_conn, rs);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -741,8 +694,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getProcedureTerm();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -754,8 +706,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
             java.sql.ResultSet rs = m_metaData.getSchemas();
             return ResultSet.wrap(m_conn, rs);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -766,8 +717,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getSchemaTerm();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -779,8 +729,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getSearchStringEscape();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -792,8 +741,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getSQLKeywords();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -804,8 +752,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getStringFunctions();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -816,8 +763,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getSystemFunctions();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -835,8 +781,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
                                                                   tableNamePattern);
             return ResultSet.wrap(m_conn, rs);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -853,8 +798,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
                                                          tableNamePattern, types);
             return ResultSet.wrap(m_conn, rs);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -866,8 +810,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
             java.sql.ResultSet rs = m_metaData.getTableTypes();
             return ResultSet.wrap(m_conn, rs);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -878,8 +821,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getTimeDateFunctions();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -891,8 +833,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return ResultSet.wrap(m_conn, m_metaData.getTypeInfo());
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -908,8 +849,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
                                                        typeNamePattern, types);
             return ResultSet.wrap(m_conn, rs);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -920,8 +860,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getURL();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -932,8 +871,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.getUserName();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -950,8 +888,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
                                                                  table);
             return ResultSet.wrap(m_conn, rs);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -963,8 +900,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.insertsAreDetected(type);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -976,8 +912,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.isCatalogAtStart();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -988,8 +923,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.isReadOnly();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1002,8 +936,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.nullPlusNonNullIsNull();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1014,8 +947,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.nullsAreSortedAtEnd();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1027,8 +959,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.nullsAreSortedAtStart();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1039,8 +970,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.nullsAreSortedHigh();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1051,8 +981,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.nullsAreSortedLow();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1063,8 +992,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.othersDeletesAreVisible(type);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1075,8 +1003,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.othersInsertsAreVisible(type);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1087,8 +1014,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.othersUpdatesAreVisible(type);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1099,8 +1025,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.ownDeletesAreVisible(type);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1111,8 +1036,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.ownInsertsAreVisible(type);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1123,8 +1047,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.ownUpdatesAreVisible(type);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1136,8 +1059,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.storesLowerCaseIdentifiers();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1149,8 +1071,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.storesLowerCaseQuotedIdentifiers();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1162,8 +1083,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.storesMixedCaseIdentifiers();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1175,8 +1095,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.storesMixedCaseQuotedIdentifiers();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1188,8 +1107,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.storesUpperCaseIdentifiers();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1201,8 +1119,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.storesUpperCaseQuotedIdentifiers();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1213,8 +1130,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsAlterTableWithAddColumn();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1225,8 +1141,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsAlterTableWithDropColumn();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1238,8 +1153,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsANSI92EntryLevelSQL();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1250,8 +1164,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsANSI92FullSQL();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1262,8 +1175,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsANSI92IntermediateSQL();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1274,8 +1186,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsBatchUpdates();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1287,8 +1198,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsCatalogsInDataManipulation();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1300,8 +1210,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsCatalogsInIndexDefinitions();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1314,8 +1223,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsCatalogsInPrivilegeDefinitions();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1326,8 +1234,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsCatalogsInProcedureCalls();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1338,8 +1245,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsCatalogsInTableDefinitions();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1350,8 +1256,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsColumnAliasing();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1362,8 +1267,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsConvert();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1375,8 +1279,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsConvert(fromType, toType);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1387,8 +1290,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsCoreSQLGrammar();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1400,8 +1302,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsCorrelatedSubqueries();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1415,8 +1316,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
             return
                 m_metaData.supportsDataDefinitionAndDataManipulationTransactions();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1429,8 +1329,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsDataManipulationTransactionsOnly();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1443,8 +1342,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsDifferentTableCorrelationNames();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1455,8 +1353,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsExpressionsInOrderBy();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1467,8 +1364,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsExtendedSQLGrammar();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1479,8 +1375,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsFullOuterJoins();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1491,8 +1386,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsGroupBy();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1504,8 +1398,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsGroupByBeyondSelect();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1516,8 +1409,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsGroupByUnrelated();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1529,8 +1421,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsIntegrityEnhancementFacility();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1542,8 +1433,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsLikeEscapeClause();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1555,8 +1445,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsLimitedOuterJoins();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1568,8 +1457,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsMinimumSQLGrammar();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1582,8 +1470,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsMixedCaseIdentifiers();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1596,8 +1483,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsMixedCaseQuotedIdentifiers();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1608,8 +1494,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsMultipleResultSets();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1621,8 +1506,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsMultipleTransactions();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1634,8 +1518,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsNonNullableColumns();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1646,8 +1529,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsOpenCursorsAcrossCommit();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1658,8 +1540,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsOpenCursorsAcrossRollback();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1670,8 +1551,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsOpenStatementsAcrossCommit();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1683,8 +1563,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsOpenStatementsAcrossRollback();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1696,8 +1575,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsOrderByUnrelated();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1708,8 +1586,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsOuterJoins();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1720,8 +1597,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsPositionedDelete();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1732,8 +1608,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsPositionedUpdate();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1746,8 +1621,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsResultSetConcurrency(type, concurrency);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1758,8 +1632,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsResultSetType(type);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1770,8 +1643,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsSchemasInDataManipulation();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1782,8 +1654,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsSchemasInIndexDefinitions();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1796,8 +1667,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsSchemasInPrivilegeDefinitions();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1808,8 +1678,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsSchemasInProcedureCalls();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1820,8 +1689,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsSchemasInTableDefinitions();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1832,8 +1700,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsSelectForUpdate();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1845,8 +1712,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsStoredProcedures();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1858,8 +1724,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsSubqueriesInComparisons();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1871,8 +1736,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsSubqueriesInExists();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1884,8 +1748,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsSubqueriesInIns();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1897,8 +1760,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsSubqueriesInQuantifieds();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1910,8 +1772,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsTableCorrelationNames();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1925,8 +1786,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsTransactionIsolationLevel(level);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1938,8 +1798,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsTransactions();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1950,8 +1809,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsUnion();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1962,8 +1820,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.supportsUnionAll();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1975,8 +1832,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.updatesAreDetected(type);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1987,8 +1843,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.usesLocalFilePerTable();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -1999,8 +1854,7 @@ public class DatabaseMetaData implements java.sql.DatabaseMetaData {
         try {
             return m_metaData.usesLocalFiles();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 

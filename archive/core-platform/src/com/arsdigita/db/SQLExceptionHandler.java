@@ -31,12 +31,12 @@ import java.sql.SQLException;
  * (normally this is called via the DB Initializer).
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #6 $
+ * @version $Revision: #7 $
  * @since 4.6
  */
 public class SQLExceptionHandler {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/SQLExceptionHandler.java#6 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/SQLExceptionHandler.java#7 $";
 
     private static String s_exceptionHandlerName = "com.arsdigita.db.oracle.OracleDbExceptionHandlerImpl";
 
@@ -65,36 +65,13 @@ public class SQLExceptionHandler {
     }
 
     /**
-     * This method throws a more-specific SQLException
-     * (subclass of com.arsdigita.db.DbException) if one is available.
-     *
-     * @throws SQLException a SQLException, re-created as a more specific
-     *         type if possible.
-     */
-    public static void throwSQLException(SQLException e) throws SQLException {
+     * This method wraps the given SQL exception with a more-specific
+     * SQLException * (subclass of com.arsdigita.db.DbException) if one is
+     * available.
+     **/
+    public static SQLException wrap(SQLException e) {
         Assert.assertNotNull(s_handler, "DB Specific Exception Handler Class");
-        try {
-            s_handler.throwSQLException(e);
-        } catch (DbNotAvailableException dbe) {
-            ConnectionManager.dbDown();
-            throw dbe;
-        }
+        return s_handler.wrap(e);
     }
 
-    /**
-     * This method throws a new SQLException, or a specific subtype
-     * if one is available for the specified message.
-     *
-     * @param msg The message for the new SQLException.
-     * @throws SQLException with the passed-in msg.
-     */
-    public static void throwSQLException(String msg) throws SQLException {
-        Assert.assertNotNull(s_handler, "DB Specific Exception Handler Class");
-        try {
-            s_handler.throwSQLException(msg);
-        } catch (DbNotAvailableException dbe) {
-            ConnectionManager.dbDown();
-            throw dbe;
-        }
-    }
 }

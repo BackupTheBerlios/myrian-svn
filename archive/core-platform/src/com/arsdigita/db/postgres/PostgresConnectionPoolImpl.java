@@ -17,6 +17,7 @@ package com.arsdigita.db.postgres;
 
 import com.arsdigita.db.BaseConnectionPool;
 import com.arsdigita.db.SQLExceptionHandler;
+import com.arsdigita.db.DbException;
 
 import java.sql.SQLException;
 
@@ -26,14 +27,14 @@ import org.apache.log4j.Logger;
  * Connection pooling class for PosgreSQL databases.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresConnectionPoolImpl.java#6 $ $DateTime: 2002/10/02 13:49:31 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresConnectionPoolImpl.java#7 $ $DateTime: 2002/10/04 18:08:01 $
  * @since 4.5
  *
  */
 
 public class PostgresConnectionPoolImpl extends BaseConnectionPool {
 
-    public static final String versionId = "$Author: rhs $ - $Date: 2002/10/02 $ $Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresConnectionPoolImpl.java#6 $";
+    public static final String versionId = "$Author: rhs $ - $Date: 2002/10/04 $ $Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresConnectionPoolImpl.java#7 $";
 
     private static final Logger s_log = Logger.getLogger(PostgresConnectionPoolImpl.class.getName());
 
@@ -43,11 +44,8 @@ public class PostgresConnectionPoolImpl extends BaseConnectionPool {
         try {
             Class.forName("org.postgresql.Driver");
         } catch ( ClassNotFoundException cnfe ) {
-            SQLExceptionHandler.throwSQLException("Cannot load postgres " +
-                                                  "driver - class not found.");
-            // we don't *need* a bogus "throw e" call here
-            // since this is a void method.  Since cnfe isn't declared
-            // to be thrown, we'll just leave the "throw e" out.
+            throw new DbException
+                ("Cannot load postgres driver - class not found.");
         }
     }
 
@@ -59,8 +57,7 @@ public class PostgresConnectionPoolImpl extends BaseConnectionPool {
             return conn;
         } catch (SQLException e) {
             s_log.error(e);
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw SQLExceptionHandler.wrap(e);
         }
     }
 

@@ -33,13 +33,13 @@ import java.util.Map;
  * that wraps a "real" implementation of java.sql.CallableStatement
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/10/04 $
  * @since 4.5
  */
 public class CallableStatement extends com.arsdigita.db.PreparedStatement
     implements java.sql.CallableStatement {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/CallableStatement.java#3 $ $Author: dennis $ $Date: 2002/08/14 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/CallableStatement.java#4 $ $Author: rhs $ $Date: 2002/10/04 $";
 
     // Constructor: use the "wrap" class method to create instances
     private CallableStatement(com.arsdigita.db.Connection conn,
@@ -55,8 +55,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getArray(i);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -69,8 +68,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getBigDecimal(parameterIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -82,8 +80,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getBigDecimal(parameterIndex, scale);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -95,8 +92,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getBlob(i);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -108,8 +104,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getBoolean(parameterIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -121,8 +116,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getByte(parameterIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -134,8 +128,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getBytes(parameterIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -147,8 +140,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getClob(i);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -161,8 +153,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getDate(parameterIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -176,8 +167,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getDate(parameterIndex, cal);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -190,8 +180,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getDouble(parameterIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -204,8 +193,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getFloat(parameterIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -218,8 +206,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getInt(parameterIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -232,8 +219,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getLong(parameterIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -246,8 +232,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getObject(parameterIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -260,8 +245,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getObject(i, map);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -274,8 +258,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getRef(i);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -288,8 +271,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getShort(parameterIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -302,8 +284,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getString(parameterIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -316,8 +297,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getTime(parameterIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -331,8 +311,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getTime(parameterIndex, cal);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -345,8 +324,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getTimestamp(parameterIndex);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -361,8 +339,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).getTimestamp(parameterIndex, cal);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -379,8 +356,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
             }
             ((java.sql.CallableStatement)m_stmt).registerOutParameter(parameterIndex, sqlType);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -395,8 +371,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             ((java.sql.CallableStatement)m_stmt).registerOutParameter(parameterIndex, sqlType, scale);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -410,8 +385,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             ((java.sql.CallableStatement)m_stmt).registerOutParameter(paramIndex, sqlType, typeName);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }
@@ -424,8 +398,7 @@ public class CallableStatement extends com.arsdigita.db.PreparedStatement
         try {
             return ((java.sql.CallableStatement)m_stmt).wasNull();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
 
     }

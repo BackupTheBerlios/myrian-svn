@@ -40,7 +40,7 @@ import org.apache.log4j.Logger;
  * </ul>
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #6 $ $Date: 2002/09/23 $
+ * @version $Revision: #7 $ $Date: 2002/10/04 $
  * @since 4.5
  */
 // Synchronization in this class is primarily because close can be called via
@@ -49,11 +49,11 @@ import org.apache.log4j.Logger;
 // is closed out from underneath this connection.
 public class Connection implements java.sql.Connection {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Connection.java#6 $ $Author: rhs $ $Date: 2002/09/23 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Connection.java#7 $ $Author: rhs $ $Date: 2002/10/04 $";
 
     // the connection object that we wrap
     private java.sql.Connection m_conn;
-    private BaseConnectionPool  m_pool;
+    BaseConnectionPool  m_pool;
 
     private static final Logger s_cat = Logger.getLogger(com.arsdigita.db.Connection.class.getName());
 
@@ -150,8 +150,7 @@ public class Connection implements java.sql.Connection {
         try {
             m_conn.clearWarnings();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -221,8 +220,7 @@ public class Connection implements java.sql.Connection {
                 m_conn = null;
             }
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -254,8 +252,7 @@ public class Connection implements java.sql.Connection {
         try {
             m_conn.commit();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -271,8 +268,7 @@ public class Connection implements java.sql.Connection {
         try {
             return Statement.wrap(this, m_conn.createStatement());
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -292,8 +288,7 @@ public class Connection implements java.sql.Connection {
                                   m_conn.createStatement(resultSetType,
                                                          resultSetConcurrency));
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -305,8 +300,7 @@ public class Connection implements java.sql.Connection {
         try {
             return m_conn.getAutoCommit();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -318,8 +312,7 @@ public class Connection implements java.sql.Connection {
         try {
             return m_conn.getCatalog();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -334,8 +327,7 @@ public class Connection implements java.sql.Connection {
         try {
             return DatabaseMetaData.wrap(this, m_conn.getMetaData());
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -347,8 +339,7 @@ public class Connection implements java.sql.Connection {
         try {
             return m_conn.getTransactionIsolation();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -360,8 +351,7 @@ public class Connection implements java.sql.Connection {
         try {
             return m_conn.getTypeMap();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -374,8 +364,7 @@ public class Connection implements java.sql.Connection {
         try {
             return m_conn.getWarnings();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -386,8 +375,7 @@ public class Connection implements java.sql.Connection {
         try {
             return (m_conn == null || m_conn.isClosed());
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -399,8 +387,7 @@ public class Connection implements java.sql.Connection {
         try {
             return m_conn.isReadOnly();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -415,8 +402,7 @@ public class Connection implements java.sql.Connection {
         try {
             return m_conn.nativeSQL(sql);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -433,8 +419,7 @@ public class Connection implements java.sql.Connection {
         try {
             return CallableStatement.wrap(this, sql, m_conn.prepareCall(sql));
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -458,8 +443,7 @@ public class Connection implements java.sql.Connection {
                                                              resultSetType,
                                                              resultSetConcurrency));
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -477,8 +461,7 @@ public class Connection implements java.sql.Connection {
         try {
             return PreparedStatement.wrap(this, sql, m_conn.prepareStatement(sql));
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -502,8 +485,7 @@ public class Connection implements java.sql.Connection {
                                                                   resultSetType,
                                                                   resultSetConcurrency));
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -517,8 +499,7 @@ public class Connection implements java.sql.Connection {
         try {
             m_conn.rollback();
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -530,8 +511,7 @@ public class Connection implements java.sql.Connection {
         try {
             m_conn.setAutoCommit(autoCommit);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -544,8 +524,7 @@ public class Connection implements java.sql.Connection {
         try {
             m_conn.setCatalog(catalog);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -558,8 +537,7 @@ public class Connection implements java.sql.Connection {
         try {
             m_conn.setReadOnly(readOnly);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -572,8 +550,7 @@ public class Connection implements java.sql.Connection {
         try {
             m_conn.setTransactionIsolation(level);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -586,8 +563,7 @@ public class Connection implements java.sql.Connection {
         try {
             m_conn.setTypeMap(map);
         } catch (SQLException e) {
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw wrap(e);
         }
     }
 
@@ -670,6 +646,23 @@ public class Connection implements java.sql.Connection {
      */
     public boolean getNeedsAutoCommitOff() {
         return m_needsAutoCommitOff;
+    }
+
+    /**
+     * Should be used to throw every SQL exception. Delegates to
+     * SQLExceptionHandler in order to ensure that the correct subclass of
+     * SQLException is thrown, and notifies ConnectionManager if this
+     * connection is bad.
+     **/
+
+    SQLException wrap(SQLException e) {
+        SQLException result = SQLExceptionHandler.wrap(e);
+
+        if (result instanceof DbNotAvailableException) {
+            ConnectionManager.badConnection(this);
+        }
+
+        return result;
     }
 
     /**

@@ -24,14 +24,14 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Revision: #7 $ $Date: 2002/10/04 $
+ * @version $Revision: #8 $ $Date: 2002/10/04 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: rhs $ - $Date: 2002/10/04 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#7 $";
+    public static final String versionId = "$Author: rhs $ - $Date: 2002/10/04 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#8 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);
@@ -74,10 +74,12 @@ public class ConnectionManager {
         m_password = password;
     }
 
-    static final void dbDown() {
-        ConnectionManager cm = ConnectionManager.getInstance();
-        if (cm != null) {
-            cm.disconnect();
+    static final void badConnection(Connection conn) {
+        ConnectionManager cm = getInstance();
+        synchronized (cm) {
+            if (conn.m_pool == cm.m_pool) {
+                cm.disconnect();
+            }
         }
     }
 
@@ -220,12 +222,10 @@ public class ConnectionManager {
             // responsibility down to the DB pool driver.
             // Or, maybe switch to wait/notify, see below TODO.
             //synchronized(ConnectionManager.class) {
-
             try {
                 conn = m_pool.getConnection();
             } catch (SQLException e) {
-                SQLExceptionHandler.throwSQLException(e);
-                throw e;  // code should never get here, but just in case
+                throw SQLExceptionHandler.wrap(e);
             }
             //}
 

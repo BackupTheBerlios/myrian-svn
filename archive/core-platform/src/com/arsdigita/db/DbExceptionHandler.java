@@ -33,29 +33,21 @@ import java.sql.PreparedStatement;
  * on a provided message.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #3 $
+ * @version $Revision: #4 $
  * @since 4.6
  */
 public interface DbExceptionHandler {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DbExceptionHandler.java#3 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DbExceptionHandler.java#4 $";
 
     /**
-     * This method throws a more-specific SQLException
-     * (subclass of com.arsdigita.db.DbException) if one is available.
+     * This method wraps the given SQLException in a more-specific
+     * SQLException  (subclass of com.arsdigita.db.DbException) if one is
+     * available.
      *
      * @param e The SQLException to process.
-     * @throws SQLException The passed-in SQLException, re-created as a more
-     *         specific type if possible.
-     */
-    public void throwSQLException(SQLException e) throws SQLException;
+     **/
 
-    /**
-     * This method throws a new SQLException, or a specific subtype
-     * if one is available for the specified message.
-     *
-     * @param msg The message for the new SQLException.
-     * @throws SQLException with the passed-in msg.
-     */
-    public void throwSQLException(String msg) throws SQLException;
+    public SQLException wrap(SQLException e);
+
 }

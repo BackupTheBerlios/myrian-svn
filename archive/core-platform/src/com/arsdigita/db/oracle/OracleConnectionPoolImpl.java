@@ -29,14 +29,14 @@ import org.apache.log4j.Logger;
  * Connection pooling class using Oracle implementation.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#6 $ $DateTime: 2002/10/02 13:49:31 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#7 $ $DateTime: 2002/10/04 18:08:01 $
  * @since
  *
  */
 
 public class OracleConnectionPoolImpl extends BaseConnectionPool {
 
-    private static final String versionId = "$Author: rhs $ - $Date: 2002/10/02 $ $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#6 $";
+    private static final String versionId = "$Author: rhs $ - $Date: 2002/10/04 $ $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#7 $";
 
     private static final Logger cat = Logger.getLogger(OracleConnectionPoolImpl.class.getName());
 
@@ -62,8 +62,7 @@ public class OracleConnectionPoolImpl extends BaseConnectionPool {
             m_ods.setPassword(m_password);
         } catch (SQLException e) {
             cat.error("Error setting connection info", e);
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw SQLExceptionHandler.wrap(e);
         }
     }
 
@@ -79,8 +78,7 @@ public class OracleConnectionPoolImpl extends BaseConnectionPool {
 
         } catch (SQLException e) {
             cat.error("Error getting new connection", e);
-            SQLExceptionHandler.throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw SQLExceptionHandler.wrap(e);
         }
     }
 

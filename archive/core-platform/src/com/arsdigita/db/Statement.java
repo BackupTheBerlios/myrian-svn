@@ -63,12 +63,12 @@ import org.apache.log4j.Logger;
  * </ul>
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/10/04 $
  * @since 4.5
  */
 public class Statement implements java.sql.Statement, ResultSetEventListener {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Statement.java#4 $ $Author: dennis $ $Date: 2002/08/14 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Statement.java#5 $ $Author: rhs $ $Date: 2002/10/04 $";
 
     private static final java.util.Set dbgStatements = new java.util.HashSet();
 
@@ -78,7 +78,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
     protected java.sql.Statement m_stmt;
 
     // the connection object that created this Statement object
-    private com.arsdigita.db.Connection m_conn;
+    protected com.arsdigita.db.Connection m_conn;
 
     private ArrayList sql_list = new ArrayList();
 
@@ -126,8 +126,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
             sql_list.add(sql);
             m_stmt.addBatch(sql);
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -139,8 +138,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             m_stmt.cancel();
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -149,8 +147,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             m_stmt.clearBatch();
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -159,8 +156,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             m_stmt.clearWarnings();
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -200,8 +196,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
                 m_stmt = null;
             }
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -262,8 +257,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
                 s_cat.info(sql);
             }
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -281,8 +275,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
                                       time,
                                       null);
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -305,8 +298,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
                                       0,
                                       sqle);
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -323,7 +315,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
                 retval = doExecute(sql);
             } catch (SQLException e) {
                 close();
-                throw e;
+                throw m_conn.wrap(e);
             }
             if (!retval) {
                 // getUpdateCount will close this statement
@@ -351,8 +343,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         } catch (SQLException e) {
             // Log SQLException and rethrow exception.
             logException("execute", sql, e);
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -397,8 +388,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         } catch (SQLException e) {
             // Log SQLException and rethrow exception.
             logException("executeBatch", queries.toString(), e);
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -416,7 +406,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
                 rs = doExecuteQuery(sql);
             } catch (SQLException e) {
                 close();
-                throw e;
+                throw m_conn.wrap(e);
             }
             rs.addResultSetEventListener(this);
             return rs;
@@ -441,8 +431,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         } catch (SQLException e) {
             // Log SQLException and rethrow exception.
             logException("executeQuery", sql, e);
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -480,8 +469,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         } catch (SQLException e) {
             // Log SQLException and rethrow exception.
             logException("executeUpdate", sql, e);
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -504,8 +492,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             return m_stmt.getFetchDirection();
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -518,8 +505,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             return m_stmt.getFetchSize();
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -531,8 +517,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             return m_stmt.getMaxFieldSize();
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -544,8 +529,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             return m_stmt.getMaxRows();
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -560,8 +544,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
             }
             return m_stmt.getMoreResults();
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -573,8 +556,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             return m_stmt.getQueryTimeout();
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -608,8 +590,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             return new ResultSet(this, m_stmt.getResultSet());
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -622,8 +603,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             return m_stmt.getResultSetConcurrency();
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -635,8 +615,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             return m_stmt.getResultSetType();
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -666,8 +645,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             return m_stmt.getUpdateCount();
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -679,8 +657,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             return m_stmt.getWarnings();
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -692,8 +669,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             m_stmt.setCursorName(name);
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -704,8 +680,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             m_stmt.setEscapeProcessing(enable);
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -717,8 +692,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             m_stmt.setFetchDirection(direction);
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -731,8 +705,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             m_stmt.setFetchSize(rows);
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -744,8 +717,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             m_stmt.setMaxFieldSize(max);
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -757,8 +729,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             m_stmt.setMaxRows(max);
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -770,8 +741,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         try {
             m_stmt.setQueryTimeout(seconds);
         } catch (SQLException e) {
-            throwSQLException(e);
-            throw e;  // code should never get here, but just in case
+            throw m_conn.wrap(e);
         }
     }
 
@@ -894,7 +864,4 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         return m_needsAutoCommitOff;
     }
 
-    protected void throwSQLException (SQLException e) throws SQLException {
-        SQLExceptionHandler.throwSQLException(e);
-    }
 }
