@@ -20,14 +20,14 @@ import java.lang.reflect.InvocationTargetException;
 import org.apache.log4j.Logger;
 
 /**
- * @author Justin Ross &lt;<a href="mailto:jross@redhat.com">jross@redhat.com</a>&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Record.java#2 $
+ * @author Justin Ross &lt;jross@redhat.com&gt;
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Record.java#3 $
  */
 public abstract class Record {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/Record.java#2 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/Record.java#3 $" +
         "$Author: justin $" +
-        "$DateTime: 2002/12/10 00:15:19 $";
+        "$DateTime: 2003/03/28 11:40:45 $";
 
     private static final Logger s_log = Logger.getLogger(Record.class);
 
