@@ -8,21 +8,7 @@
   want to wait for metamodel changes, which will provide similar
   functionality
 
-- reverse navigation in jdo implementation objects
-  + ssn -> pmi (used in JDOAdapater#getObject)
-    + add attribute map to c.r.p session
-      (done in change 43257).
-    -x- use subclass technique from c.a.p
-    -x- add static map from ssn object to pmi
-  - pc -> sm (could also be used in setSession, but is less important)
-    - can use reflection, but that may not be appropriate depending on
-      what the spec says regarding the protected-ness of the field
-
-- The current implementation of C#javaGet(PersistenceCapable,Property)
-  relies on reflective method access and a bean-style naming
-  convention.  Rewrite this method to use
-  StateManager#getXXXField(PersistenceCapable,int,XXX) or some such
-  instead.
+- pmi's IdentityMap needs to use weak references to the objects
 
 - First-class Objects vs Second-class Objects
   - how do Collection implementation fit in
@@ -30,7 +16,8 @@
 
 - integrate pandora/crp collections
 
-- metadata
+- load c.r.p metadata from jdo files instead of pdl files
+  - looks like it requires custom enhancer
 
 - implement alphabet soup in PMFI (setConnectionFactoryName)
   - decide on what APIs to support for the jndi retrieved object
