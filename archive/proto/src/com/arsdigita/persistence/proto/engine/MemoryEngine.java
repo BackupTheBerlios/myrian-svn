@@ -13,12 +13,12 @@ import java.util.*;
  * MemoryEngine
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/01/31 $
+ * @version $Revision: #12 $ $Date: 2003/01/31 $
  **/
 
 public class MemoryEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#11 $ by $Author: rhs $, $DateTime: 2003/01/31 12:34:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#12 $ by $Author: rhs $, $DateTime: 2003/01/31 12:48:23 $";
 
     private static final Logger LOG = Logger.getLogger(MemoryEngine.class);
 
@@ -94,9 +94,7 @@ public class MemoryEngine extends Engine {
     protected synchronized void flush() {
         m_uncomitted.addAll(m_unflushed);
         m_unflushed.clear();
-
-        LOG.debug(m_engine.getOperations());
-        m_engine.getOperations().clear();
+        m_engine.flush();
     }
 
     private Object get(OID oid, Property prop) {
