@@ -28,12 +28,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/07/06 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#2 $ by $Author: vadim $, $DateTime: 2004/07/06 15:29:25 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -374,7 +374,9 @@ public class PDL {
 		    try {
 			javaClass = Class.forName(jcn.getName());
 		    } catch (ClassNotFoundException e) {
-			m_errors.fatal(jcn, e.getMessage());
+			m_errors.fatal(jcn,
+                                       "Misspelled or non-existent class: " +
+                                       jcn.getName());
 			return;
 		    }
 
