@@ -1,0 +1,24 @@
+model com.arsdigita.persistence;
+
+object type Lob {
+    BigDecimal[1..1] id = t_lobs.id INTEGER;
+    String[0..1] lob = t_lobs.lob CLOB;
+
+    object key (id);
+
+//    retrieve lob {
+//        do {
+//            select lob
+//            from t_lobs
+//            where id = :id
+//        } map {
+//            lob = lob;
+//        }
+//    }
+}
+
+object type ExtendLob extends Lob {
+    String[0..1] foo = t_extend_lobs.foo VARCHAR(100);
+
+    reference key (t_extend_lobs.id);
+}
