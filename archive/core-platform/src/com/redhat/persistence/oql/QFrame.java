@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2004/03/30 $
+ * @version $Revision: #12 $ $Date: 2004/03/30 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/QFrame.java#11 $ by $Author: rhs $, $DateTime: 2004/03/30 15:48:16 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/QFrame.java#12 $ by $Author: rhs $, $DateTime: 2004/03/30 15:55:04 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -860,17 +860,14 @@ class QFrame {
             key = new CompoundKey(new CompoundKey(key, t), c);
         }
         QFrame qf = (QFrame) canon.get(key);
-        if (contains(qf)) { return false; }
         if (qf == null) {
             canon.put(key, this);
             return false;
+        } else if (merge(this, qf)) {
+            collapse.add(this.m_equiset);
+            return true;
         } else {
-            if (merge(this, qf)) {
-                collapse.add(this.m_equiset);
-                return true;
-            } else {
-                return false;
-            }
+            return false;
         }
     }
 
