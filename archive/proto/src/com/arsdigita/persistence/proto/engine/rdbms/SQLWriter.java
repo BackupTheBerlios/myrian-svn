@@ -11,12 +11,12 @@ import java.sql.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2003/03/15 $
+ * @version $Revision: #10 $ $Date: 2003/03/31 $
  **/
 
 abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#9 $ by $Author: rhs $, $DateTime: 2003/03/15 12:47:21 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#10 $ by $Author: rhs $, $DateTime: 2003/03/31 10:58:30 $";
 
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();
@@ -63,6 +63,10 @@ abstract class SQLWriter {
         }
 
         if (m_op.isParameter(path)) {
+	    if (!m_op.contains(path)) {
+		throw new IllegalStateException
+		    ("unbound variable: " + path);
+	    }
             Object value = m_op.get(path);
             if (value instanceof Collection) {
                 Collection c = (Collection) value;
@@ -242,7 +246,24 @@ class ANSIWriter extends SQLWriter {
 
         for (Iterator it = order.iterator(); it.hasNext(); ) {
             Path p = (Path) it.next();
-            write(p);
+	    if (select.isDefaulted(p)) {
+		write("case when(");
+		write(p);
+		write(" is null) then ");
+		write(select.getDefault(p));
+		write(" else ");
+		write(p);
+		write(" end");
+	    } else {
+		if (select.isParameter(p)) {
+		    write("coalesce(");
+		    write(p);
+		    write(")");
+		} else {
+		    write(p);
+		}
+	    }
+
             if (!select.isAscending(p)) {
                 write(" desc");
             }
@@ -396,6 +417,14 @@ class ANSIWriter extends SQLWriter {
         write(cond.getLeft());
         write(" = ");
         write(cond.getRight());
+    }
+
+}
+
+class RetainUpdatesWriter extends ANSIWriter {
+
+    public void write(StaticOperation sop) {
+	write(sop.getSQLBlock().getSQL());
     }
 
 }

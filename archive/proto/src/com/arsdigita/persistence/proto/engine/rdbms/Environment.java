@@ -8,12 +8,12 @@ import java.util.*;
  * Environment
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/03/14 $
+ * @version $Revision: #4 $ $Date: 2003/03/31 $
  **/
 
 class Environment {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Environment.java#3 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Environment.java#4 $ by $Author: rhs $, $DateTime: 2003/03/31 10:58:30 $";
 
     private HashMap m_values = new HashMap();
 
@@ -56,7 +56,11 @@ class SpliceEnvironment extends Environment {
     }
 
     public void set(Path parameter, Object value) {
-        throw new UnsupportedOperationException();
+        if (m_path.isAncestor(parameter)) {
+	    m_splice.set(m_path.getRelative(parameter), value);
+	} else {
+	    m_base.set(parameter, value);
+	}
     }
 
     public Object get(Path parameter) {

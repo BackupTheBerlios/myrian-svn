@@ -8,12 +8,12 @@ import java.util.*;
  * Select
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2003/03/15 $
+ * @version $Revision: #11 $ $Date: 2003/03/31 $
  **/
 
 class Select extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#10 $ by $Author: rhs $, $DateTime: 2003/03/15 02:35:11 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#11 $ by $Author: rhs $, $DateTime: 2003/03/31 10:58:30 $";
 
     private Join m_join;
     private Condition m_condition;
@@ -21,6 +21,7 @@ class Select extends Operation {
     private HashMap m_aliases = new HashMap();
     private ArrayList m_order = new ArrayList();
     private HashSet m_ascending = new HashSet();
+    private HashMap m_defaults = new HashMap();
     private Integer m_offset = null;
     private Integer m_limit = null;
 
@@ -69,8 +70,21 @@ class Select extends Operation {
         }
     }
 
+    public void addOrder(Path path, boolean isAscending, Path defaultPath) {
+	addOrder(path, isAscending);
+	m_defaults.put(path, defaultPath);
+    }
+
     public boolean isAscending(Path path) {
         return m_ascending.contains(path);
+    }
+
+    public boolean isDefaulted(Path p) {
+	return m_defaults.containsKey(p);
+    }
+
+    public Path getDefault(Path p) {
+	return (Path) m_defaults.get(p);
     }
 
     public Collection getOrder() {

@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #26 $ $Date: 2003/03/28 $
+ * @version $Revision: #27 $ $Date: 2003/03/31 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#26 $ by $Author: rhs $, $DateTime: 2003/03/28 13:41:52 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#27 $ by $Author: rhs $, $DateTime: 2003/03/31 10:58:30 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -361,7 +361,10 @@ public class RDBMSEngine extends Engine {
     }
 
     private ResultSet execute(Operation op) {
-        SQLWriter w = new ANSIWriter();
+        return execute(op, new ANSIWriter());
+    }
+
+    private ResultSet execute(Operation op, SQLWriter w) {
         w.write(op);
 
         if (LOG.isDebugEnabled()) {
@@ -402,8 +405,8 @@ public class RDBMSEngine extends Engine {
             Map.Entry me = (Map.Entry) it.next();
             env.set((Path) me.getKey(), me.getValue());
         }
-        Operation op = new StaticOperation(sql, env);
-        return execute(op);
+        Operation op = new StaticOperation(sql, env, false);
+        return execute(op, new RetainUpdatesWriter());
     }
 
     public static final Path[] getKeyPaths(ObjectType type, Path prefix) {

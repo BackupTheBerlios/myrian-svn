@@ -12,12 +12,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #17 $ $Date: 2003/03/14 $
+ * @version $Revision: #18 $ $Date: 2003/03/31 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#17 $ by $Author: rhs $, $DateTime: 2003/03/14 16:11:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#18 $ by $Author: rhs $, $DateTime: 2003/03/31 10:58:30 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -319,7 +319,7 @@ class EventSwitch extends Event.Switch {
         Collection ops = m_engine.getOperations(obj);
         if (ops == null) {
             m_engine.clearOperations(obj);
-            addOperations(obj, e.getObjectMap().getUpdates());
+            addOperations(obj, e.getObjectMap().getUpdates(), false);
             ops = m_engine.getOperations(obj);
         }
 
@@ -352,12 +352,17 @@ class EventSwitch extends Event.Switch {
     }
 
     private void addOperations(Object obj, Collection blocks) {
+	addOperations(obj, blocks, true);
+    }
+
+    private void addOperations(Object obj, Collection blocks,
+			       boolean initialize) {
         ObjectType type = Session.getObjectType(obj);
         m_engine.addOperations(obj);
         for (Iterator it = blocks.iterator(); it.hasNext(); ) {
             SQLBlock block = (SQLBlock) it.next();
             Environment env = m_engine.getEnvironment(obj);
-            StaticOperation op = new StaticOperation(block, env);
+            StaticOperation op = new StaticOperation(block, env, initialize);
             set(env, type, obj, null);
             m_engine.addOperation(obj, op);
         }

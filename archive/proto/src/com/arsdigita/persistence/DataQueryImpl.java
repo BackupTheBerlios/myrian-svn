@@ -18,12 +18,12 @@ import java.util.*;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2003/03/28 $
+ * @version $Revision: #15 $ $Date: 2003/03/31 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#14 $ by $Author: rhs $, $DateTime: 2003/03/28 17:56:58 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#15 $ by $Author: rhs $, $DateTime: 2003/03/31 10:58:30 $";
 
     private static final FilterFactory FACTORY = new FilterFactoryImpl();
 
@@ -189,8 +189,11 @@ class DataQueryImpl implements DataQuery {
         addOrder(order);
     }
 
-
     public void addOrder(String order) {
+	addOrder(order, null);
+    }
+
+    private void addOrder(String order, String def) {
         if (m_cursor != null) {
             throw new PersistenceException
                 ("Cannot order an active data query. " +
@@ -203,20 +206,55 @@ class DataQueryImpl implements DataQuery {
             if (parts.length == 1) {
                 isAscending = true;
             } else if (parts.length == 2) {
-                isAscending = parts[1].startsWith("asc");
+                isAscending = parts[1].trim().startsWith("asc");
             } else {
                 throw new IllegalArgumentException
                     ("bad order: " + order);
             }
 
-            m_query.addOrder(Path.get(parts[0]), isAscending);
+	    Path p = Path.get(parts[0]);
+
+	    if (def == null) {
+		m_query.addOrder(p, isAscending);
+	    } else {
+		m_query.addOrder(p, isAscending, Path.get(def));
+	    }
         }
     }
 
+    private int m_order = 0;
 
     public void addOrderWithNull(String orderOne, Object orderTwo,
-                          boolean isAscending) {
-        throw new Error("not implemented");
+				 boolean isAscending) {
+	Path p1, p2;
+
+	if (orderOne == null) {
+	    p1 = Path.get("__order" + m_order++);
+	    setParameter(p1.getPath(), null);
+	} else {
+	    p1 = Path.get(orderOne);
+	}
+
+	if (orderTwo instanceof String && orderTwo != null) {
+	    p2 = Path.get((String) orderTwo);
+	    if (!m_query.getSignature().exists(p2)) {
+		p2 = Path.get("__order" + m_order++);
+		setParameter(p2.getPath(), orderTwo);
+		if (orderOne != null) {
+		    if (m_query.getSignature().getType(p1) !=
+			m_pssn.getObjectType(orderTwo)) {
+			throw new PersistenceException
+			    ("type mismatch");
+		    }
+		}
+	    }
+	} else {
+	    p2 = Path.get("__order" + m_order++);
+	    setParameter(p2.getPath(), orderTwo);
+	}
+
+	addOrder(p1.getPath() + (isAscending ? " asc" : " desc"),
+		 p2.getPath());
     }
 
 
@@ -227,12 +265,10 @@ class DataQueryImpl implements DataQuery {
 
     private void setParameter(Query query, String parameterName,
 			      Object value) {
-        if (value == null) {
-            return;
-        }
-
         Object tobj;
-        if (value instanceof Collection) {
+	if (value == null) {
+	    tobj = new java.math.BigDecimal("0");
+	} else if (value instanceof Collection) {
             Collection c = (Collection) value;
             if (c.size() == 0) {
                 throw new Error("zero sized collection");

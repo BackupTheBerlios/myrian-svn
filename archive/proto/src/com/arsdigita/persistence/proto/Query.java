@@ -8,17 +8,18 @@ import java.util.*;
  * Query
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/03/28 $
+ * @version $Revision: #12 $ $Date: 2003/03/31 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#11 $ by $Author: rhs $, $DateTime: 2003/03/28 17:56:58 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#12 $ by $Author: rhs $, $DateTime: 2003/03/31 10:58:30 $";
 
     private Signature m_signature;
     private Filter m_filter;
     private ArrayList m_order = new ArrayList();
     private HashSet m_ascending = new HashSet();
+    private HashMap m_defaults = new HashMap();
     private Integer m_offset = null;
     private Integer m_limit = null;
     private HashMap m_values = new HashMap();
@@ -43,6 +44,7 @@ public class Query {
 	m_filter = and(query.m_filter, filter);
         m_order.addAll(query.m_order);
         m_ascending.addAll(query.m_ascending);
+	m_defaults.putAll(query.m_defaults);
 	m_offset = query.m_offset;
 	m_limit = query.m_limit;
 	m_values.putAll(query.m_values);
@@ -68,12 +70,25 @@ public class Query {
         }
     }
 
+    public void addOrder(Path path, boolean isAscending, Path defaultPath) {
+	addOrder(path, isAscending);
+	m_defaults.put(path, defaultPath);
+    }
+
     public Collection getOrder() {
         return m_order;
     }
 
     public boolean isAscending(Path p) {
         return m_ascending.contains(p);
+    }
+
+    public boolean isDefaulted(Path p) {
+	return m_defaults.containsKey(p);
+    }
+
+    public Path getDefault(Path p) {
+	return (Path) m_defaults.get(p);
     }
 
     public void clearOrder() {
