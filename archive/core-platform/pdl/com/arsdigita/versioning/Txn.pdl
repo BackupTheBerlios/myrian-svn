@@ -10,8 +10,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/versioning/Txn.pdl#1 $
-// $DateTime: 2003/06/12 16:01:01 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/versioning/Txn.pdl#2 $
+// $DateTime: 2003/06/18 13:35:28 $
 
 model com.arsdigita.versioning;
 
@@ -22,19 +22,6 @@ object type Txn {
   // audit info
   String[0..1]  modifyingIP  = vcx_txns.modifying_ip VARCHAR(400);
   Date[1..1]       timestamp = vcx_txns.timestamp TIMESTAMP;
-
-  // The sort_key column stores a (left-padded) value of the timestamp
-  // column expressed in milliseconds. Since the largest possible value of
-  // the Java "long" integer type is 9223372036854775807, 19 chars should
-  // be enough. (Note that in Oracle the width of the VARCHAR field is
-  // specified in bytes - not chars. Therefore, we're making the big
-  // assumption that the encoding used only requires one byte per an ASCII
-  // character.)
-  // We use VARCHAR instead of INTEGER because the PostgreSQL "integer"
-  // type is not wide enough to store long (8-byte) integers.  We'd have to
-  // write a custom SQL table definition to support this.  Absent a
-  // demonstrated need for custom SQL, I'd rather not do it.
-  String[1..1]     sortKey   = vcx_txns.sort_key VARCHAR(19);
 
   User[0..1]         modUser = join vcx_txns.modifying_user
                                to users.user_id;
