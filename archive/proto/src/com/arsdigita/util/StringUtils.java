@@ -17,22 +17,20 @@ package com.arsdigita.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Map;
 import java.util.List;
-import java.lang.StringBuffer;
+import java.util.Map;
 import java.util.Set;
-import org.apache.oro.text.perl.Perl5Util;
 
+import org.apache.oro.text.perl.Perl5Util;
+import org.apache.oro.text.regex.MalformedPatternException;
 import org.apache.oro.text.regex.MatchResult;
 import org.apache.oro.text.regex.Pattern;
-import org.apache.oro.text.regex.Perl5Matcher;
-import org.apache.oro.text.regex.Perl5Compiler;
 import org.apache.oro.text.regex.PatternMatcher;
 import org.apache.oro.text.regex.PatternMatcherInput;
+import org.apache.oro.text.regex.Perl5Compiler;
+import org.apache.oro.text.regex.Perl5Matcher;
 import org.apache.oro.text.regex.Substitution;
 import org.apache.oro.text.regex.Util;
-import org.apache.oro.text.regex.MalformedPatternException;
 
 
 /**
@@ -327,7 +325,7 @@ public class StringUtils {
                     while (entries.hasNext()) {
                         to.append(comma);
                         comma = "," + newLine;
-                        Entry e = (Entry)entries.next();
+                        Map.Entry e = (Map.Entry)entries.next();
                         to  .append(toString(e.getKey()))
                             .append(" => ")
                             .append(toString(e.getValue()));
@@ -700,6 +698,53 @@ public class StringUtils {
         return s_re.substitute(pattern, text);
     }
 
+
+
+    /**
+     * Finds all occurrences of <code>find</code> in <code>str</code> and
+     * replaces them with them with <code>replace</code>.
+     *
+     * @pre find != null
+     * @pre replace != null
+     **/
+    public static String replace(final String str,
+                                 final String find,
+                                 final String replace) {
+
+        Assert.assertNotNull(find, "find");
+        Assert.assertNotNull(replace, "replace");
+
+        if ( str == null ) return null;
+
+        int cur = str.indexOf(find);
+        if ( cur < 0 ) return str;
+
+        final int findLength = find.length();
+        // If replace is longer than find, assume the result is going to be
+        // slightly longer than the original string.
+        final int bufferLength =
+            replace.length() > findLength ? (int) (str.length() * 1.1) : str.length();
+        StringBuffer sb = new StringBuffer(bufferLength);
+        int last = 0;
+
+        if ( cur == 0 ) {
+            sb.append(replace);
+            cur = str.indexOf(find, cur+findLength);
+            last = findLength;
+        }
+
+        while ( cur > 0 ) {
+            sb.append(str.substring(last, cur));
+            sb.append(replace);
+            last = cur + findLength;
+            cur = str.indexOf(find, cur+findLength);
+        }
+        if ( last < str.length()-1) {
+            sb.append(str.substring(last));
+        }
+
+        return sb.toString();
+    }
 
 
     /**

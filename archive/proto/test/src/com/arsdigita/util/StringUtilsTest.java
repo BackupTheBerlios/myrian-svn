@@ -246,4 +246,28 @@ public class StringUtilsTest extends TestCase {
                      actual_out);
 
     }
+
+    public void testReplace() {
+        String[] pairs = {null, null,
+                          "foobar", "foobar",
+                          ";foobar", "\\;foobar",
+                          ";foo;bar;baz", "\\;foo\\;bar\\;baz",
+                          ";;foobar", "\\;\\;foobar",
+                          "f;o;obar", "f\\;o\\;obar",
+                          "f;o;;bar", "f\\;o\\;\\;bar",
+                          "foobar;", "foobar\\;",
+                          "foobar;;", "foobar\\;\\;"};
+
+        for (int ii=0, jj=1; jj<pairs.length; ii+=2, jj+=2) {
+            System.err.println("ii=" + ii + ", pairs[ii]=" + pairs[ii] +
+                               ", jj=" + jj + ", pairs[jj]=" + pairs[jj]);
+            String expected = pairs[jj];
+            String actual = StringUtils.replace(pairs[ii], ";", "\\;");
+            Assert.assertEquals(expected, actual);
+
+            expected = pairs[ii];
+            actual = StringUtils.replace(pairs[jj], "\\;", ";");
+            Assert.assertEquals(expected, actual);
+        }
+    }
 }
