@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2003/02/28 $
+ * @version $Revision: #13 $ $Date: 2003/03/14 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#12 $ by $Author: rhs $, $DateTime: 2003/02/28 19:58:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#13 $ by $Author: rhs $, $DateTime: 2003/03/14 15:06:51 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -55,18 +55,12 @@ public abstract class RecordSet {
                 if (pmaps.containsKey(parent)) {
                     props = (PropertyMap) pmaps.get(parent);
                 } else {
-                    if (value == null) {
-                        props = null;
-                    } else {
-                        props = new PropertyMap
-                            (type.getProperty(p).getContainer());
-                    }
+                    props = new PropertyMap
+                        (type.getProperty(p).getContainer());
                     pmaps.put(parent, props);
                 }
 
-                if (value != null) {
-                    props.put(type.getProperty(p), value);
-                }
+                props.put(type.getProperty(p), value);
             }
         }
 
@@ -77,7 +71,7 @@ public abstract class RecordSet {
             Map.Entry me = (Map.Entry) it.next();
             Path p = (Path) me.getKey();
             PropertyMap props = (PropertyMap) me.getValue();
-            if (props == null) {
+            if (props.isNull()) {
                 objs.put(p, null);
             } else {
                 ObjectType ot;

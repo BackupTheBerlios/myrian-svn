@@ -27,11 +27,11 @@ import org.apache.log4j.Logger;
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
  * @since 4.5
- * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#3 $
+ * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#4 $
  */
 public class DataOperation {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#3 $ by $Author: rhs $, $DateTime: 2003/03/11 16:05:41 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#4 $ by $Author: rhs $, $DateTime: 2003/03/14 15:06:51 $";
 
     private static final Logger s_cat =
         Logger.getLogger(DataOperation.class);
@@ -73,7 +73,7 @@ public class DataOperation {
      * {@link #get(String parameterName)}
      */
     public synchronized void close() {
-        throw new Error("not implemented");
+        // do nothing
     }
 
 

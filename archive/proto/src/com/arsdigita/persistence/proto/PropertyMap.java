@@ -8,12 +8,12 @@ import java.util.*;
  * PropertyMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/02/26 $
+ * @version $Revision: #3 $ $Date: 2003/03/14 $
  **/
 
 public class PropertyMap {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyMap.java#2 $ by $Author: rhs $, $DateTime: 2003/02/26 20:44:08 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyMap.java#3 $ by $Author: rhs $, $DateTime: 2003/03/14 15:06:51 $";
 
     private ObjectType m_type;
     private HashMap m_values = new HashMap();
@@ -36,6 +36,22 @@ public class PropertyMap {
 
     public Set entrySet() {
         return m_values.entrySet();
+    }
+
+    boolean isNull() {
+        Collection keys = m_type.getKeyProperties();
+        if (keys.size() == 0) {
+            return false;
+        }
+
+        for (Iterator it = keys.iterator(); it.hasNext(); ) {
+            Property prop = (Property) it.next();
+            if (get(prop) != null) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }
