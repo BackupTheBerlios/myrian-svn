@@ -18,12 +18,12 @@ import java.util.*;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2003/03/15 $
+ * @version $Revision: #13 $ $Date: 2003/03/28 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#12 $ by $Author: rhs $, $DateTime: 2003/03/15 02:35:11 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#13 $ by $Author: ashah $, $DateTime: 2003/03/28 10:09:18 $";
 
     private static final FilterFactory FACTORY = new FilterFactoryImpl();
 
@@ -324,7 +324,9 @@ class DataQueryImpl implements DataQuery {
     }
 
     public void rewind() {
-        m_cursor.rewind();
+        if (m_cursor != null) {
+            m_cursor.rewind();
+        }
     }
 
 
@@ -334,6 +336,7 @@ class DataQueryImpl implements DataQuery {
 
 
     public int getPosition() {
+        checkCursor();
         return (int) m_cursor.getPosition();
     }
 
