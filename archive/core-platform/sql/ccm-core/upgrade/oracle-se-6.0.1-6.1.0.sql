@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/upgrade/oracle-se-6.0.1-6.1.0.sql#3 $
--- $DateTime: 2004/01/21 12:36:48 $
+-- $Id: //core-platform/dev/sql/ccm-core/upgrade/oracle-se-6.0.1-6.1.0.sql#4 $
+-- $DateTime: 2004/03/16 11:15:39 $
 
 PROMPT Red Hat WAF 6.0.1 -> 6.1.0 Upgrade Script (Oracle)
 
@@ -22,6 +22,7 @@ PROMPT Red Hat WAF 6.0.1 -> 6.1.0 Upgrade Script (Oracle)
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/table-keystore-auto.sql
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/table-lucene_ids-auto.sql
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/table-webapps-auto.sql
+@@ ../oracle-se/upgrade/6.0.1-6.1.0/table-forms_lstnr_rmt_svr_post-auto.sql 
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/deferred.sql
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/update-host-unique-index.sql
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/update-cat_root_cat_object_map.sql

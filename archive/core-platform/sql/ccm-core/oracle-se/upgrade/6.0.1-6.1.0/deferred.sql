@@ -13,3 +13,6 @@ alter table init_requirements add
 alter table lucene_ids add 
     constraint lucene_ids_host_id_f_fcxb8 foreign key (host_id)
       references web_hosts(host_id);
+alter table forms_lstnr_rmt_svr_post add 
+    constraint form_lst_rmt_svr_pos_l_f_59l2x foreign key (listener_id)
+      references bebop_process_listeners(listener_id);
