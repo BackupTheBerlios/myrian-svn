@@ -49,12 +49,12 @@ import org.apache.log4j.Logger;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #11 $ $Date: 2002/10/17 $
+ * @version $Revision: #12 $ $Date: 2003/03/07 $
  */
 
 class DataAssociationImpl extends DataCollectionImpl implements DataAssociation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#11 $ by $Author: rhs $, $DateTime: 2002/10/17 11:45:15 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#12 $ by $Author: jorris $, $DateTime: 2003/03/07 01:57:54 $";
 
     private static final Logger s_cat =
         Logger.getLogger(DataAssociationImpl.class);
@@ -172,7 +172,7 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
      * @deprecated Use {@link #cursor().getLink}
      */
     public Link getLink() {
-        throw new Error("Not implemented yet.");
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
 
@@ -184,7 +184,7 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
      *                returning the link for the current DataObject).
      */
     public Link getLink(DataObject object) {
-        throw new Error("Not implemented yet.");
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
 

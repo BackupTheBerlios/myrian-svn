@@ -41,7 +41,7 @@ import java.lang.ref.WeakReference;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/10/16 $
+ * @version $Revision: #3 $ $Date: 2003/03/07 $
  * @see com.arsdigita.persistence.SessionManager
  */
 class SessionImpl implements InternalSession {
@@ -319,8 +319,9 @@ class SessionImpl implements InternalSession {
 
     /**
      *  - Deletes the
-     * persistent object of the given type with the given oid.  This method
-     * is not yet implemented.
+     * persistent object of the given type with the given oid.
+     *
+     * WARNING: This method is not yet implemented.
      *
      * @param oid The id of the object to be deleted.
      *
@@ -328,7 +329,7 @@ class SessionImpl implements InternalSession {
      **/
     public boolean delete(OID oid) {
         // Delete an object without actually retrieving it first.
-        throw new Error("Not implemented yet.");
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /**

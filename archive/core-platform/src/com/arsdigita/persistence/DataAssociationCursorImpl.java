@@ -61,13 +61,13 @@ import org.apache.log4j.Logger;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/11/01 $
+ * @version $Revision: #7 $ $Date: 2003/03/07 $
  */
 
 class DataAssociationCursorImpl extends DataCollectionImpl
     implements DataAssociationCursor {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#6 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#7 $ by $Author: jorris $, $DateTime: 2003/03/07 01:57:54 $";
 
     private static final Logger s_cat =
         Logger.getLogger(DataAssociationImpl.class);
@@ -173,7 +173,6 @@ class DataAssociationCursorImpl extends DataCollectionImpl
      */
     public Object getLinkProperty(String name) {
         return super.get(name);
-        //throw new Error("Not implemented yet.");
     }
 
 
