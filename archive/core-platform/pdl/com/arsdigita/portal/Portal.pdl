@@ -14,21 +14,18 @@
 
 model com.arsdigita.portal;
 
-import com.arsdigita.kernel.Application;
+import com.arsdigita.kernel.Resource;
 import com.arsdigita.kernel.ACSObject;
 
 // @author Justin Ross (justin@arsdigita.com)
 
-object type Portal extends ACSObject {
+object type Portal extends Resource {
     String title = portals.title VARCHAR(200);
     Boolean isTemplate = portals.template_p BIT;
 
     reference key (portals.portal_id);
 }
 
-object type Portlet extends Application {
-    reference key (portlets.portlet_id);
-}
 
 association {
     Portal[1..1] portal = join portlets.portal_id to portals.portal_id;

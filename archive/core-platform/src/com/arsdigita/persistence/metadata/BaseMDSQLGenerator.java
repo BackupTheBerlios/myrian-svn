@@ -47,12 +47,12 @@ import org.apache.log4j.Logger;
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#13 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#14 $
  * @since 4.6.3
  */
 abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#13 $ by $Author: rhs $, $DateTime: 2002/10/02 14:58:38 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#14 $ by $Author: jparsons $, $DateTime: 2002/10/14 12:51:42 $";
 
     private static final Logger s_log =
         Logger.getLogger(BaseMDSQLGenerator.class);
@@ -568,7 +568,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
         if (path.size() == 1) {
             Column from = ((JoinElement)path.get(0)).getFrom();
-            Column refkey = Utilities.getColumn(type);
+            Column refkey = type.getColumn();
             Property typekey = Utilities.getKeyProperty((ObjectType)prop.getType());
 
             if ((typekey == null) ||

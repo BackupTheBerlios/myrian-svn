@@ -18,21 +18,9 @@ import com.arsdigita.kernel.permissions.Privilege;
 import com.arsdigita.portal.Portlet;
 
 // @author Justin Ross (justin@arsdigita.com)
-// @version $Id: //core-platform/dev/pdl/com/arsdigita/kernel/Application.pdl#1 $
+// @version $Id: //core-platform/dev/pdl/com/arsdigita/kernel/Application.pdl#2 $
 
-object type ApplicationType {
-    BigDecimal id = application_types.application_type_id INTEGER;
-    String objectType = application_types.object_type VARCHAR(100);
-    String defaultDomainClass = 
-        application_types.default_domain_class VARCHAR(100);
-    String title = application_types.title VARCHAR(200);
-    String description = application_types.description VARCHAR(4000);
-    Boolean isWorkspaceApplication = 
-        application_types.workspace_application_p BIT;
-    Boolean hasFullPageView = application_types.has_full_page_view_p BIT;
-    Boolean hasEmbeddedView = application_types.has_embedded_view_p BIT;
-    Boolean isSingleton = application_types.singleton_p BIT;
-    String profile = application_types.profile VARCHAR(20);
+object type ApplicationType extends ResourceType {
 
     Privilege[0..n] relevantPrivileges =
         join application_types.application_type_id 
@@ -40,7 +28,6 @@ object type ApplicationType {
         join application_type_privilege_map.privilege
           to acs_privileges.privilege;
 
-    object key (id);
 }
 
 association {
@@ -61,15 +48,8 @@ association {
             to application_types.package_type_id;
 }
 
-
-
-
-object type Application extends ACSObject {
-    String title = applications.title VARCHAR(200);
-    String description = applications.description VARCHAR(4000);
+object type Application extends Resource {
     String primaryURL = applications.primary_url VARCHAR(4000);
-    Integer cellNumber = applications.cell_number INTEGER;
-    Integer sortKey = applications.sort_key INTEGER;
     Date[1..1] timestamp = applications.timestamp TIMESTAMP;
 
     ApplicationType[1..1] applicationType =
@@ -81,52 +61,15 @@ object type Application extends ACSObject {
 
     Application[0..1] parentApplication = 
         join applications.parent_application_id to applications.application_id;
-
-    reference key (applications.application_id);
-
-    aggressive load 
-        (applicationType.id, 
-         applicationType.isWorkspaceApplication,
-         applicationType.hasFullPageView,
-         applicationType.hasEmbeddedView,
-         applicationType.isSingleton,
-         applicationType.profile,
-         applicationType.title,
-         parentApplication.id,
-         parentApplication.objectType,
-         parentApplication.defaultDomainClass,
-         parentApplication.title,
-         parentApplication.primaryURL);
 }
 
-// XXX: If I try to use this two-way association instead of the inline ones
-// defined above, I get runtime errors complaining that 
-// applicationType.isWorkspaceApplication is not mapped.
-//
-// association {
-//     ApplicationType[1..1] applicationType =
-//         join applications.application_type_id 
-//             to application_types.application_type_id;
-//     Application[0..n] application = 
-//         join application_types.application_type_id
-//             to applications.application_type_id;
-// }
 
 association {
-    PackageInstance[1..1] packageInstance =
+    PackageInstance[0..1] packageInstance =
         join applications.package_id to apm_packages.package_id;
     Application[0..1] application = 
         join apm_packages.package_id to applications.package_id;
 }
-
-// XXX: Same problem as above.
-//
-// association {
-//     Application[0..1] parentApplication = 
-//         join applications.parent_application_id to applications.application_id;
-//     Application[0..n] childApplication = 
-//         join applications.application_id to applications.parent_application_id;
-// }
 
 query applicationForSiteNodeID {
     Application application;
