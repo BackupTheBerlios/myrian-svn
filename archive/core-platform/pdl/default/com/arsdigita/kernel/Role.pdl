@@ -15,10 +15,10 @@
 model com.arsdigita.kernel;
 
 object type Role {
-    BigDecimal[1..1] roleId = roles.role_id;
+    BigDecimal[1..1] roleId = roles.role_id INTEGER;
 
     // The name of this role
-    String[1..1]     name = roles.name;
+    String[1..1]     name = roles.name VARCHAR(200);
 
     // The group for which this role is defined
     Group[1..1]      sourceGroup = join roles.group_id to groups.group_id;
@@ -28,7 +28,7 @@ object type Role {
                                        to groups.group_id;
 
     // A textual description of this role
-    String[0..1]     description = roles.description;
+    String[0..1]     description = roles.description VARCHAR(4000);
 
     object key (roleId);
 

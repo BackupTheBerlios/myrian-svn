@@ -21,18 +21,18 @@ import com.arsdigita.kernel.*;
 
 //
 // Permission
+// MDSQL does not correctly handle multiple keys
 //
 object type Permission {
-    BigDecimal[1..1] objectId;
-    BigDecimal[1..1] partyId;
-    String[1..1]     privilege;
+    BigDecimal[1..1] objectId = acs_permissions.object_id;
+    BigDecimal[1..1] partyId = acs_permissions.grantee_id;
+    String[1..1]     privilege = acs_permissions.privilege;
+    Date[1..1]       creationDate = acs_permissions.creation_date;
+    String[0..1]     creationIP = acs_permissions.creation_ip;
 
     ACSObject[1..1]  object;
     Party[1..1]      party;
-
     User[0..1]       creationUser;
-    Date[1..1]       creationDate;
-    String[0..1]     creationIP;
 
     object key (objectId, partyId, privilege);
 
@@ -126,6 +126,15 @@ object type Permission {
 // This is one nasty query that includes display information about
 // the grantee, which may be a user or group (hence the union).
 query ObjectPermissionCollection {
+    String privilege;
+    Boolean isInherited;
+    BigDecimal granteeID;
+    Boolean granteeIsUser;
+    String granteeName;
+    String granteeEmail;
+    String granteeGivenName;
+    String granteeFamilyName;
+    BigDecimal granteeNameID;
     do {
         select acs_permissions.privilege,
                decode(acs_permissions.object_id, 
@@ -197,6 +206,15 @@ query ObjectPermissionCollection {
 // This is one nasty query that includes display information about
 // the grantee, which may be a user or group (hence the union).
 query ObjectDirectPermissionCollection {
+    String privilege;
+    Boolean isInherited;
+    BigDecimal granteeID;
+    Boolean granteeIsUser;
+    String granteeName;
+    String granteeEmail;
+    String granteeGivenName;
+    String granteeFamilyName;
+    BigDecimal granteeNameID;
     do {
         select acs_permissions.privilege,
                0 as inherited_p,
@@ -258,6 +276,7 @@ query ObjectDirectPermissionCollection {
 
 
 query PermissionFilterQuery {
+    BigDecimal objectID;
     do {
         select oc.object_id 
         from object_context oc
@@ -288,6 +307,7 @@ query PermissionFilterQuery {
 }
 
 query GroupPermissionFilterQuery {
+    BigDecimal objectID;
     do {
         select oc.object_id 
         from object_context oc
@@ -321,6 +341,7 @@ query GroupPermissionFilterQuery {
 //  - Site-wide admin
 
 query ObjectPermissionFilterQuery {
+    BigDecimal granteeID;
     do {
         select member_id
           from party_member_trans_map m,
@@ -347,6 +368,7 @@ query ObjectPermissionFilterQuery {
 }
 
 query CheckPermissionForUser {
+    Boolean hasPermission;
     do {
         select 1 as permission_p
         from object_context
@@ -382,6 +404,7 @@ query CheckPermissionForUser {
 }
 
 query CheckPermissionForGroup {
+    Boolean hasPermission;
     do {
         select 1 as permission_p
         from object_context
@@ -413,6 +436,7 @@ query CheckPermissionForGroup {
 }
 
 query CheckUninheritedPermissionForUser {
+    Boolean hasPermission;
     do {
         select 1 as permission_p from dual
         where exists (
@@ -433,6 +457,7 @@ query CheckUninheritedPermissionForUser {
 }
 
 query CheckUninheritedPermissionForGroup {
+    Boolean hasPermission;
     do {
         select 1 as permission_p from dual
         where exists (
@@ -452,6 +477,7 @@ query CheckUninheritedPermissionForGroup {
 }
 
 query CheckDirectGrant {
+    Boolean hasPermission;
     do {
         select 1 as permission_p from dual
         where exists (
@@ -474,6 +500,7 @@ data operation RevokePartyPermissions {
 }
 
 query PrivilegesForUser {
+    String privilege;
     do {
           select acs_permissions.privilege
             from acs_permissions
@@ -504,6 +531,7 @@ query PrivilegesForUser {
 }
 
 query PrivilegesForGroup {
+    String privilege;
     do {
           select acs_permissions.privilege
             from acs_permissions
@@ -541,65 +569,24 @@ object type Privilege {
     String privilege = acs_privileges.privilege VARCHAR(100);
 
     object key (privilege);
-
-    retrieve {
-        do {
-            select acs_privileges.privilege
-              from acs_privileges
-             where acs_privileges.privilege = :privilege
-        } map {
-            privilege = acs_privileges.privilege;
-        }
-    }
-
-    retrieve all {
-        do {
-            select acs_privileges.privilege
-              from acs_privileges
-        } map {
-            privilege = acs_privileges.privilege;
-        }
-    }
-
-    insert {
-        do {
-            insert into acs_privileges
-            (privilege)
-            values
-            (:privilege)
-        }
-    }   
-
-    // there are no properties to update right now
-    update {
-    }
-
-    delete {
-        do { delete from acs_privileges where privilege = :privilege }
-    }
-
 }    
+
 
 //
 // ObjectContext
 //
 object type ObjectContext {
-    BigDecimal[1..1] objectId;
+    BigDecimal[1..1] objectId = object_context.object_id;
 
-    ACSObject[1..1] object;
-    ACSObject[0..1] context;
-
+    ACSObject[1..1] object = join object_context.object_id 
+                               to acs_objects.object_id;
+    ACSObject[0..1] context = join object_context.context_id
+                                to acs_objects.object_id;
     object key (objectId);
 
-    retrieve {
-        do {
-            select object_context.object_id
-              from object_context
-             where object_context.object_id = :objectId
-        } map {
-            objectId = object_context.object_id;
-        }
-    }
+    add object {}
+    remove object {}
+
 
     insert {
         do {
@@ -621,49 +608,8 @@ object type ObjectContext {
     delete {
         do { delete from object_context where object_id = :objectId }
     }
-
-    retrieve object {
-        do {
-            select acs_objects.object_id,
-                   acs_objects.object_type
-              from acs_objects
-             where object_id = :objectId
-        } map {
-            object.id = acs_objects.object_id;
-            object.objectType = acs_objects.object_type;
-        }
-    }
-
-    retrieve context {
-        do {
-            select acs_objects.object_id,
-                   acs_objects.object_type
-              from acs_objects, object_context
-             where acs_objects.object_id = object_context.context_id
-               and object_context.object_id = :objectId
-        } map {
-            context.id = acs_objects.object_id;
-            context.objectType = acs_objects.object_type;
-        }
-    }
-
-    add context {
-        do {
-            update object_context
-               set context_id = :context.id
-             where object_id = :objectId
-        }
-    }
-
-    remove context {
-         do {
-            update object_context
-               set context_id = null
-             where object_id = :objectId
-        }
-   }
-            
 }
+
 
 object type ParameterizedPrivilege {
     String[1..1] basePrivilege = parameterized_privileges.base_privilege;

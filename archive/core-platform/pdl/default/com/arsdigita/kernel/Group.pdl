@@ -381,6 +381,9 @@ query AllContainedParties {
 }
 
 query RetrieveGroups {
+    BigDecimal groupID;
+    String name;
+    String searchName;
     do {
         select group_id,
                name, 
@@ -412,6 +415,7 @@ data operation ClearSupergroups {
     }
 }
 query GroupDirectMembers {
+    BigDecimal memberID;
     do {
         select member_id
         from group_member_map
@@ -421,6 +425,7 @@ query GroupDirectMembers {
     }
 }
 query GroupDirectSubgroups {
+    BigDecimal subgroupID;
     do {
         select subgroup_id
         from group_subgroup_map
@@ -430,6 +435,7 @@ query GroupDirectSubgroups {
     }
 }
 query GroupMembers {
+    BigDecimal memberID;
     do {
         select member_id
         from group_member_trans_map
@@ -439,6 +445,7 @@ query GroupMembers {
     }
 }
 query GroupSubgroups {
+    BigDecimal subgroupID;
     do {
         select subgroup_id
         from group_subgroup_trans_map

@@ -15,74 +15,37 @@
 model com.arsdigita.kernel;
 
 object type UserAuthentication {
-    BigDecimal id;
-    String[1..1] loginName;
-    String[1..1] password;
-    String salt;
-    String passwordQuestion;
-    String passwordAnswer;
-    User[1..1] user;
+    BigDecimal id = user_authentication.auth_id;
+    String[1..1] loginName = parties.primary_email;
+    String[1..1] password = user_authentication.password;
+    String salt = user_authentication.salt;
+    String passwordQuestion = user_authentication.password_question;
+    String passwordAnswer = user_authentication.password_answer;
+    User[1..1] user = join user_authentication.user_id to users.user_id;
 
     object key(id);
+    join user_authentication.auth_id to parties.party_id;
 
-    retrieve {
-        do {
-            select user_authentication.auth_id,
-	           parties.primary_email,
-                   user_authentication.password,
-                   user_authentication.salt,
-                   user_authentication.password_question,
-                   user_authentication.password_answer
-              from user_authentication, parties
-             where user_authentication.auth_id = :id
-               and user_authentication.user_id = parties.party_id
-        } map {    
-	    id = user_authentication.auth_id;
-            loginName = parties.primary_email;
-            password = user_authentication.password;
-            salt = user_authentication.salt;
-            passwordQuestion = user_authentication.password_question;
-            passwordAnswer = user_authentication.password_answer;
-        }
-    }
-
-    retrieve all {
-        do {
-            select user_authentication.auth_id,
-	           parties.primary_email,
-                   user_authentication.password,
-                   user_authentication.salt,
-                   user_authentication.password_question,
-                   user_authentication.password_answer
-              from user_authentication, parties
-             where user_authentication.user_id = parties.party_id
-        } map {
-	    id = user_authentication.auth_id;
-            loginName = parties.primary_email;
-            password = user_authentication.password;
-            salt = user_authentication.salt;
-            passwordQuestion = user_authentication.password_question;
-            passwordAnswer = user_authentication.password_answer;
-        }
-    }
-
-    insert {
-	do {
-	    insert into user_authentication
-	    (auth_id, password, salt, 
-	     password_question, password_answer, user_id)
-	    values
-	    (:id, :password, :salt, 
-	     :passwordQuestion, :passwordAnswer, :user.id)
-	}
-    }
-
+    // MDSQL also deletes from parties
     delete {
-	do {
-	    delete from user_authentication where auth_id = :id
-	}
+        do {
+            delete from user_authentication where auth_id = :id
+        }
     }
 
+    // MDSQL also inserts into parties
+    insert {
+        do {
+            insert into user_authentication
+            (auth_id, password, salt, 
+            password_question, password_answer, user_id)
+            values
+            (:id, :password, :salt, 
+            :passwordQuestion, :passwordAnswer, :user.id)
+        }
+    }
+
+    // MDSQL also updates parties
     update {
         do {
             update user_authentication
@@ -95,32 +58,13 @@ object type UserAuthentication {
         }
     }
 
-    retrieve user {
-        do {
-            select users.user_id, users.screen_name,
-	           parties.uri, acs_objects.object_type
-	      from user_authentication, 
-                   users, 
-	           parties,
-	           acs_objects
-	     where users.user_id = user_authentication.user_id
-	       and users.user_id = parties.party_id
-	       and parties.party_id = acs_objects.object_id
-	       and user_authentication.auth_id = :id
-        } map {
-            user.id = users.user_id;
-            user.screenName = users.screen_name;
-
-            user.uri = parties.uri;
-            user.objectType = acs_objects.object_type;
-        }
-    }
-
     add user {}
     remove user {}
 }
 
 query UserAuthenticationForLogin {
+    BigDecimal id;
+    String loginName;
     do {
         select user_authentication.auth_id,
 	           parties.primary_email

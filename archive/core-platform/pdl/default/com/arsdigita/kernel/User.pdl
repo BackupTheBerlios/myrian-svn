@@ -16,7 +16,7 @@ model com.arsdigita.kernel;
 
 object type User extends Party {
     PersonName[1..1] name = join users.name_id to person_names.name_id;
-    String screenName = users.screen_name;
+    String screenName = users.screen_name VARCHAR(100);
 
     reference key (users.user_id);
 
@@ -32,12 +32,15 @@ data operation ClearUserFromGroups {
 }
 
 query UserPrimaryEmail {
+    BigDecimal userID;
+    String primaryEmailAddress;
+
     do {
-	select users.user_id, 
-	       parties.primary_email
-	  from users, 
-	       parties
-	 where users.user_id = parties.party_id
+        select users.user_id, 
+               parties.primary_email
+          from users, 
+               parties
+         where users.user_id = parties.party_id
     } map {
 	  userID = users.user_id;
 	  primaryEmailAddress = parties.primary_email;
@@ -45,6 +48,14 @@ query UserPrimaryEmail {
 }
 
 query RetrieveUsers {
+    // This should be changed to just return a User object.
+    BigDecimal userID;
+    String screenName;
+    String firstName;
+    String lastName;
+    String searchName;
+    String primaryEmail;
+    String objectType;
     do {
         select users.user_id,
                users.screen_name,
@@ -73,6 +84,14 @@ query RetrieveUsers {
 }
 
 query RetrieveAllUsers {
+    // This should be changed to just return a User object.
+    BigDecimal userID;
+    String screenName;
+    String firstName;
+    String lastName;
+    String searchName;
+    String primaryEmail;
+    String objectType;
     do {
         select users.user_id,
                users.screen_name,
