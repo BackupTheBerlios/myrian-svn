@@ -24,16 +24,16 @@ import org.apache.log4j.Logger;
 /**
  * Subject to change.
  *
- * An error for to indicate invalid configurations.
+ * An error to indicate invalid configurations.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/ConfigurationError.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/ConfigurationError.java#3 $
  */
 public class ConfigurationError extends Error {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/ConfigurationError.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/ConfigurationError.java#3 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/11 11:58:04 $";
+        "$DateTime: 2003/09/11 12:06:11 $";
 
     private static final Logger s_log = Logger.getLogger
         (ConfigurationError.class);
