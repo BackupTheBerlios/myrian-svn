@@ -9,6 +9,10 @@
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://ccm.redhat.com/ccm-project file:///usr/share/ccm-devel/xsd/application.xsd">
 
+   <ccm:jdo>
+     <ccm:directory name="com/redhat/persistence/jdo"/>
+   </ccm:jdo>
+
   <ccm:dependencies>
   </ccm:dependencies>
 
