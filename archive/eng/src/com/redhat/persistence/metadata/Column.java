@@ -29,12 +29,12 @@ import java.util.Set;
  * the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/06 $
  */
 
 public class Column extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Column.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Column.java#2 $ by $Author: rhs $, $DateTime: 2004/08/06 08:06:46 $";
 
     /**
      * The name of this Column.
@@ -228,7 +228,8 @@ public class Column extends Element {
     }
 
     public boolean isPrimaryKey() {
-        return getTable().getPrimaryKey() == getTable().getUniqueKey(this);
+        return isUniqueKey()
+            && getTable().getPrimaryKey() == getTable().getUniqueKey(this);
     }
 
     public boolean isUniqueKey() {
