@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -1267,5 +1268,83 @@ public class StringUtils {
         }
 
         return list;
+    }
+
+    /**
+     * Given a slash-separated path like <code>"/foo/bar/baz/quux/"</code>, this
+     * iterator returns the following path fragments (in this order):
+     * <code>"/foo/bar/baz/quux/"</code>, <code>"/foo/bar/baz/"</code>,
+     * <code>"/foo/bar/"</code>, <code>"/foo/"</code>, and optionally,
+     * <code>"/"</code>.
+     *
+     * <p>If <code>returnBareSlash</code> is <code>false</code>, then the last
+     * element returned by iterator is <code>"/foo/"</code>.</p>
+     *
+     * <p>The returned iterator does not support {@link Iterator#remove()}.</p>
+     *
+     * @pre path != null && path.startsWith("/") && path.endsWith("/");
+     * @throws NullPointerException if <code>path</code> is <code>null</code>.
+     * @throws IllegalArgumentException if <code>path</code> does not begin with
+     * and end in slash.
+     **/
+    public static Iterator pathFinder(String path, boolean returnBareSlash) {
+        return new PathFinder(path, returnBareSlash);
+    }
+
+    private static class PathFinder implements Iterator {
+        private final static String SL = "/";
+
+        private final String m_path;
+        private final int m_fencePost;
+
+        // these slide back iterating over indexes of '/'
+        private int m_last;  
+        private int m_2ndToLast;
+
+        public PathFinder(String path, boolean returnBareSlash) {
+            if ( path == null ) { throw new NullPointerException("path"); }
+            if ( !path.startsWith(SL) ) {
+                throw new PathFinderException
+                    ("path should start with /: " + path);
+            }
+            if ( !path.endsWith(SL) ) {
+                throw new PathFinderException
+                    ("path should end with /: " + path);
+            }
+            m_path = path;
+            m_last = m_path.length() - 1;
+            m_fencePost = returnBareSlash ? 0 : 1;
+            set2ndToLast();
+        }
+
+        private void set2ndToLast() {
+            m_2ndToLast = m_path.lastIndexOf('/', m_last-1);
+        }
+
+        public boolean hasNext() {
+            return m_2ndToLast >= m_fencePost;
+        }
+
+        public Object next() {
+            if ( !hasNext() ) {
+                throw new NoSuchElementException
+                    ("initial path=" + m_path + "; current idx=" + m_last);
+            }
+            m_last = m_2ndToLast;
+            set2ndToLast();
+            return m_path.substring(0, m_last+1);
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    // This is intended for whitebox testing only, so we don't catch
+    // IllegalArgumentExceptions that are not explicitly thrown by PathFinder.
+    static class PathFinderException extends IllegalArgumentException {
+        PathFinderException(String msg) {
+            super(msg);
+        }
     }
 }

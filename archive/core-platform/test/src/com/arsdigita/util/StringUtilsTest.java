@@ -17,7 +17,12 @@ package com.arsdigita.util;
 
 import junit.framework.TestCase;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+
 import org.apache.log4j.Logger;
 
 public class StringUtilsTest extends TestCase {
@@ -355,6 +360,44 @@ public class StringUtilsTest extends TestCase {
             expected = pairs[ii];
             actual = StringUtils.replace(pairs[jj], "\\;", ";");
             assertEquals(expected, actual);
+        }
+    }
+
+    public void testPathFinder() {
+        try {
+            StringUtils.pathFinder(null, false);
+            fail("should've choked on null");
+        } catch (NullPointerException ex) {
+            ;
+        }
+
+        try {
+            StringUtils.pathFinder("/foo", false);
+            StringUtils.pathFinder("foo/", false);
+            fail("should've complained about a missing slash");
+        } catch (StringUtils.PathFinderException ex) {
+            ;
+        }
+
+        final String path = "/foo/bar/baz//quux/";
+        List elems = Arrays.asList
+            (new String[] {path, "/foo/bar/baz//", "/foo/bar/baz/",
+                           "/foo/bar/", "/foo/"});
+    }
+
+    private void testPathFinder(String path, List expected, boolean returnLast) {
+        Iterator actual=StringUtils.pathFinder(path, returnLast);
+
+        for (Iterator elems=expected.iterator(); elems.hasNext(); ) {
+            assertTrue("has next", actual.hasNext());
+            assertEquals((String) elems.next(), (String) actual.next());
+        }
+        assertFalse("has next", actual.hasNext());
+        try {
+            actual.next();
+            fail("should have thrown NoSuchElementException");
+        } catch (NoSuchElementException ex) {
+            ;
         }
     }
 }
