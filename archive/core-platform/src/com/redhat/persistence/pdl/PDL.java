@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/07/09 $
+ * @version $Revision: #3 $ $Date: 2003/07/09 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#2 $ by $Author: ashah $, $DateTime: 2003/07/09 11:33:50 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#3 $ by $Author: ashah $, $DateTime: 2003/07/09 12:34:39 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -479,7 +479,7 @@ public class PDL {
                     if (type != null) {
                         col.setType(type.getType());
                         col.setSize(type.getSize());
-                        col.setPrecision(type.getPrecision());
+                        col.setScale(type.getScale());
                     }
                 }
             });
@@ -744,7 +744,7 @@ public class PDL {
 			to[i].getType() != Integer.MIN_VALUE) {
 			cols[i].setType(to[i].getType());
 			cols[i].setSize(to[i].getSize());
-			cols[i].setPrecision(to[i].getPrecision());
+			cols[i].setScale(to[i].getScale());
 			it.remove();
 		    }
 		}

@@ -13,12 +13,12 @@ import java.io.IOException;
  * PDLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/07/08 $
+ * @version $Revision: #2 $ $Date: 2003/07/09 $
  **/
 
 public class PDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDLWriter.java#1 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDLWriter.java#2 $ by $Author: ashah $, $DateTime: 2003/07/09 12:34:39 $";
 
     private Writer m_out;
 
@@ -146,8 +146,8 @@ public class PDLWriter {
                     write(Column.getTypeName(col.getType()));
                     if (col.getSize() >= 0) {
                         write("(" + col.getSize());
-                        if (col.getPrecision() >= 0) {
-                            write(", " + col.getPrecision());
+                        if (col.getScale() >= 0) {
+                            write(", " + col.getScale());
                         }
                         write(")");
                     }

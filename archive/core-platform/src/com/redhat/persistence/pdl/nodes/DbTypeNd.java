@@ -4,33 +4,33 @@ package com.redhat.persistence.pdl.nodes;
  * DbType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/07/08 $
+ * @version $Revision: #2 $ $Date: 2003/07/09 $
  **/
 
 public class DbTypeNd extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/nodes/DbTypeNd.java#1 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/nodes/DbTypeNd.java#2 $ by $Author: ashah $, $DateTime: 2003/07/09 12:34:39 $";
 
     public static final Field NAME =
         new Field(DbTypeNd.class, "name", IdentifierNd.class, 1, 1);
 
     private int m_size = -1;
-    private int m_precision = -1;
+    private int m_scale = -1;
 
     public void setSize(int size) {
         m_size = size;
     }
 
-    public void setPrecision(int precision) {
-        m_precision = precision;
+    public void setScale(int scale) {
+        m_scale = scale;
     }
 
     public int getSize() {
         return m_size;
     }
 
-    public int getPrecision() {
-        return m_precision;
+    public int getScale() {
+        return m_scale;
     }
 
     public int getType() {

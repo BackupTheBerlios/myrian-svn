@@ -26,12 +26,12 @@ import java.util.*;
  * the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/07/08 $
+ * @version $Revision: #2 $ $Date: 2003/07/09 $
  */
 
 public class Column extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Column.java#1 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Column.java#2 $ by $Author: ashah $, $DateTime: 2003/07/09 12:34:39 $";
 
     /**
      * The name of this Column.
@@ -50,9 +50,9 @@ public class Column extends Element {
     private int m_size;
 
     /**
-     * The precision of this Column or -1 if the Column has no precision.
+     * The scale of this Column or -1 if the Column has no scale.
      **/
-    private int m_precision;
+    private int m_scale;
 
     private boolean m_isNullable = false;
     private Set m_constraints = new HashSet();
@@ -115,8 +115,8 @@ public class Column extends Element {
      * @pre size >= -1
      **/
 
-    public Column(String columnName, int type, int size, int precision) {
-        this(columnName, type, size, precision, false);
+    public Column(String columnName, int type, int size, int scale) {
+        this(columnName, type, size, scale, false);
     }
 
     /**
@@ -126,7 +126,7 @@ public class Column extends Element {
      * @param columnName The name of this Column.
      * @param type The JDBC integer type code for this Column.
      * @param size The size of this Column.
-     * @param precision The precision of this Column.
+     * @param scale The scale of this Column.
      * @param isNullable True if the column is nullable.
      *
      * @pre (columnName != null)
@@ -134,12 +134,12 @@ public class Column extends Element {
      * @pre size >= -1
      **/
 
-    public Column(String name, int type, int size, int precision,
+    public Column(String name, int type, int size, int scale,
                   boolean isNullable) {
         m_name = name;
         m_type = type;
         m_size = size;
-        m_precision = precision;
+        m_scale = scale;
         m_isNullable = isNullable;
 
         if (m_size == 0) {
@@ -334,12 +334,12 @@ public class Column extends Element {
         m_size = size;
     }
 
-    public int getPrecision() {
-        return m_precision;
+    public int getScale() {
+        return m_scale;
     }
 
-    public void setPrecision(int precision) {
-        m_precision = precision;
+    public void setScale(int scale) {
+        m_scale = scale;
     }
 
     private static final Map DEFAULT = new HashMap();
@@ -421,7 +421,11 @@ public class Column extends Element {
         }
 
         if (m_size > -1) {
-            result.append("(" + m_size + ")");
+            if (m_scale > -1) {
+                result.append("(" + m_size + "," + m_scale + ")");
+            } else {
+                result.append("(" + m_size + ")");
+            }
         } else if (m_type == Types.VARCHAR) {
             if (hasUniqueKey()) {
                 result.append("(700)");
