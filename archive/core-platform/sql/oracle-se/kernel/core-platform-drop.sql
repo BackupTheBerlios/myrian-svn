@@ -19,7 +19,7 @@
 --
 -- @author Oumi Mehrotra (oumi@arsdigita.com) 
 -- @creation-date May 16, 2001 20:16:43
--- @version $Id: //core-platform/dev/sql/oracle-se/kernel/core-platform-drop.sql#1 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/kernel/core-platform-drop.sql#2 $
 --
 
 @@ ../../../cms/content-section/sql/oracle-se/cms-drop.sql
@@ -39,7 +39,6 @@
 @@ acs-stylesheet-drop.sql
 @@ apm-drop.sql
 @@ site-nodes-drop.sql
-@@ security-drop.sql
 @@ ../../../infrastructure/globalization/sql/oracle-se/g11n-drop.sql
 @@ ../../../infrastructure/persistence/sql/oracle-se/persistence-drop.sql
 @@ ../../../infrastructure/preferences/sql/oracle-se/preferences-drop.sql

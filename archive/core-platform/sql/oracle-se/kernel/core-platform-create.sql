@@ -19,14 +19,13 @@
 --
 -- @author Bryan Quinn (bquinn@arsdigita.com) 
 -- @creation-date May 16, 2001 20:16:43
--- @version $Id: //core-platform/dev/sql/oracle-se/kernel/core-platform-create.sql#3 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/kernel/core-platform-create.sql#4 $
 --
 
 @@ ../globalization/g11n-create.sql
 @@ ../preferences/preferences-create.sql
 @@ objects-create.sql
 @@ parties-create.sql
-@@ security-create.sql
 @@ permissions-create.sql
 @@ site-nodes-create.sql
 @@ apm-create.sql
