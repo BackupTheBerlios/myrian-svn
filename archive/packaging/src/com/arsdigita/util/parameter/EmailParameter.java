@@ -27,13 +27,13 @@ import org.apache.oro.text.perl.Perl5Util;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EmailParameter.java#4 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EmailParameter.java#5 $
  */
 public class EmailParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EmailParameter.java#4 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EmailParameter.java#5 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/21 17:54:40 $";
+        "$DateTime: 2003/10/21 21:52:30 $";
 
     private static final Perl5Util s_perl = new Perl5Util();
     private static final String s_regex =
@@ -57,7 +57,7 @@ public class EmailParameter extends StringParameter {
 
         final InternetAddress email = (InternetAddress) value;
 
-        if (email != null && !s_perl.match(s_regex, email.toString())) {
+        if (!s_perl.match(s_regex, email.toString())) {
             final ParameterError error = new ParameterError
                 (this, "The value is not a valid email address");
 

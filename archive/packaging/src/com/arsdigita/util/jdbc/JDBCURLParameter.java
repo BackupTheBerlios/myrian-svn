@@ -26,13 +26,13 @@ import org.apache.oro.text.perl.Perl5Util;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/jdbc/JDBCURLParameter.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/jdbc/JDBCURLParameter.java#3 $
  */
 public class JDBCURLParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/jdbc/JDBCURLParameter.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/jdbc/JDBCURLParameter.java#3 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/21 17:54:40 $";
+        "$DateTime: 2003/10/21 21:52:30 $";
 
     private static final Perl5Util s_perl = new Perl5Util();
     private static final String s_regex = "/^jdbc:[^:]+:.+$/";
@@ -50,7 +50,9 @@ public class JDBCURLParameter extends StringParameter {
     public void validate(final Object value, final ErrorList errors) {
         super.validate(value, errors);
 
-        if (value != null && !s_perl.match(s_regex, (String) value)) {
+        final String url = (String) value;
+
+        if (!s_perl.match(s_regex, url)) {
             final String message =
                 "The value must start with \"jdbc:\" and take the " +
                 "form jdbc:subprotocol:subname";

@@ -24,13 +24,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#11 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#12 $
  */
 public abstract class AbstractParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#11 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#12 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/21 17:54:40 $";
+        "$DateTime: 2003/10/21 21:52:30 $";
 
     private final String m_name;
     private final Class m_type;
@@ -95,7 +95,15 @@ public abstract class AbstractParameter implements Parameter {
         if (string == null) {
             return null;
         } else {
-            return unmarshal(string, errors);
+            final Object value = unmarshal(string, errors);
+
+            if (isRequired() && value == null) {
+                final ParameterError error = new ParameterError
+                    (this, "The value must not be null");
+                errors.add(error);
+            }
+
+            return value;
         }
     }
 
@@ -114,11 +122,7 @@ public abstract class AbstractParameter implements Parameter {
     }
 
     public void validate(final Object value, final ErrorList errors) {
-        Assert.exists(errors, ErrorList.class);
-
-        if (isRequired() && value == null) {
-            errors.add(new ParameterError(this, "The value must not be null"));
-        }
+        // Nothing
     }
 
     // XXX to find and root out the old signature.
@@ -135,29 +139,6 @@ public abstract class AbstractParameter implements Parameter {
             return null;
         } else {
             return value.toString();
-        }
-    }
-
-    public final void check(final ParameterValue value)
-            throws ParameterException {
-        Assert.exists(value, ParameterValue.class);
-
-        final ErrorList errors = value.getErrors();
-
-        if (!errors.isEmpty()) {
-            final StringBuffer buffer = new StringBuffer();
-
-            final Iterator iter = errors.iterator();
-
-            while (iter.hasNext()) {
-                buffer.append("\n\t");
-                buffer.append(iter.next().toString());
-            }
-
-            throw new ParameterException
-                ("Parameter " + getName() +
-                 " failed with the following errors: " + buffer.toString(),
-                 errors);
         }
     }
 
