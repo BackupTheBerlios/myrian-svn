@@ -11,10 +11,11 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/postgres/kernel/index-dnm_ungranted_context.sql#3 $
--- $DateTime: 2004/01/29 06:03:55 $
+-- $Id: //core-platform/dev/sql/ccm-core/postgres/kernel/index-dnm_ungranted_context.sql#4 $
+-- $DateTime: 2004/02/04 12:44:51 $
 -- autor: Aram Kananov <aram@kananov.com>
 
+create index dnm_ungranted_context_obj_idx on dnm_ungranted_context(object_id);
 create index dnm_ungranted_context_gctx_idx on dnm_ungranted_context(granted_context_id);
 create unique index dnm_ungranted_context_un on dnm_ungranted_context(object_id, ancestor_id);
 create index dnm_ungranted_context_anc_idx on dnm_ungranted_context(ancestor_id);
