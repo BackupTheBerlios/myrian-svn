@@ -1,19 +1,18 @@
 package com.arsdigita.persistence.proto;
 
-import com.arsdigita.persistence.metadata.*;
-import com.arsdigita.persistence.OID;
+import com.arsdigita.persistence.proto.metadata.*;
 import java.util.*;
 
 /**
  * Path
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/12/02 $
+ * @version $Revision: #2 $ $Date: 2003/01/02 $
  **/
 
 public class Path {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Path.java#1 $ by $Author: rhs $, $DateTime: 2002/12/02 12:04:21 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Path.java#2 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
 
     private static final HashMap PATHS = new HashMap();
 
@@ -110,7 +109,9 @@ public class Path {
     }
 
     public boolean isKey(ObjectType type) {
-        return getProperty(type).isKeyProperty();
+        Property prop = getProperty(type);
+        ObjectMap map = Root.getRoot().getObjectMap(prop.getContainer());
+        return map.getKeyProperties().contains(prop);
     }
 
     public ObjectType getType(ObjectType start) {

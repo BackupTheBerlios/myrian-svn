@@ -8,7 +8,9 @@ PARSER_BEGIN(PDL)
 package com.arsdigita.persistence.proto.pdl;
 
 import com.arsdigita.persistence.proto.pdl.nodes.*;
+import com.arsdigita.persistence.proto.metadata.Root;
 import com.arsdigita.persistence.proto.metadata.Role;
+import com.arsdigita.persistence.proto.metadata.ObjectMap;
 import java.io.FileReader;
 import java.util.Iterator;
 
@@ -17,12 +19,12 @@ import java.util.Iterator;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #1 $ $Date: 2002/12/31 $
+ * @version $Revision: #2 $ $Date: 2003/01/02 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.jj#1 $ by $Author: rhs $, $DateTime: 2002/12/31 15:39:17 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.jj#2 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
 
     private String m_filename;
 
@@ -69,16 +71,20 @@ public class PDL {
         st.emit();
 
         ast.traverse(new Node.Switch() {
-                private void define(ObjectType type, Property prop) {
+                private Role define(ObjectType type, Property prop) {
                     String name = prop.getName().getName();
                     if (st.getEmitted(type).hasProperty(name)) {
                         rep.fatal(prop, "duplicate property: " + name);
-                        return;
+                        return null;
                     }
 
-                    st.getEmitted(type).addProperty
-                        (new Role(prop.getName().getName(),
-                                  st.getEmitted(st.lookup(prop.getType()))));
+                    Role result =
+                        new Role(prop.getName().getName(),
+                                 st.getEmitted(st.lookup(prop.getType())),
+                                 prop.isComponent(),
+                                 prop.isCollection());
+                    st.getEmitted(type).addProperty(result);
+                    return result;
                 }
 
                 public void onProperty(Property prop) {
@@ -86,10 +92,13 @@ public class PDL {
                 }
 
                 public void onAssociation(Association assn) {
-                    define(st.lookup(assn.getRoleOne().getType()),
-                           assn.getRoleTwo());
-                    define(st.lookup(assn.getRoleTwo().getType()),
-                           assn.getRoleOne());
+                    Role one = define(st.lookup(assn.getRoleOne().getType()),
+                                      assn.getRoleTwo());
+                    Role two = define(st.lookup(assn.getRoleTwo().getType()),
+                                      assn.getRoleOne());
+                    if (one != null && two != null) {
+                        one.setReverse(two);
+                    }
                 }
             }, new Node.IncludeFilter(new Node.Field[] {
                 AST.FILES, File.OBJECT_TYPES, ObjectType.PROPERTIES,
@@ -100,18 +109,24 @@ public class PDL {
             System.out.println(it.next());
         }
 
+        final Root root = Root.getRoot();
         for (Iterator it = st.getObjectTypes().iterator(); it.hasNext(); ) {
             ObjectType ot = (ObjectType) it.next();
-            System.out.println(st.getEmitted(ot).getQualifiedName() + ":");
-            for (Iterator jit = st.getEmitted(ot).getDeclaredProperties().iterator();
-                 jit.hasNext(); ) {
-                com.arsdigita.persistence.proto.metadata.Property prop =
-                    (com.arsdigita.persistence.proto.metadata.Property)
-                    jit.next();
-                System.out.println("  " + prop.getType().getQualifiedName() +
-                                   " " + prop.getName());
-            }
+            root.addObjectType(st.getEmitted(ot));
+            root.addObjectMap(new ObjectMap(st.getEmitted(ot)));
         }
+
+        ast.traverse(new Node.Switch() {
+                public void onIdentifier(Identifier id) {
+                    ObjectType ot = (ObjectType) id.getParent().getParent();
+                    ObjectMap om = root.getObjectMap(st.getEmitted(ot));
+                    om.getKeyProperties()
+                        .add(st.getEmitted(ot).getProperty(id.getName()));
+                }
+            }, new Node.IncludeFilter(new Node.Field[] {
+                AST.FILES, File.OBJECT_TYPES, ObjectType.OBJECT_KEY,
+                ObjectKey.PROPERTIES
+            }));
     }
 
 }
@@ -355,17 +370,26 @@ Property property() :
     [ ( <COMPONENT> { p.setComponent(true); } |
         <COMPOSITE> { p.setComposite(true); } ) ]
     n = type() { p.add(Property.TYPE, n); }
-    [ multiplicity() ]
+    [ multiplicity(p) ]
     n = id() { p.add(Property.NAME, n); ln(p, n); }
     [ <EQ> ( n = column() { p.add(Property.MAPPING, n); } |
              n = join_path() { p.add(Property.MAPPING, n); } ) ]
     { return p; }
 }
 
-void multiplicity() :
-{}
+void multiplicity(Property p) :
 {
-    <LBRACKET> integer() <DOT> <DOT> ( id() | integer() ) <RBRACKET>
+    boolean isCollection = false;
+    int upper = 1;
+}
+{
+    <LBRACKET> integer() <DOT> <DOT> ( id() { isCollection = true; }
+                                       | upper = integer() ) <RBRACKET>
+    {
+        if (isCollection || upper > 1) {
+            p.setCollection(true);
+        }
+    }
 }
 
 void object_key(ObjectType ot) :

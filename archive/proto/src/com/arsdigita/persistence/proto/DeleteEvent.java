@@ -1,18 +1,17 @@
 package com.arsdigita.persistence.proto;
 
-import com.arsdigita.persistence.OID;
 import java.io.*;
 
 /**
  * DeleteEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/12/10 $
+ * @version $Revision: #4 $ $Date: 2003/01/02 $
  **/
 
 public class DeleteEvent extends ObjectEvent {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DeleteEvent.java#3 $ by $Author: rhs $, $DateTime: 2002/12/10 15:09:40 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DeleteEvent.java#4 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
 
     DeleteEvent(Session ssn, OID oid) {
         super(ssn, oid);

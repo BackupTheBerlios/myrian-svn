@@ -7,12 +7,12 @@ import java.util.*;
  * Root
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2002/12/31 $
+ * @version $Revision: #2 $ $Date: 2003/01/02 $
  **/
 
 public class Root {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Root.java#1 $ by $Author: rhs $, $DateTime: 2002/12/31 15:39:17 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Root.java#2 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
 
     private static final Root ROOT = new Root();
 
@@ -22,6 +22,7 @@ public class Root {
 
     private ArrayList m_types = new ArrayList();
     private HashMap m_typeMap = new HashMap();
+    private HashMap m_objectMaps = new HashMap();
 
     private Root() {}
 
@@ -46,10 +47,38 @@ public class Root {
 
         m_types.add(type);
         m_typeMap.put(type.getQualifiedName(), type);
+        type.setRoot(this);
+    }
+
+    public ObjectType getObjectType(String qualifiedName) {
+        return (ObjectType) m_typeMap.get(qualifiedName);
     }
 
     public Collection getObjectTypes() {
         return m_types;
+    }
+
+    public ObjectMap getObjectMap(ObjectType type) {
+        return (ObjectMap) m_objectMaps.get(type);
+    }
+
+    public void addObjectMap(ObjectMap map) {
+        if (map == null) {
+            throw new IllegalArgumentException
+                ("Cannot add null object map.");
+        }
+        if (m_objectMaps.containsKey(map.getObjectType())) {
+            throw new IllegalArgumentException
+                ("Root already contains object map for type: " +
+                 map.getObjectType().getQualifiedName());
+        }
+        if (map.getRoot() != null) {
+            throw new IllegalArgumentException
+                ("Map belongs to another Root: " + map);
+        }
+
+        m_objectMaps.put(map.getObjectType(), map);
+        map.setRoot(this);
     }
 
 }

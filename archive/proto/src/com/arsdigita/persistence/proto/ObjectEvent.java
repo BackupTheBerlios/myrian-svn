@@ -1,18 +1,17 @@
 package com.arsdigita.persistence.proto;
 
-import com.arsdigita.persistence.OID;
 import java.io.*;
 
 /**
  * ObjectEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/12/10 $
+ * @version $Revision: #5 $ $Date: 2003/01/02 $
  **/
 
 public abstract class ObjectEvent extends Event {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectEvent.java#4 $ by $Author: rhs $, $DateTime: 2002/12/10 15:09:40 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectEvent.java#5 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
 
     private ObjectData m_odata;
 

@@ -1,7 +1,6 @@
 package com.arsdigita.persistence.proto;
 
-import com.arsdigita.persistence.metadata.*;
-import com.arsdigita.persistence.*;
+import com.arsdigita.persistence.proto.metadata.*;
 import java.util.*;
 import java.io.*;
 
@@ -14,12 +13,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/12/10 $
+ * @version $Revision: #6 $ $Date: 2003/01/02 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#5 $ by $Author: rhs $, $DateTime: 2002/12/10 15:09:40 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#6 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -61,7 +60,7 @@ public class Session {
         // point.
         addEvent(new CreateEvent(this, oid), od);
 
-        for (Iterator it = oid.getObjectType().getKeyProperties();
+        for (Iterator it = oid.getObjectMap().getKeyProperties().iterator();
              it.hasNext(); ) {
             Property prop = (Property) it.next();
             set(oid, prop, oid.get(prop.getName()));
@@ -102,14 +101,13 @@ public class Session {
                 result = false;
             } else {
                 ObjectType type = oid.getObjectType();
-                for (Iterator it = type.getProperties(); it.hasNext(); ) {
-                    Property prop = (Property) it.next();
-                    if (prop.isRole()) {
-                        if (prop.isCollection()) {
-                            clear(oid, prop);
-                        } else {
-                            set(oid, prop, null);
-                        }
+                for (Iterator it = type.getRoles().iterator();
+                     it.hasNext(); ) {
+                    Role role = (Role) it.next();
+                    if (role.isCollection()) {
+                        clear(oid, role);
+                    } else {
+                        set(oid, role, null);
                     }
                 }
                 addEvent(new DeleteEvent(this, oid), od);
@@ -179,48 +177,62 @@ public class Session {
      * @param value The new value for the Property.
      **/
 
-    public void set(OID oid, Property prop, Object value) {
+    public void set(final OID oid, Property prop, final Object value) {
         if (LOG.isDebugEnabled()) {
             trace("set", new Object[] {oid, prop.getName(), value});
         }
 
-        // Instead of storing the old value and removing it we could simply do
-        // a delete of the component and count on the code in delete to add
-        // the proper remove. Not sure what makes the most sense yet.
+        prop.dispatch(new Property.Switch() {
+                public void onRole(Role role) {
+                    // Instead of storing the old value and removing it we
+                    // could simply do a delete of the component and count on
+                    // the code in delete to add the proper remove. Not sure
+                    // what makes the most sense yet.
 
-        Object old = null;
-        if (prop.isRole() && prop.isComponent() ||
-            prop.getAssociatedProperty() != null) {
-            old = get(oid, prop);
-        }
+                    Object old = null;
+                    if (role.isComponent() || role.isReversable()) {
+                        old = get(oid, role);
+                    }
 
-        PropertyData pd = fetchPropertyData(oid, prop);
-        addEvent(new SetEvent(this, oid, prop, value), pd);
+                    PropertyData pd = fetchPropertyData(oid, role);
+                    addEvent(new SetEvent(Session.this, oid, role, value), pd);
 
-        if (prop.isRole() && prop.isComponent()) {
-            PersistentObject po = (PersistentObject) old;
-            if (po != null) {
-                delete(po.getOID());
-            }
-        } else if (prop.getAssociatedProperty() != null) {
-            Property ass = prop.getAssociatedProperty();
-            PersistentObject oldpo = (PersistentObject) old;
-            PersistentObject po = (PersistentObject) value;
-            PersistentObject me = retrieve(oid);
-            if (ass.isCollection()) {
-                if (oldpo != null) {
-                    addEvent(new RemoveEvent(this, oldpo.getOID(), ass,
-                                                me));
+                    if (role.isComponent()) {
+                        PersistentObject po = (PersistentObject) old;
+                        if (po != null) {
+                            delete(po.getOID());
+                        }
+                    } else if (role.isReversable()) {
+                        Role rev = role.getReverse();
+                        PersistentObject oldpo = (PersistentObject) old;
+                        PersistentObject po = (PersistentObject) value;
+                        PersistentObject me = retrieve(oid);
+                        if (rev.isCollection()) {
+                            if (oldpo != null) {
+                                addEvent(new RemoveEvent(Session.this,
+                                                         oldpo.getOID(), rev,
+                                                         me));
+                            }
+                            if (po != null) {
+                                addEvent(new AddEvent(Session.this,
+                                                      po.getOID(), rev, me));
+                            }
+                        } else {
+                            throw new IllegalStateException
+                                ("This case is just fucked up. " +
+                                 "I'll wait till it happens to deal with it.");
+                        }
+                    }
                 }
-                if (po != null) {
-                    addEvent(new AddEvent(this, po.getOID(), ass, me));
+
+                public void onAlias(Alias alias) {
+                    set(oid, alias.getTarget(), value);
                 }
-            } else {
-                throw new IllegalStateException
-                    ("This case is just fucked up. " +
-                     "I'll wait till it happens to deal with it.");
-            }
-        }
+
+                public void onLink(Link link) {
+                    throw new Error("not implemented");
+                }
+            });
 
         if (LOG.isDebugEnabled()) {
             untrace("set");
@@ -251,7 +263,7 @@ public class Session {
         return result;
     }
 
-    private OID getLink(OID oid, Property prop, Object value) {
+/*    private OID getLink(OID oid, Property prop, Object value) {
         ObjectType lt = (ObjectType) prop.getLinkType();
 
         if (lt == null) {
@@ -270,32 +282,49 @@ public class Session {
 
             return link;
         }
-    }
+        }*/
 
 
-    public PersistentObject add(OID oid, Property prop, Object value) {
+    public PersistentObject add(final OID oid, Property prop,
+                                final Object value) {
         if (LOG.isDebugEnabled()) {
             trace("add", new Object[] {oid, prop.getName(), value});
         }
 
-        // should deal with link attributes here
-        PropertyData pd = fetchPropertyData(oid, prop);
-        addEvent(new AddEvent(this, oid, prop, value), pd);
-        if (prop.getAssociatedProperty() != null) {
-            PersistentObject me = retrieve(oid);
-            Property ass = prop.getAssociatedProperty();
-            PersistentObject po = (PersistentObject) value;
-            if (ass.isCollection()) {
-                addEvent(new AddEvent(this, po.getOID(), ass, me));
-            } else {
-                PersistentObject old =
-                    (PersistentObject) get(po.getOID(), ass);
-                if (old != null) {
-                    addEvent(new RemoveEvent(this, old.getOID(), ass, po));
+        prop.dispatch(new Property.Switch() {
+                public void onRole(Role role) {
+                    PropertyData pd = fetchPropertyData(oid, role);
+                    addEvent(new AddEvent(Session.this, oid, role, value), pd);
+                    if (role.isReversable()) {
+                        PersistentObject me = retrieve(oid);
+                        Role rev = role.getReverse();
+                        PersistentObject po = (PersistentObject) value;
+                        if (rev.isCollection()) {
+                            addEvent(new AddEvent(Session.this, po.getOID(),
+                                                  rev, me));
+                        } else {
+                            PersistentObject old =
+                                (PersistentObject) get(po.getOID(), rev);
+                            if (old != null) {
+                                addEvent(new RemoveEvent(Session.this,
+                                                         old.getOID(), rev,
+                                                         po));
+                            }
+                            addEvent(new SetEvent(Session.this, po.getOID(),
+                                                  rev, me));
+                        }
+                    }
                 }
-                addEvent(new SetEvent(this, po.getOID(), ass, me));
-            }
-        }
+
+                public void onAlias(Alias alias) {
+                    add(oid, alias.getTarget(), value);
+                }
+
+                public void onLink(Link link) {
+                    // should deal with link attributes here
+                    throw new Error("not implemented");
+                }
+            });
 
         if (LOG.isDebugEnabled()) {
             untrace("add", null);
@@ -304,29 +333,42 @@ public class Session {
         return null;
     }
 
-    public void remove(OID oid, Property prop, Object value) {
+    public void remove(final OID oid, Property prop, final Object value) {
         if (LOG.isDebugEnabled()) {
             trace("remove", new Object[] {oid, prop.getName(), value});
         }
 
-        PropertyData pd = fetchPropertyData(oid, prop);
-        addEvent(new RemoveEvent(this, oid, prop, value), pd);
+        prop.dispatch(new Property.Switch() {
+                public void onRole(Role role) {
+                    PropertyData pd = fetchPropertyData(oid, role);
+                    addEvent(new RemoveEvent(Session.this, oid, role, value),
+                             pd);
 
-        if (prop.isRole() && prop.isComponent()) {
-            PersistentObject po = (PersistentObject) value;
-            if (po != null) {
-                delete(po.getOID());
-            }
-        } else if (prop.getAssociatedProperty() != null) {
-            Property ass = (Property) prop.getAssociatedProperty();
-            PersistentObject me = retrieve(oid);
-            PersistentObject po = (PersistentObject) value;
-            if (ass.isCollection()) {
-                addEvent(new RemoveEvent(this, po.getOID(), ass, me));
-            } else {
-                addEvent(new SetEvent(this, po.getOID(), ass, null));
-            }
-        }
+                    if (role.isComponent()) {
+                        PersistentObject po = (PersistentObject) value;
+                        delete(po.getOID());
+                    } else if (role.isReversable()) {
+                        PersistentObject po = (PersistentObject) value;
+                        Role rev = role.getReverse();
+                        PersistentObject me = retrieve(oid);
+                        if (rev.isCollection()) {
+                            addEvent(new RemoveEvent
+                                (Session.this, po.getOID(), rev, me));
+                        } else {
+                            addEvent(new SetEvent
+                                (Session.this, po.getOID(), rev, null));
+                        }
+                    }
+                }
+
+                public void onAlias(Alias alias) {
+                    remove(oid, alias.getTarget(), value);
+                }
+
+                public void onLink(Link link) {
+                    throw new Error("not implemented");
+                }
+            });
 
         if (LOG.isDebugEnabled()) {
             untrace("remove");
@@ -538,11 +580,15 @@ public class Session {
         return pd;
     }
 
+    private boolean isAttribute(Property prop) {
+        return prop.getType().getModel().equals(Model.getInstance("global"));
+    }
+
     private Signature getRetrieveSignature(ObjectType type) {
         Signature result = new Signature(type);
-        for (Iterator it = type.getProperties(); it.hasNext(); ) {
+        for (Iterator it = type.getProperties().iterator(); it.hasNext(); ) {
             Property prop = (Property) it.next();
-            if (prop.isAttribute()) {
+            if (isAttribute(prop)) {
                 result.addPath(prop.getName());
             }
         }
@@ -553,7 +599,7 @@ public class Session {
 
     private Filter getOIDFilter(OID oid) {
         Filter f = null;
-        for (Iterator it = oid.getObjectType().getKeyProperties();
+        for (Iterator it = oid.getObjectMap().getKeyProperties().iterator();
              it.hasNext(); ) {
             Property prop = (Property) it.next();
             Filter eq = m_engine.getEquals(Path.getInstance(prop.getName()),
@@ -575,7 +621,7 @@ public class Session {
     }
 
     private Query getRetrieveQuery(OID oid, Property prop) {
-        if (prop.isAttribute()) {
+        if (isAttribute(prop)) {
             ObjectType type = oid.getObjectType();
             Signature sig = new Signature(type);
             sig.addPath(prop.getName());
@@ -586,13 +632,13 @@ public class Session {
             // should filter to associated object(s)
             // should deal with one way associations
             Filter f = null;
-            Property ass = prop.getAssociatedProperty();
-            if (ass != null) {
-                if (ass.isCollection()) {
-                    f = m_engine.getContains(Path.getInstance(ass.getName()),
+            Role rev = ((Role) prop).getReverse();
+            if (rev != null) {
+                if (rev.isCollection()) {
+                    f = m_engine.getContains(Path.getInstance(rev.getName()),
                                              oid);
                 } else {
-                    f = m_engine.getEquals(Path.getInstance(ass.getName()),
+                    f = m_engine.getEquals(Path.getInstance(rev.getName()),
                                            oid);
                 }
             }

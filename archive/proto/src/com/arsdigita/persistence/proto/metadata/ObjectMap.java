@@ -6,17 +6,19 @@ import java.util.*;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2002/12/31 $
+ * @version $Revision: #2 $ $Date: 2003/01/02 $
  **/
 
 public class ObjectMap {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#1 $ by $Author: rhs $, $DateTime: 2002/12/31 15:39:17 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#2 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
 
     private Root m_root;
     private ObjectType m_type;
     private ArrayList m_mappings = new ArrayList();
     private HashMap m_mappingsMap = new HashMap();
+
+    private ArrayList m_key = new ArrayList();
 
     public ObjectMap(ObjectType type) {
         m_type = type;
@@ -67,6 +69,10 @@ public class ObjectMap {
 
     public Collection getMappings() {
         return m_mappings;
+    }
+
+    public Collection getKeyProperties() {
+        return m_key;
     }
 
 }

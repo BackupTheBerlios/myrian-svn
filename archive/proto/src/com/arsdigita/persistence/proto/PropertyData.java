@@ -1,7 +1,6 @@
 package com.arsdigita.persistence.proto;
 
-import com.arsdigita.persistence.metadata.*;
-import com.arsdigita.persistence.OID;
+import com.arsdigita.persistence.proto.metadata.*;
 import java.util.*;
 import java.io.*;
 
@@ -9,12 +8,12 @@ import java.io.*;
  * PropertyData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/12/04 $
+ * @version $Revision: #3 $ $Date: 2003/01/02 $
  **/
 
 class PropertyData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyData.java#2 $ by $Author: rhs $, $DateTime: 2002/12/04 19:18:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyData.java#3 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
 
     private ObjectData m_odata;
     private Property m_prop;

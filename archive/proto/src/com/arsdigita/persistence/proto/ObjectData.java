@@ -1,7 +1,6 @@
 package com.arsdigita.persistence.proto;
 
-import com.arsdigita.persistence.metadata.*;
-import com.arsdigita.persistence.OID;
+import com.arsdigita.persistence.proto.metadata.*;
 import java.util.*;
 import java.io.*;
 
@@ -9,12 +8,12 @@ import java.io.*;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/12/06 $
+ * @version $Revision: #4 $ $Date: 2003/01/02 $
  **/
 
 class ObjectData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#3 $ by $Author: rhs $, $DateTime: 2002/12/06 11:46:27 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#4 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
 
     private Session m_ssn;
     private PersistentObject m_object;

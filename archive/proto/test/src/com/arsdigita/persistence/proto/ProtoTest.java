@@ -2,8 +2,8 @@ package com.arsdigita.persistence.proto;
 
 import com.arsdigita.tools.junit.framework.BaseTestCase;
 
-import com.arsdigita.persistence.metadata.*;
-import com.arsdigita.persistence.OID;
+import com.arsdigita.persistence.proto.metadata.*;
+import com.arsdigita.persistence.proto.pdl.PDL;
 import java.util.*;
 import java.math.*;
 import java.io.*;
@@ -12,18 +12,22 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/12/06 $
+ * @version $Revision: #4 $ $Date: 2003/01/02 $
  **/
 
 public class ProtoTest extends BaseTestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#3 $ by $Author: rhs $, $DateTime: 2002/12/06 11:46:27 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#4 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
 
     public ProtoTest(String name) {
         super(name);
     }
 
-    public void test() {
+    public void test() throws Exception {
+        PDL.main(new String[] {
+            "pdl/com/arsdigita/persistence/global.pdl", "test/pdl/Test.pdl"
+        });
+
         OID oid = new OID("test.Test", BigInteger.ZERO);
         Property NAME = oid.getObjectType().getProperty("name");
         Property OPT2MANY = oid.getObjectType().getProperty("opt2many");

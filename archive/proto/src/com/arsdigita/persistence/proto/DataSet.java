@@ -1,17 +1,17 @@
 package com.arsdigita.persistence.proto;
 
-import com.arsdigita.persistence.metadata.ObjectType;
+import com.arsdigita.persistence.proto.metadata.ObjectType;
 
 /**
  * DataSet
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/12/02 $
+ * @version $Revision: #2 $ $Date: 2003/01/02 $
  **/
 
 public class DataSet {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DataSet.java#1 $ by $Author: rhs $, $DateTime: 2002/12/02 12:04:21 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DataSet.java#2 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
 
     private Session m_ssn;
     private Query m_query;

@@ -1,8 +1,7 @@
 package com.arsdigita.persistence.proto;
 
-import com.arsdigita.persistence.metadata.ObjectType;
-import com.arsdigita.persistence.metadata.Property;
-import com.arsdigita.persistence.OID;
+import com.arsdigita.persistence.proto.metadata.ObjectType;
+import com.arsdigita.persistence.proto.metadata.Property;
 
 import java.util.*;
 
@@ -10,12 +9,12 @@ import java.util.*;
  * Cursor
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/12/06 $
+ * @version $Revision: #4 $ $Date: 2003/01/02 $
  **/
 
 public class Cursor {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Cursor.java#3 $ by $Author: rhs $, $DateTime: 2002/12/06 17:55:29 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Cursor.java#4 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
 
     private DataSet m_dset;
     private Session m_ssn;

@@ -1,8 +1,7 @@
 package com.arsdigita.persistence.proto;
 
-import com.arsdigita.persistence.metadata.ObjectType;
-import com.arsdigita.persistence.metadata.Property;
-import com.arsdigita.persistence.OID;
+import com.arsdigita.persistence.proto.metadata.ObjectType;
+import com.arsdigita.persistence.proto.metadata.Property;
 
 import java.util.*;
 
@@ -10,12 +9,12 @@ import java.util.*;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2002/12/02 $
+ * @version $Revision: #2 $ $Date: 2003/01/02 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#1 $ by $Author: rhs $, $DateTime: 2002/12/02 12:04:21 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#2 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
 
     private Signature m_signature;
 

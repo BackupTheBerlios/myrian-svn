@@ -1,9 +1,7 @@
 package com.arsdigita.persistence.proto.engine;
 
-import com.arsdigita.persistence.metadata.*;
+import com.arsdigita.persistence.proto.metadata.*;
 import com.arsdigita.persistence.proto.*;
-import com.arsdigita.persistence.proto.Event;
-import com.arsdigita.persistence.OID;
 
 import org.apache.log4j.Logger;
 
@@ -14,12 +12,12 @@ import java.util.*;
  * MemoryEngine
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/12/10 $
+ * @version $Revision: #3 $ $Date: 2003/01/02 $
  **/
 
 public class MemoryEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#2 $ by $Author: rhs $, $DateTime: 2002/12/10 15:09:40 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#3 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
 
     private static final Logger LOG = Logger.getLogger(MemoryEngine.class);
 

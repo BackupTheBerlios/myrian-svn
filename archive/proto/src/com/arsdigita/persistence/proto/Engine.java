@@ -1,18 +1,17 @@
 package com.arsdigita.persistence.proto;
 
-import com.arsdigita.persistence.OID;
-import com.arsdigita.persistence.metadata.Property;
+import com.arsdigita.persistence.proto.metadata.Property;
 
 /**
  * Engine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2002/12/10 $
+ * @version $Revision: #3 $ $Date: 2003/01/02 $
  **/
 
 public abstract class Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Engine.java#2 $ by $Author: rhs $, $DateTime: 2002/12/10 15:09:40 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Engine.java#3 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
 
     static final Engine getInstance(Session ssn) {
         return new com.arsdigita.persistence.proto.engine.MemoryEngine(ssn);

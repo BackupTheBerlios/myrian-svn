@@ -6,12 +6,12 @@ import java.util.*;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2002/12/31 $
+ * @version $Revision: #2 $ $Date: 2003/01/02 $
  **/
 
 public class ObjectType {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#1 $ by $Author: rhs $, $DateTime: 2002/12/31 15:39:17 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#2 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
 
     private Root m_root = null;
     private Model m_model;
@@ -32,6 +32,10 @@ public class ObjectType {
 
     public Root getRoot() {
         return m_root;
+    }
+
+    public Model getModel() {
+        return m_model;
     }
 
     public String getName() {
@@ -107,6 +111,34 @@ public class ObjectType {
             return m_super.getProperty(name);
         } else {
             return null;
+        }
+    }
+
+    public Collection getRoles() {
+        Collection result = getProperties();
+        for (Iterator it = result.iterator(); it.hasNext(); ) {
+            if (!(it.next() instanceof Role)) {
+                it.remove();
+            }
+        }
+        return result;
+    }
+
+    public ObjectType getBasetype() {
+        if (m_super == null) {
+            return this;
+        } else {
+            return m_super.getBasetype();
+        }
+    }
+
+    public boolean isSubtypeOf(ObjectType type) {
+        if (this.equals(type)) {
+            return true;
+        } else if (m_super != null) {
+            return m_super.isSubtypeOf(type);
+        } else {
+            return false;
         }
     }
 

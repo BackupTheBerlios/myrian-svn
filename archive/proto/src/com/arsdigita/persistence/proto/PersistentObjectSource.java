@@ -1,17 +1,15 @@
 package com.arsdigita.persistence.proto;
 
-import com.arsdigita.persistence.OID;
-
 /**
  * PersistentObjectSource
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/12/06 $
+ * @version $Revision: #4 $ $Date: 2003/01/02 $
  **/
 
 class PersistentObjectSource {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PersistentObjectSource.java#3 $ by $Author: rhs $, $DateTime: 2002/12/06 11:46:27 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PersistentObjectSource.java#4 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
 
     public PersistentObject getPersistentObject(final Session ssn,
                                                 final OID oid) {
