@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/versioning/table-vc_transactions.sql#4 $
--- $DateTime: 2003/08/15 13:46:34 $
+-- $Id: //core-platform/dev/sql/default/versioning/table-vc_transactions.sql#5 $
+-- $DateTime: 2003/08/15 17:18:56 $
 
 create table vc_transactions (
   transaction_id   integer 
@@ -25,7 +25,7 @@ create table vc_transactions (
     on delete cascade,
   modifying_user   integer,
   modifying_ip     varchar(400),
-  timestamp        timestamp default current_timestamp not null,
+  timestamp        timestamptz default current_timestamp not null,
   description      varchar(4000),
   tag              varchar(400)
 );

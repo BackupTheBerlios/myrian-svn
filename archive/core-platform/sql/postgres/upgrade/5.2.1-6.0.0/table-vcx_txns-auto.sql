@@ -11,15 +11,15 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres/upgrade/5.2.1-6.0.0/table-vcx_txns-auto.sql#2 $
--- $DateTime: 2003/08/15 13:46:34 $
+-- $Id: //core-platform/dev/sql/postgres/upgrade/5.2.1-6.0.0/table-vcx_txns-auto.sql#3 $
+-- $DateTime: 2003/08/15 17:18:56 $
 
 create table vcx_txns (
     id INTEGER not null
         constraint vcx_txns_id_p_himn5
           primary key,
     modifying_ip VARCHAR(400),
-    timestamp TIMESTAMP not null,
+    timestamp TIMESTAMPTZ not null,
     modifying_user INTEGER
         -- referential constraint for modifying_user deferred due to circular dependencies
 );

@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/notification/table-nt_requests.sql#6 $
--- $DateTime: 2003/08/15 13:46:34 $
+-- $Id: //core-platform/dev/sql/default/notification/table-nt_requests.sql#7 $
+-- $DateTime: 2003/08/15 17:18:56 $
 
 
 create table nt_requests (
@@ -37,9 +37,9 @@ create table nt_requests (
                       default '1'
                       constraint nt_requests_expand_ck
                           check (expand_group in ('0','1')),
-    request_date      timestamp
+    request_date      timestamptz
                       default current_timestamp,
-    fulfill_date      timestamp,
+    fulfill_date      timestamptz,
     status            varchar(20)
                       default 'pending'
                       constraint nt_requests_status_ck

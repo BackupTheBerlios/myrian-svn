@@ -11,12 +11,12 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres/lucene/proc-update-dirty.sql#6 $
--- $DateTime: 2003/08/15 13:46:34 $
+-- $Id: //core-platform/dev/sql/postgres/lucene/proc-update-dirty.sql#7 $
+-- $DateTime: 2003/08/15 17:18:56 $
 
 
 
-create or replace function lucene_update_dirty(timestamp, timestamp, integer, integer)
+create or replace function lucene_update_dirty(timestamptz, timestamptz, integer, integer)
 returns integer
 as '
 declare

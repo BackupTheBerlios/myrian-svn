@@ -11,15 +11,15 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres/upgrade/5.2.1-6.0.0/alter-lucene.sql#2 $
--- $DateTime: 2003/08/15 13:46:34 $
+-- $Id: //core-platform/dev/sql/postgres/upgrade/5.2.1-6.0.0/alter-lucene.sql#3 $
+-- $DateTime: 2003/08/15 17:18:56 $
 
 alter table lucene_docs drop column is_dirty;
 alter table lucene_docs add dirty integer;
 update lucene_docs set dirty = 2147483647;
 alter table lucene_docs alter dirty set not null;
 
-create or replace function lucene_update_dirty(timestamp, timestamp, integer, integer)
+create or replace function lucene_update_dirty(timestamptz, timestamptz, integer, integer)
 returns integer
 as '
 declare

@@ -11,14 +11,14 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres/upgrade/5.2.1-6.0.0/misc.sql#6 $
--- $DateTime: 2003/08/15 15:46:34 $
+-- $Id: //core-platform/dev/sql/postgres/upgrade/5.2.1-6.0.0/misc.sql#7 $
+-- $DateTime: 2003/08/15 17:18:56 $
 
 -- redefine function because calling current_timestamp() no longer works.  We
 -- need to drop the parens.
 drop function currentDate();
 create or replace function currentDate()
-  returns timestamp as '
+  returns timestamptz as '
   declare
   begin
     return current_timestamp;

@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/workflow/table-cw_task_comments.sql#5 $
--- $DateTime: 2003/08/15 13:46:34 $
+-- $Id: //core-platform/dev/sql/default/workflow/table-cw_task_comments.sql#6 $
+-- $DateTime: 2003/08/15 17:18:56 $
 
 create table cw_task_comments (
   comment_id              integer
@@ -22,7 +22,7 @@ create table cw_task_comments (
                           constraint task_comments_task_id_fk 
                           references cw_tasks(task_id),
   task_comment            varchar(4000),
-  comment_date            timestamp default current_timestamp,
+  comment_date            timestamptz default current_timestamp,
   party_id                integer,
   --
   -- allow same comment on many tasks, many comments on same task

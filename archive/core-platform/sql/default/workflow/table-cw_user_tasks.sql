@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/workflow/table-cw_user_tasks.sql#5 $
--- $DateTime: 2003/08/15 13:46:34 $
+-- $Id: //core-platform/dev/sql/default/workflow/table-cw_user_tasks.sql#6 $
+-- $DateTime: 2003/08/15 17:18:56 $
 
 create table cw_user_tasks (
   task_id                integer
@@ -24,8 +24,8 @@ create table cw_user_tasks (
   locking_user_id        integer,
   --     use constraint when using users table
   --                         constraint user_tasks_locking_user_id_fk references users,
-  start_date             timestamp,
-  due_date               timestamp,
+  start_date             timestamptz,
+  due_date               timestamptz,
   duration_minutes       integer ,
   notification_sender_id integer 
 );

@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/messaging/table-messages.sql#5 $
--- $DateTime: 2003/08/15 13:46:34 $
+-- $Id: //core-platform/dev/sql/default/messaging/table-messages.sql#6 $
+-- $DateTime: 2003/08/15 17:18:56 $
 
 create table messages ( 
     message_id     integer
@@ -33,7 +33,7 @@ create table messages (
                    constraint messages_body_nn not null,
     type           varchar(50)
                    constraint messages_type_nn not null,
-    sent_date      timestamp 
+    sent_date      timestamptz 
                    default current_timestamp
                    constraint messages_sent_date_nn not null,
     in_reply_to    integer
