@@ -8,12 +8,12 @@ import java.util.*;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/01/10 $
+ * @version $Revision: #3 $ $Date: 2003/01/10 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#2 $ by $Author: rhs $, $DateTime: 2003/01/10 09:31:34 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#3 $ by $Author: rhs $, $DateTime: 2003/01/10 10:27:20 $";
 
     static final Object wrap(Session ssn, Object obj) {
         if (obj instanceof PersistentObject) {
@@ -76,10 +76,16 @@ class DataObjectImpl implements DataObject {
     }
 
     public Object get(String property) {
+        Property prop = getObjectType().getProperty(property);
+        if (prop.isCollection()) {
+            return new DataAssociationImpl(m_ssn, this, prop);
+        }
+
         if (m_po == null) {
             return m_temp.get(property);
         } else {
-            return wrap(m_ssn, m_po.getSession().get(m_po.getOID(), convert(property)));
+            return wrap(m_ssn, m_po.getSession().get(m_po.getOID(),
+                                                     convert(property)));
         }
     }
 
