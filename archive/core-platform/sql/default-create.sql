@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default-create.sql#8 $
--- $DateTime: 2003/02/13 14:09:25 $
+-- $Id: //core-platform/dev/sql/default-create.sql#9 $
+-- $DateTime: 2003/04/24 14:34:41 $
 
 include default/function-currentDate.sql
 
@@ -262,3 +262,4 @@ include default/web/index-application_type_privilege_map.sql
 
 include default/kernel/index-foreign_keys.sql 
 
+include default/mimetypes/insert-cms_mime_status.sql 

@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres-create.sql#18 $
--- $DateTime: 2003/04/10 15:12:46 $
+-- $Id: //core-platform/dev/sql/postgres-create.sql#19 $
+-- $DateTime: 2003/04/24 14:34:41 $
 
 begin;
 
@@ -220,6 +220,8 @@ begin;
 \i default/web/index-applications.sql
 \i default/web/index-application_types.sql
 \i default/web/index-application_type_privilege_map.sql
+
+\i default/mimetypes/insert-cms_mime_status.sql
 
 \i ddl/postgres/deferred.sql
 

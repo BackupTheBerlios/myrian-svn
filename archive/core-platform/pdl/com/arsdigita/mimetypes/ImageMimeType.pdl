@@ -11,15 +11,15 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/mimetypes/ImageMimeType.pdl#1 $
-// $DateTime: 2003/04/23 17:03:01 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/mimetypes/ImageMimeType.pdl#2 $
+// $DateTime: 2003/04/24 14:34:41 $
 
 model com.arsdigita.cms;
 
 import com.arsdigita.kernel.*;
 
 object type ImageMimeType extends MimeType {
-    String[1..1]   sizerClass = cms_image_mime_types.sizer_class VARCHAR(4000);
+    String[0..1]   sizerClass = cms_image_mime_types.sizer_class VARCHAR(4000);
 
     reference key (cms_image_mime_types.mime_type);
 }
