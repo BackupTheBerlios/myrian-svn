@@ -35,13 +35,13 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#7 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#8 $
  */
 final class ParameterPrinter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#7 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#8 $" +
         "$Author: scott $" +
-        "$DateTime: 2003/11/12 14:19:50 $";
+        "$DateTime: 2003/11/12 21:42:24 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterPrinter.class);
@@ -120,8 +120,10 @@ final class ParameterPrinter {
         register("com.arsdigita.web.WebConfig");
         register("com.arsdigita.templating.TemplatingConfig");
         register("com.arsdigita.kernel.KernelConfig");
+        register("com.arsdigita.kernel.security.SecurityConfig");
         register("com.arsdigita.mail.MailConfig");
         register("com.arsdigita.versioning.VersioningConfig");
+        register("com.arsdigita.search.SearchConfig");
         register("com.arsdigita.search.lucene.LuceneConfig");
         register("com.arsdigita.kernel.security.SecurityConfig");
         register("com.arsdigita.bebop.BebopConfig");
