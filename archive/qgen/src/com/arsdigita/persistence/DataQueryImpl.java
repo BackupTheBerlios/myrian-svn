@@ -43,6 +43,7 @@ import com.redhat.persistence.oql.Static;
 import com.redhat.persistence.oql.Variable;
 import com.redhat.persistence.pdl.PDL;
 
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,14 +57,34 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/03/24 $
+ * @version $Revision: #9 $ $Date: 2004/03/24 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataQueryImpl.java#8 $ by $Author: richardl $, $DateTime: 2004/03/24 10:43:33 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataQueryImpl.java#9 $ by $Author: ashah $, $DateTime: 2004/03/24 12:59:16 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
+
+    private static final String s_unalias =
+        "com.arsdigita.persistence.DataQueryImpl.unalias";
+
+    private static final String s_mapAndAddPath =
+        "com.arsdigita.persistence.DataQueryImpl.mapAndAddPath";
+
+    private SQLParser getParser(String key, Reader reader,
+                                SQLParser.Mapper mapper) {
+        TransactionContext ctx = m_ssn.getTransactionContext();
+        SQLParser p = (SQLParser) ctx.getAttribute(key);
+        if (p == null) {
+            p = new SQLParser(reader, mapper);
+            ctx.setAttribute(key, p);
+        } else {
+            p.initialize(reader, mapper);
+        }
+
+        return p;
+    }
 
     private Session m_ssn;
     private com.redhat.persistence.Session m_pssn;
@@ -554,7 +575,7 @@ class DataQueryImpl implements DataQuery {
 
     String mapAndAddPaths(String s) {
         StringReader reader = new StringReader(s);
-        SQLParser p = new SQLParser(reader, m_mapper);
+        SQLParser p = getParser(s_mapAndAddPath, reader, m_mapper);
 
         try {
             p.sql();
@@ -670,7 +691,7 @@ class DataQueryImpl implements DataQuery {
     String unalias(String expr) {
         if (expr == null) { return null; }
         StringReader reader = new StringReader(expr);
-        SQLParser p = new SQLParser(reader, m_unaliaser);
+        SQLParser p = getParser(s_unalias, reader, m_unaliaser);
 
         try {
             p.sql();
