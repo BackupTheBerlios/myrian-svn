@@ -6,7 +6,10 @@ import java.lang.reflect.*;
 import java.util.*;
 import javax.jdo.spi.*;
 
+import org.apache.log4j.Logger;
+
 class C {
+    private final static Logger s_log = Logger.getLogger(C.class);
 
     public static Property prop(PersistenceCapable pc, int field) {
         ObjectType type = type(pc);
@@ -26,7 +29,12 @@ class C {
     public static ObjectType type(PersistenceCapable pc) {
         PersistenceManagerImpl pmi = (PersistenceManagerImpl)
             pc.jdoGetPersistenceManager();
-        if (pmi == null) { throw new IllegalStateException("pmi==null"); }
+        if (pmi == null) {
+            // XXX: pc.toString() causes a StackOverflowError
+            throw new IllegalStateException
+                ("pmi==null; pc.class=" + pc.getClass().getName() +
+                 "; pc=" + System.identityHashCode(pc));
+        }
 
         Class cls = pc.getClass();
         Root root = pmi.getSession().getRoot();
