@@ -1,6 +1,6 @@
 begin;
 
-create view dual as select 1;
+\i postgres/oracle-compatibility.sql
 
 \i default/function-currentDate.sql
 
