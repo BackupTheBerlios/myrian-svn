@@ -36,6 +36,7 @@ import com.redhat.persistence.engine.rdbms.RDBMSQuerySource;
 import com.redhat.persistence.engine.rdbms.ConnectionSource;
 import com.redhat.persistence.engine.rdbms.OracleWriter;
 import com.redhat.persistence.engine.rdbms.PostgresWriter;
+import com.redhat.persistence.profiler.rdbms.*;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
@@ -57,12 +58,22 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #22 $ $Date: 2003/07/08 $
+ * @version $Revision: #23 $ $Date: 2003/07/20 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
 
     private static final Logger LOG = Logger.getLogger(Session.class);
+
+    final StatementProfiler m_prof = new StatementProfiler();
+
+    public void startProfiling() {
+        m_prof.start();
+    }
+
+    public void stopProfiling() {
+        m_prof.stop();
+    }
 
     private List m_dataObjects = new ArrayList();
     FlushEventProcessor m_beforeFP;
@@ -165,10 +176,10 @@ public class Session {
     {
         switch (DbHelper.getDatabase()) {
         case DbHelper.DB_ORACLE:
-            m_engine = new RDBMSEngine(m_cs, new OracleWriter());
+            m_engine = new RDBMSEngine(m_cs, new OracleWriter(), m_prof);
             break;
         case DbHelper.DB_POSTGRES:
-            m_engine = new RDBMSEngine(m_cs, new PostgresWriter());
+            m_engine = new RDBMSEngine(m_cs, new PostgresWriter(), m_prof);
             break;
         default:
             DbHelper.unsupportedDatabaseError("persistence");
