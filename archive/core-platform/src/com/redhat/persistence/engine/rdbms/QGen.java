@@ -15,12 +15,12 @@ import org.apache.log4j.Logger;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/07/08 $
+ * @version $Revision: #2 $ $Date: 2003/07/20 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/QGen.java#1 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/QGen.java#2 $ by $Author: rhs $, $DateTime: 2003/07/20 14:25:59 $";
 
     private static final Logger LOG = Logger.getLogger(QGen.class);
 
@@ -341,6 +341,9 @@ class QGen {
 
         result.setLimit(m_query.getLimit());
         result.setOffset(m_query.getOffset());
+
+        // For profiling
+        result.setQuery(m_query);
 
         return result;
     }

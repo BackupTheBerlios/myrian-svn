@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/07/19 $
+ * @version $Revision: #3 $ $Date: 2003/07/20 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#2 $ by $Author: rhs $, $DateTime: 2003/07/19 20:26:22 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#3 $ by $Author: rhs $, $DateTime: 2003/07/20 14:25:59 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -26,6 +26,7 @@ public class RDBMSEngine extends Engine {
     private ArrayList m_operations = new ArrayList();
     private HashMap m_operationMap = new HashMap();
     private EventSwitch m_switch = new EventSwitch(this);
+    private Event m_event = null;
     private HashMap m_environments = new HashMap();
     private ArrayList m_mutations = new ArrayList();
     private ArrayList m_mutationTypes = new ArrayList();
@@ -96,7 +97,11 @@ public class RDBMSEngine extends Engine {
 
     DML getOperation(Object obj, Table table) {
         Object key = new CompoundKey(obj, table);
-        return (DML) m_operationMap.get(key);
+        DML result = (DML) m_operationMap.get(key);
+        if (m_profiler != null) {
+            result.addEvent(m_event);
+        }
+        return result;
     }
 
     void clearUpdates(Object obj) {
@@ -138,6 +143,9 @@ public class RDBMSEngine extends Engine {
     }
 
     void addOperation(Operation op) {
+        if (m_profiler != null) {
+            op.addEvent(m_event);
+        }
         m_operations.add(op);
     }
 
@@ -280,7 +288,9 @@ public class RDBMSEngine extends Engine {
                             throw new IllegalStateException
                                 ("event generated twice: " + ev);
                         }
+                        m_event = ev;
                         ev.dispatch(m_switch);
+                        m_event = null;
                         generated.add(ev);
                     }
                     for (int i = ops; i < m_operations.size(); i++) {
@@ -399,6 +409,11 @@ public class RDBMSEngine extends Engine {
                 StatementLifecycle cycle = null;
                 if (m_profiler != null) {
                     RDBMSStatement stmt = new RDBMSStatement(sql);
+                    stmt.setQuery(op.getQuery());
+                    for (Iterator it = op.getEvents().iterator();
+                         it.hasNext(); ) {
+                        stmt.addEvent((Event) it.next());
+                    }
                     cycle = m_profiler.getLifecycle(stmt);
                 }
 

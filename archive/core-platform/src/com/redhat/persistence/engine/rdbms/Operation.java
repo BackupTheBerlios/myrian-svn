@@ -12,18 +12,22 @@ import java.util.*;
  * Operation
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/07/08 $
+ * @version $Revision: #2 $ $Date: 2003/07/20 $
  **/
 
 abstract class Operation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Operation.java#1 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Operation.java#2 $ by $Author: rhs $, $DateTime: 2003/07/20 14:25:59 $";
 
     private static final Logger LOG = Logger.getLogger(Operation.class);
 
     private Environment m_env;
     private HashSet m_parameters = new HashSet();
     private HashMap m_mappings = new HashMap();
+
+    // For profiling
+    private ArrayList m_events = null;
+    private Query m_query = null;
 
     protected Operation(Environment env) {
         m_env = env;
@@ -77,6 +81,26 @@ abstract class Operation {
 
     public void setMappings(Map map) {
         m_mappings.putAll(map);
+    }
+
+    void addEvent(Event ev) {
+        if (ev == null) { throw new IllegalArgumentException("null event"); }
+        if (m_events == null) { m_events = new ArrayList(); }
+        if (!m_events.contains(ev)) {
+            m_events.add(ev);
+        }
+    }
+
+    Collection getEvents() {
+        return m_events;
+    }
+
+    void setQuery(Query query) {
+        m_query = query;
+    }
+
+    Query getQuery() {
+        return m_query;
     }
 
     abstract void write(SQLWriter w);
