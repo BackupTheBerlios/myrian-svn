@@ -17,7 +17,7 @@
           |       |
           |       |---> Or
           |       |
-          |       |---> Equals
+          |       |---> Equals ---> Path
           |       |
           |       .
           |       .
@@ -32,7 +32,9 @@ Problems:
 
   * Parameters stored solely in signature is awkward for ad-hoc
     filtering.
-  * Need to represent expressions somehow.
+  * Everything is done in terms of paths, but whereever paths appear
+    it is usually also valid to specify an arbitrary expression, e.g.
+    upper(path). To do this we need to represent expressions somehow.
 
 Issues:
 
@@ -86,12 +88,36 @@ Nested queries with environment attached to query:
             FQ(?2)
 
 
+Everthing is an expression:
+
   Expression
     /_\
      |
      |
      |---Query
-     |
+     |    /_\
+     |     |
+     |     |---SourceQuery
+     |     |     |
+     |     |     |
+     |     |     '--->Declaration (Source)
+     |     |           /_\
+     |     |            |
+     |     |            |---Source (???)
+     |     |            |
+     |     |            |---Parameter
+     |     |            |
+     |     |            '---ComputedThing
+     |     |
+     |     |---FilterQuery
+     |     |
+     |     |---LimitQuery
+     |     |
+     |     |---OrderedQuery
+     |     |
+     |     |---AggregationQuery
+     |     |
+     |     '---SelectionQuery ???
      |
      |---Condition
      |     /_\
@@ -105,10 +131,26 @@ Nested queries with environment attached to query:
      |      |---Equals
      |      |
      |      |---Contains
-     |      .
-     |      .
-     |      .
+     |      |
+     |      '---In
      |
-     |---Reference
+     |---Aggregate
+     |     /_\
+     |      |
+     |      |---Count
+     |      |
+     |      |---Sum
+     |      |
+     |      |---Average
+     |      |
+     |      |---Variance
+     |      |
+     |      |---Max
+     |      |
+     |      '---Min
+     |
+     |---Variable
+     |
+     |---Value
      |
      '---Passthrough

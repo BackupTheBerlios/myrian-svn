@@ -4,12 +4,12 @@ package com.arsdigita.persistence.proto;
  * Condition
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/04/24 $
+ * @version $Revision: #2 $ $Date: 2003/04/27 $
  **/
 
 public abstract class Condition extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Condition.java#1 $ by $Author: rhs $, $DateTime: 2003/04/24 08:07:11 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Condition.java#2 $ by $Author: rhs $, $DateTime: 2003/04/27 11:28:46 $";
 
     public abstract class Switch {
 
@@ -145,6 +145,30 @@ public abstract class Condition extends Expression {
             return "not " + m_expr;
         }
 
+    }
+
+    public static final And and(Expression left, Expression right) {
+        return new And(left, right);
+    }
+
+    public static final Or or(Expression left, Expression right) {
+        return new Or(left, right);
+    }
+
+    public static final Equals equals(Expression left, Expression right) {
+        return new Equals(left, right);
+    }
+
+    public static final Contains contains(Expression left, Expression right) {
+        return new Contains(left, right);
+    }
+
+    public static final In in(Expression left, Expression right) {
+        return new In(left, right);
+    }
+
+    public static final Not not(Expression expr) {
+        return new Not(expr);
     }
 
 }
