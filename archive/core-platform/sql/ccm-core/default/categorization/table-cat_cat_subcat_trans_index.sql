@@ -11,9 +11,11 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/default/categorization/table-cat_cat_subcat_trans_index.sql#2 $
--- $DateTime: 2003/11/17 15:52:45 $
+-- $Id: //core-platform/dev/sql/ccm-core/default/categorization/table-cat_cat_subcat_trans_index.sql#3 $
+-- $DateTime: 2004/02/02 14:32:16 $
 
+
+-- See also: //core-platform/dev/sql/ccm-core/default/kernel/table-group_subgroup_trans_index.sql
 
 create table cat_cat_subcat_trans_index (
       category_id   integer
@@ -31,12 +33,12 @@ create table cat_cat_subcat_trans_index (
                     not null,
       constraint cat_cat_subcat_index_pk primary key(category_id, subcategory_id),
       -- This prevents circularity in the category-subcategory graph.
-      -- If group_id=subgroup_id then n_paths=0.
+      -- If category_id=subcategory_id, then n_paths=0.
 	  constraint cat_subcat_circularity_ck 
                  check ( category_id != subcategory_id or n_paths=0 ),
       -- This constraint makes sure that we never forget to delete rows when
       -- we decrement n_paths.  n_paths should never reach 0 except for
-      -- mappings where group_id=subgroup_id (in which case n_paths should
+      -- mappings where category_id=subcategory_id (in which case n_paths should
       -- always be 0 due to above constraint).
       constraint cat_cat_subcat_n_paths_ck
                  check (n_paths>0 or category_id=subcategory_id)
