@@ -60,20 +60,17 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/08/27 $
+ * @version $Revision: #4 $ $Date: 2003/09/10 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/pdl/PDL.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/pdl/PDL.java#4 $ by $Author: rhs $, $DateTime: 2003/09/10 10:46:29 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;
 
-    // the abstract syntax tree root nod
-    private com.redhat.persistence.pdl.PDL m_pdl =
-        new com.redhat.persistence.pdl.PDL();
-    private StringBuffer m_file = new StringBuffer(1024*10);
+    private PDLCompiler m_pdlc = new PDLCompiler();
 
     /**
      * Generates the metadata that corresponds to the AST generated from the
@@ -82,9 +79,7 @@ public class PDL {
      * @param root the metadata root node to build the metadata beneath
      */
     public void generateMetadata(MetadataRoot root) {
-        m_pdl.emit(Root.getRoot());
-        m_pdl.emitVersioned();
-        MetadataRoot.loadPrimitives();
+        m_pdlc.emit(root);
     }
 
     /**
@@ -95,7 +90,7 @@ public class PDL {
      * @throws PDLException thrown on a parsing error.
      */
     public void load(Reader r, String filename) throws PDLException {
-        m_pdl.load(r, filename);
+        m_pdlc.parse(filename, r);
     }
 
     /**
@@ -249,10 +244,10 @@ public class PDL {
                 writer.setTestPDL(true);
             }
 
-            List tables = new ArrayList(Root.getRoot().getTables());
+            List tables = new ArrayList(root.getRoot().getTables());
             for (Iterator it = tables.iterator(); it.hasNext(); ) {
                 Table table = (Table) it.next();
-                if (!files.contains(Root.getRoot().getFilename(table))) {
+                if (!files.contains(root.getRoot().getFilename(table))) {
                     it.remove();
                 }
             }

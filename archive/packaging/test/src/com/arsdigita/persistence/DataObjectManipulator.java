@@ -37,16 +37,16 @@ import org.apache.log4j.*;
  * DataObjectManipulator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/09/10 $
  */
 public class DataObjectManipulator {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/DataObjectManipulator.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/DataObjectManipulator.java#3 $ by $Author: rhs $, $DateTime: 2003/09/10 10:46:29 $";
     private static final Logger s_log =
         Logger.getLogger(DataObjectManipulator.class.getName());
 
     private static final Column getColumn(Property p) {
-	Root root = Root.getRoot();
+	Root root = SessionManager.getSession().getMetadataRoot().getRoot();
 	ObjectMap om = root.getObjectMap
 	    (root.getObjectType(p.getContainer().getQualifiedName()));
 	Mapping m = om.getMapping(Path.get(p.getName()));

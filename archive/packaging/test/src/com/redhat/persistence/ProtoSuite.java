@@ -23,12 +23,12 @@ import junit.framework.Test;
  * ProtoSuite
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/09/10 $
  **/
 
 public class ProtoSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/redhat/persistence/ProtoSuite.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/redhat/persistence/ProtoSuite.java#3 $ by $Author: rhs $, $DateTime: 2003/09/10 10:46:29 $";
 
     public ProtoSuite() {}
 
@@ -44,7 +44,7 @@ public class ProtoSuite extends PackageTestSuite {
         ProtoSuite suite = new ProtoSuite();
         populateSuite(suite);
         BaseTestSetup wrapper = new BaseTestSetup(suite);
-        wrapper.setInitScriptTarget("com.arsdigita.db.Initializer");
+        wrapper.setPerformInitialization(false);
         wrapper.setSetupSQLScript
             (System.getProperty("test.sql.dir") +
              "/com/arsdigita/persistence/setup.sql");

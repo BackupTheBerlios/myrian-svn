@@ -25,18 +25,12 @@ import java.io.*;
  * Root
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/08/29 $
+ * @version $Revision: #5 $ $Date: 2003/09/10 $
  **/
 
 public class Root {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/metadata/Root.java#4 $ by $Author: rhs $, $DateTime: 2003/08/29 10:31:35 $";
-
-    private static final Root ROOT = new Root();
-
-    public static final Root getRoot() {
-        return ROOT;
-    }
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/metadata/Root.java#5 $ by $Author: rhs $, $DateTime: 2003/09/10 10:46:29 $";
 
     private static final class Location {
 
@@ -71,7 +65,7 @@ public class Root {
     private Mist m_ops = new Mist(this);
     private Map m_adapters = new HashMap();
 
-    private Root() {}
+    public Root() {}
 
     public void setLocation(Object element, String filename, int line,
 			    int column) {

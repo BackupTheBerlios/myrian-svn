@@ -32,20 +32,26 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/08/27 $
+ * @version $Revision: #4 $ $Date: 2003/09/10 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/redhat/persistence/ProtoTest.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/redhat/persistence/ProtoTest.java#4 $ by $Author: rhs $, $DateTime: 2003/09/10 10:46:29 $";
 
 
     public ProtoTest(String name) {
         super(name);
     }
 
+    private static final String TEST_PDL =
+        "test/pdl/com/arsdigita/persistence/Test.pdl";
+
     public void test() throws Exception {
-        PDL.main(new String[] {"test/pdl/com/arsdigita/persistence/Test.pdl"});
+        Root root = new Root();
+        PDL pdl = new PDL();
+        pdl.load(new FileReader(TEST_PDL), TEST_PDL);
+        pdl.emit(root);
 
         SQLWriter w;
         switch (DbHelper.getDatabase()) {
@@ -62,7 +68,7 @@ public class ProtoTest extends TestCase {
         }
 
         Session ssn = new Session
-            (Root.getRoot(), new RDBMSEngine
+            (root, new RDBMSEngine
              (new ConnectionSource() {
                 public Connection acquire() {
                     try {
@@ -81,7 +87,7 @@ public class ProtoTest extends TestCase {
 
         ObjectType TEST = ssn.getRoot().getObjectType("test.Test");
         ObjectType ICLE = ssn.getRoot().getObjectType("test.Icle");
-        ObjectType COMPONENT = Root.getRoot().getObjectType("test.Component");
+        ObjectType COMPONENT = ssn.getRoot().getObjectType("test.Component");
 
         Adapter a = new Generic.Adapter();
         ssn.getRoot().addAdapter(Generic.class, a);

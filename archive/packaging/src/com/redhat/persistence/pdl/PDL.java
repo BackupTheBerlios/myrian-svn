@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/09/09 $
+ * @version $Revision: #6 $ $Date: 2003/09/10 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/pdl/PDL.java#5 $ by $Author: rhs $, $DateTime: 2003/09/09 17:32:16 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/pdl/PDL.java#6 $ by $Author: rhs $, $DateTime: 2003/09/10 10:46:29 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -1335,7 +1335,8 @@ public class PDL {
         for (int i = 0; i < args.length; i++) {
             pdl.load(new FileReader(args[i]), args[i]);
         }
-        pdl.emit(Root.getRoot());
+        Root root = new Root();
+        pdl.emit(root);
     }
 
 }

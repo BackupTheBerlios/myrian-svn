@@ -30,7 +30,7 @@ import java.util.*;
  * file being named after the fully qualified model name.
  *
  * @author Patrick McNeill
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/persistence/pdl/PDLOutputter.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/persistence/pdl/PDLOutputter.java#3 $
  */
 public class PDLOutputter {
     /**
@@ -43,7 +43,7 @@ public class PDLOutputter {
         throws IOException {
         Iterator models = root.getModels();
 
-        Root rt = Root.getRoot();
+        Root rt = root.getRoot();
 
         while (models.hasNext()) {
             Model model = (Model) models.next();

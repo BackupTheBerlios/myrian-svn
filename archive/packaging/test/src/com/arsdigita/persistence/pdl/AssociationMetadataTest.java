@@ -16,6 +16,11 @@
 package com.arsdigita.persistence.pdl;
 
 import com.redhat.persistence.metadata.*;
+import com.redhat.persistence.pdl.*;
+import com.redhat.persistence.pdl.PDL;
+
+import java.io.*;
+
 import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 
@@ -23,12 +28,12 @@ import org.apache.log4j.Logger;
  * AssociationMetadataTest
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #1 $ $Date: 2003/09/09 $
+ * @version $Revision: #2 $ $Date: 2003/09/10 $
  **/
 
 public class AssociationMetadataTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/pdl/AssociationMetadataTest.java#1 $ by $Author: justin $, $DateTime: 2003/09/09 13:02:17 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/pdl/AssociationMetadataTest.java#2 $ by $Author: rhs $, $DateTime: 2003/09/10 10:46:29 $";
 
     private static Logger s_log =
         Logger.getLogger(AssociationMetadataTest.class);
@@ -37,15 +42,23 @@ public class AssociationMetadataTest extends TestCase {
         super(name);
     }
 
+    private Root m_root;
     private ObjectType m_ot1;
     private ObjectType m_ot2;
     private ObjectType m_ot3;
 
+    private static final String FILE =
+        "test/pdl/com/arsdigita/persistence/Association.pdl";
+
     protected void setUp() throws Exception {
         super.setUp();
-        m_ot1 = Root.getRoot().getObjectType("Association.Obj1");
-        m_ot2 = Root.getRoot().getObjectType("Association.Obj2");
-        m_ot3 = Root.getRoot().getObjectType("Association.Obj3");
+        m_root = new Root();
+        PDL pdl = new PDL();
+        pdl.load(new FileReader(FILE), FILE);
+        pdl.emit(m_root);
+        m_ot1 = m_root.getObjectType("Association.Obj1");
+        m_ot2 = m_root.getObjectType("Association.Obj2");
+        m_ot3 = m_root.getObjectType("Association.Obj3");
     }
 
     public void testLinkAttribute1() {

@@ -16,6 +16,7 @@
 package com.arsdigita.persistence.pdl;
 
 import com.arsdigita.db.DbHelper;
+import com.arsdigita.persistence.SessionManager;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Column;
@@ -41,7 +42,7 @@ import com.arsdigita.util.cmd.*;
 /**
  * SQLRegressionGenerator
  *
- * Usage: 
+ * Usage:
  * <pre>
  *  cdweb
  *  cd webapps/ccm/WEB-INF
@@ -126,7 +127,7 @@ public class SQLRegressionGenerator {
             throw new PDLException(PDL.CMD.usage());
         }
 
-        
+
         Set all = new HashSet();
         all.addAll(files);
 
@@ -137,7 +138,7 @@ public class SQLRegressionGenerator {
     }
 
     private static void generateSQL(List files, Map options) throws PDLException {
-        MetadataRoot root = MetadataRoot.getMetadataRoot();
+        MetadataRoot root = SessionManager.getSession().getMetadataRoot();
 
         ObjectType acsObject = root.getObjectType(ACSObject.BASE_DATA_OBJECT_TYPE);
 
@@ -150,15 +151,15 @@ public class SQLRegressionGenerator {
                 throw new UncheckedWrapperException("cannot find file " + checkFile, ex);
             }
             PrintStream out = new PrintStream(file);
-            
+
             Iterator types = root.getObjectTypes().iterator();
             while (types.hasNext()) {
                 ObjectType specificType = (ObjectType)types.next();
-                
+
                 if (!specificType.isSubtypeOf(acsObject)) {
                     continue;
                 }
-                
+
                 ObjectType type = specificType;
                 do {
                     generateRowTest(specificType, type, out, false);
@@ -177,31 +178,34 @@ public class SQLRegressionGenerator {
                 throw new UncheckedWrapperException("cannot find file " + fixFile, ex);
             }
             PrintStream out = new PrintStream(file);
-            
+
             Iterator types = root.getObjectTypes().iterator();
             while (types.hasNext()) {
                 ObjectType specificType = (ObjectType)types.next();
-                
+
                 if (!specificType.isSubtypeOf(acsObject)) {
                     continue;
                 }
-                
+
                 generateRowTest(specificType, specificType, out, true);
             }
         }
     }
-    
-    private static void generateRowTest(ObjectType specificType, 
+
+    private static void generateRowTest(ObjectType specificType,
                                         ObjectType type,
                                         PrintStream out,
                                         boolean fix) {
+        MetadataRoot root = SessionManager.getSession().getMetadataRoot();
 
-        com.redhat.persistence.metadata.ObjectType protoType = Root.getRoot().getObjectType(type.getQualifiedName());
-        Assert.truth(protoType != null, "null proto type for " + type.getQualifiedName() );
+        com.redhat.persistence.metadata.ObjectType protoType =
+            root.getRoot().getObjectType(type.getQualifiedName());
+        Assert.truth(protoType != null,
+                     "null proto type for " + type.getQualifiedName());
 
         Column key;
         try {
-            final ObjectMap objectMap = Root.getRoot().getObjectMap(protoType);
+            final ObjectMap objectMap = root.getRoot().getObjectMap(protoType);
             final Table mdTable = objectMap.getTable();
             final UniqueKey primaryKey = mdTable.getPrimaryKey();
             final Column[] columns = primaryKey.getColumns();
@@ -218,15 +222,15 @@ public class SQLRegressionGenerator {
         }
         String col = key.getName();
         String table = key.getTable().getName();
-        
-        
+
+
         if (fix) {
-            out.println("select 'Deleting objects " + specificType.getQualifiedName() + 
+            out.println("select 'Deleting objects " + specificType.getQualifiedName() +
                         " not present in " + table + "." + col + "' as check from dual;\n");
             out.println("delete from acs_objects \n" +
                         " where object_type = '" + specificType.getQualifiedName() + "'\n" +
-                        "   and not exists (\n" + 
-                        "       select 1 \n" + 
+                        "   and not exists (\n" +
+                        "       select 1 \n" +
                         "         from " + table + "\n" +
                         "        where " + table + "." + col + " = acs_objects.object_id\n" +
                         "       );\n\n\n");
@@ -236,12 +240,12 @@ public class SQLRegressionGenerator {
             out.println("select object_id, display_name\n" +
                         "  from acs_objects \n" +
                         " where object_type = '" + specificType.getQualifiedName() + "'\n" +
-                        "   and not exists (\n" + 
-                        "       select 1 \n" + 
+                        "   and not exists (\n" +
+                        "       select 1 \n" +
                         "         from " + table + "\n" +
                         "        where " + table + "." + col + " = acs_objects.object_id\n" +
                         "       );\n\n\n");
         }
     }
-                           
+
 }

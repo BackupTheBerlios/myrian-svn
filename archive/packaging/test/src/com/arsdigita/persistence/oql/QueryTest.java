@@ -31,12 +31,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/09/10 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/oql/QueryTest.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/oql/QueryTest.java#3 $ by $Author: rhs $, $DateTime: 2003/09/10 10:46:29 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);
@@ -46,7 +46,7 @@ public class QueryTest extends PersistenceTestCase {
     }
 
     private void doTest(String name, String typeName, String[] properties) {
-        Root root = Root.getRoot();
+        Root root = getSession().getMetadataRoot().getRoot();
         ObjectType type = root.getObjectType(typeName);
         assertTrue("No such type: " + typeName, type != null);
         Signature sig = new Signature(type);
@@ -276,7 +276,7 @@ public class QueryTest extends PersistenceTestCase {
 
     private void doConditionTest(String from, String assn, String to,
                                  int cond) {
-        Root root = Root.getRoot();
+        Root root = getSession().getMetadataRoot().getRoot();
         ObjectType FROM = root.getObjectType(from);
         ObjectType TO = root.getObjectType(to);
         Signature sig = new Signature(TO);
@@ -321,7 +321,7 @@ public class QueryTest extends PersistenceTestCase {
      **/
 
     private void doTableTest(String tableName) {
-        Root root = Root.getRoot();
+        Root root = getSession().getMetadataRoot().getRoot();
         Table table = root.getTable(tableName);
         assertTrue("No such table: " + tableName, table != null);
         String result = compare(table.getName() + ".sql", table.getSQL(false));

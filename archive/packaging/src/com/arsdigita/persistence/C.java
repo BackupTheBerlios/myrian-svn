@@ -24,16 +24,16 @@ import java.util.*;
  * C
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/08/27 $
+ * @version $Revision: #4 $ $Date: 2003/09/10 $
  **/
 
 final class C {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/C.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/C.java#4 $ by $Author: rhs $, $DateTime: 2003/09/10 10:46:29 $";
 
     public static final com.redhat.persistence.metadata.ObjectType type
         (Root root, String qname) {
-        return root.getRoot().getObjectType(qname);
+        return root.getObjectType(qname);
     }
 
     public static final com.redhat.persistence.metadata.ObjectType type
