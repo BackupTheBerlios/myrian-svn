@@ -1,6 +1,8 @@
 package com.arsdigita.persistence.proto.pdl.adapters;
 
 import com.arsdigita.persistence.proto.metadata.*;
+import com.arsdigita.util.AssertionError;
+
 import java.sql.*;
 
 
@@ -8,12 +10,12 @@ import java.sql.*;
  * DateAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/05/29 $
+ * @version $Revision: #3 $ $Date: 2003/05/29 $
  **/
 
 public class DateAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/adapters/DateAd.java#2 $ by $Author: vadim $, $DateTime: 2003/05/29 14:36:50 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/adapters/DateAd.java#3 $ by $Author: vadim $, $DateTime: 2003/05/29 14:56:04 $";
 
     public DateAd() {
         super(Root.getRoot().getObjectType("global.Date"), Types.TIMESTAMP);
@@ -21,7 +23,21 @@ public class DateAd extends SimpleAdapter {
 
     public void bind(PreparedStatement ps, int index, Object obj, int type)
         throws SQLException {
-        Timestamp tstamp = new Timestamp(((java.util.Date) obj).getTime());
+
+        Timestamp tstamp = null;
+
+        // Timestamp overrides the getTime() method in a way that requires us to
+        // jump through a few extra hoops here.
+        if ( obj instanceof Timestamp ) {
+            tstamp = (Timestamp) obj;
+        } else if (obj instanceof java.util.Date) {
+            tstamp = new Timestamp(((java.util.Date) obj).getTime());
+        } else {
+            throw new AssertionError
+                ("Not a Date: " +
+                 ( obj == null ? "null" : obj.getClass().getName()));
+        }
+
         ps.setTimestamp(index, tstamp);
     }
 
@@ -30,7 +46,8 @@ public class DateAd extends SimpleAdapter {
         if (tstamp == null) {
             return null;
         } else {
-            return new java.util.Date(tstamp.getTime());
+            return new java.util.Date(tstamp.getTime() +
+                                      tstamp.getNanos() / 1000000);
         }
     }
 }
