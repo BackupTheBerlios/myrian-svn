@@ -11,23 +11,35 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/test-qgen/sql/ccm-core/upgrade/postgres-6.0.1-6.1.0.sql#2 $
--- $DateTime: 2004/03/16 17:15:26 $
+-- $Id: //core-platform/test-qgen/sql/ccm-core/upgrade/postgres-6.0.1-6.1.0.sql#3 $
+-- $DateTime: 2004/03/22 13:05:27 $
 
 \echo Red Hat WAF 6.0.1 -> 6.1.0 Upgrade Script (PostgreSQL)
 
 begin;
 
+\i ../postgres/upgrade/6.0.1-6.1.0/table-admin_app-auto.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/table-agentportlets-auto.sql
-\i ../postgres/upgrade/6.0.1-6.1.0/table-inits-auto.sql
+\i ../postgres/upgrade/6.0.1-6.1.0/table-forms_lstnr_rmt_svr_post-auto.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/table-init_requirements-auto.sql
+\i ../postgres/upgrade/6.0.1-6.1.0/table-inits-auto.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/table-keystore-auto.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/table-lucene_ids-auto.sql
+\i ../postgres/upgrade/6.0.1-6.1.0/table-sitemap_app-auto.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/table-webapps-auto.sql
-\i ../postgres/upgrade/6.0.1-6.1.0/table-forms_lstnr_rmt_svr_post-auto.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/deferred.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/update-host-unique-index.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/update-cat_root_cat_object_map.sql
+
+alter table cms_mime_extensions alter mime_type drop not null;
+alter table cms_mime_extensions add constraint cms_mim_exten_mim_type_f_7pwwd foreign key(mime_type) references cms_mime_types(mime_type);
+drop table ct_item_file_attachments;
+drop table parameterized_privileges;
+create index agentport_superport_id_idx on agentportlets(superportlet_id);
+create index init_reqs_reqd_init_idx on init_requirements(required_init);
+
+-- insert mime type file extensions
+\i ../default/upgrade/6.0.1-6.1.0/insert-cms_mime_extensions.sql
 
 -- Upgrade script for new permission denormalization
 -- Privilege Hierarchy
@@ -75,6 +87,14 @@ begin;
 \i ../postgres/upgrade/6.0.1-6.1.0/triggers-dnm_privileges.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/triggers-dnm_context.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/triggers-dnm_parties.sql
+
+create index dnm_group_membership_grp_idx on dnm_group_membership(pd_group_id);
+create index dnm_ungranted_context_obj_idx on dnm_ungranted_context(object_id);
+
+drop index dnm_gc_uk;
+drop index dnm_o1gc_necid_oid;
+drop index dnm_o1gc_uk1;
+drop index dnm_ungranted_context_un;
 
 drop trigger object_context_in_tr on object_context;
 drop trigger object_context_up_tr on object_context;
