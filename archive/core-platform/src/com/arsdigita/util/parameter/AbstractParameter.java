@@ -31,13 +31,13 @@ import org.apache.commons.beanutils.ConversionException;
  *
  * @see Parameter
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameter.java#5 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameter.java#6 $
  */
 public abstract class AbstractParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameter.java#5 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/11/10 11:45:06 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameter.java#6 $" +
+        "$Author: vadim $" +
+        "$DateTime: 2003/12/02 13:13:07 $";
 
     private final String m_name;
     private final Class m_type;
@@ -148,7 +148,7 @@ public abstract class AbstractParameter implements Parameter {
     //
 
     /**
-     * Calls {@link #doRead(ParameterReader,ErrorList}.
+     * Calls {@link #doRead(ParameterReader,ErrorList)}.
      *
      * @see Parameter#read(ParameterReader,ErrorList)
      */
@@ -215,7 +215,7 @@ public abstract class AbstractParameter implements Parameter {
     }
 
     /**
-     * Calls {@link #doValidate(Object,ErrorList} if
+     * Calls {@link #doValidate(Object,ErrorList)} if
      * <code>value</code> is not null.  Otherwise, if the value is
      * <em>required and null</em>, an error is added to
      * <code>errors</code> and <code>doValidate</code> is not called.
@@ -260,7 +260,7 @@ public abstract class AbstractParameter implements Parameter {
     }
 
     /**
-     * Calls {@link #doWrite(ParameterWriter,Object}.
+     * Calls {@link #doWrite(ParameterWriter,Object)}.
      *
      * @see Parameter#write(ParameterWriter,Object)
      */

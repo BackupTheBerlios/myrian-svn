@@ -22,17 +22,17 @@ package com.arsdigita.util.parameter;
  * errors encountered while reading are added to an error list.
  * This class is counterpart to <code>ParameterWriter</code>.
  *
- * @see Parameter#write(ParameterWriter,ErrorList)
+ * @see Parameter#write(ParameterWriter, Object)
  * @see ErrorList
  * @see ParameterWriter
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterReader.java#4 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterReader.java#5 $
  */
 public interface ParameterReader {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterReader.java#4 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/11/10 12:19:50 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterReader.java#5 $" +
+        "$Author: vadim $" +
+        "$DateTime: 2003/12/02 13:13:07 $";
 
     /**
      * Reads an encoded <code>String</code> value for
