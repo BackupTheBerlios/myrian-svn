@@ -28,12 +28,12 @@ import java.util.*;
  * PooledConnectionSourceTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/05/03 $
+ * @version $Revision: #2 $ $Date: 2004/05/04 $
  **/
 
 public class PooledConnectionSourceTest extends TestCase {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/PooledConnectionSourceTest.java#1 $ by $Author: rhs $, $DateTime: 2004/05/03 11:48:01 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/PooledConnectionSourceTest.java#2 $ by $Author: rhs $, $DateTime: 2004/05/04 14:18:14 $";
 
     private static final String JDBC_PREFIX = "jdbc:test:";
     private static final Map CONNECTIONS = new HashMap();
@@ -273,6 +273,12 @@ public class PooledConnectionSourceTest extends TestCase {
                                 (String cat, String scm, String tbl,
                                  String[] types) {
                                 return new MockSingleRowResultSet();
+                            }
+                            public String getDatabaseProductName() {
+                                return "Mock Product Name";
+                            }
+                            public String getDatabaseProductVersion() {
+                                return "Mock Version";
                             }
                         };
                     }
