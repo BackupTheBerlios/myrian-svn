@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/test/pdl/com/arsdigita/x/versioning/metadata.pdl#1 $
-// $DateTime: 2003/04/25 11:57:22 $
+// $Id: //core-platform/proto/test/pdl/com/arsdigita/x/versioning/metadata.pdl#2 $
+// $DateTime: 2003/04/30 13:46:51 $
 
 model x.version.test01;
 
@@ -83,6 +83,22 @@ object type UT3 {
 object type UT4 {
     BigInteger[1..1] id = t_ut4.id INTEGER;
     String[0..1] ut4attr = t_ut4.attr VARCHAR;
+
+    object key(id);
+}
+
+
+versioned object type VTC3 {
+    BigInteger[1..1] id = te_vtc3.id INTEGER;
+    String[0..1] name = te_vtc3.name VARCHAR;
+
+    object key(id);
+}
+
+object type C2 {
+    BigInteger[1..1] id = te_c2.id INTEGER;
+    String[0..1] name = te_c2.name VARCHAR;
+    composite VTC3[1..1] vtc3 = join te_c2.composite_id to te_vtc3.id;
 
     object key(id);
 }
