@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/07/09 $
+ * @version $Revision: #5 $ $Date: 2003/07/09 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#4 $ by $Author: rhs $, $DateTime: 2003/07/09 14:42:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#5 $ by $Author: rhs $, $DateTime: 2003/07/09 15:26:29 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -461,7 +461,9 @@ public class PDL {
     private void unique(Node nd, Column[] cols, boolean primary) {
         Table table = cols[0].getTable();
         if (table.getUniqueKey(cols) != null) {
-            m_errors.warn(nd, "duplicate key");
+            // Can't warn about this yet since we have no syntax that
+            // lets you not specify duplicate keys.
+            //m_errors.warn(nd, "duplicate key");
             return;
         }
         UniqueKey key = new UniqueKey(table, null, cols);
