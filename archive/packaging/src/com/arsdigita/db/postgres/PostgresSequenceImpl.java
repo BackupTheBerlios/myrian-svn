@@ -33,7 +33,7 @@ import java.sql.PreparedStatement;
 
 public class PostgresSequenceImpl extends SequenceImpl {
 
-    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/db/postgres/PostgresSequenceImpl.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/db/postgres/PostgresSequenceImpl.java#3 $ by $Author: rhs $, $DateTime: 2003/09/12 19:13:04 $";
 
     private String m_sequenceName;
 
@@ -47,29 +47,9 @@ public class PostgresSequenceImpl extends SequenceImpl {
         return new PostgresSequenceImpl(sequenceName);
     }
 
-    public BigDecimal getCurrentValue() throws SQLException {
-        Connection conn = ConnectionManager.getConnection();
-        try {
-            BigDecimal result = this.getCurrentValue(conn);
-            return result;
-        } finally {
-            ConnectionManager.returnConnection(conn);
-        }
-    }
-
-    public BigDecimal getNextValue() throws SQLException {
-        Connection conn = ConnectionManager.getConnection();
-        try {
-            BigDecimal result = this.getNextValue(conn);
-            return result;
-        } finally {
-            ConnectionManager.returnConnection(conn);
-        }
-    }
-
     public BigDecimal getCurrentValue(Connection conn) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement(
-                                                       "select currval('" + m_sequenceName + "')");
+        PreparedStatement stmt = conn.prepareStatement
+            ("select currval('" + m_sequenceName + "')");
         try {
             ResultSet rs = stmt.executeQuery();
             try {
@@ -88,8 +68,8 @@ public class PostgresSequenceImpl extends SequenceImpl {
     }
 
     public BigDecimal getNextValue(Connection conn) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement(
-                                                       "select nextval('" + m_sequenceName + "')");
+        PreparedStatement stmt = conn.prepareStatement
+            ("select nextval('" + m_sequenceName + "')");
         try {
             ResultSet rs = stmt.executeQuery();
 

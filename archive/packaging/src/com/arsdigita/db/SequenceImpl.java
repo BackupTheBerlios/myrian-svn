@@ -31,11 +31,7 @@ import java.sql.SQLException;
 
 public abstract class SequenceImpl {
 
-    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/db/SequenceImpl.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
-
-    public abstract BigDecimal getCurrentValue() throws SQLException;
-
-    public abstract BigDecimal getNextValue() throws SQLException;
+    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/db/SequenceImpl.java#3 $ by $Author: rhs $, $DateTime: 2003/09/12 19:13:04 $";
 
     public abstract BigDecimal getCurrentValue(Connection conn)
         throws SQLException;

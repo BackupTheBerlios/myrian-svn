@@ -15,9 +15,14 @@
 
 package com.arsdigita.db;
 
+import com.arsdigita.db.oracle.OracleSequenceImpl;
+import com.arsdigita.db.postgres.PostgresSequenceImpl;
+import com.arsdigita.util.*;
+import com.arsdigita.persistence.SessionManager;
+
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.sql.SQLException;
+import java.sql.*;
 import org.apache.log4j.Logger;
 
 /**
@@ -36,33 +41,27 @@ import org.apache.log4j.Logger;
 
 public class Sequences {
 
-    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/db/Sequences.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/db/Sequences.java#3 $ by $Author: rhs $, $DateTime: 2003/09/12 19:13:04 $";
 
     private static final Logger s_log =
         Logger.getLogger(Sequences.class);
 
-    private static String implName =
-        "com.arsdigita.db.oracle.OracleSequenceImpl";
-
     private static final String defaultSequenceName = "acs_object_id_seq";
 
-    private static SequenceImpl getSequenceImpl(String sequenceName) {
-        SequenceImpl seq = null;
+    private static SequenceImpl getSequenceImpl(Connection conn,
+                                                String sequenceName)
+        throws SQLException {
+        String url = conn.getMetaData().getURL();
 
-        try {
-            Method m = Class.forName(implName).getMethod("createSequence",
-                                                         new Class[] {String.class});
-
-            seq = (SequenceImpl) m.invoke(null, new Object[] {sequenceName});
-        } catch (Exception e) {
-            s_log.warn(e);
+        switch (DbHelper.getDatabaseFromURL(url)) {
+        case DbHelper.DB_ORACLE:
+            return OracleSequenceImpl.createSequence(sequenceName);
+        case DbHelper.DB_POSTGRES:
+            return PostgresSequenceImpl.createSequence(sequenceName);
+        default:
+            DbHelper.unsupportedDatabaseError("sequences");
+            return null;
         }
-
-        return seq;
-    }
-
-    protected static void setSequenceImplName(String impName) {
-        implName = impName;
     }
 
     public static BigDecimal getCurrentValue() throws SQLException {
@@ -76,44 +75,34 @@ public class Sequences {
     public static BigDecimal getCurrentValue(String sequenceName)
         throws SQLException {
 
-        java.sql.Connection conn = ConnectionManager.getCurrentThreadConnection();
-        if (conn == null) {
-            return getSequenceImpl(sequenceName).getCurrentValue();
-        } else {
-            return getNextValue(sequenceName, conn);
-        }
+        Connection conn = SessionManager.getSession().getConnection();
+        return getNextValue(sequenceName, conn);
     }
 
     public static BigDecimal getNextValue(String sequenceName)
         throws SQLException {
-        java.sql.Connection conn = ConnectionManager.getCurrentThreadConnection();
-        if (conn == null) {
-            return getSequenceImpl(sequenceName).getNextValue();
-        } else {
-            return getNextValue(sequenceName, conn);
-        }
+        Connection conn = SessionManager.getSession().getConnection();
+        return getNextValue(sequenceName, conn);
     }
 
-    public static BigDecimal getCurrentValue(java.sql.Connection conn)
+    public static BigDecimal getCurrentValue(Connection conn)
         throws SQLException {
         return getCurrentValue(defaultSequenceName, conn);
     }
 
-    public static BigDecimal getNextValue(java.sql.Connection conn)
+    public static BigDecimal getNextValue(Connection conn)
         throws SQLException {
         return getNextValue(defaultSequenceName,conn);
     }
 
     public static BigDecimal getCurrentValue(String sequenceName,
-                                             java.sql.Connection conn)
+                                             Connection conn)
         throws SQLException {
-
-        return getSequenceImpl(sequenceName).getCurrentValue(conn);
+        return getSequenceImpl(conn, sequenceName).getCurrentValue(conn);
     }
 
-    public static BigDecimal getNextValue(String sequenceName,
-                                          java.sql.Connection conn)
+    public static BigDecimal getNextValue(String sequenceName, Connection conn)
         throws SQLException {
-        return getSequenceImpl(sequenceName).getNextValue(conn);
+        return getSequenceImpl(conn, sequenceName).getNextValue(conn);
     }
 }
