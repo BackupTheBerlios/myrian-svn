@@ -51,10 +51,10 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/10 $ */
+ * @version $Revision: #3 $ $Date: 2003/01/10 $ */
 
 public class OID {
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/OID.java#2 $ by $Author: rhs $, $DateTime: 2003/01/10 13:56:45 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/OID.java#3 $ by $Author: rhs $, $DateTime: 2003/01/10 14:47:01 $";
 
     private ObjectType m_type;
     private Map m_values = new HashMap();
@@ -133,7 +133,8 @@ public class OID {
 
         if (it.hasNext()) {
             throw new IllegalArgumentException
-                ("This object type has a compound key.");
+                ("This object type has a compound key: " + type + "(" +
+                 getObjectMap().getKeyProperties() + ")");
         }
 
         String attr = prop.getName();
