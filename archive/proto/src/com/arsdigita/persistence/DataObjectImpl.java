@@ -2,21 +2,71 @@ package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.*;
 import com.arsdigita.persistence.proto.Session;
+import com.arsdigita.persistence.proto.Event;
+import com.arsdigita.persistence.proto.CreateEvent;
+import com.arsdigita.persistence.proto.DeleteEvent;
+import com.arsdigita.persistence.proto.SetEvent;
+import com.arsdigita.persistence.proto.AddEvent;
+import com.arsdigita.persistence.proto.RemoveEvent;
 import java.util.*;
 
 /**
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/02/26 $
+ * @version $Revision: #9 $ $Date: 2003/03/06 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#8 $ by $Author: rhs $, $DateTime: 2003/02/26 22:04:12 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#9 $ by $Author: rhs $, $DateTime: 2003/03/06 14:09:52 $";
 
     private Session m_ssn;
     private OID m_oid;
+    private Set m_observers = new HashSet();
+
+    private static final class ObserverEntry {
+
+        private DataObserver m_observer;
+        private Set m_firing = new HashSet();
+
+        ObserverEntry(DataObserver observer) {
+            m_observer = observer;
+        }
+
+        public DataObserver getObserver() {
+            return m_observer;
+        }
+
+        public boolean isFiring(Event event) {
+            return m_firing.contains(event.getClass());
+        }
+
+        public void setFiring(Event event) {
+            m_firing.add(event.getClass());
+        }
+
+        public void clearFiring(Event event) {
+            m_firing.remove(event.getClass());
+        }
+
+        public int hashCode() {
+            return m_observer.hashCode();
+        }
+
+        public boolean equals(Object other) {
+            if (other instanceof ObserverEntry) {
+                return m_observer.equals(((ObserverEntry) other).m_observer);
+            } else {
+                return super.equals(other);
+            }
+        }
+
+        public String toString() {
+            return "Observer: " + m_observer;
+        }
+
+    }
 
     DataObjectImpl(ObjectType type) {
         m_oid = new OID(type);
@@ -119,7 +169,96 @@ class DataObjectImpl implements DataObject {
     }
 
     public void addObserver(DataObserver observer) {
-        throw new Error("not implemented");
+        if (observer == null) {
+            throw new IllegalArgumentException("Can't add a null observer.");
+        }
+        ObserverEntry entry = new ObserverEntry(observer);
+        if (!m_observers.contains(entry)) {
+            if (m_firing != null) {
+                throw new IllegalStateException
+                    ("Can't add a new observer from within another " +
+                     "observer.\n" +
+                     "Trying to add: " + observer + "\n" +
+                     "Currently firing: " + m_firing + "\n" +
+                     "Current observers: " + m_observers);
+            }
+            m_observers.add(entry);
+        }
+    }
+
+    private ObserverEntry m_firing = null;
+
+    void fireObserver(Event event, final boolean before,
+                      boolean swallowReentrence) {
+        ObserverEntry old = m_firing;
+        try {
+            for (Iterator it = m_observers.iterator(); it.hasNext(); ) {
+                ObserverEntry entry = (ObserverEntry) it.next();
+                final DataObserver observer = entry.getObserver();
+                if (entry.isFiring(event)) {
+                    if (!swallowReentrence) {
+                        throw new PersistenceException
+                            ("Loop detected while firing a DataObserver. " +
+                             "This probably resulted from calling the save " +
+                             "method of a data object from within a " +
+                             "beforeSave observer registered on that " +
+                             "same data object, or the analogous situation " +
+                             "with delete and beforeDelete/afterDelete.");
+                    }
+                } else {
+                    try {
+                        entry.setFiring(event);
+                        m_firing = entry;
+                        event.dispatch(new Event.Switch() {
+                                public void onCreate(CreateEvent e) {
+                                    if (before) {
+                                        observer.beforeSave
+                                            (DataObjectImpl.this);
+                                    } else {
+                                        observer.afterSave
+                                            (DataObjectImpl.this);
+                                    }
+                                }
+
+                                public void onDelete(DeleteEvent e) {
+                                    if (before) {
+                                        observer.beforeDelete
+                                            (DataObjectImpl.this);
+                                    } else {
+                                        observer.afterDelete
+                                            (DataObjectImpl.this);
+                                    }
+                                }
+
+                                public void onSet(SetEvent e) {
+                                    String prop = e.getProperty().getName();
+                                    observer.set
+                                        (DataObjectImpl.this, prop, get(prop),
+                                         e.getArgument());
+                                }
+
+                                public void onAdd(AddEvent e) {
+                                    observer.add
+                                        (DataObjectImpl.this,
+                                         e.getProperty().getName(),
+                                         (DataObject) e.getArgument());
+                                }
+
+                                public void onRemove(RemoveEvent e) {
+                                    observer.remove
+                                        (DataObjectImpl.this,
+                                         e.getProperty().getName(),
+                                         (DataObject) e.getArgument());
+                                }
+                            });
+                    } finally {
+                        entry.clearFiring(event);
+                    }
+                }
+            }
+        } finally {
+            m_firing = old;
+        }
     }
 
     public DataHandler setDataHandler(DataHandler handler) {

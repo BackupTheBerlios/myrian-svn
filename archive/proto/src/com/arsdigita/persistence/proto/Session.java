@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #39 $ $Date: 2003/02/28 $
+ * @version $Revision: #40 $ $Date: 2003/03/06 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#39 $ by $Author: vadim $, $DateTime: 2003/02/28 16:01:18 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#40 $ by $Author: rhs $, $DateTime: 2003/03/06 14:09:52 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -40,7 +40,9 @@ public class Session {
 
     private Set m_violations = new HashSet();
 
-    private final Set m_eventProcessors = new HashSet();
+    private final Set m_beforeActivate = new HashSet();
+    private final Set m_beforeFlush = new HashSet();
+    private final Set m_afterFlush = new HashSet();
 
     public Session(Engine engine, QuerySource source) {
         m_engine = engine;
@@ -448,6 +450,21 @@ public class Session {
             getObjectData(obj).getPropertyData(prop).isModified();
     }
 
+    private void process(Collection processors, Collection events) {
+        for (Iterator it = processors.iterator(); it.hasNext(); ) {
+            EventProcessor ep = (EventProcessor) it.next();
+            write(ep, events);
+            ep.flush();
+        }
+    }
+
+    private void write(EventProcessor ep, Collection events) {
+        for (Iterator it = events.iterator(); it.hasNext(); ) {
+            Event ev = (Event) it.next();
+            ep.write(ev);
+        }
+    }
+
     /**
      * Performs all operations queued up by the session. This is automatically
      * called when necessary in order to insure that queries performed by the
@@ -457,6 +474,8 @@ public class Session {
         if (LOG.isDebugEnabled()) {
             trace("flush", new Object[] {});
         }
+
+        process(m_beforeFlush, m_events);
 
         for (Iterator it = m_events.iterator(); it.hasNext(); ) {
             ((Event) it.next()).m_flushable = true;
@@ -500,14 +519,7 @@ public class Session {
             ev.sync();
         }
 
-        for (Iterator ii = m_eventProcessors.iterator(); ii.hasNext(); ) {
-            EventProcessor ep = (EventProcessor) ii.next();
-            for (Iterator events = written.iterator(); events.hasNext(); ) {
-                Event event = (Event) events.next();
-                ep.write(event);
-            }
-            ep.flush();
-        }
+        process(m_afterFlush, written);
 
         if (LOG.isInfoEnabled()) {
             if (m_events.size() > 0) {
@@ -583,6 +595,8 @@ public class Session {
     }
 
     private void processPending() {
+        process(m_beforeActivate, m_pending);
+
         for (Iterator it = m_pending.iterator(); it.hasNext(); ) {
             Event ev = (Event) it.next();
             ev.activate();
@@ -697,6 +711,28 @@ public class Session {
 
     void removeViolation(PropertyData pd) { m_violations.remove(pd); }
 
+    private void check(EventProcessor ep) {
+        if (ep == null) {
+            throw new IllegalArgumentException
+                ("null event processor");
+        }
+    }
+
+    public void addBeforeActivate(EventProcessor ep) {
+        check(ep);
+        m_beforeActivate.add(ep);
+    }
+
+    public void addBeforeFlush(EventProcessor ep) {
+        check(ep);
+        m_beforeFlush.add(ep);
+    }
+
+    public void addAfterFlush(EventProcessor ep) {
+        check(ep);
+        m_afterFlush.add(ep);
+    }
+
     // FIXME: Once the old Session class and proto.Session are merged, this
     // method should be made package-private. It is (and should be) only used by
     // SessionManager. -- vadimn@redhat.com, 2003-02-28
@@ -704,8 +740,7 @@ public class Session {
      * <span style="color:FireBrick">FIXME</span> this shouldn't be public.
      **/
     public void addEventProcessor(EventProcessor ep) {
-        Assert.assertNotNull(ep, "event processor");
-        m_eventProcessors.add(ep);
+        addAfterFlush(ep);
     }
 
     void dump() {

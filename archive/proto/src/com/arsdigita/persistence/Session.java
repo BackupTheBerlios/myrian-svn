@@ -22,6 +22,11 @@ import com.arsdigita.persistence.proto.Adapter;
 import com.arsdigita.persistence.proto.Signature;
 import com.arsdigita.persistence.proto.Query;
 import com.arsdigita.persistence.proto.PropertyMap;
+import com.arsdigita.persistence.proto.EventProcessor;
+import com.arsdigita.persistence.proto.Event;
+import com.arsdigita.persistence.proto.PropertyEvent;
+import com.arsdigita.persistence.proto.ObjectEvent;
+import com.arsdigita.persistence.proto.CreateEvent;
 import com.arsdigita.persistence.proto.metadata.Root;
 import com.arsdigita.persistence.proto.metadata.Property;
 import com.arsdigita.persistence.proto.engine.MemoryEngine;
@@ -49,7 +54,7 @@ import java.sql.SQLException;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #16 $ $Date: 2003/02/27 $
+ * @version $Revision: #17 $ $Date: 2003/03/06 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -135,6 +140,48 @@ public class Session {
 
     private TransactionContext m_ctx = new TransactionContext(m_ssn);
     private MetadataRoot m_root = MetadataRoot.getMetadataRoot();
+
+    private static final void fireEvent(Event e) {
+        fireEvent(e, true);
+    }
+
+    private static final void fireEvent(Event e, boolean before) {
+        Object o = e.getObject();
+        if (o instanceof DataObjectImpl) {
+            DataObjectImpl doi = (DataObjectImpl) o;
+            doi.fireObserver(e, before, !(before && e instanceof CreateEvent));
+        }
+    }
+
+        {
+            m_ssn.addBeforeActivate(new EventProcessor() {
+                    public void write(Event e) {
+                        if (e instanceof PropertyEvent) {
+                            fireEvent(e);
+                        }
+                    }
+
+                    public void flush() { }
+                });
+            m_ssn.addBeforeFlush(new EventProcessor() {
+                    public void write(Event e) {
+                        if (e instanceof ObjectEvent) {
+                            fireEvent(e, true);
+                        }
+                    }
+
+                    public void flush() { }
+                });
+            m_ssn.addAfterFlush(new EventProcessor() {
+                    public void write(Event e) {
+                        if (e instanceof ObjectEvent) {
+                            fireEvent(e, false);
+                        }
+                    }
+
+                    public void flush() { }
+                });
+        }
 
     com.arsdigita.persistence.proto.Session getProtoSession() {
         return m_ssn;
