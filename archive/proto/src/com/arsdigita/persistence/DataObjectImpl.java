@@ -10,12 +10,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2003/03/28 $
+ * @version $Revision: #15 $ $Date: 2003/04/02 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#14 $ by $Author: ashah $, $DateTime: 2003/03/28 15:46:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#15 $ by $Author: ashah $, $DateTime: 2003/04/02 17:38:11 $";
 
     private final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -167,6 +167,8 @@ class DataObjectImpl implements DataObject {
     public void delete() {
         try {
             m_ssn.delete(this);
+            m_ssn.flush();
+            m_ssn.assertFlushed(this);
         } catch (ProtoException pe) {
             throw new PersistenceException(pe);
         }

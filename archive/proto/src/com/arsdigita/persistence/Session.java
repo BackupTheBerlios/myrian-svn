@@ -54,7 +54,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #23 $ $Date: 2003/03/28 $
+ * @version $Revision: #24 $ $Date: 2003/04/02 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -445,7 +445,11 @@ public class Session {
      **/
 
     public boolean delete(OID oid) {
-        return m_ssn.delete(retrieve(oid));
+        DataObject dobj = retrieve(oid);
+        boolean result = m_ssn.delete(dobj);
+        m_ssn.flush();
+        m_ssn.assertFlushed(dobj);
+        return result;
     }
 
 
