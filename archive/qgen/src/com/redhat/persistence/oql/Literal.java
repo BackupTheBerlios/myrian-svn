@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/02/09 $
+ * @version $Revision: #5 $ $Date: 2004/02/09 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#4 $ by $Author: rhs $, $DateTime: 2004/02/09 11:51:40 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#5 $ by $Author: rhs $, $DateTime: 2004/02/09 14:57:03 $";
 
     private Object m_value;
 
@@ -65,7 +65,11 @@ public class Literal extends Expression {
     }
 
     public String toString() {
-        return "" + m_value;
+        if (m_value instanceof String) {
+            return "\"" + m_value + "\"";
+        } else {
+            return "" + m_value;
+        }
     }
 
     String summary() {

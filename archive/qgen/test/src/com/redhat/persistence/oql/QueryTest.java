@@ -6,11 +6,13 @@ import java.io.*;
 import java.sql.*;
 import java.util.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * QueryTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/02/06 $
+ * @version $Revision: #3 $ $Date: 2004/02/09 $
  **/
 
 public class QueryTest extends TestCase {
@@ -21,7 +23,9 @@ public class QueryTest extends TestCase {
     // being an instance of TestCase. Later versions of ant don't
     // suffer from this problem.
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QueryTest.java#2 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QueryTest.java#3 $ by $Author: rhs $, $DateTime: 2004/02/09 14:57:03 $";
+
+    private static final Logger s_log = Logger.getLogger(QueryTest.class);
 
     private QuerySuite m_suite;
     private String m_name;
@@ -46,13 +50,16 @@ public class QueryTest extends TestCase {
     public void run(TestResult result) {
         result.startTest(this);
         try {
+            s_log.info("Query:\n" + m_query);
             OQLParser p = new OQLParser(new StringReader(m_query));
             Query q = p.query();
+            s_log.info("Query(Parsed):\n" + q);
             if (p.query() != null) {
                 throw new IllegalArgumentException
                     ("query string includes multiple queries: " + m_query);
             }
             String sql = q.generate(m_suite.getRoot());
+            s_log.info("SQL:\n" + sql);
             Connection conn = m_suite.getConnection();
             Statement stmt = conn.createStatement();
             try {
