@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence.engine.rdbms;
 
 import com.redhat.persistence.RecordSet;
@@ -24,30 +23,31 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 /**
  * RDBMSRecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  **/
 
 class RDBMSRecordSet extends RecordSet {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/engine/rdbms/RDBMSRecordSet.java#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/engine/rdbms/RDBMSRecordSet.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
+
+    private static final Logger s_log = Logger.getLogger(RecordSet.class);
 
     final private RDBMSEngine m_engine;
     final private ResultCycle m_rc;
-    final private Map m_mappings;
 
-    RDBMSRecordSet(Signature sig, RDBMSEngine engine, ResultCycle rc,
-                   Map mappings) {
+    RDBMSRecordSet(Signature sig, RDBMSEngine engine, ResultCycle rc) {
         super(sig);
 	if (rc == null) {
 	    throw new IllegalArgumentException("null result set");
 	}
         m_engine = engine;
         m_rc = rc;
-        m_mappings = mappings;
     }
 
     ResultSet getResultSet() {
@@ -55,7 +55,7 @@ class RDBMSRecordSet extends RecordSet {
     }
 
     String getColumn(Path p) {
-        return (String) m_mappings.get(p);
+        return getSignature().getColumn(p);
     }
 
     public boolean next() {
@@ -63,17 +63,21 @@ class RDBMSRecordSet extends RecordSet {
     }
 
     public Object get(Path p) {
+        StatementLifecycle cycle = m_rc.getLifecycle();
         try {
             ObjectType type = getSignature().getProperty(p).getType();
             Adapter ad = type.getRoot().getAdapter(type);
 
-            StatementLifecycle cycle = m_rc.getLifecycle();
             String column = getColumn(p);
             if (cycle != null) { cycle.beginGet(column); }
             Object result = ad.fetch(m_rc.getResultSet(), column);
             if (cycle != null) { cycle.endGet(result); }
+            if (s_log.isDebugEnabled()) {
+                s_log.debug(p + "(" + column + ") -> " + result);
+            }
             return result;
         } catch (SQLException e) {
+            if (cycle != null) { cycle.endGet(e); }
             throw new Error
                 ("error fetching path (" + p + "): " + e.getMessage());
         }

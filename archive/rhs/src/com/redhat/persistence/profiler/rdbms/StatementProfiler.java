@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,13 +12,12 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence.profiler.rdbms;
 
 import com.arsdigita.util.Assert;
 import com.arsdigita.util.UncheckedWrapperException;
 import com.redhat.persistence.Event;
-import com.redhat.persistence.Query;
+import com.redhat.persistence.Signature;
 import com.redhat.persistence.engine.rdbms.RDBMSProfiler;
 import com.redhat.persistence.engine.rdbms.RDBMSStatement;
 import com.redhat.persistence.engine.rdbms.StatementLifecycle;
@@ -28,6 +27,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -66,9 +67,9 @@ public class StatementProfiler implements RDBMSProfiler {
             }
 
             ObjectType type = null;
-            Query query = statement.getQuery();
-            if (query != null) {
-                type = query.getSignature().getObjectType();
+            Signature sig = statement.getSignature();
+            if (sig != null) {
+                type = sig.getObjectType();
             } else {
                 for (Iterator it = statement.getEvents().iterator();
                      it.hasNext(); ) {
@@ -220,6 +221,10 @@ public class StatementProfiler implements RDBMSProfiler {
             end("prepare");
         }
 
+        public void endPrepare(SQLException e) {
+            end("prepare", e);
+        }
+
         public void beginSet(final int pos, final int type,
                              final Object object) {
             begin("set");
@@ -230,6 +235,10 @@ public class StatementProfiler implements RDBMSProfiler {
 
         public void endSet() {
             end("set");
+        }
+
+        public void endSet(SQLException e) {
+            end("set", e);
         }
 
         public void beginExecute() {
@@ -244,12 +253,20 @@ public class StatementProfiler implements RDBMSProfiler {
             end("execute");
         }
 
+        public void endExecute(SQLException e) {
+            end("execute", e);
+        }
+
         public void beginNext() {
             begin("next");
         }
 
         public void endNext(final boolean hasMore) {
             end("next");
+        }
+
+        public void endNext(SQLException e) {
+            end("next", e);
         }
 
         public void beginGet(final String column) {
@@ -264,12 +281,23 @@ public class StatementProfiler implements RDBMSProfiler {
             end("get");
         }
 
+        public void endGet(SQLException e) {
+            end("get", e);
+        }
+
         public void beginClose() {
             begin("close");
         }
 
         public void endClose() {
             end("close");
+
+            m_out.write("</lifecycle>");
+            m_out.write("</statement>");
+        }
+
+        public void endClose(SQLException e) {
+            end("close", e);
 
             m_out.write("</lifecycle>");
             m_out.write("</statement>");
@@ -309,10 +337,22 @@ public class StatementProfiler implements RDBMSProfiler {
             return elapsed;
         }
 
-        private void end(final String tag) {
+        private void end(final String tag, SQLException e) {
             elem("millis", Long.toString(end()));
 
+            if (e != null) {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                pw.flush();
+                elem("exception", sw.toString());
+            }
+
             m_out.write("</" + tag + ">");
+        }
+
+        private void end(final String tag) {
+            end(tag, null);
         }
     }
 }

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2002-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.arsdigita.db;
 
 
@@ -260,4 +259,47 @@ public class DbHelper {
 
         return result;
     }
+
+    /**
+     * Truncate a string to a specified length, respecting character
+     * boundaries.
+     *
+     * @param s The string to be truncated.
+     * @param maxLength The maximum length of the string, in units that
+     * are database-dependent (for PG, characters; for Oracle, bytes).
+     *
+     * @see #varcharLength(String)
+     */
+    public static String truncateString(String s, int maxLength) {
+        String result = null;
+
+        switch (getDatabase()) {
+        case DB_POSTGRES:
+            result = s.substring(0, maxLength-1);
+            break;
+        case DB_ORACLE:
+            byte sBytes[] = s.getBytes();
+            byte sTruncateBytes[] = new byte[maxLength];
+
+            // Truncate based on bytes, and construct a new string
+            System.arraycopy(sBytes, 0, sTruncateBytes, 0, maxLength);
+            String truncateString = new String(sTruncateBytes);
+
+            // New string might have partially truncated a multi-byte
+            // character, so we drop the last character. Note that this is
+            // conservative, and in some cases the last character is a
+            // legitimate multi-byte character and is dropped
+            // anyway. However, implementing a completely correct solution
+            // would require the use of BreakIterator.following and
+            // therefore be an O(N) solution (I think).
+            result = truncateString.substring(0,truncateString.length()-1);
+            break;
+        default:
+            DbHelper.unsupportedDatabaseError("varcharLength");
+        }
+
+        return result;
+
+    }
+
 }

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence.metadata;
 
 import com.redhat.persistence.common.Path;
@@ -26,12 +25,12 @@ import java.util.List;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/ObjectMap.java#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/ObjectMap.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -140,26 +139,40 @@ public class ObjectMap extends Element {
         for (Iterator it = getDeclaredMappings().iterator(); it.hasNext(); ) {
             Mapping m = (Mapping) it.next();
             m.dispatch(new Mapping.Switch() {
-                    public void onValue(Value m) {
-                        if (!result.contains(m.getPath())) {
-                            result.add(m.getPath());
-                        }
+                public void onValue(Value m) {
+                    if (!result.contains(m.getPath())) {
+                        result.add(m.getPath());
                     }
+                }
 
-                    public void onJoinTo(JoinTo m) {}
+                public void onJoinTo(JoinTo m) {}
 
-                    public void onJoinFrom(JoinFrom m) {}
+                public void onJoinFrom(JoinFrom m) {}
 
-                    public void onJoinThrough(JoinThrough m) {}
+                public void onJoinThrough(JoinThrough m) {}
 
-                    public void onStatic(Static m) {}
-                });
+                public void onStatic(Static m) {}
+
+                public void onQualias(Qualias q) {}
+            });
         }
 
         for (Iterator it = m_fetched.iterator(); it.hasNext(); ) {
             Object o = it.next();
             if (!result.contains(o)) {
                 result.add(o);
+            }
+        }
+
+        if (result.size() == 0) {
+            SQLBlock sql = getRetrieveAll();
+            if (sql != null) {
+                for (Iterator it = sql.getPaths().iterator(); it.hasNext(); ) {
+                    Object o = it.next();
+                    if (!result.contains(o)) {
+                        result.add(o);
+                    }
+                }
             }
         }
 

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,17 +12,18 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence.engine.rdbms;
 
 import com.redhat.persistence.Event;
-import com.redhat.persistence.Query;
 import com.redhat.persistence.common.Path;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import org.apache.log4j.Logger;
 
@@ -30,12 +31,12 @@ import org.apache.log4j.Logger;
  * Operation
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  **/
 
 abstract class Operation {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/engine/rdbms/Operation.java#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/engine/rdbms/Operation.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
 
     private static final Logger LOG = Logger.getLogger(Operation.class);
 
@@ -46,7 +47,6 @@ abstract class Operation {
 
     // For profiling
     private ArrayList m_events = null;
-    private Query m_query = null;
 
     protected Operation(RDBMSEngine engine, Environment env) {
         m_engine = engine;
@@ -119,14 +119,6 @@ abstract class Operation {
         }
     }
 
-    void setQuery(Query query) {
-        m_query = query;
-    }
-
-    Query getQuery() {
-        return m_query;
-    }
-
     abstract void write(SQLWriter w);
 
     public String toString() {
@@ -136,4 +128,21 @@ abstract class Operation {
         return w.getSQL() + "\n" + w.getBindings();
     }
 
+    public final String toSafeString() {
+        StringBuffer buf = new StringBuffer(128);
+        buf.append("env=").append(m_env);
+        buf.append("\nparameters=").append(m_parameters);
+        buf.append("\nmappings=");
+        if ( m_mappings == null ) {
+            buf.append(m_mappings);
+        } else {
+            for (Iterator it=m_mappings.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry entry = (Map.Entry) it.next();
+                buf.append("\n  ");
+                buf.append(entry.getKey()).append("=");
+                buf.append(Arrays.asList((Path[]) entry.getValue()));
+            }
+        }
+        return buf.toString();
+    }
 }

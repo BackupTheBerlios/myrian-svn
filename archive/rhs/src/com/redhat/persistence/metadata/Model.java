@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence.metadata;
 
 import java.util.HashMap;
@@ -21,12 +20,12 @@ import java.util.HashMap;
  * Model
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  **/
 
 public class Model {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/Model.java#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/Model.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
 
     private static final HashMap MODELS = new HashMap();
 
@@ -64,12 +63,19 @@ public class Model {
         return result;
     }
 
-    private Model m_parent;
-    private String m_name;
+    private final Model m_parent;
+    private final String m_name;
+    private final String m_qualifiedName;
 
     private Model(Model parent, String name) {
         m_parent = parent;
         m_name = name;
+        if (m_parent == null) {
+            m_qualifiedName = m_name;
+        } else {
+            m_qualifiedName = m_parent.getQualifiedName() + "." + m_name;
+        }
+
     }
 
     public Model getParent() {
@@ -81,11 +87,7 @@ public class Model {
     }
 
     public String getQualifiedName() {
-        if (m_parent == null) {
-            return m_name;
-        } else {
-            return m_parent.getQualifiedName() + "." + m_name;
-        }
+        return  m_qualifiedName;
     }
 
 }

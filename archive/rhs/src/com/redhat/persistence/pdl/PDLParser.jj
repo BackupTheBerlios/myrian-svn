@@ -13,12 +13,12 @@ import com.redhat.persistence.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/pdl/PDLParser.jj#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/pdl/PDLParser.jj#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -105,6 +105,7 @@ TOKEN:
   | <QUERY: "query">
   | <RETURNS: "returns">
   | <DATA_OPERATION: "data" <WS> "operation">
+  | <QUALIAS: "qualias"> : BEGIN
   | <CALL: "do" <WS> "call"> : BEGIN
   | <DO: "do"> : BEGIN
   | <MAP: "map">
@@ -315,8 +316,8 @@ PropertyNd property() :
     n = type() { p.add(PropertyNd.TYPE, n); }
     [ multiplicity(p) ]
     n = id() { p.add(PropertyNd.NAME, n); ln(p, n); }
-    [ <EQ> ( n = column() { p.add(PropertyNd.MAPPING, n); } |
-             n = join_path() { p.add(PropertyNd.MAPPING, n); } ) ]
+    [ <EQ> ( n = column() | n = join_path() | n = qualias() )
+           { p.add(PropertyNd.MAPPING, n); } ]
     { return p; }
 }
 
@@ -340,6 +341,16 @@ void multiplicity(PropertyNd p) :
             p.setUpper(null);
         }
     }
+}
+
+QualiasNd qualias() :
+{
+    Token t, q;
+    QualiasNd n;
+}
+{
+    t = <QUALIAS> q = <SQL>
+    { n = new QualiasNd(q.image); ln(n, t); return n; }
 }
 
 void object_key(ObjectTypeNd ot) :

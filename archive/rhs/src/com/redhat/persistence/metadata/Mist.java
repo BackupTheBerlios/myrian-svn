@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,9 +12,9 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence.metadata;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,12 +24,12 @@ import java.util.Iterator;
  * Mist
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  **/
 
-class Mist implements Collection {
+class Mist extends AbstractList {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/Mist.java#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/Mist.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
 
     private Object m_parent = null;
     private ArrayList m_children = new ArrayList();
@@ -61,7 +61,7 @@ class Mist implements Collection {
 	return key;
     }
 
-    public boolean add(Object o) {
+    public void add(int index, Object o) {
 	Object key = check(o);
 	Element child = (Element) o;
 
@@ -75,40 +75,17 @@ class Mist implements Collection {
                 ("duplicate key: " + key);
         }
 
-        m_children.add(child);
+        m_children.add(index, child);
         m_childrenMap.put(key, child);
         child.setParent(m_parent);
-        return true;
     }
 
-    public boolean addAll(Collection c) {
-        boolean result = false;
-        for (Iterator it = c.iterator(); it.hasNext(); ) {
-            if (add(it.next())) {
-                result = true;
-            }
-        }
-        return result;
+    public Object get(int index) {
+        return m_children.get(index);
     }
 
     public int size() {
         return m_children.size();
-    }
-
-    public Iterator iterator() {
-        return m_children.iterator();
-    }
-
-    public boolean isEmpty() {
-        return m_children.isEmpty();
-    }
-
-    public boolean contains(Object o) {
-        return m_children.contains(o);
-    }
-
-    public boolean containsAll(Collection c) {
-        return m_children.containsAll(c);
     }
 
     public void clear() {
@@ -126,14 +103,6 @@ class Mist implements Collection {
 	m_childrenMap.remove(key);
 	child.setParent(null);
 	return true;
-    }
-
-    public boolean removeAll(Collection c) {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean retainAll(Collection c) {
-        throw new UnsupportedOperationException();
     }
 
     public Object[] toArray() {

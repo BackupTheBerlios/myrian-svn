@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,80 +12,31 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence.pdl;
 
-import com.redhat.persistence.common.Path;
-import com.redhat.persistence.common.SQLParser;
-import com.redhat.persistence.metadata.Adapter;
-import com.redhat.persistence.metadata.Column;
-import com.redhat.persistence.metadata.Constraint;
-import com.redhat.persistence.metadata.DataOperation;
-import com.redhat.persistence.metadata.ForeignKey;
-import com.redhat.persistence.metadata.JoinFrom;
-import com.redhat.persistence.metadata.JoinThrough;
-import com.redhat.persistence.metadata.JoinTo;
-import com.redhat.persistence.metadata.Link;
-import com.redhat.persistence.metadata.Mapping;
-import com.redhat.persistence.metadata.Model;
-import com.redhat.persistence.metadata.ObjectMap;
-import com.redhat.persistence.metadata.ObjectType;
-import com.redhat.persistence.metadata.Property;
-import com.redhat.persistence.metadata.Role;
-import com.redhat.persistence.metadata.Root;
-import com.redhat.persistence.metadata.SQLBlock;
-import com.redhat.persistence.metadata.Static;
-import com.redhat.persistence.metadata.Table;
-import com.redhat.persistence.metadata.UniqueKey;
-import com.redhat.persistence.metadata.Value;
-import com.redhat.persistence.pdl.nodes.AST;
-import com.redhat.persistence.pdl.nodes.AggressiveLoadNd;
-import com.redhat.persistence.pdl.nodes.AssociationNd;
-import com.redhat.persistence.pdl.nodes.BindingNd;
-import com.redhat.persistence.pdl.nodes.ColumnNd;
-import com.redhat.persistence.pdl.nodes.DataOperationNd;
-import com.redhat.persistence.pdl.nodes.DbTypeNd;
-import com.redhat.persistence.pdl.nodes.EventNd;
-import com.redhat.persistence.pdl.nodes.FileNd;
-import com.redhat.persistence.pdl.nodes.IdentifierNd;
-import com.redhat.persistence.pdl.nodes.JavaClassNd;
-import com.redhat.persistence.pdl.nodes.JoinNd;
-import com.redhat.persistence.pdl.nodes.JoinPathNd;
-import com.redhat.persistence.pdl.nodes.MappingNd;
-import com.redhat.persistence.pdl.nodes.Node;
-import com.redhat.persistence.pdl.nodes.ObjectKeyNd;
-import com.redhat.persistence.pdl.nodes.ObjectTypeNd;
-import com.redhat.persistence.pdl.nodes.PathNd;
-import com.redhat.persistence.pdl.nodes.PropertyNd;
-import com.redhat.persistence.pdl.nodes.ReferenceKeyNd;
-import com.redhat.persistence.pdl.nodes.SQLBlockNd;
-import com.redhat.persistence.pdl.nodes.SuperNd;
-import com.redhat.persistence.pdl.nodes.TypeNd;
-import com.redhat.persistence.pdl.nodes.UniqueKeyNd;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import com.arsdigita.util.*;
+import com.redhat.persistence.common.*;
+import com.redhat.persistence.metadata.*;
+import com.redhat.persistence.pdl.nodes.*;
+
+import java.io.*;
+import java.util.*;
+
 import org.apache.log4j.Logger;
 
 /**
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/pdl/PDL.java#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/pdl/PDL.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
+
+    public static final String LINK = "@link";
 
     private AST m_ast = new AST();
     private boolean m_autoLoad;
@@ -104,7 +55,7 @@ public class PDL {
             FileNd file = p.file(filename);
             m_ast.add(AST.FILES, file);
         } catch (ParseException e) {
-            throw new Error(filename + ": " + e.getMessage());
+            throw new WrappedError(filename, e);
         }
     }
 
@@ -326,7 +277,7 @@ public class PDL {
 			ObjectType ot = m_symbols.getEmitted(linkName(assn));
 
 			ot.addProperty(rone);
-			Role revOne = new Role("~" + rtwo.getName(), ot,
+			Role revOne = new Role(rtwo.getName() + LINK, ot,
                                                true,
                                                two.isCollection(),
                                                two.isNullable());
@@ -334,7 +285,7 @@ public class PDL {
 			rone.setReverse(revOne);
 
 			ot.addProperty(rtwo);
-			Role revTwo = new Role("~" + rone.getName(), ot,
+			Role revTwo = new Role(rone.getName() + LINK, ot,
                                                true,
                                                one.isCollection(),
                                                one.isNullable());
@@ -436,11 +387,15 @@ public class PDL {
 			Adapter ad = (Adapter) adapterClass.newInstance();
 			m_root.addAdapter(javaClass, ad);
 		    } catch (IllegalAccessException e) {
-			m_errors.fatal(acn, e.getMessage());
+			m_errors.fatal
+                            (acn, "illegal access: " + e.getMessage());
 		    } catch (ClassNotFoundException e) {
-			m_errors.fatal(acn, e.getMessage());
+			m_errors.fatal
+                            (acn, "class not found: " + e.getMessage());
 		    } catch (InstantiationException e) {
-			m_errors.fatal(acn, e.getMessage());
+			m_errors.fatal
+                            (acn, "instantiation exception: " +
+                             e.getMessage());
 		    }
 		}
 	    });
@@ -526,10 +481,8 @@ public class PDL {
                     return true;
                 } else if (f == JoinPathNd.JOINS) {
                     return child.getIndex() == 0;
-                } else if (f == JoinNd.FROM) {
-                    return true;
                 } else {
-                    return false;
+                    return f == JoinNd.FROM;
                 }
             }
 
@@ -758,6 +711,10 @@ public class PDL {
 		    Collection keys = om.getKeyProperties();
 		    Role pone = (Role) ot.getProperty(one.getName().getName());
 		    Role ptwo = (Role) ot.getProperty(two.getName().getName());
+                    Link lone = (Link)
+                        ptwo.getType().getProperty(pone.getName());
+                    Link ltwo = (Link)
+                        pone.getType().getProperty(ptwo.getName());
 		    keys.add(ptwo);
 		    keys.add(pone);
 
@@ -765,23 +722,28 @@ public class PDL {
 			emitMapping(pone, (JoinPathNd) one.getMapping(), 1, 2);
 			emitMapping(pone.getReverse(),
 				    (JoinPathNd) two.getMapping(), 0, 1);
+                        emitMapping(ltwo, (JoinPathNd) two.getMapping(), 0, 2);
 		    } else {
 			om.addMapping(new Static(Path.get(pone.getName())));
-			m_root.getObjectMap(pone.getType()).addMapping
-			    (new Static
-			     (Path.get(pone.getReverse().getName())));
+                        ObjectMap oneom = m_root.getObjectMap(pone.getType());
+                        oneom.addMapping
+                            (new Static
+                             (Path.get(pone.getReverse().getName())));
+                        oneom.addMapping(new Static(Path.get(ltwo.getName())));
 		    }
-
 
 		    if (two.getMapping() != null) {
 			emitMapping(ptwo, (JoinPathNd) two.getMapping(), 1, 2);
 			emitMapping(ptwo.getReverse(),
 				    (JoinPathNd) one.getMapping(), 0, 1);
+                        emitMapping(lone, (JoinPathNd) one.getMapping(), 0, 2);
 		    } else {
 			om.addMapping(new Static(Path.get(ptwo.getName())));
-			m_root.getObjectMap(ptwo.getType()).addMapping
+                        ObjectMap twoom = m_root.getObjectMap(ptwo.getType());
+                        twoom.addMapping
 			    (new Static
 			     (Path.get(ptwo.getReverse().getName())));
+                        twoom.addMapping(new Static(Path.get(lone.getName())));
 		    }
 
 		    String[] paths = new String[] { pone.getName(),
@@ -796,12 +758,6 @@ public class PDL {
 		}
 	    });
 
-	for (Iterator it = m_links.iterator(); it.hasNext(); ) {
-	    Link l = (Link) it.next();
-	    ObjectMap om = m_root.getObjectMap(l.getContainer());
-	    om.addMapping(new Static(Path.get(l.getName())));
-	}
-
         m_ast.traverse(new Node.Switch() {
                 public void onProperty(PropertyNd pn) {
                     Role prop = (Role) getEmitted(pn);
@@ -814,8 +770,10 @@ public class PDL {
                         om.addMapping(new Static(Path.get(prop.getName())));
                     } else if (mapping instanceof ColumnNd) {
                         emitMapping(prop, (ColumnNd) mapping);
-                    } else {
+                    } else if (mapping instanceof JoinPathNd) {
                         emitMapping(prop, (JoinPathNd) mapping);
+                    } else {
+                        emitMapping(prop, (QualiasNd) mapping);
                     }
 
                     // auto generate reverse way for one-way composites
@@ -1004,7 +962,7 @@ public class PDL {
         }
     }
 
-    private void emitMapping(Role prop, JoinPathNd jpn, int start,
+    private void emitMapping(Property prop, JoinPathNd jpn, int start,
 			     int stop) {
 	if (!prop.getType().isKeyed()) {
 	    m_errors.fatal(jpn, "cannot associate to a non keyed type");
@@ -1022,9 +980,15 @@ public class PDL {
 
         if (magnitude == 1) {
             JoinNd jn = (JoinNd) joins.get(low);
-            if (lookup(jn.getTo()).isUniqueKey()) {
+            Column to = lookup(jn.getTo());
+            Column from = lookup(jn.getFrom());
+            if (to.isPrimaryKey()) {
                 joinForward = true;
-            } else if (lookup(jn.getFrom()).isUniqueKey()) {
+            } else if (from.isPrimaryKey()) {
+                joinForward = false;
+            } else if (to.isUniqueKey()) {
+                joinForward = true;
+            } else if (from.isUniqueKey()) {
                 joinForward = false;
             } else {
                 m_errors.fatal(jpn, "neither end unique");
@@ -1042,7 +1006,7 @@ public class PDL {
                 setNullable(fk, prop.isNullable());
             } else {
                 m = new JoinFrom(path, fk);
-                if (!prop.isReversable()) {
+                if (!((Role) prop).isReversable()) {
                     setNullable(fk, prop.isNullable());
                 }
             }
@@ -1062,8 +1026,10 @@ public class PDL {
             } else {
                 m = new JoinThrough(path, to, from);
             }
-	    setNullable(from, false);
-	    setNullable(to, false);
+            if (prop instanceof Role) {
+                setNullable(from, false);
+                setNullable(to, false);
+            }
         } else {
             m_errors.fatal(jpn, "bad join path");
             return;
@@ -1084,6 +1050,12 @@ public class PDL {
     private Column lookup(ColumnNd colNd) {
         Table table = m_root.getTable(colNd.getTable().getName());
         return table.getColumn(colNd.getName().getName());
+    }
+
+    private void emitMapping(Property prop, QualiasNd nd) {
+        ObjectMap om = m_root.getObjectMap(prop.getContainer());
+        Qualias q = new Qualias(Path.get(prop.getName()), nd.getQuery());
+        om.addMapping(q);
     }
 
     private void emitEvents() {

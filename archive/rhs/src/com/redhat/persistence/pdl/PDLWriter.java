@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence.pdl;
 
 import com.arsdigita.util.UncheckedWrapperException;
@@ -26,6 +25,7 @@ import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Property;
 import com.redhat.persistence.metadata.Role;
+import com.redhat.persistence.metadata.Root;
 import com.redhat.persistence.metadata.Static;
 import com.redhat.persistence.metadata.UniqueKey;
 import com.redhat.persistence.metadata.Value;
@@ -37,12 +37,12 @@ import java.util.Iterator;
  * PDLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  **/
 
 public class PDLWriter {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/pdl/PDLWriter.java#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/pdl/PDLWriter.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
 
     private Writer m_out;
 
@@ -90,7 +90,11 @@ public class PDLWriter {
             write(prop);
 	}
 
-	ObjectMap om = type.getRoot().getObjectMap(type);
+	ObjectMap om = null;
+        Root root = type.getRoot();
+        if (root != null) {
+            om = root.getObjectMap(type);
+        }
 
 	if (type.getSupertype() == null && type.isKeyed()) {
 	    write("\n\n    object key (");
@@ -103,7 +107,7 @@ public class PDLWriter {
 		}
 	    }
 	    write(");");
-	} else if (om.getTable() != null) {
+	} else if (om != null && om.getTable() != null) {
 	    write("\n\n    reference key (");
 	    UniqueKey uk = om.getTable().getPrimaryKey();
 	    write(uk.getColumns());
@@ -138,7 +142,8 @@ public class PDLWriter {
         }
 
         ObjectType type = prop.getType();
-        if (type.getModel().getName().equals("global")) {
+        if (type.getModel() == null ||
+            type.getModel().getName().equals("global")) {
             write(type.getName());
         } else {
             write(type.getQualifiedName());
@@ -155,9 +160,16 @@ public class PDLWriter {
 	write(prop.getName());
         write(" = ");
 
-	ObjectMap om = prop.getRoot().getObjectMap(prop.getContainer());
+	ObjectMap om = null;
+        Root root = prop.getRoot();
+        if (root != null) {
+            om = root.getObjectMap(prop.getContainer());
+        }
 
-	Mapping m = om.getMapping(Path.get(prop.getName()));
+	Mapping m = null;
+        if (om != null) {
+            m = om.getMapping(Path.get(prop.getName()));
+        }
         if (m == null) {
             write("<no mapping for " + prop.getName() + " in " +
                   prop.getContainer().getName() + ">");

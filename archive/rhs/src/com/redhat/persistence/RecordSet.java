@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence;
 
 import com.redhat.persistence.common.Path;
@@ -30,12 +29,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/RecordSet.java#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/RecordSet.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -45,8 +44,12 @@ public abstract class RecordSet {
         m_signature = signature;
     }
 
-    public Signature getSignature() {
+    protected Signature getSignature() {
         return m_signature;
+    }
+
+    boolean isFetched(Path path) {
+        return m_signature.isFetched(path);
     }
 
     public abstract boolean next();
@@ -56,23 +59,21 @@ public abstract class RecordSet {
     public abstract void close();
 
     Map load(Session ssn) {
-        Adapter adapter =
-            ssn.getRoot().getAdapter(m_signature.getObjectType());
         Collection paths = m_signature.getPaths();
 
 	LinkedList remaining = new LinkedList();
 	for (Iterator it = paths.iterator(); it.hasNext(); ) {
 	    Path path = (Path) it.next();
-	    for (Path p = path; p != null; p = p.getParent()) {
-		if (!remaining.contains(p)) {
-		    remaining.add(p);
-		}
-	    }
-	}
 
-	if (!remaining.contains(null)) {
-	    remaining.add(null);
-	}
+            for (; ; path = path.getParent()) {
+                if (!remaining.contains(path)) {
+                    remaining.add(path);
+                }
+                if (m_signature.isSource(path)) {
+                    break;
+                }
+            }
+        }
 
 	HashMap values = new HashMap();
 	int before;
@@ -81,7 +82,11 @@ public abstract class RecordSet {
 
 	    OUTER: for (Iterator it = remaining.iterator(); it.hasNext(); ) {
 		Path p = (Path) it.next();
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("loading " + p);
+                }
 		ObjectType type = m_signature.getType(p);
+                Adapter adapter = ssn.getRoot().getAdapter(type);
 		Collection props = type.getImmediateProperties();
 		if (props.size() == 0) {
 		    values.put(p, get(p));
@@ -139,27 +144,36 @@ public abstract class RecordSet {
 		 "\nsignature: " + m_signature);
 	}
 
+        HashMap cursorValues = new HashMap();
+
 	for (Iterator it = values.entrySet().iterator(); it.hasNext(); ) {
 	    Map.Entry me = (Map.Entry) it.next();
 	    Path p = (Path) me.getKey();
-	    if (m_signature.isSource(p)) { continue; }
+            Object value = me.getValue();
+
+	    if (m_signature.isSource(p)) {
+                cursorValues.put(p, value);
+                continue;
+            }
+
 	    Property prop = m_signature.getProperty(p);
-	    if (prop.getContainer().isKeyed()) {
+            if (prop.getContainer().isKeyed() && !prop.isCollection()) {
 		Object container = values.get(p.getParent());
-		Object value = me.getValue();
 		if (container == null) {
 		    if (value == null) {
 			continue;
 		    } else {
 			throw new IllegalStateException
-			    ("container is null but value isn't");
+                            ("container of " + p + " is null");
 		    }
 		}
 		ssn.load(container, prop, value);
-	    }
+	    } else {
+                cursorValues.put(p, value);
+            }
 	}
 
-	return values;
+	return cursorValues;
     }
 
 }

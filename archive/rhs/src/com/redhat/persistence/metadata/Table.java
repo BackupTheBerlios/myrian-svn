@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence.metadata;
 
 import java.util.ArrayList;
@@ -25,12 +24,12 @@ import java.util.Set;
  * Table
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  **/
 
 public class Table extends Element {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/Table.java#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/Table.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
 
     private String m_name;
     private Mist m_columns = new Mist(this);
@@ -57,13 +56,27 @@ public class Table extends Element {
         return m_key;
     }
 
+    private static ThreadLocal s_cols = new ThreadLocal() {
+        public Object initialValue() {
+            return new HashSet();
+        }
+    };
+
+    private static ThreadLocal s_key = new ThreadLocal() {
+        public Object initialValue() {
+            return new HashSet();
+        }
+    };
+
     Constraint getConstraint(Class type, Column[] columns) {
-        Set cols = new HashSet();
+        Set cols = (Set) s_cols.get();
+        cols.clear();
         for (int i = 0; i < columns.length; i++) {
             cols.add(columns[i]);
         }
 
-        Set key = new HashSet();
+        Set key = (Set) s_key.get();
+        key.clear();
         for (Iterator it = m_constraints.iterator(); it.hasNext(); ) {
             Constraint con = (Constraint) it.next();
             if (type.isInstance(con)) {

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence.metadata;
 
 import com.arsdigita.db.DbHelper;
@@ -30,12 +29,12 @@ import java.util.Set;
  * the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  */
 
 public class Column extends Element {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/Column.java#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/Column.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
 
     /**
      * The name of this Column.
@@ -64,7 +63,6 @@ public class Column extends Element {
     /**
      * Constructs a new Column with the given table and columnName.
      *
-     * @param table The name of the table this Column belongs to.
      * @param columnName The name of this Column.
      *
      * @pre (table != null && columnName != null)
@@ -127,7 +125,7 @@ public class Column extends Element {
      * Constructs a new Column with the given table, columnName, JDBC
      * integer type code, and size.
      *
-     * @param columnName The name of this Column.
+     * @param name The name of this Column.
      * @param type The JDBC integer type code for this Column.
      * @param size The size of this Column.
      * @param scale The scale of this Column.

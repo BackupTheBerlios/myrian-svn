@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence.metadata;
 
 import com.redhat.persistence.common.Path;
@@ -26,24 +25,46 @@ import java.util.List;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  **/
 
 public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/ObjectType.java#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/ObjectType.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
 
-    private Model m_model;
-    private String m_name;
+    private final Model m_model;
+    private final String m_name;
+    private final String m_qualifiedName;
     private Class m_class;
-    private ObjectType m_super;
-    private Mist m_properties = new Mist(this);
-    private ArrayList m_immediates = new ArrayList();
+    private final ObjectType m_super;
+    private final Mist m_properties = new Mist(this);
+    private final ArrayList m_immediates = new ArrayList();
+    private final ArrayList m_roles = new ArrayList();
+    private final List m_allProps;
+    private final List m_allRoles;
+    private List m_allImmediates;
 
     public ObjectType(Model model, String name, ObjectType supertype) {
         m_model = model;
         m_name = name;
         m_super = supertype;
+        if (m_model == null) {
+            m_qualifiedName = m_name;
+        } else {
+            m_qualifiedName = m_model.getQualifiedName() + "." + m_name;
+        }
+
+        if (m_super == null) {
+            m_allProps = Collections.unmodifiableList(m_properties);
+            m_allRoles = Collections.unmodifiableList(m_roles);
+        } else {
+            m_allProps = Collections.unmodifiableList
+                (new UnionList(m_properties, m_super.m_allProps));
+            m_allRoles = Collections.unmodifiableList
+                (new UnionList(m_roles, m_super.m_allRoles));
+        }
+
+        m_allImmediates = null;
     }
 
     public Root getRoot() {
@@ -67,7 +88,7 @@ public class ObjectType extends Element {
     }
 
     public String getQualifiedName() {
-        return m_model.getQualifiedName() + "." + m_name;
+        return m_qualifiedName;
     }
 
     public ObjectType getSupertype() {
@@ -98,6 +119,9 @@ public class ObjectType extends Element {
 
     public void addProperty(Property prop) {
         m_properties.add(prop);
+        if (prop instanceof Role) {
+            m_roles.add(prop);
+        }
     }
 
     public Collection getDeclaredProperties() {
@@ -108,17 +132,8 @@ public class ObjectType extends Element {
         return (Property) m_properties.get(name);
     }
 
-    private void getProperties(Collection result) {
-        if (m_super != null) {
-            m_super.getProperties(result);
-        }
-        result.addAll(m_properties);
-    }
-
     public Collection getProperties() {
-        ArrayList result = new ArrayList();
-        getProperties(result);
-        return result;
+        return m_allProps;
     }
 
     public Property getProperty(String name) {
@@ -185,15 +200,19 @@ public class ObjectType extends Element {
         return map.getKeyProperties();
     }
 
-    public Collection getImmediateProperties() {
-	if (isKeyed()) {
-            ArrayList result = new ArrayList();
-	    result.addAll(getKeyProperties());
-            result.addAll(getBasetype().m_immediates);
-            return result;
-	} else {
-	    return getProperties();
-	}
+    public List getImmediateProperties() {
+        if (m_allImmediates == null) {
+            List keys = getKeyProperties();
+            if (keys.size() > 0) {
+                m_allImmediates = m_super == null
+                    ? Collections.unmodifiableList(new UnionList
+                                                   (keys, m_immediates))
+                    : m_super.getImmediateProperties();
+            }
+        }
+
+        // for nonkeyed types, return all properties
+        return (m_allImmediates == null) ? m_allProps : m_allImmediates;
     }
 
     public void addImmediateProperty(Property prop) {
@@ -228,13 +247,7 @@ public class ObjectType extends Element {
     }
 
     public Collection getRoles() {
-        Collection result = getProperties();
-        for (Iterator it = result.iterator(); it.hasNext(); ) {
-            if (!(it.next() instanceof Role)) {
-                it.remove();
-            }
-        }
-        return result;
+        return m_allRoles;
     }
 
     public ObjectType getBasetype() {

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence;
 
 import com.redhat.persistence.common.Path;
@@ -25,6 +24,9 @@ import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Property;
 import com.redhat.persistence.metadata.Role;
 import com.redhat.persistence.metadata.Root;
+import com.redhat.persistence.oql.*;
+import com.redhat.persistence.oql.Expression;
+import com.redhat.persistence.oql.Query;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -45,17 +47,20 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/Session.java#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/Session.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
     private static final PersistentObjectSource POS =
         new PersistentObjectSource();
+
+    // XXX: link attribute hack
+    public static final String LINK_ASSOCIATION = "assoc";
 
     private final Root m_root;
     private final Engine m_engine;
@@ -113,8 +118,7 @@ public class Session {
             }
         }
 
-        PersistentCollection pc = retrieve(m_qs.getQuery(keys));
-        Cursor c = pc.getDataSet().getCursor();
+        Cursor c = getDataSet(keys).getCursor();
         if (c.next()) {
             Object result = c.get();
             if (c.next()) {
@@ -125,11 +129,6 @@ public class Session {
         } else {
             return null;
         }
-    }
-
-
-    public PersistentCollection retrieve(Query query) {
-        return POS.getPersistentCollection(this, new DataSet(this, query));
     }
 
     public Object get(final Object obj, Property prop) {
@@ -153,11 +152,11 @@ public class Session {
                 }
 
                 public void onLink(Link link) {
-		    PersistentCollection pc = retrieve(getQuery(obj, link));
+		    DataSet ds = getDataSet(obj, link);
                     if (!link.isCollection()) {
-                        Cursor c = pc.getDataSet().getCursor();
+                        Cursor c = ds.getCursor();
                         if (c.next()) {
-                            result[0] = c.get();
+                            result[0] = c.get(LINK_ASSOCIATION);
 
                             if (c.next()) {
                                 throw new IllegalStateException
@@ -165,7 +164,8 @@ public class Session {
                             }
                         }
                     } else {
-                        result[0] = pc;
+                        result[0] = POS.getPersistentCollection
+                            (Session.this, ds);
                     }
                 }
             });
@@ -179,57 +179,151 @@ public class Session {
     }
 
 
-    private Query getQuery(Object obj, Link link) {
-	return getQuery(obj, link, null);
+    public DataSet getDataSet(ObjectType type) {
+        Expression objs = new All(type.getQualifiedName());
+        Signature sig = new Signature(type);
+        return new DataSet(this, sig, objs);
     }
 
-    private Query getQuery(Object obj, Link link, Object value) {
-	// XXX: Should probably be replaced with a proper query
-	Query q = m_qs.getQuery(link.getTo().getType());
-	Parameter from = new Parameter
-	    (link.getFrom().getType(), Path.get("__from__"));
-	q.getSignature().addParameter(from);
-	q.set(from, obj);
-	Source s = new Source(link.getLinkType(), Path.get("link"));
-	q.getSignature().addSource(s);
+    public DataSet getDataSet(PropertyMap keys) {
+        ObjectType type = keys.getObjectType();
+        Expression expr = new All(type.getQualifiedName());
+        Signature sig = new Signature(type);
 
-	q.getSignature().addPath("link");
+        ObjectMap map = type.getRoot().getObjectMap(type);
+        Collection keyProps = map.getKeyProperties();
 
-	for (Iterator it = link.getLinkType().getProperties().iterator();
-	     it.hasNext(); ) {
-	    Property prop = (Property) it.next();
-	    if (Signature.isAttribute(prop)) {
-		q.getSignature().addPath(Path.add("link", prop.getName()));
-	    }
-	}
+        Expression filter = null;
 
-	Parameter to = null;
+        for (Iterator it = keyProps.iterator(); it.hasNext(); ) {
+            Property keyProp = (Property) it.next();
+            Object key = keys.get(keyProp);
+            Expression propFilt = new Equals
+                (new Variable(keyProp.getName()), new Literal(key));
+
+            if (filter == null) {
+                filter = propFilt;
+            } else {
+                filter = new And(filter, propFilt);
+            }
+        }
+
+        expr = new Filter(expr, filter);
+        return new DataSet(this, sig, expr);
+    }
+
+    // These should probably be changed to take type signatures.
+    public DataSet getDataSet(Object obj) {
+        ObjectType type = getObjectType(obj);
+        Signature sig = new Signature(type);
+        Expression objs = new Define(new All(type.getQualifiedName()), "this");
+        Expression filter = new Equals(new Variable("this"), new Literal(obj));
+        Expression expr = new Get(new Filter(objs, filter), "this");
+        // XXX: Expression expr = new Literal(obj);
+        return new DataSet(this, sig, expr);
+    }
+
+    public DataSet getDataSet(final Object obj, Property prop) {
+        final DataSet[] result = new DataSet[1];
+        prop.dispatch(new Property.Switch() {
+            public void onRole(Role role) {
+                result[0] = getDataSet(obj, role);
+            }
+
+            public void onAlias(Alias alias) {
+                throw new Error("not implemented yet");
+            }
+
+            public void onLink(Link link) {
+                result[0] = getDataSet(obj, link);
+            }
+        });
+
+        return result[0];
+    }
+
+    private DataSet getDataSet(Object obj, Role role) {
+        ObjectType propType = role.getType();
+        DataSet ds = getDataSet(obj);
+        if (propType.isKeyed()) {
+            Signature sig = new Signature(propType);
+            Expression expr = ds.getExpression();
+            if (!role.isCollection()) {
+                expr = new Filter
+                    (expr, new Exists(new Variable(role.getName())));
+            }
+            expr = new Get(expr, role.getName());
+            return new DataSet(this, sig, expr);
+        } else {
+            ds.getSignature().addPath(role.getName());
+            return ds;
+        }
+    }
+
+    private DataSet getDataSet(Object obj, Link link) {
+	return getDataSet(obj, link, null);
+    }
+
+    private DataSet getDataSet(Object obj, Link link, Object value) {
+        // join(link = all(linkType), all(targetType),
+        //      target == link.target)
+        ObjectType targetType = link.getTo().getType();
+        Expression targets = new Define
+            (new All(targetType.getQualifiedName()), LINK_ASSOCIATION);
+        Expression links = new Define
+            (new All(link.getLinkType().getQualifiedName()), "link");
+
+        Variable linkVar = new Variable("link");
+
+        Expression cond = null;
+        for (Iterator it = targetType.getKeyProperties().iterator();
+             it.hasNext(); ) {
+            Property key = (Property) it.next();
+            String name = key.getName();
+            Expression e = new Equals
+                (new Get(new Variable(LINK_ASSOCIATION), name),
+                 new Get(new Get(linkVar, link.getTo().getName()), name));
+            if (cond == null) {
+                cond = e;
+            } else {
+                cond = new And(e, cond);
+            }
+        }
+        Expression expr = new Join(targets, links, cond);
+        Expression from = new Literal(obj);
+        expr = new Filter(expr, new Equals
+                          (new Get(linkVar, link.getFrom().getName()), from));
+
+        Signature sig = new Signature();
+        sig.addSource(targetType, Path.get(LINK_ASSOCIATION));
+        sig.addSource(link.getLinkType(), Path.get("link"));
+
 	if (value != null) {
-	    to = new Parameter
-		(link.getTo().getType(), Path.get("__to__"));
-	    q.getSignature().addParameter(to);
-	    q.set(to, value);
+	    Expression to = new Literal(value);
+            expr = new Filter
+                (expr, new Equals(new Variable(LINK_ASSOCIATION) , to));
 	}
 
-        return new Query
-            (q, Condition.and
-             (Condition.equals
-              (Path.add("link", link.getFrom().getName()),
-               from.getPath()),
-              Condition.equals
-              (Path.add("link", link.getTo().getName()),
-               to == null ? null : to.getPath())));
+        return new DataSet(this, sig, expr);
     }
 
     Object get(Object start, Path path) {
+        Object value;
+
         if (path.getParent() == null) {
-            return get(start,
-                       getObjectType(start).getProperty(path.getName()));
+            value = start;
         } else {
-            Object value = get(start, path.getParent());
-            return get(value,
-                       getObjectType(value).getProperty(path.getName()));
+            value = get(start, path.getParent());
         }
+
+        ObjectType type = getObjectType(start);
+        Property prop = type.getProperty(path.getName());
+        if (prop == null) {
+            throw new IllegalArgumentException
+                (value + ": no such property: " + path.getName());
+        }
+
+        return get(start, prop);
     }
 
 
@@ -379,8 +473,7 @@ public class Session {
             }
 
             public void onLink(Link link) {
-                Query q = getQuery(obj, link, value);
-                Cursor c = retrieve(q).getDataSet().getCursor();
+                Cursor c = getDataSet(obj, link, value).getCursor();
                 while (c.next()) {
                     e.expand(new DeleteEvent(Session.this, c.get("link")));
                 }
@@ -836,7 +929,7 @@ public class Session {
 
     ObjectData fetchObjectData(Object obj) {
         if (!hasObjectData(obj)) {
-            RecordSet rs = m_engine.execute(m_qs.getQuery(obj));
+            RecordSet rs = getDataSet(obj).getCursor().execute();
             // Cache non-existent objects
             if (!rs.next()) {
                 m_odata.put(obj, null);
@@ -865,13 +958,12 @@ public class Session {
         if (od.hasPropertyData(prop)) {
             pd = od.getPropertyData(prop);
         } else if (prop.isCollection()) {
-            pd = new PropertyData
-                (od, prop, POS.getPersistentCollection
-                 (this, new DataSet(this, m_qs.getQuery(obj, prop))));
+            pd = new PropertyData(od, prop, POS.getPersistentCollection
+                                  (this, getDataSet(obj, prop)));
         } else if (od.isInfantile()){
             pd = new PropertyData(od, prop, null);
         } else {
-            RecordSet rs = m_engine.execute(m_qs.getQuery(obj, prop));
+            RecordSet rs = getDataSet(obj, prop).getCursor().execute();
             Map values = null;
             if (rs.next()) {
                 values = rs.load(this);

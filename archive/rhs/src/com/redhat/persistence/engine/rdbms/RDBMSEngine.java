@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,16 +12,17 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence.engine.rdbms;
 
+import com.redhat.persistence.DataSet;
 import com.redhat.persistence.Engine;
 import com.redhat.persistence.Event;
 import com.redhat.persistence.PropertyMap;
-import com.redhat.persistence.Query;
 import com.redhat.persistence.QuerySource;
 import com.redhat.persistence.RecordSet;
 import com.redhat.persistence.SetEvent;
+import com.redhat.persistence.Signature;
+import com.redhat.persistence.SQLWriterException;
 import com.redhat.persistence.common.CompoundKey;
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.metadata.Adapter;
@@ -30,6 +31,14 @@ import com.redhat.persistence.metadata.Property;
 import com.redhat.persistence.metadata.Root;
 import com.redhat.persistence.metadata.SQLBlock;
 import com.redhat.persistence.metadata.Table;
+import com.redhat.persistence.oql.Define;
+import com.redhat.persistence.oql.Expression;
+import com.redhat.persistence.oql.Query;
+import com.redhat.persistence.oql.Variable;
+import com.redhat.persistence.oql.Size;
+import com.arsdigita.util.UncheckedWrapperException;
+import com.arsdigita.util.WrappedError;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -43,6 +52,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 
@@ -50,12 +60,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -225,7 +235,7 @@ public class RDBMSEngine extends Engine {
         try {
             m_conn.commit();
         } catch (SQLException e) {
-            throw new Error(e.getMessage());
+            throw new WrappedError(e);
         } finally {
             releaseAll();
         }
@@ -236,38 +246,31 @@ public class RDBMSEngine extends Engine {
         try {
             m_conn.rollback();
         } catch (SQLException e) {
-            throw new Error(e.getMessage());
+            throw new WrappedError(e);
         } finally {
             releaseAll();
             clear();
         }
     }
 
-    public RecordSet execute(Query query) {
-	return execute(query, null);
-    }
+    public RecordSet execute(Signature sig, Expression expr) {
+        Select sel = new Select(this, sig, expr);
 
-    public RecordSet execute(Query query, SQLBlock block) {
         if (LOG.isInfoEnabled()) {
-            LOG.info("Executing " + query);
+            LOG.info("Executing " + sel.getQuery());
         }
-        QGen qg = new QGen(this, query, block);
-        Select sel = qg.generate();
-        return new RDBMSRecordSet(query.getSignature(), this, execute(sel),
-                                  qg.getMappings(sel));
+
+        return new RDBMSRecordSet(sig, this, execute(sel));
     }
 
-    public long size(Query query) {
-        return size(query, null);
-    }
+    public long size(Expression expr) {
+        Query q = new Query(new Size(expr));
+        Select sel = new Select(this, q);
 
-    public long size(Query query, SQLBlock block) {
         if (LOG.isInfoEnabled()) {
-            LOG.info("Executing size " + query);
+            LOG.info("Executing " + sel.getQuery());
         }
-        QGen qg = new QGen(this, query, block);
-        Select sel = qg.generate();
-        sel.setCount(true);
+
         ResultCycle rc = execute(sel);
         if (rc == null) {
             throw new IllegalStateException
@@ -276,27 +279,29 @@ public class RDBMSEngine extends Engine {
         ResultSet rs = rc.getResultSet();
         StatementLifecycle cycle = rc.getLifecycle();
         try {
-            try {
-                long result;
-                if (rc.next()) {
+            long result;
+            if (rc.next()) {
+                try {
                     if (cycle != null) { cycle.beginGet("1"); }
                     result = rs.getLong(1);
                     if (cycle != null) { cycle.endGet(new Long(result)); }
-                } else {
-                    throw new IllegalStateException
-                        ("count returned no rows");
+                } catch (SQLException e) {
+                    if (cycle != null) { cycle.endGet(e); }
+                    throw new RDBMSException(e.getMessage()) {};
                 }
-                if (rc.next()) {
-                    throw new IllegalStateException
-                        ("count returned too many rows");
-                }
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("size = " + result);
-                }
-                return result;
-            } catch (SQLException e) {
-                throw new RDBMSException(e.getMessage()) {};
+            } else {
+                throw new IllegalStateException("count returned no rows");
             }
+
+            if (rc.next()) {
+                throw new IllegalStateException
+                    ("count returned too many rows");
+            }
+
+            if (LOG.isInfoEnabled()) {
+                LOG.info("size = " + result);
+            }
+            return result;
         } finally {
             rc.close();
         }
@@ -393,9 +398,10 @@ public class RDBMSEngine extends Engine {
                 SetEvent e = (SetEvent) m_mutations.get(i);
                 int jdbcType = ((Integer) m_mutationTypes.get(i)).intValue();
                 Property prop = e.getProperty();
+                DataSet ds = getSession().getDataSet(e.getObject(), prop);
                 QuerySource qs = getSession().getQuerySource();
                 RDBMSRecordSet rs = (RDBMSRecordSet) execute
-                    (qs.getQuery(e.getObject(), prop));
+                    (ds.getSignature(), ds.getExpression());
                 Adapter ad = prop.getRoot().getAdapter(prop.getType());
                 try {
                     if (rs.next()) {
@@ -409,7 +415,7 @@ public class RDBMSEngine extends Engine {
                     }
                 } catch (SQLException se) {
                     LOG.error(se.getMessage(), se);
-                    throw new Error(se.getMessage());
+                    throw new WrappedError(se);
                 } finally {
                     rs.close();
                 }
@@ -431,6 +437,9 @@ public class RDBMSEngine extends Engine {
                 w.clear();
                 LOG.warn("failed operation: " + op);
                 throw re;
+            } catch (SQLWriterException ex) {
+                throw new UncheckedWrapperException
+                    ("failed operation: " + op.toSafeString(), ex);
             }
 
             String sql = w.getSQL();
@@ -439,39 +448,45 @@ public class RDBMSEngine extends Engine {
                 logQueryDetails(Priority.INFO, sql, w, op);
             }
 
-
             if (sql.equals("")) {
                 return null;
             }
 
             acquire();
 
-            try {
-                StatementLifecycle cycle = null;
-                if (m_profiler != null) {
-                    RDBMSStatement stmt = new RDBMSStatement(sql);
-                    stmt.setQuery(op.getQuery());
-                    for (Iterator it = op.getEvents().iterator();
-                         it.hasNext(); ) {
-                        stmt.addEvent((Event) it.next());
-                    }
-                    cycle = m_profiler.getLifecycle(stmt);
+            StatementLifecycle cycle = null;
+            if (m_profiler != null) {
+                RDBMSStatement stmt = new RDBMSStatement(sql);
+                if (op instanceof Select) {
+                    // XXX: better way of profiling
+                    stmt.setSignature(((Select) op).getSignature());
                 }
+                for (Iterator it = op.getEvents().iterator(); it.hasNext(); ) {
+                    stmt.addEvent((Event) it.next());
+                }
+                cycle = m_profiler.getLifecycle(stmt);
+            }
 
+            PreparedStatement ps;
+
+            try {
                 if (cycle != null) { cycle.beginPrepare(); }
-                PreparedStatement ps = m_conn.prepareStatement(sql);
+                ps = m_conn.prepareStatement(sql);
                 if (cycle != null) { cycle.endPrepare(); }
+            } catch (SQLException e) {
+                if (cycle != null) { cycle.endPrepare(e); }
+                logQueryDetails(Priority.ERROR, sql, w, op, e);
+                throw new RDBMSException(e.getMessage()) {};
+            }
 
-                w.bind(ps, cycle);
+            w.bind(ps, cycle);
 
+            try {
                 if (cycle != null) { cycle.beginExecute(); }
-                long time = System.currentTimeMillis();
                 if (ps.execute()) {
-                    time = System.currentTimeMillis() - time;
                     if (cycle != null) { cycle.endExecute(0); }
                     return new ResultCycle(this, ps.getResultSet(), cycle);
                 } else {
-                    time = System.currentTimeMillis() - time;
                     int updateCount = ps.getUpdateCount();
                     if (cycle != null) { cycle.endExecute(updateCount); }
 
@@ -479,15 +494,25 @@ public class RDBMSEngine extends Engine {
                         LOG.info(updateCount + " rows affected");
                     }
 
-                    if (cycle != null) { cycle.beginClose(); }
-                    ps.close();
-                    if (cycle != null) { cycle.endClose(); }
+                    try {
+                        if (cycle != null) { cycle.beginClose(); }
+                        ps.close();
+                        if (cycle != null) { cycle.endClose(); }
+                    } catch (SQLException e) {
+                        if (cycle != null) { cycle.endClose(e); }
+                        logQueryDetails(Priority.ERROR, sql, w, op, e);
+                        throw new RDBMSException(e.getMessage()) {};
+                    }
 
                     return null;
                 }
             } catch (SQLException e) {
+                if (cycle != null) { cycle.endExecute(e); }
                 logQueryDetails(Priority.ERROR, sql, w, op, e);
                 throw new RDBMSException(e.getMessage()) {};
+            } catch (RuntimeException e) {
+                logQueryDetails(Priority.ERROR, sql, w, op, e);
+                throw e;
             }
         } finally {
             w.clear();

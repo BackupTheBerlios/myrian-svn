@@ -1,6 +1,7 @@
 options {
     STATIC = false;
     DEBUG_PARSER = false;
+    DEBUG_TOKEN_MANAGER = false;
 }
 
 PARSER_BEGIN(SQLParser)
@@ -14,12 +15,12 @@ import java.io.*;
  * SQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  */
 
 public class SQLParser {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/common/SQLParser.jj#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/common/SQLParser.jj#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
 
     public static interface Mapper {
         Path map(Path path);
@@ -39,6 +40,17 @@ public class SQLParser {
     public SQLParser(Reader r, Mapper mapper) {
         this(r);
         m_mapper = mapper;
+    }
+
+    public void initialize(java.io.Reader reader) {
+        initialize(reader, m_mapper);
+    }
+
+    public void initialize(java.io.Reader reader, Mapper mapper) {
+        m_assigns.clear();
+        m_mapper = mapper;
+        m_sql = new SQL();
+        ReInit(reader);
     }
 
     public class Assign {
@@ -80,12 +92,22 @@ public class SQLParser {
     }
 
     private void append(Token t) {
-        appendSpecial(t);
         m_image.append(t.image);
     }
 
+    private void token(Token t) {
+        token(t, null);
+    }
+
+    private void token(Token t, SQLToken.Type type) {
+        appendSpecial(t);
+        token(SQLToken.SPACE);
+        append(t);
+        token(type);
+    }
+
     private void token() {
-        token(null);
+        token((SQLToken.Type) null);
     }
 
     private void token(SQLToken.Type type) {
@@ -177,12 +199,12 @@ TOKEN [IGNORE_CASE]:
   | <ELSE: "else">
   | <END: "end">
   | <AS: "as">
+  | <FROM: "from"> // we don't treat this as a clause because of ANSI date syntax e.g., extract(epoch from ...)
 // Clause beginnings
   | <SELECT: "select">
   | <INSERT_INTO: "insert" <WS> "into">
   | <UPDATE: "update">
   | <DELETE_FROM: "delete" <WS> "from">
-  | <FROM: "from">
   | <WHERE: "where">
   | <WITH: "with">
   | <START_WITH: "start" <WS> "with">
@@ -196,8 +218,10 @@ TOKEN [IGNORE_CASE]:
 
 TOKEN: {
     <ID: <CH>(<CH>|<DIGIT>)*>
-  | <#CH: ["a" - "z", "A" - "Z", "_"]>
+  // @ is used by link attribute implementation
+  | <#CH: ["a" - "z", "A" - "Z", "_", "@"]>
   | <RAW: "RAW[" (~["]"] | "\\]")* "]">
+  | <QUOTED_ID: "\"" ( ~["\""] | "\"\"" )* "\"">
 }
 
 // TODO: Add support for multi-line comments.
@@ -212,7 +236,6 @@ void sql() :
 {
  [ ( statement() | unstructuredElement()
      ( ( unstructuredElement() | clauseStart() ) )* ) ] <EOF>
-     { token(); }
 }
 
 void statement() :
@@ -229,7 +252,7 @@ void literal() :
  (  t = <STRING_LITERAL>
   | t = <INTEGER_LITERAL>
   | t = <NUMBER_LITERAL> )
-    { append(t); }
+    { token(t); }
 }
 
 void symbol() :
@@ -238,7 +261,8 @@ void symbol() :
 }
 {
  (
-    t = <PERIOD>
+    t = <FROM> // see comment above
+  | t = <PERIOD>
   | t = <SEMI>
   | t = <CAST>
   | t = <QUESTION_MARK>
@@ -283,13 +307,11 @@ void symbol() :
   | t = <AS>
   | t = <MINUS>
   | t = <PRIOR>
+  | t = <QUOTED_ID>
   | t = <RAW> {
-      appendSpecial(t);
-      token();
-      m_image.append(t.image);
-      token(SQLToken.RAW);
+      token(t, SQLToken.RAW);
   } )
-     { if (t.kind != RAW) { append(t); } }
+     { if (t.kind != RAW) { token(t); } }
 }
 
 void clauseStart() :
@@ -302,7 +324,6 @@ void clauseStart() :
   | t = <INSERT_INTO>
   | t = <UPDATE>
   | t = <DELETE_FROM>
-  | t = <FROM>
   | t = <WHERE>
   | t = <WITH>
   | t = <START_WITH>
@@ -312,7 +333,7 @@ void clauseStart() :
   | t = <FOR_UPDATE>
   | t = <VALUES>
   | t = <SET> )
-    { append(t); }
+    { token(t); }
 }
 
 void parens() :
@@ -320,10 +341,10 @@ void parens() :
     Token t;
 }
 {
- ( LOOKAHEAD(2) t = <LPAREN> { append(t); } statement() t = <RPAREN>
-     { append(t); }
-  | t = <LPAREN> { append(t); } ( unstructuredElement() )* t = <RPAREN>
-     { append(t); } )
+ ( LOOKAHEAD(2) t = <LPAREN> { token(t); } statement() t = <RPAREN>
+     { token(t); }
+  | t = <LPAREN> { token(t); } ( unstructuredElement() )* t = <RPAREN>
+     { token(t); } )
 }
 
 void identifier() :
@@ -334,7 +355,7 @@ void identifier() :
 }
 {
     ( t = <BINDVAR> { bind = true; } | t = <ID>  )
-        { buf.append(t.image); appendSpecial(t); token(); }
+        { buf.append(t.image); appendSpecial(t); token(SQLToken.SPACE); }
         ( LOOKAHEAD(2) <PERIOD> t = <ID>
             { buf.append('.'); buf.append(t.image);
         } )*
@@ -364,7 +385,7 @@ void unstructuredElement() :
     Token t;
 }
 {
-  (  t = <COMMA> { append(t); }
+  (  t = <COMMA> { token(t); }
    | unstructuredElementNoComma()
     )
 }
@@ -386,7 +407,7 @@ void setClause() :
     Token t;
 }
 {
-    t = <SET> { append(t); } assign() ( t = <COMMA> { append(t); } assign() )*
+    t = <SET> { token(t); } assign() ( t = <COMMA> { token(t); } assign() )*
 }
 
 void assign() :
@@ -397,7 +418,7 @@ void assign() :
 {
 
     { token(); begin = m_sql.getLast(); }
-    identifier() t = <EQ> { append(t); } ( unstructuredElementNoComma() )+
+    identifier() t = <EQ> { token(t); } ( unstructuredElementNoComma() )+
     {
         token();
         m_assigns.add(new Assign(begin.getNext(), m_sql.getLast()));

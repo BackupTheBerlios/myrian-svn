@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,12 +12,12 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence.engine.rdbms;
 
+import com.arsdigita.util.WrappedError;
 import com.redhat.persistence.Condition;
 import com.redhat.persistence.Expression;
-import com.redhat.persistence.Query;
+import com.redhat.persistence.SQLWriterException;
 import com.redhat.persistence.common.ParseException;
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.common.SQL;
@@ -28,6 +28,8 @@ import com.redhat.persistence.metadata.Column;
 import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.Root;
 import com.redhat.persistence.metadata.SQLBlock;
+import com.redhat.persistence.oql.Code;
+
 import java.io.StringReader;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -36,17 +38,18 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
 
     private RDBMSEngine m_engine;
     private Operation m_op = null;
@@ -111,9 +114,9 @@ public abstract class SQLWriter {
                 }
                 if (cycle != null) { cycle.endSet(); }
             } catch (SQLException e) {
-                throw new Error
-                    ("SQL error binding [" + (index) + "] to " + obj + ": " +
-                     e.getMessage());
+                if (cycle != null) { cycle.endSet(e); }
+                throw new WrappedError
+                    ("SQL error binding [" + (index) + "] to " + obj, e);
             }
         }
     }
@@ -156,6 +159,16 @@ public abstract class SQLWriter {
         m_sql.append("?");
         m_bindings.add(value);
         m_types.add(new Integer(jdbcType));
+    }
+
+    void write(Code code) {
+        write(code.getSQL());
+        List bindings = code.getBindings();
+        for (int i = 0; i < bindings.size(); i++) {
+            Code.Binding b = (Code.Binding) bindings.get(i);
+            m_bindings.add(b.getValue());
+            m_types.add(new Integer(b.getType()));
+        }
     }
 
     public void write(Operation op) {
@@ -268,7 +281,6 @@ public abstract class SQLWriter {
     }
 
     private final Expression.Switch m_esw = new Expression.Switch() {
-        public void onQuery(Query q) { write(q); }
         public void onCondition(Condition c) { write(c); }
         public void onVariable(Expression.Variable v) { write(v); }
         public void onValue(Expression.Value v) { write(v); }
@@ -290,11 +302,6 @@ public abstract class SQLWriter {
 
     public void write(Condition cond) {
         cond.dispatch(m_csw);
-    }
-
-    public void write(Query q) {
-        QGen qg = new QGen(getEngine(), q);
-        write((Operation) qg.generate());
     }
 
     public void write(Expression.Variable v) {
@@ -321,7 +328,7 @@ public abstract class SQLWriter {
         try {
             p.sql();
         } catch (ParseException pe) {
-            throw new Error(pe.getMessage());
+            throw new WrappedError(pe);
         }
 
         write(p.getSQL(), true);
@@ -376,9 +383,6 @@ public abstract class SQLWriter {
             public void onValue(Expression.Value v) {
                 throw new Error("not implemented");
             }
-            public void onQuery(Query q) {
-                throw new Error("not implemented");
-            }
             public void onPassthrough(Expression.Passthrough p) {
                 throw new Error("not implemented");
             }
@@ -403,7 +407,7 @@ public abstract class SQLWriter {
         Path[] leftCols = expand(left);
         Path[] rightCols = expand(right);
         if (leftCols.length != rightCols.length) {
-            throw new IllegalArgumentException
+            throw new SQLWriterException
                 ("left and right of different lengths\n" +
                  "left expression: " + left +
                  "; columns: " + Arrays.asList(leftCols) + "\n" +

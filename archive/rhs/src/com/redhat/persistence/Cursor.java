@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,40 +12,42 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence;
 
 import com.redhat.persistence.common.Path;
 import java.util.Map;
+import org.apache.log4j.Logger;
 
 /**
  * Cursor
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  **/
 
 public class Cursor {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/Cursor.java#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/Cursor.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
 
-    final private Session m_ssn;
-    final private Query m_query;
-    final private Signature m_signature;
+    private static final Logger s_log = Logger.getLogger(Cursor.class);
+
+    final private DataSet m_ds;
 
     private RecordSet m_rs = null;
     private Map m_values = null;
     private long m_position = 0;
     private boolean m_closed = false;
 
-    protected Cursor(Session ssn, Query query) {
-        m_ssn = ssn;
-        m_query = query;
-        m_signature = query.getSignature();
+    protected Cursor(DataSet ds) {
+        m_ds = ds;
+    }
+
+    public DataSet getDataSet() {
+        return m_ds;
     }
 
     public Session getSession() {
-        return m_ssn;
+        return m_ds.getSession();
     }
 
     public boolean isClosed() {
@@ -53,12 +55,12 @@ public class Cursor {
     }
 
     private Object getInternal(Path path) {
-	if (m_signature.isSource(path)) {
+	if (m_values.containsKey(path)) {
 	    return m_values.get(path);
 	} else {
 	    Object o = getInternal(path.getParent());
             if (o == null) { return null; }
-	    return m_ssn.get(o, Path.get(path.getName()));
+	    return getSession().get(o, Path.get(path.getName()));
 	}
     }
 
@@ -67,12 +69,16 @@ public class Cursor {
 	    throw new ClosedException(this);
 	}
 
-        if (!m_signature.isFetched(path)) {
-            throw new NotFetchedException(this, path);
-        }
-
         if (m_position <= 0) {
 	    throw new NoRowException(this);
+        }
+
+        if (!m_rs.isFetched(path)) {
+            if (s_log.isDebugEnabled()) {
+                s_log.debug("path " + path + " is not fetched"
+                            + " in signature " + m_ds.getSignature());
+            }
+            throw new NotFetchedException(this, path);
         }
 
         return getInternal(path);
@@ -104,12 +110,12 @@ public class Cursor {
 	}
 
         if (m_rs == null) {
-            m_ssn.flush();
+            getSession().flush();
             m_rs = execute();
         }
 
         if (m_rs.next()) {
-            m_values = m_rs.load(m_ssn);
+            m_values = m_rs.load(getSession());
 
             m_position++;
             return true;
@@ -121,7 +127,8 @@ public class Cursor {
     }
 
     protected RecordSet execute() {
-	return m_ssn.getEngine().execute(m_query);
+	return getSession().getEngine().execute(m_ds.getSignature(),
+                                                m_ds.getExpression());
     }
 
     public boolean isBeforeFirst() {

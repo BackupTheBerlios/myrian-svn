@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence.pdl.nodes;
 
 import java.util.ArrayList;
@@ -27,12 +26,12 @@ import java.util.List;
  * Node
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  **/
 
 public abstract class Node {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/pdl/nodes/Node.java#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/pdl/nodes/Node.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
 
 
     /**
@@ -165,6 +164,7 @@ public abstract class Node {
         public void onJoinPath(JoinPathNd jp) {}
         public void onJoin(JoinNd join) {}
         public void onIdentifier(IdentifierNd id) {}
+        public void onQualias(QualiasNd nd) {}
 
         public void onEvent(EventNd nd) {}
         public void onSQLBlock(SQLBlockNd nd) {}

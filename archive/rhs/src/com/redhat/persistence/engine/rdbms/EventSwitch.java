@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,35 +12,11 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence.engine.rdbms;
 
-import com.redhat.persistence.AddEvent;
-import com.redhat.persistence.Condition;
-import com.redhat.persistence.CreateEvent;
-import com.redhat.persistence.DeleteEvent;
-import com.redhat.persistence.Event;
-import com.redhat.persistence.ObjectEvent;
-import com.redhat.persistence.PropertyEvent;
-import com.redhat.persistence.PropertyMap;
-import com.redhat.persistence.RemoveEvent;
-import com.redhat.persistence.SetEvent;
-import com.redhat.persistence.common.Path;
-import com.redhat.persistence.metadata.Adapter;
-import com.redhat.persistence.metadata.Column;
-import com.redhat.persistence.metadata.Constraint;
-import com.redhat.persistence.metadata.JoinFrom;
-import com.redhat.persistence.metadata.JoinThrough;
-import com.redhat.persistence.metadata.JoinTo;
-import com.redhat.persistence.metadata.Mapping;
-import com.redhat.persistence.metadata.ObjectMap;
-import com.redhat.persistence.metadata.ObjectType;
-import com.redhat.persistence.metadata.Property;
-import com.redhat.persistence.metadata.Role;
-import com.redhat.persistence.metadata.SQLBlock;
-import com.redhat.persistence.metadata.Static;
-import com.redhat.persistence.metadata.Table;
-import com.redhat.persistence.metadata.Value;
+import com.redhat.persistence.*;
+import com.redhat.persistence.common.*;
+import com.redhat.persistence.metadata.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,12 +31,12 @@ import org.apache.log4j.Logger;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -308,6 +284,9 @@ class EventSwitch extends Event.Switch {
         }
 
         m.dispatch(new Mapping.Switch() {
+            public void onQualias(Qualias q) {
+                // XXX need to really support read only
+            }
             public void onStatic(Static m) {
                 // do nothing;
             }
@@ -431,6 +410,9 @@ class EventSwitch extends Event.Switch {
                 // before since types specified in static operations
                 // will be ignored. I don't yet know if this is
                 // necessary to fix.
+            }
+            public void onQualias(Qualias q) {
+                // XXX do realy read only from session
             }
             public void onJoinTo(JoinTo j) {
                 throw new IllegalStateException("bad mapping");

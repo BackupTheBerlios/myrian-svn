@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.redhat.persistence.metadata;
 
 import com.redhat.persistence.PropertyMap;
@@ -28,12 +27,12 @@ import java.util.Iterator;
  * Adapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/11/09 $
+ * @version $Revision: #2 $ $Date: 2004/04/05 $
  **/
 
 public abstract class Adapter {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/Adapter.java#1 $ by $Author: rhs $, $DateTime: 2003/11/09 14:41:17 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/Adapter.java#2 $ by $Author: rhs $, $DateTime: 2004/04/05 15:33:44 $";
 
     private Root m_root;
 
@@ -70,31 +69,37 @@ public abstract class Adapter {
     // having things that throw unsupported operation exception.
 
     public Object fetch(ResultSet rs, String column) throws SQLException {
-        throw new UnsupportedOperationException("not a bindable type");
+        throw new UnsupportedOperationException
+            ("not a bindable adapter: " + getClass().getName());
     }
 
     public void bind(PreparedStatement ps, int index, Object obj, int type)
         throws SQLException {
-        throw new UnsupportedOperationException("not a bindable type");
+        throw new UnsupportedOperationException
+            ("not a bindable adapter: " + getClass().getName());
     }
 
     public int defaultJDBCType() {
-        throw new UnsupportedOperationException("not a bindable type");
+        throw new UnsupportedOperationException
+            ("not a bindable adapter: " + getClass().getName());
     }
 
     public boolean isMutation(Object value, int jdbcType) {
-        throw new UnsupportedOperationException("not a bindable type");
+        throw new UnsupportedOperationException
+            ("not a bindable adapter: " + getClass().getName());
     }
 
     public void mutate(ResultSet rs, String column, Object obj, int type)
         throws SQLException {
-        throw new UnsupportedOperationException("not a bindable type");
+        throw new UnsupportedOperationException
+            ("not a bindable adapter: " + getClass().getName());
     }
 
     public void setSession(Object obj, Session ssn) { return; }
 
     public Object getObject(ObjectType basetype, PropertyMap props) {
-        throw new UnsupportedOperationException("not a compound type");
+        throw new UnsupportedOperationException
+            ("not a compound adapter: " + getClass().getName());
     }
 
     public abstract PropertyMap getProperties(Object obj);
