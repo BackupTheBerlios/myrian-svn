@@ -31,10 +31,10 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #9 $ $Date: 2003/05/06 $
+ * @version $Revision: #10 $ $Date: 2003/05/06 $
  */
 public class VersioningMetadata {
-    private final static Logger LOG =
+    private final static Logger s_log =
         Logger.getLogger(VersioningMetadata.class);
 
     private final Node.Switch m_switch;
@@ -78,26 +78,34 @@ public class VersioningMetadata {
                     if ( ot.isVersioned() ) {
                         m_versionedTypes.add(fqn);
                     }
-                    LOG.info("onObjectType: " + fqn);
+                    s_log.info("onObjectType: " + fqn);
                     if ( m_changeListener != null ) {
                         m_changeListener.onObjectType(fqn, ot.isVersioned());
                     }
                 }
 
                 public void onProperty(PropertyNd prop) {
-                    TypeNd typeNd = prop.getType();
-                    // make the buffer big enough to avoid reallocation of the
-                    // underlying char[] array
-                    String typeName = typeNd.isQualified() ?
-                        typeNd.getQualifiedName() : typeNd.getName();
-                    StringBuffer sb = new StringBuffer(typeName.length() + 50);
-                    sb.append(typeName).append(".").append(prop.getName());
-                    String fqn = sb.toString();
-                    m_unversionedProps.add(fqn);
+                    Node parent = prop.getParent();
+                    String containerName = null;
+                    if ( parent instanceof ObjectTypeNd ) {
+                        containerName = ((ObjectTypeNd) parent).getQualifiedName();
+                    } else if ( parent instanceof AssociationNd) {
+                        s_log.error("not implemented");
+                    } else {
+                        throw new IllegalStateException("can'g get here.");
+                    }
+
                     if ( prop.isUnversioned() ) {
-                        LOG.info("onProperty: " + fqn + " is unversioned");
+                        String propertyName = prop.getName().getName();
+                        Property property = new Property(containerName,
+                                                         propertyName);
+
+                        s_log.info("onProperty: " + property);
+                        m_unversionedProps.add(property);
+
                         if ( m_changeListener != null ) {
-                            m_changeListener.onUnversionedProperty(fqn);
+                            m_changeListener.onUnversionedProperty
+                                (containerName, propertyName);
                         }
                     }
                 }
@@ -137,8 +145,9 @@ public class VersioningMetadata {
      *
      * @param qualifiedName the fully qualified name of an object type property
      **/
-    public boolean isMarkedUnversioned(String qualifiedName) {
-        return m_unversionedProps.contains(qualifiedName);
+    public boolean isMarkedUnversioned(String containerName, String propertyName) {
+        return m_unversionedProps.contains
+            (new Property(containerName, propertyName));
     }
 
     /**
@@ -170,7 +179,37 @@ public class VersioningMetadata {
          * This method is called whenever we traverse a property node of the PDL
          * AST that is marked <code>unversioned</code>.
          **/
-        void onUnversionedProperty(String propertyFQN);
+        void onUnversionedProperty(String containerName, String propertyName);
+    }
+
+    private static class Property {
+        private final String m_container;
+        private final String m_property;
+
+        public Property(String container, String property) {
+            m_container = container;
+            m_property = property;
+        }
+
+        public boolean equals(Object obj) throws ClassCastException {
+            if ( obj == null ) return false;
+
+            Property that = (Property) obj;
+            return that.m_container.equals(this.m_container) 
+                && that.m_property.equals(this.m_property);
+        }
+
+        public int hashCode() {
+            return m_container.hashCode() + m_property.hashCode();
+        }
+
+        public String toString() {
+            StringBuffer sb = new StringBuffer
+                (m_container.length() + m_property.length() + 50);
+            sb.append("container=").append(m_container);
+            sb.append(", property=").append(m_property);
+            return sb.toString();
+        }
     }
 }
 
