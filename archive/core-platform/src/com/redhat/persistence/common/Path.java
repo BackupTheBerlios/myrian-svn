@@ -21,15 +21,15 @@ import com.arsdigita.util.ConcurrentDict;
  * Path
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2004/03/25 $
+ * @version $Revision: #12 $ $Date: 2004/03/25 $
  **/
 
 public class Path {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#11 $ by $Author: vadim $, $DateTime: 2004/03/25 17:40:25 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#12 $ by $Author: vadim $, $DateTime: 2004/03/25 18:16:05 $";
 
     //special case the id path since it shows up so often
-    private static final Path ID_PATH = new Path(null, "id");
+    private static final Path ID_PATH = new Path("id");
     private static final int NO_DOT = -1;
 
     private static final ConcurrentDict DICT =
@@ -39,16 +39,9 @@ public class Path {
     private final String m_path;
     private final int m_lastDot;
 
-    private Path(String basename, String name) {
-        if ( basename == null ) {
-            m_lastDot = NO_DOT;
-            m_path = name;
-        } else {
-            StringBuffer sb = new StringBuffer(basename.length()+name.length()+1);
-            sb.append(basename).append('.').append(name);
-            m_path = sb.toString();
-            m_lastDot = m_path.lastIndexOf('.');
-        }
+    private Path(String path) {
+        m_path = path;
+        m_lastDot = m_path.lastIndexOf('.');
     }
 
     public static final Path get(String path) {
@@ -156,14 +149,7 @@ public class Path {
 
     private static class Supplier implements ConcurrentDict.EntrySupplier {
         public Object supply(Object key) {
-            String path = (String) key;
-
-            final int dot = path.lastIndexOf('.');
-            if (dot > -1) {
-                return new Path(path.substring(0, dot), path.substring(dot + 1));
-            } else {
-                return new Path(null, path);
-            }
+            return new Path((String) key);
         }
     }
 }
