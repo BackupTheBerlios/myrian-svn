@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * SQLLoader
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/08/27 $
+ * @version $Revision: #2 $ $Date: 2003/09/09 $
  **/
 
-public class SQLLoader {
+public abstract class SQLLoader {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/installer/SQLLoader.java#1 $ by $Author: rhs $, $DateTime: 2003/08/27 19:16:25 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/installer/SQLLoader.java#2 $ by $Author: rhs $, $DateTime: 2003/09/09 15:54:40 $";
 
     private static final Logger s_log = Logger.getLogger(SQLLoader.class);
 
@@ -26,11 +26,13 @@ public class SQLLoader {
         m_conn = conn;
     }
 
-    public void load(String filename) {
+    protected abstract Reader open(String name);
+
+    public void load(String name) {
         try {
             Statement stmt = m_conn.createStatement();
             try {
-                load(stmt, filename, filename);
+                load(stmt, name, name);
             } finally {
                 stmt.close();
             }
@@ -40,51 +42,68 @@ public class SQLLoader {
     }
 
     private void load(final Statement stmt, final String base,
-                      final String filename) {
+                      final String name) {
         try {
+            Reader reader = open(name);
+            if (reader == null) {
+                throw new IllegalArgumentException
+                    ("no such file: " + name + ", included from: " + base);
+            }
+
             StatementParser sp = new StatementParser
-                (filename, new FileReader(filename),
+                (name, reader,
                  new StatementParser.Switch() {
                      public void onStatement(String sql) {
                          execute(stmt, sql);
                      }
                      public void onInclude(String include) {
-                         include(stmt, base, filename, include);
+                         include(stmt, base, include);
                      }
                  });
             sp.parse();
+            reader.close();
         } catch (ParseException e) {
             throw new UncheckedWrapperException(e);
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             throw new UncheckedWrapperException(e);
         }
     }
 
-    private void include(Statement stmt, String base, String including,
-                         String included) {
-        File includedFile = new File(included);
-        if (includedFile.isAbsolute()) {
-            if (s_log.isInfoEnabled()) {
-                s_log.info("Absolute path found: '" + included + "'");
-            }
+    private String parent(String path) {
+        path = path.trim();
+        if (path.endsWith("/")) {
+            path = path.substring(0, path.length() - 2);
+        }
+
+        int index = path.lastIndexOf('/');
+        if (index > 0) {
+            path = path.substring(0, index);
         } else {
-            if (s_log.isInfoEnabled()) {
-                s_log.info("Relative path found: '" + included + "'");
-            }
-            //  Well make it absolute then.
-            includedFile =
-                new File(new File(base).getAbsoluteFile()
-                         .getParentFile(), included).getAbsoluteFile();
+            path = null;
         }
+
+        return path;
+    }
+
+    private void include(Statement stmt, String base, String included) {
         if (s_log.isInfoEnabled()) {
-            s_log.info("Recursively including: '" + includedFile + "'");
+            s_log.info("Resolving include: '" + included + "'");
         }
-        if (!includedFile.exists()) {
-            throw new IllegalStateException
-                ("no such file: " + includedFile + ", included from: " +
-                 base);
+
+        String front = parent(base);
+        String back = included;
+        while (back.startsWith("../")) {
+            back = back.substring(3);
+            front = parent(front);
         }
-        load(stmt, base, includedFile.toString());
+
+        String resolved = front + "/" + back;
+
+        if (s_log.isInfoEnabled()) {
+            s_log.info("Recursively including: '" + resolved + "'");
+        }
+
+        load(stmt, base, resolved);
     }
 
     private void execute(Statement stmt, String sql) {

@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 
 public class LoadSQLPlusScript {
 
-    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/installer/LoadSQLPlusScript.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:16:25 $";
+    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/installer/LoadSQLPlusScript.java#4 $ by $Author: rhs $, $DateTime: 2003/09/09 15:54:40 $";
 
     private static final Logger s_log =
             Logger.getLogger(LoadSQLPlusScript.class);
@@ -92,7 +92,15 @@ public class LoadSQLPlusScript {
         if (s_log.isInfoEnabled()) {
             s_log.info("Loading: '" + scriptFilename + "'");
         }
-        SQLLoader loader = new SQLLoader(m_con);
+        SQLLoader loader = new SQLLoader(m_con) {
+            protected Reader open(String name) {
+                try {
+                    return new FileReader(name);
+                } catch (FileNotFoundException e) {
+                    return null;
+                }
+            }
+        };
         loader.load(scriptFilename);
         try {
             m_con.commit();
