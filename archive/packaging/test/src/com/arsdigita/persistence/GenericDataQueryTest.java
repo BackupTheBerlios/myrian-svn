@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -24,12 +24,12 @@ import org.apache.log4j.Logger;
  * GenericDataQueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/08/14 $
+ * @version $Revision: #2 $ $Date: 2003/08/19 $
  **/
 
 public class GenericDataQueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/GenericDataQueryTest.java#1 $ by $Author: dennis $, $DateTime: 2003/08/14 14:53:20 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/GenericDataQueryTest.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
 
     private static final Logger s_log =
         Logger.getLogger(GenericDataQueryTest.class);

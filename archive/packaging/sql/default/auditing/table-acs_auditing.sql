@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/test-packaging/sql/default/auditing/table-acs_auditing.sql#1 $
--- $DateTime: 2003/08/14 14:53:20 $
+-- $Id: //core-platform/test-packaging/sql/default/auditing/table-acs_auditing.sql#2 $
+-- $DateTime: 2003/08/19 22:28:24 $
 
 create table acs_auditing (
         object_id          integer constraint audited_acs_object_id_fk
@@ -21,9 +21,9 @@ create table acs_auditing (
                            primary key,
 	creation_user      integer constraint audited_creation_user_fk
                            references users,
-	creation_date      timestamp not null,
+	creation_date      timestamptz not null,
 	creation_ip        varchar(50),
-	last_modified      timestamp not null,
+	last_modified      timestamptz not null,
 	modifying_user     integer constraint audited_modifying_user_fk
                            references users,
 	modifying_ip       varchar(50)

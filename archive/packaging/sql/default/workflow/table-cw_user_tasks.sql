@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/test-packaging/sql/default/workflow/table-cw_user_tasks.sql#1 $
--- $DateTime: 2003/08/14 14:53:20 $
+-- $Id: //core-platform/test-packaging/sql/default/workflow/table-cw_user_tasks.sql#2 $
+-- $DateTime: 2003/08/19 22:28:24 $
 
 create table cw_user_tasks (
   task_id                integer
@@ -24,8 +24,8 @@ create table cw_user_tasks (
   locking_user_id        integer,
   --     use constraint when using users table
   --                         constraint user_tasks_locking_user_id_fk references users,
-  start_date             timestamp,
-  due_date               timestamp,
+  start_date             timestamptz,
+  due_date               timestamptz,
   duration_minutes       integer ,
   notification_sender_id integer 
 );

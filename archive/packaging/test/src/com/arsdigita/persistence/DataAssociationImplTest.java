@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -29,15 +29,15 @@ import org.apache.log4j.Logger;
  *     com.arsdigita.persistence.DataAssociation </p>
  *
  * @author Michael Bryzek
- * @date $Date: 2003/08/14 $
- * @version $Revision: #1 $
+ * @date $Date: 2003/08/19 $
+ * @version $Revision: #2 $
  *
  * @see com.arsdigita.persistence.DataAssociationImpl
  **/
 
 public class DataAssociationImplTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/DataAssociationImplTest.java#1 $ by $Author: dennis $, $DateTime: 2003/08/14 14:53:20 $";
+    public static final String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/DataAssociationImplTest.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
     private static Logger log =
         Logger.getLogger(DataAssociationImplTest.class.getName());
 

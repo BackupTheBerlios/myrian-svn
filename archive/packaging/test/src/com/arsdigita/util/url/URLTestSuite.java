@@ -6,7 +6,7 @@ import junit.framework.Test;
 import org.apache.log4j.BasicConfigurator;
 
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003, 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -26,7 +26,7 @@ import org.apache.log4j.BasicConfigurator;
  *
  */
 public class URLTestSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/util/url/URLTestSuite.java#1 $ by $Author: dennis $, $DateTime: 2003/08/14 14:53:20 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/util/url/URLTestSuite.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
 
     public URLTestSuite() {
         super();

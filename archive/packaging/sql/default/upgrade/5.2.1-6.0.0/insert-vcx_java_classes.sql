@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001-2003 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2003-2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/test-packaging/sql/default/upgrade/5.2.1-6.0.0/insert-vcx_java_classes.sql#1 $
--- $DateTime: 2003/08/14 14:53:20 $
+-- $Id: //core-platform/test-packaging/sql/default/upgrade/5.2.1-6.0.0/insert-vcx_java_classes.sql#2 $
+-- $DateTime: 2003/08/19 22:28:24 $
 
 -- NOTE: this needs to be kept in sync with
 -- com.arsdigita.x.versioning.serialization.Types
@@ -64,4 +64,3 @@ values (14, 'java.lang.String');
 
 insert into vcx_java_classes (id, name) 
 values (15, 'java.sql.Timestamp');
-

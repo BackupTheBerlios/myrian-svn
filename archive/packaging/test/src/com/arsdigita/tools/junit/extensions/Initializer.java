@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -34,7 +34,7 @@ import java.util.Collection;
  *  Initializer
  *
  * @author Dennis Gregorovic
- * @version $Revision: #1 $ $Date: 2003/08/14 $
+ * @version $Revision: #2 $ $Date: 2003/08/19 $
  */
 
 public class Initializer {

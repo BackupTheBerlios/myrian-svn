@@ -1,3 +1,19 @@
+--
+-- Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+--
+-- The contents of this file are subject to the CCM Public
+-- License (the "License"); you may not use this file except in
+-- compliance with the License. You may obtain a copy of
+-- the License at http://www.redhat.com/licenses/ccmpl.html
+--
+-- Software distributed under the License is distributed on an "AS
+-- IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+-- implied. See the License for the specific language governing
+-- rights and limitations under the License.
+--
+-- $Id: //core-platform/test-packaging/sql/oracle-se/upgrade/5.2.1-6.0.0/auto-upgrade.sql#2 $
+-- $DateTime: 2003/08/19 22:28:24 $
+
 
 --------------------------------------------------------------------------------
 -- These columns went from 'not nullable' to 'nullable'.
@@ -389,4 +405,3 @@ create index VCX_OPERATIONS_CLASS_ID_IDX on VCX_OPERATIONS(CLASS_ID);
 create index VCX_OPERATIONS_EVNT_TYP_ID_IDX on VCX_OPERATIONS(EVENT_TYPE_ID);
 create index VCX_TAGS_TXN_ID_IDX on VCX_TAGS(TXN_ID);
 create index VCX_TXNS_MODIFYING_USER_IDX on VCX_TXNS(MODIFYING_USER);
-

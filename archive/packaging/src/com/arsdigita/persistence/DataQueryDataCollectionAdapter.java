@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -55,7 +55,7 @@ import com.arsdigita.persistence.metadata.ObjectType;
  * cursor, it just wraps the data query that was passed in.
  *
  * @author David Lutterkort
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/persistence/DataQueryDataCollectionAdapter.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/persistence/DataQueryDataCollectionAdapter.java#2 $
  */
 public class DataQueryDataCollectionAdapter extends DataQueryDecorator
     implements DataCollection {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -22,16 +22,16 @@ package com.arsdigita.db;
  * notified when a connection's users drop to zero.
  *
  * @author David Eison
- * @version $Revision: #1 $ $Date: 2003/08/14 $
+ * @version $Revision: #2 $ $Date: 2003/08/19 $
  * @since 4.6
  */
 public interface ConnectionUseListener {
 
-    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/db/ConnectionUseListener.java#1 $ by $Author: dennis $, $DateTime: 2003/08/14 14:53:20 $";
+    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/db/ConnectionUseListener.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
 
     /**
      * Called when a connection has zero users.
      */
-    public void connectionUserCountHitZero(com.arsdigita.db.Connection conn)
+    public void connectionUserCountHitZero(java.sql.Connection conn)
         throws java.sql.SQLException;
 }

@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,14 +11,14 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/test-packaging/sql/default/function-currentDate.sql#1 $
--- $DateTime: 2003/08/14 14:53:20 $
+-- $Id: //core-platform/test-packaging/sql/default/function-currentDate.sql#2 $
+-- $DateTime: 2003/08/19 22:28:24 $
 
 -- This is a function to allow the postgres and oracle PDL to 
 -- not have to hard code current_timestamp() and sysdate
 -- respectively
 create or replace function currentDate()
-  returns timestamp as '
+  returns timestamptz as '
   declare
   begin
     return current_timestamp;

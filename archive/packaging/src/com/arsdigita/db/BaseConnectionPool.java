@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -29,16 +29,16 @@ import java.util.Iterator;
  * Base connection pooling class
  *
  * @author Bob Donald
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/db/BaseConnectionPool.java#1 $ $DateTime: 2003/08/14 14:53:20 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/db/BaseConnectionPool.java#2 $ $DateTime: 2003/08/19 22:28:24 $
  * @since
  *
  */
 
 abstract public class BaseConnectionPool implements DatabaseConnectionPool {
 
-    public static final String versionId = "$Author: dennis $ " +
-        "- $Date: 2003/08/14 $ " + 
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/db/BaseConnectionPool.java#1 $";
+    public static final String versionId = "$Author: rhs $ " +
+        "- $Date: 2003/08/19 $ " + 
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/db/BaseConnectionPool.java#2 $";
 
     private static final Logger cat = Logger.getLogger(BaseConnectionPool.class.getName());
 
@@ -135,8 +135,7 @@ abstract public class BaseConnectionPool implements DatabaseConnectionPool {
         try {
             synchronized (m_monitor) {
                 conn = (java.sql.Connection) m_availConnections.remove(0);
-                m_usedConnections.add(conn);
-                conn = Connection.wrap( conn, this );
+                m_usedConnections.add(conn);                
                 cat.info("Retrieving connection from pool. " +
                          m_availConnections.size() +
                          " remaining.");
@@ -157,6 +156,17 @@ abstract public class BaseConnectionPool implements DatabaseConnectionPool {
                          " remaining.");
             }
         }
+    }
+    
+    public boolean containsConnection(java.sql.Connection conn) {
+        boolean bReturn = false;
+        if (m_availConnections.contains(conn)) {
+            bReturn = true;
+        } else if (m_usedConnections.contains(conn)) {
+            bReturn = true;
+        }
+        
+        return bReturn;
     }
 
     /**

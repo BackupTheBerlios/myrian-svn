@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/test-packaging/sql/default/notification/table-nt_requests.sql#1 $
--- $DateTime: 2003/08/14 14:53:20 $
+-- $Id: //core-platform/test-packaging/sql/default/notification/table-nt_requests.sql#2 $
+-- $DateTime: 2003/08/19 22:28:24 $
 
 
 create table nt_requests (
@@ -37,9 +37,9 @@ create table nt_requests (
                       default '1'
                       constraint nt_requests_expand_ck
                           check (expand_group in ('0','1')),
-    request_date      timestamp
+    request_date      timestamptz
                       default current_timestamp,
-    fulfill_date      timestamp,
+    fulfill_date      timestamptz,
     status            varchar(20)
                       default 'pending'
                       constraint nt_requests_status_ck

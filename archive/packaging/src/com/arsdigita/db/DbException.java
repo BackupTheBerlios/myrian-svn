@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -27,7 +27,7 @@ import java.sql.SQLException;
 public class DbException extends SQLException {
 
     public static final String versionId
-        = "$Id: //core-platform/test-packaging/src/com/arsdigita/db/DbException.java#1 $";
+        = "$Id: //core-platform/test-packaging/src/com/arsdigita/db/DbException.java#2 $";
 
     private UncheckedWrapperException m_delegate = null;
 

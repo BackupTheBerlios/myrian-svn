@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -21,12 +21,12 @@ package com.arsdigita.persistence;
  * factories to hand out filters
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/08/14 $
+ * @version $Revision: #2 $ $Date: 2003/08/19 $
  */
 
 public interface FilterFactory {
 
-    String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/FilterFactory.java#1 $ by $Author: dennis $, $DateTime: 2003/08/14 14:53:20 $";
+    String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/FilterFactory.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
 
     // These are variables indicating what to use in the comparrison
     public final static int EQUALS = 1;

@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,12 +11,10 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/test-packaging/sql/oracle-se/upgrade/5.0.0-5.1.0/categorization.sql#1 $
--- $DateTime: 2003/08/14 14:53:20 $
+-- $Id: //core-platform/test-packaging/sql/oracle-se/upgrade/5.0.0-5.1.0/categorization.sql#2 $
+-- $DateTime: 2003/08/19 22:28:24 $
 
 alter table cat_categories add (
 	abstract_p          char(1) default '0'
                         constraint cat_categories_abstract_p_ck
                         check(abstract_p in ('0','1')));
-
-

@@ -1,5 +1,3 @@
-
-
 Here is a fox: [IMAGE: 'fox' http://quickfox.com/fox.jpg]
 
 Here is a dog: [IMAGE: http://lazydog.com/fox.jpg]

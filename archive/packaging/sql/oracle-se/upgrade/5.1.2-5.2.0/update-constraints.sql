@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/test-packaging/sql/oracle-se/upgrade/5.1.2-5.2.0/update-constraints.sql#1 $
--- $DateTime: 2003/08/14 14:53:20 $
+-- $Id: //core-platform/test-packaging/sql/oracle-se/upgrade/5.1.2-5.2.0/update-constraints.sql#2 $
+-- $DateTime: 2003/08/19 22:28:24 $
 
 alter table acs_permissions drop constraint acs_premissions_pk;
 alter table acs_permissions add 
@@ -153,4 +153,3 @@ alter table user_authentication add
 --alter table users rename constraint users_user_id_fk to users_user_id_f_t_lso;
 --alter table vc_blob_operations rename constraint vc_blob_operations_fk to vc_blo_operat_opera_id_f_qcpj1;
 --alter table vc_clob_operations rename constraint vc_clob_operations_fk to vc_clo_operat_opera_id_f_k752z;
-

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -25,14 +25,14 @@ import org.apache.log4j.Logger;
  *
  *
  * @author David Dao
- * @version $Revision: #1 $ $Date: 2003/08/14 $
+ * @version $Revision: #2 $ $Date: 2003/08/19 $
  * @since 4.5
  *
  */
 
 public class J2EEConnectionManagerImpl implements DatabaseConnectionPool {
 
-    public static final String versionId = "$Author: dennis $ - $Date: 2003/08/14 $ $Id: //core-platform/test-packaging/src/com/arsdigita/db/J2EEConnectionManagerImpl.java#1 $";
+    public static final String versionId = "$Author: rhs $ - $Date: 2003/08/19 $ $Id: //core-platform/test-packaging/src/com/arsdigita/db/J2EEConnectionManagerImpl.java#2 $";
 
     private static final Logger cat = Logger.getLogger(J2EEConnectionManagerImpl.class.getName());
 
@@ -79,6 +79,15 @@ public class J2EEConnectionManagerImpl implements DatabaseConnectionPool {
             throw new java.sql.SQLException("Caught NamingException: " + e.toString());
         }
     }
+    
+    public void returnToPool(java.sql.Connection conn) {
+         cat.warn("Ignoring return to pool as this is not a pooled driver");                   
+    }
+    
+    public boolean containsConnection(java.sql.Connection conn) {
+        cat.warn("returning false; this is not a pooled connection");   
+        return false;
+    }        
 
     public void setConnectionPoolSize(int num) throws java.sql.SQLException {
         cat.warn("Ignoring set connection pool size " + num + "; this is not a pooled driver.");

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -29,7 +29,7 @@ import java.sql.SQLException;
  */
 public class DbExceptionHandlerTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/db/DbExceptionHandlerTest.java#1 $";
+    public static final String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/db/DbExceptionHandlerTest.java#2 $";
 
     private static java.sql.Connection conn;
 
@@ -77,15 +77,17 @@ public class DbExceptionHandlerTest extends TestCase {
         insertStmt.executeUpdate();
         try {
             insertStmt.executeUpdate();
-            fail("Unique constraint violation should have caused error");
-        } catch (UniqueConstraintException e) {
-            // good
+            fail("Unique constraint violation should have caused error");        
         } catch (SQLException e) {
-            // bad
-            fail("Unique constraint violation should have caused " +
-                 "UniqueConstraintException, instead caused " + e);
-        }
-        insertStmt.close();
+            SQLException wrapped = SQLExceptionHandler.wrap(e);
+            if (wrapped instanceof UniqueConstraintException) {
+                //good
+            } else
+                // bad
+                fail("Unique constraint violation should have caused " +
+                     "UniqueConstraintException, instead caused " + e);        
+            }
+            insertStmt.close();
     }
 
     public void testDbNotAvailableException() throws SQLException {

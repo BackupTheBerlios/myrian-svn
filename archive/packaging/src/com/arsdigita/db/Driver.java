@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -25,12 +25,12 @@ import java.util.Properties;
  * a "real" implementation of java.sql.Driver
  *
  * @author Mark Thomas
- * @version $Revision: #1 $ $Date: 2003/08/14 $
+ * @version $Revision: #2 $ $Date: 2003/08/19 $
  * @since 4.5
  */
 class Driver implements java.sql.Driver {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/db/Driver.java#1 $ $Author: dennis $ $Date: 2003/08/14 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/db/Driver.java#2 $ $Author: rhs $ $Date: 2003/08/19 $";
 
     // The Driver object we wrap
     private java.sql.Driver driver;
@@ -60,7 +60,7 @@ class Driver implements java.sql.Driver {
     public java.sql.Connection connect(String url, Properties info)
         throws SQLException {
         try {
-            return com.arsdigita.db.Connection.wrap(driver.connect(url, info), null);
+            return driver.connect(url, info);
         } catch (SQLException e) {
             throw SQLExceptionHandler.wrap(e);
         }
