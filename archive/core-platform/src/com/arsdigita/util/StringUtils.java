@@ -507,7 +507,6 @@ public class StringUtils {
      * @param input the String to wrap
      *
      * @since  5.1.2
-     * @version $Id: //core-platform/dev/src/com/arsdigita/util/StringUtils.java#5 $
      */
 
     public final static String wrap(String input) {
@@ -536,8 +535,7 @@ public class StringUtils {
      * breaks
      *
      * @since  5.1.2
-     * @version $Id: //core-platform/dev/src/com/arsdigita/util/StringUtils.java#5 $ */
-
+     */
     public final static String wrap(String input, int maxLength) {
 
         final char SPACE = ' ';

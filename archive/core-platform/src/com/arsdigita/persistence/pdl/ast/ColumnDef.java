@@ -31,11 +31,11 @@ import java.io.StringWriter;
  * data type.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #8 $ $Date: 2002/08/26 $
+ * @version $Revision: #9 $ $Date: 2002/10/16 $
  */
 public class ColumnDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ColumnDef.java#8 $ by $Author: rhs $, $DateTime: 2002/08/26 17:54:19 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ColumnDef.java#9 $ by $Author: richardl $, $DateTime: 2002/10/16 16:12:57 $";
 
     private static int count = 0;
     private static final Logger s_log =
@@ -93,7 +93,7 @@ public class ColumnDef extends Element {
     /**
      * Generates the Column that this ColumnDef represents.
      *
-     * @returns the Column that this ColumnDef represents.
+     * @return the Column that this ColumnDef represents.
      */
     public Column generateLogicalModel(int defaultJDBCType) {
         MetadataRoot root = MetadataRoot.getMetadataRoot();
@@ -150,7 +150,7 @@ public class ColumnDef extends Element {
     /**
      * Generates the Column that this ColumnDef represents.
      *
-     * @returns the Column that this ColumnDef represents.
+     * @return the Column that this ColumnDef represents.
      */
     public Column generateLogicalModel() {
         return generateLogicalModel(Integer.MIN_VALUE);
