@@ -6,12 +6,12 @@ import java.util.*;
  * Equals
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2004/02/28 $
+ * @version $Revision: #14 $ $Date: 2004/03/03 $
  **/
 
 public class Equals extends BinaryCondition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Equals.java#13 $ by $Author: rhs $, $DateTime: 2004/02/28 08:30:26 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Equals.java#14 $ by $Author: rhs $, $DateTime: 2004/03/03 12:16:16 $";
 
     public Equals(Expression left, Expression right) {
         super(left, right);
@@ -44,10 +44,10 @@ public class Equals extends BinaryCondition {
                  "\nright: " + rexpr);
         }
 
-        List lnull = gen.getNull(lexpr);
-        List rnull = gen.getNull(rexpr);
-        List lnonnull = gen.getNonNull(lexpr);
-        List rnonnull = gen.getNonNull(rexpr);
+        Set lnull = gen.getNull(lexpr);
+        Set rnull = gen.getNull(rexpr);
+        Set lnonnull = gen.getNonNull(lexpr);
+        Set rnonnull = gen.getNonNull(rexpr);
 
         for (int i = 0; i < lvals.size(); i++) {
             QValue lval = (QValue) lvals.get(i);

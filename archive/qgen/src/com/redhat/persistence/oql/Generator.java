@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/03/03 $
+ * @version $Revision: #9 $ $Date: 2004/03/03 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#8 $ by $Author: rhs $, $DateTime: 2004/03/03 08:29:14 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#9 $ by $Author: rhs $, $DateTime: 2004/03/03 12:16:16 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -115,7 +115,7 @@ class Generator {
         return result;
     }
 
-    List getEqualities(Expression expr) {
+    Set getEqualities(Expression expr) {
         return m_equalities.get(expr);
     }
 
@@ -123,7 +123,7 @@ class Generator {
         m_equalities.add(expr, new Equality(a, b));
     }
 
-    void addEqualities(Expression expr, List equalities) {
+    void addEqualities(Expression expr, Collection equalities) {
         m_equalities.addAll(expr, equalities);
     }
 
@@ -135,7 +135,7 @@ class Generator {
         m_sufficient.add(expr);
     }
 
-    List getUses(Expression expr) {
+    Set getUses(Expression expr) {
         return m_uses.get(expr);
     }
 
@@ -143,11 +143,11 @@ class Generator {
         m_uses.add(expr, v);
     }
 
-    void addUses(Expression expr, List values) {
+    void addUses(Expression expr, Collection values) {
         m_uses.addAll(expr, values);
     }
 
-    List getNull(Expression expr) {
+    Set getNull(Expression expr) {
         return m_null.get(expr);
     }
 
@@ -155,11 +155,11 @@ class Generator {
         m_null.add(expr, v);
     }
 
-    void addNulls(Expression expr, List values) {
+    void addNulls(Expression expr, Collection values) {
         m_null.addAll(expr, values);
     }
 
-    List getNonNull(Expression expr) {
+    Set getNonNull(Expression expr) {
         return m_nonnull.get(expr);
     }
 
@@ -167,7 +167,7 @@ class Generator {
         m_nonnull.add(expr, v);
     }
 
-    void addNonNulls(Expression expr, List values) {
+    void addNonNulls(Expression expr, Collection values) {
         m_nonnull.addAll(expr, values);
     }
 
@@ -228,21 +228,21 @@ class Generator {
 
     QFrame getConstraining(QFrame frame) {
         List conds = frame.getConditions();
-        List values = new ArrayList();
+        Set columns = new HashSet();
         Set frames = new HashSet();
         for (Iterator it = conds.iterator(); it.hasNext(); ) {
             Expression e = (Expression) it.next();
-            addConstraining(e, frame, values, frames);
+            addConstraining(e, frame, columns, frames);
         }
-        if (values.isEmpty() || !frame.isConstrained(values)) {
+        if (columns.isEmpty() || !frame.isConstrained(columns)) {
             return null;
         }
         return frame.getContainer();
     }
 
-    private void addConstraining(Expression e, QFrame frame, List values,
+    private void addConstraining(Expression e, QFrame frame, Set columns,
                                  Set frames) {
-        List equalities = getEqualities(e);
+        Set equalities = getEqualities(e);
         if (equalities == null) { return; }
         for (Iterator it = equalities.iterator(); it.hasNext(); ) {
             Equality eq = (Equality) it.next();
@@ -258,7 +258,7 @@ class Generator {
                 continue;
             }
             QValue other = eq.getOther(external);
-            values.add(other);
+            columns.add(other.getColumn());
             frames.add(ext);
         }
     }
@@ -276,7 +276,7 @@ class Generator {
         Map equisets = new HashMap();
         for (Iterator it = conds.iterator(); it.hasNext(); ) {
             Expression e = (Expression) it.next();
-            List eqs = getEqualities(e);
+            Set eqs = getEqualities(e);
             for (Iterator iter = eqs.iterator(); iter.hasNext(); ) {
                 Equality eq = (Equality) iter.next();
                 String l = eq.getLeft().toString();
@@ -302,16 +302,16 @@ class Generator {
             }
         }
 
-        MultiMap values = new MultiMap();
+        MultiMap columns = new MultiMap();
         for (Iterator it = conds.iterator(); it.hasNext(); ) {
             Expression e = (Expression) it.next();
-            addDuplicates(e, frame, values, equisets);
+            addDuplicates(e, frame, columns, equisets);
         }
 
         Set result = new HashSet();
-        for (Iterator it = values.keys().iterator(); it.hasNext(); ) {
+        for (Iterator it = columns.keys().iterator(); it.hasNext(); ) {
             QFrame qf = (QFrame) it.next();
-            if (frame.isConstrained(values.get(qf))) {
+            if (frame.isConstrained(columns.get(qf))) {
                 result.add(qf.getDuplicate());
             }
         }
@@ -319,9 +319,9 @@ class Generator {
         return result;
     }
 
-    void addDuplicates(Expression e, QFrame frame, MultiMap values,
+    void addDuplicates(Expression e, QFrame frame, MultiMap columns,
                        Map equisets) {
-        List equalities = getEqualities(e);
+        Set equalities = getEqualities(e);
         if (equalities == null) { return; }
         for (Iterator it = equalities.iterator(); it.hasNext(); ) {
             Equality eq = (Equality) it.next();
@@ -335,7 +335,7 @@ class Generator {
                 if (me.getTable().equals(other.getTable()) &&
                     me.getColumn().equals(other.getColumn()) &&
                     me.getFrame().isOuter() == other.getFrame().isOuter()) {
-                    values.add(other.getFrame(), me);
+                    columns.add(other.getFrame(), me.getColumn());
                 }
             }
         }

@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2004/03/03 $
+ * @version $Revision: #11 $ $Date: 2004/03/03 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#10 $ by $Author: rhs $, $DateTime: 2004/03/03 08:29:14 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#11 $ by $Author: rhs $, $DateTime: 2004/03/03 12:16:16 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -376,7 +376,7 @@ class QFrame {
         return frames(m_generator.getUses(e));
     }
 
-    Set frames(List values) {
+    Set frames(Collection values) {
         Set result = new HashSet();
         for (Iterator it = values.iterator(); it.hasNext(); ) {
             QValue value = (QValue) it.next();
@@ -448,7 +448,7 @@ class QFrame {
     boolean innerize() {
         boolean modified = false;
         if (m_condition != null && !m_outer) {
-            List nonnulls = m_generator.getNonNull(m_condition);
+            Set nonnulls = m_generator.getNonNull(m_condition);
             Set frames = frames(nonnulls);
             modified = innerize(frames);
         }
@@ -508,27 +508,18 @@ class QFrame {
         return false;
     }
 
-    boolean isConstrained(List values) {
+    boolean isConstrained(Set columns) {
         for (Iterator it = m_children.iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
-            if (!child.isConstrained(values)) { return false; }
+            if (!child.isConstrained(columns)) { return false; }
         }
         if (m_table != null) {
-            if (!m_generator.isConstrained(m_table, getColumns(values))) {
+            if (!m_generator.isConstrained(m_table, columns)) {
                 return false;
             }
         }
         if (m_tableExpr != null) { return false; }
         return true;
-    }
-
-    private Set getColumns(List values) {
-        Set result = new HashSet();
-        for (Iterator it = values.iterator(); it.hasNext(); ) {
-            QValue value = (QValue) it.next();
-            result.add(value.getColumn());
-        }
-        return result;
     }
 
     void shrink() {

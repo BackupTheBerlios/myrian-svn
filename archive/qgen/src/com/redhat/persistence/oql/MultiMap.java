@@ -6,51 +6,51 @@ import java.util.*;
  * MultiMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/02/24 $
+ * @version $Revision: #4 $ $Date: 2004/03/03 $
  **/
 
 class MultiMap {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/MultiMap.java#3 $ by $Author: rhs $, $DateTime: 2004/02/24 10:13:24 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/MultiMap.java#4 $ by $Author: rhs $, $DateTime: 2004/03/03 12:16:16 $";
 
     private List m_keys = new ArrayList();
-    private Map m_lists = new HashMap();
+    private Map m_sets = new HashMap();
 
     List keys() {
         return m_keys;
     }
 
-    List get(Object key) {
-        return get(key, Collections.EMPTY_LIST);
+    Set get(Object key) {
+        return get(key, Collections.EMPTY_SET);
     }
 
-    List get(Object key, List dephault) {
-        if (m_lists.containsKey(key)) {
-            return (List) m_lists.get(key);
+    Set get(Object key, Set dephault) {
+        if (m_sets.containsKey(key)) {
+            return (Set) m_sets.get(key);
         } else {
             return dephault;
         }
     }
 
     boolean contains(Object key) {
-        return m_lists.containsKey(key);
+        return m_sets.containsKey(key);
     }
 
     boolean isEmpty() {
-        return m_lists.isEmpty();
+        return m_sets.isEmpty();
     }
 
     void add(Object key, Object value) {
-        List values = (List) m_lists.get(key);
+        Set values = (Set) m_sets.get(key);
         if (values == null) {
-            values = new ArrayList();
-            m_lists.put(key, values);
+            values = new HashSet();
+            m_sets.put(key, values);
             m_keys.add(key);
         }
         values.add(value);
     }
 
-    void addAll(Object key, List values) {
+    void addAll(Object key, Collection values) {
         for (Iterator it = values.iterator(); it.hasNext(); ) {
             add(key, it.next());
         }
