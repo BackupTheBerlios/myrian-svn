@@ -1,0 +1,572 @@
+<tests>
+  <test>
+    <query>query(all(test.Tuple), a = a.name, b = b.name, c = c.name)</query>
+    <query>query(all(test.StaticTuple), a = a.name, b = b.name, c = c.name)</query>
+    <results>
+      <row a="Zero" b="Ten" c="Twenty"/>
+      <row a="Zero" b="Ten" c="Twenty One"/>
+      <row a="Zero" b="Ten" c="Twenty Two"/>
+      <row a="Zero" b="Ten" c="Twenty Three"/>
+      <row a="Zero" b="Ten" c="Twenty Four"/>
+
+      <row a="Zero" b="Eleven" c="Twenty"/>
+      <row a="Zero" b="Eleven" c="Twenty One"/>
+      <row a="Zero" b="Eleven" c="Twenty Two"/>
+      <row a="Zero" b="Eleven" c="Twenty Three"/>
+      <row a="Zero" b="Eleven" c="Twenty Four"/>
+
+      <row a="Zero" b="Twelve" c="Twenty Five"/>
+      <row a="Zero" b="Twelve" c="Twenty Six"/>
+      <row a="Zero" b="Twelve" c="Twenty Seven"/>
+      <row a="Zero" b="Twelve" c="Twenty Eight"/>
+      <row a="Zero" b="Twelve" c="Twenty Nine"/>
+
+      <row a="One" b="Ten" c="Twenty Nine"/>
+      <row a="One" b="Eleven" c="Twenty Nine"/>
+      <row a="One" b="Twelve" c="Twenty Nine"/>
+      <row a="One" b="Thirteen" c="Twenty Nine"/>
+      <row a="One" b="Fourteen" c="Twenty Nine"/>
+
+      <row a="Two" b="Sixteen" c="Twenty Nine"/>
+      <row a="Three" b="Sixteen" c="Twenty Eight"/>
+      <row a="Four" b="Sixteen" c="Twenty Seven"/>
+      <row a="Five" b="Sixteen" c="Twenty Six"/>
+      <row a="Six" b="Sixteen" c="Twenty Five"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(all(test.Tuple).cee, id = id, name = name)</query>
+    <query>query(all(test.StaticTuple).cee, id = id, name = name)</query>
+    <results>
+      <row id="20" name="Twenty"/>
+      <row id="20" name="Twenty"/>
+      <row id="20" name="Twenty"/>
+      <row id="20" name="Twenty"/>
+      <row id="20" name="Twenty"/>
+
+      <row id="21" name="Twenty One"/>
+      <row id="21" name="Twenty One"/>
+      <row id="21" name="Twenty One"/>
+      <row id="21" name="Twenty One"/>
+      <row id="21" name="Twenty One"/>
+
+      <row id="22" name="Twenty Two"/>
+      <row id="22" name="Twenty Two"/>
+      <row id="22" name="Twenty Two"/>
+      <row id="22" name="Twenty Two"/>
+      <row id="22" name="Twenty Two"/>
+
+      <row id="23" name="Twenty Three"/>
+      <row id="24" name="Twenty Four"/>
+      <row id="25" name="Twenty Five"/>
+      <row id="26" name="Twenty Six"/>
+      <row id="27" name="Twenty Seven"/>
+
+      <row id="24" name="Twenty Four"/>
+      <row id="24" name="Twenty Four"/>
+      <row id="24" name="Twenty Four"/>
+      <row id="24" name="Twenty Four"/>
+      <row id="24" name="Twenty Four"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(filter(all(test.Node), id == 30).children, id = id)</query>
+    <query>query(filter(all(test.StaticNode), id == 30).children, id = id)</query>
+    <results>
+      <row id="31"/>
+      <row id="32"/>
+      <row id="33"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(all(test.Node).parent, id = id)</query>
+    <query>query(all(test.StaticNode).parent, id = id)</query>
+    <results>
+      <row id="30"/>
+      <row id="30"/>
+      <row id="30"/>
+      <row id="33"/>
+      <row id="33"/>
+      <row id="33"/>
+      <row id="36"/>
+      <row id="37"/>
+      <row id="38"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(filter(all(test.Node), exists(parent)), id = id)</query>
+    <query>query(filter(all(test.StaticNode), exists(parent)), id = id)</query>
+    <results>
+      <row id="31"/>
+      <row id="32"/>
+      <row id="33"/>
+      <row id="34"/>
+      <row id="35"/>
+      <row id="36"/>
+      <row id="37"/>
+      <row id="38"/>
+      <row id="39"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(filter(g = all(test.Group), sql { 4 in g.members }), id = g.id, name = g.name)</query>
+    <results>
+      <row id="4" name="New Age"/>
+      <row id="7" name="80s"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(join(g = all(test.Group), m = all(test.User),
+                      exists(filter(u = g.members, m == u))),
+                 group = g.name, member = m.name)</query>
+    <results>
+      <row group="Pop" member="Britney"/>
+      <row group="Pop" member="Christina"/>
+      <row group="Pop" member="Debbie"/>
+      <row group="Pop" member="Gloria"/>
+      <row group="Pop" member="Hillary"/>
+      <row group="Pop" member="Jennifer"/>
+      <row group="Rock" member="Indigo"/>
+      <row group="R&amp;B" member="Ashanti"/>
+      <row group="Country" member="Faith"/>
+      <row group="New Age" member="Enya"/>
+      <row group="Film" member="Hillary"/>
+      <row group="Film" member="Jennifer"/>
+      <row group="Television" member="Hillary"/>
+      <row group="80s" member="Debbie"/>
+      <row group="80s" member="Enya"/>
+      <row group="80s" member="Gloria"/>
+      <row group="90s" member="Britney"/>
+      <row group="90s" member="Christina"/>
+      <row group="90s" member="Faith"/>
+      <row group="90s" member="Gloria"/>
+      <row group="90s" member="Indigo"/>
+      <row group="90s" member="Jennifer"/>
+      <row group="00s" member="Ashanti"/>
+      <row group="00s" member="Britney"/>
+      <row group="00s" member="Christina"/>
+      <row group="00s" member="Faith"/>
+      <row group="00s" member="Hillary"/>
+      <row group="00s" member="Jennifer"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(all(test.Group).supergroups, id = id, name = name)</query>
+    <results>
+      <row id="10" name="Music"/>
+      <row id="10" name="Music"/>
+      <row id="10" name="Music"/>
+      <row id="10" name="Music"/>
+      <row id="10" name="Music"/>
+
+      <row id="11" name="Entertainment"/>
+      <row id="11" name="Entertainment"/>
+      <row id="11" name="Entertainment"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(all(test.Group).supergroups.supergroups, id = id, name = name)</query>
+    <results>
+      <row id="11" name="Entertainment"/>
+      <row id="11" name="Entertainment"/>
+      <row id="11" name="Entertainment"/>
+      <row id="11" name="Entertainment"/>
+      <row id="11" name="Entertainment"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(all(test.Group).supergroups.subgroups, id = id, name = name)</query>
+    <results>
+      <row id="0" name="Pop"/>
+      <row id="1" name="Rock"/>
+      <row id="2" name="R&amp;B"/>
+      <row id="3" name="Country"/>
+      <row id="4" name="New Age"/>
+
+      <row id="0" name="Pop"/>
+      <row id="1" name="Rock"/>
+      <row id="2" name="R&amp;B"/>
+      <row id="3" name="Country"/>
+      <row id="4" name="New Age"/>
+
+      <row id="0" name="Pop"/>
+      <row id="1" name="Rock"/>
+      <row id="2" name="R&amp;B"/>
+      <row id="3" name="Country"/>
+      <row id="4" name="New Age"/>
+
+      <row id="0" name="Pop"/>
+      <row id="1" name="Rock"/>
+      <row id="2" name="R&amp;B"/>
+      <row id="3" name="Country"/>
+      <row id="4" name="New Age"/>
+
+      <row id="0" name="Pop"/>
+      <row id="1" name="Rock"/>
+      <row id="2" name="R&amp;B"/>
+      <row id="3" name="Country"/>
+      <row id="4" name="New Age"/>
+
+      <row id="5" name="Film"/>
+      <row id="6" name="Television"/>
+      <row id="10" name="Music"/>
+
+      <row id="5" name="Film"/>
+      <row id="6" name="Television"/>
+      <row id="10" name="Music"/>
+
+      <row id="5" name="Film"/>
+      <row id="6" name="Television"/>
+      <row id="10" name="Music"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(all(test.Group).subgroups, id = id, name = name)</query>
+    <results>
+      <row id="0" name="Pop"/>
+      <row id="1" name="Rock"/>
+      <row id="2" name="R&amp;B"/>
+      <row id="3" name="Country"/>
+      <row id="4" name="New Age"/>
+
+      <row id="5" name="Film"/>
+      <row id="6" name="Television"/>
+      <row id="10" name="Music"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(all(test.Group).subgroups.subgroups, id = id, name = name)</query>
+    <results>
+      <row id="0" name="Pop"/>
+      <row id="1" name="Rock"/>
+      <row id="2" name="R&amp;B"/>
+      <row id="3" name="Country"/>
+      <row id="4" name="New Age"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(all(test.Group).subgroups.supergroups, id = id, name = name)</query>
+    <results>
+      <row id="10" name="Music"/>
+      <row id="10" name="Music"/>
+      <row id="10" name="Music"/>
+      <row id="10" name="Music"/>
+      <row id="10" name="Music"/>
+
+      <row id="11" name="Entertainment"/>
+      <row id="11" name="Entertainment"/>
+      <row id="11" name="Entertainment"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(all(test.A), id = id, name = name)</query>
+    <results>
+      <row id="0" name="Zero"/>
+      <row id="1" name="One"/>
+      <row id="2" name="Two"/>
+      <row id="3" name="Three"/>
+      <row id="4" name="Four"/>
+      <row id="5" name="Five"/>
+      <row id="6" name="Six"/>
+      <row id="7" name="Seven"/>
+      <row id="8" name="Eight"/>
+      <row id="9" name="Nine"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(size(all(test.A)))</query>
+    <results>
+      <!-- XXX how did this get to be named count? -->
+      <row count="10"/>
+    </results>
+  </test>
+
+  <test>
+    <query ordered="true">query(offset(sort(all(test.A), id), 3), id = id)</query>
+    <results>
+      <row id="3"/>
+      <row id="4"/>
+      <row id="5"/>
+      <row id="6"/>
+      <row id="7"/>
+      <row id="8"/>
+      <row id="9"/>
+    </results>
+  </test>
+
+  <test>
+    <query ordered="true">query(limit(sort(all(test.A), id), 7), id = id)</query>
+    <results>
+      <row id="0"/>
+      <row id="1"/>
+      <row id="2"/>
+      <row id="3"/>
+      <row id="4"/>
+      <row id="5"/>
+      <row id="6"/>
+    </results>
+  </test>
+
+  <test>
+    <query ordered="true">query(limit(offset(sort(all(test.A), id), 3), 6), id = id)</query>
+    <results>
+      <row id="3"/>
+      <row id="4"/>
+      <row id="5"/>
+      <row id="6"/>
+      <row id="7"/>
+      <row id="8"/>
+    </results>
+  </test>
+
+  <test>
+    <query ordered="true">query(offset(limit(sort(all(test.A), id), 7), 3), id = id)</query>
+    <results>
+      <row id="3"/>
+      <row id="4"/>
+      <row id="5"/>
+      <row id="6"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(join(a = all(test.A), b = all(test.B),
+                 exists(filter(l = all(test.Link),
+                               l.a == a and l.b == b))),
+                 a = a.name, b = b.name)</query>
+    <results>
+      <row a="Zero" b="Ten"/>
+      <row a="One" b="Eleven"/>
+      <row a="One" b="Twelve"/>
+      <row a="Two" b="Ten"/>
+      <row a="Two" b="Twelve"/>
+      <row a="Two" b="Fourteen"/>
+      <row a="Two" b="Sixteen"/>
+      <row a="Two" b="Eighteen"/>
+      <row a="Three" b="Eleven"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(filter(cross(a = all(test.A), b = all(test.B)),
+                        exists(filter(l = all(test.Link),
+                                      l.b == b and l.a == a))).a,
+                 id = id, name = name)</query>
+    <results>
+      <row id="0" name="Zero"/>
+      <row id="1" name="One"/>
+      <row id="1" name="One"/>
+      <row id="2" name="Two"/>
+      <row id="2" name="Two"/>
+      <row id="2" name="Two"/>
+      <row id="2" name="Two"/>
+      <row id="2" name="Two"/>
+      <row id="3" name="Three"/>
+    </results>
+  </test>
+
+  <test>
+    <query ordered="true">query(sort(filter(cross(a = all(test.A), b = all(test.B)),
+                             exists(filter(l = all(test.Link),
+                                           l.b == b and l.a == a))).a,
+                 name),
+                 id = id, name = name)</query>
+    <results>
+      <row id="1" name="One"/>
+      <row id="1" name="One"/>
+      <row id="3" name="Three"/>
+      <row id="2" name="Two"/>
+      <row id="2" name="Two"/>
+      <row id="2" name="Two"/>
+      <row id="2" name="Two"/>
+      <row id="2" name="Two"/>
+      <row id="0" name="Zero"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(join(a = all(test.A), b = all(test.B), a == 3), a = a.id, b = b.id)</query>
+    <results>
+      <row a="3" b ="10"/>
+      <row a="3" b ="11"/>
+      <row a="3" b ="12"/>
+      <row a="3" b ="13"/>
+      <row a="3" b ="14"/>
+      <row a="3" b ="15"/>
+      <row a="3" b ="16"/>
+      <row a="3" b ="17"/>
+      <row a="3" b ="18"/>
+      <row a="3" b ="19"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(join(a = all(test.A), b = all(test.B), true), a = a.id, b = b.id)</query>
+    <results>
+      <row a="0" b ="10"/>
+      <row a="0" b ="11"/>
+      <row a="0" b ="12"/>
+      <row a="0" b ="13"/>
+      <row a="0" b ="14"/>
+      <row a="0" b ="15"/>
+      <row a="0" b ="16"/>
+      <row a="0" b ="17"/>
+      <row a="0" b ="18"/>
+      <row a="0" b ="19"/>
+
+      <row a="1" b ="10"/>
+      <row a="1" b ="11"/>
+      <row a="1" b ="12"/>
+      <row a="1" b ="13"/>
+      <row a="1" b ="14"/>
+      <row a="1" b ="15"/>
+      <row a="1" b ="16"/>
+      <row a="1" b ="17"/>
+      <row a="1" b ="18"/>
+      <row a="1" b ="19"/>
+
+      <row a="2" b ="10"/>
+      <row a="2" b ="11"/>
+      <row a="2" b ="12"/>
+      <row a="2" b ="13"/>
+      <row a="2" b ="14"/>
+      <row a="2" b ="15"/>
+      <row a="2" b ="16"/>
+      <row a="2" b ="17"/>
+      <row a="2" b ="18"/>
+      <row a="2" b ="19"/>
+
+      <row a="3" b ="10"/>
+      <row a="3" b ="11"/>
+      <row a="3" b ="12"/>
+      <row a="3" b ="13"/>
+      <row a="3" b ="14"/>
+      <row a="3" b ="15"/>
+      <row a="3" b ="16"/>
+      <row a="3" b ="17"/>
+      <row a="3" b ="18"/>
+      <row a="3" b ="19"/>
+
+      <row a="4" b ="10"/>
+      <row a="4" b ="11"/>
+      <row a="4" b ="12"/>
+      <row a="4" b ="13"/>
+      <row a="4" b ="14"/>
+      <row a="4" b ="15"/>
+      <row a="4" b ="16"/>
+      <row a="4" b ="17"/>
+      <row a="4" b ="18"/>
+      <row a="4" b ="19"/>
+
+      <row a="5" b ="10"/>
+      <row a="5" b ="11"/>
+      <row a="5" b ="12"/>
+      <row a="5" b ="13"/>
+      <row a="5" b ="14"/>
+      <row a="5" b ="15"/>
+      <row a="5" b ="16"/>
+      <row a="5" b ="17"/>
+      <row a="5" b ="18"/>
+      <row a="5" b ="19"/>
+
+      <row a="6" b ="10"/>
+      <row a="6" b ="11"/>
+      <row a="6" b ="12"/>
+      <row a="6" b ="13"/>
+      <row a="6" b ="14"/>
+      <row a="6" b ="15"/>
+      <row a="6" b ="16"/>
+      <row a="6" b ="17"/>
+      <row a="6" b ="18"/>
+      <row a="6" b ="19"/>
+
+      <row a="7" b ="10"/>
+      <row a="7" b ="11"/>
+      <row a="7" b ="12"/>
+      <row a="7" b ="13"/>
+      <row a="7" b ="14"/>
+      <row a="7" b ="15"/>
+      <row a="7" b ="16"/>
+      <row a="7" b ="17"/>
+      <row a="7" b ="18"/>
+      <row a="7" b ="19"/>
+
+      <row a="8" b ="10"/>
+      <row a="8" b ="11"/>
+      <row a="8" b ="12"/>
+      <row a="8" b ="13"/>
+      <row a="8" b ="14"/>
+      <row a="8" b ="15"/>
+      <row a="8" b ="16"/>
+      <row a="8" b ="17"/>
+      <row a="8" b ="18"/>
+      <row a="8" b ="19"/>
+
+      <row a="9" b ="10"/>
+      <row a="9" b ="11"/>
+      <row a="9" b ="12"/>
+      <row a="9" b ="13"/>
+      <row a="9" b ="14"/>
+      <row a="9" b ="15"/>
+      <row a="9" b ="16"/>
+      <row a="9" b ="17"/>
+      <row a="9" b ="18"/>
+      <row a="9" b ="19"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(join(a = all(test.A), join(l = all(test.Link),
+                                            b = all(test.B), l.b == b),
+                      filter(a = all(test.A),
+                             exists(filter(link = a.links,
+                                           link == l))) == a),
+                 a = a.name, l = l.name, b = b.name)</query>
+    <query>query(join(a = all(test.A), join(l = all(test.Link),
+                                            b = all(test.B), l.b == b),
+                      l.a == a),
+                 a = a.name, l = l.name, b = b.name)</query>
+    <results>
+      <row a="Zero" l="Zero-Ten" b="Ten"/>
+      <row a="One" l="One-Eleven" b="Eleven"/>
+      <row a="One" l="One-Twelve" b="Twelve"/>
+      <row a="Two" l="Two-Ten" b="Ten"/>
+      <row a="Two" l="Two-Twelve" b="Twelve"/>
+      <row a="Two" l="Two-Fourteen" b="Fourteen"/>
+      <row a="Two" l="Two-Sixteen" b="Sixteen"/>
+      <row a="Two" l="Two-Eighteen" b="Eighteen"/>
+      <row a="Three" l="Three-Eleven" b="Eleven"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(join(a = all(test.A), l = all(test.Link),
+                      exists(filter(link = a.links, link == l))),
+                 a = a.name, l = l.name)</query>
+    <results>
+      <row a="Zero" l="Zero-Ten"/>
+      <row a="One" l="One-Eleven"/>
+      <row a="One" l="One-Twelve"/>
+      <row a="Two" l="Two-Ten"/>
+      <row a="Two" l="Two-Twelve"/>
+      <row a="Two" l="Two-Fourteen"/>
+      <row a="Two" l="Two-Sixteen"/>
+      <row a="Two" l="Two-Eighteen"/>
+      <row a="Three" l="Three-Eleven"/>
+    </results>
+  </test>
+</tests>

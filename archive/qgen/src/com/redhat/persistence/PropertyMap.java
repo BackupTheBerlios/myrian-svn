@@ -26,12 +26,12 @@ import java.util.Set;
  * PropertyMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/04 $
  **/
 
 public class PropertyMap {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/PropertyMap.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/PropertyMap.java#2 $ by $Author: rhs $, $DateTime: 2004/02/04 11:20:32 $";
 
     private ObjectType m_type;
     private HashMap m_values = new HashMap();
@@ -56,7 +56,7 @@ public class PropertyMap {
         return m_values.entrySet();
     }
 
-    boolean isNull() {
+    public boolean isNull() {
         Collection keys = m_type.getKeyProperties();
         if (keys.size() == 0) {
             return false;
