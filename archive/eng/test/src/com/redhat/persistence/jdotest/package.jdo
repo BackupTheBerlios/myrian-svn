@@ -19,6 +19,7 @@
     <class name="Party" identity-type="datastore">
       <field name="id"/>
       <field name="email"/>
+      <field name="auxiliaryEmails"/>
     </class>
 
     <class name="User"

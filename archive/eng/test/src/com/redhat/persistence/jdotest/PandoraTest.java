@@ -44,7 +44,7 @@ import org.apache.log4j.Logger;
  * PandoraTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/06/24 $
+ * @version $Revision: #7 $ $Date: 2004/06/28 $
  **/
 
 public class PandoraTest extends AbstractCase {
@@ -108,7 +108,8 @@ public class PandoraTest extends AbstractCase {
         return prependStudly("set", prop);
     }
 
-    private void testClass(Class klass, Object[] values) {
+    private void testObject(Object pc, Object[] values) {
+        final Class klass = pc.getClass();
         ObjectType type = m_ssn.getRoot().getObjectType(klass.getName());
         PropertyMap props = new PropertyMap(type);
         for (int i = 0; i < values.length; i+=2) {
@@ -122,14 +123,6 @@ public class PandoraTest extends AbstractCase {
             props.put(p, value);
         }
 
-        List keys = type.getKeyProperties();
-        Object[] key = new Object[keys.size()];
-        for (int i = 0; i < key.length; i++) {
-            key[i] = props.get((Property) keys.get(i));
-        }
-
-        Object obj = Main.create(m_ssn, klass, key);
-
         for (Iterator it = type.getProperties().iterator(); it.hasNext(); ) {
             Property p = (Property) it.next();
             if (!p.isKeyProperty() && props.contains(p)) {
@@ -142,7 +135,7 @@ public class PandoraTest extends AbstractCase {
                          Arrays.asList(args));
                 }
                 try {
-                    setter.invoke(obj, args);
+                    setter.invoke(pc, args);
                 } catch (IllegalAccessException e) {
                     throw new Error(e);
                 } catch (InvocationTargetException e) {
@@ -154,6 +147,8 @@ public class PandoraTest extends AbstractCase {
         m_ssn.flush();
 
         Expression expr = new All(klass.getName());
+        List keys = type.getKeyProperties();
+
         for (int i = 0; i < keys.size(); i++) {
             Property p = (Property) keys.get(i);
             expr = new Filter
@@ -163,7 +158,7 @@ public class PandoraTest extends AbstractCase {
         Cursor c = Main.cursor(m_ssn, klass, expr);
 
         if (c.next()) {
-            obj = c.get();
+            Object obj = c.get();
             for (Iterator it = type.getProperties().iterator();
                  it.hasNext(); ) {
                 Property p = (Property) it.next();
@@ -190,7 +185,8 @@ public class PandoraTest extends AbstractCase {
     }
 
     public void testPicture() {
-        testClass(Picture.class, new Object[] {
+        // XXX: this has not been updated yet
+        testObject(Picture.class, new Object[] {
             "id", new Integer(100),
             "caption", "Pandora's Box",
             "content", getImageBytes("com/redhat/persistence/jdotest/pandora.jpg")
@@ -198,7 +194,8 @@ public class PandoraTest extends AbstractCase {
     }
 
     public void testProduct() {
-        testClass(Product.class, new Object[] {
+        // XXX: this has not been updated yet
+        testObject(Product.class, new Object[] {
             "id", new Integer(1000),
             "name", "Test Product",
             "price", new Float(19.99)
@@ -206,7 +203,9 @@ public class PandoraTest extends AbstractCase {
     }
 
     public void testUser() {
-        testClass(User.class, new Object[] {
+        User rhs = new User(10000);
+        m_pm.makePersistent(rhs);
+        testObject(rhs, new Object[] {
             "id", new Integer(10000),
             "email", "rhs@planitia.org",
             "name", "Rafael H. Schloming",
@@ -219,7 +218,9 @@ public class PandoraTest extends AbstractCase {
     }
 
     public void testGroup() {
-        testClass(Group.class, new Object[] {
+        Group group = new Group(10001);
+        m_pm.makePersistent(group);
+        testObject(group, new Object[] {
             "id", new Integer(10001),
             "email", "group@planitia.org",
             "name", "Group",

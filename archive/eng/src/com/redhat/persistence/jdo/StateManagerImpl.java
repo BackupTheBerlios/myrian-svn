@@ -77,10 +77,14 @@ class StateManagerImpl extends AbstractStateManager {
     public Object getObjectField(PersistenceCapable pc, int field,
                                  Object currentValue) {
         Property prop = prop(pc, field);
+        Class type = (Class) C.getAllTypes(pc.getClass()).get(field);
+
         if (prop.isKeyProperty()) {
             return getPropertyMap().get(prop);
-        } else if (prop.isCollection()) {
+        } else if (type.equals(Collection.class)) {
             return new CRPSet(ssn(), pc, prop);
+        } else if (type.equals(List.class)) {
+            return new CRPList(ssn(), pc, prop);
         } else {
             return ssn().get(pc, prop);
         }
