@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.1-6.0.0.sql#13 $
--- $DateTime: 2003/08/15 21:35:15 $
+-- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.1-6.0.0.sql#14 $
+-- $DateTime: 2003/08/16 20:47:25 $
 
 \echo Red Hat WAF 5.2.1 -> 6.0.0 Upgrade Script (PostgreSQL)
 
@@ -25,6 +25,7 @@ begin;
 \i ../default/upgrade/5.2.1-6.0.0/sequence-vcx_txns_id_seq.sql
 \i ../default/upgrade/5.2.1-6.0.0/alter-categories.sql
 \i ../default/upgrade/5.2.1-6.0.0/table-web_hosts-auto.sql
+\i ../postgres/upgrade/5.2.1-6.0.0/add-permissions-rebuild.sql
 \i ../postgres/upgrade/5.2.1-6.0.0/update-web-hosts.sql
 \i ../postgres/upgrade/5.2.1-6.0.0/alter-lucene.sql
 \i ../postgres/upgrade/5.2.1-6.0.0/mime-types.sql
