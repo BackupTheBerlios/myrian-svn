@@ -12,5 +12,6 @@
 -- rights and limitations under the License.
 --
 --
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-5.1.0-5.1.1.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-5.1.0-5.1.1.sql#2 $
 
+@@ site-nodes-url.sql
