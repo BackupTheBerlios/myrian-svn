@@ -17,7 +17,7 @@ package com.arsdigita.util;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
-import com.arsdigita.dispatcher.DispatcherHelper;
+import com.arsdigita.web.BaseApplicationServlet;
 import java.util.Map;
 import java.util.Iterator;
 import java.util.Set;
@@ -35,9 +35,9 @@ import org.apache.log4j.Logger;
  */
 public class URLRewriter {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/URLRewriter.java#6 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/URLRewriter.java#7 $" +
         "$Author: justin $" +
-        "$DateTime: 2002/08/29 17:46:14 $";
+        "$DateTime: 2002/09/24 11:42:49 $";
 
     private static final Logger s_log =
         Logger.getLogger(URLRewriter.class);
@@ -115,7 +115,17 @@ public class URLRewriter {
         }
 
         if (url.startsWith("/")) {
-            String prefix = DispatcherHelper.getDispatcherServletPath();
+            String context = (String) req.getAttribute
+                (BaseApplicationServlet.ORIGINAL_CONTEXT_PATH_ATTRIBUTE);
+            String servlet = (String) req.getAttribute
+                (BaseApplicationServlet.ORIGINAL_SERVLET_PATH_ATTRIBUTE);
+
+            String prefix = "";
+
+            if (context != null && servlet != null) {
+                prefix = context + servlet;
+            }
+
             url = resp.encodeRedirectURL(encodeParams(req, prefix + url));
         } else {
             url = resp.encodeRedirectURL(encodeParams(req, url));
@@ -156,7 +166,17 @@ public class URLRewriter {
         }
 
         if (url.startsWith("/")) {
-            String prefix = DispatcherHelper.getDispatcherServletPath();
+            String context = (String) req.getAttribute
+                (BaseApplicationServlet.ORIGINAL_CONTEXT_PATH_ATTRIBUTE);
+            String servlet = (String) req.getAttribute
+                (BaseApplicationServlet.ORIGINAL_SERVLET_PATH_ATTRIBUTE);
+
+            String prefix = "";
+
+            if (context != null && servlet != null) {
+                prefix = context + servlet;
+            }
+
             url = resp.encodeURL(encodeParams(req, prefix + url));
         } else {
             url = resp.encodeURL(encodeParams(req, url));
