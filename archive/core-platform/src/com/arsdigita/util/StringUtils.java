@@ -209,6 +209,31 @@ public class StringUtils {
         return result.toString();
     }
     /**
+     * Converts an array of Strings into a single String separated by
+     * a given string.
+     * Example Input: {"cat", "house", "dog"}, ", "
+     * Output -  "cat, house, dog"
+     *
+     * @param strings The string array too join.
+     * @param joinStr The string to join the array members together.
+     *
+     * @pre strings != null
+     *
+     * @return Joined String
+     **/
+    public static String join(String[] strings, String joinStr) {
+        StringBuffer result = new StringBuffer();
+        final int lastIdx = strings.length - 1;
+        for (int idx = 0; idx < strings.length; idx++) {
+            result.append(strings[idx]);
+            if (idx < lastIdx) {
+                result.append(joinStr);
+            }
+        }
+
+        return result.toString();
+    }
+    /**
      * Extract a parameter value from a packed list of parameter values.
      * Example: input: key="age", sep=',', plist="cost=23,age=27,name=Thom"
      * output = "27".  This is a simple implementation that is meant
