@@ -8,12 +8,12 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/01/15 $
+ * @version $Revision: #10 $ $Date: 2003/02/05 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#9 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#10 $ by $Author: ashah $, $DateTime: 2003/02/05 17:39:31 $";
 
     private ObjectType m_type;
     private HashMap m_paths = new HashMap();
@@ -109,7 +109,8 @@ public class Signature {
     static final boolean isAttribute(Property prop) {
         // This should really look at the mapping metadata to figure out what
         // to load by default.
-        return prop.getType().getModel().equals(Model.getInstance("global"));
+        return !prop.isCollection() &&
+            prop.getType().getModel().equals(Model.getInstance("global"));
     }
 
     public void addProperties(Collection props) {

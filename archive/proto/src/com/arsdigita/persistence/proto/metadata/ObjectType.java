@@ -7,12 +7,12 @@ import java.util.*;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/01/15 $
+ * @version $Revision: #6 $ $Date: 2003/02/05 $
  **/
 
 public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#5 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#6 $ by $Author: ashah $, $DateTime: 2003/02/05 17:39:31 $";
 
     private Model m_model;
     private String m_name;
@@ -112,6 +112,23 @@ public class ObjectType extends Element {
         Property prop = getProperty(path);
         ObjectMap map = getRoot().getObjectMap(prop.getContainer());
         return map.getKeyProperties().contains(prop);
+    }
+
+    public Collection getKeyProperties() {
+        ObjectMap map = getRoot().getObjectMap(this);
+        if (map == null) { return Collections.EMPTY_LIST; }
+        return map.getKeyProperties();
+    }
+
+    public boolean hasKey() {
+        ObjectMap map = getRoot().getObjectMap(this);
+        if (map == null) { return false; }
+        if (map.getKeyProperties().size() == 0) { return false;}
+        return true;
+    }
+
+    public boolean isCompound() {
+        return getProperties().size() != 0;
     }
 
     public Collection getRoles() {

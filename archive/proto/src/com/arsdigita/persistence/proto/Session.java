@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #17 $ $Date: 2003/01/31 $
+ * @version $Revision: #18 $ $Date: 2003/02/05 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#17 $ by $Author: rhs $, $DateTime: 2003/01/31 12:34:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#18 $ by $Author: ashah $, $DateTime: 2003/02/05 17:39:31 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -94,33 +94,36 @@ public class Session {
 
         ObjectData od = fetchObjectData(oid);
 
-        if (od.isVisiting()) {
+        if (od == null) {
+            result = false;
+        } else if (od.isVisiting()) {
             result = false;
         } else {
             od.setVisiting(true);
-            if (od == null) {
-                result = false;
-            } else {
-                ObjectType type = oid.getObjectType();
-                for (Iterator it = type.getRoles().iterator();
-                     it.hasNext(); ) {
-                    Role role = (Role) it.next();
-                    if (role.isCollection()) {
-                        clear(oid, role);
-                    }
-                }
 
-                for (Iterator it = type.getProperties().iterator();
-                     it.hasNext(); ) {
-                    Role role = (Role) it.next();
-                    if (!role.isCollection()) {
-                        set(oid, role, null);
-                    }
-                }
+            ObjectType type = oid.getObjectType();
+            Collection keys = type.getKeyProperties();
 
-                addEvent(new DeleteEvent(this, oid));
-                result = true;
+            for (Iterator it = type.getRoles().iterator();
+                 it.hasNext(); ) {
+                Role role = (Role) it.next();
+                if (role.isCollection()) {
+                    clear(oid, role);
+                }
             }
+
+            for (Iterator it = type.getProperties().iterator();
+                 it.hasNext(); ) {
+                Role role = (Role) it.next();
+
+                if (!role.isCollection() && !keys.contains(role)) {
+                    set(oid, role, null);
+                }
+            }
+
+            addEvent(new DeleteEvent(this, oid));
+            result = true;
+
             od.setVisiting(false);
         }
 
@@ -176,6 +179,17 @@ public class Session {
         return POS.getPersistentCollection(this, new DataSet(this, query));
     }
 
+    /**
+     * Cascades delete from container to the containee. The containee
+     * will not be deleted in all cases.
+     **/
+    private void cascadeDelete(OID container, PersistentObject containee) {
+        ObjectData containerOD = fetchObjectData(container);
+        containerOD.setVisiting(true);
+        delete(containee.getOID());
+        containerOD.setVisiting(false);
+    }
+
 
     /**
      * Sets a property of an object to a specified value.
@@ -192,11 +206,6 @@ public class Session {
 
         prop.dispatch(new Property.Switch() {
                 public void onRole(Role role) {
-                    // Instead of storing the old value and removing it we
-                    // could simply do a delete of the component and count on
-                    // the code in delete to add the proper remove. Not sure
-                    // what makes the most sense yet.
-
                     Object old = null;
                     if (role.isComponent() || role.isReversable()) {
                         old = get(oid, role);
@@ -207,27 +216,40 @@ public class Session {
                     if (role.isComponent()) {
                         PersistentObject po = (PersistentObject) old;
                         if (po != null) {
-                            delete(po.getOID());
+                            cascadeDelete(oid, po);
                         }
                     } else if (role.isReversable()) {
                         Role rev = role.getReverse();
                         PersistentObject oldpo = (PersistentObject) old;
                         PersistentObject po = (PersistentObject) value;
                         PersistentObject me = retrieve(oid);
-                        if (rev.isCollection()) {
-                            if (oldpo != null) {
+
+
+                        if (oldpo != null) {
+                            if (rev.isCollection()) {
                                 addEvent(new RemoveEvent(Session.this,
                                                          oldpo.getOID(), rev,
                                                          me));
+                            } else {
+                                if (rev.isNullable()) {
+                                    addEvent(new SetEvent(Session.this,
+                                                          oldpo.getOID(), rev,
+                                                          null));
+                                } else {
+                                    throw new IllegalStateException(
+                                        "can't set reverse 1..1 to null");
+                                }
                             }
-                            if (po != null) {
+                        }
+
+                        if (po != null) {
+                            if (rev.isCollection()) {
                                 addEvent(new AddEvent(Session.this,
                                                       po.getOID(), rev, me));
+                            } else {
+                                addEvent(new SetEvent(Session.this,
+                                                      po.getOID(), rev, me));
                             }
-                        } else {
-                            throw new IllegalStateException
-                                ("This case is just fucked up. " +
-                                 "I'll wait till it happens to deal with it.");
                         }
                     }
                 }
@@ -347,6 +369,7 @@ public class Session {
                                                          old.getOID(), rev,
                                                          po));
                             }
+                            if (me == null) { throw new Error("oops"); }
                             addEvent(new SetEvent(Session.this, po.getOID(),
                                                   rev, me));
                         }
@@ -380,8 +403,7 @@ public class Session {
                     addEvent(new RemoveEvent(Session.this, oid, role, value));
 
                     if (role.isComponent()) {
-                        PersistentObject po = (PersistentObject) value;
-                        delete(po.getOID());
+                        cascadeDelete(oid, (PersistentObject) value);
                     } else if (role.isReversable()) {
                         PersistentObject po = (PersistentObject) value;
                         Role rev = role.getReverse();
@@ -597,9 +619,10 @@ public class Session {
             // Cache non-existent objects
             if (!rs.next()) {
                 m_odata.put(oid, null);
-            }
-            while (rs.next()) {
-                rs.load(this);
+            } else {
+                do {
+                    rs.load(this);
+                } while (rs.next());
             }
         }
 

@@ -1,22 +1,15 @@
 model global;
 
-// This is here for the old PDL compiler
-object type Dummy {
-    BigInteger id = dummies.id INTEGER;
-
-    object key(id);
-}
-
-object type BigDecimal extends Dummy {}
-object type BigInteger extends Dummy {}
-object type Long extends Dummy {}
-object type Integer extends Dummy {}
-object type Boolean extends Dummy {}
-object type String extends Dummy {}
-object type Date extends Dummy {}
-object type Blob extends Dummy {}
-object type Float extends Dummy {}
-object type Byte extends Dummy {}
-object type Character extends Dummy {}
-object type Short extends Dummy {}
-object type Double extends Dummy {}
+object type BigDecimal {}
+object type BigInteger {}
+object type Long {}
+object type Integer {}
+object type Boolean {}
+object type String {}
+object type Date {}
+object type Blob {}
+object type Float {}
+object type Byte {}
+object type Character {}
+object type Short {}
+object type Double {}
