@@ -15,6 +15,7 @@
 
 package com.redhat.persistence.engine.rdbms;
 
+import com.arsdigita.util.WrappedError;
 import com.redhat.persistence.Condition;
 import com.redhat.persistence.Expression;
 import com.redhat.persistence.Query;
@@ -29,6 +30,7 @@ import com.redhat.persistence.metadata.Column;
 import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.Root;
 import com.redhat.persistence.metadata.SQLBlock;
+
 import java.io.StringReader;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -42,12 +44,12 @@ import java.util.Iterator;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2003/11/21 $
+ * @version $Revision: #13 $ $Date: 2004/01/19 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#12 $ by $Author: rhs $, $DateTime: 2003/11/21 10:51:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#13 $ by $Author: vadim $, $DateTime: 2004/01/19 15:33:35 $";
 
     private RDBMSEngine m_engine;
     private Operation m_op = null;
@@ -113,9 +115,8 @@ public abstract class SQLWriter {
                 if (cycle != null) { cycle.endSet(); }
             } catch (SQLException e) {
                 if (cycle != null) { cycle.endSet(e); }
-                throw new Error
-                    ("SQL error binding [" + (index) + "] to " + obj + ": " +
-                     e.getMessage());
+                throw new WrappedError
+                    ("SQL error binding [" + (index) + "] to " + obj, e);
             }
         }
     }
@@ -323,7 +324,7 @@ public abstract class SQLWriter {
         try {
             p.sql();
         } catch (ParseException pe) {
-            throw new Error(pe.getMessage());
+            throw new WrappedError(pe);
         }
 
         write(p.getSQL(), true);
