@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/07/20 $
+ * @version $Revision: #4 $ $Date: 2003/07/20 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#3 $ by $Author: rhs $, $DateTime: 2003/07/20 14:25:59 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#4 $ by $Author: rhs $, $DateTime: 2003/07/20 15:05:30 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -98,7 +98,7 @@ public class RDBMSEngine extends Engine {
     DML getOperation(Object obj, Table table) {
         Object key = new CompoundKey(obj, table);
         DML result = (DML) m_operationMap.get(key);
-        if (m_profiler != null) {
+        if (m_profiler != null && result != null) {
             result.addEvent(m_event);
         }
         return result;
