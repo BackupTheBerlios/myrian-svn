@@ -10,12 +10,12 @@ import org.apache.log4j.Category;
  * Node
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/07/18 $
+ * @version $Revision: #7 $ $Date: 2002/07/19 $
  **/
 
 abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#6 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#7 $ by $Author: rhs $, $DateTime: 2002/07/19 16:18:07 $";
 
     private static final Category s_log = Category.getInstance(Node.class);
 
@@ -144,6 +144,14 @@ abstract class Node {
         }
 
         if (prop.isAttribute()) {
+            if (prop.getColumn() == null) {
+                throw new NoMetadataException(
+                    prop.getFilename() + ": " + prop.getLineNumber() +
+                    ": No metadata found for property " + prop.getName() +
+                    " while generating SQL for query: " + getQuery()
+                    );
+            }
+
             if (!m_selections.containsKey(prop.getName())) {
                 m_selections.put(prop.getName(), new Selection(this, prop));
             }
@@ -376,8 +384,10 @@ abstract class Node {
         for (Iterator it = getSelections().iterator(); it.hasNext(); ) {
             Selection sel = (Selection) it.next();
             Property prop = sel.getProperty();
-            result.append("\n  fetch " + prop.getName() +
-                          "(" + prop.getColumn().getQualifiedName() + ")");
+            result.append("\n  fetch " + prop.getName());
+            if (prop.getColumn() != null) {
+                result.append("(" + prop.getColumn().getQualifiedName() + ")");
+            }
         }
 
         result.append("\n  tables=" + m_tables.values());

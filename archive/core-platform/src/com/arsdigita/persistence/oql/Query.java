@@ -12,12 +12,12 @@ import org.apache.log4j.Category;
  * specified in a PDL file to generate sql queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/07/18 $
+ * @version $Revision: #8 $ $Date: 2002/07/19 $
  **/
 
 public class Query extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#7 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#8 $ by $Author: rhs $, $DateTime: 2002/07/19 16:18:07 $";
 
     private static final Category s_log = Category.getInstance(Query.class);
 
@@ -404,7 +404,19 @@ public class Query extends Node {
     }
 
     public String toString() {
-        return super.toString() + "\n(conditions: " + m_conditions + ")";
+        StringBuffer result = new StringBuffer();
+        result.append(getObjectType().getQualifiedName() + "(");
+
+        for (Iterator it = m_selections.iterator(); it.hasNext(); ) {
+            result.append(it.next());
+            if (it.hasNext()) {
+                result.append(", ");
+            }
+        }
+
+        result.append(")");
+
+        return result.toString();
     }
 
     public String toDot() {

@@ -30,6 +30,8 @@ import java.util.Collection;
 import java.sql.Types;
 import java.sql.DatabaseMetaData;
 
+import org.apache.log4j.Category;
+
 /**
  * This class provides an implementationthat automatically generates DDL
  * statements based on the information passed in.  The primary use for
@@ -37,12 +39,15 @@ import java.sql.DatabaseMetaData;
  * {@link com.arsdigita.persistence.metadata.DynamicObjectType}.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#2 $
  * @since 4.6.3 */
 
 abstract class BaseDDLGenerator implements DDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#1 $ by $Author: randyg $, $DateTime: 2002/07/18 10:31:38 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#2 $ by $Author: rhs $, $DateTime: 2002/07/19 16:18:07 $";
+
+    private static final Category s_log =
+        Category.getInstance(BaseDDLGenerator.class);
     
     // this is used to keep track of which tables have been
     // returned.  This helps avoid duplicate tables between
@@ -86,9 +91,9 @@ abstract class BaseDDLGenerator implements DDLGenerator {
         // now we make sure that the proposed name does not already exist
         boolean checkDuplicateName = true;
         int count = 0;
-        String upperName = proposedName.toUpperCase();
 
         while (checkDuplicateName) {
+            String upperName = proposedName.toUpperCase();
             if (!tables.contains(upperName) && !tableExists(proposedName)) {
                 // we synchronize this so that we make sure that
                 // two threads are not modifying the variable at once
