@@ -30,14 +30,14 @@ import java.util.Iterator;
  * Base connection pooling class
  *
  * @author Bob Donald (<a href="mailto:bdonald@arsdigita.com"></a>)
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#5 $ $DateTime: 2002/10/02 13:49:31 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#6 $ $DateTime: 2002/10/10 16:41:26 $
  * @since
  *
  */
 
 abstract public class BaseConnectionPool implements DatabaseConnectionPool {
 
-    private static final String versionId = "$Author: rhs $ - $Date: 2002/10/02 $ $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#5 $";
+    private static final String versionId = "$Author: rhs $ - $Date: 2002/10/10 $ $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#6 $";
 
     private static final Logger cat = Logger.getLogger(BaseConnectionPool.class.getName());
 
@@ -70,26 +70,28 @@ abstract public class BaseConnectionPool implements DatabaseConnectionPool {
         return m_password;
     }
 
-    public synchronized void closeConnections() {
-        for (Iterator it = m_availConnections.iterator(); it.hasNext(); ) {
-            java.sql.Connection conn = (java.sql.Connection) it.next();
-            try {
-                conn.close();
-            } catch (java.sql.SQLException e) {
-                cat.error(e);
+    public void closeConnections() {
+        synchronized (this.getClass()) {
+            for (Iterator it = m_availConnections.iterator(); it.hasNext(); ) {
+                java.sql.Connection conn = (java.sql.Connection) it.next();
+                try {
+                    conn.close();
+                } catch (java.sql.SQLException e) {
+                    cat.error(e);
+                }
             }
-        }
-        for (Iterator it = m_usedConnections.iterator(); it.hasNext(); ) {
-            java.sql.Connection conn = (java.sql.Connection) it.next();
-            try {
-                conn.close();
-            } catch (java.sql.SQLException e) {
-                cat.error(e);
+            for (Iterator it = m_usedConnections.iterator(); it.hasNext(); ) {
+                java.sql.Connection conn = (java.sql.Connection) it.next();
+                try {
+                    conn.close();
+                } catch (java.sql.SQLException e) {
+                    cat.error(e);
+                }
             }
+            m_availConnections.clear();
+            m_usedConnections.clear();
+            m_loaded = false;
         }
-        m_availConnections.clear();
-        m_usedConnections.clear();
-        m_loaded = false;
     }
 
     public void freeConnections() {
