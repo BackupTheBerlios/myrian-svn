@@ -59,7 +59,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2003/05/27 $
+ * @version $Revision: #15 $ $Date: 2003/06/02 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -89,7 +89,22 @@ public class Session {
                         return props;
                     }
 
-                    ObjectType ot = C.fromType(type);
+                    com.arsdigita.persistence.proto.metadata.ObjectType sp =
+                        type;
+
+                    if (type.hasProperty("objectType")) {
+                        Property p = type.getProperty("objectType");
+                        if (p.getType().getQualifiedName().equals
+                            ("global.String")) {
+                            String qname = (String) props.get(p);
+                            Root root = Root.getRoot();
+                            if (qname != null && root.hasObjectType(qname)) {
+                                sp = root.getObjectType(qname);
+                            }
+                        }
+                    }
+
+                    ObjectType ot = C.fromType(sp);
                     OID oid = new OID(ot);
                     for (Iterator it = props.entrySet().iterator();
                          it.hasNext(); ) {
