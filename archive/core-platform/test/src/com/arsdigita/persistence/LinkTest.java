@@ -23,12 +23,12 @@ import org.apache.log4j.Logger;
  * LinkTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/08/15 $
+ * @version $Revision: #7 $ $Date: 2003/09/09 $
  **/
 
-public class LinkTest extends PersistenceTestCase {
+public abstract class LinkTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LinkTest.java#6 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LinkTest.java#7 $ by $Author: ashah $, $DateTime: 2003/09/09 13:36:14 $";
 
     private static Logger s_log =
         Logger.getLogger(LinkTest.class.getName());
@@ -37,20 +37,17 @@ public class LinkTest extends PersistenceTestCase {
         super(name);
     }
 
-    protected void persistenceSetUp() {
-        load("com/arsdigita/persistence/testpdl/static/Link.pdl");
-        super.persistenceSetUp();
-    }
+    abstract String getModel();
 
     public void testArticle() {
         Session ssn = SessionManager.getSession();
-        DataObject article = ssn.create("linkTest.Article");
+        DataObject article = ssn.create(getModel() + ".Article");
         article.set("id", BigInteger.ZERO);
         String text = "This is the article text.";
         article.set("text", text);
         article.save();
 
-        OID oid = new OID("linkTest.Article", BigInteger.ZERO);
+        OID oid = new OID(getModel() + ".Article", BigInteger.ZERO);
 
         article = ssn.retrieve(oid);
         assertEquals("incorrect id", BigInteger.ZERO, article.get("id"));
@@ -63,13 +60,13 @@ public class LinkTest extends PersistenceTestCase {
 
     public void testImage() {
         Session ssn = SessionManager.getSession();
-        DataObject image = ssn.create("linkTest.Image");
+        DataObject image = ssn.create(getModel() + ".Image");
         image.set("id", BigInteger.ZERO);
         byte[] bytes = "This is the image.".getBytes();
         image.set("bytes", bytes);
         image.save();
 
-        OID oid = new OID("linkTest.Image", BigInteger.ZERO);
+        OID oid = new OID(getModel() + ".Image", BigInteger.ZERO);
 
         image = ssn.retrieve(oid);
         assertEquals("incorrect id", BigInteger.ZERO, image.get("id"));
@@ -83,13 +80,13 @@ public class LinkTest extends PersistenceTestCase {
 
     public void testArticleImageLink() {
         Session ssn = SessionManager.getSession();
-        DataObject article = ssn.create("linkTest.Article");
+        DataObject article = ssn.create(getModel() + ".Article");
         article.set("id", BigInteger.ZERO);
         String text = "This is the article text.";
         article.set("text", text);
 
         for (int i = 0; i < 10; i++) {
-            DataObject image = ssn.create("linkTest.Image");
+            DataObject image = ssn.create(getModel() + ".Image");
             image.set("id", new BigInteger(Integer.toString(i)));
             byte[] bytes = "This is the image.".getBytes();
             image.set("bytes", bytes);
@@ -97,10 +94,10 @@ public class LinkTest extends PersistenceTestCase {
         }
 
         DataAssociation links = (DataAssociation) article.get("images");
-        DataCollection images = ssn.retrieve("linkTest.Image");
+        DataCollection images = ssn.retrieve(getModel() + ".Image");
         while (images.next()) {
             DataObject image = images.getDataObject();
-            DataObject link = ssn.create("linkTest.ArticleImageLink");
+            DataObject link = ssn.create(getModel() + ".ArticleImageLink");
             link.set("article", article);
             link.set("image", image);
             link.set("caption", "The caption for: " + image.getOID());
@@ -110,18 +107,22 @@ public class LinkTest extends PersistenceTestCase {
         article.save();
 
         DataAssociationCursor cursor = links.cursor();
-        while (cursor.next()) {
-            s_log.info(cursor.get("caption"));
-            s_log.info(cursor.get("image"));
-        }
+        assertEquals(10, cursor.size());
 
-        DataCollection aiLinks = ssn.retrieve("linkTest.ArticleImageLink");
+        DataCollection aiLinks = ssn.retrieve(getModel()+".ArticleImageLink");
         aiLinks.addEqualsFilter("image.id", new BigDecimal(5));
-        while (aiLinks.next()) {
-            s_log.info(aiLinks.get("article"));
-            s_log.info(aiLinks.get("image"));
-            s_log.info(aiLinks.get("caption"));
-        }
-    }
+        if (aiLinks.next()) {
+            DataObject linkArticle = (DataObject) aiLinks.get("article");
+            DataObject linkImage = (DataObject) aiLinks.get("image");
+            String caption = (String) aiLinks.get("caption");
+            assertEquals(BigInteger.valueOf(0), linkArticle.get("id"));
+            assertEquals(BigInteger.valueOf(5), linkImage.get("id"));
 
+            if (aiLinks.next()) { fail("too many rows"); }
+        } else {
+            fail("no rows returned");
+        }
+
+        article.delete();
+    }
 }
