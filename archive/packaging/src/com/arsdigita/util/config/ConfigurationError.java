@@ -13,31 +13,34 @@
  *
  */
 
-package com.arsdigita.util.parameter;
+package com.arsdigita.util.config;
 
 import com.arsdigita.util.*;
-import java.net.*;
+import com.arsdigita.util.parameter.*;
+import java.io.*;
 import java.util.*;
-import org.apache.commons.beanutils.converters.*;
-import org.apache.oro.text.perl.Perl5Util;
+import org.apache.log4j.Logger;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/BooleanParameter.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/ConfigurationError.java#1 $
  */
-public class BooleanParameter extends StringParameter {
+public class ConfigurationError extends Error {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/BooleanParameter.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/ConfigurationError.java#1 $" +
         "$Author: justin $" +
         "$DateTime: 2003/08/26 20:38:18 $";
 
-    static {
-        Converters.set(Boolean.class, new BooleanConverter());
+    private static final Logger s_log = Logger.getLogger
+        (ConfigurationError.class);
+
+    public ConfigurationError(final String message) {
+        super(message);
     }
 
-    public BooleanParameter(final String name) {
-        super(name, Boolean.class);
+    public ConfigurationError() {
+        super("Configuration is invalid");
     }
 }

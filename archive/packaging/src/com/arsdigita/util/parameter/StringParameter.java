@@ -17,29 +17,45 @@ package com.arsdigita.util.parameter;
 
 import com.arsdigita.util.*;
 import java.util.*;
+import org.apache.commons.beanutils.*;
+import org.apache.commons.beanutils.converters.*;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#2 $
  */
 public class StringParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/26 11:56:51 $";
+        "$DateTime: 2003/08/26 20:38:18 $";
+
+    private final String m_name;
+    private final Class m_type;
 
     private boolean m_isRequired;
-    private final String m_name;
     private Object m_value;
     private Object m_defaultValue;
 
-    public StringParameter(final String name) {
-        Assert.exists(name, String.class);
+    static {
+        Converters.set(String.class, new StringConverter());
+    }
+
+    protected StringParameter(final String name, final Class type) {
+        if (Assert.isEnabled()) {
+            Assert.exists(name, String.class);
+            Assert.exists(type, Class.class);
+        }
 
         m_name = name;
+        m_type = type;
         m_isRequired = true;
+    }
+
+    public StringParameter(final String name) {
+        this(name, String.class);
     }
 
     // Default is true.
@@ -58,7 +74,11 @@ public class StringParameter implements Parameter {
     public Object getValue(final ParameterStore store) {
         synchronized (this) {
             if (m_value == null) {
-                m_value = unmarshal(store.read(this));
+                final String value = store.read(this);
+
+                if (value != null) {
+                    m_value = unmarshal(value);
+                }
             }
         }
 
@@ -81,6 +101,14 @@ public class StringParameter implements Parameter {
             addError(errors, "It cannot be null");
         }
 
+        if (value != null) {
+            try {
+                unmarshal(value);
+            } catch (ConversionException ce) {
+                addError(errors, ce.getMessage());
+            }
+        }
+
         return errors;
     }
 
@@ -89,6 +117,6 @@ public class StringParameter implements Parameter {
     }
 
     protected Object unmarshal(final String string) {
-        return string;
+        return Converters.convert(m_type, string);
     }
 }

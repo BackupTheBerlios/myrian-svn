@@ -16,28 +16,27 @@
 package com.arsdigita.util.parameter;
 
 import com.arsdigita.util.*;
-import java.net.*;
 import java.util.*;
-import org.apache.commons.beanutils.converters.*;
-import org.apache.oro.text.perl.Perl5Util;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/BooleanParameter.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/SingletonParameter.java#1 $
  */
-public class BooleanParameter extends StringParameter {
+public class SingletonParameter extends ClassParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/BooleanParameter.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/SingletonParameter.java#1 $" +
         "$Author: justin $" +
         "$DateTime: 2003/08/26 20:38:18 $";
 
-    static {
-        Converters.set(Boolean.class, new BooleanConverter());
+    public SingletonParameter(final String name) {
+        super(name);
     }
 
-    public BooleanParameter(final String name) {
-        super(name, Boolean.class);
+    protected Object unmarshal(final String value) {
+        final Class clacc = (Class) super.unmarshal(value);
+
+        return Classes.newInstance(clacc);
     }
 }

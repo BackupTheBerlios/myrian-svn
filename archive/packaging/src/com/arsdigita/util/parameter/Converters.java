@@ -16,28 +16,38 @@
 package com.arsdigita.util.parameter;
 
 import com.arsdigita.util.*;
-import java.net.*;
 import java.util.*;
+import org.apache.commons.beanutils.*;
 import org.apache.commons.beanutils.converters.*;
-import org.apache.oro.text.perl.Perl5Util;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/BooleanParameter.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/Converters.java#1 $
  */
-public class BooleanParameter extends StringParameter {
+class Converters {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/BooleanParameter.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/Converters.java#1 $" +
         "$Author: justin $" +
         "$DateTime: 2003/08/26 20:38:18 $";
 
-    static {
-        Converters.set(Boolean.class, new BooleanConverter());
+    private static Map s_converters = Collections.synchronizedMap
+        (new HashMap());
+
+    static final Converter get(final Class clacc) {
+        final Converter converter = (Converter) s_converters.get(clacc);
+
+        Assert.exists(converter, Converter.class);
+
+        return converter;
     }
 
-    public BooleanParameter(final String name) {
-        super(name, Boolean.class);
+    static final void set(final Class clacc, final Converter converter) {
+        s_converters.put(clacc, converter);
+    }
+
+    static final Object convert(final Class clacc, final String value) {
+        return get(clacc).convert(clacc, value);
     }
 }

@@ -19,32 +19,41 @@ import com.arsdigita.util.*;
 import com.arsdigita.util.parameter.*;
 import java.io.*;
 import java.util.*;
+import org.apache.log4j.Logger;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/FilePropertyStore.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/FilePropertyStore.java#3 $
  */
 public class FilePropertyStore implements ParameterStore {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/FilePropertyStore.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/FilePropertyStore.java#3 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/26 12:54:51 $";
+        "$DateTime: 2003/08/26 20:38:18 $";
+
+    private static final Logger s_log = Logger.getLogger
+        (FilePropertyStore.class);
 
     private final Properties m_props;
 
     public FilePropertyStore(final String filename) {
-        final InputStream in = getClass().getResourceAsStream(filename);
-
-        Assert.exists(in, InputStream.class);
-
         m_props = new Properties();
 
-        try {
-            m_props.load(in);
-        } catch (IOException ioe) {
-            throw new UncheckedWrapperException(ioe);
+        final InputStream in = getClass().getResourceAsStream(filename);
+
+        if (in == null) {
+            if (s_log.isInfoEnabled()) {
+                s_log.info(filename + " was not found; using an empty " +
+                           "property record");
+            }
+        } else {
+            try {
+                m_props.load(in);
+            } catch (IOException ioe) {
+                throw new UncheckedWrapperException(ioe);
+            }
         }
     }
 
