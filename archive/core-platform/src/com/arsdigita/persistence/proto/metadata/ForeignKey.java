@@ -19,12 +19,12 @@ package com.arsdigita.persistence.proto.metadata;
  * ForeignKey
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/09 $
  **/
 
 public class ForeignKey extends Constraint {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/metadata/ForeignKey.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/metadata/ForeignKey.java#2 $ by $Author: rhs $, $DateTime: 2003/06/09 19:03:29 $";
 
     private UniqueKey m_key;
     private boolean m_cascade;
@@ -82,6 +82,16 @@ public class ForeignKey extends Constraint {
 
     public UniqueKey getUniqueKey() {
         return m_key;
+    }
+
+    public boolean isNullable() {
+        Column[] cols = getColumns();
+        for (int i = 0; i < cols.length; i++) {
+            if (!cols[i].isNullable()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public boolean isDeferred() {

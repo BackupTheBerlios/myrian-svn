@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/workflow/Task.pdl#12 $
-// $DateTime: 2003/06/02 10:50:25 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/workflow/Task.pdl#13 $
+// $DateTime: 2003/06/09 19:03:29 $
 
 model com.arsdigita.workflow.simple;
 
@@ -25,8 +25,6 @@ object type Task extends ACSObject {
     Boolean[1..1]     isActive = cw_tasks.is_active CHAR(1);
     BigDecimal[0..1] parentTaskID = cw_tasks.parent_task_id INTEGER;
     String[1..1]     taskState = cw_tasks.task_state VARCHAR(16);
-    component TaskComment[0..n] comments =
-              join cw_tasks.task_id to cw_task_comments.task_id;
 
     reference key (cw_tasks.task_id);
 
@@ -70,7 +68,6 @@ association {
                                        join cw_task_listeners.listener_task_id
                                          to cw_tasks.task_id;
 }
-
 
 query getTasks {
     BigDecimal taskId;

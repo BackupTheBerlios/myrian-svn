@@ -59,7 +59,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #15 $ $Date: 2003/06/02 $
+ * @version $Revision: #16 $ $Date: 2003/06/09 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -106,11 +106,10 @@ public class Session {
 
                     ObjectType ot = C.fromType(sp);
                     OID oid = new OID(ot);
-                    for (Iterator it = props.entrySet().iterator();
+                    for (Iterator it = sp.getKeyProperties().iterator();
                          it.hasNext(); ) {
-                        Map.Entry me = (Map.Entry) it.next();
-                        Property prop = (Property) me.getKey();
-                        oid.set(prop.getName(), me.getValue());
+                        Property prop = (Property) it.next();
+                        oid.set(prop.getName(), props.get(prop));
                     }
                     return new DataObjectImpl(oid);
                 }

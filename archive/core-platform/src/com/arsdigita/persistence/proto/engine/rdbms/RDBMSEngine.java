@@ -13,24 +13,19 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/06/02 $
+ * @version $Revision: #4 $ $Date: 2003/06/09 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#3 $ by $Author: rhs $, $DateTime: 2003/06/02 10:49:07 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#4 $ by $Author: rhs $, $DateTime: 2003/06/09 19:03:29 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
 
-    private EventStream m_events = new EventStream(true);
-    private HashMap m_outgoing = new HashMap();
-    private HashMap m_causes = new HashMap();
-    private HashMap m_counts = new HashMap();
-
     private ArrayList m_operations = new ArrayList();
     private HashMap m_operationMap = new HashMap();
-    private EventSwitch m_generator = new EventSwitch(this);
+    private EventSwitch m_switch = new EventSwitch(this);
     private HashMap m_environments = new HashMap();
     private ArrayList m_mutations = new ArrayList();
     private ArrayList m_mutationTypes = new ArrayList();
@@ -102,8 +97,10 @@ public class RDBMSEngine extends Engine {
     }
 
     void removeUpdates(Object obj) {
+        LOG.debug("Removing updates for: " + obj);
         ArrayList ops = (ArrayList) m_operationMap.get(obj);
         if (ops != null) {
+            LOG.debug("found: " + ops);
             for (Iterator it = ops.iterator(); it.hasNext(); ) {
                 Operation op = (Operation) it.next();
 		if (op instanceof DML) {
@@ -152,17 +149,10 @@ public class RDBMSEngine extends Engine {
     }
 
     void clear() {
-        clearEvents();
+        m_aggregator.clear();
         clearOperations();
         m_mutations.clear();
         m_mutationTypes.clear();
-    }
-
-    void clearEvents() {
-        m_events.clear();
-        m_outgoing.clear();
-        m_causes.clear();
-        m_counts.clear();
     }
 
     void clearOperations() {
@@ -208,177 +198,75 @@ public class RDBMSEngine extends Engine {
                                   qg.getMappings(sel));
     }
 
-    private Collection getOutgoing(Event ev) {
-        return (Collection) m_outgoing.get(ev);
-    }
-
-    private Collection getCauses(Event ev) {
-        return (Collection) m_causes.get(ev);
-    }
-
-    private int getCount(Event ev) {
-        if (m_counts.containsKey(ev)) {
-            return ((Integer) m_counts.get(ev)).intValue();
-        } else {
-            return 0;
-        }
-    }
-
-    private void setCount(Event ev, int count) {
-        if (count == 0) {
-            m_counts.remove(ev);
-        } else {
-            m_counts.put(ev, new Integer(count));
-        }
-    }
-
-    private void addArrow(Event from, Event to, String cause) {
-        LinkedList outgoing = (LinkedList) m_outgoing.get(from);
-        LinkedList causes = (LinkedList) m_causes.get(from);
-        if (outgoing == null) {
-            outgoing = new LinkedList();
-            causes = new LinkedList();
-            m_outgoing.put(from, outgoing);
-            m_causes.put(from, causes);
-        }
-
-        setCount(to, getCount(to) + 1);
-
-        outgoing.add(to);
-        causes.add(cause);
-    }
-
-    private void clearArrows(Event ev) {
-        Collection outgoing = getOutgoing(ev);
-        if (outgoing == null) { return; }
-        for (Iterator it = outgoing.iterator(); it.hasNext(); ) {
-            Event to = (Event) it.next();
-            setCount(to, getCount(to) - 1);
-        }
-        m_outgoing.remove(ev);
-        m_causes.remove(ev);
-    }
-
-    private void addObjectDependency(Event ev, Object obj) {
-        ObjectEvent oe = m_events.getLastEvent(obj);
-        if (oe != null) {
-            addArrow(oe, ev, "object dependency");
-        }
-    }
-
-    private void addLinkDependency(final Property prop, final ObjectEvent from,
-                                   final ObjectEvent to) {
-        if (from == null || to == null) {
-            return;
-        }
-
-        ObjectType ot = prop.getContainer();
-        ObjectMap om = ot.getRoot().getObjectMap(ot);
-        Mapping m = om.getMapping(Path.get(prop.getName()));
-        m.dispatch(new Mapping.Switch() {
-                public void onValue(Value m) { }
-
-                public void onJoinTo(JoinTo m) {
-                    addArrow(to, from, prop + ": join to link dependency");
-                }
-
-                public void onJoinFrom(JoinFrom m) {
-                    addArrow(from, to, prop + ": join from link dependency");
-                }
-
-                public void onJoinThrough(JoinThrough m) {
-                    // do nothing
-                }
-
-                public void onStatic(Static m) {
-                    if (prop.isComponent()) {
-                        addArrow(from, to, prop + ": static composition");
-                    } else if (!prop.isCollection()) {
-                        addArrow(to, from, prop + ": static reference");
-                    }
-                }
-            });
-    }
+    private Aggregator m_aggregator = new Aggregator();
 
     public void write(Event ev) {
-        addObjectDependency(ev, ev.getObject());
-
-        ev.dispatch(new Event.Switch() {
-                public void onCreate(CreateEvent e) { }
-                public void onDelete(DeleteEvent e) {
-                    Collection pes =
-                        m_events.getReachablePropertyEvents(e.getObject());
-                    for (Iterator it = pes.iterator(); it.hasNext(); ) {
-                        PropertyEvent pe = (PropertyEvent) it.next();
-                        addArrow(pe, e, "deletion object dependency");
-                        Object arg;
-                        if (pe instanceof SetEvent) {
-                            if (pe.getArgument() != null) {
-                                throw new IllegalStateException
-                                    ("nonnull set arg reachable from delete");
-                            }
-                            arg = ((SetEvent) pe).getPreviousValue();
-                        } else {
-                            arg = pe.getArgument();
-                        }
-
-                        addLinkDependency
-                            (pe.getProperty(), m_events.getLastEvent(arg), e);
-                    }
-                }
-
-                private void onProperty(PropertyEvent e) {
-                    Object obj = e.getObject();
-                    Property prop = e.getProperty();
-                    Object arg = e.getArgument();
-
-                    addObjectDependency(e, arg);
-
-                    PropertyEvent pe = m_events.getLastEvent(obj, prop);
-                    if (pe != null) { addArrow(pe, e, "WAW hazard"); }
-
-                    ObjectEvent objev = m_events.getLastEvent(obj);
-                    ObjectEvent argev = m_events.getLastEvent(arg);
-
-                    addLinkDependency(prop, objev, argev);
-                }
-
-                public void onSet(SetEvent e) { onProperty(e); }
-                public void onAdd(AddEvent e) { onProperty(e); }
-                public void onRemove(RemoveEvent e) { onProperty(e); }
-            });
-
-        m_events.add(ev);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(ev);
+        }
+        ev.dispatch(m_aggregator);
     }
 
     private void generate() {
+        Collection nodes = m_aggregator.getNodes();
         HashSet generated = new HashSet();
         int before;
         do {
             before = generated.size();
 
-            for (Iterator it = m_events.iterator(); it.hasNext(); ) {
-                Event ev = (Event) it.next();
-                if (generated.contains(ev)) { continue; }
-                if (getCount(ev) == 0) {
-                    generated.add(ev);
-                    clearArrows(ev);
-                    ev.dispatch(m_generator);
+            for (Iterator it = nodes.iterator(); it.hasNext(); ) {
+                Node nd = (Node) it.next();
+                if (generated.containsAll(nd.getDependencies())) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Generating node: " + nd);
+                    }
+                    int ops = m_operations.size();
+                    Collection events = nd.getEvents();
+                    for (Iterator iter = events.iterator(); iter.hasNext(); ) {
+                        Event ev = (Event) iter.next();
+                        if (generated.contains(ev)) {
+                            throw new IllegalStateException
+                                ("event generated twice: " + ev);
+                        }
+                        ev.dispatch(m_switch);
+                        generated.add(ev);
+                    }
+                    for (int i = ops; i < m_operations.size(); i++) {
+                        Operation op = (Operation) m_operations.get(i);
+                        LOG.debug("GENERATED: " + op);
+                        LOG.debug("ENV: " + op.getEnvironment());
+                    }
+                    it.remove();
+                    m_operationMap.clear();
+                    m_environments.clear();
                 }
             }
         } while (generated.size() > before);
 
-        if (generated.size() < m_events.size()) {
-            HashSet ungenerated = new HashSet();
-            ungenerated.addAll(m_events.getEvents());
-            ungenerated.removeAll(generated);
+        if (nodes.size() > 0) {
             StringBuffer msg = new StringBuffer();
-            msg.append("unable to generate all events");
-            for (Iterator it = ungenerated.iterator(); it.hasNext(); ) {
-                Event ev = (Event) it.next();
-                msg.append("\n  " + ev + ": ");
-                msg.append("\n    " + getOutgoing(ev));
-                msg.append("\n    " + getCauses(ev));
+            msg.append("unable to generate all events:");
+            for (Iterator it = nodes.iterator(); it.hasNext(); ) {
+                Node nd = (Node) it.next();
+                msg.append("\n\nnode {");
+                msg.append("\n  events {");
+                for (Iterator iter = nd.getEvents().iterator();
+                     iter.hasNext(); ) {
+                    msg.append("\n    ");
+                    msg.append(iter.next());
+                }
+                msg.append("\n  }\n");
+                msg.append("\n  unresolved dependencies {");
+                for (Iterator iter = nd.getDependencies().iterator();
+                     iter.hasNext(); ) {
+                    Event ev = (Event) iter.next();
+                    if (!generated.contains(ev)) {
+                        msg.append("\n    ");
+                        msg.append(ev);
+                    }
+                }
+                msg.append("\n  }");
+                msg.append("\n}");
             }
             throw new IllegalStateException(msg.toString());
         }
