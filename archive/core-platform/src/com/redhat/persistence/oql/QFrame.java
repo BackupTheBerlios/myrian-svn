@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/03/11 $
+ * @version $Revision: #2 $ $Date: 2004/03/21 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/QFrame.java#1 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/QFrame.java#2 $ by $Author: dennis $, $DateTime: 2004/03/21 18:39:35 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -476,10 +476,8 @@ class QFrame {
     boolean isSelect() {
         if (m_hoisted) {
             return false;
-        } else if (render(new ArrayList(), new HashSet()) == null) {
-            return false;
         } else {
-            return true;
+            return (render(new ArrayList(), new HashSet()) != null);
         }
     }
 

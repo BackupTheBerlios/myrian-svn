@@ -29,12 +29,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #17 $ $Date: 2004/03/11 $
+ * @version $Revision: #18 $ $Date: 2004/03/21 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#17 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:56 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#18 $ by $Author: dennis $, $DateTime: 2004/03/21 18:39:35 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -478,10 +478,8 @@ public class PDL {
                     return true;
                 } else if (f == JoinPathNd.JOINS) {
                     return child.getIndex() == 0;
-                } else if (f == JoinNd.FROM) {
-                    return true;
                 } else {
-                    return false;
+                    return f == JoinNd.FROM;
                 }
             }
 
