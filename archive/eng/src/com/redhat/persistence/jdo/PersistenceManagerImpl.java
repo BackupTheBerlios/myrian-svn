@@ -190,21 +190,35 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
 
         StateManagerImpl smi = getStateManager(pc);
         if (smi == null) {
-            throw new JDOUserException("can not delete transient instance");
+            throw new JDOUserException
+                ("can not delete transient instance", obj);
         }
         smi.getState().deletePersistent();
         m_ssn.delete(pc);
     }
 
     public void deletePersistentAll(Collection pcs) {
-        for (Iterator it = pcs.iterator(); it.hasNext(); ) {
-            deletePersistent(it.next());
-        }
+        deletePersistent(pcs.toArray());
     }
 
     public void deletePersistentAll(Object[] pcs) {
+        List exceptions = null;
+
         for (int i = 0; i < pcs.length; i++) {
-            deletePersistent(pcs[i]);
+            try {
+                deletePersistent(pcs[i]);
+            } catch (RuntimeException ex) {
+                if (exceptions == null) {
+                    exceptions = new LinkedList();
+                }
+                exceptions.add(ex);
+            }
+        }
+
+        if (exceptions != null && exceptions.size() > 0) {
+            Throwable[] nested = (Throwable[]) exceptions.toArray
+                (new Throwable[exceptions.size()]);
+            throw new JDOUserException("failed to delete all objects", nested);
         }
     }
 
@@ -274,7 +288,7 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
     public Object getObjectId(Object obj) {
         PersistenceCapable pc = (PersistenceCapable) obj;
         if (!hasStateManager(obj)) {
-            throw new JDOUserException(obj + " has no state manager");
+            throw new JDOUserException("no state manager", obj);
         }
         return getStateManager(pc).getPropertyMap();
     }
@@ -341,12 +355,12 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
     }
 
     private PersistenceCapable checkAndCast(Object obj) {
-        if (obj == null) { throw new NullPointerException("obj"); }
+        if (obj == null) { throw new JDOUserException("null object"); }
 
         if (!(obj instanceof PersistenceCapable)) {
-            throw new ClassCastException
+            throw new JDOUserException
                 ("Expected " + obj.getClass().getName() + " to implement " +
-                 PersistenceCapable.class.getName());
+                 PersistenceCapable.class.getName(), obj);
         }
         return (PersistenceCapable) obj;
     }
@@ -410,7 +424,7 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
         for (int i = 0; i < pcs.length; i++) {
             try {
                 makePersistent(pcs[i]);
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
                 if (exceptions == null) {
                     exceptions = new LinkedList();
                 }
