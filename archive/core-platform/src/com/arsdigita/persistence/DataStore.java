@@ -66,12 +66,12 @@ import org.apache.log4j.Category;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/06/06 $
+ * @version $Revision: #5 $ $Date: 2002/06/12 $
  */
 
 public class DataStore {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#4 $ by $Author: rhs $, $DateTime: 2002/06/06 15:58:20 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#5 $ by $Author: rhs $, $DateTime: 2002/06/12 16:36:59 $";
 
     private static final Category log =
         Category.getInstance(DataStore.class.getName());
@@ -367,8 +367,6 @@ public class DataStore {
                 log.info("Firing operation " + op.getFilename() + ":" +
                          op.getLineNumber());
             }
-            log.info("Operation:\n" + op);
-            log.info("Source: " + source);
         }
     }
 
