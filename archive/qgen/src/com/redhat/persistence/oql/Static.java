@@ -13,12 +13,12 @@ import java.util.*;
  * Static
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/02/23 $
+ * @version $Revision: #7 $ $Date: 2004/02/23 $
  **/
 
 public class Static extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#6 $ by $Author: ashah $, $DateTime: 2004/02/23 11:51:21 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#7 $ by $Author: ashah $, $DateTime: 2004/02/23 12:02:35 $";
 
     private SQL m_sql;
     private String m_type;
@@ -26,6 +26,29 @@ public class Static extends Expression {
     private boolean m_map;
     private Map m_bindings;
     private List m_expressions = new ArrayList();
+
+    private static final Collection s_functions = new HashSet();
+    static {
+        String[] functions = {
+            /* sql standard functions supported by both oracle and postgres.
+             * there is an added caveat that the function uses normal function
+             * syntax and not keywords as arguments (e.g. trim(leading 'a'
+             * from str), substring('teststr' from 3 for 2))
+             */
+            "current_date", "current_timestamp",
+            "upper", "lower",
+            "trim", // only trim(str) syntax is allowed
+            // postgres supported oracle-isms
+            "substr", "length", "nvl"
+        };
+        for (int i = 0; i < functions.length; i++) {
+            s_functions.add(functions[i]);
+        }
+    }
+
+    private static final boolean isAllowedFunction(String s) {
+        return s_functions.contains(s);
+    }
 
     public Static(String sql) {
         this(sql, Collections.EMPTY_MAP);
@@ -48,10 +71,13 @@ public class Static extends Expression {
                 Expression e;
                 if (t.isBind()) {
                     e = bind(image);
-                } else if (m_map && t.isPath()) {
-                    e = new Choice(new All(image, m_bindings), path(image));
-                } else if (!m_map && t.isPath()) {
-                    e = new Choice(new All(image, m_bindings), image);
+                } else if (t.isPath()) {
+                    All all = new All(image, m_bindings);
+                    if (isAllowedFunction(image) || !m_map) {
+                        e = new Choice(all, image);
+                    } else {
+                        e = new Choice(all, path(image));
+                    }
                 } else {
                     throw new IllegalStateException
                         ("don't know how to deal with token: " + t);
@@ -61,7 +87,7 @@ public class Static extends Expression {
         }
     }
 
-    private boolean isExpression(SQLToken tok) {
+    private static boolean isExpression(SQLToken tok) {
         return tok.isBind() || tok.isPath();
     }
 
