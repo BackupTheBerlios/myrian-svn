@@ -50,7 +50,7 @@ public class XML {
     static {
         s_formatters.put(Date.class, new DateTimeFormatter());
     }
-    
+
     /**
      * Registers a formatter for serializing objects of a
      * class to a String suitable for XML output.
@@ -66,7 +66,7 @@ public class XML {
     public static void unregisterFormatter(Class klass) {
         s_formatters.remove(klass);
     }
-    
+
     /**
      * Gets a directly registered formatter for a class.
      * @param klass the class to find a formatter for
@@ -75,7 +75,7 @@ public class XML {
     public static Formatter getFormatter(Class klass) {
         return (Formatter)s_formatters.get(klass);
     }
-    
+
     /**
      * Looks for the best matching formatter.
      * @param klass the class to find a formatter for
@@ -89,7 +89,7 @@ public class XML {
         }
         return formatter;
     }
-    
+
     /**
      * Converts an object to a String using the closest
      * matching registered Formatter implementation. Looks
@@ -114,12 +114,12 @@ public class XML {
             return value.toString();
         }
         if (s_log.isDebugEnabled()) {
-            s_log.debug("Processing " + value.getClass() + 
+            s_log.debug("Processing " + value.getClass() +
                         " with " + formatter.getClass());
         }
         return formatter.format(value);
     }
-    
+
     /**
      * Processes an XML file with the default SAX Parser, with
      * namespace processing, schema validation & DTD validation
@@ -131,13 +131,21 @@ public class XML {
     public static final void parseResource(String path,
                                            DefaultHandler handler) {
         if (s_log.isDebugEnabled()) {
-            s_log.debug("Processing resource " + path + 
+            s_log.debug("Processing resource " + path +
                         " with " + handler.getClass());
         }
-        
-        InputStream stream = ResourceManager.getInstance().getResourceAsStream(path);
-        Assert.exists(stream, InputStream.class);
-        
+
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
+
+        ClassLoader cload = Thread.currentThread().getContextClassLoader();
+        InputStream stream = cload.getResourceAsStream(path);
+
+        if (stream == null) {
+            throw new IllegalArgumentException("no such resource: " + path);
+        }
+
         parse(stream, handler);
     }
 
@@ -152,7 +160,7 @@ public class XML {
     public static final void parse(InputStream source,
                                    DefaultHandler handler) {
         if (s_log.isDebugEnabled()) {
-            s_log.debug("Processing stream " + source + 
+            s_log.debug("Processing stream " + source +
                         " with " + handler.getClass());
         }
 
@@ -161,16 +169,16 @@ public class XML {
             spf.setFeature("http://xml.org/sax/features/namespaces", true);
             SAXParser parser = spf.newSAXParser();
             parser.parse(source, handler);
-        } catch (ParserConfigurationException e) { 
+        } catch (ParserConfigurationException e) {
             throw new UncheckedWrapperException("error parsing stream", e);
         } catch (SAXException e) {
             if (e.getException() != null) {
-                throw new UncheckedWrapperException("error parsing stream", 
+                throw new UncheckedWrapperException("error parsing stream",
                                                     e.getException());
             } else {
                 throw new UncheckedWrapperException("error parsing stream", e);
             }
-        } catch (IOException e) { 
+        } catch (IOException e) {
             throw new UncheckedWrapperException("error parsing stream", e);
         }
     }
