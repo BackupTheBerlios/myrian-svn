@@ -24,14 +24,14 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Revision: #10 $ $Date: 2002/10/10 $
+ * @version $Revision: #11 $ $Date: 2002/10/10 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: rhs $ - $Date: 2002/10/10 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#10 $";
+    public static final String versionId = "$Author: rhs $ - $Date: 2002/10/10 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#11 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);
@@ -130,6 +130,22 @@ public class ConnectionManager {
         pool.setConnectionInfo(m_url, m_username, m_password);
         LOG.info("Setting connection pool size to " + m_connectionPoolSize);
         pool.setConnectionPoolSize(m_connectionPoolSize);
+
+        try {
+            // We do this to verify that this is a valid pool before letting
+            // potentially large amounts of threads request a connection and
+            // possibly overload the listener.
+            java.sql.Connection conn = pool.getConnection();
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            SQLException wrapped = SQLExceptionHandler.wrap(e);
+            if (wrapped instanceof DbNotAvailableException) {
+                disconnect();
+            }
+            throw wrapped;
+        }
 
         m_lastAttempt = System.currentTimeMillis();
 
