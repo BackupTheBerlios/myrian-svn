@@ -60,12 +60,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/07/08 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#2 $ by $Author: rhs $, $DateTime: 2004/07/08 11:34:59 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -131,8 +131,12 @@ public class RDBMSEngine extends Engine {
 	}
     }
 
+    Object key(Object obj) {
+        return m_aggregator.key(obj);
+    }
+
     void addOperation(Object obj, DML dml) {
-        Object key = new CompoundKey(obj, dml.getTable());
+        Object key = new CompoundKey(key(obj), dml.getTable());
         if (dml instanceof Delete) {
             DML prev = (DML) m_operationMap.get(key);
             if (prev != null) {
@@ -144,13 +148,13 @@ public class RDBMSEngine extends Engine {
     }
 
     void removeOperation(Object obj, DML dml) {
-        Object key = new CompoundKey(obj, dml.getTable());
+        Object key = new CompoundKey(key(obj), dml.getTable());
 	m_operationMap.remove(key);
 	m_operations.remove(dml);
     }
 
     DML getOperation(Object obj, Table table) {
-        Object key = new CompoundKey(obj, table);
+        Object key = new CompoundKey(key(obj), table);
         DML result = (DML) m_operationMap.get(key);
         if (m_profiler != null && result != null) {
             result.addEvent(m_event);
@@ -159,14 +163,14 @@ public class RDBMSEngine extends Engine {
     }
 
     void clearUpdates(Object obj) {
-	m_operationMap.remove(obj);
+	m_operationMap.remove(key(obj));
     }
 
     void removeUpdates(Object obj) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Removing updates for: " + obj);
         }
-        ArrayList ops = (ArrayList) m_operationMap.get(obj);
+        ArrayList ops = (ArrayList) m_operationMap.get(key(obj));
         if (ops != null) {
             LOG.debug("found: " + ops);
             for (Iterator it = ops.iterator(); it.hasNext(); ) {
@@ -184,18 +188,18 @@ public class RDBMSEngine extends Engine {
 
     void markUpdate(Object obj) {
 	if (!hasUpdates(obj)) {
-	    m_operationMap.put(obj, new ArrayList());
+	    m_operationMap.put(key(obj), new ArrayList());
 	}
     }
 
     void markUpdate(Object obj, Operation op) {
 	markUpdate(obj);
-	ArrayList ops = (ArrayList) m_operationMap.get(obj);
+	ArrayList ops = (ArrayList) m_operationMap.get(key(obj));
 	ops.add(op);
     }
 
     boolean hasUpdates(Object obj) {
-	return m_operationMap.containsKey(obj);
+	return m_operationMap.containsKey(key(obj));
     }
 
     void addOperation(Operation op) {
@@ -206,10 +210,10 @@ public class RDBMSEngine extends Engine {
     }
 
     Environment getEnvironment(Object obj) {
-        Environment result = (Environment) m_environments.get(obj);
+        Environment result = (Environment) m_environments.get(key(obj));
         if (result == null) {
             result = new Environment(this, getSession().getObjectMap(obj));
-            m_environments.put(obj, result);
+            m_environments.put(key(obj), result);
         }
         return result;
     }
@@ -309,7 +313,7 @@ public class RDBMSEngine extends Engine {
         }
     }
 
-    private Aggregator m_aggregator = new Aggregator();
+    private Aggregator m_aggregator = new Aggregator(this);
 
     public void write(Event ev) {
         if (LOG.isDebugEnabled()) {

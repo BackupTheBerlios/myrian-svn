@@ -35,12 +35,12 @@ import org.apache.log4j.Logger;
  * Aggregator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/07/08 $
  **/
 
 class Aggregator extends Event.Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/Aggregator.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/Aggregator.java#2 $ by $Author: rhs $, $DateTime: 2004/07/08 11:34:59 $";
 
     private static final Logger LOG = Logger.getLogger(Aggregator.class);
 
@@ -77,6 +77,8 @@ class Aggregator extends Event.Switch {
 
     }
 
+    private RDBMSEngine m_engine;
+
     private ArrayList m_nodes = new ArrayList();
 
     // Used to track event dependencies.
@@ -89,43 +91,52 @@ class Aggregator extends Event.Switch {
     private EventMap m_twoWay = new EventMap();
     private EventMap m_attributes = new EventMap();
 
+    public Aggregator(RDBMSEngine engine) {
+        m_engine = engine;
+    }
+
     public Collection getNodes() {
         return m_nodes;
     }
 
+    Object key(Object obj) {
+        if (obj == null) { return null; }
+        return m_engine.getSession().getSessionKey(obj);
+    }
+
     private Event getObjectEvent(Object obj) {
-        return m_objects.getEvent(obj);
+        return m_objects.getEvent(key(obj));
     }
 
     private void setObjectEvent(Object obj, Event ev) {
-        m_objects.setEvent(obj, ev);
+        m_objects.setEvent(key(obj), ev);
     }
 
     private Event getPropertyEvent(Object obj, Property prop) {
-        return m_properties.getEvent(new CompoundKey(obj, prop));
+        return m_properties.getEvent(new CompoundKey(key(obj), prop));
     }
 
     private void setPropertyEvent(Object obj, Property prop, Event ev) {
-        m_properties.setEvent(new CompoundKey(obj, prop), ev);
+        m_properties.setEvent(new CompoundKey(key(obj), prop), ev);
     }
 
     private Event getPropertyEvent(Object obj, Property prop, Object arg) {
         return m_properties.getEvent
-            (new CompoundKey(obj, new CompoundKey(prop, arg)));
+            (new CompoundKey(key(obj), new CompoundKey(prop, key(arg))));
     }
 
     private void setPropertyEvent(Object obj, Property prop, Object arg,
                                   Event ev) {
         m_properties.setEvent
-            (new CompoundKey(obj, new CompoundKey(prop, arg)), ev);
+            (new CompoundKey(key(obj), new CompoundKey(prop, key(arg))), ev);
     }
 
     private void addDependingEvent(Object obj, Event ev) {
-        m_depending.addEvent(obj, ev);
+        m_depending.addEvent(key(obj), ev);
     }
 
     private Collection getDependingEvents(Object obj) {
-        return m_depending.getEvents(obj);
+        return m_depending.getEvents(key(obj));
     }
 
     private Node findNode(Event ev) {
@@ -169,38 +180,38 @@ class Aggregator extends Event.Switch {
     }
 
     private Event getViolation(Object obj, Property prop) {
-        return m_violations.getEvent(new CompoundKey(obj, prop));
+        return m_violations.getEvent(new CompoundKey(key(obj), prop));
     }
 
     private void setViolation(Object obj, Property prop, Event ev) {
-        m_violations.setEvent(new CompoundKey(obj, prop), ev);
+        m_violations.setEvent(new CompoundKey(key(obj), prop), ev);
     }
 
     private void clearViolation(Object obj, Property prop) {
-        m_violations.remove(new CompoundKey(obj, prop));
+        m_violations.remove(new CompoundKey(key(obj), prop));
     }
 
     private void setTwoWayEvent(Object obj, Property prop, Object arg,
                                  Event ev) {
         m_twoWay.setEvent
-            (new CompoundKey(obj, new CompoundKey(prop, arg)), ev);
+            (new CompoundKey(key(obj), new CompoundKey(prop, key(arg))), ev);
     }
 
     private Event getTwoWayEvent(Object obj, Property prop, Object arg) {
         return m_twoWay.getEvent
-            (new CompoundKey(obj, new CompoundKey(prop, arg)));
+            (new CompoundKey(key(obj), new CompoundKey(prop, key(arg))));
     }
 
     private void setAttributeEvent(Object obj, Event ev) {
-        m_attributes.setEvent(obj, ev);
+        m_attributes.setEvent(key(obj), ev);
     }
 
     private Event getAttributeEvent(Object obj) {
-        return m_attributes.getEvent(obj);
+        return m_attributes.getEvent(key(obj));
     }
 
     private void clearAttributeNode(Object obj) {
-        m_attributes.remove(obj);
+        m_attributes.remove(key(obj));
     }
 
 

@@ -29,12 +29,12 @@ import java.util.Iterator;
  * Subclasses must provide a public no-args constructor.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/06/18 $
+ * @version $Revision: #5 $ $Date: 2004/07/08 $
  **/
 
 public abstract class Adapter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Adapter.java#4 $ by $Author: vadim $, $DateTime: 2004/06/18 16:55:13 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Adapter.java#5 $ by $Author: rhs $, $DateTime: 2004/07/08 11:34:59 $";
 
     private Root m_root;
 
@@ -55,7 +55,12 @@ public abstract class Adapter {
         Object key = null;
 
         for (Iterator it = keys.iterator(); it.hasNext(); ) {
-            Object value = props.get((Property) it.next());
+            Property p = (Property) it.next();
+            Object value = props.get(p);
+            if (p.getType().isKeyed() && value != null) {
+                Adapter ad = getRoot().getAdapter(value.getClass());
+                value = ad.getSessionKey(value);
+            }
             if (key == null) {
                 key = value;
             } else {
