@@ -331,6 +331,12 @@
                       exists(filter(mg = m.groups, mg == g))),
                  group = g.name, member = m.firstName)
     </query>
+    <query subselects="0" joins="2" outers="1">
+      query(left(g = all(test.Group), m = all(test.User),
+                        exists(filter(u = g.members, m == u))),
+                 group = g.name, member = m.name)
+    </query>
+
     <results>
       <row group="Pop" member="Britney"/>
       <row group="Pop" member="Christina"/>
