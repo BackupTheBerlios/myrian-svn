@@ -28,6 +28,14 @@
       <field name="name"/>
     </class>
 
+    <class name="Group"
+      persistence-capable-superclass="Party"
+      identity-type="datastore">
+
+      <field name="name"/>
+      <field name="users"/>
+    </class>
+
     <class name="Order" identity-type="datastore">
       <field name="id"/>
       <field name="items"/>

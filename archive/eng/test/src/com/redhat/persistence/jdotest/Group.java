@@ -6,21 +6,32 @@ import java.util.*;
  * Group
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/22 $
+ * @version $Revision: #2 $ $Date: 2004/06/25 $
  **/
+public class Group extends Party {
+    private String name;
+    private Collection users;
 
-public abstract class Group extends Party {
+    public Group() {}
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdotest/Group.java#1 $ by $Author: vadim $, $DateTime: 2004/06/22 13:25:03 $";
+    public Group(int id) {
+        super(id);
+        users = new LinkedList();
+    }
 
-    public abstract String getName();
+    public String getName() {
+        return name;
+    }
 
-    public abstract void setName(String name);
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public abstract Collection getUsers();
+    public Collection getUsers() {
+        return users;
+    }
 
     public String toString() {
         return getName();
     }
-
 }
