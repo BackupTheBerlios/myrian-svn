@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/upgrade/postgres-6.0.1-6.1.0.sql#5 $
--- $DateTime: 2004/03/16 19:04:14 $
+-- $Id: //core-platform/dev/sql/ccm-core/upgrade/postgres-6.0.1-6.1.0.sql#6 $
+-- $DateTime: 2004/03/18 11:43:00 $
 
 \echo Red Hat WAF 6.0.1 -> 6.1.0 Upgrade Script (PostgreSQL)
 
@@ -36,6 +36,9 @@ drop table ct_item_file_attachments;
 drop table parameterized_privileges;
 create index agentport_superport_id_idx on agentportlets(superportlet_id);
 create index init_reqs_reqd_init_idx on init_requirements(required_init);
+
+-- insert mime type file extensions
+\i ../default/upgrade/6.0.1-6.1.0/insert-cms_mime_extensions.sql
 
 -- Upgrade script for new permission denormalization
 -- Privilege Hierarchy

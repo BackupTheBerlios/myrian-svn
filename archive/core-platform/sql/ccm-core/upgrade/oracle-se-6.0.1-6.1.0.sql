@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/upgrade/oracle-se-6.0.1-6.1.0.sql#5 $
--- $DateTime: 2004/03/16 23:55:17 $
+-- $Id: //core-platform/dev/sql/ccm-core/upgrade/oracle-se-6.0.1-6.1.0.sql#6 $
+-- $DateTime: 2004/03/18 11:43:00 $
 
 PROMPT Red Hat WAF 6.0.1 -> 6.1.0 Upgrade Script (Oracle)
 
@@ -31,6 +31,9 @@ PROMPT Red Hat WAF 6.0.1 -> 6.1.0 Upgrade Script (Oracle)
 
 create index AGENTPORT_SUPERPORT_ID_IDX on AGENTPORTLETS(SUPERPORTLET_ID);
 create index INIT_REQS_REQD_INIT_IDX on INIT_REQUIREMENTS(REQUIRED_INIT);
+
+-- insert mime type file extensions
+@@ ../default/upgrade/6.0.1-6.1.0/insert-cms_mime_extensions.sql
 
 -- Upgrade script for new permission denormalization
 -- Privilege Hierarchy

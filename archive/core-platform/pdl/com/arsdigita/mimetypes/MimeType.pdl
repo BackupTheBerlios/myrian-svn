@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/mimetypes/MimeType.pdl#3 $
-// $DateTime: 2003/11/12 11:28:57 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/mimetypes/MimeType.pdl#4 $
+// $DateTime: 2004/03/18 11:43:00 $
 
 model com.arsdigita.cms;
 
@@ -28,6 +28,13 @@ object type MimeType {
   object key (mimeType);
 }
 
+
+association {
+    MimeType[0..1] mimeType = join cms_mime_extensions.mime_type 
+                                to cms_mime_types.mime_type;
+    MimeTypeExtension[0..n] extensions = join cms_mime_types.mime_type 
+                                           to cms_mime_extensions.mime_type;
+}
 
 query getMimeTypeFromFileExtension {
     String fileExtension;

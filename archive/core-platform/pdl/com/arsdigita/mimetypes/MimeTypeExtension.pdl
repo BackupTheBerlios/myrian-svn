@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/mimetypes/MimeTypeExtension.pdl#2 $
-// $DateTime: 2003/08/15 13:46:34 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/mimetypes/MimeTypeExtension.pdl#3 $
+// $DateTime: 2004/03/18 11:43:00 $
 
 model com.arsdigita.cms;
 
@@ -20,8 +20,6 @@ import com.arsdigita.kernel.*;
 
 object type MimeTypeExtension {
   String[1..1]   fileExtension = cms_mime_extensions.file_extension VARCHAR(200);
-  String[1..1]   mimeType = cms_mime_extensions.mime_type VARCHAR(200);
-
   object key (fileExtension);
 }
 
