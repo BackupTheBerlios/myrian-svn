@@ -29,15 +29,15 @@ import org.apache.log4j.Logger;
  * Description: The TransactionContext class encapsulates a database transaction.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/05/22 $
+ * @version $Revision: #11 $ $Date: 2003/05/27 $
  */
 
 public class TransactionContext {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/TransactionContext.java#10 $ by $Author: ashah $, $DateTime: 2003/05/22 14:50:15 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/TransactionContext.java#11 $ by $Author: ashah $, $DateTime: 2003/05/27 15:53:12 $";
 
     private static final Logger s_cat =
-	Logger.getLogger(TransactionContext.class);
+        Logger.getLogger(TransactionContext.class);
 
     private static boolean s_aggressive = false;
 
@@ -49,7 +49,7 @@ public class TransactionContext {
     private boolean m_inTxn = false;
 
     TransactionContext(com.arsdigita.persistence.Session ssn) {
-	m_ossn = ssn;
+        m_ossn = ssn;
         m_ssn = ssn.getProtoSession();
     }
 
@@ -72,7 +72,7 @@ public class TransactionContext {
             throw new IllegalStateException("double begin");
         }
 
-	m_inTxn = true;
+        m_inTxn = true;
     }
 
     /**
@@ -83,16 +83,19 @@ public class TransactionContext {
      **/
 
     public void commitTxn() {
-	try {
+        boolean success = false;
+        try {
             fireBeforeCommitEvent();
+            m_ossn.invalidateDataObjects(true, false);
             m_ssn.commit();
+            success = true;
             m_inTxn = false;
             fireCommitEvent();
-	} finally {
-	    m_inTxn = false;
-            m_ossn.invalidateDataObjects(true);
-	    clearAttributes();
-	}
+        } finally {
+            m_inTxn = false;
+            clearAttributes();
+            if (!success) { m_ossn.invalidateDataObjects(false, true); }
+        }
     }
 
     /**
@@ -100,16 +103,19 @@ public class TransactionContext {
      * specified runnable.
      */
     void testCommitTxn(Runnable r) {
-	try {
+        boolean success = false;
+        try {
             fireBeforeCommitEvent();
+            m_ossn.invalidateDataObjects(true, false);
             r.run();
+            success = true;
             m_inTxn = false;
             fireCommitEvent();
-	} finally {
-	    m_inTxn = false;
-            m_ossn.invalidateDataObjects(true);
-	    clearAttributes();
-	}
+        } finally {
+            m_inTxn = false;
+            clearAttributes();
+            if (!success) { m_ossn.invalidateDataObjects(false, true); }
+        }
     }
 
     /**
@@ -121,16 +127,19 @@ public class TransactionContext {
      **/
 
     public void abortTxn() {
-	try {
-	    fireBeforeAbortEvent();
-	    m_ssn.rollback();
-	} finally {
-	    m_inTxn = false;
-	    m_ossn.freeConnection();
-            m_ossn.invalidateDataObjects(false);
+        boolean success = false;
+        try {
+            fireBeforeAbortEvent();
+            m_ossn.invalidateDataObjects(false, false);
+            m_ssn.rollback();
+            success = true;
+        } finally {
+            m_inTxn = false;
+            m_ossn.freeConnection();
+            if (!success) { m_ossn.invalidateDataObjects(false, true); }
             fireAbortEvent();
-	    clearAttributes();
-	}
+            clearAttributes();
+        }
     }
 
     /**

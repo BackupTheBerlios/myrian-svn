@@ -59,7 +59,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #13 $ $Date: 2003/05/22 $
+ * @version $Revision: #14 $ $Date: 2003/05/27 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -702,12 +702,12 @@ public class Session {
         return "";
     }
 
-    void invalidateDataObjects(boolean connectedOnly) {
+    void invalidateDataObjects(boolean connectedOnly, boolean error) {
         for (Iterator it = m_dataObjects.iterator(); it.hasNext(); ) {
             WeakReference ref = (WeakReference) it.next();
             DataObjectImpl obj = (DataObjectImpl) ref.get();
             if (obj != null) {
-                obj.invalidate(connectedOnly);
+                obj.invalidate(connectedOnly, error);
             }
         }
 
