@@ -1,3 +1,7 @@
+- Grep through jdo-1_0_1-spec.txt looking for all occurrences of
+  "must" in order to compile an exhaustive list of things that we
+  _must_ implement.
+
 - stop using PropertyMap as key. switch to serializable String based
   with transient slots for actual thing. add new PMap constructor ?
   another option is to use defined key order and a CompoundKey. might
