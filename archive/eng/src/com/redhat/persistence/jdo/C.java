@@ -11,38 +11,6 @@ import org.apache.log4j.Logger;
 class C {
     private final static Logger s_log = Logger.getLogger(C.class);
 
-    public static Property prop(PersistenceCapable pc, int field) {
-        ObjectType type = type(pc);
-
-        String name =
-            JDOImplHelper.getInstance().getFieldNames(pc.getClass())[field];
-
-        Property prop = type.getProperty(name);
-
-        if (prop == null) {
-            throw new IllegalStateException("no " + name + " in " +  type);
-        }
-
-        return prop;
-    }
-
-    public static ObjectType type(PersistenceCapable pc) {
-        PersistenceManagerImpl pmi = (PersistenceManagerImpl)
-            pc.jdoGetPersistenceManager();
-        if (pmi == null) {
-            // XXX: pc.toString() causes a StackOverflowError
-            throw new IllegalStateException
-                ("pmi==null; pc.class=" + pc.getClass().getName() +
-                 "; pc=" + System.identityHashCode(pc));
-        }
-
-        Class cls = pc.getClass();
-        Root root = pmi.getSession().getRoot();
-        ObjectType type = root.getObjectType(cls.getName());
-
-        return type;
-    }
-
     public static StateManager getStateManager(PersistenceCapable pc) {
         Class cls = JDOImplHelper.getInstance().
             getPersistenceCapableSuperclass(pc.getClass());

@@ -33,8 +33,9 @@ public class JDOAdapter extends Adapter {
     }
 
     public ObjectType getObjectType(Object obj) {
-        PersistenceCapable pc = (PersistenceCapable) obj;
-        return C.type((PersistenceCapable) obj);
+        if (obj == null) { throw new NullPointerException("obj"); }
+
+        return getRoot().getObjectType(obj.getClass().getName());
     }
 
     private static PersistenceManagerImpl getPMI(Session ssn) {

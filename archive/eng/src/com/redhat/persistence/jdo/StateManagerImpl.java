@@ -17,10 +17,6 @@ class StateManagerImpl implements StateManager {
     // XXX temporary storage for replaceField/replacingField
     private Object m_tmpValue = null;
 
-    StateManagerImpl() {
-        s_log.debug("StateManagerImpl(): m_pmi=null", new Throwable());
-    }
-
     StateManagerImpl(PersistenceManagerImpl pmi) {
         if (pmi == null) { throw new NullPointerException("pmi"); }
 
@@ -68,12 +64,33 @@ class StateManagerImpl implements StateManager {
         return m_pmi;
     }
 
+    private ObjectType type(PersistenceCapable pc) {
+        if (pc == null) { throw new NullPointerException("pc"); }
+
+        return ssn().getRoot().getObjectType(pc.getClass().getName());
+    }
+
+    private Property prop(PersistenceCapable pc, int field) {
+        ObjectType type = type(pc);
+
+        String name =
+            JDOImplHelper.getInstance().getFieldNames(pc.getClass())[field];
+
+        Property prop = type.getProperty(name);
+
+        if (prop == null) {
+            throw new IllegalStateException("no " + name + " in " +  type);
+        }
+
+        return prop;
+    }
+
     /**
      * Return the value for the field.
      */
     public Object getObjectField(PersistenceCapable pc, int field,
                                  Object currentValue) {
-        return ssn().get(pc, C.prop(pc, field));
+        return ssn().get(pc, prop(pc, field));
     }
 
     public boolean getBooleanField(PersistenceCapable pc, int field,
@@ -148,8 +165,7 @@ class StateManagerImpl implements StateManager {
      * Return true if the field is cached in the calling instance.
      */
     public boolean isLoaded(PersistenceCapable pc, int field) {
-        Property prop = C.prop(pc, field);
-        return prop.isKeyProperty();
+        return prop(pc, field).isKeyProperty();
     }
 
     /**
@@ -307,7 +323,7 @@ class StateManagerImpl implements StateManager {
      */
     public void setObjectField(PersistenceCapable pc, int field,
                                Object currentValue, Object newValue) {
-        ssn().set(pc, C.prop(pc, field), newValue);
+        ssn().set(pc, prop(pc, field), newValue);
     }
 
     public void setBooleanField(PersistenceCapable pc, int field,
