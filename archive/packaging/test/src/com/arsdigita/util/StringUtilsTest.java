@@ -105,9 +105,9 @@ public class StringUtilsTest extends TestCase {
             "</div>\n";
         String actual = StringUtils.smartTextToHtml(src);
         
-        s_log.error("Input: {" + src + "}\n");
-        s_log.error("Expected: {" + expected + "}\n");
-        s_log.error("Actual: {" + actual + "}\n");
+        s_log.debug("Input: {" + src + "}\n");
+        s_log.debug("Expected: {" + expected + "}\n");
+        s_log.debug("Actual: {" + actual + "}\n");
         
         assertTrue(expected.equals(actual));
     }
