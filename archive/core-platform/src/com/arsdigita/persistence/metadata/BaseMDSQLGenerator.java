@@ -47,12 +47,12 @@ import org.apache.log4j.Category;
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#6 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#7 $
  * @since 4.6.3
  */
 abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#6 $ by $Author: randyg $, $DateTime: 2002/08/02 09:15:46 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#7 $ by $Author: randyg $, $DateTime: 2002/08/02 09:28:19 $";
 
     private static final Category s_log =
         Category.getInstance(BaseMDSQLGenerator.class);
@@ -1170,7 +1170,6 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
                 sb.append(columnToJoin.getQualifiedName() +
                           " = :" + p.getName() + "." + key);
             }
-            System.out.println("UPDATE = " + sb.toString());
 
             Operation block = new Operation(sb.toString());
             block.setLineInfo(link);
