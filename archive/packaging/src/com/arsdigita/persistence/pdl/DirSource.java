@@ -9,17 +9,19 @@ import java.util.*;
  * DirSource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/09/11 $
+ * @version $Revision: #4 $ $Date: 2003/09/12 $
  **/
 
 public class DirSource implements PDLSource {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/pdl/DirSource.java#3 $ by $Author: rhs $, $DateTime: 2003/09/11 17:59:52 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/pdl/DirSource.java#4 $ by $Author: rhs $, $DateTime: 2003/09/12 10:06:13 $";
 
     private final File m_dir;
+    private final PDLFilter m_filter;
 
-    public DirSource(File dir) {
+    public DirSource(File dir, PDLFilter filter) {
         m_dir = dir;
+        m_filter = filter;
     }
 
     public void parse(PDLCompiler compiler) {
@@ -29,7 +31,7 @@ public class DirSource implements PDLSource {
     private void parse(PDLCompiler compiler, File dir) {
         File[] listing = dir.listFiles(new FileFilter() {
             public boolean accept(File file) {
-                return file.isDirectory() || file.getName().endsWith(".pdl");
+                return file.isDirectory() || m_filter.accept(file.getName());
             }
         });
 

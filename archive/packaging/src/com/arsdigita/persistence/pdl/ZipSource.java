@@ -9,17 +9,19 @@ import java.util.zip.*;
  * ZipSource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/09/11 $
+ * @version $Revision: #3 $ $Date: 2003/09/12 $
  **/
 
 public class ZipSource implements PDLSource {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/pdl/ZipSource.java#2 $ by $Author: rhs $, $DateTime: 2003/09/11 17:59:52 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/pdl/ZipSource.java#3 $ by $Author: rhs $, $DateTime: 2003/09/12 10:06:13 $";
 
     private final ZipInputStream m_zis;
+    private final PDLFilter m_filter;
 
-    public ZipSource(ZipInputStream zis) {
+    public ZipSource(ZipInputStream zis, PDLFilter filter) {
         m_zis = zis;
+        m_filter = filter;
     }
 
     public void parse(PDLCompiler compiler) {
@@ -29,7 +31,7 @@ public class ZipSource implements PDLSource {
                 if (entry == null) { break; }
                 String name = entry.getName();
                 if (entry.isDirectory() ||
-                    !name.endsWith(".pdl")) { continue; }
+                    !m_filter.accept(name)) { continue; }
                 compiler.parse(new InputStreamReader(m_zis) {
                     public void close() {
                         // We need to override close here to do
