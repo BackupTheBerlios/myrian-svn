@@ -478,10 +478,8 @@ public class StringUtils {
      * returns a reference to the original string.  If not, a new
      * <code>String</code> object is created containing the original
      * plus a platform-dependent newline character obtained from
-     * {@link System#getProperties}.</p>
-     *
+     * {@link System#getProperties()}.</p>
      */
-
     public static String addNewline(String s) {
         int n = s.length()-1;
         if (n == -1) {
