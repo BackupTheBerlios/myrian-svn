@@ -2,18 +2,19 @@ package com.redhat.persistence.oql;
 
 import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
+import com.redhat.persistence.metadata.Static;
 import java.util.*;
 
 /**
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/01/23 $
+ * @version $Revision: #2 $ $Date: 2004/01/26 $
  **/
 
 class Code {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#1 $ by $Author: rhs $, $DateTime: 2004/01/23 15:34:30 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#2 $ by $Author: rhs $, $DateTime: 2004/01/26 12:32:44 $";
 
     private LinkedList m_stack = new LinkedList();
     private Map m_frames = new HashMap();

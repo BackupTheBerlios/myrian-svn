@@ -15,7 +15,7 @@ import java.io.*;
  * OQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/01/23 $
+ * @version $Revision: #4 $ $Date: 2004/01/26 $
  */
 
 class OQLParser {
@@ -30,6 +30,8 @@ class OQLParser {
         EXPRESSIONS.put("full", FullJoin.class);
         EXPRESSIONS.put("filter", Filter.class);
         EXPRESSIONS.put("sort", Sort.class);
+        EXPRESSIONS.put("offset", Offset.class);
+        EXPRESSIONS.put("limit", Limit.class);
         EXPRESSIONS.put("exists", Exists.class);
     }
 
@@ -89,6 +91,7 @@ TOKEN:
   | <AND: "and">
   | <OR: "or">
   | <NOT: "not">
+  | <STATIC: "static"> : BEGIN
 }
 
 TOKEN:
@@ -98,6 +101,25 @@ TOKEN:
   | <#CHARS: ["a" - "z", "A" - "Z", "_", "$"]>
   | <#ESC: "\\" ~[]>
   | <#DIGIT: ["0" - "9"]>
+}
+
+<BEGIN> MORE:
+{
+  <"{"> { image.deleteCharAt(image.length() - 1); } : INSQL
+}
+
+<INSQL> TOKEN:
+{
+    <SQL: "}">
+    {
+        image.deleteCharAt(image.length() - 1);
+        matchedToken.image = image.toString();
+    } : DEFAULT
+}
+
+<INSQL> MORE:
+{
+    <~[]>
 }
 
 SPECIAL_TOKEN:
@@ -204,6 +226,8 @@ Expression generic() :
 {
     t = <ID> [ l = exprl() { return construct(t, l); } ]
         { return new Variable(t.image); }
+  | <STATIC> t = <SQL>
+        { return new Static(t.image); }
 }
 
 List exprl() :

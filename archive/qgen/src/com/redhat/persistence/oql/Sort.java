@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * Sort
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/01/23 $
+ * @version $Revision: #2 $ $Date: 2004/01/26 $
  **/
 
 public class Sort extends Query {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Sort.java#1 $ by $Author: rhs $, $DateTime: 2004/01/23 18:29:26 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Sort.java#2 $ by $Author: rhs $, $DateTime: 2004/01/26 12:32:44 $";
 
     public static class Order {
         private Order() {}
@@ -57,7 +57,7 @@ public class Sort extends Query {
     void emit(Code code) {
         code.append("(select * from ");
         m_query.emit(code);
-        code.append(" o order by ");
+        code.append(" s order by ");
         m_key.emit(code);
         if (m_order == ASCENDING) {
             code.append(" asc");
