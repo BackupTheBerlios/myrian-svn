@@ -39,16 +39,18 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Map;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -60,12 +62,12 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #19 $ $Date: 2003/05/12 $
+ * @version $Revision: #20 $ $Date: 2003/06/13 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#19 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#20 $ by $Author: vadim $, $DateTime: 2003/06/13 16:09:00 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;
@@ -84,7 +86,7 @@ public class PDL {
     public void generateMetadata(MetadataRoot root) {
         m_pdl.emit(Root.getRoot());
         m_pdl.emitVersioned();
-	MetadataRoot.loadPrimitives();
+        MetadataRoot.loadPrimitives();
     }
 
     /**
@@ -95,7 +97,7 @@ public class PDL {
      * @throws PDLException thrown on a parsing error.
      */
     public void load(Reader r, String filename) throws PDLException {
-	m_pdl.load(r, filename);
+        m_pdl.load(r, filename);
     }
 
     /**
@@ -227,7 +229,7 @@ public class PDL {
             setDebugDirectory(debugDir);
         }
 
-        Set all = new HashSet();
+        List all = new LinkedList();
         all.addAll(library);
         all.addAll(files);
 
@@ -396,6 +398,17 @@ public class PDL {
                         }
 
                         return false;
+                    }
+                });
+
+            // sort the listing to combat the non-deterministic nature of the
+            // listFiles method. Helps reproduce bugs that depend on the order
+            // in which the files are loaded.
+            Arrays.sort(listing, new Comparator() {
+                    public int compare(Object o1, Object o2) {
+                        File f1 = (File) o1;
+                        File f2 = (File) o2;
+                        return f1.getAbsolutePath().compareTo(f2.getAbsolutePath());
                     }
                 });
 
