@@ -34,12 +34,12 @@ import java.util.Set;
  * Script
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #18 $ $Date: 2004/02/26 $
+ * @version $Revision: #19 $ $Date: 2004/03/01 $
  */
 
 public class Script {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Script.java#18 $ by $Author: justin $, $DateTime: 2004/02/26 13:06:36 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Script.java#19 $ by $Author: justin $, $DateTime: 2004/03/01 15:52:03 $";
 
     private static final Logger s_log =
         Logger.getLogger(Script.class);
@@ -129,6 +129,25 @@ public class Script {
             logInitializationFailure(null, false, e);
             throw e;
         }
+    }
+
+    private Script(final Reader r, final boolean configOnly)
+           throws InitializationException {
+        final ScriptParser sp = new ScriptParser(r);
+        sp.setConfigOnly(configOnly);
+        try {
+            sp.parse(this);
+        } catch (ParseException e) {
+            logInitializationFailure(null, false, e);
+            throw new InitializationException(e.getMessage());
+        }
+    }
+
+    public static final Script readConfig(final Reader reader)
+            throws InitializationException {
+        if (reader == null) throw new IllegalArgumentException();
+
+        return new Script(reader, true);
     }
 
     /**

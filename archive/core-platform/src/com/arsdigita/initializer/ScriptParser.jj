@@ -15,12 +15,18 @@ import java.util.*;
  * ScriptParser.java
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/02/26 $
+ * @version $Revision: #6 $ $Date: 2004/03/01 $
  */
 
 public class ScriptParser {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/ScriptParser.jj#5 $ by $Author: justin $, $DateTime: 2004/02/26 12:55:35 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/ScriptParser.jj#6 $ by $Author: justin $, $DateTime: 2004/03/01 15:52:03 $";
+
+    boolean m_configOnly = false;
+
+    public void setConfigOnly(boolean configOnly) {
+        m_configOnly = configOnly;
+    }
 
 }
 
@@ -46,7 +52,7 @@ TOKEN:
   | <FALSE: "false">
 }
 
-TOKEN [IGNORE_CASE]: 
+TOKEN [IGNORE_CASE]:
 {
     <INIT: "init">
 }
@@ -96,37 +102,33 @@ Initializer initializerClass() throws InitializationException :
     t = <ID> { className.append(t.image); }
     ( <DOT> t = <ID> { className.append("."); className.append(t.image); } ) *
     {
+        if (m_configOnly) {
+            return (Initializer) Classes.newInstance
+                (GenericInitializer.class,
+                 new Class[] {String.class},
+                 new Object[] {className.toString()});
+        }
+
         try {
             Class cls = Class.forName(className.toString());
             Constructor cons = cls.getConstructor(new Class[0]);
             return (Initializer) cons.newInstance(new Object[0]);
         } catch (ClassNotFoundException e) {
-            // The initializer no longer exists, so we use the generic
-            // one.
-
-            return (Initializer) Classes.newInstance
-                (GenericInitializer.class,
-                 new Class[] {String.class},
-                 new Object[] {className.toString()});
+            throw new InitializationException("Couldn't find " + className);
         } catch (NoSuchMethodException e) {
-            // We ran into something named foo.Initializer, but it
-            // doesn't implement c.a.initializer.Initializer anymore.
-            // So we sub in a generic initializer implementing the old
-            // interface.
-
-            return (Initializer) Classes.newInstance
-                (GenericInitializer.class,
-                 new Class[] {String.class},
-                 new Object[] {className.toString()});
+            throw new InitializationException(
+                className +
+                " must implement com.arsdigita.initializer.Initializer"
+                );
         } catch (InstantiationException e) {
             throw new InitializationException(
                 "Error instantiating " + className + ": " + e.getMessage()
                 );
         } catch (ClassCastException e) {
-            return (Initializer) Classes.newInstance
-                (GenericInitializer.class,
-                 new Class[] {String.class},
-                 new Object[] {className.toString()});
+            throw new InitializationException(
+                className +
+                " must implement com.arsdigita.initializer.Initializer"
+                );
         } catch (IllegalAccessException e) {
             throw new InitializationException(className + " must be public.");
         } catch (InvocationTargetException e) {
