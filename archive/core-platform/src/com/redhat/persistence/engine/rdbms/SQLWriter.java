@@ -13,12 +13,12 @@ import java.io.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/07/11 $
+ * @version $Revision: #4 $ $Date: 2003/07/19 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#3 $ by $Author: jorris $, $DateTime: 2003/07/11 16:08:55 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#4 $ by $Author: rhs $, $DateTime: 2003/07/19 20:26:22 $";
 
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();
@@ -57,19 +57,21 @@ public abstract class SQLWriter {
         return result;
     }
 
-    public void bind(PreparedStatement ps) {
+    public void bind(PreparedStatement ps, StatementLifecycle cycle) {
         for (int i = 0; i < m_bindings.size(); i++) {
             int index = i+1;
             Object obj = m_bindings.get(i);
             int type = ((Integer) m_types.get(i)).intValue();
 
             try {
+                if (cycle != null) { cycle.beginSet(index, type, obj); }
                 if (obj == null) {
                     ps.setNull(index, type);
                 } else {
                     Adapter ad = Adapter.getAdapter(obj.getClass());
                     ad.bind(ps, index, obj, type);
                 }
+                if (cycle != null) { cycle.endSet(); }
             } catch (SQLException e) {
                 throw new Error
                     ("SQL error binding [" + (index) + "] to " + obj + ": " +

@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/07/08 $
+ * @version $Revision: #2 $ $Date: 2003/07/19 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#1 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#2 $ by $Author: rhs $, $DateTime: 2003/07/19 20:26:22 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -35,10 +35,17 @@ public class RDBMSEngine extends Engine {
     private int m_connUsers = 0;
 
     private SQLWriter m_writer;
+    private RDBMSProfiler m_profiler;
 
     public RDBMSEngine(ConnectionSource source, SQLWriter writer) {
+        this(source, writer, null);
+    }
+
+    public RDBMSEngine(ConnectionSource source, SQLWriter writer,
+                       RDBMSProfiler profiler) {
         m_source = source;
         m_writer = writer;
+        m_profiler = profiler;
     }
 
     void acquire() {
@@ -209,21 +216,25 @@ public class RDBMSEngine extends Engine {
         QGen qg = new QGen(query, block);
         Select sel = qg.generate();
         sel.setCount(true);
-        ResultSet rs = execute(sel);
-        if (rs == null) {
+        ResultCycle rc = execute(sel);
+        if (rc == null) {
             throw new IllegalStateException
                 ("null result set");
         }
+        ResultSet rs = rc.getResultSet();
+        StatementLifecycle cycle = rc.getLifecycle();
         try {
             try {
                 long result;
-                if (rs.next()) {
+                if (rc.next()) {
+                    if (cycle != null) { cycle.beginGet("1"); }
                     result = rs.getLong(1);
+                    if (cycle != null) { cycle.endGet(new Long(result)); }
                 } else {
                     throw new IllegalStateException
                         ("count returned no rows");
                 }
-                if (rs.next()) {
+                if (rc.next()) {
                     throw new IllegalStateException
                         ("count returned too many rows");
                 }
@@ -235,16 +246,7 @@ public class RDBMSEngine extends Engine {
                 throw new RDBMSException(e.getMessage()) {};
             }
         } finally {
-            try {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug
-                        ("Closing Statement because resultset was closed.");
-                }
-                rs.getStatement().close();
-                rs.close();
-            } catch (SQLException e) {
-                throw new RDBMSException(e.getMessage()) {};
-            }
+            rc.close();
         }
     }
 
@@ -331,14 +333,8 @@ public class RDBMSEngine extends Engine {
             for (Iterator it = m_operations.iterator(); it.hasNext(); ) {
                 Operation op = (Operation) it.next();
                 it.remove();
-                ResultSet rs = execute(op);
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException e) {
-                        throw new Error(e.getMessage());
-                    }
-                }
+                ResultCycle rc = execute(op);
+                if (rc != null) { rc.close(); }
             }
 
             for (int i = 0; i < m_mutations.size(); i++) {
@@ -369,11 +365,11 @@ public class RDBMSEngine extends Engine {
         }
     }
 
-    private ResultSet execute(Operation op) {
+    private ResultCycle execute(Operation op) {
         return execute(op, m_writer);
     }
 
-    private ResultSet execute(Operation op, SQLWriter w) {
+    private ResultCycle execute(Operation op, SQLWriter w) {
         try {
             try {
                 w.write(op);
@@ -383,33 +379,55 @@ public class RDBMSEngine extends Engine {
                 throw re;
             }
 
+            String sql = w.getSQL();
+
             if (LOG.isDebugEnabled()) {
-                LOG.debug(w.getSQL());
+                LOG.debug(sql);
                 LOG.debug(w.getBindings());
                 LOG.debug(w.getTypeNames());
                 LOG.debug(op.getEnvironment());
             }
 
-            if (w.getSQL().equals("")) {
+
+            if (sql.equals("")) {
                 return null;
             }
 
             acquire();
 
             try {
-                PreparedStatement ps = m_conn.prepareStatement(w.getSQL());
-                w.bind(ps);
+                StatementLifecycle cycle = null;
+                if (m_profiler != null) {
+                    RDBMSStatement stmt = new RDBMSStatement(sql);
+                    cycle = m_profiler.getLifecycle(stmt);
+                }
+
+                if (cycle != null) { cycle.beginPrepare(); }
+                PreparedStatement ps = m_conn.prepareStatement(sql);
+                if (cycle != null) { cycle.endPrepare(); }
+
+                w.bind(ps, cycle);
+
+                if (cycle != null) { cycle.beginExecute(); }
                 if (ps.execute()) {
-                    return ps.getResultSet();
+                    if (cycle != null) { cycle.endExecute(0); }
+                    return new ResultCycle(this, ps.getResultSet(), cycle);
                 } else {
+                    int updateCount = ps.getUpdateCount();
+                    if (cycle != null) { cycle.endExecute(updateCount); }
+
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug(ps.getUpdateCount() + " rows affected");
+                        LOG.debug(updateCount + " rows affected");
                     }
+
+                    if (cycle != null) { cycle.beginClose(); }
                     ps.close();
+                    if (cycle != null) { cycle.endClose(); }
+
                     return null;
                 }
             } catch (SQLException e) {
-                LOG.error(w.getSQL(), e);
+                LOG.error(sql, e);
                 throw new RDBMSException(e.getMessage()) {};
             }
         } finally {
@@ -417,14 +435,14 @@ public class RDBMSEngine extends Engine {
         }
     }
 
-    public ResultSet execute(SQLBlock sql, Map parameters) {
+    public void execute(SQLBlock sql, Map parameters) {
         Environment env = new Environment(null);
         for (Iterator it = parameters.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry me = (Map.Entry) it.next();
             env.set((Path) me.getKey(), me.getValue());
         }
         Operation op = new StaticOperation(sql, env, false);
-        return execute(op, new RetainUpdatesWriter());
+        execute(op, new RetainUpdatesWriter());
     }
 
     static final Path[] getKeyPaths(ObjectType type, Path prefix) {
