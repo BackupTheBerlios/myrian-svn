@@ -13,12 +13,12 @@ import java.io.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/05/15 $
+ * @version $Revision: #3 $ $Date: 2003/05/16 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#2 $ by $Author: rhs $, $DateTime: 2003/05/15 16:48:35 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#3 $ by $Author: rhs $, $DateTime: 2003/05/16 17:35:38 $";
 
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();
@@ -178,17 +178,15 @@ public abstract class SQLWriter {
 
         for (Iterator it = block.getAssigns().iterator(); it.hasNext(); ) {
             SQLBlock.Assign assign = (SQLBlock.Assign) it.next();
-            boolean keep = true;
+            boolean keep = false;
             Collection bindings = sql.getBindings
                 (assign.getBegin(), assign.getEnd());
             for (Iterator iter = bindings.iterator(); iter.hasNext(); ) {
                 Path p = (Path) iter.next();
-                if (!keep && sop.contains(p)) {
-                    throw new Error("missing bind variables");
-                }
-
-                if (!sop.contains(p)) {
-                    keep = false;
+                if (sop.contains(p)) {
+                    keep = true;
+                } else {
+                    sop.set(p, null);
                 }
             }
 
