@@ -1,5 +1,6 @@
 package com.redhat.persistence.jdo;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,7 +18,7 @@ import org.apache.log4j.Logger;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #19 $ $Date: 2004/07/27 $
+ * @version $Revision: #20 $ $Date: 2004/07/28 $
  **/
 
 class CRPList implements List {
@@ -349,13 +350,19 @@ class CRPList implements List {
 
     public boolean retainAll(Collection coll) {
         boolean modified = false;
-        Iterator entries = elements.entrySet().iterator();
+        Query query = getPMI().newQuery("oql", "rsort($1, key)");
+        Collection eColl = (Collection) query.execute(elements.entrySet());
+        Iterator entries = eColl.iterator();
+        List toDelete = new ArrayList();
         while (entries.hasNext()) {
             Map.Entry entry = (Map.Entry) entries.next();
             if (!coll.contains(entry.getValue())) {
                 modified = true;
-                m_remove((Integer) entry.getKey());
+                toDelete.add(entry);
             }
+        }
+        for (Iterator it = toDelete.iterator(); it.hasNext(); ) {
+            m_remove((Integer) ((Map.Entry) it.next()).getKey());
         }
         return modified;
     }

@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
  * ListTest
  *
  * @since 2004-07-13
- * @version $Revision: #5 $ $Date: 2004/07/27 $
+ * @version $Revision: #6 $ $Date: 2004/07/28 $
  **/
 public class ListTest extends WithTxnCase {
     private final static Logger s_log = Logger.getLogger(ListTest.class);
@@ -229,8 +229,8 @@ public class ListTest extends WithTxnCase {
             new LinkedList(EMAILS.subList(1, EMAILS.size()));
         coll.add(NO_SUCH_EMAIL);
 
-        assertTrue("removed all but one", auxEmails.retainAll(coll));
-        assertEquals("remaining size", 1, auxEmails.size());
-        assertEquals("remaining element", EMAILS.get(0), auxEmails.get(0));
+        assertTrue("removed some", auxEmails.retainAll(coll));
+        assertEquals("remaining size", 2, auxEmails.size());
+        assertFalse("contains EMAILS[0]", auxEmails.contains(EMAILS.get(0)));
     }
 }
