@@ -8,12 +8,12 @@ import java.io.*;
  * PropertyData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/03/07 $
+ * @version $Revision: #12 $ $Date: 2003/03/14 $
  **/
 
 class PropertyData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyData.java#11 $ by $Author: ashah $, $DateTime: 2003/03/07 13:27:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyData.java#12 $ by $Author: ashah $, $DateTime: 2003/03/14 15:57:20 $";
 
     final private ObjectData m_odata;
     final private Property m_prop;
@@ -58,13 +58,14 @@ class PropertyData {
         }
     }
 
-    public boolean isModified() {
+    public boolean isFlushed() {
         if (m_prop.isCollection()) {
-            return getSession().getEventStream().getCurrentEvents
-                (getObject(), getProperty()).size() != 0;
+            Collection evs = getSession().getEventStream().getCurrentEvents
+                (getObject(), getProperty());
+            return evs.size() == 0;
         } else {
             return getSession().getEventStream().getLastEvent
-                (getObject(), getProperty()) != null;
+                (getObject(), getProperty()) == null;
         }
     }
 

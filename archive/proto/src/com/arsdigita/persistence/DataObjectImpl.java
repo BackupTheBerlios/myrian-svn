@@ -1,25 +1,26 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.*;
-import com.arsdigita.persistence.proto.Session;
-import com.arsdigita.persistence.proto.Event;
+import com.arsdigita.persistence.proto.AddEvent;
 import com.arsdigita.persistence.proto.CreateEvent;
 import com.arsdigita.persistence.proto.DeleteEvent;
-import com.arsdigita.persistence.proto.SetEvent;
-import com.arsdigita.persistence.proto.AddEvent;
+import com.arsdigita.persistence.proto.Event;
+import com.arsdigita.persistence.proto.ProtoException;
 import com.arsdigita.persistence.proto.RemoveEvent;
+import com.arsdigita.persistence.proto.Session;
+import com.arsdigita.persistence.proto.SetEvent;
 import java.util.*;
 
 /**
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2003/03/12 $
+ * @version $Revision: #11 $ $Date: 2003/03/14 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#10 $ by $Author: ashah $, $DateTime: 2003/03/12 14:58:16 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#11 $ by $Author: ashah $, $DateTime: 2003/03/14 15:57:20 $";
 
     private Session m_ssn;
     private OID m_oid;
@@ -113,14 +114,18 @@ class DataObjectImpl implements DataObject {
     }
 
     public void set(String property, Object value) {
-        Property prop = getObjectType().getProperty(property);
-        if (prop.isKeyProperty()) {
-            m_oid.set(property, value);
-            if (m_oid.isInitialized()) {
-                m_ssn.create(this);
+        try {
+            Property prop = getObjectType().getProperty(property);
+            if (prop.isKeyProperty()) {
+                m_oid.set(property, value);
+                if (m_oid.isInitialized()) {
+                    m_ssn.create(this);
+                }
+            } else {
+                m_ssn.set(this, convert(property), value);
             }
-        } else {
-            m_ssn.set(this, convert(property), value);
+        } catch (ProtoException pe) {
+            throw new PersistenceException(pe);
         }
     }
 
@@ -145,11 +150,11 @@ class DataObjectImpl implements DataObject {
     }
 
     public boolean isModified() {
-        return m_ssn.isModified(this);
+        return !m_ssn.isFlushed(this);
     }
 
     public boolean isPropertyModified(String name) {
-        return m_ssn.isModified(this, convert(name));
+        return !m_ssn.isFlushed(this, convert(name));
     }
 
     public boolean isValid() {
@@ -157,7 +162,11 @@ class DataObjectImpl implements DataObject {
     }
 
     public void delete() {
-        m_ssn.delete(this);
+        try {
+            m_ssn.delete(this);
+        } catch (ProtoException pe) {
+            throw new PersistenceException(pe);
+        }
     }
 
     public void specialize(String subtypeName) {
@@ -176,7 +185,15 @@ class DataObjectImpl implements DataObject {
     }
 
     public void save() {
-        m_ssn.flush();
+        try {
+            m_ssn.flush();
+        } catch (ProtoException pe) {
+            throw new PersistenceException(pe);
+        }
+
+        if (!m_ssn.isFlushed(this)) {
+            throw new PersistenceException("all events not flushed");
+        }
     }
 
     public void addObserver(DataObserver observer) {

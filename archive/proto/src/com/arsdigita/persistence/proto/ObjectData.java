@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2003/03/07 $
+ * @version $Revision: #15 $ $Date: 2003/03/14 $
  **/
 
 class ObjectData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#14 $ by $Author: ashah $, $DateTime: 2003/03/07 13:27:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#15 $ by $Author: ashah $, $DateTime: 2003/03/14 15:57:20 $";
 
     private static final Logger LOG = Logger.getLogger(ObjectData.class);
 
@@ -84,6 +84,19 @@ class ObjectData {
     public boolean isSenile() { return m_state.equals(SENILE); }
 
     public boolean isDead() { return m_state.equals(DEAD); }
+
+    public boolean isFlushed() {
+        if (getSession().getEventStream().getLastEvent(getObject()) != null) {
+            return false;
+        }
+
+        for (Iterator it = m_pdata.values().iterator(); it.hasNext(); ) {
+            PropertyData pdata = (PropertyData) it.next();
+            if (!pdata.isFlushed()) { return false; }
+        }
+
+        return true;
+    }
 
     void setState(State state) {
         if (state.equals(INFANTILE)) {

@@ -1,18 +1,19 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.Property;
+import com.arsdigita.persistence.proto.ProtoException;
 
 /**
  * DataAssociationImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/02/14 $
+ * @version $Revision: #8 $ $Date: 2003/03/14 $
  **/
 
 class DataAssociationImpl extends DataAssociationCursorImpl
     implements DataAssociation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataAssociationImpl.java#7 $ by $Author: ashah $, $DateTime: 2003/02/14 01:21:43 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataAssociationImpl.java#8 $ by $Author: ashah $, $DateTime: 2003/03/14 15:57:20 $";
 
     private com.arsdigita.persistence.proto.Session m_pssn;
     private DataObject m_data;
@@ -29,7 +30,11 @@ class DataAssociationImpl extends DataAssociationCursorImpl
     }
 
     public DataObject add(DataObject obj) {
-        return (DataObject) m_pssn.add(m_data, m_pprop, obj);
+        try {
+            return (DataObject) m_pssn.add(m_data, m_pprop, obj);
+        } catch (ProtoException pe) {
+            throw new PersistenceException(pe);
+        }
     }
 
     public void clear() {
@@ -50,7 +55,11 @@ class DataAssociationImpl extends DataAssociationCursorImpl
     }
 
     public void remove(DataObject obj) {
-        m_pssn.remove(m_data, m_pprop, obj);
+        try {
+            m_pssn.remove(m_data, m_pprop, obj);
+        } catch (ProtoException pe) {
+            throw new PersistenceException(pe);
+        }
     }
 
     public void remove(OID oid) {
@@ -58,6 +67,6 @@ class DataAssociationImpl extends DataAssociationCursorImpl
     }
 
     public boolean isModified() {
-        return m_pssn.isModified(m_data, m_pprop);
+        return !m_pssn.isFlushed(m_data, m_pprop);
     }
 }

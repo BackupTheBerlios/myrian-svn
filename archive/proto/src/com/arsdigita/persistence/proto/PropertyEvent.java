@@ -1,5 +1,6 @@
 package com.arsdigita.persistence.proto;
 
+import com.arsdigita.persistence.proto.metadata.ObjectType;
 import com.arsdigita.persistence.proto.metadata.Property;
 import java.io.*;
 import java.util.*;
@@ -8,12 +9,12 @@ import java.util.*;
  * PropertyEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/03/07 $
+ * @version $Revision: #13 $ $Date: 2003/03/14 $
  **/
 
 public abstract class PropertyEvent extends Event {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyEvent.java#12 $ by $Author: ashah $, $DateTime: 2003/03/07 13:27:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyEvent.java#13 $ by $Author: ashah $, $DateTime: 2003/03/14 15:57:20 $";
 
     final private Property m_prop;
     final private Object m_arg;
@@ -30,6 +31,14 @@ public abstract class PropertyEvent extends Event {
         m_prop = prop;
         m_arg = arg;
         m_origin = origin;
+
+        if (arg != null) {
+            ObjectType expected = prop.getType();
+            ObjectType actual = getSession().getObjectType(arg);
+            if (!actual.isSubtypeOf(expected)) {
+                throw new TypeException();
+            }
+        }
 
         if (origin != null) {
             origin.addDependent(this);
@@ -79,6 +88,11 @@ public abstract class PropertyEvent extends Event {
 
         // connect event to session data
         getSession().getEventStream().add(this);
+
+        // update object data state
+        if (getObjectData().isNubile()) {
+            getObjectData().setState(ObjectData.AGILE);
+        }
 
         // object existence
         ObjectData od = getObjectData();

@@ -3,6 +3,7 @@ package com.arsdigita.persistence.proto;
 import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
 import com.arsdigita.util.Assert;
+import com.arsdigita.util.UncheckedWrapperException;
 
 import java.util.*;
 import java.io.*;
@@ -16,12 +17,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #45 $ $Date: 2003/03/14 $
+ * @version $Revision: #46 $ $Date: 2003/03/14 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#45 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#46 $ by $Author: ashah $, $DateTime: 2003/03/14 15:57:20 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -63,12 +64,27 @@ public class Session {
             LOG.warn("pending events being dumped");
         }
         // m_visiting.clear();
+
+        // reset logging stack
+        if (LOG.isDebugEnabled()) { setLevel(0); }
+    }
+
+    private RuntimeException handleException(ProtoException pe) {
+        if (pe.isInternal()) {
+            return new UncheckedWrapperException
+                ("internal persistence exception", pe);
+        } else {
+            pe.setInternal(true);
+            return pe;
+        }
     }
 
     public void create(Object obj) {
         try {
             createInternal(obj);
             processPending();
+        } catch (ProtoException pe) {
+            throw handleException(pe);
         } finally {
             cleanUp();
         }
@@ -112,6 +128,8 @@ public class Session {
             boolean result = deleteInternal(obj);
             processPending();
             return result;
+        } catch (ProtoException pe) {
+            throw handleException(pe);
         } finally {
             cleanUp();
         }
@@ -164,7 +182,6 @@ public class Session {
 
         return result;
     }
-
 
     public Object retrieve(ObjectType obj, Object id) {
         PersistentCollection pc = retrieve(m_qs.getQuery(obj, id));
@@ -256,6 +273,8 @@ public class Session {
         try {
             setInternal(obj, prop, value);
             processPending();
+        } catch (ProtoException pe) {
+            throw handleException(pe);
         } finally {
             cleanUp();
         }
@@ -274,8 +293,14 @@ public class Session {
                         old = get(obj, role);
                     }
 
-                    PropertyEvent ev =
-                        new SetEvent(Session.this, obj, role, value);
+                    PropertyEvent ev;
+
+                    try {
+                        ev = new SetEvent(Session.this, obj, role, value);
+                    } catch (TypeException te) {
+                        te.setInternal(false);
+                        throw te;
+                    }
 
                     if (role.isReversable()) {
                         if (old != null) { reverseUpdateOld(ev, old); }
@@ -354,6 +379,8 @@ public class Session {
             Object result = addInternal(obj, prop, value);
             processPending();
             return result;
+        } catch (ProtoException pe) {
+            throw handleException(pe);
         } finally {
             cleanUp();
         }
@@ -367,8 +394,13 @@ public class Session {
 
         prop.dispatch(new Property.Switch() {
                 public void onRole(Role role) {
-                    PropertyEvent ev =
-                        new AddEvent(Session.this, obj, role, value);
+                    PropertyEvent ev;
+                    try {
+                        ev = new AddEvent(Session.this, obj, role, value);
+                    } catch (TypeException te) {
+                        te.setInternal(false);
+                        throw te;
+                    }
 
                     if (role.isReversable()) { reverseUpdateNew(ev); }
                     addEvent(ev);
@@ -395,6 +427,8 @@ public class Session {
         try {
             removeInternal(obj, prop, value);
             processPending();
+        } catch (ProtoException pe) {
+            throw handleException(pe);
         } finally {
             cleanUp();
         }
@@ -409,8 +443,14 @@ public class Session {
 
         prop.dispatch(new Property.Switch() {
                 public void onRole(Role role) {
-                    PropertyEvent ev =
-                        new RemoveEvent(Session.this, obj, role, value);
+                    PropertyEvent ev;
+                    try {
+                        ev = new RemoveEvent(Session.this, obj, role, value);
+                    } catch (TypeException te) {
+                        te.setInternal(false);
+                        throw te;
+                    }
+
                     addEvent(ev);
 
                     if (role.isReversable()) {
@@ -441,6 +481,8 @@ public class Session {
         try {
             clearInternal(obj, prop);
             processPending();
+        } catch (ProtoException pe) {
+            throw handleException(pe);
         } finally {
             cleanUp();
         }
@@ -482,7 +524,7 @@ public class Session {
     /**
      * @return true iff this session has outstanding events
      **/
-    public boolean isModified() {
+    public boolean isFlushed() {
         return m_events.size() > 0;
     }
 
@@ -498,17 +540,26 @@ public class Session {
         return hasObjectData(obj) && getObjectData(obj).isModified();
     }
 
-    public boolean isModified(Object obj, Property prop) {
+    public boolean isFlushed(Object obj) {
         if (!hasObjectData(obj)) {
-            return false;
+            return true;
+        }
+
+        ObjectData od = getObjectData(obj);
+        return od.isFlushed();
+    }
+
+    public boolean isFlushed(Object obj, Property prop) {
+        if (!hasObjectData(obj)) {
+            return true;
         }
 
         PropertyData pd = getObjectData(obj).getPropertyData(prop);
         if (pd == null) {
-            return false;
+            return true;
         }
 
-        return pd.isModified();
+        return pd.isFlushed();
     }
 
     public boolean isPersisted(Object obj) {
@@ -580,6 +631,8 @@ public class Session {
         try {
             m_flushing = true;
             flushInternal();
+        } catch (ProtoException pe) {
+            throw handleException(pe);
         } finally {
             m_flushing = false;
         }
@@ -587,7 +640,7 @@ public class Session {
 
     public void flushAll() {
         flush();
-        if (isModified()) {
+        if (isFlushed()) {
             throw new IllegalStateException("XXX");
         }
     }
@@ -817,8 +870,7 @@ public class Session {
 
     private void check(EventProcessor ep) {
         if (ep == null) {
-            throw new IllegalArgumentException
-                ("null event processor");
+            throw new IllegalArgumentException("null event processor");
         }
     }
 
