@@ -13,6 +13,18 @@
  * find better way to initialize session than in static block in
    PersistenceTestCase
  * remove DbHelper.java
+    - remove sql producing methods from Column and Table and replace
+      them with pluggable renderers
+    - remove sql producing code from DDLWriter and replace it with a
+      pluggable renderer
+    - remove usage from BlobAd and StringAd, figure out how to make
+      adapters db dependent
+    - either make InFilter a plugin point or choose one behavior
+    - remove cap.Session's use of DbHelper to choose an SQLWriter
+    - figure out how PDL.java can set up the appropriate environment
+      for the target database in the absence of a connection object
+    - figure out out to do db specific tests
+ * remove TestPDLGenerator.java
  * make sql setup and teardown work on oracle
  * remove dead sql scripts
  * import -> resource search
@@ -25,3 +37,4 @@
    construct for creating derived types, e.g.
    group(all(User), firstName == "Bob")
  * add hypersonic SQL support
+ * remove distinction between oql expressions and relational metadata
