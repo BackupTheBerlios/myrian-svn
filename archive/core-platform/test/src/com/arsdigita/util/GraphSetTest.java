@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 
 /**
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/07/31 $
+ * @version $Date: 2003/08/01 $
  * @since 2003-01-22
  **/
 public class GraphSetTest extends TestCase {
@@ -121,7 +121,7 @@ public class GraphSetTest extends TestCase {
         graph.addEdge(NODE_B, NODE_D, "b -> d");
         graph.addEdge(NODE_D, NODE_D, "d -> d");
 
-        graph.remove(NODE_D);
+        graph.removeNode(NODE_D);
 
         for (Iterator it = graph.getNodes().iterator(); it.hasNext(); ) {
             Object node = it.next();
