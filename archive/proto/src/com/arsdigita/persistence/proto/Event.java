@@ -10,12 +10,12 @@ import java.io.*;
  * Event
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/02/17 $
+ * @version $Revision: #10 $ $Date: 2003/02/19 $
  **/
 
 public abstract class Event {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Event.java#9 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Event.java#10 $ by $Author: ashah $, $DateTime: 2003/02/19 15:49:06 $";
 
     private static final Logger LOG = Logger.getLogger(Event.class);
 
@@ -54,6 +54,10 @@ public abstract class Event {
     }
 
     public abstract void dispatch(Switch sw);
+
+    abstract void inject();
+
+    abstract void activate();
 
     abstract void sync();
 

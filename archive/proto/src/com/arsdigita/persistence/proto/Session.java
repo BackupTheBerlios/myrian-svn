@@ -14,18 +14,17 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #31 $ $Date: 2003/02/17 $
+ * @version $Revision: #32 $ $Date: 2003/02/19 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#31 $ by $Author: rhs $, $DateTime: 2003/02/17 20:13:29 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#32 $ by $Author: ashah $, $DateTime: 2003/02/19 15:49:06 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
     private static final PersistentObjectSource POS =
         new PersistentObjectSource();
-
 
     private final Engine m_engine;
 
@@ -33,9 +32,6 @@ public class Session {
 
     private LinkedList m_events = new LinkedList();
     private LinkedList m_pending = new LinkedList();
-
-    private Set m_toCheck = new HashSet();
-
 
     public Session(Engine engine) {
         m_engine = engine;
@@ -48,12 +44,13 @@ public class Session {
 
         ObjectData od = getObjectData(obj);
         if (od == null) {
-            od = new ObjectData(this, obj, od.NUBILE);
+            od = new ObjectData(this, obj, od.INFANTILE);
         } else if (!od.isDeleted()) {
+            od.dump();
             throw new IllegalArgumentException
                 ("Object already exists: " + obj);
         } else {
-            od.setState(od.NUBILE);
+            od.setState(od.INFANTILE);
         }
 
         getAdapter(obj).setSession(obj, this);
@@ -154,6 +151,7 @@ public class Session {
     private void cascadeDelete(Object container, Object containee) {
         ObjectData containerOD = fetchObjectData(container);
         boolean me = false;
+        ObjectData.State state = containerOD.getState();
         if (!containerOD.isSenile()) {
             me = true;
             containerOD.setState(ObjectData.SENILE);
@@ -161,7 +159,7 @@ public class Session {
 
         deleteInternal(containee);
 
-        if (me) { containerOD.setState(ObjectData.SENILE); }
+        if (me) { containerOD.setState(state); }
     }
 
     /**
@@ -418,29 +416,17 @@ public class Session {
         return hasObjectData(obj) && getObjectData(obj).isNew();
     }
 
-
     public boolean isDeleted(Object obj) {
         return hasObjectData(obj) && getObjectData(obj).isDeleted();
     }
-
 
     public boolean isModified(Object obj) {
         return hasObjectData(obj) && getObjectData(obj).isModified();
     }
 
-
     public boolean isModified(Object obj, Property prop) {
         return hasObjectData(obj) &&
             getObjectData(obj).getPropertyData(prop).isModified();
-    }
-
-    private void processPending() {
-        for (ListIterator li = m_pending.listIterator(0); li.hasNext(); ) {
-            Event ev = (Event) li.next();
-            processEvent(ev);
-        }
-
-        m_pending.clear();
     }
 
     /**
@@ -449,46 +435,30 @@ public class Session {
      * datastore are consistent with the contents of the in memory data cache.
      **/
     public void flush() {
-        if (m_toCheck.size() > 0) {
-            for (Iterator it = m_events.iterator(); it.hasNext(); ) {
-                Event e = (Event) it.next();
-                if (e instanceof SetEvent) {
-                    SetEvent se = (SetEvent) e;
-                    PropertyData pd = se.getPropertyData();
-                    if (m_toCheck.contains(pd)) {
-                        if (pd.get() == null && !isDeleted(se.getObject())) {
-                            LOG.info("1..1 to null: " + se.getObject()
-                                     + "." + se.getProperty());
-                            throw new
-                                com.arsdigita.persistence.PersistenceException
-                                ("1..1 to null");
-                        }
-
-                        m_toCheck.remove(pd);
-                    }
-                }
-            }
-        }
-
         if (LOG.isDebugEnabled()) {
             trace("flush", new Object[] {});
         }
 
-        for (ListIterator li = m_events.listIterator(0); li.hasNext(); ) {
-            Event ev = (Event) li.next();
-            m_engine.write(ev);
+        LinkedList written = new LinkedList();
+
+        for (Iterator it = m_events.iterator(); it.hasNext(); ) {
+            Event ev = (Event) it.next();
+            if (getObjectData(ev.getObject()).isFlushable()) {
+                m_engine.write(ev);
+                written.add(ev);
+                it.remove();
+            }
         }
 
         m_engine.flush();
 
-        for (ListIterator li = m_events.listIterator(0); li.hasNext(); ) {
-            Event ev = (Event) li.next();
+        for (Iterator it = written.iterator(); it.hasNext(); ) {
+            Event ev = (Event) it.next();
             ev.sync();
         }
 
-        m_events.clear();
-
         if (LOG.isDebugEnabled()) {
+            LOG.debug("unflushed: " + m_events.size());
             untrace("flush");
         }
     }
@@ -503,8 +473,9 @@ public class Session {
         flush();
         m_engine.commit();
         m_odata.clear();
+        m_events.clear();
+        m_pending.clear();
     }
-
 
     /**
      * Reverts all changes made within the transaction and ends the
@@ -513,10 +484,9 @@ public class Session {
 
     public void rollback() {
         // should properly roll back java state
+        m_engine.rollback();
         m_odata.clear();
         m_events.clear();
-        m_engine.rollback();
-        m_toCheck.clear();
         m_pending.clear();
     }
 
@@ -531,7 +501,7 @@ public class Session {
 
         ObjectData od = getObjectData(obj);
         if (od == null) {
-            od = new ObjectData(this, obj, od.AGILE);
+            od = new ObjectData(this, obj, od.NUBILE);
         }
 
         PropertyData pd = od.getPropertyData(prop);
@@ -546,43 +516,18 @@ public class Session {
         }
     }
 
-    private void addEvent(Event ev) {
-        if (ev instanceof PropertyEvent) {
-            PropertyEvent e = (PropertyEvent) ev;
-            PropertyData pd = fetchPropertyData(e.getObject(),
-                                                e.getProperty());
-
-            if (pd == null) { throw new IllegalStateException(ev.toString()); }
-            e.setPropertyData(pd);
-
-            if (e instanceof SetEvent) {
-                if (!e.getProperty().isNullable() && e.getArgument() == null) {
-                    m_toCheck.add(pd);
-                }
-            }
-        } else {
-            ObjectEvent e = (ObjectEvent) ev;
-            ObjectData od = getObjectData(e.getObject());
-            if (od == null) { throw new IllegalStateException(ev.toString()); }
-            e.setObjectData(od);
-        }
-
+    void addEvent(Event ev) {
+        ev.inject();
         m_pending.add(ev);
     }
 
-    private void processEvent(Event ev) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("event processed: " + ev);
+    private void processPending() {
+        for (Iterator it = m_pending.iterator(); it.hasNext(); ) {
+            Event ev = (Event) it.next();
+            ev.activate();
+            m_events.add(ev);
+            it.remove();
         }
-        if (ev instanceof PropertyEvent) {
-            PropertyEvent pe = (PropertyEvent) ev;
-            pe.getPropertyData().addEvent(pe);
-        } else {
-            ObjectEvent oe = (ObjectEvent) ev;
-            oe.getObjectData().addEvent(oe);
-        }
-
-        m_events.add(ev);
     }
 
     private Object getSessionKey(Object obj) {
@@ -644,7 +589,7 @@ public class Session {
         }
     }
 
-    private PropertyData fetchPropertyData(Object obj, Property prop) {
+    PropertyData fetchPropertyData(Object obj, Property prop) {
         ObjectData od = fetchObjectData(obj);
         if (od == null) {
             throw new IllegalArgumentException("No such object: " + obj);

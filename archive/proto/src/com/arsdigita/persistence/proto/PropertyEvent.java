@@ -7,12 +7,12 @@ import java.io.*;
  * PropertyEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/02/14 $
+ * @version $Revision: #10 $ $Date: 2003/02/19 $
  **/
 
 public abstract class PropertyEvent extends Event {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyEvent.java#9 $ by $Author: ashah $, $DateTime: 2003/02/14 01:21:43 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyEvent.java#10 $ by $Author: ashah $, $DateTime: 2003/02/19 15:49:06 $";
 
     private Property m_prop;
     private Object m_arg;
@@ -42,6 +42,28 @@ public abstract class PropertyEvent extends Event {
         return m_pdata;
     }
 
+    ObjectData getObjectData() {
+        return getSession().getObjectData(getObject());
+    }
+
+    void inject() {
+        PropertyData pd =
+            getSession().fetchPropertyData(getObject(), getProperty());
+        if (pd == null) { throw new IllegalStateException(this.toString()); }
+        setPropertyData(pd);
+    }
+
+    void activate() {
+        getPropertyData().addEvent(this);
+
+        ObjectData od = getObjectData();
+        if (od.getViolationCount() < 0) {
+            od.setViolationCount(0);
+        }
+
+        if (od.getState().equals(od.NUBILE)) { od.setState(od.AGILE); }
+    }
+
     void sync() {
         m_pdata.removeEvent(this);
     }
@@ -58,5 +80,4 @@ public abstract class PropertyEvent extends Event {
         return getName() + " " + getObject() + "." + getProperty().getName() +
             " " + getArgument();
     }
-
 }

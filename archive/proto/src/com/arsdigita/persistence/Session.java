@@ -28,6 +28,8 @@ import com.arsdigita.persistence.proto.engine.rdbms.RDBMSEngine;
 import com.arsdigita.persistence.proto.engine.rdbms.ConnectionSource;
 
 import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -45,7 +47,7 @@ import java.sql.SQLException;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/02/18 $
+ * @version $Revision: #13 $ $Date: 2003/02/19 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -92,22 +94,30 @@ public class Session {
         new com.arsdigita.persistence.proto.Session(new MemoryEngine());
     // Use the instantiation below to run with the relational engine. Right
     // now this will only work on postgres.
-/*        new com.arsdigita.persistence.proto.Session(new RDBMSEngine(
-            new ConnectionSource() {
-                    public Connection acquire() {
-                        try {
-                            Connection conn =
-                                ConnectionManager.getConnection();
-                            conn.setAutoCommit(false);
-                            return conn;
-                        } catch (SQLException e) {
-                            throw new Error(e.getMessage());
-                        }
+/*
+        new com.arsdigita.persistence.proto.Session(
+            new RDBMSEngine(new ConnectionSource() {
+                private List m_conns = new ArrayList();
+
+                public Connection acquire() {
+                    if (m_conns.size() > 0) {
+                        return (Connection) m_conns.remove(m_conns.size() - 1);
                     }
-                    public void release(Connection conn) {
-                        // Do nothing
+
+                    try {
+                        Connection conn = ConnectionManager.getConnection();
+                        conn.setAutoCommit(false);
+                        return conn;
+                    } catch (SQLException e) {
+                        throw new Error(e.getMessage());
                     }
-                    }));*/
+                }
+
+                public void release(Connection conn) {
+                    m_conns.add(conn);
+                }
+            }));
+*/
     private TransactionContext m_ctx = new TransactionContext(m_ssn);
     private MetadataRoot m_root = MetadataRoot.getMetadataRoot();
 

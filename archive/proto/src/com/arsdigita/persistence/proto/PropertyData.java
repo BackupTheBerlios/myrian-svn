@@ -8,24 +8,25 @@ import java.io.*;
  * PropertyData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/02/14 $
+ * @version $Revision: #8 $ $Date: 2003/02/19 $
  **/
 
 class PropertyData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyData.java#7 $ by $Author: ashah $, $DateTime: 2003/02/14 01:21:43 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyData.java#8 $ by $Author: ashah $, $DateTime: 2003/02/19 15:49:06 $";
 
-    private ObjectData m_odata;
-    private Property m_prop;
+    final private ObjectData m_odata;
+    final private Property m_prop;
     private Object m_value;
-    private ArrayList m_events = new ArrayList();
+    final private ArrayList m_events = new ArrayList();
+    private PropertyEvent m_current = null;
 
     public PropertyData(ObjectData odata, Property prop, Object value) {
         m_odata = odata;
         m_prop = prop;
         m_value = value;
 
-        m_odata.m_pdata.put(m_prop, this);
+        m_odata.addPropertyData(m_prop, this);
     }
 
     public Session getSession() {
@@ -45,12 +46,13 @@ class PropertyData {
     }
 
     public Object get() {
-        if (!m_prop.isCollection()) {
+        if (!m_prop.isCollection() && m_current != null) {
             for (int i = m_events.size() - 1; i >= 0; i--) {
                 PropertyEvent ev = (PropertyEvent) m_events.get(i);
                 if (ev instanceof SetEvent) {
                     return ev.getArgument();
                 }
+                if (ev == m_current) { break; }
             }
         }
 
@@ -58,19 +60,32 @@ class PropertyData {
     }
 
     public void addEvent(PropertyEvent ev) {
+        if (m_current == null) { m_current = ev; }
         m_events.add(ev);
     }
 
     public void removeEvent(PropertyEvent ev) {
+        if (ev.equals(m_current)) {
+            int newIndex = m_events.indexOf(ev) + 1;
+            try {
+                m_current = (PropertyEvent) m_events.get(newIndex);
+            } catch (IndexOutOfBoundsException ex) {
+                m_current = null;
+            }
+        }
         m_events.remove(ev);
     }
 
-    public List getEvents() {
-        return m_events;
+    void invalidate() {
+        m_current = null;
+        if (!m_prop.isCollection()) {
+            m_value = null;
+        }
     }
 
     public boolean isModified() {
-        return m_events.size() > 0;
+        if (m_current == null) { return false; }
+        return m_events.size() > m_events.indexOf(m_current);
     }
 
     void dump() {
