@@ -85,3 +85,18 @@ where
   and sn.object_id = ap.package_id
   and ap.package_type_id = apt.package_type_id
   and apt.package_key = 'sitemap';
+
+insert into admin_app
+select application_id
+  from applications apps, application_types app_types
+ where apps.application_type_id = app_types.application_type_id
+   and app_types.object_type = 'com.arsdigita.ui.admin.Admin'
+   and application_id not in (select application_id
+                                from admin_app);
+insert into sitemap_app
+select application_id
+  from applications apps, application_types app_types
+ where apps.application_type_id = app_types.application_type_id
+   and app_types.object_type = 'com.arsdigita.ui.sitemap.SiteMap'
+   and application_id not in (select application_id
+                                from sitemap_app);
