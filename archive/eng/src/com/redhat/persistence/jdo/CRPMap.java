@@ -13,7 +13,7 @@ import javax.jdo.Query;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2004/07/13 $
+ * @version $Revision: #11 $ $Date: 2004/07/13 $
  **/
 class CRPMap implements Map {
     private Set entries;
@@ -69,7 +69,12 @@ class CRPMap implements Map {
     }
 
     public Set keySet() {
-        throw new UnsupportedOperationException();
+        PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+        Query query = pm.newQuery("oql", "$1.key");
+        Collection coll = (Collection) query.execute(entries);
+        // XXX: this is a temporary hack.  We need to return a CRPSet or some
+        // such instead.
+        return new HashSet(coll);
     }
 
     public Set entrySet() {

@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
  * PandoraTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/07/13 $
+ * @version $Revision: #9 $ $Date: 2004/07/13 $
  **/
 
 public class PandoraTest extends WithTxnCase {
@@ -249,6 +249,7 @@ public class PandoraTest extends WithTxnCase {
         assertEquals("topic1 on page 3", new Integer(3), idx.get(topic1));
         assertEquals("page 3", new Integer(3), idx.remove(topic1));
         assertTrue("has topic1", !idx.containsKey(topic1));
+        assertTrue("has topic2", idx.keySet().contains(topic2));
     }
 
     public void testMain() {
