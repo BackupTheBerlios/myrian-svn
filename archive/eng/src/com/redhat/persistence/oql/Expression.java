@@ -28,12 +28,12 @@ import java.util.*;
  * Expression
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/09/07 $
+ * @version $Revision: #10 $ $Date: 2004/09/13 $
  **/
 
 public abstract class Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Expression.java#9 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Expression.java#10 $ by $Author: rhs $, $DateTime: 2004/09/13 15:41:00 $";
 
     public static Expression valueOf(Path path) {
         if (path.getParent() == null) {
@@ -64,6 +64,9 @@ public abstract class Expression {
             gen.init(ssn);
             frame(gen);
             return gen.getFrame(this).getMap();
+        } catch (Throwable t) {
+            throw new Error
+                ("error during expression analysis: " + this, t);
         } finally {
             gen.clear();
         }
