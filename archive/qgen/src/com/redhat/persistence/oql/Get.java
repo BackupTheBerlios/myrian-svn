@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #20 $ $Date: 2004/03/21 $
+ * @version $Revision: #21 $ $Date: 2004/03/24 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#20 $ by $Author: rhs $, $DateTime: 2004/03/21 00:40:57 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#21 $ by $Author: ashah $, $DateTime: 2004/03/24 15:26:07 $";
 
     private static final Logger s_log = Logger.getLogger(Get.class);
 
@@ -49,6 +49,12 @@ public class Get extends Expression {
         return gen.getFrame(this).emit();
     }
 
+    private static ThreadLocal s_parsers = new ThreadLocal() {
+        protected Object initialValue() {
+            return new OQLParser(new StringReader(""));
+        }
+    };
+
     static QFrame frame(Generator gen, QFrame expr, String name,
                         Expression result) {
         ObjectType type = expr.getType();
@@ -64,7 +70,8 @@ public class Get extends Expression {
             if (m instanceof Qualias) {
                 Qualias q = (Qualias) m;
                 String query = q.getQuery();
-                OQLParser p = new OQLParser(new StringReader(query));
+                OQLParser p = (OQLParser) s_parsers.get();
+                p.ReInit(new StringReader(query));
                 // XXX: namespace
                 Expression e;
                 try {
