@@ -26,13 +26,13 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#3 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#4 $
  */
 public class BaseConfig {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#3 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#4 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/02 14:11:43 $";
+        "$DateTime: 2003/09/03 12:09:13 $";
 
     private static final Logger s_log = Logger.getLogger
         (BaseConfig.class);
@@ -70,7 +70,9 @@ public class BaseConfig {
         final ParameterValue value = param.unmarshal(m_store);
 
         if (!value.getErrors().isEmpty()) {
-            throw new ConfigurationError(value.getErrors().toString());
+            throw new ConfigurationError
+                ("Parameter " + param.getName() + ": " +
+                 value.getErrors().toString());
         }
 
         // 2. Validate and check for errors
@@ -78,7 +80,9 @@ public class BaseConfig {
         param.validate(value);
 
         if (!value.getErrors().isEmpty()) {
-            throw new ConfigurationError(value.getErrors().toString());
+            throw new ConfigurationError
+                ("Parameter " + param.getName() + ": " +
+                 value.getErrors().toString());
         }
 
         return value.getValue();

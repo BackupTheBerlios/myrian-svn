@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -38,11 +39,11 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/08/27 $
+ * @version $Revision: #4 $ $Date: 2003/09/03 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/DataQueryImplTest.java#3 $ by $Author: justin $, $DateTime: 2003/08/27 12:51:55 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/DataQueryImplTest.java#4 $ by $Author: justin $, $DateTime: 2003/09/03 12:09:13 $";
 
     private static Logger s_log =
         Logger.getLogger(DataQueryImplTest.class.getName());
@@ -816,6 +817,37 @@ public class DataQueryImplTest extends DataQueryTest {
         while(dq.next()) { }
         // just testing that sql generated doesn't cause error
     }
+
+    public void testAddLongPath() {
+        Session ssn = SessionManager.getSession();
+        DataObject[] nodes = new DataObject[4];
+        DataObject prev = null;
+        for (int i = 0; i < 4; i++) {
+            nodes[i] = ssn.create("mdsql.Node");
+            nodes[i].set("id", new BigDecimal(i));
+            nodes[i].set("name", String.valueOf(i));
+            nodes[i].set("parent", prev);
+            nodes[i].save();
+            prev = nodes[i];
+        }
+
+        DataCollection dc = ssn.retrieve("mdsql.Node");
+        dc.addPath("parent.parent.parent.name");
+        dc.addEqualsFilter("id", prev.get("id"));
+
+        if (dc.next()) {
+            assertEquals("0", dc.get("parent.parent.parent.name"));
+            assertEquals(new BigDecimal(1), dc.get("parent.parent.id"));
+            assertEquals(new BigDecimal(2), dc.get("parent.id"));
+            assertEquals(new BigDecimal(3), dc.get("id"));
+            if (dc.next()) {
+                fail("query returned more than one row");
+            }
+        } else {
+            fail("query returned no rows");
+        }
+    }
+
 
 
     /**

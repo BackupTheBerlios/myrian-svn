@@ -23,12 +23,12 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/08/27 $
+ * @version $Revision: #4 $ $Date: 2003/09/03 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/Signature.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/Signature.java#4 $ by $Author: justin $, $DateTime: 2003/09/03 12:09:13 $";
 
     private ArrayList m_paths = new ArrayList();
 
@@ -67,32 +67,32 @@ public class Signature {
         addPath(Path.get(path));
     }
 
+    /**
+     * Add all leaves of key property hierarchy
+     */
+    private void addPathKeys(Path path) {
+	ObjectType type = getType(path);
+	Collection keys = type.getKeyProperties();
+	if (keys.size() == 0) {
+            if (!m_paths.contains(path)) {
+                m_paths.add(path);
+            }
+        } else {
+            for (Iterator it = keys.iterator(); it.hasNext(); ) {
+                Property prop = (Property) it.next();
+		addPathKeys(Path.add(path, prop.getName()));
+            }
+        }
+    }
+
     public void addPath(Path path) {
 	if (!exists(path)) {
 	    throw new NoSuchPathException(path);
 	}
-
-	ObjectType type = getType(path);
-	Collection keys = type.getKeyProperties();
-	if (keys.size() == 0) {
-	    if (!m_paths.contains(path)) {
-		m_paths.add(path);
-                // make sure its container id properties are loaded
-                Path parent = path.getParent();
-                ObjectType pType = getType(parent);
-                Collection pKeys = pType.getKeyProperties();
-                for (Iterator it = pKeys.iterator(); it.hasNext(); ) {
-                    Property prop = (Property) it.next();
-                    Path keyPath = Path.add(parent, prop.getName());
-                    addPath(keyPath);
-                }
-	    }
-	} else {
-	    for (Iterator it = keys.iterator(); it.hasNext(); ) {
-		Property prop = (Property) it.next();
-		addPath(Path.add(path, prop.getName()));
-	    }
-	}
+        if (path == null) { return; }
+        addPathKeys(path);
+        // make sure its container id properties are loaded
+        addPath(path.getParent());
     }
 
     Path getPath(String path) {

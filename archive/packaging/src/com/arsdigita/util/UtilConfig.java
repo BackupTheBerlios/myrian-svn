@@ -26,21 +26,16 @@ import org.apache.log4j.Logger;
  */
 final class UtilConfig extends BaseConfig {
     public static final String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/UtilConfig.java#3 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/UtilConfig.java#4 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/02 18:33:16 $";
+        "$DateTime: 2003/09/03 12:09:13 $";
 
     private static final Logger s_log = Logger.getLogger(UtilConfig.class);
 
-    private final boolean m_assert;
     private final String m_dir;
 
     UtilConfig() {
         super("/util.properties");
-
-        final BooleanParameter assertion = new BooleanParameter
-            ("waf.debug", Parameter.REQUIRED, Boolean.FALSE);
-        m_assert = ((Boolean) initialize(assertion)).booleanValue();
 
         final StringParameter dir = new StringParameter
             ("waf.util.logging.error_report_dir", Parameter.OPTIONAL, null);
@@ -51,7 +46,7 @@ final class UtilConfig extends BaseConfig {
         }
     }
 
-    public final boolean isAssertEnabled() {
-        return m_assert;
+    final void setAssertEnabled(final boolean isEnabled) {
+        System.setProperty("waf.util.assert_enabled", null);
     }
 }
