@@ -8,12 +8,12 @@ import junit.framework.Test;
  * ProtoSuite
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/02/17 $
+ * @version $Revision: #4 $ $Date: 2003/05/12 $
  **/
 
 public class ProtoSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoSuite.java#3 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoSuite.java#4 $ by $Author: rhs $, $DateTime: 2003/05/12 15:39:36 $";
 
     public ProtoSuite() {}
 
@@ -30,10 +30,12 @@ public class ProtoSuite extends PackageTestSuite {
         populateSuite(suite);
         BaseTestSetup wrapper = new BaseTestSetup(suite);
         wrapper.setInitScriptTarget("com.arsdigita.db.Initializer");
-        wrapper.setSetupSQLScript(System.getProperty("test.sql.dir") +
-                                  "/persistence/setup.sql");
-        wrapper.setTeardownSQLScript(System.getProperty("test.sql.dir") +
-                                     "/persistence/teardown.sql");
+        wrapper.setSetupSQLScript
+            (System.getProperty("test.sql.dir") +
+             "/com/arsdigita/persistence/setup.sql");
+        wrapper.setTeardownSQLScript
+            (System.getProperty("test.sql.dir") +
+             "/com/arsdigita/persistence/teardown.sql");
         return wrapper;
     }
 
