@@ -140,6 +140,7 @@ public class BaseTestSetup extends TestDecorator {
 
             LoadSQLPlusScript loader = new LoadSQLPlusScript();
             loader.setConnection ( ConnectionManager.getConnection() );
+            loader.setDatabase(DbHelper.getDatabaseDirectory());
             loader.loadSQLPlusScript ( teardownSQLScript );
 
         }
