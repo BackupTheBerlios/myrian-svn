@@ -34,12 +34,12 @@ import org.apache.log4j.Category;
  * class works as advertised.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  */
 
 public class DynamicObjectTypeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/DynamicObjectTypeTest.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/DynamicObjectTypeTest.java#2 $ by $Author: randyg $, $DateTime: 2002/07/18 10:31:38 $";
     private static Category s_log = 
         Category.getInstance(DynamicObjectTypeTest.class.getName());
 
@@ -478,7 +478,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
     public void testAlteredParents() {
         ObjectType type = dot.save();
 
-        DynamicObjectType sub = new DynamicObjectType("childType", type);
+        DynamicObjectType sub = new DynamicObjectType("childTestType", type);
         ObjectType type2 = sub.save();
 
         DynamicObjectType subsub = new DynamicObjectType("subsubType", type2);

@@ -37,6 +37,14 @@ query getOracleTableNames {
     }
 }
 
+query getPostgresTableName {
+    do {
+        select tablename from pg_tables
+    } map {
+        tableName = pg_tables.table_name;
+    }
+}
+
 
 // This should eventually be replaced so that the system
 // uses OracleDatabaseMetadata instead of this.  But, this
@@ -47,5 +55,17 @@ query getOracleColumnNames {
     } map {
         tableName = cols.table_name;
         columnName = cols.column_name;
+    }
+}
+
+query getPostgresColumnNames {
+    do {
+        select attname, relname 
+        from pg_attribute, pg_class 
+        where pg_attribute.attnum > 0 
+        and pg_attribute.attrelid = pg_class.oid
+    } map {
+        columnName = pg_attribute.attname;
+        tableName = pg_class.relname;
     }
 }

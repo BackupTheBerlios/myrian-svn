@@ -16,13 +16,13 @@
 -- This file contains the data model for the data query test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #1 $ $Date: 2002/05/12 $
+-- @version $Revision: #2 $ $Date: 2002/07/18 $
 --
 
 create table t_sql_operation (
-	big_integer number(38),
+	big_integer numeric(38),
 	big_decimal float,
-	boolean number(1),
+	boolean numeric(1),
 	byte char,
 	single_char char,
 	multi_char char(3),

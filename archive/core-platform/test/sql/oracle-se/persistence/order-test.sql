@@ -17,7 +17,7 @@
 -- cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #1 $ $Date: 2002/05/12 $
+-- @version $Revision: #2 $ $Date: 2002/07/18 $
 --
 
 create table t_orders (
@@ -31,8 +31,8 @@ create table t_orders (
 
 create table t_line_items (
     item_id    integer primary key,
-    order_id   not null references t_orders(order_id),
-    price      number not null,
+    order_id   integer not null references t_orders(order_id),
+    price      numeric not null,
     name       varchar(100) not null,
     in_stock_p char(1)
 );
@@ -44,7 +44,7 @@ create table t_orders_ext (
 
 create table t_other_items (
     other_id    integer primary key,
-    price      number not null,
+    price      numeric not null,
     name       varchar(100) not null,
     in_stock_p char(1)
 );

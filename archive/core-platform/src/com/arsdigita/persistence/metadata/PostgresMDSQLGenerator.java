@@ -27,13 +27,13 @@ import org.apache.log4j.Category;
  * type combination ( @see ObjectEvent ).
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresMDSQLGenerator.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresMDSQLGenerator.java#2 $
  * @since 4.6.3
  */
 
-public class PostgresMDSQLGenerator implements MDSQLGenerator {
+class PostgresMDSQLGenerator extends BaseMDSQLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresMDSQLGenerator.java#1 $ by $Author: randyg $, $DateTime: 2002/07/17 16:18:39 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresMDSQLGenerator.java#2 $ by $Author: randyg $, $DateTime: 2002/07/18 10:31:38 $";
 
     private static Category s_log = 
         Category.getInstance(PostgresMDSQLGenerator.class);
@@ -49,7 +49,7 @@ public class PostgresMDSQLGenerator implements MDSQLGenerator {
      * @return the new Event, or null if it could not be created
      */
     public Event generateEvent(ObjectType type, int eventType) {
-        throw new Error("Not Yet Implemented");
+        return super.generateEvent(type, eventType);
     }
 
 
@@ -64,6 +64,6 @@ public class PostgresMDSQLGenerator implements MDSQLGenerator {
      * @return the new Event, or null if it could not be created
      */
     public Event generateEvent(ObjectType type, Property prop, int eventType) {
-        throw new Error("Not Yet Implemented");
+        return super.generateEvent(type, prop, eventType);
     }
 }

@@ -16,11 +16,12 @@
 -- This file contains the data model for the node test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #1 $ $Date: 2002/05/12 $
+-- @version $Revision: #2 $ $Date: 2002/07/18 $
 --
 
 create table t_nodes (
     node_id    integer constraint t_nodes_node_id_pk primary key,
-    parent_id  constraint t_nodes_parent_id_fk references t_nodes(node_id),
+    parent_id  integer constraint t_nodes_parent_id_fk 
+               references t_nodes(node_id),
     name       varchar(200)
 );

@@ -16,19 +16,19 @@
 -- This file contains the data model for the datatype test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #1 $ $Date: 2002/05/12 $
+-- @version $Revision: #2 $ $Date: 2002/07/18 $
 --
 
 create table t_datatypes (
     id               integer constraint t_datatypes_row_id_pk primary key,
     j_big_integer    integer,
-    j_big_decimal    number,
+    j_big_decimal    numeric,
     j_boolean        char(1),
     j_byte           integer,
     j_character      char(1),
     j_date           date,
-    j_double         number,
-    j_float          number,
+    j_double         numeric,
+    j_float          numeric,
     j_integer        integer,
     j_long           integer,
     j_short          integer,

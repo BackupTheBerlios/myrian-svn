@@ -18,6 +18,10 @@ package com.arsdigita.persistence.metadata;
 import java.util.Collection;
 import java.util.Map;
 import org.apache.log4j.Category;
+import java.util.Date;
+import com.arsdigita.persistence.SessionManager;
+import com.arsdigita.persistence.DataQuery;
+
 
 /**
  * This class provides an implementation that automatically generates DDL
@@ -30,127 +34,64 @@ import org.apache.log4j.Category;
  * operations.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#2 $
  * @since 4.6.3 */
 
-final class PostgresDDLGenerator implements DDLGenerator {
+final class PostgresDDLGenerator extends BaseDDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#1 $ by $Author: randyg $, $DateTime: 2002/07/17 16:18:39 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#2 $ by $Author: randyg $, $DateTime: 2002/07/18 10:31:38 $";
 
     private static Category s_log = 
         Category.getInstance(PostgresDDLGenerator.class);
 
+    private static final int MAX_COLUMN_NAME_LEN = 26;
+
     /**
-     * This takes an ObjectType name and model, and generates a unique
-     * table name that can be used to store the object type.
+     *  This method returns a boolean indicating whether the database contains
+     *  a table with the passed in proposed name.  If no table exists then
+     *  this returns false.  If there is a table, this returns true.
+     */
+    protected boolean tableExists(String proposedName) {
+        DataQuery query = SessionManager.getSession().retrieveQuery
+            ("com.arsdigita.persistence.getOracleTableNames");
+        query.addEqualsFilter("tableName", proposedName.toUpperCase());
+        return (query.size() > 0);
+    }
+
+
+    /**
+     *  This method returns a boolean indicating whether the database table
+     *  contains the passed in column name.  If the column does not exist
+     *  in the table then this returns false.  If the column is already
+     *  part of the table then this returns true.
+     */
+    protected boolean columnExists(String tableName, String proposedColumnName) {
+        DataQuery query = SessionManager.getSession().retrieveQuery
+            ("com.arsdigita.persistence.getOracleTableNames");
+        query.addEqualsFilter("tableName", tableName.toUpperCase());
+        query.addEqualsFilter("columnName", proposedColumnName.toUpperCase());
+        return (query.size() > 0);
+    }
+
+
+    /**
+     * Returns a SQL declaration for the jdbctype and size specified
      *
-     * @param model the object type's model
-     * @param name the object type's name
-     * @return a unique table name that is used to store data about about
-     *         object type
+     * @param jdbcType the type
+     * @param size the size
+     * @return a SQL declaration for the jdbctype and size specified
      */
-    public String generateTableName(String model, String name) {
+    protected String getTypeDeclaration(int jdbcType, int size) {
         throw new Error("Not Yet Implemented");
     }
 
-    /**
-     * This takes a table name and a Property to generate a unique 
-     * column name.
-     * 
-     * @param objectType the objecttype that will contain the property 
-     * @param proposedName the proposed name of the property
-     * @return a unique column name that will be used to store this property
-     */
-    public String generateColumnName(ObjectType objectType, String proposedName) {
-        throw new Error("Not Yet Implemented");
-    }
 
     /**
-     * Takes an object type, a primary key property, and a collection of
-     * additional properties.  Returns either a "create table" or an "alter
-     * table" statement to add the properties to the object type's table.
-     *
-     * @param type the ObjectType
-     * @param keyColumn the key column of the object type
-     * @param properties additional properties to add
-     * @param defaultValueMap mapping from property name to default value
-     * @return a DDL statement to create or alter the object type table
+     *  This method takes the default value for the date and creates
+     *  the correct syntax so that the database column will default
+     *  to the correct date/time.
      */
-    public String generateTable(ObjectType type,
-                                Column keyColumn,
-                                Collection properties,
-                                Map defaultValueMap) {
-        throw new Error("Not Yet Implemented");
-    }
-
-    /**
-     * Takes an object type, a primary key property, and a collection of
-     * additional properties.  Returns either a "create table" or an "alter
-     * table" statement to add the properties to the object type's table.
-     *
-     * @param type the ObjectType
-     * @param properties additional properties to add
-     * @param defaultValueMap mapping from property name to default value
-     * @return a DDL statement to create or alter the object type table
-     */
-    public String generateTable(ObjectType type,
-                                Collection properties,
-                                Map defaultValueMap) {
-        throw new Error("Not Yet Implemented");
-    }
-
-    /**
-     * Takes an object type, a primary key property, and a collection of
-     * additional properties.  Returns either a "create table" or an "alter
-     * table" statement to add the properties to the object type's table.
-     *
-     * @param type the ObjectType
-     * @param keyColumn the key column of the object type
-     * @param properties additional properties to add
-     * @return a DDL statement to create or alter the object type table
-     */
-    public String generateTable(ObjectType type,
-                                Column keyColumn,
-                                Collection properties) {
-        throw new Error("Not Yet Implemented");
-    }
-
-    /**
-     * Takes an object type and a collection of additional properties. 
-     * Returns either a "create table" or an "alter table" statement to add
-     * the properties to the object type's table.
-     *
-     * @param type the ObjectType
-     * @param properties additional properties to add
-     * @return a DDL statement to create or alter the object type table
-     */
-    public String generateTable(ObjectType type,
-                                Collection properties) {
-        throw new Error("Not Yet Implemented");
-    }
-
-    /**
-     * Determines a unique name for a mapping table for a particular 
-     * role reference and object type.
-     * 
-     * @param type the objecttype that owns the property
-     * @param name the property name
-     * @return a unique name for a mapping table
-     */
-    public String generateMappingTableName(ObjectType type, String name) {
-        throw new Error("Not Yet Implemented");
-    }
-
-    /**
-     * Creates the DDL to generate a mapping table from one object type to
-     * another.
-     *
-     * @param type the dynamically generated object type
-     * @param property the role reference
-     * @return the DDL statement to create the mapping table
-     */
-    public String generateMappingTable(ObjectType type, 
-                                       Property property) {
+    protected String getDefaultDateSyntax(Date defaultDate) {
         throw new Error("Not Yet Implemented");
     }
 
@@ -163,6 +104,6 @@ final class PostgresDDLGenerator implements DDLGenerator {
      * @post return > 0
      */
     public int getMaxColumnNameLength() {
-        throw new Error("Not Yet Implemented");
+        return MAX_COLUMN_NAME_LEN;
     }
 }
