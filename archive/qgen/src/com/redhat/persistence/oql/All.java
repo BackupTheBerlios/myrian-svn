@@ -8,12 +8,12 @@ import java.util.*;
  * All
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/03/03 $
+ * @version $Revision: #10 $ $Date: 2004/03/09 $
  **/
 
 public class All extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/All.java#9 $ by $Author: ashah $, $DateTime: 2004/03/03 17:26:17 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/All.java#10 $ by $Author: rhs $, $DateTime: 2004/03/09 21:48:49 $";
 
     private String m_type;
     private Map m_bindings;
@@ -62,7 +62,7 @@ public class All extends Expression {
         }
     }
 
-    String emit(Generator gen) {
+    Code emit(Generator gen) {
         Expression sub = gen.getSubstitute(this);
         if (sub != null) {
             return sub.emit(gen);

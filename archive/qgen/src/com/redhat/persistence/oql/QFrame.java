@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #15 $ $Date: 2004/03/09 $
+ * @version $Revision: #16 $ $Date: 2004/03/09 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#15 $ by $Author: rhs $, $DateTime: 2004/03/09 15:48:58 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#16 $ by $Author: rhs $, $DateTime: 2004/03/09 21:48:49 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -98,6 +98,10 @@ class QFrame {
             m_columns.put(column, v);
         }
         return v;
+    }
+
+    QValue getValue(Code sql) {
+        return new QValue(this, sql);
     }
 
     Set getColumns() {
@@ -210,87 +214,89 @@ class QFrame {
         m_equiset = equiset;
     }
 
-    String emit() {
+    Code emit() {
         return emit(true, true);
     }
 
-    String emit(boolean select, boolean range) {
+    Code emit(boolean select, boolean range) {
         List where = new ArrayList();
         Set emitted = new HashSet();
-        String join = null;
+        Code join = null;
         if (!m_hoisted) {
             join = render(where, emitted);
         }
 
-        StringBuffer buf = new StringBuffer();
+        Code result = new Code();
         if (select) {
             if (join != null) {
-                buf.append("(select ");
+                result = result.add("(select ");
             } else if (m_values.size() > 1) {
-                buf.append("(");
+                result = result.add("(");
             }
             for (Iterator it = m_values.iterator(); it.hasNext(); ) {
-                buf.append(it.next());
+                QValue v = (QValue) it.next();
+                result = result.add(v.emit());
                 if (it.hasNext()) {
-                    buf.append(", ");
+                    result = result.add(", ");
                 }
             }
             if (m_values.isEmpty()) {
-                buf.append("1");
+                result = result.add("1");
             }
         }
 
         if (select && join != null) {
-            buf.append("\nfrom ");
+            result = result.add("\nfrom ");
         }
 
         if (join != null) {
-            buf.append(join);
+            result = result.add(join);
         }
 
-        String sql = join(where, "\nand ", emitted);
-        if (!sql.equals("")) {
-            buf.append("\nwhere ");
-            buf.append(sql);
+        Code sql = join(where, "\nand ", emitted);
+        if (sql != null) {
+            result = result.add("\nwhere ");
+            result = result.add(sql);
         }
 
         List orders = getOrders();
         if (!orders.isEmpty()) {
-            buf.append("\norder by ");
+            result = result.add("\norder by ");
         }
         for (Iterator it = orders.iterator(); it.hasNext(); ) {
-            buf.append(it.next());
+            Code key = (Code) it.next();
+            result = result.add(key);
             if (it.hasNext()) {
-                buf.append(", ");
+                result = result.add(", ");
             }
         }
 
         if (range) {
             // XXX: nested offsets and limits are ignored
             if (m_offset != null) {
-                buf.append("\noffset ");
-                buf.append(m_offset.emit(m_generator));
+                result = result.add("\noffset ");
+                result = result.add(m_offset.emit(m_generator));
             }
 
             if (m_limit != null) {
-                buf.append("\nlimit ");
-                buf.append(m_limit.emit(m_generator));
+                result = result.add("\nlimit ");
+                result = result.add(m_limit.emit(m_generator));
             }
         }
 
         if (select && (join != null || m_values.size() > 1)) {
-            buf.append(")");
+            result = result.add(")");
         }
 
-        return buf.toString();
+        return result;
     }
 
-    private String join(List exprs, String sep, Set emitted) {
+    private Code join(List exprs, String sep, Set emitted) {
         List conditions = new ArrayList();
         for (Iterator it = exprs.iterator(); it.hasNext(); ) {
             Expression e = (Expression) it.next();
-            String sql = e.emit(m_generator);
-            if (!Code.TRUE.equals(sql) && !emitted.contains(sql)) {
+            Code sql = e.emit(m_generator);
+            if (!sql.isTrue() && !emitted.contains(sql)) {
                 conditions.add(sql);
                 emitted.add(sql);
             }
@@ -306,9 +312,9 @@ class QFrame {
 
     private void addOrders(List result) {
         if (m_order != null) {
-            String order = m_order.emit(m_generator);
+            Code order = m_order.emit(m_generator);
             if (!m_asc) {
-                order = order + " desc";
+                order = order.add(" desc");
             }
             result.add(order);
         }
@@ -318,30 +324,31 @@ class QFrame {
         }
     }
 
-    private String render(List conditions, Set emitted) {
+    private Code render(List conditions, Set emitted) {
         return render(conditions, new HashSet(), emitted);
     }
 
-    private String render(List conditions, Set defined, Set emitted) {
-        StringBuffer result = new StringBuffer();
+    private Code render(List conditions, Set defined, Set emitted) {
+        Code result = new Code();
 
         Set defs = new HashSet();
 
         boolean first = true;
         if (m_table != null && m_duplicate == null) {
             first = false;
-            result.append(m_table + " " + alias());
+            result = result.add(m_table).add(" ").add(alias());
             defs.add(this);
         } else if (m_tableExpr != null && m_duplicate == null) {
             first = false;
-            result.append(m_tableExpr.emit(m_generator) + " " + alias());
+            result = result.add(m_tableExpr.emit(m_generator)).add(" ")
+                .add(alias());
             defs.add(this);
         }
 
         for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
             List conds = new ArrayList();
-            String join = child.render(conds, defs, emitted);
+            Code join = child.render(conds, defs, emitted);
             /*if (join == null && !conds.isEmpty()) {
                 throw new IllegalStateException
                     ("Condition without joins: " + conds +
@@ -370,7 +377,7 @@ class QFrame {
                 }
             }
             if (!first) {
-                result.append("\n");
+                result = result.add("\n");
                 if (child.m_outer) {
                     if (conds.isEmpty()) {
                         throw new IllegalStateException
@@ -379,13 +386,13 @@ class QFrame {
                              "\nchild: " + child +
                              "\nthis: " + this);
                     }
-                    result.append("left ");
+                    result = result.add("left ");
                 } else if (conds.isEmpty()) {
-                    result.append("cross ");
+                    result = result.add("cross ");
                 }
-                result.append("join ");
+                result = result.add("join ");
             }
-            result.append(join);
+            result = result.add(join);
             if (!conds.isEmpty()) {
                 if (first) {
                     if (child.m_outer) {
@@ -398,8 +405,8 @@ class QFrame {
                     }
                     conditions.addAll(conds);
                 } else {
-                    result.append(" on ");
-                    result.append(join(conds, " and ", emitted));
+                    result = result.add(" on ");
+                    result = result.add(join(conds, " and ", emitted));
                 }
             }
             first = false;
@@ -414,7 +421,7 @@ class QFrame {
         if (first) {
             return null;
         } else {
-            return result.toString();
+            return result;
         }
     }
 

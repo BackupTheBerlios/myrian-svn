@@ -6,12 +6,12 @@ import java.util.*;
  * Equals
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2004/03/03 $
+ * @version $Revision: #15 $ $Date: 2004/03/09 $
  **/
 
 public class Equals extends BinaryCondition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Equals.java#14 $ by $Author: rhs $, $DateTime: 2004/03/03 12:16:16 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Equals.java#15 $ by $Author: rhs $, $DateTime: 2004/03/09 21:48:49 $";
 
     public Equals(Expression left, Expression right) {
         super(left, right);
@@ -70,11 +70,11 @@ public class Equals extends BinaryCondition {
         gen.addSufficient(expr);
     }
 
-    String emit(Generator gen) {
+    Code emit(Generator gen) {
         return emit(gen, m_left, m_right);
     }
 
-    static String emit(Generator gen, Expression lexpr, Expression rexpr) {
+    static Code emit(Generator gen, Expression lexpr, Expression rexpr) {
         if (gen.hasFrame(lexpr) && gen.hasFrame(rexpr)) {
             QFrame lframe = gen.getFrame(lexpr);
             QFrame rframe = gen.getFrame(rexpr);
@@ -89,13 +89,13 @@ public class Equals extends BinaryCondition {
                 for (int i = 0; i < lvals.size(); i++) {
                     QValue l = (QValue) lvals.get(i);
                     QValue r = (QValue) rvals.get(i);
-                    String lsql = l.toString();
-                    String rsql = r.toString();
-                    if (Code.NULL.equals(lsql)) {
+                    Code lsql = l.emit();
+                    Code rsql = r.emit();
+                    if (lsql.isNull()) {
                         if (!r.isNullable()) {
                             return Code.FALSE;
                         }
-                    } else if (Code.NULL.equals(rsql)) {
+                    } else if (rsql.isNull()) {
                         if (!l.isNullable()) {
                             return Code.FALSE;
                         }
@@ -115,8 +115,8 @@ public class Equals extends BinaryCondition {
 
         // XXX: we can to do something smarter than this for
         // multi column selects
-        String lsql = lexpr.emit(gen);
-        String rsql = rexpr.emit(gen);
+        Code lsql = lexpr.emit(gen);
+        Code rsql = rexpr.emit(gen);
         if (lsql.equals(rsql)) {
             return Code.TRUE;
         } else {
@@ -124,13 +124,13 @@ public class Equals extends BinaryCondition {
         }
     }
 
-    private static String emit(String left, String right) {
-        if (Code.NULL.equals(left)) {
-            return right + " is " + left;
-        } else if (Code.NULL.equals(right)) {
-            return left + " is " + right;
+    private static Code emit(Code left, Code right) {
+        if (left.isNull()) {
+            return right.add(" is ").add(left);
+        } else if (right.isNull()) {
+            return left.add(" is ").add(right);
         } else {
-            return left + " = " + right;
+            return left.add(" = ").add(right);
         }
     }
 

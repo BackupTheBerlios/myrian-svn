@@ -6,28 +6,28 @@ import java.util.*;
  * Or
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/02/28 $
+ * @version $Revision: #6 $ $Date: 2004/03/09 $
  **/
 
 public class Or extends BinaryCondition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Or.java#5 $ by $Author: rhs $, $DateTime: 2004/02/28 08:30:26 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Or.java#6 $ by $Author: rhs $, $DateTime: 2004/03/09 21:48:49 $";
 
     public Or(Expression left, Expression right) {
         super(left, right);
     }
 
-    String emit(Generator gen) {
-        String left = m_left.emit(gen);
-        String right = m_right.emit(gen);
-        if (Code.FALSE.equals(left)) {
+    Code emit(Generator gen) {
+        Code left = m_left.emit(gen);
+        Code right = m_right.emit(gen);
+        if (left.isFalse()) {
             return right;
-        } else if (Code.FALSE.equals(right)) {
+        } else if (right.isFalse()) {
             return left;
-        } else if (Code.TRUE.equals(left) || Code.TRUE.equals(right)) {
+        } else if (left.isTrue() || right.isTrue()) {
             return Code.TRUE;
         } else {
-            return left + " or " + right;
+            return left.add(" or ").add(right);
         }
     }
 

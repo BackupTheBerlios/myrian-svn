@@ -1,6 +1,7 @@
 package com.redhat.persistence.oql;
 
 import com.arsdigita.db.DbHelper;
+import com.redhat.persistence.metadata.*;
 
 import junit.framework.*;
 
@@ -14,7 +15,7 @@ import org.apache.log4j.Logger;
  * QueryTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/03/03 $
+ * @version $Revision: #10 $ $Date: 2004/03/09 $
  **/
 
 public class QueryTest extends TestCase {
@@ -25,7 +26,7 @@ public class QueryTest extends TestCase {
     // being an instance of TestCase. Later versions of ant don't
     // suffer from this problem.
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QueryTest.java#9 $ by $Author: rhs $, $DateTime: 2004/03/03 08:11:08 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QueryTest.java#10 $ by $Author: rhs $, $DateTime: 2004/03/09 21:48:49 $";
 
     private static final Logger s_log = Logger.getLogger(QueryTest.class);
 
@@ -73,13 +74,20 @@ public class QueryTest extends TestCase {
                     ("query string includes multiple queries: " + m_query);
             }
             Connection conn = m_suite.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = q.generate
-                (m_suite.getRoot(),
-                 DbHelper.getDatabase(conn) == DbHelper.DB_ORACLE);
+            Root root = m_suite.getRoot();
+            Code sql = q.generate
+                (root, DbHelper.getDatabase(conn) == DbHelper.DB_ORACLE);
             s_log.info("SQL:\n" + sql);
+            PreparedStatement stmt = conn.prepareStatement(sql.getSQL());
             try {
-                stmt.execute(sql);
+                List bindings = sql.getBindings();
+                for (int i = 0; i < bindings.size(); i++) {
+                    Code.Binding b = (Code.Binding) bindings.get(i);
+                    Object value = b.getValue();
+                    Adapter ad = root.getAdapter(value.getClass());
+                    ad.bind(stmt, i + 1, value, b.getType());
+                }
+                stmt.execute();
                 ResultSet rs = stmt.getResultSet();
                 ResultSetMetaData md = rs.getMetaData();
                 int ncols = md.getColumnCount();
@@ -112,7 +120,7 @@ public class QueryTest extends TestCase {
                         ("sql:\n\n" + sql + "\n\nmissing: " + missing +
                          "\n\nextra: " + extra + "\n\n", expected, actual);
                 }
-                SelectParser parser = new SelectParser(sql);
+                SelectParser parser = new SelectParser(sql.getSQL());
                 if (m_subselectCount != null) {
                     assertEquals
                         ("Incorrect subselect count in sql: " + sql,

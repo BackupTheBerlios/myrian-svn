@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * Not
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/02/28 $
+ * @version $Revision: #9 $ $Date: 2004/03/09 $
  **/
 
 public class Not extends UnaryCondition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Not.java#8 $ by $Author: rhs $, $DateTime: 2004/02/28 08:30:26 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Not.java#9 $ by $Author: rhs $, $DateTime: 2004/03/09 21:48:49 $";
 
     public Not(Expression expr) {
         super(expr);
@@ -21,14 +21,14 @@ public class Not extends UnaryCondition {
         gen.addNonNulls(this, gen.getNull(m_operand));
     }
 
-    String emit(Generator gen) {
-        String sql = m_operand.emit(gen);
-        if (Code.TRUE.equals(sql)) {
+    Code emit(Generator gen) {
+        Code sql = m_operand.emit(gen);
+        if (sql.isTrue()) {
             return Code.FALSE;
-        } else if (Code.FALSE.equals(sql)) {
+        } else if (sql.isFalse()) {
             return Code.TRUE;
         } else {
-            return "not (" + sql + ")";
+            return new Code("not (").add(sql).add(")");
         }
     }
 

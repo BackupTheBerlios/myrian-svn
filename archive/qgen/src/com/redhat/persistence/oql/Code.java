@@ -13,29 +13,132 @@ import org.apache.log4j.Logger;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #16 $ $Date: 2004/03/03 $
+ * @version $Revision: #17 $ $Date: 2004/03/09 $
  **/
 
-class Code {
+public class Code {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#16 $ by $Author: ashah $, $DateTime: 2004/03/03 01:22:16 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#17 $ by $Author: rhs $, $DateTime: 2004/03/09 21:48:49 $";
 
     private static final Logger s_log = Logger.getLogger(Code.class);
 
-    static final String TRUE = "1 = 1";
-    static final String FALSE = "1 = 0";
-    static final String NULL = "null";
+    public static class Binding {
 
-    static String join(Collection objs, String sep) {
-        StringBuffer result = new StringBuffer();
-        for (Iterator it = objs.iterator(); it.hasNext(); ) {
-            result.append(it.next());
-            if (it.hasNext()) {
-                result.append(sep);
+        private Object m_value;
+        private int m_type;
+
+        Binding(Object value, int type) {
+            m_value = value;
+            m_type = type;
+        }
+
+        public Object getValue() {
+            return m_value;
+        }
+
+        public int getType() {
+            return m_type;
+        }
+
+        public String toString() {
+            return "(" + m_value.toString() + ": " + m_value.getClass() +
+                ", " + Column.getTypeName(m_type) + ")";
+        }
+
+    }
+
+    static final Code TRUE = new Code("1 = 1");
+    static final Code FALSE = new Code("1 = 0");
+    static final Code NULL = new Code("null");
+
+    private String m_sql;
+    private List m_bindings;
+
+    Code(String sql, List bindings) {
+        m_sql = sql;
+        m_bindings = bindings;
+    }
+
+    Code(String sql) {
+        this(sql, Collections.EMPTY_LIST);
+    }
+
+    Code() {
+        this("");
+    }
+
+    public String getSQL() {
+        return m_sql;
+    }
+
+    public List getBindings() {
+        return m_bindings;
+    }
+
+    boolean isTrue() {
+        return equals(TRUE);
+    }
+
+    boolean isFalse() {
+        return equals(FALSE);
+    }
+
+    boolean isNull() {
+        return equals(NULL);
+    }
+
+    Code add(String sql) {
+        return new Code(m_sql + sql, m_bindings);
+    }
+
+    Code add(Code code) {
+        List bindings;
+        if (m_bindings.isEmpty()) {
+            bindings = code.m_bindings;
+        } else if (code.m_bindings.isEmpty()) {
+            bindings = m_bindings;
+        } else {
+            bindings = new ArrayList();
+            bindings.addAll(m_bindings);
+            bindings.addAll(code.m_bindings);
+        }
+        return new Code(m_sql + code.m_sql, bindings);
+    }
+
+    public int hashCode() {
+        return m_sql.hashCode() ^ m_bindings.hashCode();
+    }
+
+    public boolean equals(Object o) {
+        if (o instanceof Code) {
+            Code c = (Code) o;
+            return getSQL().equals(c.getSQL())
+                && getBindings().equals(c.getBindings());
+        } else {
+            return super.equals(o);
+        }
+    }
+
+    public String toString() {
+        return "<" + m_sql + ": " + m_bindings + ">";
+    }
+
+    static Code join(Collection parts, String sep) {
+        Code result = null;
+        for (Iterator it = parts.iterator(); it.hasNext(); ) {
+            Code part = (Code) it.next();
+            if (result == null) {
+                result = part;
+            } else {
+                result = result.add(sep).add(part);
             }
         }
-        return result.toString();
+        return result;
     }
+
+    /**
+     * Random static utility methods used by other oql classes.
+     **/
 
     private static String[] names(Column[] columns, String alias) {
         String[] result = new String[columns.length];

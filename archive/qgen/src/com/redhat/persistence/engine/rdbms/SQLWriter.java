@@ -29,6 +29,7 @@ import com.redhat.persistence.metadata.Column;
 import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.Root;
 import com.redhat.persistence.metadata.SQLBlock;
+import com.redhat.persistence.oql.Code;
 
 import java.io.StringReader;
 import java.sql.PreparedStatement;
@@ -38,17 +39,18 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/02/24 $
+ * @version $Revision: #4 $ $Date: 2004/03/09 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#3 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#4 $ by $Author: rhs $, $DateTime: 2004/03/09 21:48:49 $";
 
     private RDBMSEngine m_engine;
     private Operation m_op = null;
@@ -158,6 +160,16 @@ public abstract class SQLWriter {
         m_sql.append("?");
         m_bindings.add(value);
         m_types.add(new Integer(jdbcType));
+    }
+
+    void write(Code code) {
+        write(code.getSQL());
+        List bindings = code.getBindings();
+        for (int i = 0; i < bindings.size(); i++) {
+            Code.Binding b = (Code.Binding) bindings.get(i);
+            m_bindings.add(b.getValue());
+            m_types.add(new Integer(b.getType()));
+        }
     }
 
     public void write(Operation op) {

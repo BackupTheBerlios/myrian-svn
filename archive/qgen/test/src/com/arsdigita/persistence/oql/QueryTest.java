@@ -32,12 +32,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/02/24 $
+ * @version $Revision: #4 $ $Date: 2004/03/09 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/arsdigita/persistence/oql/QueryTest.java#3 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/arsdigita/persistence/oql/QueryTest.java#4 $ by $Author: rhs $, $DateTime: 2004/03/09 21:48:49 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);
@@ -64,7 +64,8 @@ public class QueryTest extends PersistenceTestCase {
 
     private void doTest(String name, Signature sig, Expression expr) {
         Query query = sig.makeQuery(expr);
-        String sql = query.generate(getSession().getMetadataRoot().getRoot());
+        String sql =
+            query.generate(getSession().getMetadataRoot().getRoot()).getSQL();
 
         // XXX need to test db specific syntaxes
 

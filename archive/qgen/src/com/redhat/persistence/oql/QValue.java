@@ -6,19 +6,25 @@ import com.redhat.persistence.metadata.*;
  * QValue
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/03/03 $
+ * @version $Revision: #4 $ $Date: 2004/03/09 $
  **/
 
 class QValue {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QValue.java#3 $ by $Author: rhs $, $DateTime: 2004/03/03 08:29:14 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QValue.java#4 $ by $Author: rhs $, $DateTime: 2004/03/09 21:48:49 $";
 
     private QFrame m_frame;
-    private String m_column;
+    private String m_column = null;
+    private Code m_sql = null;
 
     QValue(QFrame frame, String column) {
         m_frame = frame;
         m_column = column;
+    }
+
+    QValue(QFrame frame, Code sql) {
+        m_frame = frame;
+        m_sql = sql;
     }
 
     QFrame getFrame() {
@@ -44,10 +50,17 @@ class QValue {
         return col.isNullable();
     }
 
+    Code emit() {
+        if (m_sql != null) {
+            return m_sql;
+        } else {
+            return new Code(m_frame.alias() + "." + m_column);
+        }
+    }
+
     public String toString() {
-        // XXX: this handles literals
-        if (m_frame.getType() == null) {
-            return m_column;
+        if (m_sql != null) {
+            return m_sql.toString();
         } else {
             return m_frame.alias() + "." + m_column;
         }

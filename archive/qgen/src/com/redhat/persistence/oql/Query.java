@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2004/03/08 $
+ * @version $Revision: #13 $ $Date: 2004/03/09 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#12 $ by $Author: rhs $, $DateTime: 2004/03/08 23:10:10 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#13 $ by $Author: rhs $, $DateTime: 2004/03/09 21:48:49 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -41,13 +41,13 @@ public class Query {
         return (Expression) m_fetched.get(name);
     }
 
-    public String generate(Root root) {
+    public Code generate(Root root) {
         return generate(root, false);
     }
 
     private static final String ROWNUM = "rownum__";
 
-    public String generate(Root root, boolean oracle) {
+    public Code generate(Root root, boolean oracle) {
         Generator gen = new Generator(root);
         m_query.frame(gen);
 
@@ -110,8 +110,7 @@ public class Query {
             s_log.debug("shrunk frame:\n" + qframe);
         }
 
-        StringBuffer sql = new StringBuffer();
-        sql.append("select ");
+        Code sql = new Code("select ");
 
         for (Iterator it = m_names.iterator(); it.hasNext(); ) {
             String name = (String) it.next();
@@ -119,21 +118,20 @@ public class Query {
             // XXX: should eliminate duplicate fetches here when
             // we return something smarter than a string from this
             // method.
-            sql.append(e.emit(gen));
-            sql.append(" as \"");
-            sql.append(name);
-            sql.append("\"");
+            sql = sql.add(e.emit(gen))
+                .add(" as \"")
+                .add(name)
+                .add("\"");
             if (it.hasNext()) {
-                sql.append(",\n       ");
+                sql = sql.add(",\n       ");
             }
         }
 
         if (m_names.isEmpty()) {
-            sql.append("1");
+            sql = sql.add("1");
         }
 
-        sql.append("\nfrom ");
-        sql.append(qframe.emit(false, !oracle));
+        sql = sql.add("\nfrom ").add(qframe.emit(false, !oracle));
 
         Expression offset = qframe.getOffset();
         Expression limit = qframe.getLimit();
@@ -142,36 +140,30 @@ public class Query {
             // order by happens before the rownum assignments. The
             // second level of nesting is required because filtering
             // on rownum directly doesn't work.
-            sql.insert(0, "select * from (select r__.*, rownum as " +
-                       ROWNUM + " from (");
-            sql.append(") r__) where ");
+            sql = new Code("select * from (select r__.*, rownum as ")
+                .add(ROWNUM).add(" from (").add(sql).add(") r__) where ");
             if (offset != null) {
-                sql.append(ROWNUM);
-                sql.append(" > ");
-                sql.append(offset.emit(gen));
+                sql = sql.add(ROWNUM).add(" > ").add(offset.emit(gen));
             }
             if (limit != null) {
                 if (offset != null) {
-                    sql.append(" and ");
+                    sql = sql.add(" and ");
                 }
-                sql.append(ROWNUM);
+                sql = sql.add(ROWNUM);
                 if (offset != null) {
-                    sql.append(" - ");
-                    sql.append(offset.emit(gen));
+                    sql = sql.add(" - ").add(offset.emit(gen));
                 }
-                sql.append(" <= " + limit.emit(gen));
+                sql = sql.add(" <= ").add(limit.emit(gen));
             }
         }
 
         // XXX: need better way to do size
         if (m_query instanceof Size) {
-            sql.insert(0, "select count(*) as \"size\" from (");
-            sql.append(") count__");
+            sql = new Code("select count(*) as \"size\" from (").add(sql)
+                .add(") count__");
         }
 
-        String result = sql.toString();
-
-        return result;
+        return sql;
     }
 
     public String toString() {

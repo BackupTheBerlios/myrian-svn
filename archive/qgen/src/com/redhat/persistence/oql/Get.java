@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #18 $ $Date: 2004/03/08 $
+ * @version $Revision: #19 $ $Date: 2004/03/09 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#18 $ by $Author: rhs $, $DateTime: 2004/03/08 23:10:10 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#19 $ by $Author: rhs $, $DateTime: 2004/03/09 21:48:49 $";
 
     private static final Logger s_log = Logger.getLogger(Get.class);
 
@@ -45,7 +45,7 @@ public class Get extends Expression {
         }
     }
 
-    String emit(Generator gen) {
+    Code emit(Generator gen) {
         return gen.getFrame(this).emit();
     }
 
@@ -164,7 +164,7 @@ public class Get extends Expression {
             }
         }
 
-        String emit(Generator gen) {
+        Code emit(Generator gen) {
             if (m_key == null) {
                 return emitStatic();
             } else {
@@ -176,7 +176,7 @@ public class Get extends Expression {
             return toString();
         }
 
-        private String emitStatic() {
+        private Code emitStatic() {
             Mapping m = Code.getMapping(m_property);
             List values = m_expr.getValues();
             String[] from = new String[values.size()];
@@ -203,14 +203,7 @@ public class Get extends Expression {
             in.append(") in (");
             in(m.getRetrieve().getSQL(), cols, bindings, in);
             in.append(")");
-
-            /*StringBuffer buf = new StringBuffer();
-            buf.append("exists(select 1 from (");
-            Code.bind(m.getRetrieve().getSQL(), bindings, buf);
-            buf.append(") sg where ");
-            Code.equals(Code.concat("sg.", cols), to, buf);
-            buf.append(")");*/
-            return in.toString();
+            return new Code(in.toString());
         }
 
         static boolean is(SQLToken t, String image) {
@@ -331,7 +324,7 @@ public class Get extends Expression {
         }
 
         public String toString() {
-            return emit(m_frame.getGenerator());
+            return emit(m_frame.getGenerator()).getSQL();
         }
 
     }
@@ -355,7 +348,7 @@ public class Get extends Expression {
             frame.setValues(values);
         }
 
-        String emit(Generator gen) {
+        Code emit(Generator gen) {
             return gen.getFrame(this).emit();
         }
 
@@ -383,7 +376,7 @@ public class Get extends Expression {
             ths.setValues(m_frame.getValues());
         }
 
-        String emit(Generator gen) {
+        Code emit(Generator gen) {
             return gen.getFrame(this).emit();
         }
 
@@ -411,7 +404,7 @@ public class Get extends Expression {
             frame.setTable(m_table);
         }
 
-        String emit(Generator gen) {
+        Code emit(Generator gen) {
             return gen.getFrame(this).emit();
         }
 

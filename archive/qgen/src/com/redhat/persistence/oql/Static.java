@@ -13,12 +13,12 @@ import java.util.*;
  * Static
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2004/03/03 $
+ * @version $Revision: #11 $ $Date: 2004/03/09 $
  **/
 
 public class Static extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#10 $ by $Author: ashah $, $DateTime: 2004/03/03 17:26:17 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#11 $ by $Author: rhs $, $DateTime: 2004/03/09 21:48:49 $";
 
     private SQL m_sql;
     private String[] m_columns;
@@ -171,28 +171,28 @@ public class Static extends Expression {
         }
     }
 
-    String emit(Generator gen) {
+    Code emit(Generator gen) {
         if (!hasType() && gen.hasFrame(this)) {
             return gen.getFrame(this).emit();
         }
 
-        StringBuffer buf = new StringBuffer();
+        Code result = new Code();
         int index = 0;
-        if (hasType()) { buf.append("("); }
+        if (hasType()) { result = result.add("("); }
         for (SQLToken t = m_sql.getFirst(); t != null; t = t.getNext()) {
             if (isExpression(t)) {
                 Expression e = (Expression) m_expressions.get(index++);
-                buf.append(e.emit(gen));
+                result = result.add(e.emit(gen));
             } else if (t.isRaw())  {
                 // XXX: ignore escapes for now
                 String raw = t.getImage();
-                buf.append(raw.substring(4, raw.length() - 1));
+                result = result.add(raw.substring(4, raw.length() - 1));
             } else {
-                buf.append(t.getImage());
+                result = result.add(t.getImage());
             }
         }
-        if (hasType()) { buf.append(")"); }
-        return buf.toString();
+        if (hasType()) { result = result.add(")"); }
+        return result;
     }
 
     private class Choice extends Expression {
@@ -234,7 +234,7 @@ public class Static extends Expression {
             }
         }
 
-        String emit(Generator gen) {
+        Code emit(Generator gen) {
             if (gen.hasFrame(this)) {
                 return gen.getFrame(this).emit();
             } else if (gen.hasType(m_all.getType())) {
@@ -242,7 +242,7 @@ public class Static extends Expression {
             } else if (m_expression != null) {
                 return m_expression.emit(gen);
             } else {
-                return m_image;
+                return new Code(m_image);
             }
         }
 
