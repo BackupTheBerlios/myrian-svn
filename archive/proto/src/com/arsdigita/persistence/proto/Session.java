@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #23 $ $Date: 2003/02/12 $
+ * @version $Revision: #24 $ $Date: 2003/02/12 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#23 $ by $Author: ashah $, $DateTime: 2003/02/12 16:39:50 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#24 $ by $Author: rhs $, $DateTime: 2003/02/12 17:18:17 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -112,11 +112,12 @@ public class Session {
         PersistentCollection pc = retrieve(getQuery(obj, id));
         Cursor c = pc.getDataSet().getCursor();
         if (c.next()) {
+            Object result = c.get();
             if (c.next()) {
                 throw new IllegalStateException
                     ("query returned more than one row");
             }
-            return c.get();
+            return result;
         } else {
             return null;
         }

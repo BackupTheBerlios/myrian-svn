@@ -13,12 +13,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/02/12 $
+ * @version $Revision: #11 $ $Date: 2003/02/12 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#10 $ by $Author: ashah $, $DateTime: 2003/02/12 16:39:50 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#11 $ by $Author: rhs $, $DateTime: 2003/02/12 17:18:17 $";
 
 
     private static class Generic {
@@ -27,6 +27,7 @@ public class ProtoTest extends TestCase {
         private BigInteger m_id;
 
         public Generic(ObjectType type, BigInteger id) {
+            m_type = type;
             m_id = id;
         }
 
@@ -72,7 +73,7 @@ public class ProtoTest extends TestCase {
         Session ssn = new Session();
         ssn.create(obj);
         Object obj2 = ssn.retrieve(obj.getType(), obj.getID());
-        assertTrue(obj == obj2);
+        assertTrue("obj: " + obj + ", obj2: " + obj2, obj == obj2);
 
         ssn.set(obj, str, "foo");
         assertEquals("foo", ssn.get(obj, str));
