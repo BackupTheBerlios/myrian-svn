@@ -1,19 +1,21 @@
 package com.arsdigita.persistence;
 
+import com.arsdigita.persistence.proto.common.Path;
 import com.arsdigita.persistence.metadata.Property;
 import com.arsdigita.persistence.proto.PersistentCollection;
+import com.arsdigita.persistence.proto.Signature;
 
 /**
  * DataAssociationCursorImpl
  *
  * @author Archit Shah &lt;ashah@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/05/12 $
+ * @version $Revision: #9 $ $Date: 2003/05/15 $
  **/
 
 class DataAssociationCursorImpl extends DataCollectionImpl
     implements DataAssociationCursor {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#8 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#9 $ by $Author: rhs $, $DateTime: 2003/05/15 16:44:04 $";
 
     private DataAssociationImpl m_assn;
 
@@ -30,7 +32,12 @@ class DataAssociationCursorImpl extends DataCollectionImpl
     }
 
     public DataObject getLink() {
-        return (DataObject) get("link");
+        Signature sig = getOriginal().getSignature();
+        if (sig.isSource(Path.get("link"))) {
+            return (DataObject) get("link");
+        } else {
+            return null;
+        }
     }
 
 
