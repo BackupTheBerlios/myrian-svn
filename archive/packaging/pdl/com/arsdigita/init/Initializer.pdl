@@ -1,0 +1,29 @@
+//
+// Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/test-packaging/pdl/com/arsdigita/init/Initializer.pdl#1 $
+// $DateTime: 2003/09/11 17:51:55 $
+
+model com.arsdigita.init;
+
+// @author Justin Ross (justin@arsdigita.com)
+// @version $Id: //core-platform/test-packaging/pdl/com/arsdigita/init/Initializer.pdl#1 $
+
+object type Initializer {
+    String[1..1] className = inits.class_name VARCHAR(200);
+    Initializer[0..n] requirements =
+        join inits.class_name to init_requirements.init,
+        join init_requirements.required_init to inits.class_name;
+
+    object key (className);
+}
