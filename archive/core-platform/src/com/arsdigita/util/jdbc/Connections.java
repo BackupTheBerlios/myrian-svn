@@ -19,7 +19,9 @@ import com.arsdigita.util.Assert;
 import com.arsdigita.util.Classes;
 import com.arsdigita.util.UncheckedWrapperException;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
+import java.sql.Statement;
 import java.sql.SQLException;
 import org.apache.log4j.Logger;
 
@@ -31,9 +33,9 @@ import org.apache.log4j.Logger;
  */
 public final class Connections {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/jdbc/Connections.java#5 $" +
-        "$Author: dennis $" +
-        "$DateTime: 2004/03/30 17:47:27 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/jdbc/Connections.java#6 $" +
+        "$Author: rhs $" +
+        "$DateTime: 2004/04/06 15:27:09 $";
 
     private static final Logger s_log = Logger.getLogger(Connections.class);
 
@@ -65,13 +67,21 @@ public final class Connections {
 
             conn.setAutoCommit(false);
 
-	    // XXX Use connection metadata to find out if this is the
-	    // bad oracle.  Do we need to do this this often?
-	    //if (false) {
-	    //    final PreparedStatement stmt = conn.prepareStatement
-	    //        ("alter session set \"_push_join_union_view\" = false");
-	    //    stmt.execute();
-	    //}
+            // This is a workaround for a bug in certain versions of
+            // oracle that cause oracle to erroneously report parse
+            // errors or 0600 errors when a UNION ALL is used in a
+            // subquery.
+            DatabaseMetaData meta = conn.getMetaData();
+            String product = meta.getDatabaseProductName();
+            String version = meta.getDatabaseProductVersion();
+            if ("Oracle".equals(product) &&
+                (version.indexOf("9.0.1") != -1 ||
+                 version.indexOf("9.2.0.1.0") != -1)) {
+                final Statement stmt = conn.createStatement();
+                stmt.execute
+                    ("alter session set \"_push_join_union_view\" = false");
+                stmt.close();
+            }
 
             return conn;
         } catch (SQLException e) {
