@@ -9,12 +9,12 @@ import java.util.*;
  * CreateEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/02/19 $
+ * @version $Revision: #10 $ $Date: 2003/02/27 $
  **/
 
 public class CreateEvent extends ObjectEvent {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/CreateEvent.java#9 $ by $Author: ashah $, $DateTime: 2003/02/19 20:50:58 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/CreateEvent.java#10 $ by $Author: ashah $, $DateTime: 2003/02/27 21:02:33 $";
 
     CreateEvent(Session ssn, Object obj) {
         super(ssn, obj);
@@ -28,22 +28,19 @@ public class CreateEvent extends ObjectEvent {
         super.activate();
 
         getObjectData().setState(ObjectData.INFANTILE);
-
         getObjectData().invalidatePropertyData();
 
-        if (getObjectData().getViolationCount() != -1) {
-            throw new IllegalStateException();
-        }
-
+        // set up new dependencies
         ObjectType type = getSession().getObjectType(getObject());
 
-        int i = 0;
         for (Iterator it = type.getProperties().iterator(); it.hasNext(); ) {
             Property prop = (Property) it.next();
-            if (!prop.isNullable()) { i++; }
+            if (!prop.isNullable()) {
+                PropertyData pd =
+                    getSession().fetchPropertyData(getObject(), prop);
+                pd.addNotNullDependent(this);
+            }
         }
-
-        getObjectData().setViolationCount(i);
     }
 
     void sync() {

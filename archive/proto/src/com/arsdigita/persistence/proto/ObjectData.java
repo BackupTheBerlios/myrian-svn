@@ -9,18 +9,18 @@ import org.apache.log4j.Logger;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/02/19 $
+ * @version $Revision: #13 $ $Date: 2003/02/27 $
  **/
 
 class ObjectData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#12 $ by $Author: ashah $, $DateTime: 2003/02/19 20:50:58 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#13 $ by $Author: ashah $, $DateTime: 2003/02/27 21:02:33 $";
 
     private static final Logger LOG = Logger.getLogger(ObjectData.class);
 
     private final Session m_ssn;
     private final Object m_object;
-    private final ArrayList m_events = new ArrayList();
+    private final LinkedList m_events = new LinkedList();
 
     static class State {
         private String m_name;
@@ -41,8 +41,6 @@ class ObjectData {
     private State m_state;
 
     private HashMap m_pdata = new HashMap();
-
-    private int m_violationCount = -1;
 
     public ObjectData(Session ssn, Object object, State state) {
         m_ssn = ssn;
@@ -78,26 +76,13 @@ class ObjectData {
         }
     }
 
-    int getViolationCount() { return m_violationCount; }
-
-    void setViolationCount(int i) { m_violationCount = i; }
-
-    boolean isFlushable() {
-        if (getState().equals(DEAD)) {
-            throw new IllegalStateException();
-        } else if (getState().equals(SENILE)) {
-            return true;
-        } else if (m_violationCount == -1) {
-            throw new IllegalStateException(m_events.toString());
-        } else if (m_violationCount == 0) {
-            return true;
-        } else {
-            return false;
-        }
+    void addEvent(ObjectEvent ev) {
+        m_events.add(ev);
     }
 
-    public void addEvent(ObjectEvent ev) {
-        m_events.add(ev);
+    ObjectEvent getCurrentEvent() {
+        if (m_events.size() == 0) { return null; }
+        return (ObjectEvent) m_events.getLast();
     }
 
     void removeEvent(ObjectEvent ev) {
@@ -106,21 +91,9 @@ class ObjectData {
 
     public boolean isNew() { return m_startedNew; }
 
-    public boolean isDeleted() {
-        if (isDead() || isSenile()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+    public boolean isDeleted() { return isDead() || isSenile(); }
 
-    public boolean isModified() {
-        if (isNubile()) {
-            return false;
-        } else {
-            return true;
-        }
-    }
+    public boolean isModified() { return !isNubile(); }
 
     public boolean isInfantile() { return m_state.equals(INFANTILE); }
 
@@ -132,7 +105,7 @@ class ObjectData {
 
     public boolean isDead() { return m_state.equals(DEAD); }
 
-    public void setState(State state) {
+    void setState(State state) {
         if (state.equals(INFANTILE)) {
             m_startedNew = true;
         }

@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #36 $ $Date: 2003/02/26 $
+ * @version $Revision: #37 $ $Date: 2003/02/27 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#36 $ by $Author: rhs $, $DateTime: 2003/02/26 20:44:08 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#37 $ by $Author: ashah $, $DateTime: 2003/02/27 21:02:33 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -33,10 +33,12 @@ public class Session {
 
     private HashMap m_odata = new HashMap();
 
-    private HashSet m_visiting = new HashSet();
+    private Set m_visiting = new HashSet();
 
     private LinkedList m_events = new LinkedList();
     private LinkedList m_pending = new LinkedList();
+
+    private Set m_violations = new HashSet();
 
     private final static Set EVENT_PROCESSORS = new HashSet();
 
@@ -100,7 +102,6 @@ public class Session {
             m_visiting.add(od);
 
             ObjectType type = getObjectType(obj);
-            Collection keys = type.getKeyProperties();
 
             for (Iterator it = type.getRoles().iterator();
                  it.hasNext(); ) {
@@ -114,7 +115,7 @@ public class Session {
                  it.hasNext(); ) {
                 Role role = (Role) it.next();
 
-                if (!role.isCollection() && !keys.contains(role)) {
+                if (!role.isCollection() && get(obj, role) != null) {
                     setInternal(obj, role, null);
                 }
             }
@@ -177,45 +178,45 @@ public class Session {
      * reversible role, either set or remove, the reverse role for the old
      * target needs to be set to null.
      *
-     * @param source the source of a role that has been updated
-     * @param role the role that has been updated
+     * @param event the event causing this update
      * @param target the old target of a role that has been updated
      **/
-    private void reverseUpdateOld(Object source, Role role, Object target) {
+    private void reverseUpdateOld(PropertyEvent event, Object target) {
+        Object source = event.getObject();
+        Role role = (Role) event.getProperty();
         Role rev = role.getReverse();
 
         if (rev.isCollection()) {
-            addEvent(new RemoveEvent(this, target, rev, source));
+            addEvent(new RemoveEvent(this, target, rev, source, event));
         } else {
-            addEvent(new SetEvent(this, target, rev, null));
+            addEvent(new SetEvent(this, target, rev, null, event));
         }
     }
 
     /**
-     * Update the reverse role of an new target object. After updating a
+     * Update the reverse role of a new target object. After updating a
      * reversible role, either set or add, the reverse role for the new target
-     * needs to be set to the new source. In addition, the new targets' old
+     * needs to be set to the new source. In addition, the new target's old
      * source needs to be updated so its role target is null.
-     *
-     * @param source the source of a role that has been updated
-     * @param role the role that has been updated
-     * @param targetObj the new target of a role that has been updated
      **/
-    private void reverseUpdateNew(Object source, Role role, Object target) {
+    private void reverseUpdateNew(PropertyEvent event) {
+        Object source = event.getObject();
+        Role role = (Role) event.getProperty();
+        Object target = event.getArgument();
         Role rev = role.getReverse();
         if (rev.isCollection()) {
-            addEvent(new AddEvent(this, target, rev, source));
+            addEvent(new AddEvent(this, target, rev, source, event));
         } else {
             Object old = get(target, rev);
             if (old != null && !old.equals(source)) {
                 if (role.isCollection()) {
-                    addEvent(new RemoveEvent(this, old, role, target));
+                    addEvent(new RemoveEvent(this, old, role, target, event));
                 } else {
-                    addEvent(new SetEvent(this, old, role, null));
+                    addEvent(new SetEvent(this, old, role, null, event));
                 }
             }
 
-            addEvent(new SetEvent(this, target, rev, source));
+            addEvent(new SetEvent(this, target, rev, source, event));
         }
     }
 
@@ -237,22 +238,17 @@ public class Session {
                         old = get(obj, role);
                     }
 
-                    addEvent(new SetEvent(Session.this, obj, role, value));
-
-                    if (role.isComponent()) {
-                        if (old != null) {
-                            cascadeDelete(obj, old);
-                        }
-                    }
+                    PropertyEvent ev =
+                        new SetEvent(Session.this, obj, role, value);
+                    addEvent(ev);
 
                     if (role.isReversable()) {
-                        if (old != null) {
-                            reverseUpdateOld(obj, role, old);
-                        }
+                        if (old != null) { reverseUpdateOld(ev, old); }
+                        if (value != null) { reverseUpdateNew(ev); }
+                    }
 
-                        if (value != null) {
-                            reverseUpdateNew(obj, role, value);
-                        }
+                    if (role.isComponent()) {
+                        if (old != null) { cascadeDelete(obj, old); }
                     }
                 }
 
@@ -330,11 +326,11 @@ public class Session {
 
         prop.dispatch(new Property.Switch() {
                 public void onRole(Role role) {
-                    addEvent(new AddEvent(Session.this, obj, role, value));
+                    PropertyEvent ev =
+                        new AddEvent(Session.this, obj, role, value);
+                    addEvent(ev);
 
-                    if (role.isReversable()) {
-                        reverseUpdateNew(obj, role, value);
-                    }
+                    if (role.isReversable()) { reverseUpdateNew(ev); }
                 }
 
                 public void onAlias(Alias alias) {
@@ -368,12 +364,16 @@ public class Session {
 
         prop.dispatch(new Property.Switch() {
                 public void onRole(Role role) {
-                    addEvent(new RemoveEvent(Session.this, obj, role, value));
+                    PropertyEvent ev =
+                        new RemoveEvent(Session.this, obj, role, value);
+                    addEvent(ev);
+
+                    if (role.isReversable()) {
+                        reverseUpdateOld(ev, value);
+                    }
 
                     if (role.isComponent()) {
                         cascadeDelete(obj, value);
-                    } else if (role.isReversable()) {
-                        reverseUpdateOld(obj, role, value);
                     }
                 }
 
@@ -457,11 +457,35 @@ public class Session {
             trace("flush", new Object[] {});
         }
 
-        LinkedList written = new LinkedList();
+        for (Iterator it = m_events.iterator(); it.hasNext(); ) {
+            ((Event) it.next()).m_flushable = true;
+        }
+
+        // find unflushable events
+        List queue = new LinkedList();
+        for (Iterator pds = m_violations.iterator(); pds.hasNext(); ) {
+            PropertyData pd = (PropertyData) pds.next();
+            for (Iterator evs = pd.getDependentEvents(); evs.hasNext(); ) {
+                queue.add(evs.next());
+            }
+        }
+
+        // recursively mark reachable events as unflushable
+        while (queue.size() != 0) {
+            Event ev = (Event) queue.remove(0);
+            if (ev.m_flushable) {
+                ev.m_flushable = false;
+                for (Iterator evs = ev.getDependentEvents(); evs.hasNext(); ) {
+                    queue.add(evs.next());
+                }
+            }
+        }
+
+        List written = new LinkedList();
 
         for (Iterator it = m_events.iterator(); it.hasNext(); ) {
             Event ev = (Event) it.next();
-            if (getObjectData(ev.getObject()).isFlushable()) {
+            if (ev.m_flushable) {
                 m_engine.write(ev);
                 written.add(ev);
                 it.remove();
@@ -485,7 +509,9 @@ public class Session {
         }
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("unflushed: " + m_events.size());
+            if (m_events.size() > 0) {
+                LOG.error("unflushed: " + m_events.size());
+            }
             untrace("flush");
         }
     }
@@ -502,6 +528,8 @@ public class Session {
         m_odata.clear();
         m_events.clear();
         m_pending.clear();
+        m_visiting.clear();
+        m_violations.clear();
     }
 
     /**
@@ -515,6 +543,8 @@ public class Session {
         m_odata.clear();
         m_events.clear();
         m_pending.clear();
+        m_visiting.clear();
+        m_violations.clear();
     }
 
     Engine getEngine() {
@@ -658,6 +688,10 @@ public class Session {
 
         return pd;
     }
+
+    void addViolation(PropertyData pd) { m_violations.add(pd); }
+
+    void removeViolation(PropertyData pd) { m_violations.remove(pd); }
 
     public static void addEventProcessor(EventProcessor ep) {
         Assert.assertNotNull(ep, "event processor");

@@ -8,18 +8,23 @@ import java.io.*;
  * PropertyData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/02/19 $
+ * @version $Revision: #9 $ $Date: 2003/02/27 $
  **/
 
 class PropertyData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyData.java#8 $ by $Author: ashah $, $DateTime: 2003/02/19 15:49:06 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyData.java#9 $ by $Author: ashah $, $DateTime: 2003/02/27 21:02:33 $";
 
     final private ObjectData m_odata;
     final private Property m_prop;
     private Object m_value;
     final private ArrayList m_events = new ArrayList();
+
+    // marks the first event that is valid for this lifecycle of
+    // the associated ObjectData
     private PropertyEvent m_current = null;
+
+    private List m_dependentEvents = new ArrayList();
 
     public PropertyData(ObjectData odata, Property prop, Object value) {
         m_odata = odata;
@@ -76,6 +81,31 @@ class PropertyData {
         m_events.remove(ev);
     }
 
+    Iterator getCurrentEvents() {
+        if (m_current == null) { return Collections.EMPTY_LIST.iterator(); }
+
+        int index = m_events.indexOf(m_current);
+        return m_events.subList(index, m_events.size() - 1).iterator();
+    }
+
+    PropertyEvent getCurrentEvent(PropertyEvent pe) {
+        if (pe instanceof SetEvent && !m_prop.isCollection()) {
+            if (m_current == null) { return null; }
+            return (SetEvent) m_events.get(m_events.size() - 1);
+        } else if (!(pe instanceof SetEvent) && m_prop.isCollection()) {
+            // for add/remove get the previous one with matching argument
+            if (m_current == null) { return null; }
+            for (int i = m_events.size() - 1; i >= 0; i--) {
+                PropertyEvent old = (PropertyEvent) m_events.get(i);
+                if (old.getArgument().equals(pe.getArgument())) { return old; }
+                if (old == m_current) { return null; }
+            }
+            throw new IllegalStateException();
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
     void invalidate() {
         m_current = null;
         if (!m_prop.isCollection()) {
@@ -86,6 +116,22 @@ class PropertyData {
     public boolean isModified() {
         if (m_current == null) { return false; }
         return m_events.size() > m_events.indexOf(m_current);
+    }
+
+    void addNotNullDependent(Event ev) {
+        getSession().addViolation(this);
+        m_dependentEvents.add(ev);
+    }
+
+    Iterator getDependentEvents() { return m_dependentEvents.iterator(); }
+
+    void transferNotNullDependentEvents(Event ev) {
+        for (Iterator it = m_dependentEvents.iterator(); it.hasNext(); ) {
+            ev.addDependent((Event) it.next());
+        }
+
+        m_dependentEvents.clear();
+        getSession().removeViolation(this);
     }
 
     void dump() {
