@@ -2,16 +2,17 @@
 
 # Author:  Vadim Nasardinov (vadimn@redhat.com)
 # Since:   2004-09-28
-# Version: $Id: //eng/persistence/dev/bin/rename-package.py#2 $
+# Version: $Id: //eng/persistence/dev/bin/rename-package.py#3 $
 
 '''Usage:
     $ rename-package.py --from <old-package-name> --to <new-package-name> <dir1> [<dir2> ...]
 Example:
-    $ rename-package.py --from com.arsdigita --to cap src test/src
+    $ rename-package.py --from com.arsdigita --to cap src cap test bin conf doc sql
 '''
 
 import sys
-from os.path import join, isdir, isfile, walk
+import os
+from os.path import join, isdir, isfile, splitext, walk
 
 class Config:
     '''Represents command-line options'''
@@ -21,26 +22,34 @@ class Config:
 
         import getopt
         hash = {}
-        flags = ["from=", "to=", "help"]
-        (options, self.directories) = getopt.getopt(opts, "", flags)
+        flags = ["from=", "to=", "help", "replace"]
+        (options, self._paths) = getopt.getopt(opts, "", flags)
         if not options:
+            display_help_and_exit()
+
+        if len(self._paths) == 0:
+            print "Error: No paths given.\n"
             display_help_and_exit()
 
         for (key, value) in options:
             # an option starts with "--" and possibly ends in "="
             hash[key[2:].rstrip("=")] = value
 
-        if len(self.directories) == 0:
-            print "Error: No directories are given.\n"
-            display_help_and_exit()
-
-        for dd in self.directories:
-            if not isdir(dd):
-                print "Error:", dd, "is not a directory.\n"
-                display_help_and_exit()
         self._from_pkg = hash["from"]
         self._to_pkg   = hash["to"]
         self._help = hash.has_key("help")
+
+        self._replace_option = hash.has_key("replace")
+
+        if self.replace_requested():
+            if not isfile(self.get_fname()):
+                print "Error: %s is not a file\n" % self.get_fname()
+                display_help_and_exit()
+        else:
+            for dd in self._paths:
+                if not isdir(dd):
+                    print "Error:", dd, "is not a directory.\n"
+                    display_help_and_exit()
 
     def get_script(self):
         return self._script
@@ -60,8 +69,21 @@ class Config:
     def help_requested(self):
         return self._help
 
+    def replace_requested(self):
+        return self._replace_option
+
+
+    def get_fname(self):
+        if self.replace_requested():
+            return self._paths[0]
+        else:
+            return None
+
     def get_directories(self):
-        return list(self.directories)
+        if self.replace_requested():
+            return None
+        else:
+            return list(self._paths)
 
 
 def display_help_and_exit():
@@ -96,6 +118,8 @@ class Processor:
         to_name = self._move(fname)
         if not to_name is None:
             self._replace(fname, to_name)
+        else:
+            self._replace(fname, fname)
         self._count += 1
 
     def _move(self, from_name):
@@ -111,6 +135,9 @@ class Processor:
         return to_name
 
     def _replace(self, from_name, to_name):
+        (root, ext) = splitext(from_name)
+        if ext in ("jpg",): return
+
         ff = open(from_name)
         needs_editing = False
         pkg = self._config.get_from_pkg()
@@ -131,9 +158,15 @@ class Processor:
         return "Moved: %d out of %d %s files" % \
                (self._moved, self._count, self._ext )
 
-def rename_package(config):
+def generate_script(config):
     walker = Walker()
-    extensions = [".java", ".jj", ".pdl"]
+
+    extensions = ("java", "properties", "jj", "pdl", "xml", "sql", \
+                  "txt", "xsl", "csv", "dat", "dtd", "html", "jdo", "jpg")
+    extensions = ["." + ext for ext in extensions]
+
+    print "#!/bin/bash\n"
+
     for ext in extensions:
         for dir in config.get_directories():
             print "\n# Walking", dir, "looking for", ext, "files"
@@ -141,8 +174,33 @@ def rename_package(config):
             walk(dir, walker, processor)
             print "#", processor
 
+def edit_in_place(config):
+    fname = config.get_fname()
+    if not isfile(fname):
+        print "Error: %s is not a file" % fname
+        display_help_and_exit()
+
+    if not os.access(fname, os.W_OK):
+        print "Error: %s is not writable" % fname
+        display_help_and_exit()
+
+    from_pkg = config.get_from_pkg()
+    to_pkg   = config.get_to_pkg()
+    from_dir = config.get_from_dir()
+    to_dir   = config.get_to_dir()
+
+    for line in fileinput.input(files=fname, inplace=1):
+        line = line.rstrip("\n\r ")
+        line = line.replace(from_pkg, to_pkg)
+        line = line.replace(from_dir, to_dir)
+        print line
+
 if __name__ == '__main__':
     config = Config(sys.argv[0], sys.argv[1:])
     if config.help_requested():
         display_help_and_exit()
-    rename_package(config)
+    if config.replace_requested():
+        import fileinput
+        edit_in_place(config)
+    else:
+        generate_script(config)
