@@ -61,10 +61,7 @@ class StateManagerImpl extends AbstractStateManager {
      * instance.
      */
     public Object getObjectId(PersistenceCapable pc) {
-        Object id = JDOImplHelper.getInstance().
-            newObjectIdInstance(pc.getClass());
-        pc.jdoCopyKeyFieldsToObjectId(id);
-        return id;
+        return m_pmi.getObjectId(pc);
     }
 
     /**

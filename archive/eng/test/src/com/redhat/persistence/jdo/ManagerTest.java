@@ -1,6 +1,6 @@
 package com.redhat.persistence.jdo;
 
-import javax.jdo.spi.PersistenceCapable;
+import javax.jdo.JDOHelper;
 
 /**
  * This tests PersistenceManagerImpl and StateManagerImpl.
@@ -26,9 +26,11 @@ public class ManagerTest extends WithTxnCase {
     public void testGetObjectId() {
         final Object id1 = m_pm.getObjectId(m_group);
         assertNotNull("id1", id1);
-        PersistenceCapable pc = (PersistenceCapable) (Object) m_group;
-        final Object id2 = pc.jdoGetObjectId();
+
+        // JDOHelper delegates to StateManager
+        final Object id2 = JDOHelper.getObjectId(m_group);
         assertNotNull("id2", id2);
+
         assertEquals("identities", id1, id2);
     }
 }
