@@ -19,6 +19,7 @@ import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.pdl.PDL;
 import com.arsdigita.persistence.pdl.PDLOutputter;
+import com.redhat.persistence.engine.rdbms.RDBMSEngine;
 import junit.framework.TestCase;
 
 import java.util.HashSet;
@@ -33,12 +34,12 @@ import org.apache.log4j.Logger;
  * PersistenceTestCase
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/08/15 $
+ * @version $Revision: #13 $ $Date: 2004/01/29 $
  */
 
 public class PersistenceTestCase extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#12 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#13 $ by $Author: jorris $, $DateTime: 2004/01/29 14:53:03 $";
 
     private static final Logger LOG =
         Logger.getLogger(PersistenceTestCase.class);
@@ -153,6 +154,9 @@ public class PersistenceTestCase extends TestCase {
         return m_session;
     }
 
+    protected RDBMSEngine getEngine() {
+        return m_session.getEngine();
+    }
     private Session m_session;
 
 }
