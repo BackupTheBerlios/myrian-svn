@@ -52,7 +52,7 @@ import java.util.List;
  * Object)} methods. </p>
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/01/24 $
+ * @version $Date: 2003/01/27 $
  * @since 2003-01-23
  **/
 public class Tree {
@@ -158,6 +158,63 @@ public class Tree {
      **/
     public List getSubtrees() {
         return new ArrayList(m_children);
+    }
+
+    /**
+     * Returns a copy of this tree. The returned copy does not have a parent
+     * tree. In other words, the returned tree is no longer a part of a bigger
+     * tree, even if this tree was.
+     *
+     @ return.getParent() == null
+     **/
+    public Tree copy() {
+        Tree result = new Tree(getRoot());
+        copyRecurse(this, result);
+        return result;
+    }
+
+    private static void copyRecurse(Tree from, Tree to) {
+        Iterator children = from.getSubtrees().iterator();
+        while ( children.hasNext() ) {
+            EdgeTreePair pair = (EdgeTreePair) children.next();
+            Tree result = to.addChild(pair.getTree().getRoot(), pair.getEdge());
+            copyRecurse(pair.getTree(), result);
+        }
+    }
+
+    public int nodeCount() {
+        return nodeCountRecurse(this);
+    }
+
+    private static int nodeCountRecurse(Tree tree) {
+        int result = 1;
+        for ( Iterator ii=tree.getSubtrees().iterator(); ii.hasNext(); ) {
+            EdgeTreePair pair = (EdgeTreePair) ii.next();
+            result += nodeCountRecurse(pair.getTree());
+        }
+        return result;
+    }
+
+    /**
+     * Returns the maximum depth of the tree.
+     **/
+    public int depth() {
+        return depthRecurse(this);
+    }
+
+    private static int depthRecurse(Tree tree) {
+        if ( tree.getSubtrees().size() == 0 ) {
+            return 1;
+        }
+        int maxDepth = 0;
+        for (Iterator ii=tree.getSubtrees().iterator(); ii.hasNext(); ) {
+            EdgeTreePair pair = (EdgeTreePair) ii.next();
+            int depth = depthRecurse(pair.getTree());
+            if ( depth > maxDepth ) {
+                maxDepth = depth;
+            }
+        }
+        return maxDepth + 1;
     }
 
     /**

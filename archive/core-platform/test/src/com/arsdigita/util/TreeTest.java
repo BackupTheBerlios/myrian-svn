@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 
 /**
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/01/24 $
+ * @version $Date: 2003/01/27 $
  * @since 2003-01-22
  **/
 public class TreeTest extends TestCase {
@@ -115,5 +115,39 @@ public class TreeTest extends TestCase {
         actual = Tree.treesToNodes(dd.getAncestors());
         expected = Arrays.asList(new String[] {B, A});
         assertEquals("D's ancestors", expected, actual);
+    }
+
+    public void testTreeNodeCount() {
+        Tree aa = new Tree(A);
+        Tree bb = aa.addChild(B);
+        bb.addChild(C);
+        bb.addChild(D).addChild(A);
+        aa.addChild(D).addChild(E);
+        aa.addChild(F);
+
+        assertEquals("A's node count", 8, aa.nodeCount());
+    }
+
+    public void testTreeCopy() {
+        Tree aa = new Tree(A);
+        Tree bb = aa.addChild(B);
+        bb.addChild(C).addChild(D);
+        aa.addChild(E).addChild(B);
+        aa.addChild(F);
+        Tree bbCopy = bb.copy();
+        assertEquals("B's copy's parent", null, bbCopy.getParent());
+        assertEquals("B's copy's root", B, (String) bbCopy.getRoot());
+        assertEquals("B's copy's node count", 3, bbCopy.nodeCount());
+    }
+
+    public void testDepth() {
+        Tree aa = new Tree(A);
+        Tree bb = aa.addChild(B);
+        bb.addChild(C);
+        Tree ff = bb.addChild(D).addChild(E).addChild(F);
+        ff.addChild(A);
+        ff.addChild(B).addChild(C);
+        aa.addChild(C);
+        assertEquals("A's depth", 7, aa.depth());
     }
 }
