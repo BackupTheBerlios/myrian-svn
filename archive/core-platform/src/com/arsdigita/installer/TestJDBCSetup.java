@@ -14,9 +14,11 @@
  */
 
 /**
- * $Id: //core-platform/dev/src/com/arsdigita/installer/TestJDBCSetup.java#2 $
+ * $Id: //core-platform/dev/src/com/arsdigita/installer/TestJDBCSetup.java#3 $
  *
- *  Simple class which tests JDBC connection.
+ *  Simple class which tests JDBC connection.  This currently works
+ *  for either postgres or oracle.  The class must be modified to work
+ *  with any other database
  *
  */
 
@@ -26,7 +28,7 @@ import java.sql.*;
 
 public class TestJDBCSetup {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/TestJDBCSetup.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/TestJDBCSetup.java#3 $ by $Author: randyg $, $DateTime: 2002/07/19 08:51:21 $";
 
     public static void main (String args[]) {
 
@@ -47,7 +49,7 @@ public class TestJDBCSetup {
             System.err.println(e.toString());
             System.exit(1);
         }
-
+        System.out.println("Success");
         System.exit(0);
 
     }
@@ -61,15 +63,21 @@ public class TestJDBCSetup {
         int rowCount = 0;
 
         String result = "";
-
-        Class.forName("oracle.jdbc.driver.OracleDriver");
+        
+        String sql = null;
+        if (jdbcUrl.indexOf("postgres") > -1) {
+            Class.forName("org.postgresql.Driver");
+            sql = "select 'success' as result";
+        } else {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            sql = "SELECT 'success' AS result FROM dual";
+        }
 
         Connection con = DriverManager.getConnection(jdbcUrl, dbUsername, dbPassword);
 
         Statement stmt = con.createStatement();
 
-        ResultSet rs = stmt.executeQuery(
-            "SELECT 'success' AS result FROM dual");
+        ResultSet rs = stmt.executeQuery(sql);
 
         while (rs.next()) {
             rowCount++;
