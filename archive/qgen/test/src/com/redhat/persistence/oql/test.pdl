@@ -91,8 +91,19 @@ object type Node class com.redhat.persistence.PropertyMap
                        adapter com.redhat.persistence.oql.IdentityAdapter {
     BigInteger id = st.st_id;
     String name = st.name;
+    String description = st.description;
+    NodeType[1..1] type = join st.type_id to nt.type_id;
     Node parent = join st.parent_id to st.st_id;
     Node[0..n] children = qualias { filter(all(test.Node), parent == this) };
+
+    object key(id);
+}
+
+object type NodeType class com.redhat.persistence.PropertyMap
+                     adapter com.redhat.persistence.oql.IdentityAdapter {
+    BigInteger id = nt.type_id;
+    String name = nt.name;
+    String description = nt.description;
 
     object key(id);
 }

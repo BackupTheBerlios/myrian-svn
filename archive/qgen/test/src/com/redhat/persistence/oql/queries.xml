@@ -866,17 +866,44 @@
       <row id="9" name="00s"/>
     </results>
   </test>
+
   <test>
     <query subselects="0" joins="2" outers="0">
       query(filter(all(test.User), name == "Snurble").groups, id = id, name = name)
     </query>
     <results/>
   </test>
+
   <test>
     <query>
       query(afilter(all(test.User), name == "Snurble").groups, id = id, name = name)
     </query>
     <exception type="java.lang.IllegalArgumentException"
                 msg="no such expression: afilter"/>
+  </test>
+
+  <test>
+    <query subselects="0" joins="1" outers="0">
+      query(filter(filter(this = all(test.Node), this.id == 31).this,
+                   exists(parent)).parent,
+            id = id, name = name, description = description)
+    </query>
+    <results>
+      <row id="30" name="Thirty" description="null"/>
+    </results>
+  </test>
+
+  <test>
+    <query subselects="0" joins="2" outers="0">
+      query(filter(filter(this = all(test.Node), this.id == 31).this,
+                   exists(parent)).parent,
+            id = id, name = name, description = description,
+            type_id = type.id, type_name = type.name,
+            type_description = type.description)
+    </query>
+    <results>
+      <row id="30" name="Thirty" description="null" type_id="1"
+           type_name="Type 1" type_description="Type 1 Description"/>
+    </results>
   </test>
 </tests>

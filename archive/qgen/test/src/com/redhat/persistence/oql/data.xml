@@ -72,16 +72,18 @@
   <test.Tuple a.id="5" b.id="16" c.id="26" cee.id="24"/>
   <test.Tuple a.id="6" b.id="16" c.id="25" cee.id="24"/>
 
-  <test.Node id="30" name="Thirty"/>
-  <test.Node id="31" name="Thirty One" parent.id="30"/>
-  <test.Node id="32" name="Thirty Two" parent.id="30"/>
-  <test.Node id="33" name="Thirty Three" parent.id="30"/>
-  <test.Node id="34" name="Thirty Four" parent.id="33"/>
-  <test.Node id="35" name="Thirty Five" parent.id="33"/>
-  <test.Node id="36" name="Thirty Six" parent.id="33"/>
-  <test.Node id="37" name="Thirty Seven" parent.id="36"/>
-  <test.Node id="38" name="Thirty Eight" parent.id="37"/>
-  <test.Node id="39" name="Thirty Nine" parent.id="38"/>
+  <test.NodeType id="1" name="Type 1" description="Type 1 Description"/>
+
+  <test.Node id="30" name="Thirty" type.id="1"/>
+  <test.Node id="31" name="Thirty One" type.id="1" parent.id="30"/>
+  <test.Node id="32" name="Thirty Two" type.id="1" parent.id="30"/>
+  <test.Node id="33" name="Thirty Three" type.id="1" parent.id="30"/>
+  <test.Node id="34" name="Thirty Four" type.id="1" parent.id="33"/>
+  <test.Node id="35" name="Thirty Five" type.id="1" parent.id="33"/>
+  <test.Node id="36" name="Thirty Six" type.id="1" parent.id="33"/>
+  <test.Node id="37" name="Thirty Seven" type.id="1" parent.id="36"/>
+  <test.Node id="38" name="Thirty Eight" type.id="1" parent.id="37"/>
+  <test.Node id="39" name="Thirty Nine" type.id="1" parent.id="38"/>
 
   <test.User id="0" name="Ashanti"/>
   <test.User id="1" name="Britney"/>
