@@ -30,12 +30,12 @@ import com.arsdigita.util.UncheckedWrapperException;
  * Constraint
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/07/08 $
  **/
 
 public abstract class Constraint {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Constraint.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Constraint.java#2 $ by $Author: vadim $, $DateTime: 2004/07/08 16:07:10 $";
 
     private Table m_table;
     private String m_name;
@@ -63,7 +63,9 @@ public abstract class Constraint {
             cols.add(m_columns[i]);
             if (!m_columns[i].getTable().equals(table)) {
                 throw new IllegalArgumentException
-                    ("All column constraints must be from the same table.");
+                    ("All column constraints must be from the same table. " +
+                     "table=" + table + "; columns=" + Arrays.asList(m_columns) +
+                     "; offending column=" + m_columns[i]);
             }
         }
 
