@@ -15,20 +15,27 @@
 
 package com.arsdigita.initializer;
 
-import java.util.*;
-import java.io.*;
 import org.apache.log4j.Logger;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Script
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/09/09 $
  */
 
 public class Script {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Script.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Script.java#5 $ by $Author: jorris $, $DateTime: 2002/09/09 17:12:20 $";
 
     private static final Logger s_log =
         Logger.getLogger(Script.class);
@@ -137,8 +144,8 @@ public class Script {
      * Starts up all initializers that this script contains.
      **/
 
-    public void startup() throws InitializationException {
-        startup(null);
+    public Collection startup() throws InitializationException {
+        return startup(null);
     }
 
     /**
@@ -148,18 +155,29 @@ public class Script {
      * @param iniName The name of the initializer to start.
      **/
 
-    public void startup(String iniName) throws InitializationException {
+    public Collection startup(String iniName) throws InitializationException {
         if (isStarted)
             throw new InitializationException(
                                               "Startup has already been called."
                                               );
-        for (int i = 0; i < m_initializers.size(); i++) {
-            Initializer ini = (Initializer) m_initializers.get(i);
-            ini.startup();
-            if (ini.getClass().getName().equals(iniName))
-                break;
+        HashSet initializersRun = new HashSet();
+        try {
+            for (int i = 0; i < m_initializers.size(); i++) {
+                Initializer ini = (Initializer) m_initializers.get(i);
+                final String name = ini.getClass().getName();
+                ini.startup();
+                initializersRun.add(name);
+                if (name.equals(iniName))
+                    break;
+            }
+
+        } catch(Exception e) {
+            final boolean loggerIsInitialized = initializersRun.contains("com.arsdigita.logging.Initializer");
+            logInitializationFailure(loggerIsInitialized, e);
+            throw new InitializationException("Initialization Script startup error!", e);
         }
         isStarted = true;
+        return initializersRun;
     }
 
     /**
@@ -217,6 +235,17 @@ public class Script {
         }
 
 
+    }
+
+    private void logInitializationFailure(final boolean loggerIsInitialized, Exception e) {
+        String msg = "Fatal error loading initialization script";
+        if (loggerIsInitialized) {
+            Logger log = Logger.getLogger(Script.class);
+            log.fatal(msg, e);
+        } else {
+            System.err.println(msg + ":" + e.getMessage());
+            e.printStackTrace(System.err);
+        }
     }
 
 }

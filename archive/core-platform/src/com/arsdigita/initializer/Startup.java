@@ -21,7 +21,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
-import java.util.*;
+import java.util.Collection;
 
 /**
  * Convenience class designed to run initializers. Either manually specify the
@@ -30,13 +30,13 @@ import java.util.*;
  *
  * @author <a href="mbryzek@arsdigita.com">Michael Bryzek</a>
  * @author <a href="dennis@arsdigita.com">Dennis Gregorovic</a>
- * @version $Revision: #4 $ $Date: 2002/08/26 $
+ * @version $Revision: #5 $ $Date: 2002/09/09 $
  * @since ACS 4.7
  *
  **/
 public class Startup {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Startup.java#4 $ by $Author: jorris $, $DateTime: 2002/08/26 01:17:47 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Startup.java#5 $ by $Author: jorris $, $DateTime: 2002/09/09 17:12:20 $";
 
     /** The name of the property containing the web app root **/
     public static final String WEB_APP_ROOT = "webAppRoot";
@@ -112,29 +112,19 @@ public class Startup {
             throw new InitializationException("Couldn't find " + m_scriptName);
         }
 
+        Collection initializersRun = null;
         try {
             if (m_lastInitializer == null) {
                 m_ini = new Script(r);
-                m_ini.startup();
+                initializersRun = m_ini.startup();
             } else {
                 m_ini = new Script(r, m_lastInitializer);
-                m_ini.startup(m_lastInitializer);
+                initializersRun = m_ini.startup(m_lastInitializer);
             }
         } catch (InitializationException e) {
             e.printStackTrace(System.err);
             throw new InitializationException
                 ("Error loading init script: " + e.getMessage());
-        }
-
-        List initializers = m_ini.getInitializers();
-        Set initializersRun = new HashSet();
-        for (Iterator iterator = initializers.iterator(); iterator.hasNext();) {
-            Initializer init = (Initializer) iterator.next();
-            String name = init.getClass().getName();
-            initializersRun.add(name);
-            if (name.equals(m_lastInitializer)) {
-                break;
-            }
         }
 
         return initializersRun;
