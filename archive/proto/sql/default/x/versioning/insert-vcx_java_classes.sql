@@ -11,10 +11,11 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/proto/sql/default/x/versioning/insert-vcx_java_classes.sql#1 $
--- $DateTime: 2003/04/10 18:10:38 $
+-- $Id: //core-platform/proto/sql/default/x/versioning/insert-vcx_java_classes.sql#2 $
+-- $DateTime: 2003/04/11 10:55:52 $
 
--- See com.arsdigita.x.versioning.Event
+-- NOTE: this needs to be kept in sync with
+-- com.arsdigita.x.versioning.serialization.Types
 
 insert into vcx_java_classes (id, name) 
 values (0, 'void');
