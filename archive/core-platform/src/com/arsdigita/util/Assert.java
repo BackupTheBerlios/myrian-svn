@@ -30,13 +30,13 @@ import org.apache.log4j.Logger;
  * @author David Lutterkort
  * @author Uday Mathur
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#10 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#11 $
  */
 public class Assert {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#10 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/04/13 00:26:01 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#11 $" +
+        "$Author: vadim $" +
+        "$DateTime: 2003/04/16 16:24:34 $";
 
     private static final Logger s_log = Logger.getLogger
         (Assert.class);
@@ -235,7 +235,7 @@ public class Assert {
      *
      * @param cond condition to assert
      * @throws java.lang.IllegalStateException condition was false
-     * @deprecated Use {@link #isTrue(boolean)} instead
+     * @deprecated Use {@link #truth(boolean, String)} instead
      */
     public static final void assertTrue(boolean cond) {
         assertTrue(cond, "");
@@ -249,7 +249,7 @@ public class Assert {
      * @param cond condition to assert
      * @param msg failure message
      * @throws java.lang.IllegalStateException condition was false
-     * @deprecated Use {@link #isTrue(boolean,String)} instead
+     * @deprecated Use {@link #truth(boolean,String)} instead
      */
     public static final void assertTrue(boolean cond, String msg) {
         if (!cond) {
@@ -263,7 +263,7 @@ public class Assert {
      * Verify that a parameter is not null and throw a runtime
      * exception if so.
      *
-     * @deprecated Use {@link #isNotNull(Object,Class)} instead
+     * @deprecated Use {@link #exists(Object,Class)} instead
      */
     public static final void assertNotNull(Object o) {
         assertNotNull(o, "");
@@ -273,7 +273,7 @@ public class Assert {
      * Verify that a parameter is not null and throw a runtime
      * exception if so.
      *
-     * @deprecated Use {@link #isNotNull(Object,Class) instead
+     * @deprecated Use {@link #exists(Object,Class)} instead
      */
     public static final void assertNotNull(Object o, String label) {
         if (isEnabled()) {
@@ -313,7 +313,7 @@ public class Assert {
      * @param expected Expected value.
      * @param actual Actual value.
      * @throws java.lang.IllegalStateException condition was false
-     * @deprecated Use {@link equal(Object,Object) instead
+     * @deprecated Use {@link equal(Object,Object)} instead
      */
     public static final void assertEquals(Object expected, Object actual) {
         assertEquals(expected, actual, "expected", "actual");
@@ -353,7 +353,7 @@ public class Assert {
      * @param expected Expected value.
      * @param actual Actual value.
      * @throws java.lang.IllegalStateException condition was false
-     * @deprecated Use {@link #isTrue(boolean)} instead
+     * @deprecated Use {@link #truth(boolean, String)} instead
      */
     public static final void assertEquals(int expected, int actual) {
         assertEquals(expected, actual, "expected", "actual");
@@ -367,7 +367,7 @@ public class Assert {
      * @param expectedLabel Label for first (generally expected) value.
      * @param actualLabel Label for second (generally actual) value.
      * @throws java.lang.IllegalStateException condition was false
-     * @deprecated Use {@link #isTrue(boolean)} instead
+     * @deprecated Use {@link #truth(boolean, String)} instead
      */
     public static final void assertEquals(int expected, int actual,
                                           String expectedLabel,
