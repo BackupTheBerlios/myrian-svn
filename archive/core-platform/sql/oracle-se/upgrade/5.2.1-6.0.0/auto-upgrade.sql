@@ -377,3 +377,16 @@ show errors;
 alter index CAT_CATEGORIES_PK rename to CAT_CATEGORI_CATEGO_ID_P_YEPRQ;
 alter index TASK_DEPENDENCIES_PK rename to CW_TAS_DEP_DEP_TAS_ID__P_HDZWS;
 alter index TASK_USER_ASSIGNEES_PK rename to CW_TAS_USE_ASS_TAS_ID__P_VSDYQ;
+
+--------------------------------------------------------------------------------
+-- These indexes have been added.
+--------------------------------------------------------------------------------
+create index GROUP_MEMBER_MAP_GROUP_ID_IDX on GROUP_MEMBER_MAP(GROUP_ID);
+create index GROUP_SUBGROUP_MAP_GRP_ID_IDX on GROUP_SUBGROUP_MAP(GROUP_ID);
+create index VCX_OBJ_CHANGES_TXN_ID_IDX on VCX_OBJ_CHANGES(TXN_ID);
+create index VCX_OPERATIONS_CHANGE_ID_IDX on VCX_OPERATIONS(CHANGE_ID);
+create index VCX_OPERATIONS_CLASS_ID_IDX on VCX_OPERATIONS(CLASS_ID);
+create index VCX_OPERATIONS_EVNT_TYP_ID_IDX on VCX_OPERATIONS(EVENT_TYPE_ID);
+create index VCX_TAGS_TXN_ID_IDX on VCX_TAGS(TXN_ID);
+create index VCX_TXNS_MODIFYING_USER_IDX on VCX_TXNS(MODIFYING_USER);
+

@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/oracle-se-create.sql#31 $
--- $DateTime: 2003/07/31 17:13:50 $
+-- $Id: //core-platform/dev/sql/oracle-se-create.sql#32 $
+-- $DateTime: 2003/08/13 14:00:34 $
 
 @@ oracle-se/function-currentDate.sql
 
@@ -63,6 +63,9 @@
 @@ default/kernel/view-group_subgroup_trans_map.sql
 @@ default/kernel/view-group_member_trans_map.sql
 @@ default/kernel/view-party_member_trans_map.sql
+
+@@ default/kernel/index-group_member_map_group_id_idx.sql
+@@ default/kernel/index-group_subgroup_map_grp_id_idx.sql
 
 @@ default/kernel/comment-acs_privileges.sql
 @@ default/kernel/insert-privileges.sql
@@ -167,6 +170,13 @@
 @@ default/versioning/comment-vc_operations.sql
 @@ default/versioning/table-vc_generic_operations.sql
 @@ default/versioning/comment-vc_generic_operations.sql
+
+@@ default/versioning/index-vcx_obj_changes_txn_id_idx.sql
+@@ default/versioning/index-vcx_operations_change_id_idx.sql
+@@ default/versioning/index-vcx_operations_class_id_idx.sql
+@@ default/versioning/index-vcx_operations_evnt_typ_id_idx.sql
+@@ default/versioning/index-vcx_tags_txn_id_idx.sql
+@@ default/versioning/index-vcx_txns_modifying_user_idx.sql
 
 @@ default/versioning/insert-vcx_event_types.sql
 @@ default/versioning/insert-vcx_java_classes.sql

@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres-create.sql#28 $
--- $DateTime: 2003/07/31 17:13:50 $
+-- $Id: //core-platform/dev/sql/postgres-create.sql#29 $
+-- $DateTime: 2003/08/13 14:00:34 $
 
 begin;
 
@@ -54,6 +54,9 @@ begin;
 \i default/kernel/index-users.sql
 \i default/kernel/index-user_authentication.sql
 \i default/kernel/index-apm_package_type_listener_map.sql
+
+\i default/kernel/index-group_member_map_group_id_idx.sql
+\i default/kernel/index-group_subgroup_map_grp_id_idx.sql
 
 
 \i default/kernel/insert-privileges.sql
@@ -151,6 +154,13 @@ begin;
 \i default/versioning/comment-vc_operations.sql
 \i default/versioning/table-vc_generic_operations.sql
 \i default/versioning/comment-vc_generic_operations.sql
+
+\i default/versioning/index-vcx_obj_changes_txn_id_idx.sql
+\i default/versioning/index-vcx_operations_change_id_idx.sql
+\i default/versioning/index-vcx_operations_class_id_idx.sql
+\i default/versioning/index-vcx_operations_evnt_typ_id_idx.sql
+\i default/versioning/index-vcx_tags_txn_id_idx.sql
+\i default/versioning/index-vcx_txns_modifying_user_idx.sql
 
 \i default/versioning/insert-vcx_event_types.sql
 \i default/versioning/insert-vcx_java_classes.sql
