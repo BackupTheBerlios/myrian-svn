@@ -31,7 +31,7 @@ import java.math.BigInteger;
  */
 public class PersistenceExceptionTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceExceptionTest.java#4 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceExceptionTest.java#5 $";
 
     private Session ssn;
 
@@ -86,7 +86,7 @@ public class PersistenceExceptionTest extends PersistenceTestCase {
             // it again, like the persistence code would do.  We then see
             // if we got the right result.
             try {
-                SQLExceptionHandler.throwSQLException(e);
+                throw SQLExceptionHandler.wrap(e);
             } catch (SQLException err) {
                 try {
                     throw PersistenceException.newInstance(err);
@@ -110,7 +110,7 @@ public class PersistenceExceptionTest extends PersistenceTestCase {
             // it again, like the persistence code would do.  We then see
             // if we got the right result.
             try {
-                SQLExceptionHandler.throwSQLException(e);
+                throw SQLExceptionHandler.wrap(e);
             } catch (SQLException err) {
                 try {
                     throw PersistenceException.newInstance(err);
@@ -134,7 +134,7 @@ public class PersistenceExceptionTest extends PersistenceTestCase {
             // it again, like the persistence code would do.  We then see
             // if we got the right result.
             try {
-                SQLExceptionHandler.throwSQLException(e);
+                throw SQLExceptionHandler.wrap(e);
             } catch (SQLException err) {
                 try {
                     throw PersistenceException.newInstance(err);
@@ -164,7 +164,7 @@ public class PersistenceExceptionTest extends PersistenceTestCase {
             // it again, like the persistence code would do.  We then see
             // if we got the right result.
             try {
-                SQLExceptionHandler.throwSQLException(e);
+                throw SQLExceptionHandler.wrap(e);
             } catch (SQLException err) {
                 try {
                     throw PersistenceException.newInstance(err);

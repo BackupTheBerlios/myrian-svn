@@ -29,7 +29,7 @@ import java.sql.SQLException;
  */
 public class DbExceptionHandlerTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DbExceptionHandlerTest.java#4 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DbExceptionHandlerTest.java#5 $";
 
     private static java.sql.Connection conn;
 
@@ -102,15 +102,15 @@ public class DbExceptionHandlerTest extends TestCase {
             // the right type is handled by code in the pool or buried in DB.
             // However, here we're using straight JDBC, so we need to explicitly
             // cause the parsing to happen.
-            try {
-                SQLExceptionHandler.throwSQLException(e);
-            } catch (DbNotAvailableException err) {
+            SQLException wrapped = SQLExceptionHandler.wrap(e);
+            if (wrapped instanceof DbNotAvailableException) {
                 // good
-            } catch (SQLException err) {
-                throw new com.arsdigita.util.UncheckedWrapperException(err);
+            } else {
+                throw new com.arsdigita.util.UncheckedWrapperException
+                    (wrapped);
                 /*
                 fail("Setting garbage connection info should have caused " +
-                "DbNotAvailableException, instead caused " + err);*/
+                "DbNotAvailableException, instead caused " + wrapped);*/
             }
         }
 
@@ -122,13 +122,13 @@ public class DbExceptionHandlerTest extends TestCase {
             // the right type is handled by code in the pool or buried in DB.
             // However, here we're using straight JDBC, so we need to explicitly
             // cause the parsing to happen.
-            try {
-                SQLExceptionHandler.throwSQLException(e);
-            } catch (DbNotAvailableException err) {
+            SQLException wrapped = SQLExceptionHandler.wrap(e);
+
+            if (wrapped instanceof DbNotAvailableException) {
                 // good
-            } catch (SQLException err) {
+            } else {
                 fail("Setting garbage connection info should have caused " +
-                     "DbNotAvailableException, instead caused " + err);
+                     "DbNotAvailableException, instead caused " + wrapped);
             }
         }
 
@@ -140,13 +140,12 @@ public class DbExceptionHandlerTest extends TestCase {
             // the right type is handled by code in the pool or buried in DB.
             // However, here we're using straight JDBC, so we need to explicitly
             // cause the parsing to happen.
-            try {
-                SQLExceptionHandler.throwSQLException(e);
-            } catch (DbNotAvailableException err) {
+            SQLException wrapped = SQLExceptionHandler.wrap(e);
+            if (wrapped instanceof DbNotAvailableException) {
                 // good
-            } catch (SQLException err) {
+            } else {
                 fail("Setting garbage connection info should have caused " +
-                     "DbNotAvailableException, instead caused " + err);
+                     "DbNotAvailableException, instead caused " + wrapped);
             }
         }
 
@@ -164,13 +163,12 @@ public class DbExceptionHandlerTest extends TestCase {
             // the right type is handled by code in the pool or buried in DB.
             // However, here we're using straight JDBC, so we need to explicitly
             // cause the parsing to happen.
-            try {
-                SQLExceptionHandler.throwSQLException(e);
-            } catch (DbNotAvailableException err) {
+            SQLException wrapped = SQLExceptionHandler.wrap(e);
+            if (wrapped instanceof DbNotAvailableException) {
                 // good
-            } catch (SQLException err) {
+            } else {
                 fail("Setting garbage connection info should have caused " +
-                     "DbNotAvailableException, instead caused " + err);
+                     "DbNotAvailableException, instead caused " + wrapped);
             }
         }
     }
