@@ -23,13 +23,13 @@ package com.arsdigita.util.parameter;
  *
  * @see com.arsdigita.util.parameter.Parameter
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterContext.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterContext.java#4 $
  */
 public interface ParameterContext {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterContext.java#3 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterContext.java#4 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/11/06 12:54:46 $";
+        "$DateTime: 2003/11/10 11:04:29 $";
 
     /**
      * Returns all the parameters registered on the parameter context.
@@ -40,9 +40,11 @@ public interface ParameterContext {
     Parameter[] getParameters();
 
     /**
-     * Gets the unmarshaled value of <code>param</code>.
+     * Gets the unmarshaled value of <code>param</code>.  If the
+     * loaded value is null, <code>param.getDefaultValue()</code> is
+     * returned.
      *
-     * @param param The <code>Parameter</code> whose value to
+     * @param param The named <code>Parameter</code> whose value to
      * retrieve; it cannot be null
      * @return The unmarshaled Java object value of <code>param</code>
      */
@@ -65,7 +67,7 @@ public interface ParameterContext {
      *
      * @param param The <code>Parameter</code> whose value to set; it
      * cannot be null
-     * @param value The value to set <code>param</code> to; it may be
+     * @param value The new value of <code>param</code>; it may be
      * null
      */
     void set(Parameter param, Object value);
@@ -82,8 +84,21 @@ public interface ParameterContext {
      */
     void load(ParameterReader reader, ErrorList errors);
 
+    /**
+     * Marshals and writes all values associated with the registered
+     * parameters to <code>writer</code>.
+     *
+     * @param writer The <code>ParameterWriter</code> to which values
+     * are written; it cannot be null
+     */
     void save(ParameterWriter writer);
 
+    /**
+     * Validates all values associated with the registered parameters.
+     * Any errors encountered are added to <code>errors</code>.
+     *
+     * @param errors The <code>ErrorList</code> that captures
+     * validation errors; it cannot be null
+     */
     void validate(ErrorList errors);
-
 }

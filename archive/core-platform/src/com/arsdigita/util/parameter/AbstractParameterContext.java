@@ -31,14 +31,18 @@ import org.apache.log4j.Logger;
 /**
  * Subject to change.
  *
+ * A base implementation of the <code>ParameterContext</code>
+ * interface.
+ *
+ * @see com.arsdigita.util.parameter.ParameterContext
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameterContext.java#4 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameterContext.java#5 $
  */
 public abstract class AbstractParameterContext implements ParameterContext {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameterContext.java#4 $" +
-        "$Author: vadim $" +
-        "$DateTime: 2003/11/06 18:43:42 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameterContext.java#5 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/11/10 11:04:29 $";
 
     private static final Logger s_log = Logger.getLogger
         (AbstractParameterContext.class);
@@ -53,12 +57,19 @@ public abstract class AbstractParameterContext implements ParameterContext {
         m_info = new Properties();
     }
 
+    /**
+     * Registers <code>param</code> to the context.
+     *
+     * @param param The <code>Parameter</code> being registered; it
+     * cannot be null
+     */
     public final void register(final Parameter param) {
         if (s_log.isDebugEnabled()) {
             s_log.debug("Registering " + param + " on " + this);
         }
 
         if (Assert.isEnabled()) {
+            Assert.exists(param, Parameter.class);
             Assert.truth(!m_param.contains(param),
                          param + " is already registered");
         }
@@ -66,7 +77,9 @@ public abstract class AbstractParameterContext implements ParameterContext {
         m_param.add(param);
     }
 
-    // XXX change this?
+    /**
+     * @see ParameterContext#getParameters()
+     */
     public final Parameter[] getParameters() {
         final ArrayList list = new ArrayList();
         final Iterator params = m_param.iterator();
@@ -79,16 +92,15 @@ public abstract class AbstractParameterContext implements ParameterContext {
     }
 
     /**
-     * Gets the value of <code>param</code>.  If the loaded value is
-     * null, <code>param.getDefaultValue()</code> is returned.
-     *
-     * @param param The named <code>Parameter</code> whose value you
-     * wish to retrieve; it cannot be null
+     * @see ParameterContext#get(Parameter)
      */
     public Object get(final Parameter param) {
         return get(param, param.getDefaultValue());
     }
 
+    /**
+     * @see ParameterContext#get(Parameter,Object)
+     */
     public Object get(final Parameter param, final Object dephault) {
         if (Assert.isEnabled()) {
             Assert.exists(param, Parameter.class);
@@ -108,12 +120,7 @@ public abstract class AbstractParameterContext implements ParameterContext {
     }
 
     /**
-     * Sets the value of <code>param</code> to <code>value</code>.
-     *
-     * @param param The named <code>Parameter</code> whose value you
-     * wish to set; it cannot be null
-     * @param value The new value of <code>param</code>; it can be
-     * null
+     * @see ParameterContext#get(Parameter,Object)
      */
     public void set(final Parameter param, final Object value) {
         if (s_log.isDebugEnabled()) {
@@ -125,6 +132,15 @@ public abstract class AbstractParameterContext implements ParameterContext {
         m_map.put(param, value);
     }
 
+    /**
+     * Reads and unmarshals all values associated with the registered
+     * parameters from <code>reader</code>.  Any errors are returned.
+     *
+     * @param reader The <code>ParameterReader</code> from which to
+     * fetch the values; it cannot be null
+     * @return An <code>ErrorList</code> containing any errors
+     * encountered while loading; it cannot be null
+     */
     public final ErrorList load(final ParameterReader reader) {
         final ErrorList errors = new ErrorList();
 
@@ -133,6 +149,9 @@ public abstract class AbstractParameterContext implements ParameterContext {
         return errors;
     }
 
+    /**
+     * @see ParameterContext#load(ParameterReader,ErrorList)
+     */
     public final void load(final ParameterReader reader,
                            final ErrorList errors) {
         if (Assert.isEnabled()) {
@@ -143,6 +162,13 @@ public abstract class AbstractParameterContext implements ParameterContext {
         m_map.putAll((Map) m_param.read(reader, errors));
     }
 
+    /**
+     * Validates all values associated with the registered parameters.
+     * Any errors encountered are returned.
+     *
+     * @return An <code>ErrorList</code> containing validation errors;
+     * it cannot be null
+     */
     public final ErrorList validate() {
         final ErrorList errors = new ErrorList();
 
@@ -151,12 +177,18 @@ public abstract class AbstractParameterContext implements ParameterContext {
         return errors;
     }
 
+    /**
+     * @see ParameterContext#validate(ErrorList)
+     */
     public final void validate(final ErrorList errors) {
         Assert.exists(errors, ErrorList.class);
 
         m_param.validate(m_map, errors);
     }
 
+    /**
+     * @see ParameterContext#save(ParameterWriter)
+     */
     public final void save(ParameterWriter writer) {
         m_param.write(writer, m_map);
     }
@@ -191,8 +223,8 @@ public abstract class AbstractParameterContext implements ParameterContext {
 
     /**
      * Loads source data for <code>ParameterInfo</code> objects from
-     * the file <code>parameter.info</code> next to
-     * <code>this.getClass()</code>.
+     * the file <code>FrobNitz_parameter.properties</code> next to
+     * <code>FrobNitz.java</code>.
      */
     protected final void loadInfo() {
         final InputStream in = findInfo(getClass());
