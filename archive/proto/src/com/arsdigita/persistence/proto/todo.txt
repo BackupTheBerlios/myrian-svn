@@ -32,6 +32,15 @@ Functionality:
 
      Status: Not started. (Not blocking anything so far.)
 
+      - isModified(link) will never return true
+
+      - Cleanup Link/Role/Alias/Property mess.
+
+      - Static query support.
+
+      - extraneous join for queries only fetching ids, genPath should
+        map id props to parent join if it exists
+
  * Compound keys (1,0) (1)
 
      Mostly done in checkout. Difficult to confirm due to lack of
@@ -176,6 +185,7 @@ Error Checking/Handling:
      Status: Not started, nonblocking.
 
 Cleanup:
+ * Public way to access new session for calling flush()
  * Eliminate old metadata & PDL parser
  * Move DDL generator
  * Adapters
@@ -188,9 +198,11 @@ Review:
  * Error recovery audit
 
 Documentation:
- * javadoc
+ * Javadoc
  * Design documents
- * release notes
+ * Release Notes
    - "super" ignored
+ * Update developer documention
+ * Training documentation
 
 Disable all cascading deletes.
