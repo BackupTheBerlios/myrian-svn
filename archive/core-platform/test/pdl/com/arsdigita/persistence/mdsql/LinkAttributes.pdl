@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/test/pdl/com/arsdigita/persistence/mdsql/LinkAttributes.pdl#3 $ 
-// $DateTime: 2003/08/15 13:46:34 $
+// $Id: //core-platform/dev/test/pdl/com/arsdigita/persistence/mdsql/LinkAttributes.pdl#4 $ 
+// $DateTime: 2003/09/03 11:13:55 $
 
 model mdsql;
 
@@ -42,8 +42,17 @@ association {
 
     String[0..1] caption = t_article_image_map.caption VARCHAR(4000);
     User[0..1] user = join t_article_image_map.user_id to t_users.user_id;
+}
 
+association {
+    User[0..n] users = join t_images.image_id
+                         to t_user_image_map.image_id,
+                       join t_user_image_map.user_id
+                         to t_users.user_id;
+    Image[0..1] image = join t_users.user_id
+                          to t_user_image_map.user_id,
+                        join t_user_image_map.image_id
+                          to t_images.image_id;
 
-    // this must be here because of the way the association code works
-//    add user {}
+    String[0..1] caption = t_user_image_map.caption VARCHAR(4000);
 }
