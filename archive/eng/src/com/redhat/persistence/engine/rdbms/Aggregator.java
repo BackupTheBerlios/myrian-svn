@@ -40,12 +40,12 @@ import org.apache.log4j.Logger;
  * Aggregator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/09/13 $
+ * @version $Revision: #8 $ $Date: 2004/09/20 $
  **/
 
 class Aggregator extends Event.Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/Aggregator.java#7 $ by $Author: rhs $, $DateTime: 2004/09/13 16:23:12 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/Aggregator.java#8 $ by $Author: ashah $, $DateTime: 2004/09/20 18:11:08 $";
 
     private static final Logger LOG = Logger.getLogger(Aggregator.class);
 
@@ -105,13 +105,8 @@ class Aggregator extends Event.Switch {
     }
 
     Object key(Object obj) {
-        if (obj == null) { return null; }
         Session ssn = m_engine.getSession();
-        if (ssn.hasSessionKey(obj)) {
-            return ssn.getSessionKey(obj);
-        } else {
-            return obj;
-        }
+        return ssn.getSessionKey(obj);
     }
 
     private Event getObjectEvent(Object obj) {
@@ -141,8 +136,16 @@ class Aggregator extends Event.Switch {
             (new CompoundKey(key(obj), new CompoundKey(prop, key(arg))), ev);
     }
 
+    private void addObjectEventDependency(Node nd, Object obj) {
+        if (m_engine.getSession().hasSessionKey(obj)) {
+            nd.addDependency(getObjectEvent(obj));
+        }
+    }
+
     private void addDependingEvent(Object obj, Event ev) {
-        m_depending.addEvent(key(obj), ev);
+        if (m_engine.getSession().hasSessionKey(obj)) {
+            m_depending.addEvent(key(obj), ev);
+        }
     }
 
     private Collection getDependingEvents(Object obj) {
@@ -215,6 +218,8 @@ class Aggregator extends Event.Switch {
 
     private void setTwoWayEvent(Object obj, Property prop, Object arg,
                                  Event ev) {
+        Role role = (Role) prop;
+        if (!role.isReversable()) { return; }
         m_twoWay.setEvent
             (new CompoundKey(key(obj), new CompoundKey(prop, key(arg))), ev);
     }
@@ -245,7 +250,7 @@ class Aggregator extends Event.Switch {
         Node nd = new Node();
         nd.addEvent(e);
         m_nodes.add(nd);
-        nd.addDependency(getObjectEvent(e.getObject()));
+        addObjectEventDependency(nd, e.getObject());
         return nd;
     }
 
@@ -313,10 +318,10 @@ class Aggregator extends Event.Switch {
         Property prop = e.getProperty();
         Object arg = e.getArgument();
 
-        nd.addDependency(getObjectEvent(arg));
+        addObjectEventDependency(nd, arg);
 
         Mapping m = e.getObjectMap().getMapping(prop);
-        if (m.isNested() && m.isCompound()) {
+        if (arg != null && m.isNested() && m.isCompound()) {
             Event ovile = getViolation(arg);
             if (ovile != null) {
                 nd = merge(findNode(ovile), nd,
@@ -372,7 +377,7 @@ class Aggregator extends Event.Switch {
         Node nd = onPropertyEvent(e);
 
         Object prev = e.getPreviousValue();
-        nd.addDependency(getObjectEvent(prev));
+        addObjectEventDependency(nd, prev);
         if (prev != null) {
             addDependingEvent(prev, e);
         }

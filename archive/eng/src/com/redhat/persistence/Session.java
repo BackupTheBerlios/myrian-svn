@@ -54,12 +54,12 @@ import org.apache.commons.collections.map.ReferenceIdentityMap;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #19 $ $Date: 2004/09/13 $
+ * @version $Revision: #20 $ $Date: 2004/09/20 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#19 $ by $Author: rhs $, $DateTime: 2004/09/13 16:23:12 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#20 $ by $Author: ashah $, $DateTime: 2004/09/20 18:11:08 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -77,8 +77,6 @@ public class Session {
     private final Map m_keyodata = new ReferenceMap
         (AbstractReferenceMap.HARD, AbstractReferenceMap.WEAK);
     private final Map m_objodata = new ReferenceIdentityMap
-        (AbstractReferenceMap.WEAK, AbstractReferenceMap.HARD, true);
-    private final Map m_keys = new ReferenceIdentityMap
         (AbstractReferenceMap.WEAK, AbstractReferenceMap.HARD, true);
 
     private EventStream m_events = new EventStream(this);
@@ -931,11 +929,11 @@ public class Session {
     }
 
     public Object getSessionKey(Object obj) {
-        Object result = m_keys.get(obj);
-        if (result == null) {
+        ObjectData odata = getObjectData(obj);
+        if (odata == null) {
             throw new IllegalArgumentException("no key for object: " + obj);
         }
-        return result;
+        return odata.getKey();
     }
 
     /**
@@ -951,15 +949,7 @@ public class Session {
             Adapter ad = getAdapter(obj);
             ObjectType type = ad.getObjectType(obj);
             Object newObj = ad.getObject(type, ad.getProperties(obj), this);
-            use(getSessionKey(obj), newObj);
-        }
-    }
-
-    void use(Object key, Object obj) {
-        ObjectData odata = (ObjectData) m_keyodata.get(key);
-        if (odata != null) {
-            odata.setObject(obj);
-            setSessionKey(obj, key);
+            od.setObject(newObj);
         }
     }
 
@@ -976,18 +966,11 @@ public class Session {
     }
 
     boolean hasObjectData(Object obj) {
-        return m_objodata.containsKey(obj)
-            || (hasSessionKey(obj) && m_keyodata.containsKey(getSessionKey(obj)));
+        return m_objodata.containsKey(obj);
     }
 
     ObjectData getObjectData(Object obj) {
-        if (m_objodata.containsKey(obj)) {
-            return (ObjectData) m_objodata.get(obj);
-        } else if (hasSessionKey(obj)) {
-            return getObjectDataByKey(getSessionKey(obj));
-        } else {
-            return null;
-        }
+        return (ObjectData) m_objodata.get(obj);
     }
 
     void addObjectData(ObjectData odata) {
@@ -999,20 +982,14 @@ public class Session {
     }
 
     public boolean hasSessionKey(Object obj) {
-        return m_keys.containsKey(obj);
+        ObjectData odata = getObjectData(obj);
+        return odata != null && odata.getKey() != null;
     }
 
     void setSessionKey(Object obj, Object key) {
-        if (m_keys.containsKey(obj)) {
-            throw new IllegalArgumentException
-                ("object already assigned key: " + obj);
-        }
-        ObjectData odata = (ObjectData) m_objodata.get(obj);
-        if (odata != null) {
-            m_keyodata.put(key, odata);
-            odata.setKey(key);
-        }
-        m_keys.put(obj, key);
+        ObjectData odata = getObjectData(obj);
+        m_keyodata.put(key, odata);
+        odata.setKey(key);
     }
 
     PropertyData getPropertyData(Object obj, Property prop) {
@@ -1197,12 +1174,6 @@ public class Session {
 
         out.println("objodata");
         for (Iterator it = m_objodata.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry me = (Map.Entry) it.next();
-            out.println(str(me.getKey()));
-        }
-
-        out.println("keys");
-        for (Iterator it = m_keys.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry me = (Map.Entry) it.next();
             out.println(str(me.getKey()));
         }

@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2004/09/20 $
+ * @version $Revision: #10 $ $Date: 2004/09/20 $
  **/
 
 class ObjectData implements Violation {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/ObjectData.java#9 $ by $Author: rhs $, $DateTime: 2004/09/20 11:09:29 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/ObjectData.java#10 $ by $Author: ashah $, $DateTime: 2004/09/20 18:11:08 $";
 
     private static final Logger LOG = Logger.getLogger(ObjectData.class);
 
@@ -44,10 +44,6 @@ class ObjectData implements Violation {
     private ObjectData m_container;
     private ObjectMap m_map;
     private Object m_key = null;
-
-    void setKey(Object key) {
-        m_key = key;
-    }
 
     static class State {
         private String m_name;
@@ -76,12 +72,18 @@ class ObjectData implements Violation {
         m_map = null;
         setObject(object);
         setState(state);
-
-        m_ssn.addObjectData(this);
     }
 
     public Session getSession() {
         return m_ssn;
+    }
+
+    public Object getKey() {
+        return m_key;
+    }
+
+    void setKey(Object key) {
+        m_key = key;
     }
 
     public Object getObject() {
@@ -101,8 +103,6 @@ class ObjectData implements Violation {
             Adapter ad = ssn.getRoot().getAdapter(type);
             obj = ad.getObject(type, pmap, ssn);
             setObject(obj);
-            ssn.setSessionKey(obj, m_key);
-            m_ssn.addObjectData(this);
         }
 
         return obj;
@@ -110,6 +110,7 @@ class ObjectData implements Violation {
 
     void setObject(Object object) {
         m_object = new WeakReference(object);
+        m_ssn.addObjectData(this);
     }
 
     public Object getContainer() {
