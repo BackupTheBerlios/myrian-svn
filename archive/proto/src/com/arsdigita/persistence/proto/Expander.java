@@ -12,10 +12,10 @@ import java.util.*;
  */
 class Expander extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Expander.java#1 $ by $Author: ashah $, $DateTime: 2003/04/01 18:05:32 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Expander.java#2 $ by $Author: ashah $, $DateTime: 2003/04/03 15:36:57 $";
 
     final private Session m_ssn;
-    final private Set m_visiting = new HashSet();
+    final private Collection m_deleting = new HashSet();
     final private List m_pending;
 
     Expander(Session ssn, List pending) {
@@ -80,13 +80,10 @@ class Expander extends Event.Switch {
 
     public void onDelete(DeleteEvent e) {
         final Object obj = e.getObject();
-        ObjectData od = m_ssn.fetchObjectData(obj);
 
-        if (od == null || m_visiting.contains(od)) {
-            return;
-        }
+        if (m_ssn.isDeleted(obj) || isBeingDeleted(obj)) { return; }
 
-        m_visiting.add(od);
+        beginDelete(obj);
 
         ObjectType type = m_ssn.getObjectType(obj);
 
@@ -103,8 +100,6 @@ class Expander extends Event.Switch {
                 expand(ev);
             }
         }
-
-        m_visiting.remove(od);
 
         addEvent(e);
     }
@@ -138,13 +133,11 @@ class Expander extends Event.Switch {
     }
 
     public void onRemove(RemoveEvent e) {
-        addEvent(e);
-
         Role role = (Role) e.getProperty();
 
-        if (role.isReversable()) {
-            reverseUpdateOld(e, e.getArgument());
-        }
+        if (role.isReversable()) { reverseUpdateOld(e, e.getArgument()); }
+
+        addEvent(e);
 
         if (role.isComponent()) {
             cascadeDelete(e.getObject(), e.getArgument());
@@ -162,24 +155,20 @@ class Expander extends Event.Switch {
     }
 
     /**
-     * Cascades delete from container to the containee. The containee
-     * will not be deleted in all cases.
+     * Cascades delete from container to the containee. The container
+     * can not be deleted by a cascading delete.
      **/
     private void cascadeDelete(Object container, Object containee) {
-        ObjectData containerOD = m_ssn.getObjectData(container);
-        if (containerOD == null) {
-            throw new IllegalStateException("container object not present");
-        }
         boolean me = false;
 
-        if (!m_visiting.contains(containerOD)) {
+        if (!isBeingDeleted(container)) {
             me = true;
-            m_visiting.add(containerOD);
+            beginDelete(container);
         }
 
         expand(new DeleteEvent(m_ssn, containee));
 
-        if (me) { m_visiting.remove(containerOD); }
+        if (me) { undelete(container); }
     }
 
     /**
@@ -194,6 +183,13 @@ class Expander extends Event.Switch {
         Object source = event.getObject();
         Role role = (Role) event.getProperty();
         Role rev = role.getReverse();
+
+        // if object is being or will be deleted, do nothing
+        if (m_ssn.isDeleted(target)
+            || isBeingDeleted(target)
+            || role.isComponent()) {
+            return;
+        }
 
         if (rev.isCollection()) {
             addEvent(new RemoveEvent(m_ssn, target, rev, source, event));
@@ -227,5 +223,17 @@ class Expander extends Event.Switch {
 
             addEvent(new SetEvent(m_ssn, target, rev, source, event));
         }
+    }
+
+    private void beginDelete(Object obj) {
+        m_deleting.add(m_ssn.getSessionKey(obj));
+    }
+
+    private void undelete(Object obj) {
+        m_deleting.remove(m_ssn.getSessionKey(obj));
+    }
+
+    private boolean isBeingDeleted(Object obj) {
+        return m_deleting.contains(m_ssn.getSessionKey(obj));
     }
 }
