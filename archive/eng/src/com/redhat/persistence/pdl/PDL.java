@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2004/09/14 $
+ * @version $Revision: #13 $ $Date: 2004/09/16 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#12 $ by $Author: rhs $, $DateTime: 2004/09/14 17:42:52 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#13 $ by $Author: rhs $, $DateTime: 2004/09/16 12:02:28 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -216,7 +216,7 @@ public class PDL {
                 Role result =
                     new Role(prop.getName().getName(),
                              m_symbols.getEmitted(prop.getType()),
-                             prop.isComponent(),
+                             prop.isComponent() || prop.getNestedMap() != null,
                              prop.isCollection(),
                              prop.isNullable());
                 m_symbols.setLocation(result, prop);

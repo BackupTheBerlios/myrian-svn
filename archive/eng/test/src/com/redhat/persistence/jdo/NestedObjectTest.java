@@ -25,12 +25,12 @@ import java.util.*;
  * NestedObjectTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/09/01 $
+ * @version $Revision: #6 $ $Date: 2004/09/16 $
  **/
 
 public class NestedObjectTest extends WithTxnCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdo/NestedObjectTest.java#5 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdo/NestedObjectTest.java#6 $ by $Author: rhs $, $DateTime: 2004/09/16 12:02:28 $";
 
     private Collection query(Class klass) {
         return (Collection) m_pm.newQuery(klass).execute();
@@ -204,6 +204,20 @@ public class NestedObjectTest extends WithTxnCase {
             (Contact) singleton("filter($1, m_name == $2)", contacts, "two");
         assertEquals("1", one.getNumber());
         assertEquals("2", two.getNumber());
+    }
+
+    public void testDeletion() {
+        Rolodex r = new Rolodex();
+        m_pm.makePersistent(r);
+        Collection contacts = r.getContacts();
+        contacts.add(new Contact("asdf", "1-800-ASSDEAF"));
+        contacts.add(new Contact("fdsa", "1-800-DEAFASS"));
+
+        commit();
+
+        m_pm.deletePersistent(r);
+
+        commit();
     }
 
 }
