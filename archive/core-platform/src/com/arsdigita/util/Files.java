@@ -27,14 +27,14 @@ import org.apache.log4j.Logger;
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
  * @author Randy Graebner &lt;randyg@alum.mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/01/23 $
+ * @version $Revision: #6 $ $Date: 2004/02/09 $
  **/
 
 public final class Files {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Files.java#5 $ by $Author: dennis $, $DateTime: 2004/01/23 12:50:16 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Files.java#6 $ by $Author: dennis $, $DateTime: 2004/02/09 16:11:36 $";
 
-    private static final Logger s_log = 
+    private static final Logger s_log =
         Logger.getLogger(Files.class);
 
     public final static int OVERWRITE = 0;
@@ -51,6 +51,9 @@ public final class Files {
             }
         }
 
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Deleting " + file.toString());
+        }
         file.delete();
     }
 
@@ -77,12 +80,25 @@ public final class Files {
             }
         } else {
             if (to.exists()) {
-                if ( mode == IGNORE_EXISTING ) { return; }
+                if ( mode == IGNORE_EXISTING ) {
+                    if (s_log.isDebugEnabled()) {
+                        s_log.debug("Skipping copy of '" + from.toString() + "' because target exists.");
+                    }
+                    return;
+                }
                 if ( mode == UPDATE &&
-                     to.lastModified() > from.lastModified() ) { return; }
+                     to.lastModified() > from.lastModified() ) {
+                    if (s_log.isDebugEnabled()) {
+                        s_log.debug("Skipping copy of '" + from.toString() + "' because target is newer.");
+                    }
+                    return;
+                }
                 if (!to.canWrite()) {
                     throw new IOException("can not write file: " + to);
                 }
+            }
+            if (s_log.isDebugEnabled()) {
+                s_log.debug("Copying '" + from.toString() + "' to '" + to.toString() + "'");
             }
             File parent = to.getParentFile();
             if ( parent != null &&
@@ -123,15 +139,15 @@ public final class Files {
 
 
     /**
-     *  This writes a zip file to the given output stream and has 
-     *  several options for how the file should be written.  
+     *  This writes a zip file to the given output stream and has
+     *  several options for how the file should be written.
      *
      *  @param outputStream The output stream to write the file.
      *                      This is typically the response output stream
      *                      if the file is download or a FileOutputStream if
      *                      it is written to disk.
      *  @param fileList A string list of the files to be included in the
-     *                  zip file.  The strings are relative to the 
+     *                  zip file.  The strings are relative to the
      *                  baseFile or are absolute if the baseFile is null.
      *  @param baseFile The file that is used as the base of the zip.
      *                  This basically allows us to "cd" to the directory
@@ -144,10 +160,10 @@ public final class Files {
                                      File baseFile) {
         // Create a buffer for reading the files
         byte[] buffer = new byte[1024];
-    
+
         try {
             ZipOutputStream out = new ZipOutputStream(outputStream);
-    
+
             for (int i=0; i<fileList.length; i++) {
                 File inputFile = new File(baseFile, fileList[i]);
                 if (inputFile.isDirectory()) {
@@ -160,7 +176,7 @@ public final class Files {
                 }
 
                 FileInputStream in = new FileInputStream(inputFile);
-                    
+
                 ZipEntry zipEntry = new ZipEntry(fileList[i]);
                 out.putNextEntry(zipEntry);
 
@@ -178,12 +194,12 @@ public final class Files {
                 while ((len=in.read(buffer)) > -1) {
                     out.write(buffer, 0, len);
                 }
-    
+
                 // Close the streams
                 out.closeEntry();
                 in.close();
             }
-    
+
             // Complete the ZIP file
             out.close();
         } catch (IOException e) {
@@ -220,7 +236,7 @@ public final class Files {
                                             Collection files,
                                             String prefix) {
         // TODO: there has to be a better way to do this...
-        Assert.truth(baseDirectory.isDirectory(), 
+        Assert.truth(baseDirectory.isDirectory(),
                      "Base Directory must be a directory but is actually a file.");
         if (prefix != null && prefix.trim().length() == 0) {
             prefix = null;
@@ -282,26 +298,26 @@ public final class Files {
      */
     public static String getPrettySize(long longSize) {
         Locale locale = Kernel.getContext().getLocale();
-        
+
         NumberFormat nf = NumberFormat.getNumberInstance(locale);
         nf.setMaximumFractionDigits(0);
-        
+
         // Try finding a good matching going from small to large
         // files, assuming that most files will be small.
-        
+
         double size = (double) longSize;
-        
+
         if (size < 1000) {
             return nf.format(size) + " b";
         } else if ((size = byteToKilo(longSize)) < 1000) {
             return nf.format(size) + " kb";
         }
-        
+
         // Must be one MB or larger.  Change pricision and keep
         // checking.
-        
+
         nf.setMaximumFractionDigits(2);
-        
+
         if ((size = byteToMega(longSize)) < 1000) {
             return nf.format(size) + " MB";
         } else {
@@ -315,7 +331,7 @@ public final class Files {
     private static double byteToKilo(long size) {
         return ((double) size) / 1024.;
     }
-    
+
     private static double byteToMega(long size) {
         return ((double) size) / 1048576.;
     }
