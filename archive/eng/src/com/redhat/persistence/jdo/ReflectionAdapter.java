@@ -14,12 +14,12 @@ import java.util.*;
  * ReflectionAdapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/06/25 $
+ * @version $Revision: #3 $ $Date: 2004/07/12 $
  **/
 
 public class ReflectionAdapter extends Adapter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/ReflectionAdapter.java#2 $ by $Author: ashah $, $DateTime: 2004/06/25 14:54:45 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/ReflectionAdapter.java#3 $ by $Author: vadim $, $DateTime: 2004/07/12 12:09:36 $";
 
     private static final Class[] PERSISTENT = new Class[] { Persistent.class };
 
@@ -99,21 +99,6 @@ public class ReflectionAdapter extends Adapter {
                         if (name.startsWith("get")) {
                             if (prop.isKeyProperty()) {
                                 return m_props.get(prop);
-                            } else if (prop.isCollection()) {
-                                Class rt = method.getReturnType();
-                                if (rt.equals(List.class)) {
-                                    return new CRPList(m_ssn, ths, prop);
-                                } else if (rt.equals(Map.class)) {
-                                    return new CRPMap(m_ssn, ths, prop);
-                                } else if (rt.equals(Set.class)) {
-                                    return new CRPSet(m_ssn, ths, prop);
-                                } else if (rt.equals(Collection.class)) {
-                                    return new CRPSet(m_ssn, ths, prop);
-                                } else {
-                                    throw new IllegalStateException
-                                        ("unsupported collection type: " +
-                                         rt.getName());
-                                }
                             } else {
                                 return m_ssn.get(ths, prop);
                             }

@@ -16,7 +16,7 @@ import javax.jdo.spi.PersistenceCapable;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/07/12 $
+ * @version $Revision: #7 $ $Date: 2004/07/12 $
  **/
 
 class CRPMap implements Map {
@@ -51,12 +51,6 @@ class CRPMap implements Map {
     transient private Property m_value;
 
     CRPMap() {}
-
-    CRPMap(Session ssn, Object object, Property property) {
-        m_ssn = ssn;
-        m_object = object;
-        m_mapProp = property;
-    }
 
     private void init() {
         final ObjectType type = m_mapProp.getType();
