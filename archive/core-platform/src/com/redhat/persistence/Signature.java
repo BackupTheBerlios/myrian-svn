@@ -34,12 +34,12 @@ import org.apache.log4j.Logger;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2004/03/25 $
+ * @version $Revision: #10 $ $Date: 2004/03/30 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Signature.java#9 $ by $Author: ashah $, $DateTime: 2004/03/25 22:27:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Signature.java#10 $ by $Author: vadim $, $DateTime: 2004/03/30 15:48:15 $";
 
     private static final Logger s_log = Logger.getLogger(Signature.class);
 
@@ -86,12 +86,18 @@ public class Signature {
 
         final int pathIndex = m_paths.indexOf(p);
 
-        // compute number of digits required for pathIndex
-        int used = 0;
-        for (int i = pathIndex; i > 0; i /= 10) { used++; }
+        // compute String.valueOf(pathIndex).length() without creating a
+        // throw-away String object.
+        int pathIdxWidth;
+        if (pathIndex == 0) {
+            pathIdxWidth = 0;
+        } else {
+            pathIdxWidth = 0;
+            for (int i = pathIndex; i > 0; i /= 10) { pathIdxWidth++; }
+        }
 
         StringBuffer result = new StringBuffer(size);
-        result.append(path.substring(0, size - used));
+        result.append(path.substring(0, size - pathIdxWidth));
         result.append(pathIndex);
 
         return result.toString();
