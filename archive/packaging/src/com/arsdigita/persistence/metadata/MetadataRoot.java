@@ -29,12 +29,12 @@ import org.apache.log4j.Logger;
  * metadata system.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/09/12 $
+ * @version $Revision: #7 $ $Date: 2003/09/29 $
  **/
 
 public class MetadataRoot extends Element {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/metadata/MetadataRoot.java#6 $ by $Author: rhs $, $DateTime: 2003/09/12 16:32:14 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/metadata/MetadataRoot.java#7 $ by $Author: rhs $, $DateTime: 2003/09/29 14:39:15 $";
 
     private static final Logger s_cat = Logger.getLogger(MetadataRoot.class.getName());
 
@@ -118,8 +118,8 @@ public class MetadataRoot extends Element {
         this(new Root());
     }
 
-    public Root getRoot() {
-        return m_root;
+    public final Root getRoot() {
+	return m_root;
     }
 
     /**

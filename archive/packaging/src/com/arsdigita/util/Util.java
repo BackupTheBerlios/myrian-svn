@@ -15,12 +15,12 @@
 
 package com.arsdigita.util;
 
-import com.arsdigita.runtime.*;
 import com.arsdigita.logging.*;
 import com.arsdigita.util.parameter.*;
 import com.arsdigita.util.config.*;
 import java.io.*;
 import java.util.*;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -31,9 +31,9 @@ import org.apache.log4j.Logger;
  */
 final class Util {
     public static final String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/Util.java#4 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/09/25 17:25:55 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/Util.java#5 $" +
+        "$Author: rhs $" +
+        "$DateTime: 2003/09/29 14:39:15 $";
 
     private static final Logger s_log = Logger.getLogger(Util.class);
 

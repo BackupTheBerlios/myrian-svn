@@ -58,7 +58,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/09/17 $
+ * @version $Revision: #7 $ $Date: 2003/09/29 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -117,6 +117,17 @@ public class Session {
         m_afterFP = new FlushEventProcessor(false);
         m_ssn.addBeforeFlush(m_beforeFP);
         m_ssn.addAfterFlush(m_afterFP);
+        m_ssn.addBeforeActivate(new EventProcessor() {
+            protected void cleanUp(boolean isCommit) { }
+            protected void flush() { }
+            protected void write(Event ev) {
+                if (ev instanceof DeleteEvent) {
+                    BeforeDeleteEvent bde =
+                        new BeforeDeleteEvent((DataObjectImpl) ev.getObject());
+                    bde.fire();
+                }
+            }
+        });
 
         Root r = m_root.getRoot();
         synchronized (r) {
@@ -655,12 +666,16 @@ public class Session {
 
             for (Iterator it = events.iterator(); it.hasNext(); ) {
                 DataEvent e = (DataEvent) it.next();
+                if (e instanceof BeforeDeleteEvent) { continue; }
                 e.schedule();
             }
 
             for (Iterator it = events.iterator(); it.hasNext(); ) {
                 DataEvent e = (DataEvent) it.next();
-                if (m_toFire.remove(e)) { e.fire(); }
+                if (m_toFire.remove(e)) {
+                    if (e instanceof BeforeDeleteEvent) { continue; }
+                    e.fire();
+                }
             }
         }
 

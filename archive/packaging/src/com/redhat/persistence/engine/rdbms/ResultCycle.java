@@ -15,6 +15,7 @@
 
 package com.redhat.persistence.engine.rdbms;
 
+import com.arsdigita.developersupport.StackTraces;
 import java.sql.*;
 
 import org.apache.log4j.Logger;
@@ -23,12 +24,12 @@ import org.apache.log4j.Logger;
  * ResultCycle
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/09/29 $
  **/
 
 class ResultCycle {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/ResultCycle.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/ResultCycle.java#3 $ by $Author: rhs $, $DateTime: 2003/09/29 14:39:15 $";
 
     private static final Logger LOG = Logger.getLogger(ResultCycle.class);
 
@@ -43,7 +44,26 @@ class ResultCycle {
 
         m_engine = engine;
         m_rs = rs;
+        if (LOG.isDebugEnabled()) {
+            StackTraces.captureStackTrace(m_rs);
+        }
         m_cycle = cycle;
+    }
+
+    protected void finalize() {
+        if (m_rs != null) {
+            LOG.warn("ResultSet  was not closed.  " + 
+                     "Closing ResultSet in finalize() method. " + 
+                     "Turn on debug logging for " + this.getClass() +
+                     " to see the stack trace for this ResultSet."
+                     );
+            
+            if (LOG.isDebugEnabled()) {
+                StackTraces.log("The ResultSet was created at: ", m_rs, LOG, "debug");
+            }
+            
+            close();
+        }
     }
 
     public ResultSet getResultSet() {

@@ -33,12 +33,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/08/29 $
+ * @version $Revision: #6 $ $Date: 2003/09/29 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#5 $ by $Author: rhs $, $DateTime: 2003/08/29 10:31:35 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#6 $ by $Author: rhs $, $DateTime: 2003/09/29 14:39:15 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -391,6 +391,7 @@ public class RDBMSEngine extends Engine {
                             ("cannot update blob");
                     }
                 } catch (SQLException se) {
+                    LOG.error(se.getMessage(), se);
                     throw new Error(se.getMessage());
                 } finally {
                     rs.close();
