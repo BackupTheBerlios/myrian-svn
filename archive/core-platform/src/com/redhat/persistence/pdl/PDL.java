@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/07/29 $
+ * @version $Revision: #7 $ $Date: 2003/08/14 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#6 $ by $Author: rhs $, $DateTime: 2003/07/29 19:14:05 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#7 $ by $Author: rhs $, $DateTime: 2003/08/14 12:25:54 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -390,7 +390,6 @@ public class PDL {
     }
 
     public void emitVersioned() {
-        HashMap properties = new HashMap();
         Node.Switch nodeSwitch = VersioningMetadata.getVersioningMetadata().
             nodeSwitch(m_emitted);
         m_ast.traverse(nodeSwitch);
@@ -591,6 +590,37 @@ public class PDL {
 		FileNd.ASSOCIATIONS, AssociationNd.PROPERTIES,
 		AssociationNd.ROLE_ONE, PropertyNd.MAPPING
 	    }));
+
+        m_ast.traverse(new Node.Switch() {
+            public void onJoinPath(JoinPathNd jpn) {
+                List joins = jpn.getJoins();
+                if (joins.size() != 1) {
+                    m_errors.fatal
+                        (jpn, "only length 1 join paths allowed here");
+                    return;
+                }
+
+                JoinNd join = (JoinNd) joins.get(0);
+                ColumnNd fromNd = join.getFrom();
+                ColumnNd toNd = join.getTo();
+                Column from = lookup(fromNd);
+                Column to = lookup(toNd);
+
+                if (from.isUniqueKey()) {
+                    unique(toNd, new Column[] { to }, true);
+                    fk(join, false);
+                } else if (to.isUniqueKey()) {
+                    unique(fromNd, new Column[] { from }, true);
+                    fk(join, true);
+                } else {
+                    m_errors.fatal
+                        (jpn, "join path does not connect to a primary key");
+                    return;
+                }
+            }
+        }, new Node.IncludeFilter(new Node.Field[] {
+            AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.JOIN_PATHS
+        }));
     }
 
     private ObjectMap getMap(Node nd) {
@@ -759,19 +789,6 @@ public class PDL {
 		    }
 		}
 	    });
-
-/*        m_ast.traverse(new Node.Switch() {
-                public void onJoin(JoinNd nd) {
-                    ObjectMap om = m_root.getObjectMap
-                        (m_symbols.getEmitted
-                         ((ObjectTypeNd) nd.getParent().getParent()));
-                    om.addJoin(new Join(lookup(nd.getFrom()),
-                                        lookup(nd.getTo())));
-                }
-            }, new Node.IncludeFilter(new Node.Field[] {
-                AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.JOIN_PATHS,
-                JoinPathNd.JOINS
-                }));*/
 
         m_ast.traverse(new Node.Switch() {
                 public void onPath(PathNd nd) {
