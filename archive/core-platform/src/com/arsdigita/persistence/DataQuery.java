@@ -53,12 +53,12 @@ import java.util.Map;
  * </pre>
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/10/16 $
+ * @version $Revision: #7 $ $Date: 2002/12/05 $
  */
 
 public interface DataQuery {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQuery.java#6 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQuery.java#7 $ by $Author: richardl $, $DateTime: 2002/12/05 16:49:00 $";
 
     /**
      * Returns the type of this data query.
@@ -297,19 +297,24 @@ public interface DataQuery {
     boolean removeFilter(Filter filter);
 
     /**
-     * Highly experimental, for use by permissions service only.
+     * Add an 'in' subquery to a query.
+     *
+     * @param propertyName The column to be filtered on.
+     * @param subqueryName The full name of a query defined in a PDL file.
      */
     Filter addInSubqueryFilter(String propertyName, String subqueryName);
 
 
     /**
-     * Add an 'in' subquery to a query. This version can be used with
-     * subqueries which return more than 1 column as it wraps the subquery.
-     * <code>subQueryProperty</code> is the column pulled out of the subquery.
+     * Highly experimental; use with caution.. Add an 'in' subquery to
+     * a query. This version can be used with subqueries which return
+     * more than 1 column as it wraps the subquery.
+     * <code>subQueryProperty</code> is the column pulled out of the
+     * subquery.
      *
      * @param propertyName The column to be filtered on.
      * @param subQueryProperty The column in the subquery to be used.
-     * @param queryName The fully name of a query defined in a PDL file.
+     * @param queryName The full name of a query defined in a PDL file.
      * @return The Filter object associated with this filter.
      **/
     Filter addInSubqueryFilter( String propertyName,
@@ -317,7 +322,7 @@ public interface DataQuery {
                                 String queryName );
 
     /**
-     * 
+     *
      */
     Filter addNotInSubqueryFilter(String propertyName, String subqueryName);
 
