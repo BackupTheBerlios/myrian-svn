@@ -21,7 +21,7 @@ package com.arsdigita.util;
  * @author Archit Shah (ashah@mit.edut)
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-01-22
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/09/16 $
  **/
 public final class GraphEdge implements Graph.Edge {
     private Object m_tail;
@@ -59,7 +59,10 @@ public final class GraphEdge implements Graph.Edge {
     }
 
     public String toString() {
-        return m_label.toString();
+        StringBuffer buf = new StringBuffer();
+        buf.append(m_tail).append(" -> ").append(m_head);
+        buf.append("[").append(m_label).append("]");
+        return buf.toString();
     }
 
     public boolean equals(Object obj) {
