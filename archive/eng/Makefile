@@ -52,6 +52,7 @@ $(BUILD)/%.jmake: %
 	@echo generating $@
 # header
 	@mkdir -p $(dir $@)
+	@mkdir -p $(patsubst %.jmake,%,$@)
 	@echo "# Generated makefile, DO NOT EDIT" > $@
 # defines
 	@echo -n "JAVA_SOURCES:=" >> $@
@@ -68,14 +69,16 @@ $(BUILD)/%.jmake: %
 # mkdir
 	@echo "	@mkdir -p \$$(BUILD)/$<" >> $@
 # javac
-	@echo -n "	javac -classpath \$$(CLASSPATH)" >> $@
+	@echo "	@echo building $<" >> $@
+	@echo -n "	@javac -classpath \$$(CLASSPATH)" >> $@
 	@echo -n " -sourcepath \$$(SOURCEPATH) -d \$$(BUILD)/$< " >> $@
 	@echo "\$$(filter %.java,\$$(JDO_MODIFIED))" >> $@
 # JDO enhancer
 	@echo "ifdef JDO_SOURCES" >> $@
-	@echo -n "	\$$(JDO_ENHANCE) -d \$$(BUILD)/$< " >> $@
-	@echo -n "-s $<:\$$(BUILD)/$< " >> $@
-	@echo -n "\$$(filter %.class,\$$(JDO_MODIFIED:%.java=\$$(BUILD)/%.class)) " >> $@
+	@echo "	@echo enhancing $<" >> $@
+	@echo -n "	@\$$(JDO_ENHANCE) -d \$$(BUILD)/$< " >> $@
+	@echo -n "-s $<:\$$(BUILD)/$<:\$$(CLASSPATH) " >> $@
+	@echo -n "\$$(filter %.class,\$$(patsubst %.java,\$$(BUILD)/%.class,\$$(patsubst \$$(BUILD)%,%,\$$(JDO_MODIFIED)))) " >> $@
 	@echo "\$$(filter %.jdo,\$$^)" >> $@
 	@echo "endif" >> $@
 # timestamp

@@ -1,8 +1,22 @@
 #!/bin/sh
-. extend
+function extend() {
+    for word in $*; do
+        if [ -z $CLASSPATH ]; then
+            CLASSPATH=$word
+        else
+            CLASSPATH=$CLASSPATH:$word
+        fi
+    done
+}
 
-extend lib/*.jar lib/*.zip
-extend `find build -name "*.jmake" | sed s/\\.jmake\$//g`
-extend `find build -name "*.jmake" | sed s/\\.jmake\$//g | sed s%^build/%%g`
+if [ -z $BUILD ]; then
+	BUILD=build
+fi
 
+extend lib/*.jar lib/*.zip conf/*.properties
+extend `find $BUILD -name "*.jmake" | sed s/\\.jmake\$//g`
+extend `find $BUILD -name "*.jmake" | sed s/\\.jmake\$//g | sed s%^$BUILD/%%g`
+if [ ! -z $VERBOSE ]; then
+	echo $CLASSPATH
+fi
 exec java $*

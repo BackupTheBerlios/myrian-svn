@@ -3,6 +3,10 @@
 SWITCHES=
 ARGS=
 
+if [ -z $BUILD ]; then
+	BUILD=build
+fi
+
 for word in $*; do
     case $word in
     -*) SWITCHES="$SWITCHES $word";;
@@ -21,5 +25,5 @@ for f in `find $ARGS -name "*Suite.java"`; do
 
     sfx="`echo $package | sed s@\\\.@/@g`/${class}.java"
     pfx=`echo $f | sed s@${sfx}@@g`
-    run -Dtest.base.dir=build/${pfx} $SWITCHES com.redhat.persistence.TestRunner $qname > "build/TEST-${qname}.txt"
+    bin/run -Dtest.base.dir=${BUILD}/${pfx} $SWITCHES com.redhat.persistence.TestRunner $qname > "${BUILD}/TEST-${qname}.txt"
 done
