@@ -42,11 +42,11 @@ import java.io.File;
  *  the framework will look here. test.testpath must be the fully qualified path name.
  *
  * @author Jon Orris
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/09/24 $
  */
 
 public class PackageTestSuite extends TestSuite {
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/tools/junit/framework/PackageTestSuite.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/tools/junit/framework/PackageTestSuite.java#3 $ by $Author: dennis $, $DateTime: 2003/09/24 11:45:10 $";
 
     public PackageTestSuite() {
         super();
@@ -290,18 +290,22 @@ public class PackageTestSuite extends TestSuite {
      *  @return The package name, i.e. com.arsdigita.whatever
      */
     private static String getTestCasePath(PackageTestSuite suite) {
-        final String definedPath = System.getProperty("test.testpath");
+        String definedPath = System.getProperty("test.testpath");
         if( null != definedPath ) {
             return definedPath;
         }
 
-        File current = new File("");
-        final String packageName =  getPackageName(suite);
-        final String pathName = current.getAbsolutePath() +
-            File.separator + "build" + File.separator + "tests" +
-            File.separator + packageName.replace('.', File.separatorChar);
+        String pathName = "";
+        String baseDir = System.getProperty("test.base.dir");
+        if( baseDir != null ) {
+            pathName = baseDir;
+        } else {
+            File current = new File("");
+            pathName = current.getAbsolutePath() + File.separator + "build" + File.separator + "tests";
+        }
 
-        return pathName;
+        String packageName =  getPackageName(suite);
+        return (pathName + File.separator + packageName.replace('.', File.separatorChar));
     }
 
     /**
