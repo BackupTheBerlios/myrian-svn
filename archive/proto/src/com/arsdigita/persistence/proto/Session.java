@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #46 $ $Date: 2003/03/14 $
+ * @version $Revision: #47 $ $Date: 2003/03/24 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#46 $ by $Author: ashah $, $DateTime: 2003/03/14 15:57:20 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#47 $ by $Author: ashah $, $DateTime: 2003/03/24 12:07:20 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -525,7 +525,7 @@ public class Session {
      * @return true iff this session has outstanding events
      **/
     public boolean isFlushed() {
-        return m_events.size() > 0;
+        return m_events.size() == 0;
     }
 
     public boolean isNew(Object obj) {
@@ -640,7 +640,7 @@ public class Session {
 
     public void flushAll() {
         flush();
-        if (isFlushed()) {
+        if (!isFlushed()) {
             throw new IllegalStateException("XXX");
         }
     }
