@@ -1,7 +1,11 @@
 <tests>
   <test>
-    <query>query(all(test.Tuple), a = a.name, b = b.name, c = c.name)</query>
-    <query>query(all(test.StaticTuple), a = a.name, b = b.name, c = c.name)</query>
+    <query subselects="0" joins="3" outers="0">
+      query(all(test.Tuple), a = a.name, b = b.name, c = c.name)
+    </query>
+    <query subselects="1" joins="3">
+      query(all(test.StaticTuple), a = a.name, b = b.name, c = c.name)
+    </query>
     <results>
       <row a="Zero" b="Ten" c="Twenty"/>
       <row a="Zero" b="Ten" c="Twenty One"/>
@@ -36,8 +40,12 @@
   </test>
 
   <test>
-    <query>query(all(test.Tuple).cee, id = id, name = name)</query>
-    <query>query(all(test.StaticTuple).cee, id = id, name = name)</query>
+    <query subselects="0" joins="1" outers="1">
+      query(all(test.Tuple).cee, id = id, name = name)
+    </query>
+    <query subselects="2" joins="1" outers="1">
+      query(all(test.StaticTuple).cee, id = id, name = name)
+    </query>
     <results>
       <row id="20" name="Twenty"/>
       <row id="20" name="Twenty"/>
@@ -72,8 +80,12 @@
   </test>
 
   <test>
-    <query>query(filter(all(test.Node), id == 30).children, id = id)</query>
-    <query>query(filter(all(test.StaticNode), id == 30).children, id = id)</query>
+    <query subselects="0" outers="0">
+      query(filter(all(test.Node), id == 30).children, id = id)
+    </query>
+    <query>
+      query(filter(all(test.StaticNode), id == 30).children, id = id)
+    </query>
     <results>
       <row id="31"/>
       <row id="32"/>
@@ -82,8 +94,12 @@
   </test>
 
   <test>
-    <query>query(filter(all(test.Node), exists(children)), id = id)</query>
-    <query>query(filter(all(test.StaticNode), exists(children)), id = id)</query>
+    <query subselects="1" joins="0">
+      query(filter(all(test.Node), exists(children)), id = id)
+    </query>
+    <query>
+      query(filter(all(test.StaticNode), exists(children)), id = id)
+    </query>
     <results>
       <row id="30"/>
       <row id="33"/>
@@ -94,8 +110,12 @@
   </test>
 
   <test>
-    <query>query(all(test.Node).parent, id = id)</query>
-    <query>query(all(test.StaticNode).parent, id = id)</query>
+    <query subselects="0" joins="0">
+      query(all(test.Node).parent, id = id)
+    </query>
+    <query>
+      query(all(test.StaticNode).parent, id = id)
+    </query>
     <results>
       <row id="null"/>
       <row id="30"/>
@@ -111,8 +131,12 @@
   </test>
 
   <test>
-    <query>query(all(test.Node).parent, id = id, name = name)</query>
-    <query>query(all(test.StaticNode).parent, id = id, name = name)</query>
+    <query subselects="0" joins="1" outers="1">
+      query(all(test.Node).parent, id = id, name = name)
+    </query>
+    <query>
+      query(all(test.StaticNode).parent, id = id, name = name)
+    </query>
     <results>
       <row id="null" name="null"/>
       <row id="30" name="Thirty"/>
@@ -128,10 +152,18 @@
   </test>
 
   <test>
-    <query>query(all(test.Node), id = id, name = name)</query>
-    <query>query(all(test.StaticNode), id = id, name = name)</query>
-    <query>query(sql { test.Node }, id = id, name = name)</query>
-    <query>query(sql { test.StaticNode }, id = id, name = name)</query>
+    <query subselects="0" joins="0">
+      query(all(test.Node), id = id, name = name)
+    </query>
+    <query>
+      query(all(test.StaticNode), id = id, name = name)
+    </query>
+    <query>
+      query(sql { test.Node }, id = id, name = name)
+    </query>
+    <query>
+      query(sql { test.StaticNode }, id = id, name = name)
+    </query>
     <results>
       <row id="30" name="Thirty"/>
       <row id="31" name="Thirty One"/>
@@ -147,10 +179,18 @@
   </test>
 
   <test>
-    <query>query(filter(all(test.Node), exists(parent)), id = id)</query>
-    <query>query(filter(all(test.StaticNode), exists(parent)), id = id)</query>
-    <query>query(filter(all(test.Node), not (parent == null)), id = id)</query>
-    <query>query(filter(all(test.StaticNode), not (parent == null)), id = id)</query>
+    <query subselects="0" joins="0">
+      query(filter(all(test.Node), exists(parent)), id = id)
+    </query>
+    <query>
+      query(filter(all(test.StaticNode), exists(parent)), id = id)
+    </query>
+    <query subselects="0" joins="0">
+      query(filter(all(test.Node), not (parent == null)), id = id)
+    </query>
+    <query>
+      query(filter(all(test.StaticNode), not (parent == null)), id = id)
+    </query>
     <results>
       <row id="31"/>
       <row id="32"/>
@@ -165,7 +205,9 @@
   </test>
 
   <test>
-    <query>query(filter(g = all(test.Group), sql { 4 in g.members }), id = g.id, name = g.name)</query>
+    <query subselects="1" joins="0">
+      query(filter(g = all(test.Group), sql { 4 in g.members }), id = g.id, name = g.name)
+    </query>
     <results>
       <row id="4" name="New Age"/>
       <row id="7" name="80s"/>
@@ -173,18 +215,26 @@
   </test>
 
   <test>
-    <query>query(join(g = all(test.Group), m = all(test.User),
+    <query subselects="0" joins="2" outers="0">
+      query(join(g = all(test.Group), m = all(test.User),
                       exists(filter(u = g.members, m == u))),
-                 group = g.name, member = m.name)</query>
-    <query>query(join(g = all(test.Group), m = all(test.User),
+                 group = g.name, member = m.name)
+    </query>
+    <query subselects="0" joins="2" outers="0">
+      query(join(g = all(test.Group), m = all(test.User),
                       exists(filter(mg = m.groups, mg == g))),
-                 group = g.name, member = m.name)</query>
-    <query>query(join(g = all(test.Group), m = all(test.User),
+                 group = g.name, member = m.name)
+    </query>
+    <query subselects="0" joins="2" outers="0">
+      query(join(g = all(test.Group), m = all(test.User),
                       exists(filter(u = g.members, m == u))),
-                 group = g.name, member = m.firstName)</query>
-    <query>query(join(g = all(test.Group), m = all(test.User),
+                 group = g.name, member = m.firstName)
+    </query>
+    <query subselects="0" joins="2" outers="0">
+      query(join(g = all(test.Group), m = all(test.User),
                       exists(filter(mg = m.groups, mg == g))),
-                 group = g.name, member = m.firstName)</query>
+                 group = g.name, member = m.firstName)
+    </query>
     <results>
       <row group="Pop" member="Britney"/>
       <row group="Pop" member="Christina"/>
@@ -218,7 +268,9 @@
   </test>
 
   <test>
-    <query>query(all(test.Group).supergroups, id = id, name = name)</query>
+    <query subselects="0" joins="2" outers="0">
+      query(all(test.Group).supergroups, id = id, name = name)
+    </query>
     <results>
       <row id="10" name="Music"/>
       <row id="10" name="Music"/>
@@ -233,7 +285,9 @@
   </test>
 
   <test>
-    <query>query(all(test.Group).supergroups.supergroups, id = id, name = name)</query>
+    <query subselects="0" joins="4" outers="0">
+      query(all(test.Group).supergroups.supergroups, id = id, name = name)
+    </query>
     <results>
       <row id="11" name="Entertainment"/>
       <row id="11" name="Entertainment"/>
@@ -244,7 +298,9 @@
   </test>
 
   <test>
-    <query>query(all(test.Group).supergroups.subgroups, id = id, name = name)</query>
+    <query subselects="0" joins="4" outers="0">
+      query(all(test.Group).supergroups.subgroups, id = id, name = name)
+    </query>
     <results>
       <row id="0" name="Pop"/>
       <row id="1" name="Rock"/>
@@ -291,7 +347,9 @@
   </test>
 
   <test>
-    <query>query(all(test.Group).subgroups, id = id, name = name)</query>
+    <query subselects="0" joins="2" outers="0">
+      query(all(test.Group).subgroups, id = id, name = name)
+    </query>
     <results>
       <row id="0" name="Pop"/>
       <row id="1" name="Rock"/>
@@ -306,7 +364,9 @@
   </test>
 
   <test>
-    <query>query(all(test.Group).subgroups.subgroups, id = id, name = name)</query>
+    <query subselects="0" joins="3" outers="0">
+      query(all(test.Group).subgroups.subgroups, id = id, name = name)
+    </query>
     <results>
       <row id="0" name="Pop"/>
       <row id="1" name="Rock"/>
@@ -317,7 +377,9 @@
   </test>
 
   <test>
-    <query>query(all(test.Group).subgroups.supergroups, id = id, name = name)</query>
+    <query subselects="0" joins="3" outers="0">
+      query(all(test.Group).subgroups.supergroups, id = id, name = name)
+    </query>
     <results>
       <row id="10" name="Music"/>
       <row id="10" name="Music"/>
@@ -332,7 +394,9 @@
   </test>
 
   <test>
-    <query>query(all(test.User).groups, id = id, name = name)</query>
+    <query subselects="0" joins="2" outers="0">
+      query(all(test.User).groups, id = id, name = name)
+    </query>
     <results>
       <row id="2" name="R&amp;B"/>
       <row id="9" name="00s"/>
@@ -375,7 +439,9 @@
   </test>
 
   <test>
-    <query>query(all(test.A), id = id, name = name)</query>
+    <query subselects="0" joins="0">
+      query(all(test.A), id = id, name = name)
+    </query>
     <results>
       <row id="0" name="Zero"/>
       <row id="1" name="One"/>
@@ -391,7 +457,9 @@
   </test>
 
   <test>
-    <query>query(size(all(test.A)))</query>
+    <query>
+      query(size(all(test.A)))
+    </query>
     <results>
       <!-- XXX how did this get to be named size? -->
       <row size="10"/>
@@ -399,7 +467,8 @@
   </test>
 
   <test>
-    <query ordered="true">query(size(offset(sort(all(test.A), id), 3)))</query>
+    <query ordered="true">query(size(offset(sort(all(test.A), id), 3)))
+    </query>
     <results>
       <!-- XXX how did this get to be named size? -->
       <row size="7"/>
@@ -407,7 +476,8 @@
   </test>
 
   <test>
-    <query ordered="true">query(offset(sort(all(test.A), id), 3), id = id)</query>
+    <query ordered="true">query(offset(sort(all(test.A), id), 3), id = id)
+    </query>
     <results>
       <row id="3"/>
       <row id="4"/>
@@ -420,7 +490,8 @@
   </test>
 
   <test>
-    <query ordered="true">query(limit(sort(all(test.A), id), 7), id = id)</query>
+    <query ordered="true">query(limit(sort(all(test.A), id), 7), id = id)
+    </query>
     <results>
       <row id="0"/>
       <row id="1"/>
@@ -433,7 +504,8 @@
   </test>
 
   <test>
-    <query ordered="true">query(limit(offset(sort(all(test.A), id), 3), 6), id = id)</query>
+    <query ordered="true">query(limit(offset(sort(all(test.A), id), 3), 6), id = id)
+    </query>
     <results>
       <row id="3"/>
       <row id="4"/>
@@ -445,7 +517,8 @@
   </test>
 
   <test>
-    <query ordered="true">query(offset(limit(sort(all(test.A), id), 7), 3), id = id)</query>
+    <query ordered="true">query(offset(limit(sort(all(test.A), id), 7), 3), id = id)
+    </query>
     <results>
       <row id="3"/>
       <row id="4"/>
@@ -455,10 +528,12 @@
   </test>
 
   <test>
-    <query>query(join(a = all(test.A), b = all(test.B),
+    <query subselects="0" joins="2" outers="0">
+      query(join(a = all(test.A), b = all(test.B),
                  exists(filter(l = all(test.Link),
                                l.a == a and l.b == b))),
-                 a = a.name, b = b.name)</query>
+                 a = a.name, b = b.name)
+    </query>
     <results>
       <row a="Zero" b="Ten"/>
       <row a="One" b="Eleven"/>
@@ -473,15 +548,19 @@
   </test>
 
   <test>
-    <query>query(filter(cross(a = all(test.A), b = all(test.B)),
+    <query subselects="0" joins="2" outers="0">
+      query(filter(cross(a = all(test.A), b = all(test.B)),
                         exists(filter(l = all(test.Link),
                                       l.b == b and l.a == a))).a,
-                 id = id, name = name)</query>
-    <query ordered="true">query(sort(filter(cross(a = all(test.A), b = all(test.B)),
-                             exists(filter(l = all(test.Link),
-                                           l.b == b and l.a == a))).a,
+                 id = id, name = name)
+    </query>
+    <query ordered="true" subselects="0" joins="2" outers="0">
+      query(sort(filter(cross(a = all(test.A), b = all(test.B)),
+                        exists(filter(l = all(test.Link),
+                                      l.b == b and l.a == a))).a,
                  name),
-                 id = id, name = name)</query>
+            id = id, name = name)
+    </query>
     <results>
       <row id="1" name="One"/>
       <row id="1" name="One"/>
@@ -496,7 +575,9 @@
   </test>
 
   <test>
-    <query>query(join(a = all(test.A), b = all(test.B), a == 3), a = a.id, b = b.id)</query>
+    <query subselects="0" joins="1" outers="0">
+      query(join(a = all(test.A), b = all(test.B), a == 3), a = a.id, b = b.id)
+    </query>
     <results>
       <row a="3" b ="10"/>
       <row a="3" b ="11"/>
@@ -512,7 +593,9 @@
   </test>
 
   <test>
-    <query>query(join(a = all(test.A), b = all(test.B), true), a = a.id, b = b.id)</query>
+    <query subselects="0" joins="1" outers="0">
+      query(join(a = all(test.A), b = all(test.B), true), a = a.id, b = b.id)
+    </query>
     <results>
       <row a="0" b ="10"/>
       <row a="0" b ="11"/>
@@ -627,16 +710,20 @@
   </test>
 
   <test>
-    <query>query(join(a = all(test.A), join(l = all(test.Link),
+    <query subselects="0">
+      query(join(a = all(test.A), join(l = all(test.Link),
                                             b = all(test.B), l.b == b),
                       filter(a = all(test.A),
                              exists(filter(link = a.links,
                                            link == l))) == a),
-                 a = a.name, l = l.name, b = b.name)</query>
-    <query>query(join(a = all(test.A), join(l = all(test.Link),
+                 a = a.name, l = l.name, b = b.name)
+    </query>
+    <query subselects="0" joins="2" outers="0">
+      query(join(a = all(test.A), join(l = all(test.Link),
                                             b = all(test.B), l.b == b),
                       l.a == a),
-                 a = a.name, l = l.name, b = b.name)</query>
+                 a = a.name, l = l.name, b = b.name)
+    </query>
     <results>
       <row a="Zero" l="Zero-Ten" b="Ten"/>
       <row a="One" l="One-Eleven" b="Eleven"/>
@@ -651,9 +738,11 @@
   </test>
 
   <test>
-    <query>query(join(a = all(test.A), l = all(test.Link),
+    <query subselects="0" joins="1" outers="0">
+      query(join(a = all(test.A), l = all(test.Link),
                       exists(filter(link = a.links, link == l))),
-                 a = a.name, l = l.name)</query>
+                 a = a.name, l = l.name)
+    </query>
     <results>
       <row a="Zero" l="Zero-Ten"/>
       <row a="One" l="One-Eleven"/>
@@ -668,8 +757,12 @@
   </test>
 
   <test>
-    <query>query(all(test.A).links, a = a.id, b = b.id, index = index)</query>
-    <query ordered="true">query(sort(sort(all(test.A).links, index), a), a = a.id, b = b.id, index = index)</query>
+    <query subselects="0" joins="1" outers="0">
+      query(all(test.A).links, a = a.id, b = b.id, index = index)
+    </query>
+    <query ordered="true" subselects="0" joins="1" outers="0">
+      query(sort(sort(all(test.A).links, index), a), a = a.id, b = b.id, index = index)
+    </query>
     <results>
       <row a="0" b="10" index="0"/>
       <row a="1" b="11" index="0"/>
@@ -684,8 +777,12 @@
   </test>
 
   <test>
-    <query>query(filter(all(test.A), id == 2).bees, id = id)</query>
-    <query>query(filter(all(test.A), id == 2).bees\@link.b, id = id)</query>
+    <query subselects="0" joins="1" outers="0">
+      query(filter(all(test.A), id == 2).bees, id = id)
+    </query>
+    <query subselects="0" joins="1" outers="0">
+      query(filter(all(test.A), id == 2).bees\@link.b, id = id)
+    </query>
     <results>
       <row id="10"/>
       <row id="12"/>
@@ -696,7 +793,9 @@
   </test>
 
   <test>
-    <query>query(all(test.A).first, a = a.id, b = b.id, index = index)</query>
+    <query subselects="0" joins="1" outers="1">
+      query(all(test.A).first, a = a.id, b = b.id, index = index)
+    </query>
     <results>
       <row a="null" b="null" index="null"/>
       <row a="null" b="null" index="null"/>
@@ -712,13 +811,19 @@
   </test>
 
   <test>
-    <query>query(filter(all(test.A).first, exists(a)),
-                 a = a.id, b = b.id, index = index)</query>
-    <query>query(filter(all(test.A).first, exists(a) and exists(b)),
-                 a = a.id, b = b.id, index = index)</query>
-    <query>query(filter(all(test.A).first,
+    <query subselects="0" joins="1" outers="0">
+      query(filter(all(test.A).first, exists(a)),
+                 a = a.id, b = b.id, index = index)
+    </query>
+    <query subselects="0" joins="1" outers="0">
+      query(filter(all(test.A).first, exists(a) and exists(b)),
+                 a = a.id, b = b.id, index = index)
+    </query>
+    <query subselects="0" joins="1" outers="0">
+      query(filter(all(test.A).first,
                         exists(a) and exists(b) and exists(index)),
-                 a = a.id, b = b.id, index = index)</query>
+                 a = a.id, b = b.id, index = index)
+    </query>
     <results>
       <row a="0" b="10" index="0"/>
       <row a="1" b="11" index="0"/>
@@ -728,8 +833,12 @@
   </test>
 
   <test>
-    <query>query(all(test.User), id = id, name = name)</query>
-    <query>query(all(test.User), id = id, name = firstName)</query>
+    <query subselects="0" joins="0">
+      query(all(test.User), id = id, name = name)
+    </query>
+    <query subselects="0" joins="0">
+      query(all(test.User), id = id, name = firstName)
+    </query>
     <results>
       <row id="0" name="Ashanti"/>
       <row id="1" name="Britney"/>
@@ -745,8 +854,12 @@
   </test>
 
   <test>
-    <query>query(filter(all(test.User), name == "Britney").groups, id = id, name = name)</query>
-    <query>query(filter(all(test.User), firstName == "Britney").groups, id = id, name = name)</query>
+    <query subselects="0" joins="2" outers="0">
+      query(filter(all(test.User), name == "Britney").groups, id = id, name = name)
+    </query>
+    <query subselects="0" joins="2" outers="0">
+      query(filter(all(test.User), firstName == "Britney").groups, id = id, name = name)
+    </query>
     <results>
       <row id="0" name="Pop"/>
       <row id="8" name="90s"/>
@@ -754,12 +867,16 @@
     </results>
   </test>
   <test>
-    <query>query(filter(all(test.User), name == "Snurble").groups, id = id, name = name)</query>
+    <query subselects="0" joins="2" outers="0">
+      query(filter(all(test.User), name == "Snurble").groups, id = id, name = name)
+    </query>
     <results/>
   </test>
   <test>
-    <exception type="java.lang.IllegalArgumentException" msg="no such expression: afilter"/>
-    <query>query(afilter(all(test.User), name == "Snurble").groups, id = id, name = name)</query>
-    <results/>
+    <query>
+      query(afilter(all(test.User), name == "Snurble").groups, id = id, name = name)
+    </query>
+    <exception type="java.lang.IllegalArgumentException"
+                msg="no such expression: afilter"/>
   </test>
 </tests>

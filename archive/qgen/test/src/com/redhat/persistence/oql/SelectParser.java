@@ -19,116 +19,95 @@ import com.redhat.persistence.common.*;
 import com.arsdigita.util.UncheckedWrapperException;
 import com.arsdigita.util.Assert;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.io.StringReader;
 
-import org.apache.oro.text.perl.Perl5Util;
 import org.apache.log4j.Logger;
 
 /**
  * SelectParser
  *
  * Simple select statement parser for use in QueryTest tests.
- * Use for counting subselects & joins.
- *
- * Caveats in this version:
- *    Only supports left join
- *    Doesn't count exist clauses yet.
- *    Doesn't check for duplicate tables in select statement.
+ * Use for counting subselects, inner, and outer joins.
  *
  * @author jorris@redhat.com
- * @version $Revision $1 $ $Date: 2004/02/24 $
+ * @version $Revision $1 $ $Date: 2004/03/03 $
  */
 public class SelectParser {
 
-    SQLToken m_token = null;
-    String m_select;
-    String m_from;
-    String m_where;
-    List m_subselects = new ArrayList();
-    private List m_leftJoins = new ArrayList();
-
     private static final Logger s_log = Logger.getLogger(SelectParser.class);
+
+    private SQLToken m_token = null;
+    private SQLToken m_matchend;
+    private int m_subselects = 0;
+    private int m_inners = 0;
+    private int m_outers = 0;
+
     public SelectParser(final String sqlText) {
-
         s_log.debug("Parsing: " + sqlText);
-        try {
-            SQL sql = getParsedSQL(sqlText);
+        SQL sql = getParsedSQL(sqlText);
 
-            m_token = sql.getFirst();
-            m_select = m_token.getImage();
-
-            m_token = m_token.getNext();
-            while(m_token != null) {
-                final String image = m_token.getImage().trim();
-                //System.out.println("Image: " + image);
-                if (image.startsWith("from")) {
-                    getFromClause();
-                    if (atWhereClause()) {
-                        getWhereClause();
-                    } else if(atLeftJoinClause()) {
-                        getLeftJoinClause();
-                    }
-
-                } else {
-                    m_select += image;
-                    m_select += " ";
-                    m_token = m_token.getNext();
-                }
+        m_token = sql.getFirst();
+        while (m_token != null) {
+            if (match("(", "select")) {
+                m_subselects++;
+            } else if (match("left", "join")) {
+                m_outers++;
+            } else if (match("join")) {
+                m_inners++;
+            } else {
+                m_token = next(m_token);
+                continue;
             }
-        } catch (Exception e) {
-            String tokenized = debugTokenize(sqlText);
-            throw new UncheckedWrapperException("Error parsing " + sqlText +" Debug tokenized is: \n" + tokenized, e);
+            m_token = m_matchend;
         }
-    }
-
-    private void getLeftJoinClause() {
-        Assert.truth(atLeftJoinClause(), "Can't get join clause when not at that point!");
-        StringBuffer leftJoin = new StringBuffer();
-        leftJoin.append(m_token.getImage().trim());
-        leftJoin.append(" ");
-
-        m_token = m_token.getNext();
-        while(m_token != null) {
-            if (atLeftJoinClause()) {
-                m_leftJoins.add(leftJoin);
-                leftJoin = new StringBuffer();
-            }
-            leftJoin.append(m_token.getImage());
-            leftJoin.append(" ");
-            m_token = m_token.getNext();
-        }
-    }
-
-    public String getSelect() {
-        return m_select;
-    }
-
-    public String getWhere() {
-        return m_where;
-    }
-
-    public String getFrom() {
-        return m_from;
     }
 
     public int getSubselectCount() {
-        return m_subselects.size();
-    }
-
-    public List getSubselects() {
-        return Collections.unmodifiableList(m_subselects);
+        return m_subselects;
     }
 
     public int getJoinCount() {
-        return m_leftJoins.size();
+        return m_inners + m_outers;
     }
 
+    public int getInnerCount() {
+        return m_inners;
+    }
 
-    public List getJoins() {
-        return Collections.unmodifiableList(m_leftJoins);
+    public int getOuterCount() {
+        return m_outers;
+    }
+
+    private boolean match(String t) {
+        return match(new String[] { t });
+    }
+
+    private boolean match(String t1, String t2) {
+        return match(new String[] { t1, t2 });
+    }
+
+    private boolean match(String[] images) {
+        SQLToken tok = m_token;
+        for (int i = 0; i < images.length; i++) {
+            if (tok == null) { return false; }
+            if (!tok.getImage().equalsIgnoreCase(images[i])) {
+                return false;
+            }
+            tok = next(tok);
+        }
+        m_matchend = tok;
+        return true;
+    }
+
+    SQLToken next(SQLToken t) {
+        do {
+            t = t.getNext();
+        } while (t != null && t.isSpace());
+        return t;
     }
 
     private SQL getParsedSQL(final String sql) {
@@ -141,117 +120,6 @@ public class SelectParser {
 
        return parser.getSQL();
 
-    }
-
-    private void getFromClause() {
-        boolean done = false;
-
-        StringBuffer fromClause = new StringBuffer();
-        while(m_token != null & !done) {
-            final String sql = m_token.getImage().trim();
-            done = atWhereClause() || atLeftJoinClause();
-            if(!done) {
-
-                if (hasSubselect(sql)) {
-                    //System.out.println("Getting subselect: ");
-                    String subSelect = getSubSelect();
-                    m_subselects.add(subSelect);
-                    //System.out.println("Subselect is: " + subSelect);
-                    fromClause.append(subSelect);
-                    fromClause.append(",");
-                } else {
-                    if(!sql.equals("from")) {
-                        fromClause.append(sql);
-                        fromClause.append(" ");
-                    }
-                }
-                m_token = m_token.getNext();
-            }
-        }
-        //System.out.println("Done with from clause");
-        m_from = fromClause.toString();
-        if (m_from.endsWith(",")) {
-            m_from = m_from.substring(0, m_from.length() - 2);
-        }
-    }
-
-    private void getWhereClause() {
-        Assert.truth(atWhereClause(), "Can't get where clause when not at that point!");
-        StringBuffer where = new StringBuffer();
-        String begin = m_token.getImage().trim();
-        if (begin.equals("where")) {
-            begin = "";
-        } else {
-            begin = begin.substring(5);
-        }
-        where.append(begin);
-        m_token = m_token.getNext();
-        while(m_token != null) {
-            String fragment = m_token.getImage();
-            where.append(fragment);
-            where.append(" ");
-            m_token = m_token.getNext();
-        }
-        m_where = where.toString();
-
-    }
-
-    private String getSubSelect() {
-        final String sql = m_token.getImage();
-        String start = sql.substring(sql.indexOf("select")).trim();
-        StringBuffer subSelect = new StringBuffer();
-        subSelect.append("(");
-        subSelect.append(start);
-        m_token = m_token.getNext();
-        boolean done = false;
-        while(m_token != null && !done) {
-            String fragment = m_token.getImage().trim();
-            done = fragment.equals(")");
-            subSelect.append(fragment);
-            subSelect.append(" ");
-            m_token = m_token.getNext();
-        }
-
-        return subSelect.toString();
-    }
-
-    private boolean hasSubselect(String sqlFragment) {
-        Perl5Util re = new Perl5Util();
-//        System.out.println("Subselect test: " + sqlFragment);
-        return re.match("/\\(\\s?select/", sqlFragment);
-
-    }
-
-
-    private String debugTokenize(String original) {
-        SQL sql = getParsedSQL(original);
-
-        SQLToken token = sql.getFirst();
-        StringBuffer dbg = new StringBuffer();
-
-        while(token != null) {
-            final String image = token.getImage().trim();
-            String msg = "Token ";
-            if (token.isPath()) {
-                msg += "is path ";
-            }
-            msg += ": ";
-
-            msg += image;
-            dbg.append(msg);
-            dbg.append("\n");
-            token = token.getNext();
-        }
-        return dbg.toString();
-    }
-
-
-    private boolean atWhereClause() {
-        return m_token != null && m_token.getImage().trim().startsWith("where");
-    }
-
-    private boolean atLeftJoinClause() {
-        return m_token != null && m_token.getImage().trim().startsWith("left") && m_token.isPath();
     }
 
 }

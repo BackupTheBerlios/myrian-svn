@@ -24,12 +24,12 @@ import java.util.*;
  * QuerySuite
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/02/24 $
+ * @version $Revision: #7 $ $Date: 2004/03/03 $
  **/
 
 public class QuerySuite extends TestSuite {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QuerySuite.java#6 $ by $Author: jorris $, $DateTime: 2004/02/24 17:37:51 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QuerySuite.java#7 $ by $Author: rhs $, $DateTime: 2004/03/03 08:11:08 $";
 
     public QuerySuite() {}
 
@@ -271,6 +271,8 @@ public class QuerySuite extends TestSuite {
         private StringBuffer m_query = null;
         private Integer m_subselectCount = null;
         private Integer m_joinCount = null;
+        private Integer m_innerCount = null;
+        private Integer m_outerCount = null;
         private List m_results = null;
         private ExpectedError m_error = null;
 
@@ -284,17 +286,26 @@ public class QuerySuite extends TestSuite {
                 m_tests = new ArrayList();
                 m_name = attrs.getValue(uri, "name");
             } else if (name.equals("query")) {
-                m_variant = attrs.getValue(uri, "name");
                 m_query = new StringBuffer();
-                m_ordered = "true".equalsIgnoreCase
-                    (attrs.getValue(uri, "ordered"));
-                String subSelects = attrs.getValue("subselects");
-                if (subSelects != null) {
-                    m_subselectCount = new Integer(subSelects);
-                }
-                String joinCount = attrs.getValue("joins");
-                if (joinCount != null) {
-                    m_joinCount = new Integer(joinCount);
+                for (int i = 0; i < attrs.getLength(); i++) {
+                    String attr = attrs.getLocalName(i);
+                    String value = attrs.getValue(i);
+                    if (attr.equals("name")) {
+                        m_variant = value;
+                    } else if (attr.equals("ordered")) {
+                        m_ordered = "true".equalsIgnoreCase(value);
+                    } else if (attr.equals("subselects")) {
+                        m_subselectCount = new Integer(value);
+                    } else if (attr.equals("joins")) {
+                        m_joinCount = new Integer(value);
+                    } else if (attr.equals("inners")) {
+                        m_innerCount = new Integer(value);
+                    } else if (attr.equals("outers")) {
+                        m_outerCount = new Integer(value);
+                    } else {
+                        throw new IllegalStateException
+                            ("unrecognized attribute for query: " + attr);
+                    }
                 }
             } else if (name.equals("results")) {
                 m_results = new ArrayList();
@@ -328,9 +339,16 @@ public class QuerySuite extends TestSuite {
                     tname = m_name + "[" + tname + "]";
                 }
                 QueryTest test =
-                    new QueryTest(m_suite, tname, query, m_ordered, m_error);
+                    new QueryTest(m_suite, tname, query, m_ordered);
+                m_ordered = false;
                 test.setSubselectCount(m_subselectCount);
+                m_subselectCount = null;
                 test.setJoinCount(m_joinCount);
+                m_joinCount = null;
+                test.setInnerCount(m_innerCount);
+                m_innerCount = null;
+                test.setOuterCount(m_outerCount);
+                m_outerCount = null;
                 m_tests.add(test);
             } else if (name.equals("results")) {
                 // do nothing
@@ -338,9 +356,11 @@ public class QuerySuite extends TestSuite {
                 for (Iterator it = m_tests.iterator(); it.hasNext(); ) {
                     QueryTest test = (QueryTest) it.next();
                     test.setResults(m_results);
+                    test.setError(m_error);
                     m_suite.addTest(test);
                 }
                 m_results = null;
+                m_error = null;
             }
         }
 

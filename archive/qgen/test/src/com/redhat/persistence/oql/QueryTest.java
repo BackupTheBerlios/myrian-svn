@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
  * QueryTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/03/02 $
+ * @version $Revision: #9 $ $Date: 2004/03/03 $
  **/
 
 public class QueryTest extends TestCase {
@@ -25,7 +25,7 @@ public class QueryTest extends TestCase {
     // being an instance of TestCase. Later versions of ant don't
     // suffer from this problem.
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QueryTest.java#8 $ by $Author: rhs $, $DateTime: 2004/03/02 10:09:25 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QueryTest.java#9 $ by $Author: rhs $, $DateTime: 2004/03/03 08:11:08 $";
 
     private static final Logger s_log = Logger.getLogger(QueryTest.class);
 
@@ -34,25 +34,29 @@ public class QueryTest extends TestCase {
     private boolean m_ordered;
     private String m_query;
     private List m_results = null;
-    private final ExpectedError m_expectedError;
+    private ExpectedError m_error = null;
     private Integer m_subselectCount = null;
     private Integer m_joinCount = null;
+    private Integer m_innerCount = null;
+    private Integer m_outerCount = null;
     //private static final String NL = System.getProperty("line.separator");
 
     public QueryTest(QuerySuite suite, 
                      String name, 
                      String query,
-                     boolean ordered,
-                     ExpectedError expectedError) {
+                     boolean ordered) {
         m_suite = suite;
         m_name = name;
         m_query = query;
         m_ordered = ordered;
-        m_expectedError = expectedError;
     }
 
     void setResults(List results) {
         m_results = results;
+    }
+
+    void setError(ExpectedError error) {
+        m_error = error;
     }
 
     public int countTestCases() { return 1; }
@@ -110,16 +114,29 @@ public class QueryTest extends TestCase {
                 }
                 SelectParser parser = new SelectParser(sql);
                 if (m_subselectCount != null) {
-                    assertEquals("Too many subselects in sql: " + sql,
-                            m_subselectCount.intValue(), parser.getSubselectCount());
+                    assertEquals
+                        ("Incorrect subselect count in sql: " + sql,
+                         m_subselectCount.intValue(),
+                         parser.getSubselectCount());
                 }
 
                 if (m_joinCount != null) {
-                    assertEquals("Too many joins in sql: " + sql,
-                            m_joinCount.intValue(), parser.getJoinCount());
+                    assertEquals
+                        ("Incorrect join count in sql: " + sql,
+                         m_joinCount.intValue(), parser.getJoinCount());
                 }
 
+                if (m_innerCount != null) {
+                    assertEquals
+                        ("Incorrect inner join count in sql: " + sql,
+                         m_innerCount.intValue(), parser.getInnerCount());
+                }
 
+                if (m_outerCount != null) {
+                    assertEquals
+                        ("Incorrect outer join count in sql: " + sql,
+                         m_outerCount.intValue(), parser.getOuterCount());
+                }
             } catch (SQLException e) {
                 fail("sql:\n\n" + sql + "\n\n" + e.getMessage());
             } finally {
@@ -152,10 +169,10 @@ public class QueryTest extends TestCase {
     }
 
     boolean isUnexpected(final Throwable t) {
-        if (m_expectedError == null) {
+        if (m_error == null) {
             return true;
         }
-        return !m_expectedError.isExpected(t);
+        return !m_error.isExpected(t);
     }
 
     public void setSubselectCount(Integer subselectCount) {
@@ -164,6 +181,14 @@ public class QueryTest extends TestCase {
 
     public void setJoinCount(Integer joinCount) {
         m_joinCount = joinCount;
+    }
+
+    public void setInnerCount(Integer innerCount) {
+        m_innerCount = innerCount;
+    }
+
+    public void setOuterCount(Integer outerCount) {
+        m_outerCount = outerCount;
     }
 
 }
