@@ -202,4 +202,6 @@
 
 @@ default/kernel/index-foreign_keys.sql
 
+@@ default/indexes/index-portlets_portal_id_idx.sql 
+
 @@ ddl/oracle-se/deferred.sql

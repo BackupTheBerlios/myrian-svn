@@ -241,5 +241,7 @@ include default/addresses/table-us_addresses.sql
 include default/persistence/table-persistence_dynamic_ot.sql
 include default/persistence/table-persistence_dynamic_assoc.sql
 
+include default/indexes/index-portlets_portal_id_idx.sql 
+
 include default/kernel/index-foreign_keys.sql 
 

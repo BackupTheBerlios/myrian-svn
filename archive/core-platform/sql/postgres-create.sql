@@ -203,6 +203,8 @@ begin;
 
 \i default/kernel/index-foreign_keys.sql 
 
+\i default/indexes/index-portlets_portal_id_idx.sql 
+
 \i ddl/postgres/deferred.sql
 
 commit;
