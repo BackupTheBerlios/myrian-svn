@@ -17,7 +17,7 @@
 -- cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #3 $ $Date: 2002/07/18 $
+-- @version $Revision: #1 $ $Date: 2002/07/22 $
 --
 
 create table t_orders (

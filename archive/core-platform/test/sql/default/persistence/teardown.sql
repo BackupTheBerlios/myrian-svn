@@ -13,19 +13,19 @@
 --
 
 --
--- This file sets up all the data models necessary for the persistence
+-- This file cleans up all the test data models necessary for the persistence
 -- tests to run.
 --
--- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #4 $ $Date: 2002/07/22 $
+-- @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
+-- @version $Revision: #1 $ $Date: 2002/07/22 $
 --
 
-@@ ../../default/persistence/setup.sql
---@@ party-test.sql
---@@ node-test.sql
---@@ datatype-test.sql
-@@ data-query-test.sql
---@@ sql-operation-test.sql
---@@ data-operation-test.sql
---@@ link-test.sql
---@@ test-create.sql
+-- Right now this is duplicated from the individual files. This should
+-- be fixed at some point.
+
+
+drop table t_order_other_item_map;
+drop table t_other_items;
+drop table t_orders_ext;
+drop table t_line_items;
+drop table t_orders;

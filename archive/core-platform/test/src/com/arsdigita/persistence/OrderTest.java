@@ -25,12 +25,12 @@ import java.sql.SQLException;
  * Test
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/07/22 $
  */
 
 public abstract class OrderTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderTest.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderTest.java#4 $ by $Author: randyg $, $DateTime: 2002/07/22 18:09:12 $";
 
     public OrderTest(String name) {
         super(name);
@@ -202,9 +202,9 @@ public abstract class OrderTest extends PersistenceTestCase {
         DataQuery ordersMaxPrices = 
             getSession().retrieveQuery(getModelName() + ".OrdersMaxPrices");
         assert(ordersMaxPrices.next());
-        assertEquals("Order was not retrived correctly.",
-                     new BigDecimal(1),
-                     ordersMaxPrices.get("orderId"));
+
+        assertTrue("Order was not retrieved correctly.",
+                     1 == ((Number)ordersMaxPrices.get("orderId")).intValue());
         assertEquals("Buyer was not retrived correctly.",
                      "Rafael H. Schloming",
                      ordersMaxPrices.get("buyer"));
