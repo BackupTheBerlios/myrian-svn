@@ -222,7 +222,7 @@ public class SQLRegressionGenerator {
         
         if (fix) {
             out.println("select 'Deleting objects " + specificType.getQualifiedName() + 
-                        " not present in " + table + "." + col + "' as check from dual;\n");
+                        " not present in " + table + "." + col + "' as chk from dual;\n");
             out.println("delete from acs_objects \n" +
                         " where object_type = '" + specificType.getQualifiedName() + "'\n" +
                         "   and not exists (\n" + 
@@ -232,7 +232,7 @@ public class SQLRegressionGenerator {
                         "       );\n\n\n");
         } else {
             out.println("select 'Verifying presence of " + specificType.getQualifiedName() +
-                        " objects in " + table + "." + col + "' as check from dual;\n");
+                        " objects in " + table + "." + col + "' as chk from dual;\n");
             out.println("select object_id, display_name\n" +
                         "  from acs_objects \n" +
                         " where object_type = '" + specificType.getQualifiedName() + "'\n" +
