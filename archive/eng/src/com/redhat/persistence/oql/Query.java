@@ -23,12 +23,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/06/24 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Query.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Query.java#2 $ by $Author: rhs $, $DateTime: 2004/06/24 13:51:54 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -67,16 +67,10 @@ public class Query {
 
     private static final String ROWNUM = "rownum__";
 
-    private static final ThreadLocal s_generators = new ThreadLocal() {
-        public Object initialValue() {
-            return new Generator();
-        }
-    };
-
     private static final Map s_cache = new HashMap();
 
     public Code generate(Root root, boolean oracle) {
-        Generator gen = (Generator) s_generators.get();
+        Generator gen = Generator.getThreadGenerator();
         gen.init(root);
 
         m_query.hash(gen);

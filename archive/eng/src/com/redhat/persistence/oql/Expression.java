@@ -23,12 +23,12 @@ import java.util.*;
  * Expression
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/06/23 $
+ * @version $Revision: #3 $ $Date: 2004/06/24 $
  **/
 
 public abstract class Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Expression.java#2 $ by $Author: rhs $, $DateTime: 2004/06/23 20:43:08 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Expression.java#3 $ by $Author: rhs $, $DateTime: 2004/06/24 13:51:54 $";
 
     public static Expression valueOf(Path path) {
         if (path.getParent() == null) {
@@ -45,6 +45,13 @@ public abstract class Expression {
         } catch (ParseException e) {
             throw new Error(expression, e);
         }
+    }
+
+    public ObjectType getType(Root root) {
+        Generator gen = Generator.getThreadGenerator();
+        gen.init(root);
+        frame(gen);
+        return gen.getFrame(this).getType();
     }
 
     abstract void frame(Generator generator);

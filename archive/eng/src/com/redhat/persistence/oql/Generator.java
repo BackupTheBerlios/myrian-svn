@@ -25,14 +25,24 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/06/24 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Generator.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Generator.java#2 $ by $Author: rhs $, $DateTime: 2004/06/24 13:51:54 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
+
+    private static final ThreadLocal s_generators = new ThreadLocal() {
+        public Object initialValue() {
+            return new Generator();
+        }
+    };
+
+    static Generator getThreadGenerator() {
+        return (Generator) s_generators.get();
+    }
 
     private List m_framepool = new ArrayList();
     private Map m_queries = new HashMap();

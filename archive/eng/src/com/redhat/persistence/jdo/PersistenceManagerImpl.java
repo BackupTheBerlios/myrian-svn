@@ -395,11 +395,7 @@ public class PersistenceManagerImpl implements PersistenceManager {
      * Create a new Query using the specified language.
      */
     public Query newQuery(String language, final Object query) {
-        // XXX: right now we abuse the language string to figure out
-        // the type returned by the query expression eventually we
-        // should be able to kill this once the whole Signature/Query
-        // mess is cleared up in CRP.
-        final ObjectType type = m_ssn.getRoot().getObjectType(language);
+        // XXX: language parameter is ignored
         return new Query() {
 
             private boolean m_ignoreCache = false;
@@ -416,6 +412,7 @@ public class PersistenceManagerImpl implements PersistenceManager {
             public Object executeWithMap(Map parameters) {
                 // XXX: need to use parameters
                 final Expression expr = Expression.valueOf((String) query);
+                final ObjectType type = expr.getType(m_ssn.getRoot());
                 return new CRPCollection(m_ssn) {
                     ObjectType type() {
                         return type;
