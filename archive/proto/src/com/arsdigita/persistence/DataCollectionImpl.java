@@ -7,12 +7,12 @@ import com.arsdigita.persistence.proto.PersistentCollection;
  * DataCollectionImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/02/12 $
+ * @version $Revision: #6 $ $Date: 2003/03/14 $
  **/
 
 class DataCollectionImpl extends DataQueryImpl implements DataCollection {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataCollectionImpl.java#5 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataCollectionImpl.java#6 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
 
     DataCollectionImpl(Session ssn, PersistentCollection pc) {
         super(ssn, pc);
@@ -27,12 +27,20 @@ class DataCollectionImpl extends DataQueryImpl implements DataCollection {
         return (DataObject) m_cursor.get();
     }
 
+    /**
+     * @deprecated
+     **/
+
     public void setParameter(String p, Object o) {
-        throw new Error("deprecated");
+        super.setParameter(p, o);
     }
 
+    /**
+     * @deprecated
+     **/
+
     public Object getParameter(String p) {
-        throw new Error("deprecated");
+        return super.getParameter(p);
     }
 
     public boolean contains(OID oid) {

@@ -5,9 +5,8 @@ options {
 
 PARSER_BEGIN(SQLParser)
 
-package com.arsdigita.persistence.proto.pdl;
+package com.arsdigita.persistence.proto.common;
 
-import com.arsdigita.persistence.proto.common.*;
 import java.util.*;
 import java.io.*;
 
@@ -15,19 +14,19 @@ import java.io.*;
  * SQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/02/28 $
+ * @version $Revision: #1 $ $Date: 2003/03/14 $
  */
 
 public class SQLParser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/SQLParser.jj#2 $ by $Author: rhs $, $DateTime: 2003/02/28 17:44:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/common/SQLParser.jj#1 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
 
     public static interface Mapper {
         Path map(Path path);
     }
 
-    private StringBuffer m_sql = new StringBuffer();
-    private ArrayList m_bindings = new ArrayList();
+    private SQL m_sql = new SQL();
+    private StringBuffer m_image = new StringBuffer();
     private ArrayList m_assigns = new ArrayList();
     private Mapper m_mapper = new Mapper() {
             public Path map(Path path) {
@@ -42,39 +41,26 @@ public class SQLParser {
 
     public class Assign {
 
-        private int m_begin;
-        private int m_end;
-        private ArrayList m_bindings = new ArrayList();
+        private SQLToken m_begin;
+        private SQLToken m_end;
 
-        public Assign(int begin, int end, List bindings) {
+        public Assign(SQLToken begin, SQLToken end) {
             m_begin = begin;
             m_end = end;
-            m_bindings.addAll(bindings);
         }
 
-        public int getBegin() {
+        public SQLToken getBegin() {
             return m_begin;
         }
 
-        public int getEnd() {
+        public SQLToken getEnd() {
             return m_end;
         }
 
-        public List getBindings() {
-            return m_bindings;
-        }
-
-        public String toString() {
-            return "'" + m_sql.substring(m_begin, m_end) + "'";
-        }
     }
 
-    public String getSQL() {
-        return m_sql.toString();
-    }
-
-    public Collection getBindings() {
-        return m_bindings;
+    public SQL getSQL() {
+        return m_sql;
     }
 
     public Collection getAssigns() {
@@ -86,14 +72,21 @@ public class SQLParser {
         while (sp.specialToken != null) { sp = sp.specialToken; }
         if (sp == t) { return; }
         while (sp != null) {
-            m_sql.append(sp.image);
+            m_image.append(sp.image);
             sp = sp.next;
         }
     }
 
     private void append(Token t) {
         appendSpecial(t);
-        m_sql.append(t.image);
+        m_image.append(t.image);
+    }
+
+    private void token(boolean bind) {
+        if (m_image.length() > 0) {
+            m_sql.append(new SQLToken(m_image.toString(), bind));
+            m_image.setLength(0);
+        }
     }
 
 }
@@ -202,6 +195,7 @@ void sql() :
 {
  [ ( statement() | unstructuredElement()
      ( ( unstructuredElement() | clauseStart() ) )* ) ] <EOF>
+     { token(false); }
 }
 
 void statement() :
@@ -307,17 +301,17 @@ void identifier() :
 }
 {
     ( t = <BINDVAR> { bind = true; } | t = <ID>  )
-        { buf.append(t.image); appendSpecial(t); }
+        { buf.append(t.image); appendSpecial(t); token(false); }
         ( LOOKAHEAD(2) <PERIOD> t = <ID>
             { buf.append('.'); buf.append(t.image);
         } )*
     {
         if (bind) {
-            m_bindings.add(Path.get(buf.substring(1)));
-            m_sql.append("?");
+            m_image.append(buf.substring(1));
         } else {
-            m_sql.append(m_mapper.map(Path.get(buf.toString())));
+            m_image.append(m_mapper.map(Path.get(buf.toString())));
         }
+        token(bind);
     }
 }
 
@@ -364,15 +358,14 @@ void setClause() :
 void assign() :
 {
     Token t;
-    int begin, beginBind;
+    SQLToken begin;
 }
 {
 
-    { begin = m_sql.length(); beginBind = m_bindings.size(); }
+    { token(false); begin = m_sql.getLast(); }
     identifier() t = <EQ> { append(t); } ( unstructuredElementNoComma() )+
     {
-        m_assigns.add
-            (new Assign(begin, m_sql.length(),
-                        m_bindings.subList(beginBind, m_bindings.size())));
+        token(false);
+        m_assigns.add(new Assign(begin.getNext(), m_sql.getLast()));
     }
 }

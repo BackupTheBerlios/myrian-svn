@@ -22,12 +22,12 @@ package com.arsdigita.persistence;
  * Description: The TransactionContext class encapsulates a database transaction.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/09 $
+ * @version $Revision: #3 $ $Date: 2003/03/14 $
  */
 
 public class TransactionContext {
 
-    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/TransactionContext.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
+    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/TransactionContext.java#3 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
 
     private com.arsdigita.persistence.proto.Session m_ssn;
 
@@ -79,7 +79,7 @@ public class TransactionContext {
      * Register a one time transaction event listener
      */
     public void addTransactionListener(TransactionListener listener) {
-        throw new Error("not implemented");
+        //throw new Error("not implemented");
     }
 
     /**

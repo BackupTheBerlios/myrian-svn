@@ -7,12 +7,12 @@ import java.util.*;
  * Condition
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/03/12 $
+ * @version $Revision: #9 $ $Date: 2003/03/14 $
  **/
 
 abstract class Condition {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Condition.java#8 $ by $Author: rhs $, $DateTime: 2003/03/12 18:21:58 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Condition.java#9 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
 
     abstract void write(SQLWriter w);
 
@@ -159,23 +159,14 @@ class EqualsCondition extends Condition {
 
 class StaticCondition extends Condition {
 
-    private String m_sql;
-    private ArrayList m_bindings = new ArrayList();
+    private SQL m_sql;
 
-    public StaticCondition(String sql) {
+    public StaticCondition(SQL sql) {
         m_sql = sql;
     }
 
-    public String getSQL() {
+    public SQL getSQL() {
         return m_sql;
-    }
-
-    public void addBinding(Object value) {
-        m_bindings.add(value);
-    }
-
-    public Collection getBindings() {
-        return m_bindings;
     }
 
     void write(SQLWriter w) {

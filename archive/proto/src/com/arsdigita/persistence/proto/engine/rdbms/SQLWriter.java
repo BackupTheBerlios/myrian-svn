@@ -11,12 +11,12 @@ import java.sql.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/02/28 $
+ * @version $Revision: #7 $ $Date: 2003/03/14 $
  **/
 
 abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#6 $ by $Author: rhs $, $DateTime: 2003/02/28 19:58:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#7 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
 
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();
@@ -63,9 +63,21 @@ abstract class SQLWriter {
         }
 
         if (m_op.isParameter(path)) {
-            m_sql.append("?");
-            m_bindings.add(m_op.get(path));
-            m_types.add(new Integer(m_op.getType(path)));
+            Object value = m_op.get(path);
+            if (value instanceof Collection) {
+                Collection c = (Collection) value;
+                m_sql.append("(");
+                for (Iterator it = c.iterator(); it.hasNext(); ) {
+                    m_sql.append("?");
+                    m_bindings.add(it.next());
+                    m_types.add(new Integer(m_op.getType(path)));
+                }
+                m_sql.append(")");
+            } else {
+                m_sql.append("?");
+                m_bindings.add(value);
+                m_types.add(new Integer(m_op.getType(path)));
+            }
         } else {
             m_sql.append(path);
         }
@@ -83,57 +95,65 @@ abstract class SQLWriter {
         }
     }
 
+    public void write(SQL sql) {
+        write(sql.getFirst(), null);
+    }
+
+    public void write(SQLToken start, SQLToken end) {
+        for (SQLToken t = start; t != end; t = t.getNext()) {
+            if (t.isBind()) {
+                write(Path.get(t.getImage()));
+            } else {
+                write(t.getImage());
+            }
+        }
+    }
+
     public void write(StaticOperation sop) {
         SQLBlock block = sop.getSQLBlock();
+        SQL sql = block.getSQL();
 
-        HashSet exclude = new HashSet();
-        StringBuffer sql = new StringBuffer();
-
-        sql.append(block.getBegin());
-
+        boolean first = true;
         boolean execute = false;
+        SQLToken written = sql.getFirst();
+        SQLToken firstBegin = null;
 
         for (Iterator it = block.getAssigns().iterator(); it.hasNext(); ) {
             SQLBlock.Assign assign = (SQLBlock.Assign) it.next();
             boolean keep = true;
-            for (Iterator iter = assign.getBindings().iterator();
-                 iter.hasNext(); ) {
+            Collection bindings = sql.getBindings
+                (assign.getBegin(), assign.getEnd());
+            for (Iterator iter = bindings.iterator(); iter.hasNext(); ) {
                 Path p = (Path) iter.next();
-                if (!keep && sop.isParameter(p)) {
+                if (!keep && sop.contains(p)) {
                     throw new Error("missing bind variables");
                 }
 
-                if (!sop.isParameter(p)) {
+                if (!sop.contains(p)) {
                     keep = false;
-                    exclude.add(p);
                 }
+            }
+
+            if (first) {
+                first = false;
+                firstBegin = assign.getBegin();
             }
 
             if (keep) {
                 if (execute) {
-                    sql.append(',');
+                    write(",");
+                } else {
+                    write(sql.getFirst(), firstBegin);
                 }
                 execute = true;
-                sql.append(assign.toString());
+                write(assign.getBegin(), assign.getEnd());
             }
-        }
 
-        sql.append(block.getEnd());
+            written = assign.getEnd();
+        }
 
         if (execute || block.getAssigns().size() == 0) {
-            write(sql.toString());
-        }
-
-        for (Iterator it = block.getBindings().iterator(); it.hasNext(); ) {
-            Path p = (Path) it.next();
-            if (exclude.contains(p)) { continue; }
-            if (sop.isParameter(p)) {
-                m_bindings.add(sop.get(p));
-                m_types.add(new Integer(sop.getType(p)));
-            } else {
-                m_bindings.add(null);
-                m_types.add(new Integer(Types.INTEGER));
-            }
+            write(written, null);
         }
     }
 
@@ -146,12 +166,7 @@ abstract class SQLWriter {
     }
 
     public void write(StaticCondition cond) {
-        m_sql.append(cond.getSQL());
-        for (Iterator it = cond.getBindings().iterator(); it.hasNext(); ) {
-            Object obj = (Object) it.next();
-            m_bindings.add(obj);
-            m_types.add(new Integer(Types.INTEGER));
-        }
+        write(cond.getSQL());
     }
 
     public abstract void write(Select select);

@@ -3,8 +3,6 @@ package com.arsdigita.persistence.proto.engine.rdbms;
 import com.arsdigita.persistence.proto.*;
 import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
-import com.arsdigita.persistence.proto.pdl.SQLParser;
-import com.arsdigita.persistence.proto.pdl.ParseException;
 
 import java.util.*;
 import java.sql.*;
@@ -15,12 +13,12 @@ import java.io.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2003/03/12 $
+ * @version $Revision: #14 $ $Date: 2003/03/14 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#13 $ by $Author: rhs $, $DateTime: 2003/03/12 18:21:58 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#14 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -393,13 +391,7 @@ class QGen {
                         throw new Error(e.getMessage());
                     }
 
-                    StaticCondition sc = new StaticCondition(p.getSQL());
-                    for (Iterator it = p.getBindings().iterator();
-                         it.hasNext(); ) {
-                        Path path = (Path) it.next();
-                        sc.addBinding(f.getParameter(path));
-                    }
-                    result[0] = sc;
+                    result[0] = new StaticCondition(p.getSQL());
                 }
             });
 

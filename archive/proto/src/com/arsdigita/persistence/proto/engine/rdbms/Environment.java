@@ -8,16 +8,16 @@ import java.util.*;
  * Environment
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/03/05 $
+ * @version $Revision: #3 $ $Date: 2003/03/14 $
  **/
 
 class Environment {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Environment.java#2 $ by $Author: rhs $, $DateTime: 2003/03/05 18:41:57 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Environment.java#3 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
 
     private HashMap m_values = new HashMap();
 
-    public boolean isParameter(Path path) {
+    public boolean contains(Path path) {
         return m_values.containsKey(path);
     }
 
@@ -47,11 +47,11 @@ class SpliceEnvironment extends Environment {
         m_splice = splice;
     }
 
-    public boolean isParameter(Path path) {
+    public boolean contains(Path path) {
         if (m_path.isAncestor(path)) {
-            return m_splice.isParameter(m_path.getRelative(path));
+            return m_splice.contains(m_path.getRelative(path));
         } else {
-            return m_base.isParameter(path);
+            return m_base.contains(path);
         }
     }
 

@@ -11,17 +11,18 @@ import java.util.*;
  * Operation
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2003/03/11 $
+ * @version $Revision: #10 $ $Date: 2003/03/14 $
  **/
 
 abstract class Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Operation.java#9 $ by $Author: rhs $, $DateTime: 2003/03/11 10:49:54 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Operation.java#10 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
 
     private static final Logger LOG = Logger.getLogger(Operation.class);
 
     private Environment m_env;
     private HashMap m_types = new HashMap();
+    private HashSet m_parameters = new HashSet();
 
     protected Operation(Environment env) {
         m_env = env;
@@ -32,10 +33,19 @@ abstract class Operation {
     }
 
     public boolean isParameter(Path path) {
-        return m_env.isParameter(path);
+        return m_parameters.contains(path);
+    }
+
+    public void addParameter(Path path) {
+        m_parameters.add(path);
+    }
+
+    public boolean contains(Path parameter) {
+        return m_env.contains(parameter);
     }
 
     public void set(Path parameter, Object value, int type) {
+        m_parameters.add(parameter);
         m_env.set(parameter, value);
         m_types.put(parameter, new Integer(type));
     }

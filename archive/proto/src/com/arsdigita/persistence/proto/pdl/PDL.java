@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #28 $ $Date: 2003/03/11 $
+ * @version $Revision: #29 $ $Date: 2003/03/14 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#28 $ by $Author: rhs $, $DateTime: 2003/03/11 16:05:41 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#29 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -895,20 +895,9 @@ public class PDL {
                 SQLParser p = new SQLParser(new StringReader(nd.getSQL()));
                 p.sql();
                 final SQLBlock block = new SQLBlock(p.getSQL());
-                for (Iterator ii = p.getBindings().iterator();
-                     ii.hasNext(); ) {
-                    Path path = (Path) ii.next();
-                    block.addBinding(path);
-                }
                 for (Iterator ii = p.getAssigns().iterator(); ii.hasNext(); ) {
                     SQLParser.Assign assn = (SQLParser.Assign) ii.next();
-                    SQLBlock.Assign bassn = block.addAssign
-                        (assn.getBegin(), assn.getEnd());
-                    for (Iterator iter = assn.getBindings().iterator();
-                         iter.hasNext(); ) {
-                        Path path = (Path) iter.next();
-                        bassn.addBinding(path);
-                    }
+                    block.addAssign(assn.getBegin(), assn.getEnd().getNext());
                 }
 
                 nd.traverse(new Node.Switch() {
@@ -924,7 +913,7 @@ public class PDL {
                         }
                     });
                 return block;
-            } catch (ParseException e) {
+            } catch (com.arsdigita.persistence.proto.common.ParseException e) {
                 m_errors.fatal(nd, e.getMessage());
                 return null;
             }

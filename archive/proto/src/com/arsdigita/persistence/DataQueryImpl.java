@@ -7,6 +7,7 @@ import com.arsdigita.persistence.proto.DataSet;
 import com.arsdigita.persistence.proto.Cursor;
 import com.arsdigita.persistence.proto.Query;
 import com.arsdigita.persistence.proto.Signature;
+import com.arsdigita.persistence.proto.Parameter;
 import com.arsdigita.persistence.proto.PassthroughFilter;
 
 import com.arsdigita.util.StringUtils;
@@ -17,12 +18,12 @@ import java.util.*;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2003/03/01 $
+ * @version $Revision: #11 $ $Date: 2003/03/14 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#10 $ by $Author: rhs $, $DateTime: 2003/03/01 02:23:27 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#11 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
 
     private static final FilterFactory FACTORY = new FilterFactoryImpl();
 
@@ -69,6 +70,7 @@ class DataQueryImpl implements DataQuery {
     }
 
     public boolean isFirst() {
+        checkCursor();
         return m_cursor.isFirst();
     }
 
@@ -217,12 +219,44 @@ class DataQueryImpl implements DataQuery {
 
 
     public void setParameter(String parameterName, Object value) {
-        throw new Error("not implemented");
+        if (value == null) {
+            return;
+        }
+
+        Object tobj;
+        if (value instanceof Collection) {
+            Collection c = (Collection) value;
+            if (c.size() == 0) {
+                throw new Error("zero sized collection");
+            } else {
+                tobj = c.iterator().next();
+            }
+        } else {
+            tobj = value;
+        }
+
+        Query q = m_pc.getDataSet().getQuery();
+        Signature sig = q.getSignature();
+        Path path = Path.get(parameterName);
+        Parameter p = sig.getParameter(path);
+        if (p == null) {
+            // XXX: should add notion of multiplicity to Parameter
+            p = new Parameter(m_pssn.getObjectType(tobj), path);
+            sig.addParameter(p);
+        }
+        q.set(p, value);
     }
 
 
     public Object getParameter(String parameterName) {
-        throw new Error("not implemented");
+        Query q = m_pc.getDataSet().getQuery();
+        Signature sig = q.getSignature();
+        Path p = Path.get(parameterName);
+        if (sig.isParameter(p)) {
+            return q.get(sig.getParameter(p));
+        } else {
+            return null;
+        }
     }
 
 
@@ -288,21 +322,24 @@ class DataQueryImpl implements DataQuery {
             return null;
         }
 
-        PassthroughFilter filter = new PassthroughFilter(conditions);
         Map bindings = m_filter.getBindings();
         for (Iterator it = bindings.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry me = (Map.Entry) it.next();
             String key = (String) me.getKey();
-            filter.setParameter(Path.get(key), me.getValue());
+            setParameter(key, me.getValue());
         }
 
-        return filter;
+        return new PassthroughFilter(conditions);
     }
 
-    public boolean next() {
+    private void checkCursor() {
         if (m_cursor == null) {
             m_cursor = m_pc.getDataSet().getCursor(makeFilter());
         }
+    }
+
+    public boolean next() {
+        checkCursor();
         return m_cursor.next();
     }
 
