@@ -1,0 +1,46 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/dev/pdl/com/arsdigita/mimetypes/MimeType.pdl#1 $
+// $DateTime: 2003/04/23 17:03:01 $
+
+model com.arsdigita.cms;
+
+import com.arsdigita.kernel.*;
+
+object type MimeType {
+  String[1..1]   mimeType      = cms_mime_types.mime_type VARCHAR(200);
+  String[1..1]   label         = cms_mime_types.label VARCHAR(200);
+  String[1..1]   fileExtension = cms_mime_types.file_extension VARCHAR(200);
+  String[1..1]   javaClass     = cms_mime_types.java_class VARCHAR(4000);
+  String[1..1]   objectType    = cms_mime_types.object_type VARCHAR(4000);
+
+  object key (mimeType);
+}
+
+
+query getMimeTypeFromFileExtension {
+    String fileExtension;
+    String mimeType;
+    do {
+        select e.file_extension, e.mime_type
+        from cms_mime_extensions e
+    } map {
+        fileExtension  = e.file_extension;
+        mimeType       = e.mime_type;
+    }
+}
+
+
+
+

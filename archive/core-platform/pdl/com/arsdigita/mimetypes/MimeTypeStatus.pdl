@@ -1,0 +1,37 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/dev/pdl/com/arsdigita/mimetypes/MimeTypeStatus.pdl#1 $
+// $DateTime: 2003/04/23 17:03:01 $
+
+model com.arsdigita.cms;
+
+import com.arsdigita.kernel.*;
+
+// An object for keeping track of whether or not mime types
+// need to be loaded, and whether or not the Oracle interMedia
+// INSO filter (which converts documents to HTML) is working.
+// Values in this table are set by InitializeMimeType.java
+// There should always be exactly one instance of this object type.
+object type MimeTypeStatus {
+  BigDecimal[1..1]   id = cms_mime_status.mime_status_id INTEGER;
+    // The hash code is used to detect changes
+  BigDecimal[1..1]   hashCode = cms_mime_status.hash_code INTEGER;
+  BigDecimal[1..1]   insoFilterWorks = cms_mime_status.inso_filter_works INTEGER;
+
+  object key (id);
+
+  insert { }
+  delete { }
+
+}
