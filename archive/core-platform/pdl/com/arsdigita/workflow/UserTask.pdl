@@ -18,82 +18,14 @@ import com.arsdigita.kernel.*;
 
 object type UserTask extends Task {
 
-    String     isLocked;
-    BigDecimal lockingUserId;
-    Date        startDate;
-    Date        dueDate;
-    BigDecimal   durationMinutes;
-    BigDecimal   notificationSenderID;
+    String     isLocked = cw_user_tasks.is_locked;
+    BigDecimal lockingUserId = cw_user_tasks.locking_user_id;
+    Date        startDate = cw_user_tasks.start_date;
+    Date        dueDate = cw_user_tasks.due_date;
+    BigDecimal   durationMinutes = cw_user_tasks.duration_minutes;
+    BigDecimal   notificationSenderID = cw_user_tasks.notification_sender_id;
 
-    retrieve {
-        super;
-
-        do {
-            select is_locked       ,
-                   locking_user_id ,
-                   start_date      ,
-                   due_date,
-		   duration_minutes,
-                   notification_sender_id
-            from   cw_user_tasks
-            where  task_id = :id
-        } map {
-            isLocked        = cw_user_tasks.is_locked;
-            lockingUserId   = cw_user_tasks.locking_user_id;
-            startDate       = cw_user_tasks.start_date;
-            dueDate         = cw_user_tasks.due_date;
-            durationMinutes = cw_user_tasks.duration_minutes;
-            notificationSenderID = cw_user_tasks.notification_sender_id;
-        }
-    } 
-
-    insert  {
-        super;
-
-        do {
-           insert into cw_user_tasks (
-               task_id         ,
-               is_locked       ,
-               locking_user_id ,
-               start_date      ,
-               due_date        ,
-	       duration_minutes	,
-               notification_sender_id
-           )   values  (
-               :id              ,
-               :isLocked        ,
-               :lockingUserId   ,
-               :startDate       ,
-               :dueDate         ,
-	       :durationMinutes ,
-               :notificationSenderID
-          )
-        }
-    }
-
-    update {
-        super;
-
-        do {
-           update cw_user_tasks
-           set    is_locked   = :isLocked ,
-                  locking_user_id = :lockingUserId,
-                  start_date      = :startDate,
-                  due_date        = :dueDate,
-	  	  duration_minutes= :durationMinutes,
-                  notification_sender_id = :notificationSenderID
-           where  task_id         = :id
-        }
-    }
-
-    delete {
-       do {
-           delete from cw_user_tasks
-           where task_id = :id
-       } 
-       super;
-    }
-
+    reference key (cw_user_tasks.task_id);
 }
 
 

@@ -18,125 +18,33 @@ import com.arsdigita.kernel.*;
 
 object type Task extends ACSObject {
 
-    String[1..1]     label;
-    String[1..1]     description;
-    String[1..1]     isActive;
-    BigDecimal[0..1] parentTaskID;
-    String[1..1]     taskState;
-    String           taskObjectType;
-    composite TaskComment[0..n] comments;
+    String[1..1]     label = cw_tasks.label;
+    String[1..1]     description = cw_tasks.description;
+    String[1..1]     isActive = cw_tasks.is_active;
+    BigDecimal[0..1] parentTaskID = cw_tasks.parent_task_id;
+    String[1..1]     taskState = cw_tasks.task_state;
+    composite TaskComment[0..n] comments = 
+              join cw_tasks.task_id to cw_task_comments.task_id;
 	
-    retrieve {
-	super;
+    reference key (cw_tasks.task_id);
 
-	do {
-	    select cw_tasks.task_id ,
-		   cw_tasks.label,
-                   cw_tasks.description,
-                   cw_tasks.is_active,
-                   cw_tasks.parent_task_id,
-                   cw_tasks.task_state  ,
-                   acs_objects.object_type
-            from   cw_tasks ,
-                   acs_objects 
-            where  cw_tasks.task_id = :id
-            and    acs_objects.object_id = cw_tasks.task_id
-	} map {
-            label                    = cw_tasks.label;
-            description              = cw_tasks.description;
-            isActive                 = cw_tasks.is_active;
-            parentTaskID             = cw_tasks.parent_task_id;
-            taskState 		     = cw_tasks.task_state;
-	    taskObjectType           = acs_objects.object_type;
 
-        }	
-    }
-
-    insert  {
-	super;
-	do {
-	    insert into cw_tasks (
-	        task_id,    
-	        label,
-	        description,
-	        is_active,
-	        parent_task_id,
-                task_state		
-	    ) values  (
-                :id,
-                :label,
-                :description,
-                :isActive,
-                :parentTaskID,
-                :taskState
-            )
-        }
-    }
-
-    update {
-	super;
-
-        do {
-	   update cw_tasks
-           set label = :label,
-	       description = :description,
-	       is_active = :isActive,
-	       parent_task_id = :parentTaskID,
-               task_state  = :taskState
-           where task_id   = :id
-        }
-    }
 
    // delete all of dependency list , delete other dependency 
    // list that has this task def.  The delete may fail
    // if there other foreign key references on task
    // TODO: delete dependencies too.
     delete {
-	do {
-	    delete from cw_task_comments
+        do {
+            delete from cw_task_comments
             where task_id = :id
         }	
-
-	do {
+        
+        do {
             delete from cw_tasks
             where  task_id = :id
         }
-	super;
-    }
-
-    retrieve comments {
-        do {
-            select comment_id   ,
-                   task_id      ,
-                   task_comment ,
-                   party_id     ,
-                   comment_date 
-            from   cw_task_comments
-            where  task_id = :id
-       }  map {
-            comments.id   = cw_task_comments.comment_id;
-            comments.taskID      = cw_task_comments.task_id;
-            comments.taskComment = cw_task_comments.task_comment;
-            comments.partyID     = cw_task_comments.party_id;
-            comments.commentDate = cw_task_comments.comment_date; 
-       }
-    }   
-
-    add comments {
-    }
-
-    remove comments {
-	do {
-            delete from cw_task_comments 
-            where comment_id = :comments.id
-        }
-    }
-
-    clear comments {
-	do {
-	    delete from cw_task_comments
-            where task_id = :id
-	}
+        super;
     }
 }
 
