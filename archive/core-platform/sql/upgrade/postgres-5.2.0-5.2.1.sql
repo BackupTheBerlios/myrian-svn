@@ -11,6 +11,18 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
+-- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.0-5.2.1.sql#1 $
+-- $DateTime: 2003/05/01 17:50:37 $
 
-@@ ../oracle-se/upgrade/5.2.0-5.2.1/add-cat-deflt-ancestors-idx.sql
-@@ ../default/upgrade/5.2.0-5.2.1/alter-requests.sql
+
+begin;
+\i ../postgres/upgrade/5.2.0-5.2.1/alter-requests.sql
+\i ../postgres/upgrade/5.2.0-5.2.1/add-cat-deflt-ancestors-idx.sql
+\i ../postgres/upgrade/5.2.0-5.2.1/acs_objects-acs_permissions-cascade-workaround.sql
+
+\i ../default/notification/index-nt_requests.sql
+
+commit;
+
+--
+

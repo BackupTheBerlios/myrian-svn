@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,6 +11,14 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
+-- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.1-6.0.0.sql#1 $
+-- $DateTime: 2003/05/01 17:50:37 $
 
-@@ ../oracle-se/upgrade/5.2.0-5.2.1/add-cat-deflt-ancestors-idx.sql
-@@ ../default/upgrade/5.2.0-5.2.1/alter-requests.sql
+
+begin;
+
+drop trigger acs_permissions_cascade_del_tr on acs_objects;
+drop function acs_permissions_cascade_del_fn();
+
+commit;
+
