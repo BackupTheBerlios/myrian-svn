@@ -13,7 +13,7 @@ import javax.jdo.Query;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2004/07/14 $
+ * @version $Revision: #15 $ $Date: 2004/07/14 $
  **/
 class CRPMap implements Map {
     private Set entries;
@@ -98,11 +98,8 @@ class CRPMap implements Map {
                     if (!(elem instanceof Map.Entry)) { return false; }
 
                     Map.Entry entry = (Map.Entry) elem;
-                    MapEntry mapEntry =
-                        newMapEntry(entry.getKey(), entry.getValue());
-                    // XXX: this installs a PMI for the newly created MapEntry
-                    getPMI().makePersistent(mapEntry);
-                    return super.contains(mapEntry);
+                    Map.Entry mapEntry = getEntry(entry.getKey());
+                    return mapEntry==null ? false : mapEntry.equals(entry);
                 }
             };
     }
