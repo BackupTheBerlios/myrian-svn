@@ -17,8 +17,7 @@
  */
 package com.arsdigita.persistence.tests.data;
 
-import com.arsdigita.tools.junit.framework.BaseTestCase;
-
+import com.arsdigita.persistence.PersistenceTestCase;
 
 /**
  * The MappingsTest class contains JUnit test cases for the various ways that
@@ -26,12 +25,12 @@ import com.arsdigita.tools.junit.framework.BaseTestCase;
  * model.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/09/20 $
  **/
 
-public class MappingsTest extends BaseTestCase {
+public class MappingsTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/tests/data/MappingsTest.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/tests/data/MappingsTest.java#4 $ by $Author: ashah $, $DateTime: 2004/09/20 16:51:05 $";
 
     public MappingsTest(String name) {
         super(name);
