@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/03/23 $
+ * @version $Revision: #4 $ $Date: 2004/03/28 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Query.java#3 $ by $Author: richardl $, $DateTime: 2004/03/23 18:01:04 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Query.java#4 $ by $Author: rhs $, $DateTime: 2004/03/28 22:52:45 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -76,17 +76,42 @@ public class Query {
         }
     };
 
+    private static final Map s_cache = new HashMap();
+
     public Code generate(Root root, boolean oracle) {
         Generator gen = (Generator) s_generators.get();
         gen.init(root);
+
         //long start = System.currentTimeMillis();
+
+        m_query.hash(gen);
+
+        for (int i = 0; i < m_names.size(); i++) {
+            String name = (String) m_names.get(i);
+            gen.hash(name);
+            Expression e = get(name);
+            e.hash(gen);
+        }
+
+        Code cached;
+
+        synchronized (s_cache) {
+            cached = (Code) s_cache.get(gen.getLookupKey());
+        }
+
+        if (cached != null) {
+            Code c = cached.resolve(gen.getBindings(), root);
+            //FOCUS += System.currentTimeMillis() - start;
+            return c;
+        }
+
         m_query.frame(gen);
 
         QFrame qframe = gen.getFrame(m_query);
         gen.push(qframe);
         try {
-            for (Iterator it = m_names.iterator(); it.hasNext(); ) {
-                Expression e = get((String) it.next());
+            for (int i = 0; i < m_names.size(); i++) {
+                Expression e = get((String) m_names.get(i));
                 e.frame(gen);
             }
         } finally {
@@ -237,6 +262,12 @@ public class Query {
             sql = new Code("select count(*) as \"size\" from (").add(sql)
                 .add(") count__");
         }
+
+        synchronized (s_cache) {
+            s_cache.put(gen.getStoreKey(), sql);
+        }
+
+        sql = sql.resolve(gen.getBindings(), root);
 
         //EMIT += System.currentTimeMillis() - start;
 

@@ -6,12 +6,12 @@ import java.util.*;
  * Equals
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/03/25 $
+ * @version $Revision: #3 $ $Date: 2004/03/28 $
  **/
 
 public class Equals extends BinaryCondition {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Equals.java#2 $ by $Author: rhs $, $DateTime: 2004/03/25 22:23:19 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Equals.java#3 $ by $Author: rhs $, $DateTime: 2004/03/28 22:52:45 $";
 
     public Equals(Expression left, Expression right) {
         super(left, right);
@@ -117,7 +117,13 @@ public class Equals extends BinaryCondition {
         // multi column selects
         Code lsql = lexpr.emit(gen);
         Code rsql = rexpr.emit(gen);
-        if (lsql.equals(rsql)) {
+
+        // we need the isEmpty test because we don't want to eliminate
+        // redundent bind var comparison the first time a query is
+        // cached since the sql may not be redundent for subsequent
+        // query executions
+
+        if (lsql.getBindings().isEmpty() && lsql.equals(rsql)) {
             return Code.TRUE;
         } else {
             return emit(lsql, rsql);

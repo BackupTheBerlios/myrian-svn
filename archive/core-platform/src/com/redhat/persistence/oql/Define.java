@@ -8,12 +8,12 @@ import java.util.*;
  * Define
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/03/23 $
+ * @version $Revision: #3 $ $Date: 2004/03/28 $
  **/
 
 public class Define extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Define.java#2 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Define.java#3 $ by $Author: rhs $, $DateTime: 2004/03/28 22:52:45 $";
 
     private Expression m_expr;
     private String m_name;
@@ -43,6 +43,12 @@ public class Define extends Expression {
 
     Code emit(Generator gen) {
         return gen.getFrame(this).emit();
+    }
+
+    void hash(Generator gen) {
+        m_expr.hash(gen);
+        gen.hash(m_name);
+        gen.hash(getClass());
     }
 
     public String toString() {

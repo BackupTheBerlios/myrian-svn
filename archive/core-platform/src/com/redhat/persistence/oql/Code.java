@@ -13,23 +13,29 @@ import org.apache.log4j.Logger;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/03/25 $
+ * @version $Revision: #4 $ $Date: 2004/03/28 $
  **/
 
 public class Code {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Code.java#3 $ by $Author: richardl $, $DateTime: 2004/03/25 09:49:17 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Code.java#4 $ by $Author: rhs $, $DateTime: 2004/03/28 22:52:45 $";
 
     private static final Logger s_log = Logger.getLogger(Code.class);
 
     public static class Binding {
 
+        private Object m_key;
         private Object m_value;
         private int m_type;
 
-        Binding(Object value, int type) {
+        Binding(Object key, Object value, int type) {
+            m_key = key;
             m_value = value;
             m_type = type;
+        }
+
+        public Object getKey() {
+            return m_key;
         }
 
         public Object getValue() {
@@ -199,6 +205,41 @@ public class Code {
         }
 
         return getBindings().equals(c.getBindings());
+    }
+
+    Code resolve(Map bindings, Root root) {
+        Code result = new Code("", new ArrayList());
+        int index = 0;
+        boolean escape = false;
+        for (int i = m_lower; i < m_upper; i++) {
+            char c = m_sql.charAt(i);
+            if (!escape && c == '?') {
+                Code.Binding b = (Code.Binding) m_bindings.get(index++);
+                Object value;
+                int type;
+                if (b.getKey() == null) {
+                    value = b.getValue();
+                    type = b.getType();
+                } else {
+                    value = bindings.get(b.getKey());
+                    if (value == null) {
+                        throw new IllegalStateException
+                            ("no value for key: " + b.getKey());
+                    }
+                    Adapter ad = root.getAdapter(value.getClass());
+                    type = ad.defaultJDBCType();
+                }
+                result.m_bindings.add(new Binding(b.getKey(), value, type));
+            } else if (!escape && c == '\'') {
+                escape = true;
+            } else if (escape && c == '\'') {
+                escape = false;
+            }
+
+            result.append(c);
+        }
+        result.m_upper = result.m_sql.length();
+        return result;
     }
 
     public String toString() {

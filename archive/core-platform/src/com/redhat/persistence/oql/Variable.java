@@ -8,12 +8,12 @@ import java.util.*;
  * Variable
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/03/11 $
+ * @version $Revision: #2 $ $Date: 2004/03/28 $
  **/
 
 public class Variable extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Variable.java#1 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Variable.java#2 $ by $Author: rhs $, $DateTime: 2004/03/28 22:52:45 $";
 
     private String m_name;
 
@@ -28,6 +28,11 @@ public class Variable extends Expression {
 
     Code emit(Generator gen) {
         return gen.getFrame(this).emit();
+    }
+
+    void hash(Generator gen) {
+        gen.hash(m_name);
+        gen.hash(getClass());
     }
 
     public String toString() {

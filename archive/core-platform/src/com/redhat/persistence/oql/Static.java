@@ -13,17 +13,18 @@ import java.util.*;
  * Static
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/03/24 $
+ * @version $Revision: #4 $ $Date: 2004/03/28 $
  **/
 
 public class Static extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Static.java#3 $ by $Author: ashah $, $DateTime: 2004/03/24 13:21:25 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Static.java#4 $ by $Author: rhs $, $DateTime: 2004/03/28 22:52:45 $";
 
     private SQL m_sql;
     private String[] m_columns;
     private boolean m_map;
     private Map m_bindings;
+    private Expression m_scope;
     private List m_expressions = new ArrayList();
 
     private static final Collection s_functions = new HashSet();
@@ -58,10 +59,16 @@ public class Static extends Expression {
     }
 
     public Static(SQL sql, String[] columns, boolean map, Map bindings) {
+        this(sql, columns, map, bindings, null);
+    }
+
+    public Static(SQL sql, String[] columns, boolean map, Map bindings,
+                  Expression scope) {
         m_sql = sql;
         m_columns = columns;
         m_map = map;
         m_bindings = bindings;
+        m_scope = scope == null ? this : scope;
 
         int size = size(m_sql);
 
@@ -72,7 +79,7 @@ public class Static extends Expression {
                 if (t.isBind()) {
                     e = bind(image);
                 } else if (t.isPath()) {
-                    All all = new All(image, m_bindings, size != 1);
+                    All all = new All(image, m_bindings, m_scope, size != 1);
                     if (isAllowedFunction(image) || !m_map) {
                         e = new Choice(all, image);
                     } else {
@@ -122,9 +129,13 @@ public class Static extends Expression {
         if (path.getParent() == null) {
             String name = path.getName();
             if (isBind) {
-                String key = name.substring(1);
+                final String key = name.substring(1);
                 if (m_bindings.containsKey(key)) {
-                    return new Literal(m_bindings.get(key));
+                    return new Literal(m_bindings.get(key)) {
+                        Object getBindKey(Generator gen) {
+                            return new CompoundKey(gen.id(m_scope), key);
+                        }
+                    };
                 }
 
                 // XXX: use real subtype
@@ -206,6 +217,34 @@ public class Static extends Expression {
         return result;
     }
 
+    void hash(Generator gen) {
+        gen.hash(m_sql);
+        if (m_columns != null) {
+            for (int i = 0; i < m_columns.length; i++) {
+                gen.hash(m_columns[i]);
+            }
+        }
+        List keys = new ArrayList(m_bindings.keySet());
+        Collections.sort(keys);
+        Object id = gen.id(this);
+        List vals = new ArrayList();
+        for (int i = 0; i < keys.size(); i++) {
+            String key = (String) keys.get(i);
+            Object value = m_bindings.get(key);
+            vals.clear();
+            Literal.convert
+                (value, vals, gen.getRoot(), new CompoundKey(id, key));
+            gen.hash(key);
+            for (int j = 0; j < vals.size(); j++) {
+                Code c = (Code) vals.get(j);
+                gen.hash(c.getSQL());
+                gen.bind(c);
+            }
+        }
+        gen.hash(m_map);
+        gen.hash(getClass());
+    }
+
     private class Choice extends Expression {
 
         private All m_all;
@@ -258,6 +297,10 @@ public class Static extends Expression {
             } else {
                 return new Code(m_image);
             }
+        }
+
+        void hash(Generator gen) {
+            throw new UnsupportedOperationException();
         }
 
         String summary() { return this.toString(); }

@@ -3,6 +3,7 @@ package com.redhat.persistence.oql;
 // XXX: dependency on c.a.db.DbHelper
 import com.arsdigita.db.DbHelper;
 import com.redhat.persistence.*;
+import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
 
 import java.text.DateFormat;
@@ -13,12 +14,12 @@ import java.util.*;
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/03/16 $
+ * @version $Revision: #3 $ $Date: 2004/03/28 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Literal.java#2 $ by $Author: richardl $, $DateTime: 2004/03/16 17:59:49 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Literal.java#3 $ by $Author: rhs $, $DateTime: 2004/03/28 22:52:45 $";
 
     private Object m_value;
 
@@ -29,7 +30,8 @@ public class Literal extends Expression {
     void frame(Generator gen) {
         QFrame frame = gen.frame(this, null);
         List result = new ArrayList();
-        convert(m_value, result, gen.getRoot());
+        Object key = gen.level > 0 ? null : getBindKey(gen);
+        convert(m_value, result, gen.getRoot(), key);
         if (result.size() == 0) {
             throw new IllegalStateException
                 ("unable to convert value: " + m_value);
@@ -52,7 +54,27 @@ public class Literal extends Expression {
         return gen.getFrame(this).emit();
     }
 
-    private static void convert(Object value, List result, Root root) {
+    void hash(Generator gen) {
+        List values = new ArrayList();
+        convert(m_value, values, gen.getRoot(), getBindKey(gen));
+        for (int i = 0; i < values.size(); i++) {
+            Code c = (Code) values.get(i);
+            gen.hash(c.getSQL());
+            gen.bind(c);
+        }
+        gen.hash(getClass());
+    }
+
+    Object getBindKey(Generator gen) {
+        return gen.id(this);
+    }
+
+    static void convert(Object value, List result, Root root, Object key) {
+        convert(value, result, root, key, 0);
+    }
+
+    static int convert(Object value, List result, Root root, Object key,
+                       int bindcount) {
         if (value == null) {
             result.add(Code.NULL);
         } else if (value instanceof Collection) {
@@ -60,7 +82,7 @@ public class Literal extends Expression {
             Code sql = new Code("(");
             for (Iterator it = c.iterator(); it.hasNext(); ) {
                 List single = new ArrayList();
-                convert(it.next(), single, root);
+                bindcount = convert(it.next(), single, root, key, bindcount);
                 if (single.size() != 1) {
                     throw new IllegalStateException
                         ("can't deal with collection of compound objects");
@@ -72,26 +94,34 @@ public class Literal extends Expression {
                     sql = sql.add(")");
                 }
             }
-
             result.add(sql);
         } else {
             Adapter ad = root.getAdapter(value.getClass());
             PropertyMap pmap = ad.getProperties(value);
             if (pmap.getObjectType().isCompound()) {
-                convert(pmap, result, root);
+                bindcount = convert(pmap, result, root, key, bindcount);
             } else {
-                Code.Binding b = new Code.Binding(value, ad.defaultJDBCType());
+                Object k = key == null ? null :
+                    new CompoundKey(key, new Integer(bindcount));
+                Code.Binding b = new Code.Binding
+                    (k, value, ad.defaultJDBCType());
                 result.add(new Code("?", Collections.singletonList(b)));
+                bindcount++;
             }
         }
+
+        return bindcount;
     }
 
-    private static void convert(PropertyMap pmap, List result, Root root) {
+    private static int convert(PropertyMap pmap, List result, Root root,
+                               Object key, int bindcount) {
         Collection props = Code.properties(pmap.getObjectType());
         for (Iterator it = props.iterator(); it.hasNext(); ) {
             Property prop = (Property) it.next();
-            convert(pmap.get(prop), result, root);
+            bindcount = convert(pmap.get(prop), result, root, key, bindcount);
         }
+
+        return bindcount;
     }
 
     public String toString() {

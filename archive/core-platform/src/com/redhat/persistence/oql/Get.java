@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/03/25 $
+ * @version $Revision: #4 $ $Date: 2004/03/28 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Get.java#3 $ by $Author: richardl $, $DateTime: 2004/03/25 09:49:17 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Get.java#4 $ by $Author: rhs $, $DateTime: 2004/03/28 22:52:45 $";
 
     private static final Logger s_log = Logger.getLogger(Get.class);
 
@@ -47,6 +47,12 @@ public class Get extends Expression {
 
     Code emit(Generator gen) {
         return gen.getFrame(this).emit();
+    }
+
+    void hash(Generator gen) {
+        m_expr.hash(gen);
+        gen.hash(m_name);
+        gen.hash(getClass());
     }
 
     private static ThreadLocal s_parsers = new ThreadLocal() {
@@ -79,6 +85,7 @@ public class Get extends Expression {
                 } catch (ParseException pe) {
                     throw new IllegalStateException(pe.getMessage());
                 }
+                gen.level++;
                 This ths = new This(expr);
                 ths.frame(gen);
                 gen.push(expr);
@@ -91,6 +98,7 @@ public class Get extends Expression {
                     gen.addUses(result, frame.getValues());
                     return frame;
                 } finally {
+                    gen.level--;
                     gen.pop();
                     gen.pop();
                 }
@@ -198,6 +206,10 @@ public class Get extends Expression {
             } else {
                 return Equals.emit(gen, m_this, m_key);
             }
+        }
+
+        void hash(Generator gen) {
+            throw new UnsupportedOperationException();
         }
 
         String summary() {
@@ -380,6 +392,10 @@ public class Get extends Expression {
             return gen.getFrame(this).emit();
         }
 
+        void hash(Generator gen) {
+            throw new UnsupportedOperationException();
+        }
+
         String summary() {
             return toString();
         }
@@ -408,6 +424,10 @@ public class Get extends Expression {
             return gen.getFrame(this).emit();
         }
 
+        void hash(Generator gen) {
+            throw new UnsupportedOperationException();
+        }
+
         String summary() {
             return "this";
         }
@@ -434,6 +454,10 @@ public class Get extends Expression {
 
         Code emit(Generator gen) {
             return gen.getFrame(this).emit();
+        }
+
+        void hash(Generator gen) {
+            throw new UnsupportedOperationException();
         }
 
         String summary() {

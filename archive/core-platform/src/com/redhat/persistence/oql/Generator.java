@@ -1,20 +1,22 @@
 package com.redhat.persistence.oql;
 
+import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
 import java.util.*;
 
+import org.apache.commons.collections.primitives.*;
 import org.apache.log4j.Logger;
 
 /**
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/03/25 $
+ * @version $Revision: #6 $ $Date: 2004/03/28 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Generator.java#5 $ by $Author: rhs $, $DateTime: 2004/03/25 22:23:19 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Generator.java#6 $ by $Author: rhs $, $DateTime: 2004/03/28 22:52:45 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -28,6 +30,40 @@ class Generator {
     private MultiMap m_null = new MultiMap();
     private MultiMap m_nonnull = new MultiMap();
     private Map m_substitutions = new HashMap();
+
+    // hash related
+    private CharList m_hash = new ArrayCharList();
+    private int m_hashCode = 0;
+    private Map m_classes = new HashMap();
+    private Map m_bindings = new HashMap();
+    private Map m_ids = new HashMap();
+    private Key m_key = new Key(m_hash, m_hashCode);
+
+    // measures how many levels of qualii we've recursed
+    int level = 0;
+
+    private static final class Key {
+        private CharList m_hash;
+        private int m_code;
+        Key(CharList hash, int code) {
+            m_hash = hash;
+            m_code = code;
+        }
+        void setCode(int code) {
+            m_code = code;
+        }
+        public int hashCode() {
+            return m_code;
+        }
+        public boolean equals(Object o) {
+            Key k = (Key) o;
+            if (m_code != k.m_code) {
+                return false;
+            } else {
+                return m_hash.equals(k.m_hash);
+            }
+        }
+    }
 
     private Root m_root;
     private List m_frames;
@@ -47,10 +83,133 @@ class Generator {
         m_null.clear();
         m_nonnull.clear();
         m_substitutions.clear();
+
+        m_hash.clear();
+        m_hashCode = 0;
+        m_bindings.clear();
+        m_ids.clear();
+
+        level = 0;
     }
 
     Root getRoot() {
         return m_root;
+    }
+
+    CharList getHash() {
+        return m_hash;
+    }
+
+    int getHashCode() {
+        return m_hashCode;
+    }
+
+    Object getLookupKey() {
+        m_key.setCode(m_hashCode);
+        return m_key;
+    }
+
+    Object getStoreKey() {
+        return new Key(new ArrayCharList(m_hash), m_hashCode);
+    }
+
+    Map getBindings() {
+        return m_bindings;
+    }
+
+    private void appendHash(String str) {
+        int len = str.length();
+        for (int i = 0; i < len; i++) {
+            appendHash(str.charAt(i));
+        }
+    }
+
+    private static final char TERMINAL = '\0';
+
+    private void appendHash(char c) {
+        if (c == TERMINAL) {
+            m_hash.add(TERMINAL);
+        }
+        m_hashCode *= 31;
+        m_hashCode += c;
+        m_hash.add(c);
+    }
+
+    private void terminal() {
+        m_hash.add(TERMINAL);
+    }
+
+    void hash(Class klass) {
+        String code = (String) m_classes.get(klass);
+        if (code == null) {
+            code = "c" + m_classes.size();
+            m_classes.put(klass, code);
+        }
+        appendHash(code);
+        terminal();
+    }
+
+    void hash(String str) {
+        appendHash("s");
+        appendHash(str);
+        terminal();
+    }
+
+    void hash(ObjectType type) {
+        appendHash("t");
+        appendHash(Integer.toString(System.identityHashCode(type.getRoot())));
+        terminal();
+        appendHash(type.getQualifiedName());
+        terminal();
+    }
+
+    void hash(boolean b) {
+        appendHash("b");
+        if (b) {
+            appendHash("1");
+        } else {
+            appendHash("0");
+        }
+        terminal();
+    }
+
+    void hash(int i) {
+        appendHash("i");
+        appendHash(Integer.toString(i));
+        terminal();
+    }
+
+    void hash(SQL sql) {
+        appendHash("S");
+        for (SQLToken t = sql.getFirst(); t != null; t = t.getNext() ) {
+            appendHash(t.getImage());
+        }
+        terminal();
+    }
+
+    Object id(Expression expr) {
+        Object id = m_ids.get(expr);
+        if (id == null) {
+            id = new Integer(m_ids.size());
+            m_ids.put(expr, id);
+        }
+        return id;
+    }
+
+    void bind(Code code) {
+        List bindings = code.getBindings();
+        for (int i = 0; i < bindings.size(); i++) {
+            Code.Binding b = (Code.Binding) bindings.get(i);
+            setBinding(b.getKey(), b.getValue());
+        }
+    }
+
+    void setBinding(Object key, Object value) {
+        m_bindings.put(key, value);
+    }
+
+    Object getBinding(Object key) {
+        return m_bindings.get(key);
     }
 
     List getFrames() {
