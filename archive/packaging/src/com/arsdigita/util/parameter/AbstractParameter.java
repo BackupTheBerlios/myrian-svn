@@ -24,13 +24,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#12 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#13 $
  */
 public abstract class AbstractParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#12 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/21 21:52:30 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#13 $" +
+        "$Author: rhs $" +
+        "$DateTime: 2003/10/21 22:55:05 $";
 
     private final String m_name;
     private final Class m_type;
@@ -44,13 +44,18 @@ public abstract class AbstractParameter implements Parameter {
                                 final Class type) {
         if (Assert.isEnabled()) {
             Assert.exists(name, String.class);
-            Assert.exists(type, Class.class);
         }
 
         m_name = name;
         m_type = type;
         m_multiplicity = multiplicity;
         m_default = defaalt;
+    }
+
+    protected AbstractParameter(final String name,
+                                final int multiplicity,
+                                final Object defaalt) {
+        this(name, multiplicity, defaalt, null);
     }
 
     protected AbstractParameter(final String name,
