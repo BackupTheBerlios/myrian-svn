@@ -27,17 +27,18 @@ import java.util.*;
 import java.sql.*;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 
 /**
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/08/19 $
+ * @version $Revision: #8 $ $Date: 2003/08/27 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#7 $ by $Author: bche $, $DateTime: 2003/08/19 15:33:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#8 $ by $Author: jorris $, $DateTime: 2003/08/27 11:48:02 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -411,10 +412,7 @@ public class RDBMSEngine extends Engine {
             String sql = w.getSQL();
 
             if (LOG.isInfoEnabled()) {
-                LOG.info(sql);
-                LOG.info(w.getBindings());
-                LOG.info(w.getTypeNames());
-                LOG.info(op.getEnvironment());
+                logQueryDetails(Priority.INFO, sql, w, op);
             }
 
 
@@ -495,7 +493,8 @@ public class RDBMSEngine extends Engine {
             } catch (SQLException e) {   
                 //robust connection pooling             
                 checkBadConnection(e);
-                LOG.error(sql, e);
+                logQueryDetails(Priority.ERROR, sql, w, op, e);
+
                 if (bLogQuery) {
                     DeveloperSupport.logQuery(m_conn.hashCode(), sOpType, sql, collToMap(w.getBindings()), 0, e);
                 }
@@ -505,7 +504,22 @@ public class RDBMSEngine extends Engine {
             w.clear();
         }
     }
-    
+
+    private void logQueryDetails(final Priority priority, final String sql, final SQLWriter w, final Operation op) {
+        logQueryDetails(priority, sql, w, op, null);
+    }
+
+    private void logQueryDetails(final Priority priority, final String sql, final SQLWriter w, final Operation op, final Throwable error) {
+        if (error == null) {
+            LOG.log(priority, sql);
+        } else {
+            LOG.log(priority, sql, error);
+        }
+        LOG.log(priority, w.getBindings());
+        LOG.log(priority, w.getTypeNames());
+        LOG.log(priority, op.getEnvironment());
+    }
+
     /**
      * Tests if the SQLException was caused by a bad connection to the database.
      * If it is, disconnects ConnectionManager and returns true.  
