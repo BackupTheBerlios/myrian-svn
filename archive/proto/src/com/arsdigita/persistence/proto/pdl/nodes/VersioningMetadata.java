@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -16,8 +16,12 @@
 package com.arsdigita.persistence.proto.pdl.nodes;
 
 import com.arsdigita.persistence.metadata.MetadataRoot;
+import com.arsdigita.util.Assert;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -27,7 +31,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #2 $ $Date: 2003/02/19 $
+ * @version $Revision: #3 $ $Date: 2003/02/19 $
  */
 public class VersioningMetadata {
     private final static Logger LOG =
@@ -36,15 +40,44 @@ public class VersioningMetadata {
     private final Node.Switch m_switch;
     private final Set m_versionedTypes;
 
+    /**
+     * The reason for this change listener is to avoid tight coupling between
+     * the versioning and persistence packages. The versioning package must have
+     * some sort of access to the PDL abstract syntax tree in order to be able
+     * to determine whether or not an object type is marked "versioned".
+     *
+     * <p>The easiest route would be to add a boolean method isMarkedVersioned()
+     * to the ObjectType class. However, we want to try to avoid joining
+     * versioning and persistence at the hip like that. Therefore, instead of
+     * adding said boolean method to the ObjectType class, we use this class -
+     * i.e. VersioningMetadata - as a communication medium.</p>
+     *
+     * <p>The idea is that the PDL parser will indirectly expose its underlying
+     * PDL AST to this class via the callback provided by nodeSwitch(). This
+     * will enable this class to keep track of object types that are marked
+     * versioned. However, the versioning package must be made aware of any
+     * changes in the object type metadata. Such changes may occur as new object
+     * types are added, e.g. as a result of creating a user-defined content-type
+     * at runtime. </p>
+     **/
+    private final List m_changeListeners;
+
     private final static VersioningMetadata SINGLETON =
         new VersioningMetadata();
 
     private VersioningMetadata() {
         m_versionedTypes = new HashSet();
+        m_changeListeners = new ArrayList();
         m_switch = new Node.Switch() {
                 public void onObjectType(ObjectTypeNd ot) {
                     if ( ot.getVersioned() != null ) {
                         m_versionedTypes.add(ot.getQualifiedName());
+                        LOG.info("onObjectType");
+                        Iterator ii = m_changeListeners.iterator();
+                        while ( ii.hasNext() ) {
+                            LOG.info("calling the next change listener");
+                            ((ChangeListener) ii.next()).onChange();
+                        }
                     }
                 }
             };
@@ -69,6 +102,22 @@ public class VersioningMetadata {
      **/
     public boolean isMarkedVersioned(String qualifiedName) {
         return m_versionedTypes.contains(qualifiedName);
+    }
+
+    /**
+     * Adds a listener via which you can receive a callback whenever the
+     * versioning metadata changes.
+     **/
+    public void addChangeListener(ChangeListener listener) {
+        Assert.assertNotNull(listener, "listener");
+        m_changeListeners.add(listener);
+    }
+
+    /**
+     * @see #addChangeListener(ChangeListener)
+     **/
+    public interface ChangeListener {
+        void onChange();
     }
 }
 
