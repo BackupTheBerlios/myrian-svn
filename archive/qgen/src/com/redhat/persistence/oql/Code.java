@@ -9,12 +9,12 @@ import java.util.*;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/01/27 $
+ * @version $Revision: #4 $ $Date: 2004/01/28 $
  **/
 
 class Code {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#3 $ by $Author: rhs $, $DateTime: 2004/01/27 09:26:37 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#4 $ by $Author: rhs $, $DateTime: 2004/01/28 15:42:41 $";
 
     private Root m_root;
     private LinkedList m_stack = new LinkedList();
@@ -221,6 +221,12 @@ class Code {
 
     void alias(Property prop, final String[] vars) {
         Mapping m = getMapping(prop);
+
+        if (m.getRetrieve() != null) {
+            alias(prop.getType(), vars);
+            return;
+        }
+
         m.dispatch(new Mapping.Switch() {
             public void onValue(Value v) {
                 alias(new Column[] {v.getColumn()}, vars);
@@ -234,15 +240,12 @@ class Code {
             public void onJoinThrough(JoinThrough jt) {
                 alias(jt.getTo(), vars);
             }
-            public void onStatic(Static s) {
-                throw new IllegalStateException("static: " + s);
-            }
+            public void onStatic(Static s) {}
         });
     }
 
     void alias(ObjectType type, String[] vars) {
-        ObjectMap om = type.getRoot().getObjectMap(type);
-        alias(om.getTable().getPrimaryKey(), vars);
+        alias(columns(type), vars);
     }
 
     void alias(Constraint c, String[] vars) {
@@ -271,6 +274,19 @@ class Code {
 
     void condition(Property prop, final String[] key) {
         Mapping m = getMapping(prop);
+
+        if (m.getRetrieve() != null) {
+            append("exists(select 1 from (");
+            bind(m.getRetrieve().getSQL(),
+                 map(paths(prop.getContainer(), null), key));
+            append(") sg where ");
+            Path[] paths = paths(prop.getType(), Path.get(prop.getName()));
+            equals(concat("sg.", columns(paths, m.getRetrieve())),
+                   columns(prop.getType()));
+            append(")");
+            return;
+        }
+
         m.dispatch(new Mapping.Switch() {
             public void onValue(Value v) {
                 Code.this.equals(v.getTable().getPrimaryKey(), key);
@@ -284,9 +300,7 @@ class Code {
             public void onJoinThrough(JoinThrough jt) {
                 Code.this.equals(jt.getFrom(), key);
             }
-            public void onStatic(Static s) {
-                throw new IllegalStateException("static: " + s);
-            }
+            public void onStatic(Static s) {}
         });
     }
 
@@ -313,8 +327,14 @@ class Code {
         }
     }
 
-    void table(Property prop) {
+    void table(final Property prop) {
         Mapping m = getMapping(prop);
+
+        if (m.getRetrieve() != null) {
+            table(prop.getType());
+            return;
+        }
+
         m.dispatch(new Mapping.Switch() {
             public void onValue(Value v) {
                 append(v.getTable().getName());
@@ -328,15 +348,91 @@ class Code {
             public void onJoinThrough(JoinThrough jt) {
                 append(jt.getFrom().getTable().getName());
             }
-            public void onStatic(Static s) {
-                throw new IllegalStateException("static: " + s);
-            }
+            public void onStatic(Static s) {}
         });
     }
 
     void table(ObjectType type) {
         ObjectMap om = type.getRoot().getObjectMap(type);
-        append(om.getTable().getName());
+        if (om.getRetrieveAll() != null) {
+            append("(");
+            bind(om.getRetrieveAll().getSQL(), Collections.EMPTY_MAP);
+            append(") sr");
+        } else {
+            append(om.getTable().getName());
+        }
+    }
+
+    void bind(SQL sql, Map values) {
+        for (SQLToken t = sql.getFirst(); t != null; t = t.getNext()) {
+            if (t.isBind()) {
+                Path key = Path.get(t.getImage().substring(1));
+                String value = (String) values.get(key);
+                if (value == null) {
+                    throw new IllegalStateException
+                        ("no value for: " + key + " in " + values);
+                }
+                append(value);
+            } else {
+                append(t.getImage());
+            }
+        }
+    }
+
+    static Path[] paths(ObjectType type, Path parent) {
+        ArrayList result = new ArrayList();
+        paths(type, parent, result);
+        return (Path[]) result.toArray(new Path[result.size()]);
+    }
+
+    static void paths(ObjectType type, Path parent, Collection result) {
+        Collection key = type.getKeyProperties();
+        if (key.isEmpty()) {
+            result.add(parent);
+            return;
+        }
+        for (Iterator it = key.iterator(); it.hasNext(); ) {
+            Property prop = (Property) it.next();
+            paths(prop.getType(), Path.add(parent, prop.getName()), result);
+        }
+    }
+
+    static Map map(Path[] keys, String[] values) {
+        Map result = new HashMap();
+        for (int i = 0; i < keys.length; i++) {
+            result.put(keys[i], values[i]);
+        }
+        return result;
+    }
+
+    static String[] columns(Path[] paths, SQLBlock block) {
+        String[] result = new String[paths.length];
+        for (int i = 0; i < result.length; i++) {
+            Path column = block.getMapping(paths[i]);
+            if (column == null) {
+                throw new IllegalStateException
+                    ("no mapping for path: " + paths[i]);
+            }
+            result[i] = column.getPath();
+        }
+        return result;
+    }
+
+    static String[] columns(ObjectType type) {
+        ObjectMap om = type.getRoot().getObjectMap(type);
+        if (om.getRetrieveAll() != null) {
+            return columns(paths(type, null), om.getRetrieveAll());
+        } else {
+            return names(om.getTable().getPrimaryKey().getColumns());
+        }
+    }
+
+    static String[] concat(String prefix, String[] strs) {
+        String[] result = new String[strs.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = prefix + strs[i];
+        }
+        return result;
     }
 
 }
