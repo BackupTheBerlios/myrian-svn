@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/postgres/kernel/package-dnm_context.sql#4 $
--- $DateTime: 2004/02/04 18:03:07 $
+-- $Id: //core-platform/dev/sql/ccm-core/postgres/kernel/package-dnm_context.sql#5 $
+-- $DateTime: 2004/02/09 07:06:50 $
 -- autor: Aram Kananov <aram@kananov.com>
 
 
@@ -294,12 +294,23 @@ create or replace function dnm_context_change_context (
           values (v_new_granted_context, p_object_id, v_context_id, 1)
         ;
         --add ancestors of v_context_id to p_object_id
-        insert  into dnm_ungranted_context
-          (granted_context_id, object_id, ancestor_id, n_generations)
-          select v_new_granted_context, p_object_id, ancestor_id, n_generations +1
-            from dnm_ungranted_context
+
+        --DOH! at least in this particular case it is faster to insert rows in loop,
+        --  instead of inserting them wiht 1 sql statement.
+        --        insert  into dnm_ungranted_context
+        --          (granted_context_id, object_id, ancestor_id, n_generations)
+        --          select v_new_granted_context, p_object_id, ancestor_id, n_generations +1
+        --            from dnm_ungranted_context
+        --            where object_id = v_context_id
+        --        ;
+        for c in select ancestor_id, n_generations
+           from dnm_ungranted_context
             where object_id = v_context_id
-        ;
+        loop
+          insert  into dnm_ungranted_context
+            (granted_context_id, object_id, ancestor_id, n_generations)
+            values ( v_new_granted_context, p_object_id, c.ancestor_id, c.n_generations+1);
+        end loop;
       
         -- insert new ancestors for pd_object_ids ungranted children
         insert into dnm_ungranted_context 
