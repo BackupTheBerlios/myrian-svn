@@ -4,3 +4,4 @@
  * remove DbHelper.java
  * make sql setup and teardown work on oracle
  * remove dead sql scripts
+ * import -> resource search
