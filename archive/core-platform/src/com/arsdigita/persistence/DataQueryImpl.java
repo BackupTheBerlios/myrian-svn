@@ -22,12 +22,12 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #29 $ $Date: 2003/07/08 $
+ * @version $Revision: #30 $ $Date: 2003/08/14 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#29 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#30 $ by $Author: rhs $, $DateTime: 2003/08/14 12:29:10 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 
@@ -127,6 +127,16 @@ class DataQueryImpl implements DataQuery {
 
     public boolean previous() {
         throw new Error("not implemented");
+    }
+
+
+    public void addPath(String path) {
+        if (m_cursor != null) {
+            throw new PersistenceException
+                ("Paths cannot be added on an active data query.");
+        }
+
+        m_query.getSignature().addPath(Path.get(path));
     }
 
 

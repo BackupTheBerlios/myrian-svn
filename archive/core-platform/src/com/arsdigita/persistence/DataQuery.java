@@ -53,12 +53,12 @@ import java.util.Map;
  * </pre>
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/07/02 $
+ * @version $Revision: #9 $ $Date: 2003/08/14 $
  */
 
 public interface DataQuery {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQuery.java#8 $ by $Author: ashah $, $DateTime: 2003/07/02 01:16:18 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQuery.java#9 $ by $Author: rhs $, $DateTime: 2003/08/14 12:29:10 $";
 
     /**
      * Returns the type of this data query.
@@ -168,6 +168,28 @@ public interface DataQuery {
      * @exception PersistenceException Always thrown!
      **/
     boolean previous() throws PersistenceException;
+
+
+    /**
+     * Adds to the set of paths fetched by this DataQuery. The path is
+     * specified by a series of identifiers seperated by dots ('.').
+     * ID properties are automatically added as necessary.
+     *
+     * <blockquote><pre>
+     * DataQuery query = ssn.retrieve("exampleQuery");
+     * query.addPath("foo.bar.name");
+     * query.addPath("foo.bar.desc");
+     * while (query.next()) {
+     *     BigInteger id = query.get("foo.bar.id");
+     *     String name = query.get("foo.bar.name");
+     *     String desc = query.get("foo.bar.desc");
+     * }
+     * </pre></blockquote>
+     *
+     * @param path the additional path to fetch
+     **/
+
+    void addPath(String path);
 
 
     /**
