@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #4 $ $Date: 2003/05/12 $
+ * @version $Revision: #5 $ $Date: 2003/05/13 $
  */
 public class VersioningMetadata {
     private final static Logger s_log =
@@ -44,7 +44,7 @@ public class VersioningMetadata {
 
     private final Set m_versionedTypes;
     private final Set m_unversionedProps;
-    private ChangeListener m_changeListener;
+    private NodeVisitor m_nodeVisitor;
 
     private final static VersioningMetadata s_singleton =
         new VersioningMetadata();
@@ -101,22 +101,22 @@ public class VersioningMetadata {
     }
 
     /**
-     * Adds a listener via which you can receive a callback whenever the
+     * Adds a visitor via which you can receive a callback whenever the
      * versioning metadata changes.
      **/
-    public void registerChangeListener(ChangeListener listener) {
-        if ( m_changeListener != null ) {
+    public void registerNodeVisitor(NodeVisitor visitor) {
+        if ( m_nodeVisitor != null ) {
             throw new IllegalStateException
-                ("Already registered " + m_changeListener);
+                ("Already registered " + m_nodeVisitor);
         }
-        Assert.exists(listener, ChangeListener.class);
-        m_changeListener = listener;
+        Assert.exists(visitor, NodeVisitor.class);
+        m_nodeVisitor = visitor;
     }
 
     /**
-     * @see #addChangeListener(VersioningMetadata.ChangeListener)
+     * @see #registerNodeVisitor(VersioningMetadata.NodeVisitor)
      **/
-    public interface ChangeListener {
+    public interface NodeVisitor {
         /**
          * This method is called whenever an object type node is traversed in
          * the PDL AST.
@@ -152,8 +152,8 @@ public class VersioningMetadata {
                 m_versionedTypes.add(fqn);
             }
             s_log.info("onObjectType: " + fqn);
-            if ( m_changeListener != null ) {
-                m_changeListener.onObjectType(fqn, ot.isVersioned());
+            if ( m_nodeVisitor != null ) {
+                m_nodeVisitor.onObjectType(fqn, ot.isVersioned());
             }
         }
 
@@ -172,16 +172,16 @@ public class VersioningMetadata {
             s_log.info("onProperty: " + property);
             m_unversionedProps.add(property);
 
-            if ( m_changeListener != null ) {
+            if ( m_nodeVisitor != null ) {
                 if ( prop.isUnversioned() ) {
-                    m_changeListener.onUnversionedProperty(property);
+                    m_nodeVisitor.onUnversionedProperty(property);
                 } else if ( prop.isVersioned() ) {
                     if ( property.getType().isSimple() ) {
                         throw new IllegalStateException
                             ("Simple properties are versioned by default. " +
                              "They cannot be marked 'versioned'. " + property);
                     }
-                    m_changeListener.onVersionedProperty(property);
+                    m_nodeVisitor.onVersionedProperty(property);
                 } else {
                     throw new IllegalStateException("es impossible");
                 }
