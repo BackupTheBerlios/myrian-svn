@@ -83,8 +83,11 @@ final class JDOState {
             }
         }
 
-        loadStates("table2a.properties");
-        loadStates("table2b.properties");
+        final String dir =
+            JDOState.class.getPackage().getName().replace('.', '/');
+        loadStates(dir + "/table2a.properties");
+        loadStates(dir + "/table2b.properties");
+
         List undefined = new LinkedList();
 
         for (int ii=0; ii<N_ACTIONS; ii++) {
