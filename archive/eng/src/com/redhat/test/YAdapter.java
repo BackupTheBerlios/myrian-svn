@@ -6,6 +6,8 @@ import java.lang.reflect.Proxy;
 import java.util.HashSet;
 import java.util.Set;
 
+import junit.framework.AssertionFailedError;
+
 /**
  * This class allows you to compare two different implementations of the same
  * interface side by side.
@@ -38,7 +40,7 @@ public final class YAdapter {
     /**
      * Adds to the set of adaptable return types.
      *
-     * 
+     *
      **/
     public void addInterface(Class iface) {
         m_adaptableIfaces.add(iface);
@@ -51,7 +53,7 @@ public final class YAdapter {
     /**
      * This returns an object that implements two interfaces: the specified
      * interface <code>iface</code> and {@link YAdapter.Exposable}.
-     * 
+     *
      * <p>The <code>iface</code> interface is implemented by delegating all
      * method calls to <code>canonicalImpl</code> and <code>testedImpl</code>.
      * To ground this in a concrete example, suppose you're adapting the {@link
@@ -66,7 +68,7 @@ public final class YAdapter {
      * <code>it2</code>, respectively.  One or both of this values will be used
      * to construct the return value of the call to
      * <code>yAdapter.iterator()</code>.  The following logic is used.</p>
-     * 
+     *
      * <p>Declared return type <em>T</em> of the invoked method is examined.  In
      * our example, the return type is {@link java.util.Iterator}.  If this
      * interface had previously been made known to the <code>YAdapter</code>
@@ -130,7 +132,7 @@ public final class YAdapter {
 
             if (Exposable.class.equals(method.getDeclaringClass())) {
                 return dispatchToExposable(method);
-            } 
+            }
 
             Object canonicalResult = method.invoke(m_canonical, args);
             Object testedResult = method.invoke(m_tested, args);
@@ -170,7 +172,7 @@ public final class YAdapter {
         if (obj1==null || obj2==null
             || !obj1.equals(obj2) || !obj2.equals(obj1)) {
 
-            throw new YAdapterException
+            throw new AssertionFailedError
                 ("unequal: obj1=" + obj1 + "; obj2=" + obj2);
         }
     }
