@@ -31,12 +31,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #18 $ $Date: 2003/06/30 $
+ * @version $Revision: #19 $ $Date: 2003/07/03 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#18 $ by $Author: ashah $, $DateTime: 2003/06/30 13:42:11 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#19 $ by $Author: rhs $, $DateTime: 2003/07/03 16:36:18 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);
@@ -168,11 +168,7 @@ public class QueryTest extends PersistenceTestCase {
      **/
 
     public void testSelfReference() {
-        doTest("SelfReference",
-               "oql.SelfReference",
-               new String[] {
-                   "parent"
-               });
+        doTest("SelfReference", "oql.SelfReference", null);
     }
 
 

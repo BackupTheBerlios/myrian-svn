@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2003/07/03 $
+ * @version $Revision: #12 $ $Date: 2003/07/03 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#11 $ by $Author: rhs $, $DateTime: 2003/07/03 09:10:19 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#12 $ by $Author: rhs $, $DateTime: 2003/07/03 16:36:18 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -792,7 +792,7 @@ public class PDL {
         ForeignKey fk = from.getTable().getForeignKey(new Column[] {from});
         UniqueKey uk = to.getTable().getUniqueKey(new Column[] {to});
         if (uk == null) {
-            m_errors.warn(tond, "not a unique key");
+            m_errors.fatal(tond, "not a unique key: " + to);
             return null;
         }
 
@@ -887,12 +887,8 @@ public class PDL {
             ForeignKey from = fk(first, !forward);
             ForeignKey to = fk(second, forward);
 
-	    // XXX: The not null checks here seem to be solely for the
-	    // sake of the SelfReference.pdl test. We may want to
-	    // alter the test and make it be an error for fk to return
-	    // null.
 	    if (from == null || to == null) {
-		m_errors.warn(jpn, "unable to construct join through");
+                // should already be an error condition
 		return;
 	    }
 
