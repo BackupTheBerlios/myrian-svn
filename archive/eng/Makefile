@@ -18,12 +18,15 @@ JJTREE=sh javacc-3.2/bin/jjtree
 endif
 
 SOURCES:=src test/src cap/src cap/test/src
-#SOURCES:=src test/src cap/src cap/test/src tck/datastore/tests tck/application-identity/tests
+###SOURCES:=src test/src cap/src cap/test/src \
+###	tck/src tck/datastore/tests tck/application-identity/tests
+
 CONF   := conf
 
 SOURCEPATH:=$(subst $(space),:,$(SOURCES:%=$(BUILD)/%))
 
 CLASSPATH:=$(CLASSPATH):$(subst $(space),:,$(wildcard lib/*.jar))
+###CLASSPATH:=$(CLASSPATH):jdori/jdori.jar:jdori/jdori-enhancer.jar
 CLASSPATH:=$(CLASSPATH):$(subst $(space),:,$(wildcard lib/*.zip))
 CLASSPATH:=$(CLASSPATH):$(SOURCEPATH):$(CONF)
 
