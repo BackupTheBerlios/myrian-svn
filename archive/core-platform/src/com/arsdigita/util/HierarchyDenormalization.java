@@ -33,11 +33,11 @@ import org.apache.log4j.Logger;
  * </p>
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Revision: #9 $ $Date: 2004/01/15 $
+ * @version $Revision: #10 $ $Date: 2004/03/03 $
  */
 public abstract class HierarchyDenormalization {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/HierarchyDenormalization.java#9 $ by $Author: dan $, $DateTime: 2004/01/15 07:54:04 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/HierarchyDenormalization.java#10 $ by $Author: vadim $, $DateTime: 2004/03/03 11:29:37 $";
 
     private final static Logger s_log =
         Logger.getLogger(HierarchyDenormalization.class);
@@ -72,24 +72,26 @@ public abstract class HierarchyDenormalization {
 
         public void set(DomainObject dobj, String name,
                         Object old_value, Object new_value) {
-            if (name.equals(m_attributeName)) {
-                if (!m_isModified) {
-                    if (s_log.isDebugEnabled()) {
-                        s_log.debug("Got set on " + dobj + "." + name + 
-                                    " old " + old_value + " new " + new_value);
-                    }
-                    m_oldAttributeValue = (String) old_value;
-                    m_newAttributeValue = (String) new_value;
-                    m_isModified = true;
-                } else {
-                    if (s_log.isDebugEnabled()) {
-                        s_log.debug("Got another set on " + dobj + "." + 
-                                    name + " old " + old_value + " new " + 
-                                    new_value);
-                    }
-                    m_newAttributeValue = (String) new_value;
+
+            if (!name.equals(m_attributeName)) { return; }
+
+            if (!m_isModified) {
+                if (s_log.isDebugEnabled()) {
+                    s_log.debug("Got set on " + dobj + "." + name + 
+                                " old " + old_value + " new " + new_value);
                 }
+                m_oldAttributeValue = (String) old_value;
+                m_newAttributeValue = (String) new_value;
+                m_isModified = true;
+            } else {
+                if (s_log.isDebugEnabled()) {
+                    s_log.debug("Got another set on " + dobj + "." + 
+                                name + " old " + old_value + " new " + 
+                                new_value);
+                }
+                m_newAttributeValue = (String) new_value;
             }
+
         }
 
         public void add(DomainObject dobj, String name,
@@ -110,43 +112,45 @@ public abstract class HierarchyDenormalization {
             if (s_log.isDebugEnabled()) {
                 s_log.debug("In after save for " + dobj);
             }
-            if (m_isModified) {
-                if (s_log.isDebugEnabled()) {
-                    s_log.debug("After save: oid:" + dobj +
-                                " new value is:" + m_newAttributeValue +
-                                " old value is:" + m_oldAttributeValue);
-                }
+            if (! m_isModified) { return; }
 
-                if ((m_oldAttributeValue == null
-                     && m_newAttributeValue == null)
-                    || (m_oldAttributeValue != null
-                        && m_oldAttributeValue.equals(m_newAttributeValue))) {
-                    if (s_log.isDebugEnabled()) {
-                        s_log.debug("Aborting because both null, or equal");
-                    }
-                    return;
-                }
-
-                if (m_oldAttributeValue == null) {
-                    if (s_log.isDebugEnabled()) {
-                        s_log.debug("Aborting because old is null");
-                    }
-                    // after save triggered by autoflush in before save
-                    m_isModified = false;
-                    return;
-                }
-
-                DataOperation operation =
-                    SessionManager.getSession().retrieveDataOperation
-                    (m_operationName);
-                operation.setParameter("id", dobj.getOID().get(m_id));
-                operation.setParameter("newPrefix", m_newAttributeValue);
-                operation.setParameter
-                    ("oldPrefixLength", new Integer
-                     (m_oldAttributeValue.length()));
-                operation.setParameter("oldPrefix", m_oldAttributeValue);
-                operation.execute();
+            if (s_log.isDebugEnabled()) {
+                s_log.debug("After save: oid:" + dobj +
+                            " new value is:" + m_newAttributeValue +
+                            " old value is:" + m_oldAttributeValue);
             }
+
+            if ((m_oldAttributeValue == null
+                 && m_newAttributeValue == null)
+                || (m_oldAttributeValue != null
+                    && m_oldAttributeValue.equals(m_newAttributeValue))) {
+
+                if (s_log.isDebugEnabled()) {
+                    s_log.debug("Aborting because both null, or equal");
+                }
+                return;
+            }
+
+            if (m_oldAttributeValue == null) {
+                if (s_log.isDebugEnabled()) {
+                    s_log.debug("Aborting because old is null");
+                }
+                // after save triggered by autoflush in before save
+                m_isModified = false;
+                return;
+            }
+
+            DataOperation operation =
+                SessionManager.getSession().retrieveDataOperation
+                (m_operationName);
+            operation.setParameter("id", dobj.getOID().get(m_id));
+            operation.setParameter("newPrefix", m_newAttributeValue);
+            operation.setParameter
+                ("oldPrefixLength", new Integer
+                 (m_oldAttributeValue.length()));
+            operation.setParameter("oldPrefix", m_oldAttributeValue);
+            operation.execute();
+
             m_isModified = false;
         }
 
