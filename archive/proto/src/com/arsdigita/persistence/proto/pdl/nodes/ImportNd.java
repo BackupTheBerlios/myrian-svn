@@ -4,15 +4,15 @@ package com.arsdigita.persistence.proto.pdl.nodes;
  * Import
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2002/12/31 $
+ * @version $Revision: #1 $ $Date: 2003/01/15 $
  **/
 
-public class Import extends Node {
+public class ImportNd extends Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/Import.java#1 $ by $Author: rhs $, $DateTime: 2002/12/31 15:39:17 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/ImportNd.java#1 $ by $Author: rhs $, $DateTime: 2003/01/15 10:39:47 $";
 
     public static final Field PATH =
-        new Field(Import.class, "path", Identifier.class, 1);
+        new Field(ImportNd.class, "path", IdentifierNd.class, 1);
 
     private boolean m_isWildcard = false;
 
@@ -33,7 +33,7 @@ public class Import extends Node {
         final StringBuffer result = new StringBuffer();
 
         traverse(new Switch() {
-                public void onIdentifier(Identifier id) {
+                public void onIdentifier(IdentifierNd id) {
                     if (result.length() > 0) {
                         result.append('.');
                     }
@@ -44,7 +44,7 @@ public class Import extends Node {
         return result.toString();
     }
 
-    public String qualify(Type type) {
+    public String qualify(TypeNd type) {
         if (type.isQualified()) {
             throw new IllegalArgumentException
                 ("Type is already qualified.");

@@ -1,10 +1,7 @@
 package com.arsdigita.persistence.proto.pdl;
 
 import com.arsdigita.persistence.proto.pdl.nodes.*;
-import com.arsdigita.persistence.proto.metadata.Root;
-import com.arsdigita.persistence.proto.metadata.Role;
-import com.arsdigita.persistence.proto.metadata.Table;
-import com.arsdigita.persistence.proto.metadata.ObjectMap;
+import com.arsdigita.persistence.proto.metadata.*;
 
 import java.io.Reader;
 import java.io.FileReader;
@@ -16,12 +13,12 @@ import java.util.*;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/01/15 $
+ * @version $Revision: #5 $ $Date: 2003/01/15 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#4 $ by $Author: rhs $, $DateTime: 2003/01/15 09:35:55 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#5 $ by $Author: rhs $, $DateTime: 2003/01/15 10:39:47 $";
 
     private AST m_ast = new AST();
     private ErrorReport m_errors = new ErrorReport();
@@ -32,7 +29,7 @@ public class PDL {
     public void load(Reader r, String filename) {
         try {
             Parser p = new Parser(r);
-            File file = p.file(filename);
+            FileNd file = p.file(filename);
             m_ast.add(AST.FILES, file);
         } catch (ParseException e) {
             throw new Error(filename + ": " + e.getMessage());
@@ -49,8 +46,7 @@ public class PDL {
 
     public void emit(final Root root) {
         for (Iterator it = root.getObjectTypes().iterator(); it.hasNext(); ) {
-            m_symbols.addEmitted
-                ((com.arsdigita.persistence.proto.metadata.ObjectType) it.next());
+            m_symbols.addEmitted((ObjectType) it.next());
         }
 
         if (root.getObjectType("global.String") == null) {
@@ -58,12 +54,12 @@ public class PDL {
         }
 
         m_ast.traverse(new Node.Switch() {
-                public void onObjectType(ObjectType ot) {
+                public void onObjectType(ObjectTypeNd ot) {
                     m_symbols.define(ot);
                 }
             });
         m_ast.traverse(new Node.Switch() {
-                public void onType(Type t) {
+                public void onType(TypeNd t) {
                     m_symbols.resolve(t);
                 }
             });
@@ -72,7 +68,7 @@ public class PDL {
         m_symbols.emit();
 
         m_ast.traverse(new Node.Switch() {
-                private Role define(com.arsdigita.persistence.proto.metadata.ObjectType type, Property prop) {
+                private Role define(ObjectType type, PropertyNd prop) {
                     String name = prop.getName().getName();
                     if (type.hasProperty(name)) {
                         m_errors.fatal(prop, "duplicate property: " + name);
@@ -89,12 +85,12 @@ public class PDL {
                     return result;
                 }
 
-                public void onProperty(Property prop) {
+                public void onProperty(PropertyNd prop) {
                     define(m_symbols.getEmitted
-                           ((ObjectType) prop.getParent()), prop);
+                           ((ObjectTypeNd) prop.getParent()), prop);
                 }
 
-                public void onAssociation(Association assn) {
+                public void onAssociation(AssociationNd assn) {
                     Role one =
                         define(m_symbols.getEmitted
                                (m_symbols.lookup(assn.getRoleOne().getType())),
@@ -108,8 +104,8 @@ public class PDL {
                     }
                 }
             }, new Node.IncludeFilter(new Node.Field[] {
-                AST.FILES, File.OBJECT_TYPES, ObjectType.PROPERTIES,
-                File.ASSOCIATIONS
+                AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.PROPERTIES,
+                FileNd.ASSOCIATIONS
             }));
 
         StringBuffer buf = new StringBuffer();
@@ -123,28 +119,27 @@ public class PDL {
 
         for (Iterator it = m_symbols.getObjectTypes().iterator();
              it.hasNext(); ) {
-            ObjectType ot = (ObjectType) it.next();
+            ObjectTypeNd ot = (ObjectTypeNd) it.next();
             root.addObjectType(m_symbols.getEmitted(ot));
             root.addObjectMap(new ObjectMap(m_symbols.getEmitted(ot)));
         }
 
         m_ast.traverse(new Node.Switch() {
-                public void onIdentifier(Identifier id) {
-                    ObjectType ot = (ObjectType) id.getParent().getParent();
+                public void onIdentifier(IdentifierNd id) {
+                    ObjectTypeNd ot =
+                        (ObjectTypeNd) id.getParent().getParent();
                     ObjectMap om = root.getObjectMap(m_symbols.getEmitted(ot));
                     om.getKeyProperties()
                         .add(m_symbols.getEmitted(ot)
                              .getProperty(id.getName()));
                 }
             }, new Node.IncludeFilter(new Node.Field[] {
-                AST.FILES, File.OBJECT_TYPES, ObjectType.OBJECT_KEY,
-                ObjectKey.PROPERTIES
+                AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.OBJECT_KEY,
+                ObjectKeyNd.PROPERTIES
             }));
 
         for (Iterator it = root.getObjectTypes().iterator(); it.hasNext(); ) {
-            com.arsdigita.persistence.proto.metadata.ObjectType ot =
-                (com.arsdigita.persistence.proto.metadata.ObjectType)
-                it.next();
+            ObjectType ot = (ObjectType) it.next();
             if (ot.getSupertype() != null) {
                 ObjectMap om = root.getObjectMap(ot);
                 ObjectMap bm = root.getObjectMap(ot.getBasetype());
@@ -164,7 +159,7 @@ public class PDL {
         }
 
         m_ast.traverse(new Node.Switch() {
-                public void onColumn(Column col) {
+                public void onColumn(ColumnNd col) {
                     Table table =
                         (Table) tables.get(col.getTable().getName());
                     if (table == null) {

@@ -6,12 +6,12 @@ import java.util.*;
  * Node
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2002/12/31 $
+ * @version $Revision: #2 $ $Date: 2003/01/15 $
  **/
 
 public abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/Node.java#1 $ by $Author: rhs $, $DateTime: 2002/12/31 15:39:17 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/Node.java#2 $ by $Author: rhs $, $DateTime: 2003/01/15 10:39:47 $";
 
 
     /**
@@ -119,27 +119,26 @@ public abstract class Node {
 
         public void onAST(AST ast) {}
 
-        public void onFile(File file) {}
-        public void onModel(Model model) {}
-        public void onImport(Import imp) {}
-        public void onObjectType(ObjectType type) {}
-        public void onAssociation(Association assn) {}
+        public void onFile(FileNd file) {}
+        public void onModel(ModelNd model) {}
+        public void onImport(ImportNd imp) {}
+        public void onObjectType(ObjectTypeNd type) {}
+        public void onAssociation(AssociationNd assn) {}
 
-        public void onStatement(Statement st) {}
-        public void onProperty(Property prop) {}
-        public void onAggressiveLoad(AggressiveLoad al) {}
-        public void onReferenceKey(ReferenceKey key) {}
-        public void onObjectKey(ObjectKey key) {}
-        public void onUniqueKey(UniqueKey key) {}
+        public void onStatement(StatementNd st) {}
+        public void onProperty(PropertyNd prop) {}
+        public void onAggressiveLoad(AggressiveLoadNd al) {}
+        public void onReferenceKey(ReferenceKeyNd key) {}
+        public void onObjectKey(ObjectKeyNd key) {}
+        public void onUniqueKey(UniqueKeyNd key) {}
 
-        public void onType
-            (com.arsdigita.persistence.proto.pdl.nodes.Type type) {}
-        public void onPath(Path path) {}
-        public void onColumn(Column col) {}
-        public void onDbType(DbType type) {}
-        public void onJoinPath(JoinPath jp) {}
-        public void onJoin(Join join) {}
-        public void onIdentifier(Identifier id) {}
+        public void onType(TypeNd type) {}
+        public void onPath(PathNd path) {}
+        public void onColumn(ColumnNd col) {}
+        public void onDbType(DbTypeNd type) {}
+        public void onJoinPath(JoinPathNd jp) {}
+        public void onJoin(JoinNd join) {}
+        public void onIdentifier(IdentifierNd id) {}
     }
 
 
@@ -177,10 +176,6 @@ public abstract class Node {
     public static final Filter ALL = new Filter() {
             public boolean accept(Field f) { return true; }
         };
-    public static final Field FILES =
-        new Field(AST.class, "files", File.class);
-    public static final Filter OBJECT_TYPES =
-        new IncludeFilter(new Field[] {FILES, File.OBJECT_TYPES});
 
 
     public void traverse(Switch sw) {
@@ -304,7 +299,7 @@ public abstract class Node {
         return m_parent;
     }
 
-    public File getFile() {
+    public FileNd getFile() {
         return getParent().getFile();
     }
 

@@ -4,16 +4,16 @@ package com.arsdigita.persistence.proto.pdl.nodes;
  * Identifier
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2002/12/31 $
+ * @version $Revision: #1 $ $Date: 2003/01/15 $
  **/
 
-public class Identifier extends Node {
+public class IdentifierNd extends Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/Identifier.java#1 $ by $Author: rhs $, $DateTime: 2002/12/31 15:39:17 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/IdentifierNd.java#1 $ by $Author: rhs $, $DateTime: 2003/01/15 10:39:47 $";
 
     private String m_name;
 
-    public Identifier(String name) {
+    public IdentifierNd(String name) {
         m_name = name;
     }
 

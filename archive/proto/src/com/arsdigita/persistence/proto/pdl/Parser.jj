@@ -14,12 +14,12 @@ import com.arsdigita.persistence.proto.pdl.nodes.*;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #2 $ $Date: 2003/01/15 $
+ * @version $Revision: #3 $ $Date: 2003/01/15 $
  */
 
 class Parser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/Parser.jj#2 $ by $Author: rhs $, $DateTime: 2003/01/15 09:35:55 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/Parser.jj#3 $ by $Author: rhs $, $DateTime: 2003/01/15 10:39:47 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -137,72 +137,72 @@ SPECIAL_TOKEN:
  * Top level constructs.
  **/
 
-File file(String filename) :
+FileNd file(String filename) :
 {
-    File f = new File(filename);
+    FileNd f = new FileNd(filename);
     Node n;
     f.setLine(0);
     f.setColumn(0);
 }
 {
-    n = model() <SEMI> { f.add(File.MODEL, n); }
-    ( n = pimpwhore() <SEMI> { f.add(File.IMPORTS, n); } )*
-    (   n = object_type() { f.add(File.OBJECT_TYPES, n); }
-      | n = association() { f.add(File.ASSOCIATIONS, n); }
+    n = model() <SEMI> { f.add(FileNd.MODEL, n); }
+    ( n = pimpwhore() <SEMI> { f.add(FileNd.IMPORTS, n); } )*
+    (   n = object_type() { f.add(FileNd.OBJECT_TYPES, n); }
+      | n = association() { f.add(FileNd.ASSOCIATIONS, n); }
       | query() )*
     <EOF>
     { return f; }
 }
 
-Model model() :
+ModelNd model() :
 {
-    Model m = new Model();
+    ModelNd m = new ModelNd();
     Node n;
     Token t;
 }
 {
-    t = <MODEL> idpath(m, Model.PATH) { ln(m, t); return m; }
+    t = <MODEL> idpath(m, ModelNd.PATH) { ln(m, t); return m; }
 }
 
-Import pimpwhore() :
+ImportNd pimpwhore() :
 {
-    Import i = new Import();
+    ImportNd i = new ImportNd();
     Node n;
     Token t;
 }
 {
-    t = <IMPORT> idpath(i, Import.PATH)
+    t = <IMPORT> idpath(i, ImportNd.PATH)
     [ <DOT> <STAR> { i.setWildcard(true); } ]
     { ln(i, t); return i; }
 }
 
-ObjectType object_type() :
+ObjectTypeNd object_type() :
 {
     Token t;
-    ObjectType ot = new ObjectType();
+    ObjectTypeNd ot = new ObjectTypeNd();
     Node n;
 }
 {
-    t = <OBJECTTYPE> n = id() { ot.add(ObjectType.NAME, n); }
-    [ <EXTENDS> n = type() { ot.add(ObjectType.EXTENDS, n); } ]
+    t = <OBJECTTYPE> n = id() { ot.add(ObjectTypeNd.NAME, n); }
+    [ <EXTENDS> n = type() { ot.add(ObjectTypeNd.EXTENDS, n); } ]
     <LBRACE>
         ( statement(ot) )*
     <RBRACE>
     { ln(ot, t); return ot; }
 }
 
-Association association() :
+AssociationNd association() :
 {
     Token t;
-    Association a = new Association();
+    AssociationNd a = new AssociationNd();
     Node n;
 }
 {
     t = <ASSOCIATION>
     <LBRACE>
-        n = property() <SEMI> { a.add(Association.ROLE_ONE, n); }
-        n = property() <SEMI> { a.add(Association.ROLE_TWO, n); }
-        ( n = property() <SEMI> { a.add(Association.PROPERTIES, n); } )*
+        n = property() <SEMI> { a.add(AssociationNd.ROLE_ONE, n); }
+        n = property() <SEMI> { a.add(AssociationNd.ROLE_TWO, n); }
+        ( n = property() <SEMI> { a.add(AssociationNd.PROPERTIES, n); } )*
       [ option_block() ]
       ( event() )*
     <RBRACE>
@@ -225,14 +225,14 @@ void query() :
  * First level constructs.
  **/
 
-void statement(ObjectType ot) :
+void statement(ObjectTypeNd ot) :
 {}
 {
     (   simple_statement(ot) <SEMI>
       | compound_statement(ot) )
 }
 
-void simple_statement(ObjectType ot) :
+void simple_statement(ObjectTypeNd ot) :
 {}
 {
     (  LOOKAHEAD(property_stmt()) property_stmt(ot)
@@ -243,7 +243,7 @@ void simple_statement(ObjectType ot) :
      | join_stmt(ot) )
 }
 
-void compound_statement(ObjectType ot) :
+void compound_statement(ObjectTypeNd ot) :
 {}
 {
     (  event()
@@ -254,32 +254,32 @@ void compound_statement(ObjectType ot) :
  * Simple statements
  **/
 
-void property_stmt(ObjectType ot) :
+void property_stmt(ObjectTypeNd ot) :
 {
-    Property p;
+    PropertyNd p;
 }
 {
-    p = property() { ot.add(ObjectType.PROPERTIES, p); }
+    p = property() { ot.add(ObjectTypeNd.PROPERTIES, p); }
 }
 
-Property property() :
+PropertyNd property() :
 {
-    Property p = new Property();
+    PropertyNd p = new PropertyNd();
     Node n;
 }
 {
     [ <UNIQUE> { p.setUnique(true); } ]
     [ ( <COMPONENT> { p.setComponent(true); } |
         <COMPOSITE> { p.setComposite(true); } ) ]
-    n = type() { p.add(Property.TYPE, n); }
+    n = type() { p.add(PropertyNd.TYPE, n); }
     [ multiplicity(p) ]
-    n = id() { p.add(Property.NAME, n); ln(p, n); }
-    [ <EQ> ( n = column() { p.add(Property.MAPPING, n); } |
-             n = join_path() { p.add(Property.MAPPING, n); } ) ]
+    n = id() { p.add(PropertyNd.NAME, n); ln(p, n); }
+    [ <EQ> ( n = column() { p.add(PropertyNd.MAPPING, n); } |
+             n = join_path() { p.add(PropertyNd.MAPPING, n); } ) ]
     { return p; }
 }
 
-void multiplicity(Property p) :
+void multiplicity(PropertyNd p) :
 {
     boolean isCollection = false;
     int upper = 1;
@@ -294,71 +294,71 @@ void multiplicity(Property p) :
     }
 }
 
-void object_key(ObjectType ot) :
+void object_key(ObjectTypeNd ot) :
 {
     Token t;
-    ObjectKey k = new ObjectKey();
+    ObjectKeyNd k = new ObjectKeyNd();
     Node n;
 }
 {
     t = <OBJECTKEY>
     <LPAREN>
-        n = id() { k.add(ObjectKey.PROPERTIES, n); }
-        ( <COMMA> n = id() { k.add(ObjectKey.PROPERTIES, n); } )*
+        n = id() { k.add(ObjectKeyNd.PROPERTIES, n); }
+        ( <COMMA> n = id() { k.add(ObjectKeyNd.PROPERTIES, n); } )*
     <RPAREN>
-    { ln(k, t); ot.add(ObjectType.OBJECT_KEY, k); }
+    { ln(k, t); ot.add(ObjectTypeNd.OBJECT_KEY, k); }
 }
 
-void reference_key(ObjectType ot) :
+void reference_key(ObjectTypeNd ot) :
 {
     Token t;
-    ReferenceKey k = new ReferenceKey();
+    ReferenceKeyNd k = new ReferenceKeyNd();
     Node n;
 }
 {
     t = <REFERENCEKEY>
     <LPAREN>
-        n = column() { k.add(ReferenceKey.COLUMN, n); }
+        n = column() { k.add(ReferenceKeyNd.COLUMN, n); }
     <RPAREN>
-    { ln(k, t); ot.add(ObjectType.REFERENCE_KEY, k); }
+    { ln(k, t); ot.add(ObjectTypeNd.REFERENCE_KEY, k); }
 }
 
-void unique_key(ObjectType ot) :
+void unique_key(ObjectTypeNd ot) :
 {
     Token t;
-    UniqueKey k = new UniqueKey();
+    UniqueKeyNd k = new UniqueKeyNd();
     Node n;
 }
 {
     t = <UNIQUE>
     <LPAREN>
-        n = id() { k.add(UniqueKey.PROPERTIES, n); }
-        ( <COMMA> n = id() { k.add(UniqueKey.PROPERTIES, n); } )*
+        n = id() { k.add(UniqueKeyNd.PROPERTIES, n); }
+        ( <COMMA> n = id() { k.add(UniqueKeyNd.PROPERTIES, n); } )*
     <RPAREN>
-    { ln(k, t); ot.add(ObjectType.UNIQUE_KEYS, k); }
+    { ln(k, t); ot.add(ObjectTypeNd.UNIQUE_KEYS, k); }
 }
 
-void aggressive_load(ObjectType ot) :
+void aggressive_load(ObjectTypeNd ot) :
 {
     Token t;
-    AggressiveLoad l = new AggressiveLoad();
+    AggressiveLoadNd l = new AggressiveLoadNd();
     Node n;
 }
 {
     t = <AGGRESSIVE>
     <LPAREN>
-        n = path() { l.add(AggressiveLoad.PATHS, n); }
-        ( <COMMA> n = path() { l.add(AggressiveLoad.PATHS, n); } )*
+        n = path() { l.add(AggressiveLoadNd.PATHS, n); }
+        ( <COMMA> n = path() { l.add(AggressiveLoadNd.PATHS, n); } )*
     <RPAREN>
-    { ln(l, t); ot.add(ObjectType.AGGRESSIVE_LOAD, l); }
+    { ln(l, t); ot.add(ObjectTypeNd.AGGRESSIVE_LOAD, l); }
 }
 
-void join_stmt(ObjectType ot) :
+void join_stmt(ObjectTypeNd ot) :
 {
-    JoinPath j;
+    JoinPathNd j;
 }
 {
-    j = join_path() { ot.add(ObjectType.JOIN_PATHS, j); }
+    j = join_path() { ot.add(ObjectTypeNd.JOIN_PATHS, j); }
 }
 
 /**
@@ -425,49 +425,49 @@ void optionValue() :
  * Shared definitions
  **/
 
-JoinPath join_path() :
+JoinPathNd join_path() :
 {
-    JoinPath p = new JoinPath();
+    JoinPathNd p = new JoinPathNd();
     Node n;
 }
 {
-    n = join() { ln(p, n); p.add(JoinPath.JOINS, n); }
-    ( <COMMA> n = join() { p.add(JoinPath.JOINS, n); } )*
+    n = join() { ln(p, n); p.add(JoinPathNd.JOINS, n); }
+    ( <COMMA> n = join() { p.add(JoinPathNd.JOINS, n); } )*
     { return p; }
 }
 
-Join join() :
+JoinNd join() :
 {
     Token t;
-    Join j = new Join();
+    JoinNd j = new JoinNd();
     Node n;
 }
 {
-    t = <JOIN> n = column() { j.add(Join.FROM, n); }
-    <TO> n = column() { j.add(Join.TO, n); }
+    t = <JOIN> n = column() { j.add(JoinNd.FROM, n); }
+    <TO> n = column() { j.add(JoinNd.TO, n); }
     { ln(j, t); return j; }
 }
 
-Column column() :
+ColumnNd column() :
 {
-    Column c = new Column();
+    ColumnNd c = new ColumnNd();
     Node n;
 }
 {
-    n = id() { ln(c, n); c.add(Column.TABLE, n); }
-    <DOT> n = id() { c.add(Column.NAME, n); }
-    [ n = db_type() { c.add(Column.TYPE, n); } ]
+    n = id() { ln(c, n); c.add(ColumnNd.TABLE, n); }
+    <DOT> n = id() { c.add(ColumnNd.NAME, n); }
+    [ n = db_type() { c.add(ColumnNd.TYPE, n); } ]
     { return c; }
 }
 
-DbType db_type() :
+DbTypeNd db_type() :
 {
-    DbType d = new DbType();
+    DbTypeNd d = new DbTypeNd();
     Node n;
     int i;
 }
 {
-    n = id() { d.add(DbType.NAME, n); }
+    n = id() { d.add(DbTypeNd.NAME, n); }
     [ <LPAREN>
           i = integer() { d.setSize(i); }
           [ <COMMA> i = integer() { d.setPrecision(i); } ]
@@ -475,41 +475,41 @@ DbType db_type() :
     { ln(d, n); return d; }
 }
 
-Type type() :
+TypeNd type() :
 {
-    Type t = new Type();
+    TypeNd t = new TypeNd();
 }
 {
-    idpath(t, Type.IDENTIFIERS)
+    idpath(t, TypeNd.IDENTIFIERS)
     { return t; }
 }
 
-Path path() :
+PathNd path() :
 {
-    Path p = new Path();
+    PathNd p = new PathNd();
 }
 {
-    idpath(p, Path.PATH)
+    idpath(p, PathNd.PATH)
     { return p; }
 }
 
 void idpath(Node n, Node.Field f) :
 {
-    Identifier i;
+    IdentifierNd i;
 }
 {
     i = id() { ln(n, i); n.add(f, i); }
     ( LOOKAHEAD(2) <DOT> i = id() { n.add(f, i); } )*
 }
 
-Identifier id() :
+IdentifierNd id() :
 {
-    Identifier i;
+    IdentifierNd i;
     Token t;
 }
 {
     t = <ID> {
-        i = new Identifier(t.image);
+        i = new IdentifierNd(t.image);
         ln(i, t);
         return i;
     }
