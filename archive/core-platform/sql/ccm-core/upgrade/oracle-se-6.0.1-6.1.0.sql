@@ -11,21 +11,26 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/upgrade/oracle-se-6.0.1-6.1.0.sql#4 $
--- $DateTime: 2004/03/16 11:15:39 $
+-- $Id: //core-platform/dev/sql/ccm-core/upgrade/oracle-se-6.0.1-6.1.0.sql#5 $
+-- $DateTime: 2004/03/16 23:55:17 $
 
 PROMPT Red Hat WAF 6.0.1 -> 6.1.0 Upgrade Script (Oracle)
 
+@@ ../oracle-se/upgrade/6.0.1-6.1.0/table-admin_app-auto.sql
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/table-agentportlets-auto.sql
-@@ ../oracle-se/upgrade/6.0.1-6.1.0/table-inits-auto.sql
+@@ ../oracle-se/upgrade/6.0.1-6.1.0/table-forms_lstnr_rmt_svr_post-auto.sql 
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/table-init_requirements-auto.sql
+@@ ../oracle-se/upgrade/6.0.1-6.1.0/table-inits-auto.sql
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/table-keystore-auto.sql
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/table-lucene_ids-auto.sql
+@@ ../oracle-se/upgrade/6.0.1-6.1.0/table-sitemap_app-auto.sql
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/table-webapps-auto.sql
-@@ ../oracle-se/upgrade/6.0.1-6.1.0/table-forms_lstnr_rmt_svr_post-auto.sql 
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/deferred.sql
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/update-host-unique-index.sql
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/update-cat_root_cat_object_map.sql
+
+create index AGENTPORT_SUPERPORT_ID_IDX on AGENTPORTLETS(SUPERPORTLET_ID);
+create index INIT_REQS_REQD_INIT_IDX on INIT_REQUIREMENTS(REQUIRED_INIT);
 
 -- Upgrade script for new permission denormalization
 -- Privilege Hierarchy
