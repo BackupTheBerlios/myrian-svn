@@ -84,4 +84,10 @@ public class HttpHostParameter extends StringParameter {
             return null;
         }
     }
+
+    protected String marshal(Object value) {
+        HttpHost host = (HttpHost) value;
+        return host.getName() + ":" + host.getPort();
+    }
+
 }
