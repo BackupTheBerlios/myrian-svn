@@ -1,18 +1,20 @@
 package com.redhat.persistence.oql;
 
-import java.util.Collection;
-import java.util.Iterator;
+import com.redhat.persistence.*;
+import com.redhat.persistence.metadata.*;
+
+import java.util.*;
 
 /**
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2004/02/21 $
+ * @version $Revision: #11 $ $Date: 2004/02/24 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#10 $ by $Author: rhs $, $DateTime: 2004/02/21 18:22:56 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#11 $ by $Author: rhs $, $DateTime: 2004/02/24 21:30:52 $";
 
     private Object m_value;
 
@@ -23,7 +25,13 @@ public class Literal extends Expression {
     void frame(Generator gen) {
         // XXX: ???
         QFrame frame = gen.frame(this, null);
-        frame.setValues(new String[] { convert(m_value) });
+        List result = new ArrayList();
+        convert(m_value, result, gen.getRoot());
+        if (result.size() == 0) {
+            throw new IllegalStateException
+                ("unable to convert value: " + m_value);
+        }
+        frame.setValues((String[]) result.toArray(new String[result.size()]));
     }
 
     String emit(Generator gen) {
@@ -31,12 +39,28 @@ public class Literal extends Expression {
         return gen.getFrame(this).emit();
     }
 
-    private static String convert(Object value) {
-        if (value instanceof Collection) {
+    private static void convert(Object value, List result, Root root) {
+        if (value == null) {
+            result.add("null");
+        } else if (value instanceof Boolean) {
+            if (value.equals(Boolean.TRUE)) {
+                result.add("'1'");
+            } else {
+                result.add("'0'");
+            }
+        } else if (value instanceof Number) {
+            result.add(value.toString());
+        } else if (value instanceof Collection) {
             Collection c = (Collection) value;
             StringBuffer sb = new StringBuffer("(");
             for (Iterator it = c.iterator(); it.hasNext(); ) {
-                sb.append(convert(it.next()));
+                List single = new ArrayList();
+                convert(it.next(), single, root);
+                if (single.size() != 1) {
+                    throw new IllegalStateException
+                        ("can't deal with collection of compound objects");
+                }
+                sb.append(single.get(0));
                 if (it.hasNext()) {
                     sb.append(",");
                 } else {
@@ -44,35 +68,20 @@ public class Literal extends Expression {
                 }
             }
 
-            return sb.toString();
-        }
-
-        if (value instanceof com.redhat.persistence.PropertyMap) {
-            java.util.Map.Entry me = (java.util.Map.Entry)
-                ((com.redhat.persistence.PropertyMap) value).
-                entrySet().iterator().next();
-            value = me.getValue();
-        } else if (value instanceof com.arsdigita.persistence.DataObject) {
-            if (((com.arsdigita.persistence.DataObject) value).getOID()
-                .getNumberOfProperties() == 1) {
-                com.arsdigita.persistence.DataObject dobj =
-                    (com.arsdigita.persistence.DataObject) value;
-                value = dobj.getOID().get(((com.arsdigita.persistence.metadata.Property) dobj.getObjectType().getKeyProperties().next()).getName());
-            } else {
-                value = value.toString();
+            result.add(sb.toString());
+        } else if (value instanceof String) {
+            result.add(quote((String) value));
+        } else if (value instanceof com.redhat.persistence.PropertyMap) {
+            PropertyMap pmap = (PropertyMap) value;
+            Collection props = Code.properties(pmap.getObjectType());
+            for (Iterator it = props.iterator(); it.hasNext(); ) {
+                Property prop = (Property) it.next();
+                convert(pmap.get(prop), result, root);
             }
-        }
-
-        String literal;
-        if (value instanceof String) {
-            literal = quote((String) value);
-        } else if (value ==  null) {
-            literal = "null";
         } else {
-            literal = value.toString();
+            Adapter ad = root.getAdapter(value.getClass());
+            convert(ad.getProperties(value), result, root);
         }
-
-        return literal;
     }
 
     // XXX: temporary hack
