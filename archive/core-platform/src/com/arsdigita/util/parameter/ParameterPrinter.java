@@ -35,13 +35,13 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#4 $
  */
 final class ParameterPrinter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#3 $" +
-        "$Author: jorris $" +
-        "$DateTime: 2003/10/28 18:36:21 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#4 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/11/05 12:24:12 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterPrinter.class);
@@ -55,14 +55,14 @@ final class ParameterPrinter {
         final Iterator records = s_records.iterator();
 
         while (records.hasNext()) {
-            writeRecord(((ParameterRecord) records.next()), out);
+            writeRecord(((ParameterContext) records.next()), out);
         }
 
         out.write("</records>");
         out.close();
     }
 
-    private static void writeRecord(final ParameterRecord record,
+    private static void writeRecord(final ParameterContext record,
                                     final PrintWriter out) {
         out.write("<record>");
 
@@ -112,7 +112,7 @@ final class ParameterPrinter {
     }
 
     private static void register(final String classname) {
-        s_records.add((ParameterRecord) Classes.newInstance(classname));
+        s_records.add((ParameterContext) Classes.newInstance(classname));
     }
 
     public static final void main(final String[] args) throws IOException {
@@ -132,14 +132,15 @@ final class ParameterPrinter {
             writeXML(out);
 
             final XSLTemplate template = new XSLTemplate
-                (ParameterPrinter.class.getResource("ParameterPrinter.xsl.properties")); // XXX build system work around
+                (ParameterPrinter.class.getResource
+                     ("ParameterPrinter_html.xsl"));
 
             final Source source = new StreamSource
                 (new StringReader(sout.toString()));
             final Result result = new StreamResult(new File(args[1]));
 
             template.transform(source, result);
-        } else if (args.length == 1) {
+        } else if (args.length == 1 && !args[0].startsWith("--")) {
             final PrintWriter out = new PrintWriter
                 (new FileWriter(args[0]));
 
