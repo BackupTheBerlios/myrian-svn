@@ -16,7 +16,7 @@ import java.io.*;
  * OQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/07/08 $
+ * @version $Revision: #4 $ $Date: 2004/07/14 $
  */
 
 class OQLParser {
@@ -305,7 +305,7 @@ Expression generic() :
           }
       }
   | <SQL> t = <SQL_EXPRESSION>
-      { return new Static(t.image); }
+      { return new Static(t.image, m_parameters); }
   | t = <STRING>
       { return new Literal(parseString(t.image)); }
   | t = <INTEGER>
