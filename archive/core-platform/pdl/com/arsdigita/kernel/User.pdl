@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/User.pdl#5 $ 
-// $DateTime: 2002/10/16 14:12:35 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/User.pdl#6 $
+// $DateTime: 2002/11/06 19:22:54 $
 
 model com.arsdigita.kernel;
 
@@ -38,9 +38,9 @@ query UserPrimaryEmail {
     String primaryEmailAddress;
 
     do {
-        select users.user_id, 
+        select users.user_id,
                parties.primary_email
-          from users, 
+          from users,
                parties
          where users.user_id = parties.party_id
     } map {
@@ -64,7 +64,7 @@ query RetrieveUsers {
                person_names.given_name,
                person_names.family_name,
                parties.primary_email,
-               lower(users.screen_name || ' ' || person_names.given_name || ' ' || person_names.family_name) as search_name,
+               lower(nvl(users.screen_name,'') || ' ' || person_names.given_name || ' ' || person_names.family_name) as search_name,
                o.object_type
           from users, person_names, parties, acs_objects o
          where users.name_id = person_names.name_id
@@ -100,7 +100,7 @@ query RetrieveAllUsers {
                person_names.given_name,
                person_names.family_name,
                parties.primary_email,
-               lower(users.screen_name || ' ' || person_names.given_name || ' ' || person_names.family_name) as search_name,
+               lower(nvl(users.screen_name,'') || ' ' || person_names.given_name || ' ' || person_names.family_name) as search_name,
                o.object_type
           from users, person_names, parties, acs_objects o
          where users.name_id = person_names.name_id
