@@ -19,7 +19,6 @@ import com.redhat.persistence.metadata.Root;
 
 import java.util.Map;
 import java.util.HashMap;
-import java.lang.StringBuffer;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -28,12 +27,12 @@ import org.apache.log4j.Logger;
  * be combined and manipulated to create complex queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2003/10/23 $
+ * @version $Revision: #15 $ $Date: 2004/03/21 $
  */
 
 abstract class FilterImpl implements Filter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterImpl.java#14 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterImpl.java#15 $ by $Author: dennis $, $DateTime: 2004/03/21 18:26:23 $";
 
     private static final Logger m_log =
         Logger.getLogger(Filter.class.getName());

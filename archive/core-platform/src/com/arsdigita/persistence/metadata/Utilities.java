@@ -15,7 +15,6 @@
 
 package com.arsdigita.persistence.metadata;
 
-import java.lang.StringBuffer;
 import java.sql.Types;
 import java.util.List;
 import java.util.Iterator;
@@ -31,7 +30,7 @@ import java.util.Iterator;
  **/
 public class Utilities  {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Utilities.java#7 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Utilities.java#8 $ by $Author: dennis $, $DateTime: 2004/03/21 18:26:23 $";
 
     public final static String LINE_BREAK =
         System.getProperty("line.separator", "\n\r");
