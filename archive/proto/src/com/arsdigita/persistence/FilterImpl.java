@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * be combined and manipulated to create complex queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/02/28 $
+ * @version $Revision: #4 $ $Date: 2003/03/18 $
  */
 
 class FilterImpl implements Filter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/FilterImpl.java#3 $ by $Author: rhs $, $DateTime: 2003/02/28 17:44:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/FilterImpl.java#4 $ by $Author: ashah $, $DateTime: 2003/03/18 16:18:41 $";
 
     private static final Logger m_log =
         Logger.getLogger(Filter.class.getName());
@@ -82,6 +82,8 @@ class FilterImpl implements Filter {
             }
         }
 
+        // XXX prevent bind variable and object property name collisions
+        result.append("__");
         return result.toString();
     }
 

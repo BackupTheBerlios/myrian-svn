@@ -180,6 +180,8 @@ Cleanup:
  * Move DDL generator
  * Adapters
  * Rename everything
+ * better solution for bind variable and object property name
+   collisions (FilterImpl.java:85)
 
 Review:
  * Review everything
