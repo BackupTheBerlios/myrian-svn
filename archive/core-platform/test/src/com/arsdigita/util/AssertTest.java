@@ -19,9 +19,9 @@ import junit.framework.TestCase;
 
 public class AssertTest extends TestCase {
     public static final String versionId =
-        "$Id: //core-platform/dev/test/src/com/arsdigita/util/AssertTest.java#4 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/04/13 00:26:01 $";
+        "$Id: //core-platform/dev/test/src/com/arsdigita/util/AssertTest.java#5 $" +
+        "$Author: vadim $" +
+        "$DateTime: 2003/05/21 16:45:33 $";
 
     public AssertTest(String name) {
         super(name);
@@ -40,7 +40,7 @@ public class AssertTest extends TestCase {
             com.arsdigita.util.Assert.truth(false, "Expected true");
 
             junit.framework.Assert.fail();
-        } catch (Error e) {
+        } catch (AssertionError e) {
             // Empty
         }
 
@@ -48,7 +48,7 @@ public class AssertTest extends TestCase {
             com.arsdigita.util.Assert.falsity(true, "Expected false");
 
             junit.framework.Assert.fail();
-        } catch (Error e) {
+        } catch (AssertionError e) {
             // Empty
         }
 
@@ -56,7 +56,7 @@ public class AssertTest extends TestCase {
             com.arsdigita.util.Assert.exists(null, Object.class);
 
             junit.framework.Assert.fail();
-        } catch (Error e) {
+        } catch (AssertionError e) {
             // Empty
         }
 
@@ -64,7 +64,7 @@ public class AssertTest extends TestCase {
             com.arsdigita.util.Assert.locked(new Unlocked());
 
             junit.framework.Assert.fail();
-        } catch (Error e) {
+        } catch (AssertionError e) {
             // Empty
         }
 
@@ -72,7 +72,7 @@ public class AssertTest extends TestCase {
             com.arsdigita.util.Assert.unlocked(new Locked());
 
             junit.framework.Assert.fail();
-        } catch (Error e) {
+        } catch (AssertionError e) {
             // Empty
         }
 
@@ -80,7 +80,7 @@ public class AssertTest extends TestCase {
             com.arsdigita.util.Assert.equal(new Object(), new Object());
 
             junit.framework.Assert.fail();
-        } catch (Error e) {
+        } catch (AssertionError e) {
             // Empty
         }
 
@@ -88,7 +88,7 @@ public class AssertTest extends TestCase {
             com.arsdigita.util.Assert.equal("whoa", "dude");
 
             junit.framework.Assert.fail();
-        } catch (Error e) {
+        } catch (AssertionError e) {
             // Empty
         }
 
@@ -96,7 +96,7 @@ public class AssertTest extends TestCase {
             com.arsdigita.util.Assert.equal(null, new Object());
 
             junit.framework.Assert.fail();
-        } catch (Error e) {
+        } catch (AssertionError e) {
             // Empty
         }
 
@@ -104,7 +104,7 @@ public class AssertTest extends TestCase {
             com.arsdigita.util.Assert.equal(new Object(), null);
 
             junit.framework.Assert.fail();
-        } catch (Error e) {
+        } catch (AssertionError e) {
             // Empty
         }
 
@@ -114,7 +114,7 @@ public class AssertTest extends TestCase {
             com.arsdigita.util.Assert.unequal(one, one);
 
             junit.framework.Assert.fail();
-        } catch (Error e) {
+        } catch (AssertionError e) {
             // Empty
         }
 
@@ -122,7 +122,7 @@ public class AssertTest extends TestCase {
             com.arsdigita.util.Assert.unequal(null, null);
 
             junit.framework.Assert.fail();
-        } catch (Error e) {
+        } catch (AssertionError e) {
             // Empty
         }
 
@@ -130,7 +130,7 @@ public class AssertTest extends TestCase {
             com.arsdigita.util.Assert.unequal("dude", "dude");
 
             junit.framework.Assert.fail();
-        } catch (Error e) {
+        } catch (AssertionError e) {
             // Empty
         }
 

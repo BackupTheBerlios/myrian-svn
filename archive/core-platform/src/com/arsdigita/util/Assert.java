@@ -20,23 +20,23 @@ import org.apache.log4j.Logger;
 /**
  * Utility functions for assertions.
  *
- * The static methods in this class provide a standard way of
- * asserting certain conditions.
+ * <p>The static methods in this class provide a standard way of
+ * asserting certain conditions.</p>
  *
- * Though it is not right now, this class <em>should</em> be final.
+ * <p>Though it is not right now, this class <em>should</em> be final.
  * Do not subclass it.  In a future revision of this software, this
- * class will be made final.
+ * class will be made final.</p>
  *
  * @author David Lutterkort &lt;dlutter@redhat.com&gt;
  * @author Uday Mathur
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#14 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#15 $
  */
 public class Assert {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#14 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/05/12 01:04:26 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#15 $" +
+        "$Author: vadim $" +
+        "$DateTime: 2003/05/21 16:45:33 $";
 
     private static final Logger s_log = Logger.getLogger
         (Assert.class);
@@ -56,12 +56,12 @@ public class Assert {
      *
      * @param message A <code>String</code> describing the failure
      * condition
-     * @throws java.lang.Error
+     * @throws AssertionError
      */
     public static void fail(final String message) {
         s_log.error(message);
 
-        throw new Error(message);
+        throw new AssertionError(message);
     }
 
     /**
@@ -71,14 +71,14 @@ public class Assert {
      *
      * @param condition The condition asserted
      * @param message An error message
-     * @throws java.lang.Error if the condition is false
+     * @throws AssertionError if the condition is false
      */
     public static final void truth(final boolean condition,
                                    final String message) {
         if (!condition) {
             s_log.error(message);
 
-            throw new Error(message);
+            throw new AssertionError(message);
         }
     }
 
@@ -89,7 +89,7 @@ public class Assert {
      *
      * @param condition The condition asserted
      * @param message An error message
-     * @throws java.lang.Error if the condition is false
+     * @throws AssertionError if the condition is false
      */
     public static final void truth(final boolean condition) {
         if (!condition) {
@@ -97,7 +97,7 @@ public class Assert {
 
             s_log.error(message);
 
-            throw new Error(message);
+            throw new AssertionError(message);
         }
     }
 
@@ -107,14 +107,14 @@ public class Assert {
      *
      * @param condition The condition asserted
      * @param message An error message
-     * @throws java.lang.Error if the condition is false
+     * @throws AssertionError if the condition is false
      */
     public static final void falsity(final boolean condition,
                                      final String message) {
         if (condition) {
             s_log.error(message);
 
-            throw new Error(message);
+            throw new AssertionError(message);
         }
     }
 
@@ -124,7 +124,7 @@ public class Assert {
      * @param object The object that must not be null
      * @param clacc The <code>Class</code> of parameter
      * <code>object</code>
-     * @throws java.lang.Error if the object is null
+     * @throws AssertionError if the object is null
      */
     public static final void exists(final Object object,
                                     final Class clacc) {
@@ -133,7 +133,7 @@ public class Assert {
 
             s_log.error(message);
 
-            throw new Error(message);
+            throw new AssertionError(message);
         }
     }
 
@@ -150,7 +150,7 @@ public class Assert {
 
             s_log.error(message);
 
-            throw new Error(message);
+            throw new AssertionError(message);
         }
     }
 
@@ -167,7 +167,7 @@ public class Assert {
 
             s_log.error(message);
 
-            throw new Error(message);
+            throw new AssertionError(message);
         }
     }
 
@@ -178,7 +178,7 @@ public class Assert {
      *
      * @param value1 The first value to be compared
      * @param value2 The second
-     * @throws java.lang.Error if the arguments are unequal
+     * @throws AssertionError if the arguments are unequal
      */
     public static final void equal(final Object value1,
                                    final Object value2) {
@@ -188,7 +188,7 @@ public class Assert {
 
                 s_log.error(message);
 
-                throw new Error(message);
+                throw new AssertionError(message);
             }
         } else {
             if (!value1.equals(value2)) {
@@ -196,7 +196,7 @@ public class Assert {
 
                 s_log.error(message);
 
-                throw new Error(message);
+                throw new AssertionError(message);
             }
         }
     }
@@ -208,7 +208,7 @@ public class Assert {
      *
      * @param value1 The first value to be compared
      * @param value2 The second
-     * @throws java.lang.Error if the arguments are unequal
+     * @throws AssertionError if the arguments are unequal
      */
     public static final void equal(final Object value1,
                                    final Object value2,
@@ -217,13 +217,13 @@ public class Assert {
             if (value1 != value2) {
                 s_log.error(message);
 
-                throw new Error(message);
+                throw new AssertionError(message);
             }
         } else {
             if (!value1.equals(value2)) {
                 s_log.error(message);
 
-                throw new Error(message);
+                throw new AssertionError(message);
             }
         }
     }
@@ -235,7 +235,7 @@ public class Assert {
      *
      * @param value1 The first value to be compared
      * @param value2 The second
-     * @throws java.lang.Error if the arguments are unequal
+     * @throws AssertionError if the arguments are unequal
      */
     public static final void unequal(final Object value1,
                                      final Object value2) {
@@ -245,7 +245,7 @@ public class Assert {
 
                 s_log.error(message);
 
-                throw new Error(message);
+                throw new AssertionError(message);
             }
         } else {
             if (value1.equals(value2)) {
@@ -253,7 +253,7 @@ public class Assert {
 
                 s_log.error(message);
 
-                throw new Error(message);
+                throw new AssertionError(message);
             }
         }
     }
