@@ -15,12 +15,12 @@ import java.util.*;
  * Test
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/22 $
+ * @version $Revision: #2 $ $Date: 2004/06/22 $
  **/
 
 abstract class Test {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdotest/Test.java#1 $ by $Author: vadim $, $DateTime: 2004/06/22 13:25:03 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdotest/Test.java#2 $ by $Author: vadim $, $DateTime: 2004/06/22 14:02:37 $";
 
     private Session m_ssn;
 
@@ -32,18 +32,6 @@ abstract class Test {
         m_ssn = ssn;
     }
 
-    private static String getURL(String[] args) {
-        if (args.length < 1) {
-            System.err.println("Usage:");
-            System.err.println
-                ("    java crp.pandora.Main <jdbc-url> [load|unload|clear|lock]");
-            System.exit(1);
-            return null;
-        } else {
-            return args[0];
-        }
-    }
-
     public static final void main(Class klass, String[] args) {
         if (args.length < 2) {
             System.err.println
@@ -53,18 +41,7 @@ abstract class Test {
             System.exit(1);
         }
 
-        String jdbc = getURL(args);
-        // PostgreSQL-specific hack
-        if (jdbc.indexOf(":postgresql:") >- 1) {
-            try {
-                Class.forName("org.postgresql.Driver");
-            } catch (ClassNotFoundException ex) {
-                throw new RuntimeException
-                    ("Couldn't load driver. Check your classpath. " +
-                     ex.getMessage());
-            }
-        }
-
+        String jdbc = args[0];
 
         try {
             final Connection conn = DriverManager.getConnection(jdbc);
