@@ -1,29 +1,31 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
- *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
- *
- * Software distributed under the License is distributed on an "AS
- * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * rights and limitations under the License.
- *
- */
+* Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+*
+* The contents of this file are subject to the CCM Public
+* License (the "License"); you may not use this file except in
+* compliance with the License. You may obtain a copy of
+* the License at http://www.redhat.com/licenses/ccmpl.html
+*
+* Software distributed under the License is distributed on an "AS
+* IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+* implied. See the License for the specific language governing
+* rights and limitations under the License.
+*
+*/
 
 package com.arsdigita.util.url;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Priority;
 
-/** 
+/**
  * Helper class for fetching remote URLs. Provides a pool of worker threads
  * that actually fetch the URLs, thus enabling the URL connections to be
  * interrupted early if the remote server hangs or doesn't respond.
  *
  * @author Dirk Gomez
-*/
+ */
 
 import java.net.URLConnection;
 import java.net.URL;
@@ -33,15 +35,13 @@ import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import com.arsdigita.util.StringUtils;
+
 public class URLPool {
 
     private static final Logger s_log = Logger.getLogger(URLPool.class);
-
-    private static String m_data;
-    private static String m_url;
-
-    private int m_currentPoolSize = 0;
-    private int m_poolSize;
+    private int m_currentThreadCount = 0;
+    private int m_maxThreadCount;
     private long m_timeOut;
 
     /**
@@ -50,164 +50,226 @@ public class URLPool {
      *
      */
     public URLPool() {
-      this(10, 4000);
+        this(10, 4000);
     }
-    
+
     /**
      * Create a new URLPool with a default timeout of 4 seconds.
      *
      * @param poolsize - maximum number of threads allowed to be running at
      * any given time, any subsequent requests for urls are queued until a
      * thread becomes available.
+     *
+     * @pre poolsize > 0
      */
     public URLPool(int poolsize) {
-      this(poolsize, 4000);
+        this(poolsize, 4000);
     }
-    
+
     /**
      * Create a new URLPool with a default timeout of 4 seconds.
      *
-     * @param poolsize - maximum number of threads allowed to be running at
+     * @param threadCount - maximum number of threads allowed to be running at
      * any given time, any subsequent requests for urls are queued until a
      * thread becomes available.
      *
      * @param timeout - timeout in milliseconds to use when fetching URLs to
      * prevent a slow remote server from delaying the calling application
      * indefinitely.
+     *
+     * @pre threadCount > 0 && timeout > 0
      */
-    public URLPool(int poolsize, long timeout) {
-        m_poolSize = poolsize;
+    public URLPool(int threadCount, long timeout) {
+        assertThreadCount(threadCount);
+        assertTimeout(timeout);
+        m_maxThreadCount = threadCount;
         m_timeOut = timeout;
     }
 
+    private static void assertThreadCount(int threadCount) {
+        if (threadCount <= 0 ) {
+            throw new IllegalArgumentException("Thread Count must be greater than 0, not " + threadCount);
+        }
+    }
+
+    private static void assertTimeout(long timeout) {
+        if (timeout <= 0 ) {
+            throw new IllegalArgumentException("Timeout must be greater than 0, not " + timeout);
+        }
+    }
 
     /**
-     * Returns the pool size - maximum number of threads allowed to be running
+     * Returns the thread count - maximum number of threads allowed to be running
      * at any given time, any subsequent requests for urls are queued until a
      * thread becomes available.
      *
-     * @return the pool size - maximum number of threads allowed to be running
+     * @return the thread count - maximum number of threads allowed to be running
      * at any given time, any subsequent requests for urls are queued until a
      * thread becomes available.
      */
-    public int getPoolSize() {
-        return m_poolSize;
+    public int getMaxThreadCount() {
+        return m_maxThreadCount;
     };
 
     /**
-     * Sets the pool size - maximum number of threads allowed to be running
+     * Sets the thread count - maximum number of threads allowed to be running
      * at any given time, any subsequent requests for urls are queued until a
      * thread becomes available.
-     * @param s_poolSize the maximum number of threads allowed to be running
+     *
+     * @param maxThreadCount the maximum number of threads allowed to be running
      * at any given time
+     *
+     * @pre maxThreadCount > 0
      */
-    public void setPoolSize(int s_poolSize) {
-        m_poolSize = s_poolSize;
+    public void setMaxThreadCount(int maxThreadCount) {
+        assertThreadCount(maxThreadCount);
+        m_maxThreadCount = maxThreadCount;
     };
 
     /**
-    * Returns the timeout to use when fetching URLs to prevent a slow remote
-    * server from delaying the calling application indefinitely.
-    *
-    * @return the timeout to use when fetching URLs to prevent a slow remote
-    * server from delaying the calling application indefinitely.
-    */
+     * Returns the timeout to use when fetching URLs to prevent a slow remote
+     * server from delaying the calling application indefinitely.
+     *
+     * @return the timeout to use when fetching URLs to prevent a slow remote
+     * server from delaying the calling application indefinitely.
+     */
     public long getTimeOut() {
         return m_timeOut;
     };
 
     /**
-    * Sets the timeout to use when fetching URLs to prevent a slow remote
-    * server from delaying the calling application indefinitely.
-    *
-    * @param s_timeOut the timeout to use when fetching URLs to prevent a slow
-    * remote server from delaying the calling application indefinitely.
-    */
-    public void setTimeOut(long s_timeOut) {
-        m_timeOut = s_timeOut;
+     * Sets the timeout to use when fetching URLs to prevent a slow remote
+     * server from delaying the calling application indefinitely.
+     *
+     * @param timeOut the timeout to use when fetching URLs to prevent a slow
+     * remote server from delaying the calling application indefinitely.
+     *
+     * @param timeOut > 0
+     */
+    public void setTimeOut(long timeOut) {
+        assertTimeout(timeOut);
+        m_timeOut = timeOut;
     };
 
     /**
+     *
      * fetches the remote URL, returning the data from the page, or null if an
      * error occurred.
      *
-     * @param URL fetches the remote URL, returning the data from the page, or
-     * null if an error occurred.
+     * @param url The URL to fetch data from
+     *
+     * @return Data from the URL, or null if unable to fetch.
      */
-    public String fetchURL(String URL) {
+    public String fetchURL(String url) {
+        URL theURL = null;
+        try {
+            theURL = makeURL(url);
+        } catch(MalformedURLException e) {
+            throw new IllegalArgumentException("URL " + url + " is invalid: " + e.getMessage());
+        }
         // Check whether there is a "slot" available to fetch the URL
         // If not then sleep for half the fetch timeout time.
-        while (m_currentPoolSize > m_poolSize) {
+        while (m_currentThreadCount > m_maxThreadCount) {
             try {
                 Thread.sleep(m_timeOut/2);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+        m_currentThreadCount++;
+        URLFetcher fetcher = new URLFetcher(theURL);
+        s_log.debug("Starting fetch thread for " + url);
 
-        URLFetcher fetcher = new URLFetcher(URL);
-        s_log.debug("Starting fetch thread for " + URL);
-        m_currentPoolSize++;
-        fetcher.start();
         try {
-            fetcher.join(m_timeOut);
-            if (fetcher.isAlive()) {
-                s_log.debug("Thread still alive after " + m_timeOut + " milliseconds " + URL);
-                fetcher.interrupt();
-                fetcher.join();
+            fetcher.start();
+            try {
+                fetcher.join(m_timeOut);
+                if (fetcher.isAlive()) {
+                    s_log.debug("Thread still alive after " + m_timeOut + " milliseconds " + url);
+                    fetcher.shutdown();
+                    s_log.debug("Shutdown thread");
+                }
+            } catch (InterruptedException ex) {
+                s_log.debug("URL Fetcher interrupted", ex);
             }
-            s_log.debug("Joined with thread " + URL);
-        } catch (InterruptedException ex) {
-            s_log.debug("URL Fetcher interrupted", ex);
+        } finally {
+            System.out.println("decrement");
+            m_currentThreadCount--;
         }
-        m_currentPoolSize--;
+        System.out.println("Getting data");
         return fetcher.getData();
     }
 
-    private static class URLFetcher extends Thread {
-        private String m_data;
-        private String m_url;
+    private static URL makeURL(String url) throws MalformedURLException {
+        if (StringUtils.emptyString(url)) {
+            throw new IllegalArgumentException("Cannot have an empty URL!");
+        }
 
-        public URLFetcher(String url) {
-            m_data = null;
+        // Let's be nice to the user. If there's no "://" in the string,
+        // just prepend "http://"
+        if (url.indexOf("://") == -1) {
+            url = "http://" + url;
+        }
+
+        URL theURL = new URL(url);
+        return theURL;
+    }
+
+    private static class URLFetcher extends Thread {
+        private String m_data = "";
+        private URL m_url;
+        private boolean m_running = true;
+
+        public URLFetcher(URL url) {
             m_url = url;
         }
-        
+
         public String getData() {
             return m_data;
         }
 
+        public void shutdown() {
+            m_running = false;
+        }
+
+        public synchronized void start() {
+            super.start();
+        }
+
         public void run() {
-            StringBuffer buffer = new StringBuffer();
-            // Let's be nice to the user. If there's no "://" in the string,
-            // just prepend "http://"
-            if (m_url.indexOf("://") == -1) {
-                m_url = "http://" + m_url;
+            if (!m_running) {
+                return;
             }
-            
+            s_log.debug("Starting run");
+            BufferedReader input = null;
             try {
-                URL url = new URL(m_url);
-                URLConnection con = url.openConnection();
-               
-                InputStream is = con.getInputStream();
-                BufferedReader input = new BufferedReader(new InputStreamReader(is));
-                
+
+                URLConnection con = m_url.openConnection();
+
+                input = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 String line;
-                while ((line = input.readLine()) != null) {
-                    buffer.append(line).append('\n');
+                StringBuffer buffer = new StringBuffer();
+                while (m_running && (line = input.readLine()) != null) {
+                    buffer.append(line).append(StringUtils.NEW_LINE);
                 }
-                input.close();
-            } catch (MalformedURLException mal) {
-                mal.printStackTrace();
+                m_data = buffer.toString();
+
+            }
+            catch (IOException io) {
+                s_log.error("IO Error fetching URL: " + m_url, io);
                 return;
-            } catch (IOException io) {
-                io.printStackTrace();
-                return;
+            } finally {
+                if (null != input) {
+                    try {
+                        input.close();
+                    } catch(IOException ioe) {
+                        s_log.error("Error closing connection", ioe);
+                    }
+                }
             }
 
-            
-            m_data = buffer.toString();
         }
     }
 
 }
+

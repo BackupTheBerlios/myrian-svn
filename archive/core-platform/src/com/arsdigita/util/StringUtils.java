@@ -48,6 +48,7 @@ public class StringUtils {
         // can't instantiate me!
     }
 
+    public static final String NEW_LINE = System.getProperty("line.separator");
     /**
      * Tests if a string is empty.
      * @param s A string to test
@@ -345,19 +346,18 @@ public class StringUtils {
                 if (entries == null) {
                     to.append("[null iterator]");
                 } else {
-                    String newLine = System.getProperty("line.separator");
                     to.append("{");
-                    String comma = newLine;
+                    String comma = NEW_LINE;
 
                     while (entries.hasNext()) {
                         to.append(comma);
-                        comma = "," + newLine;
+                        comma = "," + NEW_LINE;
                         Entry e = (Entry)entries.next();
                         to  .append(toString(e.getKey()))
                             .append(" => ")
                             .append(toString(e.getValue()));
                     }
-                    to.append(newLine).append("}");
+                    to.append(NEW_LINE).append("}");
                 }
             }
         }
@@ -404,7 +404,7 @@ public class StringUtils {
         } else if (Character.isWhitespace(s.charAt(n))) {
             return s;
         } else {
-            return s.concat(System.getProperty("line.separator"));
+            return s.concat(NEW_LINE);
         }
     }
 
@@ -505,7 +505,7 @@ public class StringUtils {
      */
 
     public final static String repeat(String pattern, int repeatCount) {
-        StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer(repeatCount * pattern.length());
         for (int i = 0; i < repeatCount; i++) {
             sb.append(pattern);
         }
@@ -736,7 +736,7 @@ public class StringUtils {
          * Returns the value corresponding to the supplied key
          * placeholder.
          *
-         * @param the key being substituted
+         * @param key The key being substituted
          */
         public String generate(String key);
     }

@@ -19,6 +19,9 @@ import org.apache.log4j.Logger;
 
 import com.arsdigita.util.url.URLCache;
 import com.arsdigita.util.url.URLPool;
+import com.arsdigita.util.Assert;
+import com.arsdigita.util.StringUtils;
+
 import java.util.HashMap;
 
 /**
@@ -33,9 +36,9 @@ import java.util.HashMap;
 
 public class URLFetcher {
 
-    private static final Logger s_log = Logger.getLogger(URLPool.class);
+    private static final Logger s_log = Logger.getLogger(URLFetcher.class);
 
-    private static HashMap services = new HashMap();
+    private static HashMap s_services = new HashMap();
 
     /**
      * Registers a new service the key is the unique name for the service,
@@ -46,10 +49,9 @@ public class URLFetcher {
     */
 
     public static void registerService(String key, URLPool pool, URLCache cache) {
-        CacheService cs = new CacheService(pool, cache, true);
-        services.put(key, cs);
+        registerService(key, pool, cache, true);
     };
-        
+
     /**
      * Registers a new service the key is the unique name for the service,
      * typically the packagename of the application using the service. The
@@ -63,26 +65,29 @@ public class URLFetcher {
     */
 
     public static void registerService(String key, URLPool pool, URLCache cache, boolean cacheFailedRetrievals) {
+        Assert.assertTrue(!StringUtils.emptyString(key), "Key must not be empty!");
         CacheService cs = new CacheService(pool, cache, cacheFailedRetrievals);
-        services.put(key, cs);
+        s_services.put(key, cs);
     };
-        
+
     /**
      * Fetches the URL using the service specified by the key param. Looks in
      * the cache for the url, if not present fetches the url & stores it in
      * the cache.Returns the data for the page, or null if the fetch failed.
     */
     public static String fetchURL(String url, String key) {
-        CacheService cs = (CacheService) services.get(key);
+        Assert.assertTrue(!StringUtils.emptyString(url), "URL must not be empty!");
 
-        String urlData = ((URLCache) cs.cache).retrieve(url);
+        CacheService cs = getService(key);
+
+        String urlData = cs.cache.retrieve(url);
         if (urlData == null) {
-            urlData = ((URLPool) cs.pool).fetchURL(url);
-            if (urlData != null) {
-                ((URLCache) cs.cache).store(url,urlData);
+            urlData = cs.pool.fetchURL(url);
+            if (urlData.length() > 0) {
+                cs.cache.store(url,urlData);
             } else {
                 if (cs.cacheFailedRetrievals == true) {
-                    ((URLCache) cs.cache).store(url,urlData);
+                    cs.cache.store(url,urlData);
                 }
             }
             return urlData;
@@ -93,23 +98,35 @@ public class URLFetcher {
 
 
     /**
-     *  Purges the specified URL from the cache. 
+     * Purges the specified URL from the cache.
      */
     public static void purgeURL(String url, String key) {
-        CacheService cs = (CacheService) services.get(key);
-        ((URLCache) cs.cache).purge(url);
+        Assert.assertTrue(!StringUtils.emptyString(url), "URL must not be null!");
+        CacheService cs = getService(key);
+        cs.cache.purge(url);
     };
 
+    public boolean hasService(String key) {
+        return getService(key) != null;
+    }
 
+    private static CacheService getService(String key) {
+        Assert.assertTrue(!StringUtils.emptyString(key), "Key must not be empty!");
+        CacheService cs = (CacheService) s_services.get(key);
+        return cs;
+    }
     /**
      * A registered Cacheservice.
      */
-    private static class CacheService {
-        URLPool pool;
-        URLCache cache;
-        boolean cacheFailedRetrievals;
+    private static final class CacheService {
+        final URLPool pool;
+        final URLCache cache;
+        final boolean cacheFailedRetrievals;
 
         CacheService (URLPool pool, URLCache cache, boolean cacheFailedRetrievals) {
+            Assert.assertNotNull(pool, "URLPool cannot be null!");
+            Assert.assertNotNull(cache, "URLCache cannot be null!");
+
             this.pool = pool;
             this.cache = cache;
             this.cacheFailedRetrievals = cacheFailedRetrievals;

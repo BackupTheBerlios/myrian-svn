@@ -17,6 +17,7 @@ package com.arsdigita.tools.junit.extensions;
 
 import java.sql.Connection;
 import com.arsdigita.db.ConnectionManager;
+import com.arsdigita.db.DbHelper;
 import com.arsdigita.initializer.Script;
 import com.arsdigita.installer.LoadSQLPlusScript;
 import junit.extensions.*;
@@ -128,6 +129,7 @@ public class BaseTestSetup extends TestDecorator {
 
             LoadSQLPlusScript loader = new LoadSQLPlusScript();
             loader.setConnection ( ConnectionManager.getConnection() );
+            loader.setDatabase(DbHelper.getDatabaseDirectory());
             loader.loadSQLPlusScript ( setupSQLScript );
 
         }
