@@ -9,12 +9,12 @@ import java.util.*;
  * CreateEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/02/27 $
+ * @version $Revision: #11 $ $Date: 2003/03/07 $
  **/
 
 public class CreateEvent extends ObjectEvent {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/CreateEvent.java#10 $ by $Author: ashah $, $DateTime: 2003/02/27 21:02:33 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/CreateEvent.java#11 $ by $Author: ashah $, $DateTime: 2003/03/07 13:27:00 $";
 
     CreateEvent(Session ssn, Object obj) {
         super(ssn, obj);
@@ -28,7 +28,6 @@ public class CreateEvent extends ObjectEvent {
         super.activate();
 
         getObjectData().setState(ObjectData.INFANTILE);
-        getObjectData().invalidatePropertyData();
 
         // set up new dependencies
         ObjectType type = getSession().getObjectType(getObject());

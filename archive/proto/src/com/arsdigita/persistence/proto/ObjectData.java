@@ -9,18 +9,17 @@ import org.apache.log4j.Logger;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #13 $ $Date: 2003/02/27 $
+ * @version $Revision: #14 $ $Date: 2003/03/07 $
  **/
 
 class ObjectData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#13 $ by $Author: ashah $, $DateTime: 2003/02/27 21:02:33 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#14 $ by $Author: ashah $, $DateTime: 2003/03/07 13:27:00 $";
 
     private static final Logger LOG = Logger.getLogger(ObjectData.class);
 
     private final Session m_ssn;
     private final Object m_object;
-    private final LinkedList m_events = new LinkedList();
 
     static class State {
         private String m_name;
@@ -70,25 +69,6 @@ class ObjectData {
         return m_pdata.containsKey(prop);
     }
 
-    void invalidatePropertyData() {
-        for (Iterator it = m_pdata.values().iterator(); it.hasNext(); ) {
-            ((PropertyData) it.next()).invalidate();
-        }
-    }
-
-    void addEvent(ObjectEvent ev) {
-        m_events.add(ev);
-    }
-
-    ObjectEvent getCurrentEvent() {
-        if (m_events.size() == 0) { return null; }
-        return (ObjectEvent) m_events.getLast();
-    }
-
-    void removeEvent(ObjectEvent ev) {
-        m_events.remove(ev);
-    }
-
     public boolean isNew() { return m_startedNew; }
 
     public boolean isDeleted() { return isDead() || isSenile(); }
@@ -128,9 +108,9 @@ class ObjectData {
             pdata.dump(out);
         }
 
-        out.println("    Object Events:");
-        for (Iterator it = m_events.iterator(); it.hasNext(); ) {
-            Event ev = (Event) it.next();
+        Event ev = getSession().getEventStream().getLastEvent(getObject());
+        if (ev != null) {
+            out.println("    Current Object Event:");
             ev.dump(out);
         }
     }

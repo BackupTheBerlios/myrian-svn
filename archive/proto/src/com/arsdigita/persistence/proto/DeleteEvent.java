@@ -9,12 +9,12 @@ import java.util.*;
  * DeleteEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/02/27 $
+ * @version $Revision: #9 $ $Date: 2003/03/07 $
  **/
 
 public class DeleteEvent extends ObjectEvent {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DeleteEvent.java#8 $ by $Author: ashah $, $DateTime: 2003/02/27 21:02:33 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DeleteEvent.java#9 $ by $Author: ashah $, $DateTime: 2003/03/07 13:27:00 $";
 
     DeleteEvent(Session ssn, Object obj) {
         super(ssn, obj);
@@ -37,8 +37,16 @@ public class DeleteEvent extends ObjectEvent {
                 pd.transferNotNullDependentEvents(this);
             }
 
-            for (Iterator evs = pd.getCurrentEvents(); evs.hasNext(); ) {
-                ((PropertyEvent) evs.next()).addDependent(this);
+            if (prop.isCollection()) {
+                for (Iterator evs = getSession().getEventStream().
+                         getCurrentEvents(getObject(), prop).iterator();
+                     evs.hasNext(); ) {
+                    ((PropertyEvent) evs.next()).addDependent(this);
+                }
+            } else {
+                Event ev = getSession().getEventStream().getLastEvent
+                    (getObject(), prop);
+                if (ev != null) { ev.addDependent(this); }
             }
         }
 

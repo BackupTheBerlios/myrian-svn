@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #40 $ $Date: 2003/03/06 $
+ * @version $Revision: #41 $ $Date: 2003/03/07 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#40 $ by $Author: rhs $, $DateTime: 2003/03/06 14:09:52 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#41 $ by $Author: ashah $, $DateTime: 2003/03/07 13:27:00 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -35,8 +35,9 @@ public class Session {
 
     private Set m_visiting = new HashSet();
 
-    private LinkedList m_events = new LinkedList();
+    private EventStream m_events = new EventStream();
     private LinkedList m_pending = new LinkedList();
+    private boolean m_eventsChanged = false;
 
     private Set m_violations = new HashSet();
 
@@ -48,6 +49,8 @@ public class Session {
         m_engine = engine;
         m_qs = source;
     }
+
+    EventStream getEventStream() { return m_events; }
 
     public void create(Object obj) {
         if (LOG.isDebugEnabled()) {
@@ -465,23 +468,14 @@ public class Session {
         }
     }
 
-    /**
-     * Performs all operations queued up by the session. This is automatically
-     * called when necessary in order to insure that queries performed by the
-     * datastore are consistent with the contents of the in memory data cache.
-     **/
-    public void flush() {
-        if (LOG.isDebugEnabled()) {
-            trace("flush", new Object[] {});
-        }
-
-        process(m_beforeFlush, m_events);
-
+    private void computeFlushability() {
         for (Iterator it = m_events.iterator(); it.hasNext(); ) {
             ((Event) it.next()).m_flushable = true;
         }
 
         // find unflushable events
+        // the source of unflushability is not null properties that
+        // have not been set
         List queue = new LinkedList();
         for (Iterator pds = m_violations.iterator(); pds.hasNext(); ) {
             PropertyData pd = (PropertyData) pds.next();
@@ -500,7 +494,21 @@ public class Session {
                 }
             }
         }
+    }
 
+    /**
+     * Performs all operations queued up by the session. This is automatically
+     * called when necessary in order to insure that queries performed by the
+     * datastore are consistent with the contents of the in memory data cache.
+     **/
+    public void flush() {
+        if (LOG.isDebugEnabled()) {
+            trace("flush", new Object[] {});
+        }
+
+        process(m_beforeFlush, m_events.getEvents());
+
+        computeFlushability();
         List written = new LinkedList();
 
         for (Iterator it = m_events.iterator(); it.hasNext(); ) {
@@ -516,6 +524,7 @@ public class Session {
 
         for (Iterator it = written.iterator(); it.hasNext(); ) {
             Event ev = (Event) it.next();
+            m_eventsChanged = true;
             ev.sync();
         }
 
@@ -599,8 +608,8 @@ public class Session {
 
         for (Iterator it = m_pending.iterator(); it.hasNext(); ) {
             Event ev = (Event) it.next();
+            m_eventsChanged = true;
             ev.activate();
-            m_events.add(ev);
             it.remove();
         }
 
@@ -610,7 +619,7 @@ public class Session {
         m_visiting.clear();
     }
 
-    private Object getSessionKey(Object obj) {
+    static Object getSessionKey(Object obj) {
         Adapter ad = getAdapter(obj);
         return ad.getSessionKey(obj);
     }

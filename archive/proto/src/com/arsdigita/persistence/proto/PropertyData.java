@@ -8,23 +8,17 @@ import java.io.*;
  * PropertyData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/03/04 $
+ * @version $Revision: #11 $ $Date: 2003/03/07 $
  **/
 
 class PropertyData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyData.java#10 $ by $Author: ashah $, $DateTime: 2003/03/04 16:06:32 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyData.java#11 $ by $Author: ashah $, $DateTime: 2003/03/07 13:27:00 $";
 
     final private ObjectData m_odata;
     final private Property m_prop;
     private Object m_value;
-    final private ArrayList m_events = new ArrayList();
-
-    // marks the first event that is valid for this lifecycle of
-    // the associated ObjectData
-    private PropertyEvent m_current = null;
-
-    private List m_dependentEvents = new ArrayList();
+    final private List m_dependentEvents = new LinkedList();
 
     public PropertyData(ObjectData odata, Property prop, Object value) {
         m_odata = odata;
@@ -37,6 +31,8 @@ class PropertyData {
     public Session getSession() {
         return m_odata.getSession();
     }
+
+    private Object getObject() { return m_odata.getObject(); }
 
     public Property getProperty() {
         return m_prop;
@@ -51,71 +47,25 @@ class PropertyData {
     }
 
     public Object get() {
-        if (!m_prop.isCollection() && m_current != null) {
-            for (int i = m_events.size() - 1; i >= 0; i--) {
-                PropertyEvent ev = (PropertyEvent) m_events.get(i);
-                if (ev instanceof SetEvent) {
-                    return ev.getArgument();
-                }
-                if (ev == m_current) { break; }
-            }
-        }
-
-        return m_value;
-    }
-
-    public void addEvent(PropertyEvent ev) {
-        if (m_current == null) { m_current = ev; }
-        m_events.add(ev);
-    }
-
-    public void removeEvent(PropertyEvent ev) {
-        if (ev.equals(m_current)) {
-            int newIndex = m_events.indexOf(ev) + 1;
-            try {
-                m_current = (PropertyEvent) m_events.get(newIndex);
-            } catch (IndexOutOfBoundsException ex) {
-                m_current = null;
-            }
-        }
-        m_events.remove(ev);
-    }
-
-    Iterator getCurrentEvents() {
-        if (m_current == null) { return Collections.EMPTY_LIST.iterator(); }
-
-        int index = m_events.indexOf(m_current);
-        return m_events.subList(index, m_events.size()).iterator();
-    }
-
-    PropertyEvent getCurrentEvent(PropertyEvent pe) {
-        if (pe instanceof SetEvent && !m_prop.isCollection()) {
-            if (m_current == null) { return null; }
-            return (SetEvent) m_events.get(m_events.size() - 1);
-        } else if (!(pe instanceof SetEvent) && m_prop.isCollection()) {
-            // for add/remove get the previous one with matching argument
-            if (m_current == null) { return null; }
-            for (int i = m_events.size() - 1; i >= 0; i--) {
-                PropertyEvent old = (PropertyEvent) m_events.get(i);
-                if (old.getArgument().equals(pe.getArgument())) { return old; }
-                if (old == m_current) { return null; }
-            }
-            throw new IllegalStateException();
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    void invalidate() {
-        m_current = null;
         if (!m_prop.isCollection()) {
-            m_value = null;
+            PropertyEvent ev = getSession().getEventStream().getLastEvent
+                (getObject(), getProperty());
+            if (ev == null) { return m_value; }
+
+            return ev.getArgument();
+        } else {
+            return m_value;
         }
     }
 
     public boolean isModified() {
-        if (m_current == null) { return false; }
-        return m_events.size() > m_events.indexOf(m_current);
+        if (m_prop.isCollection()) {
+            return getSession().getEventStream().getCurrentEvents
+                (getObject(), getProperty()).size() != 0;
+        } else {
+            return getSession().getEventStream().getLastEvent
+                (getObject(), getProperty()) != null;
+        }
     }
 
     void addNotNullDependent(Event ev) {
@@ -145,10 +95,17 @@ class PropertyData {
         out.print(m_prop.getName());
         out.print(" = ");
         out.println(m_value);
-        out.println("    Property Events:");
-        for (Iterator it = m_events.iterator(); it.hasNext(); ) {
-            ((Event) it.next()).dump(out);
+        out.println("    Current Property Events:");
+        if (m_prop.isCollection()) {
+            for (Iterator it = getSession().getEventStream().
+                     getCurrentEvents(getObject(), getProperty()).iterator();
+                 it.hasNext(); ) {
+                ((Event) it.next()).dump(out);
+            }
+        } else {
+            Event ev = getSession().getEventStream().getLastEvent
+                (getObject(), getProperty());
+            if (ev != null) { ev.dump(out); }
         }
     }
-
 }

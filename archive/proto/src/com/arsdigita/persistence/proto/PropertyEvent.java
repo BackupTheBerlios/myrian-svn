@@ -8,12 +8,12 @@ import java.util.*;
  * PropertyEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/02/27 $
+ * @version $Revision: #12 $ $Date: 2003/03/07 $
  **/
 
 public abstract class PropertyEvent extends Event {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyEvent.java#11 $ by $Author: ashah $, $DateTime: 2003/02/27 21:02:33 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyEvent.java#12 $ by $Author: ashah $, $DateTime: 2003/03/07 13:27:00 $";
 
     final private Property m_prop;
     final private Object m_arg;
@@ -73,16 +73,18 @@ public abstract class PropertyEvent extends Event {
 
     void activate() {
         // WAW
-        PropertyEvent prev = getPropertyData().getCurrentEvent(this);
+        PropertyEvent prev = getSession().getEventStream().
+            getLastEvent(this);
         if (prev != null) { prev.addDependent(this); }
 
         // connect event to session data
-        getPropertyData().addEvent(this);
+        getSession().getEventStream().add(this);
 
         // object existence
         ObjectData od = getObjectData();
         if (od.isInfantile()) {
-            CreateEvent ce = (CreateEvent) od.getCurrentEvent();
+            CreateEvent ce = (CreateEvent)
+                getSession().getEventStream().getLastEvent(getObject());
             ce.addDependent(this);
         }
 
@@ -90,14 +92,15 @@ public abstract class PropertyEvent extends Event {
         ObjectData arg = getArgumentObjectData();
         if (arg != null) {
             if (arg.isInfantile()) {
-                CreateEvent ce = (CreateEvent) arg.getCurrentEvent();
+                CreateEvent ce = (CreateEvent) getSession().getEventStream()
+                    .getLastEvent(getArgument());
                 ce.addDependent(this);
             }
         }
     }
 
     void sync() {
-        m_pdata.removeEvent(this);
+        getSession().getEventStream().remove(this);
     }
 
     void dump(PrintWriter out) {
