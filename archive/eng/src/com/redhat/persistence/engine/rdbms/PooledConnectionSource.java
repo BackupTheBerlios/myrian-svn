@@ -30,36 +30,54 @@ import org.apache.log4j.Logger;
  * PooledConnectionSource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/07/28 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 public final class PooledConnectionSource implements ConnectionSource {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/PooledConnectionSource.java#1 $ by $Author: vadim $, $DateTime: 2004/07/28 11:26:48 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/PooledConnectionSource.java#2 $ by $Author: ashah $, $DateTime: 2004/08/05 17:16:07 $";
 
     private static final Logger s_log =
         Logger.getLogger(PooledConnectionSource.class);
 
     private String m_url;
     private int m_size;
-    private long m_interval;
+    private long m_interval = 0;
     private Set m_connections = new HashSet();
     private List m_available = new ArrayList();
     private List m_untested = new ArrayList();
+    private Thread m_poller = null;
 
     public PooledConnectionSource(String url, int size, long interval) {
         m_url = url;
         m_size = size;
-        m_interval = interval;
+
+        m_poller = new Poller();
+        m_poller.setDaemon(true);
+
+        setInterval(interval);
 
         Tester tester = new Tester();
         tester.setDaemon(true);
         tester.start();
+    }
 
-        if (m_interval > 0) {
-            Poller poller = new Poller();
-            poller.setDaemon(true);
-            poller.start();
+    public synchronized void setInterval(long interval) {
+        long old = m_interval;
+        m_interval = interval;
+
+        if (interval > 0 && old == 0) {
+            m_poller.start();
+        } else if (interval == 0 && old > 0) {
+            m_poller.stop();
         }
+    }
+
+    public synchronized void setSize(int size) {
+        m_size = size;
+    }
+
+    public synchronized int getSize() {
+        return m_size;
     }
 
     public synchronized Connection acquire() {
@@ -95,6 +113,13 @@ public final class PooledConnectionSource implements ConnectionSource {
 
         if (remove) {
             remove(conn);
+        } else if (m_connections.size() > m_size) {
+            remove(conn);
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                s_log.warn("error calling Connection.close", e);
+            }
         } else {
             m_available.add(conn);
         }

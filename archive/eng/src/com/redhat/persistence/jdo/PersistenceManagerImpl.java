@@ -30,25 +30,21 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
     private Session m_ssn;
     private Transaction m_txn = new TransactionImpl(this);
     private Object m_userObject = null;
+    private final PersistenceManagerFactoryImpl m_pmf;
     private final StatementProfiler m_prof;
     private final ClassInfo m_classInfo;
 
     private Map m_smiMap = new ReferenceIdentityMap
         (AbstractReferenceMap.WEAK, AbstractReferenceMap.WEAK);
 
-    public PersistenceManagerImpl(Session ssn,
-                                  StatementProfiler prof,
+    public PersistenceManagerImpl(PersistenceManagerFactoryImpl pmf,
+                                  Session ssn, StatementProfiler prof,
                                   ClassInfo classInfo) {
-
+        m_pmf = pmf;
         m_ssn = ssn;
         m_ssn.setAttribute(ATTR_NAME, this);
         m_prof = prof;
         m_classInfo = classInfo;
-    }
-
-    // XXX: revisit this kludge
-    Connection getConnection() {
-        return null;
     }
 
     StateManagerImpl getStateManager(Object pc) {
@@ -260,7 +256,7 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
      * PersistenceManager.
      */
     public PersistenceManagerFactory getPersistenceManagerFactory() {
-        throw new Error("not implemented");
+        return m_pmf;
     }
 
     /**

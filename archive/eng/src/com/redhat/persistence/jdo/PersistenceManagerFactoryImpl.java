@@ -72,11 +72,11 @@ public class PersistenceManagerFactoryImpl
     private String m_url = "";
     private String m_driver = "";
 
-    private int m_minPool = 1;
-    private int m_maxPool = 10;
+    private int m_minPool = 0;
+    private static final int s_defaultMaxPool = 10;
     private int m_mswait = 100;
 
-    private ConnectionSource m_connSrc;
+    private PooledConnectionSource m_connSrc;
 
     private transient Root m_root = new Root();
 
@@ -85,20 +85,14 @@ public class PersistenceManagerFactoryImpl
         return value != null && value.toLowerCase().equals("true");
     }
 
-    private PersistenceManagerFactoryImpl() { }
-
     public static PersistenceManagerFactory getPersistenceManagerFactory(
         Properties props) {
-
 
         synchronized(s_instances) {
             PersistenceManagerFactoryImpl result =
                 (PersistenceManagerFactoryImpl) s_instances.get(props);
             if (result == null) {
                 result = new PersistenceManagerFactoryImpl(props);
-                // XXX: the polling interval is currently hardcoded to 0
-                result.m_connSrc = new PooledConnectionSource
-                    (result.m_url, result.m_maxPool, 0);
                 s_instances.put(props, result);
 
             }
@@ -146,6 +140,9 @@ public class PersistenceManagerFactoryImpl
             }
         }
         JDOImplHelper.getInstance().addRegisterClassListener(m_registrar);
+
+        // XXX: the polling interval is currently hardcoded to 0
+        m_connSrc = new PooledConnectionSource(m_url, s_defaultMaxPool, 0);
     }
 
     public Root getMetadataRoot() {
@@ -190,11 +187,11 @@ public class PersistenceManagerFactoryImpl
         }
 
         Session ssn = new Session(m_root, engine, new QuerySource());
-        return new PersistenceManagerImpl(ssn, prof, m_registrar) {
-                public Connection getConnection() {
-                    return engine.getConnection();
-                }
-            };
+        return new PersistenceManagerImpl(this, ssn, prof, m_registrar);
+    }
+
+    ConnectionSource getConnectionSource() {
+        return m_connSrc;
     }
 
     public String getConnectionDriverName() {
@@ -310,15 +307,11 @@ public class PersistenceManagerFactoryImpl
     }
 
     public int getMaxPool() {
-        return m_maxPool;
+        return m_connSrc.getSize();
     }
 
     public void setMaxPool(int value) {
-        unmodifiable();
-    }
-
-    private void _setMaxPool(int value) {
-        m_maxPool = value;
+        m_connSrc.setSize(value);
     }
 
     public int getMsWait() {

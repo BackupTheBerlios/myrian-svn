@@ -1,5 +1,7 @@
 package com.redhat.persistence.jdo;
 
+import com.redhat.persistence.engine.rdbms.ConnectionSource;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -12,7 +14,7 @@ import org.apache.log4j.Logger;
  * Tests lifecycle of JDO instances across transactions.
  *
  * @since 2004-08-04
- * @version $Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdo/BiTxnTest.java#1 $
+ * @version $Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdo/BiTxnTest.java#2 $
  **/
 public class BiTxnTest extends AbstractCase {
     private final static Logger s_log = Logger.getLogger(BiTxnTest.class);
@@ -42,20 +44,26 @@ public class BiTxnTest extends AbstractCase {
 
     protected void tearDown() throws Exception {
         m_pm.currentTransaction().rollback();
-        m_pm.currentTransaction().begin();
 
         PersistenceManagerImpl pm = (PersistenceManagerImpl) m_pm;
-        Connection conn = pm.getConnection();
-        Statement stmt = conn.createStatement();
-
+        ConnectionSource cs =
+            ((PersistenceManagerFactoryImpl) pm.getPersistenceManagerFactory())
+            .getConnectionSource();
+        Connection conn = cs.acquire();
+        Statement stmt = null;
         try {
+            stmt = conn.createStatement();
             for (int ii=0; ii<TABLES.length; ii++) {
                 stmt.execute("delete from " + TABLES[ii]);
             }
+            conn.commit();
         } finally {
-            stmt.close();
+            try {
+                if (stmt != null) { stmt.close(); }
+            } finally {
+                cs.release(conn);
+            }
         }
-        m_pm.currentTransaction().commit();
     }
 
     private void checkpoint() {
