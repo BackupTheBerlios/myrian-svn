@@ -29,14 +29,14 @@ import org.w3c.dom.Attr;
  * <code>org.jdom.Element</code> using <code>org.w3c.dom.Element</code>.
  *
  * @author Patrick McNeill 
- * @version $Revision: #12 $ $Date: 2003/10/23 $
+ * @version $Revision: #13 $ $Date: 2004/01/22 $
  * @since ACS 4.5a
  */
 public class Element {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#12 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/23 15:28:18 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#13 $" +
+        "$Author: dan $" +
+        "$DateTime: 2004/01/22 07:19:26 $";
 
     private static final Logger s_log = Logger.getLogger
         (Element.class.getName());
@@ -173,8 +173,29 @@ public class Element {
         copyTo.m_element = m_doc.createElementNS
             (copyFrom.m_element.getNamespaceURI(), copyFrom.getName());
         this.m_element.appendChild(copyTo.m_element);
+	newChildElementHelper(copyFrom, copyTo);
+        return copyTo;
+    }
 
+    /**
+     * Copies the passed in element and all of its children to a new
+     * Element using the passed-in name
+     */
+    public Element newChildElement(String name, Element copyFrom) {
+        if (m_doc == null) {
+            m_doc = this.m_element.getOwnerDocument();
+        }
+
+        Element copyTo = new Element();
+        copyTo.m_element = m_doc.createElement(name);
+        this.m_element.appendChild(copyTo.m_element);
+	newChildElementHelper(copyFrom, copyTo);
+        return copyTo;
+    }
+
+    private void newChildElementHelper(Element copyFrom, Element copyTo) {
         copyTo.setText(copyFrom.getText());
+
 
         NamedNodeMap nnm = copyFrom.m_element.getAttributes();
 
@@ -192,9 +213,7 @@ public class Element {
             copyTo.newChildElement(child);
         }
 
-        return copyTo;
     }
-
     /**
      * Adds an attribute to the element.
      *
