@@ -26,12 +26,12 @@ import org.apache.log4j.Logger;
  * Node
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/01/28 $
+ * @version $Revision: #2 $ $Date: 2003/01/30 $
  **/
 
 abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Node.java#1 $ by $Author: rhs $, $DateTime: 2003/01/28 19:17:39 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Node.java#2 $ by $Author: rhs $, $DateTime: 2003/01/30 17:57:25 $";
 
     private static final Logger s_log = Logger.getLogger(Node.class);
 
@@ -177,6 +177,9 @@ abstract class Node {
 
         final Property prop = getObjectType().getProperty(first);
         Mapping mapping = m_map.getMapping(Path.get(first));
+        if (mapping == null) {
+            return;
+        }
 
         if (prop == null) {
             throw new IllegalArgumentException("No such property: " + first);
@@ -237,7 +240,7 @@ abstract class Node {
 
     void buildQuery() {
         Set elements = new HashSet();
-        elements.addAll(m_map.getJoins());
+        elements.addAll(m_map.getAllJoins());
 
         for (Iterator it = elements.iterator(); it.hasNext(); ) {
             Join je = (Join) it.next();

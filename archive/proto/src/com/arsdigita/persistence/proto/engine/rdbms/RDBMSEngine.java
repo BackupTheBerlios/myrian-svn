@@ -9,16 +9,20 @@ import com.arsdigita.persistence.proto.metadata.Column;
 
 import java.util.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/01/28 $
+ * @version $Revision: #3 $ $Date: 2003/01/30 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#2 $ by $Author: rhs $, $DateTime: 2003/01/28 19:17:39 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#3 $ by $Author: rhs $, $DateTime: 2003/01/30 17:57:25 $";
+
+    private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
     private static final Set getTables(ObjectMap om) {
         final HashSet result = new HashSet();
@@ -170,7 +174,22 @@ public class RDBMSEngine extends Engine {
     protected void commit() {}
 
     protected void rollback() {}
-    protected RecordSet execute(Query query) { return null; }
+
+    public RecordSet execute(Query query) {
+        Signature sig = query.getSignature();
+        com.arsdigita.persistence.proto.engine.rdbms.Query q =
+            new com.arsdigita.persistence.proto.engine.rdbms.Query
+                (Root.getRoot().getObjectMap(sig.getObjectType()));
+        for (Iterator it = sig.getPaths().iterator(); it.hasNext(); ) {
+            Path p = (Path) it.next();
+            q.fetch(p.getPath());
+        }
+        if (LOG.isDebugEnabled() &&
+            q.getChildren().size() + q.getSelections().size() > 0) {
+            LOG.debug(q.toSQL());
+        }
+        return null;
+    }
     public EventHandler getEventHandler() { return m_handler; }
     protected void flush() {}
 

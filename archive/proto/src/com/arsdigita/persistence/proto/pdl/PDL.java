@@ -14,12 +14,12 @@ import java.util.*;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/01/17 $
+ * @version $Revision: #9 $ $Date: 2003/01/30 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#8 $ by $Author: rhs $, $DateTime: 2003/01/17 11:07:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#9 $ by $Author: rhs $, $DateTime: 2003/01/30 17:57:25 $";
 
     private AST m_ast = new AST();
     private ErrorReport m_errors = new ErrorReport();
@@ -82,7 +82,8 @@ public class PDL {
                                  m_symbols.getEmitted
                                  (m_symbols.lookup(prop.getType())),
                                  prop.isComponent(),
-                                 prop.isCollection());
+                                 prop.isCollection(),
+                                 prop.isNullable());
                     type.addProperty(result);
                     m_properties.put(prop, result);
                     return result;
@@ -198,6 +199,62 @@ public class PDL {
                     }
                 }
             });
+
+        for (Iterator it = m_symbols.getObjectTypes().iterator();
+             it.hasNext(); ) {
+            ObjectTypeNd otn = (ObjectTypeNd) it.next();
+            ReferenceKeyNd rkn = otn.getReferenceKey();
+            if (rkn != null) {
+                Column from = lookup(root, rkn.getCol());
+                Column to;
+
+                ObjectType ot = m_symbols.getEmitted(otn);
+                ObjectType sup = ot.getSupertype();
+                ObjectMap om = root.getObjectMap(ot);
+                ObjectMap supm = root.getObjectMap(sup);
+                if (supm.getSuperJoin() == null) {
+                    Property prop =
+                        (Property) supm.getKeyProperties().iterator().next();
+                    Mapping m = supm.getMapping(Path.get(prop.getName()));
+                    if (m.isValue()) {
+                        to = ((ValueMapping) m).getColumn();
+                    } else {
+                        to = ((Join) ((ReferenceMapping) m)
+                              .getJoins().iterator().next()).getFrom();
+                    }
+                } else {
+                    to = supm.getSuperJoin().getFrom();
+                }
+
+                om.setSuperJoin(new Join(from, to));
+            }
+        }
+
+        m_ast.traverse(new Node.Switch() {
+                public void onJoin(JoinNd nd) {
+                    ObjectMap om = root.getObjectMap
+                        (m_symbols.getEmitted
+                         ((ObjectTypeNd) nd.getParent().getParent()));
+                    om.addJoin(new Join(lookup(root, nd.getFrom()),
+                                        lookup(root, nd.getTo())));
+                }
+            }, new Node.IncludeFilter(new Node.Field[] {
+                AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.JOIN_PATHS,
+                JoinPathNd.JOINS
+            }));
+
+        m_ast.traverse(new Node.Switch() {
+                public void onIdentifier(IdentifierNd nd) {
+                    ObjectMap om = root.getObjectMap
+                        (m_symbols.getEmitted
+                         ((ObjectTypeNd) nd.getParent().getParent()
+                          .getParent()));
+                    om.addFetchedPath(Path.get(nd.getName()));
+                }
+            }, new Node.IncludeFilter(new Node.Field[] {
+                AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.AGGRESSIVE_LOAD,
+                AggressiveLoadNd.PATHS, PathNd.PATH
+            }));
     }
 
     private void emitMapping(Root root, Property prop, ColumnNd colNd) {

@@ -8,16 +8,19 @@ import java.util.*;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/01/28 $
+ * @version $Revision: #7 $ $Date: 2003/01/30 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#6 $ by $Author: rhs $, $DateTime: 2003/01/28 19:17:39 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#7 $ by $Author: rhs $, $DateTime: 2003/01/30 17:57:25 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
     private ArrayList m_key = new ArrayList();
+    private Join m_superJoin;
+    private ArrayList m_joins = new ArrayList();
+    private ArrayList m_fetched = new ArrayList();
 
     public ObjectMap(ObjectType type) {
         m_type = type;
@@ -101,19 +104,75 @@ public class ObjectMap extends Element {
             }
         }
 
-        throw new Error("need to add aggressive loads in here");
+        result.addAll(m_fetched);
+
+        return result;
+    }
+
+    public void addFetchedPath(Path p) {
+        if (!m_fetched.contains(p)) {
+            m_fetched.add(p);
+        }
+    }
+
+    public void setSuperJoin(Join join) {
+        m_superJoin = join;
     }
 
     public Join getSuperJoin() {
-        throw new Error("not implemented");
+        return m_superJoin;
+    }
+
+    public Collection getAllJoins() {
+        ArrayList result = new ArrayList();
+
+        if (getSuperMap() != null) {
+            result.addAll(getSuperMap().getAllJoins());
+        }
+
+        if (getSuperJoin() != null) {
+            result.add(getSuperJoin());
+        }
+        result.addAll(getJoins());
+
+        return result;
     }
 
     public Collection getJoins() {
-        throw new Error("not implemented");
+        return m_joins;
+    }
+
+    public void addJoin(Join join) {
+        m_joins.add(join);
+    }
+
+    private Collection getDeclaredJoins() {
+        ArrayList joins = new ArrayList();
+        if (m_superJoin != null) {
+            joins.add(m_superJoin);
+        }
+        joins.addAll(m_joins);
+        return joins;
     }
 
     public int getRank(Table table) {
-        throw new Error("not implemented");
+        int result = 0;
+
+        ObjectMap om = this;
+        outer: while (om != null) {
+            for (Iterator it = om.getDeclaredJoins().iterator();
+                 it.hasNext(); ) {
+                Join j = (Join) it.next();
+                if (j.getFrom().getTable().equals(table)) {
+                    break outer;
+                }
+            }
+
+            result++;
+            om = om.getSuperMap();
+        }
+
+        return result;
     }
 
     Object getKey() {

@@ -28,12 +28,12 @@ import java.util.Stack;
  * This Actor validates a Query object.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/01/28 $
+ * @version $Revision: #2 $ $Date: 2003/01/30 $
  **/
 
 class Validator extends Actor {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Validator.java#1 $ by $Author: rhs $, $DateTime: 2003/01/28 19:17:39 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Validator.java#2 $ by $Author: rhs $, $DateTime: 2003/01/30 17:57:25 $";
 
     private int m_nonOuter = 0;
     private Set m_connected = new HashSet();
@@ -48,6 +48,7 @@ class Validator extends Actor {
 
         if (m_tables.size() == 0) {
             query.error("There must be at least one table in the query.");
+            return;
         }
 
         Stack stack = new Stack();

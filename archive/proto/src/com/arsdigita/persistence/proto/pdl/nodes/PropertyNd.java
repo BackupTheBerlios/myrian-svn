@@ -4,12 +4,12 @@ package com.arsdigita.persistence.proto.pdl.nodes;
  * Property
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/01/15 $
+ * @version $Revision: #3 $ $Date: 2003/01/30 $
  **/
 
 public class PropertyNd extends StatementNd {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/PropertyNd.java#2 $ by $Author: rhs $, $DateTime: 2003/01/15 17:57:03 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/PropertyNd.java#3 $ by $Author: rhs $, $DateTime: 2003/01/30 17:57:25 $";
 
     public static final Field TYPE =
         new Field(PropertyNd.class, "type", TypeNd.class, 1, 1);
@@ -22,6 +22,7 @@ public class PropertyNd extends StatementNd {
     private boolean m_isComponent = false;
     private boolean m_isComposite = false;
     private boolean m_isCollection = false;
+    private boolean m_isNullable = true;
 
     public void setUnique(boolean b) {
         m_isUnique = b;
@@ -39,6 +40,10 @@ public class PropertyNd extends StatementNd {
         m_isCollection = b;
     }
 
+    public void setNullable(boolean b) {
+        m_isNullable = b;
+    }
+
     public boolean isComponent() {
         return m_isComponent;
     }
@@ -49,6 +54,10 @@ public class PropertyNd extends StatementNd {
 
     public boolean isCollection() {
         return m_isCollection;
+    }
+
+    public boolean isNullable() {
+        return m_isNullable;
     }
 
     public void dispatch(Switch sw) {

@@ -23,12 +23,12 @@ import java.util.*;
  * PropertyNode
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/01/28 $
+ * @version $Revision: #2 $ $Date: 2003/01/30 $
  **/
 
 class PropertyNode extends Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/PropertyNode.java#1 $ by $Author: rhs $, $DateTime: 2003/01/28 19:17:39 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/PropertyNode.java#2 $ by $Author: rhs $, $DateTime: 2003/01/30 17:57:25 $";
 
     private Property m_property;
 
@@ -78,7 +78,7 @@ class PropertyNode extends Node {
     }
 
     void buildQuery() {
-        ObjectMap map = getObjectMap();
+        ObjectMap map = getParent().getObjectMap();
         ReferenceMapping rm = (ReferenceMapping) map.getMapping
             (Path.get(m_property.getName()));
         List path = new ArrayList();

@@ -4,24 +4,26 @@ package com.arsdigita.persistence.proto.metadata;
  * Role
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/01/28 $
+ * @version $Revision: #4 $ $Date: 2003/01/30 $
  **/
 
 public class Role extends Property {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Role.java#3 $ by $Author: rhs $, $DateTime: 2003/01/28 19:17:39 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Role.java#4 $ by $Author: rhs $, $DateTime: 2003/01/30 17:57:25 $";
 
     private ObjectType m_type;
     private Role m_reverse;
     private boolean m_isComponent;
     private boolean m_isCollection;
+    private boolean m_isNullable;
 
     public Role(String name, ObjectType type, boolean isComponent,
-                boolean isCollection) {
+                boolean isCollection, boolean isNullable) {
         super(name);
         m_type = type;
         m_isComponent = isComponent;
         m_isCollection = isCollection;
+        m_isNullable = isNullable;
     }
 
     public ObjectType getType() {
@@ -33,7 +35,7 @@ public class Role extends Property {
     }
 
     public boolean isNullable() {
-        throw new Error("not implemented");
+        return m_isNullable;
     }
 
     public boolean isCollection() {
