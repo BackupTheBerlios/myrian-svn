@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #8 $ $Date: 2003/05/06 $
+ * @version $Revision: #9 $ $Date: 2003/05/06 $
  */
 public class VersioningMetadata {
     private final static Logger LOG =
@@ -62,7 +62,7 @@ public class VersioningMetadata {
      * types are added, e.g. as a result of creating a user-defined content-type
      * at runtime. </p>
      **/
-    private final List m_changeListeners;
+    private ChangeListener m_changeListener;
 
     private final static VersioningMetadata SINGLETON =
         new VersioningMetadata();
@@ -70,7 +70,6 @@ public class VersioningMetadata {
     private VersioningMetadata() {
         m_versionedTypes = new HashSet();
         m_unversionedProps = new HashSet();
-        m_changeListeners = new ArrayList();
 
         m_switch = new Node.Switch() {
                 public void onObjectType(ObjectTypeNd ot) {
@@ -80,10 +79,8 @@ public class VersioningMetadata {
                         m_versionedTypes.add(fqn);
                     }
                     LOG.info("onObjectType: " + fqn);
-                    Iterator ii = m_changeListeners.iterator();
-                    while ( ii.hasNext() ) {
-                        ((ChangeListener) ii.next()).onObjectType
-                            (fqn, ot.isVersioned());
+                    if ( m_changeListener != null ) {
+                        m_changeListener.onObjectType(fqn, ot.isVersioned());
                     }
                 }
 
@@ -99,10 +96,8 @@ public class VersioningMetadata {
                     m_unversionedProps.add(fqn);
                     if ( prop.isUnversioned() ) {
                         LOG.info("onProperty: " + fqn + " is unversioned");
-                        // notify change listeners
-                        Iterator ii = m_changeListeners.iterator();
-                        while ( ii.hasNext() ) {
-                            ((ChangeListener) ii.next()).onUnversionedProperty(fqn);
+                        if ( m_changeListener != null ) {
+                            m_changeListener.onUnversionedProperty(fqn);
                         }
                     }
                 }
@@ -150,9 +145,13 @@ public class VersioningMetadata {
      * Adds a listener via which you can receive a callback whenever the
      * versioning metadata changes.
      **/
-    public void addChangeListener(ChangeListener listener) {
-        Assert.assertNotNull(listener, "listener");
-        m_changeListeners.add(listener);
+    public void registerChangeListener(ChangeListener listener) {
+        if ( m_changeListener != null ) {
+            throw new IllegalStateException
+                ("Already registered " + m_changeListener);
+        }
+        Assert.exists(listener, ChangeListener.class);
+        m_changeListener = listener;
     }
 
     /**
