@@ -31,12 +31,12 @@ import java.util.List;
  * Script
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/09/17 $
+ * @version $Revision: #7 $ $Date: 2003/09/17 $
  */
 
 public class Script {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/initializer/Script.java#6 $ by $Author: justin $, $DateTime: 2003/09/17 11:49:03 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/initializer/Script.java#7 $ by $Author: justin $, $DateTime: 2003/09/17 12:24:31 $";
 
     private static final Logger s_log =
         Logger.getLogger(Script.class);
@@ -180,43 +180,28 @@ public class Script {
      **/
 
     public Collection startup(String iniName) throws InitializationException {
-        if (m_isStarted) {
-            throw new InitializationException(
-                "Startup has already been called."
-            );
-        }
-
         HashSet initializersRun = new HashSet();
-        boolean loggerIsInitialized = false;
         Initializer ini = null;
-        try {
-            for (int i = 0; i < m_initializers.size(); i++) {
-                ini = (Initializer) m_initializers.get(i);
-                if (loggerIsInitialized) {
-                    s_log.info("Running initializer " + ini.getClass().getName() +
-                               " (" + i + " of " + m_initializers.size() + 
-                               " complete)");
-                }
 
-                final String name = ini.getClass().getName();
-//                 if (com.arsdigita.logging.Initializer.class.getName().equals(name)) {
-//                     loggerIsInitialized = true;
-//                 }
+        for (int i = 0; i < m_initializers.size(); i++) {
+            ini = (Initializer) m_initializers.get(i);
 
-                ini.startup();
-                initializersRun.add(name);
-                if (name.equals(iniName)) {
-                    break;
-                }
+            if (s_log.isInfoEnabled()) {
+                s_log.info("Running initializer " +
+                           ini.getClass().getName() +
+                           " (" + i + " of " + m_initializers.size() +
+                           " complete)");
             }
 
-        } catch(Throwable t) {
-            logInitializationFailure(ini, loggerIsInitialized, t);
-            throw new InitializationException(
-                "Initialization Script startup error!", t
-            );
+            final String name = ini.getClass().getName();
+
+            ini.startup();
+            initializersRun.add(name);
+            if (name.equals(iniName)) {
+                break;
+            }
         }
-        m_isStarted = true;
+
         s_log.info("Initialization Complete");
         return initializersRun;
     }
