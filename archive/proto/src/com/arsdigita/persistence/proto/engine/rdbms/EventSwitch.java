@@ -12,12 +12,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #24 $ $Date: 2003/05/07 $
+ * @version $Revision: #25 $ $Date: 2003/05/08 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#24 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#25 $ by $Author: rhs $, $DateTime: 2003/05/08 15:05:52 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -252,72 +252,72 @@ class EventSwitch extends Event.Switch {
         final Role role = (Role) e.getProperty();
 
         m.dispatch(new Mapping.Switch() {
-                public void onStatic(Static m) {
-                    // do nothing;
+            public void onStatic(Static m) {
+                // do nothing;
+            }
+
+            public void onValue(Value m) {
+                Column col = m.getColumn();
+                set(obj, col, arg);
+            }
+
+            public void onJoinTo(JoinTo m) {
+                set(obj, m.getKey(), arg);
+            }
+
+            public void onJoinFrom(JoinFrom m) {
+                set(arg, m.getKey(), obj);
+            }
+
+            public void onJoinThrough(JoinThrough m) {
+                Table table = m.getFrom().getTable();
+
+                DML op = m_engine.getOperation(obj, arg, table);
+                // This should eliminate duplicates, but we could be
+                // smarter by canceling out inserts and updates which
+                // we don't do right now.
+                if (op != null) { return; }
+
+                boolean one2n = role.isReversable() &&
+                    !role.getReverse().isCollection();
+                if (one2n && e instanceof RemoveEvent) {
+                    op = m_engine.getOperation(arg, null, table);
+                } else {
+                    op = m_engine.getOperation(arg, obj, table);
                 }
+                if (op != null) { return; }
 
-                public void onValue(Value m) {
-                    Column col = m.getColumn();
-                    set(obj, col, arg);
-                }
-
-                public void onJoinTo(JoinTo m) {
-                    set(obj, m.getKey(), arg);
-                }
-
-                public void onJoinFrom(JoinFrom m) {
-                    set(arg, m.getKey(), obj);
-                }
-
-                public void onJoinThrough(JoinThrough m) {
-                    Table table = m.getFrom().getTable();
-
-                    DML op = m_engine.getOperation(obj, arg, table);
-                    // This should eliminate duplicates, but we could be
-                    // smarter by canceling out inserts and updates which
-                    // we don't do right now.
-                    if (op != null) { return; }
-
-                    boolean one2n = role.isReversable() &&
-                        !role.getReverse().isCollection();
-                    if (one2n && e instanceof RemoveEvent) {
-                        op = m_engine.getOperation(arg, null, table);
+                if (e instanceof AddEvent ||
+                    e instanceof SetEvent &&
+                    arg != null) {
+                    op = new Insert(table);
+                    set(op, m.getFrom(), obj);
+                    set(op, m.getTo(), arg);
+                    m_engine.addOperation(obj, arg, op);
+                } else if (e instanceof RemoveEvent ||
+                           e instanceof SetEvent &&
+                           arg == null) {
+                    Delete del = new Delete(table, null);
+                    if (e instanceof SetEvent) {
+                        filter(del, m.getFrom(), KEY_FROM, obj);
+                    } else if (one2n) {
+                        filter(del, m.getTo(), KEY_TO, arg);
                     } else {
-                        op = m_engine.getOperation(arg, obj, table);
+                        filter(del, m.getFrom(), KEY_FROM, obj);
+                        filter(del, m.getTo(), KEY_TO, arg);
                     }
-                    if (op != null) { return; }
 
-                    if (e instanceof AddEvent ||
-                        e instanceof SetEvent &&
-                        arg != null) {
-                        op = new Insert(table);
-                        set(op, m.getFrom(), obj);
-                        set(op, m.getTo(), arg);
-                        m_engine.addOperation(obj, arg, op);
-                    } else if (e instanceof RemoveEvent ||
-                               e instanceof SetEvent &&
-                               arg == null) {
-                        Delete del = new Delete(table, null);
-                        if (e instanceof SetEvent) {
-                            filter(del, m.getFrom(), KEY_FROM, obj);
-                        } else if (one2n) {
-                            filter(del, m.getTo(), KEY_TO, arg);
-                        } else {
-                            filter(del, m.getFrom(), KEY_FROM, obj);
-                            filter(del, m.getTo(), KEY_TO, arg);
-                        }
-
-                        if (one2n) {
-                            m_engine.addOperation(arg, null, del);
-                        } else {
-                            m_engine.addOperation(obj, arg, del);
-                        }
+                    if (one2n) {
+                        m_engine.addOperation(arg, null, del);
                     } else {
-                        throw new IllegalArgumentException
-                            ("not a set, add, or remove");
+                        m_engine.addOperation(obj, arg, del);
                     }
+                } else {
+                    throw new IllegalArgumentException
+                        ("not a set, add, or remove");
                 }
-            });
+            }
+        });
     }
 
     public void onSet(final SetEvent e) {
@@ -334,7 +334,45 @@ class EventSwitch extends Event.Switch {
 
         Environment env = m_engine.getEnvironment(obj);
         set(env, prop.getType(), e.getArgument(), path);
+
+        scheduleMutation(e);
     }
+
+    private void scheduleMutation(SetEvent e) {
+        Property prop = e.getProperty();
+        ObjectType type = prop.getType();
+        if (type.isKeyed()) { return; }
+        ObjectMap om = Root.getRoot().getObjectMap(prop.getContainer());
+        Mapping m = om.getMapping(Path.get(prop.getName()));
+        Adapter ad = Adapter.getAdapter(type);
+        final int jdbcType[] = { ad.defaultJDBCType() };
+
+        m.dispatch(new Mapping.Switch() {
+            public void onValue(Value v) {
+                jdbcType[0] = v.getColumn().getType();
+            }
+            public void onStatic(Static st) {
+                // Do nothing right now. This changes semantics from
+                // before since types specified in static operations
+                // will be ignored. I don't yet know if this is
+                // necessary to fix.
+            }
+            public void onJoinTo(JoinTo j) {
+                throw new IllegalStateException("bad mapping");
+            }
+            public void onJoinFrom(JoinFrom j) {
+                throw new IllegalStateException("bad mapping");
+            }
+            public void onJoinThrough(JoinThrough j) {
+                throw new IllegalStateException("bad mapping");
+            }
+        });
+
+        if (ad.isMutation(e.getArgument(), jdbcType[0])) {
+            m_engine.scheduleMutation(e, jdbcType[0]);
+        }
+    }
+
 
     public void onAdd(AddEvent e) {
         onPropertyEvent(e);

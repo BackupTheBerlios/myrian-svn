@@ -4,22 +4,41 @@ import com.arsdigita.persistence.proto.*;
 import com.arsdigita.persistence.proto.common.*;
 
 import java.util.*;
+import java.sql.*;
 
 /**
  * OracleWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/07 $
+ * @version $Revision: #2 $ $Date: 2003/05/08 $
  **/
 
 public class OracleWriter extends ANSIWriter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/OracleWriter.java#1 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/OracleWriter.java#2 $ by $Author: rhs $, $DateTime: 2003/05/08 15:05:52 $";
 
     private static final Expression and(Expression left, Expression right) {
         if (left == null) { return right; }
         if (right == null) { return left; }
         return Condition.and(left, right);
+    }
+
+    void writeBind(Object o, int jdbcType) {
+        if (o == null) {
+            super.writeBind(o, jdbcType);
+        } else {
+            switch (jdbcType) {
+            case Types.BLOB:
+                write("empty_blob()");
+                break;
+            case Types.CLOB:
+                write("empty_clob()");
+                break;
+            default:
+                super.writeBind(o, jdbcType);
+                break;
+            }
+        }
     }
 
     void writeCompound(CompoundJoin join) {
@@ -98,8 +117,7 @@ public class OracleWriter extends ANSIWriter {
         }
 
         if (select.getOffset() != null) {
-            Integer lower = new Integer(select.getOffset().intValue() + 1);
-            write("rownum__ > " + lower);
+            write("rownum__ > " + select.getOffset());
             if (select.getLimit() != null) {
                 write("\nand ");
             }
@@ -110,12 +128,12 @@ public class OracleWriter extends ANSIWriter {
 
             if (select.getOffset() != null) {
                 upper = new Integer(select.getOffset().intValue() +
-                                    select.getLimit().intValue() + 1);
+                                    select.getLimit().intValue());
             } else {
                 upper = select.getLimit();
             }
 
-            write("rownum__ < " + upper);
+            write("rownum__ <= " + upper);
         }
     }
 

@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #34 $ $Date: 2003/05/07 $
+ * @version $Revision: #35 $ $Date: 2003/05/08 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#34 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#35 $ by $Author: rhs $, $DateTime: 2003/05/08 15:05:52 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -31,6 +31,8 @@ public class RDBMSEngine extends Engine {
     private HashMap m_operationMap = new HashMap();
     private EventSwitch m_generator = new EventSwitch(this);
     private HashMap m_environments = new HashMap();
+    private ArrayList m_mutations = new ArrayList();
+    private ArrayList m_mutationTypes = new ArrayList();
 
     private ConnectionSource m_source;
     private Connection m_conn = null;
@@ -155,9 +157,16 @@ public class RDBMSEngine extends Engine {
         return result;
     }
 
+    void scheduleMutation(SetEvent e, int type) {
+        m_mutations.add(e);
+        m_mutationTypes.add(new Integer(type));
+    }
+
     void clear() {
         clearEvents();
         clearOperations();
+        m_mutations.clear();
+        m_mutationTypes.clear();
     }
 
     void clearEvents() {
@@ -191,7 +200,7 @@ public class RDBMSEngine extends Engine {
             throw new Error(e.getMessage());
         } finally {
             releaseAll();
-            clearOperations();
+            clear();
         }
     }
 
@@ -366,6 +375,8 @@ public class RDBMSEngine extends Engine {
         }
     }
 
+    private RDBMSQuerySource QS = new RDBMSQuerySource();
+
     public void flush() {
         try {
             generate();
@@ -380,6 +391,30 @@ public class RDBMSEngine extends Engine {
                     } catch (SQLException e) {
                         throw new Error(e.getMessage());
                     }
+                }
+            }
+
+            for (int i = 0; i < m_mutations.size(); i++) {
+                SetEvent e = (SetEvent) m_mutations.get(i);
+                int jdbcType = ((Integer) m_mutationTypes.get(i)).intValue();
+                Property prop = e.getProperty();
+                RDBMSRecordSet rs = (RDBMSRecordSet) execute
+                    (QS.getQuery(e.getObject(), prop));
+                Adapter ad = Adapter.getAdapter(prop.getType());
+                try {
+                    if (rs.next()) {
+                        ad.mutate(rs.getResultSet(),
+                                  rs.getColumn(Path.get(prop.getName())),
+                                  e.getArgument(),
+                                  jdbcType);
+                    } else {
+                        throw new IllegalStateException
+                            ("cannot update blob");
+                    }
+                } catch (SQLException se) {
+                    throw new Error(se.getMessage());
+                } finally {
+                    rs.close();
                 }
             }
         } finally {

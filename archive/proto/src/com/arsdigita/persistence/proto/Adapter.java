@@ -10,12 +10,12 @@ import java.sql.*;
  * Adapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2003/05/07 $
+ * @version $Revision: #11 $ $Date: 2003/05/08 $
  **/
 
 public abstract class Adapter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Adapter.java#10 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Adapter.java#11 $ by $Author: rhs $, $DateTime: 2003/05/08 15:05:52 $";
 
     private static final Map ADAPTERS = new HashMap();
 
@@ -81,6 +81,15 @@ public abstract class Adapter {
     }
 
     public int defaultJDBCType() {
+        throw new UnsupportedOperationException("not a bindable type");
+    }
+
+    public boolean isMutation(Object value, int jdbcType) {
+        throw new UnsupportedOperationException("not a bindable type");
+    }
+
+    public void mutate(ResultSet rs, String column, Object obj, int type)
+        throws SQLException {
         throw new UnsupportedOperationException("not a bindable type");
     }
 

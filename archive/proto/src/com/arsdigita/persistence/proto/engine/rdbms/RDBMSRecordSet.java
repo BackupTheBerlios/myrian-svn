@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
  * RDBMSRecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/04/04 $
+ * @version $Revision: #7 $ $Date: 2003/05/08 $
  **/
 
 class RDBMSRecordSet extends RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSRecordSet.java#6 $ by $Author: rhs $, $DateTime: 2003/04/04 15:25:34 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSRecordSet.java#7 $ by $Author: rhs $, $DateTime: 2003/05/08 15:05:52 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -36,6 +36,14 @@ class RDBMSRecordSet extends RecordSet {
         m_mappings = mappings;
     }
 
+    ResultSet getResultSet() {
+        return m_rs;
+    }
+
+    String getColumn(Path p) {
+        return (String) m_mappings.get(p);
+    }
+
     public boolean next() {
 	if (m_rs == null) {
 	    throw new IllegalStateException("result set closed");
@@ -51,7 +59,7 @@ class RDBMSRecordSet extends RecordSet {
         try {
             Adapter ad = Adapter.getAdapter
                 (getSignature().getProperty(p).getType());
-            return ad.fetch(m_rs, (String) m_mappings.get(p));
+            return ad.fetch(m_rs, getColumn(p));
         } catch (SQLException e) {
             throw new Error
                 ("error fetching path (" + p + "): " + e.getMessage());

@@ -13,12 +13,12 @@ import java.io.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2003/05/07 $
+ * @version $Revision: #15 $ $Date: 2003/05/08 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#14 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#15 $ by $Author: rhs $, $DateTime: 2003/05/08 15:05:52 $";
 
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();
@@ -97,19 +97,25 @@ public abstract class SQLWriter {
                 Collection c = (Collection) value;
                 m_sql.append("(");
                 for (Iterator it = c.iterator(); it.hasNext(); ) {
-                    m_bindings.add(it.next());
-                    m_sql.append(it.hasNext() ? "?, " : "?");
-                    m_types.add(new Integer(m_op.getType(path)));
+                    Object o = it.next();
+                    writeBind(o, m_op.getType(path));
+                    if (it.hasNext()) {
+                        m_sql.append(", ");
+                    }
                 }
                 m_sql.append(")");
             } else {
-                m_sql.append("?");
-                m_bindings.add(value);
-                m_types.add(new Integer(m_op.getType(path)));
+                writeBind(value, m_op.getType(path));
             }
         } else {
             m_sql.append(path);
         }
+    }
+
+    void writeBind(Object value, int jdbcType) {
+        m_sql.append("?");
+        m_bindings.add(value);
+        m_types.add(new Integer(jdbcType));
     }
 
     public void write(Operation op) {
@@ -257,9 +263,7 @@ public abstract class SQLWriter {
     }
 
     public void write(Expression.Value v) {
-        m_sql.append("?");
-        m_bindings.add(v.getValue());
-        m_types.add(new Integer(RDBMSEngine.getType(v.getValue())));
+        writeBind(v.getValue(), RDBMSEngine.getType(v.getValue()));
     }
 
     public void write(Expression.Passthrough e) {
