@@ -32,12 +32,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #19 $ $Date: 2003/12/02 $
+ * @version $Revision: #20 $ $Date: 2004/01/15 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#19 $ by $Author: ashah $, $DateTime: 2003/12/02 15:20:41 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#20 $ by $Author: dennis $, $DateTime: 2004/01/15 17:23:34 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -141,9 +141,12 @@ class DataObjectImpl implements DataObject {
         }
 
         // this checks that nondisconnected objects are not being used
-        // across threads
+        // across threads.  It also checks to see if
+        // SessionManager.getSession(), which may happen during initialization
+        // bootstrapping.
         if (!isDisconnected()
             && m_ssn != null
+            && SessionManager.getSession() != null
             && m_ssn != SessionManager.getSession().getProtoSession()) {
             throw new PersistenceException
                 ("This data object: (" + this + ") is being accessed from "
