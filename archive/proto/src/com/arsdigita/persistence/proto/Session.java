@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #13 $ $Date: 2003/01/10 $
+ * @version $Revision: #14 $ $Date: 2003/01/13 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#13 $ by $Author: ashah $, $DateTime: 2003/01/10 19:25:47 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#14 $ by $Author: rhs $, $DateTime: 2003/01/13 16:40:35 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -647,7 +647,7 @@ public class Session {
         Parameter start = new Parameter(type, Path.getInstance("__start__"));
         sig.addParameter(start);
         Query q = new Query
-            (sig, m_engine.getEquals(Path.getInstance("__start__"), null));
+            (sig, new EqualsFilter(Path.getInstance("__start__"), null));
         q.set(start, POS.getPersistentObject(this, oid));
         return q;
     }
@@ -662,7 +662,7 @@ public class Session {
 
             // should filter to associated object(s)
             // should deal with one way associations
-            Filter f = m_engine.getContains
+            Filter f = new ContainsFilter
                 (Path.getInstance("__start__." + prop.getName()), null);
             Query q = new Query(sig, f);
             q.set(start, POS.getPersistentObject(this, oid));
@@ -676,7 +676,7 @@ public class Session {
                                             Path.getInstance("__start__"));
             sig.addParameter(start);
             Query q = new Query
-                (sig, m_engine.getEquals(Path.getInstance("__start__"), null));
+                (sig, new EqualsFilter(Path.getInstance("__start__"), null));
             q.set(start, POS.getPersistentObject(this, oid));
             return q;
         }

@@ -12,12 +12,12 @@ import java.util.*;
  * MemoryEngine
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/01/10 $
+ * @version $Revision: #7 $ $Date: 2003/01/13 $
  **/
 
 public class MemoryEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#6 $ by $Author: ashah $, $DateTime: 2003/01/10 18:48:23 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#7 $ by $Author: rhs $, $DateTime: 2003/01/13 16:40:35 $";
 
     private static final Logger LOG = Logger.getLogger(MemoryEngine.class);
 
@@ -88,30 +88,6 @@ public class MemoryEngine extends Engine {
     protected synchronized void flush() {
         m_uncomitted.addAll(m_unflushed);
         m_unflushed.clear();
-    }
-
-    protected Filter getAnd(Filter left, Filter right) {
-        return new DumbAndFilter(left, right);
-    }
-
-    protected Filter getOr(Filter left, Filter right) {
-        return new DumbOrFilter(left, right);
-    }
-
-    protected Filter getNot(Filter operand) {
-        return new DumbNotFilter(operand);
-    }
-
-    protected Filter getEquals(Path left, Path right) {
-        return new DumbEqualsFilter(left, right);
-    }
-
-    protected Filter getIn(Path path, Query query) {
-        return new DumbInFilter(path, query);
-    }
-
-    protected Filter getContains(Path collection, Path element) {
-        return new DumbContainsFilter(collection, element);
     }
 
     private Object get(OID oid, Property prop) {
@@ -217,11 +193,11 @@ public class MemoryEngine extends Engine {
                 }
             }
 
-            DumbFilter df = (DumbFilter) m_query.getFilter();
-            if (df != null) {
+            Filter f = m_query.getFilter();
+            if (f != null) {
                 for (Iterator it = m_oids.iterator(); it.hasNext(); ) {
                     OID oid = (OID) it.next();
-                    if (!df.accept(m_query, oid)) {
+                    if (!accept(oid, m_query, f)) {
                         it.remove();
                     }
                 }
@@ -255,84 +231,52 @@ public class MemoryEngine extends Engine {
 
     }
 
-    interface DumbFilter {
-        boolean accept(Query q, OID oid);
-    }
+    boolean accept(final OID oid, final Query q, Filter filter) {
+        final boolean[] result = { false };
 
-    class DumbAndFilter extends AndFilter implements DumbFilter {
-        public DumbAndFilter(Filter left, Filter right) {
-            super(left, right);
-        }
+        filter.dispatch(new Filter.Switch() {
 
-        public boolean accept(Query q, OID oid) {
-            return ((DumbFilter) getLeft()).accept(q, oid) &&
-                ((DumbFilter) getRight()).accept(q, oid);
-        }
-    }
+                public void onAnd(AndFilter f) {
+                    result[0] = accept(oid, q, f.getLeft()) &&
+                        accept(oid, q, f.getRight());
+                }
 
-    class DumbOrFilter extends OrFilter implements DumbFilter {
-        public DumbOrFilter(Filter left, Filter right) {
-            super(left, right);
-        }
+                public void onOr(OrFilter f) {
+                    result[0] = accept(oid, q, f.getLeft()) ||
+                        accept(oid, q, f.getRight());
+                }
 
-        public boolean accept(Query q, OID oid) {
-            return ((DumbFilter) getLeft()).accept(q, oid) ||
-                ((DumbFilter) getRight()).accept(q, oid);
-        }
-    }
+                public void onNot(NotFilter f) {
+                    result[0] = !accept(oid, q, f.getOperand());
+                }
 
-    class DumbNotFilter extends NotFilter implements DumbFilter {
-        public DumbNotFilter(Filter operand) {
-            super(operand);
-        }
+                public void onEquals(EqualsFilter f) {
+                    Object left = get(q, oid, f.getLeft());
+                    Object right = get(q, oid, f.getRight());
+                    if (left == right) {
+                        result[0] = true;
+                    } else if (left == null) {
+                        result[0] = right == null;
+                    } else {
+                        result[0] = left.equals(right);
+                    }
+                }
 
-        public boolean accept(Query q, OID oid) {
-            return !((DumbFilter) getOperand()).accept(q, oid);
-        }
-    }
+                public void onIn(InFilter f) {
+                    Object val = get(q, oid, f.getPath());
+                    DumbRecordSet drs = new DumbRecordSet(f.getQuery());
+                    result[0] = drs.getOIDs().contains(val);
+                }
 
+                public void onContains(ContainsFilter f) {
+                    Set vals = (Set) get(q, oid, f.getCollection());
+                    Object element = get(q, oid, f.getElement());
+                    result[0] = vals.contains(element);
+                }
 
-    class DumbEqualsFilter extends EqualsFilter implements DumbFilter {
-        public DumbEqualsFilter(Path left, Path right) {
-            super(left, right);
-        }
+            });
 
-        public boolean accept(Query q, OID oid) {
-            Object left = get(q, oid, getLeft());
-            Object right = get(q, oid, getRight());
-            if (left == right) {
-                return true;
-            } else if (left == null) {
-                return right == null;
-            } else {
-                return left.equals(right);
-            }
-        }
-    }
-
-    class DumbInFilter extends InFilter implements DumbFilter {
-        public DumbInFilter(Path path, Query query) {
-            super(path, query);
-        }
-
-        public boolean accept(Query q, OID oid) {
-            Object val = get(q, oid, getPath());
-            DumbRecordSet drs = new DumbRecordSet(getQuery());
-            return drs.getOIDs().contains(val);
-        }
-    }
-
-    class DumbContainsFilter extends ContainsFilter implements DumbFilter {
-        public DumbContainsFilter(Path collection, Path element) {
-            super(collection, element);
-        }
-
-        public boolean accept(Query q, OID oid) {
-            Set vals = (Set) get(q, oid, getCollection());
-            Object element = get(q, oid, getElement());
-            boolean result = vals.contains(element);
-            return result;
-        }
+        return result[0];
     }
 
 }

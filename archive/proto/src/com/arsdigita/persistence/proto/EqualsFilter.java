@@ -4,12 +4,12 @@ package com.arsdigita.persistence.proto;
  * EqualsFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/01/06 $
+ * @version $Revision: #3 $ $Date: 2003/01/13 $
  **/
 
-public abstract class EqualsFilter extends Filter {
+public class EqualsFilter extends Filter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/EqualsFilter.java#2 $ by $Author: rhs $, $DateTime: 2003/01/06 16:31:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/EqualsFilter.java#3 $ by $Author: rhs $, $DateTime: 2003/01/13 16:40:35 $";
 
     private Path m_left;
     private Path m_right;
@@ -25,6 +25,10 @@ public abstract class EqualsFilter extends Filter {
 
     public Path getRight() {
         return m_right;
+    }
+
+    public void dispatch(Switch sw) {
+        sw.onEquals(this);
     }
 
     public String toString() {
