@@ -28,13 +28,13 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterReader
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/JavaPropertyReader.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/JavaPropertyReader.java#2 $
  */
 public class JavaPropertyReader implements ParameterReader {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/JavaPropertyReader.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/JavaPropertyReader.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/17 19:02:11 $";
+        "$DateTime: 2003/10/20 18:11:10 $";
 
     private static final Logger s_log = Logger.getLogger
         (JavaPropertyReader.class);
@@ -54,6 +54,8 @@ public class JavaPropertyReader implements ParameterReader {
     }
 
     public final void load(final InputStream in) {
+        Assert.exists(in, InputStream.class);
+
         try {
             m_props.load(in);
         } catch (IOException ioe) {
