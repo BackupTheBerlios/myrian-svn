@@ -9,7 +9,7 @@ declare
   oldDirty alias for $3;
   newDirty alias for $4;
 begin
-  if newTimestamp < oldTimestamp then
+  if date_trunc(''minute'', newTimestamp) < date_trunc(''minute'', oldTimestamp) then
     return oldDirty;
   else
     return newDirty;
