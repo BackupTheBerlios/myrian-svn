@@ -25,7 +25,7 @@
 // ACSObject services. 
 //
 // @author <a href="mailto:pmarklun@arsdigita.com">Peter Marklund</a>
-// @version $Id: //core-platform/dev/pdl/com/arsdigita/formbuilder/Component.pdl#3 $
+// @version $Id: //core-platform/dev/pdl/com/arsdigita/formbuilder/Component.pdl#4 $
 //
 
 model com.arsdigita.formbuilder;
@@ -47,101 +47,101 @@ object type Component extends ACSObject {
 //
 // Disabled pending reworking of the whole PersistentContainerHelper
 // class and removal of the old UI.
-// association {
-//     Component[0..1] container;
-//     Component[0..n] component;
-//     BigDecimal[1..1] orderNumber;
-//     Boolean[1..1] isSelected;
-// 
-//     retrieve container {
-//         do {
-//            select a.object_id,
-//                   a.object_type,
-//                   a.display_name,
-//                   a.default_domain_class,
-//                   c.admin_name,
-//                   c.description,
-//                   c.attribute_string,
-//                   c.active_p,
-//                   h.order_number,
-//                   h.selected_p
-//              from acs_objects a,
-//                   bebop_components c,
-//                   bebop_component_hierarchy h
-//             where a.object_id = c.component_id
-//               and c.component_id = h.container_id
-//               and h.component_id = :component.id
-//        } map {
-//            container.id = a.object_id;
-//            container.objectType = a.object_type;
-//            container.displayName = a.display_name;
-//            container.defaultDomainClass = a.default_domain_class;
-//            container.adminName = c.admin_name;
-//            container.description = c.description;
-//            container.attributeString = c.attribute_string;
-//            container.isActive = c.active_p;
-//            orderNumber = h.order_number;
-//            isSelected = h.selected_p;
-//        }
-//    }
+association {
+    Component[0..1] container;
+    Component[0..n] component;
+    BigDecimal[1..1] orderNumber;
+    Boolean[1..1] isSelected;
+
+    retrieve container {
+        do {
+           select a.object_id,
+                  a.object_type,
+                  a.display_name,
+                  a.default_domain_class,
+                  c.admin_name,
+                  c.description,
+                  c.attribute_string,
+                  c.active_p,
+                  h.order_number,
+                  h.selected_p
+             from acs_objects a,
+                  bebop_components c,
+                  bebop_component_hierarchy h
+            where a.object_id = c.component_id
+              and c.component_id = h.container_id
+              and h.component_id = :component.id
+       } map {
+           container.id = a.object_id;
+           container.objectType = a.object_type;
+           container.displayName = a.display_name;
+           container.defaultDomainClass = a.default_domain_class;
+           container.adminName = c.admin_name;
+           container.description = c.description;
+           container.attributeString = c.attribute_string;
+           container.isActive = c.active_p;
+           orderNumber = h.order_number;
+           isSelected = h.selected_p;
+       }
+   }
 //
-//    retrieve component {
-//        do {
-//            select a.object_id,
-//                   a.object_type,
-//                   a.display_name,
-//                   a.default_domain_class,
-//                   c.admin_name,
-//                   c.description,
-//                   c.attribute_string,
-//                   c.active_p,
-//                   h.order_number,
-//                   h.selected_p
-//              from acs_objects a,
-//                   bebop_components c,
-//                   bebop_component_hierarchy h
-//             where a.object_id = c.component_id
-//               and c.component_id = h.component_id
-//               and h.container_id = :container.id
-//        } map {
-//            component.id = a.object_id;
-//            component.objectType = a.object_type;
-//            component.displayName = a.display_name;
-//            component.defaultDomainClass = a.default_domain_class;
-//            component.adminName = c.admin_name;
-//            component.description = c.description;
-//            component.attributeString = c.attribute_string;
-//            component.isActive = c.active_p;
-//            orderNumber = h.order_number;
-//            isSelected = h.selected_p;
-//        }
-//    }
+   retrieve component {
+       do {
+           select a.object_id,
+                  a.object_type,
+                  a.display_name,
+                  a.default_domain_class,
+                  c.admin_name,
+                  c.description,
+                  c.attribute_string,
+                  c.active_p,
+                  h.order_number,
+                  h.selected_p
+             from acs_objects a,
+                  bebop_components c,
+                  bebop_component_hierarchy h
+            where a.object_id = c.component_id
+              and c.component_id = h.component_id
+              and h.container_id = :container.id
+       } map {
+           component.id = a.object_id;
+           component.objectType = a.object_type;
+           component.displayName = a.display_name;
+           component.defaultDomainClass = a.default_domain_class;
+           component.adminName = c.admin_name;
+           component.description = c.description;
+           component.attributeString = c.attribute_string;
+           component.isActive = c.active_p;
+           orderNumber = h.order_number;
+           isSelected = h.selected_p;
+       }
+   }
 //
-//    add {
-//        do {
-//            insert into bebop_component_hierarchy 
-//                (container_id, component_id, order_number, selected_p)
-//            values 
-//                (:container.id, :component.id, :orderNumber, :isSelected)        
-//        }
-//    }
+   add {
+       do {
+           insert into bebop_component_hierarchy 
+               (container_id, component_id, order_number, selected_p)
+           values 
+               (:container.id, :component.id, :orderNumber, :isSelected)        
+       }
+   }
 //
-//    remove {
-//        do {
-//            delete from bebop_component_hierarchy
-//                where container_id = :container.id
-//                  and component_id = :component.id
-//        }
-//    }
+   remove {
+       do {
+           delete from bebop_component_hierarchy
+               where container_id = :container.id
+                 and component_id = :component.id
+       }
+   }
 //
-//    update {
-//        do {
-//            update bebop_component_hierarchy
-//                set order_number = :orderNumber,
-//                    selected_p = :isSelected
-//              where container_id = :container.id
-//                and component_id = :component.id
-//        }
-//    }
-//}
+   update {
+       do {
+           update bebop_component_hierarchy
+               set order_number = :orderNumber,
+                   selected_p = :isSelected
+             where container_id = :container.id
+               and component_id = :component.id
+       }
+   }
+}
 //

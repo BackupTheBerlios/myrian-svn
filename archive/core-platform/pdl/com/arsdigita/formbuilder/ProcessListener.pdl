@@ -3,8 +3,8 @@ model com.arsdigita.formbuilder;
 import com.arsdigita.kernel.*;
 
 object type ProcessListener extends ACSObject {
-	String[0..1] name = bebop_process_listeners.name;
-	String[0..1] description = bebop_process_listeners.description;
+    String[0..1] name = bebop_process_listeners.name;
+    String[0..1] description = bebop_process_listeners.description;
     String[0..1] listenerClass = bebop_process_listeners.listener_class;
 
     reference key (bebop_process_listeners.listener_id);	
@@ -12,26 +12,14 @@ object type ProcessListener extends ACSObject {
 
 
 association {
-	FormSection[1..1] form;
-	composite ProcessListener[0..n] listeners;
-	
-	retrieve listeners {
-		do {
-			select pl.listener_id,
-			       pl.name,
-                   pl.description,
-                   pl.listener_class
-			from bebop_process_listeners pl,
-			     bebop_form_process_listeners fpl
-			where pl.listener_id = fpl.listener_id
-			and fpl.form_section_id = :id
-		} map {
-			listeners.id = pl.listener_id;
-			listeners.name = pl.name;
-            listeners.description = pl.description;
-            listeners.listenerClass = pl.listener_class;
-		}
-	}
+    FormSection[1..1] form = join bebop_process_listeners.listener_id 
+                               to bebop_form_process_listeners.listener_id,
+                             join bebop_form_process_listeners.form_section_id 
+                               to bebop_form_sections.form_section_id;
+    composite ProcessListener[0..n] listeners = join bebop_form_sections.form_section_id 
+                               to bebop_form_process_listeners.form_section_id,
+                             join bebop_form_process_listeners.listener_id 
+                               to bebop_process_listeners.listener_id;
 }
 
 
