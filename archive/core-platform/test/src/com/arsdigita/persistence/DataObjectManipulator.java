@@ -16,6 +16,7 @@
 package com.arsdigita.persistence;
 import com.arsdigita.persistence.metadata.*;
 import com.arsdigita.util.StringUtils;
+import com.arsdigita.util.CheckedWrapperException;
 
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
 import junit.framework.*;
@@ -29,11 +30,11 @@ import org.apache.log4j.*;
  * DataObjectManipulator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/08/16 $
  */
 public class DataObjectManipulator {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataObjectManipulator.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataObjectManipulator.java#5 $ by $Author: jorris $, $DateTime: 2002/08/16 18:36:44 $";
     private static final Logger s_log =
         Logger.getLogger(DataObjectManipulator.class.getName());
     static  {
@@ -170,7 +171,7 @@ public class DataObjectManipulator {
         public void checkSetError(Exception t, Property p, DataObject data, Object value) throws Exception {
             logSetError(p, value);
             s_log.debug("Default checkSetError");
-            throw t;
+            throw new CheckedWrapperException(t);
         }
 
         /**
@@ -296,7 +297,7 @@ public class DataObjectManipulator {
                     msg += " with null value and failed!";
                     msg += "\nException is: " + t.getMessage();
                     s_log.debug(msg);
-                    throw new Exception(msg);
+                    throw new CheckedWrapperException(msg, t);
                 }
                 else {
                     s_log.debug("Failed to set property " + p.getName());
@@ -612,7 +613,8 @@ public class DataObjectManipulator {
                     s_log.debug("checkSetError for Strings!");
                     final boolean columnIsSpecified =  p.getColumn() != null;
                     final boolean isColumnSizeIssue = (t.getMessage().indexOf("inserted value too large") != -1) ||
-                        (t.getMessage().indexOf("can bind a LONG value only") != -1);
+                        (t.getMessage().indexOf("can bind a LONG value only") != -1) ||
+                            (t.getMessage().indexOf("value too long for type") != -1);
 
                     if( isColumnSizeIssue ) {
                         if( p.getType().equals(MetadataRoot.STRING) ) {
@@ -624,9 +626,11 @@ public class DataObjectManipulator {
                             if( columnIsSpecified ) {
                                 final int size = p.getColumn().getSize();
                                 if( stringValue.length() <= size ) {
-                                    s_log.debug("Column length appears to be invalid! Lengh is " + size);
+
+                                    String msg = "Column length appears to be invalid! Lengh is " + size;
+                                    s_log.debug(msg);
                                     logSetError(p, value);
-                                    throw t;
+                                    throw new CheckedWrapperException(msg, t);
                                 }
                             } else {
                                 s_log.debug("Column does not have size specified in the PDL, so it is not possible to determine if this is an error");
@@ -636,7 +640,7 @@ public class DataObjectManipulator {
 
                     } else {
                         logSetError(p, value);
-                        throw t;
+                        throw new CheckedWrapperException(t);
                     }
 
                 }

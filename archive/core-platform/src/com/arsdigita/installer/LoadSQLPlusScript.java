@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 
 public class LoadSQLPlusScript {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#8 $ by $Author: jorris $, $DateTime: 2002/08/16 18:36:44 $";
 
     private static final Logger s_log =
         Logger.getLogger(LoadSQLPlusScript.class);
@@ -127,7 +127,7 @@ public class LoadSQLPlusScript {
                ParseException, FileNotFoundException,
                IllegalAccessException, NoSuchMethodException {
 
-        if (s_database == "postgres") {
+        if (s_database.equals("postgres")) {
             Class.forName("org.postgresql.Driver");
         } else {
             Class.forName("oracle.jdbc.driver.OracleDriver");

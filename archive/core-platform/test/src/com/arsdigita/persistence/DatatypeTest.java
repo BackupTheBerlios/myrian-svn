@@ -26,12 +26,12 @@ import java.io.*;
  * DatatypeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/15 $
+ * @version $Revision: #6 $ $Date: 2002/08/16 $
  */
 
 public class DatatypeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DatatypeTest.java#5 $ by $Author: jorris $, $DateTime: 2002/08/15 14:01:26 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DatatypeTest.java#6 $ by $Author: jorris $, $DateTime: 2002/08/16 18:36:44 $";
 
     private Session ssn;
 
@@ -99,7 +99,7 @@ public class DatatypeTest extends PersistenceTestCase {
                      chars,
                      dt.get("clob"));
 	*/
-        
+
     }
 
     public void testDate() {
@@ -164,7 +164,7 @@ public class DatatypeTest extends PersistenceTestCase {
                          new Integer(100),
                          dq.get("integer"));
             assertEquals("incorrect 'long'",
-                         new Long(1000000000000L),
+                         LONG_VALUE,
                          dq.get("long"));
             assertEquals("incorrect 'short'",
                          new Short((short)30),
