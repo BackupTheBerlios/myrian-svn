@@ -10,25 +10,25 @@ import java.util.*;
  * Cursor
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/02/13 $
+ * @version $Revision: #12 $ $Date: 2003/02/28 $
  **/
 
 public class Cursor {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Cursor.java#11 $ by $Author: ashah $, $DateTime: 2003/02/13 15:47:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Cursor.java#12 $ by $Author: rhs $, $DateTime: 2003/02/28 17:44:25 $";
 
-    private DataSet m_dset;
-    private Session m_ssn;
-    private Signature m_signature;
+    final private Session m_ssn;
+    final private Query m_query;
+    final private Signature m_signature;
 
     private RecordSet m_rs = null;
     private Object m_current = null;
     private long m_position = 0;
 
-    protected Cursor(DataSet dset) {
-        m_dset = dset;
-        m_ssn = dset.getSession();
-        m_signature = dset.getQuery().getSignature();
+    protected Cursor(Session ssn, Query query) {
+        m_ssn = ssn;
+        m_query = query;
+        m_signature = query.getSignature();
     }
 
     public Session getSession() {
@@ -66,7 +66,7 @@ public class Cursor {
     public boolean next() {
         if (m_rs == null) {
             m_ssn.flush();
-            m_rs = m_ssn.getEngine().execute(m_dset.getQuery());
+            m_rs = m_ssn.getEngine().execute(m_query);
         }
 
         if (m_rs.next()) {
@@ -75,7 +75,6 @@ public class Cursor {
             m_position++;
             return true;
         } else {
-
             m_position = 0;
             return false;
         }

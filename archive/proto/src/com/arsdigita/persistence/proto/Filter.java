@@ -4,12 +4,12 @@ package com.arsdigita.persistence.proto;
  * Filter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/13 $
+ * @version $Revision: #3 $ $Date: 2003/02/28 $
  **/
 
 public abstract class Filter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Filter.java#2 $ by $Author: rhs $, $DateTime: 2003/01/13 16:40:35 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Filter.java#3 $ by $Author: rhs $, $DateTime: 2003/02/28 17:44:25 $";
 
     public static abstract class Switch {
 
@@ -19,6 +19,7 @@ public abstract class Filter {
         public abstract void onEquals(EqualsFilter f);
         public abstract void onIn(InFilter f);
         public abstract void onContains(ContainsFilter f);
+        public abstract void onPassthrough(PassthroughFilter f);
 
     }
 

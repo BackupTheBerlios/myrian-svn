@@ -1,17 +1,18 @@
 package com.arsdigita.persistence.proto.engine.rdbms;
 
 import com.arsdigita.persistence.proto.common.*;
+import java.util.*;
 
 /**
  * Condition
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/02/17 $
+ * @version $Revision: #7 $ $Date: 2003/02/28 $
  **/
 
 abstract class Condition {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Condition.java#6 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Condition.java#7 $ by $Author: rhs $, $DateTime: 2003/02/28 17:44:25 $";
 
     abstract void write(SQLWriter w);
 
@@ -129,6 +130,33 @@ class EqualsCondition extends Condition {
 
     public Path getRight() {
         return m_right;
+    }
+
+    void write(SQLWriter w) {
+        w.write(this);
+    }
+
+}
+
+class StaticCondition extends Condition {
+
+    private String m_sql;
+    private ArrayList m_bindings = new ArrayList();
+
+    public StaticCondition(String sql) {
+        m_sql = sql;
+    }
+
+    public String getSQL() {
+        return m_sql;
+    }
+
+    public void addBinding(Object value) {
+        m_bindings.add(value);
+    }
+
+    public Collection getBindings() {
+        return m_bindings;
     }
 
     void write(SQLWriter w) {

@@ -4,21 +4,24 @@ import com.arsdigita.persistence.proto.*;
 import com.arsdigita.persistence.proto.Query;
 import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
+import com.arsdigita.persistence.proto.pdl.SQLParser;
+import com.arsdigita.persistence.proto.pdl.ParseException;
 
 import java.util.*;
 import java.sql.*;
+import java.io.*;
 
 
 /**
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2003/02/26 $
+ * @version $Revision: #10 $ $Date: 2003/02/28 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#9 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#10 $ by $Author: rhs $, $DateTime: 2003/02/28 17:44:25 $";
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -344,6 +347,31 @@ class QGen {
                     result[0] = new EqualsCondition
                         (getColumn(f.getCollection()),
                          getColumn(f.getElement()));
+                }
+
+                public void onPassthrough(final PassthroughFilter f) {
+                    SQLParser p = new SQLParser
+                        (new StringReader(f.getConditions()),
+                         new SQLParser.Mapper() {
+                                 public Path map(Path path) {
+                                     genPath(path);
+                                     return getColumn(path);
+                                 }
+                             });
+
+                    try {
+                        p.sql();
+                    } catch (ParseException e) {
+                        throw new Error(e.getMessage());
+                    }
+
+                    StaticCondition sc = new StaticCondition(p.getSQL());
+                    for (Iterator it = p.getBindings().iterator();
+                         it.hasNext(); ) {
+                        Path path = (Path) it.next();
+                        sc.addBinding(f.getParameter(path));
+                    }
+                    result[0] = sc;
                 }
             });
 

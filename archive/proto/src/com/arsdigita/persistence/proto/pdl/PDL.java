@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #23 $ $Date: 2003/02/27 $
+ * @version $Revision: #24 $ $Date: 2003/02/28 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#23 $ by $Author: rhs $, $DateTime: 2003/02/27 11:01:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#24 $ by $Author: rhs $, $DateTime: 2003/02/28 17:44:25 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -816,7 +816,7 @@ public class PDL {
                 final SQLBlock block = new SQLBlock(p.getSQL());
                 for (Iterator ii = p.getBindings().iterator();
                      ii.hasNext(); ) {
-                    Path path = Path.get((String) ii.next());
+                    Path path = (Path) ii.next();
                     block.addBinding(path);
                 }
                 for (Iterator ii = p.getAssigns().iterator(); ii.hasNext(); ) {
@@ -825,7 +825,7 @@ public class PDL {
                         (assn.getBegin(), assn.getEnd());
                     for (Iterator iter = assn.getBindings().iterator();
                          iter.hasNext(); ) {
-                        Path path = Path.get((String) iter.next());
+                        Path path = (Path) iter.next();
                         bassn.addBinding(path);
                     }
                 }

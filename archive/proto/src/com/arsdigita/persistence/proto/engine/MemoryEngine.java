@@ -13,12 +13,12 @@ import java.util.*;
  * MemoryEngine
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #16 $ $Date: 2003/02/17 $
+ * @version $Revision: #17 $ $Date: 2003/02/28 $
  **/
 
 public class MemoryEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#16 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#17 $ by $Author: rhs $, $DateTime: 2003/02/28 17:44:25 $";
 
     private static final Logger LOG = Logger.getLogger(MemoryEngine.class);
 
@@ -298,6 +298,11 @@ public class MemoryEngine extends Engine {
                     Set vals = (Set) get(q, obj, f.getCollection());
                     Object element = get(q, obj, f.getElement());
                     result[0] = vals.contains(element);
+                }
+
+                public void onPassthrough(PassthroughFilter f) {
+                    throw new UnsupportedOperationException
+                        ("unsupported filter type");
                 }
 
             });

@@ -7,22 +7,38 @@ PARSER_BEGIN(SQLParser)
 
 package com.arsdigita.persistence.proto.pdl;
 
+import com.arsdigita.persistence.proto.common.*;
 import java.util.*;
+import java.io.*;
 
 /**
  * SQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/02/26 $
+ * @version $Revision: #2 $ $Date: 2003/02/28 $
  */
 
-class SQLParser {
+public class SQLParser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/SQLParser.jj#1 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/SQLParser.jj#2 $ by $Author: rhs $, $DateTime: 2003/02/28 17:44:25 $";
+
+    public static interface Mapper {
+        Path map(Path path);
+    }
 
     private StringBuffer m_sql = new StringBuffer();
     private ArrayList m_bindings = new ArrayList();
     private ArrayList m_assigns = new ArrayList();
+    private Mapper m_mapper = new Mapper() {
+            public Path map(Path path) {
+                return path;
+            }
+        };
+
+    public SQLParser(Reader r, Mapper mapper) {
+        this(r);
+        m_mapper = mapper;
+    }
 
     public class Assign {
 
@@ -285,27 +301,22 @@ void parens() :
 
 void identifier() :
 {
-    Token b = null, t, u;
+    Token t;
     boolean bind = false;
     StringBuffer buf = new StringBuffer();
 }
 {
-    ( b = <BINDVAR> { bind = true; buf.append(b.image); } |
-      t = <ID> { append(t); } )
-        ( LOOKAHEAD(2) t = <PERIOD> u = <ID> {
-            if (bind) {
-                buf.append(t.image);
-                buf.append(u.image);
-            } else {
-                append(t);
-                append(u);
-            }
+    ( t = <BINDVAR> { bind = true; } | t = <ID>  )
+        { buf.append(t.image); appendSpecial(t); }
+        ( LOOKAHEAD(2) <PERIOD> t = <ID>
+            { buf.append('.'); buf.append(t.image);
         } )*
     {
         if (bind) {
-            m_bindings.add(buf.substring(1));
-            appendSpecial(b);
+            m_bindings.add(Path.get(buf.substring(1)));
             m_sql.append("?");
+        } else {
+            m_sql.append(m_mapper.map(Path.get(buf.toString())));
         }
     }
 }
