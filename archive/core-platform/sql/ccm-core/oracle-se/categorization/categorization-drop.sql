@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/oracle-se/categorization/categorization-drop.sql#1 $
--- $DateTime: 2003/10/23 15:28:18 $
+-- $Id: //core-platform/dev/sql/ccm-core/oracle-se/categorization/categorization-drop.sql#2 $
+-- $DateTime: 2003/11/17 15:52:45 $
 
 
 --
@@ -20,7 +20,7 @@
 --
 -- @author randyg@arsdigita.com
 -- @creation-date 2001-05-10
--- @cvs-id $Id: //core-platform/dev/sql/ccm-core/oracle-se/categorization/categorization-drop.sql#1 $
+-- @cvs-id $Id: //core-platform/dev/sql/ccm-core/oracle-se/categorization/categorization-drop.sql#2 $
 --
 
 drop index cat_cat_pur_map_category_id_idx;

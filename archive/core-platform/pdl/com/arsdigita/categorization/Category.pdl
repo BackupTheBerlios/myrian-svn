@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/categorization/Category.pdl#25 $
-// $DateTime: 2003/10/14 15:39:41 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/categorization/Category.pdl#26 $
+// $DateTime: 2003/11/17 15:52:45 $
 
 model com.arsdigita.categorization;
 
@@ -97,6 +97,7 @@ association {
 
 }
 
+
 // this returns all related categories (both ways)
 // To get the children, do 'get("related")' and then filter on
 // the relationType link attribute to be "child"
@@ -146,7 +147,6 @@ association {
         }
     }
 }
-
 
 // This returns all of the ACSObjects within the subtree for
 // a given category
@@ -223,7 +223,7 @@ query validParents {
            and not exists (select 1
                            from cat_cat_subcat_trans_index
                            where category_id = :id
-			   and cat_categories.category_id = subcategory_id)
+                           and cat_categories.category_id = subcategory_id)
     } map {
         validParent.id = cat_categories.category_id;
         validParent.name = cat_categories.name;
@@ -248,7 +248,7 @@ query topLevelCategories {
             select 1
             from cat_category_category_map
             where relation_type = 'child'
-	    and category_id = related_category_id
+            and category_id = related_category_id
         )
     } map {
         category.id = category.category_id;
@@ -393,7 +393,7 @@ query immediateChildObjectIDs {
 
 query childCategoryIDs {
     BigDecimal id;
-    
+
     do {
          select m.related_category_id
            from cat_category_category_map m
@@ -406,7 +406,7 @@ query childCategoryIDs {
 
 query parentCategoryIDs {
     BigDecimal id;
-    
+
     do {
          SELECT category_id
                         FROM cat_category_category_map

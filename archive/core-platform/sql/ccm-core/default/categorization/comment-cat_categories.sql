@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/default/categorization/comment-cat_categories.sql#1 $
--- $DateTime: 2003/10/23 15:28:18 $
+-- $Id: //core-platform/dev/sql/ccm-core/default/categorization/comment-cat_categories.sql#2 $
+-- $DateTime: 2003/11/17 15:52:45 $
 
 comment on table cat_categories is '
   Defines a category.
