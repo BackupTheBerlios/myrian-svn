@@ -21,12 +21,12 @@ import java.util.Set;
  * DDLWriter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/14 $
+ * @version $Revision: #7 $ $Date: 2002/08/14 $
  **/
 
 public class DDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#6 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 16:52:00 $";
 
     private File m_base;
     private boolean m_overwrite;
@@ -166,7 +166,7 @@ public class DDLWriter {
                     writer.write("\\i ddl/" + dir + "/table-" + 
                                  table.getName() + "-auto.sql\n");
                 } else {
-                    writer.write("@ddl/" + dir + "/table-" + 
+                    writer.write("@ ddl/" + dir + "/table-" + 
                                  table.getName() + "-auto.sql\n");
                 }
             }
