@@ -25,3 +25,54 @@ begin
 end;
 /
 show errors;
+
+alter table cat_categories add (default_ancestors varchar(4000));
+
+create or replace procedure updateCategorizationTEMP
+as 
+   cursor categories is select category_id from cat_categories;
+   v_category_id integer;
+begin
+   open categories;
+   loop
+      FETCH categories INTO v_category_id;
+      EXIT WHEN categories%NOTFOUND;
+      updateCategorizationHelpTEMP(v_category_id);
+   end loop;
+end;
+/
+show errors
+
+create or replace procedure updateCategorizationHelpTEMP(v_category_id INTEGER)
+as 
+   cursor parents is 
+                  select category_id 
+                    from cat_category_category_map
+                   where default_p = 1
+                     and relation_type = 'child'
+          connect by prior category_id = related_category_id
+       start with related_category_id = v_category_id;
+   parent_id integer;
+begin
+   update cat_categories set default_ancestors = category_id || '/'
+          where category_id = v_category_id;
+   open parents;
+   loop
+      FETCH parents INTO parent_id;
+      EXIT WHEN parents%NOTFOUND;
+
+      update cat_categories set default_ancestors = parent_id || '/' || default_ancestors where category_id = v_category_id;
+   end loop;
+end;
+/
+show errors
+
+begin
+  updateCategorizationTEMP;
+end;
+/
+
+drop procedure updateCategorizationTEMP;
+drop procedure updateCategorizationHelpTEMP;
+
+alter table cat_categories modify (default_ancestors not null);

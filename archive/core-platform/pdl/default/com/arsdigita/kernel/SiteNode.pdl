@@ -19,7 +19,7 @@ model com.arsdigita.kernel;
 // A "site node" is a node in a URL hierarchy that can be mapped
 // to an application instance.
 //
-// @version "$Id: //core-platform/dev/pdl/default/com/arsdigita/kernel/SiteNode.pdl#6 $"
+// @version "$Id: //core-platform/dev/pdl/default/com/arsdigita/kernel/SiteNode.pdl#7 $"
 //
 
 object type SiteNode extends ACSObject {
@@ -60,6 +60,6 @@ data operation updateSiteNodeDescendants {
         update site_nodes
         set url = :newPrefix || substr(url, :oldPrefixLength + 1)
         where url like :oldPrefix || '%'
-        and not node_id = :nodeID
+        and not node_id = :id
     }
 }

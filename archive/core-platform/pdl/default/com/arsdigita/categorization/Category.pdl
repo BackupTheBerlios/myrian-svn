@@ -31,6 +31,7 @@ object type Category extends ACSObject {
     String[1..1] name = cat_categories.name VARCHAR(200);
     Boolean[1..1] isEnabled = cat_categories.enabled_p CHAR(1);
     Boolean[1..1] isAbstract = cat_categories.abstract_p CHAR(1);
+    String[1..1] defaultAncestors = cat_categories.default_ancestors VARCHAR(4000);
 
     reference key (cat_categories.category_id);
 }
@@ -220,7 +221,8 @@ query categorySubtree {
     Category categorySubtree;
     do {
         select cat_categories.category_id, name, description, enabled_p,
-               abstract_p, object_type, default_domain_class
+               abstract_p, object_type, default_domain_class,
+               default_ancestors
           from acs_objects,
                cat_categories,
                cat_cat_subcat_trans_index trans
@@ -235,6 +237,7 @@ query categorySubtree {
         categorySubtree.isAbstract = abstract_p;
         categorySubtree.objectType = object_type;
         categorySubtree.defaultDomainClass = default_domain_class;
+        categorySubtree.defaultAncestors = default_ancestors;
     }
 }
 
@@ -247,7 +250,8 @@ query validParents {
     Category validParent;
     do {
         select cat_categories.category_id, name, description, enabled_p,
-               abstract_p, object_type, default_domain_class
+               abstract_p, object_type, default_domain_class,
+               default_ancestors
           from cat_cat_subcat_trans_index trans, 
                cat_categories, 
                acs_objects
@@ -265,61 +269,17 @@ query validParents {
         validParent.isAbstract = cat_categories.abstract_p;
         validParent.objectType = acs_objects.object_type;
         validParent.defaultDomainClass = acs_objects.default_domain_class;
+        validParent.defaultAncestors = cat_categories.default_ancestors;
     }
 }
 
-
-
-
-// This walks up the categorization tree and
-// returns ancestors, including the current
-// category.
-//
-// The outermost level of nesting is so that filters can still be 
-// applied to the whole thing; without it the filter only applies 
-// to the second part of the union.  The union is just to pull in 
-// the current category.  The innermost subselect is to filter out 
-// non-default categories before the connect by, so that in the 
-// hierarchy "A (default parent of) B (non-default parent of) C", 
-// asking for C's default parents will not list A because B isn't 
-// a default parent.
-query defaultAncestors {
-    Category defaultAncestor;
-    BigDecimal level;
- 
-    do {
-        select map.depth, c.name, c.description, c.enabled_p, c.category_id,
-               'com.arsdigita.categorization.Category' as object_type, abstract_p
-          from
-          (select 0 as depth, :id as category_id from dual
-           union all
-           select level as depth, category_id 
-             from (select category_id, 
-                          related_category_id 
-                     from cat_category_category_map
-                    where default_p = 1
-                          and relation_type = 'child')
-          connect by prior category_id = related_category_id
-       start with related_category_id = :id) map,
-          cat_categories c
-         where (c.category_id = map.category_id)
-       order by map.depth desc
-    } map {
-        defaultAncestor.name = c.name;
-        defaultAncestor.description = c.description;
-        defaultAncestor.isEnabled = c.enabled_p;
-        defaultAncestor.isAbstract = c.abstract_p;
-        defaultAncestor.id = c.category_id;
-        defaultAncestor.objectType = object_type;
-        level = c.depth;
-    }
-}
 
 
 query topLevelCategories {
     Category category;
     do {
-        select category_id, description, name, enabled_p, abstract_p
+        select category_id, description, name, enabled_p, abstract_p,
+               default_ancestors
         from cat_categories
         where category_id not in (
             select related_category_id
@@ -332,6 +292,7 @@ query topLevelCategories {
         category.name = cat_categories.name;
         category.isEnabled = cat_categories.enabled_p;
         category.isAbstract = cat_categories.abstract_p;
+        category.defaultAncestors = cat_categories.default_ancestors;
     }
 }
 
@@ -376,7 +337,8 @@ data operation swapObjectWithNextObject {
 query getAllCategoryAncestors {
     Category category;
     do {
-        select c.category_id, c.name, c.description, c.enabled_p
+        select c.category_id, c.name, c.description, c.enabled_p,
+               default_ancestors
         from cat_categories c, 
              cat_cat_subcat_trans_index trans
         where trans.subcategory_id = :categoryID
@@ -386,7 +348,18 @@ query getAllCategoryAncestors {
       category.name        = c.name;
       category.description = c.description;
       category.isEnabled   = c.enabled_p;
+      category.defaultAncestors = c.default_ancestors;
   }
 }
 
 
+               
+data operation updateCategoryDescendants {
+    do {
+        update cat_categories
+        set default_ancestors = :newPrefix || substr(default_ancestors, 
+                                                     :oldPrefixLength + 1)
+        where default_ancestors like :oldPrefix || '%'
+        and not category_id = :id
+    }
+}

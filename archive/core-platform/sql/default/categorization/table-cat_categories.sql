@@ -12,5 +12,6 @@ create table cat_categories (
     -- any child objects (but it can have child categories).
     abstract_p          char(1) default '0'
                         constraint cat_categories_abstract_p_ck
-                        check(abstract_p in ('0','1'))
+                        check(abstract_p in ('0','1')),
+    default_ancestors varchar(4000) not null
 );
