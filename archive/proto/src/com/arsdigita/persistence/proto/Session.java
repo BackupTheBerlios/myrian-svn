@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #15 $ $Date: 2003/01/15 $
+ * @version $Revision: #16 $ $Date: 2003/01/17 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#15 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#16 $ by $Author: rhs $, $DateTime: 2003/01/17 14:04:52 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -102,26 +102,18 @@ public class Session {
                 result = false;
             } else {
                 ObjectType type = oid.getObjectType();
-                ObjectMap map = oid.getObjectMap();
                 for (Iterator it = type.getRoles().iterator();
                      it.hasNext(); ) {
                     Role role = (Role) it.next();
-                    if (map.getKeyProperties().contains(role)) {
-                        continue;
-                    }
                     if (role.isCollection()) {
                         clear(oid, role);
-                    } else {
-                        set(oid, role, null);
                     }
                 }
 
-                for (Iterator it = map.getKeyProperties().iterator();
+                for (Iterator it = type.getProperties().iterator();
                      it.hasNext(); ) {
                     Role role = (Role) it.next();
-                    if (role.isCollection()) {
-                        clear(oid, role);
-                    } else {
+                    if (!role.isCollection()) {
                         set(oid, role, null);
                     }
                 }
