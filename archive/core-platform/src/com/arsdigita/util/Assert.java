@@ -30,13 +30,13 @@ import org.apache.log4j.Logger;
  * @author David Lutterkort
  * @author Uday Mathur
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#11 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#12 $
  */
 public class Assert {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#11 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#12 $" +
         "$Author: vadim $" +
-        "$DateTime: 2003/04/16 16:24:34 $";
+        "$DateTime: 2003/04/16 16:32:11 $";
 
     private static final Logger s_log = Logger.getLogger
         (Assert.class);
@@ -313,7 +313,7 @@ public class Assert {
      * @param expected Expected value.
      * @param actual Actual value.
      * @throws java.lang.IllegalStateException condition was false
-     * @deprecated Use {@link equal(Object,Object)} instead
+     * @deprecated Use {@link #equal(Object,Object)} instead
      */
     public static final void assertEquals(Object expected, Object actual) {
         assertEquals(expected, actual, "expected", "actual");
