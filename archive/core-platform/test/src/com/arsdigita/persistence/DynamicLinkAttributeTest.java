@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * LinkAttributeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/11/26 $
+ * @version $Revision: #10 $ $Date: 2003/11/26 $
  */
 
 public class DynamicLinkAttributeTest extends LinkAttributeTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DynamicLinkAttributeTest.java#9 $ by $Author: ashah $, $DateTime: 2003/11/26 17:21:53 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DynamicLinkAttributeTest.java#10 $ by $Author: ashah $, $DateTime: 2003/11/26 20:05:23 $";
 
     public DynamicLinkAttributeTest(String name) {
         super(name);
@@ -164,6 +164,17 @@ public class DynamicLinkAttributeTest extends LinkAttributeTest {
         dcDown.next();
         assertEquals(BigInteger.valueOf(0), dcUp.get("id"));
         assertEquals(BigInteger.valueOf(users.length - 1), dcDown.get("id"));
+        dcUp.close();
+        dcDown.close();
+
+        dcUp = ssn.retrieve(getModelName() + ".Image");
+        dcDown = ssn.retrieve(getModelName() + ".Image");
+        dcUp.addOrder("users.link.caption asc");
+        dcDown.addOrder("users.link.caption desc");
+        dcUp.next();
+        dcDown.next();
+        assertEquals(BigInteger.valueOf(0), dcUp.get("id"));
+        assertEquals(BigInteger.valueOf(images.length - 1), dcDown.get("id"));
         dcUp.close();
         dcDown.close();
 
