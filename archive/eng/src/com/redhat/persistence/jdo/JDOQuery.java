@@ -11,8 +11,9 @@ import javax.jdo.*;
 
 class JDOQuery implements ExtendedQuery, Serializable {
 
+    private static ThreadLocal s_parsers = new ThreadLocal();
+
     transient private PersistenceManagerImpl m_pm = null;
-    transient private JDOQLParser m_parser;
 
     transient private final List m_importedPackages = new ArrayList();
     transient private final Map m_importedNames = new HashMap();
@@ -40,7 +41,6 @@ class JDOQuery implements ExtendedQuery, Serializable {
 
     public JDOQuery(PersistenceManagerImpl pmi) {
         m_pm = pmi;
-        m_parser = new JDOQLParser();
         reset();
     }
 
@@ -54,7 +54,13 @@ class JDOQuery implements ExtendedQuery, Serializable {
     }
 
     private JDOQLParser getParser() {
-        return m_parser;
+        JDOQLParser p = (JDOQLParser) s_parsers.get();
+        if (p == null) {
+            p = new JDOQLParser();
+            s_parsers.set(p);
+        }
+
+        return p;
     }
 
     private void reset() {
