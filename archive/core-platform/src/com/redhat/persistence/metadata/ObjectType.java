@@ -26,24 +26,26 @@ import java.util.List;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/10/28 $
+ * @version $Revision: #4 $ $Date: 2004/02/09 $
  **/
 
 public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/ObjectType.java#3 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/ObjectType.java#4 $ by $Author: jorris $, $DateTime: 2004/02/09 15:27:20 $";
 
-    private Model m_model;
-    private String m_name;
+    private final Model m_model;
+    private final String m_name;
+    private final String m_qualifiedName;
     private Class m_class;
-    private ObjectType m_super;
-    private Mist m_properties = new Mist(this);
-    private ArrayList m_immediates = new ArrayList();
+    private final ObjectType m_super;
+    private final Mist m_properties = new Mist(this);
+    private final ArrayList m_immediates = new ArrayList();
 
     public ObjectType(Model model, String name, ObjectType supertype) {
         m_model = model;
         m_name = name;
         m_super = supertype;
+        m_qualifiedName = m_model.getQualifiedName() + "." + m_name;
     }
 
     public Root getRoot() {
@@ -67,7 +69,7 @@ public class ObjectType extends Element {
     }
 
     public String getQualifiedName() {
-        return m_model.getQualifiedName() + "." + m_name;
+        return m_qualifiedName;
     }
 
     public ObjectType getSupertype() {

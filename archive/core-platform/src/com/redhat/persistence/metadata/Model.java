@@ -15,18 +15,20 @@
 
 package com.redhat.persistence.metadata;
 
+import com.arsdigita.util.CallTracer;
+
 import java.util.HashMap;
 
 /**
  * Model
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/10/28 $
+ * @version $Revision: #4 $ $Date: 2004/02/09 $
  **/
 
 public class Model {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Model.java#3 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Model.java#4 $ by $Author: jorris $, $DateTime: 2004/02/09 15:27:20 $";
 
     private static final HashMap MODELS = new HashMap();
 
@@ -64,12 +66,19 @@ public class Model {
         return result;
     }
 
-    private Model m_parent;
-    private String m_name;
+    private final Model m_parent;
+    private final String m_name;
+    private final String m_qualifiedName;
 
     private Model(Model parent, String name) {
         m_parent = parent;
         m_name = name;
+        if (m_parent == null) {
+            m_qualifiedName = m_name;
+        } else {
+            m_qualifiedName = m_parent.getQualifiedName() + "." + m_name;
+        }
+
     }
 
     public Model getParent() {
@@ -81,11 +90,7 @@ public class Model {
     }
 
     public String getQualifiedName() {
-        if (m_parent == null) {
-            return m_name;
-        } else {
-            return m_parent.getQualifiedName() + "." + m_name;
-        }
+        return  m_qualifiedName;
     }
 
 }
