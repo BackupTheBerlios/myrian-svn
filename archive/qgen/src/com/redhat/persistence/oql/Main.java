@@ -10,12 +10,12 @@ import java.util.*;
  * Main
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/01/23 $
+ * @version $Revision: #5 $ $Date: 2004/01/27 $
  **/
 
 public class Main {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Main.java#4 $ by $Author: rhs $, $DateTime: 2004/01/23 15:34:30 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Main.java#5 $ by $Author: rhs $, $DateTime: 2004/01/27 09:26:37 $";
 
     public static final void main(String[] args) throws Throwable {
         PDL pdl = new PDL();
@@ -38,19 +38,12 @@ public class Main {
         pdl.emit(root);
 
         Frame frame = Frame.root(root);
-        frame.type.update();
 
         for (Iterator it = expressions.iterator(); it.hasNext(); ) {
             Expression e = (Expression) it.next();
             //frame.graph(e);
-            Code code = new Code();
-            Code.Frame cframe = code.frame(frame.type.type);
-            code.push(cframe);
-            try {
-                e.frame(code);
-            } finally {
-                code.pop();
-            }
+            Code code = new Code(root);
+            e.frame(code);
             e.emit(code);
             System.out.println(code.getSQL() + ";");
         }

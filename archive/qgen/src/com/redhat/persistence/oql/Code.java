@@ -9,20 +9,28 @@ import java.util.*;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/01/26 $
+ * @version $Revision: #3 $ $Date: 2004/01/27 $
  **/
 
 class Code {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#2 $ by $Author: rhs $, $DateTime: 2004/01/26 12:32:44 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#3 $ by $Author: rhs $, $DateTime: 2004/01/27 09:26:37 $";
 
+    private Root m_root;
     private LinkedList m_stack = new LinkedList();
     private Map m_frames = new HashMap();
     private Map m_contexts = new HashMap();
-    private Set m_packages = new HashSet();
 
     private StringBuffer m_sql = new StringBuffer();
     private int m_counter = 0;
+
+    Code(Root root) {
+        m_root = root;
+    }
+
+    ObjectType getType(String type) {
+        return m_root.getObjectType(type);
+    }
 
     Frame frame(ObjectType type) {
         return new Frame(type);
@@ -60,15 +68,6 @@ class Code {
 
     Frame getContext(Variable var) {
         return (Frame) m_contexts.get(var);
-    }
-
-    // XXX: hacks for package lookup
-    void addPackage(Expression expr) {
-        m_packages.add(expr);
-    }
-
-    boolean isPackage(Expression expr) {
-        return m_packages.contains(expr);
     }
 
     String getSQL() {

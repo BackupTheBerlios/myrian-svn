@@ -8,12 +8,12 @@ import java.util.*;
  * Variable
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/01/23 $
+ * @version $Revision: #4 $ $Date: 2004/01/27 $
  **/
 
 public class Variable extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Variable.java#3 $ by $Author: rhs $, $DateTime: 2004/01/23 15:34:30 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Variable.java#4 $ by $Author: rhs $, $DateTime: 2004/01/27 09:26:37 $";
 
     private String m_name;
 
@@ -47,23 +47,19 @@ public class Variable extends Expression {
 
     Code.Frame frame(Code code) {
         Code.Frame parent = code.get(m_name);
+        if (parent == null) {
+            throw new IllegalStateException
+                ("no such variable: " + m_name + "\n" + code.getTrace());
+        }
         Property prop = parent.type.getProperty(m_name);
         Code.Frame frame = code.frame(prop.getType());
-        // XXX: hack for package lookup
-        if (parent.type.getQualifiedName().equals("root")) {
-            code.addPackage(this);
-        } else {
-            frame.alias();
-            code.setContext(this, parent);
-            code.setFrame(this, frame);
-        }
+        frame.alias();
+        code.setContext(this, parent);
+        code.setFrame(this, frame);
         return frame;
     }
 
     void emit(Code code) {
-        // XXX: hack for package lookup
-        if (code.isPackage(this)) { return; }
-
         Code.Frame parent = code.getContext(this);
         Property prop = parent.type.getProperty(m_name);
         Code.Frame frame = code.getFrame(this);

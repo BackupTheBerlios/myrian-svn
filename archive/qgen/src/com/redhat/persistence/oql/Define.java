@@ -7,12 +7,12 @@ import java.util.*;
  * Define
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/01/23 $
+ * @version $Revision: #5 $ $Date: 2004/01/27 $
  **/
 
 public class Define extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Define.java#4 $ by $Author: rhs $, $DateTime: 2004/01/23 15:34:30 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Define.java#5 $ by $Author: rhs $, $DateTime: 2004/01/27 09:26:37 $";
 
     private Expression m_expr;
     private String m_name;

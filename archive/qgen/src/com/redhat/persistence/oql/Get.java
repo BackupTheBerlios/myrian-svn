@@ -7,12 +7,12 @@ import java.util.*;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/01/23 $
+ * @version $Revision: #5 $ $Date: 2004/01/27 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#4 $ by $Author: rhs $, $DateTime: 2004/01/23 15:34:30 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#5 $ by $Author: rhs $, $DateTime: 2004/01/27 09:26:37 $";
 
     private Expression m_expr;
     private String m_name;
@@ -42,45 +42,30 @@ public class Get extends Expression {
     Code.Frame frame(Code code) {
         Code.Frame expr = m_expr.frame(code);
         Property prop = expr.type.getProperty(m_name);
-        Code.Frame frame = code.frame(prop.getType());
-        // XXX: hack for package lookup
-        if (code.isPackage(m_expr) && prop.getType().getRoot() == null) {
-            code.addPackage(this);
-        } else {
-            frame.alias();
-            code.setFrame(m_expr, expr);
-            code.setFrame(this, frame);
+        if (prop == null) {
+            throw new IllegalStateException
+                ("no such property: " + m_name + " in " + expr.type);
         }
+        Code.Frame frame = code.frame(prop.getType());
+        frame.alias();
+        code.setFrame(m_expr, expr);
+        code.setFrame(this, frame);
         return frame;
     }
 
     void emit(Code code) {
-        // XXX: hack for package lookup
-        if (code.isPackage(this)) { return; }
-
         Code.Frame expr = code.getFrame(m_expr);
         Property prop = expr.type.getProperty(m_name);
         Code.Frame frame = code.getFrame(this);
         code.append("(select ");
         String[] columns = expr.getColumns(prop);
         if (columns == null) {
-            // XXX: hack for package lookup
-            if (code.isPackage(m_expr)) {
-                code.alias(prop.getType(), frame.getColumns());
-            } else {
-                code.alias(prop, frame.getColumns());
-            }
+            code.alias(prop, frame.getColumns());
         } else {
             code.alias(columns, frame.getColumns());
         }
         code.append(" from ");
         if (columns == null) {
-            // XXX: hack for package lookup
-            if (code.isPackage(m_expr)) {
-                code.table(prop.getType());
-                code.append(")");
-                return;
-            }
             code.table(prop);
             code.append(" join ");
         }

@@ -8,6 +8,7 @@ PARSER_BEGIN(OQLParser)
 package com.redhat.persistence.oql;
 
 import java.lang.reflect.*;
+import java.math.*;
 import java.util.*;
 import java.io.*;
 
@@ -15,7 +16,7 @@ import java.io.*;
  * OQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/01/26 $
+ * @version $Revision: #6 $ $Date: 2004/01/27 $
  */
 
 class OQLParser {
@@ -36,19 +37,19 @@ class OQLParser {
         EXPRESSIONS.put("size", Size.class);
     }
 
-    static Expression construct(Token t, List expressions) {
+    static Expression construct(Token t, List args) {
         Class klass = (Class) EXPRESSIONS.get(t.image);
         if (klass == null) {
             throw new IllegalArgumentException
                 ("no such expression: " + t.image);
         }
-        Class[] params = new Class[expressions.size()];
+        Class[] params = new Class[args.size()];
         for (int i = 0; i < params.length; i++) {
             params[i] = Expression.class;
         }
         try {
             Constructor cons = klass.getDeclaredConstructor(params);
-            return (Expression) cons.newInstance(expressions.toArray());
+            return (Expression) cons.newInstance(args.toArray());
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException
                 ("no such method: " + t.image + Arrays.asList(params));
@@ -59,6 +60,16 @@ class OQLParser {
         } catch (InvocationTargetException e) {
             throw new IllegalStateException(e.getMessage());
         }
+    }
+
+    static String parseString(String image) {
+        StringBuffer result = new StringBuffer(image.length());
+        for (int i = 0; i < image.length(); i++) {
+            char c = image.charAt(i);
+            if (c == '\\') { c = image.charAt(++i); }
+            result.append(c);
+        }
+        return result.toString();
     }
 
 }
@@ -86,15 +97,21 @@ TOKEN:
   | <OR: "or">
   | <NOT: "not">
   | <STATIC: "static"> : BEGIN
+  | <ALL: "all">
 }
 
 TOKEN:
 {
-    <ID: (<CH>) (<CH>|<DIGIT>)* ( "[]" )?>
-  | <#CH: <ESC>|<CHARS>>
+    <#CH: <ESC>|<CHARS>>
   | <#CHARS: ["a" - "z", "A" - "Z", "_", "$"]>
   | <#ESC: "\\" ~[]>
   | <#DIGIT: ["0" - "9"]>
+  | <STRING: "\"" ( ~["\""] | "\\\"" )* "\"">
+  | <INTEGER: ( "+" | "-" )? (<DIGIT>)+>
+  | <DECIMAL: ( "+" | "-" )? (<DIGIT>)* ( "." (<DIGIT>)+ )?
+              ( "E" | "e" ) ( "+" | "-" ) (<DIGIT>)+>
+  | <BOOLEAN: ( "true" | "false" )>
+  | <ID: (<CH>) (<CH>|<DIGIT>)* ( "[]" )?>
 }
 
 <BEGIN> MORE:
@@ -216,12 +233,35 @@ Expression generic() :
 {
     Token t;
     List l;
+    Expression e;
 }
 {
     t = <ID> [ l = exprl() { return construct(t, l); } ]
-        { return new Variable(t.image); }
+      { return new Variable(t.image); }
   | <STATIC> t = <SQL>
-        { return new Static(t.image); }
+      { return new Static(t.image); }
+  | t = <STRING>
+      { return new Literal(parseString(t.image)); }
+  | t = <INTEGER>
+      { return new Literal(new BigInteger(t.image)); }
+  | t = <DECIMAL>
+      { return new Literal(new BigDecimal(t.image)); }
+  | t = <BOOLEAN>
+      { return new Literal(Boolean.valueOf(t.image)); }
+  | e = type()
+      { return e; }
+}
+
+Expression type() :
+{
+    Token t;
+    StringBuffer type = new StringBuffer();
+}
+{
+    <ALL> <LPAREN> t = <ID> { type.append(t.image); }
+    ( <DOT> t = <ID> { type.append('.'); type.append(t.image); } )*
+    <RPAREN>
+        { return new All(type.toString()); }
 }
 
 List exprl() :
