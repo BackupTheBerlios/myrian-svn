@@ -9,12 +9,12 @@ import java.util.*;
  * for filtering the stream down to the set of events that are of interest.
  *
  * @author <a href="mailto:ashah@redhat.com">Archit Shah</a>
- * @version $Revision: #3 $ $Date: 2003/03/10 $
+ * @version $Revision: #4 $ $Date: 2003/04/04 $
  **/
 
 public class EventStream {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/EventStream.java#3 $ by $Author: ashah $, $DateTime: 2003/03/10 17:28:24 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/EventStream.java#4 $ by $Author: ashah $, $DateTime: 2003/04/04 11:35:17 $";
 
     // all events
     private final LinkedList m_events = new LinkedList();
@@ -24,6 +24,12 @@ public class EventStream {
     private final Map m_setEvents = new HashMap();
     // CK(obj,prop) -> current event list
     private final Map m_collectionEvents = new HashMap();
+
+    private final boolean m_coalescing;
+
+    public EventStream() { this(false); }
+
+    public EventStream(boolean coalescing) { m_coalescing = coalescing; }
 
     public int size() { return m_events.size(); }
 
@@ -70,7 +76,45 @@ public class EventStream {
                 }
             }
             public void onCreate(CreateEvent e) { onObjectEvent(e); }
-            public void onDelete(DeleteEvent e) { onObjectEvent(e); }
+            public void onDelete(DeleteEvent e) {
+                Object key = getKey(e.getObject());
+                boolean found = false;
+                if (m_coalescing && getLastEvent(e.getObject()) != null) {
+                    CreateEvent ce = (CreateEvent) getLastEvent(e.getObject());
+                    for (Iterator it = m_events.iterator(); it.hasNext(); ) {
+                        Event ev = (Event) it.next();
+                        if (ev.equals(ce)) {
+                            found = true;
+                        }
+
+                        if (!found) { continue; }
+
+                        if (getKey(ev.getObject()).equals(key)) {
+                            it.remove();
+                        } else if (ev instanceof PropertyEvent) {
+                            PropertyEvent pe = (PropertyEvent) ev;
+                            if (key.equals(getKey(pe.getArgument()))) {
+                                it.remove();
+                            }
+                        }
+                    }
+
+                    if (!found) { throw new IllegalStateException(); }
+                }
+                onObjectEvent(e);
+                if (m_coalescing && found) {
+                    m_objectEvents.remove(key);
+                    for (int i = m_events.size() - 1; i >= 0; i--) {
+                        if (m_events.get(i) instanceof DeleteEvent) {
+                            DeleteEvent de = (DeleteEvent) m_events.get(i);
+                            if (key.equals(getKey(de.getObject()))) {
+                                m_objectEvents.put(key, de);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
             public void onSet(SetEvent e) {
                 m_setEvents.put((getKey(e.getObject(), e.getProperty())), e);
             }

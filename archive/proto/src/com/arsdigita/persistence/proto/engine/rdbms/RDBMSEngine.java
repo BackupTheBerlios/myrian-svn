@@ -13,17 +13,17 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #29 $ $Date: 2003/03/31 $
+ * @version $Revision: #30 $ $Date: 2003/04/04 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#29 $ by $Author: ashah $, $DateTime: 2003/03/31 18:25:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#30 $ by $Author: ashah $, $DateTime: 2003/04/04 11:35:17 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
 
-    private EventStream m_events = new EventStream();
+    private EventStream m_events = new EventStream(true);
     private HashMap m_outgoing = new HashMap();
     private HashMap m_counts = new HashMap();
 
