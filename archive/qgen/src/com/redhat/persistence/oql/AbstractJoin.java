@@ -7,12 +7,12 @@ import java.util.*;
  * AbstractJoin
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/01/16 $
+ * @version $Revision: #3 $ $Date: 2004/01/19 $
  **/
 
 public abstract class AbstractJoin extends Query {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/AbstractJoin.java#2 $ by $Author: rhs $, $DateTime: 2004/01/16 16:27:01 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/AbstractJoin.java#3 $ by $Author: rhs $, $DateTime: 2004/01/19 14:43:24 $";
 
     private Expression m_left;
     private Expression m_right;
@@ -36,7 +36,7 @@ public abstract class AbstractJoin extends Query {
         if (cond != null) {
             pane.variables = new UnionVariableNode
                 (pane.variables, new ExternalVariableNode(cond.variables));
-            pane.keys = new FilterKeyNode(pane.keys, frame, cond.constrained);
+            pane.keys = new FilterKeyNode(pane.keys, cond.constrained);
         }
     }
 

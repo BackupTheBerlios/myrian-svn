@@ -9,6 +9,7 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.table.*;
 import javax.swing.tree.*;
 import javax.swing.event.*;
 
@@ -16,12 +17,12 @@ import javax.swing.event.*;
  * Viewer
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/01/16 $
+ * @version $Revision: #2 $ $Date: 2004/01/19 $
  **/
 
 public class Viewer {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Viewer.java#1 $ by $Author: rhs $, $DateTime: 2004/01/16 16:27:01 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Viewer.java#2 $ by $Author: rhs $, $DateTime: 2004/01/19 14:43:24 $";
 
     public static final void main(String[] args) throws Exception {
         PDL pdl = new PDL();
@@ -35,38 +36,41 @@ public class Viewer {
 
         JFrame frame = new JFrame("Viewer");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        Container content = frame.getContentPane();
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 
         JTree tree = new JTree
             (new DefaultTreeModel(new DefaultMutableTreeNode
                                   (new UserNode(null))));
-        content.add(new JScrollPane(tree));
+        PaneTableModel panes = new PaneTableModel();
 
-        JTextArea errors = new JTextArea(5, 40);
-        errors.setEditable(false);
-        content.add(new JScrollPane(errors));
+        JSplitPane top = new JSplitPane
+            (JSplitPane.HORIZONTAL_SPLIT,
+             new JScrollPane(tree), new JScrollPane(new JTable(panes)));
+        top.setResizeWeight(0.0);
+        JPanel bottom = new JPanel();
+        bottom.setLayout(new BoxLayout(bottom, BoxLayout.X_AXIS));
 
-        JPanel input = new JPanel();
-        input.setLayout(new BoxLayout(input, BoxLayout.X_AXIS));
-        content.add(input);
+        JSplitPane content = new JSplitPane
+            (JSplitPane.VERTICAL_SPLIT, top, bottom);
+        content.setResizeWeight(1.0);
+        frame.setContentPane(content);
 
         JTextArea text = new JTextArea(8, 40);
-        input.add(new JScrollPane(text));
+        bottom.add(new JScrollPane(text));
 
         JPanel buttons = new JPanel();
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
-        input.add(buttons);
+        bottom.add(buttons);
 
         JButton parse = new JButton("Parse");
-        parse.addActionListener(new ParseListener(root, text, tree, errors));
+        parse.addActionListener
+            (new ParseListener(frame, root, text, tree, panes));
         buttons.add(parse);
 
         JButton load = new JButton("Load...");
-        load.addActionListener(new LoadListener(frame, root, errors));
+        load.addActionListener(new LoadListener(frame, root));
         buttons.add(load);
 
-        tree.addTreeSelectionListener(new NodeSelectionListener(errors));
+        tree.addTreeSelectionListener(new NodeSelectionListener(panes));
 
         frame.pack();
         frame.setVisible(true);
@@ -84,17 +88,19 @@ public class Viewer {
 
     private static class ParseListener implements ActionListener {
 
+        private JFrame m_frame;
         private Root m_root;
         private JTextArea m_text;
         private JTree m_tree;
-        private JTextArea m_errors;
+        private PaneTableModel m_panes;
 
-        public ParseListener(Root root, JTextArea text, JTree tree,
-                             JTextArea errors) {
+        public ParseListener(JFrame frame, Root root, JTextArea text,
+                             JTree tree, PaneTableModel panes) {
+            m_frame = frame;
             m_root = root;
             m_text = text;
             m_tree = tree;
-            m_errors = errors;
+            m_panes = panes;
         }
 
         public void actionPerformed(ActionEvent evt) {
@@ -106,28 +112,26 @@ public class Viewer {
                 ((DefaultTreeModel) m_tree.getModel()).setRoot(tree(pane));
                 Node.propogate(Collections.singleton(frame.type));
             } catch (Throwable t) {
-                m_errors.append(t.getMessage().trim() + "\n");
+                error(m_frame, t);
             }
         }
     }
 
     private static class LoadListener implements ActionListener {
 
-        private Container m_container;
+        private JFrame m_frame;
         private Root m_root;
-        private JTextArea m_errors;
         private JFileChooser m_chooser;
 
-        public LoadListener(Container container, Root root, JTextArea errors) {
-            m_container = container;
+        public LoadListener(JFrame frame, Root root) {
+            m_frame = frame;
             m_root = root;
-            m_errors = errors;
             m_chooser = new JFileChooser();
             m_chooser.setMultiSelectionEnabled(true);
         }
 
         public void actionPerformed(ActionEvent evt) {
-            int result = m_chooser.showOpenDialog(m_container);
+            int result = m_chooser.showOpenDialog(m_frame);
             if (result == JFileChooser.APPROVE_OPTION) {
                 File[] files = m_chooser.getSelectedFiles();
                 try {
@@ -137,7 +141,7 @@ public class Viewer {
                     }
                     pdl.emit(m_root);
                 } catch (Throwable t) {
-                    m_errors.append(t.getMessage().trim() + "\n");
+                    error(m_frame, t);
                 }
             }
         }
@@ -147,26 +151,27 @@ public class Viewer {
     private static class NodeSelectionListener
         implements TreeSelectionListener {
 
-        private JTextArea m_console;
+        private PaneTableModel m_panes;
 
-        public NodeSelectionListener(JTextArea console) {
-            m_console = console;
+        public NodeSelectionListener(PaneTableModel panes) {
+            m_panes = panes;
         }
 
         public void valueChanged(TreeSelectionEvent evt) {
             TreePath[] paths = evt.getPaths();
             for (int i = 0; i < paths.length; i++) {
-                if (!evt.isAddedPath(i)) { continue; }
                 DefaultMutableTreeNode node =
                     (DefaultMutableTreeNode) paths[i].getLastPathComponent();
                 UserNode un = (UserNode) node.getUserObject();
                 Pane p = un.pane;
-                if (p == null) { return; }
-                m_console.append
-                    ("T = " + p.type + ", V = " + p.variables + ", I = " +
-                     p.injection + ", C = " + p.constrained + ", K = " +
-                     p.keys + "\n");
+                if (p == null) { continue; }
+                if (evt.isAddedPath(i)) {
+                    m_panes.add(p);
+                } else {
+                    m_panes.remove(p);
+                }
             }
+            m_panes.fireTableDataChanged();
         }
 
     }
@@ -187,6 +192,68 @@ public class Viewer {
             }
         }
 
+    }
+
+    private static class PaneTableModel extends AbstractTableModel {
+        private static String[] columns = new String[] {
+            "Expression", "Type", "Variables", "Injection", "Constrained",
+            "Keys"
+        };
+
+        public String getColumnName(int col) {
+            return columns[col];
+        }
+
+        public int getColumnCount() {
+            return columns.length;
+        }
+
+        private java.util.List m_panes = new ArrayList();
+
+        public void clear() {
+            m_panes.clear();
+        }
+
+        public void add(Pane pane) {
+            m_panes.add(pane);
+        }
+
+        public void remove(Pane pane) {
+            m_panes.remove(pane);
+        }
+
+        public void addAll(Collection panes) {
+            m_panes.addAll(panes);
+        }
+
+        public int getRowCount() { return m_panes.size(); }
+
+        public Object getValueAt(int row, int column) {
+            Pane pane = (Pane) m_panes.get(row);
+            switch (column) {
+            case 0:
+                return "" + pane.expression;
+            case 1:
+                return "" + pane.type;
+            case 2:
+                return "" + pane.variables;
+            case 3:
+                return "" + pane.injection;
+            case 4:
+                return "" + pane.constrained;
+            case 5:
+                return "" + pane.keys;
+            default:
+                throw new IllegalArgumentException();
+            }
+        }
+    }
+
+    private static void error(JFrame frame, Throwable t) {
+        t.printStackTrace(System.err);
+        JOptionPane.showMessageDialog
+            (frame, ("" + t.getMessage()).trim(), "Error",
+             JOptionPane.ERROR_MESSAGE);
     }
 
 }

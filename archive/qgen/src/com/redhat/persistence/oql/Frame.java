@@ -8,12 +8,12 @@ import java.util.*;
  * Frame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/01/16 $
+ * @version $Revision: #3 $ $Date: 2004/01/19 $
  **/
 
 class Frame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Frame.java#2 $ by $Author: rhs $, $DateTime: 2004/01/16 16:31:45 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Frame.java#3 $ by $Author: rhs $, $DateTime: 2004/01/19 14:43:24 $";
 
     Frame parent;
     TypeNode type;
