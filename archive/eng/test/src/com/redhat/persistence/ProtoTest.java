@@ -18,7 +18,6 @@
 package com.redhat.persistence;
 
 import junit.framework.TestCase;
-//import com.arsdigita.tools.junit.framework.BaseTestCase;
 
 import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.engine.rdbms.*;
@@ -36,12 +35,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/09/30 $
+ * @version $Revision: #6 $ $Date: 2004/10/01 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/ProtoTest.java#5 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/ProtoTest.java#6 $ by $Author: ashah $, $DateTime: 2004/10/01 15:19:06 $";
 
 
     public ProtoTest(String name) {
