@@ -31,12 +31,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #17 $ $Date: 2003/06/25 $
+ * @version $Revision: #18 $ $Date: 2003/06/30 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#17 $ by $Author: rhs $, $DateTime: 2003/06/25 17:10:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#18 $ by $Author: ashah $, $DateTime: 2003/06/30 13:42:11 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);
@@ -58,7 +58,6 @@ public class QueryTest extends PersistenceTestCase {
             for (int i = 0; i < properties.length; i++) {
                 Path path = Path.get(properties[i]);
                 sig.addPath(path);
-                sig.addDefaultProperties(path);
             }
         }
 
@@ -239,7 +238,8 @@ public class QueryTest extends PersistenceTestCase {
                "oql.Sub",
                new String[] {
                    "id",
-                   "required"
+                   "required.id",
+                   "required.refAttribute"
                });
     }
 
@@ -252,7 +252,8 @@ public class QueryTest extends PersistenceTestCase {
                "oql.Sub",
                new String[] {
                    "id",
-                   "optional"
+                   "optional.id",
+                   "optional.refAttribute"
                });
     }
 

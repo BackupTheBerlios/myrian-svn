@@ -8,12 +8,12 @@ import java.util.*;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/06/25 $
+ * @version $Revision: #6 $ $Date: 2003/06/30 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#5 $ by $Author: rhs $, $DateTime: 2003/06/25 21:48:22 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#6 $ by $Author: ashah $, $DateTime: 2003/06/30 13:42:11 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -91,6 +91,12 @@ public class ObjectMap extends Element {
         return result;
     }
 
+    public Collection getDeclaredMappings() {
+        ArrayList result = new ArrayList();
+        result.addAll(m_mappings);
+        return result;
+    }
+
     public List getKeyProperties() {
         ObjectMap sm = getSuperMap();
         if (sm == null) {
@@ -113,7 +119,7 @@ public class ObjectMap extends Element {
 
     public Collection getDeclaredFetchedPaths() {
         final HashSet result = new HashSet();
-        for (Iterator it = getMappings().iterator(); it.hasNext(); ) {
+        for (Iterator it = getDeclaredMappings().iterator(); it.hasNext(); ) {
             Mapping m = (Mapping) it.next();
             m.dispatch(new Mapping.Switch() {
                     public void onValue(Value m) {

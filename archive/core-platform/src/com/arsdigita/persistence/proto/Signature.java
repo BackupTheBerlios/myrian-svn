@@ -8,12 +8,12 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/06/24 $
+ * @version $Revision: #4 $ $Date: 2003/06/30 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Signature.java#3 $ by $Author: rhs $, $DateTime: 2003/06/24 22:57:54 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Signature.java#4 $ by $Author: ashah $, $DateTime: 2003/06/30 13:42:11 $";
 
     private ArrayList m_paths = new ArrayList();
 
@@ -205,8 +205,15 @@ public class Signature {
 
     public void addDefaultProperties(Path path) {
         Root root = Root.getRoot();
-        addPaths(path, root.getObjectMap
-                 (getObjectType().getType(path)).getFetchedPaths());
+        ObjectType type = getObjectType().getType(path);
+        if (type.isKeyed()) {
+            addPaths(path, root.getObjectMap(type).getFetchedPaths());
+        } else {
+            Property prop = getObjectType().getProperty(path);
+            // assume that path.getParent() is keyed
+            ObjectMap container = root.getObjectMap(prop.getContainer());
+            addPaths(path.getParent(), container.getDeclaredFetchedPaths());
+        }
     }
 
     public void addDefaultProperties() {
