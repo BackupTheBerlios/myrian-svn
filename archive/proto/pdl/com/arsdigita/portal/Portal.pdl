@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/pdl/com/arsdigita/portal/Portal.pdl#1 $ 
-// $DateTime: 2002/11/27 19:51:05 $
+// $Id: //core-platform/proto/pdl/com/arsdigita/portal/Portal.pdl#2 $ 
+// $DateTime: 2003/02/17 18:04:43 $
 
 model com.arsdigita.portal;
 
@@ -22,7 +22,7 @@ import com.arsdigita.kernel.ACSObject;
 // @author Justin Ross (justin@arsdigita.com)
 
 object type Portal extends Resource {
-    String title = portals.title VARCHAR(200);
+    // String title = portals.title VARCHAR(200);
     Boolean isTemplate = portals.template_p BIT;
 
     reference key (portals.portal_id);
