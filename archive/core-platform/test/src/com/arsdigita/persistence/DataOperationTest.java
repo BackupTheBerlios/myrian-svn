@@ -29,11 +29,11 @@ import com.arsdigita.db.DbHelper;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2002/10/01 $
+ * @version $Revision: #10 $ $Date: 2002/10/16 $
  */
 public class DataOperationTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataOperationTest.java#9 $ by $Author: rhs $, $DateTime: 2002/10/01 15:44:47 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataOperationTest.java#10 $ by $Author: dennis $, $DateTime: 2002/10/16 15:08:57 $";
 
     public DataOperationTest(String name) {
         super(name);
