@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/categorization/table-cat_object_category_map.sql#4 $
--- $DateTime: 2003/05/21 12:25:09 $
+-- $Id: //core-platform/dev/sql/default/categorization/table-cat_object_category_map.sql#5 $
+-- $DateTime: 2003/06/05 16:29:48 $
 
 create table cat_object_category_map (
   category_id             integer
@@ -25,6 +25,9 @@ create table cat_object_category_map (
   default_p               char(1)
                           constraint cat_obj_map_default_p_ck
                           check(default_p in ('0','1')),
+  index_p                 char(1)
+                          constraint cat_obj_map_index_p_ck
+                          check(index_p in ('0','1')),
   sort_key                integer,
   constraint cat_obj_cat_map_ckone
   check(not category_id = object_id),

@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/categorization/Category.pdl#15 $
-// $DateTime: 2003/05/13 14:28:36 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/categorization/Category.pdl#16 $
+// $DateTime: 2003/06/05 16:29:48 $
 
 model com.arsdigita.categorization;
 
@@ -31,6 +31,7 @@ import com.arsdigita.kernel.*;
 object type Category extends ACSObject {
     String[0..1] description = cat_categories.description VARCHAR(4000);
     String[1..1] name = cat_categories.name VARCHAR(200);
+    String[0..1] url = cat_categories.url VARCHAR(200);
     Boolean[1..1] isEnabled = cat_categories.enabled_p CHAR(1);
     Boolean[1..1] isAbstract = cat_categories.abstract_p CHAR(1);
     String[1..1] defaultAncestors = cat_categories.default_ancestors VARCHAR(4000);
@@ -60,6 +61,7 @@ association {
                                   join cat_object_category_map.object_id
                                      to acs_objects.object_id;
     Boolean[0..1] isDefault = cat_object_category_map.default_p CHAR(1);
+    Boolean[0..1] isIndex = cat_object_category_map.index_p CHAR(1);
     BigDecimal[0..1] sortKey = cat_object_category_map.sort_key;
 
     add {
@@ -68,11 +70,42 @@ association {
                 category_id,
                 object_id,
                 default_p,
+                index_p,
                 sort_key
             ) values (
                 :categories.id,
+                :id,
+                :isDefault,
+                :isIndex,
+                (select CASE WHEN (:sortKey is null) THEN
+                            (select CASE WHEN (max(sort_key) is null)
+                                               THEN
+                                                0
+                                               ELSE
+                                                max(sort_key)
+                                          END + 1
+                                     from cat_object_category_map)
+                             ELSE
+                                 (:sortKey)
+                             END
+                   from dual)
+            )
+        }
+    }
+
+    add childObjects {
+        do {
+            insert into cat_object_category_map (
+                category_id,
+                object_id,
+                default_p,
+                index_p,
+                sort_key
+            ) values (
+                :id,
                 :childObjects.id,
                 :isDefault,
+                :isIndex,
                 (select CASE WHEN (:sortKey is null) THEN
                             (select CASE WHEN (max(sort_key) is null)
                                                THEN
@@ -383,5 +416,31 @@ query immediateChildObjectIDs {
             category_id = :categoryID
     } map {
         id = object_id;
+    }
+}
+
+query childCategoryIDs {
+    BigDecimal id;
+    
+    do {
+         select m.related_category_id
+           from cat_category_category_map m
+          where m.category_id = :parentID
+            and m.relation_type = 'child'
+    } map {
+         id = m.related_category_id;
+    }
+}
+
+query parentCategoryIDs {
+    BigDecimal id;
+    
+    do {
+         SELECT category_id
+                        FROM cat_category_category_map
+                        START WITH related_category_id = :parentID
+                CONNECT BY PRIOR category_id = related_category_id
+    } map {
+         id = category_id;
     }
 }
