@@ -33,8 +33,6 @@ import java.util.*;
 
 import javax.jdo.*;
 import javax.jdo.spi.JDOImplHelper;
-import javax.jdo.spi.RegisterClassEvent;
-import javax.jdo.spi.RegisterClassListener;
 
 import org.apache.log4j.Logger;
 
@@ -61,9 +59,6 @@ public class PersistenceManagerFactoryImpl
     }
 
     private static final Registrar s_registrar = new Registrar();
-    static {
-        JDOImplHelper.getInstance().addRegisterClassListener(s_registrar);
-    }
 
     private static Collection m_options;
     static {
@@ -391,10 +386,7 @@ public class PersistenceManagerFactoryImpl
         throw new JDOUnsupportedOptionException("RetainValues");
     }
 
-    // ========================================================================
-    // RegisterClassListener
-    // ========================================================================
-    private static class Registrar implements RegisterClassListener, ClassInfo {
+    private static class Registrar implements ClassInfo {
         private final Map m_classFields;
         private final Map m_classTypes;
         private final Map m_fieldFlags;
@@ -405,25 +397,14 @@ public class PersistenceManagerFactoryImpl
             m_fieldFlags  = new HashMap();
         }
 
-        public void registerClass(RegisterClassEvent event) {
-            final Class klass = event.getRegisteredClass();
+        private void registerClass(Class klass) {
+            if (m_classFields.containsKey(klass)) { return; }
 
-            if (m_classFields.containsKey(klass)
-                || m_classTypes.containsKey(klass)) {
-
-                throw new IllegalStateException
-                    ("Already registered " + toString(event));
-            }
-
-            // XXX: cacheFields should make use of event.getFieldNames
             m_classFields.put(klass,
                               Collections.unmodifiableList(cacheFields(klass)));
-            // XXX: cacheTypes should make use of event.getFieldTypes
             m_classTypes.put(klass,
                              Collections.unmodifiableList(cacheTypes(klass)));
-            // XXX: cacheFieldFlags should make use of event.getFieldFlags
             m_fieldFlags.put(klass, cacheFieldFlags(klass));
-
         }
 
         private static List cacheFields(Class pcClass) {
@@ -489,14 +470,6 @@ public class PersistenceManagerFactoryImpl
             return result;
         }
 
-
-        private static String toString(RegisterClassEvent event) {
-            return "registering " + event.getRegisteredClass().getName() +
-                superclass(event.getPersistenceCapableSuperclass()) +
-                ";\nfields=" + Arrays.asList(event.getFieldNames()) +
-                ";\ntypes="  + Arrays.asList(event.getFieldTypes());
-        }
-
         private static String superclass(Class superclass) {
             if (superclass == null) { return ""; }
             return " (inherits from " + superclass.getName() + ")";
@@ -504,16 +477,19 @@ public class PersistenceManagerFactoryImpl
 
         // Implementation of ClassInfo
 
-        public List getAllFields(Class pcClass) {
+        public synchronized List getAllFields(Class pcClass) {
+            registerClass(pcClass);
             return (List) m_classFields.get(pcClass);
         }
 
-        public List getAllTypes(Class pcClass) {
+        public synchronized List getAllTypes(Class pcClass) {
+            registerClass(pcClass);
             return (List) m_classTypes.get(pcClass);
         }
 
         // XXX: should we worry about returning a modifiable array?
-        public byte[] getAllFieldFlags(Class pcClass) {
+        public synchronized byte[] getAllFieldFlags(Class pcClass) {
+            registerClass(pcClass);
             return (byte[]) m_fieldFlags.get(pcClass);
         }
 
