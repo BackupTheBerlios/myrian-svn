@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/portal/Portal.pdl#4 $
-// $DateTime: 2003/01/03 15:20:16 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/portal/Portal.pdl#5 $
+// $DateTime: 2003/07/21 17:55:50 $
 
 model com.arsdigita.portal;
 
@@ -30,6 +30,5 @@ object type Portal extends Resource {
 
 association {
     Portal[1..1] portal = join portlets.portal_id to portals.portal_id;
-    // XXX: should be component
-    Portlet[0..n] portlet = join portals.portal_id to portlets.portal_id;
+    component Portlet[0..n] portlet = join portals.portal_id to portlets.portal_id;
 }
