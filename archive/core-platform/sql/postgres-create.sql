@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres-create.sql#26 $
--- $DateTime: 2003/06/18 15:51:58 $
+-- $Id: //core-platform/dev/sql/postgres-create.sql#27 $
+-- $DateTime: 2003/07/28 11:33:50 $
 
 begin;
 
@@ -76,7 +76,7 @@ begin;
 
 \i default/kernel/insert-users.sql
 \i default/kernel/insert-groups.sql
-\i postgres/kernel/insert-permissions.sql
+\i default/kernel/insert-permissions.sql
 \i default/kernel/view-granted_trans_context_index.sql
 \i default/kernel/view-granted_trans_context_map.sql
 \i default/kernel/view-ungranted_trans_context_index.sql
