@@ -12,12 +12,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #20 $ $Date: 2003/04/01 $
+ * @version $Revision: #21 $ $Date: 2003/04/02 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#20 $ by $Author: rhs $, $DateTime: 2003/04/01 10:11:56 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#21 $ by $Author: rhs $, $DateTime: 2003/04/02 15:54:27 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -268,9 +268,7 @@ class EventSwitch extends Event.Switch {
                 }
 
                 public void onJoinThrough(JoinThrough m) {
-                    Column from = m.getFrom().getColumns()[0];
-                    Column to = m.getTo().getColumns()[0];
-                    Table table = from.getTable();
+                    Table table = m.getFrom().getTable();
 
                     DML op = m_engine.getOperation(obj, arg, table);
                     // This should eliminate duplicates, but we could be
@@ -280,7 +278,7 @@ class EventSwitch extends Event.Switch {
 
                     boolean one2n = role.isReversable() &&
                         !role.getReverse().isCollection();
-                    if (one2n) {
+                    if (one2n && e instanceof RemoveEvent) {
                         op = m_engine.getOperation(arg, null, table);
                     } else {
                         op = m_engine.getOperation(arg, obj, table);
