@@ -17,42 +17,10 @@ package com.arsdigita.persistence;
 
 
 /**
- * A convenience class for implementing the {@link TransactionListener}
- * interface.
+ * See {@link AbstractTransactionListener} for a replacement.
  *
- * @see com.arsdigita.persistence.TransactionContext
+ * @deprecated
  * @author Stanislav Freidin (sfreidin@arsdigita.com)
  */
 
-public class TransactionListenerImpl implements TransactionListener {
-    
-  /**
-   * Called immediately before the transaction has committed
-   */
-  public void beforeCommit(TransactionContext txn) {
-    // Do nothing
-  }
-
-  /**
-   * Called immediately after the transaction has committed
-   */
-  public void afterCommit(TransactionContext txn) {
-    // Do nothing
-  }
-  
-  /**
-   * Called immediately before the transaction has aborted
-     */
-  public void beforeAbort(TransactionContext txn) {
-    // Do nothing
-  }
-  
-  /**
-   * Called immediately after the transaction has aborted
-   */
-  public void afterAbort(TransactionContext txn) {
-    // Do nothing
-  }
-}
-
-
+public class TransactionListenerImpl extends AbstractTransactionListener {}
