@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #22 $ $Date: 2003/02/12 $
+ * @version $Revision: #23 $ $Date: 2003/02/12 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#22 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#23 $ by $Author: ashah $, $DateTime: 2003/02/12 16:39:50 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -369,19 +369,17 @@ public class Session {
         }
     }
 
-
     public ObjectType getObjectType(Object obj) {
-        throw new Error("not implemented");
+        return getAdapter(obj).getObjectType(obj);
     }
 
     private Adapter getAdapter(Object obj) {
-        throw new Error("not implemented");
+        return Adapter.getAdapter(obj.getClass());
     }
 
     public ObjectMap getObjectMap(Object obj) {
-        throw new Error("not implemented");
+        return Root.getRoot().getObjectMap(getAdapter(obj).getObjectType(obj));
     }
-
 
     public boolean isNew(Object obj) {
         return hasObjectData(obj) && getObjectData(obj).isNew();
@@ -526,23 +524,25 @@ public class Session {
         pd.addEvent(ev);
     }
 
-    boolean hasObjectData(Object obj) {
+    private Object getSessionKey(Object obj) {
         Adapter ad = getAdapter(obj);
-        return m_odata.containsKey(ad.getSessionKey(obj));
+        return ad.getSessionKey(obj);
+    }
+
+    boolean hasObjectData(Object obj) {
+        return m_odata.containsKey(getSessionKey(obj));
     }
 
     ObjectData getObjectData(Object obj) {
-        Adapter ad = getAdapter(obj);
-        return (ObjectData) m_odata.get(ad.getSessionKey(obj));
+        return (ObjectData) m_odata.get(getSessionKey(obj));
     }
 
     void removeObjectData(Object obj) {
-        Adapter ad = getAdapter(obj);
-        m_odata.remove(ad.getSessionKey(obj));
+        m_odata.remove(getSessionKey(obj));
     }
 
     void addObjectData(ObjectData odata) {
-        m_odata.put(odata.getObject(), odata);
+        m_odata.put(getSessionKey(odata.getObject()), odata);
     }
 
     PropertyData getPropertyData(Object obj, Property prop) {

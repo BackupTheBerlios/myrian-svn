@@ -9,21 +9,37 @@ import java.util.*;
  * Adapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/02/12 $
+ * @version $Revision: #2 $ $Date: 2003/02/12 $
  **/
 
 public abstract class Adapter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Adapter.java#1 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Adapter.java#2 $ by $Author: ashah $, $DateTime: 2003/02/12 16:39:50 $";
 
     private static final Map ADAPTERS = new HashMap();
 
-    public static final void addAdapter(Class javaClass, Adapter ad) {
+    public static final void addAdapter(Class javaClass, ObjectType type,
+                                        Adapter ad) {
         ADAPTERS.put(javaClass, ad);
+        ADAPTERS.put(type, ad);
     }
 
     public static final Adapter getAdapter(Class javaClass) {
-        return (Adapter) ADAPTERS.get(javaClass);
+        for (; javaClass != null; javaClass = javaClass.getSuperclass()) {
+            Adapter a = (Adapter) ADAPTERS.get(javaClass);
+            if (a != null) { return a; }
+        }
+
+        throw new IllegalArgumentException("no adapter for: " + javaClass);
+    }
+
+    public static final Adapter getAdapter(ObjectType type) {
+        for (; type != null; type = type.getSupertype()) {
+            Adapter a = (Adapter) ADAPTERS.get(type);
+            if (a != null) { return a; }
+        }
+
+        throw new IllegalArgumentException("no adapter for: " + type);
     }
 
     Object getSessionKey(Object obj) {
@@ -38,7 +54,7 @@ public abstract class Adapter {
         throw new UnsupportedOperationException("not a simple type");
     }
 
-    public Object load(Map properties) {
+    public Object load(ObjectType baseType, Map properties) {
         throw new UnsupportedOperationException("not a compound type");
     }
 

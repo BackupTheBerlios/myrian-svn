@@ -1,5 +1,6 @@
 package com.arsdigita.persistence.proto.pdl;
 
+import com.arsdigita.persistence.proto.Adapter;
 import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.pdl.nodes.*;
 import com.arsdigita.persistence.proto.metadata.*;
@@ -14,12 +15,12 @@ import java.util.*;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2003/02/05 $
+ * @version $Revision: #11 $ $Date: 2003/02/12 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#10 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#11 $ by $Author: ashah $, $DateTime: 2003/02/12 16:39:50 $";
 
     private AST m_ast = new AST();
     private ErrorReport m_errors = new ErrorReport();
@@ -46,13 +47,32 @@ public class PDL {
         load(new InputStreamReader(is), s);
     }
 
+    private static class SimpleAdapter extends Adapter {
+
+        private ObjectType m_type;
+
+        SimpleAdapter(ObjectType type) {
+            if (type == null) { throw new IllegalArgumentException(); }
+            m_type = type;
+        }
+
+        public Object getJDBC(Object java, int type) { return java; }
+
+        public Object getJava(Object jdbc, int type) { return jdbc; }
+
+        public ObjectType getObjectType(Object obj) { return m_type; }
+    }
+
     public void emit(final Root root) {
         for (Iterator it = root.getObjectTypes().iterator(); it.hasNext(); ) {
             m_symbols.addEmitted((ObjectType) it.next());
         }
 
+        boolean loadingGlobal = false;
+
         if (root.getObjectType("global.String") == null) {
             loadResource("com/arsdigita/persistence/proto/pdl/global.pdl");
+            loadingGlobal = true;
         }
 
         m_ast.traverse(new Node.Switch() {
@@ -131,6 +151,13 @@ public class PDL {
         emitConstraints(root);
 
         m_errors.check();
+
+        if (loadingGlobal) {
+            ObjectType type = root.getObjectType("global.Integer");
+            Adapter.addAdapter(Integer.class, type, new SimpleAdapter(type));
+            type = root.getObjectType("global.String");
+            Adapter.addAdapter(String.class, type, new SimpleAdapter(type));
+        }
     }
 
     private void emitDDL(Root root) {

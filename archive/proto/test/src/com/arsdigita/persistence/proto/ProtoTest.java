@@ -13,12 +13,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/02/12 $
+ * @version $Revision: #10 $ $Date: 2003/02/12 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#9 $ by $Author: rhs $, $DateTime: 2003/02/12 16:20:01 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#10 $ by $Author: ashah $, $DateTime: 2003/02/12 16:39:50 $";
 
 
     private static class Generic {
@@ -48,7 +48,9 @@ public class ProtoTest extends TestCase {
     public void test() throws Exception {
         PDL.main(new String[] {"test/pdl/Test.pdl"});
 
-        Adapter.addAdapter(Generic.class, new Adapter() {
+        ObjectType TEST = Root.getRoot().getObjectType("test.Icle");
+
+        Adapter.addAdapter(Generic.class, TEST, new Adapter() {
                 public Object getKey(Object obj) {
                     return ((Generic) obj).getID();
                 }
@@ -57,8 +59,6 @@ public class ProtoTest extends TestCase {
                     return ((Generic) obj).getType();
                 }
             });
-
-        ObjectType TEST = Root.getRoot().getObjectType("test.Icle");
 
         Generic test = new Generic(TEST, BigInteger.ZERO);
         Property NAME = TEST.getProperty("name");

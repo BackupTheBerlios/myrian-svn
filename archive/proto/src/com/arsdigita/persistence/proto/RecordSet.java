@@ -10,18 +10,19 @@ import java.util.*;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/02/12 $
+ * @version $Revision: #6 $ $Date: 2003/02/12 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#5 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#6 $ by $Author: ashah $, $DateTime: 2003/02/12 16:39:50 $";
 
     private Signature m_signature;
     private Adapter m_adapter;
 
     protected RecordSet(Signature signature) {
         m_signature = signature;
+        m_adapter = Adapter.getAdapter(m_signature.getObjectType());
     }
 
     public Signature getSignature() {
@@ -70,7 +71,15 @@ public abstract class RecordSet {
             if (me.getValue() == null) {
                 objs.put(me.getKey(), null);
             } else {
-                objs.put(me.getKey(), m_adapter.load((Map) me.getValue()));
+                Path p = (Path) me.getKey();
+                if (p == null) {
+                    objs.put(p, m_adapter.load
+                             (type.getBasetype(), (Map) me.getValue()));
+                } else {
+                    objs.put(p, m_adapter.load
+                             (m_signature.getProperty(p).getType(),
+                              (Map) me.getValue()));
+                }
             }
         }
 

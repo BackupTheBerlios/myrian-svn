@@ -13,21 +13,21 @@ import org.apache.log4j.Logger;
  * SessionSuite
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #2 $ $Date: 2003/02/12 $
+ * @version $Revision: #3 $ $Date: 2003/02/12 $
  **/
 
 public class SessionSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/SessionSuite.java#2 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/SessionSuite.java#3 $";
 
     private static final Logger s_log = Logger.getLogger(SessionSuite.class);
 
     private static final class Generic {
 
         private ObjectType m_type;
-        private Integer m_id;
+        private Object m_id;
 
-        public Generic(ObjectType type, Integer id) {
+        public Generic(ObjectType type, Object id) {
             m_type = type;
             m_id = id;
         }
@@ -36,10 +36,13 @@ public class SessionSuite extends PackageTestSuite {
             return m_type;
         }
 
-        public Integer getID() {
+        public Object getID() {
             return m_id;
         }
 
+        public String toString() {
+            return m_type + ": " + m_id;
+        }
     }
 
     public SessionSuite() {}
@@ -90,9 +93,9 @@ public class SessionSuite extends PackageTestSuite {
 
         m_model = Model.getInstance("test");
 
-        m_ssn = new Session();
-
         initializeModel();
+
+        m_ssn = new Session();
 
         initializeData();
 
@@ -209,26 +212,52 @@ public class SessionSuite extends PackageTestSuite {
     }
 
     private void initializeModel() {
+        ObjectType inte = Root.getRoot().getObjectType(INTE);
+
         m_root = createKeyedType(m_model, "Root");
         m_one = createKeyedType(m_model, "One");
         m_two = createKeyedType(m_model, "Two");
 
-        ObjectType inte = Root.getRoot().getObjectType(INTE);
+        Adapter a = new Adapter() {
+            public Object load(ObjectType type, Map properties) {
+                return new Generic(type, properties.get("id"));
+            }
 
-        ObjectType int3 = createUnkeyedType(
-            m_model, "Int3", new ObjectType[] { inte, inte, inte });
+            public Object get(Object obj, Property prop) {
+                if (!prop.getName().equals("id")) {
+                    throw new IllegalArgumentException(prop.toString());
+                }
 
-        ObjectType oneint = createUnkeyedType(
-            m_model, "OneInt", new ObjectType[] { m_one, inte });
+                return ((Generic) obj).getID();
+            }
 
-        ObjectType twoint = createUnkeyedType(
-            m_model, "TwoInt", new ObjectType[] { m_two, inte });
+            public Object getKey(Object obj) {
+                return ((Generic) obj).getID();
+            }
 
-        ObjectType rootone = createUnkeyedType(
-            m_model, "RootOne", new ObjectType[] { m_root, m_one});
+            public ObjectType getObjectType(Object obj) {
+                return ((Generic) obj).getObjectType();
+            }
+        };
+
+        Adapter.addAdapter(Generic.class, m_root, a);
+        Adapter.addAdapter(Generic.class, m_one, a);
+        Adapter.addAdapter(Generic.class, m_two, a);
+
+//         ObjectType int3 = createUnkeyedType(
+//             m_model, "Int3", new ObjectType[] { inte, inte, inte });
+
+//         ObjectType oneint = createUnkeyedType(
+//             m_model, "OneInt", new ObjectType[] { m_one, inte });
+
+//         ObjectType twoint = createUnkeyedType(
+//             m_model, "TwoInt", new ObjectType[] { m_two, inte });
+
+//         ObjectType rootone = createUnkeyedType(
+//             m_model, "RootOne", new ObjectType[] { m_root, m_one});
                                             
-        ObjectType roottwo = createUnkeyedType(
-            m_model, "RootTwo", new ObjectType[] { m_root, m_two });
+//         ObjectType roottwo = createUnkeyedType(
+//             m_model, "RootTwo", new ObjectType[] { m_root, m_two });
 
         ArrayList layer1 = new ArrayList();
         layer1.add(m_root);
