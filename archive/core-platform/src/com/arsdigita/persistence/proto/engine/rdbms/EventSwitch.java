@@ -12,12 +12,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/05/16 $
+ * @version $Revision: #4 $ $Date: 2003/05/19 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#3 $ by $Author: ashah $, $DateTime: 2003/05/16 23:05:05 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#4 $ by $Author: ashah $, $DateTime: 2003/05/19 10:56:20 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -279,17 +279,25 @@ class EventSwitch extends Event.Switch {
             }
 
             public void onJoinFrom(JoinFrom m) {
+                Object toNull;
+                Object toSet;
                 if (e instanceof SetEvent) {
                     SetEvent se = (SetEvent) e;
-                    Object prev = se.getPreviousValue();
-                    if (prev != null) {
-                        set(prev, m.getKey(), null);
-                    }
+                    toNull = se.getPreviousValue();
+                    toSet = arg;
+                } else if (e instanceof RemoveEvent) {
+                    toNull = arg;
+                    toSet = null;
+                } else if (e instanceof AddEvent) {
+                    toNull = null;
+                    toSet = arg;
+                } else {
+                    throw new IllegalArgumentException
+                        ("expecting ProperyEvent");
                 }
 
-                if (arg != null) {
-                    set(arg, m.getKey(), obj);
-                }
+                if (toNull != null) { set(toNull, m.getKey(), null); }
+                if (toSet != null) { set(toSet, m.getKey(), obj); }
             }
 
             public void onJoinThrough(JoinThrough m) {
