@@ -7,12 +7,12 @@ import java.util.*;
  * AbstractJoin
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/01/23 $
+ * @version $Revision: #5 $ $Date: 2004/01/29 $
  **/
 
-public abstract class AbstractJoin extends Query {
+public abstract class AbstractJoin extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/AbstractJoin.java#4 $ by $Author: rhs $, $DateTime: 2004/01/23 15:34:30 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/AbstractJoin.java#5 $ by $Author: rhs $, $DateTime: 2004/01/29 12:50:13 $";
 
     private Expression m_left;
     private Expression m_right;

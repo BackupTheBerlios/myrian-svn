@@ -16,7 +16,7 @@ import java.io.*;
  * OQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2004/01/27 $
+ * @version $Revision: #8 $ $Date: 2004/01/29 $
  */
 
 class OQLParser {
@@ -98,6 +98,7 @@ TOKEN:
   | <NOT: "not">
   | <SQL: "sql"> : BEGINSQL
   | <ALL: "all">
+  | <QUERY: "query">
   | <#CH: <ESC>|<CHARS>>
   | <#CHARS: ["a" - "z", "A" - "Z", "_", "$"]>
   | <#ESC: "\\" ~[]>
@@ -153,12 +154,25 @@ SPECIAL_TOKEN:
  * Top level constructs.
  **/
 
+Query query() :
+{
+    Expression e;
+    Query q;
+    Token t;
+}
+{
+    <QUERY> <LPAREN> e = expression() { q = new Query(e); }
+    ( <COMMA> t = <ID> <EQ> e = expression() { q.fetch(t.image, e); } )*
+    <RPAREN> { return q; }
+  | <EOF> { return null; }
+}
+
 Expression expression() :
 {
     Expression e;
 }
 {
-    e = define() { return e; } | <EOF> { return null; }
+    e = define() { return e; }
 }
 
 Expression define() :

@@ -7,12 +7,12 @@ import java.util.*;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/01/27 $
+ * @version $Revision: #6 $ $Date: 2004/01/29 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#5 $ by $Author: rhs $, $DateTime: 2004/01/27 09:26:37 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#6 $ by $Author: rhs $, $DateTime: 2004/01/29 12:50:13 $";
 
     private Expression m_expr;
     private String m_name;
@@ -79,12 +79,10 @@ public class Get extends Expression {
     }
 
     public String toString() {
-        if (m_expr instanceof Variable ||
-            m_expr instanceof Get ||
-            m_expr instanceof Query) {
-            return m_expr + "." + m_name;
-        } else {
+        if (m_expr instanceof Condition) {
             return "(" + m_expr + ")." + m_name;
+        } else {
+            return m_expr + "." + m_name;
         }
     }
 

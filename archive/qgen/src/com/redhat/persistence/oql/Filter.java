@@ -7,12 +7,12 @@ import java.util.*;
  * Filter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/01/23 $
+ * @version $Revision: #6 $ $Date: 2004/01/29 $
  **/
 
-public class Filter extends Query {
+public class Filter extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Filter.java#5 $ by $Author: rhs $, $DateTime: 2004/01/23 15:34:30 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Filter.java#6 $ by $Author: rhs $, $DateTime: 2004/01/29 12:50:13 $";
 
     private Expression m_expr;
     private Expression m_condition;
