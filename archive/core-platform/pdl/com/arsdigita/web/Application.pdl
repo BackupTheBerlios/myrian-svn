@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/web/Application.pdl#1 $ 
-// $DateTime: 2002/12/09 11:24:18 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/web/Application.pdl#2 $ 
+// $DateTime: 2002/12/09 11:27:10 $
 
 model com.arsdigita.web;
 
@@ -24,7 +24,7 @@ import com.arsdigita.kernel.permissions.Privilege;
 import com.arsdigita.portal.Portlet;
 
 // @author Justin Ross (justin@arsdigita.com)
-// @version $Id: //core-platform/dev/pdl/com/arsdigita/web/Application.pdl#1 $
+// @version $Id: //core-platform/dev/pdl/com/arsdigita/web/Application.pdl#2 $
 
 object type ApplicationType extends ResourceType {
 
@@ -46,7 +46,7 @@ association {
 }
 
 association {
-    PackageType[1..1] packageType =
+    PackageType[0..1] packageType =
         join application_types.package_type_id 
             to apm_package_types.package_type_id;
     ApplicationType[0..n] applicationType =
