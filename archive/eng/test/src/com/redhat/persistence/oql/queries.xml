@@ -1338,4 +1338,12 @@
     <exception type="java.lang.IllegalStateException"
                 msg="expecting a boolean expression, not a define: name = &quot;foo&quot;"/>
   </test>
+
+  <test name="StaticSQLLiteralProperty">
+    <query>query($sNode30, name = name)</query>
+    <results>
+      <row name="Thirty"/>
+    </results>
+  </test>
+
 </tests>

@@ -39,12 +39,12 @@ import java.util.*;
  * QuerySuite
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/08/18 $
+ * @version $Revision: #4 $ $Date: 2004/08/20 $
  **/
 
 public class QuerySuite extends TestSuite {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/QuerySuite.java#3 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/QuerySuite.java#4 $ by $Author: ashah $, $DateTime: 2004/08/20 16:35:13 $";
 
     public QuerySuite() {}
 
@@ -59,6 +59,7 @@ public class QuerySuite extends TestSuite {
     private Root m_root = null;
     private Connection m_conn = null;
     private Session m_ssn = null;
+    private Map m_literals = new HashMap();
 
     public Root getRoot() {
         return m_root;
@@ -70,6 +71,10 @@ public class QuerySuite extends TestSuite {
 
     public Connection getConnection() {
         return m_conn;
+    }
+
+    public Map getLiterals() {
+        return m_literals;
     }
 
     private void init() {
@@ -99,7 +104,7 @@ public class QuerySuite extends TestSuite {
         Engine engine = new RDBMSEngine(src, new PostgresWriter());
         m_ssn = new Session(m_root, engine, new QuerySource());
 
-        DataLoader loader = new DataLoader(m_ssn);
+        DataLoader loader = new DataLoader(m_ssn, m_literals);
         XML.parseResource("com/redhat/persistence/oql/test.dat", loader);
         XML.parseResource("com/redhat/persistence/oql/parties.dat", loader);
         m_ssn.flush();
@@ -129,8 +134,6 @@ public class QuerySuite extends TestSuite {
 
     public static Test suite() {
         final QuerySuite suite = new QuerySuite();
-        TestLoader loader = new TestLoader(suite);
-        XML.parseResource("com/redhat/persistence/oql/queries.xml", loader);
         TestSetup wrapper = new TestSetup(suite) {
             protected void setUp() throws SQLException {
                 suite.setup();
@@ -139,17 +142,21 @@ public class QuerySuite extends TestSuite {
                 suite.teardown();
             }
         };
+        TestLoader loader = new TestLoader(suite);
+        XML.parseResource("com/redhat/persistence/oql/queries.xml", loader);
         return wrapper;
     }
 
     private static class DataLoader extends DefaultHandler {
 
         private Session m_ssn;
+        private Map m_literals;
         private ObjectType m_type = null;
         private Object m_obj = null;
 
-        public DataLoader(Session ssn) {
+        public DataLoader(Session ssn, Map m) {
             m_ssn = ssn;
+            m_literals = m;
         }
 
         public void startElement(String uri, String name, String qn,
@@ -181,6 +188,11 @@ public class QuerySuite extends TestSuite {
                     Object value = decode
                         (prop.getType(), Path.get(prop.getName()), values);
                     m_ssn.set(m_obj, prop, value);
+                }
+
+                if (attrs.getValue(uri, "literal-name") != null) {
+                    String key = attrs.getValue(uri, "literal-name");
+                    m_literals.put(key, m_obj);
                 }
             }
         }

@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * QueryTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/08/18 $
+ * @version $Revision: #4 $ $Date: 2004/08/20 $
  **/
 
 public class QueryTest extends TestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/QueryTest.java#3 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/QueryTest.java#4 $ by $Author: ashah $, $DateTime: 2004/08/20 16:35:13 $";
 
     private static final Logger s_log = Logger.getLogger(QueryTest.class);
 
@@ -71,7 +71,8 @@ public class QueryTest extends TestCase {
     protected void runTest() throws Exception {
         try {
             s_log.info("Query:\n" + m_query);
-            OQLParser p = new OQLParser(new StringReader(m_query));
+            OQLParser p = new OQLParser
+                (new StringReader(m_query), m_suite.getLiterals());
             Query q = p.query();
             s_log.info("Query(Parsed):\n" + q);
             if (p.query() != null) {

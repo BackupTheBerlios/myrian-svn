@@ -74,7 +74,7 @@
 
   <test.NodeType id="1" name="Type 1" description="Type 1 Description"/>
 
-  <test.Node id="30" name="Thirty" type.id="1"/>
+  <test.StaticNode literal-name="$sNode30" id="30" name="Thirty" type.id="1"/>
   <test.Node id="31" name="Thirty One" type.id="1" parent.id="30"/>
   <test.Node id="32" name="Thirty Two" type.id="1" parent.id="30"/>
   <test.Node id="33" name="Thirty Three" type.id="1" parent.id="30"/>
