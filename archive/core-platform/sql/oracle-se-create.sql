@@ -1,3 +1,5 @@
+@@ oracle-se/function-currentDate.sql
+
 @@ ddl/oracle-se/create.sql
 
 @@ default/globalization/table-g11n_charsets.sql

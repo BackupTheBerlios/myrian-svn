@@ -1,3 +1,5 @@
+include default/function-currentDate.sql
+
 include default/globalization/table-g11n_charsets.sql
 include default/globalization/index-g11n_charsets.sql
 include default/globalization/table-g11n_locales.sql

@@ -2,6 +2,8 @@ begin;
 
 create view dual as select 1;
 
+\i default/function-currentDate.sql
+
 \i ddl/postgres/create.sql
 \i default/globalization/table-g11n_charsets.sql
 \i default/globalization/index-g11n_charsets.sql
