@@ -86,15 +86,15 @@
   <test.Node id="39" name="Thirty Nine" type.id="1" parent.id="38"/>
 
   <test.User id="0" name="Ashanti"/>
-  <test.User id="1" name="Britney"/>
-  <test.User id="2" name="Christina"/>
-  <test.User id="3" name="Debbie"/>
+  <test.User id="1" name="Britney" lastName="Spears"/>
+  <test.User id="2" name="Christina" lastName="Aguilera"/>
+  <test.User id="3" name="Debbie" lastName="Gibson"/>
   <test.User id="4" name="Enya"/>
-  <test.User id="5" name="Faith"/>
-  <test.User id="6" name="Gloria"/>
-  <test.User id="7" name="Hillary"/>
+  <test.User id="5" name="Faith" lastName="Hill"/>
+  <test.User id="6" name="Gloria" lastName="Estefan"/>
+  <test.User id="7" name="Hillary" lastName="Duff"/>
   <test.User id="8" name="Indigo"/>
-  <test.User id="9" name="Jennifer"/>
+  <test.User id="9" name="Jennifer" lastName="Lopez"/>
 
   <test.Group id="0" name="Pop">
     <members id="1"/>

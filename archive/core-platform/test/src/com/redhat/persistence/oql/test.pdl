@@ -172,6 +172,7 @@ object type User class com.redhat.persistence.PropertyMap
     BigInteger id = u.u_id;
     String name = u.name;
     String firstName = qualias { name };
+    String lastName = u.last_name;
     Group[0..n] groups = qualias {
         filter(all(test.Group), exists(filter(m = members, m == this)))
     };
@@ -192,6 +193,8 @@ object type Group class com.redhat.persistence.PropertyMap
         filter(all(test.Group),
                exists(filter(g = subgroups, g == this)))
     };
+
+    User[0..1] other = qualias { filter(all(test.User), id == this.id) };
 
     object key(id);
 }
