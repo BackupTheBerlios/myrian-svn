@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #52 $ $Date: 2003/04/01 $
+ * @version $Revision: #53 $ $Date: 2003/04/02 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#52 $ by $Author: ashah $, $DateTime: 2003/04/01 18:05:32 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#53 $ by $Author: ashah $, $DateTime: 2003/04/02 17:08:07 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -179,6 +179,11 @@ public class Session {
             if (LOG.isDebugEnabled()) {
                 trace("delete", new Object[] { obj });
             }
+
+            if (isDeleted(obj)) {
+                return false;
+            }
+
             List pending = new LinkedList();
             Expander e = new Expander(this, pending);
             e.expand(new DeleteEvent(this, obj));
@@ -282,10 +287,10 @@ public class Session {
                 }
 
                 public void onLink(Link link) {
-		    Query q = getQuery(obj, link, value);
+                    Query q = getQuery(obj, link, value);
 		    Cursor c = retrieve(q).getDataSet().getCursor();
 		    while (c.next()) {
-                        e.expand(new DeleteEvent(Session.this, c.get()));
+                        e.expand(new DeleteEvent(Session.this, c.get("link")));
 		    }
                 }
             });
