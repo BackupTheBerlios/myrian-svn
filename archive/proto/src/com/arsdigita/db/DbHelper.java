@@ -17,8 +17,9 @@ package com.arsdigita.db;
 
 
 import com.arsdigita.util.Assert;
-import org.apache.log4j.Category;
+import com.arsdigita.util.UncheckedWrapperException;
 
+import org.apache.log4j.Category;
 
 public class DbHelper {
 
@@ -34,6 +35,8 @@ public class DbHelper {
     public static final int DB_MAX = DB_POSTGRES;
 
     private static int s_database = DB_DEFAULT;
+
+    private static final String DEFAULT_ENCODING = "UTF-8";
 
     /**
      * Sets the database type. The parameter should be one of the
@@ -174,5 +177,51 @@ public class DbHelper {
         throw new DbUnsupportedException("Database " +
                                          DbHelper.getDatabaseName(s_database) +
                                          " does not support " + operation);
+    }
+
+    /**
+     * Returns the width of the VARCHAR column required to store
+     * <code>str</code> in the database.
+     *
+     * <p>This abstracts the differences in the interpretation of, say,
+     * VARCHAR(100) in Oracle and Postgres. In Oracle, this means 100
+     * bytes. Therefore, a 100-character long string may not fit in a
+     * VARCHAR(100) column in Oracle, depending on the particular encoding used.
+     * In Postgres, VARCHAR(100) means 100 characters.</p>
+     *
+     * @return 1 if <code>str</code> is <code>null</code>; otherwise a
+     * db-specific positive value.
+     **/
+    public static int varcharLength(String str) {
+        if ( str == null || "".equals(str) ) return 1;
+
+        /**
+         * See change 30544.  See also
+         * http://post-office.corp.redhat.com/archives/ccm-engineering-list/2003-May/msg00016.html
+         * (that is Message-ID: <20030502111749.GB1867@tuborg>, in case the URL
+         * changes)
+         * See also Dan's followup at
+         * http://post-office.corp.redhat.com/archives/ccm-engineering-list/2003-May/msg00017.html
+         **/
+        int result = 0;
+        switch (getDatabase()) {
+        case DB_POSTGRES:
+            result = str.length();
+            break;
+        case DB_ORACLE:
+            try {
+                result = str.getBytes(DEFAULT_ENCODING).length;
+            } catch (java.io.UnsupportedEncodingException ex) {
+                throw new UncheckedWrapperException
+                    (DEFAULT_ENCODING + " not supported by JRE", ex);
+            }
+            break;
+        default:
+            DbHelper.unsupportedDatabaseError("versioning");
+        }
+
+        if ( result == 0 ) return 1;
+
+        return result;
     }
 }
