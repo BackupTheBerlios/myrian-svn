@@ -26,17 +26,12 @@ import java.util.*;
  * the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/12/31 $
+ * @version $Revision: #2 $ $Date: 2003/01/15 $
  */
 
-public class Column {
+public class Column extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Column.java#1 $ by $Author: rhs $, $DateTime: 2002/12/31 15:39:17 $";
-
-    /**
-     * The table this Column belongs to.
-     **/
-    private Table m_table;
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Column.java#2 $ by $Author: rhs $, $DateTime: 2003/01/15 09:35:55 $";
 
     /**
      * The name of this Column.
@@ -122,7 +117,6 @@ public class Column {
 
     public Column(Table table, String name, int type, int size,
                   boolean isNullable) {
-        m_table = table;
         m_name = name;
         m_type = type;
         m_size = size;
@@ -134,12 +128,12 @@ public class Column {
                                                );
         }
 
-        if (m_table.getColumn(m_name) != null) {
+        if (table.getColumn(m_name) != null) {
             throw new IllegalArgumentException(
                                                "Table already has column: " + m_name
                                                );
         }
-        m_table.addColumn(this);
+        table.addColumn(this);
     }
 
 
@@ -155,7 +149,7 @@ public class Column {
      **/
 
     public Table getTable() {
-        return m_table;
+        return (Table) getParent();
     }
 
 
@@ -176,7 +170,7 @@ public class Column {
      **/
 
     public String getTableName() {
-        return m_table.getName();
+        return getTable().getName();
     }
 
 
@@ -220,15 +214,15 @@ public class Column {
     }
 
     public boolean isPrimaryKey() {
-        return m_table.getPrimaryKey() == m_table.getUniqueKey(this);
+        return getTable().getPrimaryKey() == getTable().getUniqueKey(this);
     }
 
     public boolean isUniqueKey() {
-        return m_table.getUniqueKey(this) != null;
+        return getTable().getUniqueKey(this) != null;
     }
 
     public boolean isForeignKey() {
-        return m_table.getForeignKey(this) != null;
+        return getTable().getForeignKey(this) != null;
     }
 
     /**
@@ -244,7 +238,7 @@ public class Column {
      **/
 
     void outputPDL(PrintStream out) {
-        out.print(m_table.getName() + "." + m_name);
+        out.print(getTable().getName() + "." + m_name);
         if (m_type != Integer.MIN_VALUE) {
             out.print(" " + getTypeName(m_type));
         }
@@ -469,8 +463,12 @@ public class Column {
         return false;
     }
 
+    Object getKey() {
+        return getName();
+    }
+
     public String getSQL() {
-        return "alter table " + m_table.getName() + " (\n" +
+        return "alter table " + getTable().getName() + " (\n" +
             getInlineSQL(false) + "\n);";
     }
 

@@ -4,14 +4,13 @@ package com.arsdigita.persistence.proto.metadata;
  * Mapping
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2002/12/31 $
+ * @version $Revision: #2 $ $Date: 2003/01/15 $
  **/
 
-public abstract class Mapping {
+public abstract class Mapping extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Mapping.java#1 $ by $Author: rhs $, $DateTime: 2002/12/31 15:39:17 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Mapping.java#2 $ by $Author: rhs $, $DateTime: 2003/01/15 09:35:55 $";
 
-    private ObjectMap m_map = null;
     private Path m_path;
 
     protected Mapping(Path path) {
@@ -19,15 +18,15 @@ public abstract class Mapping {
     }
 
     public ObjectMap getObjectMap() {
-        return m_map;
-    }
-
-    void setObjectMap(ObjectMap map) {
-        m_map = map;
+        return (ObjectMap) getParent();
     }
 
     public Path getPath() {
         return m_path;
+    }
+
+    Object getKey() {
+        return getPath();
     }
 
 }

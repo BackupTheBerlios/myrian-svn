@@ -7,12 +7,12 @@ import java.util.*;
  * Root
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/01/02 $
+ * @version $Revision: #3 $ $Date: 2003/01/15 $
  **/
 
 public class Root {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Root.java#2 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Root.java#3 $ by $Author: rhs $, $DateTime: 2003/01/15 09:35:55 $";
 
     private static final Root ROOT = new Root();
 
@@ -20,38 +20,22 @@ public class Root {
         return ROOT;
     }
 
-    private ArrayList m_types = new ArrayList();
-    private HashMap m_typeMap = new HashMap();
-    private HashMap m_objectMaps = new HashMap();
+    private Mist m_types = new Mist(this);
+    private Mist m_maps = new Mist(this);
+    private Mist m_tables = new Mist(this);
 
     private Root() {}
 
     public boolean hasObjectType(String qualifiedName) {
-        return m_typeMap.containsKey(qualifiedName);
+        return m_types.containsKey(qualifiedName);
     }
 
     public void addObjectType(ObjectType type) {
-        if (type == null) {
-            throw new IllegalArgumentException
-                ("Cannot add a null type to the Root");
-        }
-        if (hasObjectType(type.getQualifiedName())) {
-            throw new IllegalArgumentException
-                ("Root already contains a type named: " +
-                 type.getQualifiedName());
-        }
-        if (type.getRoot() != null) {
-            throw new IllegalArgumentException
-                ("Type belongs to another Root: " + type);
-        }
-
         m_types.add(type);
-        m_typeMap.put(type.getQualifiedName(), type);
-        type.setRoot(this);
     }
 
     public ObjectType getObjectType(String qualifiedName) {
-        return (ObjectType) m_typeMap.get(qualifiedName);
+        return (ObjectType) m_types.get(qualifiedName);
     }
 
     public Collection getObjectTypes() {
@@ -59,26 +43,27 @@ public class Root {
     }
 
     public ObjectMap getObjectMap(ObjectType type) {
-        return (ObjectMap) m_objectMaps.get(type);
+        return (ObjectMap) m_maps.get(type);
     }
 
     public void addObjectMap(ObjectMap map) {
-        if (map == null) {
-            throw new IllegalArgumentException
-                ("Cannot add null object map.");
-        }
-        if (m_objectMaps.containsKey(map.getObjectType())) {
-            throw new IllegalArgumentException
-                ("Root already contains object map for type: " +
-                 map.getObjectType().getQualifiedName());
-        }
-        if (map.getRoot() != null) {
-            throw new IllegalArgumentException
-                ("Map belongs to another Root: " + map);
-        }
+        m_maps.add(map);
+    }
 
-        m_objectMaps.put(map.getObjectType(), map);
-        map.setRoot(this);
+    public boolean hasTable(String name) {
+        return m_tables.containsKey(name);
+    }
+
+    public Table getTable(String name) {
+        return (Table) m_tables.get(name);
+    }
+
+    public void addTable(Table table) {
+        m_tables.add(table);
+    }
+
+    public Collection getTables() {
+        return m_tables;
     }
 
 }

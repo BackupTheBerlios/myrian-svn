@@ -3,23 +3,25 @@ package com.arsdigita.persistence.proto.pdl;
 import com.arsdigita.persistence.proto.pdl.nodes.*;
 import com.arsdigita.persistence.proto.metadata.Root;
 import com.arsdigita.persistence.proto.metadata.Role;
+import com.arsdigita.persistence.proto.metadata.Table;
 import com.arsdigita.persistence.proto.metadata.ObjectMap;
+
 import java.io.Reader;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/01/10 $
+ * @version $Revision: #4 $ $Date: 2003/01/15 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#3 $ by $Author: rhs $, $DateTime: 2003/01/10 14:47:01 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#4 $ by $Author: rhs $, $DateTime: 2003/01/15 09:35:55 $";
 
     private AST m_ast = new AST();
     private ErrorReport m_errors = new ErrorReport();
@@ -150,6 +152,27 @@ public class PDL {
                 om.getKeyProperties().addAll(bm.getKeyProperties());
             }
         }
+
+        emitDDL(root);
+    }
+
+    private void emitDDL(Root root) {
+        final HashMap tables = new HashMap();
+        for (Iterator it = root.getTables().iterator(); it.hasNext(); ) {
+            Table table = (Table) it.next();
+            tables.put(table.getName(), table);
+        }
+
+        m_ast.traverse(new Node.Switch() {
+                public void onColumn(Column col) {
+                    Table table =
+                        (Table) tables.get(col.getTable().getName());
+                    if (table == null) {
+                        table = new Table(col.getTable().getName());
+                        tables.put(table.getName(), table);
+                    }
+                }
+            });
     }
 
     public static final void main(String[] args) throws Exception {

@@ -6,19 +6,17 @@ import java.util.*;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/01/10 $
+ * @version $Revision: #4 $ $Date: 2003/01/15 $
  **/
 
-public class ObjectType {
+public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#3 $ by $Author: rhs $, $DateTime: 2003/01/10 10:31:55 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#4 $ by $Author: rhs $, $DateTime: 2003/01/15 09:35:55 $";
 
-    private Root m_root = null;
     private Model m_model;
     private String m_name;
     private ObjectType m_super;
-    private ArrayList m_properties = new ArrayList();
-    private HashMap m_propertyMap = new HashMap();
+    private Mist m_properties = new Mist(this);
 
     public ObjectType(Model model, String name, ObjectType supertype) {
         m_model = model;
@@ -26,12 +24,8 @@ public class ObjectType {
         m_super = supertype;
     }
 
-    void setRoot(Root root) {
-        m_root = root;
-    }
-
     public Root getRoot() {
-        return m_root;
+        return (Root) getParent();
     }
 
     public Model getModel() {
@@ -51,7 +45,7 @@ public class ObjectType {
     }
 
     public boolean hasDeclaredProperty(String name) {
-        return m_propertyMap.containsKey(name);
+        return m_properties.containsKey(name);
     }
 
     public boolean hasProperty(String name) {
@@ -65,22 +59,7 @@ public class ObjectType {
     }
 
     public void addProperty(Property prop) {
-        if (prop == null) {
-            throw new IllegalArgumentException
-                ("Cannot add a null property.");
-        }
-        if (hasProperty(prop.getName())) {
-            throw new IllegalStateException
-                ("Already have a property named " + prop.getName());
-        }
-        if (prop.getContainer() != null) {
-            throw new IllegalArgumentException
-                ("Property already belongs to an object type: " + prop);
-        }
-
         m_properties.add(prop);
-        m_propertyMap.put(prop.getName(), prop);
-        prop.setContainer(this);
     }
 
     public Collection getDeclaredProperties() {
@@ -88,7 +67,7 @@ public class ObjectType {
     }
 
     public Property getDeclaredProperty(String name) {
-        return (Property) m_propertyMap.get(name);
+        return (Property) m_properties.get(name);
     }
 
     private void getProperties(Collection result) {
@@ -140,6 +119,10 @@ public class ObjectType {
         } else {
             return false;
         }
+    }
+
+    Object getKey() {
+        return toString();
     }
 
     public String toString() {

@@ -14,12 +14,12 @@ import com.arsdigita.persistence.proto.pdl.nodes.*;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #1 $ $Date: 2003/01/09 $
+ * @version $Revision: #2 $ $Date: 2003/01/15 $
  */
 
 class Parser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/Parser.jj#1 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/Parser.jj#2 $ by $Author: rhs $, $DateTime: 2003/01/15 09:35:55 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -455,7 +455,7 @@ Column column() :
 }
 {
     n = id() { ln(c, n); c.add(Column.TABLE, n); }
-    <DOT> n = id() { c.add(Column.COLUMN, n); }
+    <DOT> n = id() { c.add(Column.NAME, n); }
     [ n = db_type() { c.add(Column.TYPE, n); } ]
     { return c; }
 }

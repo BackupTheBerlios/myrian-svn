@@ -24,15 +24,15 @@ import java.io.*;
  * Table
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/12/31 $
+ * @version $Revision: #2 $ $Date: 2003/01/15 $
  **/
 
-public class Table {
+public class Table extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Table.java#1 $ by $Author: rhs $, $DateTime: 2002/12/31 15:39:17 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Table.java#2 $ by $Author: rhs $, $DateTime: 2003/01/15 09:35:55 $";
 
     private String m_name;
-    private Map m_columns = new HashMap();
+    private Mist m_columns = new Mist(this);
     private Set m_constraints = new HashSet();
     private UniqueKey m_key = null;
 
@@ -94,10 +94,7 @@ public class Table {
     }
 
     void addColumn(Column column) {
-        Column old = (Column) m_columns.get(column.getName());
-        if (old == null || old.getType() == Integer.MIN_VALUE) {
-            m_columns.put(column.getName(), column);
-        }
+        m_columns.add(column);
     }
 
     public Column getColumn(String name) {
@@ -120,8 +117,7 @@ public class Table {
         StringBuffer result = new StringBuffer();
 
         List columns = new ArrayList();
-        columns.addAll(m_columns.keySet());
-        Collections.sort(columns);
+        columns.addAll(m_columns);
 
         for (int i = 0; i < columns.size(); i++) {
             String colName = (String) columns.get(i);
@@ -237,6 +233,10 @@ public class Table {
                 }
             }
         }
+    }
+
+    Object getKey() {
+        return getName();
     }
 
     public String toString() {
