@@ -25,7 +25,7 @@ import java.util.Map;
  * property contained in a CompoundType has an associated DataType.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/14 $
+ * @version $Revision: #6 $ $Date: 2002/12/02 $
  */
 
 abstract public class CompoundType extends DataType {
@@ -38,6 +38,8 @@ abstract public class CompoundType extends DataType {
     public static final int RETRIEVE_ATTRIBUTES = 5;
     public final static int NUM_EVENT_TYPES = 6;
 
+    private static boolean s_firstRowsDefault = true;
+
     protected static final String[] s_eventTypeText = {
         "retrieve",
         "insert",
@@ -47,7 +49,7 @@ abstract public class CompoundType extends DataType {
         "retrieve attributes"
     };
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/CompoundType.java#5 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/CompoundType.java#6 $ by $Author: rhs $, $DateTime: 2002/12/02 17:55:29 $";
 
     /**
      * This Map contains all the properties this CompoundType has. It is keyed
@@ -72,8 +74,18 @@ abstract public class CompoundType extends DataType {
 
     public CompoundType(String name) {
         super(name);
+
+        initOption("FIRST_ROWS",
+                   s_firstRowsDefault ? Boolean.TRUE : Boolean.FALSE);
     }
 
+    /**
+     * Set the default value of the FIRST_ROWS option for new CompoundType
+     * objects.
+     */
+    public static void setFirstRowsDefault(boolean firstRows) {
+        s_firstRowsDefault = firstRows;
+    }
 
     /**
      * Adds a property to this CompoundType. The property may be fetched using

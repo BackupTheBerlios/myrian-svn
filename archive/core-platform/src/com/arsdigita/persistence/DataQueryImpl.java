@@ -56,7 +56,7 @@ import org.apache.log4j.Logger;
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@arsdigita.com">randyg@arsdigita.com</a>
  * @author <a href="mailto:deison@arsdigita.com">deison@arsdigita.com</a>
- * @version $Revision: #18 $ $Date: 2002/11/01 $
+ * @version $Revision: #19 $ $Date: 2002/12/02 $
  */
 // NOTE if we ever support anything other than forward-only,
 // we'll need to shut off the auto-closing functionality
@@ -64,7 +64,7 @@ import org.apache.log4j.Logger;
 // results and general confusion.
 class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#18 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#19 $ by $Author: rhs $, $DateTime: 2002/12/02 17:55:29 $";
 
     private static final Logger log =
         Logger.getLogger(DataQueryImpl.class);
@@ -1105,9 +1105,16 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
             // down towards the end of this proc
 
             if (isOracle) {
-                sql.append("select /*+ FIRST_ROWS */ *\n" +
+                sql.append("select ");
+
+                if (Boolean.TRUE.equals(m_type.getOption("FIRST_ROWS"))) {
+                    sql.append("/*+ FIRST_ROWS */ ");
+                }
+
+                sql.append("*\n" +
                            " from (select outerResults.*, " +
                            "rownum as fakeRownum from (");
+
                 if (m_wrap) {
                     sql.append("select * ");
                 }
@@ -1139,7 +1146,6 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
             } else if (m_wrap) {
                 sql.append("select *" + Utilities.LINE_BREAK);
             }
-
         }
 
         boolean foundWhere = false;
