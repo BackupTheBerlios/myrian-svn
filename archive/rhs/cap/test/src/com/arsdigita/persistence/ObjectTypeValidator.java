@@ -27,19 +27,15 @@ import java.util.Iterator;
  * ObjectTypeValidator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #1 $ $Date: 2004/05/03 $
+ * @version $Revision: #2 $ $Date: 2004/05/05 $
  */
 
 public class ObjectTypeValidator  {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/ObjectTypeValidator.java#1 $ by $Author: rhs $, $DateTime: 2004/05/03 11:48:01 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/ObjectTypeValidator.java#2 $ by $Author: rhs $, $DateTime: 2004/05/05 16:03:00 $";
     private static final Logger s_log =
         Logger.getLogger(ObjectTypeValidator.class.getName());
     DataObjectManipulator m_manipulator;
-
-    static  {
-       s_log.setLevel(Level.DEBUG);
-    }
 
     public ObjectTypeValidator() {
         m_manipulator = new DataObjectManipulator();
