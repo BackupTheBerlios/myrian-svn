@@ -15,6 +15,8 @@
 
 package com.redhat.persistence.engine.rdbms;
 
+import com.arsdigita.developersupport.NestedCounter;
+
 import com.redhat.persistence.Engine;
 import com.redhat.persistence.Event;
 import com.redhat.persistence.PropertyMap;
@@ -55,12 +57,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2003/11/21 $
+ * @version $Revision: #13 $ $Date: 2004/02/06 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#12 $ by $Author: rhs $, $DateTime: 2003/11/21 10:51:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#13 $ by $Author: vadim $, $DateTime: 2004/02/06 17:32:23 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -483,6 +485,8 @@ public class RDBMSEngine extends Engine {
             try {
                 if (cycle != null) { cycle.beginExecute(); }
                 long time = System.currentTimeMillis();
+                NestedCounter.getCounter().increment();
+
                 if (ps.execute()) {
                     time = System.currentTimeMillis() - time;
                     if (cycle != null) { cycle.endExecute(0); }
