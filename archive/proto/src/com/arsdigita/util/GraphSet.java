@@ -15,7 +15,14 @@
 
 package com.arsdigita.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.arsdigita.util.Assert;
 
@@ -32,7 +39,7 @@ import com.arsdigita.util.Assert;
  * @author Archit Shah (ashah@mit.edut)
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-01-22
- * @version $Date: 2003/02/19 $
+ * @version $Date: 2003/03/04 $
  **/
 public class GraphSet implements Graph {
     private final static String LINE_SEP = System.getProperty("line.separator");
@@ -92,7 +99,7 @@ public class GraphSet implements Graph {
     }
 
     public void addEdge(Object tail, Object head, Object label) {
-        addEdge(new EdgeImpl(tail, head, label));
+        addEdge(new GraphEdge(tail, head, label));
     }
 
     public List getNodes() {
@@ -185,53 +192,5 @@ public class GraphSet implements Graph {
         }
         sb.append("}");
         return sb.toString();
-    }
-
-    public static class EdgeImpl implements Graph.Edge {
-        private Object m_tail;
-        private Object m_head;
-        private Object m_label;
-
-        public EdgeImpl(Object tail, Object head, Object label) {
-            m_tail = tail;
-            m_head = head;
-            m_label = label;
-        }
-
-        public Object getTail() {
-            return m_tail;
-        }
-
-        public Object getHead() {
-            return m_head;
-        }
-
-        public Object getLabel() {
-            return m_label;
-        }
-
-        public String toString() {
-            return m_label.toString();
-        }
-
-        public boolean equals(Object other) {
-            if (other instanceof Graph.Edge) {
-                Graph.Edge edge = (Graph.Edge) other;
-                return
-                    this.m_tail.equals(edge.getTail()) &&
-                    this.m_head.equals(edge.getHead()) &&
-                    this.m_label.equals(edge.getLabel());
-            } else {
-                return false;
-            }
-        }
-
-        public int hashCode() {
-            return hashCode(m_tail) + hashCode(m_head) + hashCode(m_label);
-        }
-
-        private static int hashCode(Object obj) {
-            return obj == null ? 0 : obj.hashCode();
-        }
     }
 }
