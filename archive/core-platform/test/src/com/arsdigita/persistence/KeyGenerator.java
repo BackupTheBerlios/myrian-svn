@@ -1,15 +1,15 @@
 /*
  * Copyright (C) 2001-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the Open Software License v2.1
- * (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * http://rhea.redhat.com/licenses/osl2.1.html.
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the
+ * License at http://www.redhat.com/licenses/ccmpl.html.
  *
- * Software distributed under the License is distributed on an "AS
- * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * rights and limitations under the License.
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language
+ * governing rights and limitations under the License.
  *
  */
 package com.arsdigita.persistence;
@@ -26,12 +26,12 @@ import org.apache.log4j.*;
  * Attemps to generate default keys for DataObjects. Used in the 'MetaTest' framework.
  * Needs further doc.
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #5 $ $Date: 2004/03/30 $
+ * @version $Revision: #6 $ $Date: 2004/04/07 $
  */
 
 public class KeyGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/KeyGenerator.java#5 $ by $Author: dennis $, $DateTime: 2004/03/30 17:47:27 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/KeyGenerator.java#6 $ by $Author: dennis $, $DateTime: 2004/04/07 16:07:11 $";
 
     static Map s_keys = new HashMap();
     private KeyGenerator()
