@@ -18,21 +18,20 @@ class StateManagerImpl extends AbstractStateManager {
 
     private PersistenceManagerImpl m_pmi;
     private PropertyMap m_pmap;
+    private PersistenceCapable m_container;
     private String m_prefix;
     private Map m_components = new HashMap();
 
     StateManagerImpl(PersistenceManagerImpl pmi, PropertyMap pmap,
-                     String prefix) {
+                     PersistenceCapable container, String prefix) {
         if (pmi == null) { throw new NullPointerException("pmi"); }
         if (pmap == null) { throw new NullPointerException("pmap"); }
+        if (container == null) { throw new NullPointerException("container"); }
         if (prefix == null) { throw new NullPointerException("prefix"); }
         m_pmi = pmi;
         m_pmap = pmap;
+        m_container = container;
         m_prefix = prefix;
-    }
-
-    StateManagerImpl(PersistenceManagerImpl pmi, PropertyMap pmap) {
-        this(pmi, pmap, "");
     }
 
     private final Session ssn() {
@@ -43,6 +42,10 @@ class StateManagerImpl extends AbstractStateManager {
                  + " has been closed");
         }
         return ssn;
+    }
+
+    PersistenceCapable getContainer() {
+        return m_container;
     }
 
     PropertyMap getPropertyMap() {
@@ -122,7 +125,8 @@ class StateManagerImpl extends AbstractStateManager {
                     klass = CRPMap.class;
                 }
 
-                Object obj = m_pmi.newPC(m_pmap, klass, name + "$");
+                Object obj = m_pmi.newPC
+                    (m_pmap, klass, m_container, name + "$");
                 if (klass.equals(CRPList.class)) {
                     ((CRPList) obj).setFieldName(name);
                 }
@@ -135,18 +139,9 @@ class StateManagerImpl extends AbstractStateManager {
             if (prop.isKeyProperty()) {
                 return getPropertyMap().get(prop);
             } else if (prop.isCollection()) {
-                if (Map.class.equals(declaredClass)) {
-                    return m_pmi.newPC(m_pmap, CRPMap.class, name + "$");
-                } else {
-                    return new CRPSet(ssn(), ssn().retrieve(m_pmap), prop);
-                }
+                return new CRPSet(ssn(), pc, prop);
             } else {
-                final Object object = ssn().retrieve(m_pmap);
-                if (object == null) {
-                    throw new IllegalStateException
-                        ("no object in session for pmap " + m_pmap);
-                }
-                return ssn().get(object, prop);
+                return ssn().get(pc, prop);
             }
         }
     }
@@ -239,7 +234,7 @@ class StateManagerImpl extends AbstractStateManager {
                 if (obj instanceof PersistenceCapable) {
                     PersistenceCapable comp = (PersistenceCapable) obj;
                     StateManagerImpl csmi = m_pmi.newSM
-                        (comp, m_pmap, propName + "$");
+                        (comp, m_pmap, m_container, propName + "$");
                     fill(values, csmi, klass, comp);
                 } else {
                     List l = C.componentProperties(type, propName);
@@ -260,7 +255,8 @@ class StateManagerImpl extends AbstractStateManager {
     private void handleComponent(PersistenceCapable pc, String name,
                                  Class klass) {
         Map m = new HashMap();
-        StateManagerImpl csmi = m_pmi.newSM(pc, m_pmap, name + "$");
+        StateManagerImpl csmi = m_pmi.newSM
+            (pc, m_pmap, m_container, name + "$");
         fill(m, csmi, klass, pc);
         for (Iterator it = m.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry me = (Map.Entry) it.next();
@@ -300,7 +296,6 @@ class StateManagerImpl extends AbstractStateManager {
                 Property prop = (Property) props.get(0);
                 ssn().clear(pc, prop);
                 if (newValue != null) {
-
                     Object obj = getObjectField(pc, field);
                     if (isMap) {
                         ((Map) obj).putAll((Map) newValue);

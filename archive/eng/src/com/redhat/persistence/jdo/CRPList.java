@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #20 $ $Date: 2004/07/28 $
+ * @version $Revision: #21 $ $Date: 2004/07/30 $
  **/
 
 class CRPList implements List {
@@ -41,6 +41,12 @@ class CRPList implements List {
         return (PersistenceManagerImpl) JDOHelper.getPersistenceManager(this);
     }
 
+    private Object getContainer() {
+        PersistenceManagerImpl pmi = getPMI();
+        StateManagerImpl smi = pmi.getStateManager(this);
+        return smi.getContainer();
+    }
+
     private void append(int end, Object element) {
         elements.put(new Integer(end), element);
     }
@@ -51,7 +57,7 @@ class CRPList implements List {
              C.concat("limit(sort(filter($1.",
                       m_fieldName,
                       ", value == $2), key), 1)"));
-        Collection coll = (Collection) query.execute(elements, element);
+        Collection coll = (Collection) query.execute(getContainer(), element);
         Iterator it = coll.iterator();
         if (it.hasNext()) {
             MapEntry entry = (MapEntry) it.next();
@@ -100,8 +106,8 @@ class CRPList implements List {
 
             Query query = getPMI().newQuery("oql", oql);
 
-            Collection coll =
-                (Collection) query.execute(elements, new Integer(m_index));
+            Collection coll = (Collection) query.execute
+                (getContainer(), new Integer(m_index));
             m_elements = coll.iterator();
         }
 
@@ -256,7 +262,7 @@ class CRPList implements List {
              C.concat("limit(rsort(filter($1.",
                       m_fieldName,
                       ", value == $2), key), 1)"));
-        Collection coll = (Collection) query.execute(elements, element);
+        Collection coll = (Collection) query.execute(getContainer(), element);
         Iterator it = coll.iterator();
         if (it.hasNext()) {
             MapEntry entry = (MapEntry) it.next();

@@ -58,24 +58,28 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
     }
 
     PersistenceCapable newPC(PropertyMap pmap) {
-        return newPC(pmap, pmap.getObjectType().getJavaClass(), "");
+        return newPC(pmap, pmap.getObjectType().getJavaClass(), null, "");
     }
 
-    PersistenceCapable newPC(PropertyMap pmap, Class klass, String prefix) {
-        StateManagerImpl smi = new StateManagerImpl(this, pmap, prefix);
+    PersistenceCapable newPC(PropertyMap pmap, Class klass,
+                             PersistenceCapable container, String prefix) {
         PersistenceCapable pc = JDOImplHelper.getInstance().newInstance
-            (klass, smi);
+            (klass, null);
+        StateManagerImpl smi = new StateManagerImpl
+            (this, pmap, container == null ? pc : container, prefix);
+        pc.jdoReplaceStateManager(smi);
         m_smiMap.put(pc, smi);
         return pc;
     }
 
     StateManagerImpl newSM(PersistenceCapable pc, PropertyMap pmap) {
-        return newSM(pc, pmap, "");
+        return newSM(pc, pmap, pc, "");
     }
 
     StateManagerImpl newSM(PersistenceCapable pc, PropertyMap pmap,
-                           String prefix) {
-        StateManagerImpl smi = new StateManagerImpl(this, pmap, prefix);
+                           PersistenceCapable container, String prefix) {
+        StateManagerImpl smi = new StateManagerImpl
+            (this, pmap, container, prefix);
         // set pmap here for objects requiring id gen
         m_smiMap.put(pc, smi);
         pc.jdoReplaceStateManager(smi);
