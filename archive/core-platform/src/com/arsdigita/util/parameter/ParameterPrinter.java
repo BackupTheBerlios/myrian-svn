@@ -35,13 +35,13 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#6 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#7 $
  */
 final class ParameterPrinter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#6 $" +
-        "$Author: ashah $" +
-        "$DateTime: 2003/11/10 11:09:05 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#7 $" +
+        "$Author: scott $" +
+        "$DateTime: 2003/11/12 14:19:50 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterPrinter.class);
@@ -127,6 +127,7 @@ final class ParameterPrinter {
         register("com.arsdigita.bebop.BebopConfig");
         register("com.arsdigita.dispatcher.DispatcherConfig");
         register("com.arsdigita.workflow.simple.WorkflowConfig");
+        register("com.arsdigita.cms.ContentSectionConfig");
 
         if (args.length == 0) {
             System.out.println("Usage: ParameterPrinter [--html] output-file");
