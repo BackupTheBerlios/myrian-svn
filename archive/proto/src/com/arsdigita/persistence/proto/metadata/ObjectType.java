@@ -6,12 +6,12 @@ import java.util.*;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/01/02 $
+ * @version $Revision: #3 $ $Date: 2003/01/10 $
  **/
 
 public class ObjectType {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#2 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#3 $ by $Author: rhs $, $DateTime: 2003/01/10 10:31:55 $";
 
     private Root m_root = null;
     private Model m_model;
@@ -140,6 +140,10 @@ public class ObjectType {
         } else {
             return false;
         }
+    }
+
+    public String toString() {
+        return getQualifiedName();
     }
 
 }
