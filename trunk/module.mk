@@ -1,17 +1,12 @@
 define MODULE_HELP
 @echo "  make [all]"
-@echo "    This goal does a full build that respects dependencies. This means "
-@echo "    that if a file is modified in module A, and module B depends on "
-@echo "    module A, then most likely module B will be completely rebuilt."
-@echo "    If you wish to avoid this behavior during iterative development,"
-@echo "    then you may use make A to build just module A if you know that "
-@echo "    there should be no interface changes that will effect module B."
+@echo "    Perform a full build of all modules."
 @echo ""
 @echo "  make clean"
 @echo "    Remove all files generated during a full build."
 @echo ""
 @echo "  make jars"
-@echo "    Build each module's jar."
+@echo "    Build all module jars."
 @echo ""
 @echo "  make <module>"
 @echo "    Build just one module."
@@ -92,17 +87,20 @@ clean-@M:
 
 $(@M_TIMESTAMP): JAVA_MOD=$(filter %.java,$?)
 $(@M_TIMESTAMP): JDO_MOD=$(filter %.jdo,$?)
-$(@M_TIMESTAMP): DEP_MOD=$(filter %/timestamp,$?)
-$(@M_TIMESTAMP): REBUILD=$(if $(JDO_MOD)$(DEP_MOD),$(@M_SOURCES),$(JAVA_MOD))
+$(@M_TIMESTAMP): REBUILD=$(if $(JDO_MOD),$(@M_SOURCES),$(JAVA_MOD))
 $(@M_TIMESTAMP): CLASSES=$(filter %.class,$(REBUILD:@M/src/%.java=$(@M_CLASSES)/%.class))
 $(@M_TIMESTAMP): $(@M_SOURCES) $(@M_JDO_FILES) $(@M_DEPS)
 	@mkdir -p $(@M_CLASSES)
-	@echo compiling $(words $(REBUILD)) files from @M/src to $(@M_CLASSES)
-	@javac -classpath $(@M_CLASSPATH) -sourcepath build/@M/src \
-	    -d $(@M_CLASSES) $(REBUILD)
-	@echo enhancing $(words $(CLASSES)) files in $(@M_CLASSES)
-	@$(@M_enhance) -d $(@M_CLASSES) -s @M/src:$(@M_CLEAN_CLASSPATH) \
-	    $(CLASSES)
+	$(if $(REBUILD),@echo compiling $(words $(REBUILD)) \
+		files from @M/src to $(@M_CLASSES))
+	$(if $(REBUILD),@javac -classpath $(@M_CLASSPATH) \
+		-sourcepath build/@M/src \
+		-d $(@M_CLASSES) $(REBUILD))
+	$(if $(REBUILD),@echo enhancing $(words $(CLASSES)) \
+		files in $(@M_CLASSES))
+	$(if $(REBUILD),@$(@M_enhance) -d $(@M_CLASSES) \
+		-s @M/src:$(@M_CLEAN_CLASSPATH) \
+		$(CLASSES))
 	@touch $(@M_TIMESTAMP)
 endef
 
