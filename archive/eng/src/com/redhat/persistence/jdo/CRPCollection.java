@@ -11,12 +11,12 @@ import java.util.*;
  * CRPCollection
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/07/14 $
+ * @version $Revision: #4 $ $Date: 2004/08/04 $
  **/
 
 abstract class CRPCollection implements Collection, OQLCollection {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPCollection.java#3 $ by $Author: vadim $, $DateTime: 2004/07/14 15:53:40 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPCollection.java#4 $ by $Author: ashah $, $DateTime: 2004/08/04 17:36:12 $";
 
     CRPCollection() {}
 
@@ -24,8 +24,12 @@ abstract class CRPCollection implements Collection, OQLCollection {
 
     abstract ObjectType type();
 
+    protected Signature signature() {
+        return new Signature(type());
+    }
+
     private DataSet data() {
-        return new DataSet(ssn(), new Signature(type()), expression());
+        return new DataSet(ssn(), signature(), expression());
     }
 
     public abstract void clear();

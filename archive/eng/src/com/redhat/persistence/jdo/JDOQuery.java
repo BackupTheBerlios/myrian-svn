@@ -1,6 +1,7 @@
 package com.redhat.persistence.jdo;
 
 import com.redhat.persistence.Session;
+import com.redhat.persistence.Signature;
 import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.oql.*;
 import com.redhat.persistence.oql.Query;
@@ -18,7 +19,7 @@ class JDOQuery implements javax.jdo.Query, Serializable {
     transient private final Map m_paramMap = new HashMap();
     transient private final List m_paramOrder = new ArrayList();
     transient private final Map m_varMap = new HashMap();
-    transient private final List m_orders = new ArrayList();
+    transient private final List m_addPaths = new ArrayList();
 
     transient private Expression m_expr = null;
 
@@ -52,6 +53,7 @@ class JDOQuery implements javax.jdo.Query, Serializable {
         m_paramMap.clear();
         m_paramOrder.clear();
         m_varMap.clear();
+        m_addPaths.clear();
         m_expr = null;
     }
 
@@ -156,6 +158,10 @@ class JDOQuery implements javax.jdo.Query, Serializable {
     public void declareParameters(String params) { m_params = params; }
 
     public void declareVariables(String vars) { m_vars = vars; }
+
+    public void addPath(String path) {
+        m_addPaths.add(path);
+    }
 
     void addOrder(Expression e, boolean asc) {
         m_expr = new Sort(m_expr, e, asc ? Sort.ASCENDING : Sort.DESCENDING);
@@ -266,8 +272,13 @@ class JDOQuery implements javax.jdo.Query, Serializable {
     private Collection executeInternal(Map params) {
         final Expression expr = makeExpr(params);
         final ObjectType type = expr.getType(m_pm.getSession().getRoot());
+        final Signature sig = new Signature(type);
+        for (Iterator it = m_addPaths.iterator(); it.hasNext(); ) {
+            sig.addPath((String) it.next());
+        }
 
         return new CRPCollection() {
+            protected Signature signature() { return sig; }
             Session ssn() { return m_pm.getSession(); }
             ObjectType type() { return type; }
             public Expression expression() { return expr; }

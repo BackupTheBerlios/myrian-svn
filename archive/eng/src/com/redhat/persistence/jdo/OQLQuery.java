@@ -1,17 +1,19 @@
 package com.redhat.persistence.jdo;
 
+import com.redhat.persistence.Session;
+import com.redhat.persistence.Signature;
 import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.oql.*;
-import com.redhat.persistence.Session;
 import java.util.*;
 import javax.jdo.*;
 
 public class OQLQuery implements javax.jdo.Query {
 
     private boolean m_ignoreCache = false;
-    private final PersistenceManagerImpl m_pmi;
+    transient private final PersistenceManagerImpl m_pmi;
     private final String m_query;
     private String m_filter = null;
+    transient private final List m_addPaths = new ArrayList();
 
     OQLQuery(PersistenceManagerImpl pmi, String query) {
         m_pmi = pmi;
@@ -20,6 +22,10 @@ public class OQLQuery implements javax.jdo.Query {
 
     public PersistenceManager getPersistenceManager() {
         return m_pmi;
+    }
+
+    public void addPath(String path) {
+        m_addPaths.add(path);
     }
 
     private Expression makeExpr(Map params) {
@@ -46,7 +52,13 @@ public class OQLQuery implements javax.jdo.Query {
     public Object executeWithMap(Map parameters) {
         final Expression expr = makeExpr(parameters);
         final ObjectType type = expr.getType(m_pmi.getSession().getRoot());
+        final Signature sig = new Signature(type);
+        for (Iterator it = m_addPaths.iterator(); it.hasNext(); ) {
+            sig.addPath((String) it.next());
+        }
+
         return new CRPCollection() {
+            protected Signature signature() { return sig; }
             Session ssn() { return m_pmi.getSession(); }
             ObjectType type() { return type; }
             public Expression expression() { return expr; }
