@@ -29,13 +29,13 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterStore
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyStore.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyStore.java#3 $
  */
 public final class JavaPropertyStore implements ParameterStore {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyStore.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyStore.java#3 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/11 12:57:53 $";
+        "$DateTime: 2003/09/17 11:49:03 $";
 
     private static final Logger s_log = Logger.getLogger
         (JavaPropertyStore.class);
@@ -96,9 +96,9 @@ public final class JavaPropertyStore implements ParameterStore {
     /**
      * Returns a <code>String</code> representation of this object.
      *
-     * @return super.toString() + ":" + properties.toString()
+     * @return super.toString() + ":" + properties.size()
      */
     public String toString() {
-        return super.toString() + ":" + m_props;
+        return super.toString() + ":" + m_props.size();
     }
 }
