@@ -24,6 +24,10 @@ JD:=javadoc
 JD_FLAGS:=-version -author -quiet
 DOC_DEST:=$(BUILD)/doc
 
+ifndef JDO_ENHANCE
+JDO_ENHANCE=java -classpath lib/jdo.jar:jdori/jdori.jar:jdori/jdori-enhancer.jar com.sun.jdori.enhancer.Main
+endif
+
 all: $(JSTAMPS)
 
 jars: $(JARS)
@@ -46,23 +50,42 @@ tags:
 
 $(BUILD)/%.jmake: %
 	@echo generating $@
+# header
 	@mkdir -p $(dir $@)
-	@echo -n "\$$(BUILD)/$<.jstamp" > $@
-	@echo -n ":" >> $@
-	@find $< -name *.java -printf " \\\\\n	%p" >> $@
-	@find $< -name *.jj -printf " \\\\\n	\$$(BUILD)/%p" \
+	@echo "# Generated makefile, DO NOT EDIT" > $@
+# defines
+	@echo -n "JAVA_SOURCES:=" >> $@
+	@find $< -follow -name *.java -printf " \\\\\n	%p" >> $@
+	@find $< -follow -name *.jj -printf " \\\\\n	\$$(BUILD)/%p" \
 		| sed -e "s@\.jj@\.java@g" >> $@
 	@echo "" >> $@
+	@echo -n "JDO_SOURCES:=" >> $@
+	@find $< -follow -name *.jdo -printf " \\\\\n	%p" >> $@
+	@echo "" >> $@
+	@echo "JDO_MODIFIED=\$$(if \$$(filter %.jdo,\$$?),\$$^,\$$?)" >> $@
+# deps
+	@echo "\$$(BUILD)/$<.jstamp: \$$(JAVA_SOURCES) \$$(JDO_SOURCES)" >> $@
+# mkdir
 	@echo "	@mkdir -p \$$(BUILD)/$<" >> $@
+# javac
 	@echo -n "	javac -classpath \$$(CLASSPATH)" >> $@
-	@echo " -sourcepath \$$(SOURCEPATH) -d \$$(BUILD)/$< \$$?" >> $@
+	@echo -n " -sourcepath \$$(SOURCEPATH) -d \$$(BUILD)/$< " >> $@
+	@echo "\$$(filter %.java,\$$(JDO_MODIFIED))" >> $@
+# JDO enhancer
+	@echo "ifdef JDO_SOURCES" >> $@
+	@echo -n "	\$$(JDO_ENHANCE) -d \$$(BUILD)/$< " >> $@
+	@echo -n "-s $<:\$$(BUILD)/$< " >> $@
+	@echo -n "\$$(filter %.class,\$$(JDO_MODIFIED:%.java=\$$(BUILD)/%.class)) " >> $@
+	@echo "\$$(filter %.jdo,\$$^)" >> $@
+	@echo "endif" >> $@
+# timestamp
 	@echo "	@touch \$$(BUILD)/$<.jstamp" >> $@
 	@echo "" >> $@
 	@echo -n "$@:" >> $@
-	@find $< -type d -printf " \\\\\n	%p" >> $@
+	@find $< -follow -type d -printf " \\\\\n	%p" >> $@
 	@echo "" >> $@
 	@echo "" >> $@
-	@find $< -type d -printf "%p:\n" >> $@
+	@find $< -follow -type d -printf "%p:\n" >> $@
 
 $(BUILD)/%.java: %.jj
 	@mkdir -p $(dir $(BUILD)/$<)
