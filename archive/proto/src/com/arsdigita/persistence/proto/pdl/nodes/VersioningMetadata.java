@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #4 $ $Date: 2003/02/21 $
+ * @version $Revision: #5 $ $Date: 2003/03/03 $
  */
 public class VersioningMetadata {
     private final static Logger LOG =
@@ -70,14 +70,16 @@ public class VersioningMetadata {
         m_changeListeners = new ArrayList();
         m_switch = new Node.Switch() {
                 public void onObjectType(ObjectTypeNd ot) {
-                    if ( ot.getVersioned() != null ) {
-                        m_versionedTypes.add(ot.getQualifiedName());
-                        LOG.info("onObjectType");
-                        Iterator ii = m_changeListeners.iterator();
-                        while ( ii.hasNext() ) {
-                            LOG.info("calling the next change listener");
-                            ((ChangeListener) ii.next()).onChange();
-                        }
+                    final String fqn = ot.getQualifiedName();
+                    final boolean isMarkedVersioned = ot.getVersioned() != null;
+                    if ( isMarkedVersioned ) {
+                        m_versionedTypes.add(fqn);
+                    }
+                    LOG.info("onObjectType: " + fqn);
+                    Iterator ii = m_changeListeners.iterator();
+                    while ( ii.hasNext() ) {
+                        ((ChangeListener) ii.next()).onObjectType
+                            (fqn, isMarkedVersioned);
                     }
                 }
             };
@@ -98,8 +100,13 @@ public class VersioningMetadata {
      * versioned. A type is versioned if is marked versioned or if one its
      * ancestor types is marked versioned.
      *
+     * <p>This method is provided for unit testing only.
+     *
      * @param qualifiedName the fully qualified name of an object type
      **/
+    // FIXME: this can probably be removed. We pass this information at AST
+    // traversal time to the listener. It is the responsibility of the listener
+    // to retain this information.  -- vadimn@redhat.com, 2003-03-03
     public boolean isMarkedVersioned(String qualifiedName) {
         return m_versionedTypes.contains(qualifiedName);
     }
@@ -117,7 +124,13 @@ public class VersioningMetadata {
      * @see #addChangeListener(VersioningMetadata.ChangeListener)
      **/
     public interface ChangeListener {
-        void onChange();
+        /**
+         * This method is called whenever an object type node is traversed in in
+         * the PDL AST.
+         *
+         * @param objectTypeFQN the fully qualified name of the object
+         **/
+        void onObjectType(String objectTypeFQN, boolean isMarkedVersioned);
     }
 }
 
