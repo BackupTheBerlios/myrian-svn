@@ -8,18 +8,17 @@ import java.util.*;
  * Select
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/02/05 $
+ * @version $Revision: #3 $ $Date: 2003/02/05 $
  **/
 
 class Select extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#2 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#3 $ by $Author: rhs $, $DateTime: 2003/02/05 21:09:04 $";
 
     private ArrayList m_selections = new ArrayList();
     private Join m_join;
 
     public Select(Join join) {
-        super(null, null);
         m_join = join;
     }
 

@@ -15,12 +15,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/02/05 $
+ * @version $Revision: #7 $ $Date: 2003/02/05 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#6 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#7 $ by $Author: rhs $, $DateTime: 2003/02/05 21:09:04 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -32,9 +32,13 @@ public class RDBMSEngine extends Engine {
                 for (Iterator it = tables.iterator(); it.hasNext(); ) {
                     Table table = (Table) it.next();
                     if (e instanceof CreateEvent) {
-                        m_operations.add(new Insert(table, oid));
+                        addOperation(oid, new Insert(table));
                     } else if (e instanceof DeleteEvent) {
-                        m_operations.add(new Delete(table, oid));
+                        addOperation
+                            (oid, new Delete
+                                (table, makeCondition
+                                 (table.getPrimaryKey().getColumns()[0],
+                                  oid)));
                     } else {
                         throw new IllegalArgumentException
                             ("not a create or delete event");
@@ -70,36 +74,37 @@ public class RDBMSEngine extends Engine {
                 m.dispatch(new Mapping.Switch() {
                         public void onValue(ValueMapping vm) {
                             Column col = vm.getColumn();
-                            Operation op = findOperation(col.getTable(), oid);
+                            DML op = findOperation(oid, col.getTable());
                             op.set(col, e.getArgument());
                         }
 
                         public void onReference(ReferenceMapping rm) {
                             if (rm.isJoinFrom()) {
                                 Column col = rm.getJoin(0).getTo();
-                                Operation op = findOperation(col.getTable(),
-                                                             aoid);
+                                DML op = findOperation(aoid, col.getTable());
                                 op.set(col, oid);
                             } else if (rm.isJoinThrough()) {
                                 Column from = rm.getJoin(0).getTo();
                                 Column to = rm.getJoin(1).getFrom();
-                                Operation op;
+                                DML op;
                                 if (e instanceof AddEvent ||
                                     e instanceof SetEvent) {
-                                    op = new Insert(from.getTable(), null);
+                                    op = new Insert(from.getTable());
+                                    op.set(from, oid);
+                                    op.set(to, aoid);
                                 } else if (e instanceof RemoveEvent) {
-                                    op = new Delete(from.getTable(), null);
+                                    op = new Delete
+                                        (from.getTable(), new AndCondition
+                                            (makeCondition(from, oid),
+                                             makeCondition(to, aoid)));
                                 } else {
                                     throw new IllegalArgumentException
                                         ("not a set, add, or remove");
                                 }
-                                m_operations.add(op);
-                                op.set(from, oid);
-                                op.set(to, aoid);
+                                addOperation(op);
                             } else if (rm.isJoinTo()) {
                                 Column col = rm.getJoin(0).getFrom();
-                                Operation op = findOperation(col.getTable(),
-                                                             oid);
+                                DML op = findOperation(oid, col.getTable());
                                 op.set(col, e.getArgument());
                             } else {
                                 throw new IllegalArgumentException
@@ -124,21 +129,34 @@ public class RDBMSEngine extends Engine {
         };
 
     private ArrayList m_operations = new ArrayList();
+    private HashMap m_operationMap = new HashMap();
 
     public RDBMSEngine(Session ssn) {
         super(ssn);
     }
 
-    private Operation findOperation(Table table, OID oid) {
-        for (int i = m_operations.size() - 1; i >= 0; i--) {
-            Operation op = (Operation) m_operations.get(i);
-            if (table.equals(op.getTable()) && oid.equals(op.getOID())) {
-                return op;
-            }
-        }
+    private static final Condition makeCondition(Column col, OID oid) {
+        return new EqualsCondition
+            (Path.get(col.toString()), Path.get("bind: " + oid));
+    }
 
-        Operation result = new Update(table, oid);
-        m_operations.add(result);
+    private void addOperation(OID oid, DML dml) {
+        m_operationMap.put(oid + ":" + dml.getTable().getName(), dml);
+        m_operations.add(dml);
+    }
+
+    private void addOperation(DML dml) {
+        m_operations.add(dml);
+    }
+
+    private DML findOperation(OID oid, Table table) {
+        DML op = (DML) m_operationMap.get(oid + ":" + table.getName());
+        if (op != null) { return op; }
+
+        DML result = new Update
+            (table, makeCondition
+             (table.getPrimaryKey().getColumns()[0], oid));
+        addOperation(oid, result);
         return result;
     }
 

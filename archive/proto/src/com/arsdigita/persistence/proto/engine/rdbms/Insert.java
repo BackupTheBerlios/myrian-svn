@@ -11,15 +11,15 @@ import java.util.*;
  * Insert
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/01/28 $
+ * @version $Revision: #3 $ $Date: 2003/02/05 $
  **/
 
-class Insert extends Operation {
+class Insert extends DML {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Insert.java#2 $ by $Author: rhs $, $DateTime: 2003/01/28 19:17:39 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Insert.java#3 $ by $Author: rhs $, $DateTime: 2003/02/05 21:09:04 $";
 
-    public Insert(Table table, OID oid) {
-        super(table, oid);
+    public Insert(Table table) {
+        super(table);
     }
 
     public String toString() {
