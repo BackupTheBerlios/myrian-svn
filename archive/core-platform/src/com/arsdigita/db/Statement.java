@@ -54,12 +54,12 @@ import java.io.StringWriter;
  * </ul>
  *
  * @author Mark Thomas
- * @version $Revision: #9 $ $Date: 2002/12/11 $
+ * @version $Revision: #10 $ $Date: 2003/05/23 $
  * @since 4.5
  */
 public class Statement implements java.sql.Statement, ResultSetEventListener {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Statement.java#9 $ $Author: dennis $ $Date: 2002/12/11 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Statement.java#10 $ $Author: vadim $ $Date: 2003/05/23 $";
 
     private static final java.util.Set dbgStatements = new java.util.HashSet();
 
@@ -233,7 +233,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
                            "of cursors error. " + sb.toString());
                 StringWriter w = new StringWriter();
                 PrintWriter msg = new PrintWriter(w);
-                msg.println("Satement was created here:");
+                msg.println("Statement was created here:");
                 msg.println(lineSeparator);
                 m_created.printStackTrace(msg);
                 s_cat.warn(w);
