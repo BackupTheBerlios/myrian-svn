@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres-create.sql#27 $
--- $DateTime: 2003/07/28 11:33:50 $
+-- $Id: //core-platform/dev/sql/postgres-create.sql#28 $
+-- $DateTime: 2003/07/31 17:13:50 $
 
 begin;
 
@@ -166,6 +166,7 @@ begin;
 \i default/workflow/index-cw_task_comments.sql
 \i default/workflow/table-cw_system_tasks.sql
 \i default/workflow/index-cw_task_listeners.sql
+\i default/workflow/index-cw_task_listeners_tid_ltid.sql
 \i default/workflow/index-cw_task_user_assignees.sql
 \i default/workflow/index-cw_task_group_assignees.sql
 \i default/workflow/table-cw_processes.sql

@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.1-6.0.0.sql#5 $
--- $DateTime: 2003/07/24 19:46:44 $
+-- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.1-6.0.0.sql#6 $
+-- $DateTime: 2003/07/31 17:13:50 $
 
 begin;
 
@@ -38,6 +38,7 @@ begin;
 \i ../postgres/upgrade/5.2.1-6.0.0/misc.sql
 \i ../default/upgrade/5.2.1-6.0.0/insert-vcx_event_types.sql
 \i ../default/upgrade/5.2.1-6.0.0/insert-vcx_java_classes.sql
+\i ../default/upgrade/5.2.1-6.0.0/add-index-cw_task_listeners_tid_ltid.sql
 
 commit;
 

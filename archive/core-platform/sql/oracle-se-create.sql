@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/oracle-se-create.sql#30 $
--- $DateTime: 2003/06/18 15:51:58 $
+-- $Id: //core-platform/dev/sql/oracle-se-create.sql#31 $
+-- $DateTime: 2003/07/31 17:13:50 $
 
 @@ oracle-se/function-currentDate.sql
 
@@ -182,6 +182,7 @@
 @@ default/workflow/index-cw_task_comments.sql
 @@ default/workflow/table-cw_system_tasks.sql
 @@ default/workflow/index-cw_task_listeners.sql
+@@ default/workflow/index-cw_task_listeners_tid_ltid.sql
 @@ default/workflow/index-cw_task_user_assignees.sql
 @@ default/workflow/index-cw_task_group_assignees.sql
 @@ default/workflow/table-cw_processes.sql

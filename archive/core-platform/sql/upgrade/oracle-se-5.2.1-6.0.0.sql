@@ -20,3 +20,5 @@
 @@ ../default/upgrade/5.2.1-6.0.0/insert-vcx_java_classes.sql
 @@ ../oracle-se/upgrade/5.2.1-6.0.0/misc.sql
 @@ ../oracle-se/upgrade/5.2.1-6.0.0/update-constraints.sql
+@@ ../default/upgrade/5.2.1-6.0.0/add-index-cw_task_listeners_tid_ltid.sql
+
