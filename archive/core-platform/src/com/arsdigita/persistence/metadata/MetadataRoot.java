@@ -28,12 +28,12 @@ import com.arsdigita.db.DbHelper;
  * metadata system.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2002/08/14 $
+ * @version $Revision: #9 $ $Date: 2002/08/14 $
  **/
 
 public class MetadataRoot extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#8 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#9 $ by $Author: randyg $, $DateTime: 2002/08/14 17:41:26 $";
 
     private static final Logger s_cat = Logger.getLogger(MetadataRoot.class.getName());
 
@@ -330,7 +330,12 @@ public class MetadataRoot extends Element {
                         return 0;
                     }
                 default:
-                    ps.setString(index, (String) value);
+                    String stringValue = (String)value;
+                    if (stringValue == null || stringValue.length() == 0) {
+                        ps.setString(index, null);
+                    } else {
+                        ps.setString(index, stringValue);
+                    }
                     break;
                 }
 
