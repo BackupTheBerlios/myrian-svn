@@ -104,3 +104,6 @@ $(BUILD)/%.jar: $(BUILD)/%.jstamp
 
 run-tests: $(JSTAMPS)
 	bin/run-tests
+
+jdo-tests: $(JSTAMPS)
+	bin/run com.redhat.persistence.TestRunner com.redhat.persistence.jdotest.SimpleTest

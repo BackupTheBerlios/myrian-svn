@@ -47,12 +47,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/06/17 $
+ * @version $Revision: #4 $ $Date: 2004/06/18 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#3 $ by $Author: vadim $, $DateTime: 2004/06/17 16:10:26 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#4 $ by $Author: vadim $, $DateTime: 2004/06/18 12:51:12 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -78,6 +78,8 @@ public class Session {
     private final Set m_afterFlush = new HashSet();
 
     private Event m_beforeFlushMarker = null;
+
+    private Map m_attrs = new HashMap();
 
     public Session(Root root, Engine engine, QuerySource source) {
         m_root = root;
@@ -728,6 +730,7 @@ public class Session {
         m_odata.clear();
         m_events.clear();
         m_violations.clear();
+        m_attrs.clear();
         m_beforeFlushMarker = null;
         if (LOG.isDebugEnabled()) { setLevel(0); }
         cleanUpEventProcessors(isCommit);
@@ -1032,6 +1035,48 @@ public class Session {
     public void addAfterFlush(EventProcessor ep) {
         check(ep);
         m_afterFlush.add(ep);
+    }
+
+    /**
+     * Sets an attribute inside of this <code>Session</code>.  The attribute
+     * exists as long as the session is open.  When the sessin is {@link
+     * #commit() committed} or {@link rollback() rolled back}, the attribute is
+     * discarded.
+     *
+     * @see #getAttribute(String)
+     * @see #removeAttribute(String)
+     *
+     * @param name the name of the attribute
+     * @param value the value of the attribute
+     * @post getAttribute(name) == value
+     */
+    public void setAttribute(String name, Object value) {
+        m_attrs.put(name, value);
+    }
+
+    /**
+     * Returns the named attribute.
+     *
+     * @see #setAttribute(String, Object)
+     *
+     * @param name the name of the attribute
+     * @return the value of the attribute, or null if no attribute with
+     *   this value has been stored
+     */
+    public Object getAttribute(String name) {
+        return m_attrs.get(name);
+    }
+
+    /**
+     * Removes the named attribute from this <code>Session</code>.
+     *
+     * @see #setAttribute(String, Object)
+     *
+     * @param name the name of the attribute to remove
+     * @post getAttribute(name) == null
+     */
+    public void removeAttribute(String name) {
+        m_attrs.remove(name);
     }
 
     void dump() {

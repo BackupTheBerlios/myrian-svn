@@ -12,12 +12,15 @@ public class PersistenceManagerImpl implements PersistenceManager {
     private static final Logger s_log =
         Logger.getLogger(PersistenceManagerImpl.class);
 
+    static final String ATTR_NAME = PersistenceManagerImpl.class.getName();
+
     private Session m_ssn;
     private Transaction m_txn = new TransactionImpl(this);
     private Object m_userObject = null;
 
     public PersistenceManagerImpl(Session ssn) {
         m_ssn = ssn;
+        m_ssn.setAttribute(ATTR_NAME, this);
     }
 
     final Session getSession() {

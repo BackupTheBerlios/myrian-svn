@@ -5,10 +5,11 @@
   functionality
 
 - reverse navigation in jdo implementation objects
-  - ssn -> pmi (used in JDOAdapater#getObject)
-    - use subclass technique from c.a.p
-    - add attribute map to c.r.p session
-    - add static map from ssn object to pmi
+  + ssn -> pmi (used in JDOAdapater#getObject)
+    + add attribute map to c.r.p session
+      (done in change 43257).
+    -x- use subclass technique from c.a.p
+    -x- add static map from ssn object to pmi
   - pc -> sm (could also be used in setSession, but is less important)
     - can use reflection, but that may not be appropriate depending on
       what the spec says regarding the protected-ness of the field

@@ -23,18 +23,17 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
- * Title:       TransactionContext class
- *              This class is intentionally NOT threadsafe;
- *              it should not be shared across threads.
- * Description: The TransactionContext class encapsulates a database transaction.
+ * The TransactionContext class encapsulates a database transaction.
+ *
+ * This class is intentionally <em>not</em> threadsafe.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/06/18 $
  */
 
 public class TransactionContext {
 
-    String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/TransactionContext.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/TransactionContext.java#2 $ by $Author: vadim $, $DateTime: 2004/06/18 12:51:12 $";
 
     private static final Logger s_cat =
         Logger.getLogger(TransactionContext.class);
