@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
  * CompoundFilters are used to AND or OR multiple filters together.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/08/15 $
+ * @version $Revision: #11 $ $Date: 2003/11/21 $
  */
 
 class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/CompoundFilterImpl.java#10 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/CompoundFilterImpl.java#11 $ by $Author: ashah $, $DateTime: 2003/11/21 11:59:09 $";
 
     private static final Logger m_log =
         Logger.getLogger(CompoundFilterImpl.class);
@@ -141,8 +141,6 @@ class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
 
 	StringBuffer result = new StringBuffer();
 
-	result.append("(");
-
 	boolean first = true;
 
 	for (Iterator it = m_filters.iterator(); it.hasNext(); ) {
@@ -158,14 +156,14 @@ class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
 		result.append(" " + m_combineWith + " ");
 	    }
 
+            result.append("(");
 	    result.append(sql);
+            result.append(")");
 	}
 
 	if (first) {
 	    return null;
 	}
-
-	result.append(")");
 
 	return result.toString();
     }

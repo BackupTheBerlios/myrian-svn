@@ -29,10 +29,10 @@ import org.apache.log4j.Logger;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #13 $ $Date: 2003/08/15 $
+ * @version $Revision: #14 $ $Date: 2003/11/21 $
  */
 public class FilterTest extends PersistenceTestCase {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/FilterTest.java#13 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/FilterTest.java#14 $ by $Author: ashah $, $DateTime: 2003/11/21 11:59:09 $";
 
     private static Logger s_log =
         Logger.getLogger(FilterTest.class.getName());
@@ -747,6 +747,15 @@ public class FilterTest extends PersistenceTestCase {
         DataQuery dq = getDefaultQuery();
         dq.addFilter("nvl('zero', 'zero') = nvl('one', 'one')");
         assertEquals("nvl filter silently failed", 0, dq.size());
+    }
+
+    public void testFilterAndOrPrecedence() {
+        DataQuery dq = getDefaultQuery();
+        dq.addFilter("1 = 1 or 1 = 0");
+        dq.addFilter("1 = 0");
+        // this should end up parsing as (((1=1) or (1=0)) and (1=0))
+        // which is false
+        assertEquals("filter should return no rows", 0, dq.size());
     }
 
 
