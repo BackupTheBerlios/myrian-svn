@@ -19,4 +19,6 @@ extend `find $BUILD -name "*.jmake" | sed s/\\.jmake\$//g | sed s%^$BUILD/%%g`
 if [ ! -z $VERBOSE ]; then
 	echo $CLASSPATH
 fi
-exec java $*
+
+exec java "$@"
+
