@@ -13,12 +13,12 @@ import java.util.*;
  * MemoryEngine
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/01/31 $
+ * @version $Revision: #13 $ $Date: 2003/02/07 $
  **/
 
 public class MemoryEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#12 $ by $Author: rhs $, $DateTime: 2003/01/31 12:48:23 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#13 $ by $Author: ashah $, $DateTime: 2003/02/07 12:05:27 $";
 
     private static final Logger LOG = Logger.getLogger(MemoryEngine.class);
 
@@ -97,6 +97,37 @@ public class MemoryEngine extends Engine {
         m_engine.flush();
     }
 
+    private void checkLiveness(Object o) {
+        if (o == null) {
+            return;
+        }
+
+        OID oid;
+        if (o instanceof PersistentObject) {
+            oid = ((PersistentObject) o).getOID();
+        } else if (o instanceof OID) {
+            oid = (OID) o;
+        } else {
+            return;
+        }
+
+        EventList[] els = {m_uncomitted, DATA};
+        for (int j = 0; j < els.length; j++) {
+            for (int i = els[j].size() - 1; i >= 0; i--) {
+                Event ev = els[j].getEvent(i);
+                if (ev.getOID().equals(oid)) {
+                    if (ev instanceof DeleteEvent) {
+                        throw new Error("dead object:" + oid);
+                    } else if (ev instanceof CreateEvent) {
+                        return;
+                    }
+                }
+            }
+        }
+
+        throw new Error("dead object:" + oid);
+    }
+
     private Object get(OID oid, Property prop) {
         if (prop.isCollection()) {
             Set result = new HashSet();
@@ -122,6 +153,10 @@ public class MemoryEngine extends Engine {
                 }
             }
 
+            for (Iterator it = result.iterator(); it.hasNext(); ) {
+                checkLiveness(it.next());
+            }
+
             return result;
         } else {
             EventList[] els = {m_uncomitted, DATA};
@@ -132,7 +167,9 @@ public class MemoryEngine extends Engine {
                         SetEvent sev = (SetEvent) ev;
                         if (sev.getProperty().equals(prop) &&
                             oid.equals(sev.getOID())) {
-                            return sev.getArgument();
+                            Object o = sev.getArgument();
+                            checkLiveness(o);
+                            return o;
                         }
                     }
                 }

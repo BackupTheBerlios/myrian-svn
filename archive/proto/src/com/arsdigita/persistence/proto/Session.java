@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #19 $ $Date: 2003/02/05 $
+ * @version $Revision: #20 $ $Date: 2003/02/07 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#19 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#20 $ by $Author: ashah $, $DateTime: 2003/02/07 12:05:27 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -185,9 +185,69 @@ public class Session {
      **/
     private void cascadeDelete(OID container, PersistentObject containee) {
         ObjectData containerOD = fetchObjectData(container);
-        containerOD.setVisiting(true);
+        boolean me = false;
+        if (!containerOD.isVisiting()) {
+            me = true;
+            containerOD.setVisiting(true);
+        }
         delete(containee.getOID());
-        containerOD.setVisiting(false);
+
+        if (me) { containerOD.setVisiting(false); }
+    }
+
+    /**
+     * Update the reverse role of an old target object. After updating a
+     * reversible role, either set or remove, the reverse role for the old
+     * target needs to be set to null.
+     *
+     * @param sourceOID the source OID of a role that has been updated
+     * @param role the role that has been updated
+     * @param target the old target of a role that has been updated
+     **/
+    private void reverseUpdateOld(OID sourceOID, Role role,
+                                  PersistentObject target) {
+        Role rev = role.getReverse();
+        PersistentObject source = retrieve(sourceOID);
+        if (rev.isCollection()) {
+            addEvent(new RemoveEvent(this, target.getOID(), rev, source));
+        } else if (rev.isNullable()) {
+            addEvent(new SetEvent(this, target.getOID(), rev, null));
+        } else if (!fetchObjectData(target.getOID()).isVisiting() &&
+                   !isDeleted(target.getOID())) {
+            throw new IllegalStateException("can't set 1..1 to null");
+        }
+    }
+
+    /**
+     * Update the reverse role of an new target object. After updating a
+     * reversible role, either set or add, the reverse role for the new target
+     * needs to be set to the new source. In addition, the new targets' old
+     * source needs to be updated so its role target is null.
+     *
+     * @param sourceOID the source OID of a role that has been updated
+     * @param role the role that has been updated
+     * @param targetObj the new target of a role that has been updated
+     **/
+    private void reverseUpdateNew(OID sourceOID, Role role,
+                                  PersistentObject targetObj) {
+        PersistentObject source = retrieve(sourceOID);
+        OID target = targetObj.getOID();
+        Role rev = role.getReverse();
+        if (rev.isCollection()) {
+            addEvent(new AddEvent(this, target, rev, source));
+        } else {
+            PersistentObject old = (PersistentObject) get(target, rev);
+            if (old != null) {
+                if (role.isNullable()) {
+                    addEvent(new SetEvent(this, old.getOID(), role, null));
+                } else if (!fetchObjectData(old.getOID()).isVisiting() &&
+                           !isDeleted(old.getOID())) {
+                    throw new IllegalStateException("can't set 1..1 to null");
+                }
+            }
+
+            addEvent(new SetEvent(this, target, rev, source));
+        }
     }
 
 
@@ -219,37 +279,16 @@ public class Session {
                             cascadeDelete(oid, po);
                         }
                     } else if (role.isReversable()) {
-                        Role rev = role.getReverse();
-                        PersistentObject oldpo = (PersistentObject) old;
-                        PersistentObject po = (PersistentObject) value;
-                        PersistentObject me = retrieve(oid);
-
-
-                        if (oldpo != null) {
-                            if (rev.isCollection()) {
-                                addEvent(new RemoveEvent(Session.this,
-                                                         oldpo.getOID(), rev,
-                                                         me));
-                            } else {
-                                if (rev.isNullable()) {
-                                    addEvent(new SetEvent(Session.this,
-                                                          oldpo.getOID(), rev,
-                                                          null));
-                                } else {
-                                    throw new IllegalStateException(
-                                        "can't set reverse 1..1 to null");
-                                }
-                            }
+                        if (old != null) {
+                            reverseUpdateOld
+                                (oid, role, (PersistentObject) old);
                         }
+                    }
 
-                        if (po != null) {
-                            if (rev.isCollection()) {
-                                addEvent(new AddEvent(Session.this,
-                                                      po.getOID(), rev, me));
-                            } else {
-                                addEvent(new SetEvent(Session.this,
-                                                      po.getOID(), rev, me));
-                            }
+                    if (role.isReversable()) {
+                        if (value != null) {
+                            reverseUpdateNew
+                                (oid, role, (PersistentObject) value);
                         }
                     }
                 }
@@ -354,25 +393,10 @@ public class Session {
         prop.dispatch(new Property.Switch() {
                 public void onRole(Role role) {
                     addEvent(new AddEvent(Session.this, oid, role, value));
+
                     if (role.isReversable()) {
-                        PersistentObject me = retrieve(oid);
-                        Role rev = role.getReverse();
-                        PersistentObject po = (PersistentObject) value;
-                        if (rev.isCollection()) {
-                            addEvent(new AddEvent(Session.this, po.getOID(),
-                                                  rev, me));
-                        } else {
-                            PersistentObject old =
-                                (PersistentObject) get(po.getOID(), rev);
-                            if (old != null) {
-                                addEvent(new RemoveEvent(Session.this,
-                                                         old.getOID(), rev,
-                                                         po));
-                            }
-                            if (me == null) { throw new Error("oops"); }
-                            addEvent(new SetEvent(Session.this, po.getOID(),
-                                                  rev, me));
-                        }
+                        reverseUpdateNew(
+                            oid, role, (PersistentObject) value);
                     }
                 }
 
@@ -405,16 +429,8 @@ public class Session {
                     if (role.isComponent()) {
                         cascadeDelete(oid, (PersistentObject) value);
                     } else if (role.isReversable()) {
-                        PersistentObject po = (PersistentObject) value;
-                        Role rev = role.getReverse();
-                        PersistentObject me = retrieve(oid);
-                        if (rev.isCollection()) {
-                            addEvent(new RemoveEvent
-                                (Session.this, po.getOID(), rev, me));
-                        } else {
-                            addEvent(new SetEvent
-                                (Session.this, po.getOID(), rev, null));
-                        }
+                        reverseUpdateOld
+                            (oid, role, (PersistentObject) value);
                     }
                 }
 
