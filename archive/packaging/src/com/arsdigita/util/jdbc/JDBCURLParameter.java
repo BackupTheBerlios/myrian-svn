@@ -13,9 +13,10 @@
  *
  */
 
-package com.arsdigita.util.parameter;
+package com.arsdigita.util.jdbc;
 
 import com.arsdigita.util.*;
+import com.arsdigita.util.parameter.*;
 import java.net.*;
 import java.util.*;
 import org.apache.commons.beanutils.*;
@@ -25,19 +26,25 @@ import org.apache.oro.text.perl.Perl5Util;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/JDBCURLParameter.java#3 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/jdbc/JDBCURLParameter.java#1 $
  */
 public class JDBCURLParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/JDBCURLParameter.java#3 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/jdbc/JDBCURLParameter.java#1 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/29 01:09:27 $";
+        "$DateTime: 2003/09/26 13:01:19 $";
 
     private static final Perl5Util s_perl = new Perl5Util();
     private static final String s_regex = "/^jdbc:[^:]+:.+$/";
 
     public JDBCURLParameter(final String name) {
         super(name);
+    }
+
+    public JDBCURLParameter(final String name,
+			    final int multiplicity,
+			    final Object defaalt) {
+        super(name, multiplicity, defaalt);
     }
 
     protected void validate(final Object value, final List errors) {
