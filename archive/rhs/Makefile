@@ -24,7 +24,8 @@ clean:
 
 jar: all
 	jar cf $(BUILD)/crp.jar -C $(BUILD)/src .
-	jar uf $(BUILD)/crp.jar -C src .
+	cd src; find . -name "*.pdl" -or -name "*.xsl" | \
+		xargs jar uf ../$(BUILD)/crp.jar
 
 tags:
 	rm -f TAGS
