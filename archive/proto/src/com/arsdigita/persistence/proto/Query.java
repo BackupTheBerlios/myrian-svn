@@ -8,12 +8,12 @@ import java.util.*;
  * Query
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/03/18 $
+ * @version $Revision: #11 $ $Date: 2003/03/28 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#10 $ by $Author: ashah $, $DateTime: 2003/03/18 14:36:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#11 $ by $Author: rhs $, $DateTime: 2003/03/28 17:56:58 $";
 
     private Signature m_signature;
     private Filter m_filter;
@@ -21,26 +21,31 @@ public class Query {
     private HashSet m_ascending = new HashSet();
     private Integer m_offset = null;
     private Integer m_limit = null;
-    private HashMap m_values;
+    private HashMap m_values = new HashMap();
 
     public Query(Signature signature, Filter filter) {
         m_signature = signature;
         m_filter = filter;
-        m_values = new HashMap(m_signature.getParameters().size());
+    }
+
+    private static final Filter and(Filter left, Filter right) {
+	if (left == null) {
+	    return right;
+	}
+	if (right == null) {
+	    return left;
+	}
+	return new AndFilter(left, right);
     }
 
     public Query(Query query, Filter filter) {
-        this(query.getSignature(),
-             query.getFilter() == null ?
-             filter : new AndFilter(query.getFilter(), filter));
-        for (Iterator it = getSignature().getParameters().iterator();
-             it.hasNext(); ) {
-            Parameter p = (Parameter) it.next();
-            set(p, query.get(p));
-        }
-
+	m_signature = new Signature(query.m_signature);
+	m_filter = and(query.m_filter, filter);
         m_order.addAll(query.m_order);
         m_ascending.addAll(query.m_ascending);
+	m_offset = query.m_offset;
+	m_limit = query.m_limit;
+	m_values.putAll(query.m_values);
     }
 
     public Signature getSignature() {

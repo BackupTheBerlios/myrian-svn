@@ -8,12 +8,12 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2003/03/27 $
+ * @version $Revision: #15 $ $Date: 2003/03/28 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#14 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#15 $ by $Author: rhs $, $DateTime: 2003/03/28 17:56:58 $";
 
     private ArrayList m_paths = new ArrayList();
 
@@ -30,7 +30,14 @@ public class Signature {
 
     public Signature(ObjectType type) {
         this(new Source(type));
-        addKeyProperties();
+    }
+
+    public Signature(Signature sig) {
+	m_paths.addAll(sig.m_paths);
+	m_sources.addAll(sig.m_sources);
+	m_sourceMap.putAll(sig.m_sourceMap);
+	m_parameters.addAll(sig.m_parameters);
+	m_parameterMap.putAll(sig.m_parameterMap);
     }
 
     public ObjectType getObjectType() {

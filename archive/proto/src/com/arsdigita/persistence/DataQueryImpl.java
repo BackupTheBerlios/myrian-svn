@@ -18,17 +18,19 @@ import java.util.*;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2003/03/28 $
+ * @version $Revision: #14 $ $Date: 2003/03/28 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#13 $ by $Author: ashah $, $DateTime: 2003/03/28 10:09:18 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#14 $ by $Author: rhs $, $DateTime: 2003/03/28 17:56:58 $";
 
     private static final FilterFactory FACTORY = new FilterFactoryImpl();
 
     private Session m_ssn;
     private com.arsdigita.persistence.proto.Session m_pssn;
+    private HashMap m_bindings = new HashMap();
+    private Query m_query;
     PersistentCollection m_pc;
     Cursor m_cursor = null;
     private CompoundFilter m_filter = getFilterFactory().and();
@@ -41,6 +43,7 @@ class DataQueryImpl implements DataQuery {
         m_ssn = ssn;
         m_pssn = ssn.getProtoSession();
         m_pc = pc;
+	m_query = new Query(m_pc.getDataSet().getQuery(), null);
     }
 
     Session getSession() {
@@ -65,7 +68,7 @@ class DataQueryImpl implements DataQuery {
     }
 
     public boolean isEmpty() {
-        return m_pc.getDataSet().isEmpty(makeFilter());
+        return m_pssn.retrieve(makeQuery()).getDataSet().isEmpty();
     }
 
 
@@ -182,8 +185,7 @@ class DataQueryImpl implements DataQuery {
 
 
     public void setOrder(String order) {
-        Query q = m_pc.getDataSet().getQuery();
-        q.clearOrder();
+        m_query.clearOrder();
         addOrder(order);
     }
 
@@ -207,8 +209,7 @@ class DataQueryImpl implements DataQuery {
                     ("bad order: " + order);
             }
 
-            m_pc.getDataSet().getQuery().addOrder(Path.get(parts[0]),
-                                                  isAscending);
+            m_query.addOrder(Path.get(parts[0]), isAscending);
         }
     }
 
@@ -224,7 +225,8 @@ class DataQueryImpl implements DataQuery {
     }
 
 
-    public void setParameter(String parameterName, Object value) {
+    private void setParameter(Query query, String parameterName,
+			      Object value) {
         if (value == null) {
             return;
         }
@@ -241,8 +243,7 @@ class DataQueryImpl implements DataQuery {
             tobj = value;
         }
 
-        Query q = m_pc.getDataSet().getQuery();
-        Signature sig = q.getSignature();
+        Signature sig = query.getSignature();
         Path path = Path.get(parameterName);
         Parameter p = sig.getParameter(path);
         if (p == null) {
@@ -250,19 +251,17 @@ class DataQueryImpl implements DataQuery {
             p = new Parameter(m_pssn.getObjectType(tobj), path);
             sig.addParameter(p);
         }
-        q.set(p, value);
+        query.set(p, value);
+    }
+
+
+    public void setParameter(String parameterName, Object value) {
+	m_bindings.put(parameterName, value);
     }
 
 
     public Object getParameter(String parameterName) {
-        Query q = m_pc.getDataSet().getQuery();
-        Signature sig = q.getSignature();
-        Path p = Path.get(parameterName);
-        if (sig.isParameter(p)) {
-            return q.get(sig.getParameter(p));
-        } else {
-            return null;
-        }
+	return m_bindings.get(parameterName);
     }
 
 
@@ -286,11 +285,10 @@ class DataQueryImpl implements DataQuery {
                  "than the endIndex [" + endIndex + "]");
         }
 
-        m_pc.getDataSet().getQuery().setOffset
-            (new Integer(beginIndex.intValue() - 1));
+        m_query.setOffset(new Integer(beginIndex.intValue() - 1));
         if (endIndex != null) {
-            m_pc.getDataSet().getQuery().setLimit
-                (new Integer(endIndex.intValue() - beginIndex.intValue()));
+            m_query.setLimit(new Integer(endIndex.intValue() -
+					 beginIndex.intValue()));
         }
     }
 
@@ -340,25 +338,28 @@ class DataQueryImpl implements DataQuery {
         return (int) m_cursor.getPosition();
     }
 
-    private com.arsdigita.persistence.proto.Filter makeFilter() {
+    private Query makeQuery() {
         String conditions = m_filter.getConditions();
+	Query q;
         if (conditions == null || conditions.equals("")) {
-            return null;
-        }
+	    q = new Query(m_query, null);
+	} else {
+	    q = new Query(m_query, new PassthroughFilter(conditions));
+	}
 
-        Map bindings = m_filter.getBindings();
-        for (Iterator it = bindings.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry me = (Map.Entry) it.next();
-            String key = (String) me.getKey();
-            setParameter(key, me.getValue());
-        }
+	m_bindings.putAll(m_filter.getBindings());
+	for (Iterator it = m_bindings.entrySet().iterator(); it.hasNext(); ) {
+	    Map.Entry me = (Map.Entry) it.next();
+	    String key = (String) me.getKey();
+	    setParameter(q, key, me.getValue());
+	}
 
-        return new PassthroughFilter(conditions);
+        return q;
     }
 
     private void checkCursor() {
         if (m_cursor == null) {
-            m_cursor = m_pc.getDataSet().getCursor(makeFilter());
+            m_cursor = m_pssn.retrieve(makeQuery()).getDataSet().getCursor();
         }
     }
 
@@ -384,7 +385,7 @@ class DataQueryImpl implements DataQuery {
     }
 
     public long size() {
-        return m_pc.getDataSet().size(makeFilter());
+        return m_pssn.retrieve(makeQuery()).getDataSet().size();
     }
 
 }
