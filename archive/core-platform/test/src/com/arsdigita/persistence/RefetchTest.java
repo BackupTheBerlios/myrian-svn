@@ -7,36 +7,43 @@ import org.apache.log4j.Category;
  * RefetchTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/07/30 $
  **/
 
 public class RefetchTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/RefetchTest.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/RefetchTest.java#4 $ by $Author: randyg $, $DateTime: 2002/07/30 11:44:16 $";
 
     private static final Category s_log =
         Category.getInstance(RefetchTest.class);
 
-    public RefetchTest(String name) {
-        super(name);
-    }
+    private static final BigInteger NODE_ID = BigInteger.ZERO;
+    private static final String NODE_NAME = "Node Name";
 
-    static {
-        load("com/arsdigita/persistence/testpdl/mdsql/RefetchTest.pdl");
-    }
-
+    private static final BigInteger PARENT_ID = BigInteger.ONE;
+    private static final String PARENT_NAME = "Parent Name";
+    private static OID PARENT_OID = null;
+    private static OID NODE_OID;
     private static final String REFETCH_TEST = "refetchTest.RefetchTest";
     private static final String ID = "id";
     private static final String NAME = "name";
     private static final String PARENT = "parent";
 
-    private static final BigInteger NODE_ID = BigInteger.ZERO;
-    private static final String NODE_NAME = "Node Name";
-    private static final OID NODE_OID = new OID(REFETCH_TEST, NODE_ID);
+    public RefetchTest(String name) {
+        super(name);
+    }
 
-    private static final BigInteger PARENT_ID = BigInteger.ONE;
-    private static final String PARENT_NAME = "Parent Name";
-    private static final OID PARENT_OID = new OID(REFETCH_TEST, PARENT_ID);
+
+    protected void persistenceSetUp() {
+        load("com/arsdigita/persistence/testpdl/mdsql/RefetchTest.pdl");
+        super.persistenceSetUp();
+        if (PARENT_OID == null) {
+            PARENT_OID = new OID(REFETCH_TEST, PARENT_ID);
+        }
+        if (NODE_OID == null) {
+            NODE_OID = new OID(REFETCH_TEST, NODE_ID);
+        }
+    }
 
     public void test() {
         Session ssn = SessionManager.getSession();
