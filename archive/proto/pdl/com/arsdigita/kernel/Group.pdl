@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/pdl/com/arsdigita/kernel/Group.pdl#2 $ 
-// $DateTime: 2003/04/09 16:35:55 $
+// $Id: //core-platform/proto/pdl/com/arsdigita/kernel/Group.pdl#3 $ 
+// $DateTime: 2003/04/15 10:38:49 $
 
 model com.arsdigita.kernel;
 
@@ -79,6 +79,8 @@ association {
                               to group_subgroup_map.group_id, 
                             join group_subgroup_map.subgroup_id 
                               to groups.group_id;
+
+    add supergroups { }
 
     add subgroups {
         do {

@@ -31,11 +31,11 @@ import org.apache.log4j.Logger;
  * </p>
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/04/15 $
  */
 public abstract class HierarchyDenormalization {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/util/HierarchyDenormalization.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/util/HierarchyDenormalization.java#2 $ by $Author: ashah $, $DateTime: 2003/04/15 10:38:49 $";
 
     private final static Logger s_log = 
         Logger.getLogger(HierarchyDenormalization.class);
@@ -74,9 +74,10 @@ public abstract class HierarchyDenormalization {
         boolean wasNew = m_domainObject.isNew();
 
         if (s_log.isDebugEnabled()) {
-            s_log.debug("Before save: isModified:" + m_isModified + 
+            s_log.debug("Before save: oid:" + m_domainObject.getOID() +
+                        " isModified:" + m_isModified +
                         " wasNew:" + wasNew);
-        } 
+        }
 
         // if the url has been modified, we need the old url
         // if it is modified and new then this is the first url so
@@ -98,7 +99,11 @@ public abstract class HierarchyDenormalization {
             }
             if (s_log.isDebugEnabled()) {
                 s_log.debug("Old value is " + m_oldAttributeValue);
-            } 
+            }
+
+            if (m_oldAttributeValue == null) {
+                throw new IllegalStateException();
+            }
         }
     }
 
@@ -110,9 +115,16 @@ public abstract class HierarchyDenormalization {
     public void afterSave() {
         if (m_isModified) {
             if (s_log.isDebugEnabled()) {
-                s_log.debug("After save: oid:" + m_domainObject.getOID() + 
-                            " new value is:"+ getAttributeValue());
-            } 
+                s_log.debug("After save: oid:" + m_domainObject.getOID() +
+                            " new value is:"+ getAttributeValue() +
+                            " old value is:" + m_oldAttributeValue);
+            }
+
+            if (m_oldAttributeValue == null) {
+                // after save triggered by autoflush in before save
+                m_isModified = false;
+                return;
+            }
             DataOperation operation =
                 SessionManager.getSession().retrieveDataOperation
                 (m_operationName);

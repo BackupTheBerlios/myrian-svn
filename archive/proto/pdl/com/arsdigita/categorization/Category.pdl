@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/pdl/com/arsdigita/categorization/Category.pdl#3 $
-// $DateTime: 2003/04/09 16:35:55 $
+// $Id: //core-platform/proto/pdl/com/arsdigita/categorization/Category.pdl#4 $
+// $DateTime: 2003/04/15 10:38:49 $
 
 model com.arsdigita.categorization;
 
@@ -59,10 +59,10 @@ association {
                                     to cat_object_category_map.category_id,
                                   join cat_object_category_map.object_id
                                      to acs_objects.object_id;
-    Boolean[0..1] isDefault = cat_object_category_map.default_p;
+    Boolean[0..1] isDefault = cat_object_category_map.default_p CHAR(1);
     BigDecimal[0..1] sortKey = cat_object_category_map.sort_key;
 
-    add categories {
+    add {
         do {
             insert into cat_object_category_map (
                 category_id,
@@ -71,33 +71,6 @@ association {
                 sort_key
             ) values (
                 :categories.id,
-                :id,
-                :isDefault,
-                (select CASE WHEN (:sortKey is null) THEN
-                            (select CASE WHEN (max(sort_key) is null)
-                                               THEN
-                                                0
-                                               ELSE
-                                                max(sort_key)
-                                          END + 1
-                                     from cat_object_category_map)
-                             ELSE
-                                 (:sortKey)
-                             END
-                   from dual)
-            )
-        }
-    }
-
-    add childObjects {
-        do {
-            insert into cat_object_category_map (
-                category_id,
-                object_id,
-                default_p,
-                sort_key
-            ) values (
-                :id,
                 :childObjects.id,
                 :isDefault,
                 (select CASE WHEN (:sortKey is null) THEN
@@ -136,11 +109,11 @@ association {
                              join cat_category_category_map.related_category_id
                               to cat_categories.category_id;
     BigDecimal[0..1] sortKey = cat_category_category_map.sort_key;
-    Boolean[0..1] isDefault = cat_category_category_map.default_p;
+    Boolean[1..1] isDefault = cat_category_category_map.default_p CHAR(1);
     String[0..1] relationType = cat_category_category_map.relation_type;
 
 
-    add parents {
+    add {
         do {
             insert into cat_category_category_map (
                 category_id,
@@ -150,42 +123,13 @@ association {
                 relation_type
             ) values (
                 :parents.id,
-                :id,
+                :related.id,
                 :isDefault,
                 (select CASE WHEN (:sortKey is null) THEN
                              (select CASE WHEN (max(sort_key) is null) THEN
                                                0
                                                ELSE
                                                max(sort_key)
-                                          END + 1
-                                     from cat_category_category_map)
-                             ELSE
-                                 (:sortKey)
-                             END
-                   from dual),
-                :relationType
-            )
-        }
-    }
-
-    add related {
-        do {
-            insert into cat_category_category_map (
-                category_id,
-                related_category_id,
-                default_p,
-                sort_key,
-                relation_type
-            ) values (
-                :id,
-                :related.id,
-                :isDefault,
-                (select CASE WHEN (:sortKey is null) THEN
-                            (select CASE WHEN (max(sort_key) is null)
-                                               THEN
-                                                0
-                                               ELSE
-                                                max(sort_key)
                                           END + 1
                                      from cat_category_category_map)
                              ELSE

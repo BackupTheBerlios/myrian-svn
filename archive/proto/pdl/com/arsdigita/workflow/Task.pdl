@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/pdl/com/arsdigita/workflow/Task.pdl#2 $
-// $DateTime: 2003/04/09 16:35:55 $
+// $Id: //core-platform/proto/pdl/com/arsdigita/workflow/Task.pdl#3 $
+// $DateTime: 2003/04/15 10:38:49 $
 
 model com.arsdigita.workflow.simple;
 
@@ -22,7 +22,7 @@ object type Task extends ACSObject {
 
     String[1..1]     label = cw_tasks.label VARCHAR(200);
     String[1..1]     description = cw_tasks.description VARCHAR(4000);
-    String[1..1]     isActive = cw_tasks.is_active CHAR(1);
+    Boolean[1..1]     isActive = cw_tasks.is_active CHAR(1);
     BigDecimal[0..1] parentTaskID = cw_tasks.parent_task_id INTEGER;
     String[1..1]     taskState = cw_tasks.task_state VARCHAR(16);
     component TaskComment[0..n] comments =
@@ -55,7 +55,7 @@ object type Task extends ACSObject {
 }
 
 association {
-    Task[1..1] task = join cw_tasks.task_id
+    Task[0..1] task = join cw_tasks.task_id
                         to cw_task_listeners.listener_task_id,
                       join cw_task_listeners.task_id
                         to cw_tasks.task_id;
@@ -63,51 +63,6 @@ association {
                                          to cw_task_listeners.task_id,
                                        join cw_task_listeners.listener_task_id
                                          to cw_tasks.task_id;
-
-    add task {}
-    retrieve task {}
-    clear task {}
-
-    retrieve taskFinishedListeners {
-        do {
-	    select cw_task_listeners.listener_task_id ,
-                   acs_objects.object_type
-            from   cw_task_listeners ,
-                   acs_objects
-            where  cw_task_listeners.task_id = :id
-            and    acs_objects.object_id = cw_task_listeners.listener_task_id
-        } map {
-            taskFinishedListeners.id               = cw_task_listeners.listener_task_id;
-            taskFinishedListeners.objectType       = acs_objects.object_type;
-        }
-    }
-
-    add taskFinishedListeners {
-	do {
-            insert into cw_task_listeners (
-                task_id ,
-                listener_task_id
-            ) values (
-	        :id  ,
-                :taskFinishedListeners.id
-	    )
-        }
-    }
-
-    remove taskFinishedListeners {
-        do {
-            delete from cw_task_listeners
-            where  task_id = :id
-            and    listener_task_id = :taskFinishedListeners.id
-        }
-    }
-
-    clear  taskFinishedListeners {
-	do {
-	    delete from cw_task_listeners
-            where  task_id = :id
-      	}
-    }
 }
 
 

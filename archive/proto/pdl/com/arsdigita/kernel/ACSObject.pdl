@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/pdl/com/arsdigita/kernel/ACSObject.pdl#1 $ 
-// $DateTime: 2002/11/27 19:51:05 $
+// $Id: //core-platform/proto/pdl/com/arsdigita/kernel/ACSObject.pdl#2 $ 
+// $DateTime: 2003/04/15 10:38:49 $
 
 model com.arsdigita.kernel;
 
@@ -38,65 +38,6 @@ object type ACSObject {
     object key (id);
 
     // aggressive load (container.id);
-
-    insert {
-        do {
-            insert into acs_objects 
-            (object_id, object_type, display_name, default_domain_class)
-            values
-            (:id, :objectType, :displayName, :defaultDomainClass)
-        }
-
-        do {
-            insert into object_container_map
-            (object_id, container_id)
-            select :id, :container.id 
-            from dual 
-            where :container.id is not null
-        }
-    }
-
-    update {
-        do {
-            update object_container_map
-            set container_id = :container.id
-            where object_id = :id and :container.id is not null
-        }
-
-        // We have to conditionally insert into object_container_map
-        // in case the container was previously null (thus no mapping
-        // exists and the above update statement does nothing).
-        do {
-            insert into object_container_map
-            (object_id, container_id)
-            select :id, :container.id
-            from dual
-            where :container.id is not null
-            and not exists (
-                select 1 from object_container_map
-                where object_id = :id
-            )
-        }
-
-        // conditionally delete the object-container mapping if the
-        // container was set to null.
-        do {
-            delete from object_container_map
-            where object_id = :id and :container.id is null
-        }
-
-        do {
-            update acs_objects 
-            set object_type = :objectType,
-                display_name = :displayName,
-                default_domain_class = :defaultDomainClass
-            where object_id = :id
-        }
-    }
-
-    add container {}
-    remove container {}
-
 }
 
 query PackageInstanceForObject {
