@@ -27,12 +27,12 @@ import java.util.*;
  * CRPCollection
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/09/07 $
+ * @version $Revision: #8 $ $Date: 2004/09/16 $
  **/
 
 abstract class CRPCollection implements Collection, OQLCollection {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPCollection.java#7 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPCollection.java#8 $ by $Author: ashah $, $DateTime: 2004/09/16 11:20:15 $";
 
     private transient WeakResourceList m_iterators = new WeakResourceList() {
         protected void onRelease(Object o) {
@@ -151,7 +151,7 @@ abstract class CRPCollection implements Collection, OQLCollection {
         }
 
         public void close() {
-            m_cursor.close();
+            if (m_cursor != null) { m_cursor.close(); }
             m_cursor = null;
             m_next = null;
         }
