@@ -17,7 +17,7 @@ package com.arsdigita.util;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
-import com.arsdigita.web.BaseApplicationServlet;
+import com.arsdigita.web.URL;
 import java.util.Map;
 import java.util.Iterator;
 import java.util.Set;
@@ -35,9 +35,9 @@ import org.apache.log4j.Logger;
  */
 public class URLRewriter {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/URLRewriter.java#7 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/URLRewriter.java#8 $" +
         "$Author: justin $" +
-        "$DateTime: 2002/09/24 11:42:49 $";
+        "$DateTime: 2002/10/21 15:06:24 $";
 
     private static final Logger s_log =
         Logger.getLogger(URLRewriter.class);
@@ -116,9 +116,9 @@ public class URLRewriter {
 
         if (url.startsWith("/")) {
             String context = (String) req.getAttribute
-                (BaseApplicationServlet.ORIGINAL_CONTEXT_PATH_ATTRIBUTE);
+                (URL.ORIGINAL_CONTEXT_PATH_ATTRIBUTE);
             String servlet = (String) req.getAttribute
-                (BaseApplicationServlet.ORIGINAL_SERVLET_PATH_ATTRIBUTE);
+                (URL.ORIGINAL_SERVLET_PATH_ATTRIBUTE);
 
             String prefix = "";
 
@@ -167,9 +167,9 @@ public class URLRewriter {
 
         if (url.startsWith("/")) {
             String context = (String) req.getAttribute
-                (BaseApplicationServlet.ORIGINAL_CONTEXT_PATH_ATTRIBUTE);
+                (URL.ORIGINAL_CONTEXT_PATH_ATTRIBUTE);
             String servlet = (String) req.getAttribute
-                (BaseApplicationServlet.ORIGINAL_SERVLET_PATH_ATTRIBUTE);
+                (URL.ORIGINAL_SERVLET_PATH_ATTRIBUTE);
 
             String prefix = "";
 
