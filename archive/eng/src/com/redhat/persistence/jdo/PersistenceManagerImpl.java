@@ -365,10 +365,14 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
         return (PersistenceCapable) obj;
     }
 
+    public void makePersistent(Object obj) {
+        makePersistent(obj, true);
+    }
+
     /**
      * Make the transient instance persistent in this PersistenceManager.
      */
-    public void makePersistent(Object obj) {
+    public void makePersistent(Object obj, boolean store) {
         PersistenceCapable pc = checkAndCast(obj);
 
         Class cls = pc.getClass();
@@ -380,10 +384,25 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
         if (type == null) {
             throw new IllegalStateException("no type for " + cls.getName());
         }
-        makePersistent(pc, type);
+        makePersistent(pc, type, store);
     }
 
     void makePersistent(PersistenceCapable pc, ObjectType type) {
+        makePersistent(pc, type, true);
+    }
+
+    void makePersistent(Object from, Property prop, Object pc) {
+        ObjectMap map = m_ssn.getObjectMap(from);
+        Mapping mapping = map.getMapping(prop);
+        if (mapping.getMap().isNested()) {
+            makePersistent((PersistenceCapable) pc, prop.getType(), false);
+        } else {
+            makePersistent((PersistenceCapable) pc);
+        }
+    }
+
+    void makePersistent(PersistenceCapable pc, ObjectType type,
+                        boolean store) {
         requireActiveTxn();
         Class cls = pc.getClass();
         if (!hasStateManager(pc)) {
@@ -394,12 +413,26 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
 
             m_ssn.create(pc);
 
+            ObjectMap map = m_ssn.getRoot().getObjectMap(type);
+            if (store && map != null) {
+                m_ssn.store(pc, map);
+            }
+
+            if (store) {
+                for (Iterator it = pmap.entrySet().iterator();
+                     it.hasNext(); ) {
+                    Map.Entry me = (Map.Entry) it.next();
+                    Property p = (Property) me.getKey();
+                    m_ssn.set(pc, p, me.getValue());
+                }
+            }
+
             List props = m_classInfo.getAllFields(cls);
             for (int i = 0; i < props.size(); i++) {
                 String propName = smi.getPrefix() + ((String) props.get(i));
                 if (C.isComponent(type, propName)
-                    || !type.hasProperty(propName)
-                    || !type.getProperty(propName).isKeyProperty()) {
+                    || (type.hasProperty(propName) &&
+                        !type.isKeyProperty(propName))) {
                     smi.setObjectField(pc, i, null, smi.provideField(pc, i));
                 }
             }

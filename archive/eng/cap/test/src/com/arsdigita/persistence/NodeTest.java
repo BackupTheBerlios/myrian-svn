@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * NodeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/09/30 $
  */
 
 public abstract class NodeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/NodeTest.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/NodeTest.java#4 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
 
     private static Logger s_log =
         Logger.getLogger(NodeTest.class.getName());
@@ -106,15 +106,18 @@ public abstract class NodeTest extends PersistenceTestCase {
           catch (PersistenceException e) {
           }*/
 
+        DataObject node2 = null;
+        node = null;
         try {
-            node = createNode(0, "Root");
-            node.save();
+            node2 = createNode(0, "Root");
+            node2.save();
             node = createNode(0, "Root");
             node.save();
             fail("Created two nodes with same id!");
 
         } catch (PersistenceException e) {
-            node.delete();
+            if (node2 != null) { node2.delete(); }
+            if (node != null) { node.delete(); }
         }
 
         try {

@@ -54,12 +54,12 @@ import org.apache.commons.collections.map.ReferenceIdentityMap;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #22 $ $Date: 2004/09/28 $
+ * @version $Revision: #23 $ $Date: 2004/09/30 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#22 $ by $Author: ashah $, $DateTime: 2004/09/28 10:52:16 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#23 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -356,6 +356,31 @@ public class Session {
         }
     }
 
+    public void store(Object obj, ObjectMap map) {
+        try {
+            if (LOG.isDebugEnabled()) {
+                trace("store", new Object[] { obj });
+            }
+            ObjectData od = getObjectData(obj);
+            ObjectMap om = od.getObjectMap();
+            if (om != null) {
+                throw new IllegalArgumentException
+                    ("object already assigned to a store: " + obj);
+            }
+
+            od.setObjectMap(map);
+
+            od.propogateMap(null);
+            od.propogateKey(null);
+
+            computeFlushability();
+        } finally {
+            if (LOG.isDebugEnabled()) {
+                untrace("store");
+            }
+        }
+    }
+
     public boolean delete(Object obj) {
         try {
             if (LOG.isDebugEnabled()) {
@@ -414,7 +439,9 @@ public class Session {
                     }
 
                     pmap.put(link.getTo(), value);
-                    e.expand(new CreateEvent(Session.this, newObject(pmap)));
+                    Object obj = newObject(pmap);
+                    e.expand(new CreateEvent(Session.this, obj));
+                    set(e, obj, pmap);
                 }
             });
 
@@ -452,6 +479,7 @@ public class Session {
                     pmap.put(link.getTo(), value);
                     result[0] = newObject(pmap);
                     e.expand(new CreateEvent(Session.this, result[0]));
+                    set(e, result[0], pmap);
                 }
             });
 
@@ -463,6 +491,16 @@ public class Session {
         }
 
         return result[0];
+    }
+
+    private void set(Expander e, Object obj, PropertyMap pmap) {
+        store(obj, getRoot().getObjectMap(pmap.getObjectType()));
+        for (Iterator it = pmap.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry me = (Map.Entry) it.next();
+            Property prop = (Property) me.getKey();
+            Object value = me.getValue();
+            e.expand(new SetEvent(Session.this, obj, prop, value));
+        }
     }
 
     public void remove(final Object obj, Property prop, final Object value) {
@@ -578,6 +616,10 @@ public class Session {
         } else {
             return getAdapter(obj).getProperties(obj);
         }
+    }
+
+    public boolean isManaged(Object obj) {
+        return hasObjectData(obj);
     }
 
     /**
@@ -921,8 +963,9 @@ public class Session {
 
     public Object getSessionKey(Object obj) {
         ObjectData odata = getObjectData(obj);
-        if (odata == null) {
-            throw new IllegalArgumentException("no key for object: " + obj);
+        if (odata == null || odata.getKey() == null) {
+            throw new IllegalArgumentException
+                ("no key for object: " + str(obj));
         }
         return odata.getKey();
     }
@@ -972,15 +1015,33 @@ public class Session {
         m_modified.add(obj);
     }
 
-    public boolean hasSessionKey(Object obj) {
+    boolean hasSessionKey(Object obj) {
         ObjectData odata = getObjectData(obj);
         return odata != null && odata.getKey() != null;
     }
 
     void setSessionKey(Object obj, Object key) {
+        ObjectData old = getObjectDataByKey(key);
         ObjectData odata = getObjectData(obj);
-        m_keyodata.put(key, odata);
-        odata.setKey(key);
+        if (old == null || old.isDeleted() || old.isNot()) {
+            m_keyodata.put(key, odata);
+            odata.setKey(key);
+        } else if (old == odata) {
+            throw new IllegalStateException("duplicate call to setSessionKey");
+        } else {
+            // We used to throw duplicate object exception in this
+            // case, but since this now gets called during event
+            // activation that would leave the set of expanded events
+            // half activated. It just so happens if we do nothing in
+            // this case we will leave in place the violations
+            // associated with the object which is the behavior we
+            // want since at some later point the user may be able to
+            // assign the object to a better key.
+
+            //ProtoException pe = new DuplicateObjectException(obj);
+            //pe.setInternal(false);
+            //throw pe;
+        }
     }
 
     PropertyData getPropertyData(Object obj, Property prop) {

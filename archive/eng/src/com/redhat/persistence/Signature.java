@@ -39,12 +39,12 @@ import org.apache.log4j.Logger;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2004/09/07 $
+ * @version $Revision: #8 $ $Date: 2004/09/30 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Signature.java#7 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Signature.java#8 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
 
     private static final Logger s_log = Logger.getLogger(Signature.class);
 
@@ -152,7 +152,17 @@ public class Signature {
      * Add all leaves of key property hierarchy
      */
     private void addPathImmediates(ObjectMap map, Path path) {
-        ObjectMap om = path == null ? map : map.getMapping(path).getMap();
+        ObjectMap om;
+        if (path == null) {
+            om = map;
+        } else {
+            Mapping mapping = map.getMapping(path);
+            if (mapping == null) {
+                throw new IllegalStateException
+                    ("no mapping for '" + path + "' in " + map);
+            }
+            om = mapping.getMap();
+        }
         List mappings = om.getKeyMappings();
         // all props for unkeyed, immediate only for keyed
 
@@ -311,10 +321,7 @@ public class Signature {
     }
 
     private void addFetchedPaths(ObjectMap map, Path path, ObjectType type) {
-        Root root = type.getRoot();
-        if (root == null) { return; }
-        ObjectMap om = root.getObjectMap(type);
-        if (om == null) { return; }
+        ObjectMap om = path == null ? map : map.getMapping(path).getMap();
         makePathLoadable(map, path, om.getFetchedPaths());
     }
 

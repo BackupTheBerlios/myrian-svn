@@ -1,6 +1,6 @@
 model com.redhat.persistence.jdo;
 
-nested object type MapEntry<K, V>
+object type MapEntry<K, V>
     class com.redhat.persistence.jdo.MapEntry
     adapter com.redhat.persistence.jdo.JDOAdapter {
     K[0..1] key;

@@ -23,12 +23,12 @@ import java.util.*;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/09/22 $
+ * @version $Revision: #6 $ $Date: 2004/09/30 $
  **/
 
 public class ObjectTypeNd extends Node {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/nodes/ObjectTypeNd.java#5 $ by $Author: rhs $, $DateTime: 2004/09/22 15:20:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/nodes/ObjectTypeNd.java#6 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
 
     public static final Field NAME =
         new Field(ObjectTypeNd.class, "name", IdentifierNd.class, 1, 1);
@@ -61,7 +61,6 @@ public class ObjectTypeNd extends Node {
 
 
     private boolean m_isVersioned = false;
-    private boolean m_isNested = false;
 
     public void dispatch(Switch sw) {
         super.dispatch(sw);
@@ -86,14 +85,6 @@ public class ObjectTypeNd extends Node {
 
     public boolean isVersioned() {
         return m_isVersioned;
-    }
-
-    public void setNested() {
-        m_isNested = true;
-    }
-
-    public boolean isNested() {
-        return m_isNested;
     }
 
     public TypeNd getExtends() {

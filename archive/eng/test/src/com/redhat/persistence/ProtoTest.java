@@ -36,12 +36,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/09/15 $
+ * @version $Revision: #5 $ $Date: 2004/09/30 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/ProtoTest.java#4 $ by $Author: rhs $, $DateTime: 2004/09/15 13:47:13 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/ProtoTest.java#5 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
 
 
     public ProtoTest(String name) {
@@ -115,12 +115,20 @@ public class ProtoTest extends TestCase {
         }
     }
 
+    private void store(Session ssn, Generic obj) {
+        ObjectMap map = ssn.getRoot().getObjectMap(obj.getType());
+        ssn.store(obj, map);
+        ssn.set(obj, (Property) map.getKeyProperties().get(0), obj.getID());
+    }
+
     private void doTest(Session ssn, Generic obj, Property str, Property col) {
         Property REQUIRED = obj.getType().getProperty("required");
         Generic req = new Generic(REQUIRED.getType(), new BigInteger("10"));
         ssn.create(req);
+        store(ssn, req);
 
         ssn.create(obj);
+        store(ssn, obj);
         ssn.set(obj, REQUIRED, req);
 
         // FIXME: forced this file to compile by commenting out the following line
@@ -137,18 +145,22 @@ public class ProtoTest extends TestCase {
         // assertEquals(null, ssn.retrieve(obj.getType(), obj.getID()));
 
         ssn.create(obj);
+        store(ssn, obj);
         ssn.set(obj, REQUIRED, req);
 
         PersistentCollection pc =
             (PersistentCollection) ssn.get(obj, col);
 
         ObjectType ICLE = ssn.getRoot().getObjectType("test.Icle");
-        Object one = new Generic(ICLE, new BigInteger("1"));
+        Generic one = new Generic(ICLE, new BigInteger("1"));
         ssn.create(one);
-        Object two = new Generic(ICLE, new BigInteger("2"));
+        store(ssn, one);
+        Generic two = new Generic(ICLE, new BigInteger("2"));
         ssn.create(two);
-        Object three = new Generic(ICLE, new BigInteger("3"));
+        store(ssn, two);
+        Generic three = new Generic(ICLE, new BigInteger("3"));
         ssn.create(three);
+        store(ssn, three);
 
         ssn.add(obj, col, one);
         assertCollection(new Object[] {one}, pc);

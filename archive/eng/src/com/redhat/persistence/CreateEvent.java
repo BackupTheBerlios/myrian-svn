@@ -25,12 +25,12 @@ import java.util.Iterator;
  * CreateEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2004/09/07 $
+ * @version $Revision: #7 $ $Date: 2004/09/30 $
  **/
 
 public class CreateEvent extends ObjectEvent {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/CreateEvent.java#6 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/CreateEvent.java#7 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
 
     CreateEvent(Session ssn, Object obj) {
         super(ssn, obj);
@@ -60,7 +60,7 @@ public class CreateEvent extends ObjectEvent {
             }
         }
 
-        // nested object violations
+        // unkeyed object violations
         if (!ssn.hasSessionKey(getObject())) {
             ssn.addViolation(odata);
         }

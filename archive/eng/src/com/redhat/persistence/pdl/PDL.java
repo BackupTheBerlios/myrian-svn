@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #15 $ $Date: 2004/09/22 $
+ * @version $Revision: #16 $ $Date: 2004/09/30 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#15 $ by $Author: rhs $, $DateTime: 2004/09/22 15:20:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#16 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -344,12 +344,9 @@ public class PDL {
 
         m_ast.traverse(new Node.Switch() {
             public void onObjectType(ObjectTypeNd otn) {
-                if (!otn.isNested()) {
-                    ObjectMap om =
-                        new ObjectMap(m_symbols.getEmitted(otn));
-                    m_root.addObjectMap(om);
-                    m_symbols.setLocation(om, otn);
-                }
+                ObjectMap om = new ObjectMap(m_symbols.getEmitted(otn));
+                m_root.addObjectMap(om);
+                m_symbols.setLocation(om, otn);
             }
             public void onAssociation(AssociationNd assn) {
                 ObjectType ot = m_symbols.getEmitted(linkName(assn));
@@ -376,14 +373,9 @@ public class PDL {
                                 .getObjectType()
                                 .getProperty(getPath(nm.getParent()))
                                 .getType();
-                            if (type.isIndependent()) {
-                                m_errors.fatal
-                                    (nm, "can't nest a non nested type");
-                            } else {
-                                om = new ObjectMap(type);
-                                emit(nm, om);
-                                modified[0] = true;
-                            }
+                            om = new ObjectMap(type);
+                            emit(nm, om);
+                            modified[0] = true;
                         }
                     }
                 }
@@ -1037,15 +1029,13 @@ public class PDL {
                         }
                     });
                 }
-                if (!prop.getType().isIndependent()) {
-                    Mapping m = om.getMapping(prop);
-                    if (m != null) {
-                        NestedMapNd nm = getNestedMap(nd);
-                        if (nm == null) {
-                            m.setMap(new ObjectMap(prop.getType()));
-                        } else {
-                            m.setMap(getMap(nm));
-                        }
+                Mapping m = om.getMapping(prop);
+                if (m != null) {
+                    NestedMapNd nm = getNestedMap(nd);
+                    if (nm == null && prop.getType().isPrimitive()) {
+                        m.setMap(new ObjectMap(prop.getType()));
+                    } else if (nm != null) {
+                        m.setMap(getMap(nm));
                     }
                 }
             }

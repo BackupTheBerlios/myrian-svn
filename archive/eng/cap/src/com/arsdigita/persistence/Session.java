@@ -62,7 +62,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2004/09/23 $
+ * @version $Revision: #8 $ $Date: 2004/09/30 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -323,6 +323,8 @@ public class Session {
         addDataObject(result);
         try {
             m_ssn.create(result);
+            m_ssn.store(result, result.getObjectMap());
+            oid.set(m_ssn, result);
         } catch (ProtoException e) {
             throw PersistenceException.newInstance(e);
         }

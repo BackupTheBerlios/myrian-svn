@@ -22,6 +22,8 @@ import com.arsdigita.persistence.metadata.Property;
 import com.redhat.persistence.PropertyMap;
 import com.redhat.persistence.ProtoException;
 import com.redhat.persistence.Session;
+import com.redhat.persistence.metadata.ObjectMap;
+import com.redhat.persistence.metadata.Root;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,12 +39,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/09/01 $
+ * @version $Revision: #6 $ $Date: 2004/09/30 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataObjectImpl.java#5 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataObjectImpl.java#6 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -286,6 +288,8 @@ class DataObjectImpl implements DataObject {
                 m_oid.set(property, value);
                 if (m_oid.isInitialized()) {
                     getSsn().create(this);
+                    getSsn().store(this, getObjectMap());
+                    m_oid.set(getSsn(), this);
                 }
             } else {
                 getSsn().set(this, convert(property), value);
@@ -293,6 +297,11 @@ class DataObjectImpl implements DataObject {
         } catch (ProtoException pe) {
             throw PersistenceException.newInstance(pe);
         }
+    }
+
+    ObjectMap getObjectMap() {
+        Root root = getSsn().getRoot();
+        return root.getObjectMap(C.type(root, getObjectType()));
     }
 
     public boolean isNew() {

@@ -25,12 +25,12 @@ import java.io.PrintWriter;
  * PropertyEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/09/07 $
+ * @version $Revision: #6 $ $Date: 2004/09/30 $
  **/
 
 public abstract class PropertyEvent extends Event {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/PropertyEvent.java#5 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/PropertyEvent.java#6 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
 
     final private Property m_prop;
     final private Object m_arg;
@@ -96,6 +96,7 @@ public abstract class PropertyEvent extends Event {
         setPropertyData(pd);
         m_argodata = getArgument() == null ?
             null : getSession().getObjectData(getArgument());
+        ObjectData od = getObjectData();
     }
 
     void activate() {
@@ -132,10 +133,8 @@ public abstract class PropertyEvent extends Event {
             }
         }
 
-        // nested object violations
-        if (ssn.hasSessionKey(arg)) {
-            ssn.removeViolation(aodata);
-        }
+        od.propogateMap(this);
+        od.propogateKey(this);
     }
 
     void sync() {

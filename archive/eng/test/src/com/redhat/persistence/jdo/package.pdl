@@ -19,9 +19,9 @@ model com.redhat.persistence.jdo;
 object type Rolodex class com.redhat.persistence.jdo.Rolodex
     adapter com.redhat.persistence.jdo.JDOAdapter {
     BigInteger id = rolodexes.id;
-    Contact[0..n] m_contacts = inverse(contacts.rolodex_id) {
-        m_name = contacts.name;
-        m_number = contacts.number;
+    Contact[0..n] m_contacts = inverse(rolodex_contacts.rolodex_id) {
+        m_name = rolodex_contacts.name;
+        m_number = rolodex_contacts.number;
         object key (m_name);
     };
 

@@ -19,6 +19,7 @@ package com.redhat.persistence;
 
 import com.arsdigita.util.UncheckedWrapperException;
 import com.redhat.persistence.common.CompoundKey;
+import com.redhat.persistence.common.IdentityKey;
 import com.redhat.persistence.metadata.Adapter;
 import com.redhat.persistence.metadata.Mapping;
 import com.redhat.persistence.metadata.ObjectMap;
@@ -41,7 +42,7 @@ import java.util.Map;
  */
 class Expander extends Event.Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Expander.java#10 $ by $Author: ashah $, $DateTime: 2004/09/28 10:52:16 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Expander.java#11 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
 
     final private Session m_ssn;
     final private Collection m_deleting = new HashSet();
@@ -109,48 +110,8 @@ class Expander extends Event.Switch {
     }
 
     public void onCreate(CreateEvent e) {
-        final Object obj = e.getObject();
-
-        ObjectData od = m_ssn.getObjectData(obj);
-
-        Adapter a = m_ssn.getAdapter(obj);
-        PropertyMap props = a.getProperties(obj);
-        ObjectType type = props.getObjectType();
-        ObjectMap map = m_ssn.getRoot().getObjectMap(type);
-
-        Object key = a.getSessionKey(props);
-
-        if (od == null && map != null) {
-            od = m_ssn.getObjectDataByKey(key);
-        }
-
-        if (od == null || od.isDeleted() || od.isNot()) {
-            od = new ObjectData(m_ssn, obj, od.INFANTILE);
-            if (map != null) { od.setObjectMap(map); }
-        } else {
-            ProtoException pe = new DuplicateObjectException(obj);
-            pe.setInternal(false);
-            throw pe;
-        }
-
-        if (!m_ssn.hasSessionKey(obj) && map != null) {
-            m_ssn.setSessionKey(obj, key);
-        }
-
+        new ObjectData(m_ssn, e.getObject(), ObjectData.INFANTILE);
         addEvent(e);
-
-        for (Iterator it = props.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry me = (Map.Entry) it.next();
-            Event ev;
-            try {
-                ev = new SetEvent
-                    (m_ssn, obj, (Property) me.getKey(), me.getValue());
-            } catch (TypeException te) {
-                te.setInternal(false);
-                throw te;
-            }
-            expand(ev);
-        }
     }
 
     public void onDelete(DeleteEvent e) {
@@ -160,16 +121,23 @@ class Expander extends Event.Switch {
 
         beginDelete(obj);
 
-        ObjectType type = m_ssn.getObjectType(obj);
+        ObjectMap map = m_ssn.getObjectMap(obj);
 
-        for (Iterator it = type.getRoles().iterator(); it.hasNext(); ) {
-            Role role = (Role) it.next();
+        for (Iterator it = map.getMappings().iterator(); it.hasNext(); ) {
+            Mapping mapping = (Mapping) it.next();
+            Property prop = (Property) mapping.getProperty();
+            if (prop == null) { continue; }
+            if (!(prop instanceof Role)) { continue; }
+            Role role = (Role) prop;
             if (role.isCollection()) { clear(obj, role); }
         }
 
-        for (Iterator it = type.getRoles().iterator(); it.hasNext(); ) {
-            Role role = (Role) it.next();
-
+        for (Iterator it = map.getMappings().iterator(); it.hasNext(); ) {
+            Mapping mapping = (Mapping) it.next();
+            Property prop = (Property) mapping.getProperty();
+            if (prop == null) { continue; }
+            if (!(prop instanceof Role)) { continue; }
+            Role role = (Role) prop;
             if (!role.isCollection() && m_ssn.get(obj, role) != null) {
                 Event ev = new SetEvent(m_ssn, obj, role, null);
                 expand(ev);
@@ -186,11 +154,11 @@ class Expander extends Event.Switch {
         final Object value = e.getArgument();
 
         Object old = null;
-        if (role.isComponent() || role.isReversable()) {
+        if (role.isComponent() || isReversable(e)) {
             old = m_ssn.get(obj, role);
         }
 
-        if (role.isReversable()) {
+        if (isReversable(e)) {
             if (old != null) { reverseUpdateOld(e, old); }
             if (value != null) { reverseUpdateNew(e); }
         }
@@ -202,60 +170,32 @@ class Expander extends Event.Switch {
                 cascadeDelete(obj, old);
             }
         }
-
-        propogateKey(e);
     }
 
     public void onAdd(AddEvent e) {
-        Role role = (Role) e.getProperty();
-        if (role.isReversable()) { reverseUpdateNew(e); }
+        if (isReversable(e)) { reverseUpdateNew(e); }
         addEvent(e);
-
-        propogateKey(e);
     }
 
     public void onRemove(RemoveEvent e) {
-        Role role = (Role) e.getProperty();
-
-        if (role.isReversable()) { reverseUpdateOld(e, e.getArgument()); }
+        if (isReversable(e)) { reverseUpdateOld(e, e.getArgument()); }
 
         addEvent(e);
 
+        Role role = (Role) e.getProperty();
         if (role.isComponent()) {
             cascadeDelete(e.getObject(), e.getArgument());
         }
     }
 
-    private void propogateKey(PropertyEvent e) {
-        Object obj = e.getObject();
-        Object arg = e.getArgument();
-        if (arg == null) { return; }
+    private boolean isReversable(PropertyEvent e) {
         Role role = (Role) e.getProperty();
-
-        if (!m_ssn.hasSessionKey(obj)) { return; }
-        if (m_ssn.hasSessionKey(arg)) { return; }
-
-        Mapping mapping = m_ssn.getObjectMap(obj).getMapping(role);
-        ObjectMap map = mapping.getMap();
-        if (map.isNested() && map.isCompound()) {
-            Object key = new CompoundKey
-                (m_ssn.getSessionKey(obj), role.getName());
-            List props = map.getKeyProperties();
-            for (int i = 0; i < props.size(); i++) {
-                Property p = (Property) props.get(i);
-                ObjectMap om = map.getMapping(p).getMap();
-                if (om.isPrimitive()) {
-                    key = new CompoundKey(key, m_ssn.get(arg, p));
-                } else {
-                    key = new CompoundKey(key, m_ssn.getSessionKey(arg));
-                }
-            }
-            m_ssn.setSessionKey(arg, key);
-            ObjectData od = m_ssn.getObjectData(arg);
-            od.setObjectMap(mapping.getMap());
-            od.setContainer(obj);
-            e.addDependent(m_ssn.getEventStream().getLastEvent(arg));
-        }
+        Role rev = role.getReverse();
+        if (rev == null) { return false; }
+        ObjectMap map = e.getObjectMap();
+        Mapping mapping = map.getMapping(role);
+        ObjectMap target = mapping.getMap();
+        return target.getMapping(rev) != null;
     }
 
     // also called by session
@@ -340,23 +280,19 @@ class Expander extends Event.Switch {
     }
 
     private void beginDelete(Object obj) {
-        m_deleting.add(m_ssn.getSessionKey(obj));
+        m_deleting.add(new IdentityKey(obj));
     }
 
     private void undelete(Object obj) {
-        m_deleting.remove(m_ssn.getSessionKey(obj));
+        m_deleting.remove(new IdentityKey(obj));
     }
 
     private boolean isBeingDeleted(Object obj) {
-        return m_deleting.contains(m_ssn.getSessionKey(obj));
+        return m_deleting.contains(new IdentityKey(obj));
     }
 
     private boolean equals(Object o1, Object o2) {
-        if (o1 == null || o2 == null) {
-            return o1 == o2;
-        } else {
-            return m_ssn.getSessionKey(o1).equals(m_ssn.getSessionKey(o2));
-        }
+        return o1 == o2;
     }
 
 }

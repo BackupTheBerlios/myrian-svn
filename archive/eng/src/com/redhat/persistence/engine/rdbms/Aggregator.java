@@ -27,6 +27,7 @@ import com.redhat.persistence.RemoveEvent;
 import com.redhat.persistence.Session;
 import com.redhat.persistence.SetEvent;
 import com.redhat.persistence.common.CompoundKey;
+import com.redhat.persistence.common.IdentityKey;
 import com.redhat.persistence.metadata.Mapping;
 import com.redhat.persistence.metadata.Property;
 import com.redhat.persistence.metadata.Role;
@@ -40,12 +41,12 @@ import org.apache.log4j.Logger;
  * Aggregator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/09/20 $
+ * @version $Revision: #9 $ $Date: 2004/09/30 $
  **/
 
 class Aggregator extends Event.Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/Aggregator.java#8 $ by $Author: ashah $, $DateTime: 2004/09/20 18:11:08 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/Aggregator.java#9 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
 
     private static final Logger LOG = Logger.getLogger(Aggregator.class);
 
@@ -105,8 +106,7 @@ class Aggregator extends Event.Switch {
     }
 
     Object key(Object obj) {
-        Session ssn = m_engine.getSession();
-        return ssn.getSessionKey(obj);
+        return new IdentityKey(obj);
     }
 
     private Event getObjectEvent(Object obj) {
@@ -137,13 +137,13 @@ class Aggregator extends Event.Switch {
     }
 
     private void addObjectEventDependency(Node nd, Object obj) {
-        if (m_engine.getSession().hasSessionKey(obj)) {
+        if (m_engine.getSession().isManaged(obj)) {
             nd.addDependency(getObjectEvent(obj));
         }
     }
 
     private void addDependingEvent(Object obj, Event ev) {
-        if (m_engine.getSession().hasSessionKey(obj)) {
+        if (m_engine.getSession().isManaged(obj)) {
             m_depending.addEvent(key(obj), ev);
         }
     }

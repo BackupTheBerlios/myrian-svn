@@ -42,12 +42,12 @@ import java.util.*;
  * QuerySuite
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/09/01 $
+ * @version $Revision: #7 $ $Date: 2004/09/30 $
  **/
 
 public class QuerySuite extends TestSuite {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/QuerySuite.java#6 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/QuerySuite.java#7 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
 
     public QuerySuite() {}
 
@@ -248,6 +248,12 @@ public class QuerySuite extends TestSuite {
                     if (obj == null) {
                         obj = ad.getObject(type, pmap, m_ssn);
                         m_ssn.create(obj);
+                        m_ssn.store
+                            (obj, m_ssn.getRoot().getObjectMap(type));
+                        for (Iterator it = props.iterator(); it.hasNext(); ) {
+                            Property p = (Property) it.next();
+                            m_ssn.set(obj, p, pmap.get(p));
+                        }
                     }
                     return obj;
                 }

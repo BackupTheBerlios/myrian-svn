@@ -10,9 +10,7 @@
     <class name="BigEmployee" identity-type="datastore">
       <field name="address" embedded="true"/>
     </class>
-    <class name="Address" identity-type="datastore">
-      <extension vendor-name="redhat" key="embedded" value="true"/>
-    </class>
+    <class name="Address" identity-type="datastore"/>
 
     <class name="Rolodex" identity-type="datastore">
       <extension vendor-name="redhat" key="metadata" value="PDL"/>
@@ -20,9 +18,7 @@
         <collection element-type="Contact" embedded-element="true"/>
       </field>
     </class>
-    <class name="Contact" identity-type="datastore">
-      <extension vendor-name="redhat" key="embedded" value="true"/>
-    </class>
+    <class name="Contact" identity-type="datastore"/>
 
     <!-- Pandora -->
 

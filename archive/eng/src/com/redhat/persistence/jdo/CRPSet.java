@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
  * CRPSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/09/07 $
+ * @version $Revision: #10 $ $Date: 2004/09/30 $
  **/
 
 class CRPSet extends CRPCollection implements Set {
@@ -69,9 +69,9 @@ class CRPSet extends CRPCollection implements Set {
             (PersistenceManagerImpl) JDOHelper.getPersistenceManager(m_object);
 
         if (C.isComponentProperty(m_property)) {
-            pmi.makePersistent((PersistenceCapable) o, m_property.getType());
+            pmi.makePersistent(m_object, m_property, (PersistenceCapable) o);
         } else {
-            pmi.makePersistent(o);
+            pmi.makePersistent(m_object, m_property, o);
         }
 
         if (contains(o)) {

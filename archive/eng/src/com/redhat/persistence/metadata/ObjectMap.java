@@ -25,12 +25,12 @@ import java.util.*;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/09/23 $
+ * @version $Revision: #9 $ $Date: 2004/09/30 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/ObjectMap.java#8 $ by $Author: rhs $, $DateTime: 2004/09/23 15:23:52 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/ObjectMap.java#9 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -325,15 +325,13 @@ public class ObjectMap extends Element {
     }
 
     public Collection getTables() {
-        return getTables(getObjectType().getProperties());
+        return getTables(getMappings());
     }
 
-    private Collection getTables(Collection properties) {
+    private Collection getTables(Collection mappings) {
         final ArrayList result = new ArrayList();
-        for (Iterator it = properties.iterator();
-             it.hasNext(); ) {
-            Property prop = (Property) it.next();
-            Mapping m = getMapping(Path.get(prop.getName()));
+        for (Iterator it = mappings.iterator(); it.hasNext(); ) {
+            Mapping m = (Mapping) it.next();
 	    Table t = m.getTable();
             if (t == null) { continue; }
             if (!result.contains(t)) {

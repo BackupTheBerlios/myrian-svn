@@ -28,12 +28,12 @@ import java.util.List;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/09/22 $
+ * @version $Revision: #6 $ $Date: 2004/09/30 $
  **/
 
 public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/ObjectType.java#5 $ by $Author: rhs $, $DateTime: 2004/09/22 15:20:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/ObjectType.java#6 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
 
     private final Model m_model;
     private final String m_name;
@@ -258,12 +258,6 @@ public class ObjectType extends Element {
 
     public boolean hasKey() {
 	return isKeyed();
-    }
-
-    public boolean isIndependent() {
-        Root root = getRoot();
-        if (root == null) { return false; }
-        return root.hasObjectMap(this);
     }
 
     public boolean isCompound() {

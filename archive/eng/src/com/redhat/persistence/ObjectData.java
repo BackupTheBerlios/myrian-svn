@@ -17,6 +17,7 @@
  */
 package com.redhat.persistence;
 
+import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.Adapter;
 import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.ObjectType;
@@ -30,12 +31,12 @@ import org.apache.log4j.Logger;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2004/09/28 $
+ * @version $Revision: #13 $ $Date: 2004/09/30 $
  **/
 
 class ObjectData implements Violation {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/ObjectData.java#12 $ by $Author: ashah $, $DateTime: 2004/09/28 10:52:16 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/ObjectData.java#13 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
 
     private static final Logger LOG = Logger.getLogger(ObjectData.class);
 
@@ -77,6 +78,10 @@ class ObjectData implements Violation {
 
     public Session getSession() {
         return m_ssn;
+    }
+
+    State getState() {
+        return m_state;
     }
 
     public Object getKey() {
@@ -137,6 +142,90 @@ class ObjectData implements Violation {
 
     void setObjectMap(ObjectMap map) {
         m_map = map;
+    }
+
+    void propogateMap(PropertyEvent e) {
+        if (m_map == null) { return; }
+        EventStream stream = m_ssn.getEventStream();
+        Collection evs =
+            new ArrayList(stream.getReachablePropertyEvents(getObject()));
+        if (e != null) { evs.add(e); }
+        for (Iterator it = evs.iterator(); it.hasNext(); ) {
+            PropertyEvent evt = (PropertyEvent) it.next();
+            ObjectData argod = evt.getArgumentObjectData();
+            if (argod == null) { continue; }
+            ObjectMap om = m_map.getMapping(evt.getProperty()).getMap();
+            if (!om.isNested()) { continue; }
+            ObjectMap argom = argod.getObjectMap();
+            if (argom == null) {
+                argod.setObjectMap(om);
+                argod.propogateMap(null);
+            } else if (!argom.equals(om)) {
+                throw new IllegalStateException
+                    ("object maps don't match, previous = " + argom +
+                     " propogated = " + om);
+            }
+        }
+    }
+
+    void propogateKey(PropertyEvent e) {
+        if (m_map == null) { return; }
+
+        Object key;
+        if (m_map.isNested() && m_map.isCompound()) {
+            if (m_container.getKey() == null) { return; }
+            key = new CompoundKey(m_container.getKey(),
+                                  m_map.getContaining().getPath().getPath());
+        } else {
+            key = m_map.getObjectType().getBasetype();
+        }
+
+        List keys = m_map.getKeyProperties();
+        for (int i = 0; i < keys.size(); i++) {
+            Property p = (Property) keys.get(i);
+            ObjectMap om = m_map.getMapping(p).getMap();
+            PropertyData pd = getPropertyData(p);
+            if (pd == null) { return; }
+            Object value = pd.get();
+            if (value == null) { return; }
+            if (om.isPrimitive()) {
+                key = new CompoundKey(key, value);
+            } else {
+                key = new CompoundKey(key, m_ssn.getSessionKey(value));
+            }
+        }
+
+        if (m_key == null) {
+            m_ssn.setSessionKey(getObject(), key);
+            if (m_key != null) {
+                m_ssn.removeViolation(this);
+                ObjectMap main =
+                    m_ssn.getRoot().getObjectMap(m_map.getObjectType());
+                if (main != null) {
+                    for (Iterator it = main.getKeyProperties().iterator();
+                         it.hasNext(); ) {
+                        Property p = (Property) it.next();
+                        m_ssn.removeViolation(getPropertyData(p));
+                    }
+                }
+            }
+        }
+
+        EventStream stream = m_ssn.getEventStream();
+        Collection evs =
+            new ArrayList(stream.getReachablePropertyEvents(getObject()));
+        if (e != null) { evs.add(e); }
+        for (Iterator it = evs.iterator(); it.hasNext(); ) {
+            PropertyEvent evt = (PropertyEvent) it.next();
+            ObjectData argod = evt.getArgumentObjectData();
+            if (argod == null) { continue; }
+            ObjectMap om = argod.getObjectMap();
+            if (om != null && om.isNested()) {
+                argod.m_container = this;
+                evt.addDependent(stream.getLastEvent(argod.getObject()));
+                argod.propogateKey(null);
+            }
+        }
     }
 
     public PropertyMap getProperties() {
@@ -249,7 +338,7 @@ class ObjectData implements Violation {
     }
 
     public String getViolationMessage() {
-        return getObject() + " must be assigned to a container";
+        return getObject() + " must be assigned a persistable identity";
     }
 
     void dump() {

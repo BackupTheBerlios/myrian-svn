@@ -321,8 +321,7 @@ class StateManagerImpl extends AbstractStateManager {
                     ("collection properties on a component don't work");
             }
             if (value instanceof PersistenceCapable) {
-                m_pmi.makePersistent
-                    ((PersistenceCapable) value, prop.getType());
+                m_pmi.makePersistent(pc, prop, (PersistenceCapable) value);
             }
             ssn().set(pc, prop, value);
         }
@@ -403,14 +402,14 @@ class StateManagerImpl extends AbstractStateManager {
                     for (Iterator it = c.iterator(); it.hasNext(); ) {
                         Object value = it.next();
                         if (value instanceof PersistenceCapable) {
-                            m_pmi.makePersistent(value);
+                            m_pmi.makePersistent(pc, prop, value);
                         }
                         ssn().add(pc, prop, value);
                     }
                 }
             } else {
                 if (newValue instanceof PersistenceCapable) {
-                    m_pmi.makePersistent(newValue);
+                    m_pmi.makePersistent(pc, prop, newValue);
                 }
                 ssn().set(pc, prop, newValue);
             }

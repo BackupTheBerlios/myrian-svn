@@ -16,63 +16,63 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 model global;
 
-nested object type Boolean
+object type Boolean
     class java.lang.Boolean
     adapter com.redhat.persistence.pdl.adapters.BooleanAd {}
 
-nested object type Byte
+object type Byte
     class java.lang.Byte
     adapter com.redhat.persistence.pdl.adapters.ByteAd {}
 
-nested object type Character
+object type Character
     class java.lang.Character
     adapter com.redhat.persistence.pdl.adapters.CharacterAd {}
 
-nested object type String
+object type String
     class java.lang.String
     adapter com.redhat.persistence.pdl.adapters.StringAd {}
 
-nested object type Short
+object type Short
     class java.lang.Short
     adapter com.redhat.persistence.pdl.adapters.ShortAd {}
 
-nested object type Integer
+object type Integer
     class java.lang.Integer
     adapter com.redhat.persistence.pdl.adapters.IntegerAd {}
 
-nested object type Long
+object type Long
     class java.lang.Long
     adapter com.redhat.persistence.pdl.adapters.LongAd {}
 
-nested object type Float
+object type Float
     class java.lang.Float
     adapter com.redhat.persistence.pdl.adapters.FloatAd {}
 
-nested object type Double
+object type Double
     class java.lang.Double
     adapter com.redhat.persistence.pdl.adapters.DoubleAd {}
 
-nested object type BigInteger
+object type BigInteger
     class java.math.BigInteger
     adapter com.redhat.persistence.pdl.adapters.BigIntegerAd {}
 
-nested object type BigDecimal
+object type BigDecimal
     class java.math.BigDecimal
     adapter com.redhat.persistence.pdl.adapters.BigDecimalAd {}
 
-nested object type Date
+object type Date
     class java.util.Date
     adapter com.redhat.persistence.pdl.adapters.DateAd {}
 
-nested object type byte[]
+object type byte[]
     class \[B
     adapter com.redhat.persistence.pdl.adapters.ByteArrayAd {}
 
-nested object type Object
+object type Object
     class java.lang.Object
     adapter com.redhat.persistence.pdl.adapters.ObjectAd {}
 
 // XXX: need a real adapter for Locale
-nested object type Locale
+object type Locale
     class java.util.Locale
     adapter com.redhat.persistence.pdl.adapters.ObjectAd {}

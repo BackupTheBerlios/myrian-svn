@@ -30,12 +30,12 @@ import com.redhat.persistence.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2004/09/22 $
+ * @version $Revision: #10 $ $Date: 2004/09/30 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLParser.jj#9 $ by $Author: rhs $, $DateTime: 2004/09/22 15:20:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLParser.jj#10 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -120,7 +120,6 @@ TOKEN:
   | <UNIQUE: "unique">
   | <COMPOSITE: "composite">
   | <COMPONENT: "component">
-  | <NESTED: "nested">
   | <EXTENDS: "extends">
   | <QUERY: "query">
   | <RETURNS: "returns">
@@ -229,7 +228,6 @@ ObjectTypeNd object_type() :
 }
 {
     [ <VERSIONED> { ot.setVersioned(); } ]
-    [ <NESTED> { ot.setNested(); } ]
     ( t = <QUERY> | t = <OBJECTTYPE> )
         n = id() { ot.add(ObjectTypeNd.NAME, n); }
     [ <LT> parameter(ot) (<COMMA> parameter(ot))* <GT> ]

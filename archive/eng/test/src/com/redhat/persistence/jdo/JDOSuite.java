@@ -43,6 +43,7 @@ public class JDOSuite extends TestSuite {
         setup.load(User.class);
         setup.load(Group.class);
         setup.load(Rolodex.class);
+        setup.load(Contact.class);
         setup.load(Order.class);
         setup.load(Item.class);
         setup.load(Product.class);
