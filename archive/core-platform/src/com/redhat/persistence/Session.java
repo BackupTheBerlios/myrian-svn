@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/09/03 $
+ * @version $Revision: #7 $ $Date: 2003/09/10 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Session.java#6 $ by $Author: ashah $, $DateTime: 2003/09/03 11:13:55 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Session.java#7 $ by $Author: ashah $, $DateTime: 2003/09/10 11:04:03 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -51,6 +51,7 @@ public class Session {
 
     private Set m_violations = new HashSet();
 
+    private final Set m_beforeActivate = new HashSet();
     private final Set m_afterActivate = new HashSet();
     private final Set m_beforeFlush = new HashSet();
     private final Set m_afterFlush = new HashSet();
@@ -694,6 +695,8 @@ public class Session {
     }
 
     private void activate(List pending) {
+        process(m_beforeActivate, pending);
+
         for (Iterator it = pending.iterator(); it.hasNext(); ) {
             Event ev = (Event) it.next();
             ev.activate();
@@ -862,6 +865,18 @@ public class Session {
         if (ep == null) {
             throw new IllegalArgumentException("null event processor");
         }
+    }
+
+    /**
+     * Before activate event processors have the following constraint. It is
+     * illegal to add objects to roles that are being deleted by the set of
+     * events being activated. In other words, don't put an object in a
+     * position in the object graph that would imply that it should be deleted
+     * as a consequence of any delete event being activated.
+     */
+    public void addBeforeActivate(EventProcessor ep) {
+        check(ep);
+        m_beforeActivate.add(ep);
     }
 
     public void addAfterActivate(EventProcessor ep) {

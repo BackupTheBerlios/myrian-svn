@@ -58,7 +58,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #26 $ $Date: 2003/08/19 $
+ * @version $Revision: #27 $ $Date: 2003/09/10 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -259,6 +259,18 @@ public class Session {
         m_afterFP = new FlushEventProcessor(false);
         m_ssn.addBeforeFlush(m_beforeFP);
         m_ssn.addAfterFlush(m_afterFP);
+
+        m_ssn.addBeforeActivate(new EventProcessor() {
+            protected void cleanUp(boolean isCommit) { }
+            protected void flush() { }
+            protected void write(Event ev) {
+                if (ev instanceof DeleteEvent) {
+                    BeforeDeleteEvent bde =
+                        new BeforeDeleteEvent((DataObjectImpl) ev.getObject());
+                    bde.fire();
+                }
+            }
+        });
     }
 
     static class FlushEventProcessor extends EventProcessor {
@@ -335,12 +347,16 @@ public class Session {
 
             for (Iterator it = events.iterator(); it.hasNext(); ) {
                 DataEvent e = (DataEvent) it.next();
+                if (e instanceof BeforeDeleteEvent) { continue; }
                 e.schedule();
             }
 
             for (Iterator it = events.iterator(); it.hasNext(); ) {
                 DataEvent e = (DataEvent) it.next();
-                if (m_toFire.remove(e)) { e.fire(); }
+                if (m_toFire.remove(e)) {
+                    if (e instanceof BeforeDeleteEvent) { continue; }
+                    e.fire();
+                }
             }
         }
 
