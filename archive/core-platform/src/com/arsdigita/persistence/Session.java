@@ -59,7 +59,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/05/19 $
+ * @version $Revision: #13 $ $Date: 2003/05/22 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -186,7 +186,7 @@ public class Session {
 
     {
         m_ssn.addAfterActivate(new EventProcessor() {
-            public void write(Event ev) {
+            protected void write(Event ev) {
                 if (!(ev.getObject() instanceof DataObjectImpl)) { return; }
 
                 if (ev instanceof PropertyEvent) {
@@ -228,7 +228,8 @@ public class Session {
                 });
             }
 
-            public void flush() { }
+            protected void flush() { }
+            protected void cleanUp(boolean isCommit) { }
         });
 
         m_beforeFP = new FlushEventProcessor(true);
@@ -244,18 +245,22 @@ public class Session {
 
         FlushEventProcessor(boolean before) { m_before = before; }
 
-        void clear() {
-            if (m_events.size() > 0) {
-                LOG.error("events left over: " + m_events);
+        protected void cleanUp(boolean isCommit) {
+            if (isCommit && m_events.size() > 0) {
+                LOG.error("unfired data events: " + m_events);
+                throw new IllegalStateException
+                    ("unfired data events: " + m_events);
             }
             m_events.clear();
-            if (m_toFire.size() > 0) {
-                LOG.error("data events left over: " + m_toFire);
+            if (isCommit && m_toFire.size() > 0) {
+                LOG.error("unfired data events: " + m_toFire);
+                throw new IllegalStateException
+                    ("unfired data events: " + m_toFire);
             }
             m_toFire.clear();
         }
 
-        public void write(Event e) {
+        protected void write(Event e) {
             if (e.getObject() instanceof DataObjectImpl) {
                 if (e instanceof PropertyEvent
                     && ((PropertyEvent) e).getProperty().getName().charAt(0)
@@ -266,7 +271,7 @@ public class Session {
             }
         }
 
-        public void flush() {
+        protected void flush() {
             Set objs = new HashSet();
             List events = new LinkedList();
             for (int i = m_events.size() - 1; i >= 0; i--) {
@@ -698,8 +703,6 @@ public class Session {
     }
 
     void invalidateDataObjects(boolean connectedOnly) {
-        m_beforeFP.clear();
-        m_afterFP.clear();
         for (Iterator it = m_dataObjects.iterator(); it.hasNext(); ) {
             WeakReference ref = (WeakReference) it.next();
             DataObjectImpl obj = (DataObjectImpl) ref.get();

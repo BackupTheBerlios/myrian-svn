@@ -29,12 +29,12 @@ import org.apache.log4j.Logger;
  * Description: The TransactionContext class encapsulates a database transaction.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/05/12 $
+ * @version $Revision: #10 $ $Date: 2003/05/22 $
  */
 
 public class TransactionContext {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/TransactionContext.java#9 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/TransactionContext.java#10 $ by $Author: ashah $, $DateTime: 2003/05/22 14:50:15 $";
 
     private static final Logger s_cat =
 	Logger.getLogger(TransactionContext.class);
@@ -42,7 +42,8 @@ public class TransactionContext {
     private static boolean s_aggressive = false;
 
     private Session m_ossn;
-    private com.arsdigita.persistence.proto.Session m_ssn;
+    // used in test infrastructure
+    com.arsdigita.persistence.proto.Session m_ssn;
     private Map m_attrs = new HashMap();
     private ArrayList m_listeners = new ArrayList();
     private boolean m_inTxn = false;
@@ -85,6 +86,23 @@ public class TransactionContext {
 	try {
             fireBeforeCommitEvent();
             m_ssn.commit();
+            m_inTxn = false;
+            fireCommitEvent();
+	} finally {
+	    m_inTxn = false;
+            m_ossn.invalidateDataObjects(true);
+	    clearAttributes();
+	}
+    }
+
+    /**
+     * Used by test infrastructure. Replaces the actual commit with a
+     * specified runnable.
+     */
+    void testCommitTxn(Runnable r) {
+	try {
+            fireBeforeCommitEvent();
+            r.run();
             m_inTxn = false;
             fireCommitEvent();
 	} finally {

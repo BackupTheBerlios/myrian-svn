@@ -19,17 +19,24 @@ package com.arsdigita.persistence.proto;
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
  * @since 2003-02-20
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/05/22 $
  **/
 public abstract class EventProcessor {
 
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/EventProcessor.java#1 $" +
-        " by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/EventProcessor.java#2 $" +
+        " by $Author: ashah $, $DateTime: 2003/05/22 14:50:15 $";
 
-    protected void commit() {}
-
-    protected void rollback() {}
+    /**
+     * During this method, calls into the session to which the event processor
+     * is attached are not allowed.
+     *
+     * @param isCommit indicates whether the clean up corresponds to a
+     * commit. If true, the event processor should throw an exception if it is
+     * not in a consistent state. This exception will prevent the commit
+     * from actually taking place. If false, exceptions should not be thrown.
+     */
+    protected abstract void cleanUp(boolean isCommit);
 
     protected abstract void write(Event ev);
 

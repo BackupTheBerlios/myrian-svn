@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/05/15 $
+ * @version $Revision: #3 $ $Date: 2003/05/22 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Session.java#2 $ by $Author: rhs $, $DateTime: 2003/05/15 16:48:35 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Session.java#3 $ by $Author: ashah $, $DateTime: 2003/05/22 14:50:15 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -554,6 +554,13 @@ public class Session {
         }
     }
 
+    private void clear() {
+        m_odata.clear();
+        m_events.clear();
+        m_violations.clear();
+        m_beforeFlushMarker = null;
+        if (LOG.isDebugEnabled()) { setLevel(0); }
+    }
 
     /**
      * Renders all changes made within the transaction permanent and ends the
@@ -562,24 +569,33 @@ public class Session {
 
     public void commit() {
         flushAll();
-
-        m_odata.clear();
-        m_events.clear();
-        m_violations.clear();
-        commitEventProcessors();
+        clear();
+        cleanUpEventProcessors(true);
         m_engine.commit();
-        m_beforeFlushMarker = null;
-        if (LOG.isDebugEnabled()) { setLevel(0); }
     }
 
-    private void commitEventProcessors() {
+    /**
+     * This does not actually commit the transaction, but does the rest of the
+     * work associated with commit.
+     */
+    void testCommit() {
+        flushAll();
+        clear();
+        cleanUpEventProcessors(true);
+    }
+
+    private void cleanUpEventProcessors(boolean isCommit) {
+        for (Iterator eps = m_afterActivate.iterator(); eps.hasNext(); ) {
+            EventProcessor ep = (EventProcessor) eps.next();
+            ep.cleanUp(isCommit);
+        }
         for (Iterator eps = m_beforeFlush.iterator(); eps.hasNext(); ) {
             EventProcessor ep = (EventProcessor) eps.next();
-            ep.commit();
+            ep.cleanUp(isCommit);
         }
         for (Iterator eps = m_afterFlush.iterator(); eps.hasNext(); ) {
             EventProcessor ep = (EventProcessor) eps.next();
-            ep.commit();
+            ep.cleanUp(isCommit);
         }
     }
 
@@ -589,25 +605,9 @@ public class Session {
      **/
 
     public void rollback() {
-        // should properly roll back java state
-        m_odata.clear();
-        m_events.clear();
-        m_violations.clear();
-        rollbackEventProcessors();
+        clear();
         m_engine.rollback();
-        m_beforeFlushMarker = null;
-        if (LOG.isDebugEnabled()) { setLevel(0); }
-    }
-
-    private void rollbackEventProcessors() {
-        for (Iterator eps = m_beforeFlush.iterator(); eps.hasNext(); ) {
-            EventProcessor ep = (EventProcessor) eps.next();
-            ep.rollback();
-        }
-        for (Iterator eps = m_afterFlush.iterator(); eps.hasNext(); ) {
-            EventProcessor ep = (EventProcessor) eps.next();
-            ep.rollback();
-        }
+        cleanUpEventProcessors(false);
     }
 
     Engine getEngine() {
