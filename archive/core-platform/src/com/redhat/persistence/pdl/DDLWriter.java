@@ -37,12 +37,12 @@ import java.util.Set;
  * DDLWriter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/11/11 $
+ * @version $Revision: #5 $ $Date: 2004/03/15 $
  **/
 
 public class DDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/DDLWriter.java#4 $ by $Author: rhs $, $DateTime: 2003/11/11 09:45:27 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/DDLWriter.java#5 $ by $Author: dennis $, $DateTime: 2004/03/15 23:58:55 $";
 
     private File m_base;
     private boolean m_overwrite;
@@ -288,7 +288,7 @@ public class DDLWriter {
         }
 
         String dir = DbHelper.getDatabaseDirectory();
-        String path = "ddl/" + dir + "/";
+        String path = "ddl" + File.separator + dir + File.separator;
         return path;
     }
 }
