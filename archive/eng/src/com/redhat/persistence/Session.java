@@ -47,12 +47,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2004/08/02 $
+ * @version $Revision: #8 $ $Date: 2004/08/02 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#7 $ by $Author: bche $, $DateTime: 2004/08/02 17:06:52 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#8 $ by $Author: bche $, $DateTime: 2004/08/02 17:31:45 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -961,7 +961,7 @@ public class Session {
         } else if (prop.isCollection()) {
             pd = new PropertyData(od, prop, POS.getPersistentCollection
                                   (this, getDataSet(obj, prop)));
-        } else if (od.isNew()) {
+        } else if (od.isInfantile()) {
             pd = new PropertyData(od, prop, null);
         } else {
             RecordSet rs = getDataSet(obj, prop).getCursor().execute();

@@ -291,10 +291,7 @@ class StateManagerImpl extends AbstractStateManager {
                 if (props.size() > 1) { throw new Error("not implemented"); }
 
                 Property prop = (Property) props.get(0);
-                if (!ssn().isNew(pc)) {
-                    ssn().clear(pc, prop);
-                }
-                
+                ssn().clear(pc, prop);
                 if (newValue != null) {
                     Object obj = getObjectField(pc, field);
                     if (isMap) {
@@ -320,9 +317,7 @@ class StateManagerImpl extends AbstractStateManager {
             Property prop = prop(pc, field);
             if (prop.isCollection()) {
                 Collection c = (Collection) newValue;
-                if (!ssn().isNew(pc)) {
-                    ssn().clear(pc, prop);
-                } 
+                ssn().clear(pc, prop);
                 if (c != null) {
                     for (Iterator it = c.iterator(); it.hasNext(); ) {
                         Object value = it.next();
