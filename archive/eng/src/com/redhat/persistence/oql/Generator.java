@@ -26,12 +26,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/08/18 $
+ * @version $Revision: #5 $ $Date: 2004/08/26 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Generator.java#4 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Generator.java#5 $ by $Author: ashah $, $DateTime: 2004/08/26 14:07:44 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -88,6 +88,9 @@ class Generator {
             } else {
                 return m_hash.equals(k.m_hash);
             }
+        }
+        public String toString() {
+            return "Key(" + m_hash + ", " + m_code + ")";
         }
     }
 

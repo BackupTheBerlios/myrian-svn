@@ -26,12 +26,12 @@ import java.util.*;
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/08/18 $
+ * @version $Revision: #4 $ $Date: 2004/08/26 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Literal.java#3 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Literal.java#4 $ by $Author: ashah $, $DateTime: 2004/08/26 14:07:44 $";
 
     private Object m_value;
 
@@ -101,7 +101,7 @@ public class Literal extends Expression {
 
     void hash(Generator gen) {
         ObjectMap map = map(gen);
-        if (map != null) { gen.hash(map); }
+        if (map != null && !map.isPrimitive()) { gen.hash(map); }
         Object value = value(map);
         List values = new ArrayList();
         convert(value, values, gen, getBindKey(gen));
