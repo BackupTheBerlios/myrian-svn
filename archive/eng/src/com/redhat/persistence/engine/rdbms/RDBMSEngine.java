@@ -60,12 +60,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/07/08 $
+ * @version $Revision: #3 $ $Date: 2004/07/29 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#2 $ by $Author: rhs $, $DateTime: 2004/07/08 11:34:59 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#3 $ by $Author: bche $, $DateTime: 2004/07/29 13:03:57 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -452,6 +452,9 @@ public class RDBMSEngine extends Engine {
 
             if (LOG.isInfoEnabled()) {
                 logQueryDetails(Priority.INFO, sql, w, op);
+            }
+            if (LOG.isDebugEnabled()) {                
+                LOG.debug("Query Stack Trace: ", new Throwable());
             }
 
             if (sql.equals("")) {
