@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/08/05 $
+ * @version $Revision: #3 $ $Date: 2004/08/09 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/QFrame.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/QFrame.java#3 $ by $Author: bche $, $DateTime: 2004/08/09 16:21:53 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -539,9 +539,11 @@ class QFrame {
                                    && oroot.equals(frame.froot)) {
                             frame.join = frame.join.add(" and ").add(c);
                         } else {
-                            throw new IllegalStateException
-                                ("unable to place condition: " + m_condition +
-                                 " " + c + trace(joins));
+                            /*
+                             * XXX rhs needs to make sure this is
+                             * the right thing to do
+                             */
+                            where.add(c);
                         }
                     } else if (modified) {
                         join = true;
