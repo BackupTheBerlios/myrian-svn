@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2001, 2003 ArsDigita Corporation. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the ArsDigita Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
  * the License at http://www.arsdigita.com/ADPL.txt
@@ -22,21 +22,23 @@ import com.arsdigita.bebop.AbstractSingleSelectionModel;
 import com.arsdigita.kernel.ui.DomainObjectSelectionModel;
 import com.arsdigita.bebop.parameters.ParameterModel;
 
-
-
-
-public class RequestLocalSelectionModel extends AbstractSingleSelectionModel 
-    implements DomainObjectSelectionModel {
-    
+/**
+ * @deprecated This class is used just once in all of the RHEA code
+ * base; it will be moved there in the future, so please don't rely on
+ * it
+ */
+public class RequestLocalSelectionModel extends AbstractSingleSelectionModel
+        implements DomainObjectSelectionModel {
     private RequestLocal m_value;
 
     public RequestLocalSelectionModel() {
 	this(new RequestLocal());
     }
+
     public RequestLocalSelectionModel(RequestLocal l) {
 	m_value = l;
     }
-    
+
     public void setSelectedKey(PageState state,
 			       Object value) {
 	m_value.set(state, value);
@@ -54,8 +56,9 @@ public class RequestLocalSelectionModel extends AbstractSingleSelectionModel
     public DomainObject getSelectedObject(PageState state) {
 	return (DomainObject)m_value.get(state);
     }
-    
+
     public ParameterModel getStateParameter() {
-	throw new UnsupportedOperationException("no state parameter in request local selection models");
+	throw new UnsupportedOperationException
+            ("No state parameter in request local selection models");
     }
 }
