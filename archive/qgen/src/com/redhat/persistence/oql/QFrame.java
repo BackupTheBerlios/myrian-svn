@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #18 $ $Date: 2004/03/18 $
+ * @version $Revision: #19 $ $Date: 2004/03/19 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#18 $ by $Author: rhs $, $DateTime: 2004/03/18 17:18:33 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#19 $ by $Author: rhs $, $DateTime: 2004/03/19 12:59:42 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -307,22 +307,47 @@ class QFrame {
         }
     }
 
-    private static class Flags {
-        boolean outer = false;
-    }
-
     private static class JFrame {
+
+        static JFrame leaf(Code table, QFrame frame, QFrame oroot) {
+            return new JFrame(table, frame, oroot);
+        }
+
+        static JFrame cross(JFrame left, JFrame right) {
+            if (!left.oroot.equals(right.oroot)) {
+                throw new IllegalStateException
+                    ("can't cross joins from different oroots");
+            }
+            Code join = left.join.add(" cross join ").add(right.join);
+            JFrame result = new JFrame(join, left, right);
+            result.oroot = left.oroot;
+            return result;
+        }
+
+        static JFrame join(JFrame left, JFrame right, Code on) {
+            Code join = left.join;
+            if (!left.oroot.equals(right.oroot)) {
+                join = join.add(" left");
+            }
+            join = join.add(" join ").add(right.join).add(" on ").add(on);
+            JFrame result = new JFrame(join, left, right);
+            result.froot = right.oroot;
+            result.oroot = left.oroot;
+            return result;
+        }
 
         Code join = null;
         Set defined = null;
-        boolean filterable = false;
+        QFrame froot = null;
+        QFrame oroot = null;
 
-        JFrame(Code table, QFrame frame) {
+        private JFrame(Code table, QFrame frame, QFrame oroot) {
             join = table;
             defined = Collections.singleton(frame);
+            this.oroot = oroot;
         }
 
-        JFrame(Code join, JFrame left, JFrame right) {
+        private JFrame(Code join, JFrame left, JFrame right) {
             this.join = join;
             defined = new HashSet();
             defined.addAll(left.defined);
@@ -333,7 +358,7 @@ class QFrame {
 
     private Code render(List where) {
         LinkedList joins = new LinkedList();
-        render(joins, where, new Flags(), new HashSet());
+        render(joins, where, this, this, new HashSet());
         Code code = null;
         for (Iterator it = joins.iterator(); it.hasNext(); ) {
             JFrame frame = (JFrame) it.next();
@@ -346,11 +371,11 @@ class QFrame {
         return code;
     }
 
-    private void render(LinkedList joins, List where, Flags flags,
-                        Set emitted) {
-        boolean outer = flags.outer;
-        if (m_outer) {
-            flags.outer = true;
+    private void render(LinkedList joins, List where, QFrame oroot,
+                        QFrame root, Set emitted) {
+        // If the first non empty frame is outer we treat it as inner.
+        if (m_outer && !joins.isEmpty()) {
+            oroot = this;
         }
 
         Code table = null;
@@ -361,13 +386,13 @@ class QFrame {
         }
 
         if (table != null) {
-            joins.addFirst(new JFrame(table, this));
+            joins.addFirst(JFrame.leaf(table, this, oroot));
         }
 
         List children = getChildren();
         for (int i = 0; i < children.size(); i++) {
             QFrame child = (QFrame) children.get(i);
-            child.render(joins, where, flags, emitted);
+            child.render(joins, where, oroot, root, emitted);
         }
 
         if (m_condition != null) {
@@ -377,10 +402,18 @@ class QFrame {
                 Set used = frames(m_condition);
                 used.removeAll(right.defined);
                 if (used.isEmpty()) {
-                    if (right.filterable) {
+                    // We default to putting things in the where
+                    // clause here because oracle won't resolve
+                    // external variable references correctly when
+                    // they appear in join conditions.
+                    if (oroot.equals(root)) {
+                        where.add(c);
+                    } else if (right.froot != null
+                               && oroot.equals(right.froot)) {
                         right.join = right.join.add(" and ").add(c);
                     } else {
-                        where.add(c);
+                        throw new IllegalStateException
+                            ("unable to place condition: " + c);
                     }
                 } else {
                     joins.removeFirst();
@@ -396,35 +429,20 @@ class QFrame {
                         used.removeAll(right.defined);
                         used.removeAll(left.defined);
                         if (used.isEmpty()) {
-                            Code join = left.join;
-                            if (flags.outer) {
-                                join = join.add(" left");
-                            }
-                            join = join.add(" join ").add(right.join)
-                                .add(" on ").add(c);
-                            JFrame frame = new JFrame(join, left, right);
-                            frame.filterable = !flags.outer;
-                            joins.addFirst(frame);
+                            joins.addFirst(JFrame.join(left, right, c));
                             break;
                         } else if (joins.isEmpty()) {
                             throw new IllegalStateException
                                 ("unresolved variable in condition: " + c);
                         } else {
                             JFrame lefter = (JFrame) joins.removeFirst();
-                            Code join = lefter.join.add(" cross join ")
-                                .add(left.join);
-                            JFrame cross = new JFrame(join, lefter, left);
-                            left = cross;
+                            left = JFrame.cross(lefter, left);
                         }
                     }
                 }
 
                 emitted.add(c);
             }
-        }
-
-        if (m_outer) {
-            flags.outer = outer;
         }
     }
 
