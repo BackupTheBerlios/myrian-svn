@@ -3,7 +3,7 @@ BUILD=build
 empty:=
 space:=$(empty) $(empty)
 
-JAVACC=java -cp javacc/JavaCC.zip COM.sun.labs.javacc.Main
+JAVACC=sh javacc-3.2/bin/javacc
 
 SOURCES:=src test/src cap/src cap/test/src
 

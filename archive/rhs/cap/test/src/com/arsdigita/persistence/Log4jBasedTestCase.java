@@ -65,7 +65,7 @@ import org.apache.log4j.varia.StringMatchFilter;
  */
 public class Log4jBasedTestCase extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/Log4jBasedTestCase.java#1 $";
+    public static final String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/Log4jBasedTestCase.java#2 $";
 
     /**
      * The log object.  Should be modified
@@ -101,10 +101,10 @@ public class Log4jBasedTestCase extends PersistenceTestCase {
     public void logSetUp() throws Exception {
         // nuke all priorities back to DEBUG
         Category root = Category.getRoot();
-        Enumeration enum = root.getCurrentCategories();
+        Enumeration en = root.getCurrentCategories();
 
-        while (enum.hasMoreElements()) {
-            Category cat = (Category)enum.nextElement();
+        while (en.hasMoreElements()) {
+            Category cat = (Category)en.nextElement();
             originalPriorities.put(cat, cat.getPriority());
             cat.setPriority(Priority.DEBUG);
         }
