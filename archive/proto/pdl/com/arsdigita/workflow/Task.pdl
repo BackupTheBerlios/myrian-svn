@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/pdl/com/arsdigita/workflow/Task.pdl#3 $
-// $DateTime: 2003/04/15 10:38:49 $
+// $Id: //core-platform/proto/pdl/com/arsdigita/workflow/Task.pdl#4 $
+// $DateTime: 2003/04/28 23:42:15 $
 
 model com.arsdigita.workflow.simple;
 
@@ -55,7 +55,7 @@ object type Task extends ACSObject {
 }
 
 association {
-    Task[0..1] task = join cw_tasks.task_id
+    Task[0..n] task = join cw_tasks.task_id
                         to cw_task_listeners.listener_task_id,
                       join cw_task_listeners.task_id
                         to cw_tasks.task_id;
