@@ -1,10 +1,18 @@
 # Since:   2004-06-29
-# Version: $Id: //eng/persistence/dev/doc/bugs.txt#1 $
+# Version: $Id: //eng/persistence/dev/doc/bugs.txt#2 $
 
 * Opened
 .. PersistenceManager.makePersistent(Object) fails silently (rather
    than violently) when it is invoked on an object that already exists
-   in the database.
+   in the database. Correct behavior is to do nothing when the
+   specified object is associated with the persistence manager and to
+   throw an exception when the object is associated with a different
+   persistence manager. In the case of application identity, it is
+   unclear what should if the identity already exists. The
+   specification might imply that an exception should be thrown. The
+   other logical behaviors are to have the object get the persistent
+   state associated with the identity or to have the object's in
+   memory state become the canonical version of the state for that identity.
 
    Reported: 2004-06-23
    By: rhs
