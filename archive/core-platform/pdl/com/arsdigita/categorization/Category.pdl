@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/categorization/Category.pdl#22 $
-// $DateTime: 2003/09/18 13:39:19 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/categorization/Category.pdl#23 $
+// $DateTime: 2003/09/22 11:35:05 $
 
 model com.arsdigita.categorization;
 
@@ -110,14 +110,22 @@ association {
 // To get the related, do 'get("related")' and then filter on
 // the relationType link attribute to be "related"
 
-object type CategoryCategoryLink {
+association {
+    Category[0..n] parents = join cat_categories.category_id
+                              to cat_category_category_map.related_category_id,
+                             join cat_category_category_map.category_id
+                               to cat_categories.category_id;
+
+    Category[0..n] related = join cat_categories.category_id
+                              to cat_category_category_map.category_id,
+                             join cat_category_category_map.related_category_id
+                              to cat_categories.category_id;
     BigDecimal[0..1] sortKey = cat_category_category_map.sort_key;
     Boolean[1..1] isDefault = cat_category_category_map.default_p CHAR(1);
     String[0..1] relationType = cat_category_category_map.relation_type;
 
-    object key(parentCategory, relatedCategory);
 
-    insert {
+    add {
         do {
             insert into cat_category_category_map (
                 category_id,
@@ -126,8 +134,8 @@ object type CategoryCategoryLink {
                 sort_key,
                 relation_type
             ) values (
-                :parentCategory.id,
-                :relatedCategory.id,
+                :parents.id,
+                :related.id,
                 :isDefault,
                 (select CASE WHEN (:sortKey is null) THEN
                              (select CASE WHEN (max(sort_key) is null) THEN
@@ -144,22 +152,6 @@ object type CategoryCategoryLink {
             )
         }
     }
-}
-
-association {
-    component CategoryCategoryLink[0..n] parentCategories = join cat_categories.category_id
-                                                            to cat_category_category_map.related_category_id;
-
-    Category[1..1] relatedCategory =  join cat_category_category_map.related_category_id
-                                      to cat_categories.category_id;
-}
-
-association {
-    component CategoryCategoryLink[0..n] relatedCategories = join cat_categories.category_id
-                                                             to cat_category_category_map.category_id;
-
-    Category[1..1] parentCategory =   join cat_category_category_map.category_id
-                                      to cat_categories.category_id;
 }
 
 // This returns all of the ACSObjects within the subtree for
