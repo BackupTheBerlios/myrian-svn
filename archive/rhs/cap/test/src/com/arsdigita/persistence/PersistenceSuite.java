@@ -19,14 +19,17 @@ import com.arsdigita.tools.junit.framework.PackageTestSuite;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
+import com.redhat.persistence.pdl.*;
+import java.sql.*;
+
 /**
  * PersistenceSuite
  *
  * @author Jon Orris
- * @version $Revision: #1 $ $Date: 2004/05/03 $
+ * @version $Revision: #2 $ $Date: 2004/05/05 $
  */
 public class PersistenceSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/PersistenceSuite.java#1 $ by $Author: rhs $, $DateTime: 2004/05/03 11:48:01 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/PersistenceSuite.java#2 $ by $Author: rhs $, $DateTime: 2004/05/05 16:10:50 $";
 
     public PersistenceSuite() {
         super();
@@ -42,23 +45,28 @@ public class PersistenceSuite extends PackageTestSuite {
 
     public static Test suite() {
         PersistenceSuite suite = new PersistenceSuite();
-        //suite.addTestSuite(NullTest.class);
-
         populateSuite(suite);
-        BaseTestSetup wrapper = new BaseTestSetup(suite);
-        //wrapper.setPerformInitialization(false);
 
-        wrapper.addSQLSetupScript("/com/arsdigita/persistence/setup.sql");
-        wrapper.addSQLSetupScript("/persistence/setup.sql");
-        wrapper.addSQLSetupScript("/com/arsdigita/persistence/static/setup.sql");
-        wrapper.addSQLSetupScript("/com/arsdigita/persistence/mdsql/setup.sql");
+        BaseTestSetup wrapper = new BaseTestSetup(suite) {
+            protected void setUp() throws Exception {
+                super.setUp();
+                Session ssn = SessionManager.getSession();
+                Connection conn = ssn.getConnection();
+                Schema.load(ssn.getMetadataRoot().getRoot(), conn);
+                conn.commit();
+            }
+            protected void tearDown() throws Exception {
+                Session ssn = SessionManager.getSession();
+                Connection conn = ssn.getConnection();
+                Schema.unload(ssn.getMetadataRoot().getRoot(), conn);
+                super.tearDown();
+                conn.commit();
+            }
+        };
 
-        wrapper.addSQLTeardownScript("/com/arsdigita/persistence/mdsql/teardown.sql");
-        wrapper.addSQLTeardownScript("/com/arsdigita/persistence/static/teardown.sql");
-        wrapper.addSQLTeardownScript("/persistence/teardown.sql");
-        wrapper.addSQLTeardownScript("/com/arsdigita/persistence/teardown.sql");
+        wrapper.addSQLSetupScript("com/arsdigita/persistence/setup.sql");
+        wrapper.addSQLTeardownScript("com/arsdigita/persistence/teardown.sql");
 
-//        wrapper.setTeardownSQLScript("/persistence/teardown.sql");
         return wrapper;
     }
 

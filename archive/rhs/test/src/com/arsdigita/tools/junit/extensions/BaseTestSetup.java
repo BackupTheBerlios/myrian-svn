@@ -20,9 +20,10 @@ import com.arsdigita.db.*;
 import java.sql.*;
 import java.io.*;
 
-import com.arsdigita.installer.LoadSQLPlusScript;
+import com.arsdigita.installer.SQLLoader;
 import com.arsdigita.runtime.*;
 import com.arsdigita.util.jdbc.*;
+import com.redhat.persistence.pdl.*;
 import junit.extensions.TestDecorator;
 import junit.framework.Protectable;
 import junit.framework.Test;
@@ -110,38 +111,42 @@ public class BaseTestSetup extends TestDecorator {
         }
     }
 
+    private class TestLoader extends SQLLoader {
+        TestLoader(Connection conn) { super(conn); }
+        protected Reader open(String name) {
+            String db = DbHelper.getDatabaseSuffix
+                (DbHelper.getDatabase(getConnection()));
+            ClassLoader ldr = Thread.currentThread().getContextClassLoader();
+            InputStream is = null;
+            if (name.endsWith(".sql")) {
+                String first = name.substring(0, name.length() - 4);
+                String dbname = first + "." + db + ".sql";
+                is = ldr.getResourceAsStream(dbname);
+            }
+            if (is == null) {
+                is = ldr.getResourceAsStream(name);
+            }
+            if (is == null) {
+                return null;
+            } else {
+                return new InputStreamReader(is);
+            }
+        }
+    }
+
     private void runScripts(final List scripts) throws Exception {
-        LoadSQLPlusScript loader = new LoadSQLPlusScript();
         Connection conn = Connections.acquire
 	    (RuntimeConfig.getConfig().getJDBCURL());
 
-        loader.setConnection(conn);
+        TestLoader ldr = new TestLoader(conn);
 
         for (Iterator iterator = scripts.iterator(); iterator.hasNext(); ) {
             final String script = (String) iterator.next();
-            loader.loadSQLPlusScript(resolveScript(script));
+            ldr.load(script);
         }
 
         conn.commit();
         conn.close();
-    }
-
-    private String resolveScript(final String script) {
-        String sqldir = System.getProperty("test.sql.dir");
-        File filename = new File(sqldir + script);
-        if (filename.exists() && filename.isFile()) {
-            return filename.toString();
-        }
-        filename = new File(sqldir + File.separator + DbHelper.getDatabaseDirectory() + script);
-        if (filename.exists() && filename.isFile()) {
-            return filename.toString();
-        }
-        filename = new File(sqldir + File.separator + "default" + script);
-        if (filename.exists() && filename.isFile()) {
-            return filename.toString();
-        }
-        throw new IllegalArgumentException
-            ("unable to resolve script: " + script);
     }
 
     public void setSetupSQLScript(String setupSQLScript) {
