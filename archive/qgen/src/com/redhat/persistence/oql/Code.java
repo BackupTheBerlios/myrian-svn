@@ -9,12 +9,12 @@ import java.util.*;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/01/28 $
+ * @version $Revision: #5 $ $Date: 2004/02/04 $
  **/
 
 class Code {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#4 $ by $Author: rhs $, $DateTime: 2004/01/28 15:42:41 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#5 $ by $Author: rhs $, $DateTime: 2004/02/04 11:21:19 $";
 
     private Root m_root;
     private LinkedList m_stack = new LinkedList();
@@ -421,7 +421,8 @@ class Code {
     static String[] columns(ObjectType type) {
         ObjectMap om = type.getRoot().getObjectMap(type);
         if (om.getRetrieveAll() != null) {
-            return columns(paths(type, null), om.getRetrieveAll());
+            return concat
+                ("sr.", columns(paths(type, null), om.getRetrieveAll()));
         } else {
             return names(om.getTable().getPrimaryKey().getColumns());
         }
