@@ -10,12 +10,12 @@ import java.util.*;
  * Cursor
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/03 $
  **/
 
 public class Cursor {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Cursor.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Cursor.java#2 $ by $Author: ashah $, $DateTime: 2003/06/03 12:21:32 $";
 
     final private Session m_ssn;
     final private Query m_query;
@@ -45,6 +45,7 @@ public class Cursor {
 	    return m_values.get(path);
 	} else {
 	    Object o = getInternal(path.getParent());
+            if (o == null) { return null; }
 	    return m_ssn.get(o, Path.get(path.getName()));
 	}
     }
