@@ -1,129 +1,131 @@
 package com.redhat.persistence.jdo;
 
 import com.redhat.persistence.*;
+import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.oql.*;
+import com.redhat.persistence.oql.Static;
 import com.redhat.persistence.oql.Expression;
 
 import java.util.*;
+import javax.jdo.JDOHelper;
 
 /**
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/07/08 $
+ * @version $Revision: #4 $ $Date: 2004/07/09 $
  **/
 
 class CRPMap implements Map {
+    private final static String KEY = "key";
+    private final static String VALUE = "value";
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPMap.java#3 $ by $Author: vadim $, $DateTime: 2004/07/08 16:34:10 $";
+    transient private Session m_ssn;
 
-    private Session m_ssn;
-    private Object m_object;
-    private Property m_property;
-    private Property m_container;
-    private Property m_key;
-    private Property m_value;
+    /* The setup:
+     *
+     * + We have a Java class Foo that implements PersistenceCapable and has a
+     *   field dict of type java.util.Map.
+     *
+     * + The class Foo is backed by an object type "Foo".  The object type "Foo"
+     *   has a property named "foo$entries" whose object type is "FooMapHelper".
+     *
+     * + The object type "FooMapHelper" has properties named "key" and "value".
+     *
+     * + The object type "FooMapHelper" has a [1..1] property "foo" of
+     *   type "Foo".
+     */
+
+    // the enclosing JDO instance of type Foo that contains this Map as a field
+    transient private Object m_object;
+    // the property of "Foo" named "foo$entries"
+    transient private Property m_mapProp;
+    // the property of "FooMapHelper" named "foo"
+    transient private Property m_container;
+    // the property of "FooMapHelper" named "key"
+    transient private Property m_key;
+    // the property of "FooMapHelper" named "value"
+    transient private Property m_value;
 
     CRPMap() {}
 
     CRPMap(Session ssn, Object object, Property property) {
         m_ssn = ssn;
         m_object = object;
-        m_property = property;
+        m_mapProp = property;
+    }
 
-        ObjectType type = property.getType();
-        m_key = null;
-        m_value = null;
-        for (Iterator it = type.getProperties().iterator(); it.hasNext(); ) {
-            Property p = (Property) it.next();
-            if (p.isKeyProperty()) {
-                if (m_property.equals(((Role) p).getReverse())) {
-                    if (m_container == null) {
-                        m_container = p;
-                    } else {
-                        throw new IllegalStateException
-                            ("ambiguously defined container property " +
-                             " for map element: " + type);
-                    }
+    private void init() {
+        final ObjectType type = m_mapProp.getType();
+        if (type.getKeyProperties().size() != 2) {
+            throw new IllegalStateException
+                ("cannot map from " + type + " to java map entry");
+        }
+
+        Collection properties = type.getProperties();
+        if (m_container != null) { throw new IllegalStateException(); }
+
+        for (Iterator it = properties.iterator(); it.hasNext(); ) {
+            final Property pp = (Property) it.next();
+            if (pp.isKeyProperty()) {
+                if (KEY.equals(pp.getName())) {
+                    m_key = pp;
                 } else {
-                    if (m_key == null) {
-                        m_key = p;
+                    if (m_container == null) {
+                        m_container = pp;
+                        System.err.println("set container to " + pp +
+                                           "(name=" + pp.getName() + "); " +
+                                           "KEY=" + KEY +
+                                           "; KEY==name: " + (KEY.equals(pp.getName())));
                     } else {
                         throw new IllegalStateException
-                            ("ambiguously defined key property " +
-                             " for map element: " + type);
+                            ("can't happen: container already set to " +
+                             m_container);
                     }
                 }
             } else {
                 if (m_value == null) {
-                    m_value = p;
+                    m_value = pp;
                 } else {
                     throw new IllegalStateException
-                        ("ambiguously defined value property " +
-                         "for map element: " + type);
+                        ("found two non-key properties in type " + type + ": " +
+                         m_value + " and " + pp);
                 }
             }
         }
     }
 
+    Session ssn() {
+        if (m_ssn == null) {
+            PersistenceManagerImpl pmi = ((PersistenceManagerImpl) JDOHelper
+                                          .getPersistenceManager(this));
+            m_ssn = pmi.getSession();
+            StateManagerImpl smi = pmi.getStateManager(this);
+            PropertyMap pmap = smi.getPropertyMap();
+            m_object = m_ssn.retrieve(pmap);
+            ObjectType type = pmap.getObjectType();
+            String name = smi.getPrefix() + "entries";
+            m_mapProp = type.getProperty(name);
+            if (m_mapProp == null) {
+                throw new IllegalStateException("no " + name + " in " + type);
+            }
+            init();
+        }
+
+        return m_ssn;
+    }
+
+    private void lock() {
+        C.lock(ssn(), m_object);
+    }
+
     private Expression entries() {
-        return new Get(new Literal(m_object), m_property.getName());
-    }
-
-    public Set entrySet() {
-        return new CRPSet(m_ssn, m_object, m_property);
-    }
-
-    public Collection values() {
-        return new ValueCollection();
-    }
-
-    public Set keySet() {
-        return new KeySet();
-    }
-
-    public void clear() {
-        entrySet().clear();
-    }
-
-    public void putAll(Map map) {
-        for (Iterator it = map.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry me = (Map.Entry) it.next();
-            put(me.getKey(), me.getValue());
-        }
-    }
-
-    public Object remove(Object o) {
-        Map.Entry me = getEntry(o);
-        if (me == null) {
-            return null;
-        } else {
-            Object result = me.getValue();
-            m_ssn.delete(me);
-            return result;
-        }
-    }
-
-    public Object put(Object key, Object value) {
-        Map.Entry me = getEntry(key);
-        if (me == null) {
-            me = create(key);
-        }
-        Object result = me.getValue();
-        me.setValue(value);
-        return result;
+        return new Get(new Literal(m_object), m_mapProp.getName());
     }
 
     private Map.Entry create(Object key) {
-        PropertyMap pmap = new PropertyMap(m_property.getType());
-        pmap.put(m_key, key);
-        pmap.put(m_container, m_object);
-        Adapter ad = m_ssn.getRoot().getAdapter(Map.Entry.class);
-        Map.Entry me = (Map.Entry) ad.getObject
-            (pmap.getObjectType().getBasetype(), pmap, m_ssn);
-        m_ssn.create(me);
-        return me;
+        return new MapEntry(m_object, key);
     }
 
     private Map.Entry getEntry(Object key) {
@@ -131,7 +133,7 @@ class CRPMap implements Map {
             (entries(), new Equals
              (new Variable(m_key.getName()), new Literal(key)));
         DataSet ds = new DataSet
-            (m_ssn, new Signature(m_property.getType()), expr);
+            (m_ssn, new Signature(m_mapProp.getType()), expr);
         Cursor c = ds.getCursor();
         try {
             if (c.next()) {
@@ -144,59 +146,6 @@ class CRPMap implements Map {
         }
     }
 
-    public Object get(Object key) {
-        Map.Entry me = getEntry(key);
-        if (me == null) {
-            return null;
-        } else {
-            return me.getValue();
-        }
-    }
-
-    public boolean containsValue(Object o) {
-        return values().contains(o);
-    }
-
-    public boolean containsKey(Object o) {
-        return keySet().contains(o);
-    }
-
-    public boolean isEmpty() {
-        return entrySet().isEmpty();
-    }
-
-    public int size() {
-        return entrySet().size();
-    }
-
-    private class ValueCollection extends CRPCollection {
-
-        Session ssn() {
-            return CRPMap.this.m_ssn;
-        }
-
-        ObjectType type() {
-            return m_value.getType();
-        }
-
-        Expression expression() {
-            return new Get(entries(), m_value.getName());
-        }
-
-        public boolean remove(Object o) {
-            throw new UnsupportedOperationException
-                ("technically this should work");
-        }
-
-        public boolean add(Object o) {
-            throw new UnsupportedOperationException();
-        }
-
-        public void clear() {
-            CRPMap.this.clear();
-        }
-
-    };
 
     private class KeySet extends CRPCollection implements Set {
 
@@ -228,4 +177,65 @@ class CRPMap implements Map {
 
     }
 
+    // =========================================================================
+    // Map interface
+    // =========================================================================
+
+    public Object get(Object key) {
+        throw new UnsupportedOperationException();
+    }
+
+    public Object put(Object key, Object value) {
+        lock();
+        Map.Entry me = getEntry(key);
+        if (me == null) {
+            me = create(key);
+        }
+        Object result = me.getValue();
+        me.setValue(value);
+        return result;
+    }
+
+    public Object remove(Object key) {
+        throw new UnsupportedOperationException();
+    }
+
+    public Set keySet() {
+        return new KeySet();
+    }
+
+    public Set entrySet() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void putAll(Map map) {
+        for (Iterator it = map.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry me = (Map.Entry) it.next();
+            put(me.getKey(), me.getValue());
+        }
+    }
+
+    public Collection values() {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean containsValue(Object value) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean containsKey(Object key) {
+        return keySet().contains(key);
+    }
+
+    public boolean isEmpty() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void clear() {
+        throw new UnsupportedOperationException();
+    }
+
+    public int size() {
+        throw new UnsupportedOperationException();
+    }
 }
