@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 
 /**
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/01/23 $
+ * @version $Date: 2003/01/24 $
  * @since 2003-01-22
  **/
 public class TreeTest extends TestCase {
@@ -93,5 +93,27 @@ public class TreeTest extends TestCase {
         expected = Arrays.asList(new String[] {B, A});
         assertEquals("D's ancestors", expected, actual);
         assertEquals("Number of A's ancestors", 0, aa.getAncestors().size());
+    }
+
+    public void testAddSubtree() {
+        Tree bb = new Tree(B);
+        Tree cc = bb.addChild(C);
+        Tree dd = bb.addChild(D);
+        Tree aa = new Tree(A);
+        aa.addSubtree(bb);
+        Tree ee = new Tree(E);
+        aa.addSubtree(ee);
+
+        List actual = Tree.treesToNodes(ee.getAncestors());
+        List expected = Arrays.asList(new String[] {A});
+        assertEquals("E's ancestors", expected, actual);
+
+        actual = Tree.treesToNodes(cc.getAncestors());
+        expected = Arrays.asList(new String[] {B, A});
+        assertEquals("C's ancestors", expected, actual);
+
+        actual = Tree.treesToNodes(dd.getAncestors());
+        expected = Arrays.asList(new String[] {B, A});
+        assertEquals("D's ancestors", expected, actual);
     }
 }

@@ -30,10 +30,12 @@ import java.util.Stack;
  *
  * @author Archit Shah (ashah@mit.edu)
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/01/23 $
+ * @version $Date: 2003/01/24 $
  * @since 2003-01-22
  **/
 public class GraphUtil {
+    private static final String INDENT = "    ";
+
     private GraphUtil() {}
 
     /**
@@ -162,7 +164,7 @@ public class GraphUtil {
      * @pre fmtr != null
      * @pre writer != null
      **/
-    public static void printTree(Tree tree, Tree.Formatter fmtr,
+    public static void printTree(Tree tree, GraphFormatter fmtr,
                                  PrintWriter writer) {
 
         Assert.assertNotNull(tree, "tree");
@@ -174,7 +176,7 @@ public class GraphUtil {
         writer.println("}");
     }
 
-    private static void printTreeRecurse(Tree tree, Tree.Formatter fmtr,
+    private static void printTreeRecurse(Tree tree, GraphFormatter fmtr,
                                          PrintWriter writer) {
 
         String root = fmtr.formatNode(tree.getRoot());
@@ -182,7 +184,7 @@ public class GraphUtil {
             Tree.EdgeTreePair pair = (Tree.EdgeTreePair) ii.next();
             String edge = fmtr.formatEdge(pair.getEdge());
             String child = fmtr.formatNode(pair.getTree().getRoot());
-            writer.print("    " + root + " -> " + child);
+            writer.print(INDENT + root + " -> " + child);
             if ( edge != null ) {
                 writer.print("[label=\"" + edge + "\"]");
             }
@@ -190,4 +192,54 @@ public class GraphUtil {
             printTreeRecurse(pair.getTree(), fmtr, writer);
         }
     }
+
+    /**
+     * Pretty-prints the graph.
+     *
+     * @see #printTree(Tree, GraphFormatter,  PrintWriter)
+     * @pre graph != null
+     * @pre fmtr != null
+     * @pre writer != null
+     **/
+    public static void printGraph(Graph graph, GraphFormatter fmtr,
+                                  PrintWriter writer) {
+
+        Assert.assertNotNull(graph, "tree");
+        Assert.assertNotNull(fmtr, "formatter");
+        Assert.assertNotNull(writer, "writer");
+
+        writer.println("digraph " + graph.getLabel() + " {");
+        for (Iterator nodes=graph.getNodes().iterator(); nodes.hasNext(); ) {
+            Object node = nodes.next();
+            int nodeCount = graph.outgoingEdgeCount(node) +
+                graph.incomingEdgeCount(node);
+
+            if ( nodeCount==0 ) {
+                // this is a disconnected node
+                writer.println(INDENT + fmtr.formatNode(node) + ";");
+                continue;
+            }
+            if (graph.outgoingEdgeCount(node) == 0) {
+                // we'll print this node when we print the outgoing edges of
+                // some other node
+                continue;
+            }
+            Iterator edges = graph.getOutgoingEdges(node).iterator();
+            while (edges.hasNext()) {
+                Graph.Edge edge = (Graph.Edge) edges.next();
+                StringBuffer sb = new StringBuffer();
+                sb.append(INDENT).append(fmtr.formatNode(edge.getTail()));
+                sb.append(" -> ").append(fmtr.formatNode(edge.getHead()));
+                if ( edge.getLabel() != null ) {
+                    sb.append("[label=\"");
+                    sb.append(fmtr.formatEdge(edge.getLabel()));
+                    sb.append("\"]");
+                }
+                sb.append(";");
+                writer.println(sb.toString());
+            }
+        }
+        writer.println("}");
+    }
+
 }

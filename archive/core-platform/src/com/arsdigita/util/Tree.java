@@ -52,11 +52,11 @@ import java.util.List;
  * Object)} methods. </p>
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/01/23 $
+ * @version $Date: 2003/01/24 $
  * @since 2003-01-23
  **/
 public class Tree {
-    private final Tree m_parent;
+    private Tree m_parent;
     private final Object m_root;
     private final List m_children;
     private String m_label;
@@ -107,6 +107,37 @@ public class Tree {
      **/
     public Tree addChild(Object child) {
         return addChild(child, null);
+    }
+
+    /**
+     * Adds <code>subtree</code> to the root node of this tree.
+     *
+     * <p><span style="color: FireBrick;">Note</span>: This doesn't check for
+     * cycles. If you do something like,</p>
+     * 
+     * <pre>
+     * tree.addSubtree(tree);
+     * </pre>
+     *
+     * <p>you're on your own. I'll add a check for cycles like this when I have
+     * the time. (This probably means never.)</p>
+     * 
+     * @pre subtree != null && subtree.getParent() == 0
+     **/
+    public void addSubtree(Tree subtree, Object edge) {
+        Assert.assertNotNull(subtree, "subtree");
+        Assert.assertTrue(subtree.getParent() == null, "parent must be null");
+        subtree.m_parent = this;
+        m_children.add(new EdgeTreePair(edge, subtree));
+    }
+
+    /**
+     * A shortcut for <code>addSubtree(subtree,null)</code>.
+     *
+     * @see #addSubtree(Tree, Object)
+     **/
+    public void addSubtree(Tree subtree) {
+        addSubtree(subtree, null);
     }
 
     /**
@@ -197,40 +228,5 @@ public class Tree {
         public Tree getTree() {
             return m_tree;
         }
-    }
-
-    /**
-     * Implementations of this interface can be used for pretty-printing the
-     * tree.
-     **/
-    public interface Formatter {
-        /**
-         * Returns a textual representation of the node, preferably a short one that
-         * can be used in the following plain-text representation of the tree.
-         *
-         * <pre>
-         * digraph tree {
-         *     A -> B -> C -> D;
-         *     B -> E -> F;
-         *     C -> G;
-         *     D -> I;
-         *     D -> J -> H;
-         * }
-         * </pre>
-         * 
-         * <p>Example implementation:</p>
-         *
-         * <pre>
-         *  public String formatNode(Object node) {
-         *      return node == null ? null : ((ObjectType) node).getName();
-         *  }
-         * </pre>
-         **/
-        String formatNode(Object node);
-
-        /**
-         * Returns a short textual label describing the edge.
-         **/
-        String formatEdge(Object edge);
     }
 }

@@ -26,7 +26,7 @@ import junit.framework.TestCase;
 
 /**
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/01/23 $
+ * @version $Date: 2003/01/24 $
  * @since 2003-01-22
  **/
 public class GraphUtilTest extends TestCase {
@@ -112,7 +112,7 @@ public class GraphUtilTest extends TestCase {
         aa.addChild(E);
         StringWriter swriter = new StringWriter();
         PrintWriter writer = new PrintWriter(swriter);
-        GraphUtil.printTree(aa, new Tree.Formatter() {
+        GraphUtil.printTree(aa, new GraphFormatter() {
                 public String formatNode(Object node) {
                     return (String) node;
                 }
