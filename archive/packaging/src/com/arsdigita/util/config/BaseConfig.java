@@ -31,13 +31,13 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterStore
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#5 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#6 $
  */
 public class BaseConfig {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#5 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#6 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/11 11:20:25 $";
+        "$DateTime: 2003/09/11 11:49:32 $";
 
     private static final Logger s_log = Logger.getLogger
         (BaseConfig.class);
@@ -76,6 +76,11 @@ public class BaseConfig {
                            "property record");
             }
         } else {
+            if (s_log.isDebugEnabled()) {
+                s_log.debug("Loading configuration values from " +
+                            resource + " on the class path");
+            }
+
             try {
                 props.load(in);
             } catch (IOException ioe) {
@@ -100,9 +105,15 @@ public class BaseConfig {
      * null
      */
     protected final Object initialize(final Parameter param) {
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Initializing value for " + param);
+        }
+
         Assert.exists(param, Parameter.class);
 
-        // 1. Unmarshal and check for errors
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Unmarshaling parameter from " + m_store);
+        }
 
         final ParameterValue value = param.unmarshal(m_store);
 
@@ -112,7 +123,9 @@ public class BaseConfig {
                  value.getErrors().toString());
         }
 
-        // 2. Validate and check for errors
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Validating parameter value " + value);
+        }
 
         param.validate(value);
 
@@ -123,5 +136,9 @@ public class BaseConfig {
         }
 
         return value.getValue();
+    }
+
+    public final String toString() {
+        return super.toString() + " [" + m_store + "]";
     }
 }
