@@ -330,14 +330,16 @@ public class PersistenceManagerImpl implements PersistenceManager {
      * Create a new Query with no elements.
      */
     public Query newQuery() {
-        throw new Error("not implemented");
+        return new JDOQuery(this);
     }
 
     /**
      * Create a new Query specifying the Class of the candidate instances.
      */
     public Query newQuery(Class cls) {
-        throw new Error("not implemented");
+        Query q = newQuery();
+        q.setClass(cls);
+        return q;
     }
 
     /**
@@ -361,7 +363,9 @@ public class PersistenceManagerImpl implements PersistenceManager {
      * filter.
      */
     public Query newQuery(Class cls, String filter) {
-        throw new Error("not implemented");
+        Query q = newQuery(cls);
+        q.setFilter(filter);
+        return q;
     }
 
     /**

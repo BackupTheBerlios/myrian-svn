@@ -36,12 +36,23 @@
   - decide on what APIs to support for the jndi retrieved object
   - see spec for when to use jndi versus when to use jdbc url
 
-- decide if somethine like makeDirty needs to be implemented in c.r.p
+- decide if something like makeDirty needs to be implemented in c.r.p
 
 - ashah should get cache eviction in c.r.p commitable to PMI#evict can
   be implemented
+
+- serializable query
 
 - add StatementProfiler to engine constructed in PMF
 
 - plan for supporting multithread
   - does it require changes to c.r.p?
+
+- are ascending/descending reserved words in JDO? should the JDOQL
+  parser treat them as such?
+
+- proper handling of numeric literals in jdoql
+
+- are a == b == c and a > b > c valid in jdoql
+
+- handling non-short-circuiting boolean operators (& and |) in jdoql
