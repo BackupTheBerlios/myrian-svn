@@ -1,8 +1,5 @@
 package com.redhat.persistence.jdo;
 
-import com.redhat.persistence.Session;
-import com.redhat.persistence.jdo.PersistenceManagerImpl;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,7 +13,7 @@ import org.apache.log4j.Logger;
  * ListTest
  *
  * @since 2004-07-13
- * @version $Revision: #6 $ $Date: 2004/07/28 $
+ * @version $Revision: #7 $ $Date: 2004/07/30 $
  **/
 public class ListTest extends WithTxnCase {
     private final static Logger s_log = Logger.getLogger(ListTest.class);
@@ -26,7 +23,6 @@ public class ListTest extends WithTxnCase {
             {"asdf@example.com", "fdsa@example.com", "rhs@lhs.example.org"}));
     private final static String NO_SUCH_EMAIL = "no such email@nowhere.com";
 
-    private Session m_ssn;
     private Group m_group;
 
     public ListTest() {}
@@ -37,8 +33,6 @@ public class ListTest extends WithTxnCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        PersistenceManagerImpl pm = (PersistenceManagerImpl) m_pm;
-        m_ssn = pm.getSession();
         m_group = new Group(0);
         m_group.setEmail("java-project@redhat.com");
         m_group.setName("Java Hackers");
