@@ -52,3 +52,4 @@
  * figure out if session should flush in fetchPropertyData
  * run persistence tests on objects that throw errors if toString() or
    equals() are called from within persistence code
+ * error checking for aggressive load paths and paths added to signature
