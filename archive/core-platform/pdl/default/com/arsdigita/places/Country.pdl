@@ -16,13 +16,13 @@
 // Represents a country.
 //
 // @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
-// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/places/Country.pdl#1 $ by $Author: randyg $, $DateTime: 2002/08/02 16:40:10 $
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/places/Country.pdl#2 $ by $Author: randyg $, $DateTime: 2002/08/05 14:32:26 $
 //
 
 model com.arsdigita.places;
 
 object type Country extends Place {
-    String[1..1] iso = pl_countries.iso;
+    String[1..1] iso = pl_countries.iso CHAR(2);
 
     reference key (pl_countries.country_id);
 }

@@ -16,14 +16,14 @@
 // Model of a US state.
 //
 // @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
-// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/places/USState.pdl#1 $ by $Author: randyg $, $DateTime: 2002/08/02 16:40:10 $
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/places/USState.pdl#2 $ by $Author: randyg $, $DateTime: 2002/08/05 14:32:26 $
 //
 
 model com.arsdigita.places;
 
 object type USState extends Region {
-    String[1..1] fipsCode = pl_us_states.fips_code;
-    String[1..1] uspsAbbrev = pl_us_states.usps_abbrev;
+    String[1..1] fipsCode = pl_us_states.fips_code CHAR(2);
+    String[1..1] uspsAbbrev = pl_us_states.usps_abbrev CHAR(2);
 
     reference key (pl_us_states.state_id);
 }

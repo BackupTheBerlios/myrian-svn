@@ -15,6 +15,7 @@
 model com.arsdigita.ui.permissions;
 
 query PermissionObjects {
+    BigDecimal objectID;
     do {
         select unique 
         acs_permissions.object_id

@@ -16,14 +16,14 @@
 // Model US counties.
 //
 // @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
-// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/places/USCounty.pdl#1 $ by $Author: randyg $, $DateTime: 2002/08/02 16:40:10 $
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/places/USCounty.pdl#2 $ by $Author: randyg $, $DateTime: 2002/08/05 14:32:26 $
 //
 
 model com.arsdigita.places;
 
 object type USCounty extends Place {
-    String[1..1] fipsCode = pl_us_counties.fips_code;
-    String[1..1] stateFipsCode = pl_us_counties.state_fips_code;
+    String[1..1] fipsCode = pl_us_counties.fips_code CHAR(6);
+    String[1..1] stateFipsCode = pl_us_counties.state_fips_code CHAR(2);
 
     reference key (pl_us_counties.county_id);
 }

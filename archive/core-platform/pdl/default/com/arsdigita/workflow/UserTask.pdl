@@ -30,97 +30,26 @@ object type UserTask extends Task {
 
 
 association {
-
-    UserTask[0..n] tasks;
-    User[0..n] assignedUsers;
-//    UserTask[0..n] tasks = join cw_user_tasks.task_id 
-//                             to cw_task_user_assignees.task_id,
-//                           join cw_task_user_assignees.user_id 
-//                             to users.user_id;
-//    User[0..n]  assignedUsers = join users.user_id 
-//                                  to cw_task_user_assignees.user_id,
-//                                join cw_task_user_assignees.task_id
-//                                  to cw_user_tasks.task_id;
-
-    retrieve assignedUsers {
-        do {
-            select users.user_id             ,
-                   acs_objects.object_type   ,
-                   users.screen_name         ,
-                   parties.uri               
-            from   cw_task_user_assignees    ,
-                   acs_objects               ,
-                   users                     ,
-                   parties                   
-            where  cw_task_user_assignees.task_id   = :id
-            and    users.user_id                    = cw_task_user_assignees.user_id
-            and    acs_objects.object_id            = users.user_id
-            and    parties.party_id                 = acs_objects.object_id
-        } map {
-            assignedUsers.id            = users.user_id;
-            assignedUsers.screenName    = users.screen_name;
-            assignedUsers.uri           = parties.uri;
-            assignedUsers.objectType    = acs_objects.object_type;   
-        }
-    }
-
-
-    add assignedUsers {
-        do {
-           insert into cw_task_user_assignees  (
-                task_id                        ,
-                user_id                        )
-           values                              (
-               :id                             ,
-               :assignedUsers.id    
-           )
-        }
-    }
-
-    remove assignedUsers {
-        do {
-           delete from cw_task_user_assignees 
-           where  task_id = :id
-           and    user_id = :assignedUsers.id
-        }
-    }
-
-    clear assignedUsers {
-        do {
-           delete from cw_task_user_assignees
-           where task_id = :id
-        }
-    }
-
+    User[0..n] assignedUsers = join cw_user_tasks.task_id 
+                             to cw_task_user_assignees.task_id,
+                           join cw_task_user_assignees.user_id 
+                             to users.user_id;
+    UserTask[0..n] tasks = join users.user_id 
+                                  to cw_task_user_assignees.user_id,
+                                join cw_task_user_assignees.task_id
+                                  to cw_user_tasks.task_id;
 }
 
 // Group task association
 association {
-
-    Group[0..n] assignedGroups;
-    UserTask[0..n] tasks;
-
-    retrieve assignedGroups {
-        do {
-            select groups.group_id            ,
-                   acs_objects.object_type    ,
-                   groups.name                ,
-                   parties.uri               
-            from   cw_task_group_assignees    ,
-                   acs_objects                ,
-                   groups                     ,
-                   parties                   
-            where  cw_task_group_assignees.task_id   = :id
-            and    groups.group_id                    = cw_task_group_assignees.group_id
-            and    acs_objects.object_id              = groups.group_id
-            and    parties.party_id                   = acs_objects.object_id
-        } map {
-            assignedGroups.id                 = groups.group_id;
-            assignedGroups.name               = groups.name;
-            assignedGroups.uri                = parties.uri;
-            assignedGroups.objectType         = acs_object.object_type;   
-        }
-    }
+    UserTask[0..n] tasks = join groups.group_id
+                             to cw_task_group_assignees.group_id,
+                           join cw_task_group_assignees.task_id
+                             to cw_tasks.task_id;
+    Group[0..n] assignedGroups = join cw_tasks.task_id 
+                             to cw_task_group_assignees.task_id,
+                           join cw_task_group_assignees.group_id 
+                             to groups.group_id;
 
     add assignedGroups {
         do {
@@ -147,7 +76,6 @@ association {
            where  task_id  = :id
         }
     }
-
 }
 
 

@@ -16,13 +16,13 @@
 // Model postal codes.
 //
 // @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
-// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/places/PostalCode.pdl#1 $ by $Author: randyg $, $DateTime: 2002/08/02 16:40:10 $
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/places/PostalCode.pdl#2 $ by $Author: randyg $, $DateTime: 2002/08/05 14:32:26 $
 //
 
 model com.arsdigita.places;
 
 object type PostalCode extends Place {
-    String[1..1] postalCode = pl_postal_codes.postal_code;
+    String[1..1] postalCode = pl_postal_codes.postal_code VARCHAR(100);
 
     reference key (pl_postal_codes.postal_code_id);
 }

@@ -16,13 +16,13 @@ model com.arsdigita.preferences;
 
 object type PreferenceParameter {
 
-    BigDecimal id = preferences.preference_id;
-    BigDecimal parentID = preferences.parent_id;
-    String name = preferences.name;
-    String[0..1] description = preferences.description;
-    String preferenceType = preferences.preference_type;
-    String valueType = preferences.value_type;
-    String[0..1] valueString = preferences.value_string;
+    BigDecimal id = preferences.preference_id INTEGER;
+    BigDecimal parentID = preferences.parent_id INTEGER;
+    String name = preferences.name VARCHAR(80);
+    String[0..1] description = preferences.description VARCHAR(4000);
+    String preferenceType = preferences.preference_type VARCHAR(16);
+    String valueType = preferences.value_type VARCHAR(20);
+    String[0..1] valueString = preferences.value_string VARCHAR(4000);
 
     object key (id);
 
@@ -37,17 +37,4 @@ object type PreferenceParameter {
             )
         }
     }    
-
-    update {
-        do {
-            update preferences
-            set parent_id = :parentID,
-                name = :name,
-                description = :description,
-                preference_type = :preferenceType,
-                value_type = :valueType,
-                value_string = :valueString
-            where preference_id = :id
-        }
-    }
 }

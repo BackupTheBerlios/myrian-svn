@@ -30,6 +30,7 @@ query AllNoParentGroups {
 // without first retrieve information about group.
 query SubGroupCount {
    BigDecimal groupID;
+   BigDecimal count;
 
    do {
       select count(subgroup_id) as count 

@@ -6,7 +6,8 @@ create table pl_us_counties (
     fips_code                   char(6)
                                 constraint pl_usc_fips_code_nn
                                 not null,
-    state_fips_code             constraint pl_usc_state_fips_code_fk
+    state_fips_code             char(2) 
+                                constraint pl_usc_state_fips_code_fk
                                 references pl_us_states (fips_code)
                                 constraint pl_usc_state_fips_code_nn
                                 not null
