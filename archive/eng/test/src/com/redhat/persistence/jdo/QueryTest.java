@@ -98,7 +98,7 @@ public class QueryTest extends AbstractCase {
     }
 
     public void testExtent() {
-        Extent ext = pm().getExtent(Employee.class, true);
+        Extent ext = pm().getExtent(Employee.class, false);
         Iterator it = ext.iterator();
         Iterator it2 = ext.iterator();
 

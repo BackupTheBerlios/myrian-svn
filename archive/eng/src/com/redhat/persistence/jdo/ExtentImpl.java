@@ -38,14 +38,20 @@ class ExtentImpl extends CRPCollection implements Extent {
         m_cls = cls;
         m_subclasses = subclasses;
 
-        if (!subclasses) {
-            throw new Error("not implemented");
-        }
-
         DataSet ds = C.all(pmi.getSession(), cls).getDataSet();
         m_sig = ds.getSignature();
         m_type = ds.getSignature().getObjectType();
         m_expr = ds.getExpression();
+
+        if (!subclasses) {
+            // XXX checking if there is a subtype
+            for (Iterator it = ssn().getRoot().getObjectTypes().iterator();
+                 it.hasNext(); ) {
+                if (m_type.equals(((ObjectType) it.next()).getSupertype())) {
+                    throw new Error("not implemented");
+                }
+            }
+        }
     }
 
     public PersistenceManager getPersistenceManager() {
