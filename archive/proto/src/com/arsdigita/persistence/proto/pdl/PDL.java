@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #35 $ $Date: 2003/04/04 $
+ * @version $Revision: #36 $ $Date: 2003/04/05 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#35 $ by $Author: rhs $, $DateTime: 2003/04/04 17:02:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#36 $ by $Author: rhs $, $DateTime: 2003/04/05 09:09:04 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -617,6 +617,7 @@ public class PDL {
         ObjectMap om = m_root.getObjectMap(prop.getContainer());
         Value m = new Value(Path.get(prop.getName()), lookup(colNd));
         om.addMapping(m);
+	lookup(colNd).setNullable(prop.isNullable());
     }
 
     private ForeignKey fk(JoinNd jn, boolean forward) {
@@ -674,6 +675,7 @@ public class PDL {
             if (lookup(jn.getTo()).isUniqueKey()) {
                 ForeignKey fk = fk(jn, true);
                 m = new JoinTo(path, fk);
+		setNullable(fk, prop.isNullable());
             } else if (lookup(jn.getFrom()).isUniqueKey()) {
                 ForeignKey fk = fk(jn, false);
                 m = new JoinFrom(path, fk);
@@ -686,13 +688,32 @@ public class PDL {
             JoinNd second = (JoinNd) joins.get(start + 1);
             ForeignKey from = fk(first, false);
             ForeignKey to = fk(second, true);
+
+	    // XXX: The not null checks here seem to be solely for the
+	    // sake of the SelfReference.pdl test. We may want to
+	    // alter the test and make it be an error for fk to return
+	    // null.
+	    if (from == null || to == null) {
+		m_errors.warn(jpn, "unable to construct join through");
+		return;
+	    }
+
             m = new JoinThrough(path, from, to);
+	    setNullable(from, false);
+	    setNullable(to, false);
         } else {
             m_errors.fatal(jpn, "bad join path");
             return;
         }
 
         om.addMapping(m);
+    }
+
+    private void setNullable(Constraint c, boolean value) {
+	Column[] cols = c.getColumns();
+	for (int i = 0; i < cols.length; i++) {
+	    cols[i].setNullable(value);
+	}
     }
 
     private Column lookup(ColumnNd colNd) {
