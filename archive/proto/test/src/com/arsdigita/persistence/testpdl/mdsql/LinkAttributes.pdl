@@ -1,0 +1,49 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/proto/test/src/com/arsdigita/persistence/testpdl/mdsql/LinkAttributes.pdl#1 $ 
+// $DateTime: 2002/11/27 19:51:05 $
+
+model mdsql;
+
+object type Article {
+    BigInteger[1..1] id = t_articles.article_id INTEGER;
+    String[0..1] text   = t_articles.text CLOB;
+
+    object key (id);
+}
+
+object type Image {
+    BigInteger[1..1] id = t_images.image_id INTEGER;
+    Blob[0..1] bytes    = t_images.bytes BLOB;
+
+    object key (id);
+}
+
+association {
+    Article[0..n] articles = join t_images.image_id
+                               to t_article_image_map.image_id,
+                             join t_article_image_map.article_id
+                               to t_articles.article_id;
+    Image[0..n] images = join t_articles.article_id
+                           to t_article_image_map.article_id,
+                         join t_article_image_map.image_id
+                           to t_images.image_id;
+
+    String[0..1] caption = t_article_image_map.caption VARCHAR(4000);
+    User[0..1] user = join t_article_image_map.user_id to t_users.user_id;
+
+
+    // this must be here because of the way the association code works
+    add user {}
+}

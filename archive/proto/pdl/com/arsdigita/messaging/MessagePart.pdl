@@ -1,0 +1,41 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/proto/pdl/com/arsdigita/messaging/MessagePart.pdl#1 $ 
+// $DateTime: 2002/11/27 19:51:05 $
+
+model com.arsdigita.messaging;
+
+import com.arsdigita.kernel.*;
+
+// Note:
+//
+// MessagePart provides retrieve and update methods so that parts
+// can be edited, etc. after they have been created.  However, the
+// update methods do not modify the containing messageID.  This is
+// only accessible through the association between a MessagePart and a
+// Message.  For example, the insert event defined below makes no
+// reference to the message_part column of the datamodel.
+
+object type MessagePart {
+
+    BigDecimal id = message_parts.part_id INTEGER;
+    BigDecimal messageID = message_parts.message_id INTEGER;
+    String     type = message_parts.type VARCHAR(50);
+    String     name = message_parts.name VARCHAR(100);
+    String     description = message_parts.description VARCHAR(500);
+    String     disposition = message_parts.disposition VARCHAR(50);
+    Blob       content = message_parts.content BLOB;
+
+    object key (id);
+}

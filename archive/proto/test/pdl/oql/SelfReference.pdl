@@ -1,0 +1,40 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/proto/test/pdl/oql/SelfReference.pdl#1 $ 
+// $DateTime: 2002/11/27 19:51:05 $
+
+model oql;
+
+object type Object {
+    BigInteger[1..1] id = objects.id INTEGER;
+    String [1..1] type = objects.type VARCHAR(200);
+
+    object key (id);
+}
+
+object type SelfReference extends Object {
+    String[1..1] name = query_tests.name VARCHAR(200);
+    BigDecimal[0..1] parent_id = query_tests.parent_id INTEGER;
+    SelfReference[0..1] parent = join query_tests.parent_id to it.ic, join it.ic to query_tests.id;
+
+    reference key (query_tests.id);
+
+    aggressive load (parent.id, parent.name, parent.type);
+}
+
+// this helps the ddl generator and is not needed for anything else
+object type SelfReferenceHelper {
+    BigDecimal id = it.ic INTEGER;
+    object key (id);
+}

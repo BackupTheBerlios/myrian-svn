@@ -1,0 +1,2 @@
+create index acs_stylesheet_type_pkg_idx on acs_stylesheet_type_map(stylesheet_id);
+create index acs_stylesheet_type_sheet_idx on acs_stylesheet_type_map(package_type_id);

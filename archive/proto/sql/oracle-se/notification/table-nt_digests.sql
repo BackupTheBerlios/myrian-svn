@@ -1,0 +1,29 @@
+create table nt_digests (
+    digest_id         integer
+                      constraint nt_digest_pk
+                          primary key
+                      constraint nt_digest_fk
+                          references acs_objects(object_id),
+    party_from        integer
+                      constraint nt_digest_party_from_fk
+                          references parties(party_id),
+    subject           varchar(250)
+                      constraint nt_digest_subject_nn 
+                          not null,
+    header            varchar(4000)
+                      constraint nt_digest_header_nn
+                          not null,
+    separator         varchar(100)
+                      constraint nt_digest_separator_nn
+                          not null,
+    signature         varchar(4000)
+                      constraint nt_digest_signature_nn
+                          not null,
+    frequency         integer
+                      default 15
+                      constraint nt_digest_frequence_nn
+                          not null,
+    next_run          date
+                      constraint nt_digest_next_run_nn
+                          not null
+);

@@ -1,0 +1,38 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/proto/pdl/com/arsdigita/workflow/query-getOverDueProcesses.ora.pdl#1 $ 
+// $DateTime: 2002/11/27 19:51:05 $
+
+model com.arsdigita.workflow.simple;
+
+query getOverDueProcesses {
+    BigDecimal processID;
+    do {
+        select cw_processes.process_id 
+        from cw_processes 
+        where cw_processes.process_state <> 'deleted' 
+        and exists (
+           select  1
+           from   cw_tasks ,
+                  cw_user_tasks
+           where  cw_tasks.task_id = cw_user_tasks.task_id
+           and    cw_tasks.task_state = 'enabled'
+           and    nvl(cw_user_tasks.due_date, sysdate+1) < sysdate
+           and    cw_processes.process_id = cw_tasks.parent_task_id 
+	   and    cw_tasks.is_active = '1'
+       )
+    } map {
+       processID = cw_processes.process_id;
+    }
+}

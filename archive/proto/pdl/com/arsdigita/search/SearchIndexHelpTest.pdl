@@ -1,0 +1,405 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/proto/pdl/com/arsdigita/search/SearchIndexHelpTest.pdl#1 $ 
+// $DateTime: 2002/11/27 19:51:05 $
+
+model com.arsdigita.search;
+
+import com.arsdigita.kernel.*;
+
+// Define objects to test SearchIndexHelp class.
+// The following objects are defined:
+//  SearchTestBook      -- a book.
+//  SearchTestChapter   -- a chapter, component of book.
+//  SearchTestAuthor    -- an author, aggregate of book.
+//  SearchTestBookH     -- book, pdl same as SearchTestBook,
+//                         but object (java class) uses 
+//                         SearchIndexHelpCustomize.
+//  SearchTestChapterH  -- chapter, pdl same as SearchTestChapter
+//                         but object uses SearchIndexHelpCustomize
+
+
+//*******************************************
+// SearchTestBook
+//*******************************************
+
+object type SearchTestBook extends ACSObject {
+    String title = search_test_book.title VARCHAR(100);
+
+    component SearchTestChapter[0..n] chapters;
+
+    reference key (search_test_book.book_id);
+
+
+    retrieve chapters {
+        do {
+            select c.chapter_num, c.content, c.chapter_id,
+	    a.object_type
+	    from search_test_book_chapter c,
+	         search_test_book_chap_map m,
+	         acs_objects a
+            where m.book_id=:id
+            and   m.chapter_id = c.chapter_id
+            and   a.object_id = c.chapter_id
+	} map {
+	    chapters.id = c.chapter_id;  // replace c with search_test_book_chapter.chapter_id
+	    chapters.chapterNum = c.chapter_num;
+            chapters.content = c.content;
+	    chapters.objectType = a.object_type;
+	}
+    }
+
+    add chapters {
+	do {
+	    insert into search_test_book_chap_map
+	    (book_id, chapter_id)
+	    values
+	    (:id, :chapters.id)
+	}
+    }
+
+    remove chapters {
+	do {
+	    delete from search_test_book_chap_map
+	    where book_id = :id
+            and   chapter_id = :chapters.id
+        }
+    }
+
+    clear chapters {
+	do {
+	    delete from search_test_book_chap_map
+	    were book_id = :id
+        }
+    }
+
+}
+
+
+//*******************************************
+// SearchTestChapter
+//*******************************************
+
+object type SearchTestChapter extends ACSObject {
+    Integer    chapterNum = search_test_book_chapter.chapter_num INTEGER;
+    String     content = search_test_book_chapter.content CLOB;
+
+    component SearchTestBook[1..1] book;
+    SearchTestAuthor[1..n] authors;
+
+    reference key (search_test_book_chapter.chapter_id);
+
+    retrieve book {
+        do {
+            select b.title, o.object_type
+	    from search_test_book b,
+	         search_test_book_chap_map m,
+	         acs_objects o
+            where m.chapter_id=:id
+            and   m.book_id = b.book_id
+            and   b.book_id = o.object_id
+	} map {
+            book.title = b.title;
+            book.objectType = o.object_type;
+	}
+    }
+	
+    add book {
+	do {
+	    insert into search_test_book_chap_map
+	    (book_id, chapter_id)
+	    values
+	    (:book.id, :id)
+	}
+    }
+
+    remove book {
+	do {
+	    delete from search_test_book_chap_map
+	    where book_id = :book.id
+            and   chapter_id = :id
+        }
+    }
+
+    clear book {
+	do {
+	    delete from search_test_book_chap_map
+	    were chapter_id = :id
+        }
+    }
+
+	
+    retrieve authors {
+        do {
+            select a.author_id, a.name,
+	    acs.object_type
+	    from search_test_author a,
+	         search_test_chap_auth_map m,
+	         acs_objects acs
+            where m.chapter_id=:id
+            and   m.author_id = a.author_id
+            and   acs.object_id = :id
+	} map {
+	    authors.id = a.author_id;  // replace a with table name if error
+	    authors.name = a.name;
+	    authors.objectType = acs.object_type;
+	}
+    }
+
+    add authors {
+	do {
+	    insert into search_test_chap_auth_map
+	    (chapter_id, author_id)
+	    values
+	    (:id, :authors.id)
+	}
+    }
+
+    remove authors {
+	do {
+	    delete from search_test_chap_auth_map
+	    where chapter_id = :id
+            and   author_id = :authors.id
+        }
+    }
+
+    clear authors {
+	do {
+	    delete from search_test_chap_auth_map
+	    were chapter_id = :id
+        }
+    }
+}
+
+
+//*******************************************
+// SearchTestAuthor
+//*******************************************
+
+object type SearchTestAuthor extends ACSObject {
+    String     name = search_test_author.name VARCHAR(100);
+
+    SearchTestChapter[0..n] chapters;
+
+    reference key (search_test_author.author_id);
+
+    retrieve chapters {
+        do {
+            select c.chapter_num, c.content, c.chapter_id,
+	    a.object_type
+	    from search_test_book_chapter c,
+	         search_test_chap_auth_map m,
+	         acs_objects a
+            where m.author_id=:id
+            and   m.chapter_id = c.chapter_id
+            and   a.object_id = c.chapter_id
+	} map {
+	    chapters.id = c.chapter_id;  // replace c with search_test_book_chapter.chapter_id
+	    chapters.chapterNum = c.chapter_num;
+            chapters.content = c.content;
+	    chapters.objectType = a.object_type;
+	}
+    }
+
+    add chapters {
+	do {
+	    insert into search_test_chap_auth_map
+	    (author_id, chapter_id)
+	    values
+	    (:id, :chapters.id)
+	}
+    }
+
+    remove chapters {
+	do {
+	    delete from search_test_book_chap_map
+	    where author_id = :id
+            and   chapter_id = :chapters.id
+        }
+    }
+
+    clear chapters {
+	do {
+	    delete from search_test_book_chap_map
+	    were author_id = :id
+        }
+    }
+}
+
+//*******************************************
+// SearchTestBookH
+//*******************************************
+
+object type SearchTestBookH extends ACSObject {
+    String     title = search_test_book.title VARCHAR(100);
+
+    component SearchTestChapterH[0..n] chapters;
+
+	reference key (search_test_book.book_id);
+
+    retrieve chapters {
+        do {
+            select c.chapter_num, c.content, c.chapter_id,
+	    a.object_type
+	    from search_test_book_chapter c,
+	         search_test_book_chap_map m,
+	         acs_objects a
+            where m.book_id=:id
+            and   m.chapter_id = c.chapter_id
+            and   a.object_id = c.chapter_id
+	} map {
+	    chapters.id = c.chapter_id;  // replace c with search_test_book_chapter.chapter_id
+	    chapters.chapterNum = c.chapter_num;
+            chapters.content = c.content;
+	    chapters.objectType = a.object_type;
+	}
+    }
+
+    add chapters {
+	do {
+	    insert into search_test_book_chap_map
+	    (book_id, chapter_id)
+	    values
+	    (:id, :chapters.id)
+	}
+    }
+
+    remove chapters {
+	do {
+	    delete from search_test_book_chap_map
+	    where book_id = :id
+            and   chapter_id = :chapters.id
+        }
+    }
+
+    clear chapters {
+	do {
+	    delete from search_test_book_chap_map
+	    were book_id = :id
+        }
+    }
+
+}
+
+
+//*******************************************
+// SearchTestChapterH
+//*******************************************
+
+object type SearchTestChapterH extends ACSObject {
+    Integer    chapterNum = search_test_book_chapter.chapter_num INTEGER;
+    String     content = search_test_book_chapter.content CLOB;
+
+    component SearchTestBookH[1..1] book;
+
+    reference key (search_test_book_chapter.chapter_id);
+
+
+    retrieve {
+        super;
+        do {
+            select c.chapter_id, c.chapter_num, c.content
+	           from search_test_book_chapter c
+            where chapter_id=:id
+	} map {
+            id = c.chapter_id;
+	    chapterNum = c.chapter_num;
+            content = c.content;
+	}
+    }
+
+    retrieve all {
+        do {
+            select c.chapter_num, c.content, o.object_type
+	      from search_test_book_chapter c, acs_objects o
+	     where c.chapter_id = o.object_id
+	} map {
+	    chapterNum = c.chapter_num;
+            content = c.content;
+            objectType = o.object_type;
+	}
+    }
+
+    insert {
+    super;
+	do {
+	    insert into search_test_book_chapter
+	    (chapter_id, chapter_num, content)
+	    values
+	    (:id, :chapterNum, :content)
+	} 
+    }
+
+    update {
+        do {
+            update search_test_book_chapter
+            set chapter_num = :chapterNum,
+	        content = :content
+            where book_id = :id
+	}
+    super;
+    }
+
+    delete {
+        do {
+            delete from search_test_book_chapter
+            where chapter_id = :id
+	}
+    super;
+    }
+
+    retrieve book {
+        do {
+            select b.title, o.object_type
+	    from search_test_book b,
+	         search_test_book_chap_map m,
+	         acs_objects o
+            where m.chapter_id=:id
+            and   m.book_id = b.book_id
+            and   b.book_id = o.object_id
+	} map {
+            book.title = b.title;
+            book.objectType = o.object_type;
+	}
+    }
+	
+    add book {
+	do {
+	    insert into search_test_book_chap_map
+	    (book_id, chapter_id)
+	    values
+	    (:book.id, :id)
+	}
+    }
+
+    remove book {
+	do {
+	    delete from search_test_book_chap_map
+	    where book_id = :book.id
+            and   chapter_id = :id
+        }
+    }
+
+    clear book {
+	do {
+	    delete from search_test_book_chap_map
+	    were chapter_id = :id
+        }
+    }
+}
+
+
+
+
+

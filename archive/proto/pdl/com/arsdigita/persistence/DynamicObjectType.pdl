@@ -1,0 +1,90 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/proto/pdl/com/arsdigita/persistence/DynamicObjectType.pdl#1 $ 
+// $DateTime: 2002/11/27 19:51:05 $
+
+model com.arsdigita.persistence;
+
+import com.arsdigita.kernel.*;
+
+object type DynamicObjectType extends ACSObject {
+    String[1..1] pdlFile = persistence_dynamic_ot.pdl_file CLOB;
+    String[1..1] dynamicType = persistence_dynamic_ot.dynamic_object_type VARCHAR(700);
+
+    reference key (persistence_dynamic_ot.pdl_id);
+}
+
+
+// This should eventually be replaced so that the system
+// uses OracleDatabaseMetadata instead of this.  But, this
+// is here as a short term hack.
+query getOracleTableNames {
+    String tableName;
+    do {
+        select table_name from user_tables
+    } map {
+        tableName = user_tables.table_name;
+    }
+}
+
+query getPostgresTableNames {
+    String tableName;
+    do {
+        select tablename from pg_tables
+    } map {
+        tableName = pg_tables.tablename;
+    }
+}
+
+
+// This should eventually be replaced so that the system
+// uses OracleDatabaseMetadata instead of this.  But, this
+// is here as a short term hack.
+query getOracleColumnNames {
+    String tableName;
+    String columnName;
+    do {
+        select table_name, column_name from cols
+    } map {
+        tableName = cols.table_name;
+        columnName = cols.column_name;
+    }
+}
+
+query getPostgresColumnNames {
+    String tableName;
+    String columnName;
+    do {
+        select attname, relname 
+        from pg_attribute, pg_class 
+        where pg_attribute.attnum > 0 
+        and pg_attribute.attrelid = pg_class.oid
+    } map {
+        columnName = pg_attribute.attname;
+        tableName = pg_class.relname;
+    }
+}
+
+// pg_relcheck holds most constraints but pg_class holds the rest
+// in pg 7.3, there is a pg_constraint table that can be used.
+query getPostgresConstraintNames {
+    String name;
+    do {
+        select rcname as name from pg_relcheck 
+        union 
+        select relname as name from pg_class
+    } map {
+        name = name;
+    }
+}

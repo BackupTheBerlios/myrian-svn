@@ -1,0 +1,1 @@
+@@ ../../default/kernel/teardown.sql

@@ -1,0 +1,68 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/proto/pdl/com/arsdigita/kernel/Resource.pdl#1 $ 
+// $DateTime: 2002/11/27 19:51:05 $
+
+model com.arsdigita.kernel;
+
+import com.arsdigita.portal.Portlet;
+
+// @author Jim Parsons (jparsons@redhat.com)
+
+
+object type ResourceType {
+    BigDecimal id = application_types.application_type_id INTEGER;
+    unique String[1..1] objectType =
+        application_types.object_type VARCHAR(100);
+    String title = application_types.title VARCHAR(200);
+    String description = application_types.description VARCHAR(4000);
+    Boolean isWorkspaceApplication =
+        application_types.workspace_application_p BIT;
+    Boolean hasFullPageView = application_types.has_full_page_view_p BIT;
+    Boolean hasEmbeddedView = application_types.has_embedded_view_p BIT;
+    Boolean isSingleton = application_types.singleton_p BIT;
+
+    object key (id);
+}
+
+
+object type Resource extends ACSObject {
+    String title = applications.title VARCHAR(200);
+    String description = applications.description VARCHAR(4000);
+    Date[1..1] timestamp = applications.timestamp TIMESTAMP;
+
+    ResourceType[1..1] resourceType =
+        join applications.application_type_id 
+            to application_types.application_type_id;
+
+    Resource[0..n] childResource =
+        join applications.application_id to applications.parent_application_id;
+
+    Resource[0..1] parentResource =
+        join applications.parent_application_id to applications.application_id;
+
+    reference key (applications.application_id);
+
+    aggressive load
+        (resourceType.id,
+         resourceType.isWorkspaceApplication,
+         resourceType.hasFullPageView,
+         resourceType.hasEmbeddedView,
+         resourceType.isSingleton,
+         resourceType.title,
+         parentResource.id,
+         parentResource.objectType,
+         parentResource.defaultDomainClass,
+         parentResource.title);
+}

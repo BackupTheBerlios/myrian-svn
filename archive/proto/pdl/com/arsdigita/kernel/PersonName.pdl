@@ -1,0 +1,26 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/proto/pdl/com/arsdigita/kernel/PersonName.pdl#1 $ 
+// $DateTime: 2002/11/27 19:51:05 $
+
+model com.arsdigita.kernel;
+
+object type PersonName {
+    BigDecimal id = person_names.name_id INTEGER;
+    String[1..1] givenName = person_names.given_name VARCHAR(60);
+    String[0..1] middleNames = person_names.middle_names VARCHAR(80);
+    String[1..1] familyName = person_names.family_name VARCHAR(60);
+
+    object key (id);
+}

@@ -1,0 +1,81 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/proto/pdl/com/arsdigita/search/IndexingTime.pdl#1 $ 
+// $DateTime: 2002/11/27 19:51:05 $
+
+model com.arsdigita.search;
+
+import com.arsdigita.kernel.*;
+
+// IndexingTime object is used to retrieve times related to
+// the most recent indexing operation (which is run as an
+// Oracle Job).  See file search-indexing-procs-create.sql
+// for the procedures that generate the information read
+// by this file.
+
+object type IndexingTime {
+    BigDecimal id;
+    Long       jobNum;
+    String     jobStatus;
+    Date       timeQueued_date;
+    Date       timeStarted_date;
+    Date       timeFinished_date;
+    Date       timeFailed_date;
+    Date       oracleSysdate;        // Current Oracle sysdate
+
+  object key (id);
+
+  retrieve {
+      do {
+	 select
+            search_indexing.job_number() as job_num,
+            'dummy' as job_status
+         from dual
+      } map {
+         jobNum = job_num;
+         jobStatus = job_status;
+      }
+
+      do {
+	 select
+            time_queued,
+            time_started,
+    	    time_finished,
+    	    time_failed,
+	    sysdate as time_sysdate
+	 from
+            search_indexing_jobs
+         where
+            job_num = :jobNum
+      } map {
+	timeQueued_date = time_queued;
+	timeStarted_date = time_started;
+	timeFinished_date = time_finished;
+	timeFailed_date = time_failed;
+	oracleSysdate = time_sysdate;
+      }
+  }
+	 
+  insert {
+  }
+
+  update {
+  }
+
+  delete {
+   }
+}
+
+
+
