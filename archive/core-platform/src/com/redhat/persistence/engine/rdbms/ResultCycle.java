@@ -24,12 +24,12 @@ import org.apache.log4j.Logger;
  * ResultCycle
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/10/28 $
+ * @version $Revision: #6 $ $Date: 2003/11/20 $
  **/
 
 class ResultCycle {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/ResultCycle.java#5 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/ResultCycle.java#6 $ by $Author: ashah $, $DateTime: 2003/11/20 18:18:24 $";
 
     private static final Logger LOG = Logger.getLogger(ResultCycle.class);
 
@@ -52,17 +52,16 @@ class ResultCycle {
 
     protected void finalize() {
         if (m_rs != null) {
-            LOG.warn("ResultSet  was not closed.  " + 
-                     "Closing ResultSet in finalize() method. " + 
+            LOG.warn("ResultSet  was not closed.  " +
                      "Turn on debug logging for " + this.getClass() +
                      " to see the stack trace for this ResultSet."
                      );
-            
+
             if (LOG.isDebugEnabled()) {
                 StackTraces.log("The ResultSet was created at: ", m_rs, LOG, "debug");
             }
-            
-            close();
+
+            m_rs = null;
         }
     }
 
