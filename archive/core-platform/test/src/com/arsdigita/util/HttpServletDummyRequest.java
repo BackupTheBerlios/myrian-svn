@@ -32,7 +32,7 @@ import org.apache.cactus.ServletURL;
  */
 
 public class HttpServletDummyRequest implements HttpServletRequest {
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyRequest.java#9 $ by $Author: jorris $, $DateTime: 2002/10/21 17:18:48 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyRequest.java#10 $ by $Author: justin $, $DateTime: 2002/12/12 13:09:48 $";
 
     private HashMap parameters = new HashMap();
     private HashMap attributes = new HashMap();
@@ -267,11 +267,11 @@ public class HttpServletDummyRequest implements HttpServletRequest {
 
     public java.lang.String getProtocol() { return null; }
 
-    public java.lang.String getScheme() { return null; }
+    public java.lang.String getScheme() { return "http"; }
 
-    public java.lang.String getServerName() { return null; }
+    public java.lang.String getServerName() { return "localhost"; }
 
-    public int getServerPort() { return 0; }
+    public int getServerPort() { return 8080; }
 
     public java.io.BufferedReader getReader()
             throws java.io.IOException { return null; }
