@@ -1,0 +1,22 @@
+model com.arsdigita.workflow.simple;
+
+query getOverDueProcesses {
+    BigDecimal processID;
+    do {
+        select cw_processes.process_id 
+        from cw_processes 
+        where cw_processes.process_state <> 'deleted' 
+        and exists (
+           select  1
+           from   cw_tasks ,
+                  cw_user_tasks
+           where  cw_tasks.task_id = cw_user_tasks.task_id
+           and    cw_tasks.task_state = 'enabled'
+           and    nvl(cw_user_tasks.due_date, sysdate+1) < sysdate
+           and    cw_processes.process_id = cw_tasks.parent_task_id 
+	   and    cw_tasks.is_active = '1'
+       )
+    } map {
+       processID = cw_processes.process_id;
+    }
+}
