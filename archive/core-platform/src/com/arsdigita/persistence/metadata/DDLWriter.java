@@ -18,6 +18,7 @@ package com.arsdigita.persistence.metadata;
 import com.arsdigita.util.Assert;
 
 import com.arsdigita.db.DbHelper;
+import com.arsdigita.persistence.Utilities;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -36,12 +37,12 @@ import java.util.Set;
  * DDLWriter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2002/08/15 $
+ * @version $Revision: #10 $ $Date: 2002/08/29 $
  **/
 
 public class DDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#9 $ by $Author: jorris $, $DateTime: 2002/08/15 14:01:26 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#10 $ by $Author: randyg $, $DateTime: 2002/08/29 17:18:20 $";
 
     private File m_base;
     private boolean m_overwrite;
@@ -149,6 +150,7 @@ public class DDLWriter {
 
         if (deferred.size() > 0) {
             List alters = new ArrayList();
+            List dropConstraints = new ArrayList();
 
             for (Iterator it = deferred.iterator(); it.hasNext(); ) {
                 Table table = (Table) it.next();
@@ -160,7 +162,22 @@ public class DDLWriter {
                     Constraint con = (Constraint) iter.next();
                     if (con.isDeferred()) {
                         alters.add("alter table " + table.getName() +
-                                   " add\n" + con.getSQL() + ";\n");
+                                   " add " + Utilities.LINE_BREAK +
+                                   con.getSQL() + ";" +
+                                   Utilities.LINE_BREAK);
+                        if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+                            dropConstraints.add("alter table " + table.getName() +
+                                                Utilities.LINE_BREAK + 
+                                                " drop constraint " + 
+                                                con.getName() + " RESTRICT;" + 
+                                                Utilities.LINE_BREAK);
+                        } else {
+                            dropConstraints.add("alter table " + table.getName() +
+                                                Utilities.LINE_BREAK + 
+                                                " drop constraint " + 
+                                                con.getName() + ";" + 
+                                                Utilities.LINE_BREAK);
+                        }
                     }
                 }
             }
@@ -173,8 +190,18 @@ public class DDLWriter {
                 writer.write((String) it.next());
             }
             writer.close();
+
+            FileWriter dropFileWriter = 
+                new FileWriter(new File(m_base, "drop-constraints.sql"));
+            
+            for (Iterator it = dropConstraints.iterator(); it.hasNext(); ) {
+                dropFileWriter.write((String) it.next());
+            }
+            dropFileWriter.close();
         }
 
+        FileWriter dropFileWriter = 
+            new FileWriter(new File(m_base, "drop-tables.sql"));
         FileWriter writer = new FileWriter(new File(m_base, "create.sql"));
         for (Iterator it = createOrder.iterator(); it.hasNext(); ) {
             Table table = (Table) it.next();
@@ -184,17 +211,24 @@ public class DDLWriter {
                 String dir = DbHelper.getDatabaseDirectory();
                 if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
                     writer.write("\\i " + getDDLPath() + "table-" +
-                                 table.getName() + "-auto.sql\n");
+                                 table.getName() + "-auto.sql" + 
+                                 Utilities.LINE_BREAK);
                 } else {
                     writer.write("@@ " + getDDLPath() + "table-" +
-                                 table.getName() + "-auto.sql\n");
+                                 table.getName() + "-auto.sql" +
+                                 Utilities.LINE_BREAK);
                 }
+                // The order does not matter since we drop the constraints
+                // first
+                dropFileWriter.write("drop table " + table.getName() + ";" +
+                                     Utilities.LINE_BREAK);
             }
         }
         if (deferred.size() > 0) {
             //writer.write("@@deferred.sql\n");
         }
         writer.close();
+        dropFileWriter.close();
 
         Assert.assertEquals(tables.size(), created.size());
     }
