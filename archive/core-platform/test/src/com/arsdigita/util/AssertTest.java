@@ -19,20 +19,20 @@ import junit.framework.TestCase;
 
 public class AssertTest extends TestCase {
     public static final String versionId =
-        "$Id: //core-platform/dev/test/src/com/arsdigita/util/AssertTest.java#6 $" +
-        "$Author: dennis $" +
-        "$DateTime: 2003/08/15 13:46:34 $";
+        "$Id: //core-platform/dev/test/src/com/arsdigita/util/AssertTest.java#7 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/10/24 18:42:25 $";
 
     public AssertTest(String name) {
         super(name);
     }
 
     public void testAssert() {
-        Util.getConfig().setAssertEnabled(false);
+        Assert.setEnabled(false);
 
         junit.framework.Assert.assertTrue(!Assert.isEnabled());
 
-        Util.getConfig().setAssertEnabled(true);
+        Assert.setEnabled(true);
 
         junit.framework.Assert.assertTrue(Assert.isEnabled());
 

@@ -30,20 +30,20 @@ import org.apache.log4j.Logger;
  * @author David Lutterkort &lt;dlutter@redhat.com&gt;
  * @author Uday Mathur
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#19 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#20 $
  */
 public class Assert {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#19 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#20 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/23 15:28:18 $";
+        "$DateTime: 2003/10/24 18:42:25 $";
 
     private static final Logger s_log = Logger.getLogger
         (Assert.class);
 
     private static final String DEFAULT_MESSAGE = "Assertion failure";
 
-    private static final boolean s_enabled;
+    private static boolean s_enabled;
 
     static {
         final String enabled = System.getProperty
@@ -65,6 +65,10 @@ public class Assert {
      */
     public static final boolean isEnabled() {
         return s_enabled;
+    }
+
+    static final void setEnabled(final boolean enabled) {
+        s_enabled = enabled;
     }
 
     /**

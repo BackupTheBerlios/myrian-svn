@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * CoreInitializer
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/10/23 $
+ * @version $Revision: #2 $ $Date: 2003/10/24 $
  **/
 
 public class CoreInitializer extends CompoundInitializer {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/tools/junit/extensions/CoreInitializer.java#1 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/tools/junit/extensions/CoreInitializer.java#2 $ by $Author: justin $, $DateTime: 2003/10/24 18:42:25 $";
 
     private static final Logger s_log = Logger.getLogger
         (CoreInitializer.class);
@@ -46,7 +46,8 @@ public class CoreInitializer extends CompoundInitializer {
             m_converter = new StringArrayConverter();
         }
 
-        protected Object unmarshal(final String literal, final List errors) {
+        protected Object unmarshal(final String literal,
+                                   final ErrorList errors) {
             final String[] literals = StringUtils.split(literal, ',');
             final String[] strings = new String[literals.length];
 
@@ -62,12 +63,13 @@ public class CoreInitializer extends CompoundInitializer {
             return strings;
         }
 
-        protected void validate(final Object value, final List errors) {
+        protected void doValidate(final Object value,
+                                  final ErrorList errors) {
             if (value != null) {
                 final String[] strings = (String[]) value;
 
                 for (int i = 0; i < strings.length; i++) {
-                    super.validate(strings[i], errors);
+                    super.doValidate(strings[i], errors);
 
                     if (!errors.isEmpty()) {
                         break;
