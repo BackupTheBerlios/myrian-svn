@@ -66,12 +66,12 @@ import org.apache.log4j.Category;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/05/30 $
+ * @version $Revision: #4 $ $Date: 2002/06/06 $
  */
 
 public class DataStore {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#3 $ by $Author: rhs $, $DateTime: 2002/05/30 15:15:09 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#4 $ by $Author: rhs $, $DateTime: 2002/06/06 15:58:20 $";
 
     private static final Category log =
         Category.getInstance(DataStore.class.getName());
@@ -156,16 +156,21 @@ public class DataStore {
             try {
                 String colName = mapping.getColumn().getColumnName();
                 Object obj = type.fetch(rs, colName);
-                log.info(
-                    DataContainer.formatPath(path) + " = " +
-                    obj + " (" + colName + ")"
-                    );
+                logAssignment(path, obj, colName);
                 target.initPath(path, obj);
             } catch (SQLException e) {
                 throw PersistenceException.newInstance
                     ("Error while trying to fetch property " + prop +
                      " of type " + type, e);
             }
+        }
+    }
+
+    private static final void logAssignment(String[] path, Object obj,
+                                            String colName) {
+        if (log.isInfoEnabled()) {
+            log.info(DataContainer.formatPath(path) + " = " +
+                     obj + " (" + colName + ")");
         }
     }
 
