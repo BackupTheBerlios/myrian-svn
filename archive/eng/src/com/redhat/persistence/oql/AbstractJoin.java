@@ -21,12 +21,12 @@ import java.util.*;
  * AbstractJoin
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/07/22 $
  **/
 
 public abstract class AbstractJoin extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/AbstractJoin.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/AbstractJoin.java#2 $ by $Author: richardl $, $DateTime: 2004/07/22 15:13:20 $";
 
     private Expression m_left;
     private Expression m_right;
@@ -88,7 +88,7 @@ public abstract class AbstractJoin extends Expression {
         Model anon = Model.getInstance("anonymous.join");
         ObjectType result = new ObjectType
             (anon, left.getQualifiedName() + "$" + right.getQualifiedName(),
-             null) {
+             (ObjectType) null) {
             public String toString() {
                 return left + " + " + right;
             }
