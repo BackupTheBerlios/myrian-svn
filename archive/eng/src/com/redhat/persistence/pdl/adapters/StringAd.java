@@ -15,6 +15,7 @@
 package com.redhat.persistence.pdl.adapters;
 
 import com.arsdigita.db.DbHelper;
+import com.arsdigita.db.OraLob;
 import java.io.IOException;
 import java.io.Writer;
 import java.sql.Clob;
@@ -29,12 +30,12 @@ import java.sql.Types;
  * StringAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/07/09 $
  **/
 
 public class StringAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/adapters/StringAd.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/adapters/StringAd.java#2 $ by $Author: vadim $, $DateTime: 2004/07/09 13:33:10 $";
 
     public StringAd() {
 	super("global.String", Types.VARCHAR);
@@ -71,9 +72,7 @@ public class StringAd extends SimpleAdapter {
             return;
         }
 
-        oracle.sql.CLOB clob =
-            (oracle.sql.CLOB) rs.getClob(column);
-        Writer out = clob.getCharacterOutputStream();
+        Writer out = OraLob.getCharacterOutputStream(rs.getClob(column));
         try {
             out.write(((String) value).toCharArray());
             out.flush();

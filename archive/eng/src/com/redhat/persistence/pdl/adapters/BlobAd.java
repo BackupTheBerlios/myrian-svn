@@ -15,6 +15,7 @@
 package com.redhat.persistence.pdl.adapters;
 
 import com.arsdigita.db.DbHelper;
+import com.arsdigita.db.OraLob;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,12 +30,12 @@ import java.sql.Types;
  * BlobAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/07/09 $
  **/
 
 public class BlobAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/adapters/BlobAd.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/adapters/BlobAd.java#2 $ by $Author: vadim $, $DateTime: 2004/07/09 13:33:10 $";
 
     BlobAd(String type) {
         super(type, Types.BLOB);
@@ -75,9 +76,7 @@ public class BlobAd extends SimpleAdapter {
             return;
         }
 
-        oracle.sql.BLOB blob =
-            (oracle.sql.BLOB) rs.getBlob(column);
-        OutputStream out = blob.getBinaryOutputStream();
+        OutputStream out = OraLob.getBinaryOutputStream(rs.getBlob(column));
         try {
             out.write((byte[]) value);
             out.flush();

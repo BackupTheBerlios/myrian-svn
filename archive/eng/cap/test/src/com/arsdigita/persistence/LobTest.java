@@ -16,6 +16,7 @@ package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.*;
 import com.arsdigita.db.DbHelper;
+import com.arsdigita.db.OraLob;
 
 import java.io.StringReader;
 import java.io.Writer;
@@ -32,12 +33,12 @@ import org.apache.log4j.Logger;
  * LobTest - for testing Blob and Clob datatype.
  *
  * @author Jeff Teeters 
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/07/09 $
  */
 
 public class LobTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/LobTest.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/LobTest.java#2 $ by $Author: vadim $, $DateTime: 2004/07/09 13:33:10 $";
 
     private Logger s_cat =
         Logger.getLogger(LobTest.class);
@@ -382,8 +383,7 @@ public class LobTest extends PersistenceTestCase {
             ps.setBigDecimal(1, new BigDecimal(BigInteger.valueOf(id)));
             ResultSet rs = ps.executeQuery();
             rs.next();
-            oracle.sql.CLOB Clob = (oracle.sql.CLOB)rs.getClob(1);
-            Writer char_stream = Clob.getCharacterOutputStream ();
+            Writer char_stream = OraLob.getCharacterOutputStream(rs.getClob(1));
             char_stream.write(testString);
             char_stream.flush();
             char_stream.close();
