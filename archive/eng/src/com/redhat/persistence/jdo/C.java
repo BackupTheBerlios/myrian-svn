@@ -121,9 +121,12 @@ class C {
     }
 
     public static Cursor cursor(Session ssn, Class klass, Expression expr) {
-        Root root = ssn.getRoot();
-        ObjectType type = root.getObjectType(klass.getName());
+        ObjectType type = type(ssn, klass);
         return cursor(ssn, type, expr);
+    }
+
+    public static ObjectType type(Session ssn, Class cls) {
+        return ssn.getRoot().getObjectType(cls.getName());
     }
 
     public static Cursor all(Session ssn, Class klass) {

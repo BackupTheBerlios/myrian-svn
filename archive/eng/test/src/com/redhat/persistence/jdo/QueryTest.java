@@ -97,6 +97,41 @@ public class QueryTest extends AbstractCase {
         super(name);
     }
 
+    public void testExtent() {
+        Extent ext = pm().getExtent(Employee.class, true);
+        Iterator it = ext.iterator();
+        Iterator it2 = ext.iterator();
+
+        assertTrue(it.hasNext());
+        assertTrue(it2.hasNext());
+
+        it.next();
+        it2.next();
+
+        ext.close(it);
+
+        assertFalse(it.hasNext());
+        assertTrue(it2.hasNext());
+
+        try {
+            it.next();
+        } catch (NoSuchElementException nsee) {
+            // continue
+        }
+
+        it2.next();
+        assertTrue(it2.hasNext());
+
+        it2.next();
+        assertFalse(it2.hasNext());
+
+        try {
+            it2.next();
+        } catch (NoSuchElementException nsee) {
+            // continue
+        }
+    }
+
     public void testFilter() {
         Collection c = (Collection)
             pm().newQuery(Employee.class, "this.name == \"0\"").execute();

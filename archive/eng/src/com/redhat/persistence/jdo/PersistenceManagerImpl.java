@@ -236,7 +236,7 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
      */
     public Extent getExtent(Class persistenceCapableClass,
                             boolean subclasses) {
-        throw new Error("not implemented");
+        return new ExtentImpl(this, persistenceCapableClass, subclasses);
     }
 
     /**
