@@ -26,12 +26,12 @@ import java.util.*;
  * the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/09 $
+ * @version $Revision: #5 $ $Date: 2002/08/12 $
  */
 
 public class Column extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Column.java#4 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Column.java#5 $ by $Author: randyg $, $DateTime: 2002/08/12 07:53:32 $";
 
     /**
      * The table this Column belongs to.
@@ -339,6 +339,7 @@ public class Column extends Element {
         DEFAULT.put(new Integer(Types.BINARY), "BINARY");
         DEFAULT.put(new Integer(Types.BIT), "BIT");
         ORACLE.put(new Integer(Types.BIT), "CHAR(1)");
+        POSTGRES.put(new Integer(Types.BIT), "BOOLEAN");
         DEFAULT.put(new Integer(Types.BLOB), "BLOB");
         POSTGRES.put(new Integer(Types.BLOB), "BYTEA");
         DEFAULT.put(new Integer(Types.CHAR), "CHAR");
