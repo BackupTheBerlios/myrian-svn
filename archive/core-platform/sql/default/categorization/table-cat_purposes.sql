@@ -11,13 +11,13 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/categorization/table-cat_purposes.sql#2 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/categorization/table-cat_purposes.sql#3 $
+-- $DateTime: 2003/05/21 12:25:09 $
 
 create table cat_purposes (
     purpose_id         integer
                        constraint cat_purposes_purpose_id_fk
-                       references acs_objects on delete cascade
+                       references acs_objects
                        constraint cat_purposes_pk
                        primary key,
     key                varchar(40) not null

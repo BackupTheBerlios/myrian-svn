@@ -11,13 +11,13 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/formbuilder/table-forms_lstnr_xml_email.sql#2 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/formbuilder/table-forms_lstnr_xml_email.sql#3 $
+-- $DateTime: 2003/05/21 12:25:09 $
 
 create table forms_lstnr_xml_email (
     listener_id integer
         constraint forms_lstnr_xml_email_fk references
-        bebop_process_listeners on delete cascade
+        bebop_process_listeners
         constraint forms_lstnr_xml_email_pk primary key,
     recipient varchar(120),
     subject varchar(120)

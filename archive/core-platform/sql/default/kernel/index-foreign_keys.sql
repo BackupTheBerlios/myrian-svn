@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/kernel/index-foreign_keys.sql#4 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/kernel/index-foreign_keys.sql#5 $
+-- $DateTime: 2003/05/21 12:25:09 $
 
 create index ACS_PERMISSIONS_PRIVILEGE_idx on ACS_PERMISSIONS(PRIVILEGE);
 create index APM_PTYP_LSTNR_MP_LSTNR_ID_idx on APM_PACKAGE_TYPE_LISTENER_MAP(LISTENER_ID);
@@ -37,9 +37,3 @@ create index PARAMETER_PRIV_BASE_PRIV_idx on PARAMETERIZED_PRIVILEGES(BASE_PRIVI
 create index UNG_CTX_NLF_MP_IMPL_CTX_ID_idx on UNGRANTED_CONTEXT_NON_LEAF_MAP(IMPLIED_CONTEXT_ID);
 create index VC_OBJECTS_MASTER_ID_idx on VC_OBJECTS(MASTER_ID);
 create index VC_TRANSACTIONS_OBJECT_ID_idx on VC_TRANSACTIONS(OBJECT_ID);
-create index CW_PROCESS_TSK_MAP_TSK_ID_idx on CW_PROCESS_TASK_MAP(TASK_ID);
-create index CW_TASK_COMMENTS_TASK_ID_idx on CW_TASK_COMMENTS(TASK_ID);
-create index CW_TASK_DEPS_DPNT_TSK_ID_idx on CW_TASK_DEPENDENCIES(DEPENDENT_TASK_ID);
-create index CW_TASK_GRP_ASSGNS_GRP_ID_idx on CW_TASK_GROUP_ASSIGNEES(GROUP_ID);
-create index CW_TASK_LSNRS_LSNR_TASK_ID_idx on CW_TASK_LISTENERS(LISTENER_TASK_ID);
-create index CW_TASK_USR_ASSGNS_USR_ID_idx on CW_TASK_USER_ASSIGNEES(USER_ID);

@@ -11,16 +11,15 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/oracle-se/preferences/table-preferences.sql#2 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/oracle-se/preferences/table-preferences.sql#3 $
+-- $DateTime: 2003/05/21 12:25:09 $
 
 create table preferences  (
     preference_id               integer
                                 constraint preferences_pk primary key,
     parent_id                   integer
                                 constraint preferences_parent_fk
-                                references preferences (preference_id)
-                                on delete cascade,
+                                references preferences (preference_id),
     name                        varchar(80)
                                 constraint preferences_name_nn
                                 not null,

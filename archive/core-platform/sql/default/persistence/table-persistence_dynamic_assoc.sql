@@ -11,13 +11,13 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/persistence/table-persistence_dynamic_assoc.sql#2 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/persistence/table-persistence_dynamic_assoc.sql#3 $
+-- $DateTime: 2003/05/21 12:25:09 $
 
 create table persistence_dynamic_assoc (
     pdl_id                 integer
                            constraint pers_dyn_assoc_pdl_id_fk
-                           references acs_objects on delete cascade
+                           references acs_objects
                            constraint pers_dyn_assoc_pdl_id_pk
                            primary key,
     pdl_file               clob

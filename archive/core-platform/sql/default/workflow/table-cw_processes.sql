@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/workflow/table-cw_processes.sql#2 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/workflow/table-cw_processes.sql#3 $
+-- $DateTime: 2003/05/21 12:25:09 $
 
 create table cw_processes (
   process_id             integer 
@@ -28,5 +28,5 @@ create table cw_processes (
                          check (process_state in ('stopped', 'started','deleted','init')),
   object_id              integer
                          constraint processes_object_fk
-                         references acs_objects on delete cascade
+                         references acs_objects
 );

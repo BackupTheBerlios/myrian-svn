@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres-create.sql#22 $
--- $DateTime: 2003/05/19 17:20:57 $
+-- $Id: //core-platform/dev/sql/postgres-create.sql#23 $
+-- $DateTime: 2003/05/21 12:25:09 $
 
 begin;
 
@@ -92,7 +92,6 @@ begin;
 -- XXX
 --\i default/kernel/view-object_package_map.sql
 
-\i default/categorization/table-cat_categories.sql
 \i default/categorization/index-cat_cat_deflt_ancestors.sql
 \i default/categorization/comment-cat_categories.sql
 \i default/categorization/table-cat_category_category_map.sql
@@ -160,15 +159,15 @@ begin;
 \i default/workflow/table-cw_tasks.sql
 \i default/workflow/index-cw_tasks.sql
 \i default/workflow/table-cw_user_tasks.sql
-\i default/workflow/table-cw_task_dependencies.sql
+\i default/workflow/index-cw_task_dependencies.sql
 \i default/workflow/table-cw_task_comments.sql
+\i default/workflow/index-cw_task_comments.sql
 \i default/workflow/table-cw_system_tasks.sql
-\i default/workflow/table-cw_task_listeners.sql
-\i default/workflow/table-cw_task_user_assignees.sql
-\i default/workflow/table-cw_task_group_assignees.sql
+\i default/workflow/index-cw_task_listeners.sql
+\i default/workflow/index-cw_task_user_assignees.sql
+\i default/workflow/index-cw_task_group_assignees.sql
 \i default/workflow/table-cw_processes.sql
 \i default/workflow/index-cw_processes.sql
-\i default/workflow/table-cw_process_task_map.sql
 \i default/workflow/table-cw_process_definitions.sql
 
 \i default/formbuilder/table-bebop_components.sql

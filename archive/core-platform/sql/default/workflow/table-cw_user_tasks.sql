@@ -11,14 +11,13 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/workflow/table-cw_user_tasks.sql#3 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/workflow/table-cw_user_tasks.sql#4 $
+-- $DateTime: 2003/05/21 12:25:09 $
 
 create table cw_user_tasks (
   task_id                integer
                          constraint user_tasks_task_id_pk primary key
-                         constraint user_tasks_task_id_fk references cw_tasks
-                         on delete cascade,
+                         constraint user_tasks_task_id_fk references cw_tasks,
   is_locked              char(1) default 'f'
                          constraint task_is_locked_ck
                          check (is_locked in ('t', 'f')),

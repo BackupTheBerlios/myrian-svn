@@ -11,13 +11,13 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/formbuilder/table-bebop_meta_object.sql#2 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/formbuilder/table-bebop_meta_object.sql#3 $
+-- $DateTime: 2003/05/21 12:25:09 $
 
 create table bebop_meta_object (
     object_id integer
         constraint bebop_meta_obj_object_id_fk references
-        acs_objects on delete cascade
+        acs_objects
         constraint bebop_meta_obj_object_id_pk primary key,
     type_id integer
         constraint bebop_meta_object_type_id_nn not null

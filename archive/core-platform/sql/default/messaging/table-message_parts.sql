@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/messaging/table-message_parts.sql#2 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/messaging/table-message_parts.sql#3 $
+-- $DateTime: 2003/05/21 12:25:09 $
 
 
 create table message_parts (
@@ -21,7 +21,7 @@ create table message_parts (
                     primary key,
     message_id  integer
                 constraint message_parts_message_id_fk 
-                     references messages(message_id) on delete cascade,
+                     references messages(message_id),
     type        varchar(50)
                 constraint message_parts_type_nn not null,
     name        varchar(100)

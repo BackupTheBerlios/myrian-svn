@@ -11,16 +11,16 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/formbuilder/table-bebop_form_process_listeners.sql#2 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/formbuilder/table-bebop_form_process_listeners.sql#3 $
+-- $DateTime: 2003/05/21 12:25:09 $
 
 create table bebop_form_process_listeners (
         form_section_id         integer
                                 constraint bebop_form_process_lstnr_fs_fk
-                                references bebop_form_sections on delete cascade,
+                                references bebop_form_sections,
         listener_id             integer
                                 constraint bebop_form_process_lstnr_li_fk
-                                references bebop_process_listeners on delete cascade,
+                                references bebop_process_listeners,
         position                integer,
         constraint bebop_form_process_lstnr_pk
         primary key (form_section_id, listener_id),

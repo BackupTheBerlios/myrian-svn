@@ -11,13 +11,13 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/formbuilder/table-bebop_process_listeners.sql#2 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/formbuilder/table-bebop_process_listeners.sql#3 $
+-- $DateTime: 2003/05/21 12:25:09 $
 
 create table bebop_process_listeners (
 	  listener_id		integer
                         constraint bebop_process_listeners_fk
-                        references acs_objects (object_id) on delete cascade
+                        references acs_objects (object_id)
                         constraint bebop_process_listeners_pk
                         primary key,
       name              varchar(40),

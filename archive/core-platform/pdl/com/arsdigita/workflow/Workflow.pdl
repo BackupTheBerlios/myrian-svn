@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/workflow/Workflow.pdl#9 $ 
-// $DateTime: 2002/10/16 14:12:35 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/workflow/Workflow.pdl#10 $ 
+// $DateTime: 2003/05/21 12:25:09 $
 
 model com.arsdigita.workflow.simple;
 
@@ -22,7 +22,7 @@ import com.arsdigita.kernel.*;
 object type Workflow extends Task {
     BigDecimal[0..1] processDefinitionID = cw_processes.process_def_id INTEGER;
     String[0..1]     processState = cw_processes.process_state VARCHAR(16);
-    ACSObject[0..1]  object = join cw_processes.object_id to acs_objects.object_id;
+    composite ACSObject[0..1]  object = join cw_processes.object_id to acs_objects.object_id;
     component Task[0..n] wfTasks = join cw_processes.process_id 
                                      to cw_tasks.parent_task_id;
 

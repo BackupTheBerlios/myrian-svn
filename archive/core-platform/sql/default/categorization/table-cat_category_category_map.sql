@@ -11,16 +11,16 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/categorization/table-cat_category_category_map.sql#3 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/categorization/table-cat_category_category_map.sql#4 $
+-- $DateTime: 2003/05/21 12:25:09 $
 
 create table cat_category_category_map (
   category_id             integer
                           constraint cat_cat_map_parent_id_fk
-                          references cat_categories on delete cascade,
+                          references cat_categories,
   related_category_id     integer
                           constraint cat_cat_map_category_id_fk
-                          references cat_categories on delete cascade,
+                          references cat_categories,
     -- this should default to the JDBC version of true
   default_p               char(1)
                           constraint cat_cat_map_default_p_ck

@@ -11,14 +11,14 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/formbuilder/table-forms_dd_select.sql#2 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/formbuilder/table-forms_dd_select.sql#3 $
+-- $DateTime: 2003/05/21 12:25:09 $
 
 create table forms_dd_select (
     widget_id integer 
         constraint forms_dds_widget_id_pk primary key
         constraint forms_dds_widget_id_fk 
-        references bebop_widgets (widget_id) on delete cascade,
+        references bebop_widgets (widget_id),
     multiple_p char(1) check (multiple_p in ('1', '0')),
     query_id integer
         constraint forms_dds_query_id_fk

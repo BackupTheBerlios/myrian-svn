@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/oracle-se-create.sql#24 $
--- $DateTime: 2003/05/19 17:20:57 $
+-- $Id: //core-platform/dev/sql/oracle-se-create.sql#25 $
+-- $DateTime: 2003/05/21 12:25:09 $
 
 @@ oracle-se/function-currentDate.sql
 
@@ -109,7 +109,6 @@
 @@ default/kernel/constraint-site_nodes.sql
 @@ default/kernel/constraint-roles.sql
 
-@@ default/categorization/table-cat_categories.sql
 @@ default/categorization/index-cat_cat_deflt_ancestors.sql
 @@ default/categorization/comment-cat_categories.sql
 @@ default/categorization/table-cat_category_category_map.sql
@@ -175,15 +174,15 @@
 @@ default/workflow/table-cw_tasks.sql
 @@ default/workflow/index-cw_tasks.sql
 @@ oracle-se/workflow/table-cw_user_tasks.sql
-@@ default/workflow/table-cw_task_dependencies.sql
+@@ default/workflow/index-cw_task_dependencies.sql
 @@ oracle-se/workflow/table-cw_task_comments.sql
+@@ default/workflow/index-cw_task_comments.sql
 @@ default/workflow/table-cw_system_tasks.sql
-@@ default/workflow/table-cw_task_listeners.sql
-@@ default/workflow/table-cw_task_user_assignees.sql
-@@ default/workflow/table-cw_task_group_assignees.sql
+@@ default/workflow/index-cw_task_listeners.sql
+@@ default/workflow/index-cw_task_user_assignees.sql
+@@ default/workflow/index-cw_task_group_assignees.sql
 @@ default/workflow/table-cw_processes.sql
 @@ default/workflow/index-cw_processes.sql
-@@ default/workflow/table-cw_process_task_map.sql
 @@ default/workflow/table-cw_process_definitions.sql
 
 @@ default/formbuilder/table-bebop_components.sql

@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/workflow/table-cw_task_comments.sql#3 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/workflow/table-cw_task_comments.sql#4 $
+-- $DateTime: 2003/05/21 12:25:09 $
 
 create table cw_task_comments (
   comment_id              integer
@@ -20,7 +20,7 @@ create table cw_task_comments (
   task_id                 integer
                           constraint task_comments_task_id_nn not null
                           constraint task_comments_task_id_fk 
-                          references cw_tasks(task_id) on delete cascade,
+                          references cw_tasks(task_id),
   task_comment            varchar(4000),
   comment_date            timestamp default current_timestamp,
   party_id                integer,
