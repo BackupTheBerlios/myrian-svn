@@ -16,6 +16,7 @@
 package com.arsdigita.util;
 
 import javax.servlet.http.HttpSessionContext;
+import javax.servlet.ServletContext;
 import java.util.Hashtable;
 import java.util.Enumeration;
 
@@ -50,6 +51,10 @@ public class HttpDummySession implements javax.servlet.http.HttpSession {
     }
     
     public HttpSessionContext getSessionContext() {
+        return null;
+    }
+
+    public ServletContext getServletContext() {
         return null;
     }
 

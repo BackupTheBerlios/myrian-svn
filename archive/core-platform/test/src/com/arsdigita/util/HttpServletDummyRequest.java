@@ -17,7 +17,9 @@ package com.arsdigita.util;
 
 import java.util.LinkedList;
 import javax.servlet.http.*;
+import javax.servlet.ServletContext;
 import java.util.*;
+import java.io.*;
 import javax.servlet.*;
 
 /**
@@ -26,7 +28,7 @@ import javax.servlet.*;
 */
 
 public class HttpServletDummyRequest implements HttpServletRequest {
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyRequest.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyRequest.java#2 $ by $Author: dennis $, $DateTime: 2002/06/27 18:19:33 $";
 
     private HashMap parameters;
     private HashMap attributes;
@@ -242,6 +244,18 @@ public class HttpServletDummyRequest implements HttpServletRequest {
     }
 
     public java.lang.String getRealPath(java.lang.String path) { return null; }
+    public Map getParameterMap() {
+        return parameters;
+    }
+ 
+    public StringBuffer getRequestURL() { 
+        return null; 
+    }
+   
+    public void setCharacterEncoding(String env)
+    throws UnsupportedEncodingException {
+    }
+
 }
 
 

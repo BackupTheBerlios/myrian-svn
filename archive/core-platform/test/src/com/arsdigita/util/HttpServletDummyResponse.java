@@ -22,7 +22,7 @@ import java.io.PrintWriter;
 
 public class HttpServletDummyResponse implements HttpServletResponse {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyResponse.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyResponse.java#2 $ by $Author: dennis $, $DateTime: 2002/06/27 18:19:33 $";
     
   private PrintStream _out;
   private boolean     _committed;
@@ -110,6 +110,10 @@ public class HttpServletDummyResponse implements HttpServletResponse {
   public void flushBuffer() throws java.io.IOException{
     _committed = true;
     _out.flush();
+  }
+
+  public void resetBuffer() {
+    throw new UnsupportedOperationException("Method not implemented");
   }
 
   public int getBufferSize(){
