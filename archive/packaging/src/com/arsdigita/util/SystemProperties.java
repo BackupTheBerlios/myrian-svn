@@ -27,13 +27,13 @@ import org.apache.log4j.Logger;
  *
  * @see java.lang.System
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/SystemProperties.java#7 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/SystemProperties.java#8 $
  */
 public final class SystemProperties {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/SystemProperties.java#7 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/SystemProperties.java#8 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/20 01:45:24 $";
+        "$DateTime: 2003/10/21 17:54:40 $";
 
     private static final Logger s_log = Logger.getLogger
         (SystemProperties.class);
@@ -47,7 +47,7 @@ public final class SystemProperties {
      *
      * @see com.arsdigita.util.parameter.Parameter
      * @param param The <code>Parameter</code> representing the type
-;     * and name of the field you wish to recover; it cannot be null
+     * and name of the field you wish to recover; it cannot be null
      * @return A value that may be cast to the type enforced by the
      * parameter; it can be null
      */

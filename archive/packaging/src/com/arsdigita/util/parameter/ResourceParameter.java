@@ -29,13 +29,13 @@ import org.apache.log4j.Logger;
  * required, it logs an error.  Otherwise, it returns null.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ResourceParameter.java#3 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ResourceParameter.java#4 $
  */
 public class ResourceParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ResourceParameter.java#3 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ResourceParameter.java#4 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/20 23:01:49 $";
+        "$DateTime: 2003/10/21 17:54:40 $";
 
     private static final Logger s_log = Logger.getLogger(ResourceParameter.class);
 
@@ -48,26 +48,26 @@ public class ResourceParameter extends StringParameter {
                          final Object defaalt) {
         super(name, multiplicity, defaalt);
     }
-    
-    protected Object unmarshal(String value, final List errors) {
-        if (value==null) {
-            return null;
-        }
-        
+
+    protected Object unmarshal(String value, final ErrorList errors) {
         File file = new File(value);
+
         if (!file.exists()) {
-            // it is not a standard file so lets try to see if it 
+            // it is not a standard file so lets try to see if it
             // is a resource
             if (value.startsWith("/")) {
                 value = value.substring(1);
             }
-            
+
             ClassLoader cload = Thread.currentThread().getContextClassLoader();
             URL url = cload.getResource(value);
             InputStream stream = cload.getResourceAsStream(value);
             if (stream == null && isRequired()) {
                 s_log.error(value + " is not a valid file and is required");
-                errors.add(value + " is not a valid File and is required");
+
+                final ParameterError error = new ParameterError
+                    (this, "Resource not found");
+                errors.add(error);
             }
             return stream;
         } else {
@@ -77,7 +77,9 @@ public class ResourceParameter extends StringParameter {
                 // we know the file exists so this should not
                 // be an issue
                 s_log.error(value + " is not a valid file and is required", ioe);
-                errors.add(value + " is not a valid File and is required");
+
+                errors.add(new ParameterError(this, ioe));
+
                 return null;
             }
         }

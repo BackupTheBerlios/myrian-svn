@@ -24,13 +24,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#10 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#11 $
  */
 public abstract class AbstractParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#10 $" +
-        "$Author: rhs $" +
-        "$DateTime: 2003/10/17 15:40:04 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#11 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/10/21 17:54:40 $";
 
     private final String m_name;
     private final Class m_type;
@@ -85,7 +85,10 @@ public abstract class AbstractParameter implements Parameter {
 
     public Object read(final ParameterReader reader,
                        final ErrorList errors) {
-        Assert.exists(reader, ParameterReader.class);
+        if (Assert.isEnabled()) {
+            Assert.exists(reader, ParameterReader.class);
+            Assert.exists(errors, ErrorList.class);
+        }
 
         final String string = reader.read(this, errors);
 
@@ -96,26 +99,30 @@ public abstract class AbstractParameter implements Parameter {
         }
     }
 
-    protected Object unmarshal(final String value, final List errors) {
+    protected Object unmarshal(final String value, final ErrorList errors) {
         try {
             return Converters.convert(m_type, value);
         } catch (ConversionException ce) {
-            errors.add("'" + value + "' is not a valid '" +
-                       m_type.getName() + "' (" + ce.getMessage() + ")");
-
+            errors.add(new ParameterError(this, ce));
             return null;
         }
     }
 
+    // XXX to find and root out the old signature.
+    protected final Object unmarshal(final String value, final List errors) {
+        return null;
+    }
+
     public void validate(final Object value, final ErrorList errors) {
+        Assert.exists(errors, ErrorList.class);
+
         if (isRequired() && value == null) {
-            errors.add("The value must not be null");
-        } else {
-            validate(value, (List) errors);
+            errors.add(new ParameterError(this, "The value must not be null"));
         }
     }
 
-    protected void validate(final Object value, final List errors) {
+    // XXX to find and root out the old signature.
+    protected final void validate(final Object value, final List errors) {
         // Nothing
     }
 
@@ -135,7 +142,7 @@ public abstract class AbstractParameter implements Parameter {
             throws ParameterException {
         Assert.exists(value, ParameterValue.class);
 
-        final List errors = value.getErrors();
+        final ErrorList errors = value.getErrors();
 
         if (!errors.isEmpty()) {
             final StringBuffer buffer = new StringBuffer();

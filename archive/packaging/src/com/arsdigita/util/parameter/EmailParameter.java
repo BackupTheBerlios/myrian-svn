@@ -27,13 +27,13 @@ import org.apache.oro.text.perl.Perl5Util;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EmailParameter.java#3 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EmailParameter.java#4 $
  */
 public class EmailParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EmailParameter.java#3 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EmailParameter.java#4 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/28 00:48:42 $";
+        "$DateTime: 2003/10/21 17:54:40 $";
 
     private static final Perl5Util s_perl = new Perl5Util();
     private static final String s_regex =
@@ -43,21 +43,25 @@ public class EmailParameter extends StringParameter {
         super(name);
     }
 
-    protected Object unmarshal(final String value, final List errors) {
+    protected Object unmarshal(final String value, final ErrorList errors) {
         try {
             return new InternetAddress(value);
         } catch (AddressException ae) {
-            errors.add(ae.getMessage());
-
+            errors.add(new ParameterError(this, ae));
             return null;
         }
     }
 
-    protected void validate(final Object value, final List errors) {
+    public void validate(final Object value, final ErrorList errors) {
         super.validate(value, errors);
 
-        if (!s_perl.match(s_regex, ((InternetAddress) value).toString())) {
-            errors.add("The value is not a valid email address");
+        final InternetAddress email = (InternetAddress) value;
+
+        if (email != null && !s_perl.match(s_regex, email.toString())) {
+            final ParameterError error = new ParameterError
+                (this, "The value is not a valid email address");
+
+            errors.add(error);
         }
     }
 }

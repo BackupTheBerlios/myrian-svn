@@ -39,22 +39,25 @@ public class HttpHostParameter extends StringParameter {
         super(name, multiplicity, defaalt);
     }
 
-    protected Object unmarshal(final String value, final List errors) {
+    protected Object unmarshal(final String value, final ErrorList errors) {
         if (value.indexOf("://") != -1) {
-            errors.add
-                ("The value must not have a scheme prefix");
+            final ParameterError error = new ParameterError
+                (this, "The value must not have a scheme prefix");
+            errors.add(error);
         }
 
         if (value.indexOf("/") != -1) {
-            errors.add
-                ("The value must not contain slashes");
+            final ParameterError error = new ParameterError
+                (this, "The value must not contain slashes");
+            errors.add(error);
         }
 
         final int sep = value.indexOf(":");
 
         if (sep == -1) {
-            errors.add
-                ("The value must contain a colon");
+            final ParameterError error = new ParameterError
+                (this, "The value must contain a colon");
+            errors.add(error);
         }
 
         if (!errors.isEmpty()) {
@@ -67,15 +70,17 @@ public class HttpHostParameter extends StringParameter {
 
             return new HttpHost(name, Integer.parseInt(port));
         } catch (IndexOutOfBoundsException ioobe) {
-            errors.add
-                ("The host spec is invalid; it must take the form " +
+            final ParameterError error = new ParameterError
+                (this, "The host spec is invalid; it must take the form " +
                  "hostname:hostport");
+            errors.add(error);
 
             return null;
         } catch (NumberFormatException nfe) {
-            errors.add
-                ("The port number must be an integer with no extraneous " +
-                 "spaces or punctuation");
+            final ParameterError error = new ParameterError
+                (this, "The port number must be an integer with no " +
+                 "extraneous spaces or punctuation");
+            errors.add(error);
 
             return null;
         }

@@ -23,13 +23,13 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EnumerationParameter.java#4 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EnumerationParameter.java#5 $
  */
 public class EnumerationParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EnumerationParameter.java#4 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EnumerationParameter.java#5 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/02 12:40:15 $";
+        "$DateTime: 2003/10/21 17:54:40 $";
 
     private static final Logger s_log = Logger.getLogger
         (EnumerationParameter.class);
@@ -52,11 +52,14 @@ public class EnumerationParameter extends StringParameter {
         m_entries.put(name, value);
     }
 
-    protected Object unmarshal(final String value, final List errors) {
+    protected Object unmarshal(final String value, final ErrorList errors) {
         if (m_entries.containsKey(value)) {
             return m_entries.get(value);
         } else {
-            errors.add("The value must be one of " + m_entries.keySet());
+            final ParameterError error = new ParameterError
+                (this, "The value must be one of " + m_entries.keySet());
+
+            errors.add(error);
 
             return null;
         }
