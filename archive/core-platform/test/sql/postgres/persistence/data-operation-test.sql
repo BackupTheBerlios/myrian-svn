@@ -16,10 +16,10 @@
 -- This file contains the data model for the data query test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #3 $ $Date: 2002/07/23 $
+-- @version $Revision: #4 $ $Date: 2002/07/26 $
 --
 
-create or replace function DataOperationProcedure(integer) returns integer 
+create or replace function DataOperationProcedure() returns integer 
 as '
 begin
    insert into t_data_query (entry_id, action, priority, action_time)

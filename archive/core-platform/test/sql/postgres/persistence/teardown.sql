@@ -17,7 +17,7 @@
 -- tests to run.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #6 $ $Date: 2002/07/23 $
+-- @version $Revision: #7 $ $Date: 2002/07/26 $
 --
 
 -- Right now this is duplicated from the individual files. This should
@@ -39,7 +39,7 @@ drop table t_data_query;
 --drop table t_articles;
 --drop table t_images;
 
-drop function DataOperationProcedure(integer);
+drop function DataOperationProcedure();
 drop function DataOperationFunction();
 drop function DataOperationProcWithReturn(integer);
 drop function DataOperationProcWithOut(varchar);

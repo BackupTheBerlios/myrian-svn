@@ -18,6 +18,7 @@ package com.arsdigita.persistence;
 import java.math.BigDecimal;
 import com.arsdigita.db.ConnectionManager;
 import java.util.Date;
+import com.arsdigita.db.Initializer;
 
 /**
  * DataOperationText
@@ -28,11 +29,11 @@ import java.util.Date;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/07/22 $
+ * @version $Revision: #5 $ $Date: 2002/07/26 $
  */
 public class DataOperationTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataOperationTest.java#4 $ by $Author: jorris $, $DateTime: 2002/07/22 18:56:32 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataOperationTest.java#5 $ by $Author: randyg $, $DateTime: 2002/07/26 11:26:26 $";
 
     public DataOperationTest(String name) {
         super(name);
@@ -128,13 +129,13 @@ public class DataOperationTest extends PersistenceTestCase {
         // let's make sure it succeeded
         query = getSession().retrieveQuery("examples.DataQueryWithBindVariables");
         query.setParameter("priority", new BigDecimal(29999));
-        query.setParameter("description", "wrote");
         
         try {
             assert(query.size() > 0);
         } catch (PersistenceException e) {
             // this is the correct behavior
         }
+        query.setParameter("description", "wrote");
 
 
         // let's undo the update
@@ -185,10 +186,20 @@ public class DataOperationTest extends PersistenceTestCase {
         int newID = ((BigDecimal)maxQuery.get("id")).intValue();
         maxQuery.close();
 
-        operation = getSession().retrieveDataOperation
-            ("examples.DataOperationFunction");
-        operation.execute();
-        String return_value = (String)operation.get("newValue");
+        String return_value = null;
+        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+            DataQuery operationQuery = getSession().retrieveQuery
+                ("examples.DataOperationFunction");
+            operationQuery.next();
+            return_value = (String)operationQuery.get("newValue");
+            operationQuery.close();
+        } else {
+            operation = getSession().retrieveDataOperation
+                ("examples.DataOperationFunction");
+            operation.execute();
+            return_value = (String)operation.get("newValue");
+        }
+
         assert("DataOperationFunction did not correctly change the items " +
                "returned by the query.  Expected " + (size + 1) + 
                " but got " + query.size(), size + 1 == query.size());
@@ -199,10 +210,19 @@ public class DataOperationTest extends PersistenceTestCase {
                newID + 1 == nextID);
         newID = nextID;
 
-        operation = getSession().retrieveDataOperation
-            ("examples.DataOperationProcWithOut");
-        operation.execute();
-        return_value = (String)operation.get("newID");  
+        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+            DataQuery operationQuery = getSession().retrieveQuery
+                ("examples.DataOperationProcWithOut");
+            operationQuery.setParameter("oldID", null);
+            operationQuery.next();
+            return_value = (String)operationQuery.get("newID");
+            operationQuery.close();
+        } else {
+            operation = getSession().retrieveDataOperation
+                ("examples.DataOperationProcWithOut");
+            operation.execute();
+            return_value = (String)operation.get("newID");  
+        }
         assert("DataOperationProcWithOut did not correctly change the items " +
                "returned by the query", size + 1 == query.size());
         size = query.size();
@@ -212,12 +232,21 @@ public class DataOperationTest extends PersistenceTestCase {
                newID + 1 == nextID);
         newID = nextID;
 
-        operation = getSession().retrieveDataOperation
-            ("examples.DataOperationProcWithInOut");
         String stringValue = Integer.toString(Integer.parseInt(return_value) + 8);
-        operation.setParameter("oldID", stringValue);
-        operation.execute();
-        return_value = (String)operation.get("newID");
+        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+            DataQuery operationQuery = getSession().retrieveQuery
+                ("examples.DataOperationProcWithInOut");
+            operationQuery.setParameter("oldID", new Integer(stringValue));
+            operationQuery.next();
+            return_value = (String)operationQuery.get("newID");
+            operationQuery.close();
+        } else {
+            operation = getSession().retrieveDataOperation
+                ("examples.DataOperationProcWithInOut");
+            operation.setParameter("oldID", stringValue);
+            operation.execute();
+            return_value = (String)operation.get("newID");
+        }
         assert("DataOperationProcWithInOut did not correctly change the " +
                "items returned by the query.  We expected " + stringValue +
                " but got " + return_value, stringValue.equals(return_value));
@@ -231,11 +260,21 @@ public class DataOperationTest extends PersistenceTestCase {
         newID = nextID;
 
         Integer integerValue = new Integer(Integer.parseInt(return_value) + 8);
-        operation = getSession().retrieveDataOperation
-            ("examples.DataOperationProcWithInOutInt");
-        operation.setParameter("oldID", integerValue);
-        operation.execute();
-        Integer return_integer = (Integer)operation.get("newID");
+        Integer return_integer = null;
+        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+            DataQuery operationQuery = getSession().retrieveQuery
+                ("examples.DataOperationProcWithInOutInt");
+            operationQuery.setParameter("oldID", integerValue);
+            operationQuery.next();
+            return_integer = (Integer)operationQuery.get("newID");
+            operationQuery.close();
+        } else {
+            operation = getSession().retrieveDataOperation
+                ("examples.DataOperationProcWithInOutInt");
+            operation.setParameter("oldID", integerValue);
+            operation.execute();
+            return_integer = (Integer)operation.get("newID");
+        }
         assert("DataOperationProcWithInOutInt did not correctly change the " +
                "items returned by the query (with Integer)", 
                integerValue.toString().equals(return_integer.toString()));
@@ -250,12 +289,21 @@ public class DataOperationTest extends PersistenceTestCase {
         
 
         // now we test using Dates
-        operation = getSession().retrieveDataOperation
-            ("examples.DataOperationProcWithDates");
-        operation.setParameter("idToUpdate", return_integer);
         Date date = new Date();
-        operation.setParameter("oldDate", date);
-        operation.execute();
+        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+            DataQuery operationQuery = getSession().retrieveQuery
+                ("examples.DataOperationProcWithDates");
+            operationQuery.setParameter("idToUpdate", integerValue);
+            operationQuery.setParameter("oldDate", date);
+            operationQuery.next();
+            operationQuery.close();
+        } else {
+            operation = getSession().retrieveDataOperation
+                ("examples.DataOperationProcWithDates");
+            operation.setParameter("idToUpdate", return_integer);
+            operation.setParameter("oldDate", date);
+            operation.execute();
+        }
         assert("DataOperationProcWithDates and Integer added or removed a row",
                size == query.size());
 
@@ -292,6 +340,11 @@ public class DataOperationTest extends PersistenceTestCase {
      *  to pass in to the DataQuery but they do not pass in all items
      */
     public void testPLSQLWithRandomArgs() {
+        // Postgres does not have default values so there is no reason
+        // to test for it.
+        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+            return;
+        }
         // make sure that the table is empty
         DataQuery query = null;
         try {
@@ -305,7 +358,7 @@ public class DataOperationTest extends PersistenceTestCase {
             operation.setParameter("arg2", new Integer(2));
             operation.setParameter("arg5", new Integer(5));
             operation.execute();
-
+            operation.close();
             // get the row that was just inserted
             query.next();
 

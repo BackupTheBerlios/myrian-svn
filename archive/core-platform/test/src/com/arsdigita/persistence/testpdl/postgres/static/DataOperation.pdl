@@ -41,65 +41,60 @@ data operation DataOperationProcedureOneArg {
     }
 }
 
-//----------------------------------------
-data operation DataOperationFunction {
-    do call {
-        :newValue = DataOperationFunction
+query DataOperationFunction {
+    String newValue;
+    do {
+        select DataOperationFunction() as newValue
     } map {
-        newValue : VARCHAR(4000);
+        newValue = newValue;
     }
 }
 
-data operation DataOperationProcWithOut {
-    do call {
-        DataOperationProcWithOut(:newID)
+query DataOperationProcWithOut {
+    String newID;
+    Integer oldID;
+    do {
+        select DataOperationProcWithOut(:oldID) as newID
     } map {
-        newID : VARCHAR(4000);
+        newID = newID;
+        oldID = newID;
     }
 }
 
-data operation DataOperationProcWithInOut {
-    do call {
-        DataOperationProcWithInOut(:oldID, :newID)
+query DataOperationProcWithInOut {
+    Integer oldID;
+    String newID;
+    do {
+        select DataOperationProcWithInOut(:oldID) as newID
     } map {
-        oldID : VARCHAR(40);
-        newID : VARCHAR(40);
+        newID = newID;
     }
 }
 
-data operation DataOperationProcWithInOutInt {
-    do call {
-        DataOperationProcWithInOutInt(:oldID, :newID)
+query DataOperationProcWithInOutInt {
+    INTEGER oldID;
+    INTEGER newID;
+    do {
+        select DataOperationProcWithInOutInt(:oldID) as newID
     } map {
-        oldID : INTEGER;
-        newID : INTEGER;
+        oldID = newID;
+        newID = newID;
     }
 }
 
-data operation DataOperationProcWithDates {
-    do call {
-        DataOperationProcWithDates(:idToUpdate, :oldDate, :newDate)
+query DataOperationProcWithDates {
+    DATE newDate;
+    do {
+        select DataOperationProcWithDates(:idToUpdate, :oldDate) as newDate
     } map {
-        idToUpdate : INTEGER;
-        oldDate : DATE;
-        newDate : DATE;
+        newDate = newDate;
     }
 }
 
-data operation DataOperationProcWithTime {
-    do call {
-        DataOperationProcWithTime(:idToUpdate, :oldDate, :newDate)
-    } map {
-        idToUpdate : INTEGER;
-        oldDate : TIMESTAMP;
-        newDate : TIMESTAMP;
-    }
-}
-        
 
-data operation PLSQLWithArbitraryArgsQuery {
+query PLSQLWithArbitraryArgsQuery {
      do {
-         select PLSQLWithArbitraryArgs(:arg1, :arg2, null, null, :arg5)
+         select PLSQLWithArbitraryArgs(:arg1, :arg2, :arg3, :arg4, :arg5)
      }  
 } 
 
