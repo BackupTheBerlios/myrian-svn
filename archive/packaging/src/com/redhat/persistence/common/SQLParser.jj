@@ -14,12 +14,12 @@ import java.io.*;
  * SQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/10/01 $
+ * @version $Revision: #5 $ $Date: 2003/10/05 $
  */
 
 public class SQLParser {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/common/SQLParser.jj#4 $ by $Author: rhs $, $DateTime: 2003/10/01 14:17:42 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/common/SQLParser.jj#5 $ by $Author: rhs $, $DateTime: 2003/10/05 19:13:39 $";
 
     public static interface Mapper {
         Path map(Path path);
@@ -340,7 +340,7 @@ void identifier() :
         } )*
     {
         if (bind) {
-            m_image.append(buf);
+            m_image.append(buf.toString());
             token(SQLToken.BIND);
         } else {
             m_image.append(m_mapper.map(Path.get(buf.toString())).getPath());
