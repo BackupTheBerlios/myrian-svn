@@ -18,20 +18,45 @@ package com.arsdigita.db;
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
 import com.arsdigita.tools.junit.extensions.CoreTestSetup;
 import com.arsdigita.tools.junit.framework.PackageTestSuite;
+import com.arsdigita.runtime.RuntimeConfig;
+import com.arsdigita.persistence.metadata.MetadataRoot;
+import com.arsdigita.persistence.SessionManager;
+import com.arsdigita.persistence.DedicatedConnectionSource;
 import junit.framework.Test;
+import junit.framework.TestResult;
+import junit.framework.Protectable;
+import junit.extensions.TestDecorator;
 
 /**
  * @author Jon Orris
- * @version $Revision: #7 $ $Date: 2003/11/12 $
+ * @version $Revision: #8 $ $Date: 2004/01/29 $
  */
 public class DBTestSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DBTestSuite.java#7 $ by $Author: jorris $, $DateTime: 2003/11/12 15:41:14 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DBTestSuite.java#8 $ by $Author: jorris $, $DateTime: 2004/01/29 17:51:04 $";
 
     public static Test suite() {
         DBTestSuite suite = new DBTestSuite();
         populateSuite(suite);
         //BaseTestSetup wrapper = new CoreTestSetup(suite);
         //return wrapper;
-        return suite;
+        TestDecorator sessionSetup = new TestDecorator(suite) {
+            public void run(final TestResult result) {
+                final Protectable p = new Protectable() {
+                    public void protect() throws Exception {
+                        final String key = "default";
+                        String url = RuntimeConfig.getConfig().getJDBCURL();
+                        final MetadataRoot root = MetadataRoot.getMetadataRoot();
+                        SessionManager.configure(key, root, new DedicatedConnectionSource(url));
+
+                        basicRun(result);
+                    }
+
+                };
+
+                result.runProtected(this, p);
+            }
+        };
+        return sessionSetup;
     }
+
 }
