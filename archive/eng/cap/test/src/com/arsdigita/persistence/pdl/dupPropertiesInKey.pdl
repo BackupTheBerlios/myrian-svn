@@ -1,0 +1,6 @@
+model dupPropertiesInKey;
+
+object type Foo {
+    Integer id = foos.id;
+    object key(id, id);
+}

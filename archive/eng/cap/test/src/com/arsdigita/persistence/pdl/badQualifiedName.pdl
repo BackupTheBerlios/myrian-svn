@@ -1,0 +1,6 @@
+model badQualifiedName;
+
+object type Foo {
+    nonexistent.Type foo = foos.foo;
+    object key (foo);
+}

@@ -31,12 +31,12 @@ import java.util.Iterator;
  * SymbolTable
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/08/30 $
+ * @version $Revision: #3 $ $Date: 2004/09/02 $
  **/
 
 class SymbolTable {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/SymbolTable.java#2 $ by $Author: dennis $, $DateTime: 2004/08/30 14:24:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/SymbolTable.java#3 $ by $Author: rhs $, $DateTime: 2004/09/02 14:57:17 $";
 
     private HashMap m_types = new HashMap();
     private ArrayList m_order = new ArrayList();
@@ -71,7 +71,10 @@ class SymbolTable {
         String result = null;
 
         if (type.isQualified()) {
-            result = type.getQualifiedName();
+            String qname = type.getQualifiedName();
+            if (isDefined(qname)) {
+                result = qname;
+            }
         } else {
             FileNd file = type.getFile();
             Collection imps = file.getImports();

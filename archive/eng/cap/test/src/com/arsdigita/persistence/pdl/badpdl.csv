@@ -25,3 +25,5 @@ dupColumn
 dupObjectKey
 dupReferenceKey
 dupAggressiveLoad
+dupPropertiesInKey
+badQualifiedName,nonexistent

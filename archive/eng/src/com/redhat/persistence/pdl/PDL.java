@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/08/30 $
+ * @version $Revision: #9 $ $Date: 2004/09/02 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#8 $ by $Author: dennis $, $DateTime: 2004/08/30 14:24:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#9 $ by $Author: rhs $, $DateTime: 2004/09/02 14:57:17 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -519,7 +519,13 @@ public class PDL {
             //m_errors.warn(nd, "duplicate key");
             return;
         }
-        UniqueKey key = new UniqueKey(table, null, cols);
+        UniqueKey key;
+        try {
+            key = new UniqueKey(table, null, cols);
+        } catch (IllegalArgumentException e) {
+            m_errors.fatal(nd, e.getMessage());
+            return;
+        }
         if (primary) {
             UniqueKey pk = table.getPrimaryKey();
             if (pk != null) {
