@@ -36,11 +36,11 @@ import java.io.StringWriter;
  * association.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/14 $
+ * @version $Revision: #7 $ $Date: 2002/08/23 $
  */
 public class QueryDef extends NamedSQLDef {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/QueryDef.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/QueryDef.java#7 $ by $Author: randyg $, $DateTime: 2002/08/23 16:33:19 $";
 
     // this determines if it is a "zero or one row ", "one row" query
     // or a multi-row query
@@ -137,7 +137,17 @@ public class QueryDef extends NamedSQLDef {
                 if (!(path.indexOf(".") > -1 &&
                       getPropertyDef(path.substring
                                      (0, path.lastIndexOf("."))) != null)) {
-                    warning.append("Property: " + path + Utilities.LINE_BREAK);
+                    // if we have something like mapping.template.id we
+                    // need to check to make sure that the "mapping" is
+                    // property declared and if so, we assume that the
+                    // "id" is proper since we are now dealing 
+                    // with object types
+                    if (!(path.indexOf(".") < path.lastIndexOf(".") &&
+                          getPropertyDef(path.substring
+                                         (0, path.indexOf("."))) != null)) {
+                        warning.append("Property: " + path + 
+                                       Utilities.LINE_BREAK);
+                    }
                 }
             }
         }

@@ -24,7 +24,7 @@ object type Datatype extends VersionedACSObject {
   Byte             byte = t_versioned_datatypes.j_byte INTEGER;
   Character        character = t_versioned_datatypes.j_character CHAR(1);
   Date             date = t_versioned_datatypes.j_date DATE;
-  Double           double = t_versioned_datatypes.j_double NUMBER;
+  Double           double = t_versioned_datatypes.j_double NUMERIC;
   Float            float = t_versioned_datatypes.j_float FLOAT;
   Integer          integer = t_versioned_datatypes.j_integer INTEGER;
   Long             long = t_versioned_datatypes.j_long INTEGER;
