@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<project name="rhp-hook" basedir="." default="compile-hook">
+
+  <property name="build.src.dir" value="${build.dir}/src" />
+  <property name="javacc32.jar" value="javacc-3.2/bin/lib/javacc.jar" />
+
+  <target name="_javacc">
+    <mkdir dir="${build.src.dir}/${jjdir}"/>
+    <java classname="javacc" fork="true">
+      <classpath>
+        <pathelement location="${javacc32.jar}"/>
+      </classpath>
+      <arg value="-OUTPUT_DIRECTORY=${basedir}/${build.src.dir}/${jjdir}"/>
+      <arg value="${basedir}/${src.dir}/${jjdir}/${jjfile}"/>
+    </java>
+  </target>
+
+  <target name="compile-hook">
+    <antcall target="_javacc">
+      <param name="jjdir" value="com/redhat/persistence/common"/>
+      <param name="jjfile" value="SQLParser.jj"/>
+    </antcall>
+    <antcall target="_javacc">
+      <param name="jjdir" value="com/redhat/persistence/oql"/>
+      <param name="jjfile" value="OQLParser.jj"/>
+    </antcall>
+    <antcall target="_javacc">
+      <param name="jjdir" value="com/redhat/persistence/pdl"/>
+      <param name="jjfile" value="PDLParser.jj"/>
+    </antcall>
+    <antcall target="_javacc">
+      <param name="jjdir" value="com/redhat/persistence/jdo"/>
+      <param name="jjfile" value="JDOQLParser.jj"/>
+    </antcall>
+    <copy todir="${build.classes.dir}">
+      <fileset dir=".">
+        <include name="${src.dir}/**/*.pdl"/>
+      </fileset>
+      <mapper to="*" from="${src.dir}/*" type="glob"/>
+    </copy>
+  </target>
+  <target name="clean-build-hook"/>
+  <target name="clean-tests-hook"/>
+  <target name="deploy-hook"/>
+</project>

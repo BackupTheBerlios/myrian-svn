@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<ccm:application name="rh-persistence"
+           prettyName="Red Hat Persistence"
+              version="1.0.0"
+              release="1"
+           buildHooks="build-hooks.xml"
+            xmlns:ccm="http://ccm.redhat.com/ccm-project"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://ccm.redhat.com/ccm-project file:///usr/share/ccm-devel/xsd/application.xsd">
+
+  <ccm:dependencies>
+  </ccm:dependencies>
+
+  <ccm:directories>
+    <ccm:directory name="src"/>
+  </ccm:directories>
+
+  <ccm:contacts/>
+  <ccm:description/>
+
+</ccm:application>
