@@ -15,6 +15,7 @@
 package com.redhat.persistence.oql;
 
 import com.redhat.persistence.common.Path;
+import com.redhat.persistence.common.TokenMgrError;
 import com.redhat.persistence.metadata.*;
 import java.io.*;
 import java.util.*;
@@ -23,12 +24,12 @@ import java.util.*;
  * Expression
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/06/24 $
+ * @version $Revision: #5 $ $Date: 2004/07/21 $
  **/
 
 public abstract class Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Expression.java#4 $ by $Author: rhs $, $DateTime: 2004/06/24 15:01:12 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Expression.java#5 $ by $Author: vadim $, $DateTime: 2004/07/21 13:20:18 $";
 
     public static Expression valueOf(Path path) {
         if (path.getParent() == null) {
@@ -47,6 +48,8 @@ public abstract class Expression {
         try {
             return p.expression();
         } catch (ParseException e) {
+            throw new Error(expression, e);
+        } catch (TokenMgrError e) {
             throw new Error(expression, e);
         }
     }
