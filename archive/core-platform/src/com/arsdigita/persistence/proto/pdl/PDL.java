@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2003/06/13 $
+ * @version $Revision: #10 $ $Date: 2003/06/28 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#9 $ by $Author: rhs $, $DateTime: 2003/06/13 16:37:08 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#10 $ by $Author: rhs $, $DateTime: 2003/06/28 00:14:32 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -514,8 +514,13 @@ public class PDL {
 			(m_symbols.getEmitted(ot));
                     Role role = (Role) m_symbols.getEmitted(ot).getProperty
                         (id.getName());
-                    om.getKeyProperties().add(role);
-                    role.setNullable(false);
+                    if (role == null) {
+                        m_errors.fatal
+                            (id, "no such property: " + id.getName());
+                    } else {
+                        om.getKeyProperties().add(role);
+                        role.setNullable(false);
+                    }
                 }
             }, new Node.IncludeFilter(new Node.Field[] {
                 AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.OBJECT_KEY,

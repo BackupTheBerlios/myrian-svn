@@ -8,12 +8,12 @@ import java.util.*;
  * SymbolTable
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/28 $
  **/
 
 class SymbolTable {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/SymbolTable.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/SymbolTable.java#2 $ by $Author: rhs $, $DateTime: 2003/06/28 00:14:32 $";
 
     private HashMap m_types = new HashMap();
     private ArrayList m_order = new ArrayList();
@@ -32,7 +32,8 @@ class SymbolTable {
 		m_report.fatal(type, "already loaded");
 	    } else {
 		m_report.fatal
-		    (type, "duplicate type definition, original definition: " +
+		    (type, "duplicate type definition for " +
+                     type.getQualifiedName() + ", original definition: " +
 		     original.getLocation());
 	    }
         } else {
