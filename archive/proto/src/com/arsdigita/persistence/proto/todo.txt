@@ -3,7 +3,9 @@
  * Link attributes
  * Eliminate old metadata & PDL parser
  * Move DDL generator
+ * Weak refs
  * Reorder DML in relational engine
+ * Error recovery audit
  * Review everything
  * Rename everything
  * javadoc
