@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/02/24 $
+ * @version $Revision: #6 $ $Date: 2004/02/27 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#5 $ by $Author: rhs $, $DateTime: 2004/02/24 19:43:59 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#6 $ by $Author: rhs $, $DateTime: 2004/02/27 16:35:42 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -23,7 +23,10 @@ class Generator {
     private Map m_queries = new HashMap();
     private LinkedList m_stack = new LinkedList();
     private MultiMap m_equalities = new MultiMap();
+    private Set m_sufficient = new HashSet();
     private MultiMap m_uses = new MultiMap();
+    private MultiMap m_null = new MultiMap();
+    private MultiMap m_nonnull = new MultiMap();
     private Map m_substitutions = new HashMap();
 
     Generator(Root root) {
@@ -124,6 +127,14 @@ class Generator {
         m_equalities.addAll(expr, equalities);
     }
 
+    boolean isSufficient(Expression expr) {
+        return m_sufficient.contains(expr);
+    }
+
+    void addSufficient(Expression expr) {
+        m_sufficient.add(expr);
+    }
+
     List getUses(Expression expr) {
         return m_uses.get(expr);
     }
@@ -134,6 +145,30 @@ class Generator {
 
     void addUses(Expression expr, List values) {
         m_uses.addAll(expr, values);
+    }
+
+    List getNull(Expression expr) {
+        return m_null.get(expr);
+    }
+
+    void addNull(Expression expr, QValue v) {
+        m_null.add(expr, v);
+    }
+
+    void addNulls(Expression expr, List values) {
+        m_null.addAll(expr, values);
+    }
+
+    List getNonNull(Expression expr) {
+        return m_nonnull.get(expr);
+    }
+
+    void addNonNull(Expression expr, QValue v) {
+        m_nonnull.add(expr, v);
+    }
+
+    void addNonNulls(Expression expr, List values) {
+        m_nonnull.addAll(expr, values);
     }
 
     void setSubstitute(Expression expr, Expression substitute) {
@@ -228,39 +263,183 @@ class Generator {
         }
     }
 
-    List getDuplicates(QFrame frame) {
+    Set getDuplicates(QFrame frame) {
         List conds = frame.getRoot().getConditions();
+
+        Map equisets = new HashMap();
+        for (Iterator it = conds.iterator(); it.hasNext(); ) {
+            Expression e = (Expression) it.next();
+            List eqs = getEqualities(e);
+            for (Iterator iter = eqs.iterator(); iter.hasNext(); ) {
+                Equality eq = (Equality) iter.next();
+                Set lset = (Set) equisets.get(eq.getLeft());
+                Set rset = (Set) equisets.get(eq.getRight());
+                if (lset == null && rset == null) {
+                    lset = rset = new HashSet();
+                } else if (lset == null && rset != null) {
+                    lset = rset;
+                } else if (lset != null && rset == null) {
+                    rset = lset;
+                } else {
+                    lset.addAll(rset);
+                    rset = lset;
+                }
+                // They're the same set at this point, so it doesn't
+                // really matter which one we add to.
+                lset.add(eq.getLeft());
+                rset.add(eq.getRight());
+                equisets.put(eq.getLeft(), lset);
+                equisets.put(eq.getRight(), rset);
+            }
+        }
+
         MultiMap values = new MultiMap();
         for (Iterator it = conds.iterator(); it.hasNext(); ) {
             Expression e = (Expression) it.next();
-            addDuplicates(e, frame, values);
+            addDuplicates(e, frame, values, equisets);
         }
-        List result = new ArrayList();
+
+        Set result = new HashSet();
         for (Iterator it = values.keys().iterator(); it.hasNext(); ) {
             QFrame qf = (QFrame) it.next();
             if (frame.isConstrained(values.get(qf))) {
-                result.add(qf);
+                result.add(qf.getAlias());
             }
         }
+
         return result;
     }
 
-    void addDuplicates(Expression e, QFrame frame, MultiMap values) {
+    void addDuplicates(Expression e, QFrame frame, MultiMap values,
+                       Map equisets) {
         List equalities = getEqualities(e);
         if (equalities == null) { return; }
         for (Iterator it = equalities.iterator(); it.hasNext(); ) {
             Equality eq = (Equality) it.next();
             QValue me = eq.getValue(frame);
             if (me == null) { continue; }
-            QValue other = eq.getOther(me);
             if (me.getTable() == null) { continue; }
-            if (me.getTable().equals(other.getTable())
-                && me.getColumn().equals(other.getColumn())
-                && !me.getFrame().isOuter()
-                && !other.getFrame().isOuter()) {
-                values.add(other.getFrame(), me);
+            Set equiset = (Set) equisets.get(me);
+            for (Iterator iter = equiset.iterator(); iter.hasNext(); ) {
+                QValue other = (QValue) iter.next();
+                if (other.getFrame().equals(frame)) { continue; }
+                if (me.getTable().equals(other.getTable()) &&
+                    me.getColumn().equals(other.getColumn()) &&
+                    me.getFrame().isOuter() == other.getFrame().isOuter()) {
+                    values.add(other.getFrame(), me);
+                }
             }
         }
+    }
+
+    boolean isNullable(QFrame frame, List equalities) {
+        List cols = new ArrayList();
+        List ocols = new ArrayList();
+        QFrame fframe = null;
+        QFrame oframe = null;
+        for (Iterator it = equalities.iterator(); it.hasNext(); ) {
+            Equality eq = (Equality) it.next();
+            QValue from;
+            QValue other;
+            if (frame.contains(eq.getLeft()) &&
+                !frame.contains(eq.getRight())) {
+                from = eq.getLeft();
+                other = eq.getRight();
+            } else if (frame.contains(eq.getRight()) &&
+                       !frame.contains(eq.getLeft())) {
+                from = eq.getRight();
+                other = eq.getLeft();
+            } else {
+                return true;
+            }
+            if (oframe == null) {
+                fframe = from.getFrame();
+                oframe = other.getFrame();
+            } else if (!oframe.equals(other.getFrame()) ||
+                       !fframe.equals(from.getFrame())) {
+                return true;
+            }
+            cols.add(from.getColumn());
+            ocols.add(other.getColumn());
+        }
+
+        if (oframe == null) { return true; }
+        if (oframe.isOuter()) { return true; }
+        if (oframe.getTable() == null || fframe.getTable() == null) {
+            return true;
+        }
+
+        String table = fframe.getTable();
+        String otable = oframe.getTable();
+        if (table.equals(otable) && cols.equals(ocols)
+            && isConstrained(table, cols)) {
+            // XXX: technically we should make sure none of the columns
+            // are nullable
+            return false;
+        }
+
+        Table t = m_root.getTable(table);
+        if (t == null) { return true; }
+        Table ot = m_root.getTable(otable);
+        if (ot == null) { return true; }
+        ForeignKey from = ot.getForeignKey(columns(ot, ocols));
+        if (from == null) { return true; }
+        if (isNullable(from)) { return true; }
+        UniqueKey to = t.getUniqueKey(columns(t, cols));
+        if (to == null) { return true; }
+        if (isNullable(to)) { return true; }
+        if (isConnected(from, to)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isConnected(ForeignKey from, UniqueKey to) {
+        UniqueKey uk = from.getUniqueKey();
+        if (uk.equals(to)) { return true; }
+        ForeignKey fk = uk.getTable().getForeignKey(uk.getColumns());
+        if (fk == null) { return false; }
+        else { return isConnected(fk, to); }
+    }
+
+    private boolean isNullable(Constraint c) {
+        return isNullable(c.getColumns());
+    }
+
+    private boolean isNullable(Column[] cols) {
+        for (int i = 0; i < cols.length; i++) {
+            if (cols[i].isNullable()) { return true; }
+        }
+        return false;
+    }
+
+    private Column[] columns(Table t, List cols) {
+        Column[] result = new Column[cols.size()];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = t.getColumn((String) cols.get(i));
+        }
+        return result;
+    }
+
+    boolean isConstrained(String table, Collection columns) {
+        Table t = m_root.getTable(table);
+        if (t == null) { return false; }
+        outer: for (Iterator it = t.getConstraints().iterator();
+                    it.hasNext(); ) {
+            Object o = it.next();
+            if (o instanceof UniqueKey) {
+                UniqueKey key = (UniqueKey) o;
+                Column[] cols = key.getColumns();
+                for (int i = 0; i < cols.length; i++) {
+                    if (!columns.contains(cols[i].getName())) {
+                        continue outer;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
 }

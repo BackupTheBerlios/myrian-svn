@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/02/24 $
+ * @version $Revision: #9 $ $Date: 2004/02/27 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#8 $ by $Author: rhs $, $DateTime: 2004/02/24 19:43:59 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#9 $ by $Author: rhs $, $DateTime: 2004/02/27 16:35:42 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -60,19 +60,9 @@ public class Query {
             gen.pop();
         }
 
-        for (Iterator it = gen.getFrames().iterator(); it.hasNext(); ) {
-            QFrame qf = (QFrame) it.next();
-            s_log.info("frame: " + qf);
-            s_log.info("expr: " + qf.getExpression());
-            s_log.info("uses: " + gen.getUses(qf.getExpression()));
-            Expression cond = qf.getCondition();
-            if (cond != null) {
-                s_log.info("cond: " + cond);
-                s_log.info("uses: " + gen.getUses(cond));
-            }
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("unoptimized frame:\n" + qframe);
         }
-
-        s_log.info("unoptimized frame:\n" + qframe);
 
         boolean modified;
         do {
@@ -83,28 +73,43 @@ public class Query {
             }
         } while (modified);
 
-        s_log.info("hoisted frame:\n" + qframe);
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("hoisted frame:\n" + qframe);
+        }
+
+        do {
+            modified = false;
+            for (Iterator it = gen.getFrames().iterator(); it.hasNext(); ) {
+                QFrame qf = (QFrame) it.next();
+                modified |= qf.innerize();
+            }
+        } while (modified);
+
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("innerized frame:\n" + qframe);
+        }
 
         for (Iterator it = gen.getFrames().iterator(); it.hasNext(); ) {
             QFrame qf = (QFrame) it.next();
             qf.shrink();
         }
 
-        s_log.info("shrunk frame:\n" + qframe);
-
-        List where = new ArrayList();
-        String join = qframe.render(where);
-        s_log.info("join: " + join);
-        s_log.info("where: " + where);
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("shrunk frame:\n" + qframe);
+        }
 
         StringBuffer sql = new StringBuffer();
         sql.append("select ");
         for (Iterator it = m_names.iterator(); it.hasNext(); ) {
             String name = (String) it.next();
             Expression e = get(name);
+            // XXX: should eliminate duplicate fetches here when we
+            // return something smarter than a string from this
+            // method.
             sql.append(e.emit(gen));
-            sql.append(" as ");
+            sql.append(" as \"");
             sql.append(name);
+            sql.append("\"");
             if (it.hasNext()) {
                 sql.append(", ");
             }

@@ -11,12 +11,12 @@ import java.util.*;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2004/02/24 $
+ * @version $Revision: #15 $ $Date: 2004/02/27 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#14 $ by $Author: rhs $, $DateTime: 2004/02/24 10:13:24 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#15 $ by $Author: rhs $, $DateTime: 2004/02/27 16:35:42 $";
 
     private Expression m_expr;
     private String m_name;
@@ -133,54 +133,39 @@ public class Get extends Expression {
         private QFrame m_expr;
         private Property m_property;
         private QFrame m_frame;
-        private List m_conditions = null;
+        private This m_this;
+        private Key m_key = null;
 
         PropertyCondition(QFrame expr, Property property, QFrame frame) {
             m_expr = expr;
             m_property = property;
             m_frame = frame;
+            m_this = new This(m_expr);
             conditions();
         }
 
         void frame(Generator gen) {
-            gen.addUses(this, m_expr.getValues());
-            if (m_conditions == null) {
+            if (m_key == null) {
+                gen.addUses(this, m_expr.getValues());
                 gen.addUses(this, m_frame.getValues());
                 return;
-            }
-            gen.addUses(this, m_conditions);
-
-            List values = m_expr.getValues();
-            for (int i = 0; i < values.size(); i++) {
-                gen.addEquality(this, (QValue) values.get(i),
-                                (QValue) m_conditions.get(i));
+            } else {
+                m_this.frame(gen);
+                m_key.frame(gen);
+                QFrame ths = gen.getFrame(m_this);
+                QFrame key = gen.getFrame(m_key);
+                gen.addUses(this, ths.getValues());
+                gen.addUses(this, key.getValues());
+                Equals.equate(gen, this, ths, key);
             }
         }
 
         String emit(Generator gen) {
-            if (m_conditions == null) {
+            if (m_key == null) {
                 return emitStatic();
+            } else {
+                return Equals.emit(gen, m_this, m_key);
             }
-
-            List values = m_expr.getValues();
-
-            if (values.size() != m_conditions.size()) {
-                throw new IllegalStateException
-                    ("values doesn't match conditions: " + values + ", " +
-                     m_conditions);
-            }
-
-            StringBuffer buf = new StringBuffer();
-            for (int i = 0; i < values.size(); i++) {
-                buf.append(m_conditions.get(i));
-                buf.append(" = ");
-                buf.append(values.get(i));
-                if (i < values.size() - 1) {
-                    buf.append(" and ");
-                }
-            }
-
-            return buf.toString();
         }
 
         String summary() {
@@ -236,14 +221,44 @@ public class Get extends Expression {
 
         private void conditions(Constraint c) {
             String[] columns = Code.columns(c, null);
-            m_conditions = new ArrayList();
-            for (int i = 0; i < columns.length; i++) {
-                m_conditions.add(new QValue(m_frame, columns[i]));
-            }
+            m_key = new Key(m_frame, columns);
         }
 
         public String toString() {
-            return emit((Generator) null);
+            return emit(m_frame.getGenerator());
+        }
+
+    }
+
+    private static class Key extends Expression {
+
+        private QFrame m_frame;
+        private String[] m_columns;
+
+        Key(QFrame frame, String[] columns) {
+            m_frame = frame;
+            m_columns = columns;
+        }
+
+        void frame(Generator gen) {
+            QFrame frame = gen.frame(this, null);
+            List values = new ArrayList();
+            for (int i = 0; i < m_columns.length; i++) {
+                values.add(new QValue(m_frame, m_columns[i]));
+            }
+            frame.setValues(values);
+        }
+
+        String emit(Generator gen) {
+            return gen.getFrame(this).emit();
+        }
+
+        String summary() {
+            return toString();
+        }
+
+        public String toString() {
+            return m_frame.alias() + Arrays.asList(m_columns);
         }
 
     }

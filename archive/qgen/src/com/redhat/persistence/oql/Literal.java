@@ -13,12 +13,12 @@ import java.util.*;
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2004/02/26 $
+ * @version $Revision: #13 $ $Date: 2004/02/27 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#12 $ by $Author: ashah $, $DateTime: 2004/02/26 13:03:49 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#13 $ by $Author: rhs $, $DateTime: 2004/02/27 16:35:42 $";
 
     private Object m_value;
 
@@ -36,6 +36,11 @@ public class Literal extends Expression {
                 ("unable to convert value: " + m_value);
         }
         frame.setValues((String[]) result.toArray(new String[result.size()]));
+        if (m_value == null) {
+            gen.addNulls(this, frame.getValues());
+        } else {
+            gen.addNonNulls(this, frame.getValues());
+        }
     }
 
     String emit(Generator gen) {

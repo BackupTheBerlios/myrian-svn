@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
  * QueryTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/02/24 $
+ * @version $Revision: #7 $ $Date: 2004/02/27 $
  **/
 
 public class QueryTest extends TestCase {
@@ -23,7 +23,7 @@ public class QueryTest extends TestCase {
     // being an instance of TestCase. Later versions of ant don't
     // suffer from this problem.
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QueryTest.java#6 $ by $Author: jorris $, $DateTime: 2004/02/24 17:37:51 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QueryTest.java#7 $ by $Author: rhs $, $DateTime: 2004/02/27 16:35:42 $";
 
     private static final Logger s_log = Logger.getLogger(QueryTest.class);
 
@@ -79,7 +79,7 @@ public class QueryTest extends TestCase {
                 while (rs.next()) {
                     Map row = new HashMap();
                     for (int i = 1; i < ncols + 1; i++) {
-                        String name = md.getColumnName(i).toLowerCase();
+                        String name = md.getColumnName(i);
                         String value = rs.getString(i);
                         row.put(name, value);
                     }
