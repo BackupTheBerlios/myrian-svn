@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/05/27 $
+ * @version $Revision: #5 $ $Date: 2003/06/02 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#4 $ by $Author: ashah $, $DateTime: 2003/05/27 15:53:12 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#5 $ by $Author: ashah $, $DateTime: 2003/06/02 17:28:13 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -356,13 +356,25 @@ class DataObjectImpl implements DataObject {
 
             if (!m_ssn.isFlushed(this)) {
                 m_ssn.flush();
-                m_ssn.assertFlushed(this);
+                assertFlushed();
             } else {
                 // with no changes on the object fire after save directly
                 getSession().m_afterFP.fireNow(new AfterSaveEvent(this));
             }
         } catch (ProtoException pe) {
             throw new PersistenceException(pe);
+        }
+    }
+
+    private void assertFlushed() {
+        // m_ssn.assertFlushed(this) doesn't work because of '~' properties
+        for (Iterator it = getObjectType().getProperties();
+             it.hasNext(); ) {
+            Property p = (Property) it.next();
+            if (!m_ssn.isFlushed(this, C.prop(p))) {
+                // use m_ssn to generate the exception
+                m_ssn.assertFlushed(this);
+            }
         }
     }
 
