@@ -41,6 +41,12 @@
                               |----> (Opaque expression with optional metadata)
  * Static SQL in OQL -> SQL --' done
 
+ * Fetchedness (done)
+
+ * Bind variables
+
+ * Better literal support than toString()
+
  * Metadata simplification:
    - subtypes of Property can go away.
 
