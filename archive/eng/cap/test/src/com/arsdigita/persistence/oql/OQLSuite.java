@@ -14,34 +14,25 @@
  */
 package com.arsdigita.persistence.oql;
 
-import com.arsdigita.tools.junit.extensions.BaseTestSetup;
-import com.arsdigita.tools.junit.framework.PackageTestSuite;
 import junit.framework.Test;
+import junit.framework.TestSuite;
+
+import com.arsdigita.tools.junit.extensions.BaseTestSetup;
 
 /**
  * OQLSuite
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/17 $
  **/
 
-public class OQLSuite extends PackageTestSuite {
+public class OQLSuite extends TestSuite {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/oql/OQLSuite.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
-
-    public OQLSuite() {}
-
-    public OQLSuite(Class theClass) {
-        super(theClass);
-    }
-
-    public OQLSuite(String name) {
-        super(name);
-    }
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/oql/OQLSuite.java#2 $ by $Author: rhs $, $DateTime: 2004/08/17 17:46:29 $";
 
     public static Test suite() {
         OQLSuite suite = new OQLSuite();
-        populateSuite(suite);
+        suite.addTestSuite(QueryTest.class);
         BaseTestSetup wrapper = new BaseTestSetup(suite);
         return wrapper;
     }
