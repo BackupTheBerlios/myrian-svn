@@ -6,106 +6,151 @@ import com.redhat.persistence.metadata.*;
 
 import java.util.*;
 
+import org.apache.log4j.Logger;
 
 /**
  * Aggregator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/07/08 $
+ * @version $Revision: #2 $ $Date: 2003/07/28 $
  **/
 
 class Aggregator extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Aggregator.java#1 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Aggregator.java#2 $ by $Author: rhs $, $DateTime: 2003/07/28 12:34:24 $";
+
+    private static final Logger LOG = Logger.getLogger(Aggregator.class);
+
+    private static class EventMap extends HashMap {
+
+        public Event getEvent(Object key) {
+            return (Event) get(key);
+        }
+
+        public void setEvent(Object key, Event ev) {
+            put(key, ev);
+        }
+
+        public Collection getEvents(Object key) {
+            return getEvents(key, false);
+        }
+
+        private Collection getEvents(Object key, boolean create) {
+            key = new CompoundKey(Collection.class, key);
+            Collection result = (Collection) get(key);
+            if (result == null && create) {
+                result = new ArrayList();
+                put(key, result);
+            }
+            return result;
+        }
+
+        private void addEvent(Object key, Event ev) {
+            Collection events = getEvents(key, true);
+            if (!events.contains(ev)) {
+                events.add(ev);
+            }
+        }
+
+    }
 
     private ArrayList m_nodes = new ArrayList();
-    private HashMap m_events = new HashMap();
-    private HashMap m_violations = new HashMap();
-    private HashMap m_props = new HashMap();
-    private HashMap m_attributeNodes = new HashMap();
+
+    // Used to track event dependencies.
+    private EventMap m_objects = new EventMap();
+    private EventMap m_properties = new EventMap();
+    private EventMap m_depending = new EventMap();
+
+    // Used to track required merges.
+    private EventMap m_violations = new EventMap();
+    private EventMap m_props = new EventMap();
+    private EventMap m_attributes = new EventMap();
 
     public Collection getNodes() {
         return m_nodes;
     }
 
-    private Event getEvent(Object key) {
-        return (Event) m_events.get(key);
-    }
-
-    private void setEvent(Object key, Event ev) {
-        m_events.put(key, ev);
-    }
-
-    private Collection getEvents(Object key) {
-        return getEvents(key, false);
-    }
-
-    private Collection getEvents(Object key, boolean create) {
-        key = new CompoundKey(Collection.class, key);
-        Collection result = (Collection) m_events.get(key);
-        if (result == null && create) {
-            result = new ArrayList();
-            m_events.put(key, result);
-        }
-        return result;
-    }
-
-    private void addEvent(Object key, Event ev) {
-        Collection events = getEvents(key, true);
-        if (!events.contains(ev)) {
-            events.add(ev);
-        }
-    }
-
     private Event getObjectEvent(Object obj) {
-        return getEvent(obj);
+        return m_objects.getEvent(obj);
     }
 
     private void setObjectEvent(Object obj, Event ev) {
-        setEvent(obj, ev);
+        m_objects.setEvent(obj, ev);
     }
 
     private Event getPropertyEvent(Object obj, Property prop) {
-        return getEvent(new CompoundKey(obj, prop));
+        return m_properties.getEvent(new CompoundKey(obj, prop));
     }
 
     private void setPropertyEvent(Object obj, Property prop, Event ev) {
-        setEvent(new CompoundKey(obj, prop), ev);
+        m_properties.setEvent(new CompoundKey(obj, prop), ev);
     }
 
     private Event getPropertyEvent(Object obj, Property prop, Object arg) {
-        return getEvent(new CompoundKey(obj, new CompoundKey(prop, arg)));
+        return m_properties.getEvent
+            (new CompoundKey(obj, new CompoundKey(prop, arg)));
     }
 
     private void setPropertyEvent(Object obj, Property prop, Object arg,
                                   Event ev) {
-        setEvent(new CompoundKey(obj, new CompoundKey(prop, arg)), ev);
+        m_properties.setEvent
+            (new CompoundKey(obj, new CompoundKey(prop, arg)), ev);
     }
 
     private void addDependingEvent(Object obj, Event ev) {
-        addEvent(obj, ev);
+        m_depending.addEvent(obj, ev);
     }
 
     private Collection getDependingEvents(Object obj) {
-        return getEvents(obj);
+        return m_depending.getEvents(obj);
     }
 
-    private Node merge(Node to, Node from) {
+    private Node findNode(Event ev) {
+        for (Iterator it = m_nodes.iterator(); it.hasNext(); ) {
+            Node nd = (Node) it.next();
+            if (nd.getEvents().contains(ev)) {
+                return nd;
+            }
+        }
+
+        throw new IllegalArgumentException
+            ("event not in any node: " + ev);
+    }
+
+    private Node merge(Node to, Node from, String msg) {
+        if (to == from) {
+            return to;
+        }
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Merging[" + msg + "]\n\n" + from + "\n\ninto\n\n" +
+                      to + "\n\n");
+        }
+
         if (!m_nodes.contains(to)) {
             throw new IllegalArgumentException
-                ("merging into nonexistent node");
+                ("merging into nonexistent node\nto = " + to +
+                 "\nfrom = " + from);
         }
+
+        if (!m_nodes.contains(from)) {
+            throw new IllegalArgumentException
+                ("merging from nonexistent node\nto = " + to +
+                 "\n from = " + from);
+        }
+
         to.merge(from);
         m_nodes.remove(from);
+
         return to;
     }
 
-    private Node getViolation(Object obj, Property prop) {
-        return (Node) m_violations.get(new CompoundKey(obj, prop));
+    private Event getViolation(Object obj, Property prop) {
+        return m_violations.getEvent(new CompoundKey(obj, prop));
     }
 
-    private void setViolation(Object obj, Property prop, Node nd) {
-        m_violations.put(new CompoundKey(obj, prop), nd);
+    private void setViolation(Object obj, Property prop, Event ev) {
+        m_violations.setEvent(new CompoundKey(obj, prop), ev);
     }
 
     private void clearViolation(Object obj, Property prop) {
@@ -113,12 +158,12 @@ class Aggregator extends Event.Switch {
     }
 
     private void setPropertyNode(Object obj, Property prop, Object arg,
-                                 Node nd) {
-        m_props.put(new CompoundKey(obj, new CompoundKey(prop, arg)), nd);
+                                 Event ev) {
+        m_props.setEvent(new CompoundKey(obj, new CompoundKey(prop, arg)), ev);
     }
 
-    private Node getPropertyNode(Object obj, Property prop, Object arg) {
-        return (Node) m_props.get
+    private Event getPropertyNode(Object obj, Property prop, Object arg) {
+        return m_props.getEvent
             (new CompoundKey(obj, new CompoundKey(prop, arg)));
     }
 
@@ -126,16 +171,16 @@ class Aggregator extends Event.Switch {
         m_props.remove(new CompoundKey(obj, new CompoundKey(prop, arg)));
     }
 
-    private void setAttributeNode(Object obj, Node nd) {
-        m_attributeNodes.put(obj, nd);
+    private void setAttributeEvent(Object obj, Event ev) {
+        m_attributes.setEvent(obj, ev);
     }
 
-    private Node getAttributeNode(Object obj) {
-        return (Node) m_attributeNodes.get(obj);
+    private Event getAttributeEvent(Object obj) {
+        return m_attributes.getEvent(obj);
     }
 
     private void clearAttributeNode(Object obj) {
-        m_attributeNodes.remove(obj);
+        m_attributes.remove(obj);
     }
 
 
@@ -165,11 +210,11 @@ class Aggregator extends Event.Switch {
         for (Iterator it = roles.iterator(); it.hasNext(); ) {
             Role role = (Role) it.next();
             if (!role.isNullable()) {
-                setViolation(obj, role, nd);
+                setViolation(obj, role, e);
             }
         }
 
-        setAttributeNode(obj, nd);
+        setAttributeEvent(obj, e);
     }
 
     public void onDelete(DeleteEvent e) {
@@ -180,16 +225,16 @@ class Aggregator extends Event.Switch {
         Collection roles = e.getObjectMap().getObjectType().getRoles();
         for (Iterator it = roles.iterator(); it.hasNext(); ) {
             Role role = (Role) it.next();
-            Node vile = getViolation(obj, role);
+            Event vile = getViolation(obj, role);
             if (vile != null) {
-                merge(nd, vile);
+                nd = merge(nd, findNode(vile), "violations from delete");
                 clearViolation(obj, role);
             }
         }
 
-        Node attrNd = getAttributeNode(obj);
-        if (attrNd != null) {
-            merge(nd, attrNd);
+        Event attr = getAttributeEvent(obj);
+        if (attr != null) {
+            nd = merge(nd, findNode(attr), "attributes from delete");
         }
 
         clearAttributeNode(obj);
@@ -225,15 +270,16 @@ class Aggregator extends Event.Switch {
         return nd;
     }
 
-    private Node mergeTwoWay(Node nd, Object obj, Property prop, Object arg) {
+    private Node mergeTwoWay(Node nd, Object obj, Property prop, Object arg,
+                             String msg) {
         Role role = (Role) prop;
         if (!role.isReversable()) { return nd; }
         Role rev = role.getReverse();
-        Node prev = getPropertyNode(arg, rev, obj);
+        Event prev = getPropertyNode(arg, rev, obj);
         if (prev != null) {
-            merge(prev, nd);
+            Node result = merge(findNode(prev), nd, msg);
             clearPropertyNode(arg, rev, obj);
-            return prev;
+            return result;
         } else {
             return nd;
         }
@@ -253,59 +299,64 @@ class Aggregator extends Event.Switch {
         Object arg = e.getArgument();
 
         if (prev != null) {
-            nd = mergeTwoWay(nd, obj, prop, prev);
+            nd = mergeTwoWay(nd, obj, prop, prev,
+                             "two way previous value from set");
         }
         if (arg != null) {
-            nd = mergeTwoWay(nd, obj, prop, arg);
+            nd = mergeTwoWay(nd, obj, prop, arg, "two way arg from set");
         }
 
-        Node vile = getViolation(obj, prop);
+        Event vile = getViolation(obj, prop);
         if (vile != null) {
-            nd = merge(vile, nd);
+            nd = merge(findNode(vile), nd, "violation from set");
             if (arg != null) {
                 clearViolation(obj, prop);
             }
         }
 
         if (!prop.getType().isKeyed()) {
-            Node attrNd = getAttributeNode(obj);
-            if (attrNd == null) {
-                setAttributeNode(obj, nd);
-            } else if (attrNd != nd) {
-                nd = merge(attrNd, nd);
+            Event attr = getAttributeEvent(obj);
+            if (attr == null) {
+                setAttributeEvent(obj, e);
+            } else {
+                nd = merge(findNode(attr), nd, "attributes from set");
             }
         }
 
         if (!prop.isNullable() && arg == null) {
-            setViolation(obj, prop, nd);
+            setViolation(obj, prop, e);
         }
 
         if (prev != null) {
-            setPropertyNode(obj, prop, prev, nd);
+            setPropertyNode(obj, prop, prev, e);
         }
         if (arg != null) {
-            setPropertyNode(obj, prop, arg, nd);
+            setPropertyNode(obj, prop, arg, e);
         }
     }
 
     public void onAdd(AddEvent e) {
         Node nd = onPropertyEvent(e);
-        nd = mergeTwoWay(nd, e.getObject(), e.getProperty(), e.getArgument());
-        setPropertyNode(e.getObject(), e.getProperty(), e.getArgument(), nd);
+        nd = mergeTwoWay(nd, e.getObject(), e.getProperty(), e.getArgument(),
+                         "two way from add");
+        setPropertyNode(e.getObject(), e.getProperty(), e.getArgument(), e);
     }
 
     public void onRemove(RemoveEvent e) {
         Node nd = onPropertyEvent(e);
-        nd = mergeTwoWay(nd, e.getObject(), e.getProperty(), e.getArgument());
-        setPropertyNode(e.getObject(), e.getProperty(), e.getArgument(), nd);
+        nd = mergeTwoWay(nd, e.getObject(), e.getProperty(), e.getArgument(),
+                         "two way from remove");
+        setPropertyNode(e.getObject(), e.getProperty(), e.getArgument(), e);
     }
 
     public void clear() {
         m_nodes.clear();
-        m_events.clear();
+        m_objects.clear();
+        m_properties.clear();
+        m_depending.clear();
         m_violations.clear();
         m_props.clear();
-        m_attributeNodes.clear();
+        m_attributes.clear();
     }
 
 }
