@@ -33,7 +33,7 @@ public class Initializer
 
     private Configuration m_conf = new Configuration();
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#12 $ by $Author: dennis $, $DateTime: 2002/11/29 17:29:39 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#13 $ by $Author: bche $, $DateTime: 2002/12/03 12:28:57 $";
 
     public static final String JDBC_URL = "jdbcUrl";
     public static final String DB_USERNAME = "dbUsername";
@@ -204,6 +204,8 @@ public class Initializer
             PreparedStatement pstmt = m_conn.prepareStatement(testDBConnection);
             ResultSet rset = pstmt.executeQuery();
             rset.next();
+            rset.close();
+            pstmt.close();
         } catch (java.sql.SQLException e) {
             throw new InitializationException(e);
         }
