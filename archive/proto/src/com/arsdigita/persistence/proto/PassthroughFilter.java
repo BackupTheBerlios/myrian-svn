@@ -8,15 +8,14 @@ import java.util.*;
  * PassthroughFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/02/28 $
+ * @version $Revision: #2 $ $Date: 2003/04/24 $
  **/
 
 public class PassthroughFilter extends Filter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PassthroughFilter.java#1 $ by $Author: rhs $, $DateTime: 2003/02/28 17:44:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PassthroughFilter.java#2 $ by $Author: rhs $, $DateTime: 2003/04/24 08:07:11 $";
 
     private String m_conditions;
-    private HashMap m_parameters = new HashMap();
 
     public PassthroughFilter(String conditions) {
         m_conditions = conditions;
@@ -24,18 +23,6 @@ public class PassthroughFilter extends Filter {
 
     public String getConditions() {
         return m_conditions;
-    }
-
-    public Collection getParameters() {
-        return m_parameters.keySet();
-    }
-
-    public void setParameter(Path path, Object value) {
-        m_parameters.put(path, value);
-    }
-
-    public Object getParameter(Path path) {
-        return m_parameters.get(path);
     }
 
     public void dispatch(Switch sw) {

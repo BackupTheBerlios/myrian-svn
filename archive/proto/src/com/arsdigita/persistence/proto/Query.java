@@ -8,12 +8,12 @@ import java.util.*;
  * Query
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #13 $ $Date: 2003/04/07 $
+ * @version $Revision: #14 $ $Date: 2003/04/24 $
  **/
 
-public class Query {
+public class Query extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#13 $ by $Author: rhs $, $DateTime: 2003/04/07 14:17:43 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#14 $ by $Author: rhs $, $DateTime: 2003/04/24 08:07:11 $";
 
     private Signature m_signature;
     private Filter m_filter;
@@ -27,6 +27,10 @@ public class Query {
     public Query(Signature signature, Filter filter) {
         m_signature = signature;
         m_filter = filter;
+    }
+
+    public void dispatch(Switch sw) {
+        sw.onQuery(this);
     }
 
     private static final Filter and(Filter left, Filter right) {
