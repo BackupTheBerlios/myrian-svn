@@ -72,8 +72,8 @@ query DataOperationProcWithInOut {
 }
 
 query DataOperationProcWithInOutInt {
-    INTEGER oldID;
-    INTEGER newID;
+    Integer oldID;
+    Integer newID;
     do {
         select DataOperationProcWithInOutInt(:oldID) as newID
     } map {
@@ -83,7 +83,7 @@ query DataOperationProcWithInOutInt {
 }
 
 query DataOperationProcWithDates {
-    DATE newDate;
+    Date newDate;
     do {
         select DataOperationProcWithDates(:idToUpdate, :oldDate) as newDate
     } map {
