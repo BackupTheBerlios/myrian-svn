@@ -15,6 +15,7 @@
 
 package com.arsdigita.util;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -29,7 +30,7 @@ import java.util.Stack;
  *
  * @author Archit Shah (ashah@mit.edu)
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/01/22 $
+ * @version $Date: 2003/01/23 $
  * @since 2003-01-22
  **/
 public class GraphUtil {
@@ -150,5 +151,43 @@ public class GraphUtil {
             }
         }
         return result;
+    }
+
+    /**
+     * Pretty-prints the tree in a format patterned off of the <a
+     * href="http://www.research.att.com/sw/tools/graphviz/refs.html">DOT
+     * language</a>.
+     *
+     * @pre tree != null
+     * @pre fmtr != null
+     * @pre writer != null
+     **/
+    public static void printTree(Tree tree, Tree.Formatter fmtr,
+                                 PrintWriter writer) {
+
+        Assert.assertNotNull(tree, "tree");
+        Assert.assertNotNull(fmtr, "formatter");
+        Assert.assertNotNull(writer, "writer");
+
+        writer.println("digraph " + tree.getLabel() + " {");
+        printTreeRecurse(tree, fmtr, writer);
+        writer.println("}");
+    }
+
+    private static void printTreeRecurse(Tree tree, Tree.Formatter fmtr,
+                                         PrintWriter writer) {
+
+        String root = fmtr.formatNode(tree.getRoot());
+        for (Iterator ii=tree.getSubtrees().iterator(); ii.hasNext(); ) {
+            Tree.EdgeTreePair pair = (Tree.EdgeTreePair) ii.next();
+            String edge = fmtr.formatEdge(pair.getEdge());
+            String child = fmtr.formatNode(pair.getTree().getRoot());
+            writer.print("    " + root + " -> " + child);
+            if ( edge != null ) {
+                writer.print("[label=\"" + edge + "\"]");
+            }
+            writer.println(";");
+            printTreeRecurse(pair.getTree(), fmtr, writer);
+        }
     }
 }
