@@ -1,0 +1,16 @@
+model test.oid;
+
+object type CompoundTwo {
+    Integer one = ctwo.one;
+    Integer two = ctwo.two;
+
+    object key (one, two);
+}
+
+object type CompoundThree {
+    Integer one = cthree.one;
+    BigInteger two = cthree.two;
+    String three = cthree.three;
+
+    object key (one, two, three);
+}
