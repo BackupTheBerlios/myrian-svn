@@ -20,11 +20,14 @@ package com.redhat.persistence.jdo;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOUserException;
 import javax.jdo.spi.JDOImplHelper;
+import org.apache.log4j.Logger;
 
 /**
  * This tests PersistenceManagerImpl and StateManagerImpl.
  **/
 public class ManagerTest extends WithTxnCase {
+
+    private static final Logger s_log = Logger.getLogger(ManagerTest.class);
 
     private Group m_group;
 
@@ -60,7 +63,7 @@ public class ManagerTest extends WithTxnCase {
             // See Section 5.5.7.
             fail("should've thrown an exception");
         } catch (JDOUserException ex) {
-            ; // expected
+            s_log.debug("expected exception", ex);
         }
     }
 
