@@ -1,7 +1,6 @@
-select s1.sup_id as column0,
-       required__r.ref_id as column1,
+select s.sub_id as column0,
+       s.required_id as column1,
        required__r.ref_attribute as column2
 from sub s,
-     sup s1,
      refs required__r
-where s1.sup_id = s.sub_id and required__r.ref_id = s.required_id
+where required__r.ref_id = s.required_id

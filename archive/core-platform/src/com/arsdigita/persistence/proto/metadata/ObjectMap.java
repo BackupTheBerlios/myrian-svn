@@ -8,12 +8,12 @@ import java.util.*;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/06/24 $
+ * @version $Revision: #5 $ $Date: 2003/06/25 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#4 $ by $Author: ashah $, $DateTime: 2003/06/24 17:28:06 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#5 $ by $Author: rhs $, $DateTime: 2003/06/25 21:48:22 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -91,7 +91,7 @@ public class ObjectMap extends Element {
         return result;
     }
 
-    public Collection getKeyProperties() {
+    public List getKeyProperties() {
         ObjectMap sm = getSuperMap();
         if (sm == null) {
             return m_key;

@@ -1,4 +1,4 @@
-select s1.sup_id as column0,
+select s.sub_id as column0,
        s1.sup_attribute as column1
 from sub s
      join sup s1 on s1.sup_id = s.sub_id

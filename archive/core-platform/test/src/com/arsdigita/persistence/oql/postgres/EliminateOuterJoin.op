@@ -1,8 +1,3 @@
-         do {
- select sub.optional_id as optional__sub__optional_id,
-        sub.sub_id as sub_id
-   from sub sub
-        } map {
-            id = sub.sub_id;
-            optional.id = sub.optional__sub__optional_id;
-        }
+select s.sub_id as column0,
+       s.optional_id as column1
+from sub s

@@ -1,4 +1,4 @@
-select s1.sup_id as column0,
+select s.sub_id as column0,
        s1.sup_attribute as column1
 from sub s,
      sup s1

@@ -1,7 +1,6 @@
-select s1.sup_id as column0,
-       optional__r.ref_id as column1,
+select s.sub_id as column0,
+       s.optional_id as column1,
        optional__r.ref_attribute as column2
 from sub s,
-     sup s1,
      refs optional__r
-where s1.sup_id = s.sub_id and optional__r.ref_id(+) = s.optional_id
+where optional__r.ref_id(+) = s.optional_id

@@ -15,12 +15,12 @@ import org.apache.log4j.Logger;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/06/25 $
+ * @version $Revision: #4 $ $Date: 2003/06/25 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#3 $ by $Author: rhs $, $DateTime: 2003/06/25 17:10:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#4 $ by $Author: rhs $, $DateTime: 2003/06/25 21:48:22 $";
 
     private static final Logger LOG = Logger.getLogger(QGen.class);
 
@@ -523,17 +523,26 @@ class QGen {
 	    return false;
 	}
 
-        Property prop = m_query.getSignature().getProperty(path);
+        final Property prop = m_query.getSignature().getProperty(path);
         ObjectMap map = Root.getRoot().getObjectMap(prop.getContainer());
         Mapping m = map.getMapping(Path.get(prop.getName()));
 
         m.dispatch(new Mapping.Switch() {
                 public void onValue(Value m) {
-                    Path alias = addJoin
-                        (path, m.getColumn().getTable().getPrimaryKey());
-                    setColumns(path, new Path[] {
-                        Path.add(alias, m.getColumn().getName())
-                    });
+                    if (prop.isKeyProperty()) {
+                        Path[] keyCols = getColumns(path.getParent());
+                        List keys =
+                            prop.getContainer().getKeyProperties();
+                        setColumns(path, new Path[] {
+                            keyCols[keys.indexOf(prop)]
+                        });
+                    } else {
+                        Path alias = addJoin
+                            (path, m.getColumn().getTable().getPrimaryKey());
+                        setColumns(path, new Path[] {
+                            Path.add(alias, m.getColumn().getName())
+                        });
+                    }
                 }
 
                 public void onJoinTo(JoinTo m) {

@@ -1,6 +1,5 @@
-select s1.sup_id as column0,
-       optional__r.ref_id as column1,
+select s.sub_id as column0,
+       s.optional_id as column1,
        optional__r.ref_attribute as column2
 from sub s
-     join sup s1 on s1.sup_id = s.sub_id
      left join refs optional__r on optional__r.ref_id = s.optional_id

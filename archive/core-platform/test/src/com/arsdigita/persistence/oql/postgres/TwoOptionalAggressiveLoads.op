@@ -1,17 +1,14 @@
-select ao.object_id as column0,
-       ao.default_domain_class as column1,
-       thumbnail__ao.object_id as column2,
-       portrait__ao.object_type as column3,
-       portrait__ao.object_id as column4,
-       tup.bio as column5,
-       user__ao.object_id as column6,
-       tup.skills as column7,
-       ao.object_type as column8,
-       ao.display_name as column9,
-       portrait__tdr.description as column10
+select tup.profile_id as column0,
+       tup.bio as column1,
+       portrait__ao.object_type as column2,
+       tup.skills as column3,
+       ao.object_type as column4,
+       tup.user_id as column5,
+       ao.default_domain_class as column6,
+       tup.portrait_id as column7,
+       portrait__tdr.description as column8,
+       ao.display_name as column9
 from t_up_profiles tup
-     join acs_objects ao on ao.object_id = tup.profile_id
-     left join acs_objects thumbnail__ao on thumbnail__ao.object_id = tup.thumbnail_id
      left join acs_objects portrait__ao on portrait__ao.object_id = tup.portrait_id
-     join acs_objects user__ao on user__ao.object_id = tup.user_id
+     join acs_objects ao on ao.object_id = tup.profile_id
      left join t_docs_resources portrait__tdr on portrait__tdr.resource_id = tup.portrait_id

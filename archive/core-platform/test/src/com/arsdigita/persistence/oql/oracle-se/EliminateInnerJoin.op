@@ -1,8 +1,3 @@
-        do {
- select sub.required_id as required__sub__required_id,
-        sub.sub_id as sub_id
-   from sub sub
-        } map {
-            id = sub.sub_id;
-            required.id = sub.required__sub__required_id;
-        }
+select s.sub_id as column0,
+       s.required_id as column1
+from sub s
