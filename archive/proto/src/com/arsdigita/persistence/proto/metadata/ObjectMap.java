@@ -8,12 +8,12 @@ import java.util.*;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/01/17 $
+ * @version $Revision: #6 $ $Date: 2003/01/28 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#5 $ by $Author: rhs $, $DateTime: 2003/01/17 11:07:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#6 $ by $Author: rhs $, $DateTime: 2003/01/28 19:17:39 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -90,6 +90,30 @@ public class ObjectMap extends Element {
         } else {
             return sm.getKeyProperties();
         }
+    }
+
+    public Collection getFetchedPaths() {
+        HashSet result = new HashSet();
+        for (Iterator it = getMappings().iterator(); it.hasNext(); ) {
+            Mapping m = (Mapping) it.next(); 
+            if (m.isValue()) {
+                result.add(m.getPath());
+            }
+        }
+
+        throw new Error("need to add aggressive loads in here");
+    }
+
+    public Join getSuperJoin() {
+        throw new Error("not implemented");
+    }
+
+    public Collection getJoins() {
+        throw new Error("not implemented");
+    }
+
+    public int getRank(Table table) {
+        throw new Error("not implemented");
     }
 
     Object getKey() {

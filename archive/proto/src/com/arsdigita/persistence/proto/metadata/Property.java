@@ -4,12 +4,12 @@ package com.arsdigita.persistence.proto.metadata;
  * Property
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/01/15 $
+ * @version $Revision: #4 $ $Date: 2003/01/28 $
  **/
 
 public abstract class Property extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Property.java#3 $ by $Author: rhs $, $DateTime: 2003/01/15 09:35:55 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Property.java#4 $ by $Author: rhs $, $DateTime: 2003/01/28 19:17:39 $";
 
 
     public static abstract class Switch {
@@ -34,6 +34,8 @@ public abstract class Property extends Element {
     }
 
     public abstract ObjectType getType();
+
+    public abstract boolean isNullable();
 
     public abstract boolean isCollection();
 

@@ -2,6 +2,8 @@ package com.arsdigita.persistence.proto.engine.rdbms;
 
 import com.arsdigita.persistence.proto.*;
 import com.arsdigita.persistence.proto.metadata.*;
+import com.arsdigita.persistence.proto.metadata.Table;
+import com.arsdigita.persistence.proto.metadata.Column;
 
 import java.util.*;
 
@@ -9,12 +11,12 @@ import java.util.*;
  * Update
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/01/17 $
+ * @version $Revision: #2 $ $Date: 2003/01/28 $
  **/
 
 class Update extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Update.java#1 $ by $Author: rhs $, $DateTime: 2003/01/17 11:07:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Update.java#2 $ by $Author: rhs $, $DateTime: 2003/01/28 19:17:39 $";
 
     public Update(Table table, OID oid) {
         super(table, oid);

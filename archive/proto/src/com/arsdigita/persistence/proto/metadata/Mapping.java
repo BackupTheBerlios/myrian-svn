@@ -6,12 +6,12 @@ import com.arsdigita.persistence.proto.common.*;
  * Mapping
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/01/17 $
+ * @version $Revision: #5 $ $Date: 2003/01/28 $
  **/
 
 public abstract class Mapping extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Mapping.java#4 $ by $Author: rhs $, $DateTime: 2003/01/17 11:07:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Mapping.java#5 $ by $Author: rhs $, $DateTime: 2003/01/28 19:17:39 $";
 
     public static abstract class Switch {
         public abstract void onValue(ValueMapping vm);
@@ -33,6 +33,10 @@ public abstract class Mapping extends Element {
     }
 
     public abstract void dispatch(Switch sw);
+
+    public abstract boolean isValue();
+
+    public abstract boolean isReference();
 
     Object getKey() {
         return getPath();

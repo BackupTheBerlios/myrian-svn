@@ -9,12 +9,12 @@ import java.util.*;
  * ReferenceMapping
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/01/17 $
+ * @version $Revision: #4 $ $Date: 2003/01/28 $
  **/
 
 public class ReferenceMapping extends Mapping {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ReferenceMapping.java#3 $ by $Author: rhs $, $DateTime: 2003/01/17 11:07:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ReferenceMapping.java#4 $ by $Author: rhs $, $DateTime: 2003/01/28 19:17:39 $";
 
     private ArrayList m_joins = new ArrayList();
 
@@ -53,6 +53,14 @@ public class ReferenceMapping extends Mapping {
 
     public void dispatch(Switch sw) {
         sw.onReference(this);
+    }
+
+    public boolean isValue() {
+        return false;
+    }
+
+    public boolean isReference() {
+        return true;
     }
 
 }
