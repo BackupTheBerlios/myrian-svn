@@ -58,12 +58,12 @@ import org.apache.log4j.Priority;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2002/08/14 $
+ * @version $Revision: #10 $ $Date: 2002/08/14 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#9 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#10 $ by $Author: dan $, $DateTime: 2002/08/14 06:58:38 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
 
@@ -361,7 +361,11 @@ public class PDL {
                                  Collection files,
                                  final String extension,
                                  boolean trimPath) {
-        Assert.assertTrue(base.exists(), "directory " + base + " exists");
+        if (!base.exists()) {
+            s_log.warn("Skipping directory " + base + " since it doesn't exist");
+            return;
+        }
+
         Assert.assertTrue(base.isDirectory(), "directory " + base + " is directory");
 
         Stack dirs = new Stack();
