@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #19 $ $Date: 2004/03/19 $
+ * @version $Revision: #20 $ $Date: 2004/03/19 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#19 $ by $Author: rhs $, $DateTime: 2004/03/19 12:59:42 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#20 $ by $Author: rhs $, $DateTime: 2004/03/19 16:09:52 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -326,10 +326,12 @@ class QFrame {
 
         static JFrame join(JFrame left, JFrame right, Code on) {
             Code join = left.join;
-            if (!left.oroot.equals(right.oroot)) {
-                join = join.add(" left");
+            if (left.oroot.equals(right.oroot)) {
+                join = join.add("\njoin ");
+            } else {
+                join = join.add("\nleft join ");
             }
-            join = join.add(" join ").add(right.join).add(" on ").add(on);
+            join = join.add(right.join).add(" on ").add(on);
             JFrame result = new JFrame(join, left, right);
             result.froot = right.oroot;
             result.oroot = left.oroot;
@@ -365,7 +367,7 @@ class QFrame {
             if (code == null) {
                 code = frame.join;
             } else {
-                code = code.add(" cross join ").add(frame.join);
+                code = code.add("\ncross join ").add(frame.join);
             }
         }
         return code;
