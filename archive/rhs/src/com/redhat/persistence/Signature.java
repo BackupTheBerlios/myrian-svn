@@ -33,12 +33,12 @@ import org.apache.log4j.Logger;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/05/02 $
+ * @version $Revision: #4 $ $Date: 2004/05/25 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/Signature.java#3 $ by $Author: rhs $, $DateTime: 2004/05/02 13:12:27 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/Signature.java#4 $ by $Author: rhs $, $DateTime: 2004/05/25 17:42:21 $";
 
     private static final Logger s_log = Logger.getLogger(Signature.class);
 
@@ -122,7 +122,7 @@ public class Signature {
         Collection props = type.getImmediateProperties();
         // all props for unkeyed, immediate only for keyed
 
-        if (props.size() == 0 && !isSource(path)) {
+        if (props.size() == 0) {
             if (!m_paths.contains(path)) {
                 m_paths.add(path);
             }

@@ -29,12 +29,12 @@ import org.apache.log4j.Logger;
  * RDBMSRecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/05/02 $
+ * @version $Revision: #4 $ $Date: 2004/05/25 $
  **/
 
 class RDBMSRecordSet extends RecordSet {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/engine/rdbms/RDBMSRecordSet.java#3 $ by $Author: rhs $, $DateTime: 2004/05/02 13:12:27 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/engine/rdbms/RDBMSRecordSet.java#4 $ by $Author: rhs $, $DateTime: 2004/05/25 17:42:21 $";
 
     private static final Logger s_log = Logger.getLogger(RecordSet.class);
 
@@ -65,7 +65,7 @@ class RDBMSRecordSet extends RecordSet {
     public Object get(Path p) {
         StatementLifecycle cycle = m_rc.getLifecycle();
         try {
-            ObjectType type = getSignature().getProperty(p).getType();
+            ObjectType type = getSignature().getType(p);
             Adapter ad = type.getRoot().getAdapter(type);
 
             String column = getColumn(p);
