@@ -1,0 +1,237 @@
+<html>
+<head>
+<title>The Plan</title>
+</head>
+<body bgcolor="#ffffff">
+
+<h1>The Plan</h1>
+
+<h2>Bicycle Support</h2>
+
+<ul>
+  <li><s>JDOAdapter</s></li>
+  <li>Basic PersistenceManager API
+    <ul>
+      <li><s>void close()</s></li>
+      <li><s>boolean isClosed()</s></li>
+      <li><s>void currentTransaction(): Transaction</s></li>
+      <li><s>void deletePersistent(Object pc)</s></li>
+      <li><s>void deletePersistentAll(Collection pcs)</s></li>
+      <li><s>void deletePersistentAll(Object[] pcs)</s></li>
+      <li><s>Object getObjectById(Object oid, boolean validate)</s></li>
+      <li><s>Object getObjectId(Object pc)</s></li>
+      <li><s>Object getUserObject()</s></li>
+      <li><s>void makePersistent(Object pc)</s></li>
+      <li><s>void makePersistentAll(Collection pcs)</s></li>
+      <li><s>void makePersistentAll(Object[] pcs)</s></li>
+      <li><s>void setUserObject(Object obj)</s></li>
+    </ul>
+  </li>
+  <li>Basic Transaction API
+    <ul>
+      <li><s>PersistenceManager getPersistenceManager()</s></li>
+      <li><s>void begin()</s></li>
+      <li><s>void commit()</s></li>
+      <li><s>void rollback()</s></li>
+      <li><s>boolean isActive()</s></li>
+    </ul>
+  </li>
+  <li>OQL Query
+    <ul>
+      <li><s>PersistenceManager.newQuery(OQL, "...")</s></li>
+      <li><s>Object Query.execute()</s></li>
+      <li><s>Object Query.execute(Object o1)</s></li>
+      <li><s>Object Query.execute(Object o1, Object o2)</s></li>
+      <li><s>Object Query.execute(Object o1, Object o2, Object o3)</s></li>
+      <li><s>Object Query.executeWithMap(Map parameters)</s></li>
+      <li><s>Object Query.executeWithArray(Object[] parameters)</s></li>
+      <li><s>void Query.compile()</s></li>
+      <li><s>void Query.setFilter(String filter)</s></li>
+      <li>void Query.close(Object result)</li>
+      <li>void Query.closeAll()</li>
+    </ul>
+  </li>
+  <li>Collections API
+    <ul>
+      <li><s>Set</s>
+        <ul>
+          <li>equals</li>
+          <li>hashCode</li>
+        </ul>
+      </li>
+      <li><s>Map</s>
+        <ul>
+          <li>equals</li>
+          <li>hashCode</li>
+        </ul>
+      </li>
+      <li><s>List</s>
+        <ul>
+          <li>iterator results need to be ordered</li>
+          <li>listIterator</li>
+          <li>subList</li>
+          <li>removeAll</li>
+          <li>retainAll</li>
+          <li>containsAll</li>
+          <li>equals</li>
+          <li>hashCode</li>
+        </ul>
+      </li>
+      <li>locking</li>
+    </ul>
+  </li>
+  <li>cursor closing (esp. in JDOQuery/OQLQuery)</li>
+</ul>
+
+<h2>Developer Preview</h2>
+
+<ul>
+  <li><s>remove oracle build dependency</s></li>
+  <li>sql generation interface</li>
+  <li>removed hardcoded jdbc url from tests</li>
+  <li>finish JDOQL parsing</li>
+  <li>need two way order -> line item for ordering to work correctly</li>
+  <li>seperate various behavior control bits from one way, two way,
+      composite, component, etc</li>
+  <li>pdl support for nested parameterized types</li>
+  <li>improved pdl loading process (may require custom enhancer)</li>
+</ul>
+
+<h2>TCK runs (doesn't pass)</h2>
+
+<ul>
+  <li>implement alphabet soup in PMFI (setConnectionFactoryName)
+    <ul>
+      <li>decide on what APIs to support for the jndi retrieved object</li>
+      <li>see spec for when to use jndi versus when to use jdbc url</li>
+    </ul>
+  </li>
+  <li>PDL generation from Java/JDO metadata</li>
+  <li>Java API for metadata</li>
+</ul>
+
+<h2>1.0 releasable</h2>
+
+<ul>
+  <li>all relevent portions of the TCK must pass</li>
+  <li>test plan</li>
+  <li>stop using PropertyMap as key. switch to serializable String
+      based with transient slots for actual thing. add new PMap
+      constructor ? another option is to use defined key order and a
+      CompoundKey. might want to wait for metamodel changes, which
+      will provide similar functionality</li>
+  <li>load c.r.p metadata from jdo files instead of pdl files (looks
+      like it requires custom enhancer)</li>
+  <li>ashah should get cache eviction in c.r.p commitable to PMI#evict
+      can be implemented</li.
+  <li>serializable query</li>
+  <li>add StatementProfiler to engine constructed in PMF</li>
+  <li>handling non-short-circuiting boolean operators (& and |) in jdoql</li>
+  <li>gcj/1.3/1.4 support</li>
+  <li>discriminator support</li>
+  <li>successive logging seems to cause PropertyCondition's Code
+     object to mutate, could be from repeated calls to emit methods in
+     the toString()</li>
+  <li>make sql setup and teardown work on oracle</li>
+  <li>remove TestPDLGenerator.java</li>
+  <li>remove dead sql scripts</li>
+  <li>decide if something like makeDirty needs to be implemented in c.r.p</li>
+  <li>are ascending/descending reserved words in JDO? should the JDOQL
+      parser treat them as such?</li>
+  <li>proper handling of numeric literals in jdoql</li>
+  <li>are a == b == c and a > b > c valid in jdoql</li>
+  <li>collection modification flags</li>
+  <li>simplify session construction interface
+    <ul>
+      <li>move ConnectionSource impls into crp</li>
+      <li>eliminate QuerySource</li>
+    </ul>
+  </li>
+  <li>deal with subtle key ordering issues that can happen when
+      multiple places in PDL try to define the same primary key in
+      opposite orders</li>
+  <li>InstanceCallbacks support</li>
+  <li>makeTransient support</li>
+  <li>c.r.p and jdo clean up to not demand on supplied
+      equals/hashCode/toString</li>
+  <li>plan for supporting multithread (does it require changes to c.r.p?)</li>
+  <li>multithreaded (for jdo)</li>
+</ul>
+
+<h2>Performance</h2>
+
+<ul>
+  <li>C.getAllTypes and C.getAllFields should be rewritten such that
+      they their (unmodifiable) lists once and only once, as opposed
+      to recomputing them on every call.</li>
+  <li>make ReflectionAdapter use cglib's Factory interface for
+      efficient object creation</li>
+  <li>pmi's IdentityMap needs to use weak references to the
+      objects</li>
+  <li>fetch groups?</li>
+  <li>memory consumption/weak refs in jdo and c.r.p</li>
+  <li>caching metadata computation in C.java</li>
+  <li>JDOQuery/OQLQuery support for addPath and setResult</li>
+</ul>
+
+<h2>Future</h2>
+
+<ul>
+  <li>remove DbHelper.java
+    <ul>
+      <li>remove sql producing methods from Column and Table and replace
+          them with pluggable renderers</li>
+      <li>remove sql producing code from DDLWriter and replace it with a
+          pluggable renderer</li>
+      <li>remove usage from BlobAd and StringAd, figure out how to make
+          adapters db dependent</li>
+      <li>either make InFilter a plugin point or choose one behavior</li>
+      <li>remove cap.Session's use of DbHelper to choose an SQLWriter</li>
+      <li>figure out how PDL.java can set up the appropriate environment
+          for the target database in the absence of a connection object</li>
+      <li>figure out out to do db specific tests</li>
+    </ul>
+  </li>
+  <li>allow adapters to fault properties before object has been
+      resurrected</li>
+  <li>add hypersonic SQL support</li>
+</ul>
+
+<h2>Notes</h2>
+
+<ul>
+  <li>First-class Objects vs Second-class Objects
+    <ul>
+      <li>how do Collection implementation fit in</li>
+      <li>are PersitenceCapable SCOs using embedded-* the same as
+          components</li>
+    </ul>
+  </li>
+  <li>integrate pandora/crp collections</li>
+  <li>find better way to initialize session than in static block in
+   PersistenceTestCase</li>
+  <li>make session aware of both object identity and datastore
+      identity and all the various permutations and mappings in
+      between the two kinds of identity</li>
+  <li>support aggregation via implicitly generating group by for
+      aggregate operations on collection properties and also providing
+      construct for creating derived types, e.g. group(all(User),
+      firstName == "Bob")</li>
+  <li>remove distinction between oql expressions and relational
+      metadata</li>
+  <li>figure out what to do for reference qualii in
+      fetchPropertyData</li>
+  <li>figure out if session should flush in fetchPropertyData</li>
+  <li>run persistence tests on objects that throw errors if toString()
+      or equals() are called from within persistence code</li>
+  <li>cleanup Signature/RecordSet/Cursor/DataSet</li>
+  <li>CRPList/CRPMap unification</li>
+  <li>make ReflectionAdapter use cglib's Factory interface for
+      efficient object creation</li>
+  <li>move IdentityAdapter to somewhere more generic than
+      test/src/.../oql</li>
+  <li>import -> resource search</li>
+</ul>
+
+</body>
+</html>
