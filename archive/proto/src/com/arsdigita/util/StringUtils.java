@@ -35,9 +35,9 @@ import org.apache.oro.text.regex.Util;
 
 /**
  * A (static) class of generally-useful string utilities.
+ *
  * @author Bill Schneider
  */
-
 public class StringUtils {
 
     private static Perl5Util s_re = new Perl5Util();
@@ -658,9 +658,10 @@ public class StringUtils {
      *
      * eg. "::forename:: has the email address ::email::"
      *
+     * @see java.text.MessageFormat
+     *
      * @param text the text to interpolate
      * @param vars a hash table containing key -> value mappings
-     *
      */
     public static String interpolate(String text, Map vars) {
         HashSubstitution subst = new HashSubstitution(vars);
@@ -687,6 +688,8 @@ public class StringUtils {
      * THis method performs a single variable substitution
      * on a string. The placeholder takes the form of
      * ::key:: within the sample text.
+     *
+     * @see java.text.MessageFormat
      *
      * @param text the text to process for substitutions
      * @param key the name of the placeholder
@@ -756,7 +759,7 @@ public class StringUtils {
          * Returns the value corresponding to the supplied key
          * placeholder.
          *
-         * @param the key being substituted
+         * @param key the key being substituted
          */
         public String generate(String key);
     }
