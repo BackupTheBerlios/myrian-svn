@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/postgres-create.sql#5 $
--- $DateTime: 2004/01/29 06:03:55 $
+-- $Id: //core-platform/dev/sql/ccm-core/postgres-create.sql#6 $
+-- $DateTime: 2004/02/09 08:27:35 $
 
 begin;
 
@@ -83,8 +83,7 @@ begin;
 \i default/kernel/table-dnm_granted_context.sql
 \i postgres/kernel/table-dnm_ungranted_context.sql
 
-\i default/kernel/index-dnm_object_1_granted_context.sql
-\i default/kernel/index-dnm_granted_context.sql
+\i postgres/kernel/index-dnm_object_1_granted_context.sql
 \i postgres/kernel/index-dnm_granted_context.sql
 \i postgres/kernel/index-dnm_ungranted_context.sql
 
@@ -93,7 +92,7 @@ begin;
 \i postgres/kernel/triggers-dnm_context.sql
 
 \i default/kernel/table-dnm_group_membership.sql
-\i default/kernel/index-dnm_group_membership.sql
+\i postgres/kernel/index-dnm_group_membership.sql
 \i default/kernel/table-dnm_party_grants.sql
 
 \i postgres/kernel/package-dnm_parties.sql
