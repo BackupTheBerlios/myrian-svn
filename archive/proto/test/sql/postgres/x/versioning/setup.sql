@@ -10,7 +10,7 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/proto/test/sql/postgres/x/versioning/setup.sql#5 $
+-- $Id: //core-platform/proto/test/sql/postgres/x/versioning/setup.sql#6 $
 -- 
 
 --
@@ -18,8 +18,8 @@
 --
 -- Author: Vadim Nasardinov (vadimn@redhat.com)
 -- Since:  2003-02-24
--- Version: $Id: //core-platform/proto/test/sql/postgres/x/versioning/setup.sql#5 $
---          $DateTime: 2003/04/09 17:02:57 $
+-- Version: $Id: //core-platform/proto/test/sql/postgres/x/versioning/setup.sql#6 $
+--          $DateTime: 2003/04/11 16:37:54 $
 
 create table te_vt1 (
     id               integer
@@ -32,8 +32,7 @@ create table te_vt1 (
 create table te_vt2 (
     id               integer
                      constraint te_vt2_pk primary key,
-    name             varchar(100),
-    content          text
+    name             varchar(100)
 );
 
 create table te_c1 (
@@ -43,3 +42,20 @@ create table te_c1 (
     composite_id    integer
                     constraint te_c1_comp_id_fk references te_vt2
 );
+
+create table te_rt1 (
+    id              integer
+                    constraint te_rt1_pk primary key,
+    name            varchar(100)
+                    constraint te_rt1_name_nn not null,
+    int_attr        integer
+);
+
+create table te_vt3 (
+    id               integer
+                     constraint te_vt3_pk primary key,
+    name             varchar(100),
+    rt1_id           integer
+                     constraint te_vt3_rt1_id_fk references te_rt1
+);
+
