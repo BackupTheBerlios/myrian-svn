@@ -11,6 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
+-- $Id: //core-platform/dev/sql/upgrade/oracle-se-5.2.1-6.0.0.sql#9 $
+-- $DateTime: 2003/08/12 19:06:12 $
 
 PROMPT Red Hat WAF 5.2.1 -> 6.0.0 Upgrade Script (Oracle)
 

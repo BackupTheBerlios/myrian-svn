@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,8 +11,10 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.1-6.0.0.sql#6 $
--- $DateTime: 2003/07/31 17:13:50 $
+-- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.1-6.0.0.sql#7 $
+-- $DateTime: 2003/08/12 19:06:12 $
+
+\echo Red Hat WAF 5.2.1 -> 6.0.0 Upgrade Script (PostgreSQL)
 
 begin;
 
@@ -34,11 +36,11 @@ begin;
 \i ../postgres/upgrade/5.2.1-6.0.0/table-vcx_tags-auto.sql
 \i ../postgres/upgrade/5.2.1-6.0.0/table-vcx_txns-auto.sql
 \i ../postgres/upgrade/5.2.1-6.0.0/vcx_deferred.sql
--- \i ../postgres/upgrade/5.2.1-6.0.0/update-constraints.sql
-\i ../postgres/upgrade/5.2.1-6.0.0/misc.sql
 \i ../default/upgrade/5.2.1-6.0.0/insert-vcx_event_types.sql
 \i ../default/upgrade/5.2.1-6.0.0/insert-vcx_java_classes.sql
 \i ../default/upgrade/5.2.1-6.0.0/add-index-cw_task_listeners_tid_ltid.sql
+\i ../postgres/upgrade/5.2.1-6.0.0/misc.sql
+-- \i ../postgres/upgrade/5.2.1-6.0.0/auto-upgrade.sql
 
 commit;
 
