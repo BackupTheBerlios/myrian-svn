@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/default/search/table-search_content.sql#1 $
--- $DateTime: 2003/10/23 15:28:18 $
+-- $Id: //core-platform/dev/sql/ccm-core/default/search/table-search_content.sql#2 $
+-- $DateTime: 2004/01/23 05:51:08 $
 
 create table search_content (
     object_id         	integer
@@ -22,7 +22,7 @@ create table search_content (
     object_type         varchar(100), -- Same as acs_object(object_type)
                         -- denormalized to reduce joins
     link_text           varchar(1000),
-    url_stub            varchar(100),
+    url_stub            varchar(1000),
     summary             varchar(4000),
     xml_content         clob,  -- xml content to be indexed
     raw_content         blob,  -- non-xml content to be indexed
