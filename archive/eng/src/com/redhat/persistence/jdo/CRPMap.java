@@ -11,12 +11,12 @@ import java.util.*;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/07/08 $
+ * @version $Revision: #3 $ $Date: 2004/07/08 $
  **/
 
 class CRPMap implements Map {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPMap.java#2 $ by $Author: rhs $, $DateTime: 2004/07/08 11:51:12 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPMap.java#3 $ by $Author: vadim $, $DateTime: 2004/07/08 16:34:10 $";
 
     private Session m_ssn;
     private Object m_object;
@@ -24,6 +24,8 @@ class CRPMap implements Map {
     private Property m_container;
     private Property m_key;
     private Property m_value;
+
+    CRPMap() {}
 
     CRPMap(Session ssn, Object object, Property property) {
         m_ssn = ssn;

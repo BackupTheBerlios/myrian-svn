@@ -130,3 +130,27 @@ object type Picture class com.redhat.persistence.jdo.Picture
 
     object key(id);
 }
+
+
+object type Magazine class com.redhat.persistence.jdo.Magazine 
+                     adapter com.redhat.persistence.jdo.JDOAdapter {
+
+    Integer[1..1] id = magazines.id INTEGER;
+    String[1..1] title = magazines.title VARCHAR(200);
+
+    object key(id);
+}
+
+object type MagazineIndex class com.redhat.persistence.jdo.MapEntry
+                          adapter com.redhat.persistence.jdo.ReflectionAdapter {
+
+    String[1..1] key = mag_index.topic VARCHAR(200);
+    Integer[1..1] value = mag_index.page_number INTEGER;
+
+    object key(magazine, key);
+}
+
+association {
+    Magazine[1..1] magazine = join mag_index.magazine_id to magazines.id;
+    MagazineIndex[0..1] index$entries = join magazines.id to mag_index.magazine_id;
+}

@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
  * PandoraTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/07/08 $
+ * @version $Revision: #5 $ $Date: 2004/07/08 $
  **/
 
 public class PandoraTest extends WithTxnCase {
@@ -222,6 +222,28 @@ public class PandoraTest extends WithTxnCase {
                 "group@asdf.com"
             })
         });
+    }
+
+    public void testMagazine() {
+        Magazine rag = new Magazine(0);
+        m_pm.makePersistent(rag);
+        rag.setTitle("Wide Open");
+        Map index = rag.getIndex();
+        index.put("Samba", new Integer(3));
+        index.put("OProfile", new Integer(15));
+
+        javax.jdo.Query qq = m_pm.newQuery
+            ("com.redhat.persistence.OQL",
+             "all(com.redhat.persistence.jdo.Magazine)");
+        Collection magazines = (Collection) qq.execute();
+        Iterator it = magazines.iterator();
+        assertTrue("has next", it.hasNext());
+        Magazine current = (Magazine) it.next();
+        assertEquals("wide open", rag, current);
+        Map idx = current.getIndex();
+        assertTrue("has samba", idx.containsKey("Samba"));
+        assertTrue("has oprofile", idx.containsKey("OProfile"));
+        assertEquals("Samba on page 3", new Integer(3), idx.get("Samba"));
     }
 
     public void testMain() {

@@ -61,5 +61,14 @@
       <field name="id"/>
       <field name="product"/>
     </class>
+
+    <!-- Map-related classes -->
+
+    <class name="Magazine" identity-type="datastore">
+      <field name="id"/>
+      <field name="title"/>
+      <field name="index"/>
+    </class>
+
   </package>
 </jdo>

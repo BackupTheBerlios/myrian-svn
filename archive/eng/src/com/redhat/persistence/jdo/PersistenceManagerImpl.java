@@ -362,6 +362,11 @@ public class PersistenceManagerImpl implements PersistenceManager {
             String propName = smi.getPrefix() + ((String) props.get(i));
             Object obj = smi.provideField(pc, i);
             if (C.isComponent(type, propName)) {
+                if (!(obj instanceof PersistenceCapable)) {
+                    throw new ClassCastException
+                        ("Expected PersistenceCapable, got: " +
+                         (obj==null ? "null" : obj.getClass().getName()));
+                }
                 PersistenceCapable comp = (PersistenceCapable) obj;
                 if (comp == null) { continue; }
                 StateManagerImpl csmi = newSM(comp, pmap, propName + "$");
