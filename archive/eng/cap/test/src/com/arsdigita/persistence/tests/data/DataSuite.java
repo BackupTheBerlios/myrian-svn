@@ -13,20 +13,19 @@
  */
 package com.arsdigita.persistence.tests.data;
 
-import com.arsdigita.tools.junit.extensions.BaseTestSetup;
-import com.arsdigita.tools.junit.framework.PackageTestSuite;
-import junit.framework.Test;
+import com.arsdigita.persistence.*;
+import junit.framework.*;
 
 /**
  * DataSuite
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/08/30 $
+ * @version $Revision: #3 $ $Date: 2004/09/01 $
  **/
 
-public class DataSuite extends PackageTestSuite {
+public class DataSuite extends TestSuite {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/tests/data/DataSuite.java#2 $ by $Author: dennis $, $DateTime: 2004/08/30 14:24:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/tests/data/DataSuite.java#3 $ by $Author: rhs $, $DateTime: 2004/09/01 10:15:50 $";
 
     public DataSuite() {}
 
@@ -40,12 +39,11 @@ public class DataSuite extends PackageTestSuite {
 
     public static Test suite() {
         DataSuite suite = new DataSuite();
-        populateSuite(suite);
-        BaseTestSetup wrapper = new BaseTestSetup(suite);
-        wrapper.addSQLSetupScript("/com/arsdigita/persistence/tests/data/setup.sql");
-        wrapper.addSQLSetupScript("/com/arsdigita/persistence/setup.sql");
-        wrapper.addSQLTeardownScript("/com/arsdigita/persistence/tests/data/teardown.sql");
-        wrapper.addSQLTeardownScript("/com/arsdigita/persistence/teardown.sql");
+        suite.addTestSuite(CRUDTest.class);
+        suite.addTestSuite(MappingsTest.class);
+        PersistenceTestSetup wrapper = new PersistenceTestSetup(suite);
+        wrapper.addSQLSetupScript("com/arsdigita/persistence/setup.sql");
+        wrapper.addSQLTeardownScript("com/arsdigita/persistence/teardown.sql");
         return wrapper;
     }
 

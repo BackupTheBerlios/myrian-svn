@@ -14,17 +14,16 @@
 package com.arsdigita.persistence.pdl;
 
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
-import com.arsdigita.tools.junit.framework.PackageTestSuite;
-import junit.framework.Test;
+import junit.framework.*;
 
 /**
  * PDLSuite
  *
  * @author Jon Orris
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/09/01 $
  */
-public class PDLSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/pdl/PDLSuite.java#3 $ by $Author: rhs $, $DateTime: 2004/09/01 09:57:25 $";
+public class PDLSuite extends TestSuite {
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/pdl/PDLSuite.java#4 $ by $Author: rhs $, $DateTime: 2004/09/01 10:15:50 $";
 
     public static Test suite() {
         PDLSuite suite = new PDLSuite();

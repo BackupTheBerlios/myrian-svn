@@ -13,21 +13,16 @@
  */
 package com.arsdigita.persistence;
 
-import com.arsdigita.tools.junit.extensions.BaseTestSetup;
 import junit.framework.*;
-
-import com.redhat.persistence.pdl.*;
-import java.sql.*;
-import java.util.regex.*;
 
 /**
  * PersistenceSuite
  *
  * @author Jon Orris
- * @version $Revision: #3 $ $Date: 2004/08/30 $
+ * @version $Revision: #4 $ $Date: 2004/09/01 $
  */
 public class PersistenceSuite extends TestSuite {
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PersistenceSuite.java#3 $ by $Author: dennis $, $DateTime: 2004/08/30 14:24:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PersistenceSuite.java#4 $ by $Author: rhs $, $DateTime: 2004/09/01 10:15:50 $";
 
     public static Test suite() {
         PersistenceSuite suite = new PersistenceSuite();
@@ -78,26 +73,7 @@ public class PersistenceSuite extends TestSuite {
         suite.addTestSuite(StaticOrderTest.class);
         suite.addTestSuite(StaticPartyTest.class);
 
-        BaseTestSetup wrapper = new BaseTestSetup(suite) {
-            protected void setUp() throws Exception {
-                super.setUp();
-                // XXX: hack for getting session to load via static
-                // initializer in PersistenceTestCase
-                Class dummy = PersistenceTestCase.class;
-                Session ssn = SessionManager.getSession();
-                Connection conn = ssn.getConnection();
-                Schema.load(ssn.getMetadataRoot().getRoot(), conn);
-                conn.commit();
-            }
-            protected void tearDown() throws Exception {
-                Session ssn = SessionManager.getSession();
-                Connection conn = ssn.getConnection();
-                Schema.unload(ssn.getMetadataRoot().getRoot(), conn);
-                super.tearDown();
-                conn.commit();
-            }
-        };
-
+        PersistenceTestSetup wrapper = new PersistenceTestSetup(suite);
         wrapper.addSQLSetupScript("com/arsdigita/persistence/setup.sql");
         wrapper.addSQLTeardownScript("com/arsdigita/persistence/teardown.sql");
 
