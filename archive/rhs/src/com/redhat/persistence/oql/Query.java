@@ -23,23 +23,29 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/05/02 $
+ * @version $Revision: #3 $ $Date: 2004/05/18 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/oql/Query.java#2 $ by $Author: rhs $, $DateTime: 2004/05/02 13:12:27 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/oql/Query.java#3 $ by $Author: rhs $, $DateTime: 2004/05/18 18:55:20 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
     private Expression m_query;
     private List m_names;
     private Map m_fetched;
+    private boolean m_lock;
 
-    public Query(Expression query) {
+    public Query(Expression query, boolean lock) {
         m_query = query;
         m_names = new ArrayList();
         m_fetched = new HashMap();
+        m_lock = lock;
+    }
+
+    public Query(Expression query) {
+        this(query, false);
     }
 
     public void fetch(String name, Expression value) {
@@ -228,6 +234,10 @@ public class Query {
         if (m_query instanceof Size) {
             sql = new Code("select count(*) as \"size\" from (").add(sql)
                 .add(") count__");
+        }
+
+        if (m_lock) {
+            sql = sql.add("\nfor update");
         }
 
         synchronized (s_cache) {
