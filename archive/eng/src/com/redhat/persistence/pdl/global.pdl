@@ -1,0 +1,72 @@
+//
+// Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the
+// License at http://www.redhat.com/licenses/ccmpl.html.
+//
+// Software distributed under the License is distributed on an
+// "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+// or implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/global.pdl#1 $
+// $DateTime: 2004/06/07 13:49:55 $
+model global;
+
+object type Boolean
+    class java.lang.Boolean
+    adapter com.redhat.persistence.pdl.adapters.BooleanAd {}
+
+object type Byte
+    class java.lang.Byte
+    adapter com.redhat.persistence.pdl.adapters.ByteAd {}
+
+object type Character
+    class java.lang.Character
+    adapter com.redhat.persistence.pdl.adapters.CharacterAd {}
+
+object type String
+    class java.lang.String
+    adapter com.redhat.persistence.pdl.adapters.StringAd {}
+
+object type Short
+    class java.lang.Short
+    adapter com.redhat.persistence.pdl.adapters.ShortAd {}
+
+object type Integer
+    class java.lang.Integer
+    adapter com.redhat.persistence.pdl.adapters.IntegerAd {}
+
+object type Long
+    class java.lang.Long
+    adapter com.redhat.persistence.pdl.adapters.LongAd {}
+
+object type Float
+    class java.lang.Float
+    adapter com.redhat.persistence.pdl.adapters.FloatAd {}
+
+object type Double
+    class java.lang.Double
+    adapter com.redhat.persistence.pdl.adapters.DoubleAd {}
+
+object type BigInteger
+    class java.math.BigInteger
+    adapter com.redhat.persistence.pdl.adapters.BigIntegerAd {}
+
+object type BigDecimal
+    class java.math.BigDecimal
+    adapter com.redhat.persistence.pdl.adapters.BigDecimalAd {}
+
+object type Date
+    class java.util.Date
+    adapter com.redhat.persistence.pdl.adapters.DateAd {}
+
+object type byte[]
+    class \[B
+    adapter com.redhat.persistence.pdl.adapters.ByteArrayAd {}
+
+object type Object
+    class java.lang.Object
+    adapter com.redhat.persistence.pdl.adapters.ObjectAd {}
