@@ -15,12 +15,12 @@ import java.io.*;
  * SQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2004/03/11 $
+ * @version $Revision: #9 $ $Date: 2004/03/24 $
  */
 
 public class SQLParser {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/SQLParser.jj#8 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/SQLParser.jj#9 $ by $Author: ashah $, $DateTime: 2004/03/24 13:21:25 $";
 
     public static interface Mapper {
         Path map(Path path);
@@ -40,6 +40,17 @@ public class SQLParser {
     public SQLParser(Reader r, Mapper mapper) {
         this(r);
         m_mapper = mapper;
+    }
+
+    public void initialize(java.io.Reader reader) {
+        initialize(reader, m_mapper);
+    }
+
+    public void initialize(java.io.Reader reader, Mapper mapper) {
+        m_assigns.clear();
+        m_mapper = mapper;
+        m_sql = new SQL();
+        ReInit(reader);
     }
 
     public class Assign {

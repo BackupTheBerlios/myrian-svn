@@ -10,12 +10,12 @@ import org.apache.log4j.Logger;
  * EquiSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/03/23 $
+ * @version $Revision: #4 $ $Date: 2004/03/24 $
  **/
 
 class EquiSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/EquiSet.java#3 $ by $Author: richardl $, $DateTime: 2004/03/23 18:01:04 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/EquiSet.java#4 $ by $Author: ashah $, $DateTime: 2004/03/24 13:21:25 $";
 
     private static final Logger s_log = Logger.getLogger(EquiSet.class);
 
@@ -75,15 +75,16 @@ class EquiSet {
 
         boolean modified = false;
 
-        for (Iterator it = result.keys().iterator(); it.hasNext(); ) {
-            Object key = (Object) it.next();
+        List keys = result.keys();
+        for (int i = 0; i < keys.size(); i++) {
+            Object key = keys.get(i);
             Set set = result.get(key);
             Set cols = columns.get(key);
-            for (Iterator iter = cols.iterator(); iter.hasNext(); ) {
-                String col = (String) iter.next();
+            for (Iterator it = cols.iterator(); it.hasNext(); ) {
+                String col = (String) it.next();
                 Set eq = new HashSet();
-                for (Iterator ii = set.iterator(); ii.hasNext(); ) {
-                    QFrame frame = (QFrame) ii.next();
+                for (Iterator iter = set.iterator(); iter.hasNext(); ) {
+                    QFrame frame = (QFrame) iter.next();
                     eq.add(frame.getValue(col));
                 }
                 modified |= add(eq);
@@ -92,8 +93,8 @@ class EquiSet {
 
         if (!modified) {
             m_framesets = new ArrayList(result.keys().size());
-            for (Iterator it = result.keys().iterator(); it.hasNext(); ) {
-                m_framesets.add(result.get(it.next()));
+            for (int i = 0; i < keys.size(); i++) {
+                m_framesets.add(result.get(keys.get(i)));
             }
         }
 

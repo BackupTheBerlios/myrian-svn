@@ -13,12 +13,12 @@ import java.util.*;
  * Static
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/03/23 $
+ * @version $Revision: #3 $ $Date: 2004/03/24 $
  **/
 
 public class Static extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Static.java#2 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Static.java#3 $ by $Author: ashah $, $DateTime: 2004/03/24 13:21:25 $";
 
     private SQL m_sql;
     private String[] m_columns;
@@ -91,9 +91,16 @@ public class Static extends Expression {
         return tok.isBind() || tok.isPath();
     }
 
+    private static ThreadLocal s_parsers = new ThreadLocal() {
+        protected Object initialValue() {
+            return new SQLParser(new StringReader(""));
+        }
+    };
+
     private static SQL parse(String sql) {
-        final List exprs = new ArrayList();
-        SQLParser p = new SQLParser(new StringReader(sql));
+        SQLParser p = (SQLParser) s_parsers.get();
+        p.initialize(new StringReader(sql));
+
         try {
             p.sql();
         } catch (ParseException e) {
