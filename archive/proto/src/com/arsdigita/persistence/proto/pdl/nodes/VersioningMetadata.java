@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #5 $ $Date: 2003/03/03 $
+ * @version $Revision: #6 $ $Date: 2003/05/05 $
  */
 public class VersioningMetadata {
     private final static Logger LOG =
@@ -71,15 +71,15 @@ public class VersioningMetadata {
         m_switch = new Node.Switch() {
                 public void onObjectType(ObjectTypeNd ot) {
                     final String fqn = ot.getQualifiedName();
-                    final boolean isMarkedVersioned = ot.getVersioned() != null;
-                    if ( isMarkedVersioned ) {
+
+                    if ( ot.isVersioned() ) {
                         m_versionedTypes.add(fqn);
                     }
                     LOG.info("onObjectType: " + fqn);
                     Iterator ii = m_changeListeners.iterator();
                     while ( ii.hasNext() ) {
                         ((ChangeListener) ii.next()).onObjectType
-                            (fqn, isMarkedVersioned);
+                            (fqn, ot.isVersioned());
                     }
                 }
             };

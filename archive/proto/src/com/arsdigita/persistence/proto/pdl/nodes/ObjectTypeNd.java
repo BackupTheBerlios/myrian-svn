@@ -4,15 +4,13 @@ package com.arsdigita.persistence.proto.pdl.nodes;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/03/18 $
+ * @version $Revision: #8 $ $Date: 2003/05/05 $
  **/
 
 public class ObjectTypeNd extends Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/ObjectTypeNd.java#7 $ by $Author: rhs $, $DateTime: 2003/03/18 15:44:06 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/ObjectTypeNd.java#8 $ by $Author: vadim $, $DateTime: 2003/05/05 16:42:06 $";
 
-    public static final Field VERSIONED =
-        new Field(ObjectTypeNd.class, "versioned", VersionedNd.class, 0, 1);
     public static final Field NAME =
         new Field(ObjectTypeNd.class, "name", IdentifierNd.class, 1, 1);
     public static final Field EXTENDS =
@@ -39,6 +37,8 @@ public class ObjectTypeNd extends Node {
         new Field(ObjectTypeNd.class, "events", EventNd.class);
 
 
+    private boolean m_isVersioned;
+
     public void dispatch(Switch sw) {
         super.dispatch(sw);
         sw.onObjectType(this);
@@ -52,8 +52,12 @@ public class ObjectTypeNd extends Node {
         return (IdentifierNd) get(NAME);
     }
 
-    public VersionedNd getVersioned() {
-        return (VersionedNd) get(VERSIONED);
+    public void setVersioned() {
+        m_isVersioned = true;
+    }
+
+    public boolean isVersioned() {
+        return m_isVersioned;
     }
 
     public TypeNd getExtends() {
