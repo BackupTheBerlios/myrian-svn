@@ -23,18 +23,19 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EnumerationParameter.java#5 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EnumerationParameter.java#6 $
  */
-public class EnumerationParameter extends StringParameter {
+public class EnumerationParameter extends AbstractParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EnumerationParameter.java#5 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/21 17:54:40 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EnumerationParameter.java#6 $" +
+        "$Author: rhs $" +
+        "$DateTime: 2003/10/21 22:57:15 $";
 
     private static final Logger s_log = Logger.getLogger
         (EnumerationParameter.class);
 
     private final HashMap m_entries;
+    private final HashMap m_reverse;
 
     public EnumerationParameter(final String name,
                                 final int multiplicity,
@@ -42,6 +43,7 @@ public class EnumerationParameter extends StringParameter {
         super(name, multiplicity, defaalt);
 
         m_entries = new HashMap();
+        m_reverse = new HashMap();
     }
 
     public EnumerationParameter(final String name) {
@@ -49,7 +51,16 @@ public class EnumerationParameter extends StringParameter {
     }
 
     public final void put(final String name, final Object value) {
+        if (m_entries.containsKey(name)) {
+            throw new IllegalArgumentException
+                ("name already has a value: " + name);
+        }
+        if (m_reverse.containsKey(value)) {
+            throw new IllegalArgumentException
+                ("value already has a name: " + value);
+        }
         m_entries.put(name, value);
+        m_reverse.put(value, name);
     }
 
     protected Object unmarshal(final String value, final ErrorList errors) {
@@ -64,4 +75,9 @@ public class EnumerationParameter extends StringParameter {
             return null;
         }
     }
+
+    protected String marshal(Object value) {
+        return (String) m_reverse.get(value);
+    }
+
 }
