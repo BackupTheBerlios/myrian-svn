@@ -11,17 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/formbuilder/FormSection.pdl#5 $ 
-// $DateTime: 2002/10/16 14:12:35 $
-
-model in undesirable
-// ways. Until Link attributes are supported I am now instead using a query for
-// retrieval of component children, and data operations for the adding and removing
-// of children.
-
-// @author <a href="mailto:pmarklun@arsdigita.com">Peter Marklund</a>
-// @version $Id: //core-platform/dev/pdl/com/arsdigita/formbuilder/FormSection.pdl#5 $
-//
+// $Id: //core-platform/dev/pdl/com/arsdigita/formbuilder/FormSection.pdl#6 $ 
+// $DateTime: 2002/10/16 14:59:54 $
 
 model com.arsdigita.formbuilder;
 
