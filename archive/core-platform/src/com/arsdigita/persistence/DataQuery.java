@@ -53,12 +53,12 @@ import java.util.Map;
  * </pre>
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/22 $
+ * @version $Revision: #5 $ $Date: 2002/09/09 $
  */
 
 public interface DataQuery {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQuery.java#4 $ by $Author: richardl $, $DateTime: 2002/08/22 16:44:02 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQuery.java#5 $ by $Author: randyg $, $DateTime: 2002/09/09 16:02:46 $";
 
     /**
      * Returns the type of this data query.
@@ -431,6 +431,29 @@ public interface DataQuery {
      *
      **/
     void addOrder(String order) throws PersistenceException;
+
+
+    /**
+     *  This adds order on the first value if it is not null or
+     *  the second value if the first value is null.  This is
+     *  similar to doing an addOrder(nvl(columnOne, columnTwo))
+     *
+     *  @param orderOne This is typically the column that will
+     *                  be used for the ordering.  If this column
+     *                  is null then the value of orderTwo is used for
+     *                  the ordering
+     *  @param orderTwo This is typically an actual value (such as -1)
+     *                  but can also be a column name the value used
+     *                  for the ordering
+     *  @param isAscending If this is true then the items are ordered
+     *                     in ascending order.  Otherwise, they are
+     *                     ordering in descending order
+     *  @exception PersistenceException is thrown if the query has
+     *             already been executed.
+     */
+    void addOrderWithNull(String orderOne, Object orderTwo, 
+                          boolean isAscending)
+        throws PersistenceException;
 
 
     /**

@@ -38,11 +38,11 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/08/30 $
+ * @version $Revision: #8 $ $Date: 2002/09/09 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#7 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#8 $ by $Author: randyg $, $DateTime: 2002/09/09 16:02:46 $";
 
     private static Logger s_log =
         Logger.getLogger(DataQueryImplTest.class.getName());
@@ -74,7 +74,7 @@ public class DataQueryImplTest extends DataQueryTest {
         final String ORDER_FIELD = "id";
         final String PRIORITY = "priority";
 
-        dq.setOrder(ORDER_FIELD);
+        dq.addOrder(ORDER_FIELD);
         assertTrue( "Should be several items in this query set!", dq.next() );
         BigDecimal priorValue = (BigDecimal) dq.get(ORDER_FIELD);
 
@@ -89,7 +89,7 @@ public class DataQueryImplTest extends DataQueryTest {
         dq = null;
 
         DataQuery descQuery = getDefaultQuery();
-        descQuery.setOrder("id desc");
+        descQuery.addOrder("id desc");
         assertTrue( "Should be several items in this query set!", descQuery.next() );
         priorValue = (BigDecimal) descQuery.get(ORDER_FIELD);
 
@@ -104,7 +104,7 @@ public class DataQueryImplTest extends DataQueryTest {
         descQuery = null;
 
         DataQuery multipleColumnOrder = getDefaultQuery();
-        multipleColumnOrder.setOrder("action desc, priority asc");
+        multipleColumnOrder.addOrder("action desc, priority asc");
         assertTrue("Should be several items in this query set!",
                multipleColumnOrder.next() );
 
@@ -215,6 +215,64 @@ public class DataQueryImplTest extends DataQueryTest {
 
     }
 
+
+    /**
+     *  Tests the ordering capability of DataQuery.
+     *  Checks forward, reverse, and multiple field ordering.
+     *
+     */
+    public void testAddOrderWithNull() {
+        DataQuery dq = getDefaultQuery();
+        final String ORDER_FIELD = "id";
+        final String PRIORITY = "priority";
+
+        dq.addOrderWithNull(null, ORDER_FIELD, true);
+        assertTrue( "Should be several items in this query set!", dq.next() );
+        BigDecimal priorValue = (BigDecimal) dq.get(ORDER_FIELD);
+
+        while ( dq.next() ) {
+            final BigDecimal currentValue = (BigDecimal) dq.get(ORDER_FIELD);
+            assertTrue("Query was retrieved out of order.",
+                   priorValue.compareTo( currentValue ) < 0 );
+
+            priorValue = currentValue;
+
+        }
+
+
+        dq = getDefaultQuery();
+        dq.addOrderWithNull(null, ORDER_FIELD, false);
+        assertTrue( "Should be several items in this query set!", dq.next() );
+        priorValue = (BigDecimal) dq.get(ORDER_FIELD);
+
+        while ( dq.next() ) {
+            final BigDecimal currentValue = (BigDecimal) dq.get(ORDER_FIELD);
+            assertTrue("Query was retrieved out of order.",
+                   priorValue.compareTo( currentValue ) > 0 );
+
+            priorValue = currentValue;
+
+        }
+        dq = null;
+
+        DataQuery descQuery = getDefaultQuery();
+        descQuery.addOrderWithNull(null, new Integer(4), true);
+        descQuery.addOrderWithNull(null, "id", false);
+        assertTrue( "Should be several items in this query set!", descQuery.next() );
+        priorValue = (BigDecimal) descQuery.get(ORDER_FIELD);
+
+        while ( descQuery.next() ) {
+            final BigDecimal currentValue = (BigDecimal) descQuery.get(ORDER_FIELD);
+            assertTrue("Query was retrieved out of order.",
+                   priorValue.compareTo( currentValue ) > 0 );
+
+            priorValue = currentValue;
+
+        }
+        descQuery = null;
+    }
+
+
     public void testCaseInsensativity() {
         DataQuery dq = getDefaultQuery();
         dq.addOrder("upper(action), lower(description)");
@@ -267,7 +325,7 @@ public class DataQueryImplTest extends DataQueryTest {
                query.size() == query2.size());
 
         query = getDefaultQuery();
-        filter = query.setFilter("id = :id");
+        filter = query.addFilter("id = :id");
         filter.set("id", new Integer(10));
 
         assertTrue("Filtered query should have at least one row.", query.next());

@@ -63,7 +63,7 @@ import org.apache.log4j.Logger;
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@arsdigita.com">randyg@arsdigita.com</a>
  * @author <a href="mailto:deison@arsdigita.com">deison@arsdigita.com</a>
- * @version $Revision: #11 $ $Date: 2002/08/22 $
+ * @version $Revision: #12 $ $Date: 2002/09/09 $
  */
 // NOTE if we ever support anything other than forward-only,
 // we'll need to shut off the auto-closing functionality
@@ -71,7 +71,7 @@ import org.apache.log4j.Logger;
 // results and general confusion.
 class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#11 $ by $Author: jorris $, $DateTime: 2002/08/22 10:38:41 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#12 $ by $Author: randyg $, $DateTime: 2002/09/09 16:02:46 $";
 
     private static final Logger log =
         Logger.getLogger(DataQueryImpl.class);
@@ -854,6 +854,38 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
 
     /**
+     *  This adds order on the first value if it is not null or
+     *  the second value if the first value is null.  This is
+     *  similar to doing an addOrder(nvl(columnOne, columnTwo))
+     *
+     *  @param orderOne This is typically the column that will
+     *                  be used for the ordering.  If this column
+     *                  is null then the value of orderTwo is used for
+     *                  the ordering
+     *  @param orderTwo This is typically an actual value (such as -1)
+     *                  but can also be a column name the value used
+     *                  for the ordering
+     *  @param isAscending If this is true then the items are ordered
+     *                     in ascending order.  Otherwise, they are
+     *                     ordering in descending order
+     *  @exception PersistenceException is thrown if the query has
+     *             already been executed.
+     */
+    public void addOrderWithNull(String orderOne, Object orderTwo, 
+                                 boolean isAscending)
+        throws PersistenceException {
+        String suffix = null;
+        if (isAscending) {
+            suffix = "asc";
+        } else {
+            suffix = "desc";
+        }
+        addOrder("case when (" + orderOne + " is null) then " +
+                 orderTwo + " else " + orderOne + " end " + suffix);
+    }
+
+
+    /**
      * Clears the current order for the data query.
      **/
     public synchronized void clearOrder() {
@@ -1277,6 +1309,11 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
         s_allowed.add("upper");
         s_allowed.add("lower");
         s_allowed.add("nvl");
+        s_allowed.add("case");
+        s_allowed.add("then");
+        s_allowed.add("when");
+        s_allowed.add("end");
+        s_allowed.add("else");
     }
 
     boolean isAllowed(Identifier id) {
