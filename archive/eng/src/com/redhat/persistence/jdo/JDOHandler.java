@@ -14,12 +14,12 @@ import org.xml.sax.*;
  * JDOHandler
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/09/23 $
+ * @version $Revision: #4 $ $Date: 2004/09/24 $
  **/
 
 class JDOHandler extends ReflectionHandler {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/JDOHandler.java#3 $ by $Author: rhs $, $DateTime: 2004/09/23 15:48:34 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/JDOHandler.java#4 $ by $Author: rhs $, $DateTime: 2004/09/24 08:05:38 $";
 
     private ClassLoader m_loader;
     private String m_resource;
@@ -85,6 +85,8 @@ class JDOHandler extends ReflectionHandler {
                 result.add(m_package + "." + name);
             }
             result.add("java.lang." + name);
+            result.add("java.math." + name);
+            result.add("java.util." + name);
         }
         return result;
     }
@@ -525,6 +527,7 @@ class JDOHandler extends ReflectionHandler {
 
         // java.util
         J2P_SUBS.put(java.util.Date.class, "Date");
+        J2P_SUBS.put(java.util.Locale.class, "Locale");
     }
 
     private String pdlType(Class klass) {

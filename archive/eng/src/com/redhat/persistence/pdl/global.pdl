@@ -71,3 +71,8 @@ nested object type byte[]
 nested object type Object
     class java.lang.Object
     adapter com.redhat.persistence.pdl.adapters.ObjectAd {}
+
+// XXX: need a real adapter for Locale
+nested object type Locale
+    class java.util.Locale
+    adapter com.redhat.persistence.pdl.adapters.ObjectAd {}
