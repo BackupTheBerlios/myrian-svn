@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import org.apache.log4j.Logger;
@@ -30,13 +32,13 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameterContext.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameterContext.java#4 $
  */
 public abstract class AbstractParameterContext implements ParameterContext {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameterContext.java#3 $" +
-        "$Author: jorris $" +
-        "$DateTime: 2003/10/28 18:36:21 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameterContext.java#4 $" +
+        "$Author: vadim $" +
+        "$DateTime: 2003/11/06 18:43:42 $";
 
     private static final Logger s_log = Logger.getLogger
         (AbstractParameterContext.class);
@@ -159,13 +161,29 @@ public abstract class AbstractParameterContext implements ParameterContext {
         m_param.write(writer, m_map);
     }
 
+
     private static InputStream findInfo(final Class klass) {
+        final List files = new LinkedList();
+        InputStream in = findInfo(klass, files);
+        if ( in == null ) {
+            throw new IllegalStateException
+                ("Could not find any of the following files: " + files);
+        }
+        return in;
+    }
+
+    private static InputStream findInfo(final Class klass, final List files) {
         if (klass == null) { return null; }
-        final String name = klass.getName().replace('.', '/');
-        final InputStream in = klass.getClassLoader
-            ().getResourceAsStream(name + "_parameter.properties");
+        final String name =
+            klass.getName().replace('.', '/') + "_parameter.properties";
+        files.add(name);
+        if ( klass.getClassLoader() == null ) {
+            return null;
+        }
+        final InputStream in = klass.getClassLoader().getResourceAsStream(name);
+
         if (in == null) {
-            return findInfo(klass.getSuperclass());
+            return findInfo(klass.getSuperclass(), files);
         } else {
             return in;
         }
@@ -178,7 +196,6 @@ public abstract class AbstractParameterContext implements ParameterContext {
      */
     protected final void loadInfo() {
         final InputStream in = findInfo(getClass());
-        Assert.exists(in, InputStream.class);
 
         try {
             m_info.load(in);
