@@ -15,12 +15,13 @@
 
 package com.arsdigita.persistence.metadata;
 
+import com.arsdigita.persistence.DataQuery;
+import com.arsdigita.persistence.SessionManager;
+import java.sql.Types;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 import org.apache.log4j.Category;
-import java.util.Date;
-import com.arsdigita.persistence.SessionManager;
-import com.arsdigita.persistence.DataQuery;
 
 
 /**
@@ -34,12 +35,12 @@ import com.arsdigita.persistence.DataQuery;
  * operations.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#3 $
  * @since 4.6.3 */
 
 final class PostgresDDLGenerator extends BaseDDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#2 $ by $Author: randyg $, $DateTime: 2002/07/18 10:31:38 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#3 $ by $Author: randyg $, $DateTime: 2002/07/18 11:31:40 $";
 
     private static Category s_log = 
         Category.getInstance(PostgresDDLGenerator.class);
@@ -82,7 +83,50 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
      * @return a SQL declaration for the jdbctype and size specified
      */
     protected String getTypeDeclaration(int jdbcType, int size) {
-        throw new Error("Not Yet Implemented");
+        if (size < 1) {
+            size = 32;
+        }
+
+        switch (jdbcType) {
+        case Types.BIGINT:
+            return "BigInt(" + size + ")";
+        case Types.BINARY:
+        case Types.BIT:
+            return "char(1)";
+        case Types.BLOB:
+            throw new Error("Not Yet Implemented");
+            //return "blob";
+        case Types.CHAR:
+            return "char(" + size + ")";
+        case Types.CLOB:
+            return "text";
+        case Types.DATE:
+        case Types.TIMESTAMP:
+            return "timestamp";
+        case Types.DECIMAL:
+        case Types.NUMERIC:
+            return "numeric(" + size + ")";
+        case Types.DOUBLE:
+        case Types.FLOAT:
+            return "double precision";
+        case Types.INTEGER:
+            return "integer";
+        case Types.LONGVARCHAR:
+            if (size > 4000) {
+                return "text";
+            } else {
+                return "varchar(" + size + ")";
+            }
+        case Types.REAL:
+            return "real";
+        case Types.SMALLINT:
+            return "smallint";
+        case Types.VARCHAR:
+            return "varchar(" + size + ")";
+        default:
+            throw new IllegalArgumentException("The passed in type {" +
+                                               jdbcType + "} is not supported");
+        }
     }
 
 
@@ -94,6 +138,7 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
     protected String getDefaultDateSyntax(Date defaultDate) {
         throw new Error("Not Yet Implemented");
     }
+
 
     /**
      * Database systems have varying restrictions on the length of 
