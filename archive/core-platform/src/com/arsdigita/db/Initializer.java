@@ -35,7 +35,7 @@ public class Initializer
 
     private Configuration m_conf = new Configuration();
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#4 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#5 $ by $Author: randyg $, $DateTime: 2002/08/12 07:48:16 $";
 
     public Initializer() throws InitializationException {
         m_conf.initParameter("jdbcUrl", 
@@ -180,13 +180,13 @@ public class Initializer
      */
     private void setDatabase(String className) {
         if (className == null) {
-            m_database = NOT_SPECIFIED;
+            setDatabase(NOT_SPECIFIED);
         } else if (className.toLowerCase().indexOf("oracle") > -1) {
-            m_database = ORACLE;
+            setDatabase(ORACLE);
         } else if (className.toLowerCase().indexOf("postgres") > -1) {
-            m_database = POSTGRES;
+            setDatabase(POSTGRES);
         } else {
-            m_database = NOT_SPECIFIED;
+            setDatabase(NOT_SPECIFIED);
         }
     }
 
@@ -200,5 +200,12 @@ public class Initializer
     public static int getDatabase() {
         return m_database;
     }
-     
+
+    /**
+     *  This allows external sources to set the database so that it
+     *  is possible to set it from the command line
+     */
+    public static void setDatabase(int database) {
+        m_database = database;
+    }
 }

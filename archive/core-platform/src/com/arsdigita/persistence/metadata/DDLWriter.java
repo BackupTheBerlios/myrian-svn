@@ -2,6 +2,8 @@ package com.arsdigita.persistence.metadata;
 
 import com.arsdigita.util.*;
 
+import com.arsdigita.db.Initializer;
+
 import java.io.*;
 import java.util.*;
 
@@ -9,12 +11,12 @@ import java.util.*;
  * DDLWriter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/09 $
+ * @version $Revision: #4 $ $Date: 2002/08/12 $
  **/
 
 public class DDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#3 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#4 $ by $Author: randyg $, $DateTime: 2002/08/12 07:48:16 $";
 
     private File m_base;
     private boolean m_overwrite;
@@ -128,7 +130,15 @@ public class DDLWriter {
             if (skipped.contains(table)) {
                 //writer.write("@@table-" + table.getName() + ".sql\n");
             } else {
-                writer.write("@@table-" + table.getName() + "-auto.sql\n");
+                if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                    // we have to prefix it with the ../build/sql/ since
+                    // postgres reads everything relative to the directory
+                    // from which it is being executed
+                    writer.write("\\i ../" + m_base + "/table-" + 
+                                 table.getName() + "-auto.sql\n");
+                } else {
+                    writer.write("@@table-" + table.getName() + "-auto.sql\n");
+                }
             }
         }
         if (deferred.size() > 0) {

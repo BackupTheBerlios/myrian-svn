@@ -2,6 +2,7 @@ begin;
 
 create view dual as select 1;
 
+\i ../build/sql/create.sql
 \i default/globalization/table-g11n_charsets.sql
 \i default/globalization/index-g11n_charsets.sql
 \i default/globalization/table-g11n_locales.sql
@@ -20,30 +21,6 @@ create view dual as select 1;
 
 
 \i default/kernel/sequence-acs_object_id_seq.sql
-\i default/kernel/table-acs_objects.sql
-\i default/kernel/index-acs_objects.sql
-\i default/kernel/table-object_container_map.sql
-\i default/kernel/index-object_container_map.sql
-
-\i default/kernel/table-email_addresses.sql
-\i default/kernel/comment-email_addresses.sql
-\i default/kernel/table-parties.sql
-\i default/kernel/index-parties.sql
-\i default/kernel/comment-parties.sql
-\i default/kernel/table-party_email_map.sql
-\i default/kernel/comment-party_email_map.sql
-\i default/kernel/constraint-parties.sql
-\i default/kernel/table-person_names.sql
-\i default/kernel/comment-person_names.sql
-\i default/kernel/table-users.sql
-\i default/kernel/comment-users.sql
-
-\i default/kernel/table-groups.sql
-\i default/kernel/table-group_member_map.sql
-\i default/kernel/table-group_subgroup_map.sql
-\i default/kernel/table-roles.sql
-\i default/kernel/index-roles.sql
-\i default/kernel/comment-roles.sql
 
 \i default/kernel/table-group_subgroup_trans_index.sql
 \i default/kernel/index-group_subgroup_trans_index.sql
@@ -55,17 +32,9 @@ create view dual as select 1;
 \i default/kernel/view-group_member_trans_map.sql
 \i default/kernel/view-party_member_trans_map.sql
 
-\i default/kernel/table-user_authentication.sql
 
-\i default/kernel/table-acs_privileges.sql
-\i default/kernel/comment-acs_privileges.sql
-\i default/kernel/table-parameterized_privileges.sql
 \i default/kernel/insert-privileges.sql
-\i default/kernel/table-acs_permissions.sql
-\i default/kernel/comment-acs_permissions.sql
 
-\i default/kernel/table-object_context.sql
-\i default/kernel/comment-object_context.sql
 \i default/kernel/insert-object_zero.sql
 
 \i default/kernel/table-granted_context_non_leaf_map.sql
@@ -83,33 +52,15 @@ create view dual as select 1;
 \i default/kernel/index-acs_permissions.sql
 
 \i default/kernel/insert-users.sql
-\i default/kernel/insert-permissions.sql
+\i postgres/kernel/insert-permissions.sql
 \i default/kernel/view-granted_trans_context_index.sql
 \i default/kernel/view-granted_trans_context_map.sql
 \i default/kernel/view-ungranted_trans_context_index.sql
 \i default/kernel/view-ungranted_trans_context_map.sql
 \i default/kernel/view-object_context_trans_map.sql
 
-\i default/kernel/table-site_nodes.sql
-\i default/kernel/index-site_nodes.sql
-\i default/kernel/table-apm_package_types.sql
-\i default/kernel/table-apm_listeners.sql
-\i default/kernel/table-apm_package_type_listener_map.sql
-\i default/kernel/table-apm_packages.sql
-\i default/kernel/index-apm_packages.sql
 -- XXX
 --\i default/kernel/view-object_package_map.sql
-
-\i default/kernel/table-acs_stylesheets.sql
-\i default/kernel/index-acs_stylesheets.sql
-\i default/kernel/table-acs_stylesheet_type_map.sql
-\i default/kernel/index-acs_stylesheet_type_map.sql
-\i default/kernel/table-acs_stylesheet_node_map.sql
-\i default/kernel/index-acs_stylesheet_node_map.sql
-
-\i default/kernel/table-note_themes.sql
-\i default/kernel/table-notes.sql
-\i default/kernel/table-theme_stylesheet_map.sql
 
 \i default/categorization/table-cat_categories.sql
 \i default/categorization/comment-cat_categories.sql
@@ -244,5 +195,7 @@ create view dual as select 1;
 \i postgres/persistence/table-persistence_dynamic_assoc.sql
 
 --\i default/kernel/index-foreign_keys.sql 
+
+\i ../build/sql/deferred.sql
 
 commit;

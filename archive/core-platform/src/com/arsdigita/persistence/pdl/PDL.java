@@ -23,6 +23,7 @@ import com.arsdigita.persistence.metadata.DDLWriter;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.oql.Query;
+import com.arsdigita.db.Initializer;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -49,12 +50,12 @@ import org.apache.log4j.Priority;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/06 $
+ * @version $Revision: #6 $ $Date: 2002/08/12 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#5 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#6 $ by $Author: randyg $, $DateTime: 2002/08/12 07:48:16 $";
 
     private static final Category s_log = Category.getInstance(PDL.class);
 
@@ -149,6 +150,7 @@ public class PDL {
         OPTIONS.put("-path", null);
         OPTIONS.put("-dot", null);
         OPTIONS.put("-ddl", null);
+        OPTIONS.put("-database", null);
     }
 
     /**
@@ -234,7 +236,15 @@ public class PDL {
             if (base != null) {
                 writer = new DDLWriter(base);
             }
-
+            String database = (String) OPTIONS.get("-database");
+            if (database != null) {
+                if ("postgres".equalsIgnoreCase(database)) {
+                    Initializer.setDatabase(Initializer.POSTGRES);
+                } else {
+                    Initializer.setDatabase(Initializer.ORACLE);
+                }
+            }
+            
             compilePDL(files);
 
             if (writer != null) {
