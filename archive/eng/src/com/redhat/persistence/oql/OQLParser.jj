@@ -16,7 +16,7 @@ import java.io.*;
  * OQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/06/24 $
+ * @version $Revision: #3 $ $Date: 2004/07/08 $
  */
 
 class OQLParser {
@@ -295,7 +295,11 @@ Expression generic() :
     t = <ID> [ l = exprl() { return construct(t, l); } ]
       {
           if (m_parameters.containsKey(t.image)) {
-              return new Literal(m_parameters.get(t.image));
+              Object value = m_parameters.get(t.image);
+              if (value instanceof Expression) {
+                  return (Expression) value;
+              }
+              return new Literal(value);
           } else {
               return new Variable(t.image);
           }

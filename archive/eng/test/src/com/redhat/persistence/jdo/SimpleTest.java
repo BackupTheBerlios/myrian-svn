@@ -1,7 +1,7 @@
 package com.redhat.persistence.jdo;
 
-import javax.jdo.JDOHelper;
-import javax.jdo.JDOUserException;
+import java.util.*;
+import javax.jdo.*;
 
 public class SimpleTest extends WithTxnCase {
     public void testModification() {
@@ -78,5 +78,27 @@ public class SimpleTest extends WithTxnCase {
             assertTrue("obj1.isNew", JDOHelper.isNew(obj1));
             assertTrue("obj4.isNew", JDOHelper.isNew(obj4));
         }
+    }
+
+    public void testOQLQuery() {
+        Employee e = new Employee("oql", null);
+        m_pm.makePersistent(e);
+
+        Query q = m_pm.newQuery
+            ("com.redhat.persistence.OQL",
+             "all(com.redhat.persistence.jdo.Employee)");
+        Object emps = q.execute();
+
+        Query q2 = m_pm.newQuery
+            ("com.redhat.persistence.OQL", "filter(emps, dept == null)");
+        q2.setFilter("this.name == \"oql\"");
+        Map values = new HashMap();
+        values.put("emps", emps);
+        Collection c2 = (Collection) q2.executeWithMap(values);
+
+        Iterator it = c2.iterator();
+        assertTrue(it.hasNext());
+        assertEquals(e, it.next());
+        assertFalse(it.hasNext());
     }
 }

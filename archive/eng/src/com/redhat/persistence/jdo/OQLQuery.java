@@ -11,6 +11,7 @@ public class OQLQuery implements javax.jdo.Query {
     private boolean m_ignoreCache = false;
     private final PersistenceManagerImpl m_pmi;
     private final String m_query;
+    private String m_filter = null;
 
     OQLQuery(PersistenceManagerImpl pmi, String query) {
         m_pmi = pmi;
@@ -21,9 +22,28 @@ public class OQLQuery implements javax.jdo.Query {
         return m_pmi;
     }
 
+    private Expression makeExpr(Map parameters) {
+        for (Iterator it = parameters.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry me = (Map.Entry) it.next();
+            if (me.getValue() instanceof CRPCollection) {
+                CRPCollection c = (CRPCollection) me.getValue();
+                me.setValue(c.expression());
+            }
+        }
+
+        Expression expr = Expression.valueOf(m_query, parameters);
+
+        if (m_filter != null) {
+            expr = new Define(expr, "this");
+            expr = new Get
+                (new Filter(expr, Expression.valueOf(m_filter)), "this");
+        }
+
+        return expr;
+    }
+
     public Object executeWithMap(Map parameters) {
-        // XXX: need to use parameters
-        final Expression expr = Expression.valueOf(m_query, parameters);
+        final Expression expr = makeExpr(parameters);
         final ObjectType type = expr.getType(m_pmi.getSession().getRoot());
         return new CRPCollection() {
             Session ssn() { return m_pmi.getSession(); }
@@ -110,7 +130,7 @@ public class OQLQuery implements javax.jdo.Query {
     }
 
     public void setFilter(String filter) {
-        throw new Error("not implemented");
+        m_filter = filter;
     }
 
     public void setOrdering(String ordering) {
