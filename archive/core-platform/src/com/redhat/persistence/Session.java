@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/08/15 $
+ * @version $Revision: #5 $ $Date: 2003/08/29 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Session.java#4 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Session.java#5 $ by $Author: ashah $, $DateTime: 2003/08/29 15:38:21 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -121,7 +121,20 @@ public class Session {
                 }
 
                 public void onLink(Link link) {
-		    result[0] = retrieve(getQuery(obj, link));
+		    PersistentCollection pc = retrieve(getQuery(obj, link));
+                    if (!link.isCollection()) {
+                        Cursor c = pc.getDataSet().getCursor();
+                        if (c.next()) {
+                            result[0] = c.get();
+
+                            if (c.next()) {
+                                throw new IllegalStateException
+                                    ("Link query returned too many rows");
+                            }
+                        }
+                    } else {
+                        result[0] = pc;
+                    }
                 }
             });
         }
