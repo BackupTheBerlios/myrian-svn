@@ -18,7 +18,7 @@ import com.arsdigita.kernel.permissions.Privilege;
 import com.arsdigita.portal.Portlet;
 
 // @author Justin Ross (justin@arsdigita.com)
-// @version $Id: //core-platform/dev/pdl/com/arsdigita/kernel/Application.pdl#3 $
+// @version $Id: //core-platform/dev/pdl/com/arsdigita/kernel/Application.pdl#4 $
 
 object type ApplicationType extends ResourceType {
 
@@ -55,12 +55,6 @@ object type Application extends Resource {
     ApplicationType[1..1] applicationType =
         join applications.application_type_id 
             to application_types.application_type_id;
-
-    Application[0..n] childApplication = 
-        join applications.application_id to applications.parent_application_id;
-
-    Application[0..1] parentApplication = 
-        join applications.parent_application_id to applications.application_id;
 }
 
 
@@ -101,7 +95,7 @@ query applicationForSiteNodeID {
         application.objectType = acs_objects.object_type;
         application.displayName = acs_objects.display_name;
         application.defaultDomainClass = acs_objects.default_domain_class;
-        application.parentApplication.id = applications.parent_application_id;
+        application.parentResource.id = applications.parent_application_id;
         application.packageInstance.id = applications.package_id;
         application.title = applications.title;
         application.description = applications.description;
