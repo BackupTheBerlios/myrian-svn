@@ -32,13 +32,13 @@ import org.apache.log4j.Logger;
  * @author David Lutterkort &lt;dlutter@redhat.com&gt;
  * @author Uday Mathur
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //eng/persistence/dev/src/com/arsdigita/util/Assert.java#3 $
+ * @version $Id: //eng/persistence/dev/src/com/arsdigita/util/Assert.java#4 $
  */
 public class Assert {
     public static final String versionId =
-        "$Id: //eng/persistence/dev/src/com/arsdigita/util/Assert.java#3 $" +
-        "$Author: dennis $" +
-        "$DateTime: 2004/09/07 10:26:15 $";
+        "$Id: //eng/persistence/dev/src/com/arsdigita/util/Assert.java#4 $" +
+        "$Author: vadim $" +
+        "$DateTime: 2004/10/01 15:57:58 $";
 
     private static final Logger s_log = Logger.getLogger
         (Assert.class);
@@ -193,40 +193,6 @@ public class Assert {
             error(DEFAULT_MESSAGE);
 
             throw new AssertionError(DEFAULT_MESSAGE);
-        }
-    }
-
-    /**
-     * Verifies that <code>Lockable</code> is locked and throws an
-     * error if it is not.
-     *
-     * @param lockable The object that must be locked
-     * @see com.arsdigita.util.Lockable
-     */
-    public static final void locked(final Lockable lockable) {
-        if (lockable != null && !lockable.isLocked()) {
-            final String message = lockable + " is not locked";
-
-            error(message);
-
-            throw new AssertionError(message);
-        }
-    }
-
-    /**
-     * Verifies that <code>lockable</code> is <em>not</em> locked and
-     * throws an error if it is.
-     *
-     * @param lockable The object that must not be locked
-     * @see com.arsdigita.util.Lockable
-     */
-    public static final void unlocked(final Lockable lockable) {
-        if (lockable != null && lockable.isLocked()) {
-            final String message = lockable + " is locked";
-
-            error(message);
-
-            throw new AssertionError(message);
         }
     }
 
@@ -495,34 +461,6 @@ public class Assert {
                        "Values not equal, " +
                        expectedLabel + " '" + expected + "', " +
                        actualLabel + " '" + actual + "'");
-        }
-    }
-
-    /**
-     * Verify that the model is locked and throw a runtime exception
-     * if it is not locked.
-     *
-     * @deprecated Use {@link #locked(Lockable)} instead
-     */
-    public static void assertLocked(Lockable l) {
-        if (isEnabled()) {
-            assertTrue(l.isLocked(),
-                       "Illegal access to an unlocked " +
-                       l.getClass().getName());
-        }
-    }
-
-    /**
-     * Verify that the model is locked and throw a runtime exception
-     * if it is locked.
-     *
-     * @deprecated Use {@link #unlocked(Lockable)} instead
-     */
-    public static void assertNotLocked(Lockable l) {
-        if (isEnabled()) {
-            assertTrue(!l.isLocked(),
-                       "Illegal access to a locked " +
-                       l.getClass().getName());
         }
     }
 
