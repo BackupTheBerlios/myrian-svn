@@ -13,12 +13,12 @@ import java.io.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #21 $ $Date: 2003/04/04 $
+ * @version $Revision: #22 $ $Date: 2003/04/07 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#21 $ by $Author: rhs $, $DateTime: 2003/04/04 20:45:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#22 $ by $Author: rhs $, $DateTime: 2003/04/07 12:12:49 $";
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -172,11 +172,24 @@ class QGen {
 				   alias);
             } else {
                 ObjectMap map =
-                    Root.getRoot().getObjectMap(src.getObjectType());
-                Table start = map.getTable();
+		    Root.getRoot().getObjectMap(src.getObjectType());
+
+                Table start = null;
+		ObjectMap om = map;
+		while (om != null) {
+		    start = om.getTable();
+		    if (start != null) {
+			break;
+		    }
+		    om = om.getSuperMap();
+		}
+
                 if (start == null) {
-                    throw new Error("no metadata");
+                    throw new IllegalStateException
+			("can't find base table for type: " +
+			 map.getObjectType());
                 }
+
                 Path alias;
 		if (src.getPath() == null) {
 		    alias = Path.get(start.getName());
