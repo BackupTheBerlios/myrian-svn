@@ -24,13 +24,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#14 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#15 $
  */
 public abstract class AbstractParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#14 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#15 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/22 16:13:26 $";
+        "$DateTime: 2003/10/22 17:37:47 $";
 
     private final String m_name;
     private final Class m_type;
@@ -121,32 +121,21 @@ public abstract class AbstractParameter implements Parameter {
         }
     }
 
-    public final void validate(Object value, final ErrorList errors) {
+    public final void validate(final Object value, final ErrorList errors) {
         Assert.exists(errors, ErrorList.class);
 
         if (value == null) {
-            value = getDefaultValue();
-        }
+            // If the value is null, validation stops here.
 
-        if (isRequired() && value == null) {
-            final ParameterError error = new ParameterError
-                (this, "The value must not be null");
-            errors.add(error);
-            return;
-        }
+            if (isRequired()) {
+                final ParameterError error = new ParameterError
+                    (this, "The value must not be null");
+                errors.add(error);
+            }
+        } else {
+            // Always do further validation for non-null values.
 
-        if (isRequired() && value != null) {
             doValidate(value, errors);
-            return;
-        }
-
-        if (!isRequired() && value == null) {
-            // Do nothing
-        }
-
-        if (!isRequired() && value != null) {
-            doValidate(value, errors);
-            return;
         }
     }
 
