@@ -13,7 +13,7 @@ if [ -z $BUILD ]; then
 	BUILD=build
 fi
 
-extend lib/*.jar lib/*.zip conf/*.properties
+extend lib/*.jar lib/*.zip conf
 extend `find $BUILD -name "*.jmake" | sed s/\\.jmake\$//g`
 extend `find $BUILD -name "*.jmake" | sed s/\\.jmake\$//g | sed s%^$BUILD/%%g`
 if [ ! -z $VERBOSE ]; then
