@@ -17,20 +17,20 @@
  */
 package com.redhat.persistence;
 
-import com.arsdigita.tools.junit.extensions.BaseTestSetup;
-import com.arsdigita.tools.junit.framework.PackageTestSuite;
 import junit.framework.Test;
+import junit.framework.TestSuite;
+import junit.extensions.TestSetup;
 
 /**
  * ProtoSuite
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/09/15 $
  **/
 
-public class ProtoSuite extends PackageTestSuite {
+public class ProtoSuite extends TestSuite {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/ProtoSuite.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/ProtoSuite.java#4 $ by $Author: rhs $, $DateTime: 2004/09/15 13:47:13 $";
 
     public ProtoSuite() {}
 
@@ -44,13 +44,8 @@ public class ProtoSuite extends PackageTestSuite {
 
     public static Test suite() {
         ProtoSuite suite = new ProtoSuite();
-        populateSuite(suite);
-        BaseTestSetup wrapper = new BaseTestSetup(suite);
-        wrapper.setSetupSQLScript
-            ("/com/arsdigita/persistence/setup.sql");
-        wrapper.setTeardownSQLScript
-            ("/com/arsdigita/persistence/teardown.sql");
-        return wrapper;
+        suite.addTestSuite(ProtoTest.class);
+        return suite;
     }
 
     public static void main(String[] args) throws Exception {

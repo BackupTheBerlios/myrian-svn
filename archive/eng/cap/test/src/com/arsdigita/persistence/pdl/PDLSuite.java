@@ -17,25 +17,23 @@
  */
 package com.arsdigita.persistence.pdl;
 
-import com.arsdigita.tools.junit.extensions.BaseTestSetup;
 import junit.framework.*;
 
 /**
  * PDLSuite
  *
  * @author Jon Orris
- * @version $Revision: #5 $ $Date: 2004/09/01 $
+ * @version $Revision: #6 $ $Date: 2004/09/15 $
  */
 public class PDLSuite extends TestSuite {
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/pdl/PDLSuite.java#5 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/pdl/PDLSuite.java#6 $ by $Author: rhs $, $DateTime: 2004/09/15 13:47:13 $";
 
     public static Test suite() {
         PDLSuite suite = new PDLSuite();
         suite.addTestSuite(AssociationMetadataTest.class);
         suite.addTestSuite(NameFilterTest.class);
         suite.addTestSuite(PDLTest.class);
-        BaseTestSetup wrapper = new BaseTestSetup(suite);
-        return wrapper;
+        return suite;
     }
 
     public static void main(String[] args) throws Exception {

@@ -23,6 +23,7 @@ import junit.framework.TestCase;
 import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.engine.rdbms.*;
 import com.redhat.persistence.pdl.PDL;
+import com.redhat.persistence.pdl.Schema;
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.runtime.*;
 import com.arsdigita.util.jdbc.*;
@@ -35,12 +36,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/09/15 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/ProtoTest.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/ProtoTest.java#4 $ by $Author: rhs $, $DateTime: 2004/09/15 13:47:13 $";
 
 
     public ProtoTest(String name) {
@@ -48,16 +49,18 @@ public class ProtoTest extends TestCase {
     }
 
     private static final String TEST_PDL =
-        "test/pdl/com/arsdigita/persistence/Test.pdl";
+        "com/arsdigita/persistence/Test.pdl";
 
     public void test() throws Exception {
         Root root = new Root();
         PDL pdl = new PDL();
-        pdl.load(new FileReader(TEST_PDL), TEST_PDL);
+        pdl.loadResource(TEST_PDL);
         pdl.emit(root);
 
+        String url = RuntimeConfig.getConfig().getJDBCURL();
+
         SQLWriter w;
-        switch (DbHelper.getDatabase()) {
+        switch (DbHelper.getDatabaseFromURL(url)) {
         case DbHelper.DB_ORACLE:
             w = new OracleWriter();
             break;
@@ -70,18 +73,14 @@ public class ProtoTest extends TestCase {
             break;
         }
 
+        final Connection conn = Connections.acquire(url);
+        conn.setAutoCommit(false);
+
         Session ssn = new Session
             (root, new RDBMSEngine
              (new ConnectionSource() {
                 public Connection acquire() {
-                    try {
-                        Connection conn = Connections.acquire
-                            (RuntimeConfig.getConfig().getJDBCURL());
-                        conn.setAutoCommit(false);
-                        return conn;
-                    } catch (SQLException e) {
-                        throw new Error(e.getMessage());
-                    }
+                    return conn;
                 }
                 public void release(Connection conn) {
                     // Do nothing
@@ -102,8 +101,18 @@ public class ProtoTest extends TestCase {
         Property NAME = TEST.getProperty("name");
         Property COLLECTION = TEST.getProperty("collection");
         Property OPT2MANY = TEST.getProperty("opt2many");
-        doTest(ssn, test, NAME, COLLECTION);
-        doTest(ssn, test, NAME, OPT2MANY);
+
+        try {
+            Schema.load(root, conn);
+            try {
+                doTest(ssn, test, NAME, COLLECTION);
+                doTest(ssn, test, NAME, OPT2MANY);
+            } finally {
+                Schema.unload(root, conn);
+            }
+        } finally {
+            conn.rollback();
+        }
     }
 
     private void doTest(Session ssn, Generic obj, Property str, Property col) {

@@ -16,27 +16,22 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package com.arsdigita.persistence.metadata;
-import com.arsdigita.tools.junit.extensions.BaseTestSetup;
-import com.arsdigita.tools.junit.framework.PackageTestSuite;
 import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * MetadataSuite - Suite of tests for persistence.metadata
  *
  * @author Jon Orris
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/09/15 $
  */
-public class MetadataxSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/metadata/MetadataxSuite.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+public class MetadataxSuite extends TestSuite {
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/metadata/MetadataxSuite.java#4 $ by $Author: rhs $, $DateTime: 2004/09/15 13:47:13 $";
 
     public static Test suite() {
         MetadataxSuite suite = new MetadataxSuite();
-        populateSuite(suite);
-        BaseTestSetup wrapper = new BaseTestSetup(suite);
-
-        wrapper.setSetupSQLScript("/../default/persistence/aggressive-test.sql");
-        wrapper.setTeardownSQLScript("/../default/persistence/aggressive-teardown.sql");
-        return wrapper;
+        suite.addTestSuite(ConstraintTest.class);
+        return suite;
     }
 
     public static void main(String[] args) throws Exception {

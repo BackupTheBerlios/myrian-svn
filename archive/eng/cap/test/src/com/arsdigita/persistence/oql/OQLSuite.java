@@ -20,24 +20,21 @@ package com.arsdigita.persistence.oql;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import com.arsdigita.tools.junit.extensions.BaseTestSetup;
-
 /**
  * OQLSuite
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/09/01 $
+ * @version $Revision: #5 $ $Date: 2004/09/15 $
  **/
 
 public class OQLSuite extends TestSuite {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/oql/OQLSuite.java#4 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/oql/OQLSuite.java#5 $ by $Author: rhs $, $DateTime: 2004/09/15 13:47:13 $";
 
     public static Test suite() {
         OQLSuite suite = new OQLSuite();
         suite.addTestSuite(QueryTest.class);
-        BaseTestSetup wrapper = new BaseTestSetup(suite);
-        return wrapper;
+        return suite;
     }
 
     public static void main(String[] args) throws Exception {
