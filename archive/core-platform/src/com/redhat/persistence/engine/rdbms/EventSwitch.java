@@ -55,12 +55,12 @@ import org.apache.log4j.Logger;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/10/28 $
+ * @version $Revision: #5 $ $Date: 2004/02/12 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#5 $ by $Author: bche $, $DateTime: 2004/02/12 11:36:27 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -299,12 +299,16 @@ class EventSwitch extends Event.Switch {
         } else if (e instanceof SetEvent) {
             SetEvent se = (SetEvent) e;
             Object prev = se.getPreviousValue();
+            boolean exit = false;
             if (prev != null && m.getRemoves() != null) {
                 addOperations(obj, role, prev, m.getRemoves());
+                exit = true;
             }
             if (arg != null && m.getAdds() != null) {
                 addOperations(obj, role, arg, m.getAdds());
+                exit = true;
             }
+            if (exit) { return; }
         }
 
         m.dispatch(new Mapping.Switch() {
