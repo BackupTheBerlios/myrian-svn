@@ -49,12 +49,12 @@ import org.apache.log4j.Category;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/06/14 $
+ * @version $Revision: #6 $ $Date: 2002/06/21 $
  */
 
 class DataAssociationImpl extends DataCollectionImpl implements DataAssociation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#5 $ by $Author: rhs $, $DateTime: 2002/06/14 15:06:47 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#6 $ by $Author: rhs $, $DateTime: 2002/06/21 15:21:36 $";
 
     private final static Category s_cat = 
                     Category.getInstance(DataAssociationImpl.class.getName());
@@ -210,7 +210,9 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
      */
     public DataObject add(DataObject object) {
         if (object == null) {
-            s_cat.warn("Adding null object to association " + this, new Throwable());
+            throw new IllegalArgumentException(
+                "Null object was passed to DataAssociation.add()"
+                );
         }
 
         m_parent.fireObserver(new AddEvent(m_parent, m_role, object));
