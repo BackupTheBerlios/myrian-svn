@@ -168,6 +168,15 @@ public class  URLCache {
     };
 
     /**
+     *  @deprecated use {@link store(String url, URLData data)}
+     */
+    public synchronized void store(String url, String data) {
+        URLData urlData = new URLData(url);
+        urlData.setContent(data.getBytes());
+        store(url, urlData);
+    }
+
+    /**
      *  Stores data for a url in the cache. Expiry time is the default expiry
      *  time.
      *
@@ -178,6 +187,15 @@ public class  URLCache {
         store (url, data, m_defaultExpiryTime);
     };
 
+
+    /**
+     *  @deprecated use {@link store(String url, URLData data, long expiry)}
+     */
+    public synchronized void store(String url, String data, long expiry) {
+        URLData urlData = new URLData(url);
+        urlData.setContent(data.getBytes());
+        store(url, urlData, expiry);
+    }
 
     /**
      *  Stores data for a url in the cache.
