@@ -11,13 +11,13 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/default/formbuilder/table-forms_widget_label.sql#1 $
--- $DateTime: 2003/10/23 15:28:18 $
+-- $Id: //core-platform/dev/sql/ccm-core/default/formbuilder/table-forms_widget_label.sql#2 $
+-- $DateTime: 2003/11/13 14:00:28 $
 
 create table forms_widget_label (
     label_id integer
         constraint forms_wgt_label_label_id_fk
-        references bebop_widgets (widget_id)
+        references bebop_components (component_id)
         constraint forms_wgt_label_label_id_pk primary key,
     widget_id integer
         constraint forms_wgt_label_widget_id_fk
