@@ -8,12 +8,12 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/07/08 $
+ * @version $Revision: #2 $ $Date: 2003/08/08 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Signature.java#1 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Signature.java#2 $ by $Author: ashah $, $DateTime: 2003/08/08 17:14:50 $";
 
     private ArrayList m_paths = new ArrayList();
 
@@ -62,6 +62,15 @@ public class Signature {
 	if (keys.size() == 0) {
 	    if (!m_paths.contains(path)) {
 		m_paths.add(path);
+                // make sure its container id properties are loaded
+                Path parent = path.getParent();
+                ObjectType pType = getType(parent);
+                Collection pKeys = pType.getKeyProperties();
+                for (Iterator it = pKeys.iterator(); it.hasNext(); ) {
+                    Property prop = (Property) it.next();
+                    Path keyPath = Path.add(parent, prop.getName());
+                    addPath(keyPath);
+                }
 	    }
 	} else {
 	    for (Iterator it = keys.iterator(); it.hasNext(); ) {
