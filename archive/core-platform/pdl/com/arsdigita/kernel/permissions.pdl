@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/permissions.pdl#19 $
-// $DateTime: 2004/01/15 10:03:14 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/permissions.pdl#20 $
+// $DateTime: 2004/01/21 11:42:39 $
 
 model com.arsdigita.kernel.permissions;
 
@@ -380,6 +380,21 @@ query PrivilegeColumnNameMap {
       where dpcm.pd_privilege =:privilege
   } map {
      columnName = dpcm.column_name;
+  }
+}
+
+//
+// Privilege Column name map
+//
+query getAllPrivilegeColumnNameMap {
+  String columnName;
+  String privilegeName;
+  do {
+    select dpcm.column_name, dpcm.pd_privilege 
+      from dnm_privilege_col_map dpcm
+  } map {
+     columnName = dpcm.column_name;
+     privilegeName = dpcm.pd_privilege;
   }
 }
 
