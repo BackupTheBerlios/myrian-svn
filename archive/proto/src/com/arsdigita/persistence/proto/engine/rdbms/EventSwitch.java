@@ -10,12 +10,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2003/03/05 $
+ * @version $Revision: #12 $ $Date: 2003/03/10 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#11 $ by $Author: rhs $, $DateTime: 2003/03/05 18:41:57 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#12 $ by $Author: rhs $, $DateTime: 2003/03/10 15:35:44 $";
 
     private static final Path KEY = Path.get("__key__");
     private static final Path KEY_FROM = Path.get("__key_from__");
@@ -40,6 +40,45 @@ class EventSwitch extends Event.Switch {
         return Path.get(column.toString());
     }
 
+    void filter(Mutation mut, Constraint constraint, Path prefix, Object obj) {
+        Column[] cols = constraint.getColumns();
+        int index = 0;
+        LinkedList stack = new LinkedList();
+        stack.add(prefix);
+        stack.add(obj);
+
+        Condition cond = mut.getCondition();
+
+        while (stack.size() > 0) {
+            Object o = stack.removeLast();
+            Path p = (Path) stack.removeLast();
+
+            ObjectType type = Session.getObjectType(o);
+            Collection keys = type.getKeyProperties();
+
+            if (keys.size() == 0) {
+                Condition eq = new EqualsCondition(getPath(cols[index]), p);
+                if (cond == null) {
+                    cond = eq;
+                } else {
+                    cond = new AndCondition(eq, cond);
+                }
+                mut.set(p, o, cols[index].getType());
+                index++;
+                continue;
+            }
+
+            PropertyMap props = Session.getProperties(o);
+            for (Iterator it = keys.iterator(); it.hasNext(); ) {
+                Property key = (Property) it.next();
+                stack.add(Path.get(p.getPath() + "." + key.getName()));
+                stack.add(props.get(key));
+            }
+        }
+
+        mut.setCondition(cond);
+    }
+
     private void set(Object obj, Column col, Object arg) {
         Table table = col.getTable();
 
@@ -50,10 +89,10 @@ class EventSwitch extends Event.Switch {
                 return;
             }
 
-            Column key = getKey(table);
-            op = new Update(table, new EqualsCondition(getPath(key), KEY));
-            op.set(KEY, RDBMSEngine.getKeyValue(obj), key.getType());
-            m_engine.addOperation(obj, op);
+            Update up = new Update(table, null);
+            filter(up, table.getPrimaryKey(), KEY, obj);
+            m_engine.addOperation(obj, up);
+            op = up;
         }
 
         op.set(col, arg);
@@ -90,10 +129,8 @@ class EventSwitch extends Event.Switch {
                 ins.set(getKey(table), RDBMSEngine.getKeyValue(obj));
                 m_engine.addOperation(obj, ins);
             } else if (e instanceof DeleteEvent) {
-                Column key = getKey(table);
-                DML del =
-                    new Delete(table, new EqualsCondition(getPath(key), KEY));
-                del.set(KEY, RDBMSEngine.getKeyValue(obj), key.getType());
+                Delete del = new Delete(table, null);
+                filter(del, table.getPrimaryKey(), KEY, obj);
                 m_engine.addOperation(obj, del);
             } else {
                 throw new IllegalArgumentException
@@ -177,30 +214,20 @@ class EventSwitch extends Event.Switch {
                     } else if (e instanceof RemoveEvent ||
                                e instanceof SetEvent &&
                                arg == null) {
-                        Condition cond;
+                        Delete del = new Delete(table, null);
                         if (e instanceof SetEvent) {
-                            cond = new EqualsCondition(getPath(from),
-                                                       KEY_FROM);
+                            filter(del, m.getFrom(), KEY_FROM, obj);
                         } else if (one2n) {
-                            cond = new EqualsCondition(getPath(to),
-                                                       KEY_TO);
+                            filter(del, m.getTo(), KEY_TO, arg);
                         } else {
-                            cond = new AndCondition
-                                (new EqualsCondition(getPath(from),
-                                                     KEY_FROM),
-                                 new EqualsCondition(getPath(to),
-                                                     KEY_TO));
+                            filter(del, m.getFrom(), KEY_FROM, obj);
+                            filter(del, m.getTo(), KEY_TO, arg);
                         }
 
-                        op = new Delete(table, cond);
-                        op.set(KEY_FROM, RDBMSEngine.getKeyValue(obj),
-                               from.getType());
-                        op.set(KEY_TO, RDBMSEngine.getKeyValue(arg),
-                               to.getType());
                         if (one2n) {
-                            m_engine.addOperation(arg, null, op);
+                            m_engine.addOperation(arg, null, del);
                         } else {
-                            m_engine.addOperation(obj, arg, op);
+                            m_engine.addOperation(obj, arg, del);
                         }
                     } else {
                         throw new IllegalArgumentException

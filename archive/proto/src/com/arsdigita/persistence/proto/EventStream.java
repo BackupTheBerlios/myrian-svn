@@ -9,12 +9,12 @@ import java.util.*;
  * for filtering the stream down to the set of events that are of interest.
  *
  * @author <a href="mailto:ashah@redhat.com">Archit Shah</a>
- * @version $Revision: #1 $ $Date: 2003/03/07 $
+ * @version $Revision: #2 $ $Date: 2003/03/10 $
  **/
 
 public class EventStream {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/EventStream.java#1 $ by $Author: ashah $, $DateTime: 2003/03/07 13:27:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/EventStream.java#2 $ by $Author: rhs $, $DateTime: 2003/03/10 15:35:44 $";
 
     // all events
     private final LinkedList m_events = new LinkedList();
@@ -116,11 +116,17 @@ public class EventStream {
     }
 
     public ObjectEvent getLastEvent(Object obj) {
+        if (obj == null) { return null; }
         return (ObjectEvent) m_objectEvents.get(getKey(obj));
     }
 
     public PropertyEvent getLastEvent(Object obj, Property prop) {
-        if (prop.isCollection()) { throw new IllegalArgumentException(); }
+        if (prop.isCollection()) {
+            LinkedList lst =
+                (LinkedList) m_collectionEvents.get(getKey(obj, prop));
+            if (lst == null) { return null; }
+            return (PropertyEvent) lst.getLast();
+        }
         return (PropertyEvent) m_setEvents.get(getKey(obj, prop));
     }
 
@@ -156,4 +162,24 @@ public class EventStream {
         if (evs == null) { return Collections.EMPTY_LIST; }
         return evs;
     }
+
+    public Collection getReachablePropertyEvents(Object obj) {
+        ArrayList result = new ArrayList();
+
+        ObjectType ot = Session.getObjectType(obj);
+        for (Iterator it = ot.getProperties().iterator(); it.hasNext(); ) {
+            Property prop = (Property) it.next();
+            if (prop.isCollection()) {
+                result.addAll(getCurrentEvents(obj, prop));
+            } else {
+                Event e = getLastEvent(obj, prop);
+                if (e != null) {
+                    result.add(e);
+                }
+            }
+        }
+
+        return result;
+    }
+
 }

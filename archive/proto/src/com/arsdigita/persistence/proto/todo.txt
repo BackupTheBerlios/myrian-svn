@@ -1,9 +1,9 @@
 Functionality:
  * Reorder DML in relational engine (2)
 
-     Delete order needs to be finished. SQL Generation must be made to
-     obey event ordering constraints. Optionally optimize with dotted
-     arrow constraints.
+     SQL Generation must be made to obey event ordering constraints.
+     Optionally optimize with dotted arrow constraints for MDSQL
+     events.
 
  * Observers (3)
 
@@ -134,3 +134,19 @@ Documentation:
    - "super" ignored
 
 Disable all cascading deletes.
+
+Intermittant failures: @28250
+
+Testcase: testOrderLineItemAssociation took 0.126 sec
+	Caused an ERROR
+null
+java.lang.NullPointerException
+	at com.arsdigita.persistence.proto.RecordSet.load(RecordSet.java:68)
+	at com.arsdigita.persistence.proto.Cursor.next(Cursor.java:73)
+	at com.arsdigita.persistence.DataQueryImpl.next(DataQueryImpl.java:306)
+	at com.arsdigita.persistence.OrderTest.testOrderLineItemAssociation(OrderTest.java:208)
+	at com.arsdigita.persistence.PersistenceTestCase.runBare(PersistenceTestCase.java:124)
+	at junit.extensions.TestDecorator.basicRun(TestDecorator.java:22)
+	at com.arsdigita.tools.junit.extensions.BaseTestSetup$1.protect(BaseTestSetup.java:52)
+	at com.arsdigita.tools.junit.extensions.BaseTestSetup.run(BaseTestSetup.java:56)
+

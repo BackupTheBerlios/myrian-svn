@@ -13,19 +13,23 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #20 $ $Date: 2003/03/05 $
+ * @version $Revision: #21 $ $Date: 2003/03/10 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#20 $ by $Author: rhs $, $DateTime: 2003/03/05 18:41:57 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#21 $ by $Author: rhs $, $DateTime: 2003/03/10 15:35:44 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
 
+    private EventStream m_events = new EventStream();
+    private HashMap m_outgoing = new HashMap();
+    private HashMap m_counts = new HashMap();
+
     private ArrayList m_operations = new ArrayList();
     private HashMap m_operationMap = new HashMap();
-    private EventSwitch m_switch = new EventSwitch(this);
+    private EventSwitch m_generator = new EventSwitch(this);
     private HashMap m_environments = new HashMap();
 
     private ConnectionSource m_source;
@@ -122,6 +126,17 @@ public class RDBMSEngine extends Engine {
         return result;
     }
 
+    void clear() {
+        clearEvents();
+        clearOperations();
+    }
+
+    void clearEvents() {
+        m_events.clear();
+        m_outgoing.clear();
+        m_counts.clear();
+    }
+
     void clearOperations() {
         m_operationMap.clear();
         m_operations.clear();
@@ -161,12 +176,157 @@ public class RDBMSEngine extends Engine {
                                   qg.getMappings(sel));
     }
 
+    private Collection getOutgoing(Event ev) {
+        return (Collection) m_outgoing.get(ev);
+    }
+
+    private int getCount(Event ev) {
+        if (m_counts.containsKey(ev)) {
+            return ((Integer) m_counts.get(ev)).intValue();
+        } else {
+            return 0;
+        }
+    }
+
+    private void setCount(Event ev, int count) {
+        if (count == 0) {
+            m_counts.remove(ev);
+        } else {
+            m_counts.put(ev, new Integer(count));
+        }
+    }
+
+    private void addArrow(Event from, Event to) {
+        LinkedList outgoing = (LinkedList) m_outgoing.get(from);
+        if (outgoing == null) {
+            outgoing = new LinkedList();
+            m_outgoing.put(from, outgoing);
+        }
+
+        setCount(to, getCount(to) + 1);
+
+        outgoing.add(to);
+    }
+
+    private void clearArrows(Event ev) {
+        Collection outgoing = getOutgoing(ev);
+        if (outgoing == null) { return; }
+        for (Iterator it = outgoing.iterator(); it.hasNext(); ) {
+            Event to = (Event) it.next();
+            setCount(to, getCount(to) - 1);
+        }
+        m_outgoing.remove(ev);
+    }
+
+    private void addObjectDependency(Event ev, Object obj) {
+        ObjectEvent oe = m_events.getLastEvent(ev.getObject());
+        if (oe != null) {
+            addArrow(oe, ev);
+        }
+    }
+
+    private void addLinkDependency(final Property prop, final ObjectEvent from,
+                                   final ObjectEvent to) {
+        if (from == null || to == null) {
+            return;
+        }
+
+        ObjectType ot = prop.getContainer();
+        ObjectMap om = ot.getRoot().getObjectMap(ot);
+        Mapping m = om.getMapping(Path.get(prop.getName()));
+        m.dispatch(new Mapping.Switch() {
+                public void onValue(Value m) { }
+
+                public void onJoinTo(JoinTo m) {
+                    addArrow(to, from);
+                }
+
+                public void onJoinFrom(JoinFrom m) {
+                    addArrow(from, to);
+                }
+
+                public void onJoinThrough(JoinThrough m) {
+                    // do nothing
+                }
+
+                public void onStatic(Static m) {
+                    if (prop.isComponent()) {
+                        addArrow(from, to);
+                    } else if (!prop.isCollection()) {
+                        addArrow(to, from);
+                    }
+                }
+            });
+    }
+
     public void write(Event ev) {
-        ev.dispatch(m_switch);
+        addObjectDependency(ev, ev.getObject());
+
+        ev.dispatch(new Event.Switch() {
+                public void onCreate(CreateEvent e) { }
+                public void onDelete(DeleteEvent e) {
+                    Collection pes =
+                        m_events.getReachablePropertyEvents(e.getObject());
+                    for (Iterator it = pes.iterator(); it.hasNext(); ) {
+                        PropertyEvent pe = (PropertyEvent) it.next();
+                        addArrow(pe, e);
+                        Object arg = pe.getArgument();
+                        addLinkDependency
+                            (pe.getProperty(), m_events.getLastEvent(arg), e);
+                    }
+                }
+
+                private void onProperty(PropertyEvent e) {
+                    Object obj = e.getObject();
+                    Property prop = e.getProperty();
+                    Object arg = e.getArgument();
+
+                    addObjectDependency(e, arg);
+
+                    PropertyEvent pe = m_events.getLastEvent(obj, prop);
+                    if (pe != null) { addArrow(pe, e); }
+
+                    ObjectEvent objev = m_events.getLastEvent(obj);
+                    ObjectEvent argev = m_events.getLastEvent(arg);
+
+                    addLinkDependency(prop, objev, argev);
+                }
+
+                public void onSet(SetEvent e) { onProperty(e); }
+                public void onAdd(AddEvent e) { onProperty(e); }
+                public void onRemove(RemoveEvent e) { onProperty(e); }
+            });
+
+        m_events.add(ev);
+    }
+
+    private void generate() {
+        HashSet generated = new HashSet();
+        int before;
+        do {
+            before = generated.size();
+
+            for (Iterator it = m_events.iterator(); it.hasNext(); ) {
+                Event ev = (Event) it.next();
+                if (generated.contains(ev)) { continue; }
+                if (getCount(ev) == 0) {
+                    generated.add(ev);
+                    clearArrows(ev);
+                    ev.dispatch(m_generator);
+                }
+            }
+        } while (generated.size() > before);
+
+        if (generated.size() < m_events.size()) {
+            throw new IllegalStateException
+                ("not all events flushed");
+        }
     }
 
     public void flush() {
         try {
+            generate();
+
             for (Iterator it = m_operations.iterator(); it.hasNext(); ) {
                 Operation op = (Operation) it.next();
                 it.remove();
@@ -180,7 +340,7 @@ public class RDBMSEngine extends Engine {
                 }
             }
         } finally {
-            clearOperations();
+            clear();
         }
     }
 
@@ -223,7 +383,7 @@ public class RDBMSEngine extends Engine {
         ObjectType type = ad.getObjectType(obj);
         Collection keys = type.getKeyProperties();
         if (keys.size() != 1) {
-            throw new Error("not implemented");
+            throw new Error("not implemented: " + type);
         }
         return ad.getProperties(obj).get((Property) keys.iterator().next());
     }
