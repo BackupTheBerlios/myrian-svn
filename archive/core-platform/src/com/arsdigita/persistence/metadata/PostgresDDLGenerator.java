@@ -35,12 +35,12 @@ import org.apache.log4j.Category;
  * operations.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#4 $
  * @since 4.6.3 */
 
 final class PostgresDDLGenerator extends BaseDDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#3 $ by $Author: randyg $, $DateTime: 2002/07/18 11:31:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#4 $ by $Author: randyg $, $DateTime: 2002/07/18 15:00:29 $";
 
     private static Category s_log = 
         Category.getInstance(PostgresDDLGenerator.class);
@@ -54,7 +54,7 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
      */
     protected boolean tableExists(String proposedName) {
         DataQuery query = SessionManager.getSession().retrieveQuery
-            ("com.arsdigita.persistence.getOracleTableNames");
+            ("com.arsdigita.persistence.getPostgresTableNames");
         query.addEqualsFilter("tableName", proposedName.toUpperCase());
         return (query.size() > 0);
     }
@@ -68,7 +68,7 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
      */
     protected boolean columnExists(String tableName, String proposedColumnName) {
         DataQuery query = SessionManager.getSession().retrieveQuery
-            ("com.arsdigita.persistence.getOracleTableNames");
+            ("com.arsdigita.persistence.getPostgresColumnNames");
         query.addEqualsFilter("tableName", tableName.toUpperCase());
         query.addEqualsFilter("columnName", proposedColumnName.toUpperCase());
         return (query.size() > 0);
