@@ -14,7 +14,7 @@
  */
 
 /**
- * $Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#5 $
+ * $Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#6 $
  *
  *  This is the class with sole purpose to feed SQL*Plus script through
  *  JDBC interface.  SQL*Plus scripts are being parsed by SimpleOracleSQLParser,
@@ -30,10 +30,16 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.io.FileNotFoundException;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Logger;
 
 public class LoadSQLPlusScript {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#5 $ by $Author: dennis $, $DateTime: 2002/08/08 16:17:42 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 16:49:53 $";
+
+    private static final Logger s_log =
+        Logger.getLogger(LoadSQLPlusScript.class);
 
     private Connection s_con;
     private Statement s_stmt;
@@ -45,8 +51,11 @@ public class LoadSQLPlusScript {
 
     public static void main (String args[]) {
 
+        ConsoleAppender log = new ConsoleAppender();
+        BasicConfigurator.configure(log);
+
         if (args.length != 4) {
-            System.err.println(
+            s_log.error (
                 "Usage: LoadSQLPlusScript " +
                 "<JDBC_URL> <username> <password> <script_filename>");
             System.exit(1);
@@ -63,7 +72,7 @@ public class LoadSQLPlusScript {
             loader.setConnection (jdbcUrl, dbUsername, dbPassword);
             loader.loadSQLPlusScript(scriptFilename);
         } catch (Exception e) {
-            System.err.println(e.toString());
+            s_log.error (e.toString());
             System.exit(1);
         }
 
@@ -134,7 +143,7 @@ public class LoadSQLPlusScript {
         }
         
         // Parse SQL script and feed JDBC with one statement at the time
-        System.err.println("Trying to open: '" + scriptFilename + "'");
+        s_log.warn ("Trying to open: '" + scriptFilename + "'");
         SimpleSQLParser parser = new SimpleSQLParser(scriptFilename);
         
         // iterate over parser.SQLStamentList();
@@ -163,27 +172,20 @@ public class LoadSQLPlusScript {
     public void executeOneStatement (String sqlString) 
         throws SQLException {
         s_stmtCount++;
-        System.err.print("Statement count: " + s_stmtCount);
+        s_log.info ("Statement count: " + s_stmtCount);
         if (s_echoSQLStatement) {
-            System.err.println();
-            System.err.println(sqlString);
+            s_log.info (sqlString);
         }
 
         try {
             int rowsAffected = s_stmt.executeUpdate(sqlString);
-            System.err.println("  " + rowsAffected + " row(s) affected");
-            //  If in verbose mode, add some whitespace for legibility
-            if (s_echoSQLStatement) {
-                System.err.println();
-            }
+            s_log.warn ("  " + rowsAffected + " row(s) affected");
         } catch (SQLException e) {
             s_exitValue = 1;
-            System.err.println(" -- FAILED: " + e.getMessage());
+            s_log.warn (" -- FAILED: " + e.getMessage());
             if (!s_onErrorContinue) {
                 throw e;
             }
         }
-
     }
-        
 }
