@@ -1274,11 +1274,7 @@ public class StringUtils {
      * Given a slash-separated path like <code>"/foo/bar/baz/quux/"</code>, this
      * iterator returns the following path fragments (in this order):
      * <code>"/foo/bar/baz/quux/"</code>, <code>"/foo/bar/baz/"</code>,
-     * <code>"/foo/bar/"</code>, <code>"/foo/"</code>, and optionally,
-     * <code>"/"</code>.
-     *
-     * <p>If <code>returnBareSlash</code> is <code>false</code>, then the last
-     * element returned by iterator is <code>"/foo/"</code>.</p>
+     * <code>"/foo/bar/"</code>, and <code>"/foo/"</code>.
      *
      * <p>The returned iterator does not support {@link Iterator#remove()}.</p>
      *
@@ -1287,21 +1283,19 @@ public class StringUtils {
      * @throws IllegalArgumentException if <code>path</code> does not begin with
      * and end in slash.
      **/
-    public static Iterator pathFinder(String path, boolean returnBareSlash) {
-        return new PathFinder(path, returnBareSlash);
+    public static Iterator pathFinder(String path) {
+        return new PathFinder(path);
     }
 
     private static class PathFinder implements Iterator {
         private final static String SL = "/";
 
         private final String m_path;
-        private final int m_fencePost;
 
-        // these slide back iterating over indexes of '/'
+        // this slides back iterating over indexes of '/'
         private int m_last;  
-        private int m_2ndToLast;
 
-        public PathFinder(String path, boolean returnBareSlash) {
+        public PathFinder(String path) {
             if ( path == null ) { throw new NullPointerException("path"); }
             if ( !path.startsWith(SL) ) {
                 throw new PathFinderException
@@ -1313,16 +1307,10 @@ public class StringUtils {
             }
             m_path = path;
             m_last = m_path.length() - 1;
-            m_fencePost = returnBareSlash ? 0 : 1;
-            set2ndToLast();
-        }
-
-        private void set2ndToLast() {
-            m_2ndToLast = m_path.lastIndexOf('/', m_last-1);
         }
 
         public boolean hasNext() {
-            return m_2ndToLast >= m_fencePost;
+            return m_last > 0;
         }
 
         public Object next() {
@@ -1330,9 +1318,11 @@ public class StringUtils {
                 throw new NoSuchElementException
                     ("initial path=" + m_path + "; current idx=" + m_last);
             }
-            m_last = m_2ndToLast;
-            set2ndToLast();
-            return m_path.substring(0, m_last+1);
+            try {
+                return m_path.substring(0, m_last+1);
+            } finally {
+                m_last = m_path.lastIndexOf('/', m_last-1);
+            }
         }
 
         public void remove() {

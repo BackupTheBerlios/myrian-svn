@@ -365,15 +365,15 @@ public class StringUtilsTest extends TestCase {
 
     public void testPathFinder() {
         try {
-            StringUtils.pathFinder(null, false);
+            StringUtils.pathFinder(null);
             fail("should've choked on null");
         } catch (NullPointerException ex) {
             ;
         }
 
         try {
-            StringUtils.pathFinder("/foo", false);
-            StringUtils.pathFinder("foo/", false);
+            StringUtils.pathFinder("/foo");
+            StringUtils.pathFinder("foo/");
             fail("should've complained about a missing slash");
         } catch (StringUtils.PathFinderException ex) {
             ;
@@ -383,10 +383,11 @@ public class StringUtilsTest extends TestCase {
         List elems = Arrays.asList
             (new String[] {path, "/foo/bar/baz//", "/foo/bar/baz/",
                            "/foo/bar/", "/foo/"});
+        testPathFinder(path, elems);
     }
 
-    private void testPathFinder(String path, List expected, boolean returnLast) {
-        Iterator actual=StringUtils.pathFinder(path, returnLast);
+    private void testPathFinder(String path, List expected) {
+        Iterator actual=StringUtils.pathFinder(path);
 
         for (Iterator elems=expected.iterator(); elems.hasNext(); ) {
             assertTrue("has next", actual.hasNext());
