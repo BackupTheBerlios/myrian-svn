@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/01/10 $
+ * @version $Revision: #11 $ $Date: 2003/01/10 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#10 $ by $Author: ashah $, $DateTime: 2003/01/10 15:20:07 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#11 $ by $Author: rhs $, $DateTime: 2003/01/10 17:10:28 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -101,7 +101,21 @@ public class Session {
                 result = false;
             } else {
                 ObjectType type = oid.getObjectType();
+                ObjectMap map = oid.getObjectMap();
                 for (Iterator it = type.getRoles().iterator();
+                     it.hasNext(); ) {
+                    Role role = (Role) it.next();
+                    if (map.getKeyProperties().contains(role)) {
+                        continue;
+                    }
+                    if (role.isCollection()) {
+                        clear(oid, role);
+                    } else {
+                        set(oid, role, null);
+                    }
+                }
+
+                for (Iterator it = map.getKeyProperties().iterator();
                      it.hasNext(); ) {
                     Role role = (Role) it.next();
                     if (role.isCollection()) {
@@ -110,6 +124,7 @@ public class Session {
                         set(oid, role, null);
                     }
                 }
+
                 addEvent(new DeleteEvent(this, oid), od);
                 result = true;
             }
@@ -606,10 +621,10 @@ public class Session {
             while (rs.next()) {
                 value = rs.load(this);
             }
-            if (value == null) {
-                pd = new PropertyData(od, prop, null);
-            } else {
-                pd = new PropertyData(od, prop, retrieve(value));
+            pd = od.getPropertyData(prop);
+            if (pd == null) {
+                throw new IllegalStateException
+                    ("Query failed to retrieve property");
             }
         }
 
@@ -619,7 +634,7 @@ public class Session {
 
     private Signature getRetrieveSignature(ObjectType type) {
         Signature result = new Signature(type);
-        result.addDefaultPaths(type);
+        result.addDefaultProperties();
         result.addSource(new Source(type));
         return result;
     }
@@ -636,19 +651,7 @@ public class Session {
     }
 
     private Query getRetrieveQuery(OID oid, Property prop) {
-        if (Signature.isAttribute(prop)) {
-            ObjectType type = oid.getObjectType();
-            Signature sig = new Signature(type);
-            sig.addPath(prop.getName());
-            Parameter start = new Parameter(type,
-                                            Path.getInstance("__start__"));
-            sig.addParameter(start);
-            Query q = new Query
-                (sig,
-                 m_engine.getEquals(Path.getInstance("__start__"), null));
-            q.set(start, POS.getPersistentObject(this, oid));
-            return q;
-        } else {
+        if (prop.isCollection()) {
             ObjectType type = prop.getType();
             Signature sig = getRetrieveSignature(type);
             Parameter start = new Parameter(prop.getContainer(),
@@ -657,18 +660,21 @@ public class Session {
 
             // should filter to associated object(s)
             // should deal with one way associations
-            Filter f;
-            if (prop.isCollection()) {
-                f = m_engine.getContains
-                    (Path.getInstance("__start__." + prop.getName()),
-                     null);
-            } else {
-                f = m_engine.getEquals
-                    (Path.getInstance("__start__." + prop.getName()),
-                     null);
-            }
-
+            Filter f = m_engine.getContains
+                (Path.getInstance("__start__." + prop.getName()), null);
             Query q = new Query(sig, f);
+            q.set(start, POS.getPersistentObject(this, oid));
+            return q;
+        } else {
+            ObjectType type = oid.getObjectType();
+            Signature sig = new Signature(type);
+            sig.addPath(prop.getName());
+            sig.addDefaultProperties(Path.getInstance(prop.getName()));
+            Parameter start = new Parameter(type,
+                                            Path.getInstance("__start__"));
+            sig.addParameter(start);
+            Query q = new Query
+                (sig, m_engine.getEquals(Path.getInstance("__start__"), null));
             q.set(start, POS.getPersistentObject(this, oid));
             return q;
         }
@@ -718,9 +724,7 @@ public class Session {
                 msg.append(args[i]);
             }
             msg.append(") {");
-            if (level == 0) {
-                LOG.debug(msg.toString());
-            }
+            LOG.debug(msg.toString());
 
             setLevel(level + 1);
         }
@@ -755,9 +759,7 @@ public class Session {
             if (msg != null) {
                 buf.append(msg);
             }
-            if (level == 1) {
-                LOG.debug(buf.toString());
-            }
+            LOG.debug(buf.toString());
         }
     }
 

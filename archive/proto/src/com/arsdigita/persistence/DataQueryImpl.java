@@ -12,12 +12,12 @@ import java.util.*;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/01/10 $
+ * @version $Revision: #6 $ $Date: 2003/01/10 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#5 $ by $Author: rhs $, $DateTime: 2003/01/10 10:27:20 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#6 $ by $Author: rhs $, $DateTime: 2003/01/10 17:10:28 $";
 
     private Session m_ssn;
     private com.arsdigita.persistence.proto.Session m_pssn;
@@ -30,7 +30,7 @@ class DataQueryImpl implements DataQuery {
         m_ssn = ssn;
         m_pssn = ssn.getProtoSession();
         Signature sig = new Signature(type);
-        sig.addDefaultPaths(type);
+        sig.addDefaultProperties();
         m_query = new Query(sig, null);
     }
 

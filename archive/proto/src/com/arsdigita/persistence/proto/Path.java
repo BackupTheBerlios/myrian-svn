@@ -7,12 +7,12 @@ import java.util.*;
  * Path
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/02 $
+ * @version $Revision: #3 $ $Date: 2003/01/10 $
  **/
 
 public class Path {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Path.java#2 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Path.java#3 $ by $Author: rhs $, $DateTime: 2003/01/10 17:10:28 $";
 
     private static final HashMap PATHS = new HashMap();
 
@@ -97,19 +97,18 @@ public class Path {
         if (m_parent == null) {
             return start.getProperty(m_name);
         } else {
-            try {
-                Property prop = m_parent.getProperty(start);
-                ObjectType type = (ObjectType) prop.getType();
-                return type.getProperty(m_name);
-            } catch (ClassCastException e) {
-                throw new IllegalArgumentException
-                    ("Path refers to attribute of opaque type: " + this);
-            }
+            Property prop = m_parent.getProperty(start);
+            ObjectType type = (ObjectType) prop.getType();
+            return type.getProperty(m_name);
         }
     }
 
     public boolean isKey(ObjectType type) {
         Property prop = getProperty(type);
+        if (prop == null) {
+            throw new Error("No such path (" + this +
+                            ") starting from type: " + type);
+        }
         ObjectMap map = Root.getRoot().getObjectMap(prop.getContainer());
         return map.getKeyProperties().contains(prop);
     }

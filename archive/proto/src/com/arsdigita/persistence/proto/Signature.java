@@ -7,12 +7,12 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/01/10 $
+ * @version $Revision: #8 $ $Date: 2003/01/10 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#7 $ by $Author: ashah $, $DateTime: 2003/01/10 15:20:07 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#8 $ by $Author: rhs $, $DateTime: 2003/01/10 17:10:28 $";
 
     private ObjectType m_type;
     private HashMap m_paths = new HashMap();
@@ -111,23 +111,43 @@ public class Signature {
         return prop.getType().getModel().equals(Model.getInstance("global"));
     }
 
-    public void addDefaultPaths(ObjectType type) {
-        for (Iterator it = type.getProperties().iterator(); it.hasNext(); ) {
+    public void addProperties(Collection props) {
+        addProperties(null, props);
+    }
+
+    public void addProperties(Path path, Collection props) {
+        ObjectType type;
+        String prefix;
+
+        if (path == null) {
+            type = m_type;
+            prefix = "";
+        } else {
+            type = path.getType(m_type);
+            prefix = path.getPath() + ".";
+        }
+
+        for (Iterator it = props.iterator(); it.hasNext(); ) {
             Property prop = (Property) it.next();
             if (isAttribute(prop)) {
-                addPath(prop.getName());
+                addPath(prefix + prop.getName());
             }
         }
         // should add aggressively loaded properties
     }
 
+    public void addDefaultProperties(Path path) {
+        addProperties(path, path.getType(m_type).getProperties());
+    }
+
+    public void addDefaultProperties() {
+        addProperties(m_type.getProperties());
+    }
+
     private void addKeyProperties() {
         Collection props = m_type.getRoot().getObjectMap(m_type)
             .getKeyProperties();
-        for (Iterator it = props.iterator(); it.hasNext(); ) {
-            Property prop = (Property) it.next();
-            addPath(prop.getName());
-        }
+        addProperties(props);
     }
 
     public String toString() {
