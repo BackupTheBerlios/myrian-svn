@@ -8,12 +8,12 @@ import java.util.*;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/06/30 $
+ * @version $Revision: #7 $ $Date: 2003/07/03 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#6 $ by $Author: ashah $, $DateTime: 2003/06/30 13:42:11 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#7 $ by $Author: rhs $, $DateTime: 2003/07/03 10:46:29 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -118,12 +118,14 @@ public class ObjectMap extends Element {
     }
 
     public Collection getDeclaredFetchedPaths() {
-        final HashSet result = new HashSet();
+        final ArrayList result = new ArrayList();
         for (Iterator it = getDeclaredMappings().iterator(); it.hasNext(); ) {
             Mapping m = (Mapping) it.next();
             m.dispatch(new Mapping.Switch() {
                     public void onValue(Value m) {
-                        result.add(m.getPath());
+                        if (!result.contains(m.getPath())) {
+                            result.add(m.getPath());
+                        }
                     }
 
                     public void onJoinTo(JoinTo m) {}
@@ -136,7 +138,12 @@ public class ObjectMap extends Element {
                 });
         }
 
-        result.addAll(m_fetched);
+        for (Iterator it = m_fetched.iterator(); it.hasNext(); ) {
+            Object o = it.next();
+            if (!result.contains(o)) {
+                result.add(o);
+            }
+        }
 
         return result;
     }
