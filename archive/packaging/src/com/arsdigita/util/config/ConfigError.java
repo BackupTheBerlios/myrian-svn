@@ -27,16 +27,16 @@ import org.apache.log4j.Logger;
  * An error to indicate invalid configurations.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/ConfigurationError.java#3 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/ConfigError.java#1 $
  */
-public class ConfigurationError extends Error {
+public class ConfigError extends Error {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/ConfigurationError.java#3 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/ConfigError.java#1 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/11 12:06:11 $";
+        "$DateTime: 2003/09/16 13:41:28 $";
 
     private static final Logger s_log = Logger.getLogger
-        (ConfigurationError.class);
+        (ConfigError.class);
 
     /**
      * Constructs a new configuration error with the content
@@ -45,7 +45,7 @@ public class ConfigurationError extends Error {
      * @param message A <code>String</code> describing what's wrong;
      * it cannot be null
      */
-    public ConfigurationError(final String message) {
+    public ConfigError(final String message) {
         super(message);
 
         Assert.exists(message, String.class);
@@ -54,7 +54,7 @@ public class ConfigurationError extends Error {
     /**
      * Constructs a new configuration error with a default message.
      */
-    public ConfigurationError() {
+    public ConfigError() {
         super("Configuration is invalid");
     }
 }

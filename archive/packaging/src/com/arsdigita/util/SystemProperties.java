@@ -13,9 +13,9 @@
  *
  */
 
-package com.arsdigita.util.config;
+package com.arsdigita.util;
 
-import com.arsdigita.util.*;
+import com.arsdigita.util.config.*;
 import com.arsdigita.util.parameter.*;
 import java.io.*;
 import java.util.*;
@@ -28,13 +28,13 @@ import org.apache.log4j.Logger;
  *
  * @see java.lang.System
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/SystemProperties.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/SystemProperties.java#1 $
  */
 public final class SystemProperties {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/SystemProperties.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/SystemProperties.java#1 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/11 13:03:22 $";
+        "$DateTime: 2003/09/16 13:41:28 $";
 
     private static final Logger s_log = Logger.getLogger
         (SystemProperties.class);
@@ -62,14 +62,14 @@ public final class SystemProperties {
         final ParameterValue value = param.unmarshal(s_store);
 
         if (!value.getErrors().isEmpty()) {
-            throw new ConfigurationError
+            throw new ConfigError
                 ("Parameter " + param.getName() + ": " + value.getErrors());
         }
 
         param.validate(value);
 
         if (!value.getErrors().isEmpty()) {
-            throw new ConfigurationError
+            throw new ConfigError
                 ("Parameter " + param.getName() + ": " + value.getErrors());
         }
 

@@ -18,24 +18,34 @@ package com.arsdigita.util;
 import com.arsdigita.logging.*;
 import com.arsdigita.util.config.*;
 import com.arsdigita.util.parameter.*;
+import java.io.*;
+import java.util.*;
 import org.apache.log4j.Logger;
 
 /**
  * @author Justin Ross
  * @see com.arsdigita.util.Util
  */
-final class UtilConfig extends BaseConfig {
+final class UtilConfig extends JavaPropertyRecord {
     public static final String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/UtilConfig.java#4 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/UtilConfig.java#5 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/03 12:09:13 $";
+        "$DateTime: 2003/09/16 13:41:28 $";
 
     private static final Logger s_log = Logger.getLogger(UtilConfig.class);
 
     private final String m_dir;
 
     UtilConfig() {
-        super("/util.properties");
+        super("util", new Properties());
+
+        // XXX need conf URL support here
+        final InputStream in = getClass().getResourceAsStream
+            ("ccm-core/util.properties");
+
+        if (in != null) {
+            load(in);
+        }
 
         final StringParameter dir = new StringParameter
             ("waf.util.logging.error_report_dir", Parameter.OPTIONAL, null);
