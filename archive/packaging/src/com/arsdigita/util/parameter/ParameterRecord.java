@@ -31,13 +31,13 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterLoader
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#6 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#7 $
  */
 public abstract class ParameterRecord {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#6 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/09/23 14:39:23 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#7 $" +
+        "$Author: rhs $" +
+        "$DateTime: 2003/09/25 16:46:46 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterRecord.class);
@@ -54,6 +54,11 @@ public abstract class ParameterRecord {
         m_info = new Properties();
 
         ParameterPrinter.register(this);
+    }
+
+    protected final Parameter[] getParameters() {
+        Parameter[] result = new Parameter[m_params.size()];
+        return (Parameter[]) m_params.toArray(result);
     }
 
     protected final void register(final Parameter param) {
