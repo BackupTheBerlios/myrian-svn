@@ -1,5 +1,7 @@
 package com.redhat.persistence.engine.rdbms;
 
+import com.arsdigita.developersupport.DeveloperSupport;
+import com.arsdigita.webdevsupport.WebDevSupport;
 import com.redhat.persistence.*;
 import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
@@ -13,12 +15,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/04 $
+ * @version $Revision: #3 $ $Date: 2003/08/07 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#3 $ by $Author: bche $, $DateTime: 2003/08/07 17:11:17 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -404,7 +406,30 @@ public class RDBMSEngine extends Engine {
             }
 
             acquire();
-
+            
+            /*
+             * PERFORMANCE HACK: 
+             * If there is more than one DeveloperSupportListener,
+             * there is a listener other than then one created in com.arsdigita.dispatcher.Initializer.
+             * That means we are logging queries to webdevsupport.
+             */            
+            boolean bLogQuery = DeveloperSupport.getListenerCount() > 1;
+            if (LOG.isDebugEnabled()) {                
+                LOG.debug("Logging queries: " + bLogQuery);
+            }                 
+            
+            //see what kind of operation this isfor webdevsupport
+            String sOpType = "";
+            if (bLogQuery) {                
+		if (op instanceof Select) {
+			sOpType = "executeQuery";
+		} else if (op instanceof Update) {
+			sOpType = "executeUpdate";
+		} else {
+			sOpType = "execute";
+		}
+            }                
+            
             try {
                 StatementLifecycle cycle = null;
                 if (m_profiler != null) {
@@ -424,10 +449,19 @@ public class RDBMSEngine extends Engine {
                 w.bind(ps, cycle);
 
                 if (cycle != null) { cycle.beginExecute(); }
+                long time = System.currentTimeMillis();                
                 if (ps.execute()) {
-                    if (cycle != null) { cycle.endExecute(0); }
+                    time = System.currentTimeMillis() - time;
+                    if (cycle != null) { cycle.endExecute(0); }                       
+                    if (bLogQuery) {                        
+                        DeveloperSupport.logQuery(m_conn.hashCode(), sOpType, sql, collToMap(w.getBindings()), time, null);                                     
+                    }                    
                     return new ResultCycle(this, ps.getResultSet(), cycle);
-                } else {
+                } else {                    
+                    time = System.currentTimeMillis() - time;
+                    if (bLogQuery) {
+                        DeveloperSupport.logQuery(m_conn.hashCode(), sOpType, sql, collToMap(w.getBindings()), time, null);
+                    }                                                            
                     int updateCount = ps.getUpdateCount();
                     if (cycle != null) { cycle.endExecute(updateCount); }
 
@@ -443,6 +477,9 @@ public class RDBMSEngine extends Engine {
                 }
             } catch (SQLException e) {
                 LOG.error(sql, e);
+                if (bLogQuery) {
+                    DeveloperSupport.logQuery(m_conn.hashCode(), sOpType, sql, collToMap(w.getBindings()), 0, e);
+                }
                 throw new RDBMSException(e.getMessage()) {};
             }
         } finally {
@@ -459,7 +496,17 @@ public class RDBMSEngine extends Engine {
         Operation op = new StaticOperation(sql, env, false);
         execute(op, new RetainUpdatesWriter());
     }
-
+    
+    private HashMap collToMap(Collection c) {
+        Iterator iter = c.iterator();
+        HashMap map = new HashMap();
+        for (int i=1; iter.hasNext(); i++) {
+            map.put(new Integer(i), iter.next());
+        }
+        
+        return map;
+    }
+        
     static final Path[] getKeyPaths(ObjectType type, Path prefix) {
         return getPaths(type, prefix, false);
     }
