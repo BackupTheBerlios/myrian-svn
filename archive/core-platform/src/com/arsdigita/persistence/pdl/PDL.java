@@ -20,12 +20,14 @@ import com.arsdigita.util.StringUtils;
 import com.arsdigita.util.ResourceManager;
 import com.arsdigita.util.UncheckedWrapperException;
 import com.arsdigita.util.Assert;
+import com.arsdigita.util.cmd.*;
 
 import com.arsdigita.persistence.pdl.ast.AST;
 import com.arsdigita.persistence.Utilities;
 import com.arsdigita.persistence.metadata.DDLWriter;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
+import com.arsdigita.persistence.metadata.Table;
 import com.arsdigita.persistence.oql.Query;
 import com.arsdigita.db.DbHelper;
 
@@ -38,6 +40,7 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.Reader;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -46,6 +49,7 @@ import java.util.HashMap;
 import java.util.Stack;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -58,12 +62,12 @@ import org.apache.log4j.Priority;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2002/08/15 $
+ * @version $Revision: #13 $ $Date: 2002/08/27 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#12 $ by $Author: jorris $, $DateTime: 2002/08/15 14:01:26 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#13 $ by $Author: rhs $, $DateTime: 2002/08/27 17:17:22 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
 
@@ -148,22 +152,40 @@ public class PDL {
         load(new InputStreamReader(is), s);
     }
 
-    // This map is for arguments that expect values. The default value is
-    // stored in this map. If the default value is a boolean that the option
-    // is assumed to be a flag.
-    private static final Map OPTIONS = new HashMap();
+    private static final CommandLine CMD =
+        new CommandLine(PDL.class.getName(), null);
 
     static {
-        OPTIONS.put("-debugDirectory", null);
-        OPTIONS.put("-path", null);
-        OPTIONS.put("-dot", null);
-        OPTIONS.put("-ddl", null);
-        OPTIONS.put("-destination", null);
-        OPTIONS.put("-database", null);
-        OPTIONS.put("-sqldir", null);
-        OPTIONS.put("-debug", Boolean.FALSE);
-        OPTIONS.put("-verbose", Boolean.FALSE);
-        OPTIONS.put("-testddl", null);
+        CMD.addSwitch(new PathSwitch(
+            "-library-path",
+            "PDL files appearing in this path will be searched " +
+            "for unresolved dependencies found in the files to be processed",
+            new File[0]
+            ));
+        CMD.addSwitch(new PathSwitch(
+            "-path",
+            "PDL files appearing in this path will be processed",
+            new File[0]
+            ));
+        CMD.addSwitch(new BooleanSwitch("-validate", "validate PDL",
+                                        Boolean.FALSE));
+        CMD.addSwitch(new StringSwitch("-generate-ddl",
+                                       "generate ddl and write " +
+                                       "it to the specified directory", null));
+        CMD.addSwitch(new FileSwitch(
+            "-generate-events",
+            "if present PDL will be written to the specified directory " +
+            "containing the MDSQL generated events",
+            null
+            ));
+        CMD.addSwitch(new StringSwitch("-dot", "undocumented", null));
+        CMD.addSwitch(new StringSwitch("-database", "target database", null));
+        CMD.addSwitch(new StringSwitch("-sqldir", "sql directory", null));
+        CMD.addSwitch(new BooleanSwitch("-debug", "sets logging to DEBUG",
+                                        Boolean.FALSE));
+        CMD.addSwitch(new BooleanSwitch("-verbose", "sets logging to INFO",
+                                        Boolean.FALSE));
+        CMD.addSwitch(new StringSwitch("-testddl", "no clue", null));
     }
 
     /**
@@ -176,45 +198,20 @@ public class PDL {
      * an exception is for the build process within ant to fail on
      * error.
      **/
-    public static final void main(String[] argArray) throws PDLException {
-        List args = new ArrayList(java.util.Arrays.asList(argArray));
-
-        while (args.size() > 0) {
-            String arg = (String) args.get(0);
-            if (OPTIONS.containsKey(arg)) {
-                args.remove(0);
-                Object value = OPTIONS.get(arg);
-                if (Boolean.FALSE.equals(value)) {
-                    OPTIONS.put(arg, Boolean.TRUE);
-                } else if (Boolean.TRUE.equals(value)) {
-                    OPTIONS.put(arg, Boolean.FALSE);
-                } else if (args.size() > 0) {
-                    OPTIONS.put(arg, args.get(0));
-                    System.out.println("Put " + arg + " val:" + args.get(0) );
-                    args.remove(0);
-                } else {
-                    usage();
-                }
-            } else {
-                break;
-            }
-        }
+    public static final void main(String[] args) throws PDLException {
+        Map options = new HashMap();
+        args = CMD.parse(options, args);
 
         BasicConfigurator.configure();
-        if (Boolean.TRUE.equals(OPTIONS.get("-debug"))) {
+        if (Boolean.TRUE.equals(options.get("-debug"))) {
             Logger.getRootLogger().setLevel(Level.DEBUG);
-        } else if (Boolean.TRUE.equals(OPTIONS.get("-verbose"))) {
+        } else if (Boolean.TRUE.equals(options.get("-verbose"))) {
             Logger.getRootLogger().setLevel(Level.INFO);
         } else {
             Logger.getRootLogger().setLevel(Level.FATAL);
         }
 
-        String debugDir = (String) OPTIONS.get("-debugDirectory");
-        if (debugDir != null) {
-            setDebugDirectory(debugDir);
-        }
-
-        String database = (String) OPTIONS.get("-database");
+        String database = (String) options.get("-database");
         if ("postgres".equalsIgnoreCase(database)) {
             DbHelper.setDatabase(DbHelper.DB_POSTGRES);
         } else {
@@ -222,84 +219,95 @@ public class PDL {
         }
 
         String defaultDir = DbHelper.getDatabaseDirectory(DbHelper.DB_DEFAULT);
-        String databaseDir = DbHelper.getDatabaseDirectory(DbHelper.getDatabase());
+        String databaseDir =
+            DbHelper.getDatabaseDirectory(DbHelper.getDatabase());
 
 
-        List files = new ArrayList();
-        String path = (String) OPTIONS.get("-path");
-        if (path != null) {
-            String[] parts = StringUtils.split(path, ':');
-            for (int i = 0; i < parts.length; i++) {
-                s_log.debug("Loading default PDL files from " + defaultDir);
-                findPDLFiles(new File(parts[i] + "/" + defaultDir), files);
-
-                s_log.debug("Loading database PDL files from " + databaseDir);
-                findPDLFiles(new File(parts[i] + "/" + databaseDir), files);
-            }
-        }
-
-        files.addAll(args);
+        List library = findPDLFiles((File[]) options.get("-library-path"),
+                                    defaultDir, databaseDir);
+        List files = findPDLFiles((File[]) options.get("-path"),
+                                  defaultDir, databaseDir);
+        files.addAll(Arrays.asList(args));
 
         if (files.size() < 1) {
             usage();
-        } else {
-            compilePDLFiles(files);
+        }
 
-            String ddlDir = (String) OPTIONS.get("-ddl");
-            if (ddlDir != null) {
-                Set sqlFiles = new HashSet();
-                String sqldir = (String)OPTIONS.get("-sqldir");
-                findSQLFiles(new File(sqldir + "/" + defaultDir), sqlFiles);
-                findSQLFiles(new File(sqldir + "/" + databaseDir), sqlFiles);
+        File debugDir = (File) options.get("-generate-events");
+        if (debugDir != null) {
+            if (!debugDir.exists() || !debugDir.isDirectory()) {
+                throw new PDLException("No such directory: " + debugDir);
+            }
+            setDebugDirectory(debugDir);
+        }
 
-                DDLWriter writer = new DDLWriter(ddlDir, sqlFiles);
+        Set all = new HashSet();
+        all.addAll(library);
+        all.addAll(files);
 
-                if (Boolean.TRUE.equals(Boolean.valueOf((String) OPTIONS.get("-testddl")))) {
-                    System.out.println("Test DLL!");
-                        writer.setTestPDL(true);
-                }
-                try {
-                    writer.write(MetadataRoot.getMetadataRoot());
-                } catch (IOException ioe) {
-                    throw new PDLException(ioe.getMessage());
-                }
+        compilePDLFiles(all);
+
+        MetadataRoot root = MetadataRoot.getMetadataRoot();
+
+        String ddlDir = (String) options.get("-generate-ddl");
+        if (ddlDir != null) {
+            Set sqlFiles = new HashSet();
+            String sqldir = (String)options.get("-sqldir");
+            findSQLFiles(new File(sqldir + "/" + defaultDir), sqlFiles);
+            findSQLFiles(new File(sqldir + "/" + databaseDir), sqlFiles);
+
+            DDLWriter writer = new DDLWriter(ddlDir, sqlFiles);
+
+            if (Boolean.TRUE.equals(Boolean.valueOf((String) options.get("-testddl")))) {
+                writer.setTestPDL(true);
             }
 
-            String dot = (String) OPTIONS.get("-dot");
-            if (dot != null) {
-                String[] parts = StringUtils.split(dot, ':');
-                if (parts.length > 2) {
-                    throw new PDLException(
-                                           "Badly formated specification: " + dot
-                                           );
+            List tables = new ArrayList(root.getTables());
+            for (Iterator it = tables.iterator(); it.hasNext(); ) {
+                Table table = (Table) it.next();
+                if (!files.contains(table.getFilename())) {
+                    it.remove();
                 }
-                MetadataRoot root = MetadataRoot.getMetadataRoot();
-                ObjectType type = root.getObjectType(parts[0]);
-                if (type == null) {
-                    throw new PDLException("No such type: " + parts[0]);
-                }
-                Query query = new Query(type);
-                if (parts.length == 2) {
-                    query.fetch(parts[1]);
-                } else {
-                    query.fetchDefault();
-                }
-                query.generate();
-                query.dumpDot(new File("/tmp/out.dot"));
             }
+            try {
+                writer.write(tables);
+            } catch (IOException ioe) {
+                throw new PDLException(ioe.getMessage());
+            }
+        }
+
+        String dot = (String) options.get("-dot");
+        if (dot != null) {
+            String[] parts = StringUtils.split(dot, ':');
+            if (parts.length > 2) {
+                throw new PDLException(
+                    "Badly formated specification: " + dot
+                    );
+            }
+            ObjectType type = root.getObjectType(parts[0]);
+            if (type == null) {
+                throw new PDLException("No such type: " + parts[0]);
+            }
+            Query query = new Query(type);
+            if (parts.length == 2) {
+                query.fetch(parts[1]);
+            } else {
+                query.fetchDefault();
+            }
+            query.generate();
+            query.dumpDot(new File("/tmp/out.dot"));
         }
     }
 
     private static final void usage() throws PDLException {
-        // Use a string buffer to build up our error messages.
-        StringBuffer sb = new StringBuffer();
-        sb.append("Usage: ").append(PDL.class.getName());
-        sb.append(" <pdl file> <pdl-file> ..." + Utilities.LINE_BREAK);
-
-        throw new PDLException(sb.toString());
+        throw new PDLException(CMD.usage());
     }
 
     private static String s_debugDirectory = null;
+
+    public static void setDebugDirectory(File directory) {
+        s_debugDirectory = directory.getPath();
+    }
 
     public static void setDebugDirectory(String directory) {
         s_debugDirectory = directory;
@@ -308,7 +316,6 @@ public class PDL {
     public static String getDebugDirectory() {
         return s_debugDirectory;
     }
-
 
     /**
      * Loads all the PDL files in a given directory
@@ -339,6 +346,26 @@ public class PDL {
                 ("Persistence Initialization error while trying to " +
                  "compile the PDL files", ex);
         }
+    }
+
+    /**
+     * Finds all the PDL files in a given path.
+     **/
+
+    public static List findPDLFiles(File[] path,
+                                    String defaultDir,
+                                    String databaseDir) {
+        List result = new ArrayList();
+
+        for (int i = 0; i < path.length; i++) {
+            s_log.debug("Loading default PDL files from " + defaultDir);
+            findPDLFiles(new File(path[i], defaultDir), result);
+
+            s_log.debug("Loading database PDL files from " + databaseDir);
+            findPDLFiles(new File(path[i], databaseDir), result);
+        }
+
+        return result;
     }
 
     /**
@@ -420,16 +447,17 @@ public class PDL {
      *
      * @param files array of PDL files to process
      */
-    public static void compilePDLFiles(List files)
+    public static void compilePDLFiles(Collection files)
         throws PDLException {
         StringBuffer sb = new StringBuffer();
         PDL pdl = new PDL();
 
-        for (int i = 0; i < files.size(); i++) {
+        for (Iterator it = files.iterator(); it.hasNext(); ) {
+            String file = (String) it.next();
             try {
-                pdl.load((String)files.get(i));
+                pdl.load(file);
             } catch (PDLException e) {
-                sb.append((String)files.get(i)).append(": ");
+                sb.append(file).append(": ");
                 sb.append(e.getMessage()).append(Utilities.LINE_BREAK);
             }
         }
