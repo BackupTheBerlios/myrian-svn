@@ -26,27 +26,17 @@ import java.util.List;
 import java.io.StringReader;
 
 /**
- * This manipulates SQL in a way that is specific to Oracle.  For
- * instance, it has the ability to replace bind variables with the
- * value of null with "is null" or "is not null"
+ * This manipulates SQL in a way that is specific to Postgres. 
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/17 $
+ * @version $Revision: #1 $ $Date: 2002/07/17 $
  */
 
-class OracleSQLUtilities implements SQLUtilities  {
+class PostgresSQLUtilities implements SQLUtilities  {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OracleSQLUtilities.java#2 $ by $Author: randyg $, $DateTime: 2002/07/17 16:18:39 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/PostgresSQLUtilities.java#1 $ by $Author: randyg $, $DateTime: 2002/07/17 16:18:39 $";
 
     /**
-     *  This takes the SQL Element and the source which contains variable
-     *  values and processes them accordingly.  It then returns
-     *  the resulting SQL element.  For instance, for the 
-     *  OracleSQLUtilities.processNulls, this will replace all
-     *  bind variables with the value of null with "is null" or 
-     *  "is not null"
-     *  This code does not work so it currently just returns the
-     *  passed in element
      *  @deprecated This is a no-op so it will be removed.
      */
     public Element processNulls(Element sql, DataContainer source) {
@@ -59,7 +49,7 @@ class OracleSQLUtilities implements SQLUtilities  {
      *  This method takes a comparator (e.g. =, <=, >=, !=, <>)
      *  as well as a variable name and then creates the appropriate
      *  string given that the value of the variable is null.
-     *  In oracle, this will return something like "is not null"
+     *  In postgres, this will return something like "is not null"
      *  or "is null"  Other databases will have something like
      *  <code>comparator + " :" + variableName<code>
      */

@@ -42,12 +42,12 @@ import java.lang.ref.WeakReference;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/06/03 $ 
+ * @version $Revision: #3 $ $Date: 2002/07/17 $ 
  * @see com.arsdigita.persistence.SessionManager
  */
 public class Session {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/Session.java#2 $ by $Author: rhs $, $DateTime: 2002/06/03 15:25:19 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/Session.java#3 $ by $Author: randyg $, $DateTime: 2002/07/17 16:18:39 $";
 
     private final static Category s_cat = 
                               Category.getInstance(Session.class.getName());
@@ -58,7 +58,7 @@ public class Session {
 
 
     private static FilterFactory m_filterFactory = new FilterFactoryImpl();
-    private static SQLUtilities m_sqlUtil = new OracleSQLUtilities();
+    private static SQLUtilities m_sqlUtil;
     private Stack m_stack;
 
     /**
@@ -519,12 +519,21 @@ public class Session {
         return m_filterFactory;
     }
 
+
     /**
      *  <b><font color="red">Experimental</font></b> - This retrieves the
      *  factory that is used to create the filters for this DataQuery.
      */
     public static SQLUtilities getSQLUtilities() {
         return m_sqlUtil;
+    }
+
+
+    /**
+     *  This sets the SQLUtilities for the system.
+     */
+    protected static void setSQLUtilities(SQLUtilities util) {
+        m_sqlUtil = util;
     }
 
     /**

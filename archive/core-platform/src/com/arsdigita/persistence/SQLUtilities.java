@@ -25,12 +25,12 @@ import com.arsdigita.persistence.sql.Element;
  *  the Oracle instance of this replaces "= null" with "is null"
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/17 $
  */
 
 public interface SQLUtilities  {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SQLUtilities.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SQLUtilities.java#2 $ by $Author: randyg $, $DateTime: 2002/07/17 16:18:39 $";
 
     /**
      *  This takes the SQL Element and the source which contains variable
@@ -39,6 +39,7 @@ public interface SQLUtilities  {
      *  OracleSQLUtilities.processNulls, this will replace all
      *  bind variables with the value of null with "is null" or 
      *  "is not null"
+     *  @deprecated This is a no-op so it will be removed.
      */
     Element processNulls(Element sql, DataContainer source);
 

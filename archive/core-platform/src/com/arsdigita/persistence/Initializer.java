@@ -41,7 +41,7 @@ import org.apache.log4j.Category;
  * the SessionManager of them.
  *
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/17 $
  **/
 
 public class Initializer
@@ -95,6 +95,12 @@ public class Initializer
     public void startup() {
         s_log.warn("Persistence initializer is starting");
 
+        // Set the utilities
+        if (com.arsdigita.db.Initializer.getDatabase() == com.arsdigita.db.Initializer.POSTGRES) {
+            Session.setSQLUtilities(new PostgresSQLUtilities());
+        } else {
+            Session.setSQLUtilities(new OracleSQLUtilities());
+        }
         ObjectType.setOptimizeDefault(
             m_conf.getParameter("optimizeByDefault").equals(Boolean.TRUE)
             );
