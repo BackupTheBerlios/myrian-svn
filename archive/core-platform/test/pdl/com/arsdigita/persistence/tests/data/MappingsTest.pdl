@@ -87,7 +87,7 @@ object type ReferenceTo extends Base {
 }
 
 object type ReferenceFrom extends Base {
-    Target[0..1] target = join t_targets.reffrom_id to t_reffroms.id;
+    Target[0..1] target = join t_reffroms.id to t_targets.reffrom_id;
     reference key (t_reffroms.id);
 }
 

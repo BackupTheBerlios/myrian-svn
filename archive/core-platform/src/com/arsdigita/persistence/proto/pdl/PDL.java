@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/06/02 $
+ * @version $Revision: #6 $ $Date: 2003/06/04 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#5 $ by $Author: rhs $, $DateTime: 2003/06/02 10:49:07 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#6 $ by $Author: ashah $, $DateTime: 2003/06/04 14:49:04 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -668,16 +668,15 @@ public class PDL {
                 }));*/
 
         m_ast.traverse(new Node.Switch() {
-                public void onIdentifier(IdentifierNd nd) {
+                public void onPath(PathNd nd) {
                     ObjectMap om = m_root.getObjectMap
                         (m_symbols.getEmitted
-                         ((ObjectTypeNd) nd.getParent().getParent()
-                          .getParent()));
-                    om.addFetchedPath(Path.get(nd.getName()));
+                         ((ObjectTypeNd) nd.getParent().getParent()));
+                    om.addFetchedPath(nd.getPath());
                 }
             }, new Node.IncludeFilter(new Node.Field[] {
                 AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.AGGRESSIVE_LOAD,
-                AggressiveLoadNd.PATHS, PathNd.PATH
+                AggressiveLoadNd.PATHS
             }));
     }
 

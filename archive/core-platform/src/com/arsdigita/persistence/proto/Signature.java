@@ -8,12 +8,12 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/04 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Signature.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Signature.java#2 $ by $Author: ashah $, $DateTime: 2003/06/04 14:49:04 $";
 
     private ArrayList m_paths = new ArrayList();
 
@@ -174,6 +174,18 @@ public class Signature {
     }
 
     private void addProperties(Path path, Collection props) {
+        ArrayList paths = new ArrayList(props.size());
+        for (Iterator it = props.iterator(); it.hasNext(); ) {
+            paths.add(Path.get(((Property) it.next()).getName()));
+        }
+        addPaths(path, paths);
+    }
+
+    private void addPaths(Collection paths) {
+        addPaths(null, paths);
+    }
+
+    private void addPaths(Path path, Collection paths) {
         ObjectType type;
         String prefix;
 
@@ -185,29 +197,21 @@ public class Signature {
             prefix = path.getPath() + ".";
         }
 
-        for (Iterator it = props.iterator(); it.hasNext(); ) {
-            Property prop = (Property) it.next();
-            addPath(prefix + prop.getName());
+        for (Iterator it = paths.iterator(); it.hasNext(); ) {
+            Path p = (Path) it.next();
+            addPath(prefix + p.getPath());
         }
-        // should add aggressively loaded properties
-    }
-
-    private Collection getAttributeProperties(Collection properties) {
-        ArrayList result = new ArrayList(properties.size());
-        for (Iterator it = properties.iterator(); it.hasNext(); ) {
-            Property prop = (Property) it.next();
-            if (isAttribute(prop)) { result.add(prop); }
-        }
-        return result;
     }
 
     public void addDefaultProperties(Path path) {
-        addProperties(path, getAttributeProperties
-                      (getObjectType().getType(path).getProperties()));
+        Root root = Root.getRoot();
+        addPaths(path, root.getObjectMap
+                 (getObjectType().getType(path)).getFetchedPaths());
     }
 
     public void addDefaultProperties() {
-        addProperties(getAttributeProperties(getObjectType().getProperties()));
+        Root root = Root.getRoot();
+        addPaths(root.getObjectMap(getObjectType()).getFetchedPaths());
     }
 
     private void addKeyProperties() {
