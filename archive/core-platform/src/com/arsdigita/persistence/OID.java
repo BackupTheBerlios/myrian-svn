@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import java.text.MessageFormat;
 
 import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -52,10 +51,10 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/10/16 $ */
+ * @version $Revision: #7 $ $Date: 2002/11/01 $ */
 
 public class OID {
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OID.java#6 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OID.java#7 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     private ObjectType m_type;
     private Map m_values = new HashMap();

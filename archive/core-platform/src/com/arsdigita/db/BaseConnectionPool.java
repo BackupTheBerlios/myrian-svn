@@ -23,21 +23,20 @@ import org.apache.log4j.Logger;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Collections;
 import java.util.Iterator;
 
 /**
  * Base connection pooling class
  *
  * @author Bob Donald (<a href="mailto:bdonald@arsdigita.com"></a>)
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#7 $ $DateTime: 2002/10/14 11:09:33 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#8 $ $DateTime: 2002/11/01 09:30:48 $
  * @since
  *
  */
 
 abstract public class BaseConnectionPool implements DatabaseConnectionPool {
 
-    private static final String versionId = "$Author: rhs $ - $Date: 2002/10/14 $ $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#7 $";
+    private static final String versionId = "$Author: vadim $ - $Date: 2002/11/01 $ $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#8 $";
 
     private static final Logger cat = Logger.getLogger(BaseConnectionPool.class.getName());
 

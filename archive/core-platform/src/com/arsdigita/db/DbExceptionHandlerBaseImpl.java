@@ -15,14 +15,8 @@
 
 package com.arsdigita.db;
 
-import com.arsdigita.db.ConnectionManager;
-import com.arsdigita.db.SequenceImpl;
 
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.PreparedStatement;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -33,12 +27,12 @@ import org.apache.log4j.Logger;
  * Should be subclassed with database-specific initialization.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #5 $
+ * @version $Revision: #6 $
  * @since 4.6
  */
 public abstract class DbExceptionHandlerBaseImpl implements DbExceptionHandler {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DbExceptionHandlerBaseImpl.java#5 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DbExceptionHandlerBaseImpl.java#6 $";
 
     private static final Logger s_cat = Logger.getLogger(DbExceptionHandlerBaseImpl.class.getName());
 

@@ -21,18 +21,12 @@ import com.arsdigita.persistence.metadata.Property;
 import com.arsdigita.persistence.metadata.Event;
 import com.arsdigita.persistence.metadata.Operation;
 import com.arsdigita.util.Assert;
-import java.sql.Connection;
 
-import java.math.BigDecimal;
 
-import java.util.BitSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Title:       GenericDataObject class
@@ -44,12 +38,12 @@ import java.util.ArrayList;
  *              through inheritance.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #18 $ $Date: 2002/10/31 $
+ * @version $Revision: #19 $ $Date: 2002/11/01 $
  */
 
 public class GenericDataObject implements DataObject {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#18 $ by $Author: rhs $, $DateTime: 2002/10/31 15:36:36 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#19 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     private ObjectType    m_type;
     private Session       m_session;

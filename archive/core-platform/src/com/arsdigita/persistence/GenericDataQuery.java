@@ -20,18 +20,17 @@ import com.arsdigita.persistence.metadata.QueryType;
 import com.arsdigita.persistence.metadata.Property;
 import com.arsdigita.persistence.metadata.Operation;
 import com.arsdigita.persistence.metadata.Mapping;
-import com.arsdigita.persistence.metadata.Column;
 
 /**
  * GenericDataQuery
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/11/01 $
  */
 
 public class GenericDataQuery extends DataQueryImpl {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataQuery.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataQuery.java#5 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     public GenericDataQuery(Session s, String sql, String[] columns) {
         super(

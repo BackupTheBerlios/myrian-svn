@@ -15,27 +15,20 @@
 
 package com.arsdigita.db.postgres;
 
-import com.arsdigita.db.ConnectionManager;
 import com.arsdigita.db.DbExceptionHandlerBaseImpl;
-import com.arsdigita.db.SequenceImpl;
 
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.PreparedStatement;
 
 
 /**
  * Class for processing of Postgres DB Exceptions.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #6 $
+ * @version $Revision: #7 $
  * @since 4.6
  */
 public class PostgresDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresDbExceptionHandlerImpl.java#6 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresDbExceptionHandlerImpl.java#7 $";
 
     static {
         errors.put("Cannot insert a duplicate key into unique index",

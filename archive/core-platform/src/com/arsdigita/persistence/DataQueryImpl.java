@@ -19,10 +19,8 @@ import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.QueryType;
 import com.arsdigita.persistence.metadata.DataType;
 import com.arsdigita.persistence.metadata.CompoundType;
-import com.arsdigita.persistence.metadata.Event;
 import com.arsdigita.persistence.metadata.Operation;
 import com.arsdigita.persistence.metadata.Mapping;
-import com.arsdigita.persistence.metadata.Column;
 import com.arsdigita.persistence.metadata.Property;
 
 import com.arsdigita.persistence.sql.Element;
@@ -33,7 +31,6 @@ import com.arsdigita.util.Assert;
 import com.arsdigita.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,17 +39,12 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.HashSet;
 
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.sql.Statement;
 
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.PrintWriter;
-import java.io.PrintStream;
-import java.io.ByteArrayOutputStream;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -64,7 +56,7 @@ import org.apache.log4j.Logger;
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@arsdigita.com">randyg@arsdigita.com</a>
  * @author <a href="mailto:deison@arsdigita.com">deison@arsdigita.com</a>
- * @version $Revision: #17 $ $Date: 2002/10/16 $
+ * @version $Revision: #18 $ $Date: 2002/11/01 $
  */
 // NOTE if we ever support anything other than forward-only,
 // we'll need to shut off the auto-closing functionality
@@ -72,7 +64,7 @@ import org.apache.log4j.Logger;
 // results and general confusion.
 class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#17 $ by $Author: dennis $, $DateTime: 2002/10/16 15:37:20 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#18 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     private static final Logger log =
         Logger.getLogger(DataQueryImpl.class);

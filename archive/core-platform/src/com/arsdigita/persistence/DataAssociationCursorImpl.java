@@ -19,10 +19,6 @@ import com.arsdigita.persistence.metadata.CompoundType;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.metadata.Property;
 import com.arsdigita.persistence.metadata.Operation;
-import com.arsdigita.persistence.metadata.Mapping;
-import com.arsdigita.persistence.sql.Element;
-import com.arsdigita.persistence.sql.Identifier;
-import com.arsdigita.util.Assert;
 
 import java.util.Iterator;
 import java.sql.ResultSet;
@@ -65,13 +61,13 @@ import org.apache.log4j.Logger;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/10/16 $
+ * @version $Revision: #6 $ $Date: 2002/11/01 $
  */
 
 class DataAssociationCursorImpl extends DataCollectionImpl
     implements DataAssociationCursor {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#5 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#6 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     private static final Logger s_cat =
         Logger.getLogger(DataAssociationImpl.class);

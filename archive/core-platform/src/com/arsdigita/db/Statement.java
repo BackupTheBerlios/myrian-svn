@@ -17,20 +17,9 @@ package com.arsdigita.db;
 
 import com.arsdigita.developersupport.DeveloperSupport;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.math.BigDecimal;
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.Date;
-import java.sql.Ref;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Map;
 import java.util.ArrayList;
 import org.apache.log4j.Logger;
 
@@ -63,12 +52,12 @@ import org.apache.log4j.Logger;
  * </ul>
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #6 $ $Date: 2002/10/16 $
+ * @version $Revision: #7 $ $Date: 2002/11/01 $
  * @since 4.5
  */
 public class Statement implements java.sql.Statement, ResultSetEventListener {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Statement.java#6 $ $Author: dennis $ $Date: 2002/10/16 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Statement.java#7 $ $Author: vadim $ $Date: 2002/11/01 $";
 
     private static final java.util.Set dbgStatements = new java.util.HashSet();
 

@@ -18,7 +18,6 @@ package com.arsdigita.persistence;
 import com.arsdigita.persistence.metadata.DataOperationType;
 import com.arsdigita.persistence.metadata.Operation;
 import java.util.Iterator;
-import java.util.List;
 import java.util.ArrayList;
 import java.sql.SQLException;
 import com.arsdigita.db.CallableStatement;
@@ -31,11 +30,11 @@ import org.apache.log4j.Logger;
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
  * @since 4.5
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#6 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#7 $
  */
 public class DataOperation extends AbstractDataOperation {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#6 $ by $Author: richardl $, $DateTime: 2002/10/14 17:27:59 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#7 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     private Session m_session;
     private DataOperationType m_type;

@@ -17,11 +17,9 @@ package com.arsdigita.persistence.pdl;
 
 import com.arsdigita.persistence.metadata.*;
 
-import java.util.Collection;
 import java.util.Iterator;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -33,7 +31,7 @@ import java.io.PrintStream;
  * file being named after the fully qualified model name.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDLOutputter.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDLOutputter.java#4 $
  */
 public class PDLOutputter {
     /**

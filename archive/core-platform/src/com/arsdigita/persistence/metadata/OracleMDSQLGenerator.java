@@ -15,19 +15,7 @@
 
 package com.arsdigita.persistence.metadata;
 
-import com.arsdigita.util.PriorityQueue;
-import com.arsdigita.util.StringUtils;
-import com.arsdigita.persistence.oql.Query;
-import java.util.NoSuchElementException;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 
@@ -46,12 +34,12 @@ import org.apache.log4j.Logger;
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#9 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#10 $
  * @since 4.6.3
  */
 class OracleMDSQLGenerator extends BaseMDSQLGenerator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#9 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#10 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     private static final Logger s_log =
         Logger.getLogger(OracleMDSQLGenerator.class.getName());

@@ -16,7 +16,6 @@
 package com.arsdigita.persistence.pdl.ast;
 
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -24,12 +23,12 @@ import java.util.Iterator;
  * to another.  Used for Metadata-driven SQL.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/11/01 $
  */
 
 public class JoinPathDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/JoinPathDef.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/JoinPathDef.java#4 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     private List m_path;
 

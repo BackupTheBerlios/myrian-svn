@@ -16,25 +16,20 @@
 package com.arsdigita.persistence;
 
 
-import com.arsdigita.persistence.sql.SQL;
 import com.arsdigita.persistence.sql.Element;
-import com.arsdigita.persistence.sql.Identifier;
 
-import com.arsdigita.persistence.metadata.Property;
 
-import java.util.List;
-import java.io.StringReader;
 
 /**
  * This manipulates SQL in a way that is specific to Postgres.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/08/14 $
+ * @version $Revision: #3 $ $Date: 2002/11/01 $
  */
 
 class PostgresSQLUtilities implements SQLUtilities  {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/PostgresSQLUtilities.java#2 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/PostgresSQLUtilities.java#3 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     /**
      *  @deprecated This is a no-op so it will be removed.

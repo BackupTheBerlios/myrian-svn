@@ -15,21 +15,19 @@
 
 package com.arsdigita.persistence;
 
-import com.arsdigita.util.UncheckedWrapperException;
-import com.arsdigita.persistence.metadata.Property;
 
 /**
  * UndefinedEventException - Thrown when the persistence system attempts to invoke
  * an event, such as a property retrieve event, which is undefined.
  *
  * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/11/01 $
  */
 
 public class UndefinedEventException extends PersistenceException {
 
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/UndefinedEventException.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/UndefinedEventException.java#4 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     public UndefinedEventException(String msg) {
         super(msg, null);

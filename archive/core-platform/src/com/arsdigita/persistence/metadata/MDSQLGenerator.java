@@ -15,9 +15,6 @@
 
 package com.arsdigita.persistence.metadata;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * A interface that defines an API to automatically generate SQL queries based
@@ -26,13 +23,13 @@ import java.util.ArrayList;
  * type combination ( @see ObjectEvent ).
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#6 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#7 $
  * @since 4.6.3
  */
 
 public interface MDSQLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#6 $ by $Author: richardl $, $DateTime: 2002/10/16 14:39:19 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#7 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
     /**
      * Generates an Event of a particular Event type for a certain
      * ObjectType.  New Event is automatically added to the object type

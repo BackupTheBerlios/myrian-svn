@@ -54,7 +54,6 @@ import java.util.Iterator;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 
 /**
  * The main class that is used to process PDL files.  It takes any number of
@@ -62,12 +61,12 @@ import org.apache.log4j.Priority;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2002/09/30 $
+ * @version $Revision: #15 $ $Date: 2002/11/01 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#14 $ by $Author: rhs $, $DateTime: 2002/09/30 19:27:24 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#15 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
 

@@ -16,7 +16,6 @@
 package com.arsdigita.db;
 import com.arsdigita.util.Assert;
 
-import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 
@@ -31,12 +30,12 @@ import java.sql.SQLException;
  * (normally this is called via the DB Initializer).
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #7 $
+ * @version $Revision: #8 $
  * @since 4.6
  */
 public class SQLExceptionHandler {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/SQLExceptionHandler.java#7 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/SQLExceptionHandler.java#8 $";
 
     private static String s_exceptionHandlerName = "com.arsdigita.db.oracle.OracleDbExceptionHandlerImpl";
 

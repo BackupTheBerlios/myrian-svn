@@ -17,7 +17,6 @@ package com.arsdigita.util;
 
 import java.util.Vector;
 import java.util.HashMap;
-import java.util.Iterator;
 import org.apache.oro.text.perl.Perl5Util;
 
 /**
@@ -45,7 +44,7 @@ import org.apache.oro.text.perl.Perl5Util;
  * </pre>
  *
  * @author ron@arsdigita.com
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/HtmlToText.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/HtmlToText.java#4 $
  */
 
 public class HtmlToText {

@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -35,12 +34,12 @@ import java.util.Set;
  *              objects referenced through roles.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/10/16 $
+ * @version $Revision: #8 $ $Date: 2002/11/01 $
  */
 
 class DataContainer {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataContainer.java#7 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataContainer.java#8 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     private static final Logger s_log =
         Logger.getLogger(DataContainer.class.getName());

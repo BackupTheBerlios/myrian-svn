@@ -15,27 +15,20 @@
 
 package com.arsdigita.db.oracle;
 
-import com.arsdigita.db.ConnectionManager;
 import com.arsdigita.db.DbExceptionHandlerBaseImpl;
-import com.arsdigita.db.SequenceImpl;
 
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.PreparedStatement;
 
 
 /**
  * Class for processing of Oracle DB Exceptions.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #10 $
+ * @version $Revision: #11 $
  * @since 4.6
  */
 public class OracleDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleDbExceptionHandlerImpl.java#10 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleDbExceptionHandlerImpl.java#11 $";
 
     static {
         // lots of stuff can keep us away from the DB...

@@ -25,7 +25,6 @@ import com.arsdigita.persistence.pdl.PDL;
 import com.arsdigita.persistence.pdl.PDLException;
 import java.io.File;
 import java.io.StringReader;
-import java.lang.IllegalArgumentException;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
@@ -35,7 +34,7 @@ import org.apache.log4j.Level;
  * the SessionManager of them.
  *
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #9 $ $Date: 2002/10/16 $
+ * @version $Revision: #10 $ $Date: 2002/11/01 $
  **/
 
 public class Initializer

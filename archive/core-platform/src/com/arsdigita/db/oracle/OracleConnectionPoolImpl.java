@@ -16,7 +16,6 @@
 package com.arsdigita.db.oracle;
 
 import com.arsdigita.db.BaseConnectionPool;
-import com.arsdigita.db.DatabaseConnectionPool;
 import com.arsdigita.db.SQLExceptionHandler;
 
 import java.sql.SQLException;
@@ -29,14 +28,14 @@ import org.apache.log4j.Logger;
  * Connection pooling class using Oracle implementation.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#7 $ $DateTime: 2002/10/04 18:08:01 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#8 $ $DateTime: 2002/11/01 09:30:48 $
  * @since
  *
  */
 
 public class OracleConnectionPoolImpl extends BaseConnectionPool {
 
-    private static final String versionId = "$Author: rhs $ - $Date: 2002/10/04 $ $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#7 $";
+    private static final String versionId = "$Author: vadim $ - $Date: 2002/11/01 $ $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#8 $";
 
     private static final Logger cat = Logger.getLogger(OracleConnectionPoolImpl.class.getName());
 

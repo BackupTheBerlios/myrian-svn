@@ -15,7 +15,6 @@
 
 package com.arsdigita.persistence.metadata;
 
-import com.arsdigita.persistence.SessionManager;
 import com.arsdigita.persistence.PersistenceException;
 import com.arsdigita.util.StringUtils;
 import java.util.StringTokenizer;
@@ -26,8 +25,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collection;
-import java.sql.Types;
-import java.sql.DatabaseMetaData;
 
 import org.apache.log4j.Logger;
 
@@ -38,12 +35,12 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.metadata.DynamicObjectType}.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#6 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#7 $
  * @since 4.6.3 */
 
 abstract class BaseDDLGenerator implements DDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#6 $ by $Author: rhs $, $DateTime: 2002/10/14 16:12:17 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#7 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     private static final Logger s_log =
         Logger.getLogger(BaseDDLGenerator.class);

@@ -18,27 +18,12 @@ package com.arsdigita.persistence.metadata;
 import com.arsdigita.persistence.PersistenceException;
 import com.arsdigita.persistence.SessionManager;
 import com.arsdigita.persistence.DataCollection;
-import com.arsdigita.persistence.TransactionContext;
 import com.arsdigita.persistence.DataObject;
 import com.arsdigita.persistence.Filter;
 import com.arsdigita.db.Sequences;
-import com.arsdigita.initializer.Startup;
-import java.lang.StringBuffer;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 
 /**
  * This class provides support to create dynamic two-way associations between
@@ -46,7 +31,7 @@ import java.util.HashMap;
  *
  * @deprecated Use com.arsdigita.metadata.DynamicAssociation instead.
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #6 $ $Date: 2002/10/14 $
+ * @version $Revision: #7 $ $Date: 2002/11/01 $
  */
 
 public class DynamicAssociation {

@@ -17,7 +17,6 @@ package com.arsdigita.util;
 
 import java.util.TreeMap;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Comparator;
 import org.apache.log4j.Logger;
 
@@ -29,9 +28,9 @@ import org.apache.log4j.Logger;
  */
 public class OrderedMap extends TreeMap {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/OrderedMap.java#4 $" +
-        "$Author: dennis $" +
-        "$DateTime: 2002/08/14 23:39:40 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/OrderedMap.java#5 $" +
+        "$Author: vadim $" +
+        "$DateTime: 2002/11/01 09:30:48 $";
 
     private static final Logger s_log = Logger.getLogger
         (OrderedMap.class.getName());

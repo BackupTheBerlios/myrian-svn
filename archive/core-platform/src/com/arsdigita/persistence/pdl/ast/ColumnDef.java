@@ -20,10 +20,7 @@ import com.arsdigita.persistence.metadata.Table;
 import com.arsdigita.persistence.metadata.Column;
 import com.arsdigita.persistence.Utilities;
 
-import java.sql.Types;
 import org.apache.log4j.Logger;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 
 /**
@@ -31,11 +28,11 @@ import java.io.StringWriter;
  * data type.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #9 $ $Date: 2002/10/16 $
+ * @version $Revision: #10 $ $Date: 2002/11/01 $
  */
 public class ColumnDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ColumnDef.java#9 $ by $Author: richardl $, $DateTime: 2002/10/16 16:12:57 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ColumnDef.java#10 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     private static int count = 0;
     private static final Logger s_log =

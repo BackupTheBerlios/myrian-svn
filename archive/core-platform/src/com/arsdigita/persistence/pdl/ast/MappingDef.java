@@ -15,10 +15,7 @@
 
 package com.arsdigita.persistence.pdl.ast;
 
-import com.arsdigita.persistence.metadata.ObjectType;
-import com.arsdigita.persistence.metadata.Property;
 import com.arsdigita.persistence.metadata.Mapping;
-import com.arsdigita.persistence.metadata.Column;
 
 /**
  * Defines a mapping between a attribute (and maybe a role) and a database
@@ -27,12 +24,12 @@ import com.arsdigita.persistence.metadata.Column;
  * Should eventually be updated to use ColumnDef instead.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/14 $
+ * @version $Revision: #6 $ $Date: 2002/11/01 $
  */
 
 public class MappingDef extends MapStatement {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/MappingDef.java#5 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/MappingDef.java#6 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     // the role and attribute to map from
     private String[] m_path;

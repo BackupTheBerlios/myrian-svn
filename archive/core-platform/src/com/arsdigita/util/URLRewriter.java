@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.List;
 import java.util.LinkedList;
 import java.net.URLEncoder;
 import org.apache.log4j.Logger;
@@ -35,9 +34,9 @@ import org.apache.log4j.Logger;
  */
 public class URLRewriter {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/URLRewriter.java#8 $" +
-        "$Author: justin $" +
-        "$DateTime: 2002/10/21 15:06:24 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/URLRewriter.java#9 $" +
+        "$Author: vadim $" +
+        "$DateTime: 2002/11/01 09:30:48 $";
 
     private static final Logger s_log =
         Logger.getLogger(URLRewriter.class);

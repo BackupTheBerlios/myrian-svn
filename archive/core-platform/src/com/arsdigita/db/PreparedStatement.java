@@ -31,7 +31,6 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -40,13 +39,13 @@ import org.apache.log4j.Logger;
  * that wraps a "real" implementation of java.sql.CallableStatement
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #5 $ $Date: 2002/10/04 $
+ * @version $Revision: #6 $ $Date: 2002/11/01 $
  * @since 4.5
  */
 public class PreparedStatement extends com.arsdigita.db.Statement
     implements java.sql.PreparedStatement {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/PreparedStatement.java#5 $ $Author: rhs $ $Date: 2002/10/04 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/PreparedStatement.java#6 $ $Author: vadim $ $Date: 2002/11/01 $";
 
     private static final Logger s_cat =
         Logger.getLogger(PreparedStatement.class);

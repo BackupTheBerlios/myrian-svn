@@ -15,14 +15,8 @@
 
 package com.arsdigita.db;
 
-import com.arsdigita.db.ConnectionManager;
-import com.arsdigita.db.SequenceImpl;
 
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.PreparedStatement;
 
 
 /**
@@ -33,12 +27,12 @@ import java.sql.PreparedStatement;
  * on a provided message.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #4 $
+ * @version $Revision: #5 $
  * @since 4.6
  */
 public interface DbExceptionHandler {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DbExceptionHandler.java#4 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DbExceptionHandler.java#5 $";
 
     /**
      * This method wraps the given SQLException in a more-specific

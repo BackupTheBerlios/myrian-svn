@@ -15,14 +15,10 @@
 
 package com.arsdigita.persistence;
 
-import com.arsdigita.persistence.sql.Element;
-import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.lang.StringBuffer;
-import java.io.StringReader;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -31,12 +27,12 @@ import org.apache.log4j.Logger;
  * be combined and manipulated to create complex queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/10/16 $
+ * @version $Revision: #8 $ $Date: 2002/11/01 $
  */
 
 class FilterImpl implements Filter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterImpl.java#7 $ by $Author: dennis $, $DateTime: 2002/10/16 15:37:20 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterImpl.java#8 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     private static final Logger m_log =
         Logger.getLogger(Filter.class.getName());

@@ -22,7 +22,6 @@ import com.arsdigita.persistence.metadata.Property;
 import com.arsdigita.persistence.metadata.Event;
 import com.arsdigita.persistence.metadata.Operation;
 import com.arsdigita.persistence.metadata.Mapping;
-import com.arsdigita.persistence.metadata.Column;
 
 import com.arsdigita.persistence.Utilities;
 import java.util.List;
@@ -36,12 +35,12 @@ import java.util.Iterator;
  * Outputs a metadata ObjectType.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2002/09/16 $
+ * @version $Revision: #9 $ $Date: 2002/11/01 $
  */
 
 public class ObjectDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ObjectDef.java#8 $ by $Author: rhs $, $DateTime: 2002/09/16 18:59:05 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ObjectDef.java#9 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     // object name
     private String m_name;

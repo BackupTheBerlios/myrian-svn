@@ -16,7 +16,6 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.util.UncheckedWrapperException;
-import com.arsdigita.persistence.metadata.Utilities;
 import com.arsdigita.db.DbException;
 
 /**
@@ -24,14 +23,14 @@ import com.arsdigita.db.DbException;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/11/01 $
  */
 
 public class PersistenceException extends UncheckedWrapperException {
 
     private String m_messageStack = null;
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/PersistenceException.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/PersistenceException.java#4 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     /**
      * Constructor for a PersistenceException which does not wrap

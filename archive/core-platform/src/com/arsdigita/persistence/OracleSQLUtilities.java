@@ -16,14 +16,9 @@
 package com.arsdigita.persistence;
 
 
-import com.arsdigita.persistence.sql.SQL;
 import com.arsdigita.persistence.sql.Element;
-import com.arsdigita.persistence.sql.Identifier;
 
-import com.arsdigita.persistence.metadata.Property;
 
-import java.util.List;
-import java.io.StringReader;
 
 /**
  * This manipulates SQL in a way that is specific to Oracle.  For
@@ -31,12 +26,12 @@ import java.io.StringReader;
  * value of null with "is null" or "is not null"
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/11/01 $
  */
 
 class OracleSQLUtilities implements SQLUtilities  {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OracleSQLUtilities.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OracleSQLUtilities.java#5 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     /**
      *  This takes the SQL Element and the source which contains variable

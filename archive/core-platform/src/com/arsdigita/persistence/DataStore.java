@@ -16,14 +16,11 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.Association;
-import com.arsdigita.persistence.metadata.DataType;
 import com.arsdigita.persistence.metadata.CompoundType;
 import com.arsdigita.persistence.metadata.ObjectType;
-import com.arsdigita.persistence.metadata.QueryType;
 import com.arsdigita.persistence.metadata.Property;
 import com.arsdigita.persistence.metadata.Column;
 import com.arsdigita.persistence.metadata.SimpleType;
-import com.arsdigita.persistence.metadata.DataOperationType;
 import com.arsdigita.persistence.metadata.Event;
 import com.arsdigita.persistence.metadata.Operation;
 import com.arsdigita.persistence.metadata.Mapping;
@@ -34,7 +31,6 @@ import com.arsdigita.persistence.sql.Element;
 import com.arsdigita.persistence.sql.Statement;
 import com.arsdigita.persistence.sql.SetClause;
 import com.arsdigita.persistence.sql.Clause;
-import com.arsdigita.persistence.sql.ParseException;
 import com.arsdigita.persistence.sql.Assign;
 
 import com.arsdigita.db.CallableStatement;
@@ -45,13 +41,9 @@ import java.sql.SQLException;
 import java.sql.ResultSet;
 
 import java.util.Iterator;
-import java.util.Collection;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.io.StringReader;
-import java.io.Writer;
-import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
@@ -64,12 +56,12 @@ import org.apache.log4j.Logger;
  *              communicating with the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #13 $ $Date: 2002/10/16 $
+ * @version $Revision: #14 $ $Date: 2002/11/01 $
  */
 
 class DataStore {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#13 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#14 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     private static final Logger LOG =
         Logger.getLogger(DataStore.class.getName());

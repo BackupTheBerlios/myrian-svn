@@ -16,7 +16,6 @@
 package com.arsdigita.persistence;
 
 
-import com.arsdigita.persistence.sql.SQL;
 import com.arsdigita.persistence.sql.Element;
 
 /**
@@ -25,12 +24,12 @@ import com.arsdigita.persistence.sql.Element;
  *  the Oracle instance of this replaces "= null" with "is null"
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/11/01 $
  */
 
 public interface SQLUtilities  {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SQLUtilities.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SQLUtilities.java#5 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
 
     /**
      *  This takes the SQL Element and the source which contains variable
