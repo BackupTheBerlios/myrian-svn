@@ -57,12 +57,12 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/03/09 $
+ * @version $Revision: #6 $ $Date: 2004/03/16 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataQueryImpl.java#5 $ by $Author: ashah $, $DateTime: 2004/03/09 00:55:03 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataQueryImpl.java#6 $ by $Author: bche $, $DateTime: 2004/03/16 17:15:26 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 
@@ -430,12 +430,6 @@ class DataQueryImpl implements DataQuery {
                  "Data query must be rewound.");
         }
         order = unalias(order);
-
-        if (m_orders.contains(order)) {
-            throw new IllegalArgumentException
-                ("already ordered by expr: " + order);
-        }
-
         m_orders.add(order);
     }
 

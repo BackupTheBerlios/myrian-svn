@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
  * @author Randy Graebner &lt;randyg@alum.mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/02/25 $
+ * @version $Revision: #4 $ $Date: 2004/03/16 $
  **/
 
 public final class Files {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/util/Files.java#3 $ by $Author: richardl $, $DateTime: 2004/02/25 09:03:46 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/util/Files.java#4 $ by $Author: bche $, $DateTime: 2004/03/16 17:15:26 $";
 
     private static final Logger s_log =
         Logger.getLogger(Files.class);
@@ -252,7 +252,7 @@ public final class Files {
                 if (prefix == null) {
                     files.add(list[i]);
                 } else {
-                    files.add(prefix + "/" + list[i]);
+                    files.add(prefix + File.separator + list[i]);
                 }
             }
         }
@@ -264,7 +264,7 @@ public final class Files {
                 files.add(tempFile.getName());
                 listFilesInTree(tempFile, filter, files, tempFile.getName());
             } else {
-                String name = prefix + "/" + tempFile.getName();
+                String name = prefix + File.separator + tempFile.getName();
                 files.add(name);
                 listFilesInTree(tempFile, filter, files, name);
             }

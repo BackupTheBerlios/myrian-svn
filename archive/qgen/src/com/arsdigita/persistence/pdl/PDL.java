@@ -60,12 +60,12 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/01/29 $
+ * @version $Revision: #3 $ $Date: 2004/03/16 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/pdl/PDL.java#2 $ by $Author: ashah $, $DateTime: 2004/01/29 12:35:08 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/pdl/PDL.java#3 $ by $Author: bche $, $DateTime: 2004/03/16 17:15:26 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;
@@ -460,7 +460,7 @@ public class PDL {
                     try {
                         String path = listing[i].getCanonicalPath();
                         if (trimPath) {
-                            int index = path.lastIndexOf("/");
+                            int index = path.lastIndexOf(File.separator);
                             if (index != -1) {
                                 path = path.substring(index + 1);
                             }
