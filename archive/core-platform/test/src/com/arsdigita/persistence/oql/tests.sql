@@ -15,4 +15,4 @@ create table tests (
     parent_id INTEGER
         constraint tests_parent_id_f_SWQ6G
           references tests(test_id)
-);
+)

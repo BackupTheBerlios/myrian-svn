@@ -7,4 +7,4 @@ create table collection (
           references tests(test_id),
     constraint collect_tes_id_elem_id_p_XGZN5
       primary key(test_id, element_id)
-);
+)

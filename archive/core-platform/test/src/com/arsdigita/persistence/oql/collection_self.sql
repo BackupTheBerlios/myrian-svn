@@ -7,4 +7,4 @@ create table collection_self (
           references tests(test_id),
     constraint coll_sel_tes_id_ele_id_p_YAP30
       primary key(test_id, element_id)
-);
+)

@@ -6,4 +6,4 @@ create table components (
     test_id INTEGER not null
         constraint components_test_id_f_UaeCY
           references tests(test_id)
-);
+)

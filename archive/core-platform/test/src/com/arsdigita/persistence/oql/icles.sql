@@ -3,4 +3,4 @@ create table icles (
         constraint icles_icle_id_p_OEZUM
           primary key,
     name VARCHAR(200)
-);
+)
