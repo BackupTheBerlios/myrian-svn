@@ -41,7 +41,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Category;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 
 /**
@@ -50,14 +51,14 @@ import org.apache.log4j.Priority;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/12 $
+ * @version $Revision: #7 $ $Date: 2002/08/12 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#6 $ by $Author: randyg $, $DateTime: 2002/08/12 07:48:16 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#7 $ by $Author: dennis $, $DateTime: 2002/08/12 12:23:01 $";
 
-    private static final Category s_log = Category.getInstance(PDL.class);
+    private static final Logger s_log = Logger.getLogger(PDL.class);
 
     // the abstract syntax tree root nod
     private AST m_ast = new AST();
@@ -229,7 +230,7 @@ public class PDL {
             usage();
         } else {
             BasicConfigurator.configure();
-            Category.getRoot().setPriority(Priority.toPriority("info"));
+            Logger.getRootLogger().setLevel(Level.INFO);
 
             DDLWriter writer = null;
             String base = (String) OPTIONS.get("-ddl");
