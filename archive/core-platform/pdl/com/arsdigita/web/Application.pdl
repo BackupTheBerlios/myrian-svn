@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/web/Application.pdl#2 $ 
-// $DateTime: 2002/12/09 11:27:10 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/web/Application.pdl#3 $
+// $DateTime: 2003/01/03 15:20:16 $
 
 model com.arsdigita.web;
 
@@ -24,12 +24,12 @@ import com.arsdigita.kernel.permissions.Privilege;
 import com.arsdigita.portal.Portlet;
 
 // @author Justin Ross (justin@arsdigita.com)
-// @version $Id: //core-platform/dev/pdl/com/arsdigita/web/Application.pdl#2 $
+// @version $Id: //core-platform/dev/pdl/com/arsdigita/web/Application.pdl#3 $
 
 object type ApplicationType extends ResourceType {
 
     Privilege[0..n] relevantPrivileges =
-        join application_types.application_type_id 
+        join application_types.application_type_id
           to application_type_privilege_map.application_type_id,
         join application_type_privilege_map.privilege
           to acs_privileges.privilege;
@@ -38,7 +38,7 @@ object type ApplicationType extends ResourceType {
 
 association {
     ApplicationType[0..1] providerApplicationType =
-        join application_types.provider_id 
+        join application_types.provider_id
             to application_types.application_type_id;
     ApplicationType[0..n] dependentApplicationType =
         join application_types.application_type_id
@@ -47,7 +47,7 @@ association {
 
 association {
     PackageType[0..1] packageType =
-        join application_types.package_type_id 
+        join application_types.package_type_id
             to apm_package_types.package_type_id;
     ApplicationType[0..n] applicationType =
         join apm_package_types.package_type_id
@@ -56,14 +56,13 @@ association {
 
 object type Application extends Resource {
     String primaryURL = applications.primary_url VARCHAR(4000);
-    Date[1..1] timestamp = applications.timestamp TIMESTAMP;
 }
 
 
 association {
     PackageInstance[0..1] packageInstance =
         join applications.package_id to apm_packages.package_id;
-    Application[0..1] application = 
+    Application[0..1] application =
         join apm_packages.package_id to applications.package_id;
 }
 
