@@ -1,5 +1,6 @@
 package com.redhat.persistence.jdo;
 
+import com.redhat.persistence.oql.Expression;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,16 +19,22 @@ import org.apache.log4j.Logger;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #24 $ $Date: 2004/08/12 $
+ * @version $Revision: #25 $ $Date: 2004/08/23 $
  **/
 
-class CRPList implements List {
+class CRPList implements List, OQLCollection {
     private final static Logger s_log = Logger.getLogger(CRPList.class);
     private final static int NEGATIVE_ONE  = -1;
     private final static Integer NOT_FOUND = new Integer(NEGATIVE_ONE);
 
     private Map elements;
     private transient String m_fieldName;
+    private transient OQLCollection m_values;
+    private transient WeakResourceList m_iterators = new WeakResourceList() {
+        protected void onRelease(Object o) {
+            ((CRPListIterator) o).close();
+        }
+    };
 
     CRPList() {
         elements = new HashMap();
@@ -35,10 +42,24 @@ class CRPList implements List {
 
     void setFieldName(String fieldName) {
         m_fieldName = C.concat(fieldName, "$elements$entries");
+
+        Query query = getPMI().newQuery
+            (Extensions.OQL,
+             C.concat("sort($1.", m_fieldName, ", key).value"));
+        m_values = (OQLCollection) query.execute(getContainer());
     }
 
     private PersistenceManagerImpl getPMI() {
         return (PersistenceManagerImpl) JDOHelper.getPersistenceManager(this);
+    }
+
+    public Expression expression() {
+        return m_values.expression();
+    }
+
+    public void close() {
+        m_values.close();
+        m_iterators.release();
     }
 
     private Object getContainer() {
@@ -81,7 +102,7 @@ class CRPList implements List {
         return value.getObject();
     }
 
-    private class CRPListIterator implements ListIterator {
+    private class CRPListIterator implements ListIterator, Closeable {
         private int m_index;
         private boolean m_forward;
         private Iterator m_elements;
@@ -90,6 +111,11 @@ class CRPList implements List {
             m_index = from;
             m_forward = true;
             resetIterator();
+            CRPList.this.m_iterators.add(this);
+        }
+
+        public void close() {
+            Extensions.close(m_elements);
         }
 
         private void resetIterator() {
@@ -198,14 +224,18 @@ class CRPList implements List {
             Object o1 = it1.next();
             if (it2.hasNext()) {
                 Object o2 = it2.next();
-                if (!o1.equals(o2)) {
+                if (o1 == null) {
+                    if (o2 != null) {
+                        return false;
+                    }
+                } else if (!o1.equals(o2)) {
                     return false;
                 }
             } else {
                 return false;
             }
         }
-        return !it2.hasNext();
+        return true;
     }
 
     public int size() {
@@ -374,11 +404,7 @@ class CRPList implements List {
     }
 
     public Iterator iterator() {
-        Query query = getPMI().newQuery
-            (Extensions.OQL,
-             C.concat("sort($1.", m_fieldName, ", key).value"));
-        Collection coll = (Collection) query.execute(getContainer());
-        return coll.iterator();
+        return m_values.iterator();
     }
 
     public List subList(int from, int to) {

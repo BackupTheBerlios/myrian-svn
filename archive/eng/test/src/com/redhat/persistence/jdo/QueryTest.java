@@ -203,10 +203,16 @@ public class QueryTest extends AbstractCase {
             it[1][j].next();
         }
 
-        q.close(c[1]);
+        q.closeAll();
 
         for (int j = 0; j < it[0].length; j++) {
-            it[0][j] = c[0].iterator();
+            try {
+                it[0][j] = c[0].iterator();
+            } catch (JDOUserException jue) {
+                continue;
+            }
+
+            fail("query result was closed");
         }
 
         for (int i = 0; i < c.length; i++) {

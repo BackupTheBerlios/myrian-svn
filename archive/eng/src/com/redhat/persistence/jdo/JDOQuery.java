@@ -25,6 +25,12 @@ class JDOQuery implements ExtendedQuery, Serializable {
 
     transient private OQLCollection m_candidates = null;
 
+    transient private WeakResourceList m_results = new WeakResourceList() {
+        protected void onRelease(Object o) {
+            closeInternal((QueryResult) o);
+        }
+    };
+
     private String m_baseExpr = "";
     private String m_params = "";
     private String m_vars = "";
@@ -277,7 +283,7 @@ class JDOQuery implements ExtendedQuery, Serializable {
             sig.addPath((String) it.next());
         }
 
-        return new CRPCollection() {
+        CRPCollection c = new CRPCollection() {
             protected Signature signature() { return sig; }
             Session ssn() { return m_pm.getSession(); }
             ObjectType type() { return type; }
@@ -292,6 +298,10 @@ class JDOQuery implements ExtendedQuery, Serializable {
                 throw new UnsupportedOperationException();
             }
         };
+
+        Collection result = new QueryResult(c);
+        m_results.add(result);
+        return result;
     }
 
     public PersistenceManager getPersistenceManager() {
@@ -340,11 +350,24 @@ class JDOQuery implements ExtendedQuery, Serializable {
         throw new Error("not implemented");
     }
 
+    private void closeInternal(QueryResult qr) {
+        qr.close();
+        qr.makeUseless();
+    }
+
     public void close(Object queryResult) {
-        throw new Error("not implemented");
+        if (queryResult instanceof QueryResult) {
+            if (m_results.remove(queryResult)) {
+                closeInternal((QueryResult) queryResult);
+                return;
+            }
+        }
+
+        throw new JDOUserException
+            (queryResult + " is not the result of an execution of this query");
     }
 
     public void closeAll() {
-        throw new Error("not implemented");
+        m_results.release();
     }
 }

@@ -4,19 +4,24 @@ import com.redhat.persistence.*;
 import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.oql.*;
 import com.redhat.persistence.oql.Expression;
-
 import java.util.*;
 
 /**
  * CRPCollection
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/08/04 $
+ * @version $Revision: #5 $ $Date: 2004/08/23 $
  **/
 
 abstract class CRPCollection implements Collection, OQLCollection {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPCollection.java#4 $ by $Author: ashah $, $DateTime: 2004/08/04 17:36:12 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPCollection.java#5 $ by $Author: ashah $, $DateTime: 2004/08/23 16:49:41 $";
+
+    private transient WeakResourceList m_iterators = new WeakResourceList() {
+        protected void onRelease(Object o) {
+            ((CRPIterator) o).close();
+        }
+    };
 
     CRPCollection() {}
 
@@ -37,6 +42,10 @@ abstract class CRPCollection implements Collection, OQLCollection {
     public abstract boolean add(Object o);
 
     public abstract boolean remove(Object o);
+
+    public void close() {
+        m_iterators.release();
+    }
 
     public Iterator iterator() {
         return new CRPIterator(data().getCursor());
@@ -112,7 +121,7 @@ abstract class CRPCollection implements Collection, OQLCollection {
         return toArray(new Object[size()]);
     }
 
-    private class CRPIterator implements Iterator {
+    private class CRPIterator implements Iterator, Closeable {
 
         private Cursor m_cursor;
         private Object m_current = null;
@@ -121,13 +130,22 @@ abstract class CRPCollection implements Collection, OQLCollection {
 
         CRPIterator(Cursor cursor) {
             m_cursor = cursor;
+            CRPCollection.this.m_iterators.add(this);
+        }
+
+        public void close() {
+            m_cursor.close();
+            m_cursor = null;
+            m_next = null;
         }
 
         private void advance() {
-            if (m_cursor.next()) {
+            if (m_cursor == null) {
+                throw new NoSuchElementException();
+            } else if (m_cursor.next()) {
                 m_next = m_cursor.get();
             } else {
-                m_next = null;
+                close();
             }
         }
 

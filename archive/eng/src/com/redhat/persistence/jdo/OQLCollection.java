@@ -4,6 +4,6 @@ import com.redhat.persistence.oql.Expression;
 
 import java.util.Collection;
 
-interface OQLCollection extends Collection {
+interface OQLCollection extends Collection, Closeable {
     Expression expression();
 }

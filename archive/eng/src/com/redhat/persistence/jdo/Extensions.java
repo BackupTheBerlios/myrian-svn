@@ -1,6 +1,7 @@
 package com.redhat.persistence.jdo;
 
 import java.util.Collection;
+import java.util.Iterator;
 import javax.jdo.*;
 
 /**
@@ -57,5 +58,27 @@ public class Extensions {
         throw new JDOUserException
             ("specified persistence manager is of class " + pm.getClass()
              + " instead of " + PersistenceManagerImpl.class);
+    }
+
+    /**
+     * Equivalent to calling Extensions#close(Iterator) for every iterator
+     * returned by the specified collection.
+     */
+    public static void close(Collection c) {
+        if (c instanceof Closeable) {
+            ((Closeable) c).close();
+        }
+    }
+
+    /**
+     * Analogous to JDOQuery#close(Object), but applying only to the provided
+     * Iterator. This method ca be used with Any Iterator obtained through the
+     * JDO implementation including one that is the result of iterating over a
+     * Collection-valued field of a persistent objects.
+     */
+    public static void close(Iterator it) {
+        if (it instanceof Closeable) {
+            ((Closeable) it).close();
+        }
     }
 }
