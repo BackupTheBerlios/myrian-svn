@@ -12,6 +12,5 @@
 -- rights and limitations under the License.
 --
 
-drop function package_abstractness;
-
-@@ ../../default/domain/teardown.sql
+@@ package.sql
+@@ package_data.sql

@@ -12,5 +12,17 @@
 -- rights and limitations under the License.
 --
 
-@@ package.sql
-@@ package_data.sql
+@@ ../../default/domain/setup.sql
+
+create or replace function package_abstractness(v_id integer) return number
+is
+abs_count number;
+total number;
+begin
+	select count(*) into abs_count from t_class  where package_id = v_id and is_abstract = 1;
+	select count(*) into total from t_class  where package_id = v_id;
+	return abs_count / total;
+end;
+/
+
+

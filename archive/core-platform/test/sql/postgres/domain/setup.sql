@@ -12,6 +12,18 @@
 -- rights and limitations under the License.
 --
 
-drop function package_abstractness;
+@@ ../../default/domain/setup.sql
 
-@@ ../../default/domain/teardown.sql
+create or replace function package_abstractness(integer)
+  returns numeric as '
+  declare
+    v_id alias for $1;
+    abs_count numeric;
+    total numeric;
+  begin
+	select count(*) into abs_count from t_class  where package_id = v_id and is_abstract = 1;
+	select count(*) into total from t_class  where package_id = v_id;
+	return abs_count / total;
+  end' language 'plpgsql';
+
+

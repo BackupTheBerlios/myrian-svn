@@ -17,7 +17,7 @@
 -- test cases.
 --
 -- @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
--- @version $Revision: #2 $ $Date: 2002/07/18 $
+-- @version $Revision: #1 $ $Date: 2002/08/13 $
 --
 
 create table t_package (
@@ -27,18 +27,19 @@ create table t_package (
 
 create table t_class (
     class_id    integer not null constraint class_pk primary key,
-    package_id   not null constraint package_id_fk references t_package(package_id),
+    package_id  integer not null constraint package_id_fk 
+                                 references t_package(package_id),
     name       varchar(100) not null,
-    is_abstract number(1)
+    is_abstract integer
 );
 
 -- Describes which packages a given package depends on.
 -- Also known as Efferent packages.
 create table t_package_depends_on (
-    package_id                    not null  
+    package_id                    integer not null  
                                   constraint t_pack_depend_pack_id_fk
                                   references t_package(package_id),
-    depends_on_package_id         not null 
+    depends_on_package_id         integer not null 
                                   constraint t_pack_depend_de_pack_id_fk
                                   references t_package(package_id)
 );
@@ -47,22 +48,10 @@ create table t_package_depends_on (
 -- Describes which packages use a given package.
 -- Also known as Afferent packages.
 create table t_package_used_by (
-    package_id                 not null  
+    package_id                 integer not null  
                                constraint t_pack_used_by_pack_id_fk
                                references t_package(package_id),
-    used_by_package_id         not null 
+    used_by_package_id         integer not null 
                                constraint t_pack_used_by_used_pack_id_fk
                                references t_package(package_id)
 );
-
-create or replace function package_abstractness(v_id integer) return number
-is
-abs_count number;
-total number;
-begin
-	select count(*) into abs_count from t_class  where package_id = v_id and is_abstract = 1;
-	select count(*) into total from t_class  where package_id = v_id;
-	return abs_count / total;
-end;
-/
-
