@@ -8,17 +8,21 @@ import java.util.*;
 import java.sql.*;
 import java.io.*;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/24 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#2 $ by $Author: rhs $, $DateTime: 2003/06/24 22:57:54 $";
+
+    private static final Logger LOG = Logger.getLogger(QGen.class);
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -57,6 +61,8 @@ class QGen {
     private HashMap m_keys = new HashMap();
     private HashMap m_aliases = new HashMap();
     private HashMap m_joins = new HashMap();
+    private Analyzer m_anal;
+    private Condition m_extra = null;
 
     public QGen(Query query) {
 	this(query, null);
@@ -69,6 +75,7 @@ class QGen {
         }
         m_query = query;
 	m_block = block;
+        m_anal = new Analyzer(m_query.getFilter());
     }
 
     private Path getColumn(Path prefix) {
@@ -285,6 +292,14 @@ class QGen {
         }
 
         generate(m_query.getFilter());
+        Expression filter;
+        if (m_extra == null) {
+            filter = m_query.getFilter();
+        } else if (m_query.getFilter() == null) {
+            filter = m_extra;
+        } else {
+            filter = Condition.and(m_extra, m_query.getFilter());
+        }
 
         Join join = null;
         for (Iterator it = sig.getSources().iterator(); it.hasNext(); ) {
@@ -296,7 +311,7 @@ class QGen {
             }
         }
 
-        Select result = new Select(join, m_query.getFilter(), env);
+        Select result = new Select(join, filter, env);
         result.setMappings(m_columns);
 
         int col = 0;
@@ -361,13 +376,27 @@ class QGen {
             return false;
         }
 
-        Property prop = m_query.getSignature().getProperty(path);
-	if (prop == null) {
-	    return false;
-	} else if (prop.getType().isKeyed() && prop.isNullable()) {
-            return true;
+        if (m_anal.isDuplicate(path)) {
+            Path canon = m_anal.getCanonical(path);
+            if (!isOuter(canon)) {
+                return false;
+            }
+        }
+
+        Signature sig = m_query.getSignature();
+        if (sig.isParameter(path)) {
+            return false;
+        } else if (sig.isSource(path)) {
+            return false;
         } else {
-            return isOuter(path.getParent());
+            Property prop = m_query.getSignature().getProperty(path);
+            if (prop == null) {
+                return false;
+            } else if (prop.getType().isKeyed() && prop.isNullable()) {
+                return true;
+            } else {
+                return isOuter(path.getParent());
+            }
         }
     }
 
@@ -380,6 +409,10 @@ class QGen {
         return result;
     }
 
+    private SimpleJoin makeSimpleJoin(Table table, Path path) {
+        return new SimpleJoin(table, makeAlias(path, table));
+    }
+
     private Path addJoin(Path path, Constraint constraint) {
         Table table = constraint.getTable();
 	Path parent = path.getParent();
@@ -389,21 +422,45 @@ class QGen {
             return alias;
         }
 
-        alias = makeAlias(parent, table);
+        SimpleJoin simple = null;
 
-        Join join = getJoin(path);
-        Join simple = new SimpleJoin(table, alias);
-        Path tmp = Path.add(alias, "__tmp__");
+        if (m_anal.isDuplicate(path)) {
+            Path canon = m_anal.getCanonical(path);
+            genPathRecursive(canon);
+            alias = getAlias(canon, table);
+            if (alias == null) {
+                simple = makeSimpleJoin(table, canon);
+            }
+        } else {
+            simple = makeSimpleJoin(table, parent);
+        }
+
+        if (simple != null) {
+            alias = simple.getAlias();
+        }
+
+        Path tmp = Path.add
+            (alias, path.getPath().replace('.', '_') + "__tmp__");
         setColumns(tmp, getPaths(alias, constraint));
         Condition cond = Condition.equals(tmp, parent);
-        if (isOuter(path)) {
-            join = new LeftJoin(join, simple, cond);
-        } else {
-            join = new InnerJoin(join, simple, cond);
-        }
-        setJoin(path, join);
-        setAlias(parent, table, alias);
 
+        if (simple == null) {
+            if (m_extra == null) {
+                m_extra = cond;
+            } else {
+                m_extra = Condition.and(m_extra, cond);
+            }
+        } else {
+            Join join = getJoin(path);
+            if (isOuter(path)) {
+                join = new LeftJoin(join, simple, cond);
+            } else {
+                join = new InnerJoin(join, simple, cond);
+            }
+            setJoin(path, join);
+        }
+
+        setAlias(parent, table, alias);
         return alias;
     }
 

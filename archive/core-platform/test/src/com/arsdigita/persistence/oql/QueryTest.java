@@ -31,12 +31,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #15 $ $Date: 2003/06/16 $
+ * @version $Revision: #16 $ $Date: 2003/06/24 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#15 $ by $Author: rhs $, $DateTime: 2003/06/16 12:43:36 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#16 $ by $Author: rhs $, $DateTime: 2003/06/24 22:57:54 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);
@@ -62,6 +62,10 @@ public class QueryTest extends PersistenceTestCase {
             }
         }
 
+        doTest(name, query);
+    }
+
+    private void doTest(String name, Query query) {
         // Test oracle specific syntax.
         OracleWriter ow = new OracleWriter();
         ow.write(query);
@@ -73,7 +77,7 @@ public class QueryTest extends PersistenceTestCase {
         String pgResult = compare("postgres/" + name + ".op", pw.getSQL());
 
         if (oraResult != null || pgResult != null) {
-            fail(oraResult + "\n\n" + pgResult);
+            fail("Query:\n" + query + "\n\n" + oraResult + "\n\n" + pgResult);
         }
     }
 
@@ -81,8 +85,9 @@ public class QueryTest extends PersistenceTestCase {
         String op = "com/arsdigita/persistence/oql/" + expectedResource;
         InputStream is = getClass().getClassLoader().getResourceAsStream(op);
 
-        assertTrue("No such resource: " + op + "\n\nActual:\n" + actual,
-                   is != null);
+        if (is == null) {
+            return "No such resource: " + op + "\n\nTest output:\n" + actual;
+        }
 
         Reader reader = new InputStreamReader(is);
         StringBuffer expected = new StringBuffer();
@@ -250,6 +255,45 @@ public class QueryTest extends PersistenceTestCase {
                    "optional"
                });
     }
+
+
+    /**
+     * Tests the contains filter.
+     **/
+
+    private void doContainsTest(String from, String assn, String to) {
+        Root root = Root.getRoot();
+        ObjectType FROM = root.getObjectType(from);
+        ObjectType TO = root.getObjectType(to);
+        Signature sig = new Signature(TO);
+        Parameter start = new Parameter(FROM, Path.get("start"));
+        sig.addParameter(start);
+        Query q = new Query(sig, Condition.contains
+                            (Path.add(start.getPath(),
+                                      assn), null));
+        doTest("Contains-" + assn, q);
+    }
+
+    /**
+     * Tests contains filter for join throughs.
+     **/
+
+    public void testContainsJoinThrough() {
+        doContainsTest("test.Test", "collection", "test.Icle");
+    }
+
+    /**
+     * Tests contains filter for join froms.
+     **/
+
+    public void testContainsFilterJoinFrom() {
+        doContainsTest("test.Test", "components", "test.Component");
+    }
+
+
+    /**
+     * DDL Generation tests.
+     **/
 
     private void doTableTest(String tableName) {
         Root root = Root.getRoot();

@@ -8,12 +8,12 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/06/04 $
+ * @version $Revision: #3 $ $Date: 2003/06/24 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Signature.java#2 $ by $Author: ashah $, $DateTime: 2003/06/04 14:49:04 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Signature.java#3 $ by $Author: rhs $, $DateTime: 2003/06/24 22:57:54 $";
 
     private ArrayList m_paths = new ArrayList();
 
@@ -233,7 +233,13 @@ public class Signature {
             return getSource(parent).getObjectType().getProperty
                 (path.getName());
         } else {
-            return getProperty(parent).getType().getProperty(path.getName());
+            Property prop = getProperty(parent);
+            if (prop == null) {
+                throw new IllegalArgumentException
+                    ("no such property in signature: " + path);
+            } else {
+                return prop.getType().getProperty(path.getName());
+            }
         }
     }
 
