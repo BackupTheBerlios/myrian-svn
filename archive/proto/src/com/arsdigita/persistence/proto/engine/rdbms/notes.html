@@ -9,18 +9,14 @@
 <hr>
 
 <ul>
-  <li>We currently generate an extraneous outer join when using the
-      query generator to fetch associations.</li>
-  <li>There are extraneous joins for fetching aggressively loaded two
-      way associations.</li>
-  <li>We could speed up the development cycle by caching generated
-      SQL since the code in this package isn't quite fast enough to
-      run all the time without a noticable lag.</li>
+  <li>Contains filters only work if they are directly underneath And
+      filters only. They probably need to be made to do outer joins in
+      order to work generically.</li>
 </ul>
 
 <hr>
 <address>rhs@mit.edu</address>
 <!-- hhmts start -->
-Last modified: Mon Nov 18 13:48:08 EST 2002
+Last modified: Fri Feb  7 12:38:07 EST 2003
 <!-- hhmts end -->
 </body> </html>

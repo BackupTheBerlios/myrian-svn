@@ -1,11 +1,8 @@
 package com.arsdigita.persistence.proto.engine.rdbms;
 
 import com.arsdigita.persistence.proto.*;
-import com.arsdigita.persistence.proto.Query;
 import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
-import com.arsdigita.persistence.proto.metadata.Table;
-import com.arsdigita.persistence.proto.metadata.Column;
 
 import java.util.*;
 
@@ -15,12 +12,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2003/02/06 $
+ * @version $Revision: #10 $ $Date: 2003/02/07 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#9 $ by $Author: rhs $, $DateTime: 2003/02/06 18:43:54 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#10 $ by $Author: rhs $, $DateTime: 2003/02/07 12:50:17 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 

@@ -2,8 +2,6 @@ package com.arsdigita.persistence.proto.engine.rdbms;
 
 import com.arsdigita.persistence.proto.*;
 import com.arsdigita.persistence.proto.metadata.*;
-import com.arsdigita.persistence.proto.metadata.Table;
-import com.arsdigita.persistence.proto.metadata.Column;
 
 import java.util.*;
 
@@ -11,12 +9,12 @@ import java.util.*;
  * DML
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/02/05 $
+ * @version $Revision: #2 $ $Date: 2003/02/07 $
  **/
 
 class DML extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/DML.java#1 $ by $Author: rhs $, $DateTime: 2003/02/05 21:09:04 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/DML.java#2 $ by $Author: rhs $, $DateTime: 2003/02/07 12:50:17 $";
 
     private Table m_table;
     private HashMap m_bindings = new HashMap();
