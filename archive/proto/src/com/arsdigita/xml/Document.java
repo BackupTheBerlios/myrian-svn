@@ -26,7 +26,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
 import org.apache.log4j.Logger;
-
+import java.io.UnsupportedEncodingException;
 /**
  * A wrapper class that implements some functionality of
  * <code>org.jdom.Document</code> using <code>org.w3c.dom.Document</code>.
@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
  * @since ACS 4.5a
  */
 public class Document {
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/xml/Document.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/xml/Document.java#3 $ by $Author: ashah $, $DateTime: 2003/05/08 15:13:21 $";
 
     private static final Logger s_log =
         Logger.getLogger(Document.class.getName());
@@ -253,12 +253,19 @@ public class Document {
                 identity.setOutputProperty("method", "xml");
                 identity.setOutputProperty("indent", "yes");
             }
+            identity.setOutputProperty("encoding", "UTF-8");
             identity.transform(new DOMSource(document), new StreamResult(os));
         } catch (javax.xml.transform.TransformerException e) {
             s_log.error("error in toString", e);
             return document.toString();
         }
-        return os.toString();
+
+        try {
+            return os.toString("UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            s_log.error("UTF-8 encoding not supported!!!");
+            return os.toString();
+        }
     }
 
     /** Convenience wrapper for static toString(Document, boolean),

@@ -24,12 +24,12 @@ import java.util.Set;
  *  Dummy ServletContext object for unit testing of form methods that
  *  include requests in their signatures.
  *
- * @version $Revision: #2 $ $Date: 2003/04/09 $
+ * @version $Revision: #3 $ $Date: 2003/05/08 $
  */
 
 public class DummyServletContext implements ServletContext {
 
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/util/DummyServletContext.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/util/DummyServletContext.java#3 $ by $Author: ashah $, $DateTime: 2003/05/08 15:13:21 $";
 
     private HashMap m_attributes = new HashMap();
     private HashMap m_dispachers = new HashMap();
@@ -72,7 +72,14 @@ public class DummyServletContext implements ServletContext {
     }
 
     public String getRealPath(String path) {
-        return null;
+        String root = System.getProperty("test.webapp.dir");
+        if (path.equals("/")) {
+            return root;
+        }
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+        return root + path;
     }
 
     public RequestDispatcher getRequestDispatcher(String path) {

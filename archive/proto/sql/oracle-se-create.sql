@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/proto/sql/oracle-se-create.sql#5 $
--- $DateTime: 2003/04/24 15:32:09 $
+-- $Id: //core-platform/proto/sql/oracle-se-create.sql#6 $
+-- $DateTime: 2003/05/08 15:13:21 $
 
 @@ oracle-se/function-currentDate.sql
 
@@ -237,6 +237,8 @@
 @@ default/web/index-applications.sql
 @@ default/web/index-application_types.sql
 @@ default/web/index-application_type_privilege_map.sql
+
+@@ oracle-se/lucene/proc-update-dirty.sql
 
 @@ default/kernel/index-foreign_keys.sql
 

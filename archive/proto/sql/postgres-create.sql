@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/proto/sql/postgres-create.sql#6 $
--- $DateTime: 2003/04/24 15:32:09 $
+-- $Id: //core-platform/proto/sql/postgres-create.sql#7 $
+-- $DateTime: 2003/05/08 15:13:21 $
 
 begin;
 
@@ -223,6 +223,9 @@ begin;
 \i default/web/index-applications.sql
 \i default/web/index-application_types.sql
 \i default/web/index-application_type_privilege_map.sql
+
+
+\i postgres/lucene/proc-update-dirty.sql
 
 \i default/mimetypes/insert-cms_mime_status.sql
 
