@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * TestRunner
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/07/15 $
+ * @version $Revision: #4 $ $Date: 2004/07/27 $
  **/
 
 public class TestRunner {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/TestRunner.java#3 $ by $Author: ashah $, $DateTime: 2004/07/15 13:40:03 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/TestRunner.java#4 $ by $Author: rhs $, $DateTime: 2004/07/27 10:58:56 $";
 
     private static final Logger s_log = Logger.getLogger(TestRunner.class);
 
@@ -29,30 +29,38 @@ public class TestRunner {
     private static final void run(String suite) throws Exception {
         final boolean halt = "true".equals
             (System.getProperty("junit.haltonfailure"));
+        final String filter = System.getProperty("junit.test");
 
-        final TestResult result = new TestResult();
-            result.addListener(new TestListener() {
-                public void addError(Test test, Throwable t) {
-                    s_log.warn("error " + test);
-                    if (s_log.isDebugEnabled()) {
-                        s_log.debug("stack", t);
-                    }
-                    if (halt) { result.stop(); }
+        final TestResult result = new TestResult() {
+            protected void run(TestCase test) {
+                String name = "" + test;
+                if (filter == null || name.matches(filter)) {
+                    super.run(test);
                 }
-                public void addFailure(Test test, AssertionFailedError t) {
-                    s_log.warn("failure " + test);
-                    if (s_log.isDebugEnabled()) {
-                        s_log.debug("stack", t);
-                    }
-                    if (halt) { result.stop(); }
+            }
+        };
+        result.addListener(new TestListener() {
+            public void addError(Test test, Throwable t) {
+                s_log.warn("error " + test);
+                if (s_log.isDebugEnabled()) {
+                    s_log.debug("stack", t);
                 }
-                public void startTest(Test test) {
-                    s_log.info("starting " + test);
+                if (halt) { result.stop(); }
+            }
+            public void addFailure(Test test, AssertionFailedError t) {
+                s_log.warn("failure " + test);
+                if (s_log.isDebugEnabled()) {
+                    s_log.debug("stack", t);
                 }
-                public void endTest(Test test) {
-                    s_log.info("stopping " + test);
-                }
-            });
+                if (halt) { result.stop(); }
+            }
+            public void startTest(Test test) {
+                s_log.info("starting " + test);
+            }
+            public void endTest(Test test) {
+                s_log.info("stopping " + test);
+            }
+        });
 
         Class klass = Class.forName(suite);
         Method method = klass.getMethod("suite", new Class[0]);
