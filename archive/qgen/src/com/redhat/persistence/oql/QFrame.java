@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2004/03/08 $
+ * @version $Revision: #15 $ $Date: 2004/03/09 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#14 $ by $Author: rhs $, $DateTime: 2004/03/08 23:10:10 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#15 $ by $Author: rhs $, $DateTime: 2004/03/09 15:48:58 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -676,7 +676,7 @@ class QFrame {
         StringBuffer result = new StringBuffer();
         indent(result, depth);
         result.append("frame ");
-        result.append(isOuter() ? "0" : "I");
+        result.append(isOuter() ? "O" : "I");
         result.append(m_outer ? "o" : "i");
         result.append(" ");
         result.append(m_expression.summary());
