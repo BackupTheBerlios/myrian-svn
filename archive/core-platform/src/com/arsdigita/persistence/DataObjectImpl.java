@@ -19,9 +19,11 @@ import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.metadata.Property;
 import com.redhat.persistence.ProtoException;
 import com.redhat.persistence.Session;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
@@ -30,18 +32,18 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #18 $ $Date: 2003/11/24 $
+ * @version $Revision: #19 $ $Date: 2003/12/02 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#18 $ by $Author: ashah $, $DateTime: 2003/11/24 15:35:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#19 $ by $Author: ashah $, $DateTime: 2003/12/02 15:20:41 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
     private Session m_ssn;
     private OID m_oid;
-    private Set m_observers = new HashSet();
+    private List m_observers = new ArrayList();
     private Map m_disconnect = null;
     private boolean m_manualDisconnect = false;
     private Throwable m_invalidStack = null;
@@ -63,51 +65,40 @@ class DataObjectImpl implements DataObject {
             return m_observer;
         }
 
-        public boolean isFiring(Class cls) {
-            return m_firing.contains(cls);
-        }
-
         public boolean isFiring(DataEvent event) {
-            return isFiring(event.getClass());
+            return m_firing.contains(event);
         }
 
         public boolean isWaiting(DataEvent event) {
-            for (Iterator it = m_waiting.entrySet().iterator();
-                 it.hasNext(); ) {
-                Map.Entry me = (Map.Entry) it.next();
-                DataEvent value = (DataEvent) me.getValue();
-                if (value.getClass().equals(event.getClass())) {
-                    return true;
-                }
-            }
-
-            return false;
+            return m_waiting.containsValue(event);
         }
 
         public void setFiring(DataEvent event) {
             // unschedule event from others
-            for (Iterator it = m_waiting.entrySet().iterator();
-                 it.hasNext(); ) {
-                Map.Entry me = (Map.Entry) it.next();
-                DataEvent value = (DataEvent) me.getValue();
-                if (value.getClass().equals(event.getClass())) {
-                    m_waiting.remove(me.getKey());
-                    break;
+            if (isWaiting(event)) {
+                for (Iterator it = m_waiting.entrySet().iterator();
+                     it.hasNext(); ) {
+                    Map.Entry me = (Map.Entry) it.next();
+                    DataEvent value = (DataEvent) me.getValue();
+                    if (value.equals(event)) {
+                        m_waiting.remove(me.getKey());
+                        break;
+                    }
                 }
             }
 
-            m_firing.add(event.getClass());
+            m_firing.add(event);
             DataObjectImpl.this.m_firing = ObserverEntry.this;
         }
 
-        public void scheduleEvent(Class cls, DataEvent event) {
-            if (!isFiring(event)) { m_waiting.put(cls, event); }
+        public void scheduleEvent(DataEvent now, DataEvent waiting) {
+            if (!isFiring(waiting)) { m_waiting.put(now, waiting); }
         }
 
         public DataEvent clearFiring(DataEvent event) {
-            m_firing.remove(event.getClass());
+            m_firing.remove(event);
             DataObjectImpl.this.m_firing = null;
-            return (DataEvent) m_waiting.remove(event.getClass());
+            return (DataEvent) m_waiting.remove(event);
         }
 
         public int hashCode() {
@@ -475,8 +466,8 @@ class DataObjectImpl implements DataObject {
     }
 
     void fireObserver(DataEvent event) {
-        for (Iterator it = m_observers.iterator(); it.hasNext(); ) {
-            ObserverEntry entry = (ObserverEntry) it.next();
+        for (int i = 0; i < m_observers.size(); i++) {
+            ObserverEntry entry = (ObserverEntry) m_observers.get(i);
             final DataObserver observer = entry.getObserver();
             if (entry.isFiring(event)) {
                 if (s_log.isDebugEnabled()) { s_log.debug("isFiring: " + event); }
