@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/10/28 $
+ * @version $Revision: #5 $ $Date: 2003/11/26 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/RecordSet.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/RecordSet.java#5 $ by $Author: rhs $, $DateTime: 2003/11/26 21:36:25 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -144,7 +144,7 @@ public abstract class RecordSet {
 	    Path p = (Path) me.getKey();
 	    if (m_signature.isSource(p)) { continue; }
 	    Property prop = m_signature.getProperty(p);
-	    if (prop.getContainer().isKeyed()) {
+	    if (prop.getContainer().isKeyed() && !prop.isCollection()) {
 		Object container = values.get(p.getParent());
 		Object value = me.getValue();
 		if (container == null) {

@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * LinkAttributeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/11/26 $
+ * @version $Revision: #11 $ $Date: 2003/11/26 $
  */
 
 public class DynamicLinkAttributeTest extends LinkAttributeTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DynamicLinkAttributeTest.java#10 $ by $Author: ashah $, $DateTime: 2003/11/26 20:05:23 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DynamicLinkAttributeTest.java#11 $ by $Author: rhs $, $DateTime: 2003/11/26 21:36:25 $";
 
     public DynamicLinkAttributeTest(String name) {
         super(name);
@@ -187,10 +187,11 @@ public class DynamicLinkAttributeTest extends LinkAttributeTest {
         assertEquals(0, dc.size());
 
         dc = ssn.retrieve(getModelName() + ".Group");
+        dc.addPath("members.id");
         dc.addFilter
             ("members.image.id = 0 and members.image.link.caption = '1'");
         assertTrue(dc.next());
-        // assertEquals(BigInteger.valueOf(1), dc.get("members.id"));
+        assertEquals(BigInteger.valueOf(1), dc.get("members.id"));
         assertFalse(dc.next());
     }
 }

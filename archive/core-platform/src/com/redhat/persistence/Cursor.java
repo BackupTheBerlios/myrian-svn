@@ -22,12 +22,12 @@ import java.util.Map;
  * Cursor
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/10/28 $
+ * @version $Revision: #4 $ $Date: 2003/11/26 $
  **/
 
 public class Cursor {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Cursor.java#3 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Cursor.java#4 $ by $Author: rhs $, $DateTime: 2003/11/26 21:36:25 $";
 
     final private Session m_ssn;
     final private Query m_query;
@@ -53,7 +53,7 @@ public class Cursor {
     }
 
     private Object getInternal(Path path) {
-	if (m_signature.isSource(path)) {
+	if (m_values.containsKey(path)) {
 	    return m_values.get(path);
 	} else {
 	    Object o = getInternal(path.getParent());

@@ -45,12 +45,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/10/28 $
+ * @version $Revision: #11 $ $Date: 2003/11/26 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Session.java#10 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Session.java#11 $ by $Author: rhs $, $DateTime: 2003/11/26 21:36:25 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -222,14 +222,22 @@ public class Session {
     }
 
     Object get(Object start, Path path) {
+        Object value;
+
         if (path.getParent() == null) {
-            return get(start,
-                       getObjectType(start).getProperty(path.getName()));
+            value = start;
         } else {
-            Object value = get(start, path.getParent());
-            return get(value,
-                       getObjectType(value).getProperty(path.getName()));
+            value = get(start, path.getParent());
         }
+
+        ObjectType type = getObjectType(start);
+        Property prop = type.getProperty(path.getName());
+        if (prop == null) {
+            throw new IllegalArgumentException
+                (value + ": no such property: " + path.getName());
+        }
+
+        return get(start, prop);
     }
 
 
