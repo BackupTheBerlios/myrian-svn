@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/formbuilder/Component.pdl#8 $ 
-// $DateTime: 2003/02/28 16:46:36 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/formbuilder/Component.pdl#9 $ 
+// $DateTime: 2003/05/14 19:36:18 $
 
 model com.arsdigita.formbuilder;
 
@@ -21,7 +21,7 @@ model com.arsdigita.formbuilder;
 import com.arsdigita.kernel.*;
 
 object type Component extends ACSObject {
-    String[1..1] adminName = bebop_components.admin_name VARCHAR(100);
+    String[0..1] adminName = bebop_components.admin_name VARCHAR(100);
     String[0..1] description = bebop_components.description VARCHAR(4000);
     String[0..1] attributeString = bebop_components.attribute_string VARCHAR(4000);
     Boolean[0..1] isActive = bebop_components.active_p CHAR(1);
