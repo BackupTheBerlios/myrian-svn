@@ -35,12 +35,12 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.metadata.DynamicObjectType}.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#7 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#8 $
  * @since 4.6.3 */
 
 abstract class BaseDDLGenerator implements DDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#7 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#8 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
 
     private static final Logger s_log =
         Logger.getLogger(BaseDDLGenerator.class);
@@ -79,9 +79,6 @@ abstract class BaseDDLGenerator implements DDLGenerator {
         }
         tables.addAll(s_reservedWords);
     }
-
-    // used to keep track of which columns have been returned.
-    private static Map columns = new HashMap();
 
     private String findUniqueTableName(String proposedName) {
         // now we make sure that the proposed name does not already exist
@@ -197,7 +194,6 @@ abstract class BaseDDLGenerator implements DDLGenerator {
         }
 
         String tableName = key.getTableName();
-        String originalName = proposedName;
 
         if (proposedName.length() > getMaxColumnNameLength()) {
             proposedName = proposedName.substring(0, getMaxColumnNameLength() - 1);

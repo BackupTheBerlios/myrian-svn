@@ -24,27 +24,19 @@ import java.util.Iterator;
  * Defines a set of options to be associated with a metadata element.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/11/26 $
  **/
 
 public class OptionBlock extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/OptionBlock.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/OptionBlock.java#4 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
 
 
     private List m_options = new ArrayList();
 
     /**
-     * Constructs a new OptionBlock.
-     **/
-
-    public OptionBlock() {}
-
-
-    /**
      * Adds an option to this OptionBlock.
      **/
-
     public void add(Option option) {
         m_options.add(option);
     }

@@ -22,12 +22,12 @@ import java.util.*;
  * PropertyNode
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2002/08/14 $
+ * @version $Revision: #10 $ $Date: 2002/11/26 $
  **/
 
 class PropertyNode extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/PropertyNode.java#9 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/PropertyNode.java#10 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
 
     private Property m_property;
 
@@ -76,6 +76,8 @@ class PropertyNode extends Node {
     }
 
     void buildQuery() {
+        // FIXME: is the variable "query" instantiated for side effects? --
+        // 2002-11-26
         Query query = getQuery();
         JoinPath jp = m_property.getJoinPath();
         List path = jp.getPath();

@@ -30,17 +30,15 @@ import java.util.ArrayList;
  * AST
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/09/16 $
+ * @version $Revision: #7 $ $Date: 2002/11/26 $
  */
 
 public class AST extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AST.java#6 $ by $Author: rhs $, $DateTime: 2002/09/16 18:59:05 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AST.java#7 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
 
     // the various models that make up this AST/Metadata
     private Map m_models = new HashMap();
-
-    public AST() {}
 
     /**
      * Returns the ModelDef named "name".

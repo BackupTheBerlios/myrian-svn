@@ -21,14 +21,13 @@ import java.util.*;
  * UniqueKey
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/28 $
+ * @version $Revision: #6 $ $Date: 2002/11/26 $
  **/
 
 public class UniqueKey extends Constraint {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/UniqueKey.java#5 $ by $Author: randyg $, $DateTime: 2002/08/28 11:19:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/UniqueKey.java#6 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
 
-    private Column[] m_columns;
     private Set m_foreignKeys = new HashSet();
 
     public UniqueKey(Table table, String name, Column[] columns) {

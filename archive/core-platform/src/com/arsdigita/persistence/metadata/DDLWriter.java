@@ -37,12 +37,12 @@ import java.util.Set;
  * DDLWriter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2002/11/13 $
+ * @version $Revision: #12 $ $Date: 2002/11/26 $
  **/
 
 public class DDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#11 $ by $Author: jorris $, $DateTime: 2002/11/13 16:28:25 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#12 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
 
     private File m_base;
     private boolean m_overwrite;
@@ -208,7 +208,6 @@ public class DDLWriter {
             if (skipped.contains(table)) {
                 //writer.write("@@table-" + table.getName() + ".sql\n");
             } else {
-                String dir = DbHelper.getDatabaseDirectory();
                 if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
                     writer.write("\\i " + getDDLPath() + "table-" +
                                  table.getName() + "-auto.sql" + 

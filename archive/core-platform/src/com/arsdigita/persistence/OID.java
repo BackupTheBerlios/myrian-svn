@@ -51,10 +51,10 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/11/01 $ */
+ * @version $Revision: #8 $ $Date: 2002/11/26 $ */
 
 public class OID {
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OID.java#7 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OID.java#8 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
 
     private ObjectType m_type;
     private Map m_values = new HashMap();
@@ -394,7 +394,6 @@ public class OID {
     // Couldn't get MessageFormat to work, so I cheated
     public static OID valueOf(String s) throws IllegalArgumentException {
         StringTokenizer st = new StringTokenizer(s, "[:{}],");
-        StringBuffer sb = new StringBuffer();
         if (st.countTokens() < 2) {
             st = new StringTokenizer(java.net.URLDecoder.decode(s), "[:{}],");
 

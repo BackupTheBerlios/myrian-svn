@@ -29,14 +29,16 @@ import java.util.Iterator;
  * Base connection pooling class
  *
  * @author Bob Donald (<a href="mailto:bdonald@arsdigita.com"></a>)
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#8 $ $DateTime: 2002/11/01 09:30:48 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#9 $ $DateTime: 2002/11/26 18:30:20 $
  * @since
  *
  */
 
 abstract public class BaseConnectionPool implements DatabaseConnectionPool {
 
-    private static final String versionId = "$Author: vadim $ - $Date: 2002/11/01 $ $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#8 $";
+    public static final String versionId = "$Author: vadim $ " +
+        "- $Date: 2002/11/26 $ " + 
+        "$Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#9 $";
 
     private static final Logger cat = Logger.getLogger(BaseConnectionPool.class.getName());
 

@@ -28,14 +28,16 @@ import org.apache.log4j.Logger;
  * Connection pooling class using Oracle implementation.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#8 $ $DateTime: 2002/11/01 09:30:48 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#9 $ $DateTime: 2002/11/26 18:30:20 $
  * @since
  *
  */
 
 public class OracleConnectionPoolImpl extends BaseConnectionPool {
 
-    private static final String versionId = "$Author: vadim $ - $Date: 2002/11/01 $ $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#8 $";
+    public static final String versionId = "$Author: vadim $ " +
+        "- $Date: 2002/11/26 $ " + 
+        "$Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#9 $";
 
     private static final Logger cat = Logger.getLogger(OracleConnectionPoolImpl.class.getName());
 

@@ -28,12 +28,12 @@ import org.apache.log4j.Logger;
  * specified in a PDL file to generate sql queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #16 $ $Date: 2002/10/14 $
+ * @version $Revision: #17 $ $Date: 2002/11/26 $
  **/
 
 public class Query extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#16 $ by $Author: richardl $, $DateTime: 2002/10/14 17:27:59 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#17 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -306,8 +306,6 @@ public class Query extends Node {
         }
     }
 
-    private static final Set s_written = new HashSet();
-
     public void generate() {
         traverse(BUILD_QUERY);
 
@@ -434,6 +432,8 @@ public class Query extends Node {
         result.append(join(conditions, "\n    and "));
     }
 
+    // FIXME: would it not better to remove this method altogether and move the
+    // comment into writePostgresSQL(StringBuffer)? -- 2002-11-26
     private void writePostgresWhere(StringBuffer result) {
         // Do nothing, postgres doesn't need a where clause since all the join
         // conditions are specified as part of the from clause.

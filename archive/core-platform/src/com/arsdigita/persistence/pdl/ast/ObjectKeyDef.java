@@ -21,17 +21,15 @@ import java.util.*;
  * Defines the primary key for an ObjectType.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/11/26 $
  */
 
 public class ObjectKeyDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ObjectKeyDef.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ObjectKeyDef.java#4 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
 
     // the attributes that compose the key
     public List m_attrs = new ArrayList();
-
-    public ObjectKeyDef() {}
 
     /**
      * Adds an attribute to the key

@@ -42,12 +42,12 @@ import org.apache.log4j.Logger;
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#19 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#20 $
  * @since 4.6.3
  */
 abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#19 $ by $Author: rhs $, $DateTime: 2002/11/06 16:38:23 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#20 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
 
     private static final Logger s_log =
         Logger.getLogger(BaseMDSQLGenerator.class);
@@ -1153,7 +1153,6 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
                 .entrySet().iterator();
 
             StringBuffer sb = new StringBuffer();
-            String where = null;
             boolean first = true;
 
             sb.append("update ")
@@ -1272,7 +1271,6 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
         Map columnMap = new HashMap();
         Iterator attrs = type.getDeclaredProperties();
         Map columns = new HashMap();
-        List pathCols = new ArrayList();
 
         Column refkey = type.getColumn();
 
@@ -1410,7 +1408,6 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
      */
     protected Map getIDColumnsMap(ObjectType type, PriorityQueue pq) {
         Map columns = new HashMap();
-        List pathCols = new ArrayList();
 
         Column refkey = type.getColumn();
 

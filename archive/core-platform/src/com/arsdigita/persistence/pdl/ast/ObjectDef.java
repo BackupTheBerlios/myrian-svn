@@ -35,12 +35,12 @@ import java.util.Iterator;
  * Outputs a metadata ObjectType.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2002/11/01 $
+ * @version $Revision: #10 $ $Date: 2002/11/26 $
  */
 
 public class ObjectDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ObjectDef.java#9 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ObjectDef.java#10 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
 
     // object name
     private String m_name;
@@ -455,8 +455,7 @@ public class ObjectDef extends Element {
 
                 if (prop.getEvent(i) == null) {
                     // Use MDSQL to generate an event here
-                    Event event = MDSQLGeneratorFactory
-                        .getInstance()
+                    MDSQLGeneratorFactory.getInstance()
                         .generateEvent(m_type, prop, i, null);
                 }
             }

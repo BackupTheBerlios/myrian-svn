@@ -36,14 +36,14 @@ import org.apache.log4j.Logger;
  * additional properties and SQL Events.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2002/11/01 $
+ * @version $Revision: #9 $ $Date: 2002/11/26 $
  */
 
 public class AssociationDef extends Element {
 
     private static final Logger s_log = Logger.getLogger(AssociationDef.class);
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AssociationDef.java#8 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AssociationDef.java#9 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
 
     // the two PropertyDefs that define what Objects are being associated
     private PropertyDef m_one;
@@ -127,7 +127,6 @@ public class AssociationDef extends Element {
     }
 
     private Association m_assn = null;
-    private static int s_assocs = 0;
 
     /**
      * Create the metadata for this association beneath a certain Model

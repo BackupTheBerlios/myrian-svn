@@ -56,12 +56,12 @@ import org.apache.log4j.Logger;
  *              communicating with the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #15 $ $Date: 2002/11/14 $
+ * @version $Revision: #16 $ $Date: 2002/11/26 $
  */
 
 class DataStore {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#15 $ by $Author: rhs $, $DateTime: 2002/11/14 18:09:55 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#16 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
 
     private static final Logger LOG =
         Logger.getLogger(DataStore.class.getName());
@@ -345,6 +345,8 @@ class DataStore {
         }
     }
 
+    // FIXME: the parameter lazyUpdates is passed in but never used.  --
+    // 2002-11-26
     private static final void logOperation(Operation op, DataContainer source,
                                            boolean lazyUpdates) {
         if (LOG.isInfoEnabled()) {

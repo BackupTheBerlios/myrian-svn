@@ -25,13 +25,14 @@ import com.arsdigita.persistence.metadata.Mapping;
  * GenericDataQuery
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/11/01 $
+ * @version $Revision: #6 $ $Date: 2002/11/26 $
  */
 
 public class GenericDataQuery extends DataQueryImpl {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataQuery.java#5 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataQuery.java#6 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
 
+    // FIXME: the parameter s is passed in but never used.  -- 2002-11-26
     public GenericDataQuery(Session s, String sql, String[] columns) {
         super(
               new QueryType(

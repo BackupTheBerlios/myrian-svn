@@ -28,14 +28,14 @@ import org.w3c.dom.Attr;
  * <code>org.jdom.Element</code> using <code>org.w3c.dom.Element</code>.
  *
  * @author Patrick McNeill (pmcneill@arsdigita.com)
- * @version $Revision: #7 $ $Date: 2002/10/16 $
+ * @version $Revision: #8 $ $Date: 2002/11/26 $
  * @since ACS 4.5a
  */
 public class Element {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#7 $" +
-        "$Author: richardl $" +
-        "$DateTime: 2002/10/16 14:39:19 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#8 $" +
+        "$Author: vadim $" +
+        "$DateTime: 2002/11/26 18:30:20 $";
 
     private static final Logger s_log = Logger.getLogger
         (Element.class.getName());
@@ -66,24 +66,6 @@ public class Element {
     private static org.w3c.dom.Document getDocument() {
         return (org.w3c.dom.Document) s_localDocument.get();
     }
-
-    //private static org.w3c.dom.Document s_document;
-    //static {
-    //    try {
-    //        DocumentBuilderFactory builder = DocumentBuilderFactory.newInstance();
-    //        builder.setNamespaceAware(true);
-    //        s_document = builder.newDocumentBuilder().newDocument();
-    //    } catch ( ParserConfigurationException e ) {
-    //        s_log.error(e);
-    //    }
-    //}
-
-    /*
-     * We keep this document internally so that we can create DOM elements
-     * appropriately.  When they're assigned to a document, the node will be
-     * removed from its owner document and imported into the new document.
-     */
-    private static org.w3c.dom.Document s_document = null;
 
     /**
      * Protected constructor to set up factories, etc. Does not actually

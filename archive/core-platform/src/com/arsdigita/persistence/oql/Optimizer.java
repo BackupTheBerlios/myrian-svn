@@ -23,12 +23,12 @@ import java.util.*;
  * Optimizer
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/11/26 $
  **/
 
 class Optimizer extends Actor {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Optimizer.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Optimizer.java#5 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
 
     public void act(Table table) {
         Query query = table.getQuery();
@@ -136,7 +136,7 @@ class Optimizer extends Actor {
             Column head = cond.getHead();
             Column tail = cond.getTail();
 
-            Table from = table;
+            // Is the variable "to" instantiated for side effects? -- 2002-11-26
             Table to = head.getTable().equals(table) ?
                 tail.getTable() : head.getTable();
 

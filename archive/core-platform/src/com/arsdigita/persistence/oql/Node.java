@@ -33,12 +33,12 @@ import org.apache.log4j.Logger;
  * Node
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2002/08/14 $
+ * @version $Revision: #13 $ $Date: 2002/11/26 $
  **/
 
 abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#12 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#13 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
 
     private static final Logger s_log = Logger.getLogger(Node.class);
 
@@ -266,6 +266,7 @@ abstract class Node {
     }
 
     void buildQuery() {
+        // FIXME: is getQuery() called for side effects? -- 2002-11-26
         Query query = getQuery();
         Set elements = getJoinElements();
 

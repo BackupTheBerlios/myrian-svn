@@ -61,20 +61,17 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #15 $ $Date: 2002/11/01 $
+ * @version $Revision: #16 $ $Date: 2002/11/26 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#15 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#16 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
 
     // the abstract syntax tree root nod
     private AST m_ast = new AST();
-
-    public PDL() {
-    }
 
     /**
      * Retrieve a reference to the abstract syntax tree generated from the
@@ -216,11 +213,6 @@ public class PDL {
         } else {
             DbHelper.setDatabase(DbHelper.DB_ORACLE);
         }
-
-        String defaultDir = DbHelper.getDatabaseDirectory(DbHelper.DB_DEFAULT);
-        String databaseDir =
-            DbHelper.getDatabaseDirectory(DbHelper.getDatabase());
-
 
         List library = findPDLFiles((File[]) options.get("-library-path"));
         List files = findPDLFiles((File[]) options.get("-path"));

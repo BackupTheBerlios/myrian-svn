@@ -37,12 +37,12 @@ import org.apache.log4j.Logger;
  * operations.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#8 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#9 $
  * @since 4.6.3 */
 
 final class PostgresDDLGenerator extends BaseDDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#8 $ by $Author: rhs $, $DateTime: 2002/10/14 16:12:17 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#9 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
 
     private static final Logger s_log =
         Logger.getLogger(PostgresDDLGenerator.class);
@@ -96,8 +96,6 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
                                     Column keyColumn,
                                     Collection properties,
                                     Map defaultValueMap) {
-        StringBuffer ddl = new StringBuffer();
-        ArrayList statements = new ArrayList();
         String tableName = type.getColumn().getTableName();
         boolean tableExists = tableExists(tableName);
 
@@ -119,8 +117,6 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
 
                 // collections are handled by mapping tables later
                 if (!property.isCollection()) {
-                    Object defaultValue = null;
-
                     Column propCol;
 
                     if (property.isAttribute()) {
@@ -134,8 +130,6 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
                         getJDBCTypeString(property, propCol);
                     String columnName =
                         alterStringForSQL(propCol.getColumnName());
-
-                    StringBuffer sb = new StringBuffer();
 
                     list.add("alter table " + tableName + " add " +
                              columnName + " " + columnType);
