@@ -2,44 +2,52 @@ package com.redhat.persistence.jdo;
 
 import java.util.Map;
 
-public abstract class MapEntry implements Map.Entry {
+public class MapEntry implements Map.Entry {
 
-    public abstract Object getKey();
+    private Object container;
+    private Object key;
+    private Object val;
 
-    public abstract Object getVal();
-    public abstract void setVal(Object value);
+    MapEntry() {}
+
+    MapEntry(Object container, Object key) {
+        this.container = container;
+        this.key = key;
+    }
+
+    public Object getKey() {
+        return key;
+    }
 
     public Object getValue() {
-        return getVal();
+        return val;
     }
 
     public Object setValue(Object value) {
-        Object oldValue = getVal();
-        setVal(value);
+        Object oldValue = val;
+        val = value;
         return oldValue;
     }
 
     public int hashCode() {
-        Object key = getKey();
-        Object value = getVal();
-
         return (key==null ? 0 : key.hashCode()) +
-            (value==null ? 0 : value.hashCode());
+               (val==null ? 0 : val.hashCode());
     }
-
+    
     public boolean equals(Object obj) {
         if (!(obj instanceof Map.Entry)) { return false; }
-
-        Object key   = getKey();
-        Object value = getVal();
-
+    
         Map.Entry en = (Map.Entry) obj;
         Object enKey = en.getKey();
-        Object enValue = en.getValue();
-
+        Object enVal = en.getValue();
+    
         return
-            (key   == null ? enKey   == null :   key.equals(enKey))
+            (key == null ? enKey == null : key.equals(enKey))
             &&
-            (value == null ? enValue == null : value.equals(enValue));
+            (val == null ? enVal == null : val.equals(enVal));
+    }
+
+    public String toString() {
+        return "MapEntry <container=" + container + "; key=" + key + ">";
     }
 }

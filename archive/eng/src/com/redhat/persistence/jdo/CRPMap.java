@@ -1,179 +1,33 @@
 package com.redhat.persistence.jdo;
 
-import com.redhat.persistence.*;
-import com.redhat.persistence.common.*;
-import com.redhat.persistence.metadata.*;
-import com.redhat.persistence.oql.*;
-import com.redhat.persistence.oql.Static;
-import com.redhat.persistence.oql.Expression;
-
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
-import javax.jdo.spi.PersistenceCapable;
+import javax.jdo.Query;
 
 /**
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/07/12 $
+ * @version $Revision: #8 $ $Date: 2004/07/12 $
  **/
-
 class CRPMap implements Map {
-    private final static String KEY   = "key";
-    private final static String VALUE = "val";
+    private Set entries;
 
-    transient private Session m_ssn;
-
-    /* The setup:
-     *
-     * + We have a Java class Foo that implements PersistenceCapable and has a
-     *   field dict of type java.util.Map.
-     *
-     * + The class Foo is backed by an object type "Foo".  The object type "Foo"
-     *   has a property named "foo$entries" whose object type is "FooMapHelper".
-     *
-     * + The object type "FooMapHelper" has properties named "key" and "value".
-     *
-     * + The object type "FooMapHelper" has a [1..1] property "foo" of
-     *   type "Foo".
-     */
-
-    // the enclosing JDO instance of type Foo that contains this Map as a field
-    transient private Object m_object;
-    // the property of "Foo" named "foo$entries"
-    transient private Property m_mapProp;
-    // the property of "FooMapHelper" named "foo"
-    transient private Property m_container;
-    // the property of "FooMapHelper" named "key"
-    transient private Property m_key;
-    // the property of "FooMapHelper" named "value"
-    transient private Property m_value;
-
-    CRPMap() {}
-
-    private void init() {
-        final ObjectType type = m_mapProp.getType();
-        if (type.getKeyProperties().size() != 2) {
-            throw new IllegalStateException
-                ("cannot map from " + type + " to java map entry");
-        }
-
-        Collection properties = type.getProperties();
-        if (m_container != null) { throw new IllegalStateException(); }
-
-        for (Iterator it = properties.iterator(); it.hasNext(); ) {
-            final Property pp = (Property) it.next();
-            if (pp.isKeyProperty()) {
-                if (KEY.equals(pp.getName())) {
-                    m_key = pp;
-                } else {
-                    if (m_container == null) {
-                        m_container = pp;
-                    } else {
-                        throw new IllegalStateException
-                            ("can't happen: container already set to " +
-                             m_container);
-                    }
-                }
-            } else {
-                if (m_value == null) {
-                    m_value = pp;
-                } else {
-                    throw new IllegalStateException
-                        ("found two non-key properties in type " + type + ": " +
-                         m_value + " and " + pp);
-                }
-            }
-        }
-    }
-
-    Session ssn() {
-        if (m_ssn == null) {
-            PersistenceManagerImpl pmi = ((PersistenceManagerImpl) JDOHelper
-                                          .getPersistenceManager(this));
-            m_ssn = pmi.getSession();
-            StateManagerImpl smi = pmi.getStateManager(this);
-            PropertyMap pmap = smi.getPropertyMap();
-            m_object = m_ssn.retrieve(pmap);
-            ObjectType type = pmap.getObjectType();
-            String name = smi.getPrefix() + "entries";
-            m_mapProp = type.getProperty(name);
-            if (m_mapProp == null) {
-                throw new IllegalStateException("no " + name + " in " + type);
-            }
-            init();
-        }
-
-        return m_ssn;
-    }
-
-    private void lock() {
-        C.lock(ssn(), m_object);
-    }
-
-    private Expression entries() {
-        return new Get(new Literal(m_object), m_mapProp.getName());
-    }
-
-    private MapEntry create(Object key, Object value) {
-        PropertyMap pmap = new PropertyMap(m_mapProp.getType());
-        pmap.put(m_key, key);
-        pmap.put(m_container, m_object);
-        Adapter ad = ssn().getRoot().getAdapter(MapEntry.class);
-        MapEntry entry = (MapEntry) ad.getObject
-            (pmap.getObjectType().getBasetype(), pmap, ssn());
-        ssn().create(entry);
-        ssn().set(entry, m_value, value);
-        return entry;
+    CRPMap() {
+        entries = new HashSet();
     }
 
     private Map.Entry getEntry(Object key) {
-        Expression expr = new Filter
-            (entries(), new Equals
-             (new Variable(m_key.getName()), new Literal(key)));
-        DataSet ds = new DataSet
-            (m_ssn, new Signature(m_mapProp.getType()), expr);
-        Cursor c = ds.getCursor();
-        try {
-            if (c.next()) {
-                return (Map.Entry) c.get();
-            } else {
-                return null;
-            }
-        } finally {
-            c.close();
-        }
-    }
-
-    private class KeySet extends CRPCollection implements Set {
-
-        Session ssn() {
-            return CRPMap.this.m_ssn;
-        }
-
-        ObjectType type() {
-            return m_key.getType();
-        }
-
-        Expression expression() {
-            return new Get(entries(), m_key.getName());
-        }
-
-        public boolean remove(Object o) {
-            CRPMap.this.remove(o);
-            // XXX: figure out real result
-            return true;
-        }
-
-        public boolean add(Object o) {
-            throw new UnsupportedOperationException();
-        }
-
-        public void clear() {
-            CRPMap.this.clear();
-        }
-
+        PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+        Query query = pm.newQuery("oql", "filter($1, key==$2)");
+        Collection coll = (Collection) query.execute(entries, key);
+        Iterator it = coll.iterator();
+        return it.hasNext() ? (Map.Entry) it.next() : null;
     }
 
     // =========================================================================
@@ -186,10 +40,18 @@ class CRPMap implements Map {
     }
 
     public Object put(Object key, Object value) {
-        lock();
-        Map.Entry me = getEntry(key);
-        if (me == null) {
-            me = create(key, value);
+        // XXX: locking
+        final Map.Entry me = getEntry(key);
+
+        if (me == null ) {
+            // Note: we can pass in the "this" object because the oid of CRPMap
+            // is the same as the oid of the JDO instance that contains CRPMap
+            // as a field.
+            Map.Entry entry = new MapEntry(this, key);
+            entry.setValue(value);
+            // XXX: we shouldn't have to call makePersistent here
+            JDOHelper.getPersistenceManager(this).makePersistent(entry);
+            entries.add(entry);
             return null;
         } else {
             return me.setValue(value);
@@ -201,7 +63,7 @@ class CRPMap implements Map {
     }
 
     public Set keySet() {
-        return new KeySet();
+        throw new UnsupportedOperationException();
     }
 
     public Set entrySet() {
@@ -224,7 +86,7 @@ class CRPMap implements Map {
     }
 
     public boolean containsKey(Object key) {
-        return keySet().contains(key);
+        return getEntry(key) != null;
     }
 
     public boolean isEmpty() {

@@ -80,7 +80,6 @@ public class PersistenceManagerImpl implements PersistenceManager {
 
         Root root = m_ssn.getRoot();
         ObjectType gen = root.getObjectType(type.getQualifiedName() + ID_GEN);
-
         if (gen != null) {
             DataSet ds = m_ssn.getDataSet(gen);
             Cursor c = ds.getCursor();
@@ -305,6 +304,11 @@ public class PersistenceManagerImpl implements PersistenceManager {
         // XXX: This rests on the assumption that the Java class and the
         // corresponding object type have the same name.
         ObjectType type = root.getObjectType(cls.getName());
+
+        // XXX: temporary hack.  Needs fixing asap.
+        if (type== null && obj instanceof MapEntry) {
+            type = root.getObjectType("com.redhat.persistence.jdo.MagazineIndex");
+        }
         if (type == null) {
             throw new IllegalStateException("no such type " + cls.getName());
         }
@@ -316,7 +320,9 @@ public class PersistenceManagerImpl implements PersistenceManager {
         }
 
         PropertyMap pmap = smi.getPropertyMap();
-
+        if (pmap.isNull()) {
+            throw new IllegalStateException("pmap is null: " + pmap);
+        }
         Object current = m_ssn.retrieve(pmap);
 
         if (current == null) {

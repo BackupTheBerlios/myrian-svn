@@ -142,7 +142,7 @@ object type Magazine class com.redhat.persistence.jdo.Magazine
 }
 
 object type MagazineIndex class com.redhat.persistence.jdo.MapEntry
-                          adapter com.redhat.persistence.jdo.ReflectionAdapter {
+                          adapter com.redhat.persistence.jdo.JDOAdapter {
 
     String[1..1]  key = mag_index.topic VARCHAR(200);
     Integer[1..1] val = mag_index.page_number INTEGER;
@@ -153,4 +153,9 @@ object type MagazineIndex class com.redhat.persistence.jdo.MapEntry
 association {
     Magazine[1..1] container = join mag_index.magazine_id to magazines.id;
     MagazineIndex[0..n] index$entries = join magazines.id to mag_index.magazine_id;
+}
+
+object type DummyCRPMap class com.redhat.persistence.jdo.CRPMap
+    adapter com.redhat.persistence.jdo.JDOAdapter {
+
 }
