@@ -29,12 +29,12 @@ import org.apache.log4j.Logger;
  * SQLLoader
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/04/07 $
+ * @version $Revision: #8 $ $Date: 2004/07/12 $
  **/
 
 public abstract class SQLLoader {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/SQLLoader.java#7 $ by $Author: dennis $, $DateTime: 2004/04/07 16:07:11 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/SQLLoader.java#8 $ by $Author: mbooth $, $DateTime: 2004/07/12 12:18:50 $";
 
     private static final Logger s_log = Logger.getLogger(SQLLoader.class);
 
@@ -102,8 +102,10 @@ public abstract class SQLLoader {
                      }
                      public void onInclude(String include, boolean relative) {
                          if (relative) {
+                             s_log.debug( "Relative include" );
                              include(stmt, base, name, include);
                          } else {
+                             s_log.debug( "Absolute include" );
                              include(stmt, base, base, include);
                          }
                      }
@@ -137,6 +139,8 @@ public abstract class SQLLoader {
                          String included) {
         if (s_log.isDebugEnabled()) {
             s_log.debug("Resolving include: '" + included + "'");
+            s_log.debug("Base: '" + base + "'");
+            s_log.debug("From: '" + from + "'");
         }
 
         String front = parent(from);
