@@ -4,25 +4,26 @@ import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
 import java.util.*;
 
+import org.apache.commons.collections.list.*;
 import org.apache.log4j.Logger;
 
 /**
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/03/25 $
+ * @version $Revision: #7 $ $Date: 2004/03/25 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/QFrame.java#6 $ by $Author: richardl $, $DateTime: 2004/03/25 09:49:17 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/QFrame.java#7 $ by $Author: rhs $, $DateTime: 2004/03/25 16:44:14 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
     private Generator m_generator;
     private String m_alias;
     private EquiSet m_equisetpool;
-    private Set m_nonnullpool;
+    private List m_nonnullpool;
 
     private Expression m_expression;
     private ObjectType m_type;
@@ -44,14 +45,14 @@ class QFrame {
     private boolean m_hoisted;
     private QFrame m_duplicate;
     private EquiSet m_equiset;
-    private Set m_nonnull;
+    private List m_nonnull;
     private boolean m_equated;
 
     QFrame(Generator generator) {
         m_generator = generator;
         m_alias = "t" + m_generator.getFrames().size();
         m_equisetpool = new EquiSet(m_generator);
-        m_nonnullpool = new HashSet();
+        m_nonnullpool = SetUniqueList.decorate(new ArrayList());
     }
 
     void init(Expression expression, ObjectType type, QFrame container) {
@@ -798,8 +799,8 @@ class QFrame {
 
     private boolean nn(QValue qv) {
         List p = m_equiset.get(qv);
-        for (Iterator it = m_nonnull.iterator(); it.hasNext(); ) {
-            QValue nn = (QValue) it.next();
+        for (int i = 0; i < m_nonnull.size(); i++) {
+            QValue nn = (QValue) m_nonnull.get(i);
             if (nn.equals(qv) || p != null && p == m_equiset.get(nn)) {
                 return true;
             }
