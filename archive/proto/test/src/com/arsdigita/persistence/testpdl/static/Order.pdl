@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/test/src/com/arsdigita/persistence/testpdl/static/Order.pdl#1 $ 
-// $DateTime: 2002/11/27 19:51:05 $
+// $Id: //core-platform/proto/test/src/com/arsdigita/persistence/testpdl/static/Order.pdl#2 $ 
+// $DateTime: 2003/04/01 22:05:43 $
 
 model examples;
 
@@ -31,6 +31,7 @@ object type Order {
             select *
             from t_orders
         } map {
+            id = t_orders.order_id;
             buyer = t_orders.buyer;
             seller = t_orders.seller;
             shippingAddress = t_orders.shipping_address;
@@ -126,7 +127,13 @@ association {
         }
     }
 
-    remove items {}
+    remove items {
+        do {
+            delete from t_line_items
+            where order_id = :id
+            and item_id = :items.id
+        }
+    }
 
     clear items {
         do {
@@ -260,6 +267,7 @@ query OrdersMaxPrices {
 }
 
 query OrdersNumberOfLineItems {
+    BigDecimal order_id;
     do {
         select order_id from t_line_items
     } map {
@@ -328,7 +336,7 @@ object type OtherItem {
 
 
 association {
-    Order[1..1] order;
+    Order[0..1] order;
     OtherItem[0..n] relatedOtherItems;
 
     retrieve order {
