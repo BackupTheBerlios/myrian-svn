@@ -14,8 +14,6 @@
  */
 package com.redhat.persistence.oql;
 
-// XXX: dependency on c.a.db.DbHelper
-import com.arsdigita.db.DbHelper;
 import com.redhat.persistence.*;
 import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
@@ -28,12 +26,12 @@ import java.util.*;
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/05/02 $
+ * @version $Revision: #3 $ $Date: 2004/05/15 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/oql/Literal.java#2 $ by $Author: rhs $, $DateTime: 2004/05/02 13:12:27 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/oql/Literal.java#3 $ by $Author: rhs $, $DateTime: 2004/05/15 10:38:07 $";
 
     private Object m_value;
 

@@ -20,7 +20,6 @@ import com.redhat.persistence.common.*;
 import com.redhat.persistence.oql.*;
 import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.engine.rdbms.*;
-import com.arsdigita.db.DbHelper;
 import com.arsdigita.util.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -31,12 +30,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/05/03 $
+ * @version $Revision: #2 $ $Date: 2004/05/15 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/oql/QueryTest.java#1 $ by $Author: rhs $, $DateTime: 2004/05/03 11:48:01 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/oql/QueryTest.java#2 $ by $Author: rhs $, $DateTime: 2004/05/15 10:38:07 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);
