@@ -42,7 +42,8 @@ class TransactionImpl implements Transaction {
 
     public void begin() {
         if (m_inTxn) {
-            throw new IllegalStateException("double begin");
+            // http://java.sun.com/products/jdo/javadocs/javax/jdo/Transaction.html#begin%28%29
+            throw new JDOUserException("double begin");
         }
 
         m_inTxn = true;
