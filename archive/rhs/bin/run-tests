@@ -1,0 +1,15 @@
+#!/bin/sh
+
+for f in `find $* -name "*Suite.java"`; do
+    class=`basename $f .java`
+    package=`egrep -h ^package $f | sed "s@^package @@g" | sed "s@;@@g"`
+    if [ -z $package ]; then
+        qname=$class
+    else
+        qname="${package}.${class}"
+    fi
+
+    sfx="`echo $package | sed s@\\\.@/@g`/${class}.java"
+    pfx=`echo $f | sed s@${sfx}@@g`
+    run -Dtest.base.dir=build/${pfx} com.redhat.persistence.TestRunner $qname > "build/TEST-${qname}.txt"
+done
