@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * SessionSuite
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #4 $ $Date: 2003/10/28 $
+ * @version $Revision: #5 $ $Date: 2003/12/02 $
  **/
 
 public class SessionSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/redhat/persistence/SessionSuite.java#4 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/redhat/persistence/SessionSuite.java#5 $";
 
     private static final Logger s_log = Logger.getLogger(SessionSuite.class);
 
@@ -135,10 +135,10 @@ public class SessionSuite extends PackageTestSuite {
 
         m_model = Model.getInstance("test");
 
-        initializeModel();
-
         m_engine = new PassthroughEngine(new MemoryEngine());
         m_ssn = new Session(root, m_engine, new DynamicQuerySource());
+        initializeModel();
+
 
         initializeData();
 
