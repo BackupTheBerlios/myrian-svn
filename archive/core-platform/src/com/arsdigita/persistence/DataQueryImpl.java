@@ -63,7 +63,7 @@ import org.apache.log4j.Logger;
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@arsdigita.com">randyg@arsdigita.com</a>
  * @author <a href="mailto:deison@arsdigita.com">deison@arsdigita.com</a>
- * @version $Revision: #12 $ $Date: 2002/09/09 $
+ * @version $Revision: #13 $ $Date: 2002/09/10 $
  */
 // NOTE if we ever support anything other than forward-only,
 // we'll need to shut off the auto-closing functionality
@@ -71,7 +71,7 @@ import org.apache.log4j.Logger;
 // results and general confusion.
 class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#12 $ by $Author: randyg $, $DateTime: 2002/09/09 16:02:46 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#13 $ by $Author: randyg $, $DateTime: 2002/09/10 17:00:15 $";
 
     private static final Logger log =
         Logger.getLogger(DataQueryImpl.class);
@@ -1308,12 +1308,14 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
         s_allowed.add("desc");
         s_allowed.add("upper");
         s_allowed.add("lower");
-        s_allowed.add("nvl");
+        //s_allowed.add("nvl");
         s_allowed.add("case");
         s_allowed.add("then");
         s_allowed.add("when");
         s_allowed.add("end");
         s_allowed.add("else");
+        s_allowed.add("length");
+        s_allowed.add("substr");
     }
 
     boolean isAllowed(Identifier id) {
