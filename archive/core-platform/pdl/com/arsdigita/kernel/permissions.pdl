@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/permissions.pdl#13 $
-// $DateTime: 2003/05/20 08:24:13 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/permissions.pdl#14 $
+// $DateTime: 2003/06/10 14:37:58 $
 
 model com.arsdigita.kernel.permissions;
 
@@ -539,11 +539,13 @@ object type ObjectContext {
 
 
     insert {
+        // Because the insertion occurs via trigger,
+        // acs_objects_context_in_tr.
+
         do {
-            insert into object_context
-            (object_id, context_id)
-            values
-            (:objectId, :context.id)
+            update object_context
+               set context_id = :context.id
+             where object_id = :objectId
         }
     }
 
