@@ -9,44 +9,85 @@ package com.arsdigita.tools.junit.results;
 
 import org.jdom.Element;
 
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 public final class ResultDiff extends Element {
+
 
     public ResultDiff(XMLResult previous, XMLResult current) {
         super("junit_result_diff");
         final boolean namesDiffer = !current.getSuiteName().equals(previous.getSuiteName());
-         if (namesDiffer) {
-             throw new IllegalArgumentException("Cannot compare test results for different suites! Current: " +
-                     current.getSuiteName()+
-                     " Previous: " + previous.getSuiteName());
-         }
+        if (namesDiffer) {
+            throw new IllegalArgumentException("Cannot compare test results for different suites! Current: " +
+                    current.getSuiteName()+
+                    " Previous: " + previous.getSuiteName());
+        }
 
         m_previous = previous;
         m_current = current;
+        addDiffElement();
+        setAttribute("name", m_current.getSuiteName());
+        setAttribute("previous_changelist", m_previous.getChangelist());
+        setAttribute("current_changelist", m_current.getChangelist());
 
-        this.setAttribute("errors", m_current.getAttributeValue("errors"));
-        this.setAttribute("failures", m_current.getAttributeValue("failures"));
-        this.setAttribute("name", m_current.getSuiteName());
-        this.setAttribute("tests", Integer.toString(m_current.getTestCount()));
-        m_regressions = new Element("regressions");
-        addContent(m_regressions);
 
         compareCount();
         copyTests();
         compareFailures();
     }
 
+    public String getTestName() {
+        return getAttributeValue("name");
+    }
+    public XMLResult getCurrent() {
+        return m_current;
+    }
+
+    public XMLResult getPrevious() {
+        return m_previous;
+    }
+
+    public int missingTestCount() {
+        MissingTests missing = (MissingTests) getChild(MissingTests.NAME);
+        final int count = (null == missing) ? 0 : missing.missingTestCount();
+        return count;
+    }
+
+    public int newTestCount() {
+        NewTests newtests = (NewTests) getChild(NewTests.NAME);
+        final int count = (null == newtests) ? 0 : newtests.newTestCount();
+        return count;
+    }
+
+    private void addDiffElement() {
+        Element diff = new Element("diff");
+        addContent(diff);
+
+        Element prev = new Element("previous");
+        diff.addContent(prev);
+
+        Element current = new Element("current");
+        diff.addContent(current);
+
+        setRunData(prev, m_previous);
+        setRunData(current, m_current);
+    }
+
+    private void setRunData(Element diffData, XMLResult runInfo) {
+        diffData.setAttribute("errors", runInfo.getAttributeValue("errors"));
+        diffData.setAttribute("failures", runInfo.getAttributeValue("failures"));
+        diffData.setAttribute("tests", Integer.toString(runInfo.getTestCount()));
+    }
+
     private void compareCount() {
-        final int prevCount = m_previous.getTestCount();
-        final int curCount = m_current.getTestCount();
-        if (prevCount > curCount) {
-            MissingTests missing = new MissingTests(m_previous, m_current);
-            this.addContent(missing);
-        } else if (prevCount < curCount) {
-            NewTests newTests = new NewTests(m_previous, m_current);
-            this.addContent(newTests);
+        MissingTests missing = new MissingTests(m_previous, m_current);
+        if (missing.missingTestCount() > 0) {
+            addContent(missing);
+        }
+        NewTests newTests = new NewTests(m_previous, m_current);
+        if (newTests.newTestCount() > 0) {
+            addContent(newTests);
         }
     }
 
@@ -61,13 +102,21 @@ public final class ResultDiff extends Element {
     }
     private void compareFailures() {
         List tests = getChildren("testcase");
+        m_regressions = new Element("regressions");
         for (Iterator iterator = tests.iterator(); iterator.hasNext();) {
             XMLTestCase test = (XMLTestCase) iterator.next();
             if (!test.passed()) {
                 checkForRegressions(test);
             }
         }
+
+        // Don't add regression element unless neccessary.
+        List regressions = m_regressions.getChildren();
+        if (regressions != null && regressions.size() > 0) {
+            addContent(m_regressions);
+        }
     }
+
 
     private void checkForRegressions(XMLTestCase test) {
         Element failure = test.getFailure();

@@ -28,8 +28,26 @@ public class XMLResult extends Element  {
         return Integer.parseInt(count);
     }
 
+    public int getFailureCount() {
+        final String count = getAttributeValue("failures");
+        return Integer.parseInt(count);
+    }
+
+    public int getErrorCount() {
+        final String count = getAttributeValue("errors");
+        return Integer.parseInt(count);
+    }
+
+    public String getChangelist() {
+        final String changelist = getAttributeValue("changelist");
+        return changelist;
+    }
     public boolean hasTest(String name) {
         return getIndex().containsKey(name);
+    }
+
+    public void setChangelist(String changelist) {
+        setAttribute("changelist", changelist);
     }
 
     public XMLTestCase getTestCase(String name) {

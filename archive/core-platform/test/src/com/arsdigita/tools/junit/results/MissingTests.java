@@ -9,12 +9,14 @@ package com.arsdigita.tools.junit.results;
 
 import org.jdom.Element;
 
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 public class MissingTests extends Element {
+    public static final String NAME = "missing_tests";
+
     protected MissingTests(XMLResult previous, XMLResult current) {
-        super("missing_tests");
+        super(NAME);
         List tests = previous.getChildren("testcase");
         for (Iterator iterator = tests.iterator(); iterator.hasNext();) {
             XMLTestCase test = (XMLTestCase) iterator.next();
@@ -24,6 +26,12 @@ public class MissingTests extends Element {
                 addContent(missing);
             }
         }
+    }
+
+    int missingTestCount() {
+        List missing =  getChildren("missing");
+        final int count = (missing == null) ? 0 : missing.size();
+        return count;
     }
 
 }
