@@ -23,9 +23,9 @@ import org.apache.log4j.Logger;
  */
 final class UtilConfig extends Record {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/UtilConfig.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/UtilConfig.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/04/13 00:26:01 $";
+        "$DateTime: 2003/06/26 10:12:58 $";
 
     private static final Logger s_log = Logger.getLogger(UtilConfig.class);
 
@@ -40,8 +40,6 @@ final class UtilConfig extends Record {
     }
 
     public final boolean isAssertEnabled() {
-        accessed("AssertEnabled");
-
         return m_isAssertEnabled;
     }
 

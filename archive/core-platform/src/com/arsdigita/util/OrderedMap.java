@@ -29,9 +29,9 @@ import org.apache.log4j.Logger;
  */
 public class OrderedMap extends TreeMap {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/OrderedMap.java#10 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/OrderedMap.java#11 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/04/24 10:25:41 $";
+        "$DateTime: 2003/06/26 10:12:58 $";
 
     private static final Logger s_log = Logger.getLogger(OrderedMap.class);
 
@@ -73,6 +73,9 @@ public class OrderedMap extends TreeMap {
 }
 
 final class OrderingComparator implements Comparator, Cloneable {
+    private static final Logger s_log = Logger.getLogger
+        (OrderingComparator.class);
+
     private HashMap m_sortKeyMap = new HashMap();
     private long m_currSortKey = 0;
 
@@ -80,10 +83,37 @@ final class OrderingComparator implements Comparator, Cloneable {
         Long sk1 = (Long) m_sortKeyMap.get(o1);
         Long sk2 = (Long) m_sortKeyMap.get(o2);
 
-        if (sk1 == null) return 1;
-        if (sk2 == null) return -1;
+        if (sk1 == null) {
+            if (s_log.isDebugEnabled()) {
+                s_log.debug("The sort key of " + o1 + " is null; " +
+                            "returning 1");
+            }
 
-        return (int) (sk1.longValue() - sk2.longValue());
+            return 1;
+        } else if (sk2 == null) {
+            if (s_log.isDebugEnabled()) {
+                s_log.debug("The sort key of " + o2 + " is null; " +
+                            "returning -1");
+            }
+
+            return -1;
+        } else {
+            final int result = (int) (sk1.longValue() - sk2.longValue());
+
+            if (s_log.isDebugEnabled()) {
+                s_log.debug("The sort key of " + o1 + " is " +
+                            sk1.longValue());
+                s_log.debug("The sort key of " + o2 + " is " +
+                            sk2.longValue());
+                s_log.debug("The result is " + result);
+            }
+
+            if (Assert.isEnabled() && result == 0) {
+                Assert.truth(o1.equals(o2));
+            }
+
+            return result;
+        }
     }
 
     final void keep(final Object key) {
