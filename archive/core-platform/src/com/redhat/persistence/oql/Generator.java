@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/03/28 $
+ * @version $Revision: #7 $ $Date: 2004/03/30 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Generator.java#6 $ by $Author: rhs $, $DateTime: 2004/03/28 22:52:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Generator.java#7 $ by $Author: rhs $, $DateTime: 2004/03/30 15:48:16 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -30,6 +30,7 @@ class Generator {
     private MultiMap m_null = new MultiMap();
     private MultiMap m_nonnull = new MultiMap();
     private Map m_substitutions = new HashMap();
+    private EquiSet m_sharedframes = new EquiSet(this);
 
     // hash related
     private CharList m_hash = new ArrayCharList();
@@ -83,6 +84,7 @@ class Generator {
         m_null.clear();
         m_nonnull.clear();
         m_substitutions.clear();
+        m_sharedframes.clear();
 
         m_hash.clear();
         m_hashCode = 0;
@@ -365,6 +367,10 @@ class Generator {
 
     Expression getSubstitute(Expression expr) {
         return (Expression) m_substitutions.get(expr);
+    }
+
+    EquiSet getSharedFrames() {
+        return m_sharedframes;
     }
 
     private static class Equality {

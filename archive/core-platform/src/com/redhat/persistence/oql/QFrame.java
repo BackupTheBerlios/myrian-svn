@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2004/03/29 $
+ * @version $Revision: #11 $ $Date: 2004/03/30 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/QFrame.java#10 $ by $Author: rhs $, $DateTime: 2004/03/29 00:04:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/QFrame.java#11 $ by $Author: rhs $, $DateTime: 2004/03/30 15:48:16 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -695,6 +695,8 @@ class QFrame {
             m_nonnull = m_nonnullpool;
         }
 
+        EquiSet shared = m_generator.getSharedFrames();
+
         List children = getChildren();
         for (int i = 0; i < children.size(); i++) {
             QFrame child = (QFrame) children.get(i);
@@ -705,11 +707,13 @@ class QFrame {
                     m_to.clear();
                     m_generator.split(child, m_equals, m_from, m_to);
                     if (isConnected(m_to, m_from)) {
+                        shared.equate(this, child);
                         child.m_equiset = m_equiset;
                     }
                 }
                 child.equifill();
             } else {
+                shared.equate(this, child);
                 child.m_equiset = m_equiset;
                 child.m_nonnull = m_nonnull;
                 child.equifill();
@@ -733,15 +737,14 @@ class QFrame {
         }
     }
 
-    boolean innerize(Set collapse) {
+    boolean innerize(Set collapse, Map canon) {
         boolean modified = false;
 
         if (!m_outer && m_parent != null && m_equiset != m_parent.m_equiset) {
-            if (m_parent.m_equiset.addAll(m_equiset)) {
-                collapse.add(m_parent.m_equiset);
+            if (merge(this, m_parent)) {
+                collapse.add(this.m_equiset);
+                modified = true;
             }
-            m_equiset = m_parent.m_equiset;
-            modified = true;
         }
 
         if (!m_outer && m_parent != null && m_nonnull != m_parent.m_nonnull) {
@@ -763,7 +766,7 @@ class QFrame {
             modified |= innerizeAncestors(m_qvalues);
         }
 
-        modified |= mergeChildren(collapse);
+        modified |= merge(collapse, canon);
 
         if (m_outer) {
             m_equals.clear();
@@ -802,55 +805,88 @@ class QFrame {
         return modified;
     }
 
-    private Map m_canon = new HashMap();
+    private QFrame max(QFrame a, QFrame b) {
+        if (a == null) { return b; }
+        if (b == null) { return a; }
+        if (a.m_equiset.size() > b.m_equiset.size()) {
+            return a;
+        } else {
+            return b;
+        }
+    }
 
-    private boolean mergeChildren(Set collapse) {
+    private QFrame max(List frames) {
+        QFrame result = null;
+        for (int i = 0; i < frames.size(); i++) {
+            QFrame frame = (QFrame) frames.get(i);
+            result = max(result, frame);
+        }
+        return result;
+    }
+
+    private boolean merge(QFrame a, QFrame b) {
+        if (a.m_equiset == b.m_equiset) { return false; }
+        EquiSet shared = m_generator.getSharedFrames();
+        shared.equate(a, b);
+        List from = shared.get(a);
+        QFrame to = max(from);
         boolean modified = false;
-
-        m_canon.clear();
-        List children = getChildren();
-        OUTER:
-        for (int i = 0; i < children.size(); i++) {
-            QFrame child = (QFrame) children.get(i);
-            m_equals.clear();
-            if (child.addEquals(m_equals)) {
-                m_from.clear();
-                m_to.clear();
-                m_generator.split(child, m_equals, m_from, m_to);
-                Object key = key(m_to);
-                if (key == null) { continue; }
-                for (int j = 0; j < m_from.size(); j++) {
-                    QValue qv = (QValue) m_from.get(j);
-                    String t = qv.getTable();
-                    if (t == null) { continue OUTER; }
-                    String c = qv.getColumn();
-                    if (c == null) { continue OUTER; }
-                    key = new CompoundKey(new CompoundKey(key, t), c);
-                }
-                EquiSet canon = (EquiSet) m_canon.get(key);
-                if (canon == null) {
-                    m_canon.put(key, child.m_equiset);
-                } else if (canon != child.m_equiset) {
-                    if (canon.addAll(child.m_equiset)) {
-                        collapse.add(canon);
-                    }
-                    child.m_equiset = canon;
-                    modified = true;
-                }
+        for (int i = 0; i < from.size(); i++) {
+            QFrame qf = (QFrame) from.get(i);
+            if (qf.m_equiset != to.m_equiset) {
+                to.m_equiset.addAll(qf.m_equiset);
+                qf.m_equiset = to.m_equiset;
+                modified = true;
             }
         }
-
         return modified;
     }
 
+    private boolean merge(Set collapse, Map canon) {
+        m_equals.clear();
+        if (!addEquals(m_equals)) { return false; }
+
+        m_from.clear();
+        m_to.clear();
+        m_generator.split(this, m_equals, m_from, m_to);
+        Object key = key(m_to);
+        if (key == null) { return false; }
+        for (int i = 0; i < m_from.size(); i++) {
+            QValue qv = (QValue) m_from.get(i);
+            String t = qv.getTable();
+            if (t == null) { return false; }
+            String c = qv.getColumn();
+            if (c == null) { return false; }
+            key = new CompoundKey(new CompoundKey(key, t), c);
+        }
+        QFrame qf = (QFrame) canon.get(key);
+        if (contains(qf)) { return false; }
+        if (qf == null) {
+            canon.put(key, this);
+            return false;
+        } else {
+            if (merge(this, qf)) {
+                collapse.add(this.m_equiset);
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
     private Object key(List qvalues) {
-        Object key = null;
+        if (qvalues.isEmpty()) { return null; }
+        QFrame target = ((QValue) qvalues.get(0)).getFrame();
+        if (!target.getRoot().equals(getRoot())) { return null; }
+        EquiSet eq = target.m_equiset;
+        Object key = eq;
         for (int i = 0; i < qvalues.size(); i++) {
             QValue qv = (QValue) qvalues.get(i);
-            if (key == null) {
-                key = m_equiset.partition(qv);
+            Integer p = eq.partition(qv);
+            if (p == null) {
+                key = new CompoundKey(key, qv);
             } else {
-                key = new CompoundKey(key, m_equiset.partition(qv));
+                key = new CompoundKey(key, p);
             }
         }
         return key;
@@ -955,13 +991,13 @@ class QFrame {
     }
 
     boolean contains(QValue value) {
-        if (value.getFrame().equals(this)) { return true; }
-        List children = getChildren();
-        for (int i = 0; i < children.size(); i++) {
-            QFrame child = (QFrame) children.get(i);
-            if (child.contains(value)) { return true; }
-        }
-        return false;
+        return contains(value.getFrame());
+    }
+
+    boolean contains(QFrame frame) {
+        if (frame == null) { return false; }
+        else if (frame.equals(this)) { return true; }
+        else { return contains(frame.getParent()); }
     }
 
     boolean isConstrained(Set columns) {

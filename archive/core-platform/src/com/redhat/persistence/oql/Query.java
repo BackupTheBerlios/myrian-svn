@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/03/28 $
+ * @version $Revision: #5 $ $Date: 2004/03/30 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Query.java#4 $ by $Author: rhs $, $DateTime: 2004/03/28 22:52:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Query.java#5 $ by $Author: rhs $, $DateTime: 2004/03/30 15:48:16 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -47,29 +47,6 @@ public class Query {
 
     private static final String ROWNUM = "rownum__";
 
-    /*private static int FRAME = 0;
-    private static int HOIST = 0;
-    private static int MERGE = 0;
-    private static int FILL = 0;
-    private static int INNER = 0;
-    private static int SHRINK = 0;
-    private static int EMIT = 0;
-
-    static int FOCUS = 0;
-
-    public static void dump() {
-        s_log.warn("FRAME: " + FRAME);
-        s_log.warn("HOIST: " + HOIST);
-        s_log.warn("MERGE: " + MERGE);
-        s_log.warn("FILL: " + FILL);
-        s_log.warn("INNER: " + INNER);
-        s_log.warn("SHRINK: " + SHRINK);
-        s_log.warn("EMIT: " + EMIT);
-        s_log.warn("Total: " + (FRAME + HOIST + MERGE + FILL + INNER +
-                                SHRINK + EMIT));
-        s_log.warn("Focus: " + FOCUS);
-        }*/
-
     private static final ThreadLocal s_generators = new ThreadLocal() {
         public Object initialValue() {
             return new Generator();
@@ -81,8 +58,6 @@ public class Query {
     public Code generate(Root root, boolean oracle) {
         Generator gen = (Generator) s_generators.get();
         gen.init(root);
-
-        //long start = System.currentTimeMillis();
 
         m_query.hash(gen);
 
@@ -101,7 +76,6 @@ public class Query {
 
         if (cached != null) {
             Code c = cached.resolve(gen.getBindings(), root);
-            //FOCUS += System.currentTimeMillis() - start;
             return c;
         }
 
@@ -118,15 +92,11 @@ public class Query {
             gen.pop();
         }
 
-        //FRAME += System.currentTimeMillis() - start;
-
         if (s_log.isDebugEnabled()) {
             s_log.debug("unoptimized frame:\n" + qframe);
         }
 
         List frames = gen.getFrames();
-
-        //start = System.currentTimeMillis();
 
         boolean modified;
         do {
@@ -137,26 +107,18 @@ public class Query {
             }
         } while (modified);
 
-        //HOIST += System.currentTimeMillis() - start;
-
         if (s_log.isDebugEnabled()) {
             s_log.debug("hoisted frame:\n" + qframe);
         }
-
-        //start = System.currentTimeMillis();
 
         for (int i = 0; i < frames.size(); i++) {
             QFrame qf = (QFrame) frames.get(i);
             qf.mergeOuter();
         }
 
-        //MERGE += System.currentTimeMillis() - start;
-
         if (s_log.isDebugEnabled()) {
             s_log.debug("outers merged:\n" + qframe);
         }
-
-        //start = System.currentTimeMillis();
 
         for (int i = 0; i < frames.size(); i++) {
             QFrame qf = (QFrame) frames.get(i);
@@ -165,21 +127,20 @@ public class Query {
             }
         }
 
-        //FILL += System.currentTimeMillis() - start;
-
         if (s_log.isDebugEnabled()) {
             s_log.debug("eq/nn filled:\n" + qframe);
         }
 
-        //start = System.currentTimeMillis();
-
+        Set collapse = new HashSet();
+        Map canon = new HashMap();
         do {
+            collapse.clear();
+            canon.clear();
             modified = false;
-            Set collapse = new HashSet();
             for (int i = 0; i < frames.size(); i++) {
                 QFrame qf = (QFrame) frames.get(i);
                 long st = System.currentTimeMillis();
-                modified |= qf.innerize(collapse);
+                modified |= qf.innerize(collapse, canon);
             }
             if (modified) {
                 for (Iterator it = collapse.iterator(); it.hasNext(); ) {
@@ -189,26 +150,18 @@ public class Query {
             }
         } while (modified);
 
-        //INNER += System.currentTimeMillis() - start;
-
         if (s_log.isDebugEnabled()) {
             s_log.debug("innerized frame:\n" + qframe);
         }
-
-        //start = System.currentTimeMillis();
 
         for (Iterator it = gen.getFrames().iterator(); it.hasNext(); ) {
             QFrame qf = (QFrame) it.next();
             qf.shrink();
         }
 
-        //SHRINK += System.currentTimeMillis() - start;
-
         if (s_log.isDebugEnabled()) {
             s_log.debug("shrunk frame:\n" + qframe);
         }
-
-        //start = System.currentTimeMillis();
 
         Code sql = new Code("select ");
 
@@ -268,8 +221,6 @@ public class Query {
         }
 
         sql = sql.resolve(gen.getBindings(), root);
-
-        //EMIT += System.currentTimeMillis() - start;
 
         return sql;
     }

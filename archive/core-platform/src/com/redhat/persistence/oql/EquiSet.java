@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * EquiSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/03/29 $
+ * @version $Revision: #8 $ $Date: 2004/03/30 $
  **/
 
 class EquiSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/EquiSet.java#7 $ by $Author: rhs $, $DateTime: 2004/03/29 00:04:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/EquiSet.java#8 $ by $Author: rhs $, $DateTime: 2004/03/30 15:48:16 $";
 
     private static final Logger s_log = Logger.getLogger(EquiSet.class);
 
@@ -31,6 +31,10 @@ class EquiSet {
 
     EquiSet(Generator generator) {
         m_generator = generator;
+    }
+
+    int size() {
+        return m_nodes.size();
     }
 
     void clear() {
@@ -48,8 +52,8 @@ class EquiSet {
         return m_nodes.isEmpty();
     }
 
-    List get(QValue a) {
-        Integer idx = (Integer) m_nodes.get(a);
+    List get(Object nd) {
+        Integer idx = (Integer) m_nodes.get(nd);
         if (idx == null) {
             return null;
         } else {
@@ -57,8 +61,31 @@ class EquiSet {
         }
     }
 
-    Integer partition(QValue a) {
-        return (Integer) m_nodes.get(a);
+    Integer partition(Object nd) {
+        return (Integer) m_nodes.get(nd);
+    }
+
+    List getPartitions() {
+        return m_partitions;
+    }
+
+    List getPartition(Integer idx) {
+        return getPartition(idx.intValue());
+    }
+
+    List getPartition(int i) {
+        return (List) m_partitions.get(i);
+    }
+
+    private int allocatePartition() {
+        int result;
+        if (m_free.isEmpty()) {
+            result = m_partitions.size();
+            m_partitions.add(new ArrayList());
+        } else {
+            result = ((Integer) m_free.remove(m_free.size() - 1)).intValue();
+        }
+        return result;
     }
 
     private List m_equals = new ArrayList();
@@ -66,6 +93,15 @@ class EquiSet {
     boolean equate(QValue a, QValue b) {
         m_frames.add(a.getFrame());
         m_frames.add(b.getFrame());
+        m_equals.clear();
+        m_equals.add(a);
+        if (!a.equals(b)) {
+            m_equals.add(b);
+        }
+        return add(m_equals);
+    }
+
+    boolean equate(Object a, Object b) {
         m_equals.clear();
         m_equals.add(a);
         if (!a.equals(b)) {
@@ -139,14 +175,12 @@ class EquiSet {
                     continue OUTER;
                 }
                 QValue v = frame.getValue(cols[i].getName());
-                Integer idx = (Integer) m_nodes.get(v);
-                if (idx == null) {
-                    continue OUTER;
-                }
+                Object id = m_nodes.get(v);
+                if (id == null) { id = v; }
                 if (key == null) {
-                    key = idx;
+                    key = id;
                 } else {
-                    key = new CompoundKey(idx, key);
+                    key = new CompoundKey(id, key);
                 }
             }
             result.add(key);
@@ -155,25 +189,6 @@ class EquiSet {
 
     List getFrameSets() {
         return m_framesets;
-    }
-
-    private List getPartition(Integer idx) {
-        return getPartition(idx.intValue());
-    }
-
-    private List getPartition(int i) {
-        return (List) m_partitions.get(i);
-    }
-
-    private int allocatePartition() {
-        int result;
-        if (m_free.isEmpty()) {
-            result = m_partitions.size();
-            m_partitions.add(new ArrayList());
-        } else {
-            result = ((Integer) m_free.remove(m_free.size() - 1)).intValue();
-        }
-        return result;
     }
 
     private List m_from = SetUniqueList.decorate(new ArrayList());

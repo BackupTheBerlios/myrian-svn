@@ -1187,22 +1187,25 @@
 
   <test>
     <!-- Encountered when fetching through certain qualias mappings. -->
-    <query fetched="name,last" joins="1">
+    <query fetched="name,last" joins="1" outers="1">
       query(all(test.Group), name = other.name, last = other.lastName)
     </query>
+    <query fetched="group,name,last" joins="1" outers="1">
+      query(all(test.Group), group = name, name = other.name, last = other.lastName)
+    </query>
     <results>
-      <row id="0" name="Ashanti" last="null"/>
-      <row id="1" name="Britney" last="Spears"/>
-      <row id="2" name="Christina" last="Aguilera"/>
-      <row id="3" name="Debbie" last="Gibson"/>
-      <row id="4" name="Enya" last="null"/>
-      <row id="5" name="Faith" last="Hill"/>
-      <row id="6" name="Gloria" last="Estefan"/>
-      <row id="7" name="Hillary" last="Duff"/>
-      <row id="8" name="Indigo" last="null"/>
-      <row id="9" name="Jennifer" last="Lopez"/>
-      <row id="10" name="null" last="null"/>
-      <row id="11" name="null" last="null"/>
+      <row id="0" group="Pop" name="Ashanti" last="null"/>
+      <row id="1" group="Rock" name="Britney" last="Spears"/>
+      <row id="2" group="R&amp;B" name="Christina" last="Aguilera"/>
+      <row id="3" group="Country" name="Debbie" last="Gibson"/>
+      <row id="4" group="New Age" name="Enya" last="null"/>
+      <row id="5" group="Film" name="Faith" last="Hill"/>
+      <row id="6" group="Television" name="Gloria" last="Estefan"/>
+      <row id="7" group="80s" name="Hillary" last="Duff"/>
+      <row id="8" group="90s" name="Indigo" last="null"/>
+      <row id="9" group="00s" name="Jennifer" last="Lopez"/>
+      <row id="10" group="Music" name="null" last="null"/>
+      <row id="11" group="Entertainment" name="null" last="null"/>
     </results>
   </test>
 </tests>
