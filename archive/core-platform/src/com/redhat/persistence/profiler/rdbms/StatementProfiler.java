@@ -18,7 +18,7 @@ package com.redhat.persistence.profiler.rdbms;
 import com.arsdigita.util.Assert;
 import com.arsdigita.util.UncheckedWrapperException;
 import com.redhat.persistence.Event;
-import com.redhat.persistence.Query;
+import com.redhat.persistence.Signature;
 import com.redhat.persistence.engine.rdbms.RDBMSProfiler;
 import com.redhat.persistence.engine.rdbms.RDBMSStatement;
 import com.redhat.persistence.engine.rdbms.StatementLifecycle;
@@ -68,9 +68,9 @@ public class StatementProfiler implements RDBMSProfiler {
             }
 
             ObjectType type = null;
-            Query query = statement.getQuery();
-            if (query != null) {
-                type = query.getSignature().getObjectType();
+            Signature sig = statement.getSignature();
+            if (sig != null) {
+                type = sig.getObjectType();
             } else {
                 for (Iterator it = statement.getEvents().iterator();
                      it.hasNext(); ) {

@@ -26,12 +26,12 @@ import java.util.List;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/10/28 $
+ * @version $Revision: #5 $ $Date: 2004/03/11 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/ObjectMap.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/ObjectMap.java#5 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -140,26 +140,40 @@ public class ObjectMap extends Element {
         for (Iterator it = getDeclaredMappings().iterator(); it.hasNext(); ) {
             Mapping m = (Mapping) it.next();
             m.dispatch(new Mapping.Switch() {
-                    public void onValue(Value m) {
-                        if (!result.contains(m.getPath())) {
-                            result.add(m.getPath());
-                        }
+                public void onValue(Value m) {
+                    if (!result.contains(m.getPath())) {
+                        result.add(m.getPath());
                     }
+                }
 
-                    public void onJoinTo(JoinTo m) {}
+                public void onJoinTo(JoinTo m) {}
 
-                    public void onJoinFrom(JoinFrom m) {}
+                public void onJoinFrom(JoinFrom m) {}
 
-                    public void onJoinThrough(JoinThrough m) {}
+                public void onJoinThrough(JoinThrough m) {}
 
-                    public void onStatic(Static m) {}
-                });
+                public void onStatic(Static m) {}
+
+                public void onQualias(Qualias q) {}
+            });
         }
 
         for (Iterator it = m_fetched.iterator(); it.hasNext(); ) {
             Object o = it.next();
             if (!result.contains(o)) {
                 result.add(o);
+            }
+        }
+
+        if (result.size() == 0) {
+            SQLBlock sql = getRetrieveAll();
+            if (sql != null) {
+                for (Iterator it = sql.getPaths().iterator(); it.hasNext(); ) {
+                    Object o = it.next();
+                    if (!result.contains(o)) {
+                        result.add(o);
+                    }
+                }
             }
         }
 

@@ -51,10 +51,10 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/09/10 $ */
+ * @version $Revision: #13 $ $Date: 2004/03/11 $ */
 
 public class OID {
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OID.java#12 $ by $Author: ashah $, $DateTime: 2003/09/10 00:21:05 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OID.java#13 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
 
     private ObjectType m_type;
     private Map m_values = new HashMap();
@@ -484,35 +484,6 @@ public class OID {
     public boolean equals(Object obj) {
         if (obj instanceof OID) {
             OID oid = (OID)obj;
-
-            // this is a relatively expensive check,
-            // so we only do it if debug level logging
-            // is enabled.
-            // However, the warning it generates
-            // really belongs as an error, so that's
-            // how we log it.
-            if (m_log.isDebugEnabled()) {
-                Iterator i = m_values.values().iterator();
-                Iterator i2 = oid.m_values.values().iterator();
-                while (i.hasNext() && i2.hasNext()) {
-                    Object o = i.next();
-                    Object o2 = i2.next();
-                    if (o != null &&
-                        o2 != null &&
-                        !o.getClass().isInstance(o2) &&
-                        !o2.getClass().isInstance(o) &&
-                        o.toString().equals(o2.toString())) {
-                        m_log.error("Equality check problem comparing OID " +
-                                    this + " to " + obj + ": value " + o +
-                                    " is of type " + o.getClass() +
-                                    " while value " + o2 + " is of type " +
-                                    o2.getClass() + "; check OID creation for " +
-                                    "both these objects for incorrect type " +
-                                    "conversions or toStrings.");
-                    }
-                }
-            }
-
             // we rely on the toString ecause the HashMap.equals does not
             // give us what we need
             return m_type.getBasetype().equals(oid.m_type.getBasetype()) &&

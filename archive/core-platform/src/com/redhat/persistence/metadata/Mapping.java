@@ -23,12 +23,12 @@ import java.util.Collection;
  * Mapping
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/10/28 $
+ * @version $Revision: #4 $ $Date: 2004/03/11 $
  **/
 
 public abstract class Mapping extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Mapping.java#3 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Mapping.java#4 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
 
     public static abstract class Switch {
         public abstract void onValue(Value m);
@@ -36,6 +36,9 @@ public abstract class Mapping extends Element {
         public abstract void onJoinFrom(JoinFrom m);
         public abstract void onJoinThrough(JoinThrough m);
         public abstract void onStatic(Static m);
+        public void onQualias(Qualias q) {
+            throw new UnsupportedOperationException();
+        }
     }
 
     private Path m_path;

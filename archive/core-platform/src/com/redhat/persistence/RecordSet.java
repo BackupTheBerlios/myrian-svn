@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/01/22 $
+ * @version $Revision: #7 $ $Date: 2004/03/11 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/RecordSet.java#6 $ by $Author: ashah $, $DateTime: 2004/01/22 17:43:25 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/RecordSet.java#7 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -45,8 +45,12 @@ public abstract class RecordSet {
         m_signature = signature;
     }
 
-    public Signature getSignature() {
+    protected Signature getSignature() {
         return m_signature;
+    }
+
+    boolean isFetched(Path path) {
+        return m_signature.isFetched(path);
     }
 
     public abstract boolean next();
@@ -56,23 +60,21 @@ public abstract class RecordSet {
     public abstract void close();
 
     Map load(Session ssn) {
-        Adapter adapter =
-            ssn.getRoot().getAdapter(m_signature.getObjectType());
         Collection paths = m_signature.getPaths();
 
 	LinkedList remaining = new LinkedList();
 	for (Iterator it = paths.iterator(); it.hasNext(); ) {
 	    Path path = (Path) it.next();
-	    for (Path p = path; p != null; p = p.getParent()) {
-		if (!remaining.contains(p)) {
-		    remaining.add(p);
-		}
-	    }
-	}
 
-	if (!remaining.contains(null)) {
-	    remaining.add(null);
-	}
+            for (; ; path = path.getParent()) {
+                if (!remaining.contains(path)) {
+                    remaining.add(path);
+                }
+                if (m_signature.isSource(path)) {
+                    break;
+                }
+            }
+        }
 
 	HashMap values = new HashMap();
 	int before;
@@ -81,7 +83,11 @@ public abstract class RecordSet {
 
 	    OUTER: for (Iterator it = remaining.iterator(); it.hasNext(); ) {
 		Path p = (Path) it.next();
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("loading " + p);
+                }
 		ObjectType type = m_signature.getType(p);
+                Adapter adapter = ssn.getRoot().getAdapter(type);
 		Collection props = type.getImmediateProperties();
 		if (props.size() == 0) {
 		    values.put(p, get(p));
@@ -159,7 +165,7 @@ public abstract class RecordSet {
 			continue;
 		    } else {
 			throw new IllegalStateException
-			    ("container is null but value isn't");
+                            ("container of " + p + " is null");
 		    }
 		}
 		ssn.load(container, prop, value);

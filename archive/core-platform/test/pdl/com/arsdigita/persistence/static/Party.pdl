@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/test/pdl/com/arsdigita/persistence/static/Party.pdl#2 $ 
-// $DateTime: 2003/08/15 13:46:34 $
+// $Id: //core-platform/dev/test/pdl/com/arsdigita/persistence/static/Party.pdl#3 $ 
+// $DateTime: 2004/03/11 18:13:02 $
 
 model examples;
 
@@ -66,28 +66,17 @@ object type User extends Party {
 
     reference key (t_users.user_id);
 
-    retrieve {
-        super;
-
+    retrieve all {
         do {
-            select first_name, last_names
-            from t_users
-            where user_id = :id
+            select first_name, last_names, user_id, email, bio
+            from t_users, t_parties
+            where t_users.user_id = t_parties.party_id
         } map {
-            firstName = t_users.first_name;
-            lastNames = t_users.last_names;
-        }
-    }
-
-    retrieve attributes {
-        do {
-            select *
-            from t_users
-            where user_id = :id
-        } map {
-            firstName = t_users.first_name;
-            lastNames = t_users.last_names;
-            bio = t_users.bio;
+            id = user_id;
+            firstName = first_name;
+            lastNames = last_names;
+            bio = bio;
+            email = email;
         }
     }
 

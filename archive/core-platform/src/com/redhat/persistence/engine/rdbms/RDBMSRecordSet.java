@@ -24,30 +24,31 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 /**
  * RDBMSRecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/11/21 $
+ * @version $Revision: #8 $ $Date: 2004/03/11 $
  **/
 
 class RDBMSRecordSet extends RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSRecordSet.java#7 $ by $Author: rhs $, $DateTime: 2003/11/21 10:51:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSRecordSet.java#8 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
+
+    private static final Logger s_log = Logger.getLogger(RecordSet.class);
 
     final private RDBMSEngine m_engine;
     final private ResultCycle m_rc;
-    final private Map m_mappings;
 
-    RDBMSRecordSet(Signature sig, RDBMSEngine engine, ResultCycle rc,
-                   Map mappings) {
+    RDBMSRecordSet(Signature sig, RDBMSEngine engine, ResultCycle rc) {
         super(sig);
 	if (rc == null) {
 	    throw new IllegalArgumentException("null result set");
 	}
         m_engine = engine;
         m_rc = rc;
-        m_mappings = mappings;
     }
 
     ResultSet getResultSet() {
@@ -55,7 +56,7 @@ class RDBMSRecordSet extends RecordSet {
     }
 
     String getColumn(Path p) {
-        return (String) m_mappings.get(p);
+        return getSignature().getColumn(p);
     }
 
     public boolean next() {
@@ -72,6 +73,9 @@ class RDBMSRecordSet extends RecordSet {
             if (cycle != null) { cycle.beginGet(column); }
             Object result = ad.fetch(m_rc.getResultSet(), column);
             if (cycle != null) { cycle.endGet(result); }
+            if (s_log.isDebugEnabled()) {
+                s_log.debug(p + "(" + column + ") -> " + result);
+            }
             return result;
         } catch (SQLException e) {
             if (cycle != null) { cycle.endGet(e); }

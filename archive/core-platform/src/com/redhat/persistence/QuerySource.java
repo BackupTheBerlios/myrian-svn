@@ -17,19 +17,20 @@ package com.redhat.persistence;
 
 import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Property;
+import com.redhat.persistence.oql.Query;
 
 /**
  * QuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/10/28 $
+ * @version $Revision: #5 $ $Date: 2004/03/11 $
  **/
 
-public abstract class QuerySource {
+public class QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/QuerySource.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/QuerySource.java#5 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
 
-    private Session m_ssn;
+    private Session m_ssn = null;
 
     void setSession(Session ssn) {
         m_ssn = ssn;
@@ -39,13 +40,21 @@ public abstract class QuerySource {
         return m_ssn;
     }
 
-    public abstract Query getQuery(ObjectType type);
+    public Query getQuery(ObjectType type) {
+        throw new UnsupportedOperationException();
+    }
 
-    public abstract Query getQuery(PropertyMap keys);
+    public Query getQuery(PropertyMap keys) {
+        throw new UnsupportedOperationException();
+    }
 
     // These should probably be changed to take type signatures.
-    public abstract Query getQuery(Object obj);
+    public Query getQuery(Object obj) {
+        throw new UnsupportedOperationException();
+    }
 
-    public abstract Query getQuery(Object obj, Property prop);
+    public Query getQuery(Object obj, Property prop) {
+        throw new UnsupportedOperationException();
+    }
 
 }

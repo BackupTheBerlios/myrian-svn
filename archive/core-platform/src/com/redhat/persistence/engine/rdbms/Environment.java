@@ -24,18 +24,19 @@ import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Static;
 import com.redhat.persistence.metadata.Value;
+import com.redhat.persistence.metadata.Qualias;
 import java.util.HashMap;
 
 /**
  * Environment
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/10/28 $
+ * @version $Revision: #5 $ $Date: 2004/03/11 $
  **/
 
 class Environment {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Environment.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Environment.java#5 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
 
     private RDBMSEngine m_engine;
     private ObjectMap m_om;
@@ -79,6 +80,9 @@ class Environment {
                     public void onJoinFrom(JoinFrom j) {}
                     public void onJoinThrough(JoinThrough j) {}
                     public void onStatic(Static s) {}
+                    public void onQualias(Qualias q) {
+                        // XXX do real read only properties from session
+                    }
                 });
             }
         }

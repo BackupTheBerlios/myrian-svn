@@ -24,12 +24,12 @@ import com.arsdigita.tools.junit.framework.BaseTestCase;
  * model.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/08/15 $
+ * @version $Revision: #6 $ $Date: 2004/03/11 $
  **/
 
 public class MappingsTest extends BaseTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/MappingsTest.java#5 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/MappingsTest.java#6 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
 
     public MappingsTest(String name) {
         super(name);
@@ -92,11 +92,6 @@ public class MappingsTest extends BaseTestCase {
             ("ReferenceTo", new String[] { "target", "id" });
     }
 
-    public void testReferenceFromIsolation() {
-        doIsolationTest
-            ("ReferenceFrom", new String[] { "target", "id" });
-    }
-
     public void testReferenceFromDouble() {
         doDoubleTest
             ("ReferenceFrom", new String[] { "target", "id" });
@@ -117,4 +112,7 @@ public class MappingsTest extends BaseTestCase {
             ("test.Component", new String[] { "test", "id" }).run();
     }
 
+    public void testNakedJoin() {
+        doTest("NakedJoin");
+    }
 }

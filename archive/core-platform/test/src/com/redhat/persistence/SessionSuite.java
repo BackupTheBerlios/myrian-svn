@@ -16,7 +16,6 @@
 package com.redhat.persistence;
 
 import com.redhat.persistence.metadata.*;
-import com.redhat.persistence.engine.MemoryEngine;
 import com.redhat.persistence.pdl.PDL;
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
 import com.arsdigita.tools.junit.extensions.CoreTestSetup;
@@ -30,49 +29,49 @@ import org.apache.log4j.Logger;
  * SessionSuite
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #5 $ $Date: 2003/12/02 $
+ * @version $Revision: #6 $ $Date: 2004/03/11 $
  **/
 
 public class SessionSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/redhat/persistence/SessionSuite.java#5 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/redhat/persistence/SessionSuite.java#6 $";
 
     private static final Logger s_log = Logger.getLogger(SessionSuite.class);
 
-    private static class PassthroughEngine extends Engine {
+//     private static class PassthroughEngine extends Engine {
 
-        private Engine m_engine;
-        private List m_events;
-        private boolean m_recording = false;
+//         private Engine m_engine;
+//         private List m_events;
+//         private boolean m_recording = false;
 
-        PassthroughEngine(Engine eng) {
-            m_engine = eng;
-            m_events = new LinkedList();
-        }
+//         PassthroughEngine(Engine eng) {
+//             m_engine = eng;
+//             m_events = new LinkedList();
+//         }
 
-        void start() { m_recording = true; }
-        List stop() {
-            m_recording = false;
-            List l = m_events;
-            m_events = new LinkedList();
-            return l;
-        }
+//         void start() { m_recording = true; }
+//         List stop() {
+//             m_recording = false;
+//             List l = m_events;
+//             m_events = new LinkedList();
+//             return l;
+//         }
 
-        protected void write(Event ev) {
-            m_engine.write(ev);
-            if (m_recording) { m_events.add(ev); }
-        }
+//         protected void write(Event ev) {
+//             m_engine.write(ev);
+//             if (m_recording) { m_events.add(ev); }
+//         }
 
-        protected void flush() { m_engine.flush(); }
-        protected void commit() { m_engine.commit(); }
-        protected void rollback() { m_engine.rollback(); }
-        protected RecordSet execute(Query query) {
-            return m_engine.execute(query);
-        }
-        protected long size(Query query) {
-            return m_engine.size(query);
-        }
-    }
+//         protected void flush() { m_engine.flush(); }
+//         protected void commit() { m_engine.commit(); }
+//         protected void rollback() { m_engine.rollback(); }
+//         protected RecordSet execute(Query query) {
+//             return m_engine.execute(query);
+//         }
+//         protected long size(Query query) {
+//             return m_engine.size(query);
+//         }
+//     }
 
     public SessionSuite() {}
 
@@ -126,7 +125,8 @@ public class SessionSuite extends PackageTestSuite {
     private Map[] m_objs = new Map[] {
         new HashMap(), new HashMap(), new HashMap() };
 
-    private PassthroughEngine m_engine;
+//    private PassthroughEngine m_engine;
+    private Engine m_engine;
 
     public void initialize() {
         PDL pdl = new PDL();
@@ -135,8 +135,8 @@ public class SessionSuite extends PackageTestSuite {
 
         m_model = Model.getInstance("test");
 
-        m_engine = new PassthroughEngine(new MemoryEngine());
-        m_ssn = new Session(root, m_engine, new DynamicQuerySource());
+//         m_engine = new PassthroughEngine(new MemoryEngine());
+        m_ssn = new Session(root, m_engine, new QuerySource());
         initializeModel();
 
 
@@ -242,20 +242,20 @@ public class SessionSuite extends PackageTestSuite {
 
     private void startTest(String name) {
         s_log.info(name);
-        m_engine.stop();
-        m_engine.start();
+//         m_engine.stop();
+//         m_engine.start();
     }
 
     private void endTest() {
         m_ssn.flush();
-        List evs = m_engine.stop();
-        if (s_log.isDebugEnabled()) {
-            for (Iterator it = evs.iterator(); it.hasNext(); ) {
-                s_log.debug(it.next());
-            }
-        }
-        s_log.info("stop: " + evs.size());
-        m_engine.start();
+//         List evs = m_engine.stop();
+//         if (s_log.isDebugEnabled()) {
+//             for (Iterator it = evs.iterator(); it.hasNext(); ) {
+//                 s_log.debug(it.next());
+//             }
+//         }
+//         s_log.info("stop: " + evs.size());
+//         m_engine.start();
     }
 
     private void initializeModel() {

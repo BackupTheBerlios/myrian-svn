@@ -18,7 +18,6 @@ package com.redhat.persistence.engine.rdbms;
 import com.arsdigita.util.WrappedError;
 import com.redhat.persistence.Condition;
 import com.redhat.persistence.Expression;
-import com.redhat.persistence.Query;
 import com.redhat.persistence.SQLWriterException;
 import com.redhat.persistence.common.ParseException;
 import com.redhat.persistence.common.Path;
@@ -30,6 +29,7 @@ import com.redhat.persistence.metadata.Column;
 import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.Root;
 import com.redhat.persistence.metadata.SQLBlock;
+import com.redhat.persistence.oql.Code;
 
 import java.io.StringReader;
 import java.sql.PreparedStatement;
@@ -39,17 +39,18 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2004/01/19 $
+ * @version $Revision: #14 $ $Date: 2004/03/11 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#13 $ by $Author: vadim $, $DateTime: 2004/01/19 15:33:35 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#14 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
 
     private RDBMSEngine m_engine;
     private Operation m_op = null;
@@ -159,6 +160,16 @@ public abstract class SQLWriter {
         m_sql.append("?");
         m_bindings.add(value);
         m_types.add(new Integer(jdbcType));
+    }
+
+    void write(Code code) {
+        write(code.getSQL());
+        List bindings = code.getBindings();
+        for (int i = 0; i < bindings.size(); i++) {
+            Code.Binding b = (Code.Binding) bindings.get(i);
+            m_bindings.add(b.getValue());
+            m_types.add(new Integer(b.getType()));
+        }
     }
 
     public void write(Operation op) {
@@ -271,7 +282,6 @@ public abstract class SQLWriter {
     }
 
     private final Expression.Switch m_esw = new Expression.Switch() {
-        public void onQuery(Query q) { write(q); }
         public void onCondition(Condition c) { write(c); }
         public void onVariable(Expression.Variable v) { write(v); }
         public void onValue(Expression.Value v) { write(v); }
@@ -293,11 +303,6 @@ public abstract class SQLWriter {
 
     public void write(Condition cond) {
         cond.dispatch(m_csw);
-    }
-
-    public void write(Query q) {
-        QGen qg = new QGen(getEngine(), q);
-        write((Operation) qg.generate());
     }
 
     public void write(Expression.Variable v) {
@@ -377,9 +382,6 @@ public abstract class SQLWriter {
                 }
             }
             public void onValue(Expression.Value v) {
-                throw new Error("not implemented");
-            }
-            public void onQuery(Query q) {
                 throw new Error("not implemented");
             }
             public void onPassthrough(Expression.Passthrough p) {

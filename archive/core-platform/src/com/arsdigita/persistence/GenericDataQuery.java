@@ -15,9 +15,7 @@
 
 package com.arsdigita.persistence;
 
-import com.redhat.persistence.Cursor;
-import com.redhat.persistence.Query;
-import com.redhat.persistence.RecordSet;
+import com.redhat.persistence.DataSet;
 import com.redhat.persistence.Signature;
 import com.redhat.persistence.common.ParseException;
 import com.redhat.persistence.common.Path;
@@ -26,59 +24,51 @@ import com.redhat.persistence.metadata.Model;
 import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Role;
 import com.redhat.persistence.metadata.SQLBlock;
+import com.redhat.persistence.oql.Static;
+
 import java.io.StringReader;
+import java.util.Collections;
 
 /**
  * GenericDataQuery
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/10/28 $
+ * @version $Revision: #13 $ $Date: 2004/03/11 $
  */
 
 public class GenericDataQuery extends DataQueryImpl {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataQuery.java#12 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
-
-    private SQLBlock m_block;
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataQuery.java#13 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
 
     public GenericDataQuery(Session s, String sql, String[] columns) {
-        super(s, query(s, sql, columns));
+        super(s, ds(s, sql, columns));
+    }
+
+    private static DataSet ds(Session s, String sql, String[] columns) {
+	ObjectType propType = s.getRoot().getObjectType("global.Object");
+        final ObjectType type =
+            new ObjectType(Model.getInstance("gdq"), sql, null);
+	Signature sig = new Signature(type);
+	for (int i = 0; i < columns.length; i++) {
+	    type.addProperty
+                (new Role(columns[i], propType, false, false, true));
+	    sig.addPath(Path.get(columns[i]));
+	}
+
 	SQLParser p = new SQLParser(new StringReader(sql));
 	try {
 	    p.sql();
 	} catch (ParseException e) {
 	    throw new PersistenceException(e);
 	}
-	m_block = new SQLBlock(p.getSQL());
-	for (int i = 0; i < columns.length; i++) {
-	    Path path = Path.get(columns[i]);
-	    m_block.addMapping(path, path);
-	}
-    }
 
-    private static final Query query(Session s, String sql, String[] paths) {
-	ObjectType propType = s.getRoot().getObjectType("global.Object");
-	ObjectType type = new ObjectType(Model.getInstance("gdq"), sql, null);
-	Signature sig = new Signature(type);
-	for (int i = 0; i < paths.length; i++) {
-	    type.addProperty
-		(new Role(paths[i], propType, false, false, true));
-	    sig.addPath(Path.get(paths[i]));
-	}
-	return new Query(sig, null);
-    }
+        Static st = new Static
+            (p.getSQL(), columns, false, Collections.EMPTY_MAP) {
+            protected boolean hasType() { return true; }
+            protected ObjectType getType() { return type; }
+        };
 
-    protected Cursor execute(final Query query) {
-	return new Cursor(getSession().getProtoSession(), query) {
-		protected RecordSet execute() {
-		    return GenericDataQuery.this.getSession().getEngine()
-			.execute(query, m_block);
-		}
-	    };
-    }
-
-    public long size() {
-        return getSession().getEngine().size(makeQuery(), m_block);
+        return new DataSet(s.getProtoSession(), sig, st);
     }
 
 }

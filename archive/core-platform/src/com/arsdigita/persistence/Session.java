@@ -20,6 +20,7 @@ import com.arsdigita.developersupport.DeveloperSupportProfiler;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.redhat.persistence.CreateEvent;
+import com.redhat.persistence.DataSet;
 import com.redhat.persistence.DeleteEvent;
 import com.redhat.persistence.Engine;
 import com.redhat.persistence.Event;
@@ -27,13 +28,11 @@ import com.redhat.persistence.EventProcessor;
 import com.redhat.persistence.PropertyEvent;
 import com.redhat.persistence.PropertyMap;
 import com.redhat.persistence.ProtoException;
-import com.redhat.persistence.Query;
 import com.redhat.persistence.QuerySource;
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.engine.rdbms.OracleWriter;
 import com.redhat.persistence.engine.rdbms.PostgresWriter;
 import com.redhat.persistence.engine.rdbms.RDBMSEngine;
-import com.redhat.persistence.engine.rdbms.RDBMSQuerySource;
 import com.redhat.persistence.metadata.Adapter;
 import com.redhat.persistence.metadata.Property;
 import com.redhat.persistence.metadata.Root;
@@ -61,7 +60,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #34 $ $Date: 2004/02/12 $
+ * @version $Revision: #35 $ $Date: 2004/03/11 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -74,7 +73,7 @@ public class Session {
     private TransactionContext m_ctx;
     private PSession m_ssn;
     private final RDBMSEngine m_engine;
-    private final RDBMSQuerySource m_qs;
+    private final QuerySource m_qs;
 
     private List m_dataObjects = new ArrayList();
     FlushEventProcessor m_beforeFP;
@@ -114,7 +113,7 @@ public class Session {
             break;
         }
 
-        m_qs = new RDBMSQuerySource();
+        m_qs = new QuerySource();
         m_ssn = this.new PSession(m_root.getRoot(), m_engine, m_qs);
         m_ctx = new TransactionContext(this);
 
@@ -374,9 +373,9 @@ public class Session {
      **/
 
     public DataCollection retrieve(ObjectType type) {
-        Query q = m_qs.getQuery
-            (getRoot().getObjectType(type.getQualifiedName()));
-        return new DataCollectionImpl(this, m_ssn.retrieve(q));
+        return new DataCollectionImpl
+            (this, m_ssn.getDataSet(getRoot().getObjectType
+                                    (type.getQualifiedName())));
     }
 
 
@@ -480,8 +479,7 @@ public class Session {
         if (ot == null) {
             throw new PersistenceException("no such query: " + name);
         }
-        Query q = m_qs.getQuery(ot);
-        return new DataQueryImpl(this, m_ssn.retrieve(q));
+        return new DataQueryImpl(this, m_ssn.getDataSet(ot));
     }
 
     /**

@@ -17,35 +17,38 @@ package com.redhat.persistence;
 
 import com.redhat.persistence.common.Path;
 import java.util.Map;
+import org.apache.log4j.Logger;
 
 /**
  * Cursor
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/11/26 $
+ * @version $Revision: #5 $ $Date: 2004/03/11 $
  **/
 
 public class Cursor {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Cursor.java#4 $ by $Author: rhs $, $DateTime: 2003/11/26 21:36:25 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Cursor.java#5 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
 
-    final private Session m_ssn;
-    final private Query m_query;
-    final private Signature m_signature;
+    private static final Logger s_log = Logger.getLogger(Cursor.class);
+
+    final private DataSet m_ds;
 
     private RecordSet m_rs = null;
     private Map m_values = null;
     private long m_position = 0;
     private boolean m_closed = false;
 
-    protected Cursor(Session ssn, Query query) {
-        m_ssn = ssn;
-        m_query = query;
-        m_signature = query.getSignature();
+    protected Cursor(DataSet ds) {
+        m_ds = ds;
+    }
+
+    public DataSet getDataSet() {
+        return m_ds;
     }
 
     public Session getSession() {
-        return m_ssn;
+        return m_ds.getSession();
     }
 
     public boolean isClosed() {
@@ -58,7 +61,7 @@ public class Cursor {
 	} else {
 	    Object o = getInternal(path.getParent());
             if (o == null) { return null; }
-	    return m_ssn.get(o, Path.get(path.getName()));
+	    return getSession().get(o, Path.get(path.getName()));
 	}
     }
 
@@ -67,12 +70,16 @@ public class Cursor {
 	    throw new ClosedException(this);
 	}
 
-        if (!m_signature.isFetched(path)) {
-            throw new NotFetchedException(this, path);
-        }
-
         if (m_position <= 0) {
 	    throw new NoRowException(this);
+        }
+
+        if (!m_rs.isFetched(path)) {
+            if (s_log.isDebugEnabled()) {
+                s_log.debug("path " + path + " is not fetched"
+                            + " in signature " + m_ds.getSignature());
+            }
+            throw new NotFetchedException(this, path);
         }
 
         return getInternal(path);
@@ -104,12 +111,12 @@ public class Cursor {
 	}
 
         if (m_rs == null) {
-            m_ssn.flush();
+            getSession().flush();
             m_rs = execute();
         }
 
         if (m_rs.next()) {
-            m_values = m_rs.load(m_ssn);
+            m_values = m_rs.load(getSession());
 
             m_position++;
             return true;
@@ -121,7 +128,8 @@ public class Cursor {
     }
 
     protected RecordSet execute() {
-	return m_ssn.getEngine().execute(m_query);
+	return getSession().getEngine().execute(m_ds.getSignature(),
+                                                m_ds.getExpression());
     }
 
     public boolean isBeforeFirst() {

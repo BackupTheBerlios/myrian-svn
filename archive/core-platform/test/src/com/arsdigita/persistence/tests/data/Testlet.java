@@ -27,12 +27,12 @@ import java.util.*;
  * Testlet
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/08/15 $
+ * @version $Revision: #6 $ $Date: 2004/03/11 $
  **/
 
 public abstract class Testlet {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/Testlet.java#5 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/Testlet.java#6 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
 
     private static final Logger LOG = Logger.getLogger(Testlet.class);
 
@@ -115,6 +115,13 @@ public abstract class Testlet {
 
     protected static final void verify(DataObject data, ObjectTree tree,
                                        DataSource ds) {
+        TestTransaction.testCommitTxn
+            (SessionManager.getSession().getTransactionContext());
+        verifyRecursive(data, tree, ds);
+    }
+
+    private static final void verifyRecursive(DataObject data, ObjectTree tree,
+                                              DataSource ds) {
         if (data == null) {
             Assert.fail("Null data object for " + tree.getAbsolutePath() +
                         ", expected: " + ds.getOID(tree) +
@@ -135,7 +142,8 @@ public abstract class Testlet {
         for (Iterator it = tree.getSubtrees().iterator(); it.hasNext(); ) {
             ObjectTree subtree = (ObjectTree) it.next();
 
-            verify((DataObject) data.get(subtree.getName()), subtree, ds);
+            verifyRecursive
+                ((DataObject) data.get(subtree.getName()), subtree, ds);
         }
     }
 

@@ -15,9 +15,10 @@
 
 package com.arsdigita.persistence.oql;
 
-import com.arsdigita.persistence.*;
-import com.redhat.persistence.*;
+import com.arsdigita.persistence.PersistenceTestCase;
+import com.redhat.persistence.Signature;
 import com.redhat.persistence.common.*;
+import com.redhat.persistence.oql.*;
 import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.engine.rdbms.*;
 import com.arsdigita.db.DbHelper;
@@ -31,12 +32,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #23 $ $Date: 2004/01/29 $
+ * @version $Revision: #24 $ $Date: 2004/03/11 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#23 $ by $Author: jorris $, $DateTime: 2004/01/29 14:53:03 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#24 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);
@@ -50,38 +51,30 @@ public class QueryTest extends PersistenceTestCase {
         ObjectType type = root.getObjectType(typeName);
         assertTrue("No such type: " + typeName, type != null);
         Signature sig = new Signature(type);
-        Query query = new Query(sig, null);
 
-        if (properties == null) {
-            sig.addDefaultProperties();
-        } else {
+        if (properties != null) {
             for (int i = 0; i < properties.length; i++) {
                 Path path = Path.get(properties[i]);
                 sig.addPath(path);
             }
         }
 
-        doTest(name, query);
+        doTest(name, sig, new All(type.getQualifiedName()));
     }
 
-    private void doTest(String name, Query query) {
-        // Test oracle specific syntax.
-        OracleWriter ow = new OracleWriter() {
-            public RDBMSEngine getEngine() {
-                return QueryTest.this.getEngine();
-            }
-        };
-        ow.write(query);
-        String oraResult = compare("oracle-se/" + name + ".op", ow.getSQL());
+    private void doTest(String name, Signature sig, Expression expr) {
+        Query query = sig.makeQuery(expr);
+        String sql =
+            query.generate(getSession().getMetadataRoot().getRoot()).getSQL();
 
-        // Test pg syntax.
-        PostgresWriter pw = new PostgresWriter() {
-            public RDBMSEngine getEngine() {
-                return QueryTest.this.getEngine();
-            }
-        };
-        pw.write(query);
-        String pgResult = compare("postgres/" + name + ".op", pw.getSQL());
+        // XXX need to test db specific syntaxes
+
+        // Test oracle specific syntax.
+        String oraQuery = sql;
+        String oraResult = compare("oracle-se/" + name + ".op", oraQuery);
+
+        String pgQuery = sql;
+        String pgResult = compare("postgres/" + name + ".op", pgQuery);
 
         if (oraResult != null || pgResult != null) {
             fail("Query:\n" + query + "\n\n" + oraResult + "\n\n" + pgResult);
@@ -271,28 +264,35 @@ public class QueryTest extends PersistenceTestCase {
     private static final int CONTAINS = 0;
     private static final int EQUALS = 1;
 
-    private Condition condition(int cond, Path p1, Path p2) {
-        switch (cond) {
-        case CONTAINS:
-            return Condition.contains(p1, p2);
-        case EQUALS:
-            return Condition.equals(p1, p2);
-        default:
-            throw new IllegalStateException("unknown condition: " + cond);
-        }
-    }
-
     private void doConditionTest(String from, String assn, String to,
                                  int cond) {
         Root root = getSession().getMetadataRoot().getRoot();
-        ObjectType FROM = root.getObjectType(from);
-        ObjectType TO = root.getObjectType(to);
-        Signature sig = new Signature(TO);
-        Parameter start = new Parameter(FROM, Path.get("start"));
-        sig.addParameter(start);
-        Query q = new Query(sig, condition(cond, Path.add(start.getPath(),
-                                                          assn), null));
-        doTest(CONDITIONS[cond] + "-" + assn, q);
+        Signature sig = new Signature(root.getObjectType(to));
+
+        // XXX: should be bind variable of type from
+        Literal start = new  Literal(new Object());
+        Expression left = new Get(start, assn);
+
+        Expression expr = new Define(new All(to), "right");
+        Expression filt;
+        switch (cond) {
+        case CONTAINS:
+            left = new Define(left, "left");
+            filt = new Exists
+                (new Filter(left, new Equals
+                            (new Variable("left"), new Variable("right"))));
+            break;
+        case EQUALS:
+            filt = new Equals(left, new Variable("right"));
+            break;
+        default:
+            throw new IllegalStateException("unknown condition: " + cond);
+        }
+
+        expr = new Filter(expr, filt);
+        expr = new Get(expr, "right");
+
+        doTest(CONDITIONS[cond] + "-" + assn, sig, expr);
     }
 
     /**

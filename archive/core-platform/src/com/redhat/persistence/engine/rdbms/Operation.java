@@ -16,7 +16,6 @@
 package com.redhat.persistence.engine.rdbms;
 
 import com.redhat.persistence.Event;
-import com.redhat.persistence.Query;
 import com.redhat.persistence.common.Path;
 
 import java.util.ArrayList;
@@ -33,12 +32,12 @@ import org.apache.log4j.Logger;
  * Operation
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/11/17 $
+ * @version $Revision: #8 $ $Date: 2004/03/11 $
  **/
 
 abstract class Operation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Operation.java#7 $ by $Author: vadim $, $DateTime: 2003/11/17 17:03:49 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Operation.java#8 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
 
     private static final Logger LOG = Logger.getLogger(Operation.class);
 
@@ -49,7 +48,6 @@ abstract class Operation {
 
     // For profiling
     private ArrayList m_events = null;
-    private Query m_query = null;
 
     protected Operation(RDBMSEngine engine, Environment env) {
         m_engine = engine;
@@ -120,14 +118,6 @@ abstract class Operation {
         } else {
             return m_events;
         }
-    }
-
-    void setQuery(Query query) {
-        m_query = query;
-    }
-
-    Query getQuery() {
-        return m_query;
     }
 
     abstract void write(SQLWriter w);

@@ -15,13 +15,14 @@
 
 package com.redhat.persistence.engine.rdbms;
 
+import com.redhat.persistence.DataSet;
 import com.redhat.persistence.Engine;
 import com.redhat.persistence.Event;
 import com.redhat.persistence.PropertyMap;
-import com.redhat.persistence.Query;
 import com.redhat.persistence.QuerySource;
 import com.redhat.persistence.RecordSet;
 import com.redhat.persistence.SetEvent;
+import com.redhat.persistence.Signature;
 import com.redhat.persistence.SQLWriterException;
 import com.redhat.persistence.common.CompoundKey;
 import com.redhat.persistence.common.Path;
@@ -31,6 +32,11 @@ import com.redhat.persistence.metadata.Property;
 import com.redhat.persistence.metadata.Root;
 import com.redhat.persistence.metadata.SQLBlock;
 import com.redhat.persistence.metadata.Table;
+import com.redhat.persistence.oql.Define;
+import com.redhat.persistence.oql.Expression;
+import com.redhat.persistence.oql.Query;
+import com.redhat.persistence.oql.Variable;
+import com.redhat.persistence.oql.Size;
 import com.arsdigita.util.UncheckedWrapperException;
 import com.arsdigita.util.WrappedError;
 import com.arsdigita.webdevsupport.WebDevSupport;
@@ -56,12 +62,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #15 $ $Date: 2004/02/12 $
+ * @version $Revision: #16 $ $Date: 2004/03/11 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#15 $ by $Author: vadim $, $DateTime: 2004/02/12 15:53:46 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#16 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -249,31 +255,23 @@ public class RDBMSEngine extends Engine {
         }
     }
 
-    public RecordSet execute(Query query) {
-	return execute(query, null);
-    }
-
-    public RecordSet execute(Query query, SQLBlock block) {
+    public RecordSet execute(Signature sig, Expression expr) {
         if (LOG.isInfoEnabled()) {
-            LOG.info("Executing " + query);
+            LOG.info("Executing " + expr);
         }
-        QGen qg = new QGen(this, query, block);
-        Select sel = qg.generate();
-        return new RDBMSRecordSet(query.getSignature(), this, execute(sel),
-                                  qg.getMappings(sel));
+
+        Select sel = new Select(this, sig, expr);
+        Map result = new HashMap();
+        return new RDBMSRecordSet(sig, this, execute(sel));
     }
 
-    public long size(Query query) {
-        return size(query, null);
-    }
-
-    public long size(Query query, SQLBlock block) {
+    public long size(Expression expr) {
         if (LOG.isInfoEnabled()) {
-            LOG.info("Executing size " + query);
+            LOG.info("Executing size " + expr);
         }
-        QGen qg = new QGen(this, query, block);
-        Select sel = qg.generate();
-        sel.setCount(true);
+
+        Query q = new Query(new Size(expr));
+        Select sel = new Select(this, q);
         ResultCycle rc = execute(sel);
         if (rc == null) {
             throw new IllegalStateException
@@ -401,9 +399,10 @@ public class RDBMSEngine extends Engine {
                 SetEvent e = (SetEvent) m_mutations.get(i);
                 int jdbcType = ((Integer) m_mutationTypes.get(i)).intValue();
                 Property prop = e.getProperty();
+                DataSet ds = getSession().getDataSet(e.getObject(), prop);
                 QuerySource qs = getSession().getQuerySource();
                 RDBMSRecordSet rs = (RDBMSRecordSet) execute
-                    (qs.getQuery(e.getObject(), prop));
+                    (ds.getSignature(), ds.getExpression());
                 Adapter ad = prop.getRoot().getAdapter(prop.getType());
                 try {
                     if (rs.next()) {
@@ -450,7 +449,6 @@ public class RDBMSEngine extends Engine {
                 logQueryDetails(Priority.INFO, sql, w, op);
             }
 
-
             if (sql.equals("")) {
                 return null;
             }
@@ -460,7 +458,10 @@ public class RDBMSEngine extends Engine {
             StatementLifecycle cycle = null;
             if (m_profiler != null) {
                 RDBMSStatement stmt = new RDBMSStatement(sql);
-                stmt.setQuery(op.getQuery());
+                if (op instanceof Select) {
+                    // XXX: better way of profiling
+                    stmt.setSignature(((Select) op).getSignature());
+                }
                 for (Iterator it = op.getEvents().iterator(); it.hasNext(); ) {
                     stmt.addEvent((Event) it.next());
                 }
@@ -513,6 +514,9 @@ public class RDBMSEngine extends Engine {
                 if (cycle != null) { cycle.endExecute(e); }
                 logQueryDetails(Priority.ERROR, sql, w, op, e);
                 throw new RDBMSException(e.getMessage()) {};
+            } catch (RuntimeException e) {
+                logQueryDetails(Priority.ERROR, sql, w, op, e);
+                throw e;
             }
         } finally {
             w.clear();
