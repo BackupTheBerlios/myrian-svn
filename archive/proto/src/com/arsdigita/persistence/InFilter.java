@@ -9,12 +9,12 @@ import java.util.*;
  * InFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/04/09 $
+ * @version $Revision: #2 $ $Date: 2003/04/23 $
  **/
 
 class InFilter extends FilterImpl implements Filter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/InFilter.java#1 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/InFilter.java#2 $ by $Author: ashah $, $DateTime: 2003/04/23 10:50:52 $";
 
     private String m_prop;
     private String m_subProp;
@@ -39,7 +39,7 @@ class InFilter extends FilterImpl implements Filter {
 	if (m_subProp == null) {
 	    Iterator paths = block.getPaths().iterator();
 	    if (paths.hasNext()) {
-		subProp = block.getMapping((Path) paths.next());
+		subProp = (Path) paths.next();
 	    } else {
 		return m_prop + " in (" + m_query + ")";
 	    }
@@ -58,7 +58,7 @@ class InFilter extends FilterImpl implements Filter {
 	}
 
 	return "exists ( select \"" + subcol.getPath() +
-	    "\" from (" + m_query + ") insub where \"insub\".\"" +
+	    "\" from (" + m_query + ") \"insub\" where \"insub\".\"" +
 	    subcol.getPath() + "\" = " + m_prop + ")";
     }
 
