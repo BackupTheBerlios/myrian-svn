@@ -34,9 +34,9 @@ import org.apache.log4j.Logger;
  */
 public class URLRewriter {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/URLRewriter.java#9 $" +
-        "$Author: vadim $" +
-        "$DateTime: 2002/11/01 09:30:48 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/URLRewriter.java#10 $" +
+        "$Author: justin $" +
+        "$DateTime: 2002/11/21 00:42:37 $";
 
     private static final Logger s_log =
         Logger.getLogger(URLRewriter.class);
@@ -113,22 +113,7 @@ public class URLRewriter {
             s_log.debug("encodeRedirectURL: before: " + url);
         }
 
-        if (url.startsWith("/")) {
-            String context = (String) req.getAttribute
-                (URL.ORIGINAL_CONTEXT_PATH_ATTRIBUTE);
-            String servlet = (String) req.getAttribute
-                (URL.ORIGINAL_SERVLET_PATH_ATTRIBUTE);
-
-            String prefix = "";
-
-            if (context != null && servlet != null) {
-                prefix = context + servlet;
-            }
-
-            url = resp.encodeRedirectURL(encodeParams(req, prefix + url));
-        } else {
-            url = resp.encodeRedirectURL(encodeParams(req, url));
-        }
+        url = resp.encodeRedirectURL(encodeParams(req, url));
 
         if (s_log.isDebugEnabled()) {
             s_log.debug("encodeRedirectURL:  after: " + url);
@@ -164,22 +149,7 @@ public class URLRewriter {
             s_log.debug("encodeURL: before: " + url);
         }
 
-        if (url.startsWith("/")) {
-            String context = (String) req.getAttribute
-                (URL.ORIGINAL_CONTEXT_PATH_ATTRIBUTE);
-            String servlet = (String) req.getAttribute
-                (URL.ORIGINAL_SERVLET_PATH_ATTRIBUTE);
-
-            String prefix = "";
-
-            if (context != null && servlet != null) {
-                prefix = context + servlet;
-            }
-
-            url = resp.encodeURL(encodeParams(req, prefix + url));
-        } else {
-            url = resp.encodeURL(encodeParams(req, url));
-        }
+        url = resp.encodeURL(encodeParams(req, url));
 
         if (s_log.isDebugEnabled()) {
             s_log.debug("encodeURL:  after: " + url);

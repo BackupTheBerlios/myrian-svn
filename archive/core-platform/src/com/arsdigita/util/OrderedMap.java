@@ -28,12 +28,11 @@ import org.apache.log4j.Logger;
  */
 public class OrderedMap extends TreeMap {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/OrderedMap.java#6 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/OrderedMap.java#7 $" +
         "$Author: justin $" +
-        "$DateTime: 2002/11/14 16:34:00 $";
+        "$DateTime: 2002/11/21 00:42:37 $";
 
-    private static final Logger s_log = Logger.getLogger
-        (OrderedMap.class.getName());
+    private static final Logger s_log = Logger.getLogger(OrderedMap.class);
 
     private OrderingComparator m_comparator;
 
@@ -47,7 +46,7 @@ public class OrderedMap extends TreeMap {
      * Calls to put define the order in which the OrderedMap returns
      * its contents in calls to entrySet().iterator();
      */
-    public Object put(Object key, Object value) {
+    public Object put(final Object key, final Object value) {
         if (s_log.isDebugEnabled()) {
             s_log.debug("Adding a new map entry: " + key + " => " + value);
         }
@@ -56,9 +55,17 @@ public class OrderedMap extends TreeMap {
 
         return super.put(key, value);
     }
+
+    public Object clone() {
+        final OrderedMap result = (OrderedMap) super.clone();
+
+        result.m_comparator = (OrderingComparator) m_comparator.clone();
+
+        return result;
+    }
 }
 
-class OrderingComparator implements Comparator {
+class OrderingComparator implements Comparator, Cloneable {
     private HashMap m_sortKeyMap = new HashMap();
     private long m_currSortKey = 0;
 
@@ -74,5 +81,20 @@ class OrderingComparator implements Comparator {
 
     void keep(Object key) {
         m_sortKeyMap.put(key, new Long(m_currSortKey++));
+    }
+
+    protected Object clone() {
+        try {
+            final OrderingComparator result =
+                (OrderingComparator) super.clone();
+
+            result.m_sortKeyMap = (HashMap) m_sortKeyMap.clone();
+
+            return result;
+        } catch (CloneNotSupportedException cnse) {
+            // I don't think we can get here.
+
+            return null;
+        }
     }
 }
