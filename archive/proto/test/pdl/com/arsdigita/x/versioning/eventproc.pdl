@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/test/pdl/com/arsdigita/x/versioning/eventproc.pdl#9 $ 
-// $DateTime: 2003/05/12 12:30:38 $
+// $Id: //core-platform/proto/test/pdl/com/arsdigita/x/versioning/eventproc.pdl#10 $ 
+// $DateTime: 2003/05/16 13:59:22 $
 
 model x.version.events.test01;
 
@@ -60,20 +60,41 @@ object type RT1 {
 }
 
 object type UVCT1 {
-        BigInteger[1..1] id = te_uvct1.id INTEGER;
-        String[0..1] name = te_uvct1.name VARCHAR;
+    BigInteger[1..1] id = te_uvct1.id INTEGER;
+    String[0..1] name = te_uvct1.name VARCHAR;
 
-        object key(id);
+    object key(id);
 }
 
 object type UVCT2 {
-        BigInteger[1..1] id = te_uvct2.id INTEGER;
-        String[0..1] name = te_uvct2.name VARCHAR;
+    BigInteger[1..1] id = te_uvct2.id INTEGER;
+    String[0..1] name = te_uvct2.name VARCHAR;
 
-        object key(id);
+    object key(id);
 }
 
 association {
     unversioned component UVCT2[0..n] uvct2s = join te_vt2.id to te_uvct2.composite_id;
     VT2[0..1] vt2 = join te_uvct2.composite_id to te_vt2.id;
+}
+
+versioned object type VT4 {
+    BigInteger[1..1] id         = te_vt4.id INTEGER;
+
+    BigDecimal[0..1] bigDecimal = te_vt4.j_big_decimal INTEGER;
+    BigInteger[0..1] bigInteger = te_vt4.j_big_integer INTEGER;
+    Blob[0..1] blob             = te_vt4.j_blob BLOB;
+    Boolean[0..1] boolean       = te_vt4.j_boolean CHAR(1);
+    Byte[0..1] byte             = te_vt4.j_byte INTEGER;
+    Character[0..1] character   = te_vt4.j_character CHAR(1);
+    Date[0..1] date             = te_vt4.j_date DATE;
+    Double[0..1] double         = te_vt4.j_double NUMERIC;
+    Float[0..1] float           = te_vt4.j_float FLOAT;
+    Integer[0..1] integer       = te_vt4.j_integer INTEGER;
+    Long[0..1] long             = te_vt4.j_long INTEGER;
+    Short[0..1] short           = te_vt4.j_short INTEGER;
+    String[0..1] clob           = te_vt4.j_clob CLOB;
+    String[0..1] string         = te_vt4.j_string VARCHAR;
+
+    object key(id);
 }
