@@ -137,6 +137,24 @@
   </test>
 
   <test>
+    <query subselects="0" joins="1" outers="1">
+      query(all(test.Node).meIfHasParent, id = id, name = name)
+    </query>
+    <results>
+      <row id="null" name="null"/>
+      <row id="31" name="Thirty One"/>
+      <row id="32" name="Thirty Two"/>
+      <row id="33" name="Thirty Three"/>
+      <row id="34" name="Thirty Four"/>
+      <row id="35" name="Thirty Five"/>
+      <row id="36" name="Thirty Six"/>
+      <row id="37" name="Thirty Seven"/>
+      <row id="38" name="Thirty Eight"/>
+      <row id="39" name="Thirty Nine"/>
+    </results>
+  </test>
+
+  <test>
     <query subselects="0" joins="0">
       query(all(test.Node), id = id, name = name)
     </query>
@@ -695,7 +713,7 @@
   </test>
 
   <test>
-    <query subselects="0">
+    <query subselects="0" joins="2" outers="0">
       query(join(a = all(test.A), join(l = all(test.Link),
                                             b = all(test.B), l.b == b),
                       filter(a = all(test.A),
@@ -894,7 +912,7 @@
       query(filter(all(test.Pair1), exists(p2)).p2, id = id, p1\.id = p1.id)
     </query>
 
-    <query fetched="id,p1.id,p1.name" subselects="0" joins="1" outers="1">
+    <query fetched="id,p1.id,p1.name" subselects="0" joins="2" outers="1">
       query(all(test.Pair1).p2, id = id, p1\.id = p1.id, p1\.name = p1.name)
     </query>
     <query fetched="id,p1.id,p1.name" subselects="0" joins="1" outers="0">
@@ -910,7 +928,7 @@
             p1\.id = p1.id)
     </query>
 
-    <query fetched="id,name,p1.id,p1.name" subselects="0" joins="1" outers="1">
+    <query fetched="id,name,p1.id,p1.name" subselects="0" joins="2" outers="1">
       query(all(test.Pair1).p2, id = id, name = name, p1\.id = p1.id,
             p1\.name = p1.name)
     </query>

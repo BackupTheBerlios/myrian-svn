@@ -96,6 +96,21 @@ object type Node class com.redhat.persistence.PropertyMap
     Node parent = join st.parent_id to st.st_id;
     Node[0..n] children = qualias { filter(all(test.Node), parent == this) };
 
+    // XXX: this definition is actually different from the uncommented
+    // one and has the effect of added a parent is not null filter
+    // when doing a get. This is because this resolves to the row in
+    // the actual containing query. This may actually be a case where
+    // the "this" variable should actually resolve to a subquery
+    // rather than a column reference. This could be done for all such
+    // variables although this would put more stress on the optimizer,
+    // or it may make sense to it only for the special this frame.
+    //
+    // Node[0..1] meIfHasParent = qualias { filter(this, exists(parent)) };
+
+    Node[0..1] meIfHasParent = qualias {
+        filter(n = all(test.Node), this == n and exists(parent))
+    };
+
     object key(id);
 }
 
