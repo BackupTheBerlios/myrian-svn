@@ -25,14 +25,14 @@ import org.apache.log4j.Logger;
  *
  *
  * @author David Dao
- * @version $Revision: #5 $ $Date: 2003/08/06 $
+ * @version $Revision: #6 $ $Date: 2003/08/07 $
  * @since 4.5
  *
  */
 
 public class J2EEConnectionManagerImpl implements DatabaseConnectionPool {
 
-    public static final String versionId = "$Author: bche $ - $Date: 2003/08/06 $ $Id: //core-platform/proto/src/com/arsdigita/db/J2EEConnectionManagerImpl.java#5 $";
+    public static final String versionId = "$Author: bche $ - $Date: 2003/08/07 $ $Id: //core-platform/proto/src/com/arsdigita/db/J2EEConnectionManagerImpl.java#6 $";
 
     private static final Logger cat = Logger.getLogger(J2EEConnectionManagerImpl.class.getName());
 
@@ -83,6 +83,11 @@ public class J2EEConnectionManagerImpl implements DatabaseConnectionPool {
     public void returnToPool(java.sql.Connection conn) {
          cat.warn("Ignoring return to pool as this is not a pooled driver");                   
     }
+    
+    public boolean containsConnection(java.sql.Connection conn) {
+        cat.warn("returning false; this is not a pooled connection");   
+        return false;
+    }        
 
     public void setConnectionPoolSize(int num) throws java.sql.SQLException {
         cat.warn("Ignoring set connection pool size " + num + "; this is not a pooled driver.");

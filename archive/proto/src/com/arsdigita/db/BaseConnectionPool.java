@@ -29,7 +29,7 @@ import java.util.Iterator;
  * Base connection pooling class
  *
  * @author Bob Donald
- * @version $Id: //core-platform/proto/src/com/arsdigita/db/BaseConnectionPool.java#5 $ $DateTime: 2003/08/06 14:16:04 $
+ * @version $Id: //core-platform/proto/src/com/arsdigita/db/BaseConnectionPool.java#6 $ $DateTime: 2003/08/07 18:03:02 $
  * @since
  *
  */
@@ -37,8 +37,8 @@ import java.util.Iterator;
 abstract public class BaseConnectionPool implements DatabaseConnectionPool {
 
     public static final String versionId = "$Author: bche $ " +
-        "- $Date: 2003/08/06 $ " + 
-        "$Id: //core-platform/proto/src/com/arsdigita/db/BaseConnectionPool.java#5 $";
+        "- $Date: 2003/08/07 $ " + 
+        "$Id: //core-platform/proto/src/com/arsdigita/db/BaseConnectionPool.java#6 $";
 
     private static final Logger cat = Logger.getLogger(BaseConnectionPool.class.getName());
 
@@ -156,6 +156,17 @@ abstract public class BaseConnectionPool implements DatabaseConnectionPool {
                          " remaining.");
             }
         }
+    }
+    
+    public boolean containsConnection(java.sql.Connection conn) {
+        boolean bReturn = false;
+        if (m_availConnections.contains(conn)) {
+            bReturn = true;
+        } else if (m_usedConnections.contains(conn)) {
+            bReturn = true;
+        }
+        
+        return bReturn;
     }
 
     /**

@@ -19,14 +19,14 @@ package com.arsdigita.db;
  *
  *
  * @author David Dao
- * @version $Revision: #5 $ $Date: 2003/08/06 $
+ * @version $Revision: #6 $ $Date: 2003/08/07 $
  * @since 4.5
  *
  */
 
 public interface DatabaseConnectionPool {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/DatabaseConnectionPool.java#5 $ by $Author: bche $, $DateTime: 2003/08/06 17:35:46 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/DatabaseConnectionPool.java#6 $ by $Author: bche $, $DateTime: 2003/08/07 18:03:02 $";
 
     public java.sql.Connection getConnection() throws java.sql.SQLException;
 
@@ -85,4 +85,12 @@ public interface DatabaseConnectionPool {
      * @param conn the connection to return to the pool
      */        
     public void returnToPool( java.sql.Connection conn );        
+    
+    /**
+     * Returns true if this pool contains the connection, conn
+     * 
+     * @param conn the connection to test
+     * @return true if this pool contains the connection conn
+     */
+    public boolean containsConnection(java.sql.Connection conn);
 }
