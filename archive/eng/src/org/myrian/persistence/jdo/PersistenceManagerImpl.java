@@ -104,6 +104,12 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
         return smi;
     }
 
+    private ObjectType getGenerator(ObjectType type) {
+        Root root = m_ssn.getRoot();
+        return root.getObjectType
+            (type.getBasetype().getQualifiedName() + ID_GEN);
+    }
+
     private PropertyMap pmap(PersistenceCapable pc, ObjectType type) {
         if (hasStateManager(pc)) {
             return getStateManager(pc).getPropertyMap();
@@ -112,8 +118,7 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
         PropertyMap pmap = new PropertyMap(type);
         Class cls = pc.getClass();
 
-        Root root = m_ssn.getRoot();
-        ObjectType gen = root.getObjectType(type.getQualifiedName() + ID_GEN);
+        ObjectType gen = getGenerator(type);
         if (gen != null) {
             DataSet ds = m_ssn.getDataSet(gen);
             Cursor c = ds.getCursor();
