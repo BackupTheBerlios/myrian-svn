@@ -31,12 +31,12 @@ import java.sql.SQLException;
  * (normally this is called via the DB Initializer).
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #4 $
+ * @version $Revision: #5 $
  * @since 4.6
  */
 public class SQLExceptionHandler {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/SQLExceptionHandler.java#4 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/SQLExceptionHandler.java#5 $";
 
     private static String s_exceptionHandlerName = "com.arsdigita.db.oracle.OracleDbExceptionHandlerImpl";
 
@@ -73,7 +73,15 @@ public class SQLExceptionHandler {
      */
     public static void throwSQLException(SQLException e) throws SQLException {
         Assert.assertNotNull(s_handler, "DB Specific Exception Handler Class");
-        s_handler.throwSQLException(e);
+        try {
+            s_handler.throwSQLException(e);
+        } catch (DbNotAvailableException dbe) {
+            ConnectionManager cm = ConnectionManager.getInstance();
+            if (cm != null) {
+                cm.disconnect();
+            }
+            throw dbe;
+        }
     }
 
     /**
@@ -85,6 +93,14 @@ public class SQLExceptionHandler {
      */
     public static void throwSQLException(String msg) throws SQLException {
         Assert.assertNotNull(s_handler, "DB Specific Exception Handler Class");
-        s_handler.throwSQLException(msg);
+        try {
+            s_handler.throwSQLException(msg);
+        } catch (DbNotAvailableException dbe) {
+            ConnectionManager cm = ConnectionManager.getInstance();
+            if (cm != null) {
+                cm.disconnect();
+            }
+            throw dbe;
+        }
     }
 }

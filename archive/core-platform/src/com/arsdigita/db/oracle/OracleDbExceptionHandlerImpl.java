@@ -30,19 +30,27 @@ import java.sql.PreparedStatement;
  * Class for processing of Oracle DB Exceptions.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #3 $
+ * @version $Revision: #4 $
  * @since 4.6
  */
 public class OracleDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleDbExceptionHandlerImpl.java#3 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleDbExceptionHandlerImpl.java#4 $";
 
     static {
         // lots of stuff can keep us away from the DB...
-        errors.put("ORA-01034", com.arsdigita.db.DbNotAvailableException.class);
-        errors.put("No suitable driver", com.arsdigita.db.DbNotAvailableException.class);
-        errors.put("Invalid Oracle URL specified", com.arsdigita.db.DbNotAvailableException.class);
-        errors.put("ORA-12154", com.arsdigita.db.DbNotAvailableException.class);
+        errors.put("ORA-01034",
+                   com.arsdigita.db.DbNotAvailableException.class);
+        errors.put("No suitable driver",
+                   com.arsdigita.db.DbNotAvailableException.class);
+        errors.put("Invalid Oracle URL specified",
+                   com.arsdigita.db.DbNotAvailableException.class);
+        errors.put("ORA-12154",
+                   com.arsdigita.db.DbNotAvailableException.class);
+        errors.put("ORA-03114",
+                   com.arsdigita.db.DbNotAvailableException.class);
+        errors.put("not connected",
+                   com.arsdigita.db.DbNotAvailableException.class);
 
         // this one is pretty specific, thankfully.
         errors.put("ORA-00001", com.arsdigita.db.UniqueConstraintException.class);

@@ -25,12 +25,12 @@ import com.arsdigita.db.oracle.*;
 public class Initializer
     implements com.arsdigita.initializer.Initializer {
 
-    private static final Logger s_log =
+    private static final Logger LOG =
         Logger.getLogger(Initializer.class);
 
     private Configuration m_conf = new Configuration();
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#8 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#9 $ by $Author: rhs $, $DateTime: 2002/09/23 17:23:42 $";
 
     public static final String JDBC_URL = "jdbcUrl";
     public static final String DB_USERNAME = "dbUsername";
@@ -80,7 +80,7 @@ public class Initializer
     }
 
     public void startup() {
-        s_log.warn("Database Initializer starting...");
+        LOG.warn("Database Initializer starting...");
 
         String jdbcUrl = (String)m_conf.getParameter(JDBC_URL);
         int database = DbHelper.getDatabaseFromURL(jdbcUrl);
@@ -89,13 +89,11 @@ public class Initializer
 
         try {
             if (database == DbHelper.DB_ORACLE) {
-                SQLExceptionHandler.setDbExceptionHandlerImplName(
-                                                                  OracleDbExceptionHandlerImpl.class.getName()
-                                                                  );
+                SQLExceptionHandler.setDbExceptionHandlerImplName
+                    (OracleDbExceptionHandlerImpl.class.getName());
             } else if (database == DbHelper.DB_POSTGRES) {
-                SQLExceptionHandler.setDbExceptionHandlerImplName(
-                                                                  PostgresDbExceptionHandlerImpl.class.getName()
-                                                                  );
+                SQLExceptionHandler.setDbExceptionHandlerImplName
+                    (PostgresDbExceptionHandlerImpl.class.getName());
             } else {
                 DbHelper.unsupportedDatabaseError("SQL Exception Handler");
             }
@@ -119,76 +117,73 @@ public class Initializer
             DbHelper.unsupportedDatabaseError("Sequences");
         }
 
+        String dbUsername = (String)m_conf.getParameter(DB_USERNAME);
+        String dbPassword = (String)m_conf.getParameter(DB_PASSWORD);
+
+        ConnectionManager cm =
+            new ConnectionManager(jdbcUrl, dbUsername, dbPassword);
+
 
         if (database == DbHelper.DB_ORACLE) {
-            ConnectionManager.setDatabaseConnectionPoolName(
-                                                            OracleConnectionPoolImpl.class.getName()
-                                                            );
+            cm.setDatabaseConnectionPoolName(OracleConnectionPoolImpl.class);
         } else if (database == DbHelper.DB_POSTGRES) {
-            ConnectionManager.setDatabaseConnectionPoolName(
-                                                            PostgresConnectionPoolImpl.class.getName()
-                                                            );
+            cm.setDatabaseConnectionPoolName(PostgresConnectionPoolImpl.class);
         } else {
             DbHelper.unsupportedDatabaseError("Connection Pool");
         }
 
 
         if (DbHelper.getDatabase() == DbHelper.DB_ORACLE) {
-            String useFixForOracle901 = (String) m_conf.getParameter(
-                                                                     USE_FIX_FOR_ORACLE_901
-                                                                     );
+            String useFixForOracle901 =
+                (String) m_conf.getParameter(USE_FIX_FOR_ORACLE_901);
 
             if (null != useFixForOracle901 &&
                 useFixForOracle901.equals("true")) {
-                com.arsdigita.db.oracle.OracleConnectionPoolImpl.setUseFixFor901(true);
+                com.arsdigita.db.oracle.OracleConnectionPoolImpl
+                    .setUseFixFor901(true);
             }
         }
 
         Integer retryLimit =
-            (Integer)m_conf.getParameter(CONNECTION_RETRY_LIMIT);
+            (Integer) m_conf.getParameter(CONNECTION_RETRY_LIMIT);
         if (retryLimit == null) {
             retryLimit = new Integer(0);
         }
 
         Integer retrySleep =
-            (Integer)m_conf.getParameter(CONNECTION_RETRY_SLEEP);
+            (Integer) m_conf.getParameter(CONNECTION_RETRY_SLEEP);
         if (retrySleep == null) {
             retrySleep = new Integer(100);
         }
 
         Integer maxConnections =
-            (Integer)m_conf.getParameter(CONNECTION_POOL_SIZE);
+            (Integer) m_conf.getParameter(CONNECTION_POOL_SIZE);
         if (maxConnections == null) {
             maxConnections = new Integer(8);
         }
 
-        ConnectionManager.setRetryLimit(retryLimit.intValue());
-        ConnectionManager.setRetrySleep(retrySleep.intValue());
-        ConnectionManager.setConnectionPoolSize(maxConnections.intValue());
+        cm.setRetryLimit(retryLimit.intValue());
+        cm.setRetrySleep(retrySleep.intValue());
+        cm.setConnectionPoolSize(maxConnections.intValue());
 
-        s_log.info("Setting ConnectionManager default connection info...");
+        LOG.info("Setting ConnectionManager default connection info...");
 
-        String dbUsername = (String)m_conf.getParameter(DB_USERNAME);
-        String dbPassword = (String)m_conf.getParameter(DB_PASSWORD);
         try {
-            ConnectionManager.setDefaultConnectionInfo(
-                                                       jdbcUrl, dbUsername, dbPassword
-                                                       );
+            cm.connect();
         } catch (java.sql.SQLException e) {
-            throw new InitializationException(
-                                              "SQLException initializing " +
-                                              "dbapi " + e.getMessage());
+            throw new InitializationException
+                ("SQLException initializing " + "dbapi " + e.getMessage());
         }
 
         String driverSpecificParam1 =
-            (String)m_conf.getParameter(DRIVER_SPECIFIC_PARAM1);
+            (String) m_conf.getParameter(DRIVER_SPECIFIC_PARAM1);
         if (driverSpecificParam1 != null) {
-            ConnectionManager.setDriverSpecificParameter(
-                                                         "param1", driverSpecificParam1);
+            cm.setDriverSpecificParameter("param1", driverSpecificParam1);
         }
 
-        s_log.warn("Database initializer finished.");
+        ConnectionManager.setInstance(cm);
 
+        LOG.warn("Database initializer finished.");
     }
 
     public void shutdown() {

@@ -15,6 +15,7 @@
 
 package com.arsdigita.db;
 
+import com.arsdigita.util.*;
 import java.sql.SQLException;
 import org.apache.log4j.Logger;
 
@@ -23,95 +24,118 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/09/23 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: dennis $ - $Date: 2002/08/14 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#4 $";
+    public static final String versionId = "$Author: rhs $ - $Date: 2002/09/23 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#5 $";
 
-    private static DatabaseConnectionPool s_pool = null;
-    private static String s_poolName =
-        "com.arsdigita.db.oracle.OracleConnectionPoolImpl";
+    private static final Logger LOG =
+        Logger.getLogger(ConnectionManager.class);
+
+    private static ConnectionManager MANAGER;
+
+    static ConnectionManager getInstance() {
+        return MANAGER;
+    }
+
+    static void setInstance(ConnectionManager cm) {
+        MANAGER = cm;
+    }
+
+
+    private DatabaseConnectionPool m_pool = null;
+    private Class m_poolImpl =
+        com.arsdigita.db.oracle.OracleConnectionPoolImpl.class;
 
     // # of times a getConnection will retry if connection is null
     // set by connectionRetryLimit in enterprise.init
-    private static int s_retryLimit = 0;
+    private int m_retryLimit = 0;
 
     // # of milliseconds thread will sleep between retries.
     // set by connectionRetrySleep in enterprise.init
-    private static long s_retrySleep = 100;
+    private long m_retrySleep = 100;
 
     // max # of connections to pool
     // set by connectionPoolSize in enterprise.init
-    private static int s_connectionPoolSize = 8;
+    private int m_connectionPoolSize = 8;
 
-    private static ThreadLocal s_currentThreadConnection = new ThreadLocal();
+    // DB Connection info
+    private String m_url;
+    private String m_username;
+    private String m_password;
 
-    private static final Logger cat = Logger.getLogger(com.arsdigita.db.ConnectionManager.class.getName());
 
-    static void setDefaultConnectionInfo(String url,
-                                         String username,
-                                         String password)
-        throws java.sql.SQLException {
+    ConnectionManager(String url, String username, String password) {
+        m_url = url;
+        m_username = username;
+        m_password = password;
+    }
 
-        synchronized (ConnectionManager.class) {
-
-            // check to see if pool is already intialized
-            // for this url, username, and password.
-
-            if (s_pool != null) {
-                if ( s_pool.getUrl().equals(url) &&
-                     s_pool.getUserName().equals(username) &&
-                     s_pool.getPassword().equals(password) ) {
-                    // pool already intialized.
-                    return;
-                } else {
-                    s_pool.freeConnections();
-                }
-            }
-
-            // reset the pool
-            s_pool = null;
-
-            try {
-                s_pool = (DatabaseConnectionPool)Class.forName(s_poolName)
-                    .newInstance();
-            } catch (Exception e) {
-                //ClassNotFoundException, InstantiationException,
-                //IllegalAccessException
-                cat.error("Unable to initialize DB pool", e);
-                throw new DbException(e);
-            }
-
-            cat.info("Setting connection info to " + url + ", " +
-                     username + ", " + password);
-            s_pool.setConnectionInfo(url, username, password);
-            cat.info("Setting connection pool size to " + s_connectionPoolSize);
-            s_pool.setConnectionPoolSize(s_connectionPoolSize);
+    synchronized void disconnect() {
+        if (m_pool != null) {
+            CURRENT_THREAD_CONNECTION = new ThreadLocal();
+            m_pool.freeConnections();
+            m_pool = null;
         }
     }
 
-    protected static synchronized void setDatabaseConnectionPoolName(String implName) {
-        s_poolName = implName;
+    synchronized void connect() throws java.sql.SQLException {
+        // check to see if pool is already intialized
+        // for this url, username, and password.
+
+        if (m_pool != null) {
+            if ( m_pool.getUrl().equals(m_url) &&
+                 m_pool.getUserName().equals(m_username) &&
+                 m_pool.getPassword().equals(m_password) ) {
+                // pool already intialized.
+                return;
+            } else {
+                m_pool.freeConnections();
+            }
+        }
+
+        // reset the pool
+        m_pool = null;
+
+        try {
+            m_pool = (DatabaseConnectionPool) m_poolImpl.newInstance();
+        } catch (InstantiationException e) {
+            LOG.error("Unable to initialize DB pool", e);
+            throw new DbException(e);
+        } catch (IllegalAccessException e) {
+            LOG.error("Unable to initialize DB pool", e);
+            throw new DbException(e);
+        }
+
+        LOG.info("Setting connection info to " + m_url + ", " +
+                 m_username + ", " + m_password);
+        m_pool.setConnectionInfo(m_url, m_username, m_password);
+        LOG.info("Setting connection pool size to " + m_connectionPoolSize);
+        m_pool.setConnectionPoolSize(m_connectionPoolSize);
+    }
+
+    synchronized void setDatabaseConnectionPoolName(Class poolImpl) {
+        m_poolImpl = poolImpl;
     }
 
     /**
      * Sets the number of times ConnectionManager will retry
      * getting a connection.
      */
-    protected static synchronized void setRetryLimit(int retryLimit) {
-        s_retryLimit = retryLimit;
+    synchronized void setRetryLimit(int retryLimit) {
+        m_retryLimit = retryLimit;
     }
 
     /**
      * Sets the number of milliseconds ConnectionManager will
      * sleep between retries when getting a connection.
      */
-    protected static synchronized void setRetrySleep(long retrySleep) {
-        s_retrySleep = retrySleep;
+    synchronized void setRetrySleep(long retrySleep) {
+        m_retrySleep = retrySleep;
     }
 
     /**
@@ -119,14 +143,15 @@ public class ConnectionManager {
      * pool.  Note that a non-pooling connection manager may
      * silently ignore this setting.
      */
-    protected static synchronized void setConnectionPoolSize(int connectionPoolSize) {
-        s_connectionPoolSize = connectionPoolSize;
-        if (s_pool != null) {
-            cat.info("Setting connection pool size to " + s_connectionPoolSize);
+    synchronized void setConnectionPoolSize(int connectionPoolSize) {
+        m_connectionPoolSize = connectionPoolSize;
+        if (m_pool != null) {
+            LOG.info("Setting connection pool size to " + m_connectionPoolSize);
             try {
-                s_pool.setConnectionPoolSize(s_connectionPoolSize);
+                m_pool.setConnectionPoolSize(m_connectionPoolSize);
             } catch (java.sql.SQLException e) {
-                cat.error("Unable to set connection pool size", e);
+                LOG.error("Unable to set connection pool size", e);
+
             }
         }
         // If not set here, this will be set in setDefaultConnectionInfo
@@ -138,17 +163,17 @@ public class ConnectionManager {
      * @param name Name of parameter.
      * @param value Value of parameter.
      */
-    protected static synchronized void setDriverSpecificParameter(String name, String value) {
-        cat.info("Setting " + name + " to " + value);
-        if (s_pool != null) {
+    synchronized void setDriverSpecificParameter(String name, String value) {
+        LOG.info("Setting " + name + " to " + value);
+        if (m_pool != null) {
             try {
-                s_pool.setDriverSpecificParameter(name, value);
+                m_pool.setDriverSpecificParameter(name, value);
             } catch (java.sql.SQLException  e) {
-                cat.error("Unable to set driver specific parameter " +
+                LOG.error("Unable to set driver specific parameter " +
                           name + " to " + value);
             }
         } else {
-            cat.error("setDriverSpecificParameter must be called after " +
+            LOG.error("setDriverSpecificParameter must be called after " +
                       "setting default connection info.  Ignoring set for " +
                       name + " to " + value);
         }
@@ -158,16 +183,20 @@ public class ConnectionManager {
      * Number of connections that will be used by a connection pool.
      * Irrelevant if using a non-pooling connection manager.
      */
-    public static int getConnectionPoolSize() {
-        return s_connectionPoolSize;
+    int getConnectionPoolSize() {
+        return m_connectionPoolSize;
     }
 
     /**
      * Return an available connection from the pool.
      */
     // intentionally not synchronized, due to the sleep.
-    public static java.sql.Connection getConnection()
+    private java.sql.Connection gimmeConnection()
         throws java.sql.SQLException {
+
+        if (m_pool == null) {
+            connect();
+        }
 
         int retries = 0;
         long time = System.currentTimeMillis();
@@ -184,45 +213,45 @@ public class ConnectionManager {
             // TODO: Consider working on a system for
             // controlling the order of who gets this lock?
             // TODO: Consider removing this synchronization
-            // altogether, assuming s_pool is practically
+            // altogether, assuming m_pool is practically
             // immutable, and pushing all synchronization
             // responsibility down to the DB pool driver.
             // Or, maybe switch to wait/notify, see below TODO.
             //synchronized(ConnectionManager.class) {
 
             try {
-                conn = s_pool.getConnection();
+                conn = m_pool.getConnection();
             } catch (SQLException e) {
                 SQLExceptionHandler.throwSQLException(e);
                 throw e;  // code should never get here, but just in case
             }
             //}
 
-            if (cat.isInfoEnabled()) {
+            if (LOG.isInfoEnabled()) {
                 long newtime = System.currentTimeMillis() - time;
 
-                cat.info("getConnection(). Executed in " + newtime +
+                LOG.info("getConnection(). Executed in " + newtime +
                          " total ms. across " + retries + " retries");
                 Throwable t = new Throwable("getConnection stack trace");
-                cat.debug(null, t);
+                LOG.debug(null, t);
             }
 
             // Wrap the connection object with our implementation.
             if (conn == null) {
                 retries++;
-                if (retries <= s_retryLimit) {
-                    cat.warn("Unable to get connection, sleeping (retry #" +
+                if (retries <= m_retryLimit) {
+                    LOG.warn("Unable to get connection, sleeping (retry #" +
                              retries + ")");
                     try {
                         // TODO: consider synchronizing and changing this to
                         // a wait/notify relationship, instead of the current
                         // polling system.
-                        Thread.sleep(s_retrySleep);
+                        Thread.sleep(m_retrySleep);
                     } catch (InterruptedException e) {
                         // ignore
                     }
                 } else {
-                    cat.warn("Unable to get connection, giving up " +
+                    LOG.warn("Unable to get connection, giving up " +
                              "(beyond retry limit at #" + retries + ")");
                     throw new java.sql.SQLException("Unable to get connection");
                 }
@@ -236,6 +265,36 @@ public class ConnectionManager {
             // been exceeded.
         } while (true);
     }
+
+
+    /**
+     * Static API
+     **/
+
+
+    public static java.sql.Connection getConnection()
+        throws java.sql.SQLException {
+        return MANAGER.gimmeConnection();
+    }
+
+
+    /**
+     * Frees all of the connections in the pool.
+     */
+    public static void freeConnections() {
+        if (MANAGER != null) {
+            MANAGER.disconnect();
+        }
+    }
+
+
+    /**
+     * Code for ensuring that there is only one connection per thread.
+     **/
+
+
+    // Stores the connection for the current thread.
+    private static ThreadLocal CURRENT_THREAD_CONNECTION = new ThreadLocal();
 
     /**
      * Returns the connection presently in use by this thread.
@@ -254,7 +313,7 @@ public class ConnectionManager {
      */
     // synchronization is not necessary since these are threadlocal
     public static java.sql.Connection getCurrentThreadConnection() {
-        return (java.sql.Connection)s_currentThreadConnection.get();
+        return (java.sql.Connection) CURRENT_THREAD_CONNECTION.get();
     }
 
     /**
@@ -267,15 +326,7 @@ public class ConnectionManager {
      */
     // synchronization is not necessary since these are threadlocal
     public static void setCurrentThreadConnection(java.sql.Connection conn) {
-        s_currentThreadConnection.set(conn);
+        CURRENT_THREAD_CONNECTION.set(conn);
     }
 
-    /**
-     * Frees all of the connections in the pool.
-     */
-    public static void freeConnections() {
-        if (s_pool != null) {
-            s_pool.freeConnections();
-        }
-    }
 }

@@ -40,7 +40,7 @@ import org.apache.log4j.Logger;
  * </ul>
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #5 $ $Date: 2002/09/16 $
+ * @version $Revision: #6 $ $Date: 2002/09/23 $
  * @since 4.5
  */
 // Synchronization in this class is primarily because close can be called via
@@ -49,7 +49,7 @@ import org.apache.log4j.Logger;
 // is closed out from underneath this connection.
 public class Connection implements java.sql.Connection {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Connection.java#5 $ $Author: randyg $ $Date: 2002/09/16 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Connection.java#6 $ $Author: rhs $ $Date: 2002/09/23 $";
 
     // the connection object that we wrap
     private java.sql.Connection m_conn;
@@ -132,7 +132,7 @@ public class Connection implements java.sql.Connection {
                             "connection count is now " + dbgConnections.size(),
                             t);
                 if (dbgConnections.size() >
-                    ConnectionManager.getConnectionPoolSize()) {
+                    ConnectionManager.getInstance().getConnectionPoolSize()) {
                     s_cat.warn("connection constructor: connections list " +
                                "exceeded pool size: " + dbgConnections);
                 }
@@ -188,7 +188,7 @@ public class Connection implements java.sql.Connection {
                                         "debugging");
             synchronized (dbgConnections) {
                 if (dbgConnections.size() >
-                    ConnectionManager.getConnectionPoolSize()) {
+                    ConnectionManager.getInstance().getConnectionPoolSize()) {
                     s_cat.warn("connection close: un-closed connections " +
                                "list exceeded pool size: " + dbgConnections);
                 }
