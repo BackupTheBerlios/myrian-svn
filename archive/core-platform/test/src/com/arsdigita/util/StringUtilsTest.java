@@ -29,10 +29,10 @@ public class StringUtilsTest extends TestCase {
 
         assertTrue( StringUtils.emptyString(null) );
         assertTrue( StringUtils.emptyString("") );
-        assertTrue( StringUtils.emptyString((Object)(new String(""))) );
+        assertTrue( StringUtils.emptyString((Object)"") );
 
         assertTrue( ! StringUtils.emptyString("foo") );
-        assertTrue( ! StringUtils.emptyString((Object)(new String("foo"))) );
+        assertTrue( ! StringUtils.emptyString((Object)"foo") );
         assertTrue( ! StringUtils.emptyString((Object)(new Integer(1))) );
 
     }

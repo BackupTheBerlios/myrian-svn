@@ -24,12 +24,12 @@ import javax.servlet.*;
  *  include requests in their signatures.
  *
  * @author <a href="mailto:richardl@arsdigita.com">richardl@arsdigita.com</a>
- * @version $Revision: #1 $ $Date: 2002/08/26 $
+ * @version $Revision: #2 $ $Date: 2002/10/13 $
  */
 
 public class DummyServletContext implements ServletContext {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/DummyServletContext.java#1 $ by $Author: jorris $, $DateTime: 2002/08/26 01:17:47 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/DummyServletContext.java#2 $ by $Author: jorris $, $DateTime: 2002/10/13 21:43:37 $";
 
     private HashMap attributes;
 
@@ -90,8 +90,7 @@ public class DummyServletContext implements ServletContext {
     }
 
     public String getServerInfo() {
-        String serverString = new String("Bogus Server/1.0");
-        return serverString;
+        return "Bogus Server/1.0";
     }
 
     public Servlet getServlet(String name) {
