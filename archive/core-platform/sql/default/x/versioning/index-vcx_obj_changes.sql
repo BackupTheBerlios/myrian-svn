@@ -11,16 +11,9 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/x/versioning/comment-vcx_transactions.sql#1 $
--- $DateTime: 2003/02/07 18:31:46 $
+-- $Id: //core-platform/dev/sql/default/x/versioning/index-vcx_obj_changes.sql#1 $
+-- $DateTime: 2003/02/12 20:42:45 $
 
-comment on table vcx_transactions is '
-  A transaction is a set of modifications that was made to an object''s
-  attributes by a user during a database transaction. 
-';
-comment on column vcx_transactions.master_id is '
-  The ID of the top-level master object for this transaction
-';
-comment on column vcx_transactions.object_id is '
-  The ID of the object which was actually modified during the transaction
-';
+create index vcx_obj_changes_master_id_idx on vcx_obj_changes(master_id);
+-- index the timestamp -- avoids full table scans for last_attr_value.
+create index vcx_obj_changes_tstamp_idx on vcx_obj_changes(timestamp);

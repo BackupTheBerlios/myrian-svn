@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/x/versioning/Operation.pdl#1 $ 
-// $DateTime: 2003/02/06 18:54:47 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/x/versioning/Operation.pdl#2 $ 
+// $DateTime: 2003/02/12 20:42:45 $
 
 model com.arsdigita.x.versioning;
 
@@ -24,10 +24,10 @@ object type Operation {
   String[1..1]         action = vcx_operations.action VARCHAR(200);
   String[1..1]         attribute = vcx_operations.attribute VARCHAR(200);
   String[1..1]         classname = vcx_operations.classname VARCHAR(4000);
-  composite Transaction[1..1] transaction = join vcx_operations.transaction_id 
-                                              to vcx_transactions.transaction_id;
+  composite DataObjectChange[1..1] change = join vcx_operations.change_id 
+                                              to vcx_obj_changes.change_id;
   object key (id);
 
-  aggressive load (transaction.id);
+  aggressive load (change.id);
 }
 

@@ -11,16 +11,16 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/x/versioning/table-vcx_operations.sql#1 $
--- $DateTime: 2003/02/07 18:31:46 $
+-- $Id: //core-platform/dev/sql/default/x/versioning/table-vcx_operations.sql#2 $
+-- $DateTime: 2003/02/12 20:42:45 $
 
 
 
 create table vcx_operations (
   operation_id      integer 
     constraint vcx_operations_pk primary key,
-  transaction_id    integer
-    constraint vcx_operations_trans_id_fk references vcx_transactions
+  change_id    integer
+    constraint vcx_operations_trans_id_fk references vcx_obj_changes
     on delete cascade,
   action            varchar(200)
     constraint vcx_operations_actions_fk references vcx_actions,

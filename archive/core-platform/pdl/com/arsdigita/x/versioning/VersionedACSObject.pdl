@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/x/versioning/VersionedACSObject.pdl#2 $ 
-// $DateTime: 2003/02/10 16:27:50 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/x/versioning/VersionedACSObject.pdl#3 $ 
+// $DateTime: 2003/02/12 20:42:45 $
 
 model com.arsdigita.x.versioning;
 
@@ -35,12 +35,12 @@ query rollbackOperations {
 
   do {
     select 
-      o.operation_id, o.transaction_id, o.action, o.attribute, o.classname,
+      o.operation_id, o.change_id, o.action, o.attribute, o.classname,
       t.object_id,
       a.object_type, a.display_name, a.default_domain_class,
       v.master_id, v.is_deleted
     from
-      vcx_operations o, vcx_transactions t, acs_objects a, vcx_objects v
+      vcx_operations o, vcx_obj_changes t, acs_objects a, vcx_objects v
     where
       (t.master_id = :masterID or (t.master_id is null and t.object_id = :masterID))
     and
@@ -48,22 +48,22 @@ query rollbackOperations {
     and
       t.object_id = v.object_id
     and
-      t.transaction_id = o.transaction_id
+      t.change_id = o.change_id
     order by
-      t.timestamp desc, t.transaction_id desc
+      t.timestamp desc, t.change_id desc
   } map {
     operation.id                 = o.operation_id;
     operation.action             = o.action;
     operation.attribute          = o.attribute;
     operation.classname          = o.classname;    
-    operation.transaction.id     = o.transaction_id;
+    operation.change.id     = o.change_id;
     acsObject.id                 = t.object_id;
     acsObject.defaultDomainClass = a.default_domain_class;
     acsObject.objectType         = a.object_type;
     acsObject.displayName        = a.display_name;
     acsObject.master.id          = v.master_id;
     acsObject.isDeleted          = v.is_deleted;
-    transID                      = o.transaction_id;
+    transID                      = o.change_id;
     objectID                     = t.object_id;
   }
 }
@@ -71,7 +71,7 @@ query rollbackOperations {
 // this can be removed with proper usage of associations
 data operation reparentTransactions {
   do {
-    update vcx_transactions set master_id = :master
+    update vcx_obj_changes set master_id = :master
     where object_id = :id
   }
 }

@@ -11,12 +11,12 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/oracle-se/versioning/table-vcx_transactions.sql#1 $
--- $DateTime: 2003/02/07 18:31:46 $
+-- $Id: //core-platform/dev/sql/default/x/versioning/table-vcx_obj_changes.sql#1 $
+-- $DateTime: 2003/02/12 20:42:45 $
 
-create table vcx_transactions (
-  transaction_id   integer 
-    constraint vcx_transactions_pk primary key,
+create table vcx_obj_changes (
+  change_id        integer 
+    constraint vcx_obj_changes_pk primary key,
   master_id        integer
     constraint vcx_trans_masters_fk references vcx_objects
     on delete cascade,
@@ -25,7 +25,7 @@ create table vcx_transactions (
     on delete cascade,
   modifying_user   integer,
   modifying_ip     varchar(400),
-  timestamp        date default sysdate not null,
+  timestamp        timestamp default current_timestamp not null,
   description      varchar(4000),
   tag              varchar(400)
 );

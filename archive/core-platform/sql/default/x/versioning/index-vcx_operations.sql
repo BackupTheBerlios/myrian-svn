@@ -11,9 +11,9 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/x/versioning/index-vcx_operations.sql#1 $
--- $DateTime: 2003/02/07 18:31:46 $
+-- $Id: //core-platform/dev/sql/default/x/versioning/index-vcx_operations.sql#2 $
+-- $DateTime: 2003/02/12 20:42:45 $
 
 create index vcx_operations_action_idx on vcx_operations(action);
 -- index foreign keys
-create index vcx_operations_transaction_idx on vcx_operations(transaction_id);
+create index vcx_operations_change_idx on vcx_operations(change_id);

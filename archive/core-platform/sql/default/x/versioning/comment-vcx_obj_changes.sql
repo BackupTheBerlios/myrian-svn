@@ -11,9 +11,16 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/x/versioning/index-vcx_transactions.sql#1 $
--- $DateTime: 2003/02/07 18:31:46 $
+-- $Id: //core-platform/dev/sql/default/x/versioning/comment-vcx_obj_changes.sql#1 $
+-- $DateTime: 2003/02/12 20:42:45 $
 
-create index vcx_transactions_master_id_idx on vcx_transactions(master_id);
--- index the timestamp -- avoids full table scans for last_attr_value.
-create index vcx_transactions_tstamp_idx on vcx_transactions(timestamp);
+comment on table vcx_obj_changes is '
+  A change is a set of modifications that was made to an object''s
+  attributes by a user during a database change. 
+';
+comment on column vcx_obj_changes.master_id is '
+  The ID of the top-level master object for this change
+';
+comment on column vcx_obj_changes.object_id is '
+  The ID of the object which was actually modified during the change
+';

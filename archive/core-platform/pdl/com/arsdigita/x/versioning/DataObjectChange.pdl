@@ -11,28 +11,28 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/x/versioning/Transaction.pdl#1 $ 
-// $DateTime: 2003/02/06 18:54:47 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/x/versioning/DataObjectChange.pdl#1 $ 
+// $DateTime: 2003/02/12 20:42:45 $
 
 model com.arsdigita.x.versioning;
 
 import com.arsdigita.kernel.*;
 
-object type Transaction {
-  BigDecimal[1..1]  id = vcx_transactions.transaction_id INTEGER;
-  String[0..1]      modifying_ip = vcx_transactions.modifying_ip VARCHAR(400);
-  Date[0..1]        timestamp = vcx_transactions.timestamp TIMESTAMP;
-  String[0..1]      description = vcx_transactions.description VARCHAR(4000);
-  String[0..1]      tag = vcx_transactions.tag VARCHAR(400);
-  User[0..1] modUser = join vcx_transactions.modifying_user 
+object type DataObjectChange {
+  BigDecimal[1..1]  id = vcx_obj_changes.change_id INTEGER;
+  String[0..1]      modifying_ip = vcx_obj_changes.modifying_ip VARCHAR(400);
+  Date[0..1]        timestamp = vcx_obj_changes.timestamp TIMESTAMP;
+  String[0..1]      description = vcx_obj_changes.description VARCHAR(4000);
+  String[0..1]      tag = vcx_obj_changes.tag VARCHAR(400);
+  User[0..1] modUser = join vcx_obj_changes.modifying_user 
                                    to users.user_id;
 
-  Operation[0..n] operations = join vcx_transactions.transaction_id
-                                           to vcx_operations.transaction_id;
+  Operation[0..n] operations = join vcx_obj_changes.change_id
+                                           to vcx_operations.change_id;
 
-  VersionedACSObject[1..1]  master = join vcx_transactions.master_id 
+  VersionedACSObject[1..1]  master = join vcx_obj_changes.master_id 
                                                  to acs_objects.object_id;
-  VersionedACSObject[1..1] acsObject = join vcx_transactions.object_id
+  VersionedACSObject[1..1] acsObject = join vcx_obj_changes.object_id
                                                    to acs_objects.object_id;
 
   object key (id);
@@ -43,8 +43,8 @@ object type Transaction {
     // java layer
   insert {
     do {
-      insert into vcx_transactions (
-        transaction_id, modifying_user, 
+      insert into vcx_obj_changes (
+        change_id, modifying_user, 
         modifying_ip, timestamp, description, tag, 
         object_id, master_id
       ) values (
