@@ -43,3 +43,5 @@
    - eliminate QuerySource
  * make ReflectionAdapter use cglib's Factory interface for efficient
    object creation
+ * deal with subtle key ordering issues that can happen when multiple
+   places in PDL try to define the same primary key in opposite orders
