@@ -29,15 +29,15 @@ import org.apache.log4j.Logger;
  *     com.arsdigita.persistence.DataAssociation </p>
  *
  * @author <a href="mbryzek@arsdigita.com">Michael Bryzek</a>
- * @date $Date: 2003/03/28 $
- * @version $Revision: #2 $
+ * @date $Date: 2003/04/04 $
+ * @version $Revision: #3 $
  *
  * @see com.arsdigita.persistence.DataAssociationImpl
  **/
 
 public class DataAssociationImplTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataAssociationImplTest.java#2 $ by $Author: rhs $, $DateTime: 2003/03/28 17:56:58 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataAssociationImplTest.java#3 $ by $Author: ashah $, $DateTime: 2003/04/04 14:28:00 $";
     private static Logger log =
         Logger.getLogger(DataAssociationImplTest.class.getName());
 
@@ -156,15 +156,13 @@ public class DataAssociationImplTest extends PersistenceTestCase {
         assertTrue("assocation not modified after add!!",
 		   m_orderAssoc.getLineItems().isModified());
         m_orderAssoc.getLineItems().remove(li);
-        assertTrue("assocation modified after remove!!",
-		   !m_orderAssoc.getLineItems().isModified());
 
         DataAssociationCursor c = m_orderAssoc.getLineItems().cursor();
         c.next();
         li = c.getDataObject();
         m_orderAssoc.getLineItems().remove(li);
         assertTrue("assocation not modified after remove!!",
-		   m_orderAssoc.getLineItems().isModified());
+                   m_orderAssoc.getLineItems().isModified());
 
         c.close();
     }

@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
  * NodeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/09 $
+ * @version $Revision: #3 $ $Date: 2003/04/04 $
  */
 
 public abstract class NodeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/NodeTest.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/NodeTest.java#3 $ by $Author: ashah $, $DateTime: 2003/04/04 14:28:00 $";
 
     private static Logger s_log =
         Logger.getLogger(NodeTest.class.getName());
@@ -80,6 +80,7 @@ public abstract class NodeTest extends PersistenceTestCase {
             fail("Set parent to an invalid type!");
 
         } catch (PersistenceException e) {
+            node.delete();
         }
 
         try {
@@ -89,6 +90,7 @@ public abstract class NodeTest extends PersistenceTestCase {
             fail("Set an invalid attribute!");
 
         } catch (PersistenceException e) {
+            node.delete();
         }
 
 
