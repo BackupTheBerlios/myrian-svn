@@ -37,11 +37,11 @@ import org.apache.log4j.*;
  * DataObjectManipulator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #3 $ $Date: 2003/04/18 $
+ * @version $Revision: #4 $ $Date: 2003/05/07 $
  */
 public class DataObjectManipulator {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataObjectManipulator.java#3 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataObjectManipulator.java#4 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
     private static final Logger s_log =
         Logger.getLogger(DataObjectManipulator.class.getName());
 
@@ -318,11 +318,11 @@ public class DataObjectManipulator {
                     s_log.debug("Failed to set property " + p.getName());
                     s_log.debug("Checking error");
                     checkSetError(t, p, data, value);
-                    if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+                    //                    if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
                         throw new AbortMetaTestException();
-                    } else {
-                        return;
-                    }
+                        //                    } else {
+                        //                        return;
+                        //                    }
                 }
             }
 

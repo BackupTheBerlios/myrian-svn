@@ -16,7 +16,10 @@
 package com.arsdigita.persistence.oql;
 
 import com.arsdigita.persistence.*;
+import com.arsdigita.persistence.proto.*;
+import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
+import com.arsdigita.persistence.proto.engine.rdbms.*;
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.util.StringUtils;
 import org.apache.log4j.Logger;
@@ -28,12 +31,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/04/18 $
+ * @version $Revision: #4 $ $Date: 2003/05/07 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/oql/QueryTest.java#3 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/oql/QueryTest.java#4 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);
@@ -46,20 +49,20 @@ public class QueryTest extends PersistenceTestCase {
         Root root = Root.getRoot();
         ObjectType type = root.getObjectType(typeName);
         assertTrue("No such type: " + typeName, type != null);
-        /*Query query = new Query(type);
+        Signature sig = new Signature(type);
+        Query query = new Query(sig, null);
 
         if (properties == null) {
-            query.fetchDefault();
+            sig.addDefaultProperties();
         } else {
             for (int i = 0; i < properties.length; i++) {
-                query.fetch(properties[i]);
+                sig.addPath(Path.get(properties[i]));
             }
         }
 
-        query.generate();
-        Operation actual = query.getOperation();*/
-        //compare(name + ".op", actual.toString());
-	compare(name + ".op", "not implemented");
+        OracleWriter w = new OracleWriter();
+        w.write(query);
+        compare(name + ".op", w.getSQL());
     }
 
     private void compare(String expectedResource, String actual) {

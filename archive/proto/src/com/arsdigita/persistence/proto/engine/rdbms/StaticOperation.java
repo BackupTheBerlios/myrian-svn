@@ -10,12 +10,12 @@ import java.sql.*;
  * StaticOperation
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/03/31 $
+ * @version $Revision: #5 $ $Date: 2003/05/07 $
  **/
 
 class StaticOperation extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/StaticOperation.java#4 $ by $Author: rhs $, $DateTime: 2003/03/31 10:58:30 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/StaticOperation.java#5 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
 
     private SQLBlock m_sql;
 
@@ -43,11 +43,10 @@ class StaticOperation extends Operation {
     }
 
     public int getType(Path path) {
-        int type = Types.INTEGER;
         if (m_sql.hasType(path)) {
-            type = m_sql.getType(path);
+            return m_sql.getType(path);
         }
-        return type;
+        return super.getType(path);
     }
 
 

@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #40 $ $Date: 2003/04/24 $
+ * @version $Revision: #41 $ $Date: 2003/05/07 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#40 $ by $Author: ashah $, $DateTime: 2003/04/24 16:58:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#41 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -286,6 +286,24 @@ public class PDL {
 	    });
 
 	m_errors.check();
+
+        m_ast.traverse(new Node.Switch() {
+            public void onProperty(PropertyNd pnd) {
+                Node n = pnd.getMapping();
+                if (!(n instanceof ColumnNd)) {
+                    return;
+                }
+
+                ObjectType ot = m_symbols.getEmitted(pnd.getType());
+                Column col = lookup((ColumnNd)n);
+                if (col.getType() == Integer.MIN_VALUE) {
+                    Adapter ad = Adapter.getAdapter(ot.getJavaClass());
+                    col.setType(ad.defaultJDBCType());
+                }
+            }
+        });
+
+	propogateTypes();
     }
 
     public void emitVersioned() {
@@ -380,7 +398,7 @@ public class PDL {
         }
 
         m_ast.traverse(new Node.Switch() {
-                public void onColumn(ColumnNd colNd) {
+            public void onColumn(ColumnNd colNd) {
                     Table table =
                         (Table) tables.get(colNd.getTable().getName());
                     if (table == null) {
@@ -475,8 +493,10 @@ public class PDL {
                         (ObjectTypeNd) id.getParent().getParent();
                     ObjectMap om = m_root.getObjectMap
 			(m_symbols.getEmitted(ot));
-                    om.getKeyProperties().add
-                        (m_symbols.getEmitted(ot).getProperty(id.getName()));
+                    Role role = (Role) m_symbols.getEmitted(ot).getProperty
+                        (id.getName());
+                    om.getKeyProperties().add(role);
+                    role.setNullable(false);
                 }
             }, new Node.IncludeFilter(new Node.Field[] {
                 AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.OBJECT_KEY,
@@ -617,8 +637,6 @@ public class PDL {
 		    }
 		}
 	    });
-
-	propogateTypes();
 
 /*        m_ast.traverse(new Node.Switch() {
                 public void onJoin(JoinNd nd) {

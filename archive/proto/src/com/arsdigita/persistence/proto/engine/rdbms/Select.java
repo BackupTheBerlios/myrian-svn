@@ -9,12 +9,12 @@ import java.util.*;
  * Select
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2003/04/30 $
+ * @version $Revision: #13 $ $Date: 2003/05/07 $
  **/
 
 class Select extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#12 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#13 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
 
     private Join m_join;
     private Expression m_filter;
@@ -26,7 +26,7 @@ class Select extends Operation {
     private Integer m_limit = null;
 
     public Select(Join join, Expression filter) {
-        this(join, filter, new Environment());
+        this(join, filter, new Environment(null));
     }
 
     public Select(Join join, Expression filter, Environment env) {

@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #21 $ $Date: 2003/04/30 $
+ * @version $Revision: #22 $ $Date: 2003/05/07 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#21 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#22 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 
@@ -271,7 +271,7 @@ class DataQueryImpl implements DataQuery {
 			      Object value) {
         Object tobj;
 	if (value == null) {
-	    tobj = new java.math.BigDecimal("0");
+	    tobj = "";
 	} else if (value instanceof Collection) {
             Collection c = (Collection) value;
             if (c.size() == 0) {

@@ -13,17 +13,26 @@ import java.io.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2003/04/30 $
+ * @version $Revision: #14 $ $Date: 2003/05/07 $
  **/
 
-abstract class SQLWriter {
+public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#13 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#14 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
 
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();
     private ArrayList m_bindings = new ArrayList();
     private ArrayList m_types = new ArrayList();
+    private HashSet m_expanded = new HashSet();
+
+    public void clear() {
+        m_op = null;
+        m_sql.setLength(0);
+        m_bindings.clear();
+        m_types.clear();
+        m_expanded.clear();
+    }
 
     public String getSQL() {
         return m_sql.toString();
@@ -31,6 +40,21 @@ abstract class SQLWriter {
 
     public Collection getBindings() {
         return m_bindings;
+    }
+
+    public Collection getTypes() {
+        return m_types;
+    }
+
+    public Collection getTypeNames() {
+        ArrayList result = new ArrayList();
+
+        for (Iterator it = getTypes().iterator(); it.hasNext(); ) {
+            Integer type = (Integer) it.next();
+            result.add(Column.getTypeName(type.intValue()));
+        }
+
+        return result;
     }
 
     public void bind(PreparedStatement ps) {
@@ -235,8 +259,7 @@ abstract class SQLWriter {
     public void write(Expression.Value v) {
         m_sql.append("?");
         m_bindings.add(v.getValue());
-        // TODO: do type lookup based on class of value
-        m_types.add(new Integer(java.sql.Types.INTEGER));
+        m_types.add(new Integer(RDBMSEngine.getType(v.getValue())));
     }
 
     public void write(Expression.Passthrough e) {
@@ -274,7 +297,6 @@ abstract class SQLWriter {
         write(")");
     }
 
-    private HashSet m_expanded = new HashSet();
 
     private boolean isExpandable(Expression expr) {
         return !m_expanded.contains(expr)
@@ -346,22 +368,26 @@ abstract class SQLWriter {
         return result;
     }
 
-    private void writeEquals(Expression left, Expression right) {
+    private void writeLogicalEquals(Expression left, Expression right) {
         if (isExpandable(left) && isExpandable(right)) {
             write(expand(left, right));
         } else {
-            write(left);
-            write(" = ");
-            write(right);
+            writeEquals(left, right);
         }
     }
 
+    void writeEquals(Expression left, Expression right) {
+        write(left);
+        write(" = ");
+        write(right);
+    }
+
     public void write(Condition.Equals cond) {
-        writeEquals(cond.getLeft(), cond.getRight());
+        writeLogicalEquals(cond.getLeft(), cond.getRight());
     }
 
     public void write(Condition.Contains cond) {
-        writeEquals(cond.getLeft(), cond.getRight());
+        writeLogicalEquals(cond.getLeft(), cond.getRight());
     }
 
     public abstract void write(Select select);
@@ -516,7 +542,8 @@ class ANSIWriter extends SQLWriter {
         write(join.getAlias());
     }
 
-    private void writeCompound(CompoundJoin join) {
+
+    void writeCompound(CompoundJoin join) {
         write(join.getLeft());
         write("\n     ");
         write(join.getType().toString());

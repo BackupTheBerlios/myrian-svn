@@ -7,6 +7,7 @@ import com.arsdigita.persistence.proto.metadata.*;
 import com.arsdigita.persistence.proto.engine.rdbms.*;
 import com.arsdigita.persistence.proto.pdl.PDL;
 import com.arsdigita.db.ConnectionManager;
+import com.arsdigita.db.DbHelper;
 import java.util.*;
 import java.math.*;
 import java.sql.*;
@@ -16,12 +17,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #20 $ $Date: 2003/04/18 $
+ * @version $Revision: #21 $ $Date: 2003/05/07 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#20 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#21 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
 
 
     public ProtoTest(String name) {
@@ -50,23 +51,37 @@ public class ProtoTest extends TestCase {
     }
 
     private void doTest(Generic obj, Property str, Property col) {
-        Session ssn = new Session(new RDBMSEngine(
-            new ConnectionSource() {
-                    public Connection acquire() {
-                        try {
-                            Connection conn =
-                                ConnectionManager.getConnection();
-                            conn.setAutoCommit(false);
-                            return conn;
-                        } catch (SQLException e) {
-                            throw new Error(e.getMessage());
-                        }
-                    }
-                    public void release(Connection conn) {
-                        // Do nothing
+        SQLWriter w;
+        switch (DbHelper.getDatabase()) {
+        case DbHelper.DB_ORACLE:
+            w = new OracleWriter();
+            break;
+        case DbHelper.DB_POSTGRES:
+            w = new PostgresWriter();
+            break;
+        default:
+            DbHelper.unsupportedDatabaseError("proto test");
+            w = null;
+            break;
+        }
+
+        Session ssn = new Session
+            (new RDBMSEngine
+             (new ConnectionSource() {
+                public Connection acquire() {
+                    try {
+                        Connection conn =
+                            ConnectionManager.getConnection();
+                        conn.setAutoCommit(false);
+                        return conn;
+                    } catch (SQLException e) {
+                        throw new Error(e.getMessage());
                     }
                 }
-            ), new RDBMSQuerySource());
+                public void release(Connection conn) {
+                    // Do nothing
+                }
+             }, w), new RDBMSQuerySource());
 
         Property REQUIRED = obj.getType().getProperty("required");
         Generic req = new Generic(REQUIRED.getType(), new BigInteger("10"));

@@ -16,6 +16,7 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.db.ConnectionManager;
+import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.proto.common.Path;
@@ -34,6 +35,8 @@ import com.arsdigita.persistence.proto.engine.MemoryEngine;
 import com.arsdigita.persistence.proto.engine.rdbms.RDBMSEngine;
 import com.arsdigita.persistence.proto.engine.rdbms.RDBMSQuerySource;
 import com.arsdigita.persistence.proto.engine.rdbms.ConnectionSource;
+import com.arsdigita.persistence.proto.engine.rdbms.OracleWriter;
+import com.arsdigita.persistence.proto.engine.rdbms.PostgresWriter;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
@@ -55,7 +58,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #28 $ $Date: 2003/04/30 $
+ * @version $Revision: #29 $ $Date: 2003/05/07 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -144,7 +147,22 @@ public class Session {
 	    }
         };
     private final RDBMSQuerySource m_qs = new RDBMSQuerySource();
-    private final RDBMSEngine m_engine = new RDBMSEngine(m_cs);
+    private final RDBMSEngine m_engine;
+
+    {
+        switch (DbHelper.getDatabase()) {
+        case DbHelper.DB_ORACLE:
+            m_engine = new RDBMSEngine(m_cs, new OracleWriter());
+            break;
+        case DbHelper.DB_POSTGRES:
+            m_engine = new RDBMSEngine(m_cs, new PostgresWriter());
+            break;
+        default:
+            DbHelper.unsupportedDatabaseError("persistence");
+            m_engine = null;
+            break;
+        }
+    }
 
     private class PSession extends com.arsdigita.persistence.proto.Session {
         PSession() { super(Session.this.m_engine, Session.this.m_qs); }

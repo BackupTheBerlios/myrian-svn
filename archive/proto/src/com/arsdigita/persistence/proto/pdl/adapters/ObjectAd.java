@@ -8,15 +8,15 @@ import java.sql.*;
  * ObjectAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/04/04 $
+ * @version $Revision: #2 $ $Date: 2003/05/07 $
  **/
 
 public class ObjectAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/adapters/ObjectAd.java#1 $ by $Author: rhs $, $DateTime: 2003/04/04 20:45:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/adapters/ObjectAd.java#2 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
 
     public ObjectAd() {
-	super(Root.getRoot().getObjectType("global.Object"));
+	super(Root.getRoot().getObjectType("global.Object"), Types.INTEGER);
     }
 
     public void bind(PreparedStatement ps, int index, Object obj, int type)

@@ -13,12 +13,12 @@ import java.io.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #25 $ $Date: 2003/04/30 $
+ * @version $Revision: #26 $ $Date: 2003/05/07 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#25 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#26 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -55,7 +55,7 @@ class QGen {
     private SQLBlock m_block;
     private HashMap m_columns = new HashMap();
     private HashMap m_keys = new HashMap();
-    private HashMap m_tables = new HashMap();
+    private HashMap m_aliases = new HashMap();
     private HashMap m_joins = new HashMap();
 
     public QGen(Query query) {
@@ -88,17 +88,110 @@ class QGen {
         m_columns.put(prefix, columns);
     }
 
-    private Set getTables(Path prefix) {
-        Set result = (Set) m_tables.get(prefix);
-        if (result == null) {
-            result = new HashSet();
-            m_tables.put(prefix, result);
+    private static final HashSet RESERVED = new HashSet();
+
+    static {
+        // TODO: expand this list
+        RESERVED.add("as");
+        RESERVED.add("in");
+        RESERVED.add("to");
+    }
+
+    private String abbreviateHard(String name) {
+        StringBuffer buf = new StringBuffer(name.length());
+        int index = 0;
+        while (true) {
+            buf.append(name.charAt(index));
+            index = name.indexOf('_', index);
+            if (index < 0 || index >= name.length()) {
+                break;
+            }
+            index++;
         }
+
+        if (buf.length() == 0) {
+            throw new IllegalStateException
+                ("empty hard abbreviation produced for " + name);
+        }
+
+        String candidate = buf.toString();
+        if (RESERVED.contains(candidate)) {
+            return candidate + "_";
+        } else {
+            return candidate;
+        }
+    }
+
+    private String abbreviate(String name) {
+        final int limit = 30;
+
+        String candidate;
+
+        if (name.length() <= limit) {
+            candidate = name;
+        } else {
+            StringBuffer buf = new StringBuffer(name.length());
+            boolean preserve = true;
+            for (int i = 0; i < name.length(); i++) {
+                char c = name.charAt(i);
+                if (preserve) {
+                    preserve = false;
+                    buf.append(c);
+                    continue;
+                }
+
+                switch (Character.toLowerCase(c)) {
+                case 'a':
+                case 'e':
+                case 'i':
+                case 'o':
+                case 'u':
+                    break;
+                case '_':
+                    preserve = true;
+                default:
+                    buf.append(c);
+                    break;
+                }
+            }
+
+            candidate = buf.toString();
+        }
+
+        String result = candidate;
+        for (int attempt = 1; m_aliases.values().contains(result); attempt++) {
+            String id = "" + attempt;
+            result = candidate.substring
+                (0, Math.min(candidate.length(), limit - id.length())) + id;
+        }
+
+        if ("".equals(result)) {
+            throw new IllegalStateException
+                ("empty abbreviation produced for " + name);
+        }
+
         return result;
     }
 
-    private void addTable(Path prefix, Table table) {
-        getTables(prefix).add(table);
+    private Path makeAlias(Path prefix, String name) {
+	if (prefix == null) {
+	    return Path.get(abbreviate(name));
+	} else {
+	    return Path.get
+                (abbreviate(prefix.getPath().replace('.', '_') + "__" + name));
+	}
+    }
+
+    private Path makeAlias(Path prefix, Table table) {
+        return makeAlias(prefix, abbreviateHard(table.getName()));
+    }
+
+    private void setAlias(Path prefix, Table table, Path alias) {
+        m_aliases.put(new CompoundKey(prefix, table), alias);
+    }
+
+    private Path getAlias(Path prefix, Table table) {
+        return (Path) m_aliases.get(new CompoundKey(prefix, table));
     }
 
     private Join getJoin(Source src) {
@@ -136,7 +229,8 @@ class QGen {
     public Select generate() {
         Signature sig = m_query.getSignature();
 
-        Environment env = new Environment();
+        Environment env = new Environment
+            (Root.getRoot().getObjectMap(sig.getObjectType()));
 
         for (Iterator it = sig.getSources().iterator(); it.hasNext(); ) {
             Source src = (Source) it.next();
@@ -145,18 +239,12 @@ class QGen {
 
             if (isStatic(src)) {
                 SQLBlock block = getBlock(src);
-                Path alias;
-		if (src.getPath() == null) {
-		    alias = Path.get("static__");
-		} else {
-		    alias = Path.get(src.getPath() + "static__");
-		}
+                Path alias = makeAlias(src.getPath(), "st_");
                 j = new StaticJoin
 		    (new StaticOperation(block, env, false), alias);
             } else {
                 ObjectMap map =
-		    Root.getRoot().getObjectMap(src.getObjectType());
-
+                    Root.getRoot().getObjectMap(src.getObjectType());
                 Table start = null;
 		ObjectMap om = map;
 		while (om != null) {
@@ -173,19 +261,12 @@ class QGen {
 			 map.getObjectType());
                 }
 
-                Path alias;
-		if (src.getPath() == null) {
-		    alias = Path.get(start.getName());
-		} else {
-		    alias = Path.get
-			(src.getPath().getPath().replace('.', '_') + "__" +
-			 start.getName());
-		}
+                Path alias = makeAlias(src.getPath(), start);
                 j = new SimpleJoin(start, alias);
 
                 setColumns(src.getPath(),
                            getPaths(alias, start.getPrimaryKey()));
-                addTable(src.getPath(), start);
+                setAlias(src.getPath(), start, alias);
             }
 
             setJoin(src, j);
@@ -235,7 +316,8 @@ class QGen {
                 result.set
                     (Path.add(param.getPath(), paths[i]),
                      RDBMSEngine.get(m_query.get(param), paths[i]),
-                     Types.INTEGER);
+                     RDBMSEngine.getType
+                     (param.getObjectType().getType(paths[i]).getJavaClass()));
             }
         }
 
@@ -280,7 +362,7 @@ class QGen {
         Property prop = m_query.getSignature().getProperty(path);
 	if (prop == null) {
 	    return false;
-	} else if (prop.isNullable()) {
+	} else if (prop.getType().isKeyed() && prop.isNullable()) {
             return true;
         } else {
             return isOuter(path.getParent());
@@ -300,28 +382,25 @@ class QGen {
         Table table = constraint.getTable();
 	Path parent = path.getParent();
 
-	Path alias;
-	if (parent == null) {
-	    alias = Path.get(table.getName());
-	} else {
-	    alias = Path.get(parent.getPath().replace('.', '_') +
-			     "__" + table.getName());
-	}
-
-        if (!getTables(parent).contains(table)) {
-            Join join = getJoin(path);
-            Join simple = new SimpleJoin(table, alias);
-            Path tmp = Path.add(alias, "__tmp__");
-            Condition cond = Condition.equals(parent, tmp);
-            setColumns(tmp, getPaths(alias, constraint));
-            if (isOuter(path)) {
-                join = new LeftJoin(join, simple, cond);
-            } else {
-                join = new InnerJoin(join, simple, cond);
-            }
-            setJoin(path, join);
-            addTable(parent, table);
+	Path alias = getAlias(parent, table);
+        if (alias != null) {
+            return alias;
         }
+
+        alias = makeAlias(parent, table);
+
+        Join join = getJoin(path);
+        Join simple = new SimpleJoin(table, alias);
+        Path tmp = Path.add(alias, "__tmp__");
+        setColumns(tmp, getPaths(alias, constraint));
+        Condition cond = Condition.equals(tmp, parent);
+        if (isOuter(path)) {
+            join = new LeftJoin(join, simple, cond);
+        } else {
+            join = new InnerJoin(join, simple, cond);
+        }
+        setJoin(path, join);
+        setAlias(parent, table, alias);
 
         return alias;
     }

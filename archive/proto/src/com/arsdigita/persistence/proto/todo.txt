@@ -121,6 +121,9 @@ Cleanup:
  * better solution for bind variable and object property name
    collisions (FilterImpl.java:85)
 
+Testing:
+  Make metatest not abort.
+
 Review:
  * Review everything
  * Error recovery audit
@@ -134,6 +137,7 @@ Documentation:
  * Training documentation
 
 Disable all cascading deletes.
+
 
 -= D O N E =-
 

@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #33 $ $Date: 2003/04/23 $
+ * @version $Revision: #34 $ $Date: 2003/05/07 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#33 $ by $Author: ashah $, $DateTime: 2003/04/23 09:29:41 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#34 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -36,8 +36,11 @@ public class RDBMSEngine extends Engine {
     private Connection m_conn = null;
     private int m_connUsers = 0;
 
-    public RDBMSEngine(ConnectionSource source) {
+    private SQLWriter m_writer;
+
+    public RDBMSEngine(ConnectionSource source, SQLWriter writer) {
         m_source = source;
+        m_writer = writer;
     }
 
     void acquire() {
@@ -146,7 +149,7 @@ public class RDBMSEngine extends Engine {
     Environment getEnvironment(Object obj) {
         Environment result = (Environment) m_environments.get(obj);
         if (result == null) {
-            result = new Environment();
+            result = new Environment(Session.getObjectMap(obj));
             m_environments.put(obj, result);
         }
         return result;
@@ -385,51 +388,57 @@ public class RDBMSEngine extends Engine {
     }
 
     private ResultSet execute(Operation op) {
-        return execute(op, new ANSIWriter());
+        return execute(op, m_writer);
     }
 
     private ResultSet execute(Operation op, SQLWriter w) {
         try {
-            w.write(op);
-        } catch(RDBMSException re) {
-            LOG.warn("failed operation: " + op);
-            throw re;
-        }
+            try {
+                w.write(op);
+            } catch(RDBMSException re) {
+                w.clear();
+                LOG.warn("failed operation: " + op);
+                throw re;
+            }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(w.getSQL());
-            LOG.debug(w.getBindings());
-            LOG.debug(op.getEnvironment());
-        }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(w.getSQL());
+                LOG.debug(w.getBindings());
+                LOG.debug(w.getTypeNames());
+                LOG.debug(op.getEnvironment());
+            }
 
-        if (w.getSQL().equals("")) {
-            return null;
-        }
-
-        acquire();
-
-        try {
-            PreparedStatement ps = m_conn.prepareStatement(w.getSQL());
-            w.bind(ps);
-            if (ps.execute()) {
-                return ps.getResultSet();
-            } else {
-		if (LOG.isDebugEnabled()) {
-		    LOG.debug(ps.getUpdateCount() + " rows affected");
-		}
-                ps.close();
+            if (w.getSQL().equals("")) {
                 return null;
             }
-        } catch (SQLException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(m_operations);
+
+            acquire();
+
+            try {
+                PreparedStatement ps = m_conn.prepareStatement(w.getSQL());
+                w.bind(ps);
+                if (ps.execute()) {
+                    return ps.getResultSet();
+                } else {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug(ps.getUpdateCount() + " rows affected");
+                    }
+                    ps.close();
+                    return null;
+                }
+            } catch (SQLException e) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(m_operations);
+                }
+                throw new RDBMSException(e.getMessage()) {};
             }
-            throw new Error(e.getMessage());
+        } finally {
+            w.clear();
         }
     }
 
     public ResultSet execute(SQLBlock sql, Map parameters) {
-        Environment env = new Environment();
+        Environment env = new Environment(null);
         for (Iterator it = parameters.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry me = (Map.Entry) it.next();
             env.set((Path) me.getKey(), me.getValue());
@@ -478,6 +487,18 @@ public class RDBMSEngine extends Engine {
 
         PropertyMap props = Session.getProperties(o);
         return props.get(props.getObjectType().getProperty(path.getName()));
+    }
+
+    static final int getType(Object obj) {
+        if (obj == null) {
+            return Types.INTEGER;
+        } else {
+            return getType(obj.getClass());
+        }
+    }
+
+    static final int getType(Class klass) {
+        return Adapter.getAdapter(klass).defaultJDBCType();
     }
 
 }

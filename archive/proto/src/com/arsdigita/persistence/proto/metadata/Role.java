@@ -4,12 +4,12 @@ package com.arsdigita.persistence.proto.metadata;
  * Role
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/01/30 $
+ * @version $Revision: #5 $ $Date: 2003/05/07 $
  **/
 
 public class Role extends Property {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Role.java#4 $ by $Author: rhs $, $DateTime: 2003/01/30 17:57:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Role.java#5 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
 
     private ObjectType m_type;
     private Role m_reverse;
@@ -36,6 +36,10 @@ public class Role extends Property {
 
     public boolean isNullable() {
         return m_isNullable;
+    }
+
+    public void setNullable(boolean value) {
+        m_isNullable = value;
     }
 
     public boolean isCollection() {

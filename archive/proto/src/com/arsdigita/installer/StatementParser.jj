@@ -42,10 +42,18 @@ class StatementParser {
         m_image.append(t.image);
     }
 
+    private boolean m_plsql = false;
+
     private String clearImage() {
 	String result = m_image.toString();
 	m_image.setLength(0);
-	return result.substring(0, result.lastIndexOf(';'));
+        if (m_plsql) {
+            result = result.substring(0, result.lastIndexOf(';') + 1);
+        } else {
+            result = result.substring(0, result.lastIndexOf(';'));
+        }
+        m_plsql = false;
+	return result;
     }
 
     public static final void main(String[] args) throws FileNotFoundException {
@@ -150,7 +158,7 @@ void statement() :
     (   LOOKAHEAD(<NAKED_BEGIN> <SEMICOLON>)
 	t = <NAKED_BEGIN> { append(t); }
 	t = <SEMICOLON> { append(t); }
-      | LOOKAHEAD(plsql()) plsql()
+      | LOOKAHEAD(plsql()) plsql() { m_plsql = true; }
       | LOOKAHEAD(<INCLUDE>) <INCLUDE> t = <SQL_TOKEN>
 	{
 	    m_switch.onInclude(t.image);

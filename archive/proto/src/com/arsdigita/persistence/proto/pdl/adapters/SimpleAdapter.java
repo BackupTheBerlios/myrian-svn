@@ -8,18 +8,20 @@ import com.arsdigita.persistence.proto.metadata.*;
  * SimpleAdapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/03/18 $
+ * @version $Revision: #2 $ $Date: 2003/05/07 $
  **/
 
 abstract class SimpleAdapter extends Adapter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/adapters/SimpleAdapter.java#1 $ by $Author: rhs $, $DateTime: 2003/03/18 15:44:06 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/adapters/SimpleAdapter.java#2 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
 
     private ObjectType m_type;
+    private int m_defaultJDBCType;
 
-    protected SimpleAdapter(ObjectType type) {
+    protected SimpleAdapter(ObjectType type, int defaultJDBCType) {
 	if (type == null) { throw new IllegalArgumentException(); }
 	m_type = type;
+        m_defaultJDBCType = defaultJDBCType;
     }
 
     public PropertyMap getProperties(Object obj) {
@@ -27,5 +29,7 @@ abstract class SimpleAdapter extends Adapter {
     }
 
     public ObjectType getObjectType(Object obj) { return m_type; }
+
+    public int defaultJDBCType() { return m_defaultJDBCType; }
 
 }

@@ -26,12 +26,12 @@ import java.util.*;
  * the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/03/05 $
+ * @version $Revision: #7 $ $Date: 2003/05/07 $
  */
 
 public class Column extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Column.java#6 $ by $Author: rhs $, $DateTime: 2003/03/05 18:41:57 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Column.java#7 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
 
     /**
      * The name of this Column.
@@ -260,7 +260,7 @@ public class Column extends Element {
         }
     }
 
-    private static String getTypeName(int type) {
+    public static String getTypeName(int type) {
         switch (type) {
         case Types.ARRAY:
             return "ARRAY";

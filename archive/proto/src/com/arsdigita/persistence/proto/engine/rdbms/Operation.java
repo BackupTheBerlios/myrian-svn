@@ -12,17 +12,16 @@ import java.util.*;
  * Operation
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2003/04/30 $
+ * @version $Revision: #12 $ $Date: 2003/05/07 $
  **/
 
 abstract class Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Operation.java#11 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Operation.java#12 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
 
     private static final Logger LOG = Logger.getLogger(Operation.class);
 
     private Environment m_env;
-    private HashMap m_types = new HashMap();
     private HashSet m_parameters = new HashSet();
     private HashMap m_mappings = new HashMap();
 
@@ -31,7 +30,7 @@ abstract class Operation {
     }
 
     protected Operation() {
-        this(new Environment());
+        this(new Environment(null));
     }
 
     public boolean isParameter(Path path) {
@@ -46,10 +45,14 @@ abstract class Operation {
         return m_env.contains(parameter);
     }
 
-    public void set(Path parameter, Object value, int type) {
+    public void set(Path parameter, Object value) {
         m_parameters.add(parameter);
         m_env.set(parameter, value);
-        m_types.put(parameter, new Integer(type));
+    }
+
+    public void set(Path parameter, Object value, int type) {
+        m_parameters.add(parameter);
+        m_env.set(parameter, value, type);
     }
 
     public Object get(Path parameter) {
@@ -57,7 +60,7 @@ abstract class Operation {
     }
 
     public int getType(Path parameter) {
-        return ((Integer) m_types.get(parameter)).intValue();
+        return m_env.getType(parameter);
     }
 
     Environment getEnvironment() {
