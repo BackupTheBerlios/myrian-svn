@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/02/28 $
+ * @version $Revision: #8 $ $Date: 2004/03/03 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#7 $ by $Author: rhs $, $DateTime: 2004/02/28 08:30:26 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#8 $ by $Author: rhs $, $DateTime: 2004/03/03 08:29:14 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -312,7 +312,7 @@ class Generator {
         for (Iterator it = values.keys().iterator(); it.hasNext(); ) {
             QFrame qf = (QFrame) it.next();
             if (frame.isConstrained(values.get(qf))) {
-                result.add(qf.getAlias());
+                result.add(qf.getDuplicate());
             }
         }
 

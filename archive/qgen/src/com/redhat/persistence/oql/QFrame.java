@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/03/02 $
+ * @version $Revision: #10 $ $Date: 2004/03/03 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#9 $ by $Author: rhs $, $DateTime: 2004/03/02 10:09:25 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#10 $ by $Author: rhs $, $DateTime: 2004/03/03 08:29:14 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -22,6 +22,8 @@ class QFrame {
     private Expression m_expression;
     private ObjectType m_type;
     private QFrame m_container;
+
+    private String m_alias;
 
     private boolean m_outer = false;
     private List m_values = null;
@@ -35,7 +37,7 @@ class QFrame {
     private Expression m_limit = null;
     private Expression m_offset = null;
     private boolean m_hoisted = false;
-    private QFrame m_alias = null;
+    private QFrame m_duplicate = null;
 
     QFrame(Generator generator, Expression expression, ObjectType type,
            QFrame container) {
@@ -43,6 +45,7 @@ class QFrame {
         m_expression = expression;
         m_type = type;
         m_container = container;
+        m_alias = "t" + m_generator.getFrames().size();
     }
 
     Generator getGenerator() {
@@ -157,8 +160,8 @@ class QFrame {
     }
 
     String alias() {
-        if (m_alias != null) { return m_alias.alias(); }
-        return "t" + m_generator.getFrames().indexOf(this);
+        if (m_duplicate != null) { return m_duplicate.alias(); }
+        return m_alias;
     }
 
     String emit() {
@@ -279,11 +282,11 @@ class QFrame {
         Set defs = new HashSet();
 
         boolean first = true;
-        if (m_table != null && m_alias == null) {
+        if (m_table != null && m_duplicate == null) {
             first = false;
             result.append(m_table + " " + alias());
             defs.add(this);
-        } else if (m_tableExpr != null && m_alias == null) {
+        } else if (m_tableExpr != null && m_duplicate == null) {
             first = false;
             result.append(m_tableExpr.emit(m_generator) + " " + alias());
             defs.add(this);
@@ -377,7 +380,7 @@ class QFrame {
         Set result = new HashSet();
         for (Iterator it = values.iterator(); it.hasNext(); ) {
             QValue value = (QValue) it.next();
-            result.add(value.getFrame().getAlias());
+            result.add(value.getFrame().getDuplicate());
         }
         return result;
     }
@@ -548,19 +551,19 @@ class QFrame {
             }
             if (dups.size() > 0) {
                 QFrame dup = (QFrame) dups.iterator().next();
-                setAlias(dup);
+                setDuplicate(dup);
             }
             frames.add(this);
         }
     }
 
-    private void setAlias(QFrame target) {
-        m_alias = target;
+    private void setDuplicate(QFrame dup) {
+        m_duplicate = dup;
     }
 
-    QFrame getAlias() {
-        if (m_alias == null) { return this; }
-        return m_alias.getAlias();
+    QFrame getDuplicate() {
+        if (m_duplicate == null) { return this; }
+        return m_duplicate.getDuplicate();
     }
 
     public String toString() {

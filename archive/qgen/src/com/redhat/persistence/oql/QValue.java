@@ -6,12 +6,12 @@ import com.redhat.persistence.metadata.*;
  * QValue
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/02/28 $
+ * @version $Revision: #3 $ $Date: 2004/03/03 $
  **/
 
 class QValue {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QValue.java#2 $ by $Author: rhs $, $DateTime: 2004/02/28 08:30:26 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QValue.java#3 $ by $Author: rhs $, $DateTime: 2004/03/03 08:29:14 $";
 
     private QFrame m_frame;
     private String m_column;
@@ -34,7 +34,7 @@ class QValue {
     }
 
     boolean isNullable() {
-        QFrame frame = m_frame.getAlias();
+        QFrame frame = m_frame.getDuplicate();
         if (frame.isOuter()) { return true; }
         if (frame.getTable() == null) { return true; }
         Root root = frame.getGenerator().getRoot();
