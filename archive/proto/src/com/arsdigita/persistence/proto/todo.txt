@@ -54,6 +54,15 @@ Functionality:
 
      Cache data structures, cache invalidation.
 
+     Single object caching can be done with minor modification to
+     Session.retrieve(PropertyMap). Grab the session key, and if the
+     object exists in the session data structures then check to see
+     that the object isn't deleted, and return it if it exists. This
+     requires the same logic that is in RecordSet.load() in order to
+     deal with specializing the object that the session stores. This
+     will result in some additional test failures due to changing
+     semantics.
+
      Status: Not started, nonblocking.
 
  * Weak refs
