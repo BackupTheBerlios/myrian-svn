@@ -91,7 +91,7 @@
   <li>removed hardcoded jdbc url from tests</li>
   <li>finish JDOQL parsing</li>
   <li>need two way order -> line item for ordering to work correctly</li>
-  <li>seperate various behavior control bits from one way, two way,
+  <li>separate various behavior control bits from one way, two way,
       composite, component, etc</li>
   <li>pdl support for nested parameterized types</li>
   <li>improved pdl loading process (may require custom enhancer)</li>
@@ -113,7 +113,7 @@
 <h2>1.0 releasable</h2>
 
 <ul>
-  <li>all relevent portions of the TCK must pass</li>
+  <li>all relevant portions of the TCK must pass</li>
   <li>test plan</li>
   <li>stop using PropertyMap as key. switch to serializable String
       based with transient slots for actual thing. add new PMap
@@ -122,7 +122,7 @@
       will provide similar functionality</li>
   <li>load c.r.p metadata from jdo files instead of pdl files (looks
       like it requires custom enhancer)</li>
-  <li>ashah should get cache eviction in c.r.p commitable to PMI#evict
+  <li>ashah should get cache eviction in c.r.p committable to PMI#evict
       can be implemented</li.
   <li>serializable query</li>
   <li>add StatementProfiler to engine constructed in PMF</li>
@@ -164,8 +164,8 @@
   <li>C.getAllTypes and C.getAllFields should be rewritten such that
       they their (unmodifiable) lists once and only once, as opposed
       to recomputing them on every call.</li>
-  <li>make ReflectionAdapter use cglib's Factory interface for
-      efficient object creation</li>
+  <li><s>make ReflectionAdapter use cglib's Factory interface for
+      efficient object creation</s> (no longer used)</li>
   <li>pmi's IdentityMap needs to use weak references to the
       objects</li>
   <li>fetch groups?</li>
@@ -183,8 +183,8 @@
           them with pluggable renderers</li>
       <li>remove sql producing code from DDLWriter and replace it with a
           pluggable renderer</li>
-      <li>remove usage from BlobAd and StringAd, figure out how to make
-          adapters db dependent</li>
+      <li><s>remove usage of oracle.sql.[BC]LOB from BlobAd and StringAd, figure
+          out how to make adapters db-independent</s></li>
       <li>either make InFilter a plugin point or choose one behavior</li>
       <li>remove cap.Session's use of DbHelper to choose an SQLWriter</li>
       <li>figure out how PDL.java can set up the appropriate environment
@@ -203,7 +203,7 @@
   <li>First-class Objects vs Second-class Objects
     <ul>
       <li>how do Collection implementation fit in</li>
-      <li>are PersitenceCapable SCOs using embedded-* the same as
+      <li>are PersistenceCapable SCOs using embedded-* the same as
           components</li>
     </ul>
   </li>
