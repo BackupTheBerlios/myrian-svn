@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #17 $ $Date: 2004/03/19 $
+ * @version $Revision: #18 $ $Date: 2004/03/23 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#17 $ by $Author: rhs $, $DateTime: 2004/03/19 21:45:43 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#18 $ by $Author: rhs $, $DateTime: 2004/03/23 16:12:52 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -47,8 +47,39 @@ public class Query {
 
     private static final String ROWNUM = "rownum__";
 
+    /*private static int FRAME = 0;
+    private static int HOIST = 0;
+    private static int MERGE = 0;
+    private static int FILL = 0;
+    private static int INNER = 0;
+    private static int SHRINK = 0;
+    private static int EMIT = 0;
+
+    static int FOCUS = 0;
+
+    public static void dump() {
+        s_log.warn("FRAME: " + FRAME);
+        s_log.warn("HOIST: " + HOIST);
+        s_log.warn("MERGE: " + MERGE);
+        s_log.warn("FILL: " + FILL);
+        s_log.warn("INNER: " + INNER);
+        s_log.warn("SHRINK: " + SHRINK);
+        s_log.warn("EMIT: " + EMIT);
+        s_log.warn("Total: " + (FRAME + HOIST + MERGE + FILL + INNER +
+                                SHRINK + EMIT));
+        s_log.warn("Focus: " + FOCUS);
+        }*/
+
+    private static final ThreadLocal s_generators = new ThreadLocal() {
+        public Object initialValue() {
+            return new Generator();
+        }
+    };
+
     public Code generate(Root root, boolean oracle) {
-        Generator gen = new Generator(root);
+        Generator gen = (Generator) s_generators.get();
+        gen.init(root);
+        //long start = System.currentTimeMillis();
         m_query.frame(gen);
 
         QFrame qframe = gen.getFrame(m_query);
@@ -62,11 +93,15 @@ public class Query {
             gen.pop();
         }
 
+        //FRAME += System.currentTimeMillis() - start;
+
         if (s_log.isDebugEnabled()) {
             s_log.debug("unoptimized frame:\n" + qframe);
         }
 
         List frames = gen.getFrames();
+
+        //start = System.currentTimeMillis();
 
         boolean modified;
         do {
@@ -77,18 +112,26 @@ public class Query {
             }
         } while (modified);
 
+        //HOIST += System.currentTimeMillis() - start;
+
         if (s_log.isDebugEnabled()) {
             s_log.debug("hoisted frame:\n" + qframe);
         }
+
+        //start = System.currentTimeMillis();
 
         for (int i = 0; i < frames.size(); i++) {
             QFrame qf = (QFrame) frames.get(i);
             qf.mergeOuter();
         }
 
+        //MERGE += System.currentTimeMillis() - start;
+
         if (s_log.isDebugEnabled()) {
             s_log.debug("outers merged:\n" + qframe);
         }
+
+        //start = System.currentTimeMillis();
 
         for (int i = 0; i < frames.size(); i++) {
             QFrame qf = (QFrame) frames.get(i);
@@ -97,9 +140,13 @@ public class Query {
             }
         }
 
+        //FILL += System.currentTimeMillis() - start;
+
         if (s_log.isDebugEnabled()) {
             s_log.debug("eq/nn filled:\n" + qframe);
         }
+
+        //start = System.currentTimeMillis();
 
         do {
             modified = false;
@@ -117,18 +164,26 @@ public class Query {
             }
         } while (modified);
 
+        //INNER += System.currentTimeMillis() - start;
+
         if (s_log.isDebugEnabled()) {
             s_log.debug("innerized frame:\n" + qframe);
         }
+
+        //start = System.currentTimeMillis();
 
         for (Iterator it = gen.getFrames().iterator(); it.hasNext(); ) {
             QFrame qf = (QFrame) it.next();
             qf.shrink();
         }
 
+        //SHRINK += System.currentTimeMillis() - start;
+
         if (s_log.isDebugEnabled()) {
             s_log.debug("shrunk frame:\n" + qframe);
         }
+
+        //start = System.currentTimeMillis();
 
         Code sql = new Code("select ");
 
@@ -182,6 +237,8 @@ public class Query {
             sql = new Code("select count(*) as \"size\" from (").add(sql)
                 .add(") count__");
         }
+
+        //EMIT += System.currentTimeMillis() - start;
 
         return sql;
     }

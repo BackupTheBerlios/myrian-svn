@@ -6,12 +6,12 @@ import java.util.*;
  * MultiMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/03/08 $
+ * @version $Revision: #6 $ $Date: 2004/03/23 $
  **/
 
 class MultiMap {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/MultiMap.java#5 $ by $Author: rhs $, $DateTime: 2004/03/08 23:10:10 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/MultiMap.java#6 $ by $Author: rhs $, $DateTime: 2004/03/23 16:12:52 $";
 
     private List m_keys = new ArrayList();
     private Map m_sets = new HashMap();
@@ -61,6 +61,12 @@ class MultiMap {
         for (Iterator it = values.iterator(); it.hasNext(); ) {
             add(key, it.next());
         }
+    }
+
+    void clear() {
+        m_keys.clear();
+        m_sets.clear();
+        m_size = 0;
     }
 
     public String toString() {

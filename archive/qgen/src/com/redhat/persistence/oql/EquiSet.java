@@ -10,12 +10,12 @@ import org.apache.log4j.Logger;
  * EquiSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/03/16 $
+ * @version $Revision: #3 $ $Date: 2004/03/23 $
  **/
 
 class EquiSet {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/EquiSet.java#2 $ by $Author: rhs $, $DateTime: 2004/03/16 15:39:46 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/EquiSet.java#3 $ by $Author: rhs $, $DateTime: 2004/03/23 16:12:52 $";
 
     private static final Logger s_log = Logger.getLogger(EquiSet.class);
 
@@ -24,13 +24,18 @@ class EquiSet {
     private Map m_nodes = new HashMap();
     private Set m_sets = new HashSet();
 
-    private EquiSet m_equiframes = null;
-
     private Set m_frames = new HashSet();
     private List m_framesets = null;
 
     EquiSet(Generator generator) {
         m_generator = generator;
+    }
+
+    void clear() {
+        m_nodes.clear();
+        m_sets.clear();
+        m_frames.clear();
+        m_framesets = null;
     }
 
     Set getSets() {

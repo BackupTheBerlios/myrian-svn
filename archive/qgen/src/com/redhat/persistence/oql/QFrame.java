@@ -10,47 +10,73 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #26 $ $Date: 2004/03/22 $
+ * @version $Revision: #27 $ $Date: 2004/03/23 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#26 $ by $Author: rhs $, $DateTime: 2004/03/22 16:41:14 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#27 $ by $Author: rhs $, $DateTime: 2004/03/23 16:12:52 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
     private Generator m_generator;
+    private String m_alias;
+    private EquiSet m_equisetpool;
+    private Set m_nonnullpool;
+
     private Expression m_expression;
     private ObjectType m_type;
     private QFrame m_container;
 
-    private String m_alias;
+    private boolean m_outer;
+    private List m_values;
+    private Map m_mappings;
+    private String m_table;
+    private Expression m_tableExpr;
+    private Map m_columns;
+    private QFrame m_parent;
+    private List m_children;
+    private Expression m_condition;
+    private Expression m_order;
+    private boolean m_asc;
+    private Expression m_limit;
+    private Expression m_offset;
+    private boolean m_hoisted;
+    private QFrame m_duplicate;
+    private EquiSet m_equiset;
+    private Set m_nonnull;
+    private boolean m_equated;
 
-    private boolean m_outer = false;
-    private List m_values = null;
-    private Map m_mappings = null;
-    private String m_table = null;
-    private Expression m_tableExpr = null;
-    private Map m_columns = null;
-    private QFrame m_parent = null;
-    private List m_children = null;
-    private Expression m_condition = null;
-    private Expression m_order = null;
-    private boolean m_asc = true;
-    private Expression m_limit = null;
-    private Expression m_offset = null;
-    private boolean m_hoisted = false;
-    private QFrame m_duplicate = null;
-    private EquiSet m_equiset = null;
-    private Set m_nonnull = null;
-
-    QFrame(Generator generator, Expression expression, ObjectType type,
-           QFrame container) {
+    QFrame(Generator generator) {
         m_generator = generator;
+        m_alias = "t" + m_generator.getFrames().size();
+        m_equisetpool = new EquiSet(m_generator);
+        m_nonnullpool = new HashSet();
+    }
+
+    void init(Expression expression, ObjectType type, QFrame container) {
         m_expression = expression;
         m_type = type;
         m_container = container;
-        m_alias = "t" + m_generator.getFrames().size();
+
+        m_outer = false;
+        m_values = null;
+        m_mappings = null;
+        m_table = null;
+        m_tableExpr = null;
+        m_columns = null;
+        m_parent = null;
+        m_children = null;
+        m_condition = null;
+        m_order = null;
+        m_asc = true;
+        m_limit = null;
+        m_offset = null;
+        m_hoisted = false;
+        m_duplicate = null;
+        m_equiset = null;
+        m_nonnull = null;
+        m_equated = false;
     }
 
     Generator getGenerator() {
@@ -535,13 +561,7 @@ class QFrame {
         return result;
     }
 
-    List getConditions() {
-        List result = new ArrayList();
-        addConditions(result);
-        return result;
-    }
-
-    private void addConditions(List result) {
+    void addConditions(List result) {
         for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
             child.addConditions(result);
@@ -595,12 +615,6 @@ class QFrame {
         return true;
     }
 
-    List getInnerConditions() {
-        List result = new ArrayList();
-        addInnerConditions(result);
-        return result;
-    }
-
     void addInnerConditions(List result) {
         for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
@@ -613,15 +627,19 @@ class QFrame {
         }
     }
 
+    private List m_equals = new ArrayList();
+    private List m_from = new ArrayList();
+    private List m_to = new ArrayList();
+
     void mergeOuter() {
         if (!m_outer) { return; }
-        List equals = getEquals();
-        if (equals != null) {
-            List from = new ArrayList();
-            List to = new ArrayList();
-            m_generator.split(this, equals, from, to);
-            if (isConnected(to, from)) {
-                QFrame target = ((QValue) to.get(0)).getFrame();
+        m_equals.clear();
+        if (addEquals(m_equals)) {
+            m_from.clear();
+            m_to.clear();
+            m_generator.split(this, m_equals, m_from, m_to);
+            if (isConnected(m_to, m_from)) {
+                QFrame target = ((QValue) m_to.get(0)).getFrame();
                 if (target.getRoot().equals(getRoot())) {
                     // At this point barring the possibility of from
                     // being a nullable unique key we know merging is
@@ -635,7 +653,7 @@ class QFrame {
                     m_parent.m_children.remove(this);
                     target.addChild(this);
 
-                    if (!isNullable(to)) {
+                    if (!isNullable(m_to)) {
                         m_outer = false;
                     }
                 }
@@ -644,18 +662,24 @@ class QFrame {
     }
 
     void equifill() {
-        if (m_equiset == null) { m_equiset = new EquiSet(m_generator); }
-        if (m_nonnull == null) { m_nonnull = new HashSet(); }
+        if (m_equiset == null) {
+            m_equisetpool.clear();
+            m_equiset = m_equisetpool;
+        }
+        if (m_nonnull == null) {
+            m_nonnullpool.clear();
+            m_nonnull = m_nonnullpool;
+        }
 
         for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
             if (child.m_outer) {
-                List equals = child.getEquals();
-                if (equals != null) {
-                    List from = new ArrayList();
-                    List to = new ArrayList();
-                    m_generator.split(child, equals, from, to);
-                    if (isConnected(to, from)) {
+                m_equals.clear();
+                if (child.addEquals(m_equals)) {
+                    m_from.clear();
+                    m_to.clear();
+                    m_generator.split(child, m_equals, m_from, m_to);
+                    if (isConnected(m_to, m_from)) {
                         child.m_equiset = m_equiset;
                     }
                 }
@@ -684,8 +708,6 @@ class QFrame {
             }
         }
     }
-
-    private boolean m_equated = false;
 
     boolean innerize(Set collapse) {
         boolean modified = false;
@@ -718,18 +740,18 @@ class QFrame {
         }
 
         if (m_outer) {
-            List equals = getEquals();
-            if (equals != null) {
-                List from = new ArrayList();
-                List to = new ArrayList();
-                m_generator.split(this, equals, from, to);
+            m_equals.clear();
+            if (addEquals(m_equals)) {
+                m_from.clear();
+                m_to.clear();
+                m_generator.split(this, m_equals, m_from, m_to);
 
                 // XXX: compound keys
-                if (to.size() == 1) {
-                    QValue target = (QValue) to.get(0);
+                if (m_to.size() == 1) {
+                    QValue target = (QValue) m_to.get(0);
                     Set vals = m_parent.m_equiset.get(target);
                     if (vals != null) {
-                        QValue key = (QValue) from.get(0);
+                        QValue key = (QValue) m_from.get(0);
                         String table = key.getTable();
                         String column = key.getColumn();
                         if (table != null && column != null) {
@@ -755,17 +777,19 @@ class QFrame {
         return modified;
     }
 
-    private List getEquals() {
-        List conditions = getInnerConditions();
-        List equals = new ArrayList();
-        for (int i = 0; i < conditions.size(); i++) {
-            Expression c = (Expression) conditions.get(i);
+    private List m_econds = new ArrayList();
+
+    private boolean addEquals(List equals) {
+        m_econds.clear();
+        addInnerConditions(m_econds);
+        for (int i = 0; i < m_econds.size(); i++) {
+            Expression c = (Expression) m_econds.get(i);
             if (!m_generator.isSufficient(c)) {
-                return null;
+                return false;
             }
             equals.addAll(m_generator.getEqualities(c));
         }
-        return equals;
+        return true;
     }
 
     private boolean nn(QValue qv) {
