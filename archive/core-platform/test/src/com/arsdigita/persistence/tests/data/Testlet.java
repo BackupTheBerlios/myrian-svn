@@ -27,12 +27,12 @@ import java.util.*;
  * Testlet
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/05/12 $
+ * @version $Revision: #4 $ $Date: 2003/07/29 $
  **/
 
 public abstract class Testlet {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/Testlet.java#3 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/Testlet.java#4 $ by $Author: rhs $, $DateTime: 2003/07/29 16:08:45 $";
 
     private static final Logger LOG = Logger.getLogger(Testlet.class);
 
@@ -81,8 +81,8 @@ public abstract class Testlet {
         return result;
     }
 
-    private static final void addPaths(ObjectTree tree, int include,
-                                       int exclude, int depth) {
+    protected static final void addPaths(ObjectTree tree, int include,
+                                         int exclude, int depth) {
         ObjectType type = tree.getObjectType();
         for (Iterator it = type.getProperties(); it.hasNext(); ) {
             Property prop = (Property) it.next();

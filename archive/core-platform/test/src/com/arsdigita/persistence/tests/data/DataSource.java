@@ -44,12 +44,12 @@ import java.security.*;
  * value of the correct type for the specified property.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/07/08 $
+ * @version $Revision: #6 $ $Date: 2003/07/29 $
  **/
 
 public class DataSource {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/DataSource.java#5 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/DataSource.java#6 $ by $Author: rhs $, $DateTime: 2003/07/29 16:08:45 $";
 
     private static final Logger LOG = Logger.getLogger(DataSource.class);
 
@@ -90,7 +90,8 @@ public class DataSource {
     }
 
     private String makeString(byte[] hash, int maxLength) {
-        int length = (int) (maxLength * ((float) Math.abs(hash[0]) / 127.0));
+        int length = 1 + (int) ((maxLength - 1) *
+                                ((float) Math.abs(hash[0]) / 127.0));
         StringBuffer result = new StringBuffer(length);
 
         for (int i = 0; i < length; i++) {

@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
  * Aggregator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/07/28 $
+ * @version $Revision: #3 $ $Date: 2003/07/29 $
  **/
 
 class Aggregator extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Aggregator.java#2 $ by $Author: rhs $, $DateTime: 2003/07/28 12:34:24 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Aggregator.java#3 $ by $Author: rhs $, $DateTime: 2003/07/29 16:08:45 $";
 
     private static final Logger LOG = Logger.getLogger(Aggregator.class);
 
@@ -63,7 +63,7 @@ class Aggregator extends Event.Switch {
 
     // Used to track required merges.
     private EventMap m_violations = new EventMap();
-    private EventMap m_props = new EventMap();
+    private EventMap m_twoWay = new EventMap();
     private EventMap m_attributes = new EventMap();
 
     public Collection getNodes() {
@@ -157,18 +157,15 @@ class Aggregator extends Event.Switch {
         m_violations.remove(new CompoundKey(obj, prop));
     }
 
-    private void setPropertyNode(Object obj, Property prop, Object arg,
+    private void setTwoWayEvent(Object obj, Property prop, Object arg,
                                  Event ev) {
-        m_props.setEvent(new CompoundKey(obj, new CompoundKey(prop, arg)), ev);
+        m_twoWay.setEvent
+            (new CompoundKey(obj, new CompoundKey(prop, arg)), ev);
     }
 
-    private Event getPropertyNode(Object obj, Property prop, Object arg) {
-        return m_props.getEvent
+    private Event getTwoWayEvent(Object obj, Property prop, Object arg) {
+        return m_twoWay.getEvent
             (new CompoundKey(obj, new CompoundKey(prop, arg)));
-    }
-
-    private void clearPropertyNode(Object obj, Property prop, Object arg) {
-        m_props.remove(new CompoundKey(obj, new CompoundKey(prop, arg)));
     }
 
     private void setAttributeEvent(Object obj, Event ev) {
@@ -275,14 +272,20 @@ class Aggregator extends Event.Switch {
         Role role = (Role) prop;
         if (!role.isReversable()) { return nd; }
         Role rev = role.getReverse();
-        Event prev = getPropertyNode(arg, rev, obj);
-        if (prev != null) {
-            Node result = merge(findNode(prev), nd, msg);
-            clearPropertyNode(arg, rev, obj);
-            return result;
-        } else {
-            return nd;
+
+        Node result = nd;
+
+        Event ev = getTwoWayEvent(obj, prop, arg);
+        if (ev != null) {
+            result = merge(findNode(ev), result, msg + " (forward)");
         }
+
+        ev = getTwoWayEvent(arg, rev, obj);
+        if (ev != null) {
+            result = merge(findNode(ev), result, msg + " (reverse)");
+        }
+
+        return result;
     }
 
     public void onSet(SetEvent e) {
@@ -328,10 +331,10 @@ class Aggregator extends Event.Switch {
         }
 
         if (prev != null) {
-            setPropertyNode(obj, prop, prev, e);
+            setTwoWayEvent(obj, prop, prev, e);
         }
         if (arg != null) {
-            setPropertyNode(obj, prop, arg, e);
+            setTwoWayEvent(obj, prop, arg, e);
         }
     }
 
@@ -339,14 +342,14 @@ class Aggregator extends Event.Switch {
         Node nd = onPropertyEvent(e);
         nd = mergeTwoWay(nd, e.getObject(), e.getProperty(), e.getArgument(),
                          "two way from add");
-        setPropertyNode(e.getObject(), e.getProperty(), e.getArgument(), e);
+        setTwoWayEvent(e.getObject(), e.getProperty(), e.getArgument(), e);
     }
 
     public void onRemove(RemoveEvent e) {
         Node nd = onPropertyEvent(e);
         nd = mergeTwoWay(nd, e.getObject(), e.getProperty(), e.getArgument(),
                          "two way from remove");
-        setPropertyNode(e.getObject(), e.getProperty(), e.getArgument(), e);
+        setTwoWayEvent(e.getObject(), e.getProperty(), e.getArgument(), e);
     }
 
     public void clear() {
@@ -355,7 +358,7 @@ class Aggregator extends Event.Switch {
         m_properties.clear();
         m_depending.clear();
         m_violations.clear();
-        m_props.clear();
+        m_twoWay.clear();
         m_attributes.clear();
     }
 

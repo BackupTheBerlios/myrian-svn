@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 
 public class DoubleUpdateTestlet extends Testlet {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/DoubleUpdateTestlet.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/DoubleUpdateTestlet.java#2 $ by $Author: rhs $, $DateTime: 2003/07/29 16:08:45 $";
 
     private static final Logger s_log = Logger.getLogger(DoubleUpdateTestlet.class);
 
@@ -47,6 +47,8 @@ public class DoubleUpdateTestlet extends Testlet {
         ObjectTree tree = makeTree(m_type, ATTRIBUTE | ROLE, COLLECTION, 1);
         ObjectTree updated = new ObjectTree(m_type);
         updated.addPath(m_path);
+        addPaths(updated.getSubtree(m_path[0]), ATTRIBUTE | ROLE, COLLECTION,
+                 0);
 
         // Create
         DataObject data = create(tree, m_initial);
