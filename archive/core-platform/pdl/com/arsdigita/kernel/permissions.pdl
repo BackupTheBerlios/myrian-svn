@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/permissions.pdl#14 $
-// $DateTime: 2003/06/10 14:37:58 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/permissions.pdl#15 $
+// $DateTime: 2003/06/10 20:21:10 $
 
 model com.arsdigita.kernel.permissions;
 
@@ -533,33 +533,6 @@ object type ObjectContext {
     composite ACSObject[0..1] context = join object_context.context_id
                                           to acs_objects.object_id;
     object key (objectId);
-
-    add object {}
-    remove object {}
-
-
-    insert {
-        // Because the insertion occurs via trigger,
-        // acs_objects_context_in_tr.
-
-        do {
-            update object_context
-               set context_id = :context.id
-             where object_id = :objectId
-        }
-    }
-
-    update {
-        do {
-            update object_context
-               set context_id = :context.id
-             where object_id = :objectId
-        }
-    }
-
-    delete {
-        do { delete from object_context where object_id = :objectId }
-    }
 }
 
 
