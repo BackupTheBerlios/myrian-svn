@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/07/20 $
+ * @version $Revision: #10 $ $Date: 2004/07/21 $
  **/
 
 class CRPList implements List {
@@ -143,7 +143,7 @@ class CRPList implements List {
         // XXX: there is no syntax for specifying sort order in OQL
         Query query = getPMI().newQuery
             ("oql",
-             "limit(sort(filter($1.auxiliaryEmails$elements$entries, value == $2), key), 1)");
+             "sort(filter($1.auxiliaryEmails$elements$entries, value == $2), key)");
         Collection coll = (Collection) query.execute(elements, element);
         Iterator it = coll.iterator();
 

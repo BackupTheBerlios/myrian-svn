@@ -48,6 +48,10 @@ public class MapEntry implements Map.Entry {
     }
 
     public String toString() {
-        return "MapEntry <container=" + container + "; key=" + key + ">";
+        StringBuffer sb = new StringBuffer();
+        sb.append("MapEntry <container=").append(container);
+        sb.append("; key=").append(key).append("; value=");
+        sb.append(value).append(">");
+        return sb.toString();
     }
 }
