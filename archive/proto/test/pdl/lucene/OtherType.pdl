@@ -11,11 +11,16 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/test/pdl/com/arsdigita/web/TestApplication.pdl#2 $ 
+// $Id: //core-platform/proto/test/pdl/lucene/OtherType.pdl#1 $
 // $DateTime: 2002/12/09 12:29:30 $
 
-model com.arsdigita.web;
+model com.arsdigita.lucene;
 
-object type TestApplication extends Application {
-    reference key (test_application.id);
+import com.arsdigita.kernel.*;
+
+object type OtherType extends ACSObject {
+    String[1..1] name = l_other.name VARCHAR(100);
+    String[0..1] text = l_other.text CLOB;
+
+    reference key (l_other.id);
 }

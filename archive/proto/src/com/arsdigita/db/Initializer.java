@@ -17,6 +17,9 @@ package com.arsdigita.db;
 
 import com.arsdigita.initializer.Configuration;
 import com.arsdigita.initializer.InitializationException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 import org.apache.log4j.Logger;
 import com.arsdigita.db.postgres.*;
@@ -30,7 +33,7 @@ public class Initializer
 
     private Configuration m_conf = new Configuration();
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/Initializer.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/Initializer.java#2 $ by $Author: rhs $, $DateTime: 2002/12/09 12:29:30 $";
 
     public static final String JDBC_URL = "jdbcUrl";
     public static final String DB_USERNAME = "dbUsername";
@@ -193,6 +196,18 @@ public class Initializer
             (String) m_conf.getParameter(DRIVER_SPECIFIC_PARAM1);
         if (driverSpecificParam1 != null) {
             cm.setDriverSpecificParameter("param1", driverSpecificParam1);
+        }
+
+        try {
+            Connection m_conn = cm.getConnection();
+            String testDBConnection = "select 1 from dual";
+            PreparedStatement pstmt = m_conn.prepareStatement(testDBConnection);
+            ResultSet rset = pstmt.executeQuery();
+            rset.next();
+            rset.close();
+            pstmt.close();
+        } catch (java.sql.SQLException e) {
+            throw new InitializationException(e);
         }
 
         LOG.warn("Database initializer finished.");

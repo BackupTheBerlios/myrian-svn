@@ -11,12 +11,12 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/pdl/com/arsdigita/portal/Portlet.pdl#1 $ 
-// $DateTime: 2002/11/27 19:51:05 $
+// $Id: //core-platform/proto/pdl/com/arsdigita/portal/Portlet.pdl#2 $ 
+// $DateTime: 2002/12/09 12:29:30 $
 
 model com.arsdigita.portal;
 
-import com.arsdigita.kernel.ApplicationType;
+import com.arsdigita.web.ApplicationType;
 import com.arsdigita.kernel.ResourceType;
 import com.arsdigita.kernel.Resource;
 

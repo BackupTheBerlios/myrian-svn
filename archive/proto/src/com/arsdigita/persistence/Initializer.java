@@ -19,6 +19,8 @@ import com.arsdigita.db.DbHelper;
 import com.arsdigita.initializer.Configuration;
 import com.arsdigita.initializer.InitializationException;
 import com.arsdigita.persistence.metadata.MDSQLGeneratorFactory;
+import com.arsdigita.util.ResourceManager;
+import com.arsdigita.persistence.metadata.CompoundType;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.pdl.PDL;
@@ -34,7 +36,7 @@ import org.apache.log4j.Level;
  * the SessionManager of them.
  *
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2002/12/09 $
  **/
 
 public class Initializer
@@ -73,6 +75,11 @@ public class Initializer
                              Boolean.class,
                              ObjectType.getOptimizeDefault() ?
                              Boolean.TRUE : Boolean.FALSE);
+        m_conf.initParameter("useFirstRowsByDefault",
+                             "Use the FIRST_ROWS hint in queries on which " +
+                             "setRange() has been called",
+                             Boolean.class,
+                             Boolean.TRUE);
 
         // here for legacy purposes
         m_conf.initParameter(METADATA_XML_FILE_NAMES,
@@ -112,18 +119,21 @@ public class Initializer
         } else {
             DbHelper.unsupportedDatabaseError("SQL Utilities");
         }
+
         ObjectType.setOptimizeDefault(
                                       m_conf.getParameter(OPTIMIZE_BY_DEFAULT).equals(Boolean.TRUE)
                                       );
 
+        CompoundType.setFirstRowsDefault
+            (Boolean.TRUE.equals
+             (m_conf.getParameter("useFirstRowsByDefault")));
+
         if (database == DbHelper.DB_ORACLE) {
-            MDSQLGeneratorFactory.setMDSQLGenerator(
-                                                    MDSQLGeneratorFactory.ORACLE_GENERATOR
-                                                    );
+            MDSQLGeneratorFactory.setMDSQLGenerator
+                (MDSQLGeneratorFactory.ORACLE_GENERATOR);
         } else if (database == DbHelper.DB_POSTGRES) {
-            MDSQLGeneratorFactory.setMDSQLGenerator(
-                                                    MDSQLGeneratorFactory.POSTGRES_GENERATOR
-                                                    );
+            MDSQLGeneratorFactory.setMDSQLGenerator
+                (MDSQLGeneratorFactory.POSTGRES_GENERATOR);
         } else {
             DbHelper.unsupportedDatabaseError("MDSQL generator");
         }
@@ -132,9 +142,9 @@ public class Initializer
 
         if ((m_conf.getParameter(METADATA_XML_FILE_NAMES) != null) &&
             (pdlDir == null)) {
-            throw new InitializationException(
-                                              "Invalid persistence configuration.  Please replace " +
-                                              "metadataXmlFileNames with pdlDirectory.");
+            throw new InitializationException
+                ("Invalid persistence configuration.  Please replace " +
+                 "metadataXmlFileNames with pdlDirectory.");
         }
 
         SessionManager.setSchemaConnectionInfo( "",  "", "", "");
@@ -160,9 +170,10 @@ public class Initializer
         PDL.loadPDLFiles(new File(pdlDir));
 
         // Finally the files out of the database
+	TransactionContext txn = null;
         try {
             Session session = SessionManager.getSession();
-            TransactionContext txn = session.getTransactionContext();
+            txn = session.getTransactionContext();
             txn.beginTxn();
 
             MetadataRoot root = MetadataRoot.getMetadataRoot();
@@ -229,6 +240,11 @@ public class Initializer
             throw new InitializationException
                 ("Persistence Initialization error while trying to " +
                  "compile the PDL files: " + e.getMessage());
+        } catch (Exception e2) {
+            if (txn != null) {
+                txn.abortTxn();
+            }
+            throw new InitializationException(e2);
         }
     }
 

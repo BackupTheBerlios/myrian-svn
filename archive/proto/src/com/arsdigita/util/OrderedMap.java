@@ -28,9 +28,9 @@ import org.apache.log4j.Logger;
  */
 public class OrderedMap extends TreeMap {
     public static final String versionId =
-        "$Id: //core-platform/proto/src/com/arsdigita/util/OrderedMap.java#1 $" +
-        "$Author: dennis $" +
-        "$DateTime: 2002/11/27 19:51:05 $";
+        "$Id: //core-platform/proto/src/com/arsdigita/util/OrderedMap.java#2 $" +
+        "$Author: rhs $" +
+        "$DateTime: 2002/12/09 12:29:30 $";
 
     private static final Logger s_log = Logger.getLogger(OrderedMap.class);
 
@@ -62,6 +62,12 @@ public class OrderedMap extends TreeMap {
         result.m_comparator = (OrderingComparator) m_comparator.clone();
 
         return result;
+    }
+
+    public void clear() {
+        super.clear();
+
+        m_comparator.clear();
     }
 }
 
@@ -96,5 +102,10 @@ class OrderingComparator implements Comparator, Cloneable {
 
             return null;
         }
+    }
+
+    void clear() {
+        m_sortKeyMap.clear();
+        m_currSortKey = 0;
     }
 }

@@ -22,7 +22,7 @@ import java.util.Map;
  * A interface that defines an API to automatically generate DDL
  * statements based on the information passed in.  The primary use for
  * this class is to provide DDL to create and alter tables used by
- * {@link com.arsdigita.persistence.metadata.DynamicObjectType}.
+ * {@link com.arsdigita.metadata.DynamicObjectType}.
  *
  * Note that the DDLGenerator does not support dropping tables and
  * columns.  This is to avoid data loss and allow rolling back of UDCT
@@ -30,12 +30,12 @@ import java.util.Map;
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
  * @author <a href="mailto:randyg@arsdigita.com">Randy Graebner</a>
- * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/DDLGenerator.java#1 $
+ * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/DDLGenerator.java#2 $
  * @since 4.6.3 */
 
 public interface DDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/DDLGenerator.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/DDLGenerator.java#2 $ by $Author: rhs $, $DateTime: 2002/12/09 12:29:30 $";
     /**
      * This takes an ObjectType name and model, and generates a unique
      * table name that can be used to store the object type.

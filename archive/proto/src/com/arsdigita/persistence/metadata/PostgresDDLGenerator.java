@@ -30,19 +30,19 @@ import org.apache.log4j.Logger;
  * This class provides an implementation that automatically generates DDL
  * statements based on the information passed in.  The primary use for
  * this class is to provide DDL to create and alter tables used by
- * {@link com.arsdigita.persistence.metadata.DynamicObjectType}.
+ * {@link com.arsdigita.metadata.DynamicObjectType}.
  *
  * Note that the DDLGenerator does not support dropping tables and
  * columns.  This is to avoid data loss and allow rolling back of UDCT
  * operations.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#1 $
+ * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#2 $
  * @since 4.6.3 */
 
 final class PostgresDDLGenerator extends BaseDDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#2 $ by $Author: rhs $, $DateTime: 2002/12/09 12:29:30 $";
 
     private static final Logger s_log =
         Logger.getLogger(PostgresDDLGenerator.class);

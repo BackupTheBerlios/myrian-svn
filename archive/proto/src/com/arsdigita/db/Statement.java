@@ -22,6 +22,8 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.util.ArrayList;
 import org.apache.log4j.Logger;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * A simple implementation of the java.sql.Statement interface that
@@ -52,12 +54,12 @@ import org.apache.log4j.Logger;
  * </ul>
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2002/12/09 $
  * @since 4.5
  */
 public class Statement implements java.sql.Statement, ResultSetEventListener {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/Statement.java#1 $ $Author: dennis $ $Date: 2002/11/27 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/Statement.java#2 $ $Author: rhs $ $Date: 2002/12/09 $";
 
     private static final java.util.Set dbgStatements = new java.util.HashSet();
 
@@ -88,6 +90,10 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
     // their requirement.
     private boolean m_needsAutoCommitOff = true;
 
+    //use a Throwable to keep a stack trace of when this statement
+    //was created
+    private Throwable m_created;
+
     // Constructor: use the "wrap" class method to create instances
     protected Statement(com.arsdigita.db.Connection conn,
                         java.sql.Statement stmt) {
@@ -102,6 +108,8 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
                             new Throwable("Stack trace"));
             }
         }
+        
+        m_created = new Throwable();
     }
 
     // Methods
@@ -223,6 +231,12 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
                            ", closing in garbage collection.  Lots of these " +
                            "messages can indicate the cause of an out " +
                            "of cursors error. " + sb.toString());
+                StringWriter w = new StringWriter();
+                PrintWriter msg = new PrintWriter(w);
+                msg.println("Satement was created here:");
+                msg.println(lineSeparator);
+                m_created.printStackTrace(msg);
+                s_cat.warn(w);
                 try {
                     close();
                 } catch (SQLException e) {

@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/pdl/com/arsdigita/categorization/Category.pdl#1 $ 
-// $DateTime: 2002/11/27 19:51:05 $
+// $Id: //core-platform/proto/pdl/com/arsdigita/categorization/Category.pdl#2 $
+// $DateTime: 2002/12/09 12:29:30 $
 
 model com.arsdigita.categorization;
 
@@ -51,7 +51,7 @@ association {
 }
 
 association {
-    Category[0..n] categories = join acs_objects.object_id 
+    Category[0..n] categories = join acs_objects.object_id
                                   to cat_object_category_map.object_id,
                                 join cat_object_category_map.category_id
                                   to cat_categories.category_id;
@@ -59,7 +59,7 @@ association {
                                     to cat_object_category_map.category_id,
                                   join cat_object_category_map.object_id
                                      to acs_objects.object_id;
-    Boolean[0..1] isDefault = cat_object_category_map.default_p; 
+    Boolean[0..1] isDefault = cat_object_category_map.default_p;
     BigDecimal[0..1] sortKey = cat_object_category_map.sort_key;
 
     add categories {
@@ -73,21 +73,21 @@ association {
                 :categories.id,
                 :id,
                 :isDefault,
-                (select CASE WHEN (:sortKey is null) THEN 
+                (select CASE WHEN (:sortKey is null) THEN
                             (select CASE WHEN (max(sort_key) is null)
-                                               THEN 
-                                                0 
-                                               ELSE 
+                                               THEN
+                                                0
+                                               ELSE
                                                 max(sort_key)
-                                          END + 1 
-                                     from cat_object_category_map) 
-                             ELSE 
+                                          END + 1
+                                     from cat_object_category_map)
+                             ELSE
                                  (:sortKey)
                              END
                    from dual)
             )
         }
-    } 
+    }
 
     add childObjects {
         do {
@@ -100,29 +100,29 @@ association {
                 :id,
                 :childObjects.id,
                 :isDefault,
-                (select CASE WHEN (:sortKey is null) THEN 
+                (select CASE WHEN (:sortKey is null) THEN
                             (select CASE WHEN (max(sort_key) is null)
-                                               THEN 
-                                                0 
-                                               ELSE 
+                                               THEN
+                                                0
+                                               ELSE
                                                 max(sort_key)
-                                          END + 1 
-                                     from cat_object_category_map) 
-                             ELSE 
+                                          END + 1
+                                     from cat_object_category_map)
+                             ELSE
                                  (:sortKey)
                              END
                    from dual)
             )
         }
-    } 
+    }
 }
 
 
 
 // this returns all related categories (both ways)
-// To get the children, do 'get("related")' and then filter on 
+// To get the children, do 'get("related")' and then filter on
 // the relationType link attribute to be "child"
-// To get the related, do 'get("related")' and then filter on 
+// To get the related, do 'get("related")' and then filter on
 // the relationType link attribute to be "related"
 
 association {
@@ -155,11 +155,11 @@ association {
                 (select CASE WHEN (:sortKey is null) THEN
                              (select CASE WHEN (max(sort_key) is null) THEN
                                                0
-                                               ELSE 
+                                               ELSE
                                                max(sort_key)
                                           END + 1
                                      from cat_category_category_map)
-                             ELSE 
+                             ELSE
                                  (:sortKey)
                              END
                    from dual),
@@ -180,15 +180,15 @@ association {
                 :id,
                 :related.id,
                 :isDefault,
-                (select CASE WHEN (:sortKey is null) THEN 
+                (select CASE WHEN (:sortKey is null) THEN
                             (select CASE WHEN (max(sort_key) is null)
-                                               THEN 
-                                                0 
-                                               ELSE 
+                                               THEN
+                                                0
+                                               ELSE
                                                 max(sort_key)
-                                          END + 1 
-                                     from cat_category_category_map) 
-                             ELSE 
+                                          END + 1
+                                     from cat_category_category_map)
+                             ELSE
                                  (:sortKey)
                              END
                    from dual),
@@ -199,20 +199,20 @@ association {
 }
 
 
-// This returns all of the ACSObjects within the subtree for 
+// This returns all of the ACSObjects within the subtree for
 // a given category
-// no depth on this one, because the 
+// no depth on this one, because the
 // same category might appear multiple times
 // at different levels.
 query objectsInSubtree {
     ACSObject object;
 
     do {
-        select acs_objects.object_id, 
+        select acs_objects.object_id,
                object_type,
                display_name,
                default_domain_class
-          from acs_objects, 
+          from acs_objects,
                (select subcategory_id from cat_cat_subcat_trans_index
                 where category_id = :categoryID) categories,
                cat_object_category_map map
@@ -256,7 +256,7 @@ query categorySubtree {
 
 
 // This gets the subtree from the specifid root, except for the
-// subtree of the current category (elements in the current 
+// subtree of the current category (elements in the current
 // category's subtree would lead to a loop in the DAG, so they
 // aren't valid parents).
 query validParents {
@@ -265,14 +265,14 @@ query validParents {
         select cat_categories.category_id, name, description, enabled_p,
                abstract_p, object_type, default_domain_class,
                default_ancestors
-          from cat_cat_subcat_trans_index trans, 
-               cat_categories, 
+          from cat_cat_subcat_trans_index trans,
+               cat_categories,
                acs_objects
          where trans.category_id = :rootID
            and cat_categories.category_id = trans.subcategory_id
            and cat_categories.category_id = acs_objects.object_id
-           and cat_categories.category_id not in (select subcategory_id 
-                                      from cat_cat_subcat_trans_index 
+           and cat_categories.category_id not in (select subcategory_id
+                                      from cat_cat_subcat_trans_index
                                      where category_id = :id)
     } map {
         validParent.id = cat_categories.category_id;
@@ -312,7 +312,7 @@ query topLevelCategories {
 
 data operation swapCategoryWithNextCategory {
     do {
-        update cat_category_category_map 
+        update cat_category_category_map
         set sort_key = CASE WHEN (sort_key = :sortKey) THEN
                                  (:nextSortKey)
                             ELSE
@@ -320,7 +320,7 @@ data operation swapCategoryWithNextCategory {
                        END
         where (sort_key = :sortKey or sort_key = :nextSortKey)
         and category_id = :parentID
-        and 2 = (select count(*) from cat_category_category_map 
+        and 2 = (select count(*) from cat_category_category_map
                  where (sort_key = :sortKey or sort_key = :nextSortKey)
                  and category_id = :parentID)
     }
@@ -328,7 +328,7 @@ data operation swapCategoryWithNextCategory {
 
 data operation swapObjectWithNextObject {
     do {
-        update cat_object_category_map 
+        update cat_object_category_map
         set sort_key = CASE WHEN (sort_key = :sortKey) THEN
                                  (:nextSortKey)
                             ELSE
@@ -336,7 +336,7 @@ data operation swapObjectWithNextObject {
                        END
         where (sort_key = :sortKey or sort_key = :nextSortKey)
         and category_id = :parentID
-        and 2 = (select count(*) from cat_object_category_map 
+        and 2 = (select count(*) from cat_object_category_map
                  where (sort_key = :sortKey or sort_key = :nextSortKey)
                  and category_id = :parentID)
     }
@@ -351,7 +351,7 @@ query minObjectCategorySortKey {
     }
 
     do {
-        select min(sort_key) as sort_key from cat_object_category_map 
+        select min(sort_key) as sort_key from cat_object_category_map
         where category_id = :categoryID
     } map {
         sortKey = sort_key;
@@ -366,7 +366,7 @@ query maxObjectCategorySortKey {
     }
 
     do {
-        select max(sort_key) as sort_key from cat_object_category_map 
+        select max(sort_key) as sort_key from cat_object_category_map
         where category_id = :categoryID
     } map {
         sortKey = sort_key;
@@ -381,7 +381,7 @@ query minCategoryCategorySortKey {
     }
 
     do {
-        select min(sort_key) as sort_key from cat_category_category_map 
+        select min(sort_key) as sort_key from cat_category_category_map
         where category_id = :categoryID
     } map {
         sortKey = sort_key;
@@ -396,7 +396,7 @@ query maxCategoryCategorySortKey {
     }
 
     do {
-        select max(sort_key) as sort_key from cat_category_category_map 
+        select max(sort_key) as sort_key from cat_category_category_map
         where category_id = :categoryID
     } map {
         sortKey = sort_key;
@@ -412,7 +412,7 @@ query getAllCategoryAncestors {
     do {
         select c.category_id, c.name, c.description, c.enabled_p,
                default_ancestors
-        from cat_categories c, 
+        from cat_categories c,
              cat_cat_subcat_trans_index trans
         where trans.subcategory_id = :categoryID
           and trans.category_id = c.category_id
@@ -426,11 +426,11 @@ query getAllCategoryAncestors {
 }
 
 
-               
+
 data operation updateCategoryDescendants {
     do {
         update cat_categories
-        set default_ancestors = :newPrefix || substr(default_ancestors, 
+        set default_ancestors = :newPrefix || substr(default_ancestors,
                                                      :oldPrefixLength + 1)
         where default_ancestors like :oldPrefix || '%'
         and not category_id = :id
@@ -438,6 +438,8 @@ data operation updateCategoryDescendants {
 }
 
 query immediateChildObjectIDs {
+    BigDecimal id;
+
     do {
         select
             object_id

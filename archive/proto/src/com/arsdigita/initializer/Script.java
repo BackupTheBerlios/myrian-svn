@@ -30,12 +30,12 @@ import java.util.List;
  * Script
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2002/12/09 $
  */
 
 public class Script {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/initializer/Script.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/initializer/Script.java#2 $ by $Author: rhs $, $DateTime: 2002/12/09 12:29:30 $";
 
     private static final Logger s_log =
         Logger.getLogger(Script.class);
