@@ -21,10 +21,11 @@ import com.redhat.persistence.oql.Equals;
 import com.redhat.persistence.oql.Expression;
 import com.redhat.persistence.oql.Literal;
 import com.redhat.persistence.oql.Not;
+import com.redhat.persistence.oql.Static;
 
 class EqualsFilter extends FilterImpl {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/EqualsFilter.java#1 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/EqualsFilter.java#2 $ by $Author: ashah $, $DateTime: 2004/03/24 01:05:38 $";
 
     private final String m_attribute;
     private final String m_bindName;
@@ -55,7 +56,17 @@ class EqualsFilter extends FilterImpl {
     protected Expression makeExpression(DataQueryImpl query, Map bindings) {
         Path path = Path.get(m_attribute);
         path = query.unalias(path);
-        path = query.mapAndAddPath(path);
+
+        Expression variable;
+        if (query.hasProperty(path)) {
+            path = query.mapAndAddPath(path);
+            variable = Expression.valueOf(path);
+        } else {
+            // this handles cases like eq("lower(attribute)", value)
+            String expr = query.unalias(m_attribute);
+            expr = query.mapAndAddPaths(expr);
+            variable = new Static(expr);
+        }
 
         Expression value;
         if (isValueNull()) {
@@ -64,7 +75,9 @@ class EqualsFilter extends FilterImpl {
             value = new Literal(getBindings().get(m_bindName));
         }
 
-        Expression expr = new Equals(Expression.valueOf(path), value);
+
+        Expression expr = new Equals(variable, value);
+
         if (m_not) {
             expr = new Not(expr);
         }

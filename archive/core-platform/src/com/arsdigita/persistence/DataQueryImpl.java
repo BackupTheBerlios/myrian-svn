@@ -56,12 +56,12 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #37 $ $Date: 2004/03/23 $
+ * @version $Revision: #38 $ $Date: 2004/03/24 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#37 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#38 $ by $Author: ashah $, $DateTime: 2004/03/24 01:05:38 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 
@@ -69,7 +69,7 @@ class DataQueryImpl implements DataQuery {
     private com.redhat.persistence.Session m_pssn;
     private HashMap m_bindings = new HashMap();
 
-    final private Signature m_originalSig;
+    final Signature m_originalSig;
     private Signature m_signature;
 
     final private Expression m_originalExpr;
@@ -115,14 +115,7 @@ class DataQueryImpl implements DataQuery {
      * Returns the com.redhat.persistence type of the query.
      */
     ObjectType getTypeInternal() {
-        // XXX: link attribute hack
-        if (m_originalSig.isSource(Path.get("link"))) {
-            return m_originalSig.getSource
-                (Path.get(com.redhat.persistence.Session.LINK_ASSOCIATION))
-                .getObjectType();
-        } else {
-            return m_originalSig.getObjectType();
-        }
+        return m_originalSig.getObjectType();
     }
 
     public CompoundType getType() {
@@ -130,13 +123,11 @@ class DataQueryImpl implements DataQuery {
     }
 
     public boolean hasProperty(String propertyName) {
-        // XXX: link attributes
         Path p =  unalias(Path.get(propertyName));
         return hasProperty(p);
     }
 
-    private boolean hasProperty(Path p) {
-        // XXX: link attributes
+    boolean hasProperty(Path p) {
         return getTypeInternal().getProperty(p) != null;
     }
 
@@ -545,6 +536,9 @@ class DataQueryImpl implements DataQuery {
     private class AddPathMapper implements SQLParser.Mapper {
         public Path map(Path path) {
             Path p = unalias(path);
+            // XXX: hasProperty(p) does not work because you can't
+            // addPath doesn't accept paths starting with
+            // Session.LINK_ASSOCIATION
             if (getTypeInternal().getProperty(p) != null) {
                 addPath(p, false);
             }
@@ -572,8 +566,6 @@ class DataQueryImpl implements DataQuery {
     }
 
     private Expression makeExpr() {
-        final ObjectType type = getTypeInternal();
-
         String[] orders = new String[m_orders.size()];
 
         for (int i = m_orders.size() - 1; i >= 0; i--) {

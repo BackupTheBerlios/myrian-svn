@@ -19,18 +19,19 @@ import com.arsdigita.persistence.metadata.Property;
 import com.redhat.persistence.Signature;
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.metadata.Link;
+import com.redhat.persistence.metadata.ObjectType;
 
 /**
  * DataAssociationCursorImpl
  *
  * @author Archit Shah &lt;ashah@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2004/03/11 $
+ * @version $Revision: #15 $ $Date: 2004/03/24 $
  **/
 
 class DataAssociationCursorImpl extends DataCollectionImpl
     implements DataAssociationCursor {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#14 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#15 $ by $Author: ashah $, $DateTime: 2004/03/24 01:05:38 $";
 
     private DataAssociationImpl m_assn;
 
@@ -49,6 +50,26 @@ class DataAssociationCursorImpl extends DataCollectionImpl
 
     private boolean hasLinkAttributes() {
         return (m_assn.getProperty() instanceof Link);
+    }
+
+    ObjectType getTypeInternal() {
+        if (m_originalSig.isSource(Path.get("link"))) {
+            return m_originalSig.getSource
+                (Path.get(com.redhat.persistence.Session.LINK_ASSOCIATION))
+                .getObjectType();
+        } else {
+            return super.getTypeInternal();
+        }
+    }
+
+    boolean hasProperty(Path p) {
+        boolean superAnswer = super.hasProperty(p);
+
+        if (superAnswer || !hasLinkAttributes()) {
+            return superAnswer;
+        }
+
+        return m_originalSig.exists(p);
     }
 
     protected Path resolvePath(Path path) {
