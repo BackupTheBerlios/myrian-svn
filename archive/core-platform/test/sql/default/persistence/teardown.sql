@@ -17,7 +17,7 @@
 -- tests to run.
 --
 -- @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
--- @version $Revision: #3 $ $Date: 2002/07/23 $
+-- @version $Revision: #4 $ $Date: 2002/07/23 $
 --
 
 -- Right now this is duplicated from the individual files. This should
@@ -38,3 +38,5 @@ drop table t_groups;
 drop table t_users;
 drop table t_colors;
 drop table t_parties;
+
+drop table PLSQLTestTable;

@@ -19,21 +19,21 @@
 -- @version $Revision: #3 $ $Date: 2002/07/23 $
 --
 
-create or replace procedure DataOperationProcedure as
-    my_variable	integer;
+create or replace function DataOperationProcedure(integer) returns integer 
+as '
 begin
    insert into t_data_query (entry_id, action, priority, action_time)
    select entry_id + 1, action, priority, action_time from t_data_query 
    where entry_id = (select max(entry_id) from t_data_query);
+   return 1;
 end;
-/
-show errors
+' LANGUAGE 'plpgsql';
 
 
-create or replace function DataOperationFunction 
-return varchar2
-is 
-  toReturn varchar2(300);
+create or replace function DataOperationFunction() returns varchar
+as '
+declare
+  toReturn varchar(300);
 begin
    insert into t_data_query (entry_id, action, priority, action_time)
    select entry_id + 1, action, priority, action_time from t_data_query 
@@ -41,102 +41,93 @@ begin
    select max(entry_id) into toReturn from t_data_query;   
    return toReturn;
 end;
-/
-show errors
+' LANGUAGE 'plpgsql';
 
-create or replace procedure DataOperationProcWithOut(v_new_id OUT varchar2) 
-as 
+
+create or replace function DataOperationProcWithOut(varchar) returns varchar
+as '
+declare v_new_id varchar;
 begin
    insert into t_data_query (entry_id, action, priority, action_time)
    select entry_id + 1, action, priority, action_time from t_data_query 
    where entry_id = (select max(entry_id) from t_data_query);
    select max(entry_id) into v_new_id from t_data_query;   
+   return v_new_id;
 end;
-/
-show errors
+' LANGUAGE 'plpgsql';
 
-create or replace procedure DataOperationProcWithOut(v_new_id OUT varchar2) 
-as 
+
+create or replace function DataOperationProcWithInOut(integer) returns varchar
+as '
+declare 
+    v_new_id varchar;
 begin
    insert into t_data_query (entry_id, action, priority, action_time)
-   select entry_id + 1, action, priority, action_time from t_data_query 
+   select $1, action, priority, action_time from t_data_query 
    where entry_id = (select max(entry_id) from t_data_query);
-   select max(entry_id) into v_new_id from t_data_query;   
+   select cast(max(entry_id) as varchar) into v_new_id from t_data_query;   
+   return v_new_id;
 end;
-/
-show errors
+' LANGUAGE 'plpgsql';
 
-create or replace procedure DataOperationProcWithInOut(
-       v_old_id IN varchar2,
-       v_new_id OUT varchar2) 
-as 
+
+create or replace function DataOperationProcWithInOutInt(integer) returns integer
+as '
+declare 
+    v_new_id integer;
 begin
    insert into t_data_query (entry_id, action, priority, action_time)
-   select v_old_id, action, priority, action_time from t_data_query 
+   select $1, action, priority, action_time from t_data_query 
    where entry_id = (select max(entry_id) from t_data_query);
    select max(entry_id) into v_new_id from t_data_query;   
+   return v_new_id;
 end;
-/
-show errors
+' LANGUAGE 'plpgsql';
 
-create or replace procedure DataOperationProcWithInOutInt(
-       v_old_id IN Integer,
-       v_new_id OUT Integer) 
-as 
-begin
-   insert into t_data_query (entry_id, action, priority, action_time)
-   select v_old_id, action, priority, action_time from t_data_query 
-   where entry_id = (select max(entry_id) from t_data_query);
-   select max(entry_id) into v_new_id from t_data_query;   
-end;
-/
-show errors
 
-create or replace procedure DataOperationProcWithDates(
-       v_id_to_update IN Integer,
-       v_old_date IN Date,
-       v_new_date OUT Date) 
-as 
+create or replace function DataOperationProcWithDates(integer, timestamp)
+       returns timestamp
+as '
+declare 
+   v_new_date timestamp;
 begin
-   update t_data_query set action_time = v_old_date
-   where entry_id = v_id_to_update;
+   update t_data_query set action_time = $2
+   where entry_id = $1;
    select max(action_time) into v_new_date from t_data_query;   
+   return v_new_date;
 end;
-/
-show errors
+' LANGUAGE 'plpgsql';
 
-create or replace procedure DataOperationProcedureWithArgs(v_priority in integer)
-as
+
+create or replace function DataOperationProcedureWithArgs(integer) returns integer
+as '
 begin
    insert into t_data_query (entry_id, action, priority, action_time)
-   select entry_id + 1, action, v_priority, action_time from t_data_query 
+   select entry_id + 1, action, $1, action_time from t_data_query 
    where entry_id = (select max(entry_id) from t_data_query);
+   return 1;
 end;
-/
-show errors
+' LANGUAGE 'plpgsql';
 
-create or replace procedure DataOperationProcedureOneArg(v_description in integer)
-as
+
+create or replace function DataOperationProcedureOneArg(varchar) returns integer
+as '
 begin
    insert into t_data_query (entry_id, action, priority, action_time, description)
-   select entry_id + 1, action, priority, action_time, v_description 
+   select entry_id + 1, action, priority, action_time, $1
    from t_data_query 
    where entry_id = (select max(entry_id) from t_data_query);
+   return 1;
 end;
-/
-show errors
+' LANGUAGE 'plpgsql';
 
-create or replace procedure PLSQLWithArbitraryArgs(v_arg1 in integer, 
-       v_arg2 in integer, 
-       v_arg3 in integer default null, 
-       v_arg4 in integer default null, 
-       v_arg5 in integer default null)
-as
+
+create or replace function PLSQLWithArbitraryArgs(integer, integer, integer, integer, integer) returns integer
+as '
 begin
         insert into PLSQLTestTable 
         values 
-        (v_arg1, v_arg2, v_arg3, v_arg4, v_arg5);
+        ($1, $2, $3, $4, $5);
+        return 1;
 end;
-/
-show errors
-
+' LANGUAGE 'plpgsql';

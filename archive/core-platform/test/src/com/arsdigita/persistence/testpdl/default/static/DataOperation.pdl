@@ -14,7 +14,6 @@
 
 model examples;
 
-
 data operation DataOperationWithBindVariables {
     do {
         update t_data_query
@@ -24,48 +23,11 @@ data operation DataOperationWithBindVariables {
     }
 }
 
-
 data operation DataOperationWithBindVariablesAndNull {
     do {
         update t_data_query
         set description = :description
         where priority = :priority
-    }
-}
-
-
-data operation DataOperationWithPLSQL {
-    do {
-        begin
-          DataOperationProcedure;
-        end;
-    }
-}
-
-data operation DataOperationWithPLSQLAndReturn {
-    do {
-        begin
-          DataOperationFunction;
-        end;
-    } map {
-        returnValue = DataOperationFunction.returnValue;
-    }
-}
-
-data operation DataOperationWithPLSQLAndArgs {
-    do {
-        begin
-          DataOperationProcedureWithArgs(:priority);
-        end;
-    }
-}
-
-
-data operation DataOperationProcedureOneArg {
-    do {
-        begin
-          DataOperationProcedureOneArg(:description);
-        end;
     }
 }
 
@@ -94,68 +56,61 @@ data operation DataOperationToDeleteTestDynamicAssociations {
 }
 
 
-data operation DataOperationFunction {
-    do call {
-        :newValue = DataOperationFunction
-    } map {
-        newValue : VARCHAR(4000);
-    }
-}
-
-data operation DataOperationProcWithOut {
-    do call {
-        DataOperationProcWithOut(:newID)
-    } map {
-        newID : VARCHAR(4000);
-    }
-}
-
-data operation DataOperationProcWithInOut {
-    do call {
-        DataOperationProcWithInOut(:oldID, :newID)
-    } map {
-        oldID : VARCHAR(40);
-        newID : VARCHAR(40);
-    }
-}
-
-data operation DataOperationProcWithInOutInt {
-    do call {
-        DataOperationProcWithInOutInt(:oldID, :newID)
-    } map {
-        oldID : INTEGER;
-        newID : INTEGER;
-    }
-}
-
-data operation DataOperationProcWithDates {
-    do call {
-        DataOperationProcWithDates(:idToUpdate, :oldDate, :newDate)
-    } map {
-        idToUpdate : INTEGER;
-        oldDate : DATE;
-        newDate : DATE;
-    }
-}
-
-data operation DataOperationProcWithTime {
-    do call {
-        DataOperationProcWithTime(:idToUpdate, :oldDate, :newDate)
-    } map {
-        idToUpdate : INTEGER;
-        oldDate : TIMESTAMP;
-        newDate : TIMESTAMP;
-    }
-}
+//data operation DataOperationFunction {
+//    do call {
+//        :newValue = DataOperationFunction
+//    } map {
+//        newValue : VARCHAR(4000);
+//    }
+//}
+//
+//data operation DataOperationProcWithOut {
+//    do call {
+//        DataOperationProcWithOut(:newID)
+//    } map {
+//        newID : VARCHAR(4000);
+//    }
+//}
+//
+//data operation DataOperationProcWithInOut {
+//    do call {
+//        DataOperationProcWithInOut(:oldID, :newID)
+//    } map {
+//        oldID : VARCHAR(40);
+//        newID : VARCHAR(40);
+//    }
+//}
+//
+//data operation DataOperationProcWithInOutInt {
+//    do call {
+//        DataOperationProcWithInOutInt(:oldID, :newID)
+//    } map {
+//        oldID : INTEGER;
+//        newID : INTEGER;
+//    }
+//}
+//
+//data operation DataOperationProcWithDates {
+//    do call {
+//        DataOperationProcWithDates(:idToUpdate, :oldDate, :newDate)
+//    } map {
+//        idToUpdate : INTEGER;
+//        oldDate : DATE;
+//        newDate : DATE;
+//    }
+//}
+//
+//data operation DataOperationProcWithTime {
+//    do call {
+//        DataOperationProcWithTime(:idToUpdate, :oldDate, :newDate)
+//    } map {
+//        idToUpdate : INTEGER;
+//        oldDate : TIMESTAMP;
+//        newDate : TIMESTAMP;
+//    }
+//}
         
 
-data operation PLSQLWithArbitraryArgsQuery {
-     do {
-         begin
-            PLSQLWithArbitraryArgs(v_arg1 => :arg1, v_arg2 => :arg2, v_arg5 => :arg5);
-         end;
-     }  
-} 
 
 query PLSQLQueryWithArbitraryArgs {
       do {

@@ -63,7 +63,7 @@ import org.apache.log4j.Category;
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@arsdigita.com">randyg@arsdigita.com</a>
  * @author <a href="mailto:deison@arsdigita.com">deison@arsdigita.com</a>
- * @version $Revision: #4 $ $Date: 2002/07/18 $
+ * @version $Revision: #5 $ $Date: 2002/07/23 $
  */
 // NOTE if we ever support anything other than forward-only,
 // we'll need to shut off the auto-closing functionality
@@ -71,7 +71,7 @@ import org.apache.log4j.Category;
 // results and general confusion.
 class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#4 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#5 $ by $Author: randyg $, $DateTime: 2002/07/23 15:15:57 $";
 
     private final static Category log =
         Category.getInstance(DataQueryImpl.class.getName());
@@ -1019,10 +1019,9 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
         StringBuffer sql = new StringBuffer();
         StringBuffer rangeSuffix = null;
 
-        String filter = null;
-        if (m_filter != null) {
-            filter = m_filter.getSQL(this);
-        }
+        boolean isPostgres = (com.arsdigita.db.Initializer.getDatabase() ==
+                              com.arsdigita.db.Initializer.POSTGRES);
+        boolean isOracle = !isPostgres;
 
         // at this point, we determine what the prefix of the query
         // should be and we take care of the range, if applicable
@@ -1037,22 +1036,35 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
             // select count(*) from (<above>)
             // down towards the end of this proc
 
-            sql.append("select /*+ FIRST_ROWS */ *\n" +
-                       " from (select outerResults.*, " +
-                       "rownum as fakeRownum from (");
-            if (m_wrap) {
-                sql.append("select * ");
-            } 
+            if (isOracle) {
+                sql.append("select /*+ FIRST_ROWS */ *\n" +
+                           " from (select outerResults.*, " +
+                           "rownum as fakeRownum from (");
+                if (m_wrap) {
+                    sql.append("select * ");
+                } 
+                
+                rangeSuffix = new StringBuffer(") outerResults" + 
+                                               Utilities.LINE_BREAK);
+                
+                if (getParameter("endFakeRowNum") != null) {
+                    rangeSuffix.append("where rownum < :endFakeRowNum");
+                }
+                
+                rangeSuffix.append(") where fakeRownum >= :beginFakeRowNum)");
+            } else {
+                // it is postgres so we use "limit" and "offset"
+                int begin = ((Integer)getParameter("beginFakeRowNum")).intValue();
+                if (m_wrap) {
+                    sql.append("select * ");
+                } 
+                rangeSuffix = new StringBuffer(" offset " + (begin - 1));
 
-            rangeSuffix = new StringBuffer(") outerResults" + 
-                                           Utilities.LINE_BREAK);
-
-            if (getParameter("endFakeRowNum") != null) {
-                rangeSuffix.append("where rownum < :endFakeRowNum");
+                if (getParameter("endFakeRowNum") != null) {
+                    int end = ((Integer)getParameter("endFakeRowNum")).intValue();
+                    rangeSuffix.append(" limit " + (end - begin));
+                }
             }
-
-            rangeSuffix.append(") where fakeRownum >= :beginFakeRowNum)");
-
         } else {
             if (count) {
                 sql.append("select count(*)" + Utilities.LINE_BREAK);
@@ -1063,6 +1075,10 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
         }
 
         boolean foundWhere = false;
+        String filter = null;
+        if (m_filter != null) {
+            filter = m_filter.getSQL(this);
+        }
 
         if (m_wrap) {
             sql.append("from (");
@@ -1109,7 +1125,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
             }
 
             if (count) {
-                sql.append(")" + Utilities.LINE_BREAK);
+                sql.append(") countTable " + Utilities.LINE_BREAK);
             }
 
             if (!count && m_order != null) {
@@ -1127,11 +1143,12 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
         // and we cannot just return endIndex - beginIndex because
         // we don't know if the system has endIndex rows
         if (count && getParameter("beginFakeRowNum") != null) {
-            sql = new StringBuffer("select count(*) from ( " + sql.toString());
+            sql = new StringBuffer("select count(*) from ( " + 
+                                   sql.toString());
             if (rangeSuffix != null) {
                 sql.append(rangeSuffix.toString());
             }
-            sql.append(")");
+            sql.append(") countTable");
         } else {
             // this again has to deal with the "setRange" method
             if (rangeSuffix != null) {

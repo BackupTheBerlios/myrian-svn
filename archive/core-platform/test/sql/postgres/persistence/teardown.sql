@@ -17,7 +17,7 @@
 -- tests to run.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #5 $ $Date: 2002/07/22 $
+-- @version $Revision: #6 $ $Date: 2002/07/23 $
 --
 
 -- Right now this is duplicated from the individual files. This should
@@ -33,21 +33,19 @@ drop table t_user_group_map;
 --drop table t_datatypes;
 drop table t_data_query;
 
---drop table t_nodes;
 --drop table t_sql_operation;
 
 --drop table t_article_image_map;
 --drop table t_articles;
 --drop table t_images;
 
---drop procedure DataOperationProcedure;
---drop function DataOperationFunction;
+drop function DataOperationProcedure(integer);
+drop function DataOperationFunction();
 drop function DataOperationProcWithReturn(integer);
---drop procedure DataOperationProcWithOut;
---drop procedure DataOperationProcWithInOut;
---drop procedure DataOperationProcWithInOutInt;
---drop procedure DataOperationProcWithDates;
---drop procedure DataOperationProcedureWithArgs;
---drop procedure PLSQLWithArbitraryArgs;
---drop procedure DataOperationProcedureOneArg;
---drop table PLSQLTestTable;
+drop function DataOperationProcWithOut(varchar);
+drop function DataOperationProcWithInOut(integer);
+drop function DataOperationProcWithInOutInt(integer);
+drop function DataOperationProcWithDates(integer, timestamp);
+drop function DataOperationProcedureOneArg(varchar);
+drop function DataOperationProcedureWithArgs(integer);
+drop function PLSQLWithArbitraryArgs(integer, integer, integer, integer, integer);
