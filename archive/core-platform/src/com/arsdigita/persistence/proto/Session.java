@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/06/23 $
+ * @version $Revision: #9 $ $Date: 2003/06/24 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Session.java#8 $ by $Author: vadim $, $DateTime: 2003/06/23 16:12:15 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Session.java#9 $ by $Author: ashah $, $DateTime: 2003/06/24 17:28:06 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -51,6 +51,22 @@ public class Session {
     EventStream getEventStream() { return m_events; }
 
     public Object retrieve(PropertyMap keys) {
+        ObjectData odata = getObjectData(keys);
+
+        if (odata != null) {
+            if (odata.isDeleted()) { return null; }
+
+            ObjectType requested = keys.getObjectType();
+            ObjectType current = getObjectType(odata.getObject());
+
+            // this duplicates logic in RecordSet.load [ashah]
+            if (current.isSubtypeOf(requested)) {
+                return odata.getObject();
+            } else if (!requested.isSubtypeOf(current)) {
+                return null;
+            }
+        }
+
         PersistentCollection pc = retrieve(m_qs.getQuery(keys));
         Cursor c = pc.getDataSet().getCursor();
         if (c.next()) {
@@ -658,6 +674,12 @@ public class Session {
         process(m_afterActivate, activated);
     }
 
+    static Object getSessionKey(PropertyMap pmap) {
+        ObjectType ot = pmap.getObjectType();
+        Adapter ad = Adapter.getAdapter(ot);
+        return ad.getSessionKey(ot, pmap);
+    }
+
     static Object getSessionKey(Object obj) {
         Adapter ad = getAdapter(obj);
         return ad.getSessionKey(obj);
@@ -701,6 +723,10 @@ public class Session {
 
     boolean hasObjectData(Object obj) {
         return m_odata.containsKey(getSessionKey(obj));
+    }
+
+    ObjectData getObjectData(PropertyMap pmap) {
+        return (ObjectData) m_odata.get(getSessionKey(pmap));
     }
 
     ObjectData getObjectData(Object obj) {
