@@ -12,7 +12,7 @@
 -- rights and limitations under the License.
 --
 --
--- $Id: //core-platform/dev/sql/upgrade/oracle-se-5.1.0-5.2.0.sql#2 $
+-- $Id: //core-platform/dev/sql/upgrade/oracle-se-5.1.0-5.2.0.sql#3 $
 
 create or replace function currentDate
 return date 
@@ -22,3 +22,5 @@ begin
 end;
 / 
 show errors;
+
+@@ ../oracle-se/upgrade/categorization/categorization-5.2.1-5.2.2.sql

@@ -19,6 +19,7 @@
 
 
 
+@@ default/kernel/package-hierarchy_denormalization.sql
 @@ default/kernel/sequence-acs_object_id_seq.sql
 @@ default/kernel/index-acs_objects.sql
 @@ default/kernel/index-object_container_map.sql
@@ -94,6 +95,8 @@
 @@ default/categorization/comment-cat_purposes.sql
 @@ default/categorization/table-cat_category_purpose_map.sql
 @@ default/categorization/index-cat_category_purpose_map.sql
+@@ default/categorization/table-cat_cat_subcat_trans_index.sql
+@@ default/categorization/trigger-cat_category_category_map.sql
 
 @@ oracle-se/auditing/table-acs_auditing.sql
 @@ default/auditing/index-acs_auditing.sql

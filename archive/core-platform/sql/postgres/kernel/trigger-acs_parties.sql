@@ -4,7 +4,8 @@
 
 create or replace function parties_groups_in_fn () returns opaque as '
 begin
-  perform parties_add_group(new.group_id);
+  perform hierarchy_add_item(new.group_id, ''group_subgroup_trans_index'',
+                             ''group_id'', ''subgroup_id'');
   return null;
 end;' language 'plpgsql';
 

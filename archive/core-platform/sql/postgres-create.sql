@@ -23,6 +23,7 @@ create view dual as select 1;
 
 
 \i default/kernel/sequence-acs_object_id_seq.sql
+\i postgres/kernel/package-hierarchy_denormalization.sql
 
 \i default/kernel/table-group_subgroup_trans_index.sql
 \i default/kernel/index-group_subgroup_trans_index.sql
@@ -78,6 +79,8 @@ create view dual as select 1;
 \i default/categorization/comment-cat_purposes.sql
 \i default/categorization/table-cat_category_purpose_map.sql
 \i default/categorization/index-cat_category_purpose_map.sql
+\i default/categorization/table-cat_cat_subcat_trans_index.sql
+\i postgres/categorization/trigger-cat_category_category_map.sql
 
 \i default/auditing/table-acs_auditing.sql
 \i default/auditing/index-acs_auditing.sql

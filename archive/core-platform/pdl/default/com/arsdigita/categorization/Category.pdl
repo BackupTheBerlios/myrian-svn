@@ -199,18 +199,11 @@ query objectsInSubtree {
                display_name,
                default_domain_class
           from acs_objects, 
-               (select :categoryID as related_category_id from dual
-                union all
-                select distinct related_category_id 
-                           from (select related_category_id, 
-                                        category_id 
-                                   from cat_category_category_map 
-                                  where relation_type = 'child')
-                     connect by prior related_category_id = category_id
-                     start with category_id = :categoryID) categories,
+               (select subcategory_id from cat_cat_subcat_trans_index
+                where category_id = :categoryID) categories,
                cat_object_category_map map
          where acs_objects.object_id = map.object_id
-               and categories.related_category_id = map.category_id
+               and categories.subcategory_id = map.category_id
     } map {
         object.id = acs_objects.object_id;
         object.objectType = acs_objects.object_type;
@@ -223,35 +216,17 @@ query objectsInSubtree {
 // This walks down the categorization tree and
 // returns child categories, including the current
 // category.
-// See explanation for all the subselects in
-// defaultAncestors, same ideas here.
-// TODO: rethink selecting sort_key as 0.  Problem is that
-// this category may have no children, so we can't just
-// select the sort_key out from cat_category_category_map.
-// May be worth changing with a min and a nvl or select case when.
-// May be worth leaving at 0.  -DEE 7/25/01
 query categorySubtree {
     Category categorySubtree;
-    BigDecimal level;
-    BigDecimal sortKey;
     do {
-          select map.depth, c.category_id, c.name, c.description, 
-                 c.enabled_p, map.sort_key, 
-                 'com.arsdigita.categorization.Category' as object_type, 
-                 c.abstract_p
-            from (select 0 as depth, 0 as sort_key, :id as related_category_id 
-                        from dual
-                  union all
-                  select level as depth, sort_key, related_category_id
-                           from (select related_category_id,
-                                        category_id, sort_key    
-                                   from cat_category_category_map 
-                                  where relation_type = 'child')
-                             connect by prior related_category_id = 
-                                        category_id 
-                             start with category_id = :id) map, 
-                 cat_categories c
-           where (c.category_id = map.related_category_id)
+        select cat_categories.category_id, name, description, enabled_p,
+               abstract_p, object_type, default_domain_class
+          from acs_objects,
+               cat_categories,
+               cat_cat_subcat_trans_index trans
+         where acs_objects.object_id = cat_categories.category_id
+           and trans.category_id = :id
+           and trans.subcategory_id = cat_categories.category_id
     } map {
         categorySubtree.id = category_id;
         categorySubtree.name = name;
@@ -259,8 +234,7 @@ query categorySubtree {
         categorySubtree.isEnabled = enabled_p;
         categorySubtree.isAbstract = abstract_p;
         categorySubtree.objectType = object_type;
-        sortKey = sort_key;
-        level = depth;
+        categorySubtree.defaultDomainClass = default_domain_class;
     }
 }
 
@@ -269,58 +243,28 @@ query categorySubtree {
 // subtree of the current category (elements in the current 
 // category's subtree would lead to a loop in the DAG, so they
 // aren't valid parents).
-// TODO: I would like to move this MINUS into the inner level, in
-// order to allow for selecting out DEPTH (to be used as a link
-// attribute at some point), but I can't figure out how to.
-// In particular, ORA-01472 keeps you from doing a connect by
-// on a view containing MINUS, among other things, and ORA-01473 
-// disallows subqueries in a connect by so I can't do a where not
-// exists either.
-
-// TODO: I can't figure out how to support sort_key here because
-// it breaks the minus.  For now, we're just not sorting when
-// using this query.
 query validParents {
     Category validParent;
     do {
-          select category_id, name, description, enabled_p, abstract_p,
-                 'com.arsdigita.categorization.Category' as object_type
-            from (select 0 as depth, 
-                         :rootID as related_category_id 
-                    from dual
-                  union all
-                  select level as depth, related_category_id
-                           from (select related_category_id, category_id
-                                   from cat_category_category_map 
-                                  where relation_type = 'child')
-                             connect by prior related_category_id = 
-                                        category_id 
-                             start with category_id = :rootID) map, 
-                 cat_categories c
-           where (c.category_id = map.related_category_id)
-          MINUS
-          select category_id, name, description, enabled_p, abstract_p,
-                 'com.arsdigita.categorization.Category' as object_type
-            from (select 0 as depth, 
-                         :id as related_category_id 
-                    from dual
-                  union all
-                  select level as depth, related_category_id
-                           from (select related_category_id, category_id
-                                   from cat_category_category_map 
-                                  where relation_type = 'child')
-                             connect by prior related_category_id = 
-                                        category_id 
-                             start with category_id = :id) map, 
-                 cat_categories c
-           where (c.category_id = map.related_category_id)
+        select cat_categories.category_id, name, description, enabled_p,
+               abstract_p, object_type, default_domain_class
+          from cat_cat_subcat_trans_index trans, 
+               cat_categories, 
+               acs_objects
+         where trans.category_id = :rootID
+           and cat_categories.category_id = trans.subcategory_id
+           and cat_categories.category_id = acs_objects.object_id
+           and cat_categories.category_id not in (select subcategory_id 
+                                      from cat_cat_subcat_trans_index 
+                                     where category_id = :id)
     } map {
-        validParent.id = c.category_id;
-        validParent.name = c.name;
-        validParent.description = c.description;
-        validParent.isEnabled = c.enabled_p;
-        validParent.isAbstract = c.abstract_p;
-        validParent.objectType = c.object_type;
+        validParent.id = cat_categories.category_id;
+        validParent.name = cat_categories.name;
+        validParent.description = cat_categories.description;
+        validParent.isEnabled = cat_categories.enabled_p;
+        validParent.isAbstract = cat_categories.abstract_p;
+        validParent.objectType = acs_objects.object_type;
+        validParent.defaultDomainClass = acs_objects.default_domain_class;
     }
 }
 
@@ -419,7 +363,7 @@ data operation swapObjectWithNextObject {
 }
 
 
-///////////////////////////////////////////////////////
+
 query getRootCategory {
     BigDecimal id;
     String name;

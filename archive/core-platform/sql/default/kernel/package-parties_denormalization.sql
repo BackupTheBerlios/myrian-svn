@@ -37,11 +37,8 @@ as
       group_id    in groups.group_id%TYPE
   )
   as begin
-      -- every group is a subgroup of itself.
-      insert into group_subgroup_trans_index
-      (group_id, subgroup_id, n_paths)
-      values
-      (add_group.group_id, add_group.group_id, 0);
+      hierarchy_add_item(add_group.group_id, 'group_subgroup_trans_index', 
+                         'group_id', 'subgroup_id');
   end add_group;
 
   procedure add_subgroup (
@@ -54,36 +51,10 @@ as
 
       add_subgroup_members(group_id, subgroup_id);
 
-      for new_entry in (
-          select ancestors.group_id, descendants.subgroup_id,
-                 (ancestors.n_paths * descendants.n_paths) as n_paths
-          from group_subgroup_trans_index ancestors,
-               group_subgroup_trans_index descendants
-          where ancestors.subgroup_id = add_subgroup.group_id
-            and descendants.group_id = add_subgroup.subgroup_id
-      ) loop
-
-          if ((add_subgroup.group_id = new_entry.group_id) or
-              (add_subgroup.subgroup_id = new_entry.subgroup_id)) then
-            v_path_increment := 1;
-          else 
-            v_path_increment := new_entry.n_paths;
-          end if;
-
-          update group_subgroup_trans_index
-          set n_paths = n_paths + v_path_increment
-          where group_id = new_entry.group_id
-            and subgroup_id = new_entry.subgroup_id;
-
-          if (SQL%NOTFOUND) then
-
-              insert into group_subgroup_trans_index
-              (group_id, subgroup_id, n_paths)
-              values
-              (new_entry.group_id, new_entry.subgroup_id, v_path_increment);
-          end if;
-      end loop;
-
+      hierarchy_add_subitem(add_subgroup.group_id, 
+                            add_subgroup.subgroup_id,
+                           'group_subgroup_trans_index',
+                           'group_id', 'subgroup_id');
   end add_subgroup;
 
   procedure remove_subgroup (
@@ -93,41 +64,9 @@ as
   as
     v_path_decrement integer;
   begin
-
-      for remove_entry in (
-          select ancestors.group_id, descendants.subgroup_id,
-                 (ancestors.n_paths * descendants.n_paths) as n_paths
-          from group_subgroup_trans_index ancestors,
-               group_subgroup_trans_index descendants
-          where ancestors.subgroup_id = remove_subgroup.group_id
-            and descendants.group_id = remove_subgroup.subgroup_id
-      ) loop
-
-        if ((remove_entry.group_id = remove_subgroup.group_id) or
-            (remove_entry.subgroup_id = remove_subgroup.subgroup_id)) then
-            v_path_decrement := 1;
-        else
-            v_path_decrement := remove_entry.n_paths;
-        end if;
-
-        -- delete this entry if n_path would become 0 if we were
-        -- to decrement n_paths
-        delete from group_subgroup_trans_index
-        where group_id = remove_entry.group_id
-          and subgroup_id = remove_entry.subgroup_id
-          and n_paths <= v_path_decrement;
-
-        -- if nothing got deleted, then decrement n_paths
-        if (SQL%NOTFOUND) then
-
-           update group_subgroup_trans_index
-              set n_paths = n_paths - v_path_decrement
-            where group_id = remove_entry.group_id
-              and subgroup_id = remove_entry.subgroup_id;
-
-        end if;
-
-      end loop;
+      hierarchy_remove_subitem(group_id, subgroup_id,
+                              'group_subgroup_trans_index',      
+                              'group_id', 'subgroup_id');
 
       remove_subgroup_members(group_id, subgroup_id);
 

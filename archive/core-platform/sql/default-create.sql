@@ -17,6 +17,7 @@ include default/preferences/comment-preferences.sql
 
 
 
+include default/kernel/package-hierarchy_denormalization.sql
 include default/kernel/sequence-acs_object_id_seq.sql
 include default/kernel/table-acs_objects.sql
 include default/kernel/index-acs_objects.sql
@@ -119,6 +120,8 @@ include default/categorization/table-cat_purposes.sql
 include default/categorization/comment-cat_purposes.sql
 include default/categorization/table-cat_category_purpose_map.sql
 include default/categorization/index-cat_category_purpose_map.sql
+include default/categorization/table-cat_cat_subcat_trans_index.sql
+include default/categorization/trigger-cat_category_category_map.sql
 
 include default/auditing/table-acs_auditing.sql
 include default/auditing/index-acs_auditing.sql
