@@ -11,11 +11,11 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/kernel/insert-permissions.sql#5 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/kernel/insert-permissions.sql#6 $
+-- $DateTime: 2003/07/28 11:26:33 $
 
 
 insert into acs_permissions (object_id, grantee_id, privilege, creation_date)
-values (0, -204, 'admin', sysdate);
+values (0, -204, 'admin', currentDate());
 insert into acs_permissions (object_id, grantee_id, privilege, creation_date)
-values (0, -300, 'admin', sysdate);
+values (0, -300, 'admin', currentDate());
