@@ -30,24 +30,26 @@ import java.util.Iterator;
  * Base connection pooling class
  *
  * @author Bob Donald (<a href="mailto:bdonald@arsdigita.com"></a>)
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#6 $ $DateTime: 2002/10/10 16:41:26 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#7 $ $DateTime: 2002/10/14 11:09:33 $
  * @since
  *
  */
 
 abstract public class BaseConnectionPool implements DatabaseConnectionPool {
 
-    private static final String versionId = "$Author: rhs $ - $Date: 2002/10/10 $ $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#6 $";
+    private static final String versionId = "$Author: rhs $ - $Date: 2002/10/14 $ $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#7 $";
 
     private static final Logger cat = Logger.getLogger(BaseConnectionPool.class.getName());
 
-    List m_usedConnections = Collections.synchronizedList(new LinkedList());
-    List m_availConnections = Collections.synchronizedList(new LinkedList());
+    private List m_usedConnections = new LinkedList();
+    private List m_availConnections = new LinkedList();
+    private Object m_monitor = new Object();
 
     protected String m_user;
     protected String m_password;
     protected String m_url;
     protected int    m_maxSize = 10; // set default
+
     private boolean  m_loaded = false;
 
     public void setConnectionInfo(String url, String username,
@@ -71,7 +73,7 @@ abstract public class BaseConnectionPool implements DatabaseConnectionPool {
     }
 
     public void closeConnections() {
-        synchronized (this.getClass()) {
+        synchronized (m_monitor) {
             for (Iterator it = m_availConnections.iterator(); it.hasNext(); ) {
                 java.sql.Connection conn = (java.sql.Connection) it.next();
                 try {
@@ -95,7 +97,7 @@ abstract public class BaseConnectionPool implements DatabaseConnectionPool {
     }
 
     public void freeConnections() {
-        synchronized(this.getClass()) {
+        synchronized(m_monitor) {
             m_availConnections.clear();
             m_loaded = false;
         }
@@ -115,7 +117,7 @@ abstract public class BaseConnectionPool implements DatabaseConnectionPool {
         if (m_loaded == false ) {
 
             cat.info("Populating database connection pool.");
-            synchronized(this.getClass()) {
+            synchronized(m_monitor) {
                 while(m_availConnections.size() < m_maxSize) {
                     java.sql.Connection pooledConn = getNewConnection();
                     if (pooledConn != null) {
@@ -123,19 +125,21 @@ abstract public class BaseConnectionPool implements DatabaseConnectionPool {
                     }
                 }
                 m_loaded = true;
+                cat.info("Database connection pool loaded with " +
+                         m_availConnections.size() +
+                         " connections.");
             }
-            cat.info("Database connection pool loaded with " +
-                     m_availConnections.size() +
-                     " connections.");
         }
 
         try {
-            conn = (java.sql.Connection) m_availConnections.remove(0);
-            m_usedConnections.add(conn);
-            conn = Connection.wrap( conn, this );
-            cat.info("Retrieving connection from pool. " +
-                     m_availConnections.size() +
-                     " remaining.");
+            synchronized (m_monitor) {
+                conn = (java.sql.Connection) m_availConnections.remove(0);
+                m_usedConnections.add(conn);
+                conn = Connection.wrap( conn, this );
+                cat.info("Retrieving connection from pool. " +
+                         m_availConnections.size() +
+                         " remaining.");
+            }
         } catch ( java.lang.IndexOutOfBoundsException e ) {
             conn = null;
         }
@@ -144,11 +148,13 @@ abstract public class BaseConnectionPool implements DatabaseConnectionPool {
     }
 
     public void returnToPool( java.sql.Connection conn ) {
-        if (m_usedConnections.remove(conn)) {
-            m_availConnections.add(conn);
-            cat.info("Connection returned to pool. " +
-                     m_availConnections.size() +
-                     " remaining.");
+        synchronized (m_monitor) {
+            if (m_usedConnections.remove(conn)) {
+                m_availConnections.add(conn);
+                cat.info("Connection returned to pool. " +
+                         m_availConnections.size() +
+                         " remaining.");
+            }
         }
     }
 
