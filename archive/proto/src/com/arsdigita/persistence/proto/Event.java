@@ -11,12 +11,12 @@ import java.util.*;
  * Event
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/02/27 $
+ * @version $Revision: #12 $ $Date: 2003/04/01 $
  **/
 
 public abstract class Event {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Event.java#11 $ by $Author: ashah $, $DateTime: 2003/02/27 21:02:33 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Event.java#12 $ by $Author: ashah $, $DateTime: 2003/04/01 18:05:32 $";
 
     private static final Logger LOG = Logger.getLogger(Event.class);
 
@@ -69,7 +69,7 @@ public abstract class Event {
         return m_dependentEvents.iterator();
     }
 
-    abstract void inject();
+    abstract void prepare();
 
     abstract void activate();
 

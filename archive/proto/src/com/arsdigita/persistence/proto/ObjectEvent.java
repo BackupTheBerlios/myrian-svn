@@ -6,19 +6,17 @@ import java.io.*;
  * ObjectEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/03/07 $
+ * @version $Revision: #12 $ $Date: 2003/04/01 $
  **/
 
 public abstract class ObjectEvent extends Event {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectEvent.java#11 $ by $Author: ashah $, $DateTime: 2003/03/07 13:27:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectEvent.java#12 $ by $Author: ashah $, $DateTime: 2003/04/01 18:05:32 $";
 
     private ObjectData m_odata;
 
     ObjectEvent(Session ssn, Object obj) {
         super(ssn, obj);
-
-        log();
     }
 
     void setObjectData(ObjectData odata) {
@@ -29,7 +27,7 @@ public abstract class ObjectEvent extends Event {
         return m_odata;
     }
 
-    void inject() {
+    void prepare() {
         ObjectData od = getSession().getObjectData(getObject());
         if (od == null) { throw new IllegalStateException(toString()); }
         setObjectData(od);
