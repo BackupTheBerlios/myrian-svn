@@ -29,10 +29,10 @@ import org.apache.log4j.Logger;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/03/22 $
+ * @version $Revision: #3 $ $Date: 2004/03/24 $
  */
 public class FilterTest extends PersistenceTestCase {
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/arsdigita/persistence/FilterTest.java#2 $ by $Author: ashah $, $DateTime: 2004/03/22 16:48:51 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/arsdigita/persistence/FilterTest.java#3 $ by $Author: richardl $, $DateTime: 2004/03/24 10:43:33 $";
 
     private static Logger s_log =
         Logger.getLogger(FilterTest.class.getName());
@@ -91,6 +91,14 @@ public class FilterTest extends PersistenceTestCase {
                " in addEqualsFilter ", + fullSize > query.size());
     }
 
+    public void testFilterEqualsFunction() {
+        DataQuery query = getDefaultQuery();
+        query.addEqualsFilter("upper(action)", "read");
+        assertEquals(0, query.size());
+        query.reset();
+        query.addEqualsFilter("lower(action)", "read");
+        assertEquals(5, query.size());
+    }
 
     /**
      *  This tests the FilterImpl.notEquals and FilterFactory.notEquals methods

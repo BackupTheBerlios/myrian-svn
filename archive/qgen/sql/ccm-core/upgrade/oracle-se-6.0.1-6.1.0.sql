@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/test-qgen/sql/ccm-core/upgrade/oracle-se-6.0.1-6.1.0.sql#4 $
--- $DateTime: 2004/03/22 14:14:33 $
+-- $Id: //core-platform/test-qgen/sql/ccm-core/upgrade/oracle-se-6.0.1-6.1.0.sql#5 $
+-- $DateTime: 2004/03/24 10:43:33 $
 
 PROMPT Red Hat WAF 6.0.1 -> 6.1.0 Upgrade Script (Oracle)
 
@@ -28,6 +28,7 @@ PROMPT Red Hat WAF 6.0.1 -> 6.1.0 Upgrade Script (Oracle)
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/deferred.sql
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/update-host-unique-index.sql
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/update-cat_root_cat_object_map.sql
+-- @@ ../oracle-se/upgrade/6.0.1-6.1.0/update-applications.sql
 
 alter table cms_mime_extensions (mime_type null);
 alter table cms_mime_extensions add constraint
