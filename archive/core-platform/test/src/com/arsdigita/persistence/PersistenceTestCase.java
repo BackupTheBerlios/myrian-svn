@@ -33,12 +33,12 @@ import org.apache.log4j.Logger;
  * PersistenceTestCase
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/05/12 $
+ * @version $Revision: #11 $ $Date: 2003/07/23 $
  */
 
 public class PersistenceTestCase extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#10 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#11 $ by $Author: ashah $, $DateTime: 2003/07/23 18:57:59 $";
 
     private static final Logger LOG =
         Logger.getLogger(PersistenceTestCase.class);
@@ -127,7 +127,7 @@ public class PersistenceTestCase extends TestCase {
         persistenceSetUp();
         try {
             super.runBare();
-            m_session.getProtoSession().flushAll();
+            m_session.flushAll();
         } finally {
             persistenceTearDown();
         }

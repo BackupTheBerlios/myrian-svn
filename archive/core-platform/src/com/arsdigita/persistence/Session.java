@@ -58,7 +58,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #23 $ $Date: 2003/07/20 $
+ * @version $Revision: #24 $ $Date: 2003/07/23 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -728,6 +728,20 @@ public class Session {
         return new DataOperation(this, op.getSQL());
     }
 
+    /**
+     * Force all outstanding changes to be flushed to the database. This is
+     * approximately the equivalent of calling save on every data object
+     * associated with this session.
+     *
+     * @throws FlushException when all changes can not be flushed
+     **/
+    public void flushAll() {
+        try {
+            getProtoSession().flushAll();
+        } catch (ProtoException pe) {
+            throw PersistenceException.newInstance(pe);
+        }
+    }
 
     /**
      *   - Returns the

@@ -15,12 +15,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/07/22 $
+ * @version $Revision: #3 $ $Date: 2003/07/23 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Session.java#2 $ by $Author: jorris $, $DateTime: 2003/07/22 15:20:07 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Session.java#3 $ by $Author: ashah $, $DateTime: 2003/07/23 18:57:59 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -387,11 +387,8 @@ public class Session {
 
     public void assertFlushed(Object obj) {
         if (!isFlushed(obj)) {
-            if (LOG.isInfoEnabled()) {
-                LOG.info("nulled not null property datas: " + m_violations);
-            }
-            throw new FlushException("all events not flushed for obj: " + obj +
-				     "\nviolations: " + m_violations);
+            // could derive which violations are relevant for this object
+            throw new FlushException(obj, m_violations);
         }
     }
 
@@ -493,9 +490,7 @@ public class Session {
     public void flushAll() {
         flush();
         if (!isFlushed()) {
-            throw new IllegalStateException
-                ("unflushed events:" + m_events.getEvents() +
-                 "\nviolations: " + m_violations);
+            throw new FlushException(m_violations);
         }
     }
 
