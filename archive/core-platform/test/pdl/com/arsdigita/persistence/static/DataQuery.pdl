@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/test/pdl/com/arsdigita/persistence/static/DataQuery.pdl#3 $ 
-// $DateTime: 2003/08/15 13:46:34 $
+// $Id: //core-platform/dev/test/pdl/com/arsdigita/persistence/static/DataQuery.pdl#4 $ 
+// $DateTime: 2003/08/26 15:50:26 $
 
 model examples;
 
@@ -210,5 +210,14 @@ query multipleIDs {
     } map {
         id = t1.entry_id;
         id2 = t2.entry_id;
+    }
+}
+
+query GetOrdersOnlyID {
+    mdsql.Order order;
+    do {
+        select order_id from t_orders
+    } map {
+        order.id = order_id;
     }
 }
