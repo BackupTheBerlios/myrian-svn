@@ -46,6 +46,8 @@ object type ArticleImageLink {
     add image { }
     add article { }
 
+    update {}
+    delete {}
     retrieve all {
         do {
             select a.article_id, a.text, m.caption, i.image_id, i.bytes
