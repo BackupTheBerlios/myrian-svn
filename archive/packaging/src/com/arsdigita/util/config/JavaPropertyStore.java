@@ -24,47 +24,81 @@ import org.apache.log4j.Logger;
 /**
  * Subject to change.
  *
+ * An implementation of <code>ParameterStore</code> that uses standard
+ * Java properties to store and retrieve values.
+ *
+ * @see com.arsdigita.util.parameter.ParameterStore
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyStore.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyStore.java#2 $
  */
-public class JavaPropertyStore implements ParameterStore {
+public final class JavaPropertyStore implements ParameterStore {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyStore.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyStore.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/02 14:11:43 $";
+        "$DateTime: 2003/09/11 12:57:53 $";
 
     private static final Logger s_log = Logger.getLogger
         (JavaPropertyStore.class);
 
     private final Properties m_props;
 
-
+    /**
+     * Constructs a parameter store that uses <code>props</code>.
+     *
+     * @param props The <code>Properties</code> object that stores
+     * property values; it cannot be null
+     */
     public JavaPropertyStore(final Properties props) {
         Assert.exists(props, Properties.class);
 
         m_props = props;
     }
 
+    /**
+     * Reads a marshaled <code>String</code> value from the Java
+     * properties object for parameter <code>param</code>.
+     *
+     * @param param The named <code>Parameter</code> whose raw value
+     * you wish to retrieve; it cannot be null
+     * @return The marshaled <code>String</code> value of
+     * <code>param</code> from the Java property store
+     */
     public String read(final Parameter param) {
-        final String name = param.getName();
-        final String value = System.getProperty(name);
-
-        if (value == null) {
-            return m_props.getProperty(name);
-        } else {
-            return value;
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Reading " + param + " from " + this);
         }
+
+        Assert.exists(param, Parameter.class);
+
+        return m_props.getProperty(param.getName());
     }
 
+    /**
+     * Writes the marshaled <code>value</code> to the Java property
+     * object.
+     *
+     * @param param The named <code>Parameter</code> whose value you
+     * wish to set; it cannot be null
+     * @param value The marshaled <code>String</code> value to set
+     * <code>param</code> to; it can be null
+     */
     public void write(final Parameter param, final String value) {
-        final String name = param.getName();
-
-        // If it was set as a system property before, re-set it.
-
-        if (System.getProperty(name) != null) {
-            System.setProperty(name, value);
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Writing " + param + " with value "
+                        + value + " to " + this);
         }
 
-        m_props.setProperty(name, value);
+        Assert.exists(param, Parameter.class);
+
+        m_props.setProperty(param.getName(), value);
+    }
+
+    /**
+     * Returns a <code>String</code> representation of this object.
+     *
+     * @return super.toString() + ":" + properties.toString()
+     */
+    public String toString() {
+        return super.toString() + ":" + m_props;
     }
 }
