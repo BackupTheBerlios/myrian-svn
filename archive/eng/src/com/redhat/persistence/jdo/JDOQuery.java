@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.*;
 import javax.jdo.*;
 
-class JDOQuery implements javax.jdo.Query, Serializable {
+class JDOQuery implements ExtendedQuery, Serializable {
 
     transient private PersistenceManagerImpl m_pm = null;
     transient private JDOQLParser m_parser;
@@ -25,7 +25,7 @@ class JDOQuery implements javax.jdo.Query, Serializable {
 
     transient private OQLCollection m_candidates = null;
 
-    private String m_extent = "";
+    private String m_baseExpr = "";
     private String m_params = "";
     private String m_vars = "";
     private String m_imports = "";
@@ -36,6 +36,11 @@ class JDOQuery implements javax.jdo.Query, Serializable {
         m_pm = pmi;
         m_parser = new JDOQLParser();
         reset();
+    }
+
+    JDOQuery(PersistenceManagerImpl pmi, String expr) {
+        this(pmi);
+        m_baseExpr = expr;
     }
 
     private Root getRoot() {
@@ -159,7 +164,7 @@ class JDOQuery implements javax.jdo.Query, Serializable {
 
     public void declareVariables(String vars) { m_vars = vars; }
 
-    public void addPath(String path) {
+    void addPath(String path) {
         m_addPaths.add(path);
     }
 
@@ -170,10 +175,19 @@ class JDOQuery implements javax.jdo.Query, Serializable {
     private Expression makeExpr(Map params) {
         try {
             JDOQLParser p = getParser();
+            params = new HashMap(params);
+            for (Iterator it = params.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry me = (Map.Entry) it.next();
+                if (me.getValue() instanceof OQLCollection) {
+                    OQLCollection c = (OQLCollection) me.getValue();
+                    me.setValue(c.expression());
+                }
+            }
+
             if (m_candidates != null) {
                 m_expr = m_candidates.expression();
             } else {
-                m_expr = new All(m_extent);
+                m_expr = Expression.valueOf(m_baseExpr, params);
             }
 
             m_expr = new Define(m_expr, "this");
@@ -212,42 +226,15 @@ class JDOQuery implements javax.jdo.Query, Serializable {
     }
 
     public Object execute(Object p1) {
-        compile();
-        if (m_paramMap.size() > 1) {
-            throw new JDOUserException
-                ("can not execute with unbound parameters " +
-                 m_paramMap.keySet());
-        }
-        Map m = new HashMap();
-        m.put(m_paramOrder.get(0), p1);
-        return executeInternal(m);
+        return executeWithArray(new Object[] { p1 });
     }
 
     public Object execute(Object p1, Object p2) {
-        compile();
-        if (m_paramMap.size() > 2) {
-            throw new JDOUserException
-                ("can not execute with unbound parameters " +
-                 m_paramMap.keySet());
-        }
-        Map m = new HashMap();
-        m.put(m_paramOrder.get(0), p1);
-        m.put(m_paramOrder.get(1), p1);
-        return executeInternal(m);
+        return executeWithArray(new Object[] { p1, p2 });
     }
 
     public Object execute(Object p1, Object p2, Object p3) {
-        compile();
-        if (m_paramMap.size() > 3) {
-            throw new JDOUserException
-                ("can not execute with unbound parameters " +
-                 m_paramMap.keySet());
-        }
-        Map m = new HashMap();
-        m.put(m_paramOrder.get(0), p1);
-        m.put(m_paramOrder.get(1), p1);
-        m.put(m_paramOrder.get(2), p1);
-        return executeInternal(m);
+        return executeWithArray(new Object[] { p1, p2, p3 });
     }
 
     public Object executeWithMap(Map params) {
@@ -257,14 +244,19 @@ class JDOQuery implements javax.jdo.Query, Serializable {
 
     public Object executeWithArray(Object[] params) {
         compile();
-        if (params.length != m_paramMap.size()) {
+        if (m_paramMap.size() > 0 && params.length != m_paramMap.size()) {
             throw new JDOUserException
                 ("can not execute with unbound parameters " +
                  m_paramMap.keySet());
         }
+
         Map m = new HashMap();
         for (int i = 0; i < params.length; i++) {
-            m.put(m_paramOrder.get(i), params[i]);
+            if (m_paramMap.size() == 0) {
+                m.put("$" + (i+1), params[i]);
+            } else {
+                m.put(m_paramOrder.get(i), params[i]);
+            }
         }
         return executeInternal(m);
     }
@@ -300,7 +292,7 @@ class JDOQuery implements javax.jdo.Query, Serializable {
 
     private void setCandidates(OQLCollection pcs) {
         m_candidates = pcs;
-        m_extent = null;
+        m_baseExpr = null;
     }
 
     public void setCandidates(Collection pcs) {
@@ -322,7 +314,7 @@ class JDOQuery implements javax.jdo.Query, Serializable {
     }
 
     public void setClass(Class cls) {
-        m_extent = cls.getName();
+        m_baseExpr = "all(" + cls.getName() + ")";
         m_candidates = null;
     }
 

@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #23 $ $Date: 2004/08/11 $
+ * @version $Revision: #24 $ $Date: 2004/08/12 $
  **/
 
 class CRPList implements List {
@@ -53,7 +53,7 @@ class CRPList implements List {
 
     private Integer m_indexOf(Object element) {
         Query query = getPMI().newQuery
-            ("oql",
+            (Extensions.OQL,
              C.concat("limit(sort(filter($1.",
                       m_fieldName,
                       ", value == $2), key), 1)"));
@@ -104,7 +104,7 @@ class CRPList implements List {
                      ", $2 >= key), key)");
             }
 
-            Query query = getPMI().newQuery("oql", oql);
+            Query query = getPMI().newQuery(Extensions.OQL, oql);
 
             Collection coll = (Collection) query.execute
                 (getContainer(), new Integer(m_index));
@@ -258,7 +258,7 @@ class CRPList implements List {
 
     public int lastIndexOf(Object element) {
         Query query = getPMI().newQuery
-            ("oql",
+            (Extensions.OQL,
              C.concat("limit(rsort(filter($1.",
                       m_fieldName,
                       ", value == $2), key), 1)"));
@@ -356,7 +356,7 @@ class CRPList implements List {
 
     public boolean retainAll(Collection coll) {
         boolean modified = false;
-        Query query = getPMI().newQuery("oql", "rsort($1, key)");
+        Query query = getPMI().newQuery(Extensions.OQL, "rsort($1, key)");
         Collection eColl = (Collection) query.execute(elements.entrySet());
         Iterator entries = eColl.iterator();
         List toDelete = new ArrayList();
@@ -375,7 +375,7 @@ class CRPList implements List {
 
     public Iterator iterator() {
         Query query = getPMI().newQuery
-            ("oql",
+            (Extensions.OQL,
              C.concat("sort($1.", m_fieldName, ", key).value"));
         Collection coll = (Collection) query.execute(getContainer());
         return coll.iterator();

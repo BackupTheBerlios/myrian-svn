@@ -531,8 +531,12 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
      * Create a new Query using the specified language.
      */
     public Query newQuery(String language, final Object query) {
-        // XXX: language parameter is ignored
-        return new OQLQuery(this, (String) query);
+        if (Extensions.OQL.equals(language)) {
+            return new JDOQuery(this, (String) query);
+        }
+
+        throw new JDOUserException
+            ("Language " + language + " is not supported");
     }
 
     /**

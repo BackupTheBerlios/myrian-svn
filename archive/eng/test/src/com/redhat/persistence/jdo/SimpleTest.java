@@ -82,12 +82,11 @@ public class SimpleTest extends WithTxnCase {
         m_pm.makePersistent(e);
 
         Query q = m_pm.newQuery
-            ("com.redhat.persistence.OQL",
-             "all(com.redhat.persistence.jdo.Employee)");
+            (Extensions.OQL, "all(com.redhat.persistence.jdo.Employee)");
         Object emps = q.execute();
 
         Query q2 = m_pm.newQuery
-            ("com.redhat.persistence.OQL", "filter(emps, dept == null)");
+            (Extensions.OQL, "filter(emps, dept == null)");
         q2.setFilter("this.name == \"oql\"");
         Map values = new HashMap();
         values.put("emps", emps);
@@ -106,8 +105,8 @@ public class SimpleTest extends WithTxnCase {
         commit();
 
         Collection emps = (Collection) m_pm.newQuery(Employee.class).execute();
-        OQLQuery q = (OQLQuery) m_pm.newQuery("oql", "filter($1, name == $2)");
-        q.addPath("dept");
+        Query q = m_pm.newQuery(Extensions.OQL, "filter($1, name == $2)");
+        Extensions.addPath(q, "dept");
         Collection emp = (Collection) q.execute(emps, name);
         e = (Employee) emp.iterator().next();
         assertNull(e.getDept());

@@ -13,7 +13,7 @@ import javax.jdo.Query;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #25 $ $Date: 2004/08/11 $
+ * @version $Revision: #26 $ $Date: 2004/08/12 $
  **/
 class CRPMap implements Map {
     private final static NullableObject NULL = new NullableObject() {
@@ -30,7 +30,7 @@ class CRPMap implements Map {
     }
 
     private Map.Entry getEntry(Object key) {
-        Query query = getPMI().newQuery("oql", "filter($1, key==$2)");
+        Query query = getPMI().newQuery(Extensions.OQL, "filter($1, key==$2)");
         Collection coll = (Collection) query.execute(entries, key);
         Iterator it = coll.iterator();
         return it.hasNext() ? (Map.Entry) it.next() : null;
@@ -124,7 +124,7 @@ class CRPMap implements Map {
     }
 
     private Collection keys() {
-        Query query = getPMI().newQuery("oql", "$1.key");
+        Query query = getPMI().newQuery(Extensions.OQL, "$1.key");
         return (Collection) query.execute(entries);
     }
 
@@ -202,12 +202,13 @@ class CRPMap implements Map {
     }
 
     public Collection values() {
-        Query query = getPMI().newQuery("oql", "$1.value");
+        Query query = getPMI().newQuery(Extensions.OQL, "$1.value");
         return (Collection) query.execute(entries);
     }
 
     public boolean containsValue(Object value) {
-        Query query = getPMI().newQuery("oql", "filter($1, value==$2)");
+        Query query = getPMI().newQuery
+            (Extensions.OQL, "filter($1, value==$2)");
         Collection coll = (Collection) query.execute(entries, value);
         return coll.size() > 0;
     }

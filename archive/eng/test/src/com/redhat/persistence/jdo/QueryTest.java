@@ -143,8 +143,7 @@ public class QueryTest extends AbstractCase {
         Query q;
 
         q = pm().newQuery
-            ("com.redhat.persistence.OQL",
-             "all(com.redhat.persistence.jdo.Employee)");
+            (Extensions.OQL, "all(com.redhat.persistence.jdo.Employee)");
         q.setFilter("this.dept.name == \"even\"");
         c = (Collection) q.execute();
 

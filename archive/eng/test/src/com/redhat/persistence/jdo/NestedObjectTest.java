@@ -8,12 +8,12 @@ import java.util.*;
  * NestedObjectTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/08/06 $
+ * @version $Revision: #2 $ $Date: 2004/08/12 $
  **/
 
 public class NestedObjectTest extends WithTxnCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdo/NestedObjectTest.java#1 $ by $Author: rhs $, $DateTime: 2004/08/06 08:43:09 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdo/NestedObjectTest.java#2 $ by $Author: ashah $, $DateTime: 2004/08/12 17:40:23 $";
 
     private void assertSingleton(Object o, Collection c) {
         Iterator it = c.iterator();
@@ -41,7 +41,8 @@ public class NestedObjectTest extends WithTxnCase {
     private Collection lukes() {
         Collection emps = (Collection) m_pm.newQuery(Employee.class).execute();
         Collection lukes = (Collection) m_pm.newQuery
-            ("oql", "filter($1, name == $2)").execute(emps, "Luke Skywalker");
+            (Extensions.OQL,
+             "filter($1, name == $2)").execute(emps, "Luke Skywalker");
         return lukes;
     }
 
@@ -64,8 +65,8 @@ public class NestedObjectTest extends WithTxnCase {
         assertEquals(L_STATE, a.getState());
         assertEquals(L_ZIP, a.getZip());
 
-        Collection addr =
-            (Collection) m_pm.newQuery("oql", "$1.address").execute(luke);
+        Collection addr = (Collection) m_pm.newQuery
+            (Extensions.OQL, "$1.address").execute(luke);
 
         assertSingleton(a, addr);
     }

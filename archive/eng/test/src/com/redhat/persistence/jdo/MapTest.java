@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
  * MapTest
  *
  * @since 2004-07-13
- * @version $Revision: #7 $ $Date: 2004/08/11 $
+ * @version $Revision: #8 $ $Date: 2004/08/12 $
  **/
 public class MapTest extends WithTxnCase {
     private final static Logger s_log = Logger.getLogger(MapTest.class);
@@ -50,8 +50,7 @@ public class MapTest extends WithTxnCase {
 
     public void testMagazine1() {
         javax.jdo.Query qq = m_pm.newQuery
-            ("com.redhat.persistence.OQL",
-             "all(com.redhat.persistence.jdo.Magazine)");
+            (Extensions.OQL, "all(com.redhat.persistence.jdo.Magazine)");
         Collection magazines = (Collection) qq.execute();
         Iterator it = magazines.iterator();
         assertTrue("has next", it.hasNext());
