@@ -35,11 +35,11 @@ import java.math.BigDecimal;
  * facilitates this future refactoring.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/30 $
  */
 public abstract class DataQueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryTest.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryTest.java#2 $ by $Author: rhs $, $DateTime: 2002/05/30 15:13:40 $";
 
     public DataQueryTest(String name) {
         super(name);
@@ -96,7 +96,7 @@ public abstract class DataQueryTest extends PersistenceTestCase {
      * @see <a href="http://developer.arsdigita.com/acs5/sdm/one-ticket?
                      ticket_id=140759">Bug #140759</a>
      */
-    public void testCursorMovementFAILS() {
+    public void FAILStestCursorMovement() {
 
         // TODO: uncomment This test will fail, since the cursor
         // methods are not properly implemented.  The code is

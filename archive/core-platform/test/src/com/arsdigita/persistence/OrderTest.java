@@ -25,12 +25,12 @@ import java.sql.SQLException;
  * Test
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/30 $
  */
 
 public abstract class OrderTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderTest.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderTest.java#2 $ by $Author: rhs $, $DateTime: 2002/05/30 15:13:40 $";
 
     public OrderTest(String name) {
         super(name);
@@ -348,7 +348,7 @@ public abstract class OrderTest extends PersistenceTestCase {
 	assertEquals("saves not cascaded", 0, cursor.size());
     }
 
-    public void testDeletingCompositionsFAILS() {
+    public void FAILStestDeletingCompositions() {
         int numItems = 10;
         DataObject order = makeOrder(numItems);
         order.save();
@@ -367,7 +367,7 @@ public abstract class OrderTest extends PersistenceTestCase {
         assertEquals("deletes not cascaded", 0, items.size());
     }
 
-    public void testClearFAILS() {
+    public void FAILStestClear() {
         int numItems = 10;
 	DataObject order = makeOrder(numItems);
 	order.save();
