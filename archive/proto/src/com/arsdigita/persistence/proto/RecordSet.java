@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2003/03/27 $
+ * @version $Revision: #15 $ $Date: 2003/04/15 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#14 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#15 $ by $Author: ashah $, $DateTime: 2003/04/15 10:07:23 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -82,15 +82,35 @@ public abstract class RecordSet {
 
 		    Object obj = null;
 		    if (!pmap.isNull()) {
+                        Object previous = null;
 			if (type.isKeyed()) {
-			    obj = ssn.getObject
-				(m_adapter.getSessionKey(type, pmap));
+                            previous = ssn.getObject
+                                (m_adapter.getSessionKey(type, pmap));
+
+                            if (previous != null) {
+                                ObjectType prevType =
+                                    m_adapter.getObjectType(previous);
+
+                                if (type.equals(prevType)
+                                    || prevType.isSubtypeOf(type)) {
+                                    obj = previous;
+                                } else if (!type.isSubtypeOf(prevType)) {
+                                    throw new IllegalStateException
+                                        ("object of wrong type in session "
+                                         + type + " " + prevType);
+                                }
+                            }
 			}
+
 			if (obj == null) {
 			    obj = m_adapter.getObject(type, pmap);
 			    if (type.isKeyed()) {
 				m_adapter.setSession(obj, ssn);
 			    }
+
+                            if (previous != obj) {
+                                ssn.use(obj);
+                            }
 			}
 		    }
 		    values.put(p, obj);

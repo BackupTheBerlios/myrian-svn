@@ -7,12 +7,12 @@ import java.sql.*;
  * BooleanAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/04/10 $
+ * @version $Revision: #3 $ $Date: 2003/04/15 $
  **/
 
 public class BooleanAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/adapters/BooleanAd.java#2 $ by $Author: ashah $, $DateTime: 2003/04/10 17:19:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/adapters/BooleanAd.java#3 $ by $Author: ashah $, $DateTime: 2003/04/15 10:07:23 $";
 
     public BooleanAd() {
 	super(Root.getRoot().getObjectType("global.Boolean"));
@@ -20,14 +20,14 @@ public class BooleanAd extends SimpleAdapter {
 
     public void bind(PreparedStatement ps, int index, Object obj, int type)
 	throws SQLException {
-        if (Types.CHAR == type) {
+        if (Types.BIT == type) {
+            ps.setBoolean(index, ((Boolean) obj).booleanValue());
+        } else {
             if (Boolean.TRUE.equals(obj)) {
                 ps.setString(index, "1");
             } else {
                 ps.setString(index, "0");
             }
-        } else {
-            ps.setBoolean(index, ((Boolean) obj).booleanValue());
         }
     }
 
@@ -41,5 +41,4 @@ public class BooleanAd extends SimpleAdapter {
 	    return Boolean.FALSE;
 	}
     }
-
 }

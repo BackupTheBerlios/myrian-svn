@@ -9,17 +9,17 @@ import org.apache.log4j.Logger;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #15 $ $Date: 2003/03/14 $
+ * @version $Revision: #16 $ $Date: 2003/04/15 $
  **/
 
 class ObjectData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#15 $ by $Author: ashah $, $DateTime: 2003/03/14 15:57:20 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#16 $ by $Author: ashah $, $DateTime: 2003/04/15 10:07:23 $";
 
     private static final Logger LOG = Logger.getLogger(ObjectData.class);
 
     private final Session m_ssn;
-    private final Object m_object;
+    private Object m_object;
 
     static class State {
         private String m_name;
@@ -55,6 +55,10 @@ class ObjectData {
 
     public Object getObject() {
         return m_object;
+    }
+
+    void setObject(Object object) {
+        m_object = object;
     }
 
     public void addPropertyData(Property p, PropertyData pd) {

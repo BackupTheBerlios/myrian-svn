@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #58 $ $Date: 2003/04/10 $
+ * @version $Revision: #59 $ $Date: 2003/04/15 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#58 $ by $Author: ashah $, $DateTime: 2003/04/10 17:19:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#59 $ by $Author: ashah $, $DateTime: 2003/04/15 10:07:23 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -477,7 +477,8 @@ public class Session {
     public void flushAll() {
         flush();
         if (!isFlushed()) {
-            throw new IllegalStateException("XXX");
+            throw new IllegalStateException
+                ("unflushed events:" + m_events.getEvents());
         }
     }
 
@@ -639,6 +640,13 @@ public class Session {
     static Object getSessionKey(Object obj) {
         Adapter ad = getAdapter(obj);
         return ad.getSessionKey(obj);
+    }
+
+    void use(Object obj) {
+        ObjectData odata = getObjectData(obj);
+        if (odata != null) {
+            odata.setObject(obj);
+        }
     }
 
     Object getObject(Object key) {

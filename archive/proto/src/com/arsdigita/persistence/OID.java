@@ -51,10 +51,10 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/03/12 $ */
+ * @version $Revision: #7 $ $Date: 2003/04/15 $ */
 
 public class OID {
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/OID.java#6 $ by $Author: ashah $, $DateTime: 2003/03/12 14:58:16 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/OID.java#7 $ by $Author: ashah $, $DateTime: 2003/04/15 10:07:23 $";
 
     private ObjectType m_type;
     private Map m_values = new HashMap();
@@ -309,6 +309,11 @@ public class OID {
             }
             // TODO: can we do any data validation if the key property isn't an
             // attribute?
+        }
+
+        if (hasProperty(propertyName)) {
+            throw new IllegalArgumentException
+                (propertyName + " is already set to " + get(propertyName));
         }
 
         m_values.put(propertyName, value);

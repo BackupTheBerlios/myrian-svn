@@ -29,12 +29,12 @@ import org.apache.log4j.Logger;
  * Description: The TransactionContext class encapsulates a database transaction.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/04/09 $
+ * @version $Revision: #7 $ $Date: 2003/04/15 $
  */
 
 public class TransactionContext {
 
-    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/TransactionContext.java#6 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
+    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/TransactionContext.java#7 $ by $Author: ashah $, $DateTime: 2003/04/15 10:07:23 $";
 
     private static final Logger s_cat =
 	Logger.getLogger(TransactionContext.class);
@@ -67,6 +67,10 @@ public class TransactionContext {
 
     public void beginTxn() {
         // Do nothing. This is implicit now.
+        if (m_inTxn) {
+            throw new IllegalStateException("double begin");
+        }
+
 	m_inTxn = true;
     }
 
@@ -79,13 +83,13 @@ public class TransactionContext {
 
     public void commitTxn() {
 	try {
-	    fireBeforeCommitEvent();
+            fireBeforeCommitEvent();
             m_ssn.commit();
+            m_inTxn = false;
+            fireCommitEvent();
 	} finally {
 	    m_inTxn = false;
-            m_ossn.freeConnection();
             m_ossn.invalidateDataObjects(true);
-            fireCommitEvent();
 	    clearAttributes();
 	}
     }

@@ -36,7 +36,7 @@ import org.apache.log4j.Level;
  * the SessionManager of them.
  *
  * @author Archit Shah 
- * @version $Revision: #5 $ $Date: 2003/04/09 $
+ * @version $Revision: #6 $ $Date: 2003/04/15 $
  **/
 
 public class Initializer
@@ -238,7 +238,7 @@ public class Initializer
                 ("Persistence Initialization error while trying to " +
                  "compile the PDL files: " + e.getMessage());
         } catch (Exception e2) {
-            if (txn != null) {
+            if (txn != null && txn.inTxn()) {
                 txn.abortTxn();
             }
             throw new InitializationException(e2);
