@@ -19,12 +19,12 @@ package com.arsdigita.persistence.metadata;
  * ForeignKey
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/08/28 $
  **/
 
 public class ForeignKey extends Constraint {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ForeignKey.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ForeignKey.java#5 $ by $Author: randyg $, $DateTime: 2002/08/28 11:19:00 $";
 
     private UniqueKey m_key;
     private boolean m_cascade;
@@ -91,7 +91,7 @@ public class ForeignKey extends Constraint {
     }
 
     String getSuffix() {
-        return "_fk";
+        return "_f";
     }
 
     String getColumnSQL() {
