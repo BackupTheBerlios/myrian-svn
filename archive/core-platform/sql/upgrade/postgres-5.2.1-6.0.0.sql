@@ -11,13 +11,15 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.1-6.0.0.sql#8 $
--- $DateTime: 2003/08/13 18:01:33 $
+-- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.1-6.0.0.sql#9 $
+-- $DateTime: 2003/08/14 19:42:42 $
 
 \echo Red Hat WAF 5.2.1 -> 6.0.0 Upgrade Script (PostgreSQL)
 
 begin;
 
+\i ../postgres/upgrade/5.2.1-6.0.0/drop-ri-triggers.sql
+\i ../postgres/upgrade/5.2.1-6.0.0/drop-unique-indexes.sql
 \i ../default/upgrade/5.2.1-6.0.0/drop-search-test.sql
 \i ../default/upgrade/5.2.1-6.0.0/sequence-vcx_id_seq.sql
 \i ../default/upgrade/5.2.1-6.0.0/sequence-vcx_txns_id_seq.sql
