@@ -3,30 +3,23 @@ options {
     DEBUG_PARSER = false;
 }
 
-PARSER_BEGIN(PDL)
+PARSER_BEGIN(Parser)
 
 package com.arsdigita.persistence.proto.pdl;
 
 import com.arsdigita.persistence.proto.pdl.nodes.*;
-import com.arsdigita.persistence.proto.metadata.Root;
-import com.arsdigita.persistence.proto.metadata.Role;
-import com.arsdigita.persistence.proto.metadata.ObjectMap;
-import java.io.FileReader;
-import java.util.Iterator;
 
 /**
- * PDL
+ * Parser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #2 $ $Date: 2003/01/02 $
+ * @version $Revision: #1 $ $Date: 2003/01/09 $
  */
 
-public class PDL {
+class Parser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.jj#2 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
-
-    private String m_filename;
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/Parser.jj#1 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -38,100 +31,9 @@ public class PDL {
         node.setColumn(from.getColumn());
     }
 
-    public static final void main(String[] args) throws Exception {
-        AST ast = new AST();
-        for (int i = 0; i < args.length; i++) {
-            try {
-                PDL p = new PDL(new FileReader(args[i]));
-                File file = p.file(args[i]);
-                ast.add(AST.FILES, file);
-            } catch (ParseException e) {
-                System.err.println(args[i] + ": " + e.getMessage());
-                break;
-            }
-        }
-//        System.out.println(ast);
-
-        final ErrorReport rep = new ErrorReport();
-        final SymbolTable st = new SymbolTable(rep);
-
-        ast.traverse(new Node.Switch() {
-                public void onObjectType(ObjectType ot) {
-                    st.define(ot);
-                }
-            });
-        ast.traverse(new Node.Switch() {
-                public void onType(Type t) {
-                    st.resolve(t);
-                }
-            });
-
-        st.sort();
-
-        st.emit();
-
-        ast.traverse(new Node.Switch() {
-                private Role define(ObjectType type, Property prop) {
-                    String name = prop.getName().getName();
-                    if (st.getEmitted(type).hasProperty(name)) {
-                        rep.fatal(prop, "duplicate property: " + name);
-                        return null;
-                    }
-
-                    Role result =
-                        new Role(prop.getName().getName(),
-                                 st.getEmitted(st.lookup(prop.getType())),
-                                 prop.isComponent(),
-                                 prop.isCollection());
-                    st.getEmitted(type).addProperty(result);
-                    return result;
-                }
-
-                public void onProperty(Property prop) {
-                    define((ObjectType) prop.getParent(), prop);
-                }
-
-                public void onAssociation(Association assn) {
-                    Role one = define(st.lookup(assn.getRoleOne().getType()),
-                                      assn.getRoleTwo());
-                    Role two = define(st.lookup(assn.getRoleTwo().getType()),
-                                      assn.getRoleOne());
-                    if (one != null && two != null) {
-                        one.setReverse(two);
-                    }
-                }
-            }, new Node.IncludeFilter(new Node.Field[] {
-                AST.FILES, File.OBJECT_TYPES, ObjectType.PROPERTIES,
-                File.ASSOCIATIONS
-            }));
-
-        for (Iterator it = rep.getMessages().iterator(); it.hasNext(); ) {
-            System.out.println(it.next());
-        }
-
-        final Root root = Root.getRoot();
-        for (Iterator it = st.getObjectTypes().iterator(); it.hasNext(); ) {
-            ObjectType ot = (ObjectType) it.next();
-            root.addObjectType(st.getEmitted(ot));
-            root.addObjectMap(new ObjectMap(st.getEmitted(ot)));
-        }
-
-        ast.traverse(new Node.Switch() {
-                public void onIdentifier(Identifier id) {
-                    ObjectType ot = (ObjectType) id.getParent().getParent();
-                    ObjectMap om = root.getObjectMap(st.getEmitted(ot));
-                    om.getKeyProperties()
-                        .add(st.getEmitted(ot).getProperty(id.getName()));
-                }
-            }, new Node.IncludeFilter(new Node.Field[] {
-                AST.FILES, File.OBJECT_TYPES, ObjectType.OBJECT_KEY,
-                ObjectKey.PROPERTIES
-            }));
-    }
-
 }
 
-PARSER_END(PDL)
+PARSER_END(Parser)
 
 <DEFAULT,BEGIN> SKIP:
 {

@@ -13,21 +13,19 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/01/06 $
+ * @version $Revision: #7 $ $Date: 2003/01/09 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#6 $ by $Author: rhs $, $DateTime: 2003/01/06 17:58:56 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#7 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
 
     public ProtoTest(String name) {
         super(name);
     }
 
     public void test() throws Exception {
-        PDL.main(new String[] {
-            "pdl/com/arsdigita/persistence/global.pdl", "test/pdl/Test.pdl"
-        });
+        PDL.main(new String[] {"test/pdl/Test.pdl"});
 
         OID oid = new OID("test.Test", BigInteger.ZERO);
         Property NAME = oid.getObjectType().getProperty("name");

@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/01/06 $
+ * @version $Revision: #9 $ $Date: 2003/01/09 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#8 $ by $Author: rhs $, $DateTime: 2003/01/06 17:58:56 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#9 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -415,6 +415,26 @@ public class Session {
     }
 
 
+    public boolean isNew(OID oid) {
+        throw new Error("not implemented");
+    }
+
+
+    public boolean isDeleted(OID oid) {
+        throw new Error("not implemented");
+    }
+
+
+    public boolean isModified(OID oid) {
+        throw new Error("not implemented");
+    }
+
+
+    public boolean isModified(OID oid, Property prop) {
+        throw new Error("not implemented");
+    }
+
+
     /**
      * Performs all operations queued up by the session. This is automatically
      * called when necessary in order to insure that queries performed by the
@@ -594,29 +614,17 @@ public class Session {
         return pd;
     }
 
-    private boolean isAttribute(Property prop) {
-        // This should really look at the mapping metadata to figure out what
-        // to load by default.
-        return prop.getType().getModel().equals(Model.getInstance("global"));
-    }
 
     private Signature getRetrieveSignature(ObjectType type) {
         Signature result = new Signature(type);
-        for (Iterator it = type.getProperties().iterator(); it.hasNext(); ) {
-            Property prop = (Property) it.next();
-            if (isAttribute(prop)) {
-                result.addPath(prop.getName());
-            }
-        }
-        // should add aggressively loaded properties
-
+        result.addDefaultPaths(type);
+        result.addSource(new Source(type));
         return result;
     }
 
     private Query getRetrieveQuery(OID oid) {
         ObjectType type = oid.getObjectType();
         Signature sig = getRetrieveSignature(type);
-        sig.addSource(new Source(type));
         Parameter start = new Parameter(type, Path.getInstance("__start__"));
         sig.addParameter(start);
         Query q = new Query
@@ -626,11 +634,10 @@ public class Session {
     }
 
     private Query getRetrieveQuery(OID oid, Property prop) {
-        if (isAttribute(prop)) {
+        if (Signature.isAttribute(prop)) {
             ObjectType type = oid.getObjectType();
             Signature sig = new Signature(type);
             sig.addPath(prop.getName());
-            sig.addSource(new Source(type));
             Parameter start = new Parameter(type,
                                             Path.getInstance("__start__"));
             sig.addParameter(start);
@@ -642,7 +649,6 @@ public class Session {
         } else {
             ObjectType type = prop.getType();
             Signature sig = getRetrieveSignature(type);
-            sig.addSource(new Source(type));
             Parameter start = new Parameter(prop.getContainer(),
                                             Path.getInstance("__start__"));
             sig.addParameter(start);

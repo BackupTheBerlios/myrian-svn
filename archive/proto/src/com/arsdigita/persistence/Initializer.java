@@ -36,7 +36,7 @@ import org.apache.log4j.Level;
  * the SessionManager of them.
  *
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #2 $ $Date: 2002/12/09 $
+ * @version $Revision: #3 $ $Date: 2003/01/09 $
  **/
 
 public class Initializer
@@ -89,8 +89,8 @@ public class Initializer
 
         m_conf.initParameter(SESSION_FACTORY,
                              "Class name of the Session factory to use",
-                             String.class,
-                            DefaultSessionFactory.class.getName());
+                             String.class/*,
+                                           DefaultSessionFactory.class.getName()*/);
     }
 
     public Configuration getConfiguration() {
@@ -148,7 +148,7 @@ public class Initializer
         }
 
         SessionManager.setSchemaConnectionInfo( "",  "", "", "");
-        final SessionFactory factory = getSessionFactory();
+/*        final SessionFactory factory = getSessionFactory();
         SessionManager.setSessionFactory(factory);
 
 
@@ -164,7 +164,7 @@ public class Initializer
 		s_log.info("Not using aggressive connection closing " + 
 			   "[aggressiveConnectionClose parameter]");
 	    }
-        }
+            }*/
 
         //SessionManager.setSessionFactory();
         PDL.loadPDLFiles(new File(pdlDir));
@@ -248,7 +248,7 @@ public class Initializer
         }
     }
 
-    private SessionFactory getSessionFactory() {
+/*    private SessionFactory getSessionFactory() {
         SessionFactory factory;
         final String factoryClassName = (String) m_conf.getParameter(SESSION_FACTORY);
         try {
@@ -264,7 +264,7 @@ public class Initializer
                     " due to private constructor! ", ia);
         }
         return factory;
-    }
+        }*/
 
 
     public void shutdown() {}

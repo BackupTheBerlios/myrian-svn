@@ -27,12 +27,12 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *              inheritance.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/01/09 $
  */
 
 public interface DataObject {
 
-    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObject.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObject.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
 
     /**
      * Returns the type of this persistent object.
@@ -58,7 +58,7 @@ public interface DataObject {
      * @return The property value.
      **/
 
-    Object get(String propertyName) throws PersistenceException;
+    Object get(String propertyName);
 
     /**
      * Sets the specified property to <i>value</i>.
@@ -149,7 +149,7 @@ public interface DataObject {
      * @post isDeleted()
      **/
 
-    void delete() throws PersistenceException;
+    void delete();
 
 
     /**
@@ -183,7 +183,7 @@ public interface DataObject {
      * @post !(isNew() || isModified())
      **/
 
-    void save() throws PersistenceException;
+    void save();
 
 
     /**

@@ -55,7 +55,7 @@ import com.arsdigita.persistence.metadata.ObjectType;
  * cursor, it just wraps the data query that was passed in.
  *
  * @author <a href="mailto:lutter@arsdigita.com">David Lutterkort</a>
- * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryDataCollectionAdapter.java#1 $
+ * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryDataCollectionAdapter.java#2 $
  */
 public class DataQueryDataCollectionAdapter extends DataQueryDecorator
     implements DataCollection {
@@ -102,7 +102,7 @@ public class DataQueryDataCollectionAdapter extends DataQueryDecorator
     }
 
     public DataObject getDataObject() {
-        return (DataObject) ((DataQueryImpl) getDataQuery()).getUnalias(m_dataObjectProperty);
+        throw new Error("unimplemented");
     }
 
     public ObjectType getObjectType() {
@@ -124,7 +124,7 @@ public class DataQueryDataCollectionAdapter extends DataQueryDecorator
      * @return the valur of the link attribute (may be null)
      */
     public Object getLinkAttribute(String propertyName) {
-        return ((DataQueryImpl) getDataQuery()).getUnalias(propertyName);
+        throw new Error("unimplemented");
     }
 
     // Adapt DataQuery methods. All property names need to be replaced by

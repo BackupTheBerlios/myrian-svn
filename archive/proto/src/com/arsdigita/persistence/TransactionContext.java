@@ -22,22 +22,18 @@ package com.arsdigita.persistence;
  * Description: The TransactionContext class encapsulates a database transaction.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/01/09 $
  */
 
-public interface TransactionContext extends com.arsdigita.db.ConnectionUseListener {
-    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/TransactionContext.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+public class TransactionContext {
 
-    /**
-     * 
-     *
-     * Called when a connection has zero users.
-     * Will recycle the connection back into the pool if
-     * conn.getNeedsAutoCommitOff reports false.
-     * May be called via a finalizer, so can't count on thread safety.
-     */
-    void connectionUserCountHitZero(com.arsdigita.db.Connection conn)
-        throws java.sql.SQLException;
+    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/TransactionContext.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
+
+    private com.arsdigita.persistence.proto.Session m_ssn;
+
+    TransactionContext(com.arsdigita.persistence.proto.Session ssn) {
+        m_ssn = ssn;
+    }
 
     /**
      * Begins a new transaction.
@@ -50,13 +46,11 @@ public interface TransactionContext extends com.arsdigita.db.ConnectionUseListen
      *
      * This should be a transparent behavior change introduced as a
      * performance optimization, SDM #159142.
-     *
-     * @throws PersistenceException is no longer really thrown, but
-     *         this shouldn't affect anyone since it's a runtime type
-     *         anyway.
      **/
 
-    void beginTxn() throws PersistenceException;
+    public void beginTxn() {
+        // Do nothing. This is implicit now.
+    }
 
     /**
      * Commits the current transaction.
@@ -65,7 +59,9 @@ public interface TransactionContext extends com.arsdigita.db.ConnectionUseListen
      *  @post !inTxn()
      **/
 
-    void commitTxn() throws PersistenceException;
+    public void commitTxn() {
+        m_ssn.commit();
+    }
 
     /**
      * Aborts the current transaction.
@@ -75,12 +71,16 @@ public interface TransactionContext extends com.arsdigita.db.ConnectionUseListen
      *  @post !inTxn()
      **/
 
-    void abortTxn();
+    public void abortTxn() {
+        m_ssn.rollback();
+    }
 
     /**
      * Register a one time transaction event listener
      */
-    void addTransactionListener(TransactionListener listener);
+    public void addTransactionListener(TransactionListener listener) {
+        throw new Error("not implemented");
+    }
 
     /**
      * Unregister a transaction event listener. There is
@@ -88,18 +88,19 @@ public interface TransactionContext extends com.arsdigita.db.ConnectionUseListen
      * listeners are automatically removed after they have been
      * invoked to prevent infinite recursion.
      */
-    void removeTransactionListener(TransactionListener listener);
+    public void removeTransactionListener(TransactionListener listener) {
+        throw new Error("not implemented");
+    }
 
     /**
      * Returns true if there is currently a transaction in progress.
      *
      * @return True if a transaction is in progress, false otherwise.
-     * @throws PersistenceException is no longer really thrown, but
-     *         this shouldn't affect anyone since it's a runtime type
-     *         anyway.
      **/
 
-    boolean inTxn() throws PersistenceException;
+    public boolean inTxn() {
+        return true;
+    }
 
     /**
      * Returns the isolation level of the current transaction.
@@ -109,7 +110,9 @@ public interface TransactionContext extends com.arsdigita.db.ConnectionUseListen
      * @return The isolation level of the current transaction.
      **/
 
-    int getTransactionIsolation() throws PersistenceException;
+    public int getTransactionIsolation() {
+        throw new Error("not implemented");
+    }
 
     /**
      * Sets the isolation level of the current transaction.
@@ -119,7 +122,16 @@ public interface TransactionContext extends com.arsdigita.db.ConnectionUseListen
      *
      * @param level The desired isolation level.
      **/
-    void setTransactionIsolation(int level)
-        throws PersistenceException;
+    public void setTransactionIsolation(int level) {
+        throw new Error("not implemented");
+    }
+
+    public boolean getAggressiveClose() {
+        throw new Error("not implemented");
+    }
+
+    public void setAggressiveClose(boolean value) {
+        throw new Error("not implemented");
+    }
 
 }

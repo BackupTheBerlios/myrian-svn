@@ -7,12 +7,12 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/01/06 $
+ * @version $Revision: #6 $ $Date: 2003/01/09 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#5 $ by $Author: rhs $, $DateTime: 2003/01/06 17:58:56 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#6 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
 
     private ObjectType m_type;
     private HashMap m_paths = new HashMap();
@@ -102,6 +102,22 @@ public class Signature {
 
     public Collection getParameters() {
         return m_parameters;
+    }
+
+    static final boolean isAttribute(Property prop) {
+        // This should really look at the mapping metadata to figure out what
+        // to load by default.
+        return prop.getType().getModel().equals(Model.getInstance("global"));
+    }
+
+    public void addDefaultPaths(ObjectType type) {
+        for (Iterator it = type.getProperties().iterator(); it.hasNext(); ) {
+            Property prop = (Property) it.next();
+            if (isAttribute(prop)) {
+                addPath(prop.getName());
+            }
+        }
+        // should add aggressively loaded properties
     }
 
     public String toString() {

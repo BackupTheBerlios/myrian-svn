@@ -51,25 +51,20 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $ */
+ * @version $Revision: #2 $ $Date: 2003/01/09 $ */
 
 public class OID {
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/OID.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/OID.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
 
-    private ObjectType m_type;
-    private Map m_values = new HashMap();
+    private com.arsdigita.persistence.proto.OID m_oid;
 
-    /**
-     * A Format used for formatting/parsing OIDs
-     */
-    private static MessageFormat m_format = new MessageFormat("[{0}:{1}]");
+    OID(com.arsdigita.persistence.proto.OID oid) {
+        m_oid = oid;
+    }
 
-    /**
-     *  used to log errors
-     */
-    private static final Logger m_log =
-        Logger.getLogger(OID.class);
-
+    final com.arsdigita.persistence.proto.OID getProtoOID() {
+        return m_oid;
+    }
 
     /**
      *  Creates an OID for the Object type.  An example of an object
@@ -93,10 +88,13 @@ public class OID {
      *
      *  @param type The ObjectType
      *
-     *  @pre type != null */
+     *  @pre type != null
+     **/
+
     public OID(ObjectType type) {
-        m_type = type;
+        m_oid = new com.arsdigita.persistence.proto.OID(C.type(type));
     }
+
 
     /**
      * Creates an OID with a single attribute for the key. To create
@@ -123,22 +121,7 @@ public class OID {
      * @pre type.getObjectMap().getObjectKey().getCount() == 1
      */
     public OID(ObjectType type, Object value) {
-        this(type);
-        Iterator it = type.getKeyProperties();
-        if (!it.hasNext()) {
-            throw new PersistenceException("Empty object key: " + type);
-        }
-
-        Property prop = (Property) it.next();
-
-        if (it.hasNext()) {
-            throw new PersistenceException(
-                                           "This object type has a compound key."
-                                           );
-        }
-
-        String attr = prop.getName();
-        set(attr, value);
+        m_oid = new com.arsdigita.persistence.proto.OID(C.type(type), value);
     }
 
     /**
@@ -209,7 +192,8 @@ public class OID {
      *            != 1</code>).
      *
      *  @pre SessionManager.getMetadataRoot().getObjectType(typeName) != null
-     */
+     **/
+
     public OID(String typeName, Object value) {
         this(lookup(typeName), value);
     }
@@ -238,7 +222,9 @@ public class OID {
      *             <code>type.getObjectMap().getObjectKey().getCount()
      *             != 1</code>).
      *
-     *  @pre SessionManager.getMetadataRoot().getObjectType(typeName) != null */
+     *  @pre SessionManager.getMetadataRoot().getObjectType(typeName) != null
+     **/
+
     public OID(String typeName, int value) {
         this(typeName, new BigDecimal(value));
     }
@@ -266,53 +252,27 @@ public class OID {
      *             != 1</code>).
      *
      *  @pre type != null
-     *  @pre type.getObjectMap().getObjectKey().getCount() == 1 */
+     *  @pre type.getObjectMap().getObjectKey().getCount() == 1
+     **/
+
     public OID(ObjectType type, int value) {
         this(type, new BigDecimal(value));
     }
 
+
     /**
-     *  Adds a property to the OID. Is used as part of the key for the Object ID.
+     *  Adds a property to the OID. Is used as part of the key for the Object
+     *  ID.
      *
      *  @param propertyName Name of the property
      *  @param value The property
      *
-     */
+     **/
+
     public void set(String propertyName, Object value) {
-        Property prop = m_type.getProperty(propertyName);
-
-        // We do some type-checking here, to ensure that OIDs are being
-        // created with legit types of values.
-        if (Assert.isAssertOn()) {
-            if (prop == null) {
-                StringBuffer valid = new StringBuffer();
-                Iterator i = m_type.getProperties();
-                if (i.hasNext()) {
-                    valid.append(((Property)i.next()).getName());
-                }
-                while (i.hasNext()) {
-                    valid.append(", ").append(((Property)i.next()).getName());
-                }
-                Assert.assertNotNull(prop, "getProperty(" + propertyName +
-                                     ") for type " + m_type.getName() +
-                                     " where valid properties are {" +
-                                     valid + "}");
-            }
-            // null has no type
-            // if prop isn't an attribute, not sure what to do with it.
-            if (prop.isAttribute() && value != null) {
-                // we can be sure this is a simpletype because isAttribute was true.
-                SimpleType expectedType = (SimpleType)prop.getType();
-                Assert.assertTrue(expectedType.getJavaClass().isAssignableFrom(value.getClass()),
-                                  "expected value of type: " + expectedType.getJavaClass() +
-                                  "actual type used:" + value.getClass());
-            }
-            // TODO: can we do any data validation if the key property isn't an
-            // attribute?
-        }
-
-        m_values.put(propertyName, value);
+        m_oid.set(propertyName, value);
     }
+
 
     /**
      *  Obtains a property associated with the OID.
@@ -320,66 +280,47 @@ public class OID {
      *  @param propertyName Name of the property
      *
      *  @return The property, or null if there is no property with this name.
-     */
+     **/
+
     public Object get(String propertyName) {
-        return m_values.get(propertyName);
+        return m_oid.get(propertyName);
     }
+
 
     /**
      *  @param name The name of the property
      *
      *  @return true if there is a property mapped to name, false if not.
-     */
+     **/
+
     public boolean hasProperty(String name) {
-        return m_values.containsKey(name);
+        return m_oid.hasProperty(name);
     }
 
-    /**
-     *  @return A Map of all properties for the OID.
-     */
-    Map getProperties() {
-        return m_values;
-    }
 
     public boolean isInitialized() {
-        for (Iterator it = m_type.getKeyProperties(); it.hasNext(); ) {
-            if (!m_values.containsKey(((Property) it.next()).getName())) {
-                return false;
-            }
-        }
-
-        return true;
+        return m_oid.isInitialized();
     }
+
 
     /**
      *  @return The number of properties
-     */
+     **/
+
     public int getNumberOfProperties() {
-        return getProperties().size();
+        return m_oid.getNumberOfProperties();
     }
+
 
     /**
      * Indicates if an OID contains no non-null information.
      *
      * @return true if no values have been set or if all
      *         values have been set to null.
-     */
-    public boolean arePropertiesNull() {
-        Iterator i = getProperties().values().iterator();
-        while (i.hasNext()) {
-            if (i.next() != null) {
-                return false;
-            }
-        }
-        return true;
-    }
+     **/
 
-    /**
-     *  @return The ObjectType.
-     *  @deprecated
-     */
-    public ObjectType getDataObjectType() {
-        return getObjectType();
+    public boolean arePropertiesNull() {
+        return m_oid.arePropertiesNull();
     }
 
 
@@ -387,7 +328,7 @@ public class OID {
      *  @return The ObjectType.
      **/
     public ObjectType getObjectType() {
-        return m_type;
+        return C.fromType(m_oid.getObjectType());
     }
 
 
@@ -395,128 +336,41 @@ public class OID {
      * Serializes the OID.
      */
     public String toString() {
-        String fullType = m_type.getQualifiedName();
-        Object[] args = {fullType, getProperties().toString()};
-        return m_format.format(args);
+        return m_oid.toString();
     }
 
 
     // Couldn't get MessageFormat to work, so I cheated
-    public static OID valueOf(String s) throws IllegalArgumentException {
-        StringTokenizer st = new StringTokenizer(s, "[:{}],");
-        if (st.countTokens() < 2) {
-            st = new StringTokenizer(java.net.URLDecoder.decode(s), "[:{}],");
-
-            if (st.countTokens() < 2) {
-                throw new IllegalArgumentException
-                    ("Invalid OID '" + s + "'. It must have at least the object " +
-                     "type and the value");
-            }
-        }
-
-        String type = st.nextToken();
-
-        try {
-            // we know that the first item is the type of the object
-            // represented by this OID
-            OID oid = new OID(type);
-
-            // for the rest of them, we are going to "split" on the
-            // "=" sign
-            int nTokens = 0;
-            while (st.hasMoreTokens()) {
-                String nextToken = st.nextToken();
-                int index = nextToken.indexOf("=");
-                String key = (nextToken.substring(0, index));
-                String value = nextToken.substring(index + 1);
-
-                // we need the key to loose the single space before it that
-                // is created by the HashMap.  We cannot use trim because
-                // we don't want to loose trailing spaces
-                if (nTokens > 0) {
-                    key = key.substring(1);
-                }
-
-                // if it can be a BigDecimal, that is what we make it
-                boolean bigDecimal = true;
-                for (int i = 0; i < value.length(); i++) {
-                    char c = value.charAt(i);
-                    if (!('0' <= c && c <= '9') &&
-                        !((i == 0) && (c == '-'))) {
-                        bigDecimal = false;
-                        break;
-                    }
-                }
-
-                if (bigDecimal) {
-                    oid.set(key, new BigDecimal(value));
-                } else {
-                    oid.set(key, value);
-                }
-                nTokens++;
-            }
-            return oid;
-        } catch (PersistenceException e) {
-            throw new IllegalArgumentException
-                ("Invalid OID '" + s + "'. The type specified [" + type +
-                 "] is not defined");
-        }
+    public static OID valueOf(String s) {
+        return new OID(com.arsdigita.persistence.proto.OID.valueOf(s));
     }
+
 
     /**
      * Indicates if two OIDs have the same base type and contain the
      * same values.  Note that if values are null this isn't an ideal
      * distinction; it's best to check "arePropertiesNull" before
      * relying on this equals method (see DomainObject's equals method
-     * for an example).  */
+     * for an example).
+     **/
+
     public boolean equals(Object obj) {
         if (obj instanceof OID) {
-            OID oid = (OID)obj;
-
-            // this is a relatively expensive check,
-            // so we only do it if debug level logging
-            // is enabled.
-            // However, the warning it generates
-            // really belongs as an error, so that's
-            // how we log it.
-            if (m_log.isDebugEnabled()) {
-                Iterator i = m_values.values().iterator();
-                Iterator i2 = oid.m_values.values().iterator();
-                while (i.hasNext() && i2.hasNext()) {
-                    Object o = i.next();
-                    Object o2 = i2.next();
-                    if (o != null &&
-                        o2 != null &&
-                        !o.getClass().isInstance(o2) &&
-                        !o2.getClass().isInstance(o) &&
-                        o.toString().equals(o2.toString())) {
-                        m_log.error("Equality check problem comparing OID " +
-                                    this + " to " + obj + ": value " + o +
-                                    " is of type " + o.getClass() +
-                                    " while value " + o2 + " is of type " +
-                                    o2.getClass() + "; check OID creation for " +
-                                    "both these objects for incorrect type " +
-                                    "conversions or toStrings.");
-                    }
-                }
-            }
-
-            // we rely on the toString ecause the HashMap.equals does not
-            // give us what we need
-            return m_type.getBasetype().equals(oid.m_type.getBasetype()) &&
-                m_values.equals(oid.m_values);
+            com.arsdigita.persistence.proto.OID oid = ((OID)obj).m_oid;
+            return m_oid.equals(oid);
+        } else {
+            return false;
         }
-        return false;
     }
+
 
     /**
      * Simple hashcode method to calculate hashcode based on the information
      * used in the equals method.  Needed because we overrode equals;
      * two equivalent objects must hash to the same value.
-     */
+     **/
+
     public int hashCode() {
-        // here we rely on the values collection's hashcode method
-        // to base its hashcode on the hashcodes of the contained values.
-        return (m_type.getBasetype().hashCode() + m_values.hashCode());
+        return m_oid.hashCode();
     }
 }

@@ -24,21 +24,12 @@ import com.arsdigita.persistence.sql.Element;
  * This manipulates SQL in a way that is specific to Postgres.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/01/09 $
  */
 
 class PostgresSQLUtilities implements SQLUtilities  {
 
-    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/PostgresSQLUtilities.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
-
-    /**
-     *  @deprecated This is a no-op so it will be removed.
-     */
-    public Element processNulls(Element sql, DataContainer source) {
-        // this does not work so right now it does not do anything.
-        return sql;
-    }
-
+    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/PostgresSQLUtilities.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
 
     /**
      *  This method takes a comparator (e.g. =, <=, >=, !=, <>)

@@ -15,3 +15,8 @@ object type Boolean extends Dummy {}
 object type String extends Dummy {}
 object type Date extends Dummy {}
 object type Blob extends Dummy {}
+object type Float extends Dummy {}
+object type Byte extends Dummy {}
+object type Character extends Dummy {}
+object type Short extends Dummy {}
+object type Double extends Dummy {}

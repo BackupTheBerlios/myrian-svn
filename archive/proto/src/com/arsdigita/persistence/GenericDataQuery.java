@@ -25,31 +25,16 @@ import com.arsdigita.persistence.metadata.Mapping;
  * GenericDataQuery
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/01/09 $
  */
 
 public class GenericDataQuery extends DataQueryImpl {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/GenericDataQuery.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/GenericDataQuery.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
 
-    // FIXME: the parameter s is passed in but never used.  -- 2002-11-26
     public GenericDataQuery(Session s, String sql, String[] columns) {
-        super(
-              new QueryType(
-                            "<generic>",
-                            new com.arsdigita.persistence.metadata.Event()
-                            ),
-              new Operation(sql)
-              );
-
-        Operation op = getOperation();
-        for (int i = 0; i < columns.length; i++) {
-            m_type.addProperty(new Property(columns[i],
-                                            MetadataRoot.OBJECT));
-            op.addMapping(
-                          new Mapping(new String[] {columns[i]}, null, columns[i])
-                          );
-        }
+        super(s, null);
+        throw new Error("not implemented");
     }
 
 }

@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -61,17 +62,20 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/01/09 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/PDL.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/PDL.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
 
     // the abstract syntax tree root nod
     private AST m_ast = new AST();
+    private com.arsdigita.persistence.proto.pdl.PDL m_pdl =
+        new com.arsdigita.persistence.proto.pdl.PDL();
+    private StringBuffer m_file = new StringBuffer(1024*10);
 
     /**
      * Retrieve a reference to the abstract syntax tree generated from the
@@ -91,6 +95,7 @@ public class PDL {
      */
     public void generateMetadata(MetadataRoot root) {
         m_ast.generateMetadata(root);
+        m_pdl.emit(com.arsdigita.persistence.proto.metadata.Root.getRoot());
     }
 
     /**
@@ -101,9 +106,24 @@ public class PDL {
      * @throws PDLException thrown on a parsing error.
      */
     public void load(Reader r, String filename) throws PDLException {
+        m_file.setLength(0);
+        char[] buf = new char[1024];
+        int nchars;
+        do {
+            try {
+                nchars = r.read(buf);
+            } catch (IOException e) {
+                throw new PDLException(e.getMessage());
+            }
+            if (nchars > 0) {
+                m_file.append(buf, 0, nchars);
+            }
+        } while (nchars > 0);
+
         try {
-            Parser p = new Parser(r);
+            Parser p = new Parser(new StringReader(m_file.toString()));
             p.file(m_ast, filename);
+            m_pdl.load(new StringReader(m_file.toString()), filename);
         } catch (ParseException e) {
             throw new PDLException(e.getMessage());
         }

@@ -11,10 +11,11 @@
  * implied. See the License for the specific language governing
  * rights and limitations under the License.
  *
- */
+ **/
 
 package com.arsdigita.persistence;
 
+import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
 
 import java.sql.Connection;
@@ -30,22 +31,20 @@ import java.sql.Connection;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/01/09 $
  * @see com.arsdigita.persistence.SessionManager
- */
-public interface Session {
+ **/
+public class Session {
 
-   /**
-     *  - Sets the connection
-     * info for the specified schema.
-     *
-     * @param schema The name of the schema.
-     * @param url The JDBC URL.
-     * @param username The db username.
-     * @param password The db password.
-     **/
-    void setSchemaConnectionInfo(String schema, String url,
-                                        String username, String password);
+
+    private com.arsdigita.persistence.proto.Session m_ssn =
+        new com.arsdigita.persistence.proto.Session();
+    private TransactionContext m_ctx = new TransactionContext(m_ssn);
+    private MetadataRoot m_root = MetadataRoot.getMetadataRoot();
+
+    com.arsdigita.persistence.proto.Session getProtoSession() {
+        return m_ssn;
+    }
 
     /**
      * Retrieves the {@link TransactionContext}
@@ -97,14 +96,22 @@ public interface Session {
      *
      * @return The transaction context for this Session.
      **/
-    TransactionContext getTransactionContext();
+
+    public TransactionContext getTransactionContext() {
+        return m_ctx;
+    }
+
 
     /**
      * Returns the JDBC connection associated with this session.
      *
      * @return The JDBC connection used by this Session object.
      **/
-    Connection getConnection();
+
+    public Connection getConnection() {
+        throw new Error("not implemented");
+    }
+
 
     /**
      * Creates and returns a DataObject of the given type. All fields of
@@ -121,8 +128,11 @@ public interface Session {
      * @return A persistent object of the specified type.
      * @see #create(String)
      * @see GenericDataObjectFactory
-     */
-    DataObject create(ObjectType type);
+     **/
+    public DataObject create(ObjectType type) {
+        return new DataObjectImpl(this, type);
+    }
+
 
     /**
      * Creates and returns an empty DataObject of the given type. The
@@ -151,8 +161,11 @@ public interface Session {
      * @return A persistent object of the type identified by
      * <i>typeName</i>.
      **/
-    DataObject create(String typeName)
-        throws PersistenceException;
+
+    public DataObject create(String typeName) {
+        return create(m_root.getObjectType(typeName));
+    }
+
 
     /**
      * Creates a new DataObject with the type of the given oid and initializes
@@ -162,7 +175,15 @@ public interface Session {
      *        the resulting DataObject.
      **/
 
-    DataObject create(OID oid);
+    public DataObject create(OID oid) {
+        DataObjectImpl.PersistentObjectImpl po =
+            (DataObjectImpl.PersistentObjectImpl) m_ssn.create
+            (oid.getProtoOID());
+        DataObjectImpl doi = po.getDataObject();
+        doi.setSession(this);
+        return doi;
+    }
+
 
     /**
      * Retrieves the DataObject specified by <i>oid</i>.  If there is
@@ -175,19 +196,29 @@ public interface Session {
      *
      * @return A persistent object of the type specified by the oid.
      **/
-    DataObject retrieve(OID oid)
-        throws PersistenceException;
+
+    public DataObject retrieve(OID oid) {
+        DataObjectImpl.PersistentObjectImpl po =
+            (DataObjectImpl.PersistentObjectImpl) m_ssn.retrieve
+            (oid.getProtoOID());
+        DataObjectImpl doi = po.getDataObject();
+        doi.setSession(this);
+        return doi;
+    }
+
 
     /**
-     *  - Deletes the
-     * persistent object of the given type with the given oid.  This method
-     * is not yet implemented.
+     *  Deletes the persistent object of the given type with the given oid.
      *
      * @param oid The id of the object to be deleted.
      *
      * @return True of an object was deleted, false otherwise.
      **/
-    boolean delete(OID oid);
+
+    public boolean delete(OID oid) {
+        return m_ssn.delete(oid.getProtoOID());
+    }
+
 
     /**
      * Retrieves a collection of objects of the specified objectType.
@@ -199,7 +230,11 @@ public interface Session {
      * @return A DataCollection of the specified type.
      * @see Session#retrieve(String)
      **/
-    DataCollection retrieve(ObjectType type);
+
+    public DataCollection retrieve(ObjectType type) {
+        return new DataCollectionImpl(this, type);
+    }
+
 
     /**
      * <p>Retrieves a collection of objects of the specified objectType.
@@ -242,8 +277,11 @@ public interface Session {
      * <code>retrieveAll</code> event..
      * @see Session#retrieve(ObjectType)
      **/
-    DataCollection retrieve(String typeName)
-        throws PersistenceException;
+
+    public DataCollection retrieve(String typeName) {
+        return retrieve(m_root.getObjectType(typeName));
+    }
+
 
     /**
      * <p>Retrieves a persistent query object based on the named query.
@@ -286,8 +324,11 @@ public interface Session {
      *
      * @param name The name of the query.
      * @return A new DataQuery object.
-     */
-    DataQuery retrieveQuery(String name) throws PersistenceException;
+     **/
+
+    public DataQuery retrieveQuery(String name) {
+        throw new Error("not implemented");
+    }
 
     /**
      * <p>
@@ -318,64 +359,12 @@ public interface Session {
      * @return A DataOperation object corresponding to the definition
      * in the PDL.
      *
-     */
-    DataOperation retrieveDataOperation(String name)
-        throws PersistenceException;
+     **/
 
-    /**
-     *   - This retrieves the
-     *  factory that is used to create the filters for this DataQuery.
-     */
-    FilterFactory getFilterFactory();
+    public DataOperation retrieveDataOperation(String name) {
+        throw new Error("not implemented");        
+    }
 
-
-    /**
-     *  - This allows
-     * developers to push messages on to the stack.  When a PersistenceError
-     * is created, it automatically reads all of the messages off of the
-     * stack and prints them as part of the error message.  Every call to
-     * <code>pushMessage</code> should have a corresponding call to
-     * {@link Session#popMessage()}.
-     *  <p>
-     *  For instance, when saving an object in GenericDataObject,
-     *  the code could look something like
-     *  <pre>
-     *  <code>
-     *  public void save() {
-     *  session.pushMessage("Saving object " + getOID());
-     *  &lt;do the save stuff here&gt;
-     *  session.popMessage();
-     *  </code>
-     *  </pre>
-     *
-     *  @param message The message to push on to the stack
-     *  @see Session#getStackTrace
-     */
-    void pushMessage(String message);
-
-    /**
-     *  - This allows developers
-     *  to pop message off of the stack.  This
-     *  should be used after an action has been completed successfully
-     *  and should have a corresponding call to
-     * {@link Session#pushMessage(String message)}.
-     *  <p>
-     *  For instance, when saving an object in GenericDataObject,
-     *  the code could look something like
-     *  <pre>
-     *  <code>
-     *  public void save() {
-     *  session.pushMessage("Saving object " + getOID());
-     *  &lt;do the save stuff here&gt;
-     *  session.popMessage();
-     *  </code>
-     *  </pre>
-     *
-     *  @return This returns the message that was popped off of the stack
-     *          If the stack was empty then "null" is returned.
-     *  @see Session
-     */
-    String popMessage();
 
     /**
      *   - Returns the
@@ -385,5 +374,10 @@ public interface Session {
      *  by the list of items.  If the stack is empty, this returns the
      *  empty string.  Calling this clears the stack.
      *
-     */
-    String getStackTrace();}
+     **/
+
+    public String getStackTrace() {
+        throw new Error("not implemented");        
+    }
+
+}

@@ -28,19 +28,18 @@ import org.apache.log4j.Logger;
  *
  * @see Initializer
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/01/09 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/SessionManager.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/SessionManager.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
 
     private static String s_url = null;           // the jdbc URL
     private static String s_username = null;      // the database username
     private static String s_password = null;      // the database password
     private static ThreadLocal s_session;  // the session
     private static SQLUtilities s_sqlUtil;
-    private static SessionFactory s_factory;
 
     private static final Logger s_cat =
         Logger.getLogger(SessionManager.class.getName());
@@ -67,10 +66,6 @@ public class SessionManager {
         return (Session) s_session.get();
     }
 
-    static InternalSession getInternalSession() {
-        return (InternalSession) s_session.get();
-    }
-
      /**
      *  This sets the connection info for this session manager
      *
@@ -90,9 +85,9 @@ public class SessionManager {
         s_password = password;
     }
 
-    static synchronized void setSessionFactory(SessionFactory factory) {
+/*    static synchronized void setSessionFactory(SessionFactory factory) {
         s_factory = factory;
-    }
+        }*/
 
     /**
      *  This resets the connection info by "forgetting" the schema, url,
@@ -119,8 +114,7 @@ public class SessionManager {
                                                         "not been initialized: " +
                                                         sb.toString());
                     }
-                    Session s = s_factory.newSession("", s_url, s_username, s_password);
-                    //s.setSchemaConnectionInfo("", s_url, s_username, s_password);
+                    Session s = new Session();
                     return s;
                 }
             };

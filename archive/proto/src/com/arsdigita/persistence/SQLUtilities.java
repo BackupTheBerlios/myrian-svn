@@ -24,24 +24,12 @@ import com.arsdigita.persistence.sql.Element;
  *  the Oracle instance of this replaces "= null" with "is null"
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/01/09 $
  */
 
 public interface SQLUtilities  {
 
-    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/SQLUtilities.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
-
-    /**
-     *  This takes the SQL Element and the source which contains variable
-     *  values and processes them accordingly.  It then returns
-     *  the resulting SQL element.  For instance, for the
-     *  OracleSQLUtilities.processNulls, this will replace all
-     *  bind variables with the value of null with "is null" or
-     *  "is not null"
-     *  @deprecated This is a no-op so it will be removed.
-     */
-    Element processNulls(Element sql, DataContainer source);
-
+    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/SQLUtilities.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
 
     /**
      *  This method takes a comparator (e.g. =, <=, >=, !=, <>)

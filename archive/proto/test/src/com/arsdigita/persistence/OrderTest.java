@@ -25,12 +25,12 @@ import java.sql.SQLException;
  * Test
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/01/09 $
  */
 
 public abstract class OrderTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/OrderTest.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/OrderTest.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
 
     public OrderTest(String name) {
         super(name);
@@ -157,7 +157,7 @@ public abstract class OrderTest extends PersistenceTestCase {
               com.arsdigita.db.DbHelper.DB_POSTGRES &&
               "dynamic".equals(m_testType))) {
             try {
-                GenericDataObject orders = (GenericDataObject)object.get("order");
+                DataObject orders = (DataObject)object.get("order");
                 object.set("order", null);
                 object.save();
                 fail("trying to execute an event that is not defined should " +

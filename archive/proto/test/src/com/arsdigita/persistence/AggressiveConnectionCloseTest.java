@@ -46,7 +46,7 @@ import org.apache.log4j.varia.StringMatchFilter;
  */
 public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
 
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/AggressiveConnectionCloseTest.java#1 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/AggressiveConnectionCloseTest.java#2 $";
 
     private Session ssn;
 
@@ -70,7 +70,7 @@ public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
         super.setUp();
 
         ssn = getSession();
-        originalCloseValue = TransactionContextImpl.getAggressiveClose();
+        originalCloseValue = ssn.getTransactionContext().getAggressiveClose();
     }
 
     /**
@@ -79,7 +79,7 @@ public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
     public void tearDown() throws Exception {
         super.tearDown();
 
-        TransactionContextImpl.setAggressiveClose(originalCloseValue);
+        ssn.getTransactionContext().setAggressiveClose(originalCloseValue);
     }
 
     public void testAggressiveClosing() {
@@ -95,7 +95,7 @@ public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
         log.addFilter(filterReturn);
         log.addFilter(new DenyAllFilter());
 
-        TransactionContextImpl.setAggressiveClose(true);
+        ssn.getTransactionContext().setAggressiveClose(true);
 
         // do something simple, should result in a "holding on to" message
         DataObject dt = ssn.create("examples.Datatype");
@@ -119,7 +119,7 @@ public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
             assertLogDoesNotContain(holdString);
             assertLogContains(returnString);
 
-            TransactionContextImpl.setAggressiveClose(false);
+            ssn.getTransactionContext().setAggressiveClose(false);
 
             // abort prev transaction, start a new one, so that we can have a
             // clean connection

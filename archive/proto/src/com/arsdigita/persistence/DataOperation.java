@@ -30,21 +30,18 @@ import org.apache.log4j.Logger;
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
  * @since 4.5
- * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#1 $
+ * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#2 $
  */
-public class DataOperation extends AbstractDataOperation {
+public class DataOperation {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
-
-    private Session m_session;
-    private DataOperationType m_type;
-    private CallableStatement m_callableStatement = null;
-
-    // This is used to hold the variables, in order, for a CallableStatement
-    private ArrayList variables;
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
 
     private static final Logger s_cat =
         Logger.getLogger(DataOperation.class);
+
+    private Session m_session;
+    private DataOperationType m_type;
+
 
     /**
      * Creates a new data operation to run within a particular session.
@@ -67,19 +64,7 @@ public class DataOperation extends AbstractDataOperation {
      * only available for the last one.
      */
     public void execute() {
-        DataStore dataStore = SessionManager.getInternalSession().getDataStore();
-        for (Iterator it = m_type.getEvent().getOperations(); it.hasNext(); ) {
-            Operation op = (Operation) it.next();
-            variables = new ArrayList();
-            if (op.isCallableStatement()) {
-                m_callableStatement = dataStore.fireCallableOperation
-                    (op, m_source, variables);
-            } else {
-                dataStore.fireOperation(op, m_source);
-                m_callableStatement = null;
-                variables = null;
-            }
-        }
+        throw new Error("not implemented");
     }
 
 
@@ -90,16 +75,7 @@ public class DataOperation extends AbstractDataOperation {
      * {@link #get(String parameterName)}
      */
     public synchronized void close() {
-        if (m_callableStatement != null) {
-            try {
-                // associated statement closing should be handled
-                // automatically if close after use flag was set.
-                m_callableStatement.close();
-            } catch (SQLException e) {
-                throw PersistenceException.newInstance(e);
-            }
-            m_callableStatement = null;
-        }
+        throw new Error("not implemented");
     }
 
 
@@ -119,29 +95,35 @@ public class DataOperation extends AbstractDataOperation {
      *  @param parameterName The name of the parameter to retrieve
      */
     public Object get(String parameterName) {
-        try {
-            if (m_callableStatement != null) {
-                int index = variables.indexOf(parameterName);
-                if (index > -1) {
-                    return m_callableStatement.getObject(index + 1);
-                } else {
-                    throw new PersistenceException
-                        ("The variable you have requested (" + parameterName +
-                         "is not found within the executed statement");
-                }
-            } else {
-                throw new PersistenceException
-                    ("You must call execute() before trying to retrieve " +
-                     "values");
-            }
-        } catch (SQLException e) {
-            throw PersistenceException.newInstance(e);
-        }
+        throw new Error("not implemented");
+    }
+
+    /**
+     * Allows a user to bind a parameter within a named query.
+     *
+     * @param parameterName The name of the parameter to bind
+     * @param value The value to assign to the parameter
+     */
+    public void setParameter(String parameterName, Object value) {
+        throw new Error("not implemented");
+    }
+
+
+    /**
+     * Allows a caller to get a parameter value for a parameter that
+     * has already been set
+     *
+     * @param parameterName The name of the parameter to retrieve
+     * @return This returns the object representing the value of the
+     * parameter specified by the name or "null" if the parameter value
+     * has not yet been set.
+     */
+    public Object getParameter(String parameterName) {
+        throw new Error("not implemented");
     }
 
     public String toString() {
         return "DataOperation: " + Utilities.LINE_BREAK + " + " +
-            "Type = " + m_type + Utilities.LINE_BREAK +
-            "+ Bindings = " + m_source;
+            "Type = " + m_type + Utilities.LINE_BREAK;
     }
 }

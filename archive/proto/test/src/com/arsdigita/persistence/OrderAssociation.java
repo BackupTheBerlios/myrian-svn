@@ -25,7 +25,7 @@ import java.util.*;
  */
 final class OrderAssociation {
 
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/OrderAssociation.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/OrderAssociation.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
     public static final int NUM_ITEMS = 10;
 
     OrderAssociation(Session session) {
@@ -41,7 +41,7 @@ final class OrderAssociation {
         order.set("hasShipped", Boolean.FALSE);
         order.save();
 
-        m_order = (GenericDataObject) session.retrieve
+        m_order = (DataObject) session.retrieve
             (new OID("examples.Order", id));
 
         DataAssociation items = (DataAssociation) m_order.get("items");
@@ -81,7 +81,7 @@ final class OrderAssociation {
         return m_lineItems;
     }
 
-    private GenericDataObject m_order;
+    private DataObject m_order;
     private DataAssociation m_lineItems;
     private ObjectType m_lineItemType;
 

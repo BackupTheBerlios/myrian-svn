@@ -47,7 +47,7 @@ import org.apache.log4j.varia.StringMatchFilter;
  */
 public class StatementClosingTest extends Log4jBasedTestCase {
 
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/StatementClosingTest.java#1 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/StatementClosingTest.java#2 $";
 
     private Session ssn;
 
@@ -72,7 +72,7 @@ public class StatementClosingTest extends Log4jBasedTestCase {
         super.setUp();
 
         ssn = getSession();
-        originalCloseValue = TransactionContextImpl.getAggressiveClose();
+        originalCloseValue = ssn.getTransactionContext().getAggressiveClose();
     }
 
     /**
@@ -81,7 +81,7 @@ public class StatementClosingTest extends Log4jBasedTestCase {
     public void tearDown() throws Exception {
         super.tearDown();
 
-        TransactionContextImpl.setAggressiveClose(originalCloseValue);
+        ssn.getTransactionContext().setAggressiveClose(originalCloseValue);
     }
 
     public void testStatementClosing() {
@@ -99,7 +99,7 @@ public class StatementClosingTest extends Log4jBasedTestCase {
         log.addFilter(closeFilter);
         log.addFilter(new DenyAllFilter());
 
-        TransactionContextImpl.setAggressiveClose(true);
+        ssn.getTransactionContext().setAggressiveClose(true);
 
         // do something simple
         DataObject dt = ssn.create("examples.Datatype");

@@ -33,13 +33,13 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $ */
+ * @version $Revision: #2 $ $Date: 2003/01/09 $ */
 
 public interface DataAssociation extends DataCollection {
     // when this no longer extends DataCollection, make sure it
     // still has get/set Query and get/set Source
 
-    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataAssociation.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataAssociation.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
 
     /**
      * Adds <i>object</i> to the persistent association.
@@ -80,24 +80,6 @@ public interface DataAssociation extends DataCollection {
      * This is a convenience method for getDataAssociationCursor()
      */
     DataAssociationCursor cursor();
-
-
-    /**
-     * Returns the link associated with the current row.
-     *
-     * @return The link.
-     * @deprecated Use {@link #cursor()}.getLink()
-     **/
-    Link getLink();
-
-
-    /**
-     * Returns the link associated the parent object of this
-     * association with the given object.
-     *
-     * @return The link.
-     **/
-    Link getLink(DataObject object);
 
 
     /**
