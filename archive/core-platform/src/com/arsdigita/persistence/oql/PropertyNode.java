@@ -7,18 +7,19 @@ import java.util.*;
  * PropertyNode
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/05/30 $
+ * @version $Revision: #4 $ $Date: 2002/06/10 $
  **/
 
 class PropertyNode extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/PropertyNode.java#3 $ by $Author: rhs $, $DateTime: 2002/05/30 15:15:09 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/PropertyNode.java#4 $ by $Author: rhs $, $DateTime: 2002/06/10 15:35:38 $";
 
     private Property m_property;
 
     public PropertyNode(Node parent, Property property) {
         super(parent, (ObjectType) property.getType());
         m_property = property;
+        fetchKey();
     }
 
     String getName() {
@@ -51,6 +52,10 @@ class PropertyNode extends Node {
         }
     }
 
+    boolean isNullable() {
+        return m_property.isNullable();
+    }
+
     void buildQuery() {
         Query query = getQuery();
         JoinPath jp = m_property.getJoinPath();
@@ -62,7 +67,7 @@ class PropertyNode extends Node {
         table = defineTable(first.getTo().getTableName());
         Column to = table.defineColumn(first.getTo());
 
-        query.addCondition(new Condition(from, to));
+        new Condition(query, from, to);
 
         for (int i = 1; i < path.size(); i++) {
             JoinElement je = (JoinElement) path.get(i);
@@ -70,7 +75,7 @@ class PropertyNode extends Node {
             from = table.defineColumn(je.getFrom());
             table = defineTable(je.getTo().getTableName());
             to = table.defineColumn(je.getTo());
-            query.addCondition(new Condition(from, to));
+            new Condition(query, from, to);
         }
 
         super.buildQuery();

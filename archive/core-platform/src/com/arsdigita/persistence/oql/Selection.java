@@ -7,12 +7,12 @@ import com.arsdigita.persistence.metadata.*;
  * Selection
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/05/30 $
+ * @version $Revision: #4 $ $Date: 2002/06/10 $
  **/
 
 class Selection {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Selection.java#3 $ by $Author: rhs $, $DateTime: 2002/05/30 15:15:09 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Selection.java#4 $ by $Author: rhs $, $DateTime: 2002/06/10 15:35:38 $";
 
     private Node m_node;
     private Property m_property;
@@ -21,6 +21,12 @@ class Selection {
     Selection(Node node, Property property) {
         m_node = node;
         m_property = property;
+
+        getQuery().addSelection(this);
+    }
+
+    public Query getQuery() {
+        return m_node.getQuery();
     }
 
     public Property getProperty() {
@@ -32,13 +38,35 @@ class Selection {
     }
 
     public void setColumn(Column column) {
+        if (m_column != null) {
+            m_column.getTable().removeSelection(this);
+        }
         m_column = column;
+        m_column.getTable().addSelection(this);
+    }
+
+    public Mapping getMapping() {
+        String path = m_node.getPrefix() + m_property.getName();
+        com.arsdigita.persistence.metadata.Column col =
+            new com.arsdigita.persistence.metadata.Column(
+                m_column.getTable().getAlias(),
+                getAlias()
+                );
+        col.setLineInfo(m_property.getColumn());
+        Mapping mapping = new Mapping(StringUtils.split(path, '.'), col);
+        mapping.setLineInfo(m_property);
+        return mapping;
+    }
+
+
+    public String getName() {
+        return m_node.getName() + "." + m_property.getName();
     }
 
     public String getAlias() {
-        if (m_node == m_node.getQuery() &&
+        if (m_node == getQuery() &&
             m_node.getObjectType().isKeyProperty(m_property)) {
-            return m_property.getColumn().getColumnName();
+            return m_column.getName();
         } else {
             String alias = m_node.getAlias();
             if (alias == null) {
@@ -53,17 +81,8 @@ class Selection {
         }
     }
 
-    public Mapping getMapping() {
-        String path = m_node.getPrefix() + m_property.getName();
-        com.arsdigita.persistence.metadata.Column col =
-            new com.arsdigita.persistence.metadata.Column(
-                m_column.getTable().getAlias(),
-                getAlias()
-                );
-        col.setLineInfo(m_property.getColumn());
-        Mapping mapping = new Mapping(StringUtils.split(path, '.'), col);
-        mapping.setLineInfo(m_property);
-        return mapping;
+    public String toString() {
+        return getName() + " -> " + m_column;
     }
 
 }

@@ -15,17 +15,26 @@
 
 package com.arsdigita.persistence.pdl;
 
+import com.arsdigita.util.StringUtils;
+
 import com.arsdigita.persistence.pdl.ast.AST;
 import com.arsdigita.persistence.Utilities;
 import com.arsdigita.persistence.metadata.MetadataRoot;
+import com.arsdigita.persistence.metadata.ObjectType;
+import com.arsdigita.persistence.oql.Query;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.IOException;
 import java.io.Reader;
 
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Stack;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -39,12 +48,12 @@ import org.apache.log4j.Priority;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/06/10 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#2 $ by $Author: rhs $, $DateTime: 2002/06/10 15:35:38 $";
 
     private static final Category s_log = Category.getInstance(PDL.class);
 
@@ -129,6 +138,16 @@ public class PDL {
         load(new InputStreamReader(is), s);
     }
 
+    // This map is for arguments that expect values. The default value is
+    // stored in this map. If the default value is a boolean that the option
+    // is assumed to be a flag.
+    private static final Map OPTIONS = new HashMap();
+
+    static {
+        OPTIONS.put("-debugDirectory", null);
+        OPTIONS.put("-path", null);
+        OPTIONS.put("-dot", null);
+    }
 
     /**
      * Compiles pdl files into one xml file. The target xml file is
@@ -143,26 +162,95 @@ public class PDL {
     public static final void main(String[] argArray) throws PDLException {
         List args = new ArrayList(java.util.Arrays.asList(argArray));
 
-        if (args.size() > 0 && "-debugDirectory".equals(args.get(0))) {
-            if (args.size() > 1) {
-                setDebugDirectory((String) args.get(1));
-                for (int i = 2; i < args.size(); i++) {
-                    args.set(i - 2, args.get(i));
+        while (args.size() > 0) {
+            String arg = (String) args.get(0);
+            if (OPTIONS.containsKey(arg)) {
+                args.remove(0);
+                Object value = OPTIONS.get(arg);
+                if (Boolean.FALSE.equals(value)) {
+                    OPTIONS.put(arg, Boolean.TRUE);
+                } else if (Boolean.TRUE.equals(value)) {
+                    OPTIONS.put(arg, Boolean.FALSE);
+                } else if (args.size() > 0) {
+                    OPTIONS.put(arg, args.get(0));
+                    args.remove(0);
+                } else {
+                    usage();
                 }
-                args.remove(args.size() - 1);
-                args.remove(args.size() - 1);
             } else {
-                usage();
+                break;
             }
         }
 
-        if (args.size() < 1) {
+        String debugDir = (String) OPTIONS.get("-debugDirectory");
+        if (debugDir != null) {
+            setDebugDirectory(debugDir);
+        }
+
+        List files = new ArrayList();
+        Stack dirs = new Stack();
+
+        String path = (String) OPTIONS.get("-path");
+        if (path != null) {
+            String[] parts = StringUtils.split(path, ':');
+            for (int i = 0; i < parts.length; i++) {
+                dirs.push(new File(parts[i]));
+            }
+        }
+
+        while (dirs.size() > 0) {
+            File dir = (File) dirs.pop();
+            File[] listing = dir.listFiles(new FileFilter() {
+                    public boolean accept(File file) {
+                        return file.isDirectory() ||
+                            file.getName().endsWith(".pdl");
+                    }
+                });
+            for (int i = 0; i < listing.length; i++) {
+                if (listing[i].isDirectory()) {
+                    dirs.push(listing[i]);
+                } else {
+                    try {
+                        files.add(listing[i].getCanonicalPath());
+                    } catch (IOException e) {
+                        throw new PDLException(e.getMessage());
+                    }
+                }
+            }
+        }
+
+        files.addAll(args);
+
+        if (files.size() < 1) {
             usage();
         } else {
             BasicConfigurator.configure();
             Category.getRoot().setPriority(Priority.toPriority("info"));
 
-            compilePDL(args);
+            compilePDL(files);
+
+            String dot = (String) OPTIONS.get("-dot");
+            if (dot != null) {
+                String[] parts = StringUtils.split(dot, ':');
+                if (parts.length > 2) {
+                    throw new PDLException(
+                        "Badly formated specification: " + dot
+                        );
+                }
+                MetadataRoot root = MetadataRoot.getMetadataRoot();
+                ObjectType type = root.getObjectType(parts[0]);
+                if (type == null) {
+                    throw new PDLException("No such type: " + parts[0]);
+                }
+                Query query = new Query(type);
+                if (parts.length == 2) {
+                    query.fetch(parts[1]);
+                } else {
+                    query.fetchDefault();
+                }
+                query.generate();
+                query.dumpDot(new File("/tmp/out.dot"));
+            }
         }
     }
 

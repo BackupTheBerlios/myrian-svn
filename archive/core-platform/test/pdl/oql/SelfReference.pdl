@@ -1,4 +1,4 @@
-model test;
+model oql;
 
 object type Object {
     BigInteger[1..1] id = objects.id INTEGER;
@@ -7,9 +7,9 @@ object type Object {
     object key (id);
 }
 
-object type QueryTest extends Object {
+object type SelfReference extends Object {
     String[1..1] name = query_tests.name VARCHAR(200);
-    QueryTest[0..1] parent = join query_tests.parent_id to it.ic, join it.ic to query_tests.id;
+    SelfReference[0..1] parent = join query_tests.parent_id to it.ic, join it.ic to query_tests.id;
 
     reference key (query_tests.id);
 

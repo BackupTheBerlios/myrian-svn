@@ -7,41 +7,51 @@ import java.util.*;
  * Condition
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/06/10 $
  **/
 
 class Condition {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Condition.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Condition.java#2 $ by $Author: rhs $, $DateTime: 2002/06/10 15:35:38 $";
 
     private Set m_columns = new HashSet();
-    private Column m_left;
-    private Column m_right;
+    private Query m_query;
+    private Column m_tail;
+    private Column m_head;
 
-    public Condition(Column left, Column right) {
-        Assert.assertNotNull(left, "left");
-        Assert.assertNotNull(right, "right");
+    public Condition(Query query, Column tail, Column head) {
+        Assert.assertNotNull(query, "query");
+        Assert.assertNotNull(tail, "tail");
+        Assert.assertNotNull(head, "head");
 
-        m_left = left;
-        m_right = right;
+        m_query = query;
+        m_tail = tail;
+        m_head = head;
 
-        m_columns.add(left);
-        m_columns.add(right);
+        m_columns.add(tail);
+        m_columns.add(head);
 
-        m_left.getTable().addCondition(this);
-        m_right.getTable().addCondition(this);
+        m_query.addCondition(this);
+        m_tail.getTable().addCondition(this);
+        m_head.getTable().addCondition(this);
     }
 
-    public Column getLeft() {
-        return m_left;
+    public void remove() {
+        m_query.removeCondition(this);
+        m_tail.getTable().removeCondition(this);
+        m_head.getTable().removeCondition(this);
     }
 
-    public Column getRight() {
-        return m_right;
+    public Column getTail() {
+        return m_tail;
+    }
+
+    public Column getHead() {
+        return m_head;
     }
 
     public boolean isOuter() {
-        return m_right.getTable().getNode().isOuter();
+        return m_head.getTable().getNode().isOuter();
     }
 
     public String toString() {

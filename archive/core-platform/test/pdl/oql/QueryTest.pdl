@@ -1,0 +1,35 @@
+model oql;
+
+object type Sup {
+    BigInteger[1..1] id = sup.sup_id INTEGER;
+    String supAttribute = sup.sup_attribute VARCHAR(200);
+
+    object key (id);
+}
+
+object type Sub extends Sup {
+    String subAttribute = sub.sub_attribute VARCHAR(200);
+    Ref[1..1] required = join sub.required_id to refs.ref_id;
+    Ref[0..1] optional = join sub.optional_id to refs.ref_id;
+
+    reference key (sub.sub_id);
+}
+
+association {
+    Sub[1..1] sub = join comps.sub_id to sub.sub_id;
+    Comp[0..n] comps = join sub.sub_id to comps.sub_id;
+}
+
+object type Comp {
+    BigInteger[1..1] id = comps.comp_id INTEGER;
+    String compAttribute = comps.comp_attribute VARCHAR(200);
+
+    object key (id);
+}
+
+object type Ref {
+    BigInteger[1..1] id = refs.ref_id INTEGER;
+    String refAttribute = refs.ref_attribute VARCHAR(200);
+
+    object key (id);
+}

@@ -3,6 +3,7 @@ package com.arsdigita.persistence.oql;
 import com.arsdigita.util.*;
 import com.arsdigita.persistence.metadata.*;
 import java.util.*;
+import java.io.*;
 
 import org.apache.log4j.Category;
 
@@ -11,16 +12,21 @@ import org.apache.log4j.Category;
  * specified in a PDL file to generate sql queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/05/30 $
+ * @version $Revision: #5 $ $Date: 2002/06/10 $
  **/
 
 public class Query extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#4 $ by $Author: rhs $, $DateTime: 2002/05/30 15:15:09 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#5 $ by $Author: rhs $, $DateTime: 2002/06/10 15:35:38 $";
 
     private static final Category s_log = Category.getInstance(Query.class);
 
     private Set m_conditions = new HashSet();
+    private Set m_selections = new HashSet();
+    private StringBuffer m_dot = new StringBuffer();
+    private List m_errors = new ArrayList();
+    private List m_modifications = new ArrayList();
+
 
     /**
      * Constructs a query for retrieving all objects of the given type. By
@@ -33,10 +39,35 @@ public class Query extends Node {
 
     public Query(ObjectType type) {
         super(null, type);
+        fetchKey();
+    }
+
+    Set getSelections(Column column) {
+        Set result = new HashSet();
+        for (Iterator it = m_selections.iterator(); it.hasNext(); ) {
+            Selection sel = (Selection) it.next();
+            if (column.equals(sel.getColumn())) {
+                result.add(sel);
+            }
+        }
+
+        return result;
+    }
+
+    void addSelection(Selection selection) {
+        m_selections.add(selection);
+    }
+
+    void removeSelection(Selection selection) {
+        m_selections.remove(selection);
     }
 
     void addCondition(Condition condition) {
         m_conditions.add(condition);
+    }
+
+    void removeCondition(Condition condition) {
+        m_conditions.remove(condition);
     }
 
     String getName() {
@@ -56,6 +87,10 @@ public class Query extends Node {
     }
 
     boolean isOuter() {
+        return false;
+    }
+
+    boolean isNullable() {
         return false;
     }
 
@@ -170,25 +205,93 @@ public class Query extends Node {
         return result[0];
     }
 
-    public void generate() {
-        traverse(BUILD_QUERY);
-        traverse(CHECK_QUERY);
+    private boolean m_modified = false;
 
+    public boolean  isModified() {
+        return m_modified;
+    }
+
+    void modify(String msg) {
+        m_modifications.add(msg);
+        m_modified = true;
+        dot();
+        new Validator().act(this);
         if (m_errors.size() > 0) {
+            generateError();
+        }
+    }
+
+    private void generateError() {
+        try {
+            File file = File.createTempFile("oql", ".dot");
+            String path = file.getCanonicalPath();
+            dumpDot(file);
             ObjectType type = getObjectType();
-            throw new Error(
+            throw new OQLException(
                 type.getFilename() + ": " + type.getLineNumber() +
                 " column " + type.getColumnNumber() +
-                " errors generating query: " + m_errors + "\n\n" + toDot()
+                ": Encountered an error while generating a query for " +
+                type.getQualifiedName() + ".\nThe following errors were " + 
+                "reported:\n  " + join(m_errors, "\n  ") +
+                "\nAfter making the following modifications:\n  " +
+                join(m_modifications, "\n  ") +
+                "\nA dot representation of the query after each stage of " +
+                " modification has been written to  the file '" + path +
+                "'. If you think this message is the result of a bug then " +
+                "please include the contents of the above file in any bug " +
+                "report."
                 );
+        } catch (IOException e) {
+            s_log.error(e);
+        }
+    }
+
+    private void dot() {
+        if (m_dot.length() > 0) {
+            m_dot.append("\n\n");
         }
 
-        // Phase one, identify all the tables from which we must do direct
-        // selects.
-        // Phase two, compute the long join paths for those tables.
-        // Phase three, collapse the long join paths.
-        // Phase four, add any missing tables required for joins.
-        // Phase five, remove any redundent tables.
+        toDot(m_dot);
+    }
+
+    public void dumpDot(File file) {
+        try {
+            FileWriter writer = new FileWriter(file);
+            writer.write(m_dot.toString());
+            writer.close();
+        } catch (IOException e) {
+            s_log.error(e.getMessage());
+        }
+    }
+
+    private static final Set s_written = new HashSet();
+
+    public void generate() {
+        traverse(BUILD_QUERY);
+
+        modify("Genesis");
+        while (isModified()) {
+            m_modified = false;
+            traverse(OPTIMIZE_QUERY);
+        }
+
+        /*
+        // I use this code to dump every query in the system in dot form.
+        // We want it commented out unless we're debugging stuff.
+        String dot = toDot();
+        String op = getOperation().toString();
+        if (!s_written.contains(op)) {
+            try {
+                FileWriter writer = new FileWriter(
+                    "/tmp/dmp/" + s_written.size() + ".dot"
+                    );
+                writer.write(dot);
+                writer.close();
+                s_written.add(op);
+            } catch (IOException e) {
+                s_log.error(e.getMessage());
+            }
+            }*/
     }
 
     public String toSQL() {
@@ -200,63 +303,60 @@ public class Query extends Node {
         final StringBuffer result = new StringBuffer();
         result.append(" select ");
 
-        final boolean[] first = { true };
+        final List selections = new ArrayList();
 
         traverse(new Actor() {
                 public void act(Node node) {
                     for (Iterator it = node.getSelections().iterator();
                          it.hasNext(); ) {
                         Selection sel = (Selection) it.next();
-
-                        if (first[0]) {
-                            first[0] = false;
-                        } else {
-                            result.append(",\n        ");
-                        }
-
-                        result.append(sel.getColumn().getQualifiedName());
-                        result.append(" as ");
-                        result.append(sel.getAlias());
+                        selections.add(sel.getColumn().getQualifiedName() +
+                                       " as " + sel.getAlias());
                     }
                 }
             });
+
+        Collections.sort(selections);
+        result.append(join(selections, ",\n        "));
 
         result.append("\n   from ");
 
-        first[0] = true;
+        final List tables = new ArrayList();
 
         traverse(new Actor() {
                 public void act(Table table) {
-                    if (first[0]) {
-                        first[0] = false;
-                    } else {
-                        result.append(",\n        ");
-                    }
-
-                    result.append(table.getName() + " " + table.getAlias());
+                    tables.add(table.getName() + " " + table.getAlias());
                 }
             });
+
+        Collections.sort(tables);
+        result.append(join(tables, ",\n        "));
 
         if (m_conditions.size() > 0) {
             result.append("\n  where ");
         }
 
-        first[0] = true;
-
+        final List conditions = new ArrayList();
         for (Iterator it = m_conditions.iterator(); it.hasNext(); ) {
             Condition condition = (Condition) it.next();
+            conditions.add(condition.getTail().getQualifiedName() + " = " +
+                           condition.getHead().getQualifiedName() +
+                           (condition.isOuter() ? "(+)" : ""));
+        }
 
-            if (first[0]) {
-                first[0] = false;
-            } else {
-                result.append("\n    and ");
-            }
+        Collections.sort(conditions);
+        result.append(join(conditions, "\n    and "));
 
-            result.append(condition.getLeft().getQualifiedName() + " = " +
-                          condition.getRight().getQualifiedName());
+        return result.toString();
+    }
 
-            if (condition.isOuter()) {
-                result.append("(+)");
+    private static final String join(List list, String sep) {
+        StringBuffer result = new StringBuffer();
+
+        for (Iterator it = list.iterator(); it.hasNext(); ) {
+            result.append(it.next());
+            if (it.hasNext()) {
+                result.append(sep);
             }
         }
 
@@ -265,23 +365,17 @@ public class Query extends Node {
 
     private static final Actor BUILD_QUERY = new Actor() {
             public void act(Node node) {
-                s_log.debug("Building query:\n" + node);
+                if (s_log.isDebugEnabled()) {
+                    s_log.debug("Building query:\n" + node);
+                }
                 node.buildQuery();
-                s_log.debug("Done building query:\n" + node);
-            }
-        };
-
-    private static final Actor CHECK_QUERY = new Actor() {
-            public void act(Table table) {
-                if (table.getConditions().size() == 0 &&
-                    table.getQuery().numTables() > 1) {
-                    s_log.error(
-                        "Unconstrained table in query for "
-                        + table.getQuery().getObjectType().getQualifiedName()
-                        + ": " + table);
+                if (s_log.isDebugEnabled()) {
+                    s_log.debug("Done building query:\n" + node);
                 }
             }
         };
+
+    private static final Actor OPTIMIZE_QUERY = new Optimizer();
 
     public List getAllMappings() {
         final List result = new ArrayList();
@@ -299,15 +393,32 @@ public class Query extends Node {
         return result;
     }
 
+    public Operation getOperation() {
+        Operation result = new Operation(getSQL() + "\n");
+
+        for (Iterator it = getAllMappings().iterator(); it.hasNext(); ) {
+            result.addMapping((Mapping) it.next());
+        }
+
+        return result;
+    }
+
     public String toString() {
         return super.toString() + "\n(conditions: " + m_conditions + ")";
     }
 
     public String toDot() {
-        final StringBuffer result = new StringBuffer();
+        StringBuffer result = new StringBuffer();
+        toDot(result);
+        return result.toString();
+    }
+
+    private void toDot(StringBuffer result) {
         result.append("digraph " + getName() + " {\n");
         result.append("    size=\"11,17\";\n");
-        result.append("    center=1;\n\n");
+        result.append("    center=1;\n");
+        result.append("    rankdir=LR;\n");
+        result.append("    node [shape=record];\n\n");
 
         Map env = new HashMap();
 
@@ -315,18 +426,19 @@ public class Query extends Node {
 
         for (Iterator it = m_conditions.iterator(); it.hasNext(); ) {
             Condition cond = (Condition) it.next();
-            result.append("    " + env.get(cond.getLeft()) + " -> " +
-                          env.get(cond.getRight()));
+            result.append(
+                "    " + env.get(cond.getTail().getTable()) + ":" +
+                env.get(cond.getTail()) +
+                " -> " +
+                env.get(cond.getHead().getTable()) + ":" +
+                env.get(cond.getHead())
+                );
             if (cond.isOuter()) { result.append(" [color=blue]"); }
             result.append(";\n");
         }
 
         result.append("}");
-
-        return result.toString();
     }
-
-    private List m_errors = new ArrayList();
 
     void error(String message) {
         m_errors.add(message);

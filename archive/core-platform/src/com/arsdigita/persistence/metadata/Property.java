@@ -27,7 +27,7 @@ import java.io.PrintStream;
  * REQUIRED, and COLLECTION.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/06/10 $
  **/
 
 public class Property extends Element {
@@ -81,7 +81,7 @@ public class Property extends Element {
         "[0..n]"
     };
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#2 $ by $Author: rhs $, $DateTime: 2002/06/10 15:35:38 $";
 
     /**
      * The name of the Property.
@@ -431,6 +431,20 @@ public class Property extends Element {
 
     public Event getEvent(int type) {
         return m_events[type];
+    }
+
+    public static final String getEventName(int type) {
+        return s_eventTypeText[type];
+    }
+
+    public static final int getEventCode(String name) {
+        for (int i = 0; i < s_eventTypeText.length; i++) {
+            if (s_eventTypeText[i].equals(name)) {
+                return i;
+            }
+        }
+
+        throw new IllegalArgumentException(name + ": not a valid event");
     }
 
     /**

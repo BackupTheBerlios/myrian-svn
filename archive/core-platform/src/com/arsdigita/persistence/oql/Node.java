@@ -10,12 +10,12 @@ import org.apache.log4j.Category;
  * Node
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/05/22 $
+ * @version $Revision: #4 $ $Date: 2002/06/10 $
  **/
 
 abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#3 $ by $Author: rhs $, $DateTime: 2002/05/22 18:02:37 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#4 $ by $Author: rhs $, $DateTime: 2002/06/10 15:35:38 $";
 
     private static final Category s_log = Category.getInstance(Node.class);
 
@@ -29,8 +29,14 @@ abstract class Node {
     public Node(Node parent, ObjectType type) {
         m_parent = parent;
         m_type = type;
+    }
 
-        fetchKey();
+    public final int depth() {
+        if (m_parent == null) {
+            return 0;
+        } else {
+            return m_parent.depth() + 1;
+        }
     }
 
     public Node getParent() {
@@ -51,6 +57,10 @@ abstract class Node {
 
     void addTable(Table table) {
         m_tables.put(table.getName(), table);
+    }
+
+    void removeTable(Table table) {
+        m_tables.remove(table.getName());
     }
 
     Table getTable(String name) {
@@ -153,10 +163,15 @@ abstract class Node {
 
     abstract boolean isOuter();
 
+    abstract boolean isNullable();
+
     void traverse(Actor actor) {
         actor.act(this);
 
-        for (Iterator it = m_tables.values().iterator(); it.hasNext(); ) {
+        ArrayList tables = new ArrayList(m_tables.size());
+        tables.addAll(m_tables.values());
+
+        for (Iterator it = tables.iterator(); it.hasNext(); ) {
             Table table = (Table) it.next();
             actor.act(table);
         }
@@ -193,7 +208,7 @@ abstract class Node {
 
                     if (iter.hasNext()) { msg.append(", "); }
                 }
-                throw new Error(msg.toString());
+                throw new OQLException(msg.toString());
             }
         }
 
@@ -224,7 +239,7 @@ abstract class Node {
 
                 if (connected.contains(from.getTable()) &&
                     !connected.contains(to.getTable())) {
-                    query.addCondition(new Condition(from, to));
+                    new Condition(query, from, to);
                     connected.add(to.getTable());
                 }
             }
@@ -237,7 +252,7 @@ abstract class Node {
 
                 if (connected.contains(from.getTable()) &&
                     !connected.contains(to.getTable())) {
-                    query.addCondition(new Condition(from, to));
+                    new Condition(query, from, to);
                     connected.add(to.getTable());
                 }
             }
@@ -344,19 +359,27 @@ abstract class Node {
              outer.hasNext(); ) {
             Table table = (Table) outer.next();
 
-            env.put(table, "cluster_table" + env.size());
-            result.append("    subgraph " + env.get(table) + " {\n");
-            result.append("        color=red;\n");
+            env.put(table, "table" + env.size());
+            result.append("        " + env.get(table) + " [ label=\"");
 
             for (Iterator it = table.getColumns().iterator();
                  it.hasNext(); ) {
                 Column col = (Column) it.next();
                 env.put(col, "column" + env.size());
-                result.append("        " + env.get(col) + " [label=\"" +
-                              col.getQualifiedName() + "\"];\n");
+                result.append("<" + env.get(col) + ">" +
+                              col.getQualifiedName());
+                Set sels = getQuery().getSelections(col);
+                for (Iterator inner = sels.iterator(); inner.hasNext(); ) {
+                    Selection sel = (Selection) inner.next();
+                    result.append("\\n(" + sel.getName() + ")");
+                }
+
+                if (it.hasNext()) {
+                    result.append("|");
+                }
             }
 
-            result.append("        }\n");
+            result.append("\"];\n");
         }
 
         for (Iterator it = getChildren().iterator(); it.hasNext(); ) {

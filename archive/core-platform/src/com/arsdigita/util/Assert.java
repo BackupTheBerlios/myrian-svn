@@ -23,12 +23,12 @@ package com.arsdigita.util;
  *
  * @author David Lutterkort (lutter@arsdigita.com)
  * @author Uday Mathur (umathur@arsdigita.com)
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#2 $
  * 
  */
 public class Assert {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#2 $ by $Author: rhs $, $DateTime: 2002/06/10 15:35:38 $";
 
     public static final boolean ASSERT_ON = true;
 
@@ -109,7 +109,7 @@ public class Assert {
      * @param expected Expected value.
      * @param actual Actual value.
      * @throws java.lang.IllegalStateException condition was false
-     */
+     **/
     public static final void assertEquals(Object expected, Object actual) {
         assertEquals(expected, actual, "expected", "actual");
     }
@@ -123,7 +123,7 @@ public class Assert {
      * @param expectedLabel Label for first (generally expected) value.
      * @param actualLabel Label for second (generally actual) value.
      * @throws java.lang.IllegalStateException condition was false
-     */
+     **/
     public static final void assertEquals(Object expected, Object actual,
                                     String expectedLabel,
                                     String actualLabel) {
@@ -143,8 +143,40 @@ public class Assert {
     }
 
     /**
+     * Verify that two values are equal.
+     * 
+     * @param expected Expected value.
+     * @param actual Actual value.
+     * @throws java.lang.IllegalStateException condition was false
+     **/
+    public static final void assertEquals(int expected, int actual) {
+        assertEquals(expected, actual, "expected", "actual");
+    }
+
+    /**
+     * Verify that two values are equal.
+     * 
+     * @param expected Expected value.
+     * @param actual Actual value.
+     * @param expectedLabel Label for first (generally expected) value.
+     * @param actualLabel Label for second (generally actual) value.
+     * @throws java.lang.IllegalStateException condition was false
+     **/
+    public static final void assertEquals(int expected, int actual,
+                                          String expectedLabel,
+                                          String actualLabel) {
+        if (ASSERT_ON) {
+            assertTrue(expected == actual, 
+                       "Values not equal, " + 
+                       expectedLabel + " '" + expected + "', " +
+                       actualLabel + " '" + actual + "'");
+        }
+    }
+
+    /**
      * Verify that the model is locked and throw a runtime exception if
-     * it is not locked. */
+     * it is not locked.
+     **/
     public static void assertLocked(Lockable l) {
         assertTrue( l.isLocked(),
                 "Illegal access to an unlocked " + l.getClass().getName());

@@ -17,6 +17,7 @@ package com.arsdigita.persistence.metadata;
 
 import com.arsdigita.util.PriorityQueue;
 import com.arsdigita.util.StringUtils;
+import com.arsdigita.persistence.oql.Query;
 import java.util.NoSuchElementException;
 
 import java.util.Iterator;
@@ -45,12 +46,12 @@ import org.apache.log4j.Category;
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#3 $
  * @since 4.6.3
  */
 public class OracleMDSQLGenerator implements MDSQLGenerator{
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#3 $ by $Author: rhs $, $DateTime: 2002/06/10 15:35:38 $";
 
     private static final Category s_log =
         Category.getInstance(OracleMDSQLGenerator.class.getName());
@@ -1027,29 +1028,22 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
      */
     protected Operation generateRetrieveOperationOptimized(ObjectType type,
                                                        Property prop) {
-        com.arsdigita.persistence.oql.Query q =
-            new com.arsdigita.persistence.oql.Query(type);
+        Query query = new Query(type);
         if (prop == null) {
-            q.fetchDefault();
+            query.fetchDefault();
         } else {
-            q.fetch(prop.getName());
+            query.fetch(prop.getName());
         }
 
-        String baseSQL = q.toSQL();
+        query.generate();
 
-        Operation op = new Operation("select clause goes here");
+        Operation op = query.getOperation();
+
         if (prop == null) {
             op.setLineInfo(type);
         } else {
             op.setLineInfo(prop);
         }
-
-        for (Iterator mapIter = q.getAllMappings().iterator(); mapIter.hasNext(); ) {
-            Mapping m = (Mapping) mapIter.next();
-            op.addMapping(m);
-        }
-
-        op.setSQL(baseSQL);
 
         return op;
     }
