@@ -25,12 +25,12 @@ import java.util.*;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/09/13 $
+ * @version $Revision: #7 $ $Date: 2004/09/16 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/ObjectMap.java#6 $ by $Author: rhs $, $DateTime: 2004/09/13 16:23:12 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/ObjectMap.java#7 $ by $Author: rhs $, $DateTime: 2004/09/16 13:22:03 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -45,6 +45,9 @@ public class ObjectMap extends Element {
     private ArrayList m_deletes = null;
 
     public ObjectMap(ObjectType type) {
+        if (type == null) {
+            throw new IllegalArgumentException("null type");
+        }
         m_type = type;
     }
 
