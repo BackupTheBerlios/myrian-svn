@@ -30,16 +30,18 @@ import org.apache.log4j.Logger;
  * @author David Lutterkort &lt;dlutter@redhat.com&gt;
  * @author Uday Mathur
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#15 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#16 $
  */
 public class Assert {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#15 $" +
-        "$Author: vadim $" +
-        "$DateTime: 2003/05/21 16:45:33 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#16 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/07/08 19:05:18 $";
 
     private static final Logger s_log = Logger.getLogger
         (Assert.class);
+
+    private static final String DEFAULT_MESSAGE = "Assertion failure";
 
     /**
      * Tells whether asserts are turned on.  Use this to wrap code
@@ -58,10 +60,21 @@ public class Assert {
      * condition
      * @throws AssertionError
      */
-    public static void fail(final String message) {
-        s_log.error(message);
+    public static final void fail(final String message) {
+        error(message);
 
         throw new AssertionError(message);
+    }
+
+    /**
+     * Throws an error.
+     *
+     * @throws AssertionError
+     */
+    public static final void fail() {
+        error(DEFAULT_MESSAGE);
+
+        throw new AssertionError(DEFAULT_MESSAGE);
     }
 
     /**
@@ -76,7 +89,7 @@ public class Assert {
     public static final void truth(final boolean condition,
                                    final String message) {
         if (!condition) {
-            s_log.error(message);
+            error(message);
 
             throw new AssertionError(message);
         }
@@ -88,16 +101,13 @@ public class Assert {
      * false.
      *
      * @param condition The condition asserted
-     * @param message An error message
      * @throws AssertionError if the condition is false
      */
     public static final void truth(final boolean condition) {
         if (!condition) {
-            final String message = "Assertion failure";
+            error(DEFAULT_MESSAGE);
 
-            s_log.error(message);
-
-            throw new AssertionError(message);
+            throw new AssertionError(DEFAULT_MESSAGE);
         }
     }
 
@@ -112,9 +122,24 @@ public class Assert {
     public static final void falsity(final boolean condition,
                                      final String message) {
         if (condition) {
-            s_log.error(message);
+            error(message);
 
             throw new AssertionError(message);
+        }
+    }
+
+    /**
+     * Asserts that an arbitrary condition is false and throws an
+     * error if the condition is true.
+     *
+     * @param condition The condition asserted
+     * @throws AssertionError if the condition is false
+     */
+    public static final void falsity(final boolean condition) {
+        if (condition) {
+            error(DEFAULT_MESSAGE);
+
+            throw new AssertionError(DEFAULT_MESSAGE);
         }
     }
 
@@ -131,9 +156,23 @@ public class Assert {
         if (object == null) {
             final String message = clacc.getName() + " is null";
 
-            s_log.error(message);
+            error(message);
 
             throw new AssertionError(message);
+        }
+    }
+
+    /**
+     * Asserts that an object is not null.
+     *
+     * @param object The object that must not be null
+     * @throws AssertionError if the object is null
+     */
+    public static final void exists(final Object object) {
+        if (object == null) {
+            error(DEFAULT_MESSAGE);
+
+            throw new AssertionError(DEFAULT_MESSAGE);
         }
     }
 
@@ -148,7 +187,7 @@ public class Assert {
         if (lockable != null && !lockable.isLocked()) {
             final String message = lockable + " is not locked";
 
-            s_log.error(message);
+            error(message);
 
             throw new AssertionError(message);
         }
@@ -165,7 +204,7 @@ public class Assert {
         if (lockable != null && lockable.isLocked()) {
             final String message = lockable + " is locked";
 
-            s_log.error(message);
+            error(message);
 
             throw new AssertionError(message);
         }
@@ -186,7 +225,7 @@ public class Assert {
             if (value1 != value2) {
                 final String message = value1 + " does not equal " + value2;
 
-                s_log.error(message);
+                error(message);
 
                 throw new AssertionError(message);
             }
@@ -194,7 +233,7 @@ public class Assert {
             if (!value1.equals(value2)) {
                 final String message = value1 + " does not equal " + value2;
 
-                s_log.error(message);
+                error(message);
 
                 throw new AssertionError(message);
             }
@@ -215,13 +254,13 @@ public class Assert {
                                    final String message) {
         if (value1 == null) {
             if (value1 != value2) {
-                s_log.error(message);
+                error(message);
 
                 throw new AssertionError(message);
             }
         } else {
             if (!value1.equals(value2)) {
-                s_log.error(message);
+                error(message);
 
                 throw new AssertionError(message);
             }
@@ -243,7 +282,7 @@ public class Assert {
             if (value1 == value2) {
                 final String message = value1 + " equals " + value2;
 
-                s_log.error(message);
+                error(message);
 
                 throw new AssertionError(message);
             }
@@ -251,7 +290,7 @@ public class Assert {
             if (value1.equals(value2)) {
                 final String message = value1 + " equals " + value2;
 
-                s_log.error(message);
+                error(message);
 
                 throw new AssertionError(message);
             }
@@ -312,7 +351,7 @@ public class Assert {
      */
     public static final void assertTrue(boolean cond, String msg) {
         if (!cond) {
-            s_log.error(msg);
+            error(msg);
 
             throw new IllegalStateException(msg);
         }
@@ -461,19 +500,17 @@ public class Assert {
      */
     public static void assertNotLocked(Lockable l) {
         if (isEnabled()) {
-            assertTrue (!l.isLocked(),
-                        "Illegal access to a locked " +
-                        l.getClass().getName());
+            assertTrue(!l.isLocked(),
+                       "Illegal access to a locked " +
+                       l.getClass().getName());
         }
     }
 
-    /**
-     * This is the equivalent of assertTrue(false).
-     *
-     * @deprecated because it's just as simple to throw an
-     * <code>Error</code> or <code>Exception</code>
-     */
-    public static void fail() {
-        assertTrue(false);
+    // Utility methods
+
+    private static void error(final String message) {
+        // Log the stack trace too, since we still have code that
+        // manages to hide exceptions.
+        s_log.error(message, new AssertionError(message));
     }
 }
