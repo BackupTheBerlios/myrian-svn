@@ -26,12 +26,7 @@ class C {
 
             String[] names = helper.getFieldNames(klass);
             if (names.length == 0) { continue; }
-            List current = new ArrayList(names.length);
-            // Yes, I know about Arrays.asList(Object[]).  It returns a list
-            // that doesn't implement addAll.
-            for (int ii=0; ii<names.length; ii++) {
-                current.add(names[ii]);
-            }
+            List current = new ArrayList(Arrays.asList(names));
             current.addAll(fields);
             fields = current;
         }

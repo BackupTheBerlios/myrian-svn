@@ -15,8 +15,8 @@ class StateManagerImpl extends AbstractStateManager {
     private final static Logger s_log =
         Logger.getLogger(StateManagerImpl.class);
 
-    private PersistenceManagerImpl m_pmi = null;
-    private PropertyMap m_pmap = null;
+    private PersistenceManagerImpl m_pmi;
+    private PropertyMap m_pmap;
 
     StateManagerImpl(PersistenceManagerImpl pmi, PropertyMap pmap) {
         if (pmi == null) { throw new NullPointerException("pmi"); }
