@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/categorization/Category.pdl#21 $
-// $DateTime: 2003/08/29 13:00:25 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/categorization/Category.pdl#22 $
+// $DateTime: 2003/09/18 13:39:19 $
 
 model com.arsdigita.categorization;
 
@@ -51,20 +51,14 @@ association {
                                       to acs_objects.object_id;
 }
 
-association {
-    Category[0..n] categories = join acs_objects.object_id
-                                  to cat_object_category_map.object_id,
-                                join cat_object_category_map.category_id
-                                  to cat_categories.category_id;
-    ACSObject[0..n] childObjects = join cat_categories.category_id
-                                    to cat_object_category_map.category_id,
-                                  join cat_object_category_map.object_id
-                                     to acs_objects.object_id;
+object type CategoryObjectLink {
     Boolean[0..1] isDefault = cat_object_category_map.default_p CHAR(1);
     Boolean[0..1] isIndex = cat_object_category_map.index_p CHAR(1);
     BigDecimal[0..1] sortKey = cat_object_category_map.sort_key;
 
-    add {
+    object key(category, childObject);
+
+    insert {
         do {
             insert into cat_object_category_map (
                 category_id,
@@ -73,8 +67,8 @@ association {
                 index_p,
                 sort_key
             ) values (
-                :categories.id,
-                :childObjects.id,
+                :category.id,
+                :childObject.id,
                 :isDefault,
                 :isIndex,
                 (select CASE WHEN (:sortKey is null) THEN
@@ -95,6 +89,19 @@ association {
 
 }
 
+association {
+    unversioned component CategoryObjectLink[0..n] childObjects = join cat_categories.category_id
+                                                                  to cat_object_category_map.category_id;
+    Category[1..1] category = join cat_object_category_map.category_id
+                              to cat_categories.category_id;
+}
+
+association {
+    unversioned component CategoryObjectLink[0..n] categories = join acs_objects.object_id
+                                                                to cat_object_category_map.object_id;
+    ACSObject[1..1] childObject = join cat_object_category_map.object_id
+                                  to acs_objects.object_id;
+}
 
 
 // this returns all related categories (both ways)
@@ -103,22 +110,14 @@ association {
 // To get the related, do 'get("related")' and then filter on
 // the relationType link attribute to be "related"
 
-association {
-    Category[0..n] parents = join cat_categories.category_id
-                              to cat_category_category_map.related_category_id,
-                             join cat_category_category_map.category_id
-                               to cat_categories.category_id;
-
-    Category[0..n] related = join cat_categories.category_id
-                              to cat_category_category_map.category_id,
-                             join cat_category_category_map.related_category_id
-                              to cat_categories.category_id;
+object type CategoryCategoryLink {
     BigDecimal[0..1] sortKey = cat_category_category_map.sort_key;
     Boolean[1..1] isDefault = cat_category_category_map.default_p CHAR(1);
     String[0..1] relationType = cat_category_category_map.relation_type;
 
+    object key(parentCategory, relatedCategory);
 
-    add {
+    insert {
         do {
             insert into cat_category_category_map (
                 category_id,
@@ -127,8 +126,8 @@ association {
                 sort_key,
                 relation_type
             ) values (
-                :parents.id,
-                :related.id,
+                :parentCategory.id,
+                :relatedCategory.id,
                 :isDefault,
                 (select CASE WHEN (:sortKey is null) THEN
                              (select CASE WHEN (max(sort_key) is null) THEN
@@ -147,6 +146,21 @@ association {
     }
 }
 
+association {
+    component CategoryCategoryLink[0..n] parentCategories = join cat_categories.category_id
+                                                            to cat_category_category_map.related_category_id;
+
+    Category[1..1] relatedCategory =  join cat_category_category_map.related_category_id
+                                      to cat_categories.category_id;
+}
+
+association {
+    component CategoryCategoryLink[0..n] relatedCategories = join cat_categories.category_id
+                                                             to cat_category_category_map.category_id;
+
+    Category[1..1] parentCategory =   join cat_category_category_map.category_id
+                                      to cat_categories.category_id;
+}
 
 // This returns all of the ACSObjects within the subtree for
 // a given category
@@ -223,7 +237,7 @@ query validParents {
            and not exists (select 1
                            from cat_cat_subcat_trans_index
                            where category_id = :id
-			   and cat_categories.category_id = subcategory_id)
+                           and cat_categories.category_id = subcategory_id)
     } map {
         validParent.id = cat_categories.category_id;
         validParent.name = cat_categories.name;
@@ -248,7 +262,7 @@ query topLevelCategories {
             select 1
             from cat_category_category_map
             where relation_type = 'child'
-	    and category_id = related_category_id
+            and category_id = related_category_id
         )
     } map {
         category.id = category.category_id;
@@ -393,7 +407,7 @@ query immediateChildObjectIDs {
 
 query childCategoryIDs {
     BigDecimal id;
-    
+
     do {
          select m.related_category_id
            from cat_category_category_map m
@@ -406,7 +420,7 @@ query childCategoryIDs {
 
 query parentCategoryIDs {
     BigDecimal id;
-    
+
     do {
          SELECT category_id
                         FROM cat_category_category_map
