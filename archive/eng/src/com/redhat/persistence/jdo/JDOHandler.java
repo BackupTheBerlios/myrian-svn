@@ -1,6 +1,7 @@
 package com.redhat.persistence.jdo;
 
 import com.redhat.persistence.PropertyMap;
+import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.pdl.adapters.IdentityAdapter;
 
 import java.lang.reflect.*;
@@ -13,12 +14,12 @@ import org.xml.sax.*;
  * JDOHandler
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/09/13 $
+ * @version $Revision: #2 $ $Date: 2004/09/20 $
  **/
 
 class JDOHandler extends ReflectionHandler {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/JDOHandler.java#1 $ by $Author: rhs $, $DateTime: 2004/09/13 15:27:58 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/JDOHandler.java#2 $ by $Author: rhs $, $DateTime: 2004/09/20 13:26:16 $";
 
     private ClassLoader m_loader;
     private String m_resource;
@@ -40,7 +41,9 @@ class JDOHandler extends ReflectionHandler {
     private boolean m_collection = false;
     private Class m_key = null;
     private Class m_value = null;
-    private int m_jdbcSize = -1;
+    private String m_jdbcColumn = null;
+    private Integer m_jdbcType = null;
+    private Integer m_jdbcSize = null;
 
     private Map m_fields = new LinkedHashMap();
     private Map m_lines = new HashMap();
@@ -210,11 +213,27 @@ class JDOHandler extends ReflectionHandler {
         }
     }
 
+    public void handleJdbcColumn(String value) {
+        m_jdbcColumn = value;
+    }
+
     public void handleJdbcSize(String value) {
         try {
-            m_jdbcSize = Integer.parseInt(value);
+            m_jdbcSize = Integer.valueOf(value);
         } catch (Throwable t) {
             throw fatal("bad jdbc size: " + value, t);
+        }
+    }
+
+    public void handleJdbcType(String value) {
+        Class klass = java.sql.Types.class;
+        try {
+            Field f = klass.getField(value);
+            m_jdbcType = new Integer(f.getInt(null));
+        } catch (NoSuchFieldException e) {
+            throw fatal("bad jdbc type: " + value, e);
+        } catch (IllegalAccessException e) {
+            throw fatal("bad jdbc type: " + value, e);
         }
     }
 
@@ -397,7 +416,9 @@ class JDOHandler extends ReflectionHandler {
         m_required = false;
         m_collection = false;
         m_embedded = false;
-        m_jdbcSize = -1;
+        m_jdbcColumn = null;
+        m_jdbcType = null;
+        m_jdbcSize = null;
     }
 
     public void endClass() {
