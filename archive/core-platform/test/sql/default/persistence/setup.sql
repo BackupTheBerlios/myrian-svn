@@ -17,7 +17,7 @@
 -- tests to run.
 --
 -- @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
--- @version $Revision: #2 $ $Date: 2002/07/22 $
+-- @version $Revision: #3 $ $Date: 2002/07/23 $
 --
 
 -- Right now this is duplicated from the individual files. This should
@@ -27,3 +27,4 @@
 @@ order-test.sql 
 @@ node-test.sql 
 @@ party-test.sql 
+@@ test-create.sql

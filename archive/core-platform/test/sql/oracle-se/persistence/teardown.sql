@@ -17,13 +17,11 @@
 -- tests to run.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #5 $ $Date: 2002/07/22 $
+-- @version $Revision: #6 $ $Date: 2002/07/23 $
 --
 
 -- Right now this is duplicated from the individual files. This should
 -- be fixed at some point.
-
-@@ test-drop.sql
 
 drop table t_user_group_map;
 
