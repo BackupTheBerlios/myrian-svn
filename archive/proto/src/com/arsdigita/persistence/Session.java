@@ -15,6 +15,7 @@
 
 package com.arsdigita.persistence;
 
+import com.arsdigita.db.ConnectionManager;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.proto.Adapter;
@@ -23,12 +24,15 @@ import com.arsdigita.persistence.proto.Query;
 import com.arsdigita.persistence.proto.PropertyMap;
 import com.arsdigita.persistence.proto.metadata.Property;
 import com.arsdigita.persistence.proto.engine.MemoryEngine;
+import com.arsdigita.persistence.proto.engine.rdbms.RDBMSEngine;
+import com.arsdigita.persistence.proto.engine.rdbms.ConnectionSource;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * <p>All persistence operations take place within the context of a session.
@@ -41,7 +45,7 @@ import java.sql.Connection;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/02/17 $
+ * @version $Revision: #11 $ $Date: 2003/02/18 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -85,7 +89,22 @@ public class Session {
     }
 
     private com.arsdigita.persistence.proto.Session m_ssn =
-        new com.arsdigita.persistence.proto.Session(new MemoryEngine());
+        new com.arsdigita.persistence.proto.Session(new RDBMSEngine(
+            new ConnectionSource() {
+                    public Connection acquire() {
+                        try {
+                            Connection conn =
+                                ConnectionManager.getConnection();
+                            conn.setAutoCommit(false);
+                            return conn;
+                        } catch (SQLException e) {
+                            throw new Error(e.getMessage());
+                        }
+                    }
+                    public void release(Connection conn) {
+                        // Do nothing
+                    }
+                }));
     private TransactionContext m_ctx = new TransactionContext(m_ssn);
     private MetadataRoot m_root = MetadataRoot.getMetadataRoot();
 
