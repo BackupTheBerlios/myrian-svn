@@ -24,13 +24,13 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameterContext.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameterContext.java#2 $
  */
 public abstract class AbstractParameterContext implements ParameterContext {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameterContext.java#1 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/23 15:28:18 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameterContext.java#2 $" +
+        "$Author: rhs $" +
+        "$DateTime: 2003/10/27 10:33:59 $";
 
     private static final Logger s_log = Logger.getLogger
         (AbstractParameterContext.class);
@@ -153,16 +153,25 @@ public abstract class AbstractParameterContext implements ParameterContext {
         m_param.write(writer, m_map);
     }
 
+    private static InputStream findInfo(final Class klass) {
+        if (klass == null) { return null; }
+        final String name = klass.getName().replace('.', '/');
+        final InputStream in = klass.getClassLoader
+            ().getResourceAsStream(name + "_parameter.properties");
+        if (in == null) {
+            return findInfo(klass.getSuperclass());
+        } else {
+            return in;
+        }
+    }
+
     /**
      * Loads source data for <code>ParameterInfo</code> objects from
      * the file <code>parameter.info</code> next to
      * <code>this.getClass()</code>.
      */
     protected final void loadInfo() {
-        final String name = getClass().getName().replace('.', '/');
-        final InputStream in = getClass().getClassLoader
-            ().getResourceAsStream(name + "_parameter.properties");
-
+        final InputStream in = findInfo(getClass());
         Assert.exists(in, InputStream.class);
 
         try {
