@@ -25,12 +25,11 @@ import com.arsdigita.persistence.PersistenceTestCase;
  * model.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/09/20 $
+ * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 public class MappingsTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/tests/data/MappingsTest.java#4 $ by $Author: ashah $, $DateTime: 2004/09/20 16:51:05 $";
 
     public MappingsTest(String name) {
         super(name);

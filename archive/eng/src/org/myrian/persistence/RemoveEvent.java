@@ -23,12 +23,11 @@ import org.myrian.persistence.metadata.Property;
  * RemoveEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class RemoveEvent extends PropertyEvent {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/RemoveEvent.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     RemoveEvent(Session ssn, Object obj, Property prop, Object arg) {
         this(ssn, obj, prop, arg, null);

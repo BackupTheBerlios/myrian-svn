@@ -24,12 +24,11 @@ import junit.framework.TestSuite;
  * OQLSuite
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/09/15 $
+ * @version $Revision: #6 $ $Date: 2004/10/04 $
  **/
 
 public class OQLSuite extends TestSuite {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/oql/OQLSuite.java#5 $ by $Author: rhs $, $DateTime: 2004/09/15 13:47:13 $";
 
     public static Test suite() {
         OQLSuite suite = new OQLSuite();

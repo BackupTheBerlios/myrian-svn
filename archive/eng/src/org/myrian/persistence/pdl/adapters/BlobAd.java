@@ -33,12 +33,11 @@ import java.sql.Types;
  * BlobAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class BlobAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/pdl/adapters/BlobAd.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     BlobAd(String type) {
         super(type, Types.BLOB);

@@ -33,12 +33,11 @@ import org.apache.log4j.Logger;
  * QueryTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class QueryTest extends TestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/org/myrian/persistence/oql/QueryTest.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static final Logger s_log = Logger.getLogger(QueryTest.class);
 

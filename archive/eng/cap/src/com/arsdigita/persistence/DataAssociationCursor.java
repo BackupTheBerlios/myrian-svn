@@ -52,12 +52,11 @@ package com.arsdigita.persistence;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/04 $
  */
 
 public interface DataAssociationCursor extends DataCollection {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataAssociationCursor.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
     /**
      * Returns a data association that created this iterator

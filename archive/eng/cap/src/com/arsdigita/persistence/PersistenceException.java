@@ -23,12 +23,11 @@ package com.arsdigita.persistence;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/10/01 $
+ * @version $Revision: #6 $ $Date: 2004/10/04 $
  */
 
 public class PersistenceException extends RuntimeException {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/PersistenceException.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     /**
      * Constructor for a PersistenceException which does not wrap

@@ -25,12 +25,11 @@ import java.util.*;
  * CRUDTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/09/20 $
+ * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 public class CRUDTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/tests/data/CRUDTest.java#4 $ by $Author: ashah $, $DateTime: 2004/09/20 16:51:05 $";
 
     public CRUDTest(String name) {
         super(name);

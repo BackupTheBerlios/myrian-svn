@@ -24,12 +24,11 @@ package com.arsdigita.persistence;
  * and turn them into soft deletes under certain circumstances.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/04 $
  **/
 
 public abstract class DataHandler {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataHandler.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
 
     /**

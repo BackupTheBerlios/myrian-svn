@@ -32,7 +32,6 @@ import java.util.Iterator;
  **/
 public class Utilities  {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/Utilities.java#5 $ by $Author: ashah $, $DateTime: 2004/10/04 11:13:41 $";
 
     public final static String LINE_BREAK =
         System.getProperty("line.separator", "\n\r");

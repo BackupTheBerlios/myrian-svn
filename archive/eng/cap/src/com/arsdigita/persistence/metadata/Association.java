@@ -25,12 +25,11 @@ import org.myrian.persistence.common.CompoundKey;
  * link.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/10/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 public class Association extends ModelElement {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/Association.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private Property m_roleOne;
     private Property m_roleTwo;

@@ -23,13 +23,12 @@ package com.arsdigita.persistence;
  * an event, such as a property retrieve event, which is undefined.
  *
  * @author Jon Orris
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/04 $
  */
 
 public class UndefinedEventException extends PersistenceException {
 
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/UndefinedEventException.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
     public UndefinedEventException(String msg) {
         super(msg, null);

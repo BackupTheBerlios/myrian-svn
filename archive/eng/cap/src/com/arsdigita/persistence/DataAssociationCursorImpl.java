@@ -27,13 +27,12 @@ import org.myrian.persistence.metadata.ObjectType;
  * DataAssociationCursorImpl
  *
  * @author Archit Shah &lt;ashah@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/10/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 class DataAssociationCursorImpl extends DataCollectionImpl
     implements DataAssociationCursor {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private DataAssociationImpl m_assn;
 

@@ -20,12 +20,11 @@ package com.arsdigita.util.cmd;
 /**
  * @deprecated Use CLI (http://jakarta.apache.org/commons/cli/index.html) instead.
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/04 $
  **/
 
 public class BooleanSwitch extends Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/util/cmd/BooleanSwitch.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
     public BooleanSwitch(String name, String usage, Boolean defValue) {
         super(name, FLAG, usage, defValue);

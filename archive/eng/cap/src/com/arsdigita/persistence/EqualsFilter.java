@@ -27,7 +27,6 @@ import org.myrian.persistence.oql.Static;
 
 class EqualsFilter extends FilterImpl {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/EqualsFilter.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private final String m_attribute;
     private final String m_bindName;

@@ -45,7 +45,6 @@ import org.apache.log4j.varia.StringMatchFilter;
  */
 public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/AggressiveConnectionCloseTest.java#3 $";
 
     private Session ssn;
 

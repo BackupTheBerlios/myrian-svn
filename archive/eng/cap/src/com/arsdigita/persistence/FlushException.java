@@ -23,7 +23,6 @@ package com.arsdigita.persistence;
  */
 public class FlushException extends PersistenceException {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/FlushException.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     /**
      * No public constructor.

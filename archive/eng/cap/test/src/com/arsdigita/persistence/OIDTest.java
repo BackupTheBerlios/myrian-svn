@@ -30,15 +30,14 @@ import org.apache.log4j.Logger;
  *
  *
  * @author Michael Bryzek
- * @date $Date: 2004/09/01 $
- * @version $Revision: #3 $
+ * @date $Date: 2004/10/04 $
+ * @version $Revision: #4 $
  *
  * @see com.arsdigita.persistence.OID
  **/
 
 public class OIDTest extends TestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/OIDTest.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
     private static Logger s_log =
         Logger.getLogger(OIDTest.class.getName());

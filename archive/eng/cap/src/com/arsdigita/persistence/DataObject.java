@@ -23,12 +23,11 @@ import com.arsdigita.persistence.metadata.ObjectType;
  * Defines the public methods of Data Objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/04 $
  */
 
 public interface DataObject {
 
-    String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataObject.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
     /**
      * Returns the type of this persistent object.

@@ -16,12 +16,11 @@ import org.apache.log4j.Logger;
  * JDOHandler
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/10/04 $
+ * @version $Revision: #3 $ $Date: 2004/10/04 $
  **/
 
 class JDOHandler extends ReflectionHandler {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/jdo/JDOHandler.java#2 $ by $Author: ashah $, $DateTime: 2004/10/04 11:43:08 $";
     private final static Logger s_log = Logger.getLogger(JDOHandler.class);
 
     private final static byte P_MOD_NONE          = (byte) 0;

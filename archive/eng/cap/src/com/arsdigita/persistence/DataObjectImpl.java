@@ -39,12 +39,11 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/10/01 $
+ * @version $Revision: #8 $ $Date: 2004/10/04 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataObjectImpl.java#7 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 

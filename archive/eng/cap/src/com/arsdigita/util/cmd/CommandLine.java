@@ -27,12 +27,11 @@ import java.util.Map;
 /**
  * @deprecated Use CLI (http://jakarta.apache.org/commons/cli/index.html) instead.
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/04 $
  **/
 
 public class CommandLine {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/util/cmd/CommandLine.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
     private String m_name;
     private String m_usage;

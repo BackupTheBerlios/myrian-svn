@@ -22,14 +22,9 @@ package org.myrian.persistence;
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
  * @since 2003-02-20
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 public abstract class EventProcessor {
-
-    public final static String versionId =
-        "$Id: //eng/persistence/dev/src/org/myrian/persistence/EventProcessor.java#1 $" +
-        " by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
-
     /**
      * During this method, calls into the session to which the event processor
      * is attached are not allowed.

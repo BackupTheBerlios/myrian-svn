@@ -24,12 +24,11 @@ import junit.framework.*;
  * DataSuite
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/09/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 public class DataSuite extends TestSuite {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/tests/data/DataSuite.java#4 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
     public DataSuite() {}
 

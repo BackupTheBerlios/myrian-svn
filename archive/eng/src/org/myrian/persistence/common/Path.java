@@ -23,12 +23,11 @@ import org.myrian.util.ConcurrentDict;
  * Path
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class Path {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/common/Path.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     //special case the id path since it shows up so often
     private static final Path ID_PATH = new Path("id");

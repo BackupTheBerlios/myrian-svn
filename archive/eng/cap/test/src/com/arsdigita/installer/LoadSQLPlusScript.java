@@ -29,7 +29,6 @@ import org.apache.log4j.Logger;
 
 public class LoadSQLPlusScript {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/installer/LoadSQLPlusScript.java#3 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static final Logger s_log =
             Logger.getLogger(LoadSQLPlusScript.class);

@@ -25,12 +25,11 @@ import java.util.*;
  * MultiMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 class MultiMap {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/oql/MultiMap.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private List m_keys = new ArrayList();
     private Map m_values = new HashMap();

@@ -21,12 +21,11 @@ package org.myrian.persistence.pdl.nodes;
  * Property
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class PropertyNd extends StatementNd {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/pdl/nodes/PropertyNd.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     public static final Field TYPE =
         new Field(PropertyNd.class, "type", TypeNd.class, 1, 1);

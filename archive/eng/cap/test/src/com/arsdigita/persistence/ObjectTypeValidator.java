@@ -30,12 +30,11 @@ import java.util.Iterator;
  * ObjectTypeValidator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #4 $ $Date: 2004/10/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/04 $
  */
 
 public class ObjectTypeValidator  {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/ObjectTypeValidator.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
     private static final Logger s_log =
         Logger.getLogger(ObjectTypeValidator.class.getName());
     DataObjectManipulator m_manipulator;

@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 
 public class DynamicNodeTest extends NodeTest {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/DynamicNodeTest.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
     public DynamicNodeTest(String name) {
         super(name);

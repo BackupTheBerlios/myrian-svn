@@ -40,12 +40,11 @@ import java.util.*;
  * QuerySuite
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/10/04 $
+ * @version $Revision: #3 $ $Date: 2004/10/04 $
  **/
 
 public class QuerySuite extends TestSuite {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/org/myrian/persistence/oql/QuerySuite.java#2 $ by $Author: ashah $, $DateTime: 2004/10/04 11:13:41 $";
 
     public QuerySuite() {}
 

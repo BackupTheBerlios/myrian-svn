@@ -24,12 +24,11 @@ import org.myrian.persistence.metadata.Root;
  * a Model.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/10/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 abstract public class ModelElement extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/ModelElement.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private Root m_root;
     private org.myrian.persistence.metadata.Model m_model;

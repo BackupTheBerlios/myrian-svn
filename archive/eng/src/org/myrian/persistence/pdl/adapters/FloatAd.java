@@ -27,12 +27,11 @@ import java.sql.Types;
  * FloatAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class FloatAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/pdl/adapters/FloatAd.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     public FloatAd() {
 	super("global.Float", Types.FLOAT);

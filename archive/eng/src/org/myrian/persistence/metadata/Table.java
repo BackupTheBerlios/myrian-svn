@@ -27,12 +27,11 @@ import java.util.Set;
  * Table
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class Table extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/metadata/Table.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private String m_name;
     private Mist m_columns = new Mist(this);

@@ -41,7 +41,6 @@ import java.util.Map;
  */
 class Expander extends Event.Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/Expander.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     final private Session m_ssn;
     final private Collection m_deleting = new HashSet();

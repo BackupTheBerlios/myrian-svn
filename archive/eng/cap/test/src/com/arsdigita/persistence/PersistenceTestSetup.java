@@ -28,12 +28,11 @@ import junit.framework.*;
  * PersistenceTestSetup
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/10/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/04 $
  **/
 
 public class PersistenceTestSetup extends BaseTestSetup {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PersistenceTestSetup.java#3 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     public PersistenceTestSetup(TestSuite suite) {
         super(suite);

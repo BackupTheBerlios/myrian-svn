@@ -32,14 +32,9 @@ import org.apache.log4j.Logger;
  * @author David Lutterkort &lt;dlutter@redhat.com&gt;
  * @author Uday Mathur
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //eng/persistence/dev/src/org/myrian/util/Assert.java#1 $
+ * @version $Id: //eng/persistence/dev/src/org/myrian/util/Assert.java#2 $
  */
 public class Assert {
-    public static final String versionId =
-        "$Id: //eng/persistence/dev/src/org/myrian/util/Assert.java#1 $" +
-        "$Author: vadim $" +
-        "$DateTime: 2004/10/01 18:41:18 $";
-
     private static final Logger s_log = Logger.getLogger
         (Assert.class);
 

@@ -28,12 +28,11 @@ import org.apache.log4j.Logger;
  * PartyTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/09/15 $
+ * @version $Revision: #5 $ $Date: 2004/10/04 $
  */
 
 public class StaticPartyTest extends PartyTest {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/StaticPartyTest.java#4 $ by $Author: rhs $, $DateTime: 2004/09/15 13:47:13 $";
 
     public StaticPartyTest(String name) {
         super(name);

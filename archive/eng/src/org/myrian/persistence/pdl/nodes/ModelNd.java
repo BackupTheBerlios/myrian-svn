@@ -21,12 +21,11 @@ package org.myrian.persistence.pdl.nodes;
  * Model
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class ModelNd extends Node {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/pdl/nodes/ModelNd.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     public static final Field PATH =
         new Field(ModelNd.class, "path", IdentifierNd.class, 1);

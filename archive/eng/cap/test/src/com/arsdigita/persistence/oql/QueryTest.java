@@ -34,12 +34,11 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2004/10/04 $
+ * @version $Revision: #7 $ $Date: 2004/10/04 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/oql/QueryTest.java#6 $ by $Author: ashah $, $DateTime: 2004/10/04 11:13:41 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);

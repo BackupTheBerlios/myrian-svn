@@ -23,10 +23,9 @@ import junit.framework.*;
  * PDLSuite
  *
  * @author Jon Orris
- * @version $Revision: #6 $ $Date: 2004/09/15 $
+ * @version $Revision: #7 $ $Date: 2004/10/04 $
  */
 public class PDLSuite extends TestSuite {
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/pdl/PDLSuite.java#6 $ by $Author: rhs $, $DateTime: 2004/09/15 13:47:13 $";
 
     public static Test suite() {
         PDLSuite suite = new PDLSuite();

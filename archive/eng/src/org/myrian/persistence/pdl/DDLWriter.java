@@ -38,12 +38,11 @@ import java.util.Set;
  * DDLWriter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class DDLWriter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/pdl/DDLWriter.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static final String LINE_BREAK =
         System.getProperty("line.separator", "\n\r");

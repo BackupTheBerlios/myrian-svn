@@ -31,13 +31,12 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $ */
+ * @version $Revision: #4 $ $Date: 2004/10/04 $ */
 
 public interface DataAssociation extends DataCollection {
     // when this no longer extends DataCollection, make sure it
     // still has get/set Query and get/set Source
 
-    String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataAssociation.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
     /**
      * Adds <i>object</i> to the persistent association.

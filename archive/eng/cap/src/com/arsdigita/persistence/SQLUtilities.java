@@ -24,12 +24,11 @@ package com.arsdigita.persistence;
  *  the Oracle instance of this replaces "= null" with "is null"
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/04 $
  */
 
 public interface SQLUtilities  {
 
-    String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/SQLUtilities.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
     /**
      *  This method takes a comparator (e.g. =, <=, >=, !=, <>)

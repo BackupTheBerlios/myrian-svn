@@ -21,12 +21,11 @@ package com.arsdigita.persistence;
  * PartyTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/04 $
  */
 
 public class DynamicPartyTest extends PartyTest {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/DynamicPartyTest.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
     public DynamicPartyTest(String name) {
         super(name);

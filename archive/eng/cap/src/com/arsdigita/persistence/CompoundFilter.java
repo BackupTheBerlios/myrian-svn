@@ -22,12 +22,11 @@ package com.arsdigita.persistence;
  * CompoundFilters are used to AND or OR multiple filters together.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/04 $
  */
 
 public interface CompoundFilter extends Filter {
 
-    String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/CompoundFilter.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
 
     /**

@@ -43,12 +43,11 @@ import org.apache.log4j.Logger;
  *
  * @see Initializer
  * @author Archit Shah
- * @version $Revision: #5 $ $Date: 2004/10/01 $
+ * @version $Revision: #6 $ $Date: 2004/10/04 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/SessionManager.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static final Logger s_log = Logger.getLogger
         (SessionManager.class.getName());

@@ -30,12 +30,11 @@ import java.util.Iterator;
  * manifest file that lists resources located in the java classpath.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/10/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 public class ManifestSource implements PDLSource {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/pdl/ManifestSource.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
 
     private final String m_manifest;
     private final PDLFilter m_filter;

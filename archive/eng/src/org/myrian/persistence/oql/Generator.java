@@ -29,12 +29,11 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/oql/Generator.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 

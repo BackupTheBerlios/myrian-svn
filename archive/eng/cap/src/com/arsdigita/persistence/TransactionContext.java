@@ -31,12 +31,11 @@ import org.apache.log4j.Logger;
  * This class is intentionally <em>not</em> threadsafe.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/10/01 $
+ * @version $Revision: #6 $ $Date: 2004/10/04 $
  */
 
 public class TransactionContext {
 
-    String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/TransactionContext.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static final Logger s_cat =
         Logger.getLogger(TransactionContext.class);

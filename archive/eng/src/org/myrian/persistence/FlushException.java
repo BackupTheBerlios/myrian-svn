@@ -27,12 +27,11 @@ import java.util.Iterator;
  * to flush.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class FlushException extends ProtoException {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/FlushException.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private final Object m_obj;
 

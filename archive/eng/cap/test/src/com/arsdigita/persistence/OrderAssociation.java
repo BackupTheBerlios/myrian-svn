@@ -27,7 +27,6 @@ import java.util.*;
  */
 final class OrderAssociation {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/OrderAssociation.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
     public static final int NUM_ITEMS = 10;
 
     private final String m_model;

@@ -31,12 +31,11 @@ import org.apache.log4j.Logger;
  * SQLLoader
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/10/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/04 $
  **/
 
 public abstract class SQLLoader {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/installer/SQLLoader.java#3 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static final Logger s_log = Logger.getLogger(SQLLoader.class);
 

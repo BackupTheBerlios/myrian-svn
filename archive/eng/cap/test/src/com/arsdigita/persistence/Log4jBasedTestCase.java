@@ -68,7 +68,6 @@ import org.apache.log4j.varia.StringMatchFilter;
  */
 public class Log4jBasedTestCase extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/Log4jBasedTestCase.java#3 $";
 
     /**
      * The log object.  Should be modified

@@ -41,11 +41,10 @@ import org.apache.log4j.*;
  * for common cases as Attribute Properties, Key Properties, etc.
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #6 $ $Date: 2004/10/04 $
+ * @version $Revision: #7 $ $Date: 2004/10/04 $
  */
 public class PropertyManipulator {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PropertyManipulator.java#6 $ by $Author: ashah $, $DateTime: 2004/10/04 11:13:41 $";
     private static final Logger s_log =
         Logger.getLogger(PropertyManipulator.class.getName());
     static  {

@@ -30,8 +30,8 @@ import junit.framework.TestSuite;
  *
  *
  * @author Michael Bryzek
- * @date $Date: 2004/09/01 $
- * @version $Revision: #3 $
+ * @date $Date: 2004/10/04 $
+ * @version $Revision: #4 $
  *
  * @see com.arsdigita.persistence.Initializer
  **/
@@ -39,7 +39,6 @@ import junit.framework.TestSuite;
 public class InitializerTest extends TestCase
 {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/InitializerTest.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
     /**
      * Constructor (needed for JTest)

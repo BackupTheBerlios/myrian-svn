@@ -30,11 +30,10 @@ import org.apache.log4j.Logger;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author Jon Orris
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/04 $
  */
 public class DataCollectionImplTest extends DataCollectionTest
 {
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/DataCollectionImplTest.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
     private static Logger s_log =
         Logger.getLogger(DataCollectionImplTest.class.getName());
     private ObjectType m_nodeType;

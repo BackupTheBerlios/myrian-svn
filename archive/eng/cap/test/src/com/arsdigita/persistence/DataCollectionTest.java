@@ -22,7 +22,6 @@ import java.util.*;
 
 public abstract class DataCollectionTest extends DataQueryTest  {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/DataCollectionTest.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
     public DataCollectionTest(String name) {
         super(name);

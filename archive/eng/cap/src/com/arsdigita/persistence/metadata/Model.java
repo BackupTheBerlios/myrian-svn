@@ -28,12 +28,11 @@ import java.util.Set;
  * Associations.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/10/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/04 $
  */
 
 public class Model extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/Model.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     static Model wrap(Root root,
 		      org.myrian.persistence.metadata.Model model) {

@@ -45,11 +45,10 @@ import java.util.Map;
  * DataObjectManipulator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #5 $ $Date: 2004/10/04 $
+ * @version $Revision: #6 $ $Date: 2004/10/04 $
  */
 public class DataObjectManipulator {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/DataObjectManipulator.java#5 $ by $Author: ashah $, $DateTime: 2004/10/04 11:13:41 $";
     private static final Logger s_log =
             Logger.getLogger(DataObjectManipulator.class.getName());
 

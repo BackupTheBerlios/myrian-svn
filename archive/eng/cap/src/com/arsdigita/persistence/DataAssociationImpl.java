@@ -24,13 +24,12 @@ import org.myrian.persistence.ProtoException;
  * DataAssociationImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/10/01 $
+ * @version $Revision: #6 $ $Date: 2004/10/04 $
  **/
 
 class DataAssociationImpl extends DataAssociationCursorImpl
     implements DataAssociation {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataAssociationImpl.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private org.myrian.persistence.Session m_pssn;
     private DataObjectImpl m_data;

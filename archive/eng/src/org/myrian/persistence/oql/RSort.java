@@ -23,7 +23,6 @@ package org.myrian.persistence.oql;
 
 public class RSort extends Sort {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/oql/RSort.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     public RSort(Expression query, Expression key) {
         super(query, key, Sort.DESCENDING);

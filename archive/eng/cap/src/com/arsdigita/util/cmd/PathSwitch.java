@@ -23,12 +23,11 @@ import java.io.File;
 /**
  * @deprecated Use CLI (http://jakarta.apache.org/commons/cli/index.html) instead.
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/10/04 $
+ * @version $Revision: #6 $ $Date: 2004/10/04 $
  **/
 
 public class PathSwitch extends Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/util/cmd/PathSwitch.java#5 $ by $Author: ashah $, $DateTime: 2004/10/04 11:13:41 $";
 
     public PathSwitch(String name, String usage, File[] defValue) {
         super(name, PARAMETER, usage, defValue);

@@ -36,12 +36,11 @@ import java.util.Map;
  * for filtering the stream down to the set of events that are of interest.
  *
  * @author <a href="mailto:ashah@redhat.com">Archit Shah</a>
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 class EventStream {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/EventStream.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     // all events
     private final LinkedList m_events = new LinkedList();

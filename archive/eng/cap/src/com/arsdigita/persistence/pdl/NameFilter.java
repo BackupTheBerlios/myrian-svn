@@ -27,12 +27,11 @@ import java.util.Iterator;
  * extension and suffix.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/04 $
  **/
 
 public class NameFilter implements PDLFilter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/pdl/NameFilter.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
     private final String m_suffix;
     private final String m_extension;

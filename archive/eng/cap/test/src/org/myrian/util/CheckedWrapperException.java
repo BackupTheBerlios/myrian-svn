@@ -34,11 +34,10 @@ package org.myrian.util;
  * <tt>new RuntimeException(e.getMessage(), e);</tt>
  *
  * @author David Eison
- * @version $Id: //eng/persistence/dev/cap/test/src/org/myrian/util/CheckedWrapperException.java#1 $
+ * @version $Id: //eng/persistence/dev/cap/test/src/org/myrian/util/CheckedWrapperException.java#2 $
  */
 public class CheckedWrapperException extends Exception {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/org/myrian/util/CheckedWrapperException.java#1 $";
     private static final String NEW_LINE = System.getProperty("line.separator");
     Throwable m_rootCause;
 

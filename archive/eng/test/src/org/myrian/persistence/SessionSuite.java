@@ -30,12 +30,11 @@ import org.apache.log4j.Logger;
  * SessionSuite
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class SessionSuite extends TestSuite {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/org/myrian/persistence/SessionSuite.java#1 $";
 
     private static final Logger s_log = Logger.getLogger(SessionSuite.class);
 

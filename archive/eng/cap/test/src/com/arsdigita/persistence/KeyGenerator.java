@@ -29,12 +29,11 @@ import org.apache.log4j.*;
  * Attemps to generate default keys for DataObjects. Used in the 'MetaTest' framework.
  * Needs further doc.
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #4 $ $Date: 2004/10/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/04 $
  */
 
 public class KeyGenerator {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/KeyGenerator.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     static Map s_keys = new HashMap();
     private KeyGenerator()

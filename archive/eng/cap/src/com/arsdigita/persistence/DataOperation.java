@@ -30,11 +30,10 @@ import org.apache.log4j.Logger;
  *
  * @author Patrick McNeill
  * @since 4.5
- * @version $Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataOperation.java#4 $
+ * @version $Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataOperation.java#5 $
  */
 public class DataOperation {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataOperation.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static final Logger s_cat =
         Logger.getLogger(DataOperation.class);

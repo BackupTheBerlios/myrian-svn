@@ -24,12 +24,11 @@ import java.util.Collection;
  * {@link PDLSource} based on filename extension and database suffix.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/04 $
  **/
 
 public interface PDLFilter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/pdl/PDLFilter.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
     /**
      * Tests the names for inclusion in the filtered results of a

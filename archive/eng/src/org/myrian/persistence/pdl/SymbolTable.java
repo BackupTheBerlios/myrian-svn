@@ -25,12 +25,11 @@ import java.util.*;
  * SymbolTable
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 class SymbolTable {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/pdl/SymbolTable.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private Map m_types = new HashMap();
     private List m_order = new ArrayList();

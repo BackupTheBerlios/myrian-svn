@@ -21,12 +21,11 @@ package com.arsdigita.persistence;
  * DataEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/04 $
  **/
 
 abstract class DataEvent {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataEvent.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
     DataObjectImpl m_object;
 

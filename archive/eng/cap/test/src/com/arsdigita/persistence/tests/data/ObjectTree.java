@@ -27,12 +27,11 @@ import java.util.*;
  * ObjectTree
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/10/04 $
+ * @version $Revision: #6 $ $Date: 2004/10/04 $
  **/
 
 public class ObjectTree {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/tests/data/ObjectTree.java#5 $ by $Author: ashah $, $DateTime: 2004/10/04 11:13:41 $";
 
     private ObjectType m_type;
     private ObjectTree m_parent;

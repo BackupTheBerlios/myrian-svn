@@ -34,11 +34,6 @@ import org.apache.log4j.Logger;
  * @author Justin Ross
  */
 public final class Connections {
-    public static final String versionId =
-        "$Id: //eng/persistence/dev/src/org/myrian/util/jdbc/Connections.java#1 $" +
-        "$Author: vadim $" +
-        "$DateTime: 2004/10/01 18:41:18 $";
-
     private static final Logger s_log = Logger.getLogger(Connections.class);
 
     /**

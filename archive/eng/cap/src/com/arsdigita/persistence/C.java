@@ -29,12 +29,11 @@ import java.util.Map;
  * C
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/10/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 final class C {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/C.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     public static final org.myrian.persistence.metadata.ObjectType type
         (Root root, String qname) {

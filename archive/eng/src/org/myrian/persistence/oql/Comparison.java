@@ -19,7 +19,6 @@ package org.myrian.persistence.oql;
 
 public class Comparison extends BinaryCondition {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/oql/Comparison.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private final String m_operator;
 

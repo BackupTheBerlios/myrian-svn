@@ -29,12 +29,11 @@ package com.arsdigita.persistence.metadata;
  * @see CompoundType
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/10/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/04 $
  */
 
 abstract public class DataType extends ModelElement {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/DataType.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private org.myrian.persistence.metadata.ObjectType m_type;
 

@@ -23,12 +23,11 @@ import org.myrian.persistence.metadata.Table;
  * Insert
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 class Insert extends DML {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/engine/rdbms/Insert.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     public Insert(RDBMSEngine engine, Table table) {
         super(engine, table);

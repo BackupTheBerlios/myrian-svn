@@ -27,12 +27,11 @@ import org.apache.log4j.Logger;
  * NodeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/09/30 $
+ * @version $Revision: #5 $ $Date: 2004/10/04 $
  */
 
 public abstract class NodeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/NodeTest.java#4 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
 
     private static Logger s_log =
         Logger.getLogger(NodeTest.class.getName());

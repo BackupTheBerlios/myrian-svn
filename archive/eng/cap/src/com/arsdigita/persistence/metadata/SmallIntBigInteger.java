@@ -26,11 +26,10 @@ import java.math.BigInteger;
  *  This class is intended to be used within MetadataRoot when instantiating
  *  values from the database.
  *
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/04 $
  *
  */
 class SmallIntBigInteger extends BigInteger {
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/SmallIntBigInteger.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
     SmallIntBigInteger(byte[] val) {
         super(val);

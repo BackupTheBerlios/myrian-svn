@@ -34,12 +34,11 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/10/04 $
+ * @version $Revision: #3 $ $Date: 2004/10/04 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/org/myrian/persistence/ProtoTest.java#2 $ by $Author: ashah $, $DateTime: 2004/10/04 11:30:49 $";
 
 
     public ProtoTest(String name) {

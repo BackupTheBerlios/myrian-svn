@@ -57,7 +57,7 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *   </pre>
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/04 $
  *
  * @see com.arsdigita.persistence.SessionManager
  * @see com.arsdigita.persistence.Session
@@ -67,7 +67,6 @@ import com.arsdigita.persistence.metadata.ObjectType;
 
 public interface DataCollection extends DataQuery {
 
-    String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataCollection.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
 
     /**
      * Returns a data object for the current position in the collection.

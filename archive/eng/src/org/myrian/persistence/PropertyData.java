@@ -28,12 +28,11 @@ import java.util.List;
  * PropertyData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 class PropertyData implements Violation {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/PropertyData.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     final private ObjectData m_odata;
     final private Property m_prop;

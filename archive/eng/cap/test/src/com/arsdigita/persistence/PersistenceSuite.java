@@ -23,10 +23,9 @@ import junit.framework.*;
  * PersistenceSuite
  *
  * @author Jon Orris
- * @version $Revision: #6 $ $Date: 2004/09/30 $
+ * @version $Revision: #7 $ $Date: 2004/10/04 $
  */
 public class PersistenceSuite extends TestSuite {
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PersistenceSuite.java#6 $ by $Author: ashah $, $DateTime: 2004/09/30 17:47:51 $";
 
     public static Test suite() {
         PersistenceSuite suite = new PersistenceSuite();

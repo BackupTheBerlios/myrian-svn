@@ -56,10 +56,9 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/10/01 $ */
+ * @version $Revision: #6 $ $Date: 2004/10/04 $ */
 
 public class OID {
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/OID.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private ObjectType m_type;
     private Map m_values = new HashMap();
