@@ -28,12 +28,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/08/18 $
+ * @version $Revision: #6 $ $Date: 2004/08/19 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#5 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#6 $ by $Author: rhs $, $DateTime: 2004/08/19 15:03:09 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -142,21 +142,21 @@ public class PDL {
         }
 
         m_ast.traverse(new Node.Switch() {
-                public void onObjectType(ObjectTypeNd ot) {
-                    if (ot.hasReturns()) {
-                        m_errors.warn(ot, "returns clause is deprecated");
-                    }
-                    m_symbols.define(ot);
+            public void onObjectType(ObjectTypeNd ot) {
+                if (ot.hasReturns()) {
+                    m_errors.warn(ot, "returns clause is deprecated");
                 }
-            });
+                m_symbols.define(ot);
+            }
+        });
 
 	m_errors.check();
 
         m_ast.traverse(new Node.Switch() {
-                public void onType(TypeNd t) {
-                    m_symbols.resolve(t);
-                }
-            });
+            public void onType(TypeNd t) {
+                m_symbols.resolve(t);
+            }
+        });
 
 	m_errors.check();
 
@@ -167,159 +167,159 @@ public class PDL {
         m_symbols.emit();
 
 	m_ast.traverse(new Node.Switch() {
-		public void onAssociation(AssociationNd assn) {
-		    if (assn.getProperties().size() == 0) {
-			return;
-		    }
+            public void onAssociation(AssociationNd assn) {
+                if (assn.getProperties().size() == 0) {
+                    return;
+                }
 
-		    ObjectType ot = new ObjectType
-			(Model.getInstance
-			 (assn.getFile().getModel().getName()),
-			 linkName(assn.getRoleOne(), assn.getRoleTwo()), null);
-		    m_symbols.addEmitted(ot);
-		}
-	    });
+                ObjectType ot = new ObjectType
+                    (Model.getInstance
+                     (assn.getFile().getModel().getName()),
+                     linkName(assn.getRoleOne(), assn.getRoleTwo()), null);
+                m_symbols.addEmitted(ot);
+            }
+        });
 
         m_ast.traverse(new Node.Switch() {
-                private Role define(ObjectType type, PropertyNd prop) {
-                    String name = prop.getName().getName();
+            private Role define(ObjectType type, PropertyNd prop) {
+                String name = prop.getName().getName();
 
-                    // Check for collisions
-                    Property prev = (Property) m_propertyCollisions.get
-                        (type.getQualifiedName() + ":" + name);
-                    if (prev == null) {
-                        prev = type.getProperty(name);
-                    }
-                    if (prev != null) {
-                        m_errors.fatal
-                            (prop, "duplicate property: " + name +
-                             ", previous definition: " +
-                             getNode(prev).getLocation());
-                        return null;
-                    }
-
-                    // Check for bad multiplicity
-                    Integer upper = prop.getUpper();
-                    Integer lower = prop.getLower();
-                    if (upper != null && upper.intValue() <= 0
-                        || lower != null && lower.intValue() < 0
-                        || (upper != null && lower != null
-                            && upper.intValue() < lower.intValue())) {
-                        m_errors.fatal(prop, "bad multiplicity: " + name);
-                        return null;
-                    }
-
-                    // Create the property
-                    Role result =
-                        new Role(prop.getName().getName(),
-                                 m_symbols.getEmitted(prop.getType()),
-                                 prop.isComponent(),
-                                 prop.isCollection(),
-                                 prop.isNullable());
-                    m_symbols.setLocation(result, prop);
-
-                    type.addProperty(result);
-                    if (prop.isImmediate()) {
-                        type.addImmediateProperty(result);
-                    }
-
-                    // Track what node defined this property and vice versa
-                    emit(prop, result);
-
-                    // Track for collision detection
-                    ObjectType ot = type;
-                    while (ot != null) {
-                        m_propertyCollisions.put
-                            (ot.getQualifiedName() + ":" + name, result);
-                        ot = ot.getSupertype();
-                    }
-
-                    return result;
+                // Check for collisions
+                Property prev = (Property) m_propertyCollisions.get
+                    (type.getQualifiedName() + ":" + name);
+                if (prev == null) {
+                    prev = type.getProperty(name);
+                }
+                if (prev != null) {
+                    m_errors.fatal
+                        (prop, "duplicate property: " + name +
+                         ", previous definition: " +
+                         getNode(prev).getLocation());
+                    return null;
                 }
 
-                public void onProperty(PropertyNd prop) {
-                    ObjectType type =
-                        m_symbols.getEmitted((ObjectTypeNd) prop.getParent());
+                // Check for bad multiplicity
+                Integer upper = prop.getUpper();
+                Integer lower = prop.getLower();
+                if (upper != null && upper.intValue() <= 0
+                    || lower != null && lower.intValue() < 0
+                    || (upper != null && lower != null
+                        && upper.intValue() < lower.intValue())) {
+                    m_errors.fatal(prop, "bad multiplicity: " + name);
+                    return null;
+                }
 
-                    Role role = define(type, prop);
+                // Create the property
+                Role result =
+                    new Role(prop.getName().getName(),
+                             m_symbols.getEmitted(prop.getType()),
+                             prop.isComponent(),
+                             prop.isCollection(),
+                             prop.isNullable());
+                m_symbols.setLocation(result, prop);
 
-                    /* if the property is a composite, the other end is a
-                     * needs to be set up for cascading deletes to work
-                     */
-                    if (prop.isComposite()) {
-                        String rev = "~" + prop.getName().getName() + ":" +
-                            type.getQualifiedName().replace('.', '$');
-                        Role reverse = new Role(rev, type, true, true, true);
-                        role.getType().addProperty(reverse);
-                        role.setReverse(reverse);
+                type.addProperty(result);
+                if (prop.isImmediate()) {
+                    type.addImmediateProperty(result);
+                }
+
+                // Track what node defined this property and vice versa
+                emit(prop, result);
+
+                // Track for collision detection
+                ObjectType ot = type;
+                while (ot != null) {
+                    m_propertyCollisions.put
+                        (ot.getQualifiedName() + ":" + name, result);
+                    ot = ot.getSupertype();
+                }
+
+                return result;
+            }
+
+            public void onProperty(PropertyNd prop) {
+                ObjectType type =
+                    m_symbols.getEmitted((ObjectTypeNd) prop.getParent());
+
+                Role role = define(type, prop);
+
+                /* if the property is a composite, the other end is a
+                 * needs to be set up for cascading deletes to work
+                 */
+                if (prop.isComposite()) {
+                    String rev = "~" + prop.getName().getName() + ":" +
+                        type.getQualifiedName().replace('.', '$');
+                    Role reverse = new Role(rev, type, true, true, true);
+                    role.getType().addProperty(reverse);
+                    role.setReverse(reverse);
+                }
+            }
+
+            public void onAssociation(AssociationNd assn) {
+                PropertyNd one = assn.getRoleOne();
+                PropertyNd two = assn.getRoleTwo();
+                if (one.isComposite()) { two.setComponent(); }
+                if (two.isComposite()) { one.setComponent(); }
+                Collection props = assn.getProperties();
+                ObjectType oneot =
+                    m_symbols.getEmitted(one.getType());
+                ObjectType twoot =
+                    m_symbols.getEmitted(two.getType());
+
+                if (props.size() > 0) {
+                    Role rone = new Role(one.getName().getName(), oneot,
+                                         one.isComponent(), false, false);
+                    m_symbols.setLocation(rone, one);
+                    Role rtwo = new Role(two.getName().getName(), twoot,
+                                         two.isComponent(), false, false);
+                    m_symbols.setLocation(rtwo, two);
+
+                    ObjectType ot = m_symbols.getEmitted(linkName(assn));
+
+                    ot.addProperty(rone);
+                    Role revOne = new Role(rtwo.getName() + LINK, ot,
+                                           true,
+                                           two.isCollection(),
+                                           two.isNullable());
+                    rone.getType().addProperty(revOne);
+                    rone.setReverse(revOne);
+
+                    ot.addProperty(rtwo);
+                    Role revTwo = new Role(rone.getName() + LINK, ot,
+                                           true,
+                                           one.isCollection(),
+                                           one.isNullable());
+                    rtwo.getType().addProperty(revTwo);
+                    rtwo.setReverse(revTwo);
+
+                    for (Iterator it = props.iterator(); it.hasNext(); ) {
+                        PropertyNd prop = (PropertyNd) it.next();
+                        define(ot, prop);
+                    }
+
+                    Link l = new Link(rone.getName(), rtwo, rone,
+                                      one.isCollection(),
+                                      one.isNullable());
+                    m_symbols.setLocation(l, one);
+                    m_links.add(l);
+                    twoot.addProperty(l);
+                    l = new Link(rtwo.getName(), rone, rtwo,
+                                 two.isCollection(), two.isNullable());
+                    m_symbols.setLocation(l, two);
+                    m_links.add(l);
+                    oneot.addProperty(l);
+                } else {
+                    Role rone = define(oneot, two);
+                    Role rtwo = define(twoot, one);
+                    if (rone != null && rtwo != null) {
+                        rone.setReverse(rtwo);
                     }
                 }
-
-                public void onAssociation(AssociationNd assn) {
-		    PropertyNd one = assn.getRoleOne();
-		    PropertyNd two = assn.getRoleTwo();
-                    if (one.isComposite()) { two.setComponent(); }
-                    if (two.isComposite()) { one.setComponent(); }
-		    Collection props = assn.getProperties();
-		    ObjectType oneot =
-			m_symbols.getEmitted(one.getType());
-		    ObjectType twoot =
-			m_symbols.getEmitted(two.getType());
-
-		    if (props.size() > 0) {
-			Role rone = new Role(one.getName().getName(), oneot,
-					     one.isComponent(), false, false);
-                        m_symbols.setLocation(rone, one);
-			Role rtwo = new Role(two.getName().getName(), twoot,
-					     two.isComponent(), false, false);
-                        m_symbols.setLocation(rtwo, two);
-
-			ObjectType ot = m_symbols.getEmitted(linkName(assn));
-
-			ot.addProperty(rone);
-			Role revOne = new Role(rtwo.getName() + LINK, ot,
-                                               true,
-                                               two.isCollection(),
-                                               two.isNullable());
-			rone.getType().addProperty(revOne);
-			rone.setReverse(revOne);
-
-			ot.addProperty(rtwo);
-			Role revTwo = new Role(rone.getName() + LINK, ot,
-                                               true,
-                                               one.isCollection(),
-                                               one.isNullable());
-			rtwo.getType().addProperty(revTwo);
-			rtwo.setReverse(revTwo);
-
-			for (Iterator it = props.iterator(); it.hasNext(); ) {
-			    PropertyNd prop = (PropertyNd) it.next();
-			    define(ot, prop);
-			}
-
-			Link l = new Link(rone.getName(), rtwo, rone,
-					  one.isCollection(),
-					  one.isNullable());
-                        m_symbols.setLocation(l, one);
-			m_links.add(l);
-			twoot.addProperty(l);
-			l = new Link(rtwo.getName(), rone, rtwo,
-				     two.isCollection(), two.isNullable());
-                        m_symbols.setLocation(l, two);
-			m_links.add(l);
-			oneot.addProperty(l);
-		    } else {
-			Role rone = define(oneot, two);
-			Role rtwo = define(twoot, one);
-			if (rone != null && rtwo != null) {
-			    rone.setReverse(rtwo);
-			}
-		    }
-                }
-            }, new Node.IncludeFilter(new Node.Field[] {
-                AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.PROPERTIES,
-                FileNd.ASSOCIATIONS
-            }));
+            }
+        }, new Node.IncludeFilter(new Node.Field[] {
+            AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.PROPERTIES,
+            FileNd.ASSOCIATIONS
+        }));
 
         m_errors.check();
 
@@ -390,44 +390,44 @@ public class PDL {
         m_errors.check();
 
 	m_ast.traverse(new Node.Switch() {
-		public void onObjectType(ObjectTypeNd nd) {
-		    ObjectType ot = m_symbols.getEmitted(nd);
-		    JavaClassNd jcn = nd.getJavaClass();
-		    JavaClassNd acn = nd.getAdapterClass();
+            public void onObjectType(ObjectTypeNd nd) {
+                ObjectType ot = m_symbols.getEmitted(nd);
+                JavaClassNd jcn = nd.getJavaClass();
+                JavaClassNd acn = nd.getAdapterClass();
 
-		    if (jcn == null ) { return; }
+                if (jcn == null ) { return; }
 
-		    Class javaClass;
-		    try {
-			javaClass = Class.forName(jcn.getName());
-		    } catch (ClassNotFoundException e) {
-			m_errors.fatal(jcn,
-                                       "Misspelled or non-existent class: " +
-                                       jcn.getName());
-			return;
-		    }
+                Class javaClass;
+                try {
+                    javaClass = Class.forName(jcn.getName());
+                } catch (ClassNotFoundException e) {
+                    m_errors.fatal(jcn,
+                                   "Misspelled or non-existent class: " +
+                                   jcn.getName());
+                    return;
+                }
 
-		    ot.setJavaClass(javaClass);
+                ot.setJavaClass(javaClass);
 
-                    if (acn == null) { return; }
+                if (acn == null) { return; }
 
-		    try {
-			Class adapterClass = Class.forName(acn.getName());
-			Adapter ad = (Adapter) adapterClass.newInstance();
-			m_root.addAdapter(javaClass, ad);
-		    } catch (IllegalAccessException e) {
-			m_errors.fatal
-                            (acn, "illegal access: " + e.getMessage());
-		    } catch (ClassNotFoundException e) {
-			m_errors.fatal
-                            (acn, "class not found: " + e.getMessage());
-		    } catch (InstantiationException e) {
-			m_errors.fatal
-                            (acn, "instantiation exception: " +
-                             e.getMessage());
-		    }
-		}
-	    });
+                try {
+                    Class adapterClass = Class.forName(acn.getName());
+                    Adapter ad = (Adapter) adapterClass.newInstance();
+                    m_root.addAdapter(javaClass, ad);
+                } catch (IllegalAccessException e) {
+                    m_errors.fatal
+                        (acn, "illegal access: " + e.getMessage());
+                } catch (ClassNotFoundException e) {
+                    m_errors.fatal
+                        (acn, "class not found: " + e.getMessage());
+                } catch (InstantiationException e) {
+                    m_errors.fatal
+                        (acn, "instantiation exception: " +
+                         e.getMessage());
+                }
+            }
+        });
 
 	m_errors.check();
 
@@ -502,12 +502,12 @@ public class PDL {
     // XXX: Commented out on this branch as this is the only
     // dependency on the part of core not in the branch spec.
     /*
-    public void emitVersioned() {
-        VersioningMetadata.NodeSwitch nodeSwitch =
-            VersioningMetadata.getVersioningMetadata().nodeSwitch(m_emitted);
-        m_ast.traverse(nodeSwitch);
-        nodeSwitch.onFinish();
-    }
+      public void emitVersioned() {
+      VersioningMetadata.NodeSwitch nodeSwitch =
+      VersioningMetadata.getVersioningMetadata().nodeSwitch(m_emitted);
+      m_ast.traverse(nodeSwitch);
+      nodeSwitch.onFinish();
+      }
     */
 
     private HashMap m_primaryKeys = new HashMap();
@@ -646,30 +646,30 @@ public class PDL {
 
         m_ast.traverse(new Node.Switch() {
             public void onColumn(ColumnNd colNd) {
-                    Table table =
-                        (Table) tables.get(colNd.getTable().getName());
-                    if (table == null) {
-                        table = new Table(colNd.getTable().getName());
-                        tables.put(table.getName(), table);
-                        m_symbols.setLocation(table, colNd);
-                    }
-
-                    DbTypeNd type = colNd.getType();
-                    Column col = table.getColumn(colNd.getName().getName());
-
-                    if (col == null) {
-                        col = new Column(colNd.getName().getName());
-                        table.addColumn(col);
-                        m_symbols.setLocation(col, colNd);
-                    }
-
-                    if (type != null) {
-                        col.setType(type.getType());
-                        col.setSize(type.getSize());
-                        col.setScale(type.getScale());
-                    }
+                Table table =
+                    (Table) tables.get(colNd.getTable().getName());
+                if (table == null) {
+                    table = new Table(colNd.getTable().getName());
+                    tables.put(table.getName(), table);
+                    m_symbols.setLocation(table, colNd);
                 }
-            });
+
+                DbTypeNd type = colNd.getType();
+                Column col = table.getColumn(colNd.getName().getName());
+
+                if (col == null) {
+                    col = new Column(colNd.getName().getName());
+                    table.addColumn(col);
+                    m_symbols.setLocation(col, colNd);
+                }
+
+                if (type != null) {
+                    col.setType(type.getType());
+                    col.setSize(type.getSize());
+                    col.setScale(type.getScale());
+                }
+            }
+        });
 
         for (Iterator it = tables.values().iterator(); it.hasNext(); ) {
             Table table = (Table) it.next();
@@ -708,36 +708,36 @@ public class PDL {
         });
 
 	m_ast.traverse(new Node.Switch() {
-		public void onJoinPath(JoinPathNd jpn) {
-		    List joins = jpn.getJoins();
-		    if (joins.size() != 2) {
-			return;
-		    }
+            public void onJoinPath(JoinPathNd jpn) {
+                List joins = jpn.getJoins();
+                if (joins.size() != 2) {
+                    return;
+                }
 
-		    ColumnNd from = ((JoinNd) joins.get(0)).getTo();
-		    ColumnNd to = ((JoinNd) joins.get(1)).getFrom();
+                ColumnNd from = ((JoinNd) joins.get(0)).getTo();
+                ColumnNd to = ((JoinNd) joins.get(1)).getFrom();
 
-                    boolean collection = true;
-                    Object obj = getEmitted(jpn.getParent());
-                    if (obj != null && obj instanceof Property) {
-                        Property prop = (Property) obj;
-                        if (!prop.isCollection()) {
-                            collection = false;
-                        }
+                boolean collection = true;
+                Object obj = getEmitted(jpn.getParent());
+                if (obj != null && obj instanceof Property) {
+                    Property prop = (Property) obj;
+                    if (!prop.isCollection()) {
+                        collection = false;
                     }
+                }
 
-                    if (collection) {
-                        unique(jpn, new Column[] { lookup(from), lookup(to) },
-                               true);
-                    } else {
-                        unique(jpn, new Column[] { lookup(from) }, true);
-                    }
-		}
-	    }, new Node.IncludeFilter(new Node.Field[] {
-		AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.PROPERTIES,
-		FileNd.ASSOCIATIONS, AssociationNd.PROPERTIES,
-		AssociationNd.ROLE_ONE, PropertyNd.MAPPING
-	    }));
+                if (collection) {
+                    unique(jpn, new Column[] { lookup(from), lookup(to) },
+                           true);
+                } else {
+                    unique(jpn, new Column[] { lookup(from) }, true);
+                }
+            }
+        }, new Node.IncludeFilter(new Node.Field[] {
+            AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.PROPERTIES,
+            FileNd.ASSOCIATIONS, AssociationNd.PROPERTIES,
+            AssociationNd.ROLE_ONE, PropertyNd.MAPPING
+        }));
 
         m_ast.traverse(new Node.Switch() {
             public void onJoinPath(JoinPathNd jpn) {
@@ -796,90 +796,90 @@ public class PDL {
 
     private void emitMapping() {
         m_ast.traverse(new Node.Switch() {
-                public void onIdentifier(IdentifierNd id) {
-                    ObjectMap om = getMap(id.getParent().getParent());
-                    ObjectType ot = om.getObjectType();
-                    Role role = (Role) ot.getProperty(id.getName());
-                    if (role == null) {
+            public void onIdentifier(IdentifierNd id) {
+                ObjectMap om = getMap(id.getParent().getParent());
+                ObjectType ot = om.getObjectType();
+                Role role = (Role) ot.getProperty(id.getName());
+                if (role == null) {
+                    m_errors.fatal
+                        (id, "no such property: " + id.getName());
+                } else {
+                    if (role.isCollection()) {
                         m_errors.fatal
-                            (id, "no such property: " + id.getName());
+                            (id, "collections cannot be keys: " +
+                             id.getName());
                     } else {
-                        if (role.isCollection()) {
-                            m_errors.fatal
-                                (id, "collections cannot be keys: " +
-                                 id.getName());
-                        } else {
-                            om.getKeyProperties().add(role);
-                            role.setNullable(false);
-                        }
+                        om.getKeyProperties().add(role);
+                        role.setNullable(false);
                     }
                 }
-            }, new Node.IncludeFilter(new Node.Field[] {
-                AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.PROPERTIES,
-                PropertyNd.NESTED_MAP, NestedMapNd.OBJECT_KEY,
-                NestedMapNd.MAPPINGS, NestedMappingNd.NESTED_MAP,
-                ObjectTypeNd.OBJECT_KEY, ObjectKeyNd.PROPERTIES
-            }));
+            }
+        }, new Node.IncludeFilter(new Node.Field[] {
+            AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.PROPERTIES,
+            PropertyNd.NESTED_MAP, NestedMapNd.OBJECT_KEY,
+            NestedMapNd.MAPPINGS, NestedMappingNd.NESTED_MAP,
+            ObjectTypeNd.OBJECT_KEY, ObjectKeyNd.PROPERTIES
+        }));
 
 	m_ast.traverse(new Node.Switch() {
-		public void onAssociation(AssociationNd assn) {
-		    if (assn.getProperties().size() == 0) {
-			return;
-		    }
+            public void onAssociation(AssociationNd assn) {
+                if (assn.getProperties().size() == 0) {
+                    return;
+                }
 
-		    PropertyNd one = assn.getRoleOne();
-		    PropertyNd two = assn.getRoleTwo();
-		    ObjectType ot = m_symbols.getEmitted(linkName(assn));
-		    ObjectMap om = m_root.getObjectMap(ot);
-		    Collection keys = om.getKeyProperties();
-		    Role pone = (Role) ot.getProperty(one.getName().getName());
-		    Role ptwo = (Role) ot.getProperty(two.getName().getName());
-                    Link lone = (Link)
-                        ptwo.getType().getProperty(pone.getName());
-                    Link ltwo = (Link)
-                        pone.getType().getProperty(ptwo.getName());
-		    keys.add(ptwo);
-		    keys.add(pone);
+                PropertyNd one = assn.getRoleOne();
+                PropertyNd two = assn.getRoleTwo();
+                ObjectType ot = m_symbols.getEmitted(linkName(assn));
+                ObjectMap om = m_root.getObjectMap(ot);
+                Collection keys = om.getKeyProperties();
+                Role pone = (Role) ot.getProperty(one.getName().getName());
+                Role ptwo = (Role) ot.getProperty(two.getName().getName());
+                Link lone = (Link)
+                    ptwo.getType().getProperty(pone.getName());
+                Link ltwo = (Link)
+                    pone.getType().getProperty(ptwo.getName());
+                keys.add(ptwo);
+                keys.add(pone);
 
-		    if (one.getMapping() != null) {
-			emitMapping(pone, (JoinPathNd) one.getMapping(), 1, 2);
-			emitMapping(pone.getReverse(),
-				    (JoinPathNd) two.getMapping(), 0, 1);
-                        emitMapping(ltwo, (JoinPathNd) two.getMapping(), 0, 2);
-		    } else {
-			om.addMapping(new Static(Path.get(pone.getName())));
-                        ObjectMap oneom = m_root.getObjectMap(pone.getType());
-                        oneom.addMapping
-                            (new Static
-                             (Path.get(pone.getReverse().getName())));
-                        oneom.addMapping(new Static(Path.get(ltwo.getName())));
-		    }
+                if (one.getMapping() != null) {
+                    emitMapping(pone, (JoinPathNd) one.getMapping(), 1, 2);
+                    emitMapping(pone.getReverse(),
+                                (JoinPathNd) two.getMapping(), 0, 1);
+                    emitMapping(ltwo, (JoinPathNd) two.getMapping(), 0, 2);
+                } else {
+                    om.addMapping(new Static(Path.get(pone.getName())));
+                    ObjectMap oneom = m_root.getObjectMap(pone.getType());
+                    oneom.addMapping
+                        (new Static
+                         (Path.get(pone.getReverse().getName())));
+                    oneom.addMapping(new Static(Path.get(ltwo.getName())));
+                }
 
-		    if (two.getMapping() != null) {
-			emitMapping(ptwo, (JoinPathNd) two.getMapping(), 1, 2);
-			emitMapping(ptwo.getReverse(),
-				    (JoinPathNd) one.getMapping(), 0, 1);
-                        emitMapping(lone, (JoinPathNd) one.getMapping(), 0, 2);
-		    } else {
-			om.addMapping(new Static(Path.get(ptwo.getName())));
-                        ObjectMap twoom = m_root.getObjectMap(ptwo.getType());
-                        twoom.addMapping
-			    (new Static
-			     (Path.get(ptwo.getReverse().getName())));
-                        twoom.addMapping(new Static(Path.get(lone.getName())));
-		    }
+                if (two.getMapping() != null) {
+                    emitMapping(ptwo, (JoinPathNd) two.getMapping(), 1, 2);
+                    emitMapping(ptwo.getReverse(),
+                                (JoinPathNd) one.getMapping(), 0, 1);
+                    emitMapping(lone, (JoinPathNd) one.getMapping(), 0, 2);
+                } else {
+                    om.addMapping(new Static(Path.get(ptwo.getName())));
+                    ObjectMap twoom = m_root.getObjectMap(ptwo.getType());
+                    twoom.addMapping
+                        (new Static
+                         (Path.get(ptwo.getReverse().getName())));
+                    twoom.addMapping(new Static(Path.get(lone.getName())));
+                }
 
-		    String[] paths = new String[] { pone.getName(),
-						    ptwo.getName() };
-		    for (int i = 0; i < paths.length; i++) {
-			Mapping m = om.getMapping(Path.get(paths[i]));
-			if (m.getTable() != null) {
-			    om.setTable(m.getTable());
-			    break;
-			}
-		    }
-		}
-	    });
+                String[] paths = new String[] { pone.getName(),
+                                                ptwo.getName() };
+                for (int i = 0; i < paths.length; i++) {
+                    Mapping m = om.getMapping(Path.get(paths[i]));
+                    if (m.getTable() != null) {
+                        om.setTable(m.getTable());
+                        break;
+                    }
+                }
+            }
+        });
 
         m_ast.traverse(new Node.Switch() {
             public void onProperty(PropertyNd pn) {
@@ -962,59 +962,59 @@ public class PDL {
         });
 
         m_ast.traverse(new Node.Switch() {
-                public void onReferenceKey(ReferenceKeyNd rkn) {
-                    Column key = lookup(rkn.getCol());
-                    ObjectMap om = getMap(rkn.getParent());
-                    om.setTable(key.getTable());
-                }
+            public void onReferenceKey(ReferenceKeyNd rkn) {
+                Column key = lookup(rkn.getCol());
+                ObjectMap om = getMap(rkn.getParent());
+                om.setTable(key.getTable());
+            }
 
-                public void onObjectKey(ObjectKeyNd okn) {
-                    ObjectMap om = getMap(okn.getParent());
-                    IdentifierNd prop =
-                        (IdentifierNd) okn.getProperties().iterator().next();
-                    Mapping m = om.getMapping(Path.get(prop.getName()));
-                    if (m != null) {
-                        om.setTable(m.getTable());
-                    }
+            public void onObjectKey(ObjectKeyNd okn) {
+                ObjectMap om = getMap(okn.getParent());
+                IdentifierNd prop =
+                    (IdentifierNd) okn.getProperties().iterator().next();
+                Mapping m = om.getMapping(Path.get(prop.getName()));
+                if (m != null) {
+                    om.setTable(m.getTable());
                 }
-            });
+            }
+        });
 
 	m_ast.traverse(new Node.Switch() {
-		public void onReferenceKey(ReferenceKeyNd rkn) {
-		    Column key = lookup(rkn.getCol());
-		    ObjectMap om = getMap(rkn.getParent());
-		    Column[] cols = new Column[] {key};
-		    if (key.getTable().getForeignKey(cols) == null) {
-			ObjectMap sm = om.getSuperMap();
-			Table table = null;
-			while (sm != null) {
-			    table = sm.getTable();
-			    if (table != null) {
-				break;
-			    }
-			    sm = sm.getSuperMap();
-			}
-			if (table == null) {
-			    throw new IllegalStateException
-				("unable to find supertable for " +
-                                 om.getObjectType());
-			}
-			fk(cols, table.getPrimaryKey());
-		    }
-		}
-	    });
+            public void onReferenceKey(ReferenceKeyNd rkn) {
+                Column key = lookup(rkn.getCol());
+                ObjectMap om = getMap(rkn.getParent());
+                Column[] cols = new Column[] {key};
+                if (key.getTable().getForeignKey(cols) == null) {
+                    ObjectMap sm = om.getSuperMap();
+                    Table table = null;
+                    while (sm != null) {
+                        table = sm.getTable();
+                        if (table != null) {
+                            break;
+                        }
+                        sm = sm.getSuperMap();
+                    }
+                    if (table == null) {
+                        throw new IllegalStateException
+                            ("unable to find supertable for " +
+                             om.getObjectType());
+                    }
+                    fk(cols, table.getPrimaryKey());
+                }
+            }
+        });
 
         m_ast.traverse(new Node.Switch() {
-                public void onPath(PathNd nd) {
-                    ObjectMap om = m_root.getObjectMap
-                        (m_symbols.getEmitted
-                         ((ObjectTypeNd) nd.getParent().getParent()));
-                    om.addFetchedPath(nd.getPath());
-                }
-            }, new Node.IncludeFilter(new Node.Field[] {
-                AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.AGGRESSIVE_LOAD,
-                AggressiveLoadNd.PATHS
-            }));
+            public void onPath(PathNd nd) {
+                ObjectMap om = m_root.getObjectMap
+                    (m_symbols.getEmitted
+                     ((ObjectTypeNd) nd.getParent().getParent()));
+                om.addFetchedPath(nd.getPath());
+            }
+        }, new Node.IncludeFilter(new Node.Field[] {
+            AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.AGGRESSIVE_LOAD,
+            AggressiveLoadNd.PATHS
+        }));
     }
 
     private void propogateTypes() {
@@ -1247,10 +1247,10 @@ public class PDL {
 
     private void emitEvents() {
         m_ast.traverse(new Node.Switch() {
-                public void onEvent(EventNd nd) {
-                    emitEvent(nd);
-                }
-            });
+            public void onEvent(EventNd nd) {
+                emitEvent(nd);
+            }
+        });
     }
 
     private void emitEvent(EventNd ev) {
