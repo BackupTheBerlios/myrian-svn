@@ -1,1 +1,0 @@
-@@ create-system-party.sql

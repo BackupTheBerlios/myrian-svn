@@ -12,8 +12,12 @@
 -- rights and limitations under the License.
 --
 --
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-5.0.5-5.0.6.sql#2 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-5.0.0-5.1.0.sql#1 $
 
 @@ ../../../../services/versioning/sql/oracle-se/upgrade/versioning-5.0.5-5.0.6.sql
 
-
+@@ ../categorization/categorization-5.0.6-5.1.8.sql
+@@ permissions-5.0.6-5.1.8.sql
+@@ ../messaging/messaging-5.0.6-5.1.8.sql
+@@ objects-5.0.6-5.1.8.sql
+@@ ../../kernel/fk-indices-create.sql
