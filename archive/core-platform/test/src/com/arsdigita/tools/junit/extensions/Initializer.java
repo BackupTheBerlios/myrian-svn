@@ -34,7 +34,7 @@ import java.util.Collection;
  *  Initializer
  *
  * @author Dennis Gregorovic
- * @version $Revision: #5 $ $Date: 2002/12/11 $
+ * @version $Revision: #6 $ $Date: 2003/04/20 $
  */
 
 public class Initializer {
@@ -69,7 +69,7 @@ public class Initializer {
         s_webAppRoot = System.getProperty("test.webapp.dir");
 
         System.out.println ("starting initializers " + scriptName +
-                            " ; iniName: " + iniName);
+                            " ; iniName: " + iniName + " webapp dir: " + s_webAppRoot);
 
         try {
             s_startup = new Startup(s_webAppRoot, scriptName);
