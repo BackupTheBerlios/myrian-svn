@@ -45,12 +45,12 @@ import org.apache.log4j.Category;
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#2 $
  * @since 4.6.3
  */
 public class OracleMDSQLGenerator implements MDSQLGenerator{
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
 
     private static final Category s_log =
         Category.getInstance(OracleMDSQLGenerator.class.getName());
@@ -306,7 +306,13 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
             propName[1] = Utilities.getKeyProperty(type).getName();
         }
 
-        operation.addMapping(new Mapping(propName, refkey));
+        Mapping mapping = new Mapping(propName, refkey);
+        if (baseProp == null) {
+            mapping.setLineInfo(type);
+        } else {
+            mapping.setLineInfo(baseProp);
+        }
+        operation.addMapping(mapping);
 
     attrLoop:
         while (attrs.hasNext()) {
@@ -345,6 +351,7 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
                              "attribute" + numAttrs,
                              col.getType(),
                              col.getSize());
+            col.setLineInfo(type);
 
             numAttrs++;
 
@@ -361,7 +368,14 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
                 propName[1] = prop.getName();
             }
 
-            operation.addMapping(new Mapping(propName, col));
+            Mapping m = new Mapping(propName, col);
+            if (baseProp == null) {
+                m.setLineInfo(type);
+            } else {
+                m.setLineInfo(baseProp);
+            }
+
+            operation.addMapping(m);
         }
 
         return true;
@@ -746,7 +760,10 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
                                                currentCol.getSize());
 
                     if (baseProp == null) {
-                        operation.addMapping(new Mapping(aggressive, mapCol));
+                        Mapping m = new Mapping(aggressive, mapCol);
+                        m.setLineInfo(type);
+                        mapCol.setLineInfo(type);
+                        operation.addMapping(m);
                     } else {
                         String[] aggName = new String[aggressive.length + 1];
 
@@ -756,7 +773,10 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
                             aggName[j+1] = aggressive[j];
                         }
 
-                        operation.addMapping(new Mapping(aggName, mapCol));
+                        Mapping m = new Mapping(aggName, mapCol);
+                        m.setLineInfo(baseProp);
+                        mapCol.setLineInfo(baseProp);
+                        operation.addMapping(m);
                     }
 
                     if (currentType.isKeyProperty(prop)) {
@@ -795,6 +815,7 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
                                                    keyColumn.getColumnName(),
                                                    keyColumn.getType(),
                                                    keyColumn.getSize());
+                            keyColumn.setLineInfo(type);
 
                             idColumns.put(idName, keyColumn);
                         }
@@ -884,12 +905,15 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
             Column newKeyCol = new Column(keycol.getTableName(),
                                           colName,
                                           keycol.getType());
+            newKeyCol.setLineInfo(type);
 
             columns.add(keycol.getTableName() + "." + keycol.getColumnName() +
                         " as " + colName);
 
             if (baseProp == null) {
-                operation.addMapping(new Mapping(propPath, newKeyCol));
+                Mapping m = new Mapping(propPath, newKeyCol);
+                m.setLineInfo(type);
+                operation.addMapping(m);
             } else {
                 String[] aggName = new String[propPath.length + 1];
 
@@ -899,7 +923,9 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
                     aggName[i+1] = propPath[i];
                 }
 
-                operation.addMapping(new Mapping(aggName, newKeyCol));
+                Mapping m = new Mapping(aggName, newKeyCol);
+                m.setLineInfo(baseProp);
+                operation.addMapping(m);
             }
         }
     }
@@ -914,6 +940,11 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
     protected Operation generateRetrieveSQL(ObjectType type,
                                             Property baseProp) {
         Operation operation = new Operation("select clause goes here");
+        if (baseProp == null) {
+            operation.setLineInfo(type);
+        } else {
+            operation.setLineInfo(baseProp);
+        }
         StringBuffer sb = new StringBuffer();
         List tables = new ArrayList();
         List columns = new ArrayList();
@@ -1007,6 +1038,11 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
         String baseSQL = q.toSQL();
 
         Operation op = new Operation("select clause goes here");
+        if (prop == null) {
+            op.setLineInfo(type);
+        } else {
+            op.setLineInfo(prop);
+        }
 
         for (Iterator mapIter = q.getAllMappings().iterator(); mapIter.hasNext(); ) {
             Mapping m = (Mapping) mapIter.next();
@@ -1047,6 +1083,11 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
 
         Event oe;
         oe = new Event();
+        if (prop == null) {
+            oe.setLineInfo(type);
+        } else {
+            oe.setLineInfo(prop);
+        }
         oe.addOperation(op);
         return oe;
     }
@@ -1061,6 +1102,7 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
         Operation op = generateRetrieveOperationOptimized(type, null);
         Event oe;
         oe = new Event();
+        oe.setLineInfo(type);
         oe.addOperation(op);
         return oe;
     }
@@ -1099,6 +1141,7 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
         Event oe;
 
         oe = new Event();
+        oe.setLineInfo(type);
         oe.addOperation(sql);
 
         return oe;
@@ -1120,6 +1163,7 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
         Event oe;
 
         oe = new Event();
+        oe.setLineInfo(type);
         oe.addOperation(sql);
 
         return oe;
@@ -1139,7 +1183,10 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
             return null;
         }
 
-        Event oe = getSuperEvent(type, CompoundType.INSERT, new Event());
+        Event ev = new Event();
+        ev.setLineInfo(type);
+
+        Event oe = getSuperEvent(type, CompoundType.INSERT, ev);
 
         if ((type.getReferenceKey() == null) && (type.getSupertype() != null)) {
             return oe;
@@ -1177,6 +1224,7 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
               .append(")");
 
             Operation block = new Operation(sb.toString());
+            block.setLineInfo(type);
             oe.addOperation(block);
         }
 
@@ -1197,7 +1245,10 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
             return null;
         }
 
-        Event oe = getSuperEvent(type, CompoundType.UPDATE, new Event());
+        Event ev = new Event();
+        ev.setLineInfo(type);
+
+        Event oe = getSuperEvent(type, CompoundType.UPDATE, ev);
 
         if ((type.getReferenceKey() == null) && (type.getSupertype() != null)) {
             return oe;
@@ -1244,6 +1295,7 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
               .append(where);
 
             Operation block = new Operation(sb.toString());
+            block.setLineInfo(type);
             oe.addOperation(block);
         }
 
@@ -1277,10 +1329,14 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
         }
 
         if ((type.getReferenceKey() == null) && (type.getSupertype() != null)) {
-            return getSuperEvent(type, CompoundType.DELETE, new Event());
+            Event ev = new Event();
+            ev.setLineInfo(type);
+
+            return getSuperEvent(type, CompoundType.DELETE, ev);
         }
 
         Event oe = new Event();
+        oe.setLineInfo(type);
 
         while (!pq.isEmpty()) {
             String tableName = (String)pq.dequeue();
@@ -1295,6 +1351,7 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
               .append(Utilities.getKeyProperty(type).getName());
 
             Operation block = new Operation(sb.toString());
+            block.setLineInfo(type);
             oe.addOperation(block);
         }
 
@@ -1370,6 +1427,7 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
           .append(Utilities.getKeyProperty(type).getName()).append("\n");
 
         Event event = new Event();
+        event.setLineInfo(prop);
 
         sql.setSQL(sb.toString());
 
@@ -1472,7 +1530,10 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
         }
 
         Event event = new Event();
-        event.addOperation(new Operation(sb.toString()));
+        event.setLineInfo(prop);
+        Operation op = new Operation(sb.toString());
+        op.setLineInfo(prop);
+        event.addOperation(op);
 
         return event;
     }
@@ -1556,7 +1617,10 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
         }
 
         Event event = new Event();
-        event.addOperation(new Operation(sb.toString()));
+        event.setLineInfo(prop);
+        Operation op = new Operation(sb.toString());
+        op.setLineInfo(prop);
+        event.addOperation(op);
 
         return event;
     }
@@ -1643,7 +1707,10 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
         }
 
         Event event = new Event();
-        event.addOperation(new Operation(sb.toString()));
+        event.setLineInfo(prop);
+        Operation op = new Operation(sb.toString());
+        op.setLineInfo(prop);
+        event.addOperation(op);
 
         return event;
     }
@@ -1724,7 +1791,10 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
         }
     
         Event event = new Event();
-        event.addOperation(new Operation(sb.toString()));
+        event.setLineInfo(prop);
+        Operation op = new Operation(sb.toString());
+        op.setLineInfo(prop);
+        event.addOperation(op);
 
         return event;
     }
@@ -1739,6 +1809,7 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
      */
     protected Event generatePropertyClear(ObjectType type, Property prop) {
         Event event = new Event();
+        event.setLineInfo(prop);
         StringBuffer sb = new StringBuffer();
         List path = prop.getJoinPath().getPath();
 
@@ -1774,7 +1845,9 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
               .append(" = :")
               .append(refkey.getName());
 
-            event.addOperation(new Operation(sb.toString()));
+            Operation op = new Operation(sb.toString());
+            op.setLineInfo(prop);
+            event.addOperation(op);
 
             // we assume true componentism here, if an entry is not in the 
             // mapping table, it's gone
@@ -1792,7 +1865,9 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
                   .append(je2.getFrom().getTableName())
                   .append(")");
 
-                event.addOperation(new Operation(sb.toString()));
+                op = new Operation(sb.toString());
+                op.setLineInfo(prop);
+                event.addOperation(op);
             }
         } else {
             if (prop.isComponent()) {
@@ -1813,7 +1888,9 @@ public class OracleMDSQLGenerator implements MDSQLGenerator{
                   .append(refkey.getName());
             }
 
-            event.addOperation(new Operation(sb.toString()));
+            Operation op = new Operation(sb.toString());
+            op.setLineInfo(prop);
+            event.addOperation(op);
         }
 
 

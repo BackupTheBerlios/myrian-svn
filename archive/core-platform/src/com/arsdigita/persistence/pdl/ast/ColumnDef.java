@@ -24,11 +24,11 @@ import java.sql.Types;
  * data type.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/21 $
  */
 public class ColumnDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ColumnDef.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ColumnDef.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
 
     // the name of the column
     private String m_column;
@@ -77,12 +77,18 @@ public class ColumnDef extends Element {
      * @returns the Column that this ColumnDef represents.
      */
     public Column generateLogicalModel() {
+        Column result;
+
         if (m_type != null) {
-            return new Column(m_table, m_column, m_type.getTypeCode(),
-                              m_type.getSize());
+            result = new Column(m_table, m_column, m_type.getTypeCode(),
+                                m_type.getSize());
         } else {
-            return new Column(m_table, m_column);
+            result = new Column(m_table, m_column);
         }
+
+        initLineInfo(result);
+
+        return result;
     }
 
     /**
@@ -91,12 +97,18 @@ public class ColumnDef extends Element {
      * @returns the Column that this ColumnDef represents.
      */
     public Column generateLogicalModel(int defaultJDBCType) {
+        Column result;
+
         if (m_type != null) {
-            return new Column(m_table, m_column, m_type.getTypeCode(),
-                              m_type.getSize());
+            result = new Column(m_table, m_column, m_type.getTypeCode(),
+                                m_type.getSize());
         } else {
-            return new Column(m_table, m_column, defaultJDBCType);
+            result = new Column(m_table, m_column, defaultJDBCType);
         }
+
+        initLineInfo(result);
+
+        return result;
     }
 
     /**

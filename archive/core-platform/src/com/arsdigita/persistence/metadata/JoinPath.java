@@ -27,7 +27,7 @@ import java.io.PrintStream;
  * particular columns to join, and in what order.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#2 $
  * @since 4.6
  *
  * @invariant getPath() != null 
@@ -35,7 +35,7 @@ import java.io.PrintStream;
 
 public class JoinPath extends Element {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
 
     private List m_path;
     // a List of JoinElements
@@ -65,6 +65,10 @@ public class JoinPath extends Element {
      * @pre element != null
      **/
     public void addJoinElement(JoinElement element) {
+        if (m_path.size() == 0) {
+            setLineInfo(element);
+        }
+
         m_path.add(element);
     }
 
@@ -77,7 +81,7 @@ public class JoinPath extends Element {
      * @pre from != null && to != null
      **/
     public void addJoinElement(Column from, Column to) {
-        m_path.add(new JoinElement(from, to));
+        addJoinElement(new JoinElement(from, to));
     }
 
     /**
@@ -101,6 +105,7 @@ public class JoinPath extends Element {
      **/
     protected void setPath(List path) {
         m_path = path;
+        setLineInfo((JoinElement) path.get(0));
     }
 
     /**

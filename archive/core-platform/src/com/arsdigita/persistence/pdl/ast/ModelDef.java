@@ -30,12 +30,12 @@ import java.util.Collection;
  * Defines the Model of a particular object type.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/21 $
  */
 
 public class ModelDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ModelDef.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ModelDef.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
 
     // the model name
     private String m_name;
@@ -170,6 +170,7 @@ public class ModelDef extends Element {
         MetadataRoot root = MetadataRoot.getMetadataRoot();
         if (root.getModel(m_name) == null) {
             m_model = new Model(m_name);
+            initLineInfo(m_model);
             root.addModel(m_model);
         } else {
             m_model = root.getModel(m_name);

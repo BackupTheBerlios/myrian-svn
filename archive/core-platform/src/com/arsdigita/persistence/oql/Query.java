@@ -11,12 +11,12 @@ import org.apache.log4j.Category;
  * specified in a PDL file to generate sql queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/21 $
  **/
 
 public class Query extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
 
     private static final Category s_log = Category.getInstance(Query.class);
 
@@ -174,6 +174,10 @@ public class Query extends Node {
         traverse(BUILD_QUERY);
         traverse(CHECK_QUERY);
 
+        if (m_errors.size() > 0) {
+            throw new Error("Errors: " + m_errors + "\n\n" + toDot());
+        }
+
         // Phase one, identify all the tables from which we must do direct
         // selects.
         // Phase two, compute the long join paths for those tables.
@@ -184,7 +188,10 @@ public class Query extends Node {
 
     public String toSQL() {
         generate();
+        return getSQL();
+    }
 
+    public String getSQL() {
         final StringBuffer result = new StringBuffer();
         result.append(" select ");
 
@@ -289,6 +296,35 @@ public class Query extends Node {
 
     public String toString() {
         return super.toString() + "\n(conditions: " + m_conditions + ")";
+    }
+
+    public String toDot() {
+        final StringBuffer result = new StringBuffer();
+        result.append("digraph " + getName() + " {\n");
+        result.append("    size=\"11,17\";\n");
+        result.append("    center=1;\n\n");
+
+        Map env = new HashMap();
+
+        toDot(env, result);
+
+        for (Iterator it = m_conditions.iterator(); it.hasNext(); ) {
+            Condition cond = (Condition) it.next();
+            result.append("    " + env.get(cond.getLeft()) + " -> " +
+                          env.get(cond.getRight()));
+            if (cond.isOuter()) { result.append(" [color=blue]"); }
+            result.append(";\n");
+        }
+
+        result.append("}");
+
+        return result.toString();
+    }
+
+    private List m_errors = new ArrayList();
+
+    void error(String message) {
+        m_errors.add(message);
     }
 
 }

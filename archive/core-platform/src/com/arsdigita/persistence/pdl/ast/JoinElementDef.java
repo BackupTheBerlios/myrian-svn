@@ -15,18 +15,20 @@
 
 package com.arsdigita.persistence.pdl.ast;
 
+import com.arsdigita.persistence.metadata.Column;
+import com.arsdigita.persistence.metadata.JoinElement;
 
 /**
  * Defines a mapping between two particular columns, used by JoinPathDef
  * to support MDSQL.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/21 $
  */
 
 public class JoinElementDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/JoinElementDef.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/JoinElementDef.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
 
     private ColumnDef m_from;
     // the "start" column
@@ -59,14 +61,14 @@ public class JoinElementDef extends Element {
     /**
      * Generates a JoinElement that represents a path element.
      */
-    com.arsdigita.persistence.metadata.JoinElement generateLogicalModel() {
-        com.arsdigita.persistence.metadata.Column from;
-        com.arsdigita.persistence.metadata.Column to;
+    JoinElement generateLogicalModel() {
+        Column from;
+        Column to;
 
         from = m_from.generateLogicalModel();
         to = m_to.generateLogicalModel();
 
-        return new com.arsdigita.persistence.metadata.JoinElement(from, to);
+        return new JoinElement(from, to);
     }
 
     /**

@@ -9,19 +9,20 @@ import org.apache.log4j.Category;
  * Table
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/21 $
  **/
 
 class Table {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Table.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Table.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
 
     private static final Category s_log = Category.getInstance(Table.class);
 
     private Node m_node;
     private String m_name;
     private Map m_columns = new HashMap();
-    private Set m_conditions = new HashSet();
+    private Set m_entering = new HashSet();
+    private Set m_leaving = new HashSet();
 
     Table(Node node, String name) {
         m_node = node;
@@ -42,11 +43,13 @@ class Table {
         m_columns.put(column.getName(), column);
     }
 
-    Column defineColumn(String name) {
-        Column column = getColumn(name);
+    Column defineColumn(com.arsdigita.persistence.metadata.Column source) {
+        Column column = getColumn(source.getColumnName());
         if (column == null) {
-            column = new Column(this, name);
+            column = new Column(this, source.getColumnName());
         }
+
+        column.getSources().add(source);
 
         return column;
     }
@@ -60,11 +63,25 @@ class Table {
     }
 
     void addCondition(Condition condition) {
-        m_conditions.add(condition);
+        if (condition.getRight().getTable().equals(this)) {
+            if (m_entering.size() > 0) {
+                getQuery().error("Table is already targeted: " + getAlias());
+            }
+            m_entering.add(condition);
+        } else {
+            m_leaving.add(condition);
+        }
+    }
+
+    Set getEntering() {
+        return m_entering;
     }
 
     public Set getConditions() {
-        return m_conditions;
+        Set result = new HashSet();
+        result.addAll(m_entering);
+        result.addAll(m_leaving);
+        return result;
     }
 
     public String getName() {

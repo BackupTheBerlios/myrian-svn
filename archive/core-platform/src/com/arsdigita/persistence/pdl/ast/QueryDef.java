@@ -31,11 +31,11 @@ import java.util.Iterator;
  * association.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/21 $
  */
 public class QueryDef extends NamedSQLDef {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/QueryDef.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/QueryDef.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
 
     // this determines if it is a "zero or one row ", "one row" query 
     // or a multi-row query
@@ -81,11 +81,13 @@ public class QueryDef extends NamedSQLDef {
      */
     QueryType generateEvents() {
         Event event = new Event();
+        initLineInfo(event);
 
         Operation op = m_sql.generateOperation();
         event.addOperation(op);
 
         QueryType result =  new QueryType(m_name, event);
+        initLineInfo(result);
         result.setReturnsLowerBound(m_lowerBound);
         result.setReturnsUpperBound(m_upperBound);
 
@@ -98,8 +100,9 @@ public class QueryDef extends NamedSQLDef {
             Mapping mapping = (Mapping) it.next();
             String[] path = mapping.getPath();
             if (!result.hasProperty(path[0])) {
-                result.addProperty(new Property(path[0],
-                                                MetadataRoot.OBJECT));
+                Property prop = new Property(path[0], MetadataRoot.OBJECT);
+                initLineInfo(prop);
+                result.addProperty(prop);
             }
         }
 

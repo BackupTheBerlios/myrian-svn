@@ -16,7 +16,7 @@
 // Represents US Addresses
 //
 // @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
-// @version $Id: //core-platform/dev/pdl/com/arsdigita/addresses/USAddress.pdl#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $
+// @version $Id: //core-platform/dev/pdl/com/arsdigita/addresses/USAddress.pdl#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $
 //
 
 model com.arsdigita.addresses;
@@ -39,8 +39,6 @@ object type BaseUSAddress extends ACSObject {
 }
 
 object type USAddress extends BaseUSAddress {
-    reference key (us_addresses.address_id);
-
     retrieve { super; }
 
     insert { super; }

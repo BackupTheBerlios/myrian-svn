@@ -24,12 +24,12 @@ import java.io.PrintStream;
  * complete path from one object type or table to another.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinElement.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinElement.java#2 $
  * @since 4.6
  **/
 public class JoinElement extends Element {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinElement.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinElement.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
     private Column m_from = null;
     // column belonging to the start table, or closest to it
 
@@ -50,6 +50,8 @@ public class JoinElement extends Element {
 
         m_from = from;
         m_to = to;
+
+        setLineInfo(m_from);
     }
 
     /**
@@ -75,6 +77,7 @@ public class JoinElement extends Element {
      **/
     public void setFrom(Column from) {
         m_from = from;
+        setLineInfo(m_from);
     }
 
     /**

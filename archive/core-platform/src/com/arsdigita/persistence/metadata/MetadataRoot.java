@@ -26,12 +26,12 @@ import org.apache.log4j.Category;
  * metadata system.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/21 $
  **/
 
 public class MetadataRoot extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
 
     private static final Category s_cat = Category.getInstance(MetadataRoot.class.getName());
 
@@ -41,7 +41,7 @@ public class MetadataRoot extends Element {
     private static MetadataRoot s_root;
     // the following is a list of constants that can be used to specify the
     // type
-    public static final SimpleType BIGINTEGER =
+    public static final SimpleType BIGINTEGER = init(
     new SimpleType("BigInteger", java.math.BigInteger.class, Types.NUMERIC) {
             public int bindValue(PreparedStatement ps, int index, Object value,
                              int jdbcType) throws SQLException {
@@ -63,9 +63,9 @@ public class MetadataRoot extends Element {
                     return val;
                 }
             }
-        };
+        });
 
-    public static final SimpleType BIGDECIMAL =
+    public static final SimpleType BIGDECIMAL = init(
     new SimpleType("BigDecimal", java.math.BigDecimal.class, Types.NUMERIC) {
             public int bindValue(PreparedStatement ps, int index, Object value,
                              int jdbcType) throws SQLException {
@@ -83,9 +83,9 @@ public class MetadataRoot extends Element {
 
                 return val;
             }
-        };
+        });
 
-    public static final SimpleType BOOLEAN =
+    public static final SimpleType BOOLEAN = init(
     new SimpleType("Boolean", java.lang.Boolean.class, Types.BIT) {
             public int bindValue(PreparedStatement ps, int index, Object value,
                              int jdbcType) throws SQLException {
@@ -104,9 +104,9 @@ public class MetadataRoot extends Element {
                     return Boolean.FALSE;
                 }
             }
-        };
+        });
 
-    public static final SimpleType BYTE =
+    public static final SimpleType BYTE = init(
     new SimpleType("Byte", java.lang.Byte.class, Types.TINYINT) {
             public int bindValue(PreparedStatement ps, int index, Object value,
                              int jdbcType) throws SQLException {
@@ -123,9 +123,9 @@ public class MetadataRoot extends Element {
                     return new Byte(b);
                 }
             }
-        };
+        });
 
-    public static final SimpleType CHARACTER =
+    public static final SimpleType CHARACTER = init(
     new SimpleType("Character", java.lang.Character.class, Types.CHAR) {
             public int bindValue(PreparedStatement ps, int index, Object value,
                              int jdbcType) throws SQLException {
@@ -142,9 +142,9 @@ public class MetadataRoot extends Element {
                     return null;
                 }
             }
-        };
+        });
 
-    public static final SimpleType DATE =
+    public static final SimpleType DATE = init(
     new SimpleType("Date", java.util.Date.class, Types.TIMESTAMP) {
             public int bindValue(PreparedStatement ps, int index, Object value,
                              int jdbcType) throws SQLException {
@@ -163,9 +163,9 @@ public class MetadataRoot extends Element {
                     return new java.util.Date(tstamp.getTime());
                 }
             }
-        };
+        });
 
-    public static final SimpleType DOUBLE =
+    public static final SimpleType DOUBLE = init(
     new SimpleType("Double", java.lang.Double.class, Types.DOUBLE) {
             public int bindValue(PreparedStatement ps, int index, Object value,
                              int jdbcType) throws SQLException {
@@ -182,9 +182,9 @@ public class MetadataRoot extends Element {
                     return new Double(d);
                 }
             }
-        };
+        });
 
-    public static final SimpleType FLOAT =
+    public static final SimpleType FLOAT = init(
     new SimpleType("Float", java.lang.Float.class, Types.REAL) {
             public int bindValue(PreparedStatement ps, int index, Object value,
                              int jdbcType) throws SQLException {
@@ -201,9 +201,9 @@ public class MetadataRoot extends Element {
                     return new Float(f);
                 }
             }
-        };
+        });
 
-    public static final SimpleType INTEGER =
+    public static final SimpleType INTEGER = init(
     new SimpleType("Integer", java.lang.Integer.class, Types.INTEGER) {
             public int bindValue(PreparedStatement ps, int index, Object value,
                              int jdbcType) throws SQLException {
@@ -220,9 +220,9 @@ public class MetadataRoot extends Element {
                     return new Integer(i);
                 }
             }
-        };
+        });
 
-    public static final SimpleType LONG =
+    public static final SimpleType LONG = init(
     new SimpleType("Long", java.lang.Long.class, Types.BIGINT) {
             public int bindValue(PreparedStatement ps, int index, Object value,
                              int jdbcType) throws SQLException {
@@ -239,9 +239,9 @@ public class MetadataRoot extends Element {
                     return new Long(l);
                 }
             }
-        };
+        });
 
-    public static final SimpleType SHORT =
+    public static final SimpleType SHORT = init(
     new SimpleType("Short", java.lang.Short.class, Types.SMALLINT) {
             public int bindValue(PreparedStatement ps, int index, Object value,
                              int jdbcType) throws SQLException {
@@ -258,9 +258,9 @@ public class MetadataRoot extends Element {
                     return new Short(s);
                 }
             }
-        };
+        });
 
-    public static final SimpleType STRING =
+    public static final SimpleType STRING = init(
     new SimpleType("String", java.lang.String.class, Types.VARCHAR) {
             public boolean needsRefresh(Object value, int jdbcType) {
                 return (value != null && jdbcType == Types.CLOB);
@@ -321,9 +321,9 @@ public class MetadataRoot extends Element {
                     return rs.getString(column);
                 }
             }
-        };
+        });
 
-    public static final SimpleType BLOB =
+    public static final SimpleType BLOB = init(
     new SimpleType("Blob", java.sql.Blob.class, Types.BLOB) {
             public boolean needsRefresh(Object value, int jdbcType) {
                 return (value != null && jdbcType == Types.BLOB);
@@ -382,9 +382,9 @@ public class MetadataRoot extends Element {
                     return blob.getBytes(1L, (int)blob.length());
                 }
             }
-        };
+        });
 
-    public static final SimpleType CLOB =
+    public static final SimpleType CLOB = init(
     new SimpleType("Clob", java.sql.Clob.class, Types.CLOB) {
             public int bindValue(PreparedStatement ps, int index, Object value,
                              int jdbcType) throws SQLException {
@@ -416,10 +416,10 @@ public class MetadataRoot extends Element {
                     return clob.getSubString(1L, (int)clob.length());
                 }
             }
-        };
+        });
 
     // This is for backword compatibility with data queries.
-    public static final SimpleType OBJECT =
+    public static final SimpleType OBJECT = init(
     new SimpleType("<Object>", java.lang.Object.class, Types.VARCHAR) {
             public int bindValue(PreparedStatement ps, int index, Object value,
                              int jdbcType) throws SQLException {
@@ -436,7 +436,13 @@ public class MetadataRoot extends Element {
                     return rs.getObject(column);
                 }
             }
-        };
+        });
+
+    private static final SimpleType init(SimpleType type) {
+        type.setFilename("MetadataRoot.java");
+        type.setLineInfo(32, 14);
+        return type;
+    }
 
     static {
         s_root = newInstance();
@@ -464,6 +470,8 @@ public class MetadataRoot extends Element {
         result.addPrimitiveType(STRING);
         result.addPrimitiveType(BLOB);
         result.addPrimitiveType(CLOB);
+        result.setFilename("MetadataRoot.java");
+        result.setLineInfo(32, 14);
         return result;
     }
 

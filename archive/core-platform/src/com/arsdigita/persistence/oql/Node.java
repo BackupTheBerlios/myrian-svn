@@ -10,12 +10,12 @@ import org.apache.log4j.Category;
  * Node
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/21 $
  **/
 
 abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
 
     private static final Category s_log = Category.getInstance(Node.class);
 
@@ -35,6 +35,10 @@ abstract class Node {
 
     public Node getParent() {
         return m_parent;
+    }
+
+    public Collection getChildren() {
+        return m_children.values();
     }
 
     public ObjectType getObjectType() {
@@ -170,19 +174,39 @@ abstract class Node {
             JoinElement je = (JoinElement) it.next();
 
             Column from = defineTable(je.getFrom().getTableName()).
-                         defineColumn(je.getFrom().getColumnName());
+                defineColumn(je.getFrom());
             Column to   = defineTable(je.getTo().getTableName()).
-                         defineColumn(je.getTo().getColumnName());
-            query.addCondition(new Condition(from, to));
+                defineColumn(je.getTo());
+
+            if (to.equals(from)) {
+                Set sources = from.getSources();
+                StringBuffer msg = new StringBuffer(
+                    "Duplicate columns: "
+                    );
+                for (Iterator iter = sources.iterator(); iter.hasNext(); ) {
+                    com.arsdigita.persistence.metadata.Column col =
+                        (com.arsdigita.persistence.metadata.Column) iter.next();
+                    msg.append(col.getFilename() + ": " +
+                               col.getLineNumber() + " column " +
+                               col.getColumnNumber());
+
+                    if (iter.hasNext()) { msg.append(", "); }
+                }
+                throw new Error(msg.toString());
+            }
+
+            if (to.getTable().getEntering().size() > 0) {
+                query.addCondition(new Condition(to, from));
+            } else {
+                query.addCondition(new Condition(from, to));
+            }
         }
 
         for (Iterator it = getSelections().iterator(); it.hasNext(); ) {
             Selection sel = (Selection) it.next();
             Property prop = sel.getProperty();
             Table table = defineTable(prop.getColumn().getTableName());
-            sel.setColumn(
-                table.defineColumn(prop.getColumn().getColumnName())
-                );
+            sel.setColumn(table.defineColumn(prop.getColumn()));
         }
     }
 
@@ -253,6 +277,37 @@ abstract class Node {
 
         result.append(")");
         return result.toString();
+    }
+
+    void toDot(Map env, StringBuffer result) {
+        env.put(this, "cluster_node" + env.size());
+        result.append("    subgraph " + env.get(this) + " {\n");
+
+        for (Iterator outer = getTables().iterator();
+             outer.hasNext(); ) {
+            Table table = (Table) outer.next();
+
+            env.put(table, "cluster_table" + env.size());
+            result.append("    subgraph " + env.get(table) + " {\n");
+            result.append("        color=red;\n");
+
+            for (Iterator it = table.getColumns().iterator();
+                 it.hasNext(); ) {
+                Column col = (Column) it.next();
+                env.put(col, "column" + env.size());
+                result.append("        " + env.get(col) + " [label=\"" +
+                              col.getQualifiedName() + "\"];\n");
+            }
+
+            result.append("        }\n");
+        }
+
+        for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
+            Node child = (Node) it.next();
+            child.toDot(env, result);
+        }
+
+        result.append("    }\n");
     }
 
 }

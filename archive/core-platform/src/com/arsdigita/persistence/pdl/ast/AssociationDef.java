@@ -34,12 +34,12 @@ import java.util.HashMap;
  * additional properties and SQL Events.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/21 $
  */
 
 public class AssociationDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AssociationDef.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AssociationDef.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
 
     // the two PropertyDefs that define what Objects are being associated
     private PropertyDef m_one;
@@ -142,10 +142,10 @@ public class AssociationDef extends Element {
         }
 
         m_assn = new Association(one, two);
+        initLineInfo(m_assn);
 
         ObjectType anon = (ObjectType) m_assn.getLinkType();
-        anon.setFilename(getFilename());
-        anon.setLineInfo(getLineNumber(), getColumnNumber());
+        initLineInfo(anon);
 
         Iterator props = m_attrs.values().iterator();
 

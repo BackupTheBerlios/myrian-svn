@@ -1,0 +1,100 @@
+model test;
+
+import com.arsdigita.kernel.User;
+import com.arsdigita.kernel.ACSObject;
+
+association {
+    composite User[1..1] user = join up_profiles.user_id to users.user_id;
+    Profile[0..1] profile = join users.user_id to up_profiles.user_id;
+}
+
+object type Profile extends ACSObject {
+    composite File[0..1] portrait = join up_profiles.portrait_id 
+			   to docs_resources.resource_id;
+    composite File[0..1] thumbnail = join up_profiles.thumbnail_id 
+			   to docs_resources.resource_id;
+    String bio = up_profiles.bio VARCHAR(4000);
+    String skills = up_profiles.skills VARCHAR(4000);
+
+    reference key (up_profiles.profile_id);
+
+    aggressive load (user.id, portrait.id, portrait.objectType, portrait.description);
+
+    retrieve portrait {
+        do {
+	    select r.resource_id, r.parent_id, r.name, r.description,
+	    r.mime_type, r.is_folder, r.path, nvl(dbms_lob.getlength(r.content),0) sizeBytes,
+	    a.object_type
+	    from docs_resources r, up_profiles p, acs_objects a
+	    where p.portrait_id = r.resource_id
+	    and r.resource_id = a.object_id
+	    and p.profile_id = :id
+        } map {
+	    portrait.objectType = object_type;
+	    portrait.id = resource_id;
+	    portrait.mimeType = mime_type;
+	    portrait.size = sizeBytes;
+	    portrait.parentID    = parent_id;
+	    portrait.name        = name;
+	    portrait.description = description;
+	    portrait.isFolder    = is_folder;
+	    portrait.path        = path;
+	}
+    }
+
+    add portrait {
+        do {
+	    update up_profiles 
+	    set portrait_id = :portrait.id
+	    where profile_id = :id
+        }
+    }
+
+    remove portrait {
+        do { update up_profiles 
+	     set portrait_id = null,
+	     thumbnail_id = null
+	     where profile_id = :id
+	}
+    }
+
+    retrieve thumbnail {
+        do {
+	    select r.resource_id, r.parent_id, r.name, r.description,
+	    r.mime_type, r.is_folder, r.path, nvl(dbms_lob.getlength(r.content),0) sizeBytes,
+	    a.object_type
+	    from docs_resources r, up_profiles p, acs_objects a
+	    where p.thumbnail_id = r.resource_id
+	    and r.resource_id = a.object_id
+	    and p.profile_id = :id
+        } map {
+	    thumbnail.objectType = object_type;
+	    thumbnail.id = resource_id;
+	    thumbnail.mimeType = mime_type;
+	    thumbnail.size = sizeBytes;
+	    thumbnail.parentID    = parent_id;
+	    thumbnail.name        = name;
+	    thumbnail.description = description;
+	    thumbnail.isFolder    = is_folder;
+	    thumbnail.path        = path;
+	}
+    }
+
+    add thumbnail {
+        do {
+	    update up_profiles 
+	    set thumbnail_id = :thumbnail.id
+	    where profile_id = :id
+
+        }
+    }
+
+    remove thumbnail {
+        do { update up_profiles 
+	     set thumbnail_id = null,
+	     portrait_id = null
+	     where profile_id = :id
+	}
+    }
+}
+

@@ -27,12 +27,12 @@ import com.arsdigita.persistence.metadata.Column;
  * Should eventually be updated to use ColumnDef instead.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/21 $
  */
 
 public class MappingDef extends MapStatement {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/MappingDef.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/MappingDef.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
 
     // the role and attribute to map from
     private String[] m_path;
@@ -83,7 +83,11 @@ public class MappingDef extends MapStatement {
     }
 
     Mapping generateMapping() {
-        return new Mapping(getPath(), new Column(m_table, m_column));
+        Column column = new Column(m_table, m_column);
+        Mapping mapping = new Mapping(getPath(), column);
+        initLineInfo(column);
+        initLineInfo(mapping);
+        return mapping;
     }
 
     /**

@@ -24,12 +24,12 @@ import java.io.PrintStream;
  * link.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/21 $
  **/
 
 public class Association extends ModelElement {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Association.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Association.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
 
 
     /**
@@ -103,26 +103,34 @@ public class Association extends ModelElement {
         m_roles[0].setAssociation(this);
         m_roles[1].setAssociation(this);
 
-        m_linkType.addProperty(
-            new Property(m_roles[0].getName(), m_roles[0].getType(),
-                         Property.REQUIRED, m_roles[0].isComponent())
-                );
+        Property prop = new Property(
+            m_roles[0].getName(), m_roles[0].getType(),
+            Property.REQUIRED, m_roles[0].isComponent()
+            );
+        prop.setLineInfo(m_roles[0]);
+        m_linkType.addProperty(prop);            
         m_linkType.addKeyProperty(m_roles[0].getName());
 
-        m_linkType.addProperty(
-            new Property(m_roles[1].getName(), m_roles[1].getType(),
-                         Property.REQUIRED, m_roles[1].isComponent())
-                );
+        prop = new Property(m_roles[1].getName(), m_roles[1].getType(),
+                            Property.REQUIRED, m_roles[1].isComponent());
+        prop.setLineInfo(m_roles[1]);
+        m_linkType.addProperty(prop);
         m_linkType.addKeyProperty(m_roles[1].getName());
 
         // Make sure the link type has an empty insert event.
-        m_linkType.setEvent(ObjectType.INSERT, new Event());
-        m_linkType.setEvent(ObjectType.DELETE, new Event());
+        m_linkType.setEvent(ObjectType.INSERT, newEvent());
+        m_linkType.setEvent(ObjectType.DELETE, newEvent());
         for (Iterator it = m_linkType.getKeyProperties(); it.hasNext(); ) {
-            Property prop = (Property) it.next();
-            prop.setEvent(Property.ADD, new Event());
-            prop.setEvent(Property.REMOVE, new Event());
+            prop = (Property) it.next();
+            prop.setEvent(Property.ADD, newEvent());
+            prop.setEvent(Property.REMOVE, newEvent());
         }
+    }
+
+    private final Event newEvent() {
+        Event result = new Event();
+        result.setLineInfo(m_roles[0]);
+        return result;
     }
 
 

@@ -7,12 +7,12 @@ import java.util.*;
  * PropertyNode
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/21 $
  **/
 
 class PropertyNode extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/PropertyNode.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/PropertyNode.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
 
     private Property m_property;
 
@@ -46,28 +46,28 @@ class PropertyNode extends Node {
     }
 
     void buildQuery() {
-        super.buildQuery();
-
         Query query = getQuery();
         JoinPath jp = m_property.getJoinPath();
         List path = jp.getPath();
 
         JoinElement first = (JoinElement) path.get(0);
         Table table = getParent().defineTable(first.getFrom().getTableName());
-        Column from = table.defineColumn(first.getFrom().getColumnName());
+        Column from = table.defineColumn(first.getFrom());
         table = defineTable(first.getTo().getTableName());
-        Column to = table.defineColumn(first.getTo().getColumnName());
+        Column to = table.defineColumn(first.getTo());
 
         query.addCondition(new Condition(from, to));
 
         for (int i = 1; i < path.size(); i++) {
             JoinElement je = (JoinElement) path.get(i);
             table = defineTable(je.getFrom().getTableName());
-            from = table.defineColumn(je.getFrom().getColumnName());
+            from = table.defineColumn(je.getFrom());
             table = defineTable(je.getTo().getTableName());
-            to = table.defineColumn(je.getTo().getColumnName());
+            to = table.defineColumn(je.getTo());
             query.addCondition(new Condition(from, to));
         }
+
+        super.buildQuery();
     }
 
 }

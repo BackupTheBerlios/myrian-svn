@@ -6,12 +6,12 @@ import java.util.*;
  * The root class for all nodes in the abstract syntax tree (AST).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/21 $
  **/
 
 public abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/Node.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/Node.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
 
     // The filename that this node was created from.
     private String m_filename = "<none>";
@@ -64,5 +64,10 @@ public abstract class Node {
     }
 
     void generateAssociationEvents() {}
+
+    void initLineInfo(com.arsdigita.persistence.metadata.Element element) {
+        element.setFilename(getFilename());
+        element.setLineInfo(getLineNumber(), getColumnNumber());
+    }
 
 }

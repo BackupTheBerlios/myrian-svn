@@ -29,12 +29,12 @@ import org.apache.log4j.Category;
  * SQLBlockDef
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/21 $
  */
 
 public class SQLBlockDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/SQLBlockDef.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/SQLBlockDef.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
 
     private static Category s_log = 
         Category.getInstance(SQLBlockDef.class);
@@ -149,8 +149,7 @@ public class SQLBlockDef extends Element {
      */
     Operation generateOperation() {
         Operation op = new Operation(m_sql);
-        op.setFilename(getFilename());
-        op.setLineInfo(getLineNumber(), getColumnNumber());
+        initLineInfo(op);
 
         op.setCallableStatement(m_isCallableStatement);
         Iterator maps = m_mapStmts.iterator();
