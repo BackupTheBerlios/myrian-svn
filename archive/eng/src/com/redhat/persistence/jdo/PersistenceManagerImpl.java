@@ -347,22 +347,35 @@ public class PersistenceManagerImpl implements PersistenceManager {
         }
     }
 
-
     /**
      * Make a Collection of instances persistent.
      */
     public void makePersistentAll(Collection pcs) {
-        for (Iterator it = pcs.iterator(); it.hasNext(); ) {
-            makePersistent(it.next());
-        }
+        makePersistentAll(pcs.toArray());
     }
 
     /**
      * Make an array of instances persistent.
      */
     public void makePersistentAll(Object[] pcs) {
+        List exceptions = null;
+
         for (int i = 0; i < pcs.length; i++) {
-            makePersistent(pcs[i]);
+            try {
+                makePersistent(pcs[i]);
+            } catch (Exception ex) {
+                if (exceptions == null) {
+                    exceptions = new LinkedList();
+                }
+                exceptions.add(ex);
+            }
+        }
+
+        if (exceptions != null && exceptions.size() > 0) {
+            Throwable[] nested = (Throwable[]) exceptions.toArray
+                (new Throwable[exceptions.size()]);
+            throw new JDOUserException("failed to make all objects persistent",
+                                       nested);
         }
     }
 
