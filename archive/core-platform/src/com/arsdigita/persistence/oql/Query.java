@@ -1,5 +1,6 @@
 package com.arsdigita.persistence.oql;
 
+import com.arsdigita.db.Initializer;
 import com.arsdigita.util.*;
 import com.arsdigita.persistence.metadata.*;
 import java.util.*;
@@ -12,12 +13,12 @@ import org.apache.log4j.Category;
  * specified in a PDL file to generate sql queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2002/07/19 $
+ * @version $Revision: #9 $ $Date: 2002/07/22 $
  **/
 
 public class Query extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#8 $ by $Author: rhs $, $DateTime: 2002/07/19 16:18:07 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#9 $ by $Author: rhs $, $DateTime: 2002/07/22 16:04:48 $";
 
     private static final Category s_log = Category.getInstance(Query.class);
 
@@ -299,8 +300,12 @@ public class Query extends Node {
         return getSQL();
     }
 
-    public String getSQL() {
-        final StringBuffer result = new StringBuffer();
+    /**
+     * Writes out the select clause for this query. This is shared by both the
+     * postgres and the oracle versions of getSQL().
+     **/
+
+    private void writeANSISelect(StringBuffer result) {
         result.append(" select ");
 
         final List selections = new ArrayList();
@@ -318,7 +323,9 @@ public class Query extends Node {
 
         Collections.sort(selections);
         result.append(join(selections, ",\n        "));
+    }
 
+    private void writeOracleFrom(StringBuffer result) {
         result.append("\n   from ");
 
         final List tables = new ArrayList();
@@ -331,7 +338,45 @@ public class Query extends Node {
 
         Collections.sort(tables);
         result.append(join(tables, ",\n        "));
+    }
 
+    private void writePostgresFrom(StringBuffer result) {
+        result.append("\n   from ");
+
+        Stack tables = new Stack();
+
+        for (Iterator it = getTables().iterator(); it.hasNext(); ) {
+            Table table = (Table) it.next();
+            if (table.getEntering().size() == 0) {
+                tables.add(table);
+                result.append(table.getName() + " " + table.getAlias());
+                break;
+            }
+        }
+
+        while (tables.size() > 0) {
+            Table table = (Table) tables.pop();
+            for (Iterator it = table.getLeaving().iterator();
+                 it.hasNext(); ) {
+                Condition condition = (Condition) it.next();
+                result.append("\n        ");
+                if (condition.isOuter()) {
+                    result.append("left ");
+                }
+                result.append("join ");
+                Table join = condition.getHead().getTable();
+                result.append(join.getName() + " " + join.getAlias());
+                result.append(" on (");
+                result.append(condition.getTail().getQualifiedName() + " = " +
+                              condition.getHead().getQualifiedName());
+                result.append(")");
+
+                tables.push(condition.getHead().getTable());
+            }
+        }
+    }
+
+    private void writeOracleWhere(StringBuffer result) {
         if (m_conditions.size() > 0) {
             result.append("\n  where ");
         }
@@ -346,7 +391,32 @@ public class Query extends Node {
 
         Collections.sort(conditions);
         result.append(join(conditions, "\n    and "));
+    }
 
+    private void writePostgresWhere(StringBuffer result) {
+        // Do nothing, postgres doesn't need a where clause since all the join
+        // conditions are specified as part of the from clause.
+    }
+
+    private void writeOracleSQL(StringBuffer result) {
+        writeANSISelect(result);
+        writeOracleFrom(result);
+        writeOracleWhere(result);
+    }
+
+    private void writePostgresSQL(StringBuffer result) {
+        writeANSISelect(result);
+        writePostgresFrom(result);
+        writePostgresWhere(result);
+    }
+
+    public String getSQL() {
+        final StringBuffer result = new StringBuffer();
+        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+            writePostgresSQL(result);
+        } else {
+            writeOracleSQL(result);
+        }
         return result.toString();
     }
 
