@@ -33,11 +33,11 @@ import org.apache.log4j.Logger;
  * </p>
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Revision: #8 $ $Date: 2003/12/09 $
+ * @version $Revision: #9 $ $Date: 2004/01/15 $
  */
 public abstract class HierarchyDenormalization {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/HierarchyDenormalization.java#8 $ by $Author: ashah $, $DateTime: 2003/12/09 15:56:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/HierarchyDenormalization.java#9 $ by $Author: dan $, $DateTime: 2004/01/15 07:54:04 $";
 
     private final static Logger s_log =
         Logger.getLogger(HierarchyDenormalization.class);
@@ -74,10 +74,19 @@ public abstract class HierarchyDenormalization {
                         Object old_value, Object new_value) {
             if (name.equals(m_attributeName)) {
                 if (!m_isModified) {
+                    if (s_log.isDebugEnabled()) {
+                        s_log.debug("Got set on " + dobj + "." + name + 
+                                    " old " + old_value + " new " + new_value);
+                    }
                     m_oldAttributeValue = (String) old_value;
                     m_newAttributeValue = (String) new_value;
                     m_isModified = true;
                 } else {
+                    if (s_log.isDebugEnabled()) {
+                        s_log.debug("Got another set on " + dobj + "." + 
+                                    name + " old " + old_value + " new " + 
+                                    new_value);
+                    }
                     m_newAttributeValue = (String) new_value;
                 }
             }
@@ -91,12 +100,19 @@ public abstract class HierarchyDenormalization {
 
         public void clear(DomainObject dobj, String name) { }
 
-        public void beforeSave(DomainObject dobj) { }
+        public void beforeSave(DomainObject dobj) { 
+            if (s_log.isDebugEnabled()) {
+                s_log.debug("In before save for " + dobj);
+            }
+        }
 
         public void afterSave(DomainObject dobj) {
+            if (s_log.isDebugEnabled()) {
+                s_log.debug("In after save for " + dobj);
+            }
             if (m_isModified) {
                 if (s_log.isDebugEnabled()) {
-                    s_log.debug("After save: oid:" + dobj.getOID() +
+                    s_log.debug("After save: oid:" + dobj +
                                 " new value is:" + m_newAttributeValue +
                                 " old value is:" + m_oldAttributeValue);
                 }
@@ -105,10 +121,16 @@ public abstract class HierarchyDenormalization {
                      && m_newAttributeValue == null)
                     || (m_oldAttributeValue != null
                         && m_oldAttributeValue.equals(m_newAttributeValue))) {
+                    if (s_log.isDebugEnabled()) {
+                        s_log.debug("Aborting because both null, or equal");
+                    }
                     return;
                 }
 
                 if (m_oldAttributeValue == null) {
+                    if (s_log.isDebugEnabled()) {
+                        s_log.debug("Aborting because old is null");
+                    }
                     // after save triggered by autoflush in before save
                     m_isModified = false;
                     return;
