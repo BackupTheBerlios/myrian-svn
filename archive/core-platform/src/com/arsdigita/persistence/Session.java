@@ -59,7 +59,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #16 $ $Date: 2003/06/09 $
+ * @version $Revision: #17 $ $Date: 2003/06/20 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -315,8 +315,11 @@ public class Session {
 
             m_events.clear();
 
-            if (LOG.isInfoEnabled()) {
-                LOG.info((m_before ? "before flush:" : "after flush: ") + events);
+            if (LOG.isDebugEnabled()) {
+                if (events.size() > 0) {
+                    LOG.debug((m_before ? "before flush:" : "after flush: ")
+                              + events);
+                }
             }
 
             m_toFire.addAll(events);

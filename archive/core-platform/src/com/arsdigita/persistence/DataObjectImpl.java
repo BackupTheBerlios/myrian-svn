@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/06/16 $
+ * @version $Revision: #7 $ $Date: 2003/06/20 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#6 $ by $Author: ashah $, $DateTime: 2003/06/16 17:03:22 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#7 $ by $Author: ashah $, $DateTime: 2003/06/20 14:19:28 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -130,7 +130,6 @@ class DataObjectImpl implements DataObject {
     }
 
     public ObjectType getObjectType() {
-        validate();
         return m_oid.getObjectType();
     }
 
@@ -183,7 +182,14 @@ class DataObjectImpl implements DataObject {
                 m_disconnect.put(prop, obj);
                 return obj;
             } else {
-                return m_ssn.get(this, convert(property));
+                Object result = m_ssn.get(this, convert(property));
+                if (result instanceof DataObjectImpl) {
+                    DataObjectImpl dobj = (DataObjectImpl) result;
+                    if (dobj.isDisconnected()) {
+                        result = getSession().retrieve(dobj.getOID());
+                    }
+                }
+                return result;
             }
         } else {
             return null;
@@ -212,6 +218,8 @@ class DataObjectImpl implements DataObject {
                 m_disconnect.put(p, ssn.get(this, C.prop(p)));
             }
         }
+
+        m_ssn.releaseObject(this);
     }
 
     public void set(String property, Object value) {
@@ -254,6 +262,8 @@ class DataObjectImpl implements DataObject {
     }
 
     void invalidate(boolean connectedOnly, boolean error) {
+        if (!isValid()) { return; }
+
         if (error || (!connectedOnly && m_ssn.isModified(this))) {
             m_valid = false;
             if (s_log.isDebugEnabled()) {
