@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #56 $ $Date: 2003/04/07 $
+ * @version $Revision: #57 $ $Date: 2003/04/07 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#56 $ by $Author: rhs $, $DateTime: 2003/04/07 14:17:43 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#57 $ by $Author: rhs $, $DateTime: 2003/04/07 19:59:54 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -712,15 +712,22 @@ public class Session {
             pd = new PropertyData(od, prop, null);
         } else {
             RecordSet rs = m_engine.execute(m_qs.getQuery(obj, prop));
-            boolean found = false;
-            while (rs.next()) {
-                found = true;
-                rs.load(this);
+            Map values = null;
+            if (rs.next()) {
+                values = rs.load(this);
             }
+	    if (rs.next()) {
+		throw new IllegalStateException
+		    ("Query returned too many rows");
+	    }
 
-            if (!found && prop.getType().isKeyed()) {
-		load(obj, prop, null);
-            } else if (!found) {
+            if (prop.getType().isKeyed()) {
+		if (values == null) {
+		    load(obj, prop, null);
+		} else {
+		    load(obj, prop, values.get(null));
+		}
+            } else if (values == null) {
                 throw new IllegalStateException
                     ("Query failed to return any results");
 	    }
