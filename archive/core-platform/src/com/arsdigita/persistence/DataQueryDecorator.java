@@ -23,11 +23,11 @@ import java.util.Map;
  * methods can be added to a stock data query.
  *
  * @author David Lutterkort
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDecorator.java#5 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDecorator.java#6 $
  */
 public class DataQueryDecorator implements DataQuery {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDecorator.java#5 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDecorator.java#6 $ by $Author: ashah $, $DateTime: 2003/07/02 01:16:18 $";
 
     private DataQuery m_dq;
 
@@ -188,14 +188,6 @@ public class DataQueryDecorator implements DataQuery {
 
     public Object getParameter(String parameterName) {
         return m_dq.getParameter(parameterName);
-    }
-
-    public boolean isNoView() {
-        return m_dq.isNoView();
-    }
-
-    public void setNoView(boolean isNoView) {
-        m_dq.setNoView(isNoView);
     }
 
     public void setRange(Integer beginIndex) {

@@ -27,12 +27,12 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *              inheritance.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/05/12 $
+ * @version $Revision: #7 $ $Date: 2003/07/02 $
  */
 
 public interface DataObject {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObject.java#6 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObject.java#7 $ by $Author: ashah $, $DateTime: 2003/07/02 01:16:18 $";
 
     /**
      * Returns the type of this persistent object.
@@ -194,15 +194,5 @@ public interface DataObject {
 
     void addObserver(DataObserver observer);
 
-
-    /**
-     * Sets the data handler used by this DataObject and returns the previous
-     * handler.
-     *
-     * @param handler The data handler.
-     * @return The previous DataHandler used by this DataObject.
-     **/
-
-    DataHandler setDataHandler(DataHandler handler);
 
 }

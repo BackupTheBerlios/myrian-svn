@@ -53,12 +53,12 @@ import java.util.Map;
  * </pre>
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/12/05 $
+ * @version $Revision: #8 $ $Date: 2003/07/02 $
  */
 
 public interface DataQuery {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQuery.java#7 $ by $Author: richardl $, $DateTime: 2002/12/05 16:49:00 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQuery.java#8 $ by $Author: ashah $, $DateTime: 2003/07/02 01:16:18 $";
 
     /**
      * Returns the type of this data query.
@@ -485,26 +485,6 @@ public interface DataQuery {
      * has not yet been set.
      */
     public Object getParameter(String parameterName);
-
-
-    /**
-     *  This returns a boolean indicating whether or not the event
-     *  should be wrapped as a view before filtering.  True indicates
-     *  that no view should be used.  By default, the value is
-     *  false and a view is used.
-     */
-    boolean isNoView();
-
-    /**
-     *  This sets whether or not the query should be wrapped
-     *  in the standard view before filtering
-     *
-     *  @param isNoView This determines whether or not the
-     *                  query should be wrapped in a view before
-     *                  applying filters.  true means it should
-     *                  NOT be wrapped
-     */
-    void setNoView(boolean isNoView);
 
 
     /**

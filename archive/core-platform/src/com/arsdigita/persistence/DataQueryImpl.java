@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #25 $ $Date: 2003/06/26 $
+ * @version $Revision: #26 $ $Date: 2003/07/02 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#25 $ by $Author: rhs $, $DateTime: 2003/06/26 18:40:22 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#26 $ by $Author: ashah $, $DateTime: 2003/07/02 01:16:18 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 
@@ -302,15 +302,6 @@ class DataQueryImpl implements DataQuery {
 
     public Object getParameter(String parameterName) {
 	return m_bindings.get(":" + parameterName);
-    }
-
-
-    public boolean isNoView() {
-        throw new Error("not implemented");
-    }
-
-    public void setNoView(boolean isNoView) {
-        throw new Error("not implemented");
     }
 
 

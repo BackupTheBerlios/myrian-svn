@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/07/01 $
+ * @version $Revision: #9 $ $Date: 2003/07/02 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#8 $ by $Author: ashah $, $DateTime: 2003/07/01 11:28:55 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#9 $ by $Author: ashah $, $DateTime: 2003/07/02 01:16:18 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -473,11 +473,6 @@ class DataObjectImpl implements DataObject {
         } catch (MetadataException pe) {
             throw new PersistenceException(pe);
         }
-    }
-
-    public DataHandler setDataHandler(DataHandler handler) {
-        // throw new Error("not implemented");
-        return null;
     }
 
     public boolean equals(Object o) {
