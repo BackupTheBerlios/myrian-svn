@@ -30,7 +30,7 @@ public class Initializer
 
     private Configuration m_conf = new Configuration();
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#10 $ by $Author: rhs $, $DateTime: 2002/10/10 11:39:36 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#11 $ by $Author: rhs $, $DateTime: 2002/10/15 15:21:28 $";
 
     public static final String JDBC_URL = "jdbcUrl";
     public static final String DB_USERNAME = "dbUsername";
@@ -180,6 +180,8 @@ public class Initializer
 
         LOG.info("Setting ConnectionManager default connection info...");
 
+        ConnectionManager.setInstance(cm);
+
         try {
             cm.connect();
         } catch (java.sql.SQLException e) {
@@ -192,8 +194,6 @@ public class Initializer
         if (driverSpecificParam1 != null) {
             cm.setDriverSpecificParameter("param1", driverSpecificParam1);
         }
-
-        ConnectionManager.setInstance(cm);
 
         LOG.warn("Database initializer finished.");
     }
