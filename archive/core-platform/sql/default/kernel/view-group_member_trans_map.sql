@@ -3,5 +3,5 @@
 --          (A,B) is in group_subgroup_trans_map
 --       THEN 
 --          this view will contain (A,u).  
-create or replace view group_member_trans_map
+create view group_member_trans_map
 as select group_id, member_id from group_member_trans_index;

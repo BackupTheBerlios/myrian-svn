@@ -5,9 +5,9 @@ create table acs_auditing (
                            primary key,
 	creation_user      integer constraint audited_creation_user_fk
                            references users on delete set null,
-	creation_date      timestamp not null,
+	creation_date      date not null,
 	creation_ip        varchar(50),
-	last_modified      timestamp not null,
+	last_modified      date not null,
 	modifying_user     integer constraint audited_modifying_user_fk
                            references users on delete set null,
 	modifying_ip       varchar(50)

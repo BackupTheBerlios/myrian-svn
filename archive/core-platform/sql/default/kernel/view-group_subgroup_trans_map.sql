@@ -11,6 +11,6 @@
 --       graph, then this view will contain (A,B).  Note that this implies
 --       it would contain (A,A)
 --
-create or replace view group_subgroup_trans_map
+create view group_subgroup_trans_map
 as select group_id, subgroup_id
    from group_subgroup_trans_index;

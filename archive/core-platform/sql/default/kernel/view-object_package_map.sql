@@ -1,4 +1,4 @@
-create or replace view object_package_map as
+create view object_package_map as
 select o.object_id, p.package_id
 from acs_objects o, apm_packages p
 where p.package_id=o.object_id 

@@ -1,4 +1,4 @@
-create or replace view party_member_trans_map
+create view party_member_trans_map
 as select user_id as party_id, user_id as member_id 
    from users
    UNION ALL

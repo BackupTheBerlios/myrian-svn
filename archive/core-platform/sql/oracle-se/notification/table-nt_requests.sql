@@ -21,9 +21,9 @@ create table nt_requests (
                       default '1'
                       constraint nt_requests_expand_ck
                           check (expand_group in ('0','1')),
-    request_date      timestamp
-                      default current_timestamp,
-    fulfill_date      timestamp,
+    request_date      date
+                      default sysdate,
+    fulfill_date      date,
     status            varchar(20)
                       default 'pending'
                       constraint nt_requests_status_ck

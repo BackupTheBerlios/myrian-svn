@@ -1,5 +1,5 @@
 create table us_addresses (
-    address_id                  constraint us_addresses_address_id_fk
+    address_id                  integer constraint us_addresses_address_id_fk
                                 references acs_objects (object_id)
                                 constraint us_addresses_pk
                                 primary key,

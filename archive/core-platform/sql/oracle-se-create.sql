@@ -9,7 +9,7 @@
 
 
 
-@@ default/preferences/table-preferences.sql
+@@ oracle-se/preferences/table-preferences.sql
 @@ default/preferences/index-preferences.sql
 @@ default/preferences/comment-preferences.sql
 
@@ -57,7 +57,7 @@
 @@ default/kernel/comment-acs_privileges.sql
 @@ default/kernel/table-parameterized_privileges.sql
 @@ default/kernel/insert-privileges.sql
-@@ default/kernel/table-acs_permissions.sql
+@@ oracle-se/kernel/table-acs_permissions.sql
 @@ default/kernel/comment-acs_permissions.sql
 
 @@ default/kernel/table-object_context.sql
@@ -82,8 +82,8 @@
 @@ default/kernel/insert-permissions.sql
 @@ default/kernel/view-granted_trans_context_index.sql
 @@ default/kernel/view-granted_trans_context_map.sql
-@@ default/kernel/view-ungranted_trans_context_index.sql
-@@ default/kernel/view-ungranted_trans_context_map.sql
+@@ oracle-se/kernel/view-ungranted_trans_context_index.sql
+@@ oracle-se/kernel/view-ungranted_trans_context_map.sql
 @@ default/kernel/view-object_context_trans_map.sql
 
 @@ default/kernel/table-site_nodes.sql
@@ -120,20 +120,20 @@
 @@ default/categorization/table-cat_category_purpose_map.sql
 @@ default/categorization/index-cat_category_purpose_map.sql
 
-@@ default/auditing/table-acs_auditing.sql
+@@ oracle-se/auditing/table-acs_auditing.sql
 @@ default/auditing/index-acs_auditing.sql
 
-@@ default/messaging/table-messages.sql
+@@ oracle-se/messaging/table-messages.sql
 @@ default/messaging/index-messages.sql
 @@ default/messaging/comment-messages.sql
 @@ default/messaging/table-message_parts.sql
 @@ default/messaging/index-message_parts.sql
 @@ default/messaging/comment-message_parts.sql
-@@ default/messaging/table-message_threads.sql
+@@ oracle-se/messaging/table-message_threads.sql
 
-@@ default/notification/table-nt_digests.sql
+@@ oracle-se/notification/table-nt_digests.sql
 @@ default/notification/index-nt_digests.sql
-@@ default/notification/table-nt_requests.sql
+@@ oracle-se/notification/table-nt_requests.sql
 @@ default/notification/index-nt_requests.sql
 @@ default/notification/table-nt_queue.sql
 

@@ -18,6 +18,6 @@ create table acs_permissions (
        primary key (object_id, grantee_id, privilege),
 	   creation_user         integer constraint acs_perm_creation_user_fk
                              references users on delete set null,
-	   creation_date         timestamp default current_timestamp not null,
+	   creation_date         date default sysdate not null,
 	   creation_ip           varchar(50)
 );

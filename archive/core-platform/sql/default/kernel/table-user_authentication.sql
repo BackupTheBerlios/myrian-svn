@@ -5,7 +5,7 @@
 create table user_authentication (
 	auth_id			integer not null
 				constraint user_auth_pk primary key,
-	user_id			not null
+	user_id			integer not null
 				constraint user_auth_user_id_fk
 				references users (user_id)
 				constraint user_auth_user_un unique,

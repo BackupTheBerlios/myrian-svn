@@ -14,7 +14,7 @@ create table message_threads (
     sender                 integer
                            constraint msg_threads_sender_fk  
                            references parties (party_id),
-    last_update            timestamp
+    last_update            date
                            constraint msg_threads_last_update_nn
                            not null,
     num_replies            integer

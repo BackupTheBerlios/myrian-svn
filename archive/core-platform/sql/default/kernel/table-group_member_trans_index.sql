@@ -17,4 +17,6 @@ create table group_member_trans_index (
     -- always be 0 due to above constraint).
     constraint gmti_n_paths_ck
                 check (n_paths>0)
-) organization index;
+);
+
+-- XXX organization index;

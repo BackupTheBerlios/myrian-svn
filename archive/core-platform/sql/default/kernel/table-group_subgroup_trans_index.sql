@@ -25,4 +25,6 @@ create table group_subgroup_trans_index (
     -- always be 0 due to above constraint).
     constraint gsti_n_paths_ck
                 check (n_paths>0 or group_id=subgroup_id)
-) organization index;
+);
+
+-- XXX organization index;

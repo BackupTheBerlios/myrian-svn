@@ -8,4 +8,6 @@ create table object_grants (
        n_grants             integer not null
                             constraint object_grants_positive_ck
                                 check (n_grants >= 1)
-) organization index;
+);
+
+-- XXX organization index;

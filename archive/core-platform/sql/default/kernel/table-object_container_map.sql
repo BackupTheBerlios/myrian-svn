@@ -8,4 +8,6 @@ create table object_container_map (
                             constraint aocm_container_id_fk
                             references acs_objects (object_id)
                                 on delete cascade
-) organization index;
+);
+
+-- XXX organization index;

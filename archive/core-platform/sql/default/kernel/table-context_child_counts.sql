@@ -18,4 +18,6 @@
 --   n_children integer default 1 not null
 --              constraint ccc_n_children_ck
 --              check (n_children>=1)
---) organization index;
+--);
+
+-- XXX organization index;

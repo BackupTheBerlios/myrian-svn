@@ -7,7 +7,9 @@ create table object_context (
                             references acs_objects (object_id)
                                 on delete cascade
                             constraint object_context_pk primary key,
-       context_id           constraint object_context_context_id_fk
+       context_id           integer constraint object_context_context_id_fk
                             references acs_objects(object_id)
                                 on delete cascade
-) organization index;
+);
+
+-- XXX organization index;

@@ -20,11 +20,13 @@ create table granted_context_non_leaf_map (
        object_id            integer not null
                             constraint gcnlm_object_id_fk 
                             references acs_objects (object_id),
-       implied_context_id   constraint gcnlm_implied_context_id_fk
+       implied_context_id   integer constraint gcnlm_implied_context_id_fk
                             references acs_objects(object_id),
        n_generations        integer not null
                             constraint gcnlm_generation_ck
                                 check (n_generations >= 0),
        constraint gcnlm_implied_context_pk 
             primary key (object_id, implied_context_id)
-) organization index;
+);
+
+-- XXX organization index;

@@ -23,7 +23,7 @@ create table nt_digests (
                       default 15
                       constraint nt_digest_frequence_nn
                           not null,
-    next_run          timestamp
+    next_run          date
                       constraint nt_digest_next_run_nn
                           not null
 );

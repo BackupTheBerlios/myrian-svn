@@ -5,6 +5,8 @@ create table object_context_map (
                             constraint ocm_object_id_fk 
                             references acs_objects (object_id)
                             constraint ocm_object_id_pk primary key,
-       context_id           constraint ocm_context_id_fk
+       context_id           integer constraint ocm_context_id_fk
                             references acs_objects(object_id)
-) organization index;
+);
+
+-- XXX organization index;

@@ -1,5 +1,5 @@
 create table acs_stylesheets ( 
-	stylesheet_id	constraint acs_stylesheets_pk primary key
+	stylesheet_id	integer constraint acs_stylesheets_pk primary key
                         constraint acs_stylesheet_id_fk 
                         references acs_objects (object_id),
 	-- locale/language

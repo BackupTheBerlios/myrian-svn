@@ -9,7 +9,7 @@ create table preferences  (
                                 constraint preferences_name_nn
                                 not null,
     description                 varchar(4000),
-    is_node                     integer
+    is_node                     number
                                 default 0
                                 constraint preferences_is_node_ck
                                 check (is_node in (0, 1)),

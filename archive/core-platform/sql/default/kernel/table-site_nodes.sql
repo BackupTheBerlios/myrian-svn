@@ -2,7 +2,7 @@ create table site_nodes (
 	node_id		integer
 	    	    	constraint site_nodes_node_id_pk
 			primary key,
-	parent_id       constraint site_nodes_parent_id_fk
+	parent_id       integer constraint site_nodes_parent_id_fk
 			references site_nodes (node_id),
         name		varchar(100)
 			constraint site_nodes_name_ck
@@ -21,6 +21,6 @@ create table site_nodes (
         pattern_p	char(1) default '0' not null
 			constraint site_nodes_pattern_p_ck
 			check (pattern_p in ('0', '1')),
-	object_id	constraint site_nodes_object_id_fk
+	object_id	integer constraint site_nodes_object_id_fk
 			references acs_objects (object_id)
 );

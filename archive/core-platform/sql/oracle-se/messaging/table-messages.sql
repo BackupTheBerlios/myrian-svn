@@ -17,8 +17,8 @@ create table messages (
                    constraint messages_body_nn not null,
     type           varchar(50)
                    constraint messages_type_nn not null,
-    sent_date      timestamp 
-                   default current_timestamp
+    sent_date      date 
+                   default sysdate
                    constraint messages_sent_date_nn not null,
     in_reply_to    integer
                    constraint messages_reply_to_fk
