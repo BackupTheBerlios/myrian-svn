@@ -7,12 +7,12 @@ import java.util.*;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/02/05 $
+ * @version $Revision: #7 $ $Date: 2003/02/06 $
  **/
 
 public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#6 $ by $Author: ashah $, $DateTime: 2003/02/05 17:39:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#7 $ by $Author: rhs $, $DateTime: 2003/02/06 18:43:54 $";
 
     private Model m_model;
     private String m_name;
@@ -99,6 +99,10 @@ public class ObjectType extends Element {
             return getProperty(path.getName());
         } else {
             Property prop = getProperty(path.getParent());
+            if (prop == null) {
+                throw new IllegalArgumentException
+                    ("no such path: " + path);
+            }
             ObjectType type = prop.getType();
             return type.getProperty(path.getName());
         }

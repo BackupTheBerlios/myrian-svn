@@ -1,6 +1,7 @@
 package com.arsdigita.persistence.proto.engine.rdbms;
 
 import com.arsdigita.persistence.proto.*;
+import com.arsdigita.persistence.proto.Query;
 import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
 import com.arsdigita.persistence.proto.metadata.Table;
@@ -13,24 +14,24 @@ import java.util.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/02/06 $
+ * @version $Revision: #3 $ $Date: 2003/02/06 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#2 $ by $Author: rhs $, $DateTime: 2003/02/06 12:29:10 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#3 $ by $Author: rhs $, $DateTime: 2003/02/06 18:43:54 $";
 
-    private Signature m_signature;
+    private Query m_query;
     private HashMap m_columns = new HashMap();
     private HashMap m_tables = new HashMap();
     private HashMap m_joins = new HashMap();
 
-    public QGen(Signature signature) {
-        if (signature.getSources().size() == 0) {
+    public QGen(Query query) {
+        if (query.getSignature().getSources().size() == 0) {
             throw new IllegalArgumentException
                 ("no sources");
         }
-        m_signature = signature;
+        m_query = query;
     }
 
     private Path getColumn(Path prefix) {
@@ -72,8 +73,8 @@ class QGen {
     }
 
     public Select generate() {
-        for (Iterator it = m_signature.getSources().iterator();
-             it.hasNext(); ) {
+        Signature sig = m_query.getSignature();
+        for (Iterator it = sig.getSources().iterator(); it.hasNext(); ) {
             Source src = (Source) it.next();
             ObjectMap map = Root.getRoot().getObjectMap(src.getObjectType());
             Table start = map.getTable();
@@ -88,16 +89,15 @@ class QGen {
             addTable(src.getPath(), start);
         }
 
-        for (Iterator it = m_signature.getPaths().iterator();
-             it.hasNext(); ) {
+        for (Iterator it = sig.getPaths().iterator(); it.hasNext(); ) {
             Path path = (Path) it.next();
             genPath(path);
         }
 
-        Join join = null;
+        Condition condition = filter(m_query.getFilter());
 
-        for (Iterator it = m_signature.getSources().iterator();
-             it.hasNext(); ) {
+        Join join = null;
+        for (Iterator it = sig.getSources().iterator(); it.hasNext(); ) {
             Source src = (Source) it.next();
             if (join == null) {
                 join = getJoin(src);
@@ -106,10 +106,9 @@ class QGen {
             }
         }
 
-        Select result = new Select(join, null);
+        Select result = new Select(join, condition);
 
-        for (Iterator it = m_signature.getPaths().iterator();
-             it.hasNext(); ) {
+        for (Iterator it = sig.getPaths().iterator(); it.hasNext(); ) {
             Path path = (Path) it.next();
             result.addSelection(getColumn(path));
         }
@@ -118,7 +117,7 @@ class QGen {
     }
 
     Source getSource(Path path) {
-        Source src = m_signature.getSource(path);
+        Source src = m_query.getSignature().getSource(path);
         if (src == null) {
             return getSource(path.getParent());
         } else {
@@ -155,9 +154,14 @@ class QGen {
             return;
         }
 
+        if (m_query.getSignature().isParameter(path)) {
+            setColumn(path, Path.get(":" + path));
+            return;
+        }
+
         genPath(path.getParent());
 
-        Property prop = m_signature.getObjectType().getProperty(path);
+        Property prop = m_query.getSignature().getProperty(path);
         ObjectMap map = Root.getRoot().getObjectMap(prop.getContainer());
         Mapping m = map.getMapping(Path.get(prop.getName()));
 
@@ -180,17 +184,67 @@ class QGen {
                     } else if (rm.isJoinFrom()) {
                         Column to = rm.getJoin(0).getTo();
                         addJoin(path, to);
-                        setColumn(path, Path.get(path + "__" + to));
+                        setColumn(path, Path.get
+                                  (path.getParent() + "__" + to));
                     } else if (rm.isJoinThrough()) {
                         addJoin(path, rm.getJoin(0).getTo());
                         setColumn
                             (path, Path.get
-                             (path + "__" + rm.getJoin(1).getFrom()));
+                             (path.getParent() + "__" +
+                              rm.getJoin(1).getFrom()));
                     } else {
                         throw new Error("huh?");
                     }
                 }
             });
+    }
+
+    private Condition filter(Filter filter) {
+        if (filter == null) {
+            return null;
+        }
+
+        final Condition[] result = { null };
+
+        filter.dispatch(new Filter.Switch() {
+                public void onAnd(AndFilter f) {
+                    result[0] = new AndCondition(filter(f.getLeft()),
+                                                 filter(f.getRight()));
+                }
+
+                public void onOr(OrFilter f) {
+                    result[0] = new OrCondition(filter(f.getLeft()),
+                                                filter(f.getRight()));
+                }
+
+                public void onNot(NotFilter f) {
+                    result[0] = new NotCondition(filter(f.getOperand()));
+                }
+
+                public void onEquals(EqualsFilter f) {
+                    genPath(f.getLeft());
+                    genPath(f.getRight());
+                    result[0] = new EqualsCondition(getColumn(f.getLeft()),
+                                                    getColumn(f.getRight()));
+                }
+
+                public void onIn(InFilter f) {
+                    genPath(f.getPath());
+                    QGen qgen = new QGen(f.getQuery());
+                    result[0] = new InCondition(getColumn(f.getPath()),
+                                                qgen.generate());
+                }
+
+                public void onContains(ContainsFilter f) {
+                    genPath(f.getCollection());
+                    genPath(f.getElement());
+                    result[0] = new EqualsCondition
+                        (getColumn(f.getCollection()),
+                         getColumn(f.getElement()));
+                }
+            });
+
+        return result[0];
     }
 
 }

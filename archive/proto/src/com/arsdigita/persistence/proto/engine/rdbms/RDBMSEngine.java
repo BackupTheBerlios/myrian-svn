@@ -15,12 +15,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/02/06 $
+ * @version $Revision: #9 $ $Date: 2003/02/06 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#8 $ by $Author: rhs $, $DateTime: 2003/02/06 12:29:10 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#9 $ by $Author: rhs $, $DateTime: 2003/02/06 18:43:54 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -172,19 +172,8 @@ public class RDBMSEngine extends Engine {
     protected void rollback() {}
 
     public RecordSet execute(Query query) {
-        Signature sig = query.getSignature();
-        com.arsdigita.persistence.proto.engine.rdbms.Query q =
-            new com.arsdigita.persistence.proto.engine.rdbms.Query
-                (Root.getRoot().getObjectMap(sig.getObjectType()));
-        for (Iterator it = sig.getPaths().iterator(); it.hasNext(); ) {
-            Path p = (Path) it.next();
-            q.fetch(p.getPath());
-        }
-
-        if (LOG.isDebugEnabled() &&
-            q.getChildren().size() + q.getSelections().size() > 0) {
-            LOG.debug(q.toSQL());
-            QGen qg = new QGen(sig);
+        if (LOG.isDebugEnabled()) {
+            QGen qg = new QGen(query);
             LOG.debug(qg.generate());
         }
         return null;

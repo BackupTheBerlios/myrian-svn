@@ -8,12 +8,12 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/02/05 $
+ * @version $Revision: #12 $ $Date: 2003/02/06 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#11 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#12 $ by $Author: rhs $, $DateTime: 2003/02/06 18:43:54 $";
 
     private ObjectType m_type;
     private ArrayList m_paths = new ArrayList();
@@ -83,6 +83,10 @@ public class Signature {
         return (Source) m_sourceMap.get(p);
     }
 
+    public boolean isSource(Path p) {
+        return m_sourceMap.containsKey(p);
+    }
+
     public Collection getSources() {
         return m_sources;
     }
@@ -106,6 +110,10 @@ public class Signature {
 
         m_parameters.add(p);
         m_parameterMap.put(p.getPath(), p);
+    }
+
+    public boolean isParameter(Path p) {
+        return m_parameterMap.containsKey(p);
     }
 
     public Parameter getParameter(Path p) {
@@ -160,6 +168,19 @@ public class Signature {
         Collection props = m_type.getRoot().getObjectMap(m_type)
             .getKeyProperties();
         addProperties(props);
+    }
+
+    public Property getProperty(Path path) {
+        Path parent = path.getParent();
+        if (isParameter(parent)) {
+            return getParameter(parent).getObjectType().getProperty
+                (path.getName());
+        } else if (isSource(parent)) {
+            return getSource(parent).getObjectType().getProperty
+                (path.getName());
+        } else {
+            return getProperty(parent).getType().getProperty(path.getName());
+        }
     }
 
     public String toString() {
