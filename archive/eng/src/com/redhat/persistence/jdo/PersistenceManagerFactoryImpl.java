@@ -17,6 +17,16 @@ import javax.jdo.*;
 public class PersistenceManagerFactoryImpl
     implements PersistenceManagerFactory, Serializable {
 
+    /* See pp. 70-71, Section 8.5 "PersistenceManagerFactory methods":
+     *
+     * JDO implementations might manage a map of instantiated
+     * PersistenceManagerFactory instances based on specified property key
+     * values, and return a previously instantiated PersistenceManagerFactory
+     * instance. In this case, the properties of the returned instance must
+     * exactly match the requested properties.
+     */
+    private final static Map s_instances = new HashMap();
+
     private static Collection m_options;
     private static Collection m_unsupportedProperties;
     static {
@@ -64,12 +74,21 @@ public class PersistenceManagerFactoryImpl
         return value != null && value.toLowerCase().equals("true");
     }
 
-    public static PersistenceManagerFactory getPersistenceManagerFactory(
-        Properties p) {
-        return new PersistenceManagerFactoryImpl(p);
-    }
+    private PersistenceManagerFactoryImpl() { }
 
-    public PersistenceManagerFactoryImpl() { }
+    public static PersistenceManagerFactory getPersistenceManagerFactory(
+        Properties props) {
+
+        synchronized(s_instances) {
+            PersistenceManagerFactoryImpl result = (PersistenceManagerFactoryImpl)
+                s_instances.get(props);
+            if (result == null) {
+                result = new PersistenceManagerFactoryImpl(props);
+                s_instances.put(props, result);
+            }
+            return result;
+        }
+    }
 
     public PersistenceManagerFactoryImpl(Properties p) {
         for (Enumeration e = p.propertyNames(); e.hasMoreElements(); ) {
