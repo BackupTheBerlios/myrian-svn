@@ -16,7 +16,7 @@
 // Represents US Addresses
 //
 // @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
-// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/addresses/USAddress.pdl#1 $ by $Author: randyg $, $DateTime: 2002/08/02 16:40:10 $
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/addresses/USAddress.pdl#2 $ by $Author: randyg $, $DateTime: 2002/08/05 11:36:12 $
 //
 
 model com.arsdigita.addresses;
@@ -24,14 +24,14 @@ model com.arsdigita.addresses;
 import com.arsdigita.kernel.*;
 
 object type BaseUSAddress extends ACSObject {
-    String[1..1] line1 = us_addresses.line1;
-    String[0..1] line2 = us_addresses.line2;
-    String[0..1] line3 = us_addresses.line3;
-    String[0..1] line4 = us_addresses.line4;
-    String[1..1] city = us_addresses.city;
-    String[1..1] state = us_addresses.state;
-    String[1..1] zip = us_addresses.zip;
-    String[0..1] zipExt = us_addresses.zip_ext;
+    String[1..1] line1 = us_addresses.line1 VARCHAR(200);
+    String[0..1] line2 = us_addresses.line2 VARCHAR(200);
+    String[0..1] line3 = us_addresses.line3 VARCHAR(200);
+    String[0..1] line4 = us_addresses.line4 VARCHAR(200);
+    String[1..1] city = us_addresses.city VARCHAR(200);
+    String[1..1] state = us_addresses.state CHAR(2);
+    String[1..1] zip = us_addresses.zip CHAR(5);
+    String[0..1] zipExt = us_addresses.zip_ext CHAR(4);
 
     reference key (us_addresses.address_id);
 

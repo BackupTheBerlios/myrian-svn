@@ -16,16 +16,16 @@
 // description
 //
 // @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
-// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/globalization/Locale.pdl#1 $ by $Author: randyg $, $DateTime: 2002/08/02 16:40:10 $
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/globalization/Locale.pdl#2 $ by $Author: randyg $, $DateTime: 2002/08/05 11:36:12 $
 //
 
 model com.arsdigita.globalization;
 
 object type Locale {
-    BigDecimal id = g11n_locales.locale_id;
-    String[1..1] language = g11n_locales.language;
-    String[0..1] country = g11n_locales.country;
-    String[0..1] variant = g11n_locales.variant;
+    BigDecimal id = g11n_locales.locale_id INTEGER;
+    String[1..1] language = g11n_locales.language CHAR(2);
+    String[0..1] country = g11n_locales.country CHAR(2);
+    String[0..1] variant = g11n_locales.variant VARCHAR(30);
     Charset[0..1] defaultCharset =
         join g11n_locales.default_charset_id to g11n_charsets.charset_id;
     Charset[0..n] charsets =
@@ -34,20 +34,7 @@ object type Locale {
 
     object key (id);
 
-    retrieve all {
-        do {
-            select g11n_locales.locale_id,
-                   g11n_locales.language,
-                   g11n_locales.country,
-                   g11n_locales.variant,
-                   g11n_locales.default_charset_id
-            from g11n_locales
-        } map {
-            id = g11n_locales.locale_id;
-            language = g11n_locales.language;
-            country = g11n_locales.country;
-            variant = g11n_locales.variant;
-            defaultCharset.id = g11n_locales.default_charset_id;
-        }
-    }
+    aggressive load (
+       defaultCharset.id
+    );
 }

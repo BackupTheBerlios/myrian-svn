@@ -16,35 +16,20 @@
 // description
 //
 // @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
-// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/globalization/MessageCatalog.pdl#1 $ by $Author: randyg $, $DateTime: 2002/08/02 16:40:10 $
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/globalization/MessageCatalog.pdl#2 $ by $Author: randyg $, $DateTime: 2002/08/05 11:36:12 $
 //
 
 model com.arsdigita.globalization;
 
 object type MessageCatalog {
-    BigDecimal id = g11n_catalogs.catalog_id;
-    String[1..1] name = g11n_catalogs.catalog_name;
+    BigDecimal id = g11n_catalogs.catalog_id INTEGER;
+    String[1..1] name = g11n_catalogs.catalog_name VARCHAR(400);
     Locale[0..1] locale =
         join g11n_catalogs.locale_id to g11n_locales.locale_id;
-    Blob[0..1] catalog = g11n_catalogs.catalog;
-    Date[1..1] lastModified = g11n_catalogs.last_modified;
+    Blob[0..1] catalog = g11n_catalogs.catalog BLOB;
+    Date[1..1] lastModified = g11n_catalogs.last_modified TIMESTAMP;
 
     object key (id);
-
-    retrieve all {
-        do {
-            select catalog_id,
-                   catalog_name,
-                   locale_id,
-                   catalog,
-                   last_modified
-            from g11n_catalogs
-        } map {
-            id = g11n_catalogs.catalog_id;
-            name = g11n_catalogs.catalog_name;
-            locale.id = g11n_catalogs.locale_id;
-            catalog = g11n_catalogs.catalog;
-            lastModified = g11n_catalogs.last_modified;
-        }
-    }
+    
+    aggressive load (locale.id);
 }

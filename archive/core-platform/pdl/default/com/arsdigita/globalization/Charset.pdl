@@ -16,14 +16,14 @@
 // Represents a character set.
 //
 // @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
-// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/globalization/Charset.pdl#1 $ by $Author: randyg $, $DateTime: 2002/08/02 16:40:10 $
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/globalization/Charset.pdl#2 $ by $Author: randyg $, $DateTime: 2002/08/05 11:36:12 $
 //
 
 model com.arsdigita.globalization;
 
 object type Charset {
-    BigDecimal id = g11n_charsets.charset_id;
-    String[1..1] charset = g11n_charsets.charset;
+    BigDecimal id = g11n_charsets.charset_id INTEGER;
+    String[1..1] charset = g11n_charsets.charset VARCHAR(30);
 
     object key (id);
 }
