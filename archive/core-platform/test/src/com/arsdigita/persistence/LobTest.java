@@ -16,6 +16,7 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.*;
+import com.arsdigita.db.Initializer;
 
 import java.io.StringReader;
 import java.io.Writer;
@@ -26,20 +27,18 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import oracle.jdbc.driver.OracleTypes;
-
 import org.apache.log4j.Category;
 
 /**
  * LobTest - for testing Blob and Clob datatype.
  *
  * @author Jeff Teeters (teeters@arsdigita.com)
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/07/30 $
  */
 
 public class LobTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LobTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LobTest.java#3 $ by $Author: randyg $, $DateTime: 2002/07/30 18:09:09 $";
 
     private Category s_cat = 
         Category.getInstance(LobTest.class);
@@ -99,6 +98,7 @@ public class LobTest extends PersistenceTestCase {
         runLobTest("clob", 1000000);
     }
 
+
     /***
      * Test writing large clobs
      ***/
@@ -113,14 +113,20 @@ public class LobTest extends PersistenceTestCase {
         runLobTest("clob", 2000);
     }
 
-    public void testLargeClobsOracleSpecificSyntax() {
+    public void testLargeClobsDatabaseSpecificSyntax() {
+        String db = null;
+        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+            db = "postgres";
+        } else {
+            db = "oracle";
+        }
         // not bothering with the binary search, it isn't reliable anyway...
-        runLobTest("oracleclob", 1000000);
-        runLobTest("oracleclob", 4001);
-        runLobTest("oracleclob", 4000);
-        runLobTest("oracleclob", 3999);
-        runLobTest("oracleclob", 3000);
-        runLobTest("oracleclob", 2000);
+        runLobTest(db + "clob", 1000000);
+        runLobTest(db + "clob", 4001);
+        runLobTest(db + "clob", 4000);
+        runLobTest(db + "clob", 3999);
+        runLobTest(db + "clob", 3000);
+        runLobTest(db + "clob", 2000);
     }
 
     /***
@@ -128,7 +134,7 @@ public class LobTest extends PersistenceTestCase {
      * failures in the other two tests aren't due to JVM stuff.
      ***/
     public void testLargeStrings() {
-        runLobTest("string (Just Java, no Oracle/DB)", 1000000);
+        runLobTest("string (Just Java, no Oracle/Postgres/DB)", 1000000);
     }
 
 
@@ -172,14 +178,16 @@ public class LobTest extends PersistenceTestCase {
     
     // Support routine for above test.  Returns errMsg or null if ok.
     private String sizeWorks(int size, String lobType) {
-        if (lobType.equals("blob"))
+        if (lobType.equals("blob")){
             return runBlobTest(size);
-        else if (lobType.equals("clob")) 
+        } else if (lobType.equals("clob")) {
             return runClobTest(size);
-        else if (lobType.equals("oracleclob")) 
-            return runClobOracleSpecificTest(size);
-        else
+        } else if (lobType.equals("oracleclob") || 
+                   lobType.equals("postgresclob")) {
+            return runClobDatabaseSpecificTest(size);
+        } else {
             return runStringTest(size);
+        }
     }
 
 
@@ -219,8 +227,8 @@ public class LobTest extends PersistenceTestCase {
             if (msg.length() > 500) {
                 msg = msg.substring(0,500) + "...";
             }
-            s_cat.error("Oracle error when testing with size =" + size, e);
-            return "Oracle error when testing with size =" + size +
+            s_cat.error("Database error when testing with size =" + size, e);
+            return "Database error when testing with size =" + size +
                 ". :" + msg;
         }
     }
@@ -238,20 +246,21 @@ public class LobTest extends PersistenceTestCase {
                 testBytes[i] = sourceBytes[i % (HI-LO+1)];
             }
             String testString = new String(testBytes);
-            
+
             DataObject dt = getSession().create("examples.Datatype");
             dt.set("id", BigInteger.ZERO);
             dt.set("clob", testString);
             dt.save();
             
             dt = getSession().retrieve(new OID("examples.Datatype", BigInteger.ZERO));
+            String bar = (String) dt.get("string");
             String foundString = (String) dt.get("clob");
             dt.delete();
 
             if (foundString.length() != testString.length()) {
                 return "Length mismatch.  Found length=" + foundString.length();
             }
-            for (i = 0; i < foundString.length(); i++) {
+            for (i = 0; i < foundString.length() - 1; i++) {
                 if (foundString.charAt(i) != testString.charAt(i)) {
                     return "Mismatch at character " + i;
                 }
@@ -263,8 +272,8 @@ public class LobTest extends PersistenceTestCase {
             if (msg.length() > 500) {
                 msg = msg.substring(0,500) + "...";
             }
-            s_cat.error("Oracle error when testing with size =" + size, e);
-            return "Oracle error when testing with size =" + size +
+            s_cat.error("Database error when testing with size =" + size, e);
+            return "Database error when testing with size =" + size +
                 ". :" + msg;
         }
     }
@@ -296,7 +305,8 @@ public class LobTest extends PersistenceTestCase {
         return null;
     }
 
-    private String runClobOracleSpecificTest(int size) {
+
+    private String runClobDatabaseSpecificTest(int size) {
         try {
             // Create a string of random bytes
             byte [] testBytes = new byte[size];
@@ -308,35 +318,17 @@ public class LobTest extends PersistenceTestCase {
             }
             String testString = new String(testBytes);
             
-            Connection conn = getSession().getTransactionContext().getConnection();
+            Connection conn = getSession().getTransactionContext()
+                .getConnection();
 
-            PreparedStatement ps;
-            String retval;
-
-            ps = conn.prepareStatement("insert into t_datatypes  (  id  ,  j_clob  )  values  ( ? , EMPTY_CLOB())");
-            try {
-                ps.setBigDecimal(1, new BigDecimal(BigInteger.ZERO));
-                ps.executeUpdate();
-            } finally {
-                ps.close();
+            if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                executePostgresUpdate(conn, testString);
+            } else {
+                executeOracleUpdate(conn, testString);
             }
 
-            ps = conn.prepareStatement("select j_clob from t_datatypes where id = ? for update");
-            try {
-                ps.setBigDecimal(1, new BigDecimal(BigInteger.ZERO));
-                ResultSet rs = ps.executeQuery();
-                rs.next();
-                oracle.sql.CLOB Clob = (oracle.sql.CLOB)rs.getClob(1);
-                Writer char_stream = Clob.getCharacterOutputStream ();
-                char_stream.write(testString);
-                char_stream.flush();
-                char_stream.close();
-                rs.close();
-            } finally {
-                ps.close();
-            }
-
-            DataObject dt = getSession().retrieve(new OID("examples.Datatype", BigInteger.ZERO));
+            DataObject dt = getSession().retrieve(new OID("examples.Datatype", 
+                                                          BigInteger.ZERO));
             String foundString = (String) dt.get("clob");
             dt.delete();
 
@@ -356,9 +348,61 @@ public class LobTest extends PersistenceTestCase {
             if (msg.length() > 500) {
                 msg = msg.substring(0,500) + "...";
             }
-            s_cat.error("Oracle error when testing with size =" + size, e);
-            return "Oracle error when testing with size =" + size +
+            String dbName = null;
+            if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                dbName = "Postgres";
+            } else {
+                dbName = "Oracle";
+            }
+            s_cat.error(dbName + " error when testing with size =" + size, e);
+            return dbName + " error when testing with size =" + size +
                 ". :" + msg;
+        }
+    }
+
+
+    private void executeOracleUpdate(Connection conn, String testString) 
+        throws java.sql.SQLException, java.io.IOException {
+        PreparedStatement ps =
+            conn.prepareStatement("insert into t_datatypes  (id, j_clob) " +
+                                  "values  (?, EMPTY_CLOB())");
+        try {
+            ps.setBigDecimal(1, new BigDecimal(BigInteger.ZERO));
+            ps.executeUpdate();
+        } finally {
+            ps.close();
+        }
+
+        ps = conn.prepareStatement("select j_clob from t_datatypes " +
+                                   "where id = ? for update");
+        
+        try {
+            ps.setBigDecimal(1, new BigDecimal(BigInteger.ZERO));
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            oracle.sql.CLOB Clob = (oracle.sql.CLOB)rs.getClob(1);
+            Writer char_stream = Clob.getCharacterOutputStream ();
+            char_stream.write(testString);
+            char_stream.flush();
+            char_stream.close();
+            rs.close();
+        } finally {
+            ps.close();
+        }
+    }
+
+
+    private void executePostgresUpdate(Connection conn, String testString) 
+        throws java.sql.SQLException, java.io.IOException {
+        PreparedStatement ps =
+            conn.prepareStatement("insert into t_datatypes " +
+                                  "(id, j_clob  ) values (? , ?)");
+        try {
+            ps.setBigDecimal(1, new BigDecimal(BigInteger.ZERO));
+            ps.setString(2, testString);
+            ps.executeUpdate();
+        } finally {
+            ps.close();
         }
     }
 }
