@@ -24,14 +24,14 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Revision: #6 $ $Date: 2002/10/02 $
+ * @version $Revision: #7 $ $Date: 2002/10/04 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: rhs $ - $Date: 2002/10/02 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#6 $";
+    public static final String versionId = "$Author: rhs $ - $Date: 2002/10/04 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#7 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);
@@ -68,11 +68,17 @@ public class ConnectionManager {
     private String m_username;
     private String m_password;
 
-
     ConnectionManager(String url, String username, String password) {
         m_url = url;
         m_username = username;
         m_password = password;
+    }
+
+    static final void dbDown() {
+        ConnectionManager cm = ConnectionManager.getInstance();
+        if (cm != null) {
+            cm.disconnect();
+        }
     }
 
     synchronized void disconnect() {
@@ -90,8 +96,10 @@ public class ConnectionManager {
             return;
         }
 
+        DatabaseConnectionPool pool;
+
         try {
-            m_pool = (DatabaseConnectionPool) m_poolImpl.newInstance();
+            pool = (DatabaseConnectionPool) m_poolImpl.newInstance();
         } catch (InstantiationException e) {
             LOG.error("Unable to initialize DB pool", e);
             throw new DbException(e);
@@ -102,9 +110,14 @@ public class ConnectionManager {
 
         LOG.info("Setting connection info to " + m_url + ", " +
                  m_username + ", " + m_password);
-        m_pool.setConnectionInfo(m_url, m_username, m_password);
+        pool.setConnectionInfo(m_url, m_username, m_password);
         LOG.info("Setting connection pool size to " + m_connectionPoolSize);
-        m_pool.setConnectionPoolSize(m_connectionPoolSize);
+        pool.setConnectionPoolSize(m_connectionPoolSize);
+
+        // We have to wait until here to set m_pool to the new value since we
+        // don't want to make the pool available to other threads without
+        // proper connection info and pool size.
+        m_pool = pool;
     }
 
     synchronized void setDatabaseConnectionPoolName(Class poolImpl) {

@@ -31,12 +31,12 @@ import java.sql.SQLException;
  * (normally this is called via the DB Initializer).
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #5 $
+ * @version $Revision: #6 $
  * @since 4.6
  */
 public class SQLExceptionHandler {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/SQLExceptionHandler.java#5 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/SQLExceptionHandler.java#6 $";
 
     private static String s_exceptionHandlerName = "com.arsdigita.db.oracle.OracleDbExceptionHandlerImpl";
 
@@ -76,10 +76,7 @@ public class SQLExceptionHandler {
         try {
             s_handler.throwSQLException(e);
         } catch (DbNotAvailableException dbe) {
-            ConnectionManager cm = ConnectionManager.getInstance();
-            if (cm != null) {
-                cm.disconnect();
-            }
+            ConnectionManager.dbDown();
             throw dbe;
         }
     }
@@ -96,10 +93,7 @@ public class SQLExceptionHandler {
         try {
             s_handler.throwSQLException(msg);
         } catch (DbNotAvailableException dbe) {
-            ConnectionManager cm = ConnectionManager.getInstance();
-            if (cm != null) {
-                cm.disconnect();
-            }
+            ConnectionManager.dbDown();
             throw dbe;
         }
     }
