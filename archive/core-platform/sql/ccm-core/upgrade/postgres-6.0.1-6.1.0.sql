@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/upgrade/postgres-6.0.1-6.1.0.sql#1 $
--- $DateTime: 2004/01/15 18:48:26 $
+-- $Id: //core-platform/dev/sql/ccm-core/upgrade/postgres-6.0.1-6.1.0.sql#2 $
+-- $DateTime: 2004/01/15 18:53:13 $
 
 \echo Red Hat WAF 6.0.1 -> 6.1.0 Upgrade Script (PostgreSQL)
 
@@ -25,5 +25,6 @@ begin;
 \i ../postgres/upgrade/6.0.1-6.1.0/table-lucene_ids-auto.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/table-webapps-auto.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/deferred.sql
+\i ../postgres/upgrade/6.0.1-6.1.0/update-host-unique-index.sql
 
 commit;
