@@ -30,6 +30,7 @@ object type DynamicObjectType extends ACSObject {
 // uses OracleDatabaseMetadata instead of this.  But, this
 // is here as a short term hack.
 query getOracleTableNames {
+    String tableName;
     do {
         select table_name from user_tables
     } map {
@@ -38,6 +39,7 @@ query getOracleTableNames {
 }
 
 query getPostgresTableNames {
+    String tableName;
     do {
         select tablename from pg_tables
     } map {
@@ -50,6 +52,8 @@ query getPostgresTableNames {
 // uses OracleDatabaseMetadata instead of this.  But, this
 // is here as a short term hack.
 query getOracleColumnNames {
+    String tableName;
+    String columnName;
     do {
         select table_name, column_name from cols
     } map {
@@ -59,6 +63,8 @@ query getOracleColumnNames {
 }
 
 query getPostgresColumnNames {
+    String tableName;
+    String columnName;
     do {
         select attname, relname 
         from pg_attribute, pg_class 

@@ -16,6 +16,15 @@ model com.arsdigita.workflow.simple;
 
 
 query getUserTasks {
+    BigDecimal taskID;
+    BigDecimal taskParentId;
+    String taskLabel;
+    String taskDescription;
+    Date taskDueDate;
+    Date taskStartDate;
+    String isLocked;
+    String isActive;
+
     do {
 	select cw_tasks.task_id ,
                acs_objects.object_type ,
@@ -42,6 +51,15 @@ query getUserTasks {
 }
 
 query getTaskAssignedUsers {
+    BigDecimal userID;
+    BigDecimal taskID;
+    Date taskDueDate;
+    Date taskStartDate;
+    String isLocked;
+    String isActive;
+    String taskState;
+    BigDecimal parentID;
+
     do {
         select cw_task_user_assignees.user_id ,
                cw_user_tasks.task_id ,
@@ -58,18 +76,26 @@ query getTaskAssignedUsers {
         and    cw_tasks.task_id = cw_user_tasks.task_id
     } map {
         userID = cw_task_user_assignees.user_id;
-	taskID = cw_task_user_assignees.task_id;
+        taskID = cw_task_user_assignees.task_id;
         taskDueDate     = cw_user_tasks.due_date;
         taskStartDate   = cw_user_tasks.start_date;
         isLocked        = cw_user_tasks.is_locked;
-	taskState       = cw_tasks.task_state;
-	isActive        = cw_tasks.is_active;
-	parentID 	= cw_tasks.parent_task_id;
+        taskState       = cw_tasks.task_state;
+        isActive        = cw_tasks.is_active;
+        parentID 	= cw_tasks.parent_task_id;
     }  
 }
 
 
 query getTaskAssignedGroups {
+    BigDecimal groupID;
+    BigDecimal taskID;
+    String isActive;
+    String taskState;
+    Date taskDueDate;
+    Date taskStartdate;
+    BigDecimal parentID;
+
     do {
         select cw_task_group_assignees.group_id , 
                cw_tasks.task_id    ,
@@ -97,6 +123,7 @@ query getTaskAssignedGroups {
 
 
 query getActiveProcesses {
+    BigDecimal processID;
     do {
         select cw_processes.process_id 
         from cw_processes 
@@ -115,6 +142,7 @@ query getActiveProcesses {
 }
 
 query getOverDueProcesses {
+    BigDecimal processID;
     do {
         select cw_processes.process_id 
         from cw_processes 

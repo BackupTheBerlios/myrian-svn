@@ -17,41 +17,19 @@ model com.arsdigita.workflow.simple;
 import com.arsdigita.kernel.*;
 
 object type WorkflowTemplate extends Workflow {
-    BigDecimal[0..1] processID;
+    BigDecimal[0..1] processID = cw_process_definitions.process_def_id;
 
-    retrieve {
-	super;
-    }
-
-    insert {
-        super;
-        do {
-            insert into cw_process_definitions (
-                process_def_id
-            ) values (
-                :id
-            )
-        }
-    }
-    
-    update {
- 	super;
-    }
-
-    delete {
-        do {
-            delete from cw_process_definitions
-            where process_def_id = :id
-        }
-	super;
-    }
-
+    reference key (cw_process_definitions.process_def_id);
 }
 
 
 query getProcessDefinitions {
+    BigDecimal processDefinitionId;
+    String processDefinitionLabel;
+    String processDefinitionDescription;
+
     do {
-	select cw_process_definitions.process_def_id,
+        select cw_process_definitions.process_def_id,
 	       cw_tasks.label,
 	       cw_tasks.description
         from   cw_tasks,
@@ -59,13 +37,17 @@ query getProcessDefinitions {
         where  cw_tasks.task_id = 
 			cw_process_definitions.process_def_id 
     } map {
-	processDefinitionId = cw_process_definitions.process_def_id;
-	processDefinitionLabel = cw_tasks.label;
-	processDefinitionDescription = cw_tasks.description;
+        processDefinitionId = cw_process_definitions.process_def_id;
+        processDefinitionLabel = cw_tasks.label;
+        processDefinitionDescription = cw_tasks.description;
     }
 }
 
 query getProcessInfo {
+    BigDecimal processID;
+    BigDecimal processDefID;
+    String processObjectType;
+
     do {
         select cw_processes.process_id 
         ,      acs_objects.object_type

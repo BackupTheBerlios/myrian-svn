@@ -49,11 +49,21 @@ object type Task extends ACSObject {
 }
 
 association {
-    Task[1..1] task;
-    Task[0..n] taskFinishedListeners;
+    Task[1..1] task = join cw_tasks.task_id 
+                        to cw_task_listeners.task_id,
+                      join cw_task_listeners.task_id
+                        to cw_tasks.task_id;
+    Task[0..n] taskFinishedListeners = join cw_tasks.task_id 
+                                         to cw_task_listeners.task_id, 
+                                       join cw_task_listeners.task_id
+                                         to cw_tasks.task_id;
+
+    add task {}
+    retrieve task {}
+    clear task {}
 
     retrieve taskFinishedListeners {
-	do {
+        do {
 	    select cw_task_listeners.listener_task_id ,
                    acs_objects.object_type 
             from   cw_task_listeners ,
@@ -152,6 +162,11 @@ association {
 }
 
 query getTasks {
+    BigDecimal taskId;
+    BigDecimal taskParentId;
+    String taskLabel;
+    String taskDescription;
+
     do {
         select cw_tasks.task_id,
                cw_tasks.parent_task_id,

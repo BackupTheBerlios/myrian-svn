@@ -63,6 +63,12 @@ object type Workflow extends Task {
 
 
 query getProcesses {
+    BigDecimal id;
+    BigDecimal processID;
+    BigDecimal processDefID;
+    BigDecimal processObjectID;
+    String processObjectType;
+
     do {
         select cw_processes.process_id 
         ,      acs_objects.object_type

@@ -113,13 +113,19 @@ data operation DataOperationToDeleteTestDynamicAssociations {
 
 
 query PLSQLQueryWithArbitraryArgs {
-      do {
-            select a, b, c, d, e from PLSQLTestTable
-      } map {
-            arg1 = PLSQLTestTable.a;
-            arg2 = PLSQLTestTable.b;
-            arg3 = PLSQLTestTable.c;
-            arg4 = PLSQLTestTable.d;
-            arg5 = PLSQLTestTable.e;
-      }
+    Integer arg1;
+    Integer arg2;
+    Integer arg3;
+    Integer arg4;
+    Integer arg5;
+
+    do {
+        select a, b, c, d, e from PLSQLTestTable
+    } map {
+        arg1 = PLSQLTestTable.a;
+        arg2 = PLSQLTestTable.b;
+        arg3 = PLSQLTestTable.c;
+        arg4 = PLSQLTestTable.d;
+        arg5 = PLSQLTestTable.e;
+    }
 }
