@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #22 $ $Date: 2004/08/11 $
+ * @version $Revision: #23 $ $Date: 2004/08/11 $
  **/
 
 class CRPList implements List {
@@ -374,8 +374,11 @@ class CRPList implements List {
     }
 
     public Iterator iterator() {
-        // XXX: this is unordered
-        return elements.values().iterator();
+        Query query = getPMI().newQuery
+            ("oql",
+             C.concat("sort($1.", m_fieldName, ", key).value"));
+        Collection coll = (Collection) query.execute(getContainer());
+        return coll.iterator();
     }
 
     public List subList(int from, int to) {
