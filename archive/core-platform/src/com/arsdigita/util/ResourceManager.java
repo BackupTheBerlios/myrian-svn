@@ -15,7 +15,10 @@
 
 package com.arsdigita.util;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import javax.servlet.ServletContext;
 import org.apache.log4j.Logger;
 
@@ -39,7 +42,7 @@ public class ResourceManager {
     private File m_webappRoot;
     private ServletContext m_servletContext;
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/ResourceManager.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/ResourceManager.java#5 $ by $Author: dennis $, $DateTime: 2002/09/12 11:38:06 $";
 
     /**
      * Empty constructor, which we make private to enforce the singleton
@@ -75,22 +78,37 @@ public class ResourceManager {
         if (m_webappRoot == null && m_servletContext == null) {
             throw new IllegalStateException(CONFIGURE_MESSAGE);
         }
-        try {
-            // TODO: if we have a servlet context, use it!
-            // Maybe we're in a WAR file, in which case we *have*
-            // to use sctx.getResourceAsStream.
-            if (m_servletContext != null) {
-                try {
-                    return m_servletContext.getResourceAsStream(url);
-                } catch (NullPointerException e) {
-                    s_log.warn("Failed to retrieve resource " + url + ".");
-                    return null;
+        if (m_servletContext != null) {
+            // If we have a Servlet Context, use it.
+            InputStream is = m_servletContext.getResourceAsStream(url);
+            if (is == null) {
+                String errorMessage = "Failed to retrieve resource: " + url + 
+                    "\nReal Path: " + m_servletContext.getRealPath(url);
+                
+                // Since this method is called during startup before the
+                // log4j initializer has been run, we test to see whether to
+                // log or print the error message.
+                if (s_log.getAllAppenders().hasMoreElements()) {
+                    s_log.warn(errorMessage);
+                } else {
+                    System.err.println(errorMessage);
                 }
-            } else {
-                return new FileInputStream(new File(m_webappRoot, url));
             }
-        } catch (FileNotFoundException fnfe) {
-            return null;
+            return is;
+        } else {
+            try {
+                return new FileInputStream(new File(m_webappRoot, url));
+            } catch (FileNotFoundException fnfe) {
+                String errorMessage = "Failed to retrieve resource: " + url +
+                    "\nWebapp Root: " + m_webappRoot;
+                    
+                if (s_log.getAllAppenders().hasMoreElements()) {
+                    s_log.warn(errorMessage);
+                } else {
+                    System.err.println(errorMessage);
+                }
+                return null;
+            }
         }
     }
 
