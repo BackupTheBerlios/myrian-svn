@@ -6,12 +6,12 @@ import java.util.*;
  * Node
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/01/15 $
+ * @version $Revision: #3 $ $Date: 2003/02/12 $
  **/
 
 public abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/Node.java#2 $ by $Author: rhs $, $DateTime: 2003/01/15 10:39:47 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/Node.java#3 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
 
 
     /**
@@ -133,6 +133,7 @@ public abstract class Node {
         public void onUniqueKey(UniqueKeyNd key) {}
 
         public void onType(TypeNd type) {}
+        public void onJavaClass(JavaClassNd jc) {}
         public void onPath(PathNd path) {}
         public void onColumn(ColumnNd col) {}
         public void onDbType(DbTypeNd type) {}

@@ -14,12 +14,12 @@ import com.arsdigita.persistence.proto.pdl.nodes.*;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #4 $ $Date: 2003/01/30 $
+ * @version $Revision: #5 $ $Date: 2003/02/12 $
  */
 
 class Parser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/Parser.jj#4 $ by $Author: rhs $, $DateTime: 2003/01/30 17:57:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/Parser.jj#5 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -96,6 +96,7 @@ TOKEN:
   | <TRUE: "true">
   | <FALSE: "false">
   | <AGGRESSIVE: "aggressive" <WS> "load">
+  | <ADAPTER: "adapter">
   | <#WS: ([" ", "\t", "\n", "\r", "\f"])+>
 }
 
@@ -184,7 +185,8 @@ ObjectTypeNd object_type() :
 }
 {
     t = <OBJECTTYPE> n = id() { ot.add(ObjectTypeNd.NAME, n); }
-    [ <EXTENDS> n = type() { ot.add(ObjectTypeNd.EXTENDS, n); } ]
+    [ ( <EXTENDS> n = type() { ot.add(ObjectTypeNd.EXTENDS, n); } |
+        <ADAPTER> n = javaClass() { ot.add(ObjectTypeNd.ADAPTER, n); } ) ]
     <LBRACE>
         ( statement(ot) )*
     <RBRACE>
@@ -492,6 +494,15 @@ PathNd path() :
 {
     idpath(p, PathNd.PATH)
     { return p; }
+}
+
+JavaClassNd javaClass() :
+{
+    JavaClassNd j = new JavaClassNd();
+}
+{
+    idpath(j, JavaClassNd.IDENTIFIERS)
+    { return j; }
 }
 
 void idpath(Node n, Node.Field f) :

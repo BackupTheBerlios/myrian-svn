@@ -13,12 +13,42 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/01/09 $
+ * @version $Revision: #8 $ $Date: 2003/02/12 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#7 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#8 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
+
+
+    private static class Test {
+
+        private BigInteger m_id;
+
+        public Test(BigInteger id) {
+            m_id = id;
+        }
+
+        public BigInteger getID() {
+            return m_id;
+        }
+
+    }
+
+    private static class Icle {
+
+        private BigInteger m_id;
+
+        public Icle(BigInteger id) {
+            m_id = id;
+        }
+
+        public BigInteger getID() {
+            return m_id;
+        }
+
+    }
+
 
     public ProtoTest(String name) {
         super(name);
@@ -27,49 +57,70 @@ public class ProtoTest extends TestCase {
     public void test() throws Exception {
         PDL.main(new String[] {"test/pdl/Test.pdl"});
 
-        OID oid = new OID("test.Test", BigInteger.ZERO);
-        Property NAME = oid.getObjectType().getProperty("name");
-        Property COLLECTION = oid.getObjectType().getProperty("collection");
-        Property OPT2MANY = oid.getObjectType().getProperty("opt2many");
-        doTest(oid, NAME, COLLECTION);
-        doTest(oid, NAME, OPT2MANY);
+        Adapter.addAdapter(Test.class, new Adapter() {
+                public Object getKey(Object obj) {
+                    return "test.Test:" + ((Test) obj).getID();
+                }
+
+                public ObjectType getObjectType(Object obj) {
+                    return Root.getRoot().getObjectType("test.Test");
+                }
+            });
+        Adapter.addAdapter(Icle.class, new Adapter() {
+                public Object getKey(Object obj) {
+                    return "test.Icle:" + ((Icle) obj).getID();
+                }
+
+                public ObjectType getObjectType(Object obj) {
+                    return Root.getRoot().getObjectType("test.Icle");
+                }
+            });
+
+        Test test = new Test(BigInteger.ZERO);
+        ObjectType type = Root.getRoot().getObjectType("test.Icle");
+        Property NAME = type.getProperty("name");
+        Property COLLECTION = type.getProperty("collection");
+        Property OPT2MANY = type.getProperty("opt2many");
+        doTest(test, test.getID(), NAME, COLLECTION);
+        doTest(test, test.getID(), NAME, OPT2MANY);
     }
 
-    private void doTest(OID oid, Property str, Property col) {
+    private void doTest(Object obj, Object id, Property str, Property col) {
         Session ssn = new Session();
-        PersistentObject po = ssn.create(oid);
-        PersistentObject po2 = ssn.retrieve(oid);
-        assertTrue(po == po2);
+        ssn.create(obj);
+        ObjectType type = ssn.getObjectType(obj);
+        Object obj2 = ssn.retrieve(type, id);
+        assertTrue(obj == obj2);
 
-        ssn.set(oid, str, "foo");
-        assertEquals("foo", ssn.get(oid, str));
+        ssn.set(obj, str, "foo");
+        assertEquals("foo", ssn.get(obj, str));
 
-        ssn.delete(oid);
-        assertEquals(null, ssn.retrieve(oid));
+        ssn.delete(obj);
+        assertEquals(null, ssn.retrieve(type, id));
 
-        ssn.create(oid);
+        ssn.create(obj);
 
         PersistentCollection pc =
-            (PersistentCollection) ssn.get(oid, col);
+            (PersistentCollection) ssn.get(obj, col);
 
-        Object one = ssn.create
-            (new OID("test.Icle", new BigInteger("1")));
-        Object two = ssn.create
-            (new OID("test.Icle", new BigInteger("2")));
-        Object three = ssn.create
-            (new OID("test.Icle", new BigInteger("3")));
+        Object one = new Icle(new BigInteger("1"));
+        ssn.create(one);
+        Object two = new Icle(new BigInteger("2"));
+        ssn.create(two);
+        Object three = new Icle(new BigInteger("3"));
+        ssn.create(three);
 
-        ssn.add(oid, col, one);
+        ssn.add(obj, col, one);
         assertCollection(new Object[] {one}, pc);
-        ssn.add(oid, col, two);
+        ssn.add(obj, col, two);
         assertCollection(new Object[] {one, two}, pc);
-        ssn.add(oid, col, three);
+        ssn.add(obj, col, three);
         assertCollection(new Object[] {one, two, three}, pc);
-        ssn.remove(oid, col, two);
+        ssn.remove(obj, col, two);
         assertCollection(new Object[] {one, three}, pc);
-        ssn.remove(oid, col, three);
+        ssn.remove(obj, col, three);
         assertCollection(new Object[] {one}, pc);
-        ssn.add(oid, col, three);
+        ssn.add(obj, col, three);
         assertCollection(new Object[] {one, three}, pc);
 
         System.out.println();
@@ -84,7 +135,7 @@ public class ProtoTest extends TestCase {
         System.out.println();
         ssn.dump();
 
-        ssn.delete(oid);
+        ssn.delete(obj);
         ssn.flush();
         System.out.println();
         System.out.println("---------------------------------");

@@ -8,12 +8,12 @@ import java.util.*;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/02/05 $
+ * @version $Revision: #9 $ $Date: 2003/02/12 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#8 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#9 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -197,26 +197,6 @@ public class ObjectMap extends Element {
                     }
                 });
         }
-        return result;
-    }
-
-    public int getRank(Table table) {
-        int result = 0;
-
-        ObjectMap om = this;
-        outer: while (om != null) {
-            for (Iterator it = om.getDeclaredJoins().iterator();
-                 it.hasNext(); ) {
-                Join j = (Join) it.next();
-                if (j.getFrom().getTable().equals(table)) {
-                    break outer;
-                }
-            }
-
-            result++;
-            om = om.getSuperMap();
-        }
-
         return result;
     }
 

@@ -7,18 +7,18 @@ import com.arsdigita.persistence.proto.PersistentCollection;
  * DataAssociationCursorImpl
  *
  * @author Archit Shah &lt;ashah@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/01/11 $
+ * @version $Revision: #5 $ $Date: 2003/02/12 $
  **/
 
 class DataAssociationCursorImpl extends DataCollectionImpl
     implements DataAssociationCursor {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#4 $ by $Author: rhs $, $DateTime: 2003/01/11 09:31:47 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#5 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
 
     private DataAssociationImpl m_assn;
 
     DataAssociationCursorImpl(Session ssn, DataObject data, Property prop) {
-        super(ssn, (PersistentCollection) ssn.getProtoSession().get(data.getOID().getProtoOID(), C.prop(prop)));
+        super(ssn, (PersistentCollection) ssn.getProtoSession().get(data, C.prop(prop)));
     }
 
     protected final void setAssociation(DataAssociationImpl assn) {

@@ -13,12 +13,12 @@ import java.util.*;
  * MemoryEngine
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #13 $ $Date: 2003/02/07 $
+ * @version $Revision: #14 $ $Date: 2003/02/12 $
  **/
 
 public class MemoryEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#13 $ by $Author: ashah $, $DateTime: 2003/02/07 12:05:27 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#14 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
 
     private static final Logger LOG = Logger.getLogger(MemoryEngine.class);
 
@@ -102,12 +102,7 @@ public class MemoryEngine extends Engine {
             return;
         }
 
-        OID oid;
-        if (o instanceof PersistentObject) {
-            oid = ((PersistentObject) o).getOID();
-        } else if (o instanceof OID) {
-            oid = (OID) o;
-        } else {
+        if (getSession().getObjectMap(o).getKeyProperties().isEmpty()) {
             return;
         }
 
@@ -115,9 +110,9 @@ public class MemoryEngine extends Engine {
         for (int j = 0; j < els.length; j++) {
             for (int i = els[j].size() - 1; i >= 0; i--) {
                 Event ev = els[j].getEvent(i);
-                if (ev.getOID().equals(oid)) {
+                if (ev.getObject().equals(o)) {
                     if (ev instanceof DeleteEvent) {
-                        throw new Error("dead object:" + oid);
+                        throw new Error("dead object:" + o);
                     } else if (ev instanceof CreateEvent) {
                         return;
                     }
@@ -125,10 +120,10 @@ public class MemoryEngine extends Engine {
             }
         }
 
-        throw new Error("dead object:" + oid);
+        throw new Error("dead object:" + o);
     }
 
-    private Object get(OID oid, Property prop) {
+    private Object get(Object obj, Property prop) {
         if (prop.isCollection()) {
             Set result = new HashSet();
             EventList[] els = {DATA, m_uncomitted};
@@ -138,7 +133,7 @@ public class MemoryEngine extends Engine {
                     if (ev instanceof PropertyEvent) {
                         PropertyEvent pev = (PropertyEvent) ev;
                         if (pev.getProperty().equals(prop) &&
-                            oid.equals(pev.getOID())) {
+                            obj.equals(pev.getObject())) {
                             if (pev instanceof AddEvent) {
                                 result.add(pev.getArgument());
                             } else if (pev instanceof RemoveEvent) {
@@ -166,7 +161,7 @@ public class MemoryEngine extends Engine {
                     if (ev instanceof SetEvent) {
                         SetEvent sev = (SetEvent) ev;
                         if (sev.getProperty().equals(prop) &&
-                            oid.equals(sev.getOID())) {
+                            obj.equals(sev.getObject())) {
                             Object o = sev.getArgument();
                             checkLiveness(o);
                             return o;
@@ -179,42 +174,38 @@ public class MemoryEngine extends Engine {
         }
     }
 
-    private Object get(Query query, OID oid, Path p) {
+    private Object get(Query query, Object obj, Path p) {
         if (p == null) {
-            return new PersistentObjectSource()
-                .getPersistentObject(getSession(), oid);
+            return obj;
         }
 
         Path parent = p.getParent();
         if (parent == null) {
             Parameter param = query.getSignature().getParameter(p);
             if (param == null) {
-                return get(oid,
-                           oid.getObjectType().getProperty(p.getName()));
+                return get(obj,
+                           getSession().getObjectType(obj)
+                           .getProperty(p.getName()));
             } else {
                 return query.get(param);
             }
         } else {
-            Object value = get(query, oid, p.getParent());
+            Object value = get(query, obj, p.getParent());
             if (value == null) {
                 return null;
-            } else if (value instanceof PersistentObject) {
-                OID poid = ((PersistentObject) value).getOID();
-                return get(poid,
-                           poid.getObjectType().getProperty(p.getName()));
-            } else {
-                throw new IllegalArgumentException
-                    ("Path references attribute of opaque type: " + p);
             }
+
+            return get(value, getSession().getObjectType(value)
+                       .getProperty(p.getName()));
         }
     }
 
     private class DumbRecordSet extends RecordSet {
 
         private Query m_query;
-        private Set m_oids = new HashSet();
+        private Set m_objs = new HashSet();
         private Iterator m_it = null;
-        private OID m_oid = null;
+        private Object m_obj = null;
 
         public DumbRecordSet(Query query) {
             super(query.getSignature());
@@ -224,41 +215,41 @@ public class MemoryEngine extends Engine {
             for (int j = 0; j < els.length; j++) {
                 for (int i = 0; i < els[j].size(); i++) {
                     Event ev = els[j].getEvent(i);
-                    if (!ev.getOID().getObjectType().isSubtypeOf
+                    if (!getSession().getObjectType(ev.getObject()).isSubtypeOf
                         (getSignature().getObjectType())) {
                         continue;
                     }
 
                     if (ev instanceof CreateEvent) {
-                        m_oids.add(ev.getOID());
+                        m_objs.add(ev.getObject());
                     } else if (ev instanceof DeleteEvent) {
-                        m_oids.remove(ev.getOID());
+                        m_objs.remove(ev.getObject());
                     }
                 }
             }
 
             Filter f = m_query.getFilter();
             if (f != null) {
-                for (Iterator it = m_oids.iterator(); it.hasNext(); ) {
-                    OID oid = (OID) it.next();
-                    if (!accept(oid, m_query, f)) {
+                for (Iterator it = m_objs.iterator(); it.hasNext(); ) {
+                    Object obj = it.next();
+                    if (!accept(obj, m_query, f)) {
                         it.remove();
                     }
                 }
             }
         }
 
-        public Set getOIDs() {
-            return m_oids;
+        public Set getObjects() {
+            return m_objs;
         }
 
         public boolean next() {
             if (m_it == null) {
-                m_it = m_oids.iterator();
+                m_it = m_objs.iterator();
             }
 
             if (m_it.hasNext()) {
-                m_oid = (OID) m_it.next();
+                m_obj = m_it.next();
                 return true;
             } else {
                 return false;
@@ -266,37 +257,37 @@ public class MemoryEngine extends Engine {
         }
 
         public Object get(Path p) {
-            return MemoryEngine.this.get(m_query, m_oid, p);
+            return MemoryEngine.this.get(m_query, m_obj, p);
         }
 
         public String toString() {
-            return m_oids.toString();
+            return m_objs.toString();
         }
 
     }
 
-    boolean accept(final OID oid, final Query q, Filter filter) {
+    boolean accept(final Object obj, final Query q, Filter filter) {
         final boolean[] result = { false };
 
         filter.dispatch(new Filter.Switch() {
 
                 public void onAnd(AndFilter f) {
-                    result[0] = accept(oid, q, f.getLeft()) &&
-                        accept(oid, q, f.getRight());
+                    result[0] = accept(obj, q, f.getLeft()) &&
+                        accept(obj, q, f.getRight());
                 }
 
                 public void onOr(OrFilter f) {
-                    result[0] = accept(oid, q, f.getLeft()) ||
-                        accept(oid, q, f.getRight());
+                    result[0] = accept(obj, q, f.getLeft()) ||
+                        accept(obj, q, f.getRight());
                 }
 
                 public void onNot(NotFilter f) {
-                    result[0] = !accept(oid, q, f.getOperand());
+                    result[0] = !accept(obj, q, f.getOperand());
                 }
 
                 public void onEquals(EqualsFilter f) {
-                    Object left = get(q, oid, f.getLeft());
-                    Object right = get(q, oid, f.getRight());
+                    Object left = get(q, obj, f.getLeft());
+                    Object right = get(q, obj, f.getRight());
                     if (left == right) {
                         result[0] = true;
                     } else if (left == null) {
@@ -307,14 +298,14 @@ public class MemoryEngine extends Engine {
                 }
 
                 public void onIn(InFilter f) {
-                    Object val = get(q, oid, f.getPath());
+                    Object val = get(q, obj, f.getPath());
                     DumbRecordSet drs = new DumbRecordSet(f.getQuery());
-                    result[0] = drs.getOIDs().contains(val);
+                    result[0] = drs.getObjects().contains(val);
                 }
 
                 public void onContains(ContainsFilter f) {
-                    Set vals = (Set) get(q, oid, f.getCollection());
-                    Object element = get(q, oid, f.getElement());
+                    Set vals = (Set) get(q, obj, f.getCollection());
+                    Object element = get(q, obj, f.getElement());
                     result[0] = vals.contains(element);
                 }
 

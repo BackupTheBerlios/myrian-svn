@@ -7,15 +7,15 @@ import java.io.*;
  * AddEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/01/31 $
+ * @version $Revision: #5 $ $Date: 2003/02/12 $
  **/
 
 public class AddEvent extends PropertyEvent {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/AddEvent.java#4 $ by $Author: rhs $, $DateTime: 2003/01/31 12:34:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/AddEvent.java#5 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
 
-    AddEvent(Session ssn, OID oid, Property prop, Object arg) {
-        super(ssn, oid, prop, arg);
+    AddEvent(Session ssn, Object obj, Property prop, Object arg) {
+        super(ssn, obj, prop, arg);
     }
 
     public void dispatch(Switch sw) {

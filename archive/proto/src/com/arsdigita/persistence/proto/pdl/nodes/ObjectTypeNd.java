@@ -4,18 +4,20 @@ package com.arsdigita.persistence.proto.pdl.nodes;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/01/30 $
+ * @version $Revision: #3 $ $Date: 2003/02/12 $
  **/
 
 public class ObjectTypeNd extends Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/ObjectTypeNd.java#2 $ by $Author: rhs $, $DateTime: 2003/01/30 17:57:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/ObjectTypeNd.java#3 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
 
 
     public static final Field NAME =
         new Field(ObjectTypeNd.class, "name", IdentifierNd.class, 1, 1);
     public static final Field EXTENDS =
         new Field(ObjectTypeNd.class, "extends", TypeNd.class, 0, 1);
+    public static final Field ADAPTER =
+        new Field(ObjectTypeNd.class, "adapter", JavaClassNd.class, 0, 1);
     public static final Field PROPERTIES =
         new Field(ObjectTypeNd.class, "properties", PropertyNd.class);
     public static final Field OBJECT_KEY =

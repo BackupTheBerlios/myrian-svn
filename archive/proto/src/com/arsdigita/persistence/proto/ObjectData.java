@@ -8,15 +8,15 @@ import java.io.*;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/02/10 $
+ * @version $Revision: #7 $ $Date: 2003/02/12 $
  **/
 
 class ObjectData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#6 $ by $Author: ashah $, $DateTime: 2003/02/10 15:36:01 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#7 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
 
     private Session m_ssn;
-    private PersistentObject m_object;
+    private Object m_object;
     private ArrayList m_events = new ArrayList();
 
     public static class State {
@@ -35,7 +35,7 @@ class ObjectData {
 
     HashMap m_pdata = new HashMap();
 
-    public ObjectData(Session ssn, PersistentObject object, State state) {
+    public ObjectData(Session ssn, Object object, State state) {
         m_ssn = ssn;
         m_object = object;
         m_state = state;
@@ -47,16 +47,8 @@ class ObjectData {
         return m_ssn;
     }
 
-    public PersistentObject getPersistentObject() {
+    public Object getObject() {
         return m_object;
-    }
-
-    public OID getOID() {
-        if (m_object == null) {
-            return null;
-        } else {
-            return m_object.getOID();
-        }
     }
 
     public PropertyData getPropertyData(Property prop) {
@@ -155,7 +147,7 @@ class ObjectData {
     }
 
     void dump(PrintWriter out) {
-        out.print(getOID());
+        out.print(getObject());
         out.println(":");
         for (Iterator it = m_pdata.values().iterator(); it.hasNext(); ) {
             PropertyData pdata = (PropertyData) it.next();

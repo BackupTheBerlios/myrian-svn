@@ -10,19 +10,19 @@ import java.util.*;
  * Cursor
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/02/10 $
+ * @version $Revision: #10 $ $Date: 2003/02/12 $
  **/
 
 public class Cursor {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Cursor.java#9 $ by $Author: ashah $, $DateTime: 2003/02/10 15:36:01 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Cursor.java#10 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
 
     private DataSet m_dset;
     private Session m_ssn;
     private Signature m_signature;
 
     private RecordSet m_rs = null;
-    private OID m_current = null;
+    private Object m_current = null;
     private long m_position = 0;
 
     protected Cursor(DataSet dset) {
@@ -60,7 +60,7 @@ public class Cursor {
     }
 
     public Object get() {
-        return m_ssn.retrieve(m_current);
+        return m_current;
     }
 
     public boolean next() {

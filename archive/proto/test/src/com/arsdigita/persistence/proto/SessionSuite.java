@@ -13,14 +13,34 @@ import org.apache.log4j.Logger;
  * SessionSuite
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #1 $ $Date: 2003/02/07 $
+ * @version $Revision: #2 $ $Date: 2003/02/12 $
  **/
 
 public class SessionSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/SessionSuite.java#1 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/SessionSuite.java#2 $";
 
     private static final Logger s_log = Logger.getLogger(SessionSuite.class);
+
+    private static final class Generic {
+
+        private ObjectType m_type;
+        private Integer m_id;
+
+        public Generic(ObjectType type, Integer id) {
+            m_type = type;
+            m_id = id;
+        }
+
+        public ObjectType getObjectType() {
+            return m_type;
+        }
+
+        public Integer getID() {
+            return m_id;
+        }
+
+    }
 
     public SessionSuite() {}
 
@@ -116,36 +136,36 @@ public class SessionSuite extends PackageTestSuite {
         ObjectType source = role.getContainer();
         ObjectType target = role.getType();
 
-        PersistentObject obj = (PersistentObject) m_objs[0].get(source);
+        Object obj = m_objs[0].get(source);
 
         resetState();
 
         s_log.info("test: 0add1" + role.getName());
-        m_ssn.add(obj.getOID(), role, m_objs[0].get(target));
+        m_ssn.add(obj, role, m_objs[0].get(target));
         endTest();
 
         s_log.info("test: 1rem1" + role.getName());
-        m_ssn.remove(obj.getOID(), role, m_objs[0].get(target));
+        m_ssn.remove(obj, role, m_objs[0].get(target));
         endTest();
 
         resetState();
 
         s_log.info("test: 0add2" + role.getName());
-        m_ssn.add(obj.getOID(), role, m_objs[0].get(target));
-        m_ssn.add(obj.getOID(), role, m_objs[1].get(target));
+        m_ssn.add(obj, role, m_objs[0].get(target));
+        m_ssn.add(obj, role, m_objs[1].get(target));
         endTest();
 
         s_log.info("test: 2add1" + role.getName());
-        m_ssn.add(obj.getOID(), role, m_objs[2].get(target));
+        m_ssn.add(obj, role, m_objs[2].get(target));
         endTest();
 
         s_log.info("test: 3rem1" + role.getName());
-        m_ssn.remove(obj.getOID(), role, m_objs[2].get(target));
+        m_ssn.remove(obj, role, m_objs[2].get(target));
         endTest();
 
         s_log.info("test: 2rem2" + role.getName());
-        m_ssn.remove(obj.getOID(), role, m_objs[0].get(target));
-        m_ssn.remove(obj.getOID(), role, m_objs[1].get(target));
+        m_ssn.remove(obj, role, m_objs[0].get(target));
+        m_ssn.remove(obj, role, m_objs[1].get(target));
         endTest();
     }
 
@@ -153,11 +173,11 @@ public class SessionSuite extends PackageTestSuite {
         ObjectType source = role.getContainer();
         ObjectType target = role.getType();
 
-        PersistentObject obj = (PersistentObject) m_objs[0].get(source);
+        Object obj = m_objs[0].get(source);
 
         resetState();
         s_log.info("test: set " + role.getName());
-        m_ssn.set(obj.getOID(), role, m_objs[1].get(target));
+        m_ssn.set(obj, role, m_objs[1].get(target));
         endTest();
 
         // XXX: negative test
@@ -168,15 +188,15 @@ public class SessionSuite extends PackageTestSuite {
         ObjectType source = role.getContainer();
         ObjectType target = role.getType();
 
-        PersistentObject obj = (PersistentObject) m_objs[0].get(source);
+        Object obj = m_objs[0].get(source);
 
         resetState();
         s_log.info("test: set " + role.getName());
-        m_ssn.set(obj.getOID(), role, m_objs[1].get(target));
+        m_ssn.set(obj, role, m_objs[1].get(target));
         endTest();
 
         s_log.info("test: setnull " + role.getName());
-        m_ssn.set(obj.getOID(), role, null);
+        m_ssn.set(obj, role, null);
         endTest();
     }
 
@@ -251,18 +271,19 @@ public class SessionSuite extends PackageTestSuite {
         fill(m_two, 2);
     }
 
-    private PersistentObject fill(ObjectType type, int round) {
+    private Object fill(ObjectType type, int round) {
         if (m_objs[round].get(type) != null) {
-            return (PersistentObject) m_objs[round].get(type);
+            return m_objs[round].get(type);
         }
 
-        PersistentObject obj;
+        Object obj;
 
         if (type.hasKey()) {
             if (type.getKeyProperties().size() > 1) {
                 throw new IllegalStateException("compound key");
             }
-            obj = m_ssn.create(new OID(type, new Integer(round)));
+            obj = new Generic(type, new Integer(round));
+            m_ssn.create(obj);
         } else {
             throw new IllegalStateException("can't create keyless object");
         }
@@ -288,17 +309,16 @@ public class SessionSuite extends PackageTestSuite {
             Role role = (Role) prop;
             ObjectType targetType = role.getType();
 
-            PersistentObject target =
-                (PersistentObject) m_objs[round].get(targetType);
+            Object target = m_objs[round].get(targetType);
 
             if (target != null) {
-                m_ssn.set(obj.getOID(), role, target);
+                m_ssn.set(obj, role, target);
             } else if (!targetType.isCompound()) {
                 // XXX: assuming all simple types are integers for this
-                m_ssn.set(obj.getOID(), role, new Integer(round));
+                m_ssn.set(obj, role, new Integer(round));
             } else {
                 // compound type
-                m_ssn.set(obj.getOID(), role, fill(targetType, round));
+                m_ssn.set(obj, role, fill(targetType, round));
             }
         }
 

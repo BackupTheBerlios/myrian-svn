@@ -12,12 +12,12 @@ import java.util.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/02/07 $
+ * @version $Revision: #5 $ $Date: 2003/02/12 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#4 $ by $Author: rhs $, $DateTime: 2003/02/07 12:50:17 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#5 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
 
     private Query m_query;
     private HashMap m_columns = new HashMap();
@@ -61,7 +61,7 @@ class QGen {
         m_joins.put(src, join);
     }
 
-    private Column getKey(Table table) {
+    private static final Column getKey(Table table) {
         UniqueKey key = table.getPrimaryKey();
         if (key == null) {
             throw new Error("table has no primary key: " + table);
@@ -111,6 +111,11 @@ class QGen {
             result.addSelection(getColumn(path));
         }
 
+        for (Iterator it = sig.getParameters().iterator(); it.hasNext(); ) {
+            Parameter param = (Parameter) it.next();
+            result.set(param.getPath(), m_query.get(param));
+        }
+
         return result;
     }
 
@@ -153,7 +158,7 @@ class QGen {
         }
 
         if (m_query.getSignature().isParameter(path)) {
-            setColumn(path, Path.get(":" + path));
+            setColumn(path, path);
             return;
         }
 

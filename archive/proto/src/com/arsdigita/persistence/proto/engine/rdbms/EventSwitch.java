@@ -10,47 +10,56 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/02/07 $
+ * @version $Revision: #2 $ $Date: 2003/02/12 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#1 $ by $Author: rhs $, $DateTime: 2003/02/07 16:00:49 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#2 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
+
+    private static final Path KEY = Path.get("__key__");
+    private static final Path KEY_FROM = Path.get("__key_from__");
+    private static final Path KEY_TO = Path.get("__key_to__");
 
     private RDBMSEngine m_engine;
+    private final Session m_ssn;
 
     public EventSwitch(RDBMSEngine engine) {
         m_engine = engine;
+        m_ssn = engine.getSession();
     }
 
-    private static final Condition makeCondition(Table table, OID oid) {
-        return makeCondition(table.getPrimaryKey().getColumns()[0], oid);
+    private static final Path getKey(Table table) {
+        return Path.get(table.getPrimaryKey().getColumns()[0].toString());
     }
 
-    private static final Condition makeCondition(Column col, OID oid) {
-        return new EqualsCondition
-            (Path.get(col.toString()), Path.get("bind: " + oid));
+    private static final Path getPath(Column column) {
+        return Path.get(column.toString());
     }
 
-    private DML findOperation(OID oid, Table table) {
-        DML op = m_engine.getOperation(oid, table);
+    private DML findOperation(Object obj, Table table) {
+        DML op = m_engine.getOperation(obj, table);
         if (op != null) { return op; }
 
-        DML result = new Update(table, makeCondition(table, oid));
-        m_engine.addOperation(oid, result);
+        DML result =
+            new Update(table, new EqualsCondition(getKey(table), KEY));
+        result.set(KEY, obj);
+        m_engine.addOperation(obj, result);
         return result;
     }
 
     private void onObjectEvent(ObjectEvent e) {
-        OID oid = e.getOID();
-        Collection tables = oid.getObjectMap().getTables();
+        Object obj = e.getObject();
+        Collection tables = m_ssn.getObjectMap(obj).getTables();
         for (Iterator it = tables.iterator(); it.hasNext(); ) {
             Table table = (Table) it.next();
             if (e instanceof CreateEvent) {
-                m_engine.addOperation(oid, new Insert(table));
+                m_engine.addOperation(obj, new Insert(table));
             } else if (e instanceof DeleteEvent) {
-                DML del = new Delete(table, makeCondition(table, oid));
-                m_engine.addOperation (oid, del);
+                DML del = new Delete
+                    (table, new EqualsCondition(getKey(table), KEY));
+                del.set(KEY, obj);
+                m_engine.addOperation(obj, del);
             } else {
                 throw new IllegalArgumentException
                     ("not a create or delete event");
@@ -67,16 +76,10 @@ class EventSwitch extends Event.Switch {
     }
 
     private void onPropertyEvent(final PropertyEvent e) {
-        final OID oid = e.getOID();
-        final OID aoid;
+        final Object obj = e.getObject();
+        final Object arg = e.getArgument();
 
-        if (e.getArgument() instanceof PersistentObject) {
-            aoid = ((PersistentObject) e.getArgument()).getOID();
-        } else {
-            aoid = null;
-        }
-
-        final ObjectMap om = oid.getObjectMap();
+        final ObjectMap om = m_ssn.getObjectMap(obj);
         Mapping m = om.getMapping(Path.get(e.getProperty().getName()));
         // XXX: no metadata
         if (m == null) {
@@ -85,15 +88,15 @@ class EventSwitch extends Event.Switch {
         m.dispatch(new Mapping.Switch() {
                 public void onValue(ValueMapping vm) {
                     Column col = vm.getColumn();
-                    DML op = findOperation(oid, col.getTable());
+                    DML op = findOperation(obj, col.getTable());
                     op.set(col, e.getArgument());
                 }
 
                 public void onReference(ReferenceMapping rm) {
                     if (rm.isJoinFrom()) {
                         Column col = rm.getJoin(0).getTo();
-                        DML op = findOperation(aoid, col.getTable());
-                        op.set(col, oid);
+                        DML op = findOperation(arg, col.getTable());
+                        op.set(col, arg);
                     } else if (rm.isJoinThrough()) {
                         Column from = rm.getJoin(0).getTo();
                         Column to = rm.getJoin(1).getFrom();
@@ -101,13 +104,17 @@ class EventSwitch extends Event.Switch {
                         if (e instanceof AddEvent ||
                             e instanceof SetEvent) {
                             op = new Insert(from.getTable());
-                            op.set(from, oid);
-                            op.set(to, aoid);
+                            op.set(from, obj);
+                            op.set(to, arg);
                         } else if (e instanceof RemoveEvent) {
                             op = new Delete
                                 (from.getTable(), new AndCondition
-                                    (makeCondition(from, oid),
-                                     makeCondition(to, aoid)));
+                                    (new EqualsCondition(getPath(from),
+                                                         KEY_FROM),
+                                     new EqualsCondition(getPath(to),
+                                                         KEY_TO)));
+                            op.set(KEY_FROM, obj);
+                            op.set(KEY_TO, arg);
                         } else {
                             throw new IllegalArgumentException
                                 ("not a set, add, or remove");
@@ -115,7 +122,7 @@ class EventSwitch extends Event.Switch {
                         m_engine.addOperation(op);
                     } else if (rm.isJoinTo()) {
                         Column col = rm.getJoin(0).getFrom();
-                        DML op = findOperation(oid, col.getTable());
+                        DML op = findOperation(obj, col.getTable());
                         op.set(col, e.getArgument());
                     } else {
                         throw new IllegalArgumentException

@@ -8,12 +8,12 @@ import java.io.*;
  * Event
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/02/10 $
+ * @version $Revision: #8 $ $Date: 2003/02/12 $
  **/
 
 public abstract class Event {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Event.java#7 $ by $Author: ashah $, $DateTime: 2003/02/10 15:36:01 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Event.java#8 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
 
     private static final Logger LOG = Logger.getLogger(Event.class);
 
@@ -32,19 +32,19 @@ public abstract class Event {
     }
 
     private Session m_ssn;
-    private OID m_oid;
+    private Object m_obj;
 
-    Event(Session ssn, OID oid) {
+    Event(Session ssn, Object obj) {
         m_ssn = ssn;
-        m_oid = oid;
+        m_obj = obj;
     }
 
     public Session getSession() {
         return m_ssn;
     }
 
-    public OID getOID() {
-        return m_oid;
+    public Object getObject() {
+        return m_obj;
     }
 
     public abstract void dispatch(Switch sw);

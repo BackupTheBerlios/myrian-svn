@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #21 $ $Date: 2003/02/10 $
+ * @version $Revision: #22 $ $Date: 2003/02/12 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#21 $ by $Author: ashah $, $DateTime: 2003/02/10 15:36:01 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#22 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -30,69 +30,44 @@ public class Session {
     private HashMap m_odata = new HashMap();
 
     // These are kept up to date by code in Event.java
-    LinkedList m_evs = new LinkedList();
+    LinkedList m_events = new LinkedList();
 
-    /**
-     * Creates an object with the given OID.
-     *
-     * @param oid The OID of the object to create.
-     *
-     * @return The newly created object.
-     **/
-
-    public PersistentObject create(OID oid) {
+    public void create(Object obj) {
         if (LOG.isDebugEnabled()) {
-            trace("create", new Object[] {oid});
+            trace("create", new Object[] {obj});
         }
 
-        ObjectData od = getObjectData(oid);
+        ObjectData od = getObjectData(obj);
         if (od == null) {
-            od = new ObjectData(this, POS.getPersistentObject(this, oid),
-                                od.NUBILE);
+            od = new ObjectData(this, obj, od.NUBILE);
         } else if (!od.isDeleted()) {
-            throw new IllegalArgumentException("OID already exists: " + oid);
+            throw new IllegalArgumentException
+                ("Object already exists: " + obj);
         } else {
             od.setState(od.NUBILE);
         }
 
-        // This will have problems if there was a preexisting oid of a
-        // different type. Also if the OID already existed and was modified
-        // the new object will pick up all the changes made to the old one.
-        // Not sure what to do about this except perhaps disallow it at some
-        // point.
-        addEvent(new CreateEvent(this, oid), od);
-
-        for (Iterator it = oid.getObjectMap().getKeyProperties().iterator();
-             it.hasNext(); ) {
-            Property prop = (Property) it.next();
-            set(oid, prop, oid.get(prop.getName()));
-        }
-
-        PersistentObject result = od.getPersistentObject();
+        // This will have problems if there was a preexisting object with the
+        // same identity, but different type. Also if the object already
+        // existed and was modified the new object will pick up all the
+        // changes made to the old one. Not sure what to do about this except
+        // perhaps disallow it at some point.
+        addEvent(new CreateEvent(this, obj), od);
 
         if (LOG.isDebugEnabled()) {
-            untrace("create", result);
+            untrace("create");
         }
-
-        return result;
     }
 
-    /**
-     * Deletes the object with the given OID.
-     *
-     * @param oid The OID of the object to delete.
-     *
-     * @return True if an object was deleted, false otherwise.
-     **/
 
-    public boolean delete(OID oid) {
+    public boolean delete(Object obj) {
         if (LOG.isDebugEnabled()) {
-            trace("delete", new Object[] {oid});
+            trace("delete", new Object[] {obj});
         }
 
         boolean result;
 
-        ObjectData od = fetchObjectData(oid);
+        ObjectData od = fetchObjectData(obj);
 
         if (od == null) {
             result = false;
@@ -101,14 +76,14 @@ public class Session {
         } else {
             od.setState(od.SENILE);
 
-            ObjectType type = oid.getObjectType();
+            ObjectType type = getObjectType(obj);
             Collection keys = type.getKeyProperties();
 
             for (Iterator it = type.getRoles().iterator();
                  it.hasNext(); ) {
                 Role role = (Role) it.next();
                 if (role.isCollection()) {
-                    clear(oid, role);
+                    clear(obj, role);
                 }
             }
 
@@ -117,11 +92,11 @@ public class Session {
                 Role role = (Role) it.next();
 
                 if (!role.isCollection() && !keys.contains(role)) {
-                    set(oid, role, null);
+                    set(obj, role, null);
                 }
             }
 
-            addEvent(new DeleteEvent(this, oid));
+            addEvent(new DeleteEvent(this, obj));
             result = true;
         }
 
@@ -133,55 +108,31 @@ public class Session {
     }
 
 
-    /**
-     * Retrieves the object with the given OID.
-     *
-     * @param oid The OID of the object to retrieve.
-     *
-     * @return The retrieved object.
-     **/
-
-    public PersistentObject retrieve(OID oid) {
-        if (LOG.isDebugEnabled()) {
-            trace("retrieve", new Object[] {oid});
-        }
-
-        ObjectData od = fetchObjectData(oid);
-
-        PersistentObject result;
-        if (od == null) {
-            result = null;
+    public Object retrieve(ObjectType obj, Object id) {
+        PersistentCollection pc = retrieve(getQuery(obj, id));
+        Cursor c = pc.getDataSet().getCursor();
+        if (c.next()) {
+            if (c.next()) {
+                throw new IllegalStateException
+                    ("query returned more than one row");
+            }
+            return c.get();
         } else {
-            result = od.getPersistentObject();
+            return null;
         }
-
-        if (LOG.isDebugEnabled()) {
-            untrace("retrieve", result);
-        }
-
-        return result;
     }
 
-
-    /**
-     * Returns a PersistentCollection that corresponds to the given Query.
-     *
-     * @param query A query object that specifies which objects are to be
-     *              included in the collection and which properties are to be
-     *              preloaded.
-     *
-     * @return A PersistentCollection that corresponds to the given Query.
-     **/
 
     public PersistentCollection retrieve(Query query) {
         return POS.getPersistentCollection(this, new DataSet(this, query));
     }
 
+
     /**
      * Cascades delete from container to the containee. The containee
      * will not be deleted in all cases.
      **/
-    private void cascadeDelete(OID container, PersistentObject containee) {
+    private void cascadeDelete(Object container, Object containee) {
         ObjectData containerOD = fetchObjectData(container);
         boolean me = false;
         if (!containerOD.isSenile()) {
@@ -189,7 +140,7 @@ public class Session {
             containerOD.setState(ObjectData.SENILE);
         }
 
-        delete(containee.getOID());
+        delete(containee);
 
         if (me) { containerOD.setState(ObjectData.SENILE); }
     }
@@ -199,21 +150,18 @@ public class Session {
      * reversible role, either set or remove, the reverse role for the old
      * target needs to be set to null.
      *
-     * @param sourceOID the source OID of a role that has been updated
+     * @param source the source of a role that has been updated
      * @param role the role that has been updated
      * @param target the old target of a role that has been updated
      **/
-    private void reverseUpdateOld(OID sourceOID, Role role,
-                                  PersistentObject target) {
+    private void reverseUpdateOld(Object source, Role role, Object target) {
         Role rev = role.getReverse();
-        
-        PersistentObject source = retrieve(sourceOID);
+
         if (rev.isCollection()) {
-            addEvent(new RemoveEvent(this, target.getOID(), rev, source));
+            addEvent(new RemoveEvent(this, target, rev, source));
         } else if (rev.isNullable()) {
-            addEvent(new SetEvent(this, target.getOID(), rev, null));
-        } else if (!fetchObjectData(target.getOID()).isSenile() &&
-                   !isDeleted(target.getOID())) {
+            addEvent(new SetEvent(this, target, rev, null));
+        } else if (!fetchObjectData(target).isSenile() && !isDeleted(target)) {
             throw new IllegalStateException("can't set 1..1 to null");
         }
     }
@@ -224,24 +172,21 @@ public class Session {
      * needs to be set to the new source. In addition, the new targets' old
      * source needs to be updated so its role target is null.
      *
-     * @param sourceOID the source OID of a role that has been updated
+     * @param source the source of a role that has been updated
      * @param role the role that has been updated
      * @param targetObj the new target of a role that has been updated
      **/
-    private void reverseUpdateNew(OID sourceOID, Role role,
-                                  PersistentObject targetObj) {
-        PersistentObject source = retrieve(sourceOID);
-        OID target = targetObj.getOID();
+    private void reverseUpdateNew(Object source, Role role, Object target) {
         Role rev = role.getReverse();
         if (rev.isCollection()) {
             addEvent(new AddEvent(this, target, rev, source));
         } else {
-            PersistentObject old = (PersistentObject) get(target, rev);
+            Object old = get(target, rev);
             if (old != null) {
                 if (role.isNullable()) {
-                    addEvent(new SetEvent(this, old.getOID(), role, null));
-                } else if (!fetchObjectData(old.getOID()).isSenile() &&
-                           !isDeleted(old.getOID())) {
+                    addEvent(new SetEvent(this, old, role, null));
+                } else if (!fetchObjectData(old).isSenile() &&
+                           !isDeleted(old)) {
                     throw new IllegalStateException("can't set 1..1 to null");
                 }
             }
@@ -251,50 +196,39 @@ public class Session {
     }
 
 
-    /**
-     * Sets a property of an object to a specified value.
-     *
-     * @param oid The OID of the object to be mutated.
-     * @param prop The Property to mutate.
-     * @param value The new value for the Property.
-     **/
-
-    public void set(final OID oid, Property prop, final Object value) {
+    public void set(final Object obj, Property prop, final Object value) {
         if (LOG.isDebugEnabled()) {
-            trace("set", new Object[] {oid, prop.getName(), value});
+            trace("set", new Object[] {obj, prop.getName(), value});
         }
 
         prop.dispatch(new Property.Switch() {
                 public void onRole(Role role) {
                     Object old = null;
                     if (role.isComponent() || role.isReversable()) {
-                        old = get(oid, role);
+                        old = get(obj, role);
                     }
 
-                    addEvent(new SetEvent(Session.this, oid, role, value));
+                    addEvent(new SetEvent(Session.this, obj, role, value));
 
                     if (role.isComponent()) {
-                        PersistentObject po = (PersistentObject) old;
-                        if (po != null) {
-                            cascadeDelete(oid, po);
+                        if (old != null) {
+                            cascadeDelete(obj, value);
                         }
                     }
 
                     if (role.isReversable()) {
                         if (old != null) {
-                            reverseUpdateOld
-                                (oid, role, (PersistentObject) old);
+                            reverseUpdateOld(obj, role, old);
                         }
 
                         if (value != null) {
-                            reverseUpdateNew
-                                (oid, role, (PersistentObject) value);
+                            reverseUpdateNew(obj, role, value);
                         }
                     }
                 }
 
                 public void onAlias(Alias alias) {
-                    set(oid, alias.getTarget(), value);
+                    set(obj, alias.getTarget(), value);
                 }
 
                 public void onLink(Link link) {
@@ -307,30 +241,29 @@ public class Session {
         }
     }
 
-    /**
-     * Fetches the property value for the given OID.
-     *
-     * @param oid The OID of the object being accessed.
-     * @param prop The Property to access.
-     *
-     * @return The value of the property.
-     **/
 
-    public Object get(final OID oid, Property prop) {
+    public Object get(final Object obj, Property prop) {
         if (LOG.isDebugEnabled()) {
-            trace("get", new Object[] {oid, prop.getName()});
+            trace("get", new Object[] {obj, prop.getName()});
         }
 
         final Object[] result = {null};
 
         prop.dispatch(new Property.Switch() {
                 public void onRole(Role role) {
-                    PropertyData pd = fetchPropertyData(oid, role);
-                    result[0] = pd.get();
+                    // Should probably use seperate subclass of property for
+                    // this dispatch.
+                    if (getObjectMap(obj).getKeyProperties().contains(role)) {
+                        Adapter ad = getAdapter(obj);
+                        result[0] = ad.get(obj, role);
+                    } else {
+                        PropertyData pd = fetchPropertyData(obj, role);
+                        result[0] = pd.get();
+                    }
                 }
 
                 public void onAlias(Alias alias) {
-                    result[0] = get(oid, alias.getTarget());
+                    result[0] = get(obj, alias.getTarget());
                 }
 
                 public void onLink(Link link) {
@@ -345,62 +278,34 @@ public class Session {
         return result[0];
     }
 
-    Object get(OID start, Path path) {
+    Object get(Object start, Path path) {
         if (path.getParent() == null) {
             return get(start,
-                       start.getObjectType().getProperty(path.getName()));
+                       getObjectType(start).getProperty(path.getName()));
         } else {
             Object value = get(start, path.getParent());
-            if (value instanceof PersistentObject) {
-                OID oid = ((PersistentObject) value).getOID();
-                return get(oid,
-                           oid.getObjectType().getProperty(path.getName()));
-            } else {
-                throw new IllegalArgumentException
-                    ("Path refers to attribute of opaque type: " + path);
-            }
+            return get(value,
+                       getObjectType(value).getProperty(path.getName()));
         }
     }
 
-/*    private OID getLink(OID oid, Property prop, Object value) {
-        ObjectType lt = (ObjectType) prop.getLinkType();
 
-        if (lt == null) {
-            return null;
-        } else {
-            OID link = new OID(lt);
-
-            for (Iterator it = lt.getKeyProperties(); it.hasNext(); ) {
-                Property key = (Property) it.next();
-                if (key.getName().equals(prop.getName())) {
-                    link.set(key.getName(), value);
-                } else {
-                    link.set(key.getName(), oid);
-                }
-            }
-
-            return link;
-        }
-        }*/
-
-
-    public PersistentObject add(final OID oid, Property prop,
-                                final Object value) {
+    public Object add(final Object obj, Property prop, final Object value) {
         if (LOG.isDebugEnabled()) {
-            trace("add", new Object[] {oid, prop.getName(), value});
+            trace("add", new Object[] {obj, prop.getName(), value});
         }
 
         prop.dispatch(new Property.Switch() {
                 public void onRole(Role role) {
-                    addEvent(new AddEvent(Session.this, oid, role, value));
+                    addEvent(new AddEvent(Session.this, obj, role, value));
 
                     if (role.isReversable()) {
-                        reverseUpdateNew(oid, role, (PersistentObject) value);
+                        reverseUpdateNew(obj, role, value);
                     }
                 }
 
                 public void onAlias(Alias alias) {
-                    add(oid, alias.getTarget(), value);
+                    add(obj, alias.getTarget(), value);
                 }
 
                 public void onLink(Link link) {
@@ -416,25 +321,24 @@ public class Session {
         return null;
     }
 
-    public void remove(final OID oid, Property prop, final Object value) {
+    public void remove(final Object obj, Property prop, final Object value) {
         if (LOG.isDebugEnabled()) {
-            trace("remove", new Object[] {oid, prop.getName(), value});
+            trace("remove", new Object[] {obj, prop.getName(), value});
         }
 
         prop.dispatch(new Property.Switch() {
                 public void onRole(Role role) {
-                    addEvent(new RemoveEvent(Session.this, oid, role, value));
+                    addEvent(new RemoveEvent(Session.this, obj, role, value));
 
                     if (role.isComponent()) {
-                        cascadeDelete(oid, (PersistentObject) value);
+                        cascadeDelete(obj, value);
                     } else if (role.isReversable()) {
-                        reverseUpdateOld
-                            (oid, role, (PersistentObject) value);
+                        reverseUpdateOld(obj, role, value);
                     }
                 }
 
                 public void onAlias(Alias alias) {
-                    remove(oid, alias.getTarget(), value);
+                    remove(obj, alias.getTarget(), value);
                 }
 
                 public void onLink(Link link) {
@@ -448,23 +352,16 @@ public class Session {
     }
 
 
-    /**
-     * Removes all elements from the given property.
-     *
-     * @param oid The OID of the object containing the property being cleared.
-     * @param prop The property being cleared.
-     **/
-
-    public void clear(OID oid, Property prop) {
+    public void clear(Object obj, Property prop) {
         if (LOG.isDebugEnabled()) {
-            trace("clear", new Object[] {oid, prop.getName()});
+            trace("clear", new Object[] {obj, prop.getName()});
         }
 
         PersistentCollection pc =
-            (PersistentCollection) get(oid, prop);
+            (PersistentCollection) get(obj, prop);
         Cursor c = pc.getDataSet().getCursor();
         while (c.next()) {
-            remove(oid, prop, c.get());
+            remove(obj, prop, c.get());
         }
 
         if (LOG.isDebugEnabled()) {
@@ -473,24 +370,37 @@ public class Session {
     }
 
 
-    public boolean isNew(OID oid) {
-        return hasObjectData(oid) && getObjectData(oid).isNew();
+    public ObjectType getObjectType(Object obj) {
+        throw new Error("not implemented");
+    }
+
+    private Adapter getAdapter(Object obj) {
+        throw new Error("not implemented");
+    }
+
+    public ObjectMap getObjectMap(Object obj) {
+        throw new Error("not implemented");
     }
 
 
-    public boolean isDeleted(OID oid) {
-        return hasObjectData(oid) && getObjectData(oid).isDeleted();
+    public boolean isNew(Object obj) {
+        return hasObjectData(obj) && getObjectData(obj).isNew();
     }
 
 
-    public boolean isModified(OID oid) {
-        return hasObjectData(oid) && getObjectData(oid).isModified();
+    public boolean isDeleted(Object obj) {
+        return hasObjectData(obj) && getObjectData(obj).isDeleted();
     }
 
 
-    public boolean isModified(OID oid, Property prop) {
-        return hasObjectData(oid) &&
-            getObjectData(oid).getPropertyData(prop).isModified();
+    public boolean isModified(Object obj) {
+        return hasObjectData(obj) && getObjectData(obj).isModified();
+    }
+
+
+    public boolean isModified(Object obj, Property prop) {
+        return hasObjectData(obj) &&
+            getObjectData(obj).getPropertyData(prop).isModified();
     }
 
 
@@ -514,9 +424,9 @@ public class Session {
         LinkedList written = new LinkedList();
         LinkedList deferred = new LinkedList();
 
-        for (ListIterator li = m_evs.listIterator(0); li.hasNext(); ) {
+        for (ListIterator li = m_events.listIterator(0); li.hasNext(); ) {
             Event ev = (Event) li.next();
-            ObjectData od = getObjectData(ev.getOID());
+            ObjectData od = getObjectData(ev.getObject());
 
             if ((nubile && od.isNubile()) ||
                 (agile && od.isAgile()) ||
@@ -535,7 +445,7 @@ public class Session {
             ev.sync();
         }
 
-        m_evs = deferred;
+        m_events = deferred;
 
         if (LOG.isDebugEnabled()) {
             untrace("flush");
@@ -562,7 +472,7 @@ public class Session {
     public void rollback() {
         // should properly roll back java state
         m_odata.clear();
-        m_evs = new LinkedList();
+        m_events = new LinkedList();
         m_engine.rollback();
     }
 
@@ -570,18 +480,17 @@ public class Session {
         return m_engine;
     }
 
-    void load(OID oid, Property prop, Object value) {
+    void load(Object obj, Property prop, Object value) {
         if (LOG.isDebugEnabled()) {
-            trace("load", new Object[] {oid, prop.getName(), value});
+            trace("load", new Object[] {obj, prop.getName(), value});
         }
 
-        ObjectData od = getObjectData(oid);
+        ObjectData od = getObjectData(obj);
         if (od == null) {
             // We may need to change the signature of this to read in enough
             // data to allow type negotiation to happen properly without
             // requiring another db hit.
-            od = new ObjectData(this, POS.getPersistentObject(this, oid),
-                                od.AGILE);
+            od = new ObjectData(this, obj, od.AGILE);
         }
 
         PropertyData pd = od.getPropertyData(prop);
@@ -597,11 +506,11 @@ public class Session {
     }
 
     private void appendEvent(Event ev) {
-        m_evs.add(ev);
+        m_events.add(ev);
     }
 
     private void addEvent(ObjectEvent ev) {
-        addEvent(ev, fetchObjectData(ev.getOID()));
+        addEvent(ev, fetchObjectData(ev.getObject()));
     }
 
     private void addEvent(ObjectEvent ev, ObjectData od) {
@@ -611,30 +520,33 @@ public class Session {
     }
 
     private void addEvent(PropertyEvent ev) {
-        PropertyData pd = fetchPropertyData(ev.getOID(), ev.getProperty());
+        PropertyData pd = fetchPropertyData(ev.getObject(), ev.getProperty());
         ev.setPropertyData(pd);
         appendEvent(ev);
         pd.addEvent(ev);
     }
 
-    boolean hasObjectData(OID oid) {
-        return m_odata.containsKey(oid);
+    boolean hasObjectData(Object obj) {
+        Adapter ad = getAdapter(obj);
+        return m_odata.containsKey(ad.getSessionKey(obj));
     }
 
-    ObjectData getObjectData(OID oid) {
-        return (ObjectData) m_odata.get(oid);
+    ObjectData getObjectData(Object obj) {
+        Adapter ad = getAdapter(obj);
+        return (ObjectData) m_odata.get(ad.getSessionKey(obj));
     }
 
-    void removeObjectData(OID oid) {
-        m_odata.remove(oid);
+    void removeObjectData(Object obj) {
+        Adapter ad = getAdapter(obj);
+        m_odata.remove(ad.getSessionKey(obj));
     }
 
     void addObjectData(ObjectData odata) {
-        m_odata.put(odata.getOID(), odata);
+        m_odata.put(odata.getObject(), odata);
     }
 
-    PropertyData getPropertyData(OID oid, Property prop) {
-        ObjectData od = getObjectData(oid);
+    PropertyData getPropertyData(Object obj, Property prop) {
+        ObjectData od = getObjectData(obj);
         if (od != null) {
             return od.getPropertyData(prop);
         } else {
@@ -642,12 +554,12 @@ public class Session {
         }
     }
 
-    private ObjectData fetchObjectData(OID oid) {
-        if (!hasObjectData(oid)) {
-            RecordSet rs = m_engine.execute(getRetrieveQuery(oid));
+    private ObjectData fetchObjectData(Object obj) {
+        if (!hasObjectData(obj)) {
+            RecordSet rs = m_engine.execute(getRetrieveQuery(obj));
             // Cache non-existent objects
             if (!rs.next()) {
-                m_odata.put(oid, null);
+                m_odata.put(obj, null);
             } else {
                 do {
                     rs.load(this);
@@ -655,7 +567,7 @@ public class Session {
             }
         }
 
-        ObjectData od = getObjectData(oid);
+        ObjectData od = getObjectData(obj);
         if (od != null && od.isDeleted()) {
             return null;
         } else {
@@ -663,10 +575,10 @@ public class Session {
         }
     }
 
-    private PropertyData fetchPropertyData(OID oid, Property prop) {
-        ObjectData od = fetchObjectData(oid);
+    private PropertyData fetchPropertyData(Object obj, Property prop) {
+        ObjectData od = fetchObjectData(obj);
         if (od == null) {
-            throw new IllegalArgumentException("No such oid: " + oid);
+            throw new IllegalArgumentException("No such object: " + obj);
         }
 
         PropertyData pd;
@@ -676,14 +588,13 @@ public class Session {
         } else if (prop.isCollection()) {
             pd = new PropertyData
                 (od, prop, POS.getPersistentCollection
-                 (this, new DataSet(this, getRetrieveQuery(oid, prop))));
+                 (this, new DataSet(this, getRetrieveQuery(obj, prop))));
         } else if (od.isNew()){
             pd = new PropertyData(od, prop, null);
         } else {
-            RecordSet rs = m_engine.execute(getRetrieveQuery(oid, prop));
-            OID value = null;
+            RecordSet rs = m_engine.execute(getRetrieveQuery(obj, prop));
             while (rs.next()) {
-                value = rs.load(this);
+                rs.load(this);
             }
             pd = od.getPropertyData(prop);
             if (pd == null) {
@@ -702,18 +613,35 @@ public class Session {
         return result;
     }
 
-    private Query getRetrieveQuery(OID oid) {
-        ObjectType type = oid.getObjectType();
+    private Query getQuery(ObjectType type, Object id) {
+        Signature sig = getRetrieveSignature(type);
+        ObjectMap map = Root.getRoot().getObjectMap(type);
+        Collection keys = map.getKeyProperties();
+        if (keys.size() != 1) {
+            throw new IllegalArgumentException("type has more than one key");
+        }
+        Property key = (Property) keys.iterator().next();
+        Parameter idParam = new Parameter(key.getType(), Path.get("__id__"));
+        sig.addParameter(idParam);
+        Filter f =
+            new EqualsFilter(Path.get(key.getName()), idParam.getPath());
+        Query result = new Query(sig, f);
+        result.set(idParam, id);
+        return result;
+    }
+
+    private Query getRetrieveQuery(Object obj) {
+        ObjectType type = getObjectType(obj);
         Signature sig = getRetrieveSignature(type);
         Parameter start = new Parameter(type, Path.get("__start__"));
         sig.addParameter(start);
         Query q = new Query
             (sig, new EqualsFilter(Path.get("__start__"), null));
-        q.set(start, POS.getPersistentObject(this, oid));
+        q.set(start, obj);
         return q;
     }
 
-    private Query getRetrieveQuery(OID oid, Property prop) {
+    private Query getRetrieveQuery(Object obj, Property prop) {
         if (prop.isCollection()) {
             ObjectType type = prop.getType();
             Signature sig = getRetrieveSignature(type);
@@ -726,19 +654,18 @@ public class Session {
             Filter f = new ContainsFilter
                 (Path.get("__start__." + prop.getName()), null);
             Query q = new Query(sig, f);
-            q.set(start, POS.getPersistentObject(this, oid));
+            q.set(start, obj);
             return q;
         } else {
-            ObjectType type = oid.getObjectType();
+            ObjectType type = getObjectType(obj);
             Signature sig = new Signature(type);
             sig.addPath(prop.getName());
             sig.addDefaultProperties(Path.get(prop.getName()));
-            Parameter start = new Parameter(type,
-                                            Path.get("__start__"));
+            Parameter start = new Parameter(type, Path.get("__start__"));
             sig.addParameter(start);
             Query q = new Query
                 (sig, new EqualsFilter(Path.get("__start__"), null));
-            q.set(start, POS.getPersistentObject(this, oid));
+            q.set(start, obj);
             return q;
         }
     }

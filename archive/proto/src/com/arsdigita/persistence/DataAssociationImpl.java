@@ -6,13 +6,13 @@ import com.arsdigita.persistence.metadata.Property;
  * DataAssociationImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/01/11 $
+ * @version $Revision: #6 $ $Date: 2003/02/12 $
  **/
 
 class DataAssociationImpl extends DataAssociationCursorImpl
     implements DataAssociation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataAssociationImpl.java#5 $ by $Author: rhs $, $DateTime: 2003/01/11 09:31:47 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataAssociationImpl.java#6 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
 
     private com.arsdigita.persistence.proto.Session m_pssn;
     private DataObject m_data;
@@ -30,13 +30,11 @@ class DataAssociationImpl extends DataAssociationCursorImpl
     }
 
     public DataObject add(DataObject obj) {
-        return (DataObject) DataObjectImpl.wrap
-            (getSession(), m_pssn.add(m_data.getOID().getProtoOID(), m_pprop,
-                                      DataObjectImpl.unwrap(obj)));
+        return (DataObject) m_pssn.add(m_data, m_pprop, obj);
     }
 
     public void clear() {
-        m_pssn.clear(m_data.getOID().getProtoOID(), m_pprop);
+        m_pssn.clear(m_data, m_pprop);
     }
 
     public DataCollection getDataCollection() { return cursor(); }
@@ -53,15 +51,14 @@ class DataAssociationImpl extends DataAssociationCursorImpl
     }
 
     public void remove(DataObject obj) {
-        remove(obj.getOID());
+        m_pssn.remove(m_data, m_pprop, obj);
     }
 
     public void remove(OID oid) {
-        m_pssn.remove(m_data.getOID().getProtoOID(), m_pprop,
-                      m_pssn.retrieve(oid.getProtoOID()));
+        remove(m_ssn.retrieve(oid));
     }
 
     public boolean isModified() {
-        return m_pssn.isModified(m_data.getOID().getProtoOID(), m_pprop);
+        return m_pssn.isModified(m_data, m_pprop);
     }
 }

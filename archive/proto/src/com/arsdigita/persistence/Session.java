@@ -17,6 +17,7 @@ package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
+import com.arsdigita.persistence.proto.Adapter;
 import com.arsdigita.persistence.proto.Signature;
 import com.arsdigita.persistence.proto.Query;
 
@@ -33,11 +34,24 @@ import java.sql.Connection;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/01/11 $
+ * @version $Revision: #5 $ $Date: 2003/02/12 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
 
+    // This is just a temporary way to get an adapter registered.
+    static {
+        Adapter.addAdapter(DataObjectImpl.class, new Adapter() {
+                public Object getKey(Object obj) {
+                    return ((DataObjectImpl) obj).getOID();
+                }
+
+                public com.arsdigita.persistence.proto.metadata.ObjectType
+                getObjectType(Object obj) {
+                    return C.type(((DataObjectImpl) obj).getObjectType());
+                }
+            });
+    }
 
     private com.arsdigita.persistence.proto.Session m_ssn =
         new com.arsdigita.persistence.proto.Session();
@@ -178,8 +192,9 @@ public class Session {
      **/
 
     public DataObject create(OID oid) {
-        return (DataObject) DataObjectImpl.wrap
-            (this, m_ssn.create(oid.getProtoOID()));
+        DataObject result = new DataObjectImpl(this, oid);
+        m_ssn.create(result);
+        return result;
     }
 
 
@@ -196,8 +211,7 @@ public class Session {
      **/
 
     public DataObject retrieve(OID oid) {
-        return (DataObject) DataObjectImpl.wrap
-            (this, m_ssn.retrieve(oid.getProtoOID()));
+        throw new Error("not implemented");
     }
 
 
@@ -210,7 +224,7 @@ public class Session {
      **/
 
     public boolean delete(OID oid) {
-        return m_ssn.delete(oid.getProtoOID());
+        return m_ssn.delete(retrieve(oid));
     }
 
 

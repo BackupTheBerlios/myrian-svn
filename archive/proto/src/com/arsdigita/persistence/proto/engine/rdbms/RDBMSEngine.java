@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2003/02/07 $
+ * @version $Revision: #12 $ $Date: 2003/02/12 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#11 $ by $Author: rhs $, $DateTime: 2003/02/07 16:00:49 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#12 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -29,8 +29,8 @@ public class RDBMSEngine extends Engine {
         super(ssn);
     }
 
-    void addOperation(OID oid, DML dml) {
-        String key = oid + ":" + dml.getTable().getName();
+    void addOperation(Object obj, DML dml) {
+        Object key = new CompoundKey(obj, dml.getTable());
         if (dml instanceof Delete) {
             DML prev = (DML) m_operationMap.get(key);
             if (prev != null) {
@@ -45,8 +45,9 @@ public class RDBMSEngine extends Engine {
         m_operations.add(dml);
     }
 
-    DML getOperation(OID oid, Table table) {
-        return (DML) m_operationMap.get(oid + ":" + table.getName());
+    DML getOperation(Object obj, Table table) {
+        Object key = new CompoundKey(obj, table);
+        return (DML) m_operationMap.get(key);
     }
 
     void clearOperations() {
@@ -67,7 +68,9 @@ public class RDBMSEngine extends Engine {
     }
 
     public void write(Event ev) {
-        ev.dispatch(m_switch);
+        if (LOG.isDebugEnabled()) {
+            ev.dispatch(m_switch);
+        }
     }
 
     public void flush() {
