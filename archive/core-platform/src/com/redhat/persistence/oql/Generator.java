@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/04/07 $
+ * @version $Revision: #10 $ $Date: 2004/05/28 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Generator.java#9 $ by $Author: dennis $, $DateTime: 2004/04/07 16:07:11 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Generator.java#10 $ by $Author: mbooth $, $DateTime: 2004/05/28 09:51:17 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -49,7 +49,6 @@ class Generator {
     // hash related
     private CharList m_hash = new ArrayCharList();
     private int m_hashCode = 0;
-    private Map m_classes = new HashMap();
     private Map m_bindings = new HashMap();
     private Map m_ids = new HashMap();
     private Key m_key = new Key(m_hash, m_hashCode);
@@ -77,6 +76,14 @@ class Generator {
             } else {
                 return m_hash.equals(k.m_hash);
             }
+        }
+        public String toString() {
+            StringBuffer buf = new StringBuffer();
+
+            buf.append( "{code: " ).append( m_code );
+            buf.append( ";hash: " ).append( m_hash.toString() ).append( '}' );
+
+            return buf.toString();
         }
     }
 
@@ -156,12 +163,7 @@ class Generator {
     }
 
     void hash(Class klass) {
-        String code = (String) m_classes.get(klass);
-        if (code == null) {
-            code = "c" + m_classes.size();
-            m_classes.put(klass, code);
-        }
-        appendHash(code);
+        appendHash(klass.getName());
         terminal();
     }
 

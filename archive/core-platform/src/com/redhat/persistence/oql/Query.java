@@ -15,6 +15,7 @@
 package com.redhat.persistence.oql;
 
 import com.redhat.persistence.metadata.*;
+import org.apache.commons.collections.map.LRUMap;
 import java.util.*;
 
 import org.apache.log4j.Logger;
@@ -23,12 +24,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/04/07 $
+ * @version $Revision: #8 $ $Date: 2004/05/28 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Query.java#7 $ by $Author: dennis $, $DateTime: 2004/04/07 16:07:11 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Query.java#8 $ by $Author: mbooth $, $DateTime: 2004/05/28 09:51:17 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -67,7 +68,13 @@ public class Query {
         }
     };
 
-    private static final Map s_cache = new HashMap();
+    private static LRUMap s_cache = new LRUMap(2000);
+
+    public static void setQueryCacheSize(int size) {
+        s_cache = new LRUMap(size);
+        if( s_log.isDebugEnabled() )
+            s_log.debug( "Reset query cache to size " + size );
+    }
 
     public Code generate(Root root, boolean oracle) {
         Generator gen = (Generator) s_generators.get();
@@ -231,6 +238,19 @@ public class Query {
         }
 
         synchronized (s_cache) {
+            if( s_log.isInfoEnabled() ) {
+                s_log.info( "Query cache MISS. Cache size " + s_cache.size() );
+
+                if( s_log.isDebugEnabled() ) {
+                    StringBuffer buf = new StringBuffer();
+
+                    buf.append( "Cache Key: " ).append( gen.getStoreKey().toString() );
+                    buf.append( "\nValue: " ).append( sql );
+                    buf.append( "\nQuery: " ).append( toString() );
+
+                    s_log.debug( buf.toString() );
+                }
+            }
             s_cache.put(gen.getStoreKey(), sql);
         }
 

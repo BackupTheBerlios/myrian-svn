@@ -19,6 +19,7 @@ import com.arsdigita.persistence.pdl.PDLCompiler;
 import com.arsdigita.runtime.DataInitEvent;
 import com.arsdigita.runtime.DomainInitEvent;
 import com.arsdigita.runtime.LegacyInitEvent;
+import com.arsdigita.runtime.RuntimeConfig;
 import java.io.StringReader;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
@@ -27,7 +28,7 @@ import org.apache.log4j.Level;
  * Initializer loads UDCTs.
  *
  * @author Archit Shah
- * @version $Revision: #21 $ $Date: 2004/04/07 $
+ * @version $Revision: #22 $ $Date: 2004/05/28 $
  **/
 
 public class Initializer implements com.arsdigita.runtime.Initializer {
@@ -44,6 +45,8 @@ public class Initializer implements com.arsdigita.runtime.Initializer {
      * initialization parameter.
      **/
     public void init(DomainInitEvent evt) {
+        com.redhat.persistence.oql.Query.setQueryCacheSize( RuntimeConfig.getConfig().getQueryCacheSize() );
+
         // Finally the files out of the database
         TransactionContext txn = null;
         try {
