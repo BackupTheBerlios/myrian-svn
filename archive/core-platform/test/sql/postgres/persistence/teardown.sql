@@ -17,7 +17,7 @@
 -- tests to run.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #4 $ $Date: 2002/07/22 $
+-- @version $Revision: #5 $ $Date: 2002/07/22 $
 --
 
 -- Right now this is duplicated from the individual files. This should
@@ -25,13 +25,10 @@
 
 --@@ test-drop.sql
 
+drop table t_user_group_map;
+
 @@ ../../default/persistence/teardown.sql
 
---drop table t_user_group_map;
---drop table t_groups;
---drop table t_users;
---drop table t_colors;
---drop table t_parties;
 
 --drop table t_datatypes;
 drop table t_data_query;

@@ -13,18 +13,15 @@
 --
 
 --
--- This file sets up all the data models necessary for the persistence
--- tests to run.
+-- This file contains the data model for the node test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #5 $ $Date: 2002/07/22 $
+-- @version $Revision: #1 $ $Date: 2002/07/22 $
 --
 
-@@ ../../default/persistence/setup.sql
-@@ party-test.sql
-@@ datatype-test.sql
-@@ data-query-test.sql
-@@ sql-operation-test.sql
-@@ data-operation-test.sql
-@@ link-test.sql
-@@ test-create.sql
+create table t_nodes (
+    node_id    integer constraint t_nodes_node_id_pk primary key,
+    parent_id  integer constraint t_nodes_parent_id_fk 
+               references t_nodes(node_id),
+    name       varchar(200)
+);

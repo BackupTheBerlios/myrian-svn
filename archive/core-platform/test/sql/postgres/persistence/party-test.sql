@@ -13,15 +13,17 @@
 --
 
 --
--- This file contains the data model for the node test cases.
+-- This file contains the data model for the party test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #3 $ $Date: 2002/07/18 $
+-- @version $Revision: #3 $ $Date: 2002/07/22 $
 --
 
-create table t_nodes (
-    node_id    integer constraint t_nodes_node_id_pk primary key,
-    parent_id  integer constraint t_nodes_parent_id_fk 
-               references t_nodes(node_id),
-    name       varchar(200)
+-- This only contains postgres specific tables that have counter parts
+-- in the other database sql directories
+create table t_user_group_map (
+    group_id    integer references t_groups,
+    member_id   integer references t_users,
+    membership_date timestamp default now() not null,
+    primary key (group_id, member_id)
 );
