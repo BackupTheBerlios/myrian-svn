@@ -62,12 +62,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/03/03 $
+ * @version $Revision: #4 $ $Date: 2004/03/16 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#3 $ by $Author: rhs $, $DateTime: 2004/03/03 18:47:37 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#4 $ by $Author: ashah $, $DateTime: 2004/03/16 17:42:16 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -256,22 +256,23 @@ public class RDBMSEngine extends Engine {
     }
 
     public RecordSet execute(Signature sig, Expression expr) {
+        Select sel = new Select(this, sig, expr);
+
         if (LOG.isInfoEnabled()) {
-            LOG.info("Executing " + expr);
+            LOG.info("Executing " + sel.getQuery());
         }
 
-        Select sel = new Select(this, sig, expr);
-        Map result = new HashMap();
         return new RDBMSRecordSet(sig, this, execute(sel));
     }
 
     public long size(Expression expr) {
-        if (LOG.isInfoEnabled()) {
-            LOG.info("Executing size " + expr);
-        }
-
         Query q = new Query(new Size(expr));
         Select sel = new Select(this, q);
+
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Executing " + sel.getQuery());
+        }
+
         ResultCycle rc = execute(sel);
         if (rc == null) {
             throw new IllegalStateException
