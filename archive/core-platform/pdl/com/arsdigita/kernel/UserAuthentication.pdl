@@ -11,24 +11,24 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/UserAuthentication.pdl#10 $ 
-// $DateTime: 2003/05/12 18:19:45 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/UserAuthentication.pdl#11 $
+// $DateTime: 2003/07/17 18:48:29 $
 
 model com.arsdigita.kernel;
 
 object type UserAuthentication {
-    BigDecimal id = user_authentication.auth_id INTEGER;
+    BigDecimal[1..1] id = user_authentication.auth_id INTEGER;
     String[1..1] primaryEmail = parties.primary_email VARCHAR(100);
     String[0..1] screenName = users.screen_name VARCHAR(100);
     String[1..1] password = user_authentication.password VARCHAR(100);
-    String salt = user_authentication.salt VARCHAR(100);
-    String passwordQuestion = user_authentication.password_question VARCHAR(1000);
-    String passwordAnswer = user_authentication.password_answer VARCHAR(1000);
+    String[0..1] salt = user_authentication.salt VARCHAR(100);
+    String[0..1] passwordQuestion = user_authentication.password_question VARCHAR(1000);
+    String[0..1] passwordAnswer = user_authentication.password_answer VARCHAR(1000);
     User[1..1] user = join user_authentication.user_id to users.user_id;
 
     object key(id);
-    join user_authentication.auth_id to parties.party_id;
-    join user_authentication.auth_id to users.user_id;
+    UserAuthentication[1..1] party =
+        join user_authentication.auth_id to parties.party_id;
 
     // MDSQL also deletes from parties
     delete {
@@ -41,10 +41,10 @@ object type UserAuthentication {
     insert {
         do {
             insert into user_authentication
-            (auth_id, password, salt, 
+            (auth_id, password, salt,
             password_question, password_answer, user_id)
             values
-            (:id, :password, :salt, 
+            (:id, :password, :salt,
             :passwordQuestion, :passwordAnswer, :user.id)
         }
     }
@@ -76,7 +76,7 @@ query UserAuthenticationForLogin {
 	           users.screen_name,
 	           lower(users.screen_name) as lower_screen_name,
 	           parties.primary_email
-          from user_authentication, 
+          from user_authentication,
 	           parties,
 	           users
          where user_authentication.user_id = parties.party_id
