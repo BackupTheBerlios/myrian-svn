@@ -11,14 +11,14 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/versioning/insert-vcx_java_classes.sql#1 $
--- $DateTime: 2003/06/12 17:39:20 $
+-- $Id: //core-platform/dev/sql/default/versioning/insert-vcx_java_classes.sql#2 $
+-- $DateTime: 2003/06/19 09:40:38 $
 
 -- NOTE: this needs to be kept in sync with
 -- com.arsdigita.x.versioning.serialization.Types
 
 insert into vcx_java_classes (id, name) 
-values (0, 'void');
+values (0, 'java.lang.Void');
 
 insert into vcx_java_classes (id, name) 
 values (1, 'java.math.BigDecimal');
