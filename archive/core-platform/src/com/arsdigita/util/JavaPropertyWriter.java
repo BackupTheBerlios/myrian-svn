@@ -29,14 +29,15 @@ import org.apache.log4j.Logger;
  * standard Java properties to store values.
  *
  * @see com.arsdigita.util.parameter.ParameterWriter
+ * @see JavaPropertyReader
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/JavaPropertyWriter.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/JavaPropertyWriter.java#3 $
  */
 public class JavaPropertyWriter implements ParameterWriter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/JavaPropertyWriter.java#2 $" +
-        "$Author: jorris $" +
-        "$DateTime: 2003/10/28 18:36:21 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/JavaPropertyWriter.java#3 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/11/10 12:29:19 $";
 
     private static final Logger s_log = Logger.getLogger
         (JavaPropertyWriter.class);

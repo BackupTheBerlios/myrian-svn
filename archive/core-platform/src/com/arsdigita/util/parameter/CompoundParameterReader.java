@@ -15,6 +15,7 @@
 
 package com.arsdigita.util.parameter;
 
+import com.arsdigita.util.Assert;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -23,29 +24,47 @@ import org.apache.log4j.Logger;
 /**
  * Subject to change.
  *
+ * Aggregates a set of <code>ParameterReaders</code> so they may be
+ * treated as one.
+ *
+ * @see ParameterReader
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/CompoundParameterReader.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/CompoundParameterReader.java#3 $
  */
 public class CompoundParameterReader implements ParameterReader {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/CompoundParameterReader.java#2 $" +
-        "$Author: jorris $" +
-        "$DateTime: 2003/10/28 18:36:21 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/CompoundParameterReader.java#3 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/11/10 12:29:19 $";
 
     private static final Logger s_log = Logger.getLogger
         (CompoundParameterReader.class);
 
     private final List m_readers;
 
+    /**
+     * Constructs a new compound parameter reader.
+     */
     public CompoundParameterReader() {
         m_readers = new ArrayList();
     }
 
-    public void add(final ParameterReader loader) {
-        m_readers.add(loader);
+    /**
+     * Adds <code>reader</code> to the set of component readers.
+     *
+     * @param reader The <code>ParameterReader</code> being added; it
+     * cannot be null
+     */
+    public void add(final ParameterReader reader) {
+        Assert.exists(reader, ParameterReader.class);
+
+        m_readers.add(reader);
     }
 
+    /**
+     * @see ParameterReader#read(Parameter,ErrorList)
+     */
     public String read(final Parameter param, final ErrorList errors) {
         for (final Iterator it = m_readers.iterator(); it.hasNext(); ) {
             final ParameterReader reader = (ParameterReader) it.next();

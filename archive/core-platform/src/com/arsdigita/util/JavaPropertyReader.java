@@ -30,14 +30,15 @@ import org.apache.log4j.Logger;
  * standard Java properties to retrieve values.
  *
  * @see com.arsdigita.util.parameter.ParameterReader
+ * @see JavaPropertyWriter
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/JavaPropertyReader.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/JavaPropertyReader.java#3 $
  */
 public class JavaPropertyReader implements ParameterReader {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/JavaPropertyReader.java#2 $" +
-        "$Author: jorris $" +
-        "$DateTime: 2003/10/28 18:36:21 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/JavaPropertyReader.java#3 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/11/10 12:29:19 $";
 
     private static final Logger s_log = Logger.getLogger
         (JavaPropertyReader.class);
@@ -56,6 +57,13 @@ public class JavaPropertyReader implements ParameterReader {
         m_props = props;
     }
 
+    /**
+     * Loads the internal <code>Properties</code> object using
+     * <code>in</code>.
+     *
+     * @param in The <code>InputStream</code> that has the source
+     * properties; it cannot be null
+     */
     public final void load(final InputStream in) {
         Assert.exists(in, InputStream.class);
 
