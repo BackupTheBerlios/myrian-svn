@@ -1,0 +1,24 @@
+model com.arsdigita.categorization;
+
+query getSubCategories {
+    BigDecimal id;
+    String name;
+    BigDecimal nchild;
+    
+    do {
+        select g.name,
+               g.category_id,
+               count(sd2.category_id) as sub_count
+        from cat_category_category_map sd1
+             left join cat_categories g on 
+                       (g.category_id = sd1.related_category_id)
+             left join cat_category_category_map sd2 on
+                       (sd1.related_category_id = sd2.category_id)
+        where sd1.category_id = :objectID
+        group by g.name, g.category_id
+    } map {
+        id = g.category_id;
+        name = g.name;
+        nchild = sub_count;
+    }
+}

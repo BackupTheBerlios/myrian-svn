@@ -1,0 +1,22 @@
+model com.arsdigita.categorization;
+
+query getRootCategory {
+    BigDecimal id;
+    String name;
+    BigDecimal nchild;
+
+    do {
+        select g.name, 
+               g.category_id,
+               count(sd.category_id) as sub_count
+        from cat_categories g,
+             cat_category_category_map sd
+        where g.category_id = :objectID
+          and sd.category_id(+) = g.category_id
+        group by g.name, g.category_id
+    } map {
+        id = g.category_id;
+        name = g.name;
+        nchild = sub_count;
+    }
+}

@@ -339,8 +339,11 @@ query topLevelCategories {
 data operation swapCategoryWithNextCategory {
     do {
         update cat_category_category_map 
-        set sort_key = decode(sort_key, 
-                              :sortKey, :nextSortKey, :nextSortKey, :sortKey) 
+        set sort_key = CASE WHEN (sort_key = :sortKey) THEN
+                                 (:nextSortKey)
+                            ELSE
+                                 (:sortKey)
+                       END
         where (sort_key = :sortKey or sort_key = :nextSortKey)
         and category_id = :parentID
         and 2 = (select count(*) from cat_category_category_map 
@@ -352,8 +355,11 @@ data operation swapCategoryWithNextCategory {
 data operation swapObjectWithNextObject {
     do {
         update cat_object_category_map 
-        set sort_key = decode(sort_key, 
-                              :sortKey, :nextSortKey, :nextSortKey, :sortKey) 
+        set sort_key = CASE WHEN (sort_key = :sortKey) THEN
+                                 (:nextSortKey)
+                            ELSE
+                                 (:sortKey)
+                       END
         where (sort_key = :sortKey or sort_key = :nextSortKey)
         and category_id = :parentID
         and 2 = (select count(*) from cat_object_category_map 
@@ -363,47 +369,3 @@ data operation swapObjectWithNextObject {
 }
 
 
-
-query getRootCategory {
-    BigDecimal id;
-    String name;
-    BigDecimal nchild;
-
-    do {
-        select g.name, 
-               g.category_id,
-               count(sd.category_id) as sub_count
-        from cat_categories g,
-             cat_category_category_map sd
-        where g.category_id = :objectID
-          and sd.category_id(+) = g.category_id
-        group by g.name, g.category_id
-    } map {
-        id = g.category_id;
-        name = g.name;
-        nchild = sub_count;
-    }
-}
-
-query getSubCategories {
-    BigDecimal id;
-    String name;
-    BigDecimal nchild;
-    
-    do {
-        select g.name,
-               g.category_id,
-               count(sd2.category_id) as sub_count
-        from cat_categories g,  
-             cat_category_category_map sd1,
-             cat_category_category_map sd2
-        where sd1.category_id = :objectID
-          and g.category_id = sd1.related_category_id
-          and sd2.category_id(+) = sd1.related_category_id
-        group by g.name, g.category_id
-    } map {
-        id = g.category_id;
-        name = g.name;
-        nchild = sub_count;
-    }
-}
