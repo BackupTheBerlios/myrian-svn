@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
  * CRPSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/06/24 $
+ * @version $Revision: #3 $ $Date: 2004/06/29 $
  **/
 
 class CRPSet extends CRPCollection implements Set {
@@ -46,7 +46,7 @@ class CRPSet extends CRPCollection implements Set {
         if (contains(o)) {
             return false;
         } else {
-            Main.lock(m_ssn, m_object);
+            C.lock(m_ssn, m_object);
             if (contains(o)) {
                 return false;
             } else {
@@ -58,7 +58,7 @@ class CRPSet extends CRPCollection implements Set {
 
     public boolean remove(Object o) {
         if (contains(o)) {
-            Main.lock(m_ssn, m_object);
+            C.lock(m_ssn, m_object);
             if (contains(o)) {
                 m_ssn.remove(m_object, m_property, o);
                 return true;

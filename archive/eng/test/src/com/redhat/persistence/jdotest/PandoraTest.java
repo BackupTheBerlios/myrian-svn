@@ -9,7 +9,7 @@ import com.redhat.persistence.Session;
 import com.redhat.persistence.engine.rdbms.ConnectionSource;
 import com.redhat.persistence.engine.rdbms.PostgresWriter;
 import com.redhat.persistence.engine.rdbms.RDBMSEngine;
-import com.redhat.persistence.jdo.Main;
+import com.redhat.persistence.jdo.C;
 import com.redhat.persistence.jdo.PersistenceManagerImpl;
 import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Property;
@@ -44,7 +44,7 @@ import org.apache.log4j.Logger;
  * PandoraTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/06/28 $
+ * @version $Revision: #9 $ $Date: 2004/06/29 $
  **/
 
 public class PandoraTest extends AbstractCase {
@@ -155,7 +155,7 @@ public class PandoraTest extends AbstractCase {
                 (expr, new Equals(new Variable(p.getName()),
                                   new Literal(props.get(p))));
         }
-        Cursor c = Main.cursor(m_ssn, klass, expr);
+        Cursor c = C.cursor(m_ssn, klass, expr);
 
         if (c.next()) {
             Object obj = c.get();
@@ -237,7 +237,7 @@ public class PandoraTest extends AbstractCase {
     public void testMain() {
         Picture[] pictures = new Picture[10];
         for (int i = 0; i < pictures.length; i++) {
-            pictures[i] = (Picture) Main.create
+            pictures[i] = (Picture) C.create
                 (m_ssn, Picture.class, new Object[] { new Integer(i) });
             pictures[i].setCaption("Caption " + i);
             pictures[i].setContent(new byte[32]);
@@ -245,7 +245,7 @@ public class PandoraTest extends AbstractCase {
 
         Product[] products = new Product[10];
         for (int i = 0; i < products.length; i++) {
-            products[i] = (Product) Main.create
+            products[i] = (Product) C.create
                 (m_ssn, Product.class, new Object[] { new Integer(i) });
             products[i].setName("Product " + i);
             products[i].setPrice((float)3.14);
@@ -325,16 +325,16 @@ public class PandoraTest extends AbstractCase {
             order.setParty(rhs);
             Collection items = order.getItems();
             for (int j = 0; j < 10; j++) {
-                Item item = (Item) Main.create
+                Item item = (Item) C.create
                     (m_ssn, Item.class, new Object[] { new Integer(j + 10*i) });
                 item.setProduct(products[i]);
                 items.add(item);
             }
         }
 
-        Cursor c = Main.all(m_ssn, Order.class);
+        Cursor c = C.all(m_ssn, Order.class);
         while (c.next()) {
-            Main.lock(m_ssn, c.get());
+            C.lock(m_ssn, c.get());
         }
 
         m_ssn.flushAll();
@@ -343,7 +343,7 @@ public class PandoraTest extends AbstractCase {
             new Class[] { Product.class, Picture.class, Order.class,
                           User.class };
         for (int i = 0; i < klasses.length; i++) {
-            c = Main.all(m_ssn, klasses[i]);
+            c = C.all(m_ssn, klasses[i]);
             while (c.next()) {
                 m_ssn.delete(c.get());
             }

@@ -13,12 +13,12 @@ import java.util.*;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/22 $
+ * @version $Revision: #2 $ $Date: 2004/06/29 $
  **/
 
 class CRPList extends CRPCollection implements List {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPList.java#1 $ by $Author: vadim $, $DateTime: 2004/06/22 13:25:03 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPList.java#2 $ by $Author: vadim $, $DateTime: 2004/06/29 15:21:16 $";
 
     private Object m_object;
     private Property m_property;
@@ -84,7 +84,7 @@ class CRPList extends CRPCollection implements List {
     }
 
     private void lock() {
-        Main.lock(m_ssn, m_object);
+        C.lock(m_ssn, m_object);
     }
 
     public void clear() {
@@ -134,7 +134,7 @@ class CRPList extends CRPCollection implements List {
         expr = new Sort(expr, new Variable(m_index.getName()),
                         first ? Sort.ASCENDING : Sort.DESCENDING);
         expr = new Limit(expr, new Literal(new Integer(1)));
-        Cursor c = Main.cursor(m_ssn, m_property.getType(), expr);
+        Cursor c = C.cursor(m_ssn, m_property.getType(), expr);
         try {
             if (c.next()) {
                 ListElement el = (ListElement) c.get();
@@ -224,7 +224,7 @@ class CRPList extends CRPCollection implements List {
         Expression expr = elements();
         expr = new Filter(expr, new Equals(new Variable(m_index.getName()),
                                            new Literal(new Integer(index))));
-        Cursor c = Main.cursor(m_ssn, m_property.getType(), expr);
+        Cursor c = C.cursor(m_ssn, m_property.getType(), expr);
         try {
             if (c.next()) {
                 return (ListElement) c.get();
@@ -355,7 +355,7 @@ class CRPList extends CRPCollection implements List {
                        ("index", new Integer(m_index)))),
                      new Variable(idx),
                      direction == FORWARD ? Sort.ASCENDING : Sort.DESCENDING);
-                m_cursor = Main.cursor(m_ssn, m_property.getType(), expr);
+                m_cursor = C.cursor(m_ssn, m_property.getType(), expr);
                 m_direction = direction;
             }
 
