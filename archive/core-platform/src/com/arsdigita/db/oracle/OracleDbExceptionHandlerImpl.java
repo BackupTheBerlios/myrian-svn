@@ -30,12 +30,12 @@ import java.sql.PreparedStatement;
  * Class for processing of Oracle DB Exceptions.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #6 $
+ * @version $Revision: #7 $
  * @since 4.6
  */
 public class OracleDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleDbExceptionHandlerImpl.java#6 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleDbExceptionHandlerImpl.java#7 $";
 
     static {
         // lots of stuff can keep us away from the DB...
@@ -63,6 +63,11 @@ public class OracleDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
                    com.arsdigita.db.DbNotAvailableException.class);
         // TNS:packet writer failure
         errors.put("ORA-12571",
+                   com.arsdigita.db.DbNotAvailableException.class);
+        // immediate shutdown in progress
+        errors.put("ORA-01089",
+                   com.arsdigita.db.DbNotAvailableException.class);
+        errors.put("Closed Connection",
                    com.arsdigita.db.DbNotAvailableException.class);
 
         // this one is pretty specific, thankfully.
