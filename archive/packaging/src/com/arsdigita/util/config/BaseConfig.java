@@ -25,25 +25,47 @@ import org.apache.log4j.Logger;
 /**
  * Subject to change.
  *
+ * A base class for defining configuration records.  It uses {@link
+ * com.arsdigita.util.parameter parameters} to recover configuration
+ * from a persistent store.
+ *
+ * @see com.arsdigita.util.parameter.ParameterStore
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#4 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#5 $
  */
 public class BaseConfig {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#4 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#5 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/03 12:09:13 $";
+        "$DateTime: 2003/09/11 11:20:25 $";
 
     private static final Logger s_log = Logger.getLogger
         (BaseConfig.class);
 
     private final ParameterStore m_store;
 
+    /**
+     * Constructs a configuration record that uses <code>store</code>
+     * to marshal and unmarshal parameter values.
+     *
+     * @param store The <code>ParameterStore</code> to keep the
+     * parameter values in
+     */
     protected BaseConfig(final ParameterStore store) {
         m_store = store;
     }
 
+    /**
+     * Constructs a configuration record that uses the Java properties
+     * file referenced by <code>resource</code> as its store.  If no
+     * such resource is found, an empty properties file is used.
+     *
+     * @param resource The location on the class path of a Java
+     * properties file; it cannot be null
+     */
     protected BaseConfig(final String resource) {
+        Assert.exists(resource, String.class);
+
         final Properties props = new Properties();
 
         final InputStream in = getClass().getResourceAsStream(resource);
@@ -64,7 +86,22 @@ public class BaseConfig {
         m_store = new JavaPropertyStore(props);
     }
 
+    /**
+     * Initializes a named parameter (represented by
+     * <code>param</code> by unmarshaling and validating it.  If any
+     * errors are encountered during the unmarshal or validate steps,
+     * a <code>ConfigurationError</code> listing the error messages is
+     * thrown.
+     *
+     * @throws com.arsdigita.util.config.ConfigurationError
+     * @param param The named <code>Parameter</code> you wish to
+     * fetch; it cannot be null
+     * @return The unmarshaled value of <code>param</code>; it may be
+     * null
+     */
     protected final Object initialize(final Parameter param) {
+        Assert.exists(param, Parameter.class);
+
         // 1. Unmarshal and check for errors
 
         final ParameterValue value = param.unmarshal(m_store);
