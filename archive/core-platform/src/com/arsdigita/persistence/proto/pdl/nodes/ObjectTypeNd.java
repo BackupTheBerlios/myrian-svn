@@ -4,12 +4,12 @@ package com.arsdigita.persistence.proto.pdl.nodes;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/07/03 $
  **/
 
 public class ObjectTypeNd extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/nodes/ObjectTypeNd.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/nodes/ObjectTypeNd.java#2 $ by $Author: rhs $, $DateTime: 2003/07/03 09:10:19 $";
 
     public static final Field NAME =
         new Field(ObjectTypeNd.class, "name", IdentifierNd.class, 1, 1);
@@ -30,7 +30,7 @@ public class ObjectTypeNd extends Node {
         new Field(ObjectTypeNd.class, "uniqueKeys", UniqueKeyNd.class);
     public static final Field AGGRESSIVE_LOAD =
         new Field(ObjectTypeNd.class, "aggressiveLoad",
-                  AggressiveLoadNd.class);
+                  AggressiveLoadNd.class, 0, 1);
     public static final Field JOIN_PATHS =
         new Field(ObjectTypeNd.class, "joinPaths", JoinPathNd.class);
     public static final Field EVENTS =

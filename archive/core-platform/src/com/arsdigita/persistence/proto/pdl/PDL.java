@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2003/06/28 $
+ * @version $Revision: #11 $ $Date: 2003/07/03 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#10 $ by $Author: rhs $, $DateTime: 2003/06/28 00:14:32 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#11 $ by $Author: rhs $, $DateTime: 2003/07/03 09:10:19 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -32,6 +32,7 @@ public class PDL {
     private HashSet m_links = new HashSet();
     private HashSet m_fks = new HashSet();
     private HashMap m_fkNds = new HashMap();
+    private HashMap m_events = new HashMap();
 
     public PDL() {}
 
@@ -70,6 +71,19 @@ public class PDL {
     private Root m_root;
 
     public void emit(Root root) {
+        m_ast.traverse(new Node.Switch() {
+            public void onNode(Node nd) {
+                for (Iterator it = nd.getFields().iterator(); it.hasNext(); ) {
+                    String error = nd.validate((Node.Field) it.next());
+                    if (error != null) {
+                        m_errors.fatal(nd, error);
+                    }
+                }
+            }
+        });
+
+        m_errors.check();
+
 	m_root = root;
 
         for (Iterator it = m_root.getObjectTypes().iterator();
@@ -127,11 +141,19 @@ public class PDL {
                         m_errors.fatal(prop, "duplicate property: " + name);
                         return null;
                     }
+                    Integer upper = prop.getUpper();
+                    Integer lower = prop.getLower();
+                    if (upper != null && upper.intValue() <= 0
+                        || lower != null && lower.intValue() < 0
+                        || (upper != null && lower != null
+                            && upper.intValue() < lower.intValue())) {
+                        m_errors.fatal(prop, "bad multiplicity: " + name);
+                        return null;
+                    }
 
                     Role result =
                         new Role(prop.getName().getName(),
-                                 m_symbols.getEmitted
-                                 (m_symbols.lookup(prop.getType())),
+                                 m_symbols.getEmitted(prop.getType()),
                                  prop.isComponent(),
                                  prop.isCollection(),
                                  prop.isNullable());
@@ -166,9 +188,9 @@ public class PDL {
 		    PropertyNd two = assn.getRoleTwo();
 		    Collection props = assn.getProperties();
 		    ObjectType oneot =
-			m_symbols.getEmitted(m_symbols.lookup(one.getType()));
+			m_symbols.getEmitted(one.getType());
 		    ObjectType twoot =
-			m_symbols.getEmitted(m_symbols.lookup(two.getType()));
+			m_symbols.getEmitted(two.getType());
 
 		    if (props.size() > 0) {
 			Role rone = new Role(one.getName().getName(), oneot,
@@ -308,6 +330,18 @@ public class PDL {
         });
 
 	propogateTypes();
+
+        m_errors.check();
+
+        m_ast.traverse(new Node.Switch() {
+            public void onSuper(SuperNd sn) {
+                m_errors.warn
+                    (sn, "super is no longer necessary and deprecated, " +
+                     "please remove");
+            }
+        });
+
+        m_errors.check();
     }
 
     public void emitVersioned() {
@@ -518,8 +552,14 @@ public class PDL {
                         m_errors.fatal
                             (id, "no such property: " + id.getName());
                     } else {
-                        om.getKeyProperties().add(role);
-                        role.setNullable(false);
+                        if (role.isCollection()) {
+                            m_errors.fatal
+                                (id, "collections cannot be keys: " +
+                                 id.getName());
+                        } else {
+                            om.getKeyProperties().add(role);
+                            role.setNullable(false);
+                        }
                     }
                 }
             }, new Node.IncludeFilter(new Node.Field[] {
@@ -707,15 +747,30 @@ public class PDL {
 	} while (m_fks.size() < before);
     }
 
+    private HashMap m_propByColumns = new HashMap();
+
     private void emitMapping(Property prop, ColumnNd colNd) {
 	if (prop.getType().isKeyed()) {
 	    m_errors.fatal(colNd, "association requires a join path");
 	}
 
-        ObjectMap om = m_root.getObjectMap(prop.getContainer());
-        Value m = new Value(Path.get(prop.getName()), lookup(colNd));
-        om.addMapping(m);
         Column col = lookup(colNd);
+
+        Property prev = (Property) m_propByColumns.get(col);
+        if (prev == null) {
+            m_propByColumns.put(col, prop);
+        } else {
+            ObjectType ot1 = prop.getContainer();
+            ObjectType ot2 = prev.getContainer();
+            if ((ot1.isSubtypeOf(ot2) || ot2.isSubtypeOf(ot1))
+                && !prop.equals(prev)) {
+                m_errors.fatal(colNd, "column already mapped to " + prev);
+            }
+        }
+
+        ObjectMap om = m_root.getObjectMap(prop.getContainer());
+        Value m = new Value(Path.get(prop.getName()), col);
+        om.addMapping(m);
         if (prop.isNullable()) { col.setNullable(true); }
     }
 
@@ -904,6 +959,7 @@ public class PDL {
 
 	    if (assn.getProperties().size() > 0) {
 		ot = m_symbols.getEmitted(linkName(assn));
+                boolean warnDups = true;
 		if ((givenName == null ||
 		     givenName.equals(one) ||
 		     givenName.equals(two)) &&
@@ -919,7 +975,17 @@ public class PDL {
 		} else {
 		    type = ev.getType();
 		    name = givenName;
+                    warnDups = false;
 		}
+                if (warnDups) {
+                    Collection blocks = getSQLBlocks(ot, type, name);
+                    if (blocks != null && blocks.size() > 0) {
+                        m_errors.warn
+                            (ev, "redundent events specified," +
+                             " ignoring this event");
+                        return;
+                    }
+                }
 	    } else if (givenName == null || givenName.equals(one)) {
 		if (givenName != null && !ev.isSingle()) {
 		    Collection blocks = getSQLBlocks(oneType, ev.getType(),
@@ -957,7 +1023,6 @@ public class PDL {
             }
         }
 
-	// XXX: should add duplicate event checking here
 	addEvent(m_root.getObjectMap(ot), ev, type, name);
     }
 
@@ -967,9 +1032,9 @@ public class PDL {
     }
 
 
-    private void setSQLBlocks(ObjectType ot, EventNd.Type type, String role,
-                              Collection blocks) {
-        setSQLBlocks(ot.getRoot().getObjectMap(ot), type, role, blocks);
+    private void setSQLBlocks(ObjectType ot, EventNd nd, EventNd.Type type,
+                              String role, Collection blocks) {
+        setSQLBlocks(ot.getRoot().getObjectMap(ot), nd, type, role, blocks);
     }
 
     private Collection getSQLBlocks(ObjectMap om, EventNd.Type type,
@@ -1017,14 +1082,20 @@ public class PDL {
         return result;
     }
 
-    private void setSQLBlocks(ObjectMap om, EventNd.Type type, String role,
-                              Collection blocks) {
+    private void setSQLBlocks(ObjectMap om, EventNd nd, EventNd.Type type,
+                              String role, Collection blocks) {
         if (type.equals(EventNd.INSERT)) {
-            om.setDeclaredInserts(blocks);
+            if (checkDuplicates(om, om.getDeclaredInserts(), blocks, nd)) {
+                om.setDeclaredInserts(blocks);
+            }
         } else if (type.equals(EventNd.UPDATE)) {
-            om.setDeclaredUpdates(blocks);
+            if (checkDuplicates(om, om.getDeclaredUpdates(), blocks, nd)) {
+                om.setDeclaredUpdates(blocks);
+            }
         } else if (type.equals(EventNd.DELETE)) {
-            om.setDeclaredDeletes(blocks);
+            if (checkDuplicates(om, om.getDeclaredDeletes(), blocks, nd)) {
+                om.setDeclaredDeletes(blocks);
+            }
         } else if (type.equals(EventNd.RETRIEVE)) {
             if (role == null) {
                 om.setDeclaredRetrieves
@@ -1033,9 +1104,15 @@ public class PDL {
                 throw new Error("single block event");
             }
         } else if (type.equals(EventNd.ADD)) {
-            getMapping(om, role).setAdds(blocks);
+            Mapping m = getMapping(om, role);
+            if (checkDuplicates(om, m.getAdds(), blocks, nd)) {
+                m.setAdds(blocks);
+            }
         } else if (type.equals(EventNd.REMOVE)) {
-            getMapping(om, role).setRemoves(blocks);
+            Mapping m = getMapping(om, role);
+            if (checkDuplicates(om, m.getRemoves(), blocks, nd)) {
+                m.setRemoves(blocks);
+            }
         } else if (type.equals(EventNd.CLEAR)) {
             // do nothing
         } else if (type.equals(EventNd.RETRIEVE_ATTRIBUTES)) {
@@ -1045,15 +1122,36 @@ public class PDL {
         }
     }
 
+    private boolean checkDuplicates(ObjectMap om, Object prev, Object obj,
+                                    EventNd nd) {
+        if (prev != null) {
+            Node prevNd = (Node) m_events.get(prev);
+            m_errors.fatal
+                (nd, "duplicate " + nd.getType() + " event for object type " +
+                 om.getObjectType().getQualifiedName() +
+                 ", previous definition: " + prevNd.getLocation());
+            return false;
+        } else {
+            m_events.put(obj, nd);
+            return true;
+        }
+    }
+
     private void addEvent(ObjectMap om, EventNd ev, EventNd.Type type,
 			  String role) {
         if (type.equals(EventNd.RETRIEVE) &&
             role != null) {
             Mapping m = getMapping(om, role);
-            m.setRetrieve(getBlock(ev));
+            SQLBlock block = getBlock(om, ev);
+            if (checkDuplicates(om, m.getRetrieve(), block, ev)) {
+                m.setRetrieve(block);
+            }
             return;
         } else if (type.equals(EventNd.RETRIEVE_ALL)) {
-            om.setRetrieveAll(getBlock(ev));
+            SQLBlock block = getBlock(om, ev);
+            if (checkDuplicates(om, om.getRetrieveAll(), block, ev)) {
+                om.setRetrieveAll(block);
+            }
             return;
         }
 
@@ -1061,54 +1159,67 @@ public class PDL {
 
         for (Iterator it = ev.getSQL().iterator(); it.hasNext(); ) {
             SQLBlockNd nd = (SQLBlockNd) it.next();
-            blocks.add(getBlock(nd));
+            blocks.add(getBlock(om, nd));
         }
 
-        setSQLBlocks(om, type, role, blocks);
+        setSQLBlocks(om, ev, type, role, blocks);
     }
 
-    private SQLBlock getBlock(EventNd ev) {
+    private SQLBlock getBlock(ObjectMap om, EventNd ev) {
         if (ev.getSQL().size() > 1) {
             m_errors.fatal(ev, "more than one sql block");
         }
         SQLBlockNd nd;
         Iterator it = ev.getSQL().iterator();
         if (it.hasNext()) {
-            return getBlock((SQLBlockNd) it.next());
+            return getBlock(om, (SQLBlockNd) it.next());
         } else {
             return null;
         }
     }
 
-    private SQLBlock getBlock(SQLBlockNd nd) {
-            try {
-                SQLParser p = new SQLParser(new StringReader(nd.getSQL()));
-                p.sql();
-                final SQLBlock block = new SQLBlock(p.getSQL());
-                for (Iterator ii = p.getAssigns().iterator(); ii.hasNext(); ) {
-                    SQLParser.Assign assn = (SQLParser.Assign) ii.next();
-                    block.addAssign(assn.getBegin(), assn.getEnd().getNext());
+    private SQLBlock getBlock(ObjectMap om, SQLBlockNd nd) {
+        final ObjectType type = om == null ? null : om.getObjectType();
+
+        try {
+            SQLParser p = new SQLParser(new StringReader(nd.getSQL()));
+            p.sql();
+            final SQLBlock block = new SQLBlock(p.getSQL());
+            for (Iterator ii = p.getAssigns().iterator(); ii.hasNext(); ) {
+                SQLParser.Assign assn = (SQLParser.Assign) ii.next();
+                block.addAssign(assn.getBegin(), assn.getEnd().getNext());
+            }
+
+            nd.traverse(new Node.Switch() {
+                private void checkPath(Node nd, Path path) {
+                    if (type != null && !type.exists(path)) {
+                        m_errors.fatal
+                            (nd, "no such path in " +
+                             type.getQualifiedName() + ": " + path);
+                    }
                 }
 
-                nd.traverse(new Node.Switch() {
-                        public void onMapping(MappingNd nd) {
-                            Path col = nd.getCol().getPath();
-                            col = Path.get(col.getName());
-                            block.addMapping(nd.getPath().getPath(), col);
-                        }
+                public void onMapping(MappingNd nd) {
+                    Path col = nd.getCol().getPath();
+                    col = Path.get(col.getName());
+                    Path path = nd.getPath().getPath();
+                    checkPath(nd, path);
+                    block.addMapping(path, col);
+                }
 
-                        public void onBinding(BindingNd nd) {
-                            block.addType(nd.getPath().getPath(),
-                                          nd.getType().getType());
-                        }
-                    });
-		m_root.setLocation(block, nd.getFile().getName(), nd.getLine(),
-				   nd.getColumn());
-                return block;
-            } catch (com.arsdigita.persistence.proto.common.ParseException e) {
-                m_errors.fatal(nd, e.getMessage());
-                return null;
-            }
+                public void onBinding(BindingNd nd) {
+                    Path path = nd.getPath().getPath();
+                    checkPath(nd, path);
+                    block.addType(path, nd.getType().getType());
+                }
+            });
+            m_root.setLocation(block, nd.getFile().getName(), nd.getLine(),
+                               nd.getColumn());
+            return block;
+        } catch (com.arsdigita.persistence.proto.common.ParseException e) {
+            m_errors.fatal(nd, e.getMessage());
+            return null;
+        }
     }
 
     private Mapping getMapping(ObjectMap om, String role) {
@@ -1124,13 +1235,13 @@ public class PDL {
 
     private void emitDataOperations() {
         m_ast.traverse(new Node.Switch() {
-                public void onDataOperation(DataOperationNd nd) {
-                    Path name = Path.get(nd.getFile().getModel().getName() +
-                                         "." + nd.getName().getName());
-                    m_root.addDataOperation
-                        (new DataOperation(name, getBlock(nd.getSQL())));
-                }
-            });
+            public void onDataOperation(DataOperationNd nd) {
+                Path name = Path.get(nd.getFile().getModel().getName() +
+                                     "." + nd.getName().getName());
+                m_root.addDataOperation
+                    (new DataOperation(name, getBlock(null, nd.getSQL())));
+            }
+        });
     }
 
     public static final void main(String[] args) throws Exception {

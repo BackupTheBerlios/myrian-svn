@@ -4,26 +4,26 @@ package com.arsdigita.persistence.proto.pdl.nodes;
  * Property
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/06/02 $
+ * @version $Revision: #4 $ $Date: 2003/07/03 $
  **/
 
 public class PropertyNd extends StatementNd {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/nodes/PropertyNd.java#3 $ by $Author: rhs $, $DateTime: 2003/06/02 10:49:07 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/nodes/PropertyNd.java#4 $ by $Author: rhs $, $DateTime: 2003/07/03 09:10:19 $";
 
     public static final Field TYPE =
         new Field(PropertyNd.class, "type", TypeNd.class, 1, 1);
     public static final Field NAME =
         new Field(PropertyNd.class, "name", IdentifierNd.class, 1, 1);
     public static final Field MAPPING =
-        new Field(PropertyNd.class, "mapping", Node.class, 1, 1);
+        new Field(PropertyNd.class, "mapping", Node.class, 0, 1);
 
     private boolean m_isImmediate = false;
     private boolean m_isUnique = false;
     private boolean m_isComponent = false;
     private boolean m_isComposite = false;
-    private boolean m_isCollection = false;
-    private boolean m_isNullable = true;
+    private Integer m_lower = null;
+    private Integer m_upper = new Integer(1);
 
     private boolean m_isUnversioned = false;
     private boolean m_isVersioned = false;
@@ -60,15 +60,20 @@ public class PropertyNd extends StatementNd {
         m_isComposite = true;
     }
 
-    /**
-     * @post isCollection()
-     **/
-    public void setCollection() {
-        m_isCollection = true;
+    public Integer getLower() {
+        return m_lower;
     }
 
-    public void setNullable(boolean b) {
-        m_isNullable = b;
+    public void setLower(Integer lower) {
+        m_lower = lower;
+    }
+
+    public Integer getUpper() {
+        return m_upper;
+    }
+
+    public void setUpper(Integer upper) {
+        m_upper = upper;
     }
 
     /**
@@ -101,11 +106,11 @@ public class PropertyNd extends StatementNd {
     }
 
     public boolean isCollection() {
-        return m_isCollection;
+        return m_upper == null;
     }
 
     public boolean isNullable() {
-        return m_isNullable;
+        return m_lower == null || m_lower.intValue() == 0;
     }
 
     /**

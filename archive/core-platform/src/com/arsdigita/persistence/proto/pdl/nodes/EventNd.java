@@ -6,12 +6,12 @@ import java.util.*;
  * EventNd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/07/03 $
  **/
 
 public class EventNd extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/nodes/EventNd.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/nodes/EventNd.java#2 $ by $Author: rhs $, $DateTime: 2003/07/03 09:10:19 $";
 
     private static final HashMap TYPES = new HashMap();
 
@@ -48,6 +48,8 @@ public class EventNd extends Node {
         new Field(EventNd.class, "sql", SQLBlockNd.class);
     public static final Field NAME =
         new Field(EventNd.class, "name", IdentifierNd.class, 0, 1);
+    public static final Field SUPERS =
+        new Field(EventNd.class, "supers", SuperNd.class);
 
     private Type m_type;
 
@@ -70,6 +72,10 @@ public class EventNd extends Node {
     public boolean isSingle() {
         return m_type.equals(RETRIEVE_ALL) ||
             (m_type.equals(RETRIEVE) && getName() != null);
+    }
+
+    public Collection getSupers() {
+        return (Collection) get(SUPERS);
     }
 
     public void dispatch(Switch sw) {

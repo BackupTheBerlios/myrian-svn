@@ -13,12 +13,12 @@ import com.arsdigita.persistence.proto.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/06/26 $
+ * @version $Revision: #5 $ $Date: 2003/07/03 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDLParser.jj#4 $ by $Author: rhs $, $DateTime: 2003/06/26 18:40:22 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDLParser.jj#5 $ by $Author: rhs $, $DateTime: 2003/07/03 09:10:19 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -323,16 +323,22 @@ PropertyNd property() :
 void multiplicity(PropertyNd p) :
 {
     boolean isCollection = false;
-    int lower = 0, upper = 1;
+    int lower = -1, upper = -1;
 }
 {
-    <LBRACKET> lower = integer() <DOT> <DOT> ( id() { isCollection = true; }
-                                              | upper = integer() ) <RBRACKET>
+    <LBRACKET> lower = integer()
+         <DOT> <DOT> ( id() { isCollection = true; }
+                       | upper = integer() ) <RBRACKET>
     {
-        if (isCollection || upper > 1) {
-            p.setCollection();
+        if (lower >= 0) {
+            p.setLower(new Integer(lower));
         }
-        p.setNullable(lower == 0);
+        if (upper >= 0) {
+            p.setUpper(new Integer(upper));
+        }
+        if (isCollection) {
+            p.setUpper(null);
+        }
     }
 }
 
@@ -410,7 +416,7 @@ void join_stmt(ObjectTypeNd ot) :
 EventNd event() :
 {
     EventNd ev = new EventNd();
-    Token t;
+    Token t, s;
     Node n;
 }
 {
@@ -422,7 +428,9 @@ EventNd event() :
         ( t = <RETRIEVE> [ t = <ALL> | t = <ATTRIBUTES> |
                            n = id() { ev.add(EventNd.NAME, n); } ] ) )
       <LBRACE>
-          ( n = sql_block() { ev.add(EventNd.SQL, n); } | <SUPER> <SEMI> )*
+          ( n = sql_block() { ev.add(EventNd.SQL, n); }
+            | s = <SUPER> <SEMI>
+              { n = new SuperNd(); ln(n, s); ev.add(EventNd.SUPERS, n); } )*
       <RBRACE>
       { ev.setType(EventNd.getType(t.image)); ln(ev, t); }
      |

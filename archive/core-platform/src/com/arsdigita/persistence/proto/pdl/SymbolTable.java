@@ -8,12 +8,12 @@ import java.util.*;
  * SymbolTable
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/06/28 $
+ * @version $Revision: #3 $ $Date: 2003/07/03 $
  **/
 
 class SymbolTable {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/SymbolTable.java#2 $ by $Author: rhs $, $DateTime: 2003/06/28 00:14:32 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/SymbolTable.java#3 $ by $Author: rhs $, $DateTime: 2003/07/03 09:10:19 $";
 
     private HashMap m_types = new HashMap();
     private ArrayList m_order = new ArrayList();
@@ -199,7 +199,7 @@ class SymbolTable {
             ObjectTypeNd ot = (ObjectTypeNd) it.next();
             ObjectType sup = null;
             if (ot.getExtends() != null) {
-                sup = getEmitted(lookup(ot.getExtends()));
+                sup = getEmitted(ot.getExtends());
             }
             ObjectType type =
                 new ObjectType

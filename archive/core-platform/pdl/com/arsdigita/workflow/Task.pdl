@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/workflow/Task.pdl#13 $
-// $DateTime: 2003/06/09 19:03:29 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/workflow/Task.pdl#14 $
+// $DateTime: 2003/07/03 09:10:19 $
 
 model com.arsdigita.workflow.simple;
 
@@ -111,7 +111,7 @@ query getCommentsInWorkflow {
            and c.task_id = t2.task_id
     } map {
         comment.id = c.comment_id;
-        comment.taskID = c.task_id;
+        comment.task = c.task_id;
         comment.taskComment = c.task_comment;
         comment.commentDate = c.comment_date;
         comment.partyID = c.party_id;

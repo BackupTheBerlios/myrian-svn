@@ -6,12 +6,12 @@ import java.util.*;
  * Node
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/07/03 $
  **/
 
 public abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/nodes/Node.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/nodes/Node.java#2 $ by $Author: rhs $, $DateTime: 2003/07/03 09:10:19 $";
 
 
     /**
@@ -82,6 +82,10 @@ public abstract class Node {
             return m_upper;
         }
 
+        public String getName() {
+            return m_name;
+        }
+
         public String toString() {
             return m_name;
         }
@@ -143,6 +147,7 @@ public abstract class Node {
 
         public void onEvent(EventNd nd) {}
         public void onSQLBlock(SQLBlockNd nd) {}
+        public void onSuper(SuperNd nd) {}
         public void onMapping(MappingNd nd) {}
         public void onBinding(BindingNd nd) {}
 
@@ -225,6 +230,7 @@ public abstract class Node {
     private Node m_parent = null;
     private Field m_field = null;
     private ArrayList m_children = new ArrayList();
+    private HashMap m_fields = new HashMap();
 
 
     /**
@@ -241,27 +247,25 @@ public abstract class Node {
     public Object get(Field field) {
         check(field);
 
-        ArrayList result = null;
-        for (Iterator it = m_children.iterator(); it.hasNext(); ) {
-            Child child = (Child) it.next();
-            if (child.getField().equals(field)) {
-                if (field.getUpper() == 1) {
-                    return child.getNode();
-                } else {
-                    if (result == null) {
-                        result = new ArrayList();
-                    }
-                    result.add(child.getNode());
-                }
+        ArrayList children = (ArrayList) m_fields.get(field);
+        if (field.getUpper() == 1) {
+            if (children == null) {
+                return null;
+            } else {
+                return children.get(0);
+            }
+        } else if (children == null
+                   && (field.getUpper() > 1
+                       || field.getUpper() < field.getLower())) {
+            return Collections.EMPTY_LIST;
+        } else {
+            if (children == null) {
+                throw new IllegalStateException
+                    ("returning null from collection field");
+            } else {
+                return children;
             }
         }
-
-        if (result == null &&
-            (field.getUpper() > 1 || field.getUpper() < field.getLower())) {
-            result = new ArrayList();
-        }
-
-        return result;
     }
 
     public int getIndex() {
@@ -285,6 +289,50 @@ public abstract class Node {
         child.m_parent = this;
         child.m_field = field;
         m_children.add(new Child(field, child));
+        ArrayList children = (ArrayList) m_fields.get(field);
+        if (children == null) {
+            children = new ArrayList();
+            m_fields.put(field, children);
+        }
+        children.add(child);
+    }
+
+    public Collection getFields() {
+        // XXX: should really climb the type hierarchy here to get all
+        // fields, currently we don't have supertypes with fields so
+        // it doesn't matter.
+        Type t = (Type) TYPES.get(getClass());
+        if (t == null) {
+            return Collections.EMPTY_LIST;
+        } else {
+            return t.getFields();
+        }
+    }
+
+    public String validate(Field field) {
+        int lower = field.getLower();
+        int upper = field.getUpper();
+        if (upper < lower) {
+            return null;
+        }
+
+        Collection children = (Collection) m_fields.get(field);
+        if (children == null) {
+            children = Collections.EMPTY_LIST;
+        }
+
+        if (children.size() > upper) {
+            return "there can be at most " + upper + " " + field.getName();
+        } else if (children.size() < lower) {
+            if (upper == 1) {
+                return field.getName() + " is required";
+            } else {
+                return "there must be at least " + lower + " " +
+                    field.getName();
+            }
+        } else {
+            return null;
+        }
     }
 
 
