@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/09/09 $
+ * @version $Revision: #8 $ $Date: 2003/09/25 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/QGen.java#7 $ by $Author: rhs $, $DateTime: 2003/09/09 17:32:16 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/QGen.java#8 $ by $Author: justin $, $DateTime: 2003/09/25 14:54:00 $";
 
     private static final Logger LOG = Logger.getLogger(QGen.class);
 
@@ -64,29 +64,30 @@ class QGen {
     private static final HashMap BLOCKS = new HashMap();
     private static final HashMap PREFIXES = new HashMap();
 
-    static final boolean hasSource(SQLBlock block) {
+    static synchronized final boolean hasSource(SQLBlock block) {
         return SOURCES.containsKey(block);
     }
 
-    static final Source getSource(SQLBlock block) {
+    static synchronized final Source getSource(SQLBlock block) {
         return (Source) SOURCES.get(block);
     }
 
-    static final boolean hasSQLBlock(Source src) {
+    static synchronized final boolean hasSQLBlock(Source src) {
         return BLOCKS.containsKey(src);
     }
 
-    static final SQLBlock getSQLBlock(Source src) {
+    static synchronized final SQLBlock getSQLBlock(Source src) {
         return (SQLBlock) BLOCKS.get(src);
     }
 
-    static final void addSource(Source src, SQLBlock block, Path prefix) {
+    static synchronized final void addSource(Source src, SQLBlock block,
+                                             Path prefix) {
         SOURCES.put(block, src);
         BLOCKS.put(src, block);
         PREFIXES.put(block, prefix);
     }
 
-    static final Path getPrefix(SQLBlock block) {
+    static synchronized final Path getPrefix(SQLBlock block) {
         return (Path) PREFIXES.get(block);
     }
 

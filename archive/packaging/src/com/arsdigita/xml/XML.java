@@ -17,24 +17,108 @@ package com.arsdigita.xml;
 
 import com.arsdigita.util.UncheckedWrapperException;
 import com.arsdigita.util.ResourceManager;
+import com.arsdigita.util.Assert;
 
-import org.xml.sax.SAXException;
+import com.arsdigita.xml.formatters.DateTimeFormatter;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
 /**
- * Provides a set of helper methods for dealing with XML files.
+ * Provides a set of helper methods for dealing with XML,
+ * including file parsing &amp; object -> string serialization
  */
 public class XML {
 
     private static final Logger s_log = Logger.getLogger(XML.class);
+
+    private static Map s_formatters = new HashMap();
+    static {
+        s_formatters.put(Date.class, new DateTimeFormatter());
+    }
+    
+    /**
+     * Registers a formatter for serializing objects of a
+     * class to a String suitable for XML output.
+     */
+    public static void registerFormatter(Class klass,
+                                         Formatter formatter) {
+        s_formatters.put(klass, formatter);
+    }
+
+    /**
+     * Unregisters a formatter against a class.
+     */
+    public static void unregisterFormatter(Class klass) {
+        s_formatters.remove(klass);
+    }
+    
+    /**
+     * Gets a directly registered formatter for a class.
+     * @param klass the class to find a formatter for
+     * @return the formatter, or null if non is registered
+     */
+    public static Formatter getFormatter(Class klass) {
+        return (Formatter)s_formatters.get(klass);
+    }
+    
+    /**
+     * Looks for the best matching formatter.
+     * @param klass the class to find a formatter for
+     * @return the formatter, or null if non is registered
+     */
+    public static Formatter findFormatter(Class klass) {
+        Formatter formatter = null;
+        while (formatter == null && klass != null) {
+            formatter = getFormatter(klass);
+            klass = klass.getSuperclass();
+        }
+        return formatter;
+    }
+    
+    /**
+     * Converts an object to a String using the closest
+     * matching registered Formatter implementation. Looks
+     * for a formatter registered against the object's
+     * class first, then its superclass, etc. If no formatter
+     * is found, uses the toString() method
+     */
+    public static String format(Object value) {
+        if (value == null) {
+            return null;
+        }
+
+        if (value instanceof String) {
+            return (String)value;
+        }
+
+        Formatter formatter = findFormatter(value.getClass());
+        if (formatter == null) {
+            if (s_log.isDebugEnabled()) {
+                s_log.debug("No formatter for " + value.getClass());
+            }
+            return value.toString();
+        }
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Processing " + value.getClass() + 
+                        " with " + formatter.getClass());
+        }
+        return formatter.format(value);
+    }
     
     /**
      * Processes an XML file with the default SAX Parser, with
@@ -44,26 +128,51 @@ public class XML {
      * @param path the XML file relative to the webapp root
      * @param handler the content handler
      */
-    public static final void parseResource(String file,
+    public static final void parseResource(String path,
                                            DefaultHandler handler) {
         if (s_log.isDebugEnabled()) {
-            s_log.debug("Processing file " + file + " with " + handler.getClass());
+            s_log.debug("Processing resource " + path + 
+                        " with " + handler.getClass());
+        }
+        
+        InputStream stream = ResourceManager.getInstance().getResourceAsStream(path);
+        Assert.exists(stream, InputStream.class);
+        
+        parse(stream, handler);
+    }
+
+    /**
+     * Processes an XML file with the default SAX Parser, with
+     * namespace processing, schema validation & DTD validation
+     * enabled.
+     *
+     * @param source the xml input stream
+     * @param handler the content handler
+     */
+    public static final void parse(InputStream source,
+                                   DefaultHandler handler) {
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Processing stream " + source + 
+                        " with " + handler.getClass());
         }
 
-        String path = ResourceManager.getInstance().getServletContext().
-            getRealPath(file);
-        
         try {
             SAXParserFactory spf = SAXParserFactory.newInstance();
             spf.setFeature("http://xml.org/sax/features/namespaces", true);
             SAXParser parser = spf.newSAXParser();
-            parser.parse(path, handler);
+            parser.parse(source, handler);
         } catch (ParserConfigurationException e) { 
-            throw new UncheckedWrapperException("error parsing " + path, e);
-        } catch (SAXException e) { 
-            throw new UncheckedWrapperException("error parsing " + path, e);
+            throw new UncheckedWrapperException("error parsing stream", e);
+        } catch (SAXException e) {
+            if (e.getException() != null) {
+                throw new UncheckedWrapperException("error parsing stream", 
+                                                    e.getException());
+            } else {
+                throw new UncheckedWrapperException("error parsing stream", e);
+            }
         } catch (IOException e) { 
-            throw new UncheckedWrapperException("error parsing " + path, e);
+            throw new UncheckedWrapperException("error parsing stream", e);
         }
     }
+
 }

@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashMap;
 
 import org.apache.oro.text.perl.Perl5Util;
 import org.apache.oro.text.regex.MalformedPatternException;
@@ -34,6 +35,7 @@ import org.apache.oro.text.regex.Perl5Matcher;
 import org.apache.oro.text.regex.Substitution;
 import org.apache.oro.text.regex.Util;
 
+import org.apache.log4j.Logger;
 
 /**
  * A (static) class of generally-useful string utilities.
@@ -41,6 +43,8 @@ import org.apache.oro.text.regex.Util;
  * @author Bill Schneider
  */
 public class StringUtils {
+
+    private static final Logger s_log = Logger.getLogger(StringUtils.class);
 
     private static Perl5Util s_re = new Perl5Util();
 
@@ -153,6 +157,303 @@ public class StringUtils {
         }
     }
 
+    
+    /**
+     * Converts plain text with simple inline markup 
+     * into HTML. The following constructs are recognised:
+     *
+     * <ul>
+     * <li>*text* generates bold <strong>text</strong>
+     * <li>/text/ generates italic <em>text</em>
+     * <li>=text= generates fixed <code>text</code>
+     * <li>@text(http://www.google.com) generates a titled link <a href="http://www.google.com">text</a>
+     * <li>http://www.google.com generates an untitled link <a href="http://www.google.com">http://www.google.com</a>
+     * <li>--- <br/>generates a horizontal line<br/> <hr/>
+     * <li>___ <br/>generates a horizontal line<br/> <hr/>
+     * <li><p>* my item <br>
+     * * my next item<br>
+     * * my final item </p>
+     * generates an bulleted list
+     * <ul>
+     *  <li>my item
+     *  <li>my next item
+     *  <li>my final item
+     * </ul>
+     * <li><p>+ my item <br>
+     * + my next item<br>
+     * + my final item </p>
+     * generates an enumerated list
+     * <ol>
+     *  <li>my item
+     *  <li>my next item
+     *  <li>my final item
+     * </ol>
+     * <li>1/2, 1/4, 3/4, (C), (TM), (R) generate entities
+     *  &frac12;, &frac14, &frac34;, &copy; <sup>TM</sup>
+     * &reg;
+     * </ul>
+     */
+    public final static String smartTextToHtml(String s) {
+        ArrayList blocks = new ArrayList();
+        s_re.split(blocks, "/\\r?\\n(\\r?\\n)+/", s);
+        
+        StringBuffer html = new StringBuffer("");
+        Iterator i = blocks.iterator();
+        while (i.hasNext()) {
+            String block = (String)i.next();
+            if (s_re.match("/^\\s*(___+|---+)\\s*$/", block)) {
+                html.append("<hr/>");
+            } else if (s_re.match("/^\\*\\s/", block)) {
+                html.append(smartTextList("/^\\*\\s+/m", "ul", block));
+            } else if (s_re.match("/^\\+\\s/", block)) {
+                html.append(smartTextList("/^\\+\\s+/m", "ol", block));
+            } else if (s_re.match("/\\w/", block)) {
+                html.append("<div>\n" + smartTextInline(block) + "\n</div>");
+            }
+            html.append("\n");
+        }
+        return html.toString();
+    }
+    
+    private static String smartTextList(String match,
+                                        String type,
+                                        String s) {
+        ArrayList blocks = new ArrayList();
+        s_re.split(blocks, match, s);
+        
+        StringBuffer list = new StringBuffer("<" + type + ">\n");
+        Iterator i = blocks.iterator();
+        while (i.hasNext()) {
+            String block = (String)i.next();
+
+            if ("".equals(block)) {
+                continue;
+            }
+
+            list.append("<li>\n");
+            list.append(smartTextInline(block));
+            list.append("</li>\n");
+        }
+        list.append("</" + type + ">");
+
+        return list.toString();
+    }
+    
+    private static Map s_entities = new HashMap();
+    static {
+        s_entities.put("fraction12", "&frac12;");
+        s_entities.put("fraction14", "&frac14;");
+        s_entities.put("fraction34", "&frac34;");
+        s_entities.put("copyright", "&copy;");
+        s_entities.put("registered", "&reg;");
+        s_entities.put("trademark", "<sup>TM</sup>");
+    }
+
+    private static String smartTextInline(String s) {
+        HashMap links = new HashMap();
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Input {" + s + "}");
+        }
+
+        // We're going to use the octal characters \u0001 and \u0002 for
+        // escaping stuff, so we'd better make sure there aren't any
+        // in the text.
+        s = s_re.substitute("s/\u0001|\u0002|\u0003//g", s);
+    
+        // We transform a few common symbols
+        // We don't substitute them straight in because the
+        // substituted text might interfere with stuff that
+        // follows...
+        s = s_re.substitute("s|\\b1/4\\b|\u0003fraction14\u0003|gx", s);
+        s = s_re.substitute("s|\\b1/2\\b|\u0003fraction12\u0003|gx", s);
+        s = s_re.substitute("s|\\b3/4\\b|\u0003fraction34\u0003|gx", s);        
+        s = s_re.substitute("s|\\(C\\)|\u0003copyright\u0003|gx", s);
+        s = s_re.substitute("s|\\(R\\)|\u0003registered\u0003|gx", s);
+        s = s_re.substitute("s|\\(TM\\)|\u0003trademark\u0003|gx", s);
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("After entities {" + s + "}");
+        }
+    
+        // We've got to protect the url of titled links before we go further,
+        // however we can't actually generate the link yet because
+        // that interferes with the monospace stuff below....
+        s = s_re.substitute("s|@@|\u0001|gx", s);
+        s = smartTextReplace(new TitledLinkSubstitution(links), 
+                             "@([^\\(@]+)\\(([^\\)]+)\\)", s);
+    
+        // We protect hyperlinks so that the '/' or '@' doesn't get 
+        // mistaken for a block of italics / link
+        s = smartTextReplace(new UntitledLinkSubstitution(links), 
+                             "([a-z]+:\\/\\/[^\\s,\\(\\)><]*)", s);
+        s = smartTextReplace(new UntitledLinkSubstitution(links),
+                             "(mailto:[^\\s,\\(\\)><]*)", s);
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("After links {" + s + "}");
+        }
+
+
+        // Next lets process italics /italic/
+        // NB. this must be first, otherwise closing tags </foo>
+        // interfere with the pattern matching
+        s = s_re.substitute("s|//|\u0001|gx", s);
+        //s = s_re.substitute("s|(?<!\\w)/([^/]+)/(?!\\w)|<em>$1</em>|gx", s);
+        s = s_re.substitute("s|(\\W)/([^/]+)/(?!\\w)|$1<em>$2</em>|gx", s);
+        s = s_re.substitute("s|\u0001|/|gx", s);
+        
+        // Lets process bold text *bold*
+        s = s_re.substitute("s|\\*\\*|\u0001|gx", s);
+        //s = s_re.substitute("s|(?<!\\w)\\*([^\\*]+)\\*(?!\\w)|<strong>$1</strong>|gx", s);
+        s = s_re.substitute("s|(\\W)\\*([^\\*]+)\\*(?!\\w)|$1<strong>$2</strong>|gx", s);
+        s = s_re.substitute("s|\u0001|*|gx", s);
+        
+        // Now we're onto the monospace stuff =monospace=
+        s = s_re.substitute("s|==|\u0001|gx", s);
+        //s = s_re.substitute("s|(?<!\\w)=([^=]+)=(?!\\w)|<code>$1</code>|gx", s);
+        s = s_re.substitute("s|(\\W)=([^=]+)=(?!\\w)|$1<code>$2</code>|gx", s);
+        s = s_re.substitute("s|\u0001|=|gx", s);
+
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("After styles {" + s + "}");
+        }
+
+
+        // Links are next on the list @text(url)
+        s = s_re.substitute("s|@@|\u0001|gx", s);
+        s = s_re.substitute("s|@([^\\(@]+)\\(([^\\)]+)\\)|<a href=\"$2\">$1</a>|gx", s);
+        s = s_re.substitute("s|\u0001|@|gx", s);
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("After links pass two {" + s + "}");
+        }
+        
+        // Finally we can unobscure the hyperlinks
+        s = smartTextReplace(new UnobscureSubstitution(links),
+                             "\u0002([^\u0002]+)\u0002", s);
+        s = s_re.substitute("s|\u0001|@|gx", s);
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("After links pass three {" + s + "}");
+        }
+
+        // And those entities
+        s = smartTextReplace(new EntitySubstitution(), 
+                              "\u0003([^\u0003]+)\u0003", s);
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("After entities (complete) {" + s + "}");
+        }
+        
+        return s;
+    }
+    
+
+    private static String smartTextReplace(Substitution subst,
+                                           String pattern,
+                                           String s) {
+        Perl5Matcher matcher = new Perl5Matcher();
+        Perl5Compiler compiler = new Perl5Compiler();
+        StringBuffer result = new StringBuffer();
+        PatternMatcherInput input = new PatternMatcherInput(s);
+
+        try {
+            Util.substitute(result,
+                            matcher,
+                            compiler.compile(pattern),
+                            subst,
+                            input,
+                            Util.SUBSTITUTE_ALL);
+        } catch (MalformedPatternException e) {
+            throw new UncheckedWrapperException("cannot perform substitution", e);
+        }
+        return result.toString();
+    }
+
+    private static class TitledLinkSubstitution implements Substitution {
+        private Map m_hash;
+
+        public TitledLinkSubstitution(Map hash) {
+            m_hash = hash;
+        }
+
+        public void appendSubstitution(StringBuffer appendBuffer,
+                                       MatchResult match,
+                                       int substitutionCount,
+                                       PatternMatcherInput originalInput,
+                                       PatternMatcher matcher,
+                                       Pattern pattern) {
+            String title = match.group(1);
+            String link = match.group(2);
+            s_log.debug("Link: " + link);
+
+            Integer i = new Integer(m_hash.size());
+            s_log.debug("Key: " + i);
+            m_hash.put(i, link);
+            String dst = "@" + title + "(\u0002" + i.toString() + "\u0002)";
+            appendBuffer.append(dst);
+            s_log.debug("Encoded Link: " + dst);
+        }
+    }
+    
+    private static class UntitledLinkSubstitution implements Substitution {
+        private Map m_hash;
+
+        public UntitledLinkSubstitution(Map hash) {
+            m_hash = hash;
+        }
+
+        public void appendSubstitution(StringBuffer appendBuffer,
+                                       MatchResult match,
+                                       int substitutionCount,
+                                       PatternMatcherInput originalInput,
+                                       PatternMatcher matcher,
+                                       Pattern pattern) {
+            String link = match.group(1);
+            s_log.debug("Link: " + link);
+
+            Integer i = new Integer(m_hash.size());
+            s_log.debug("Key: " + i);
+            m_hash.put(i, link);
+            String dst = "@\u0002" + i.toString() + "\u0002(\u0002" + i.toString() + "\u0002)";
+            appendBuffer.append(dst);
+            s_log.debug("Encoded Link: " + dst);
+        }
+    }
+
+    private static class UnobscureSubstitution implements Substitution {
+        private Map m_hash;
+
+        public UnobscureSubstitution(Map hash) {
+            m_hash = hash;
+        }
+
+        public void appendSubstitution(StringBuffer appendBuffer,
+                                       MatchResult match,
+                                       int substitutionCount,
+                                       PatternMatcherInput originalInput,
+                                       PatternMatcher matcher,
+                                       Pattern pattern) {
+            String s = match.group(1);
+            s_log.debug("Key: " + s);
+            
+            Integer i = new Integer(s);
+            appendBuffer.append((String)m_hash.get(i));
+            s_log.debug("Link: " + m_hash.get(i));
+        }
+    }
+    
+    
+    private static class EntitySubstitution implements Substitution {
+        public void appendSubstitution(StringBuffer appendBuffer,
+                                       MatchResult match,
+                                       int substitutionCount,
+                                       PatternMatcherInput originalInput,
+                                       PatternMatcher matcher,
+                                       Pattern pattern) {
+            String s = match.group(1);
+            s_log.debug("Key: " + s);
+            
+            appendBuffer.append((String)s_entities.get(s));
+            s_log.debug("Entity: " + s_entities.get(s));
+        }
+    }
+    
 
     /**
      * Convert a string of items separated by a separator
@@ -227,7 +528,7 @@ public class StringUtils {
    *
    * @param s The original string to split.
    * @param re The regular expression in the format required by
-   * {@link org.apache.oro.text.perl.Perl5Util#match}.
+   * {@link org.apache.oro.text.perl.Perl5Util#umatch}.
    * @return List of substrings.
    *
    * @author Richard W.M. Jones
@@ -243,28 +544,28 @@ public class StringUtils {
 
     while (s != null && s.length() > 0)
       {
-	// Find the next match.
-	if (p5.match (re, s))
-	  {
-	    MatchResult result = p5.getMatch ();
+        // Find the next match.
+        if (p5.match (re, s))
+          {
+            MatchResult result = p5.getMatch ();
 
-	    // String up to the start of the match.
-	    if (result.beginOffset (0) > 0)
-	      list.add (s.substring (0, result.beginOffset (0)));
+            // String up to the start of the match.
+            if (result.beginOffset (0) > 0)
+              list.add (s.substring (0, result.beginOffset (0)));
 
-	    // Matching part.
-	    list.add (result.toString ());
+            // Matching part.
+            list.add (result.toString ());
 
-	    // Update s to be the remainder of the string.
-	    s = s.substring (result.endOffset (0));
-	  }
-	else
-	  {
-	    // Finished.
-	    list.add (s);
+            // Update s to be the remainder of the string.
+            s = s.substring (result.endOffset (0));
+          }
+        else
+          {
+            // Finished.
+            list.add (s);
 
-	    s = null;
-	  }
+            s = null;
+          }
       }
 
     return list;
@@ -826,8 +1127,8 @@ public class StringUtils {
                                  final String find,
                                  final String replace) {
 
-        Assert.assertNotNull(find, "find");
-        Assert.assertNotNull(replace, "replace");
+        Assert.exists(find, String.class);
+        Assert.exists(replace, String.class);
 
         if ( str == null ) return null;
 

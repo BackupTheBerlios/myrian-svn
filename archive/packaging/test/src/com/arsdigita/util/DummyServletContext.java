@@ -15,8 +15,10 @@
 
 package com.arsdigita.util;
 
+import org.apache.log4j.Logger;
+
 import javax.servlet.*;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -24,15 +26,16 @@ import java.util.Set;
  *  Dummy ServletContext object for unit testing of form methods that
  *  include requests in their signatures.
  *
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/09/25 $
  */
 
 public class DummyServletContext implements ServletContext {
 
-    public static final String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/util/DummyServletContext.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public static final String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/util/DummyServletContext.java#3 $ by $Author: justin $, $DateTime: 2003/09/25 14:54:00 $";
 
     private HashMap m_attributes = new HashMap();
     private HashMap m_dispachers = new HashMap();
+    private static final Logger s_log = Logger.getLogger(DummyServletContext.class);
 
 
     public Object getAttribute(String name) {
@@ -90,8 +93,15 @@ public class DummyServletContext implements ServletContext {
         return null;
     }
 
-    public java.io.InputStream getResourceAsStream(String path) {
-        return null;
+    public java.io.InputStream getResourceAsStream(String name) {
+        final String path = getRealPath(name);
+
+        try {
+            return new FileInputStream(path);
+        } catch (FileNotFoundException e) {
+            s_log.error("Couldn't get file stream for resource " + name + " at path " + path, e);
+            return null;
+        }
     }
 
     public String getServerInfo() {

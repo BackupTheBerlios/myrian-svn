@@ -19,7 +19,7 @@ package com.arsdigita.util;
  * Special MIME types useful for typing Message objects.
  *
  * @author Ron Henderson 
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/MessageType.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/MessageType.java#3 $
  */
 
 public interface MessageType {
@@ -40,4 +40,11 @@ public interface MessageType {
      */
     public final static String TEXT_PREFORMATTED =
         TEXT_PLAIN + "; format=preformatted";
+
+    /**
+     * MIME type of "text/plain" with a special format qualifier that
+     * simple inline markup should be recognised
+     */
+    public final static String TEXT_SMART =
+        TEXT_PLAIN + "; format=smart";
 }

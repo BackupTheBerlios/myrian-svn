@@ -18,15 +18,14 @@ package com.arsdigita.util.cmd;
 import java.io.*;
 
 /**
- * FileSwitch
- *
+ * @deprecated Use CLI (http://jakarta.apache.org/commons/cli/index.html) instead.
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/09/25 $
  **/
 
 public class FileSwitch extends Switch {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/util/cmd/FileSwitch.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/util/cmd/FileSwitch.java#3 $ by $Author: justin $, $DateTime: 2003/09/25 14:54:00 $";
 
     public FileSwitch(String name, String usage, File defValue) {
         super(name, PARAMETER, usage, defValue);

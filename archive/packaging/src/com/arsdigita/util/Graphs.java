@@ -30,10 +30,21 @@ import java.util.Stack;
  *
  * @author Archit Shah (ashah@mit.edu)
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/08/19 $
+ * @version $Date: 2003/09/25 $
  * @since 2003-01-22
  **/
 public class Graphs {
+
+    /**
+     * A simple implementation of the {@link Graphs.EdgeSelector} interface that
+     * selects outgoing edges.
+     **/
+    public final static EdgeSelector FORWARD_SELECTOR = new EdgeSelector() {
+            public boolean test(Graph.Edge edge, boolean forward) {
+                return forward;
+            }
+        };
+
     private static final String INDENT = "    ";
 
     private Graphs() {}
@@ -41,51 +52,76 @@ public class Graphs {
     /**
      * Finds a path in <code>graph</code> from begin to end
      * 
-     *
+     * @see #findPath(Graph, Object, EdgeSelector, NodeSelector)
      * @returns list of edges representing the found path
+     * @throws NullPointerException if any of the three arguments is <code>null</code>.
      **/
     public static final List findPath(Graph graph, Object begin, Object end) {
-        List path = new ArrayList(findPathRecurse(graph, begin, end, new HashSet()));
-        Collections.reverse(path);
+        NodeSelector terminator = new EqualityTerminator(end);
+        return findPath(graph, begin, FORWARD_SELECTOR, terminator);
+    }
+
+    /**
+     * Performs a traversal of <code>graph</code> looking for path that starts
+     * with <code>startNode</code> and terminates with a node that satisfies the
+     * test specified by <code>terminator</code> and consists only of those
+     * edges that satisfy the test specified by <code>selector</code>.
+     *
+     * @return a path from start node to a node that satisfies the condition
+     * specified by <code>terminator</code>, such that all edges in the path
+     * satisfy the condition specified by <code>selector</code>. An empty list
+     * is returned, if no such path can be found.
+     **/
+    public static List findPath(Graph graph, Object startNode,
+                                EdgeSelector selector,
+                                NodeSelector terminator) {
+
+        Stack path = new Stack();
+        findPathRecur
+            (graph, startNode, selector, terminator, new HashSet(), path);
         return path;
     }
 
-    private static final Stack findPathRecurse(
-        Graph g, Object start, Object finish, Set searched) {
 
-        Iterator it = g.getOutgoingEdges(start).iterator();
+    private static final boolean findPathRecur
+        (Graph graph, Object start,
+         EdgeSelector selector, NodeSelector terminator,
+         Set searched, Stack path) {
 
+        Iterator it = graph.getOutgoingEdges(start).iterator();
         searched.add(start);
 
         while (it.hasNext()) {
-            Graph.Edge e = (Graph.Edge) it.next();
+            Graph.Edge edge = (Graph.Edge) it.next();
+            if ( !selector.test(edge, true) ) { continue; }
 
-            if (e.getHead().equals(finish)) {
-                Stack s = new Stack();
-                s.push(e);
-                return s;
+            path.push(edge);
+            final Object node = edge.getHead();
+
+            if (terminator.test(node)) {
+                return true;
             }
-        }
 
-        it = g.getOutgoingEdges(start).iterator();
-        while (it.hasNext()) {
-            Graph.Edge e = (Graph.Edge) it.next();
-            if (!searched.contains(e.getHead())) {
-                Stack answer = findPathRecurse(g, e.getHead(), finish, searched);
-                if (answer != null) {
-                    answer.push(e);
-                    return answer;
-                }
+            if (!searched.contains(node)) {
+                boolean found = findPathRecur
+                    (graph, node, selector, terminator, searched, path);
+
+                if ( found ) { return true; }
             }
+            path.pop();
         }
-
-        return null;
+        return false;
     }
 
     /**
      * @param edgePath a list of edges such as the one returned by
      * {@link #findPath(Graph, Object, Object)}.
      * @return the same path represented as a list of nodes rather than edges.
+     *
+     * @throws IllegalStateException if <code>edgePath</code> is not a valid
+     * path. For example, <code>(a->b, c->d, d->e)</code> is invalid, because
+     * the edge between <code>b</code> and <code>c</code> is missing.
+     * @throws NullPointerException if <code>edgePath</code> is <code>null</code>
      **/
     public static final List edgePathToNodePath(List edgePath) {
         List path = new ArrayList();
@@ -93,8 +129,11 @@ public class Graphs {
         for (Iterator edges = edgePath.iterator(); edges.hasNext(); ) {
             Graph.Edge edge = (Graph.Edge) edges.next();
             if ( lastEdge != null ) {
-                Assert.assertEquals(lastEdge.getHead(), edge.getTail(),
-                                    "lastEdge.getHead()", "edge.getTail()");
+                if ( !lastEdge.getHead().equals(edge.getTail()) ) {
+                    throw new IllegalArgumentException
+                        ("non-contiguous path segment:\n" + lastEdge + "\n" +
+                         edge);
+                }
             }
             path.add(edge.getTail());
             lastEdge = edge;
@@ -252,6 +291,45 @@ public class Graphs {
             }
         }
         writer.println("}");
+    }
+
+    /**
+     * @see #findPath(Graph, Object, EdgeSelector, NodeSelector)
+     **/
+    public interface EdgeSelector {
+        /**
+         * @param edge the edge to test
+         * @param forward the value of <code>false</code> indicates that an edge
+         * is to be traversed backwards.  Useful, when you want to find a path
+         * starting with the destination and working your way back to the
+         * source. The value <code>true</code> indicates that edge is being
+         * considered for traversal in the natural, forward direction.
+         **/
+        boolean test(Graph.Edge edge, boolean forward);
+    }
+
+    /**
+     * @see #findPath(Graph, Object, EdgeSelector, NodeSelector)
+     **/
+    public interface NodeSelector {
+        boolean test(Object node);
+    }
+
+    public final static class EqualityTerminator implements NodeSelector {
+        private Object m_node;
+
+        /**
+         * @throws NullPointerException if <code>node</code> is null
+         **/
+        public EqualityTerminator(Object node) {
+            if (node==null) { throw new NullPointerException("node"); }
+
+            m_node = node;
+        }
+
+        public boolean test(Object node) {
+            return m_node.equals(node);
+        }
     }
 
 }
