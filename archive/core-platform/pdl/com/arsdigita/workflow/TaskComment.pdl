@@ -15,12 +15,11 @@
 model com.arsdigita.workflow.simple;
 
 object type TaskComment {
-    BigDecimal id = cw_task_comments.comment_id;
-    BigDecimal taskID = cw_task_comments.task_id;
-    String     taskComment = cw_task_comments.task_comment;
-
-    Date       commentDate = cw_task_comments.comment_date;
-    BigDecimal partyID = cw_task_comments.party_id;
+    BigDecimal id = cw_task_comments.comment_id INTEGER;
+    BigDecimal[1..1] taskID = cw_task_comments.task_id INTEGER;
+    String     taskComment = cw_task_comments.task_comment VARCHAR(4000);
+    Date       commentDate = cw_task_comments.comment_date TIMESTAMP;
+    BigDecimal partyID = cw_task_comments.party_id INTEGER;
 
     object key(id);
 }

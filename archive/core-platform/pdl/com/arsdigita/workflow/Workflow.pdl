@@ -18,10 +18,11 @@ import com.arsdigita.kernel.*;
 
 //TODO: instead of getting the ObjectID and Type, create an association;
 object type Workflow extends Task {
-    BigDecimal    processDefinitionID = cw_processes.process_def_id;
-    String        processState = cw_processes.process_state;
-    ACSObject[0..1]   object = join cw_processes.object_id to acs_objects.object_id;
-    composite Task[0..n] wfTasks;
+    BigDecimal[0..1] processDefinitionID = cw_processes.process_def_id INTEGER;
+    String[0..1]     processState = cw_processes.process_state VARCHAR(16);
+    ACSObject[0..1]  object = join cw_processes.object_id to acs_objects.object_id;
+    composite Task[0..n] wfTasks = join cw_processes.process_id 
+                                     to cw_tasks.parent_task_id;
 
     reference key (cw_processes.process_id);
 

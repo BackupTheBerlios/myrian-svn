@@ -17,7 +17,7 @@ model com.arsdigita.workflow.simple;
 import com.arsdigita.kernel.*;
 
 object type WorkflowTemplate extends Workflow {
-    BigDecimal[0..1] processID = cw_process_definitions.process_def_id;
+    BigDecimal[0..1] processID = cw_process_definitions.process_def_id INTEGER;
 
     reference key (cw_process_definitions.process_def_id);
 }

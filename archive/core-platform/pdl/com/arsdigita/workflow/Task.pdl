@@ -18,11 +18,11 @@ import com.arsdigita.kernel.*;
 
 object type Task extends ACSObject {
 
-    String[1..1]     label = cw_tasks.label;
-    String[1..1]     description = cw_tasks.description;
-    String[1..1]     isActive = cw_tasks.is_active;
-    BigDecimal[0..1] parentTaskID = cw_tasks.parent_task_id;
-    String[1..1]     taskState = cw_tasks.task_state;
+    String[1..1]     label = cw_tasks.label VARCHAR(200);
+    String[1..1]     description = cw_tasks.description VARCHAR(4000);
+    String[1..1]     isActive = cw_tasks.is_active CHAR(1);
+    BigDecimal[0..1] parentTaskID = cw_tasks.parent_task_id INTEGER;
+    String[1..1]     taskState = cw_tasks.task_state VARCHAR(16);
     composite TaskComment[0..n] comments = 
               join cw_tasks.task_id to cw_task_comments.task_id;
 	
@@ -105,8 +105,15 @@ association {
 }   
 
 association {
-    Task[1..1] targetTask;
-    Task[0..n] dependsOn;
+    Task[1..1] targetTask = join cw_tasks.task_id 
+                              to cw_task_dependencies.task_id,
+                            join cw_task_dependencies.dependent_task_id
+                              to cw_tasks.task_id;
+
+    Task[0..n] dependsOn = join cw_tasks.task_id 
+                              to cw_task_dependencies.dependent_task_id,
+                            join cw_task_dependencies.task_id
+                              to cw_tasks.task_id;
 
     retrieve dependsOn {
         do {
