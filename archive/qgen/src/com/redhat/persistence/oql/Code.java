@@ -3,18 +3,20 @@ package com.redhat.persistence.oql;
 import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.metadata.Static;
+
+import java.io.*;
 import java.util.*;
 
 /**
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/02/04 $
+ * @version $Revision: #6 $ $Date: 2004/02/06 $
  **/
 
 class Code {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#5 $ by $Author: rhs $, $DateTime: 2004/02/04 11:21:19 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#6 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
 
     private Root m_root;
     private LinkedList m_stack = new LinkedList();
@@ -22,7 +24,7 @@ class Code {
     private Map m_contexts = new HashMap();
 
     private StringBuffer m_sql = new StringBuffer();
-    private int m_counter = 0;
+    private Map m_counters = new HashMap();
 
     Code(Root root) {
         m_root = root;
@@ -30,6 +32,11 @@ class Code {
 
     ObjectType getType(String type) {
         return m_root.getObjectType(type);
+    }
+
+    ObjectType getType(Object value) {
+        Adapter ad = m_root.getAdapter(value.getClass());
+        return ad.getObjectType(value);
     }
 
     Frame frame(ObjectType type) {
@@ -78,49 +85,48 @@ class Code {
         m_sql.append(sql);
     }
 
-    String var() {
-        return "v" + m_counter++;
-    }
-
-    String[] vars(ObjectType type) {
-        ArrayList vars = new ArrayList();
-        vars(type, vars);
-        return (String[]) vars.toArray(new String[vars.size()]);
-    }
-
-    private void vars(ObjectType type, List vars) {
-        Collection props = type.getKeyProperties();
-        if (props.isEmpty()) {
-            props = type.getImmediateProperties();
+    String var(String stem) {
+        Integer count = (Integer) m_counters.get(stem);
+        if (count == null) {
+            count = new Integer(0);
         }
-        if (props.isEmpty()) {
-            vars.add(var());
-        }
-        for (Iterator it = props.iterator(); it.hasNext(); ) {
-            Property prop = (Property) it.next();
-            vars(prop.getType(), vars);
-        }
+        String result = stem + count;
+        count = new Integer(count.intValue() + 1);
+        m_counters.put(stem, count);
+        return result;
     }
 
     class Frame {
 
         ObjectType type;
-        private Map m_columns = new HashMap();
+        private String[] m_columns = null;
 
         private Frame(ObjectType type) {
             this.type = type;
         }
 
-        void setColumns(Property prop, String[] columns) {
-            m_columns.put(prop, columns);
-        }
-
-        void setColumns(String prop, String[] columns) {
-            setColumns(type.getProperty(prop), columns);
+        void setColumns(String[] columns) {
+            for (int i = 0; i < columns.length; i++) {
+                if (columns[i] == null) {
+                    throw new IllegalArgumentException
+                        ("null column: " + Arrays.asList(columns));
+                }
+            }
+            m_columns = columns;
         }
 
         String[] getColumns(Property prop) {
-            return (String[]) m_columns.get(prop);
+            Collection props = properties(prop.getContainer());
+            int offset = 0;
+            for (Iterator it = props.iterator(); it.hasNext(); ) {
+                Property p = (Property) it.next();
+                if (p.equals(prop)) { break; }
+                offset += span(p.getType());
+            }
+            if (offset == m_columns.length) { return null; }
+            String[] result = new String[span(prop.getType())];
+            System.arraycopy(m_columns, offset, result, 0, result.length);
+            return result;
         }
 
         String[] getColumns(String prop) {
@@ -128,40 +134,29 @@ class Code {
         }
 
         String[] getColumns() {
-            ArrayList result = new ArrayList();
-            Collection props = type.getKeyProperties();
-            if (props.isEmpty()) {
-                props = type.getImmediateProperties();
-            }
-            if (props.isEmpty()) {
-                props = Collections.singleton(null);
-            }
-            for (Iterator it = props.iterator(); it.hasNext(); ) {
-                Property prop = (Property) it.next();
-                String[] cols = getColumns(prop);
-                for (int i = 0; i < cols.length; i++) {
-                    result.add(cols[i]);
-                }
-            }
-            if (result.isEmpty()) {
-                return null;
-            } else {
-                return (String[]) result.toArray(new String[result.size()]);
-            }
+            return m_columns;
         }
 
-        void alias() {
-            Collection props = type.getKeyProperties();
-            if (props.isEmpty()) {
-                props = type.getImmediateProperties();
+        String alias(Property prop) {
+            String alias = var("t");
+            setColumns(columns(prop, alias));
+            return alias;
+        }
+
+        String alias(ObjectType type) {
+            String alias = var("t");
+            setColumns(columns(type, alias));
+            return alias;
+        }
+
+        String alias(int ncolumns) {
+            String alias = var("t");
+            String[] columns = new String[ncolumns];
+            for (int i = 0; i < columns.length; i++) {
+                columns[i] = alias + ".col" + i;
             }
-            if (props.isEmpty()) {
-                setColumns((Property) null, vars(type));
-            }
-            for (Iterator it = props.iterator(); it.hasNext(); ) {
-                Property prop = (Property) it.next();
-                setColumns(prop, vars(prop.getType()));
-            }
+            setColumns(columns);
+            return alias;
         }
 
         public String toString() {
@@ -169,14 +164,15 @@ class Code {
             buf.append("<frame ");
             buf.append(type);
             buf.append(" ");
-            for (Iterator it = m_columns.entrySet().iterator();
-                 it.hasNext(); ) {
-                Map.Entry me = (Map.Entry) it.next();
-                Property prop = (Property) me.getKey();
-                String[] columns = (String[]) me.getValue();
-                buf.append(prop);
-                buf.append(" = ");
-                buf.append(Arrays.asList(columns));
+            if (m_columns == null) {
+                buf.append("null");
+            } else {
+                for (int i = 0; i < m_columns.length; i++) {
+                    buf.append(m_columns[i]);
+                    if (i < m_columns.length - 1) {
+                        buf.append(" ");
+                    }
+                }
             }
             buf.append(">");
             return buf.toString();
@@ -184,11 +180,11 @@ class Code {
 
     }
 
-    static String[] names(Column[] columns) {
+    static String[] names(Column[] columns, String alias) {
         String[] result = new String[columns.length];
         for (int i = 0; i < columns.length; i++) {
             Column col = columns[i];
-            result[i] = col.getTable().getName() + "." + col.getName();
+            result[i] = alias + "." + col.getName();
         }
         return result;
     }
@@ -219,60 +215,50 @@ class Code {
         return m;
     }
 
-    void alias(Property prop, final String[] vars) {
-        Mapping m = getMapping(prop);
-
-        if (m.getRetrieve() != null) {
-            alias(prop.getType(), vars);
-            return;
-        }
-
-        m.dispatch(new Mapping.Switch() {
-            public void onValue(Value v) {
-                alias(new Column[] {v.getColumn()}, vars);
-            }
-            public void onJoinTo(JoinTo j) {
-                alias(j.getKey(), vars);
-            }
-            public void onJoinFrom(JoinFrom j) {
-                alias(j.getKey().getTable().getPrimaryKey(), vars);
-            }
-            public void onJoinThrough(JoinThrough jt) {
-                alias(jt.getTo(), vars);
-            }
-            public void onStatic(Static s) {}
-        });
-    }
-
-    void alias(ObjectType type, String[] vars) {
-        alias(columns(type), vars);
-    }
-
-    void alias(Constraint c, String[] vars) {
-        alias(c.getColumns(), vars);
-    }
-
-    void alias(Column[] columns, String[] vars) {
-        alias(names(columns), vars);
-    }
-
-    void alias(String[] columns, String[] vars) {
-        if (columns.length != vars.length) {
-            throw new IllegalArgumentException
-                ("columns: " + Arrays.asList(columns) + ", vars: " +
-                 Arrays.asList(vars) + "\n" + getTrace());
-        }
+    void alias(String[] columns) {
         for (int i = 0; i < columns.length; i++) {
             append(columns[i]);
-            append(" as ");
-            append(vars[i]);
+            append(" as col" + i);
             if (i < columns.length - 1) {
                 append(", ");
             }
         }
     }
 
-    void condition(Property prop, final String[] key) {
+    String[] columns(Property prop, final String alias) {
+        Mapping m = getMapping(prop);
+
+        if (m.getRetrieve() != null) {
+            return columns(prop.getType(), alias);
+        }
+
+        final String[][] result = new String[][] { null };
+
+        m.dispatch(new Mapping.Switch() {
+            public void onValue(Value v) {
+                result[0] = names(new Column[] {v.getColumn()}, alias);
+            }
+            public void onJoinTo(JoinTo j) {
+                result[0] = columns(j.getKey(), alias);
+            }
+            public void onJoinFrom(JoinFrom j) {
+                result[0] =
+                    columns(j.getKey().getTable().getPrimaryKey(), alias);
+            }
+            public void onJoinThrough(JoinThrough jt) {
+                result[0] = columns(jt.getTo(), alias);
+            }
+            public void onStatic(Static s) {}
+        });
+
+        return result[0];
+    }
+
+    static String[] columns(Constraint c, String alias) {
+        return names(c.getColumns(), alias);
+    }
+
+    void condition(Property prop, final String alias, final String[] key) {
         Mapping m = getMapping(prop);
 
         if (m.getRetrieve() != null) {
@@ -282,34 +268,34 @@ class Code {
             append(") sg where ");
             Path[] paths = paths(prop.getType(), Path.get(prop.getName()));
             equals(concat("sg.", columns(paths, m.getRetrieve())),
-                   columns(prop.getType()));
+                   columns(prop.getType(), alias));
             append(")");
             return;
         }
 
         m.dispatch(new Mapping.Switch() {
             public void onValue(Value v) {
-                Code.this.equals(v.getTable().getPrimaryKey(), key);
+                Code.this.equals(v.getTable().getPrimaryKey(), alias, key);
             }
             public void onJoinTo(JoinTo j) {
-                Code.this.equals(j.getTable().getPrimaryKey(), key);
+                Code.this.equals(j.getTable().getPrimaryKey(), alias, key);
             }
             public void onJoinFrom(JoinFrom j) {
-                Code.this.equals(j.getKey(), key);
+                Code.this.equals(j.getKey(), alias, key);
             }
             public void onJoinThrough(JoinThrough jt) {
-                Code.this.equals(jt.getFrom(), key);
+                Code.this.equals(jt.getFrom(), alias, key);
             }
             public void onStatic(Static s) {}
         });
     }
 
-    void equals(Constraint c, String[] columns) {
-        equals(c.getColumns(), columns);
+    void equals(Constraint c, String alias, String[] columns) {
+        equals(c.getColumns(), alias, columns);
     }
 
-    void equals(Column[] left, String[] right) {
-        equals(names(left), right);
+    void equals(Column[] left, String alias, String[] right) {
+        equals(names(left, alias), right);
     }
 
     void equals(String[] left, String[] right) {
@@ -357,7 +343,7 @@ class Code {
         if (om.getRetrieveAll() != null) {
             append("(");
             bind(om.getRetrieveAll().getSQL(), Collections.EMPTY_MAP);
-            append(") sr");
+            append(")");
         } else {
             append(om.getTable().getName());
         }
@@ -418,13 +404,13 @@ class Code {
         return result;
     }
 
-    static String[] columns(ObjectType type) {
+    static String[] columns(ObjectType type, String alias) {
         ObjectMap om = type.getRoot().getObjectMap(type);
         if (om.getRetrieveAll() != null) {
             return concat
-                ("sr.", columns(paths(type, null), om.getRetrieveAll()));
+                (alias + ".", columns(paths(type, null), om.getRetrieveAll()));
         } else {
-            return names(om.getTable().getPrimaryKey().getColumns());
+            return names(om.getTable().getPrimaryKey().getColumns(), alias);
         }
     }
 
@@ -434,6 +420,114 @@ class Code {
             result[i] = prefix + strs[i];
         }
         return result;
+    }
+
+    static int span(ObjectType type) {
+        Collection props = properties(type);
+        if (props.isEmpty()) {
+            return 1;
+        } else {
+            int result = 0;
+            for (Iterator it = props.iterator(); it.hasNext(); ) {
+                Property prop = (Property) it.next();
+                result += span(prop.getType());
+            }
+            return result;
+        }
+    }
+
+    static Collection properties(ObjectType type) {
+        Collection props = type.getKeyProperties();
+        if (props.isEmpty()) {
+            return type.getImmediateProperties();
+        } else {
+            return props;
+        }
+    }
+
+    private Map m_aliases = new HashMap();
+
+    void setAlias(Expression expr, String alias) {
+        m_aliases.put(expr, alias);
+    }
+
+    String getAlias(Expression expr) {
+        return (String) m_aliases.get(expr);
+    }
+
+    private Set m_virtuals = new HashSet();
+
+    void addVirtual(Expression e) {
+        m_virtuals.add(e);
+    }
+
+    boolean isVirtual(Expression e) {
+        return m_virtuals.contains(e);
+    }
+
+    void materialize(Expression e) {
+        Frame f = getFrame(e);
+        String[] columns = f.getColumns();
+        if (isVirtual(e)) {
+            if (columns.length > 1) {
+                append("(");
+            }
+        } else {
+            append("(select ");
+        }
+        for (int i = 0; i < columns.length; i++) {
+            append(columns[i]);
+            if (i < columns.length - 1) {
+                append(", ");
+            }
+        }
+        if (isVirtual(e)) {
+            if (columns.length > 1) {
+                append(")");
+            }
+        } else {
+            append(" from ");
+            e.emit(this);
+            append(")");
+        }
+    }
+
+    boolean isQualias(Property prop) {
+        if (prop.getRoot() == null) {
+            return false;
+        }
+        return getMapping(prop) instanceof Qualias;
+    }
+
+    private Map m_qualiases = new HashMap();
+
+    Code.Frame frame(Expression expr, Code.Frame parent, Property prop) {
+        Qualias q = (Qualias) getMapping(prop);
+        OQLParser p = new OQLParser(new StringReader(q.getQuery()));
+        Expression qualias;
+        try { qualias = p.expression(); }
+        catch (ParseException e) {
+            throw new IllegalStateException(e.getMessage());
+        }
+        LinkedList stack = m_stack;
+        try {
+            m_stack = new LinkedList();
+            push(parent);
+            try {
+                Code.Frame frame = qualias.frame(this);
+                m_qualiases.put(expr, qualias);
+                return frame;
+            } finally {
+                pop();
+            }
+        } finally {
+            m_stack = stack;
+        }
+    }
+
+    void emit(Expression expr) {
+        Expression qualias = (Expression) m_qualiases.get(expr);
+        qualias.emit(this);
     }
 
 }

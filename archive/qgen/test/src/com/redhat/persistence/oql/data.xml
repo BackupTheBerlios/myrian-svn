@@ -32,15 +32,15 @@
   <test.C id="28" name="Twenty Eight"/>
   <test.C id="29" name="Twenty Nine"/>
 
-  <test.Link a.id="0" b.id="10" name="Zero-Ten"/>
-  <test.Link a.id="1" b.id="11" name="One-Eleven"/>
-  <test.Link a.id="1" b.id="12" name="One-Twelve"/>
-  <test.Link a.id="2" b.id="10" name="Two-Ten"/>
-  <test.Link a.id="2" b.id="12" name="Two-Twelve"/>
-  <test.Link a.id="2" b.id="14" name="Two-Fourteen"/>
-  <test.Link a.id="2" b.id="16" name="Two-Sixteen"/>
-  <test.Link a.id="2" b.id="18" name="Two-Eighteen"/>
-  <test.Link a.id="3" b.id="11" name="Three-Eleven"/>
+  <test.Link a.id="0" b.id="10" index="0" name="Zero-Ten"/>
+  <test.Link a.id="1" b.id="11" index="0" name="One-Eleven"/>
+  <test.Link a.id="1" b.id="12" index="1" name="One-Twelve"/>
+  <test.Link a.id="2" b.id="10" index="0" name="Two-Ten"/>
+  <test.Link a.id="2" b.id="12" index="1" name="Two-Twelve"/>
+  <test.Link a.id="2" b.id="14" index="2" name="Two-Fourteen"/>
+  <test.Link a.id="2" b.id="16" index="3" name="Two-Sixteen"/>
+  <test.Link a.id="2" b.id="18" index="4" name="Two-Eighteen"/>
+  <test.Link a.id="3" b.id="11" index="0" name="Three-Eleven"/>
 
   <test.Tuple a.id="0" b.id="10" c.id="20" cee.id="20"/>
   <test.Tuple a.id="0" b.id="10" c.id="21" cee.id="20"/>

@@ -4,7 +4,8 @@ object type A class com.redhat.persistence.PropertyMap
               adapter com.redhat.persistence.oql.IdentityAdapter {
     BigInteger id = a.a_id;
     String name = a.name;
-    Link[0..n] links = join a.a_id to l.a_id;
+    Link[0..1] first = qualias { filter(links, index == 0) };
+    Link[0..n] links = qualias { filter(all(test.Link), a.id == id) };
 
     object key(id);
 }
@@ -30,7 +31,7 @@ object type Link class com.redhat.persistence.PropertyMap
     A a = join l.a_id to a.a_id;
     B b = join l.b_id to b.b_id;
     String name = l.name;
-    Integer sortKey = l.sort_key;
+    Integer index = l.index;
 
     object key(a, b);
 }
@@ -89,7 +90,8 @@ object type Node class com.redhat.persistence.PropertyMap
     BigInteger id = st.st_id;
     String name = st.name;
     Node parent = join st.parent_id to st.st_id;
-    Node[0..n] children = join st.st_id to st.parent_id;
+    Node[0..n] children =
+        qualias { filter(n = all(test.Node), n.parent.id == id).n };
 
     object key(id);
 }
@@ -155,8 +157,10 @@ object type Group class com.redhat.persistence.PropertyMap
                          join members.u_id to u.u_id;
     Group[0..n] subgroups = join g.g_id to subgroups.g_id,
                             join subgroups.sg_id to g.g_id;
-    Group[0..n] supergroups = join g.g_id to subgroups.sg_id,
-                              join subgroups.g_id to g.g_id;
+    Group[0..n] supergroups = qualias {
+        filter(g = all(test.Group),
+               exists(filter(sg = g.subgroups, sg.id == id))).g
+    };
 
     object key(id);
 }

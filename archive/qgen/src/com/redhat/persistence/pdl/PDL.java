@@ -15,76 +15,25 @@
 
 package com.redhat.persistence.pdl;
 
-import com.redhat.persistence.common.Path;
-import com.redhat.persistence.common.SQLParser;
-import com.redhat.persistence.metadata.Adapter;
-import com.redhat.persistence.metadata.Column;
-import com.redhat.persistence.metadata.Constraint;
-import com.redhat.persistence.metadata.DataOperation;
-import com.redhat.persistence.metadata.ForeignKey;
-import com.redhat.persistence.metadata.JoinFrom;
-import com.redhat.persistence.metadata.JoinThrough;
-import com.redhat.persistence.metadata.JoinTo;
-import com.redhat.persistence.metadata.Link;
-import com.redhat.persistence.metadata.Mapping;
-import com.redhat.persistence.metadata.Model;
-import com.redhat.persistence.metadata.ObjectMap;
-import com.redhat.persistence.metadata.ObjectType;
-import com.redhat.persistence.metadata.Property;
-import com.redhat.persistence.metadata.Role;
-import com.redhat.persistence.metadata.Root;
-import com.redhat.persistence.metadata.SQLBlock;
-import com.redhat.persistence.metadata.Static;
-import com.redhat.persistence.metadata.Table;
-import com.redhat.persistence.metadata.UniqueKey;
-import com.redhat.persistence.metadata.Value;
-import com.redhat.persistence.pdl.nodes.AST;
-import com.redhat.persistence.pdl.nodes.AggressiveLoadNd;
-import com.redhat.persistence.pdl.nodes.AssociationNd;
-import com.redhat.persistence.pdl.nodes.BindingNd;
-import com.redhat.persistence.pdl.nodes.ColumnNd;
-import com.redhat.persistence.pdl.nodes.DataOperationNd;
-import com.redhat.persistence.pdl.nodes.DbTypeNd;
-import com.redhat.persistence.pdl.nodes.EventNd;
-import com.redhat.persistence.pdl.nodes.FileNd;
-import com.redhat.persistence.pdl.nodes.IdentifierNd;
-import com.redhat.persistence.pdl.nodes.JavaClassNd;
-import com.redhat.persistence.pdl.nodes.JoinNd;
-import com.redhat.persistence.pdl.nodes.JoinPathNd;
-import com.redhat.persistence.pdl.nodes.MappingNd;
-import com.redhat.persistence.pdl.nodes.Node;
-import com.redhat.persistence.pdl.nodes.ObjectKeyNd;
-import com.redhat.persistence.pdl.nodes.ObjectTypeNd;
-import com.redhat.persistence.pdl.nodes.PathNd;
-import com.redhat.persistence.pdl.nodes.PropertyNd;
-import com.redhat.persistence.pdl.nodes.ReferenceKeyNd;
-import com.redhat.persistence.pdl.nodes.SQLBlockNd;
-import com.redhat.persistence.pdl.nodes.SuperNd;
-import com.redhat.persistence.pdl.nodes.TypeNd;
-import com.redhat.persistence.pdl.nodes.UniqueKeyNd;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import com.redhat.persistence.common.*;
+import com.redhat.persistence.metadata.*;
+import com.redhat.persistence.pdl.nodes.*;
+
+import java.io.*;
+import java.util.*;
+
 import org.apache.log4j.Logger;
 
 /**
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/02/03 $
+ * @version $Revision: #3 $ $Date: 2004/02/06 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/pdl/PDL.java#2 $ by $Author: rhs $, $DateTime: 2004/02/03 18:30:38 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/pdl/PDL.java#3 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -819,8 +768,10 @@ public class PDL {
                         om.addMapping(new Static(Path.get(prop.getName())));
                     } else if (mapping instanceof ColumnNd) {
                         emitMapping(prop, (ColumnNd) mapping);
-                    } else {
+                    } else if (mapping instanceof JoinPathNd) {
                         emitMapping(prop, (JoinPathNd) mapping);
+                    } else {
+                        emitMapping(prop, (QualiasNd) mapping);
                     }
 
                     // auto generate reverse way for one-way composites
@@ -1091,6 +1042,12 @@ public class PDL {
     private Column lookup(ColumnNd colNd) {
         Table table = m_root.getTable(colNd.getTable().getName());
         return table.getColumn(colNd.getName().getName());
+    }
+
+    private void emitMapping(Property prop, QualiasNd nd) {
+        ObjectMap om = m_root.getObjectMap(prop.getContainer());
+        Qualias q = new Qualias(Path.get(prop.getName()), nd.getQuery());
+        om.addMapping(q);
     }
 
     private void emitEvents() {

@@ -7,12 +7,12 @@ import java.util.*;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/01/29 $
+ * @version $Revision: #3 $ $Date: 2004/02/06 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#2 $ by $Author: rhs $, $DateTime: 2004/01/29 12:50:13 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#3 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
 
     private Expression m_query;
     private List m_names;
@@ -44,7 +44,7 @@ public class Query {
         try {
             for (Iterator it = m_names.iterator(); it.hasNext(); ) {
                 Expression e = get((String) it.next());
-                e.frame(code);
+                code.setFrame(e, e.frame(code));
             }
         } finally {
             code.pop();
@@ -57,15 +57,14 @@ public class Query {
             for (Iterator it = m_names.iterator(); it.hasNext(); ) {
                 String name = (String) it.next();
                 Expression e = get(name);
-                e.emit(code);
+                code.materialize(e);
                 code.append(" as ");
                 code.append(name);
                 if (it.hasNext()) { code.append(", "); }
             }
         }
-        code.append(" from ");
+        code.append("\nfrom ");
         m_query.emit(code);
-        code.append(" q");
 
         return code.getSQL();
     }

@@ -7,12 +7,12 @@ import java.util.*;
  * Filter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/01/29 $
+ * @version $Revision: #7 $ $Date: 2004/02/06 $
  **/
 
 public class Filter extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Filter.java#6 $ by $Author: rhs $, $DateTime: 2004/01/29 12:50:13 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Filter.java#7 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
 
     private Expression m_expr;
     private Expression m_condition;
@@ -45,11 +45,9 @@ public class Filter extends Expression {
     }
 
     void emit(Code code) {
-        code.append("(select * from ");
         m_expr.emit(code);
-        code.append(" f where ");
+        code.append(" join (select 3) " + code.var("d") + " on ");
         m_condition.emit(code);
-        code.append(")");
     }
 
     public String toString() {

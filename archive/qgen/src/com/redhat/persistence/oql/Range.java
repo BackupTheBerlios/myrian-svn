@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * Range
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/01/29 $
+ * @version $Revision: #3 $ $Date: 2004/02/06 $
  **/
 
 public abstract class Range extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Range.java#2 $ by $Author: rhs $, $DateTime: 2004/01/29 12:50:13 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Range.java#3 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
 
     Expression m_query;
     Expression m_operand;
@@ -30,7 +30,27 @@ public abstract class Range extends Expression {
     }
 
     Code.Frame frame(Code code) {
-        return m_query.frame(code);
+        Code.Frame query = m_query.frame(code);
+        Code.Frame frame = code.frame(query.type);
+        code.setAlias(this, frame.alias(query.getColumns().length));
+        code.setFrame(m_query, query);
+        code.setFrame(m_operand, m_operand.frame(code));
+        return frame;
     }
+
+    void emit(Code code) {
+        Code.Frame query = code.getFrame(m_query);
+        code.append("(select ");
+        code.alias(query.getColumns());
+        code.append(" from ");
+        m_query.emit(code);
+        code.append(" ");
+        code.append(getRangeType());
+        code.append(" ");
+        code.materialize(m_operand);
+        code.append(") " + code.getAlias(this));
+    }
+
+    abstract String getRangeType();
 
 }

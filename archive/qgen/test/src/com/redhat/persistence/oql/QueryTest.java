@@ -10,7 +10,7 @@ import java.util.*;
  * QueryTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/02/04 $
+ * @version $Revision: #2 $ $Date: 2004/02/06 $
  **/
 
 public class QueryTest extends TestCase {
@@ -21,7 +21,7 @@ public class QueryTest extends TestCase {
     // being an instance of TestCase. Later versions of ant don't
     // suffer from this problem.
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QueryTest.java#1 $ by $Author: rhs $, $DateTime: 2004/02/04 11:20:32 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QueryTest.java#2 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
 
     private QuerySuite m_suite;
     private String m_name;
@@ -71,7 +71,8 @@ public class QueryTest extends TestCase {
                     results.add(row);
                 }
                 if (m_ordered) {
-                    assertEquals(sql, m_results, results);
+                    assertEquals
+                        ("sql:\n\n" + sql + "\n\n", m_results, results);
                 } else {
                     MultiSet expected = new MultiSet();
                     expected.addAll(m_results);

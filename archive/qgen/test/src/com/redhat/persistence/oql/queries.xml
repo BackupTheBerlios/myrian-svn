@@ -581,4 +581,30 @@
       <row a="Three" l="Three-Eleven"/>
     </results>
   </test>
+
+  <test>
+    <query>query(all(test.A).links, a = a.id, b = b.id, index = index)</query>
+    <query ordered="true">query(sort(sort(all(test.A).links, index), a), a = a.id, b = b.id, index = index)</query>
+    <results>
+      <row a="0" b="10" index="0"/>
+      <row a="1" b="11" index="0"/>
+      <row a="1" b="12" index="1"/>
+      <row a="2" b="10" index="0"/>
+      <row a="2" b="12" index="1"/>
+      <row a="2" b="14" index="2"/>
+      <row a="2" b="16" index="3"/>
+      <row a="2" b="18" index="4"/>
+      <row a="3" b="11" index="0"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(all(test.A).first, a = a.id, b = b.id, index = index)</query>
+    <results>
+      <row a="0" b="10" index="0"/>
+      <row a="1" b="11" index="0"/>
+      <row a="2" b="10" index="0"/>
+      <row a="3" b="11" index="0"/>
+    </results>
+  </test>
 </tests>

@@ -7,12 +7,12 @@ import java.util.*;
  * AbstractJoin
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/01/29 $
+ * @version $Revision: #6 $ $Date: 2004/02/06 $
  **/
 
 public abstract class AbstractJoin extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/AbstractJoin.java#5 $ by $Author: rhs $, $DateTime: 2004/01/29 12:50:13 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/AbstractJoin.java#6 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
 
     private Expression m_left;
     private Expression m_right;
@@ -43,17 +43,16 @@ public abstract class AbstractJoin extends Expression {
     Code.Frame frame(Code code) {
         Code.Frame left = m_left.frame(code);
         Code.Frame right = m_right.frame(code);
+
         Code.Frame frame =
             code.frame(JoinTypeNode.join(left.type, right.type));
-        for (Iterator it = frame.type.getKeyProperties().iterator();
-             it.hasNext(); ) {
-            Property prop = (Property) it.next();
-            if (left.type.hasProperty(prop.getName())) {
-                frame.setColumns(prop, left.getColumns(prop.getName()));
-            } else {
-                frame.setColumns(prop, right.getColumns(prop.getName()));
-            }
-        }
+
+        String[] lc = left.getColumns();
+        String[] rc = right.getColumns();
+        String[] columns = new String[lc.length + rc.length];
+        System.arraycopy(lc, 0, columns, 0, lc.length);
+        System.arraycopy(rc, 0, columns, lc.length, rc.length);
+        frame.setColumns(columns);
 
         if (m_condition != null) {
             code.push(frame);
@@ -63,13 +62,13 @@ public abstract class AbstractJoin extends Expression {
                 code.pop();
             }
         }
+
         return frame;
     }
 
     void emit(Code code) {
-        code.append("(select * from ");
         m_left.emit(code);
-        code.append(" l ");
+        code.append(" ");
         String type = getJoinType();
         code.append(type);
         code.append(" ");
@@ -77,13 +76,11 @@ public abstract class AbstractJoin extends Expression {
             code.append("join ");
         }
         m_right.emit(code);
-        code.append(" r");
 
         if (m_condition != null) {
             code.append(" on ");
             m_condition.emit(code);
         }
-        code.append(")");
     }
 
     public String toString() {

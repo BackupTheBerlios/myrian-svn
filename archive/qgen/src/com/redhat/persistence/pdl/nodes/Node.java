@@ -27,12 +27,12 @@ import java.util.List;
  * Node
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/06 $
  **/
 
 public abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/pdl/nodes/Node.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/pdl/nodes/Node.java#2 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
 
 
     /**
@@ -165,6 +165,7 @@ public abstract class Node {
         public void onJoinPath(JoinPathNd jp) {}
         public void onJoin(JoinNd join) {}
         public void onIdentifier(IdentifierNd id) {}
+        public void onQualias(QualiasNd nd) {}
 
         public void onEvent(EventNd nd) {}
         public void onSQLBlock(SQLBlockNd nd) {}

@@ -15,32 +15,9 @@
 
 package com.redhat.persistence.engine.rdbms;
 
-import com.redhat.persistence.AddEvent;
-import com.redhat.persistence.Condition;
-import com.redhat.persistence.CreateEvent;
-import com.redhat.persistence.DeleteEvent;
-import com.redhat.persistence.Event;
-import com.redhat.persistence.ObjectEvent;
-import com.redhat.persistence.PropertyEvent;
-import com.redhat.persistence.PropertyMap;
-import com.redhat.persistence.RemoveEvent;
-import com.redhat.persistence.SetEvent;
-import com.redhat.persistence.common.Path;
-import com.redhat.persistence.metadata.Adapter;
-import com.redhat.persistence.metadata.Column;
-import com.redhat.persistence.metadata.Constraint;
-import com.redhat.persistence.metadata.JoinFrom;
-import com.redhat.persistence.metadata.JoinThrough;
-import com.redhat.persistence.metadata.JoinTo;
-import com.redhat.persistence.metadata.Mapping;
-import com.redhat.persistence.metadata.ObjectMap;
-import com.redhat.persistence.metadata.ObjectType;
-import com.redhat.persistence.metadata.Property;
-import com.redhat.persistence.metadata.Role;
-import com.redhat.persistence.metadata.SQLBlock;
-import com.redhat.persistence.metadata.Static;
-import com.redhat.persistence.metadata.Table;
-import com.redhat.persistence.metadata.Value;
+import com.redhat.persistence.*;
+import com.redhat.persistence.common.*;
+import com.redhat.persistence.metadata.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,12 +32,12 @@ import org.apache.log4j.Logger;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/06 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#2 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -308,6 +285,9 @@ class EventSwitch extends Event.Switch {
         }
 
         m.dispatch(new Mapping.Switch() {
+            public void onQualias(Qualias q) {
+                // XXX need to really support read only
+            }
             public void onStatic(Static m) {
                 // do nothing;
             }

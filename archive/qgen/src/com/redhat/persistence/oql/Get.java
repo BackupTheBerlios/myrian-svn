@@ -7,12 +7,12 @@ import java.util.*;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/01/29 $
+ * @version $Revision: #7 $ $Date: 2004/02/06 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#6 $ by $Author: rhs $, $DateTime: 2004/01/29 12:50:13 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#7 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
 
     private Expression m_expr;
     private String m_name;
@@ -46,8 +46,18 @@ public class Get extends Expression {
             throw new IllegalStateException
                 ("no such property: " + m_name + " in " + expr.type);
         }
-        Code.Frame frame = code.frame(prop.getType());
-        frame.alias();
+        Code.Frame frame;
+        if (code.isQualias(prop)) {
+            frame = code.frame(this, expr, prop);
+        } else {
+            frame = code.frame(prop.getType());
+            String[] columns = expr.getColumns(prop);
+            if (columns == null) {
+                code.setAlias(this, frame.alias(prop));
+            } else {
+                frame.setColumns(columns);
+            }
+        }
         code.setFrame(m_expr, expr);
         code.setFrame(this, frame);
         return frame;
@@ -57,25 +67,27 @@ public class Get extends Expression {
         Code.Frame expr = code.getFrame(m_expr);
         Property prop = expr.type.getProperty(m_name);
         Code.Frame frame = code.getFrame(this);
-        code.append("(select ");
+        String alias = code.getAlias(this);
+
+        if (code.isQualias(prop)) {
+            m_expr.emit(code);
+            code.append(" cross join ");
+            code.emit(this);
+            return;
+        }
+
         String[] columns = expr.getColumns(prop);
         if (columns == null) {
-            code.alias(prop, frame.getColumns());
-        } else {
-            code.alias(columns, frame.getColumns());
-        }
-        code.append(" from ");
-        if (columns == null) {
             code.table(prop);
+            code.append(" ");
+            code.append(alias);
             code.append(" join ");
         }
         m_expr.emit(code);
-        code.append(" e");
         if (columns == null) {
             code.append(" on ");
-            code.condition(prop, expr.getColumns());
+            code.condition(prop, alias, expr.getColumns());
         }
-        code.append(")");
     }
 
     public String toString() {

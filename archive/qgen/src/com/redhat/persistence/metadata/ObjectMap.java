@@ -26,12 +26,12 @@ import java.util.List;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/06 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/metadata/ObjectMap.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/metadata/ObjectMap.java#2 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -140,20 +140,22 @@ public class ObjectMap extends Element {
         for (Iterator it = getDeclaredMappings().iterator(); it.hasNext(); ) {
             Mapping m = (Mapping) it.next();
             m.dispatch(new Mapping.Switch() {
-                    public void onValue(Value m) {
-                        if (!result.contains(m.getPath())) {
-                            result.add(m.getPath());
-                        }
+                public void onValue(Value m) {
+                    if (!result.contains(m.getPath())) {
+                        result.add(m.getPath());
                     }
+                }
 
-                    public void onJoinTo(JoinTo m) {}
+                public void onJoinTo(JoinTo m) {}
 
-                    public void onJoinFrom(JoinFrom m) {}
+                public void onJoinFrom(JoinFrom m) {}
 
-                    public void onJoinThrough(JoinThrough m) {}
+                public void onJoinThrough(JoinThrough m) {}
 
-                    public void onStatic(Static m) {}
-                });
+                public void onStatic(Static m) {}
+
+                public void onQualias(Qualias q) {}
+            });
         }
 
         for (Iterator it = m_fetched.iterator(); it.hasNext(); ) {

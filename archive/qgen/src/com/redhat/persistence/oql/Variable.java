@@ -8,12 +8,12 @@ import java.util.*;
  * Variable
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/01/27 $
+ * @version $Revision: #5 $ $Date: 2004/02/06 $
  **/
 
 public class Variable extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Variable.java#4 $ by $Author: rhs $, $DateTime: 2004/01/27 09:26:37 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Variable.java#5 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
 
     private String m_name;
 
@@ -52,8 +52,19 @@ public class Variable extends Expression {
                 ("no such variable: " + m_name + "\n" + code.getTrace());
         }
         Property prop = parent.type.getProperty(m_name);
-        Code.Frame frame = code.frame(prop.getType());
-        frame.alias();
+
+        Code.Frame frame;
+        if (code.isQualias(prop)) {
+            frame = code.frame(this, parent, prop);
+        } else {
+            frame = code.frame(prop.getType());
+            String[] columns = parent.getColumns(prop);
+            if (columns == null) {
+                code.setAlias(this, frame.alias(prop));
+            } else {
+                frame.setColumns(columns);
+            }
+        }
         code.setContext(this, parent);
         code.setFrame(this, frame);
         return frame;
@@ -63,19 +74,23 @@ public class Variable extends Expression {
         Code.Frame parent = code.getContext(this);
         Property prop = parent.type.getProperty(m_name);
         Code.Frame frame = code.getFrame(this);
+        String alias = code.getAlias(this);
+
+        if (code.isQualias(prop)) {
+            code.emit(this);
+            return;
+        }
 
         String[] columns = parent.getColumns(prop);
-        code.append("(select ");
         if (columns == null) {
-            code.alias(prop, frame.getColumns());
-            code.append(" from ");
             code.table(prop);
-            code.append(" where ");
-            code.condition(prop, parent.getColumns());
+            code.append(" ");
+            code.append(alias);
+            code.append(" join (select 1) " + code.var("d") + " on ");
+            code.condition(prop, alias, parent.getColumns());
         } else {
-            code.alias(columns, frame.getColumns());
+            code.append("(select 2) " + code.var("d"));
         }
-        code.append(")");
     }
 
     public String toString() {

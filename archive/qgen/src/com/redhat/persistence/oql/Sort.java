@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * Sort
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/01/29 $
+ * @version $Revision: #4 $ $Date: 2004/02/06 $
  **/
 
 public class Sort extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Sort.java#3 $ by $Author: rhs $, $DateTime: 2004/01/29 12:50:13 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Sort.java#4 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
 
     public static class Order {
         private Order() {}
@@ -45,26 +45,32 @@ public class Sort extends Expression {
 
     Code.Frame frame(Code code) {
         Code.Frame query = m_query.frame(code);
+        Code.Frame frame = code.frame(query.type);
+        code.setAlias(this, frame.alias(query.getColumns().length));
         code.push(query);
         try {
-            m_key.frame(code);
+            code.setFrame(m_key, m_key.frame(code));
         } finally {
             code.pop();
         }
-        return query;
+        code.setFrame(m_query, query);
+        return frame;
     }
 
     void emit(Code code) {
-        code.append("(select * from ");
+        Code.Frame query = code.getFrame(m_query);
+        code.append("(select ");
+        code.alias(query.getColumns());
+        code.append(" from ");
         m_query.emit(code);
-        code.append(" s order by ");
-        m_key.emit(code);
+        code.append(" order by ");
+        code.materialize(m_key);
         if (m_order == ASCENDING) {
             code.append(" asc");
         } else if (m_order == DESCENDING) {
             code.append(" desc");
         }
-        code.append(")");
+        code.append(") " + code.getAlias(this));
     }
 
     String summary() {

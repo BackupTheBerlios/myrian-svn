@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * Size
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/01/26 $
+ * @version $Revision: #2 $ $Date: 2004/02/06 $
  **/
 
 public class Size extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Size.java#1 $ by $Author: rhs $, $DateTime: 2004/01/26 14:16:33 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Size.java#2 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
 
     private Expression m_query;
 
@@ -30,7 +30,7 @@ public class Size extends Expression {
     void emit(Code code) {
         code.append("(select count(*) from ");
         m_query.emit(code);
-        code.append(" sz )");
+        code.append(") " + code.var("c"));
     }
 
     public String toString() {

@@ -10,12 +10,12 @@ import java.util.*;
  * Static
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/01/26 $
+ * @version $Revision: #2 $ $Date: 2004/02/06 $
  **/
 
 public class Static extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#1 $ by $Author: rhs $, $DateTime: 2004/01/26 12:32:44 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#2 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
 
     private String m_sql;
     private Expression[] m_expressions;
@@ -62,7 +62,7 @@ public class Static extends Expression {
 
     Code.Frame frame(Code code) {
         for (int i = 0; i < m_expressions.length; i++) {
-            m_expressions[i].frame(code);
+            code.setFrame(m_expressions[i], m_expressions[i].frame(code));
         }
         return null;
     }
@@ -79,7 +79,7 @@ public class Static extends Expression {
         for (SQLToken t = sql.getFirst(); t != null; t = t.getNext()) {
             // XXX: need to handle bind and raw
             if (t.isPath()) {
-                m_expressions[index++].emit(code);
+                code.materialize(m_expressions[index++]);
             } else {
                 code.append(t.getImage());
             }
