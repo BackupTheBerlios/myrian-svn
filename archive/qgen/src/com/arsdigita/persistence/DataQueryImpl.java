@@ -57,12 +57,12 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/02/24 $
+ * @version $Revision: #3 $ $Date: 2004/02/24 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataQueryImpl.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataQueryImpl.java#3 $ by $Author: ashah $, $DateTime: 2004/02/24 21:22:56 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 
@@ -222,8 +222,6 @@ class DataQueryImpl implements DataQuery {
 
         Path p = unalias(path);
 
-        s_log.warn("addPath(" + path + ")");
-
         // find out if the path traverses a collection property
         ObjectType type = getTypeInternal();
         for (Path r = p; r != null; r = r.getParent()) {
@@ -231,7 +229,6 @@ class DataQueryImpl implements DataQuery {
             if (prop.isCollection()) {
                 // path traverses collection, need to add join
                 addJoin(r);
-                s_log.warn("addJoin(" + r + ")");
                 break;
             }
         }
