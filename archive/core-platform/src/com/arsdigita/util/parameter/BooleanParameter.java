@@ -20,14 +20,18 @@ import org.apache.commons.beanutils.converters.BooleanConverter;
 /**
  * Subject to change.
  *
+ * A parameter representing a Java <code>Boolean</code>.
+ *
+ * @see java.lang.Boolean
+ * @see Parameter
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/BooleanParameter.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/BooleanParameter.java#4 $
  */
 public class BooleanParameter extends AbstractParameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/BooleanParameter.java#3 $" +
-        "$Author: jorris $" +
-        "$DateTime: 2003/10/28 18:36:21 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/BooleanParameter.java#4 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/11/10 12:56:08 $";
 
     static {
         Converters.set(Boolean.class, new BooleanConverter());

@@ -21,14 +21,18 @@ import java.net.URL;
 /**
  * Subject to change.
  *
+ * A parameter representing a Java <code>URL</code>.
+ *
+ * @see java.net.URL
+ * @see Parameter
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/URLParameter.java#4 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/URLParameter.java#5 $
  */
 public class URLParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/URLParameter.java#4 $" +
-        "$Author: jorris $" +
-        "$DateTime: 2003/10/28 18:36:21 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/URLParameter.java#5 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/11/10 12:56:08 $";
 
     public URLParameter(final String name) {
         super(name);

@@ -22,14 +22,18 @@ import org.apache.oro.text.perl.Perl5Util;
 /**
  * Subject to change.
  *
+ * A parameter representing an <code>InternetAddress</code>.
+ *
+ * @see javax.mail.internet.InternetAddress
+ * @see Parameter
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/EmailParameter.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/EmailParameter.java#4 $
  */
 public class EmailParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/EmailParameter.java#3 $" +
-        "$Author: jorris $" +
-        "$DateTime: 2003/10/28 18:36:21 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/EmailParameter.java#4 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/11/10 12:56:08 $";
 
     private static final Perl5Util s_perl = new Perl5Util();
     private static final String s_regex =

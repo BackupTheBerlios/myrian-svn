@@ -23,14 +23,19 @@ import java.util.Iterator;
 /**
  * Subject to change.
  *
+ * A parameter that manages a collection of <code>Parameter</code> to
+ * <code>Object</code> value mappings.
+ *
+ * @see java.util.Map
+ * @see Parameter
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/MapParameter.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/MapParameter.java#3 $
  */
 public class MapParameter extends AbstractParameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/MapParameter.java#2 $" +
-        "$Author: jorris $" +
-        "$DateTime: 2003/10/28 18:36:21 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/MapParameter.java#3 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/11/10 12:56:08 $";
 
     private final ArrayList m_params;
 
