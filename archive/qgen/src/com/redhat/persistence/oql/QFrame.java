@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2004/03/03 $
+ * @version $Revision: #12 $ $Date: 2004/03/03 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#11 $ by $Author: rhs $, $DateTime: 2004/03/03 12:16:16 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#12 $ by $Author: rhs $, $DateTime: 2004/03/03 16:00:32 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -524,17 +524,19 @@ class QFrame {
 
     void shrink() {
         Set frames = new HashSet();
-        shrink(frames);
+        List conds = getRoot().getConditions();
+        Map equisets = m_generator.equisets(conds);
+        shrink(frames, conds, equisets);
     }
 
-    private void shrink(Set frames) {
+    private void shrink(Set frames, List conds, Map equisets) {
         for (Iterator it = m_children.iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
-            child.shrink(frames);
+            child.shrink(frames, conds, equisets);
         }
 
         if (m_table != null) {
-            Set dups = m_generator.getDuplicates(this);
+            Set dups = m_generator.getDuplicates(this, conds, equisets);
             dups.retainAll(frames);
             if (dups.size() > 1) {
                 throw new IllegalStateException

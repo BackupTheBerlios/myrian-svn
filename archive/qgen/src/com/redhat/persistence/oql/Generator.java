@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/03/03 $
+ * @version $Revision: #10 $ $Date: 2004/03/03 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#9 $ by $Author: rhs $, $DateTime: 2004/03/03 12:16:16 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#10 $ by $Author: rhs $, $DateTime: 2004/03/03 16:00:32 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -263,9 +263,7 @@ class Generator {
         }
     }
 
-    Set getDuplicates(QFrame frame) {
-        List conds = frame.getRoot().getConditions();
-
+    Map equisets(Collection conditions) {
         // We have to key this map by QValue.toString() rather than a
         // QValue, this is because there can be multiple QValues for a
         // given frame referring to the same column. This also means
@@ -274,7 +272,7 @@ class Generator {
         // toString() will used the aliased name for the frame.
 
         Map equisets = new HashMap();
-        for (Iterator it = conds.iterator(); it.hasNext(); ) {
+        for (Iterator it = conditions.iterator(); it.hasNext(); ) {
             Expression e = (Expression) it.next();
             Set eqs = getEqualities(e);
             for (Iterator iter = eqs.iterator(); iter.hasNext(); ) {
@@ -302,6 +300,10 @@ class Generator {
             }
         }
 
+        return equisets;
+    }
+
+    Set getDuplicates(QFrame frame, List conds, Map equisets) {
         MultiMap columns = new MultiMap();
         for (Iterator it = conds.iterator(); it.hasNext(); ) {
             Expression e = (Expression) it.next();
