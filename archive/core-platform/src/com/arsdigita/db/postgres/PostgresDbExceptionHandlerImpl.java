@@ -23,12 +23,12 @@ import com.arsdigita.db.DbExceptionHandlerBaseImpl;
  * Class for processing of Postgres DB Exceptions.
  *
  * @author David Eison
- * @version $Revision: #9 $
+ * @version $Revision: #10 $
  * @since 4.6
  */
 public class PostgresDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresDbExceptionHandlerImpl.java#9 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresDbExceptionHandlerImpl.java#10 $";
 
     static {
         errors.put("Cannot insert a duplicate key into unique index",
@@ -48,6 +48,11 @@ public class PostgresDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
         errors.put("This connection has been terminated by the administrator.",
                    com.arsdigita.db.DbNotAvailableException.class);
 
+       errors.put("FATAL 1:  This connection has been terminated by the administrator.",
+                  com.arsdigita.db.DbNotAvailableException.class);
+       errors.put("Broken pipe",
+                  com.arsdigita.db.DbNotAvailableException.class);
+
         // These errors are here so that the PersistenceExceptionTest passes
         // on both oracle and postgres. They can also theoretically occur in
         // postgres mode if you forget to switch your jdbc URL from the oracle
@@ -56,7 +61,6 @@ public class PostgresDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
                    com.arsdigita.db.DbNotAvailableException.class);
         errors.put("ORA-12154",
                    com.arsdigita.db.DbNotAvailableException.class);
-
     }
 
 }
