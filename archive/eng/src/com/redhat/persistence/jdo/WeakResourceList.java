@@ -9,7 +9,12 @@ abstract class WeakResourceList {
     private List m_refs = new LinkedList();
 
     public void add(Object o) {
+        purge();
         m_refs.add(new WeakReference(o));
+    }
+
+    public void purge() {
+        remove(null);
     }
 
     public boolean remove(Object obj) {
@@ -32,7 +37,9 @@ abstract class WeakResourceList {
     public void release() {
         while (m_refs.size() > 0) {
             Object o = ((WeakReference) m_refs.remove(0)).get();
-            onRelease(o);
+            if (o != null) {
+                onRelease(o);
+            }
         }
     }
 }

@@ -144,6 +144,7 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
     public void close() {
         s_log.debug("close(): m_ssn = null");
         m_ssn = null;
+        m_smiMap.clear();
     }
 
     void commit() {
