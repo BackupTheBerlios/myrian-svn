@@ -14,18 +14,20 @@
  */
 package com.arsdigita.util;
 
-import org.apache.log4j.Logger;
-
-import java.util.List;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 /**
- * CallTracer is a utility class for tracing calls to methods in a class. This is a poor man's
- * OptimizeIT or JProbe type of tool. Use to figure out where methods are being called from and with
- * what frequency. To use, do something like:
+ * CallTracer is a utility class for tracing calls to methods in a class. This
+ * is a poor man's OptimizeIT or JProbe type of tool. Use to figure out where
+ * methods are being called from and with what frequency. To use, do something
+ * like:
  *
+ * <pre>
  * Class Foo {
  *    private static CallTracer s_trace = new CallTracer(Foo.class, 100);
  *
@@ -42,18 +44,23 @@ import java.util.Iterator;
  *    }
  *
  * }
+ * </pre>
  *
- * In this example, the CallTracer will independently track calls to foo() and bar(), and send a report
- * to the log every 100 calls of: every caller of foo (or bar) and it's count.
+ * <p>In this example, the CallTracer will independently track calls to foo()
+ * and bar(), and send a report to the log every 100 calls of: every caller of
+ * foo (or bar) and it's count.</p>
  *
- * The CallTracer _will not_ log unless DEBUG level in log4j is set for the class being traced.
+ * <p>The CallTracer _will not_ log unless DEBUG level in log4j is set for the
+ * class being traced.</p>
  *
- * Obviously, using CallTracer can impose a signifigant overhead.
+ * <p>Obviously, using CallTracer can impose a signifigant overhead.</p>
  *
- * See bug 113696 for an example of how this class was used.
+ * <p>See <a
+ * href="https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=113696#c7">bug
+ * 113696</a> for an example of how this class can be used.</p>
  *
  * @author jorris@redhat.com
- * @version $Revision $1 $ $Date: 2004/02/09 $
+ * @version $Revision $1 $ $Date: 2004/02/10 $
  */
 public class CallTracer {
 
