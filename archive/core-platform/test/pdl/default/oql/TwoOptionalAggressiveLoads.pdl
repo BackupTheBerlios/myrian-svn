@@ -19,14 +19,14 @@ import com.arsdigita.kernel.ACSObject;
 import com.arsdigita.versioning.VersionedACSObject;
 
 object type TwoOptionalAggressiveLoads extends ACSObject {
-    component File[0..1] portrait = join up_profiles.portrait_id 
-			   to docs_resources.resource_id;
-    component File[0..1] thumbnail = join up_profiles.thumbnail_id 
-			   to docs_resources.resource_id;
-    String bio = up_profiles.bio VARCHAR(4000);
-    String skills = up_profiles.skills VARCHAR(4000);
+    component File[0..1] portrait = join t_up_profiles.portrait_id 
+			   to t_docs_resources.resource_id;
+    component File[0..1] thumbnail = join t_up_profiles.thumbnail_id 
+			   to t_docs_resources.resource_id;
+    String bio = t_up_profiles.bio VARCHAR(4000);
+    String skills = t_up_profiles.skills VARCHAR(4000);
 
-    reference key (up_profiles.profile_id);
+    reference key (t_up_profiles.profile_id);
 
     aggressive load (user.id, portrait.id, portrait.objectType, portrait.description);
 
@@ -35,7 +35,7 @@ object type TwoOptionalAggressiveLoads extends ACSObject {
 	    select r.resource_id, r.parent_id, r.name, r.description,
 	    r.mime_type, r.is_folder, r.path, nvl(dbms_lob.getlength(r.content),0) sizeBytes,
 	    a.object_type
-	    from docs_resources r, up_profiles p, acs_objects a
+	    from t_docs_resources r, t_up_profiles p, acs_objects a
 	    where p.portrait_id = r.resource_id
 	    and r.resource_id = a.object_id
 	    and p.profile_id = :id
@@ -54,14 +54,14 @@ object type TwoOptionalAggressiveLoads extends ACSObject {
 
     add portrait {
         do {
-	    update up_profiles 
+	    update t_up_profiles 
 	    set portrait_id = :portrait.id
 	    where profile_id = :id
         }
     }
 
     remove portrait {
-        do { update up_profiles 
+        do { update t_up_profiles 
 	     set portrait_id = null,
 	     thumbnail_id = null
 	     where profile_id = :id
@@ -73,7 +73,7 @@ object type TwoOptionalAggressiveLoads extends ACSObject {
 	    select r.resource_id, r.parent_id, r.name, r.description,
 	    r.mime_type, r.is_folder, r.path, nvl(dbms_lob.getlength(r.content),0) sizeBytes,
 	    a.object_type
-	    from docs_resources r, up_profiles p, acs_objects a
+	    from t_docs_resources r, t_up_profiles p, acs_objects a
 	    where p.thumbnail_id = r.resource_id
 	    and r.resource_id = a.object_id
 	    and p.profile_id = :id
@@ -92,7 +92,7 @@ object type TwoOptionalAggressiveLoads extends ACSObject {
 
     add thumbnail {
         do {
-	    update up_profiles 
+	    update t_up_profiles 
 	    set thumbnail_id = :thumbnail.id
 	    where profile_id = :id
 
@@ -100,7 +100,7 @@ object type TwoOptionalAggressiveLoads extends ACSObject {
     }
 
     remove thumbnail {
-        do { update up_profiles 
+        do { update t_up_profiles 
 	     set thumbnail_id = null,
 	     portrait_id = null
 	     where profile_id = :id
@@ -109,32 +109,32 @@ object type TwoOptionalAggressiveLoads extends ACSObject {
 }
 
 association {
-    component User[1..1] user = join up_profiles.user_id to users.user_id;
-    TwoOptionalAggressiveLoads[0..1] profile = join users.user_id to up_profiles.user_id;
+    component User[1..1] user = join t_up_profiles.user_id to users.user_id;
+    TwoOptionalAggressiveLoads[0..1] profile = join users.user_id to t_up_profiles.user_id;
 }
 
 object type ResourceImpl extends VersionedACSObject { 
-    BigDecimal[0..1] parentID    = docs_resources.parent_id INTEGER;
-    String[1..1]     name        = docs_resources.name VARCHAR(200);
-    String[0..1]     description = docs_resources.description VARCHAR(4000);
-    Boolean[1..1]    isFolder    = docs_resources.is_folder CHAR(1);
-    String[1..1]     path        = docs_resources.path VARCHAR(4000);
+    BigDecimal[0..1] parentID    = t_docs_resources.parent_id INTEGER;
+    String[1..1]     name        = t_docs_resources.name VARCHAR(200);
+    String[0..1]     description = t_docs_resources.description VARCHAR(4000);
+    Boolean[1..1]    isFolder    = t_docs_resources.is_folder CHAR(1);
+    String[1..1]     path        = t_docs_resources.path VARCHAR(4000);
   
-    reference key (docs_resources.resource_id);
+    reference key (t_docs_resources.resource_id);
 }
 
 object type File extends ResourceImpl {
-    String mimeType = docs_resources.mime_type VARCHAR(200);
-    Blob content = docs_resources.content BLOB;
-    BigDecimal size = docs_files.length INTEGER;
+    String mimeType = t_docs_resources.mime_type VARCHAR(200);
+    Blob content = t_docs_resources.content BLOB;
+    BigDecimal size = t_docs_files.length INTEGER;
 
-    reference key (docs_files.file_id);
+    reference key (t_docs_files.file_id);
 
     insert {
         super;
 
         do {
-            update docs_resources
+            update t_docs_resources
             set mime_type = :mimeType,
                 content = :content
             where resource_id = :id
@@ -147,7 +147,7 @@ object type File extends ResourceImpl {
         super;
 
         do {
-            update docs_resources
+            update t_docs_resources
             set mime_type = :mimeType,
                 content = :content
             where resource_id = :id

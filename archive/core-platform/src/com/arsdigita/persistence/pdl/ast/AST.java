@@ -30,12 +30,12 @@ import java.util.ArrayList;
  * AST
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/26 $
+ * @version $Revision: #6 $ $Date: 2002/09/16 $
  */
 
 public class AST extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AST.java#5 $ by $Author: rhs $, $DateTime: 2002/08/26 17:54:19 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AST.java#6 $ by $Author: rhs $, $DateTime: 2002/09/16 18:59:05 $";
 
     // the various models that make up this AST/Metadata
     private Map m_models = new HashMap();
@@ -176,6 +176,8 @@ public class AST extends Element {
             model.validateMappings();
         }
 
+        root.generateDDL();
+
         for (int i = 0; i < objectDefs.size(); i++) {
             ObjectDef od = (ObjectDef) objectDefs.get(i);
             od.generateEvents();
@@ -186,8 +188,6 @@ public class AST extends Element {
                     node.generateAssociationEvents();
                 }
             }.traverse(this);
-
-        root.generateDDL();
     }
 
     /**

@@ -36,12 +36,12 @@ import java.util.Iterator;
  * Outputs a metadata ObjectType.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/08/14 $
+ * @version $Revision: #8 $ $Date: 2002/09/16 $
  */
 
 public class ObjectDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ObjectDef.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ObjectDef.java#8 $ by $Author: rhs $, $DateTime: 2002/09/16 18:59:05 $";
 
     // object name
     private String m_name;
@@ -430,10 +430,6 @@ public class ObjectDef extends Element {
 
         for (Iterator it = m_type.getDeclaredProperties(); it.hasNext(); ) {
             Property prop = (Property)it.next();
-
-            if (prop.isAttribute()) {
-                continue;
-            }
 
             mdsqlloop:
             for (int i = 0; i<Property.NUM_EVENT_TYPES; i++) {

@@ -17,12 +17,11 @@
 -- tests to run.
 --
 -- @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
--- @version $Revision: #8 $ $Date: 2002/09/03 $
+-- @version $Revision: #9 $ $Date: 2002/09/16 $
 --
 
 -- Right now this is duplicated from the individual files. This should
 -- be fixed at some point.
 
-@@ test-create.sql
 @@ data-operation-test.sql
 @@ aggressive-test.sql

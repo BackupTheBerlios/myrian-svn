@@ -38,7 +38,7 @@ object type Article {
 object type ArticleImageLink {
     Article[1..1] article;
     Image[1..1] image;
-    String caption = t_article_image_map.caption VARCHAR;
+    String caption = t_article_image_map.caption VARCHAR(4000);
 
     object key (article, image);
 

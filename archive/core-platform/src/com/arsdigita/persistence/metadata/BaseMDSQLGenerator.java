@@ -47,12 +47,12 @@ import org.apache.log4j.Logger;
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#11 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#12 $
  * @since 4.6.3
  */
 abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#11 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#12 $ by $Author: rhs $, $DateTime: 2002/09/16 18:59:05 $";
 
     private static final Logger s_log =
         Logger.getLogger(BaseMDSQLGenerator.class);
@@ -142,7 +142,10 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
         // don't waste time
         if (prop.isAttribute() || (prop.getJoinPath() == null)) {
-            return null;
+            if (eventType != Property.RETRIEVE ||
+                prop.getColumn() == null) {
+                return null;
+            }
         }
 
         switch (eventType) {
@@ -208,6 +211,39 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
     }
 
     /**
+     * Generates SQL for retrieving a single attribute of an object.
+     * @param type The type of the object.
+     * @param prop The attribute.
+     **/
+
+    protected Event generateAttributeRetrieve(ObjectType type, Property prop) {
+        Column col = prop.getColumn();
+        Table table = col.getTable();
+        if (table.getPrimaryKey() == null) {
+            return null;
+        }
+        Column keyCol = table.getPrimaryKey().getColumns()[0];
+        Property key = (Property) type.getKeyProperties().next();
+
+        StringBuffer sql = new StringBuffer();
+        sql.append("select " + col.getName() +
+                   "\nfrom " + table.getName() +
+                   "\nwhere " + keyCol.getName() + " = :" + key.getName());
+
+        Operation op = new Operation(sql.toString());
+        op.setLineInfo(prop);
+        op.addMapping(new Mapping(new String[] { prop.getName() },
+                                  table.getName(),
+                                  col.getName()));
+
+        Event event = new Event();
+        event.setLineInfo(prop);
+        event.addOperation(op);
+
+        return event;
+    }
+
+    /**
      * Generates the SQL for a retrieve event for a particular object type.
      *
      * @param type the object type to generate the event for
@@ -216,6 +252,10 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
     protected Event generatePropertyRetrieve(ObjectType type,
                                              Property prop,
                                              ObjectType link) {
+        if (prop != null && prop.isAttribute()) {
+            return generateAttributeRetrieve(type, prop);
+        }
+
         Operation op = generateRetrieveOperation(type, prop, link);
 
         if (op == null) {
