@@ -126,7 +126,7 @@ public class StatementProfiler implements RDBMSProfiler {
                 elem("table", tables[i]);
             }
 
-            elem("query", "<![CDATA[" + m_statement.getQuery() + "]]>");
+            //elem("query", "<![CDATA[" + m_statement.getQuery() + "]]>");
 
             final Iterator events = m_statement.getEvents().iterator();
 
