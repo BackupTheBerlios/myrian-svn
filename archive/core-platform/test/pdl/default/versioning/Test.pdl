@@ -47,7 +47,7 @@ object type Datatype extends VersionedACSObject {
                                      to t_versioned_datatypes.parent_id;
 
   Datatype[0..1]   parent = join t_versioned_datatypes.parent_id
-                              to t_versioned_datatypes.id;
+                                        to t_versioned_datatypes.id;
   
   reference key (t_versioned_datatypes.id);
   aggressive load (related.id, parent.id, child.id);
