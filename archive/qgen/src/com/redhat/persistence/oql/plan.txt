@@ -21,3 +21,35 @@
 
  * Modify sql generation code to produce more optimized sql based on
    the analyzed query.
+
+--
+
+ * Metadata support for qualias
+   - Qualis is added as a new "logical" type of mapping, i.e. a
+     logical query fragment that goes in ObjectMap.
+
+ * Qualias support in analyzer/SQLG
+
+ * Use analyzer during SQLG
+
+ * Expand OQL to support necessary primitives
+   - retrieve all
+   - order
+   - range
+   - simple ------------------.
+                              |----> (Opaque expression with optional metadata)
+ * Static SQL in OQL -> SQL --'
+
+ * Metadata simplification:
+   - subtypes of Property can go away.
+
+ * Legacy changes:
+   - DataQueryImpl
+     + addPath
+     + add/setFilter
+     + add/setOrder
+     + setRange
+   - QuerySource
+   - Session -> Engine interface changes
+     + RBMSEngine
+     + RecordSet
