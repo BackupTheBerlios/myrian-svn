@@ -209,14 +209,16 @@ public class BaseTestSetup extends TestDecorator {
 
         TestConfig() {
             super("/test.properties");
+
             m_url = (String) initialize
-                (new JDBCURLParameter("waf.test.jdbc.url"), null);
+                (new JDBCURLParameter("waf.test.jdbc.url"));
             m_user = (String) initialize
-                (new StringParameter("waf.test.jdbc.user"), null);
+                (new StringParameter("waf.test.jdbc.user"));
             m_password = (String) initialize
-                (new StringParameter("waf.test.jdbc.password"), null);
+                (new StringParameter("waf.test.jdbc.password"));
             m_pdl = (String) initialize
-                (new StringParameter("waf.test.pdl"), null);
+                (new StringParameter("waf.test.pdl"));
+
             m_database = DbHelper.getDatabaseFromURL(m_url);
         }
 

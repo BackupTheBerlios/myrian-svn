@@ -26,13 +26,13 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#2 $
  */
 public class BaseConfig {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/27 12:40:24 $";
+        "$DateTime: 2003/09/02 12:40:15 $";
 
     private static final Logger s_log = Logger.getLogger
         (BaseConfig.class);
@@ -43,8 +43,7 @@ public class BaseConfig {
         m_store = new FilePropertyStore(filename);
     }
 
-    protected final Object initialize(final Parameter param,
-                                      final Object defaalt) {
+    protected final Object initialize(final Parameter param) {
         // 1. Unmarshal and check for errors
 
         final ParameterValue value = param.unmarshal(m_store);
@@ -53,13 +52,7 @@ public class BaseConfig {
             throw new ConfigurationError(value.getErrors().toString());
         }
 
-        // 2. Set to default if null
-
-        if (!value.isAssigned()) {
-            value.setValue(defaalt);
-        }
-
-        // 3. Validate and check for errors
+        // 2. Validate and check for errors
 
         param.validate(value);
 

@@ -24,24 +24,27 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#4 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#5 $
  */
 public class StringParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#4 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#5 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/28 00:48:42 $";
+        "$DateTime: 2003/09/02 12:40:15 $";
 
     private final String m_name;
     private final Class m_type;
-
-    private boolean m_required;
+    private final int m_multiplicity;
+    private final Object m_default;
 
     static {
         Converters.set(String.class, new StringConverter());
     }
 
-    protected StringParameter(final String name, final Class type) {
+    protected StringParameter(final String name,
+                              final int multiplicity,
+                              final Object defaalt,
+                              final Class type) {
         if (Assert.isEnabled()) {
             Assert.exists(name, String.class);
             Assert.exists(type, Class.class);
@@ -49,20 +52,27 @@ public class StringParameter implements Parameter {
 
         m_name = name;
         m_type = type;
-        m_required = true;
+        m_multiplicity = multiplicity;
+        m_default = defaalt;
+    }
+
+    protected StringParameter(final String name,
+                              final Class type) {
+        this(name, Parameter.REQUIRED, null, type);
+    }
+
+    public StringParameter(final String name,
+                           final int multiplicity,
+                           final Object defaalt) {
+        this(name, multiplicity, defaalt, String.class);
     }
 
     public StringParameter(final String name) {
-        this(name, String.class);
+        this(name, Parameter.REQUIRED, null);
     }
 
-    // Default is true.
     public final boolean isRequired() {
-        return m_required;
-    }
-
-    public final void setRequired(final boolean required) {
-        m_required = required;
+        return m_multiplicity == Parameter.REQUIRED;
     }
 
     public final String getName() {
@@ -74,7 +84,7 @@ public class StringParameter implements Parameter {
         final String literal = store.read(this);
 
         if (literal == null) {
-            //value.setValue(getDefaultValue());
+            value.setValue(m_default);
         } else {
             value.setValue(unmarshal(literal, value.getErrors()));
         }
