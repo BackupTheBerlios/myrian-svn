@@ -19,7 +19,7 @@ package com.arsdigita.persistence.proto;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-28
- * @version $Revision: #1 $ $Date: 2003/02/28 $
+ * @version $Revision: #2 $ $Date: 2003/04/23 $
  **/
 public interface EventProcessorManager {
     /**
@@ -28,7 +28,7 @@ public interface EventProcessorManager {
      * <code>EventProcessorManager</code> and <code>EventProcessor</code> must
      * have the same semantics as {@link
      * com.arsdigita.persistence.SessionManager} and {@link
-     * com.arsdigita.perisistence.Session}.
+     * com.arsdigita.persistence.Session}.
      **/
     EventProcessor getEventProcessor();
 }

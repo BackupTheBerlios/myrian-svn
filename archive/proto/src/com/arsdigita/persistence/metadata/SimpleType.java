@@ -24,16 +24,16 @@ import java.util.Collection;
 
 /**
  * The SimpleType class is the base class for all the primative DataTypes
- * that the perisistence layer knows how to store. These simple types serve as
+ * that the persistence layer knows how to store. These simple types serve as
  * the atoms from which compound types are built.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/04/18 $
+ * @version $Revision: #3 $ $Date: 2003/04/23 $
  */
 
 public class SimpleType extends DataType {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/SimpleType.java#2 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/SimpleType.java#3 $ by $Author: vadim $, $DateTime: 2003/04/23 09:49:19 $";
 
     static final SimpleType
 	wrap(com.arsdigita.persistence.proto.metadata.ObjectType obj) {
