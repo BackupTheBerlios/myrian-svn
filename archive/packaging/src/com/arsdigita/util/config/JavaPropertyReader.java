@@ -29,17 +29,16 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterLoader
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyLoader.java#7 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyReader.java#1 $
  */
-public class JavaPropertyLoader extends JavaPropertyReader 
-        implements ParameterLoader {
+public class JavaPropertyReader implements ParameterReader {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyLoader.java#7 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyReader.java#1 $" +
         "$Author: justin $" +
         "$DateTime: 2003/10/17 18:08:50 $";
 
     private static final Logger s_log = Logger.getLogger
-        (JavaPropertyLoader.class);
+        (JavaPropertyReader.class);
 
     private final Properties m_props;
 
@@ -49,38 +48,46 @@ public class JavaPropertyLoader extends JavaPropertyReader
      * @param props The <code>Properties</code> object that stores
      * property values; it cannot be null
      */
-    public JavaPropertyLoader(final Properties props) {
-        super(props);
+    public JavaPropertyReader(final Properties props) {
+        Assert.exists(props, Properties.class);
 
         m_props = props;
     }
 
-    public final ParameterValue load(final Parameter param) {
-        if (s_log.isDebugEnabled()) {
-            s_log.debug("Loading " + param + " from " + this);
+    public final void load(final InputStream in) {
+        try {
+            m_props.load(in);
+        } catch (IOException ioe) {
+            throw new UncheckedWrapperException(ioe);
+        }
+    }
+
+    /**
+     * Reads a <code>String</code> value back for a
+     * <code>param</code>.
+     *
+     * @param param The <code>Parameter</code> whose value is
+     * requested; it cannot be null
+     * @param errors An <code>ErrorList</code> to trap any errors
+     * encountered when reading; it cannot be null
+     * @return The <code>String</code> value for <code>param</code>;
+     * it can be null
+     */
+    public final String read(final Parameter param, final ErrorList errors) {
+        if (Assert.isEnabled()) {
+            Assert.exists(param, Parameter.class);
+            Assert.exists(errors, ErrorList.class);
         }
 
-        Assert.exists(param, Parameter.class);
-
-        final String key = param.getName();
-
-        if (m_props.containsKey(key)) {
-            final ParameterValue value = new ParameterValue();
-
-            value.setObject(param.read(this, value.getErrors()));
-
-            return value;
-        } else {
-            return null;
-        }
+        return m_props.getProperty(param.getName());
     }
 
     /**
      * Returns a <code>String</code> representation of this object.
      *
-     * @return super.toString() + ":" + properties.size()
+     * @return super.toString() + "," + properties.size()
      */
     public String toString() {
-        return super.toString() + ":" + m_props.size();
+        return super.toString() + "," + m_props.size();
     }
 }
