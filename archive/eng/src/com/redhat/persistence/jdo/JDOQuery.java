@@ -92,6 +92,7 @@ class JDOQuery implements ExtendedQuery, Serializable {
     }
 
     public void compile() {
+        reset();
         JDOQLParser p = getParser();
         p.parseImports(this, m_imports);
         p.parseParameters(this, m_params);

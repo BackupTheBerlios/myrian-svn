@@ -147,13 +147,13 @@ class JDOQLParser {
             if (m_scope == null) {
                 m_scope = new StringBuffer(m_name);
             } else {
-                m_scope.append(m_name);
+                m_scope.append(".").append(m_name);
             }
             m_name = s;
         }
 
         public String toString() {
-            return m_scope == null ? m_name : m_scope + m_name;
+            return m_scope == null ? m_name : m_scope + "." + m_name;
         }
     }
 }
@@ -447,7 +447,7 @@ Expression literal() :
     }
 }
 
-Expression primary() :
+Expression postfixExpression() :
 {
     Expression expr;
     Token t;
@@ -459,29 +459,33 @@ Expression primary() :
           <LPAREN> expr = expression() <RPAREN>
         | expr = literal()
         | <THIS> { expr = new Variable("this"); }
+        | t = <IDENTIFIER> {
+              // XXX need to prefix "this." for some paths
+              if (getParameters().containsKey(t.image)) {
+                  Object value = getParameters().get(t.image);
+                  if (value instanceof Expression) {
+                      expr = (Expression) value;
+                  } else {
+                      expr = new Literal(value);
+                  }
+              } else {
+                  expr = new Variable(t.image);
+              }
+          }
+    )
 
-        ( LOOKAHEAD(3) 
+    ( LOOKAHEAD(3)
           <DOT> t = <IDENTIFIER> <LPAREN> { args = new ArrayList(); }
             [ arg = expression() { args.add(arg); }
               ( <COMMA> arg = expression() { args.add(arg); } )*
             ]
           <RPAREN> { throw new Error("not implemented"); }
-        | ( <DOT> t = <IDENTIFIER> ) { expr = new Get(expr, t.image); }
-        )*
-    )
+        | <DOT> t = <IDENTIFIER> { expr = new Get(expr, t.image); }
+    )*
+
     { return expr; }
 }
 
-Expression postfixExpression() :
-{
-    Expression p;
-    Name n;
-}
-{
-      p = primary() { return p; }
-    | n = name() { return Expression.valueOf(Path.get(n.toString())); }
-      // XXX need to prefix "this." for some paths
-}
 
 Expression unaryExpression() :
 {
