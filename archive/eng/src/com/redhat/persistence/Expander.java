@@ -38,7 +38,7 @@ import java.util.Map;
  */
 class Expander extends Event.Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Expander.java#4 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Expander.java#5 $ by $Author: rhs $, $DateTime: 2004/08/18 17:55:18 $";
 
     final private Session m_ssn;
     final private Collection m_deleting = new HashSet();
@@ -237,6 +237,16 @@ class Expander extends Event.Switch {
         if (map.isNested() && map.isCompound()) {
             Object key = new CompoundKey
                 (m_ssn.getSessionKey(obj), role.getName());
+            List props = map.getKeyProperties();
+            for (int i = 0; i < props.size(); i++) {
+                Property p = (Property) props.get(i);
+                ObjectMap om = map.getMapping(p).getMap();
+                if (om.isPrimitive()) {
+                    key = new CompoundKey(key, arg);
+                } else {
+                    key = new CompoundKey(key, m_ssn.getSessionKey(arg));
+                }
+            }
             m_ssn.setSessionKey(arg, key);
             ObjectData od = m_ssn.getObjectData(arg);
             od.setObjectMap(mapping.getMap());

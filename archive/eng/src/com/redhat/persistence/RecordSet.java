@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
 
@@ -32,12 +33,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/08/18 $
+ * @version $Revision: #9 $ $Date: 2004/08/18 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/RecordSet.java#8 $ by $Author: rhs $, $DateTime: 2004/08/18 17:29:45 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/RecordSet.java#9 $ by $Author: rhs $, $DateTime: 2004/08/18 17:55:18 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -80,28 +81,33 @@ public abstract class RecordSet {
     private Object key(Path path) {
         ObjectMap map = getObjectMap(path);
         ObjectType type = map.getObjectType();
-        Collection props = type.getImmediateProperties();
+
+        Object key;
+
         if (map.isPrimitive()) {
             return get(path);
         } else if (map.isNested()) {
-            Object key = path == null ?
+            key = path == null ?
                 key(map.getContainer().getPath()) : key(path.getParent());
             if (key == null) {
                 return null;
             } else {
-                return new CompoundKey
+                key = new CompoundKey
                     (key, map.getContaining().getPath().getName());
             }
         } else {
-            Object key = type.getBasetype();
-            for (Iterator it = props.iterator(); it.hasNext(); ) {
-                Property p = (Property) it.next();
-                Object subKey = key(Path.add(path, p.getName()));
-                if (subKey == null) { return null; }
-                key = new CompoundKey(key, subKey);
-            }
-            return key;
+            key = type.getBasetype();
         }
+
+        List props = map.getKeyProperties();
+        for (int i = 0; i < props.size(); i++) {
+            Property p = (Property) props.get(i);
+            Object subKey = key(Path.add(path, p.getName()));
+            if (subKey == null) { return null; }
+            key = new CompoundKey(key, subKey);
+        }
+
+        return key;
     }
 
     private Object get(Session ssn, Path path) {
