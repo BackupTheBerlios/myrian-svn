@@ -25,12 +25,12 @@ import java.util.List;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/05/02 $
+ * @version $Revision: #4 $ $Date: 2004/05/05 $
  **/
 
 public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/ObjectType.java#3 $ by $Author: rhs $, $DateTime: 2004/05/02 13:12:27 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/ObjectType.java#4 $ by $Author: rhs $, $DateTime: 2004/05/05 21:58:27 $";
 
     private final Model m_model;
     private final String m_name;
@@ -84,7 +84,11 @@ public class ObjectType extends Element {
     }
 
     public Class getJavaClass() {
-	return m_class;
+        if (m_class == null && m_super != null) {
+            return m_super.getJavaClass();
+        } else {
+            return m_class;
+        }
     }
 
     public String getQualifiedName() {
