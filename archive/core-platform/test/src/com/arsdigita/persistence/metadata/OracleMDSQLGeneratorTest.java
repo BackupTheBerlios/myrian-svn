@@ -27,13 +27,13 @@ import org.apache.log4j.Category;
  * This class performs unit tests on com.arsdigita.persistence.metadata.OracleMDSQLGenerator </p>
  *
  * author <a href="mailto:jorriarsdigita.com">jorriarsdigita.com</a>
- * version $Revision: #1 $ $Date: 2002/05/12 $
+ * version $Revision: #2 $ $Date: 2002/07/18 $
  * 
  */
 
 public class OracleMDSQLGeneratorTest extends PersistenceTestCase {  
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/OracleMDSQLGeneratorTest.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/OracleMDSQLGeneratorTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private static Category s_log = 
         Category.getInstance(OracleMDSQLGeneratorTest.class.getName());

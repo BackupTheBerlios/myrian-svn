@@ -21,7 +21,7 @@ import junit.framework.*;
 
 public class SequenceTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/SequenceTest.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/SequenceTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     public static String sequenceName = "acs_object_id_seq";
 

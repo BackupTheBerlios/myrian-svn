@@ -16,7 +16,7 @@
 -- Upgrade 4.6.5 to 4.6.6
 --
 -- @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
--- @version $Id: //core-platform/dev/sql/oracle-se/upgrade/places/places-4.6.5-4.6.6.sql#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/upgrade/places/places-4.6.5-4.6.6.sql#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $
 --
 
 @@ pl-core-4.6.5-4.6.6.sql

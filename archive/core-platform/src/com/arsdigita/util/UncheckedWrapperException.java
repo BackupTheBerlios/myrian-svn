@@ -31,11 +31,11 @@ package com.arsdigita.util;
  * <tt>new UncheckedWrapperException(e.getMessage(), e);</tt>
  *
  * @author David Eison (eison@arsdigita.com)
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#2 $
  */
 public class UncheckedWrapperException extends RuntimeException {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#1 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#2 $";
 
     Throwable m_rootCause;
 

@@ -17,7 +17,7 @@
 --
 -- @author Dennis Gregorovic (dennis@arsdigita.com) 
 -- @creation-date Aug 16, 2001
--- @version $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-4.6.3-4.6.4.sql#1 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-4.6.3-4.6.4.sql#2 $
 --
 
 @@ parties-4.6.3-4.6.4.sql

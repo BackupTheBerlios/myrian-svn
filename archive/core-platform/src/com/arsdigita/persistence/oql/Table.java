@@ -9,12 +9,12 @@ import org.apache.log4j.Category;
  * Table
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/06/10 $
+ * @version $Revision: #6 $ $Date: 2002/07/18 $
  **/
 
 class Table {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Table.java#5 $ by $Author: rhs $, $DateTime: 2002/06/10 15:35:38 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Table.java#6 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private static final Category s_log = Category.getInstance(Table.class);
 

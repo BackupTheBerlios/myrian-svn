@@ -16,7 +16,7 @@
 -- Create countries.
 --
 -- @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
--- @version $Id: //core-platform/dev/sql/oracle-se/places/pl-countries-create.sql#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/places/pl-countries-create.sql#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $
 --
 
 create table pl_countries (

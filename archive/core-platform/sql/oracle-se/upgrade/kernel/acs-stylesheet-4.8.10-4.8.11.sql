@@ -15,7 +15,7 @@
 --
 -- Copyright (C) 2002 Arsdigita Corporation
 --
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/acs-stylesheet-4.8.10-4.8.11.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/acs-stylesheet-4.8.10-4.8.11.sql#2 $
 
 -- Drop the foreign key constraints and then re-enable them with 
 -- with on delete cascade set.

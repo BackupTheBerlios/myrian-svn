@@ -12,7 +12,7 @@
 -- rights and limitations under the License.
 --
 -- Copyright (C) 2001 Arsdigita Corporation
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/permissions-4.8.10-4.8.11.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/permissions-4.8.10-4.8.11.sql#2 $
 
 -- Add cascading deletes to grantee_id and privilege columns
 alter table acs_permissions

@@ -19,7 +19,7 @@
 -- Copyright (C) 2001 Arsdigita Corporation
 -- @author Randy Graebner (randyg@arsdigita.com)
 --
--- $Id: //core-platform/dev/sql/oracle-se/categorization/categorization-create.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/categorization/categorization-create.sql#2 $
 
 
 create table cat_categories (

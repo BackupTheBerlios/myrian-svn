@@ -23,13 +23,13 @@ import com.arsdigita.persistence.metadata.Property;
  * an event, such as a property retrieve event, which is undefined.
  *
  * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  */
 
 public class UndefinedEventException extends PersistenceException {
 
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/UndefinedEventException.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/UndefinedEventException.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     public UndefinedEventException(String msg) {
         super(msg, null);

@@ -16,7 +16,7 @@
 --
 -- Procedures for building and syncing the search index.
 -- Written by Teeters@arsdigita.com (Jeff Teeters).
--- $Id: //core-platform/dev/sql/oracle-se/search/search-indexing-procs-create.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/search/search-indexing-procs-create.sql#2 $
 
 -- Table for keeping track of search indexing jobs
 

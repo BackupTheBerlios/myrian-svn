@@ -17,7 +17,7 @@
 --
 -- @author randyg@arsdigita.com
 -- @creation-date 2001-05-10
--- @cvs-id $Id: //core-platform/dev/sql/oracle-se/categorization/categorization-drop.sql#1 $
+-- @cvs-id $Id: //core-platform/dev/sql/oracle-se/categorization/categorization-drop.sql#2 $
 --
 
 drop index cat_cat_pur_map_category_id_idx;

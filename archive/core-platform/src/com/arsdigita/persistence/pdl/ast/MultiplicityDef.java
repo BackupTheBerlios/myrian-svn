@@ -22,12 +22,12 @@ import com.arsdigita.persistence.Utilities;
  * Defines the multiplicity of a given association
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  */
 
 public class MultiplicityDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/MultiplicityDef.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/MultiplicityDef.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     // the upper and lower bounds of the association's multiplicity
     private String m_upper;

@@ -26,7 +26,7 @@ import junit.framework.TestCase;
  * <p> This class performs unit tests on com.arsdigita.persistence.metadatax.MetadataRoot </p>
  *
  * @author <a href="mailto:jorris@arsdigita.com">jorris@arsdigita.com</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  * 
  * @see com.arsdigita.persistence.metadata.MetadataRoot
  */
@@ -34,7 +34,7 @@ import junit.framework.TestCase;
 public class MetadataRootTest extends TestCase
 {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/MetadataRootTest.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/MetadataRootTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     public MetadataRootTest(String name) {
         super(name);

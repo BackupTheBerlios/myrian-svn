@@ -40,13 +40,13 @@ import org.apache.log4j.Category;
  * that wraps a "real" implementation of java.sql.CallableStatement
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  * @since 4.5
  */
 public class PreparedStatement extends com.arsdigita.db.Statement
     implements java.sql.PreparedStatement {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/PreparedStatement.java#1 $ $Author: dennis $ $Date: 2002/05/12 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/PreparedStatement.java#2 $ $Author: dennis $ $Date: 2002/07/18 $";
 
     private Category s_cat = Category.getInstance(com.arsdigita.db.PreparedStatement.class.getName());
 

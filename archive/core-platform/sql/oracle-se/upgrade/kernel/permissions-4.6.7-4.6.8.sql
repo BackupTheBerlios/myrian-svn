@@ -17,7 +17,7 @@
 -- Copyright (C) 2001 Arsdigita Corporation
 -- @author <a href="mailto:mbryzek@arsdigita.com">Michael Bryzek</a>
 --
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/permissions-4.6.7-4.6.8.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/permissions-4.6.7-4.6.8.sql#2 $
 
 create index acs_perm_creation_user_idx on acs_permissions(creation_user);
 create index object_context_context_id_idx on object_context(context_id);

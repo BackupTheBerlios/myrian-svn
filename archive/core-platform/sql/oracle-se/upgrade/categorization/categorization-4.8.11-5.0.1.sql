@@ -16,7 +16,7 @@
 --
 -- Copyright (C) 2001 Arsdigita Corporation
 --
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/categorization/categorization-4.8.11-5.0.1.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/categorization/categorization-4.8.11-5.0.1.sql#2 $
 
 -- Category purposes are used to define what the various top-level
 -- branches (i.e. direct children of the "/" category) are to be used for

@@ -32,12 +32,12 @@ import java.util.Collection;
  * methods (e.g. execute or executeQuery)
  *
  * @author <a href="mailto:randyg@arsdigita.com">randyg@arsdigita.com</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  */
 
 abstract class AbstractDataOperation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/AbstractDataOperation.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/AbstractDataOperation.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     protected ObjectType m_paramType = new ObjectType("<params>");
     protected DataContainer m_source = new DataContainer(m_paramType);

@@ -18,7 +18,7 @@
 --
 -- @author ron@arsdigita.com
 --
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/notification/notification-4.6.8-4.6.9.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/notification/notification-4.6.8-4.6.9.sql#2 $
 
 -- Add support for notification header and signature fields 
 

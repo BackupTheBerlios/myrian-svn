@@ -28,7 +28,7 @@ import javax.servlet.*;
 */
 
 public class HttpServletDummyRequest implements HttpServletRequest {
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyRequest.java#2 $ by $Author: dennis $, $DateTime: 2002/06/27 18:19:33 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyRequest.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private HashMap parameters;
     private HashMap attributes;

@@ -14,7 +14,7 @@
 --
 --
 -- @author oumi@arsdigita.com
--- @version-id $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/parties-4.6.7-4.6.8.sql#1 $
+-- @version-id $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/parties-4.6.7-4.6.8.sql#2 $
 --
 -- CHANGE: make user_authentication.password non-nullable.
 --

@@ -22,10 +22,10 @@ import junit.framework.Test;
  * MetadataSuite - Suite of tests for persistence.metadata
  *
  * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #2 $ $Date: 2002/05/13 $
+ * @version $Revision: #3 $ $Date: 2002/07/18 $
  */
 public class MetadataxSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/MetadataxSuite.java#2 $ by $Author: dennis $, $DateTime: 2002/05/13 16:12:59 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/MetadataxSuite.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     public static Test suite() {
         MetadataxSuite suite = new MetadataxSuite();

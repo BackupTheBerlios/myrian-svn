@@ -12,7 +12,7 @@
 -- rights and limitations under the License.
 --
 --
--- $Id: //core-platform/dev/sql/oracle-se/persistence/persistence-drop.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/persistence/persistence-drop.sql#2 $
 
 drop table persistence_dynamic_ot;
 drop table persistence_dynamic_assoc;

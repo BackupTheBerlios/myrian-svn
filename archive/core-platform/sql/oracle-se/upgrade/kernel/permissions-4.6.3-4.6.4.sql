@@ -14,7 +14,7 @@
 --
 --
 -- @author oumi@arsdigita.com
--- @version-id $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/permissions-4.6.3-4.6.4.sql#1 $
+-- @version-id $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/permissions-4.6.3-4.6.4.sql#2 $
 --
 -- FILE UPDATED: kernel/sql/oracle-se/permissions-create.sql
 -- CHANGE: 

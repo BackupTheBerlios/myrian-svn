@@ -4,12 +4,12 @@ package com.arsdigita.persistence;
  * DataObserver
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/06/14 $
+ * @version $Revision: #3 $ $Date: 2002/07/18 $
  **/
 
 public abstract class DataObserver {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObserver.java#2 $ by $Author: rhs $, $DateTime: 2002/06/14 12:22:31 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObserver.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     public void set(DataObject object, String property, Object previous,
                     Object value) {}

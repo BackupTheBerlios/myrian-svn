@@ -17,6 +17,6 @@
 -- Copyright (C) 1999-2000 ArsDigita Corporation
 -- Author: Karl Goldstein (karlg@arsdigita.com)
 
--- $Id: //core-platform/dev/sql/oracle-se/templating/acs-templating-create.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/templating/acs-templating-create.sql#2 $
 
 @@ demo-create.sql

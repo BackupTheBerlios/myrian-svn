@@ -14,7 +14,7 @@
 -- Data model upgrade from 4.8.4 to 4.8.5
 --
 -- Copyright (C) 2001 Arsdigita Corporation
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/parties-4.8.4-4.8.5.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/parties-4.8.4-4.8.5.sql#2 $
 
 alter table party_email_map drop constraint pem_email_address_fk;
 alter table parties drop constraint parties_primary_email_fk;

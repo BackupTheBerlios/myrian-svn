@@ -19,7 +19,7 @@
 --
 -- @author Bryan Quinn (bquinn@arsdigita.com) 
 -- @creation-date May 16, 2001 20:16:43
--- @version $Id: //core-platform/dev/sql/oracle-se/kernel/site-nodes-create.sql#1 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/kernel/site-nodes-create.sql#2 $
 --
 
 create table site_nodes (

@@ -498,7 +498,7 @@ public class StringUtils {
      *
      * @author ron@arsdigita.com
      * @since  5.1.2
-     * @version $Id: //core-platform/dev/src/com/arsdigita/util/StringUtils.java#1 $ 
+     * @version $Id: //core-platform/dev/src/com/arsdigita/util/StringUtils.java#2 $ 
      */
 
     public final static String wrap(String input) {
@@ -528,7 +528,7 @@ public class StringUtils {
      *
      * @author ron@arsdigita.com
      * @since  5.1.2
-     * @version $Id: //core-platform/dev/src/com/arsdigita/util/StringUtils.java#1 $ */
+     * @version $Id: //core-platform/dev/src/com/arsdigita/util/StringUtils.java#2 $ */
 
     public final static String wrap(String input, int maxLength) {
 

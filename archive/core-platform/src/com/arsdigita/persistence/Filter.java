@@ -78,12 +78,12 @@ import java.util.Map;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  */
 
 public interface Filter {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/Filter.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/Filter.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
     
     // this string is used as the namespace for the bind variables
     String FILTER = "__FILTERPARAMS__";

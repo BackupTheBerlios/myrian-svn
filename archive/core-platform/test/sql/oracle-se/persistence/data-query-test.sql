@@ -16,7 +16,7 @@
 -- This file contains the data model for the data query test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #1 $ $Date: 2002/05/12 $
+-- @version $Revision: #2 $ $Date: 2002/07/18 $
 --
 
 create table t_data_query (

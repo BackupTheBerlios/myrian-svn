@@ -7,12 +7,12 @@ import com.arsdigita.persistence.metadata.*;
  * Selection
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/06/10 $
+ * @version $Revision: #5 $ $Date: 2002/07/18 $
  **/
 
 class Selection {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Selection.java#4 $ by $Author: rhs $, $DateTime: 2002/06/10 15:35:38 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Selection.java#5 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private Node m_node;
     private Property m_property;

@@ -12,7 +12,7 @@
 -- rights and limitations under the License.
 --
 --
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-5.0.5-5.0.6.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-5.0.5-5.0.6.sql#2 $
 
 @@ ../../../../services/versioning/sql/oracle-se/upgrade/versioning-5.0.5-5.0.6.sql
 

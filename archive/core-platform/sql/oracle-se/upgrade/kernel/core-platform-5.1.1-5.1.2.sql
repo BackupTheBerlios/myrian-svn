@@ -12,6 +12,6 @@
 -- rights and limitations under the License.
 --
 -- Copyright (C) 2002 Arsdigita Corporation
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-5.1.1-5.1.2.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-5.1.1-5.1.2.sql#2 $
 
 @@ ../../../../services/messaging/sql/oracle-se/upgrade/messaging-5.1.1-5.1.2.sql

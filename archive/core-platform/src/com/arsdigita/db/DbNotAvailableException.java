@@ -22,13 +22,13 @@ import java.sql.SQLException;
  * violation is thrown by the database.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #1 $
+ * @version $Revision: #2 $
  * @since 4.6
  */
 
 public class DbNotAvailableException extends DbException {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DbNotAvailableException.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DbNotAvailableException.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     /**
      * Default constructor.  setRootCause should be called

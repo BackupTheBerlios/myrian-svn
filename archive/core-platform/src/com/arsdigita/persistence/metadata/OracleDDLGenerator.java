@@ -37,12 +37,12 @@ import java.sql.DatabaseMetaData;
  * {@link com.arsdigita.persistence.metadata.DynamicObjectType}.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleDDLGenerator.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleDDLGenerator.java#3 $
  * @since 4.6.3 */
 
 final class OracleDDLGenerator extends BaseDDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleDDLGenerator.java#2 $ by $Author: randyg $, $DateTime: 2002/07/18 10:31:38 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleDDLGenerator.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
     
     private static final int MAX_COLUMN_NAME_LEN = 26;
 

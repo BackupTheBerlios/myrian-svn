@@ -32,7 +32,7 @@ import org.apache.log4j.Category;
 
 /**
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  */
 
 public class DynamicAssociationTest extends PersistenceTestCase {

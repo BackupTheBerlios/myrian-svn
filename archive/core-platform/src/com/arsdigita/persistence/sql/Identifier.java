@@ -9,12 +9,12 @@ import java.util.Map;
  * Identifier
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/05/30 $
+ * @version $Revision: #3 $ $Date: 2002/07/18 $
  **/
 
 public class Identifier extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Identifier.java#2 $ by $Author: rhs $, $DateTime: 2002/05/30 15:15:09 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Identifier.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private String[] m_path;
     private boolean m_isBindVar = false;

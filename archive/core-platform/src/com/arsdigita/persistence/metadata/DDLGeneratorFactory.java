@@ -24,12 +24,12 @@ import org.apache.log4j.Category;
  * returns it to calling classes.
  * 
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGeneratorFactory.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGeneratorFactory.java#3 $
  * @since 4.6.3
  */
 public class DDLGeneratorFactory {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGeneratorFactory.java#2 $ by $Author: randyg $, $DateTime: 2002/07/17 16:18:39 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGeneratorFactory.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private static Category s_log = 
         Category.getInstance(DDLGeneratorFactory.class);

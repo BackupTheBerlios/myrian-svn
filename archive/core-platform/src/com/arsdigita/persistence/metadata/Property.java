@@ -27,7 +27,7 @@ import java.io.PrintStream;
  * REQUIRED, and COLLECTION.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/06/10 $
+ * @version $Revision: #3 $ $Date: 2002/07/18 $
  **/
 
 public class Property extends Element {
@@ -81,7 +81,7 @@ public class Property extends Element {
         "[0..n]"
     };
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#2 $ by $Author: rhs $, $DateTime: 2002/06/10 15:35:38 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     /**
      * The name of the Property.

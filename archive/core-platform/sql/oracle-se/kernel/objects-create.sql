@@ -17,7 +17,7 @@
 --
 -- @author oumi@arsdigita.com
 -- @creation-date 2001-05-10
--- @cvs-id $Id: //core-platform/dev/sql/oracle-se/kernel/objects-create.sql#2 $
+-- @cvs-id $Id: //core-platform/dev/sql/oracle-se/kernel/objects-create.sql#3 $
 --
 
 create sequence acs_object_id_seq cache 1000;

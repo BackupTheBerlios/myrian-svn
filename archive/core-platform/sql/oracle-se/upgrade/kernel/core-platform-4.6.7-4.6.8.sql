@@ -14,7 +14,7 @@
 -- Data model upgrade from 4.6.7 to 4.6.8
 --
 -- Copyright (C) 2001 Arsdigita Corporation
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-4.6.7-4.6.8.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-4.6.7-4.6.8.sql#2 $
 
 -- PRE-UPGRADE
 -- This script checks that the data is fit for upgrading (e.g., ensure that

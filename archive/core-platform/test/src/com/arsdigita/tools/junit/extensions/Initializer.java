@@ -33,7 +33,7 @@ import java.io.Reader;
  *  Initializer
  *  
  * @author <a href="mailto:dennis@arsdigita.com">Dennis Gregorovic</a>
- * @version $Revision: #1 $ $Date: 2002/05/15 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  */
 
 public class Initializer {

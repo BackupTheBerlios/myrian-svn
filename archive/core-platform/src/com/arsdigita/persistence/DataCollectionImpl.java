@@ -31,13 +31,13 @@ import java.util.Map;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/06/03 $
+ * @version $Revision: #3 $ $Date: 2002/07/18 $
  */
 
 class DataCollectionImpl extends DataQueryImpl
     implements DataCollection {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataCollectionImpl.java#2 $ by $Author: rhs $, $DateTime: 2002/06/03 15:25:19 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataCollectionImpl.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
 
     /**

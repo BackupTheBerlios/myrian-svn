@@ -25,7 +25,7 @@
 // ACSObject services. 
 //
 // @author <a href="mailto:pmarklun@arsdigita.com">Peter Marklund</a>
-// @version $Id: //core-platform/dev/pdl/com/arsdigita/formbuilder/Component.pdl#1 $
+// @version $Id: //core-platform/dev/pdl/com/arsdigita/formbuilder/Component.pdl#2 $
 //
 
 model com.arsdigita.formbuilder;

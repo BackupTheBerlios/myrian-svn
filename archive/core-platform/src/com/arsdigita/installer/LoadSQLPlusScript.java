@@ -14,7 +14,7 @@
  */
 
 /**
- * $Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#1 $
+ * $Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#2 $
  *
  *  This is the class with sole purpose to feed SQL*Plus script through
  *  JDBC interface.  SQL*Plus scripts are being parsed by SimpleOracleSQLParser,
@@ -30,7 +30,7 @@ import java.lang.reflect.*;
 
 public class LoadSQLPlusScript {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private Connection s_con;
     private Statement s_stmt;

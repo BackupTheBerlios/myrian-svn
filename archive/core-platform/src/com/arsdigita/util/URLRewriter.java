@@ -34,7 +34,7 @@ import org.apache.log4j.Category;
  */
 public class URLRewriter {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/URLRewriter.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/URLRewriter.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private static Category s_log = 
         Category.getInstance(URLRewriter.class);

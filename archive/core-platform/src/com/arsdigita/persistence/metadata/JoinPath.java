@@ -27,7 +27,7 @@ import java.io.PrintStream;
  * particular columns to join, and in what order.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#3 $
  * @since 4.6
  *
  * @invariant getPath() != null 
@@ -35,7 +35,7 @@ import java.io.PrintStream;
 
 public class JoinPath extends Element {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private List m_path;
     // a List of JoinElements

@@ -14,7 +14,7 @@
 -- Data model upgrade from 4.6.8 to 4.6.9
 --
 -- Copyright (C) 2001 Arsdigita Corporation
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-4.6.8-4.6.9.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-4.6.8-4.6.9.sql#2 $
 
 @@ ../../../../services/notification/sql/oracle-se/upgrade/notification-4.6.8-4.6.9.sql
 @@ ../../../../cms/content-section/sql/oracle-se/upgrade/upgrade-4.6.8-4.6.9.sql

@@ -15,7 +15,7 @@
 -- service
 --
 -- @author <a href="mailto:pmarklun@arsdigita.com">Peter Marklund</a>
--- @version $Id: //core-platform/dev/sql/oracle-se/formbuilder/formbuilder-drop.sql#1 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/formbuilder/formbuilder-drop.sql#2 $
 --
 
 -- Drop the tables referencing bebop_components before we drop

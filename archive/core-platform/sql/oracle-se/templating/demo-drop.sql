@@ -17,7 +17,7 @@
 --
 -- brech (Mon Aug 28 11:06:33 2000)
 --
--- $Id: //core-platform/dev/sql/oracle-se/templating/demo-drop.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/templating/demo-drop.sql#2 $
 --
 
 drop table ad_template_sample_users;

@@ -24,12 +24,12 @@ import java.io.PrintStream;
  * link.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/05/21 $
+ * @version $Revision: #3 $ $Date: 2002/07/18 $
  **/
 
 public class Association extends ModelElement {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Association.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Association.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
 
     /**

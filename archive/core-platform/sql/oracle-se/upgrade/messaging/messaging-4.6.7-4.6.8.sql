@@ -3,7 +3,7 @@
 --
 -- @author ron@arsdigita.com
 --
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/messaging/messaging-4.6.7-4.6.8.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/messaging/messaging-4.6.7-4.6.8.sql#2 $
 
 alter table messages add (
     object_id   integer

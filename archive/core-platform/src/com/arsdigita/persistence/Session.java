@@ -42,12 +42,12 @@ import java.lang.ref.WeakReference;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/17 $ 
+ * @version $Revision: #4 $ $Date: 2002/07/18 $ 
  * @see com.arsdigita.persistence.SessionManager
  */
 public class Session {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/Session.java#3 $ by $Author: randyg $, $DateTime: 2002/07/17 16:18:39 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/Session.java#4 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private final static Category s_cat = 
                               Category.getInstance(Session.class.getName());

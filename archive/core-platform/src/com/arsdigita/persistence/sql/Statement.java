@@ -6,12 +6,12 @@ import java.util.*;
  * Statement
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/05/30 $
+ * @version $Revision: #3 $ $Date: 2002/07/18 $
  **/
 
 public class Statement extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Statement.java#2 $ by $Author: rhs $, $DateTime: 2002/05/30 15:15:09 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Statement.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private List m_clauses = new ArrayList();
     private List m_clausesNoMod = Collections.unmodifiableList(m_clauses);

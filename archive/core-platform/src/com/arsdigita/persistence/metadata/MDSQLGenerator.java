@@ -26,13 +26,13 @@ import java.util.ArrayList;
  * type combination ( @see ObjectEvent ).
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#2 $
  * @since 4.6.3
  */
 
 public interface MDSQLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
     /**
      * Generates an Event of a particular Event type for a certain
      * ObjectType.  New Event is automatically added to the object type

@@ -14,7 +14,7 @@
  */
 
 /**
- * $Id: //core-platform/dev/src/com/arsdigita/installer/Unzipper.java#1 $
+ * $Id: //core-platform/dev/src/com/arsdigita/installer/Unzipper.java#2 $
  *
  *  Extract the .zip archive in specified directory.
  *
@@ -35,7 +35,7 @@ import java.io.FileOutputStream;
 
 class Unzipper {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/Unzipper.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/Unzipper.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     public static void main (String args[]) 
             throws IOException, FileNotFoundException

@@ -57,7 +57,7 @@ import java.sql.*;
  *   </pre>
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  *
  * @see com.arsdigita.persistence.SessionManager
  * @see com.arsdigita.persistence.Session
@@ -67,7 +67,7 @@ import java.sql.*;
 
 public interface DataCollection extends DataQuery {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataCollection.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataCollection.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     /**
      * Returns a data object for the current position in the collection.

@@ -6,12 +6,12 @@ import java.math.*;
  * LazyLoadFailureTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/06/03 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  **/
 
 public class LazyLoadFailureTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LazyLoadFailureTest.java#1 $ by $Author: rhs $, $DateTime: 2002/06/03 15:25:19 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LazyLoadFailureTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     public LazyLoadFailureTest(String name) {
         super(name);

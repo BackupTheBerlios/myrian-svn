@@ -33,7 +33,7 @@ import java.sql.PreparedStatement;
 
 public class PostgresSequenceImpl extends SequenceImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresSequenceImpl.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresSequenceImpl.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private String m_sequenceName;
 

@@ -25,14 +25,14 @@ import org.apache.log4j.Category;
  * 
  *
  * @author David Dao (<a href="mailto:david@arsdigita.com"></a>)
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  * @since 4.5
  * 
  */
 
 public class J2EEConnectionManagerImpl implements DatabaseConnectionPool {
 
-    public static final String versionId = "$Author: dennis $ - $Date: 2002/05/12 $ $Id: //core-platform/dev/src/com/arsdigita/db/J2EEConnectionManagerImpl.java#1 $";
+    public static final String versionId = "$Author: dennis $ - $Date: 2002/07/18 $ $Id: //core-platform/dev/src/com/arsdigita/db/J2EEConnectionManagerImpl.java#2 $";
 
     private static Category cat = Category.getInstance(J2EEConnectionManagerImpl.class.getName());
 

@@ -51,12 +51,12 @@ import java.util.HashMap;
  *
  * @deprecated Use com.arsdigita.metadata.DynamicObjectType instead.
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $ 
+ * @version $Revision: #2 $ $Date: 2002/07/18 $ 
  */
 
 public class DynamicObjectType {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DynamicObjectType.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DynamicObjectType.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     // The DDL generator used
     private static DDLGenerator m_generator = DDLGeneratorFactory.getInstance();

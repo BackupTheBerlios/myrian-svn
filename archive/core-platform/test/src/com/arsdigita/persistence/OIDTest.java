@@ -31,15 +31,15 @@ import org.apache.log4j.Category;
  * <p> Copyright 2001 ArsDigita Corporation</p>
  * 
  * @author <a href="mbryzek@arsdigita.com">Michael Bryzek</a>
- * @date $Date: 2002/05/12 $
- * @version $Revision: #1 $
+ * @date $Date: 2002/07/18 $
+ * @version $Revision: #2 $
  * 
  * @see com.arsdigita.persistence.OID
  **/
 
 public class OIDTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OIDTest.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OIDTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private static Category s_log = 
         Category.getInstance(OIDTest.class.getName());

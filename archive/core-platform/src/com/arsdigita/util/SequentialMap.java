@@ -39,11 +39,11 @@ import java.util.Set;
  *
  * @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
  * @author <a href="mailto:lutter@arsdigita.com">David Lutterkort</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  */
 public class SequentialMap extends AbstractMap implements Map {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/SequentialMap.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/SequentialMap.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private ArrayList m_entries = null;
     private Set m_entrySet = null;

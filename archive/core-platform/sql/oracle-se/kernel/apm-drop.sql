@@ -16,7 +16,7 @@
 -- 
 -- @author Oumi Mehrotra (oumi@arsdigita.com)
 --
--- $Id: //core-platform/dev/sql/oracle-se/kernel/apm-drop.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/kernel/apm-drop.sql#2 $
 --
 
 drop view object_package_map;

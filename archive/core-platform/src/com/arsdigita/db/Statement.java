@@ -63,12 +63,12 @@ import org.apache.log4j.Category;
  * </ul>
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  * @since 4.5
  */
 public class Statement implements java.sql.Statement, ResultSetEventListener {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Statement.java#1 $ $Author: dennis $ $Date: 2002/05/12 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Statement.java#2 $ $Author: dennis $ $Date: 2002/07/18 $";
 
     private static final java.util.Set dbgStatements = new java.util.HashSet();
 

@@ -34,11 +34,11 @@ import org.apache.log4j.Category;
  * and look at the output
  *
  * @author Randy Graebner (randyg@alum.mit.edu)
- * @version $Revision: #1 $, $Date: 2002/06/19 $
+ * @version $Revision: #2 $, $Date: 2002/07/18 $
  */
 public class DBTestPage extends Page {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/DBTestPage.java#1 $ by $Author: randyg $, $DateTime: 2002/06/19 16:09:25 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/DBTestPage.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private static Category s_log =
         Category.getInstance(DBTestPage.class);

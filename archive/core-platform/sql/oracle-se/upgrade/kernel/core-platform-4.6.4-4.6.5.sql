@@ -14,7 +14,7 @@
 -- Data model upgrade from 4.6.4 to 4.6.5
 --
 -- Copyright (C) 2001 Arsdigita Corporation
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-4.6.4-4.6.5.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-4.6.4-4.6.5.sql#2 $
 
 @@ ../../../../infrastructure/presentation/templating/sql/oracle-se/upgrade/stylesheet-upgrade-4.6.4-4.6.5.sql
 @@ ../../../../infrastructure/persistence/sql/oracle-se/upgrade/persistence-4.6.4-4.6.5.sql

@@ -20,7 +20,7 @@ package com.arsdigita.util;
  *
  * @author Ron Henderson (ron@arsdigita.com)
  * @author richardl@arsdigita.com
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/MessageType.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/MessageType.java#2 $
  */
 
 public interface MessageType {

@@ -27,7 +27,7 @@ import java.sql.SQLException;
 public class DbException extends SQLException {
 
     public static final String versionId
-        = "$Id: //core-platform/dev/src/com/arsdigita/db/DbException.java#1 $";
+        = "$Id: //core-platform/dev/src/com/arsdigita/db/DbException.java#2 $";
 
     private UncheckedWrapperException m_delegate = null;
 

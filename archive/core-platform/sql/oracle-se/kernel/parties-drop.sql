@@ -17,7 +17,7 @@
 --
 -- @author oumi@arsdigita.com
 -- @creation-date 2001-05-10
--- @cvs-id $Id: //core-platform/dev/sql/oracle-se/kernel/parties-drop.sql#1 $
+-- @cvs-id $Id: //core-platform/dev/sql/oracle-se/kernel/parties-drop.sql#2 $
 --
 
 drop table user_authentication;

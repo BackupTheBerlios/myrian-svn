@@ -29,12 +29,12 @@ import java.io.ByteArrayOutputStream;
  * all metadata classes.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/05/22 $
+ * @version $Revision: #4 $ $Date: 2002/07/18 $
  */
 
 abstract public class Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Element.java#3 $ by $Author: rhs $, $DateTime: 2002/05/22 18:02:37 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Element.java#4 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private static final Category s_log =
         Category.getInstance(Element.class.getName());

@@ -14,7 +14,7 @@
 -- Data model upgrade from 4.8.5 to 4.8.6
 --
 -- Copyright (C) 2001 Arsdigita Corporation
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/objects-4.8.5-4.8.6.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/objects-4.8.5-4.8.6.sql#2 $
 
 alter table object_container_map
     drop constraint aocm_object_id_fk;

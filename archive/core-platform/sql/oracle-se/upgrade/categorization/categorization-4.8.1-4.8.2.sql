@@ -17,7 +17,7 @@
 -- Copyright (C) 2001 Arsdigita Corporation
 -- @author <a href="mailto:mbryzek@arsdigita.com">Michael Bryzek</a>
 --
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/categorization/categorization-4.8.1-4.8.2.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/categorization/categorization-4.8.1-4.8.2.sql#2 $
 
 -- foreign key index. Also needed to significantly reduce io when
 -- looking for categories for an object

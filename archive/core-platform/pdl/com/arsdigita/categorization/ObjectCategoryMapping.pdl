@@ -17,13 +17,16 @@ model com.arsdigita.categorization;
 import com.arsdigita.kernel.*;
 
 object type ObjectCategoryMapping  {
-    BigDecimal id = cat_object_category_map.object_category_map_id INTEGER;
-    BigDecimal[1..1] parentCategoryID =
-        cat_object_category_map.category_id INTEGER;
-    BigDecimal[1..1] objectID = 
-        cat_object_category_map.object_id INTEGER;
+    BigDecimal[1..1] id = cat_object_category_map.object_category_map_id INTEGER;
     Integer[1..1] sortKey = cat_object_category_map.sort_key INTEGER;
     Boolean[1..1] isDefault = cat_object_category_map.default_p CHAR(1);
+
+    Category[1..1] parentCategory =
+        join cat_object_category_map.category_id to
+             cat_categories.category_id;
+    ACSObject[1..1] object =
+        join cat_object_category_map.object_id to
+             acs_objects.object_id;
 
     object key (id);
 
@@ -37,8 +40,8 @@ object type ObjectCategoryMapping  {
                 sort_key
             ) values (
                 :id,
-                :parentCategoryID,
-                :objectID,
+                :parentCategory.id,
+                :object.id,
                 :isDefault,
                 (select CASE WHEN :sortKey is null 
                              THEN (select CASE WHEN max(sort_key) is null

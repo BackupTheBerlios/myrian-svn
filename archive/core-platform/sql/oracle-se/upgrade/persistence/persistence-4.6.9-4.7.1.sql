@@ -19,7 +19,7 @@
 -- Copyright (C) 2001 Arsdigita Corporation
 -- @author Patrick McNeill (pmcneill@arsdigita.com)
 --
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/persistence/persistence-4.6.9-4.7.1.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/persistence/persistence-4.6.9-4.7.1.sql#2 $
 
 create table persistence_dynamic_assoc (
     pdl_id                 integer

@@ -16,7 +16,7 @@
 -- Drop locales.
 --
 -- @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
--- @version $Id: //core-platform/dev/sql/oracle-se/globalization/g11n-locales-drop.sql#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/globalization/g11n-locales-drop.sql#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $
 --
 
 drop table g11n_locale_charset_map;

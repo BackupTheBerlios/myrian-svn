@@ -19,7 +19,7 @@
 --
 -- @author ron@arsdigita.com
 -- @author ddao@arsdigita.com
--- @version $Id: //core-platform/dev/sql/oracle-se/notification/notification-create.sql#1 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/notification/notification-create.sql#2 $
 
 -- Digest support
 

@@ -8,12 +8,12 @@ import java.util.Map;
  * Clause
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/05/30 $
+ * @version $Revision: #3 $ $Date: 2002/07/18 $
  **/
 
 public class Clause extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Clause.java#2 $ by $Author: rhs $, $DateTime: 2002/05/30 15:15:09 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Clause.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private Symbol m_start;
     private SQL m_sql;

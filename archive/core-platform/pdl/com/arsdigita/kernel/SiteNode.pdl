@@ -20,7 +20,7 @@ model com.arsdigita.kernel;
 // to an application instance.
 //
 // @author <a href="mailto:bquinn@arsdigita.com">Bryan Quinn</a>
-// @version "$Id: //core-platform/dev/pdl/com/arsdigita/kernel/SiteNode.pdl#1 $" 
+// @version "$Id: //core-platform/dev/pdl/com/arsdigita/kernel/SiteNode.pdl#2 $" 
 //
 
 object type SiteNode extends ACSObject {
@@ -44,7 +44,7 @@ object type SiteNode extends ACSObject {
         do {
             SELECT sn.node_id, sn.parent_id,
             sn.name, sn.url, sn.directory_p, sn.pattern_p, 
-            o.object_type, o.display_name
+            o.object_type, o.display_name, o.default_domain_class
             FROM site_nodes sn, acs_objects o
             WHERE sn.node_id = o.object_id
             AND node_id = :id
@@ -56,6 +56,7 @@ object type SiteNode extends ACSObject {
             isPattern = sn.pattern_p;
             objectType = o.object_type;
             displayName = o.display_name;
+            defaultDomainClass = o.default_domain_class;
         }
     }
 

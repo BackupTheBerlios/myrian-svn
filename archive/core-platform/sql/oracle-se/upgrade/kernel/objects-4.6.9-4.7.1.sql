@@ -15,7 +15,7 @@
 --     - add object-container hierarchy
 --
 -- Copyright (C) 2001 Arsdigita Corporation
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/objects-4.6.9-4.7.1.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/objects-4.6.9-4.7.1.sql#2 $
 
 -- Note: this upgrade will lose any                
 -- "on delete set null" clauses on foreign keys to 

@@ -35,11 +35,11 @@ import java.math.BigDecimal;
  * facilitates this future refactoring.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/05/30 $
+ * @version $Revision: #3 $ $Date: 2002/07/18 $
  */
 public abstract class DataQueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryTest.java#2 $ by $Author: rhs $, $DateTime: 2002/05/30 15:13:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryTest.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     public DataQueryTest(String name) {
         super(name);

@@ -30,12 +30,12 @@ import java.util.Map;
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
  * @author <a href="mailto:randyg@arsdigita.com">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGenerator.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGenerator.java#2 $
  * @since 4.6.3 */
 
 public interface DDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGenerator.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGenerator.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
     /**
      * This takes an ObjectType name and model, and generates a unique
      * table name that can be used to store the object type.

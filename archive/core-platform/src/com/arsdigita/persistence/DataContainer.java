@@ -37,12 +37,12 @@ import java.util.Set;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/06/14 $
+ * @version $Revision: #3 $ $Date: 2002/07/18 $
  */
 
 public class DataContainer {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataContainer.java#2 $ by $Author: rhs $, $DateTime: 2002/06/14 15:06:47 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataContainer.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private static final Category s_log =
          Category.getInstance(DataContainer.class.getName());

@@ -23,7 +23,7 @@ import java.sql.SQLException;
 
 public class ConnectionManagerTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/ConnectionManagerTest.java#2 $ by $Author: randyg $, $DateTime: 2002/07/17 14:30:02 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/ConnectionManagerTest.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private String ORACLE_DATE_QUERY = "select sysdate from dual";
     private String POSTGRES_DATE_QUERY = "select 'now'::datetime";

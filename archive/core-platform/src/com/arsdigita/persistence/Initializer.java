@@ -41,7 +41,7 @@ import org.apache.log4j.Category;
  * the SessionManager of them.
  *
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #2 $ $Date: 2002/07/17 $
+ * @version $Revision: #3 $ $Date: 2002/07/18 $
  **/
 
 public class Initializer

@@ -31,7 +31,7 @@ import java.math.BigInteger;
  */
 public class PersistenceExceptionTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceExceptionTest.java#1 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceExceptionTest.java#2 $";
 
     private Session ssn;
 

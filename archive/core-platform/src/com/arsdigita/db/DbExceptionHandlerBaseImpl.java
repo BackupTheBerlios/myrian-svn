@@ -33,12 +33,12 @@ import org.apache.log4j.Category;
  * Should be subclassed with database-specific initialization.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #1 $
+ * @version $Revision: #2 $
  * @since 4.6
  */
 public abstract class DbExceptionHandlerBaseImpl implements DbExceptionHandler {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DbExceptionHandlerBaseImpl.java#1 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DbExceptionHandlerBaseImpl.java#2 $";
 
     private static final Category s_cat = Category.getInstance(DbExceptionHandlerBaseImpl.class.getName());
 

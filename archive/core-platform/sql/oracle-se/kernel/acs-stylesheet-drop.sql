@@ -15,7 +15,7 @@
 -- drop tables for storing XSL stylesheets in content repository
 -- 
 -- Oumi Mehrotra (oumi@arsdigita.com)
--- $Id: //core-platform/dev/sql/oracle-se/kernel/acs-stylesheet-drop.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/kernel/acs-stylesheet-drop.sql#2 $
 --
 -----------
 

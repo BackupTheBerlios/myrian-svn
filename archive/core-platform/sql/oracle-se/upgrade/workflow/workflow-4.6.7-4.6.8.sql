@@ -17,7 +17,7 @@
 -- Copyright (C) 2001 Arsdigita Corporation
 -- @author <a href="mailto:mbryzek@arsdigita.com">Michael Bryzek</a>
 --
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/workflow/workflow-4.6.7-4.6.8.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/workflow/workflow-4.6.7-4.6.8.sql#2 $
 
 create index cw_tasks_parent_task_id_idx on cw_tasks(parent_task_id);
 create index cw_processes_object_id_idx on cw_processes(object_id);

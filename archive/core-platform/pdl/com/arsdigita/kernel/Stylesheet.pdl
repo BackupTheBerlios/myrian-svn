@@ -15,7 +15,7 @@
 // Metadata for Stylesheets. 
 //
 // @author <a href="mailto:bquinn@arsdigita.com">Bryan Quinn</a>
-// @version "$Id: //core-platform/dev/pdl/com/arsdigita/kernel/Stylesheet.pdl#1 $" 
+// @version "$Id: //core-platform/dev/pdl/com/arsdigita/kernel/Stylesheet.pdl#2 $" 
 
 model com.arsdigita.kernel;
 

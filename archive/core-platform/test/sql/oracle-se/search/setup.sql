@@ -19,7 +19,7 @@
 
 -- Author: Jeff Teeters (teeters@arsdigita.com)
 
--- $Id: //core-platform/dev/test/sql/oracle-se/search/setup.sql#1 $
+-- $Id: //core-platform/dev/test/sql/oracle-se/search/setup.sql#2 $
 
 create table searchable_notes (
     note_id integer 

@@ -13,7 +13,7 @@
 -- rights and limitations under the License.
 --
 -- Copyright (C) 2002 Arsdigita Corporation
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-5.1.2-5.1.3.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-5.1.2-5.1.3.sql#2 $
 
 @@ add-edit-privilege-5.1.2-5.1.3.sql
 @@ ../../../../services/categorization/sql/oracle-se/upgrade/categorization-5.1.2-5.1.3.sql

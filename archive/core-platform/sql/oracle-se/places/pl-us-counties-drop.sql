@@ -16,7 +16,7 @@
 -- Drop US counties.
 --
 -- @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
--- @version $Id: //core-platform/dev/sql/oracle-se/places/pl-us-counties-drop.sql#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/places/pl-us-counties-drop.sql#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $
 --
 
 drop table pl_us_counties;

@@ -18,7 +18,7 @@ import java.io.PrintStream;
  * file being named after the fully qualified model name.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDLOutputter.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDLOutputter.java#2 $
  */
 public class PDLOutputter {
     /**

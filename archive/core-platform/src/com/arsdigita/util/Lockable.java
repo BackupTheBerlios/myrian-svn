@@ -51,11 +51,11 @@ package com.arsdigita.util;
  * attempt is made to modify it.
  *
  * @author David Lutterkort (lutter@arsdigita.com)
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Lockable.java#1 $ */
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Lockable.java#2 $ */
 
 public interface Lockable {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Lockable.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Lockable.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
   /**
    * Lock an object. Locked objects are to be considered immutable. Any
    * attempt to modify them, e.g., through a <code>setXXX</code> method 

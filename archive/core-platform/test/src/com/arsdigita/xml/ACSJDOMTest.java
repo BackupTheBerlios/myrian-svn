@@ -24,7 +24,7 @@ import javax.xml.transform.stream.*;
 
 public class ACSJDOMTest extends TestCase { 
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/xml/ACSJDOMTest.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/xml/ACSJDOMTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     public static final String BEBOP_XML_NS = 
         "http://www.arsdigita.com/bebop/1.0";

@@ -17,7 +17,7 @@
 -- Copyright (C) 2001 Arsdigita Corporation
 -- @author <a href="mailto:mbryzek@arsdigita.com">Michael Bryzek</a>
 --
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/categorization/categorization-4.6.7-4.6.8.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/categorization/categorization-4.6.7-4.6.8.sql#2 $
 
 create index cat_object_root_cat_object_idx on cat_object_root_category_map(object_id);
 create index cat_object_root_cat_pkg_idx on cat_object_root_category_map(package_id);

@@ -13,7 +13,7 @@
 --
 --
 -- @author bquinn@arsdigita.com
--- @version-id $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/apm-4.6.4-4.6.5.sql#1 $
+-- @version-id $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/apm-4.6.4-4.6.5.sql#2 $
 --
 -- Add on delete cascade and not null constraints to the package tables.
 -- Remove the unused apm_package_type_map.

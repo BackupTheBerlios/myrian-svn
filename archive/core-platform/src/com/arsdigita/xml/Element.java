@@ -28,14 +28,14 @@ import org.w3c.dom.Attr;
  * <code>org.jdom.Element</code> using <code>org.w3c.dom.Element</code>.
  *
  * @author Patrick McNeill (pmcneill@arsdigita.com)
- * @version $Revision: #3 $ $Date: 2002/07/15 $
+ * @version $Revision: #4 $ $Date: 2002/07/18 $
  * @since ACS 4.5a
  */
 public class Element {
     public static final String versionId = 
-        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#3 $" +
-        "$Author: randyg $" +
-        "$DateTime: 2002/07/15 13:53:08 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#4 $" +
+        "$Author: dennis $" +
+        "$DateTime: 2002/07/18 13:18:21 $";
 
     private static Category s_log = Category.getInstance
         (Element.class.getName());

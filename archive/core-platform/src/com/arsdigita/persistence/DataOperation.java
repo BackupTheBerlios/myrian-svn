@@ -30,11 +30,11 @@ import com.arsdigita.db.CallableStatement;
  * 
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
  * @since 4.5
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#2 $
  */
 public class DataOperation extends AbstractDataOperation {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private Session m_session;
     private DataOperationType m_type;

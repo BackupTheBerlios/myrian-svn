@@ -17,7 +17,7 @@
 --
 -- brech (Mon Aug 28 11:04:55 2000)
 --
--- $Id: //core-platform/dev/sql/oracle-se/templating/acs-templating-drop.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/templating/acs-templating-drop.sql#2 $
 --
 
 @@ demo-drop

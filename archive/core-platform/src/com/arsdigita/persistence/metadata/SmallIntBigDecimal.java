@@ -28,7 +28,7 @@ import java.math.BigInteger;
  *  values from the database.
  *
  * @author <a href="mailto:jorris@arsdigita.com">jorris@arsdigita.com</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  * 
  */
 class SmallIntBigDecimal extends BigDecimal {

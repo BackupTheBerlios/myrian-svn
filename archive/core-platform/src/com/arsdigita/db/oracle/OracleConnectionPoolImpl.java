@@ -29,14 +29,14 @@ import org.apache.log4j.Category;
  * Connection pooling class using Oracle implementation.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#2 $ $DateTime: 2002/06/10 19:04:44 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#3 $ $DateTime: 2002/07/18 13:18:21 $
  * @since  
  * 
  */
 
 public class OracleConnectionPoolImpl extends BaseConnectionPool {
 
-    private static final String versionId = "$Author: jorris $ - $Date: 2002/06/10 $ $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#2 $";
+    private static final String versionId = "$Author: dennis $ - $Date: 2002/07/18 $ $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#3 $";
 
     private static OracleDataSource ods = null;
 

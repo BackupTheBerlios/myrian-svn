@@ -18,7 +18,7 @@
 -- @author David Dao <ddao@arsdigita.com>
 -- @author John Prevost <jmp@arsdigita.com>
 --
--- @version $Id: //core-platform/dev/sql/oracle-se/messaging/messaging-create.sql#2 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/messaging/messaging-create.sql#3 $
 
 --
 -- The messages table stores the basic sender and reply-to information

@@ -32,7 +32,7 @@ import java.sql.SQLException;
 
 public class DBExerciseTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DBExerciseTest.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DBExerciseTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private static java.sql.Connection conn;
     

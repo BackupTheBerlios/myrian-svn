@@ -25,12 +25,12 @@ import com.arsdigita.util.Assert;
  * CompoundFilters are used to AND or OR multiple filters together. 
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  */
 
 class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/CompoundFilterImpl.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/CompoundFilterImpl.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private static org.apache.log4j.Category m_log = 
       org.apache.log4j.Category.getInstance(CompoundFilterImpl.class.getName());

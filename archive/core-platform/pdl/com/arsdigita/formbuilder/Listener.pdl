@@ -15,7 +15,7 @@
 // This object type is used to persist Bebop listeners.
 //
 // @author <a href="mailto:pmarklun@arsdigita.com">Peter Marklund</a>
-// @version $Id: //core-platform/dev/pdl/com/arsdigita/formbuilder/Listener.pdl#1 $
+// @version $Id: //core-platform/dev/pdl/com/arsdigita/formbuilder/Listener.pdl#2 $
 //
 
 model com.arsdigita.formbuilder;

@@ -21,7 +21,7 @@
 // may be persisted via the association in Listener.pdl
 //
 // @author <a href="mailto:pmarklun@arsdigita.com">Peter Marklund</a>
-// @version $Id: //core-platform/dev/pdl/com/arsdigita/formbuilder/Widget.pdl#1 $
+// @version $Id: //core-platform/dev/pdl/com/arsdigita/formbuilder/Widget.pdl#2 $
 //
 
 model com.arsdigita.formbuilder;

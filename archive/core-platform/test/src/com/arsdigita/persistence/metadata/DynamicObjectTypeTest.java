@@ -34,12 +34,12 @@ import org.apache.log4j.Category;
  * class works as advertised.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/07/18 $
  */
 
 public class DynamicObjectTypeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/DynamicObjectTypeTest.java#2 $ by $Author: randyg $, $DateTime: 2002/07/18 10:31:38 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/DynamicObjectTypeTest.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
     private static Category s_log = 
         Category.getInstance(DynamicObjectTypeTest.class.getName());
 

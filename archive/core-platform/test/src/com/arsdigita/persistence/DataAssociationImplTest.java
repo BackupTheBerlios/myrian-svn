@@ -31,15 +31,15 @@ import org.apache.log4j.Category;
  *     DataAssociationImpl implements com.arsdigita.persistence.DataAssociation </p>
  * 
  * @author <a href="mbryzek@arsdigita.com">Michael Bryzek</a>
- * @date $Date: 2002/05/12 $
- * @version $Revision: #1 $
+ * @date $Date: 2002/07/18 $
+ * @version $Revision: #2 $
  * 
  * @see com.arsdigita.persistence.DataAssociationImpl
  **/
 
 public class DataAssociationImplTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataAssociationImplTest.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataAssociationImplTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
     private static Category log =                          
         Category.getInstance(DataAssociationImplTest.class.getName());
 

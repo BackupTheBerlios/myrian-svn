@@ -25,12 +25,12 @@ import java.util.Properties;
  * a "real" implementation of java.sql.Driver
  *
  * @author <a href="mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  * @since 4.5
  */
 class Driver implements java.sql.Driver {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Driver.java#1 $ $Author: dennis $ $Date: 2002/05/12 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Driver.java#2 $ $Author: dennis $ $Date: 2002/07/18 $";
 
     // The Driver object we wrap
     private java.sql.Driver driver;

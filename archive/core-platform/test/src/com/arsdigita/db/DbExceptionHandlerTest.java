@@ -29,7 +29,7 @@ import java.sql.SQLException;
  */
 public class DbExceptionHandlerTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DbExceptionHandlerTest.java#1 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DbExceptionHandlerTest.java#2 $";
 
     private static java.sql.Connection conn;
     

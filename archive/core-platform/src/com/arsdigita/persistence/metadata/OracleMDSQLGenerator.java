@@ -46,12 +46,12 @@ import org.apache.log4j.Category;
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#4 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#5 $
  * @since 4.6.3
  */
 class OracleMDSQLGenerator extends BaseMDSQLGenerator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#4 $ by $Author: randyg $, $DateTime: 2002/07/18 10:31:38 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#5 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private static final Category s_log =
         Category.getInstance(OracleMDSQLGenerator.class.getName());

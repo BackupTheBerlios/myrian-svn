@@ -23,12 +23,12 @@ import java.sql.SQLException;
  * that wraps a "real" implementation of java.sql.DatabaseMetaData
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  * @since 4.5
  */
 public class DatabaseMetaData implements java.sql.DatabaseMetaData {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DatabaseMetaData.java#1 $ $Author: dennis $ $Date: 2002/05/12 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DatabaseMetaData.java#2 $ $Author: dennis $ $Date: 2002/07/18 $";
 
     // the object we wrap
     private java.sql.DatabaseMetaData m_metaData;

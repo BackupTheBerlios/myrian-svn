@@ -26,12 +26,12 @@ import java.util.Set;
  * PersistenceTestCase
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  */
 
 public class PersistenceTestCase extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     // Prevent loading the same PDL file twice
     private static Set s_loadedPDLResources = new HashSet();

@@ -19,7 +19,7 @@
 --
 -- @author Oumi Mehrotra (oumi@arsdigita.com) 
 -- @creation-date May 16, 2001 20:16:43
--- @version $Id: //core-platform/dev/sql/oracle-se/kernel/core-platform-drop.sql#2 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/kernel/core-platform-drop.sql#3 $
 --
 
 @@ ../../../cms/content-section/sql/oracle-se/cms-drop.sql

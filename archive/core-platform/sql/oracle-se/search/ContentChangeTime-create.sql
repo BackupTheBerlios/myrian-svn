@@ -22,7 +22,7 @@
 -- rebuilt.
 -- Author: Jeff Teeters (teeters@arsdigita.com)
 
--- $Id: //core-platform/dev/sql/oracle-se/search/ContentChangeTime-create.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/search/ContentChangeTime-create.sql#2 $
 
 
 -- Time is stored as number of seconds since Jan 1, 1970

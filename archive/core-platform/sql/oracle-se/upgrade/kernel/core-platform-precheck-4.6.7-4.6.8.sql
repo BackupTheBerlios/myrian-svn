@@ -20,7 +20,7 @@
 -- (which would leave the schema in a partially upgraded state).
 --
 -- Copyright (C) 2001 Arsdigita Corporation
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-precheck-4.6.7-4.6.8.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-precheck-4.6.7-4.6.8.sql#2 $
 
 WHENEVER SQLERROR EXIT ROLLBACK;
 

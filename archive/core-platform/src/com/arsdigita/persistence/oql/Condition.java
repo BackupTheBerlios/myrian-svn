@@ -7,12 +7,12 @@ import java.util.*;
  * Condition
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/10 $
+ * @version $Revision: #4 $ $Date: 2002/07/18 $
  **/
 
 class Condition {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Condition.java#3 $ by $Author: rhs $, $DateTime: 2002/07/10 16:04:39 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Condition.java#4 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private Set m_columns = new HashSet();
     private Node m_node;

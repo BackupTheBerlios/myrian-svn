@@ -15,7 +15,7 @@
 -- service
 --
 -- @author <a href="mailto:pmarklun@arsdigita.com">Peter Marklund</a>
--- @version $Id: //core-platform/dev/sql/oracle-se/formbuilder/formbuilder-create.sql#1 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/formbuilder/formbuilder-create.sql#2 $
 --
 
 create table bebop_components (

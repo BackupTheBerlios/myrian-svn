@@ -12,7 +12,7 @@
 -- rights and limitations under the License.
 --
 -- Copyright (C) 2001 Arsdigita Corporation
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-5.0.1-5.0.2.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-5.0.1-5.0.2.sql#2 $
 
 @@ ../../../../cms/content-section/sql/oracle-se/upgrade/cms-5.0.1-5.0.2.sql
 

@@ -14,7 +14,7 @@
 -- Data model upgrade from 4.8.2 to 4.8.3
 --
 -- Copyright (C) 2001 Arsdigita Corporation
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-4.8.2-4.8.3.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-4.8.2-4.8.3.sql#2 $
 
 @@ parties-4.8.2-4.8.3.sql
 @@ permissions-4.8.2-4.8.3.sql

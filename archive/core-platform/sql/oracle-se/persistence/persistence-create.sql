@@ -19,7 +19,7 @@
 -- Copyright (C) 2001 Arsdigita Corporation
 -- @author Randy Graebner (randyg@arsdigita.com)
 --
--- $Id: //core-platform/dev/sql/oracle-se/persistence/persistence-create.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/persistence/persistence-create.sql#2 $
 
 create table persistence_dynamic_ot (
     pdl_id                 integer

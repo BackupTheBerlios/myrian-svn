@@ -15,7 +15,7 @@
 --
 -- Drop script for the notification services
 --
--- $Id: //core-platform/dev/sql/oracle-se/notification/notification-drop.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/notification/notification-drop.sql#2 $
 
 drop table nt_queue;
 drop table nt_requests;

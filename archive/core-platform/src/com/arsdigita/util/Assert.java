@@ -25,14 +25,14 @@ import org.apache.log4j.Category;
  *
  * @author David Lutterkort (lutter@arsdigita.com)
  * @author Uday Mathur (umathur@arsdigita.com)
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#4 $
  *
  */
 public class Assert {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#3 $" +
-        "$Author: justin $" +
-        "$DateTime: 2002/07/10 14:13:47 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#4 $" +
+        "$Author: dennis $" +
+        "$DateTime: 2002/07/18 13:18:21 $";
 
     private static Category s_log = Category.getInstance
         (Assert.class.getName());

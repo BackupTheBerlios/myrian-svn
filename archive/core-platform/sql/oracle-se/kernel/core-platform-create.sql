@@ -19,7 +19,7 @@
 --
 -- @author Bryan Quinn (bquinn@arsdigita.com) 
 -- @creation-date May 16, 2001 20:16:43
--- @version $Id: //core-platform/dev/sql/oracle-se/kernel/core-platform-create.sql#5 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/kernel/core-platform-create.sql#6 $
 --
 
 @@ ../globalization/g11n-create.sql

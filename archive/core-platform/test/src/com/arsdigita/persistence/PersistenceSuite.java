@@ -23,10 +23,10 @@ import junit.framework.Test;
  * PersistenceSuite
  *
  * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #2 $ $Date: 2002/05/13 $
+ * @version $Revision: #3 $ $Date: 2002/07/18 $
  */
 public class PersistenceSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceSuite.java#2 $ by $Author: dennis $, $DateTime: 2002/05/13 16:12:59 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceSuite.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     public PersistenceSuite() {
         super();

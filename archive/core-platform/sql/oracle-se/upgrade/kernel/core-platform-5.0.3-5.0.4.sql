@@ -12,7 +12,7 @@
 -- rights and limitations under the License.
 --
 -- Copyright (C) 2001 Red Hat Corporation
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-5.0.3-5.0.4.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/core-platform-5.0.3-5.0.4.sql#2 $
 
 @@ group-member-map-constraints.sql
 @@ permissions-5.0.3-5.0.4.sql

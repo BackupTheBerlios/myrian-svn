@@ -18,7 +18,7 @@
 -- Copyright (C) 2001 Arsdigita Corporation
 -- @author Joseph Bank (jbank@arsdigita.com)
 --
--- $Id: //core-platform/dev/sql/oracle-se/auditing/auditing-create.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/auditing/auditing-create.sql#2 $
 
 create table acs_auditing (
         object_id          constraint audited_acs_object_id_fk

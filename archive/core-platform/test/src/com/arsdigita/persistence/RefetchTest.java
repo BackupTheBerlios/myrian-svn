@@ -7,12 +7,12 @@ import org.apache.log4j.Category;
  * RefetchTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/06/24 $
+ * @version $Revision: #3 $ $Date: 2002/07/18 $
  **/
 
 public class RefetchTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/RefetchTest.java#2 $ by $Author: jorris $, $DateTime: 2002/06/24 13:04:06 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/RefetchTest.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private static final Category s_log =
         Category.getInstance(RefetchTest.class);

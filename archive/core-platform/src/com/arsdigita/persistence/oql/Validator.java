@@ -7,12 +7,12 @@ import java.util.*;
  * Validator
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/06/10 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  **/
 
 class Validator extends Actor {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Validator.java#1 $ by $Author: rhs $, $DateTime: 2002/06/10 15:35:38 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Validator.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private int m_nonOuter = 0;
     private Set m_connected = new HashSet();

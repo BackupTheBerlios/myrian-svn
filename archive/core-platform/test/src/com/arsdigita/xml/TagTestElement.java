@@ -20,7 +20,7 @@ package com.arsdigita.xml;
 
 public class TagTestElement {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/xml/TagTestElement.java#1 $ by $Author: dennis $, $DateTime: 2002/05/13 01:37:49 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/xml/TagTestElement.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
     public static org.w3c.dom.Element getInternalElementForTesting(Element e) {
 	return e.getInternalElement();
     }

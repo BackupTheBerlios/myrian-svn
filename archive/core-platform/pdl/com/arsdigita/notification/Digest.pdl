@@ -12,7 +12,7 @@
 // rights and limitations under the License.
 //
 
-// $Id: //core-platform/dev/pdl/com/arsdigita/notification/Digest.pdl#1 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/notification/Digest.pdl#2 $
 
 model com.arsdigita.notification;
 

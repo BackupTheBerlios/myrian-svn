@@ -17,7 +17,7 @@
 --
 -- @author oumi@arsdigita.com
 -- @creation-date 2001-05-10
--- @version $Id: //core-platform/dev/sql/oracle-se/kernel/parties-create.sql#1 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/kernel/parties-create.sql#2 $
 --
 
 ---------------------

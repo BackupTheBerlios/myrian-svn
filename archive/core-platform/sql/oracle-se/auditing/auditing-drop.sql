@@ -18,6 +18,6 @@
 -- Copyright (C) 2001 Arsdigita Corporation
 -- @author Joseph Bank (jbank@arsdigita.com)
 --
--- $Id: //core-platform/dev/sql/oracle-se/auditing/auditing-drop.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/auditing/auditing-drop.sql#2 $
 
 drop table acs_auditing;

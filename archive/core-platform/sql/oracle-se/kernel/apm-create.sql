@@ -19,7 +19,7 @@
 --
 -- @author Bryan Quinn (bquinn@arsdigita.com)
 -- @creation-date 2001/05/16
--- @version-id $Id: //core-platform/dev/sql/oracle-se/kernel/apm-create.sql#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $
+-- @version-id $Id: //core-platform/dev/sql/oracle-se/kernel/apm-create.sql#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $
 
 -----------------------------
 --     PACKAGE OBJECT      --

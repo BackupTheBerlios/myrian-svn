@@ -24,12 +24,12 @@ import java.util.*;
  * cache, whose methods <em>are</em> threadsafe.
  * 
  * @author Bill Schneider (bschneid@arsdigita.com)
- * @version $Revision: #1 $, $Date: 2002/05/12 $
+ * @version $Revision: #2 $, $Date: 2002/07/18 $
  */
 
 public class Cache {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Cache.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Cache.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     // map keys to their values
     private static Cache instance = new Cache(32000);

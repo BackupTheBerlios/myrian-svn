@@ -35,7 +35,7 @@ public class Initializer
 
     private Configuration m_conf = new Configuration();
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#3 $ by $Author: randyg $, $DateTime: 2002/07/17 14:30:02 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#4 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     public Initializer() throws InitializationException {
         m_conf.initParameter("jdbcUrl", 

@@ -12,7 +12,7 @@ Currently (4/5/2001) only supports table/column definitions
 
 \@author Michael Bryzek (mbryzek\@arsdigita.com)
 \@creation-date 2001-04-05
-\@cvs-id $Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/data/generate-xml-from-db.pl#1 $
+\@cvs-id $Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/data/generate-xml-from-db.pl#2 $
 
 USAGE: $programName oracle_username oracle_password xml_file_stub
 

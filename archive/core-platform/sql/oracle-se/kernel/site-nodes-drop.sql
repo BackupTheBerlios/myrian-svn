@@ -18,7 +18,7 @@
 --
 -- @author oumi@arsdigita.com
 -- @creation-date 2000-05-25
--- @version $Id: //core-platform/dev/sql/oracle-se/kernel/site-nodes-drop.sql#1 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/kernel/site-nodes-drop.sql#2 $
 --
 
 drop table site_nodes;

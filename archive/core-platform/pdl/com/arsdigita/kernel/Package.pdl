@@ -15,7 +15,7 @@
 // Definiton of Package Metadata
 //
 // @author <a href="mailto:bquinn@arsdigita.com">Bryan Quinn</a>
-// @version "$Id: //core-platform/dev/pdl/com/arsdigita/kernel/Package.pdl#1 $" 
+// @version "$Id: //core-platform/dev/pdl/com/arsdigita/kernel/Package.pdl#2 $" 
 
 model com.arsdigita.kernel;
 

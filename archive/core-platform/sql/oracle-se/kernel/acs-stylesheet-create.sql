@@ -17,7 +17,7 @@
 -- 
 -- Bill Schneider (bschneid@arsdigita.com)
 -- Bryan Quinn    (bquinn@arsdigita.com)
--- $Id: //core-platform/dev/sql/oracle-se/kernel/acs-stylesheet-create.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/kernel/acs-stylesheet-create.sql#2 $
 -- created 4/11/01
 --
 -----------

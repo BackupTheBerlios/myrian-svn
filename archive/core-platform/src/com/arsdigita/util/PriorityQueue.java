@@ -25,7 +25,7 @@ import java.util.TreeSet;
  * 
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
  * @since 4.7
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/PriorityQueue.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/PriorityQueue.java#2 $
  */
 public class PriorityQueue {
     private TreeSet m_model = new TreeSet(new PQComparator());

@@ -63,7 +63,7 @@ import org.apache.log4j.Category;
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@arsdigita.com">randyg@arsdigita.com</a>
  * @author <a href="mailto:deison@arsdigita.com">deison@arsdigita.com</a>
- * @version $Revision: #3 $ $Date: 2002/05/30 $
+ * @version $Revision: #4 $ $Date: 2002/07/18 $
  */
 // NOTE if we ever support anything other than forward-only,
 // we'll need to shut off the auto-closing functionality
@@ -71,7 +71,7 @@ import org.apache.log4j.Category;
 // results and general confusion.
 class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#3 $ by $Author: bche $, $DateTime: 2002/05/30 11:10:14 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#4 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     private final static Category log =
         Category.getInstance(DataQueryImpl.class.getName());

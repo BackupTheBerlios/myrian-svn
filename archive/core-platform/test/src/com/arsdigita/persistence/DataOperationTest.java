@@ -28,11 +28,11 @@ import java.util.Date;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/06/24 $
+ * @version $Revision: #3 $ $Date: 2002/07/18 $
  */
 public class DataOperationTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataOperationTest.java#2 $ by $Author: jorris $, $DateTime: 2002/06/24 13:04:06 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataOperationTest.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     public DataOperationTest(String name) {
         super(name);

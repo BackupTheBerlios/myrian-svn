@@ -33,7 +33,6 @@ object type Category extends ACSObject {
 
     composite SortedACSObject[0..n] childObjects;
     composite ObjectCategoryMapping[0..n]  childObjectAssociations;
-    composite ObjectCategoryMapping[0..n]  objectParentCategoryAssociations;
     composite CategoryCategoryMapping[0..n]  categoryParentCategoryAssociations;
     composite CategoryCategoryMapping[0..n]  categoryRelatedCategoryAssociations;
     composite SortedCategory[0..n]  categorySubtree;
@@ -115,8 +114,8 @@ object type Category extends ACSObject {
               and relation_type = 'child'
         } map {
             childCategoryAssociations.id = cat_category_category_map.category_category_map_id;
-            childCategoryAssociations.objectID = cat_category_category_map.related_category_id;
-            childCategoryAssociations.parentCategoryID = cat_category_category_map.category_id;
+            childCategoryAssociations.object.id = cat_category_category_map.related_category_id;
+            childCategoryAssociations.parentCategory.id = cat_category_category_map.category_id;
             childCategoryAssociations.isDefault = cat_category_category_map.default_p;
             childCategoryAssociations.sortKey = cat_category_category_map.sort_key;
             childCategoryAssociations.relationType = cat_category_category_map.relation_type;
@@ -134,8 +133,8 @@ object type Category extends ACSObject {
             where category_id = :id
         } map {
             childObjectAssociations.id = cat_object_category_map.object_category_map_id;
-            childObjectAssociations.parentCategoryID = cat_object_category_map.category_id;
-            childObjectAssociations.objectID = cat_object_category_map.object_id;
+            childObjectAssociations.parentCategory.id = cat_object_category_map.category_id;
+            childObjectAssociations.object.ID = cat_object_category_map.object_id;
             childObjectAssociations.isDefault = cat_object_category_map.default_p;
             childObjectAssociations.sortKey = cat_object_category_map.sort_key;
         }
@@ -153,8 +152,8 @@ object type Category extends ACSObject {
               and relation_type = 'child'
         } map {
             categoryParentCategoryAssociations.id = category_category_map_id;
-            categoryParentCategoryAssociations.parentCategoryID = category_id;
-            categoryParentCategoryAssociations.objectID = related_category_id;
+            categoryParentCategoryAssociations.parentCategory.id = category_id;
+            categoryParentCategoryAssociations.object.id = related_category_id;
             categoryParentCategoryAssociations.isDefault = default_p;
             categoryParentCategoryAssociations.sortKey = sort_key;
             categoryParentCategoryAssociations.relationType = relation_type;
@@ -177,8 +176,6 @@ object type Category extends ACSObject {
               and relation_type = 'related'
         } map {
             categoryRelatedCategoryAssociations.id = category_category_map_id;
-            categoryRelatedCategoryAssociations.categoryID1 = category_id;
-            categoryRelatedCategoryAssociations.categoryID2 = related_category_id;
             categoryRelatedCategoryAssociations.isDefault = default_p;
             categoryRelatedCategoryAssociations.sortKey = sort_key;
             categoryRelatedCategoryAssociations.relationType = relation_type;
@@ -437,32 +434,32 @@ object type Category extends ACSObject {
 
 }
 
-association {
-    Category[0..n] relaters;
-    Category[0..n] relations;
-
-    Integer[1..1] sortKey;
-    String[1..1] relationType;
-
-    retrieve relations {
-        do {
-            select r.*, 'com.arsdigita.categorization.Category' as type,
-                   m.sort_key, m.relation_type
-            from cat_category_category_map m, cat_categories r
-            where m.category_id = :relaters.id
-            and m.related_category_id = r.category_id
-        } map {
-            relations.id = r.category_id;
-            relations.objectType = type;
-            relations.name = r.name;
-            relations.description = r.description;
-            relations.isEnabled = r.enabled_p;
-            relations.isAbstract = r.abstract_p;
-            sortKey = m.sort_key;
-            relationType = m.relation_type;
-        }
-    }
-}
+//association {
+//    Category[0..n] relaters;
+//    Category[0..n] relations;
+//
+//    Integer[1..1] sortKey;
+//    String[1..1] relationType;
+//
+//    retrieve relations {
+//        do {
+//            select r.*, 'com.arsdigita.categorization.Category' as type,
+//                   m.sort_key, m.relation_type
+//            from cat_category_category_map m, cat_categories r
+//            where m.category_id = :relaters.id
+//            and m.related_category_id = r.category_id
+//        } map {
+//            relations.id = r.category_id;
+//            relations.objectType = type;
+//            relations.name = r.name;
+//            relations.description = r.description;
+//            relations.isEnabled = r.enabled_p;
+//            relations.isAbstract = r.abstract_p;
+//            sortKey = m.sort_key;
+//            relationType = m.relation_type;
+//        }
+//    }
+//}
 
 query getCategories {
     do {

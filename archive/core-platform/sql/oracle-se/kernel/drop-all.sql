@@ -19,7 +19,7 @@
 --
 -- @author Bryan Quinn (bquinn@arsdigita.com) 
 -- @creation-date July 22, 2001 17:29:09
--- @cvs-id $Id: //core-platform/dev/sql/oracle-se/kernel/drop-all.sql#1 $
+-- @cvs-id $Id: //core-platform/dev/sql/oracle-se/kernel/drop-all.sql#2 $
 
 begin
    ctx_ddl.drop_section_group('autogroup');

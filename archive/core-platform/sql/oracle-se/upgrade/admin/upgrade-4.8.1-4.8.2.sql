@@ -13,7 +13,7 @@
 --
 -- Remove user and group site nodes, APM Packages and stylesheets.
 --
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/admin/upgrade-4.8.1-4.8.2.sql#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/admin/upgrade-4.8.1-4.8.2.sql#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $
 
 delete from acs_stylesheet_type_map 
  where stylesheet_id in (select stylesheet_id 

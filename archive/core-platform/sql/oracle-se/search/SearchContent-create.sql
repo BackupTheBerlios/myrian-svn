@@ -23,7 +23,7 @@
 
 -- Author: Jeff Teeters (teeters@arsdigita.com)
 
--- $Id: //core-platform/dev/sql/oracle-se/search/SearchContent-create.sql#1 $
+-- $Id: //core-platform/dev/sql/oracle-se/search/SearchContent-create.sql#2 $
 
 
 -- Table that stores content to be indexed.

@@ -21,12 +21,12 @@ package com.arsdigita.persistence;
  * factories to hand out filters
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  */
 
 public interface FilterFactory {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterFactory.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterFactory.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     // These are variables indicating what to use in the comparrison
     public final static int EQUALS = 1;

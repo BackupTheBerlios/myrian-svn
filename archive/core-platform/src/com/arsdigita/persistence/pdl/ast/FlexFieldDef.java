@@ -21,11 +21,11 @@ package com.arsdigita.persistence.pdl.ast;
  * object type.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  */
 public class FlexFieldDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/FlexFieldDef.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/FlexFieldDef.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     // the Column to specify as a flexfield
     private ColumnDef m_column;

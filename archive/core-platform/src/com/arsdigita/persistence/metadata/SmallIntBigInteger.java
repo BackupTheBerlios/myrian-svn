@@ -25,11 +25,11 @@ import java.math.BigInteger;
  *  values from the database.
  *
  * @author <a href="mailto:jorris@arsdigita.com">jorris@arsdigita.com</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  * 
  */
 class SmallIntBigInteger extends BigInteger {
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/SmallIntBigInteger.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/SmallIntBigInteger.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
 
     SmallIntBigInteger(byte[] val) {
         super(val);

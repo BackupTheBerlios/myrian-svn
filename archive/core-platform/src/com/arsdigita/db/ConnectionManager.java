@@ -23,14 +23,14 @@ import org.apache.log4j.Category;
  * Central location for obtaining database connection.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/07/18 $
  * @since 4.5
  * 
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: dennis $ - $Date: 2002/05/12 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#1 $";
+    public static final String versionId = "$Author: dennis $ - $Date: 2002/07/18 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#2 $";
 
     private static DatabaseConnectionPool s_pool = null;
     private static String s_poolName = 
