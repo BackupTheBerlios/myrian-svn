@@ -14,22 +14,20 @@
 
 package com.arsdigita.persistence.proto;
 
-import com.arsdigita.persistence.proto.metadata.Property;
-
 /**
- * Engine
+ * Event processor.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2003/02/20 $
+ * @since 2003-02-20
+ * @version $Revision: #1 $ $Date: 2003/02/20 $
  **/
+public abstract class EventProcessor {
 
-public abstract class Engine extends EventProcessor {
+    public final static String versionId =
+        "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/EventProcessor.java#1 $" +
+        " by $Author: vadim $, $DateTime: 2003/02/20 16:04:48 $";
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Engine.java#9 $ by $Author: vadim $, $DateTime: 2003/02/20 16:04:48 $";
+    protected abstract void write(Event ev);
 
-    protected abstract void commit();
-
-    protected abstract void rollback();
-
-    protected abstract RecordSet execute(Query query);
+    protected abstract void flush();
 }

@@ -2,6 +2,8 @@ package com.arsdigita.persistence.proto;
 
 import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
+import com.arsdigita.util.Assert;
+
 import java.util.*;
 import java.io.*;
 
@@ -14,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #33 $ $Date: 2003/02/19 $
+ * @version $Revision: #34 $ $Date: 2003/02/20 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#33 $ by $Author: ashah $, $DateTime: 2003/02/19 20:50:58 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#34 $ by $Author: vadim $, $DateTime: 2003/02/20 16:04:48 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -34,6 +36,8 @@ public class Session {
 
     private LinkedList m_events = new LinkedList();
     private LinkedList m_pending = new LinkedList();
+
+    private final static Set EVENT_PROCESSORS = new HashSet();
 
     public Session(Engine engine) {
         m_engine = engine;
@@ -461,6 +465,15 @@ public class Session {
             ev.sync();
         }
 
+        for (Iterator ii = EVENT_PROCESSORS.iterator(); ii.hasNext(); ) {
+            EventProcessor ep = (EventProcessor) ii.next();
+            for (Iterator events = written.iterator(); events.hasNext(); ) {
+                Event event = (Event) events.next();
+                ep.write(event);
+            }
+            ep.flush();
+        }
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("unflushed: " + m_events.size());
             untrace("flush");
@@ -698,6 +711,11 @@ public class Session {
             q.set(start, obj);
             return q;
         }
+    }
+
+    public static void addEventProcessor(EventProcessor ep) {
+        Assert.assertNotNull(ep, "event processor");
+        EVENT_PROCESSORS.add(ep);
     }
 
     void dump() {
