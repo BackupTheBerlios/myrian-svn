@@ -16,7 +16,6 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.CompoundType;
-import com.arsdigita.infrastructure.RowSequence;
 import java.util.Map;
 
 /**
@@ -54,12 +53,12 @@ import java.util.Map;
  * </pre>
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/08/22 $
  */
 
-public interface DataQuery extends RowSequence {
+public interface DataQuery {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQuery.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQuery.java#4 $ by $Author: richardl $, $DateTime: 2002/08/22 16:44:02 $";
 
     /**
      * Returns the type of this data query.
@@ -558,4 +557,45 @@ public interface DataQuery extends RowSequence {
      * only one value is retrieved with if (next()) {...}).
      */
     void close();
+
+    /**
+     * Rewinds the row sequence to the beginning.  It's as if next() was
+     * never called.
+     **/
+    void rewind();
+
+
+    /**
+     * Returns the value of the <i>propertyName</i> property associated with
+     * the current position in the sequence.
+     *
+     * @param propertyName the name of the property
+     *
+     * @return the value of the property
+     **/
+    Object get(String propertyName);
+
+
+    /**
+     * Returns the current position within the sequence. The first
+     * position is 1.
+     *
+     * @return the current position; 0 if there is no current position
+     **/
+    int getPosition();
+
+    /**
+     * Moves the cursor to the next row in the sequence.
+     *
+     * @return true if the new current row is valid; false if there are no
+     *         more rows.
+     **/
+    boolean next();
+
+    /**
+     * Returns the size of this query.
+     * @return the number of rows.
+     **/
+    long size();
+
 }
