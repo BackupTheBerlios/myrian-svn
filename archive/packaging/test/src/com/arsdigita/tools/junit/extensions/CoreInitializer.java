@@ -1,6 +1,6 @@
 package com.arsdigita.tools.junit.extensions;
 
-import com.arsdigita.init.*;
+import com.arsdigita.runtime.*;
 import com.arsdigita.persistence.pdl.*;
 import com.arsdigita.util.StringUtils;
 import com.arsdigita.util.SystemProperties;
@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * CoreInitializer
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/09/24 $
+ * @version $Revision: #2 $ $Date: 2003/09/25 $
  **/
 
 public class CoreInitializer extends CompoundInitializer {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/tools/junit/extensions/CoreInitializer.java#1 $ by $Author: dennis $, $DateTime: 2003/09/24 22:52:36 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/tools/junit/extensions/CoreInitializer.java#2 $ by $Author: justin $, $DateTime: 2003/09/25 17:25:55 $";
 
     private static final Logger s_log = Logger.getLogger
         (CoreInitializer.class);

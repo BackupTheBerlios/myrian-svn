@@ -19,7 +19,7 @@ import com.arsdigita.util.*;
 import com.arsdigita.util.config.*;
 import com.arsdigita.util.parameter.*;
 import com.arsdigita.db.*;
-import com.arsdigita.init.*;
+import com.arsdigita.runtime.*;
 import com.arsdigita.persistence.*;
 import com.arsdigita.persistence.metadata.*;
 import com.arsdigita.persistence.pdl.*;
