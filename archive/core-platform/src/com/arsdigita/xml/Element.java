@@ -28,14 +28,14 @@ import org.w3c.dom.Attr;
  * <code>org.jdom.Element</code> using <code>org.w3c.dom.Element</code>.
  *
  * @author Patrick McNeill (pmcneill@arsdigita.com)
- * @version $Revision: #2 $ $Date: 2002/06/10 $
+ * @version $Revision: #3 $ $Date: 2002/07/15 $
  * @since ACS 4.5a
  */
 public class Element {
     public static final String versionId = 
-        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#2 $" +
-        "$Author: justin $" +
-        "$DateTime: 2002/06/10 16:20:30 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#3 $" +
+        "$Author: randyg $" +
+        "$DateTime: 2002/07/15 13:53:08 $";
 
     private static Category s_log = Category.getInstance
         (Element.class.getName());
@@ -339,6 +339,49 @@ public class Element {
     }
 
 
+    public java.util.Map getAttributes() {
+        // Retrieve the attributes of the DOM Element
+        org.w3c.dom.NamedNodeMap attributeNodeMap =
+            m_element.getAttributes();
+        
+        // Create the HashMap that we will return the attributes
+        // in
+        java.util.HashMap returnMap = new java.util.HashMap();
+        
+        // Copy the attribute values in the NamedNodeMap to the
+        // HashMap
+        for (int i = 0; i < attributeNodeMap.getLength(); ++i) {
+            // Get the Node
+            org.w3c.dom.Node attributeNode = attributeNodeMap.item(i);
+            // Copy the name and value to the map
+            returnMap.put(attributeNode.getNodeName(), 
+                          attributeNode.getNodeValue());
+        }
+        
+        // Return the HashMap
+        return returnMap;
+    }
+    
+    /**
+     * Retrieves an attribute value by name.
+     * @param name The name of the attribute to retrieve
+     * @return The Attr value as a string, 
+     * or the empty string if that attribute does not have a specified 
+     * or default value.
+     */
+    public String getAttribute(String name) {
+        return m_element.getAttribute(name);
+    }
+    
+    public boolean hasAttribute(String name) {
+        return m_element.hasAttribute(name);
+    }
+    
+    public String getName() {
+        return m_element.getTagName();
+    }
+
+
     /**
      * Functions to allow this class to interact appropriately with the 
      * Document class (for example, allows nodes to be moved around, 
@@ -392,20 +435,5 @@ public class Element {
                 visitAllAttributes(nl.item(i));
             }
         }
-    }
-
-    /**
-     * Retrieves an attribute value by name.
-     * @param sAttributeName The name of the attribute to retrieve
-     * @return The Attr value as a string, 
-     * or the empty string if that attribute does not have a specified or default value.
-
-     */
-    public String getAttribute(String sAttributeName) {
-	return m_element.getAttribute(sAttributeName);
-    }
-
-    public String getName() {
-        return m_element.getNodeName();
     }
 }
