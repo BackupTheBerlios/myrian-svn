@@ -351,14 +351,13 @@ attributes, etc) screws up the session's handling of two way
 associations since to be consistent we should have a reverse property
 pointing back from the keyless object, but we can't expand events
 properly since the keyless object would have no OID. Alternatively we
-may could say that things that point to keyless objects are
-attributes, not roles and so there is no back pointer, but this could
-be odd for link attributes because the pointers on the link to each
-end of the association wouldn't actually be the opposite ends of the
-association to the links themselves. This could be made to work, but
-it might be better just to say that they have OIDs. Without a link
-having an OID, updating the values of link attributes may be
-difficult.
+could say that things that point to keyless objects are attributes,
+not roles and so there is no back pointer, but this could be odd for
+link attributes because the pointers on the link to each end of the
+association wouldn't actually be the opposite ends of the association
+to the links themselves. This could be made to work, but it might be
+better just to say that they have OIDs. Without a link having an OID,
+updating the values of link attributes may be difficult.
 
 Should link OIDs be OIDs of other OIDs, OIDs of other
 PersistentObjects, or OIDs of Paths. Logically they should probably
