@@ -18,7 +18,7 @@
 -- @author David Dao <ddao@arsdigita.com>
 -- @author John Prevost <jmp@arsdigita.com>
 --
--- @version $Id: //core-platform/dev/sql/oracle-se/messaging/messaging-create.sql#1 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/messaging/messaging-create.sql#2 $
 
 --
 -- The messages table stores the basic sender and reply-to information
@@ -37,9 +37,7 @@ create table messages (
     reply_to       varchar2(250),
     sender         integer
                    constraint messages_sender_fk  
-                       references parties (party_id)
-                   constraint messages_sender_nn
-                       not null,
+                       references parties (party_id),
     subject        varchar2(250)
                    constraint messages_subject_nn not null,
     body           varchar2(4000)
