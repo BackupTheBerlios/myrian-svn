@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #17 $ $Date: 2004/03/09 $
+ * @version $Revision: #18 $ $Date: 2004/03/11 $
  **/
 
 public class Code {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#17 $ by $Author: rhs $, $DateTime: 2004/03/09 21:48:49 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#18 $ by $Author: ashah $, $DateTime: 2004/03/11 13:04:49 $";
 
     private static final Logger s_log = Logger.getLogger(Code.class);
 
@@ -189,6 +189,13 @@ public class Code {
         if (isStaticAttribute(m)) {
             ObjectMap map = m.getObjectMap();
             SQLBlock block = map.getRetrieveAll();
+            if (block == null && m instanceof Static) {
+                throw new MetadataException
+                    (map.getRoot(), map,
+                     "Specify metadata for property " + prop.getName()
+                     + " in type " + prop.getContainer().getQualifiedName()
+                     + " or include a retrieve all for the type");
+            }
             return columns(paths(prop.getType(), m.getPath()), block);
         }
 
@@ -278,17 +285,19 @@ public class Code {
         }
     }
 
+    /**
+     * @pre map.getRetrieveAll() == null
+     */
     static Table table(ObjectMap map) {
-        Table table = null;
         for (ObjectMap om = map; om != null; om = om.getSuperMap()) {
-            table = om.getTable();
-            if (table != null) { break; }
+            Table table = om.getTable();
+            if (table != null) { return table; }
         }
-        if (table == null) {
-            throw new IllegalStateException
-                ("type does not have table: " + map.getObjectType());
-        }
-        return table;
+
+        throw new MetadataException
+            (map.getRoot(), map,
+             "No retrieve all or mapping metadata for type "
+             + map.getObjectType().getQualifiedName());
     }
 
     static void bind(SQL sql, Map values, StringBuffer buf) {
