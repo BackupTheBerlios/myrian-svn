@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/default/kernel/index-foreign_keys.sql#3 $
--- $DateTime: 2004/02/13 15:19:42 $
+-- $Id: //core-platform/dev/sql/ccm-core/default/kernel/index-foreign_keys.sql#4 $
+-- $DateTime: 2004/03/11 11:20:54 $
 
 create index ACS_PERMISSIONS_PRIVILEGE_idx on ACS_PERMISSIONS(PRIVILEGE);
 create index APM_PTYP_LSTNR_MP_LSTNR_ID_idx on APM_PACKAGE_TYPE_LISTENER_MAP(LISTENER_ID);
@@ -32,7 +32,6 @@ create index NT_QUEUE_PARTY_TO_idx on NT_QUEUE(PARTY_TO);
 -- This index makes oracle 9i go totally mad
 -- create index object_context_context_id_idx on object_context(context_id);
 create index OBJECT_CONTEXT_CONTEXT_ID_idx on OBJECT_CONTEXT(CONTEXT_ID);
-create index PARAMETER_PRIV_BASE_PRIV_idx on PARAMETERIZED_PRIVILEGES(BASE_PRIVILEGE);
 create index VC_OBJECTS_MASTER_ID_idx on VC_OBJECTS(MASTER_ID);
 create index VC_TRANSACTIONS_OBJECT_ID_idx on VC_TRANSACTIONS(OBJECT_ID);
 create index AGENTPORT_SUPERPORT_ID_idx on AGENTPORTLETS(SUPERPORTLET_ID);
