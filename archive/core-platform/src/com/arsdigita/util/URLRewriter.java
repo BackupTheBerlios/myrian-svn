@@ -34,10 +34,10 @@ import org.apache.log4j.Logger;
  * ID parameter.
  */
 public class URLRewriter {
-    public static final String versionId = 
-        "$Id: //core-platform/dev/src/com/arsdigita/util/URLRewriter.java#5 $" +
+    public static final String versionId =
+        "$Id: //core-platform/dev/src/com/arsdigita/util/URLRewriter.java#6 $" +
         "$Author: justin $" +
-        "$DateTime: 2002/08/27 15:44:44 $";
+        "$DateTime: 2002/08/29 17:46:14 $";
 
     private static final Logger s_log =
         Logger.getLogger(URLRewriter.class);
@@ -116,7 +116,7 @@ public class URLRewriter {
 
         if (url.startsWith("/")) {
             String prefix = DispatcherHelper.getDispatcherServletPath();
-            url = prefix + resp.encodeRedirectURL(encodeParams(req, url));
+            url = resp.encodeRedirectURL(encodeParams(req, prefix + url));
         } else {
             url = resp.encodeRedirectURL(encodeParams(req, url));
         }
@@ -157,7 +157,7 @@ public class URLRewriter {
 
         if (url.startsWith("/")) {
             String prefix = DispatcherHelper.getDispatcherServletPath();
-            url = prefix + resp.encodeURL(encodeParams(req, url));
+            url = resp.encodeURL(encodeParams(req, prefix + url));
         } else {
             url = resp.encodeURL(encodeParams(req, url));
         }
