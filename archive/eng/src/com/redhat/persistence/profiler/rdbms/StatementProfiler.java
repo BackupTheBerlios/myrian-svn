@@ -69,7 +69,9 @@ public class StatementProfiler implements RDBMSProfiler {
             ObjectType type = null;
             Signature sig = statement.getSignature();
             if (sig != null) {
-                type = sig.getObjectType();
+                if (sig.isSource(null)) {
+                    type = sig.getObjectType();
+                }
             } else {
                 for (Iterator it = statement.getEvents().iterator();
                      it.hasNext(); ) {
