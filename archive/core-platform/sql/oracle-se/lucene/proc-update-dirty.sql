@@ -1,6 +1,6 @@
 
 
-create or replace function lucene_update_dirty(oldTimestamp date, newTimestamp date, oldDirty char, newDirty char)
+create or replace function lucene_update_dirty(oldTimestamp date, newTimestamp date, oldDirty integer, newDirty integer)
 return char
 as begin
   if newTimestamp < oldTimestamp then

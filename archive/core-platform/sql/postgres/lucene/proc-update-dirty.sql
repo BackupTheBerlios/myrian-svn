@@ -1,6 +1,6 @@
 
 
-create or replace function lucene_update_dirty(timestamp, timestamp, boolean, boolean)
+create or replace function lucene_update_dirty(timestamp, timestamp, integer, integer)
 returns boolean
 as '
 declare
