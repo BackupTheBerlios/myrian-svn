@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #19 $ $Date: 2004/03/16 $
+ * @version $Revision: #20 $ $Date: 2004/03/18 $
  **/
 
 public class Code {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#19 $ by $Author: rhs $, $DateTime: 2004/03/16 12:21:18 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#20 $ by $Author: rhs $, $DateTime: 2004/03/18 17:18:33 $";
 
     private static final Logger s_log = Logger.getLogger(Code.class);
 
@@ -63,6 +63,7 @@ public class Code {
     static final Code TRUE = new Code("1 = 1");
     static final Code FALSE = new Code("1 = 0");
     static final Code NULL = new Code("null");
+    static final Code EMPTY = new Code();
 
     private StringBuffer m_sql;
     private int m_lower;
@@ -107,6 +108,10 @@ public class Code {
 
     boolean isNull() {
         return equals(NULL);
+    }
+
+    boolean isEmpty() {
+        return equals(EMPTY);
     }
 
     Code add(String sql) {

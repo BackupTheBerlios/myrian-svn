@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #17 $ $Date: 2004/03/16 $
+ * @version $Revision: #18 $ $Date: 2004/03/18 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#17 $ by $Author: rhs $, $DateTime: 2004/03/16 15:39:46 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#18 $ by $Author: rhs $, $DateTime: 2004/03/18 17:18:33 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -213,10 +213,10 @@ class QFrame {
 
     Code emit(boolean select, boolean range) {
         List where = new ArrayList();
-        Set emitted = new HashSet();
         Code join = null;
         if (!m_hoisted) {
-            join = render(where, emitted);
+            join = render(where);
+            if (join != null && join.isEmpty()) { join = null; }
         }
 
         Code result = new Code();
@@ -246,10 +246,13 @@ class QFrame {
             result = result.add(join);
         }
 
-        Code sql = join(where, "\nand ", emitted);
-        if (sql != null) {
-            result = result.add("\nwhere ");
-            result = result.add(sql);
+        for (int i = 0; i < where.size(); i++) {
+            if (i == 0) {
+                result = result.add("\nwhere ");
+            } else {
+                result = result.add(" and ");
+            }
+            result = result.add((Code) where.get(i));
         }
 
         List orders = getOrders();
@@ -284,19 +287,6 @@ class QFrame {
         return result;
     }
 
-    private Code join(List exprs, String sep, Set emitted) {
-        List conditions = new ArrayList();
-        for (Iterator it = exprs.iterator(); it.hasNext(); ) {
-            Expression e = (Expression) it.next();
-            Code sql = e.emit(m_generator);
-            if (!sql.isTrue() && !emitted.contains(sql)) {
-                conditions.add(sql);
-                emitted.add(sql);
-            }
-        }
-        return Code.join(conditions, sep);
-    }
-
     private List getOrders() {
         List result = new ArrayList();
         addOrders(result);
@@ -317,111 +307,124 @@ class QFrame {
         }
     }
 
-    private Code render(List conditions, Set emitted) {
-        return render(conditions, new HashSet(), emitted, new boolean[1]);
+    private static class Flags {
+        boolean outer = false;
     }
 
-    private Code render(List conditions, Set defined, Set emitted,
-                        boolean[] outer) {
-        Code result = new Code();
+    private static class JFrame {
 
-        Set defs = new HashSet();
+        Code join = null;
+        Set defined = null;
+        boolean filterable = false;
 
-        boolean first = true;
-        if (m_table != null && m_duplicate == null) {
-            first = false;
-            result = result.add(m_table).add(" ").add(alias());
-            defs.add(this);
-        } else if (m_tableExpr != null && m_duplicate == null) {
-            first = false;
-            result = result.add(m_tableExpr.emit(m_generator)).add(" ")
-                .add(alias());
-            defs.add(this);
+        JFrame(Code table, QFrame frame) {
+            join = table;
+            defined = Collections.singleton(frame);
         }
 
-        for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
-            QFrame child = (QFrame) it.next();
-            List conds = new ArrayList();
-            boolean[] isOuter = { false };
-            Code join = child.render(conds, defs, emitted, isOuter);
-            boolean prop = false;
-            for (Iterator iter = conds.iterator(); iter.hasNext(); ) {
-                Expression e = (Expression) iter.next();
-                Code c = e.emit(m_generator);
-                if (c.isTrue() || emitted.contains(c)) {
-                    iter.remove();
-                    continue;
-                }
-                Set used = frames(e);
-                used.removeAll(defs);
-                if (!used.isEmpty()) {
-                    prop = true;
-                    break;
-                }
+        JFrame(Code join, JFrame left, JFrame right) {
+            this.join = join;
+            defined = new HashSet();
+            defined.addAll(left.defined);
+            defined.addAll(right.defined);
+        }
+
+    }
+
+    private Code render(List where) {
+        LinkedList joins = new LinkedList();
+        render(joins, where, new Flags(), new HashSet());
+        Code code = null;
+        for (Iterator it = joins.iterator(); it.hasNext(); ) {
+            JFrame frame = (JFrame) it.next();
+            if (code == null) {
+                code = frame.join;
+            } else {
+                code = code.add(" cross join ").add(frame.join);
             }
-            if (join == null || prop) {
-                if (!conds.isEmpty()) {
-                    if (isOuter[0] && !outer[0]) {
-                        outer[0] = true;
-                    } else if (!isOuter[0] && outer[0]) {
-                        throw new IllegalStateException
-                            ("can't merge inner and outer conditions:" +
-                             "\nconds =  " + conds +
-                             "\nconditions = " + conditions +
-                             "\nroot = " + getRoot() +
-                             "\nthis = " + this +
-                             "\nchild = " + child);
-                    }
-                }
-                conditions.addAll(conds);
-                conds.clear();
-            }
-            if (join == null) { continue; }
-            Set nemitted = new HashSet();
-            nemitted.addAll(emitted);
-            Code on = join(conds, " and ", nemitted);
-            if (!first) {
-                result = result.add("\n");
-                if (isOuter[0] && on != null) {
-                    result = result.add("left ");
-                } else if (on == null) {
-                    result = result.add("cross ");
-                }
-                result = result.add("join ");
-            }
-            result = result.add(join);
-            if (on != null) {
-                if (first) {
-                    if (isOuter[0]) {
-                        throw new IllegalStateException
-                            ("Propogating outer join conditions:" +
-                             "\nroot: " + getRoot() +
-                             "\nchild: " + child +
-                             "\nthis: " + this +
-                             "\nconds: " + conds);
-                    }
-                    conditions.addAll(conds);
-                } else {
-                    result = result.add(" on ");
-                    result = result.add(on);
-                    emitted.addAll(nemitted);
-                }
-            }
-            first = false;
+        }
+        return code;
+    }
+
+    private void render(LinkedList joins, List where, Flags flags,
+                        Set emitted) {
+        boolean outer = flags.outer;
+        if (m_outer) {
+            flags.outer = true;
+        }
+
+        Code table = null;
+        if (m_table != null && m_duplicate == null) {
+            table = new Code(m_table).add(" ").add(alias());
+        } else if (m_tableExpr != null && m_duplicate == null) {
+            table = m_tableExpr.emit(m_generator).add(" ").add(alias());
+        }
+
+        if (table != null) {
+            joins.addFirst(new JFrame(table, this));
+        }
+
+        List children = getChildren();
+        for (int i = 0; i < children.size(); i++) {
+            QFrame child = (QFrame) children.get(i);
+            child.render(joins, where, flags, emitted);
         }
 
         if (m_condition != null) {
-            conditions.add(m_condition);
+            Code c = m_condition.emit(m_generator);
+            if (!c.isTrue() && !emitted.contains(c)) {
+                JFrame right = (JFrame) joins.getFirst();
+                Set used = frames(m_condition);
+                used.removeAll(right.defined);
+                if (used.isEmpty()) {
+                    if (right.filterable) {
+                        right.join = right.join.add(" and ").add(c);
+                    } else {
+                        where.add(c);
+                    }
+                } else {
+                    joins.removeFirst();
+
+                    if (joins.isEmpty()) {
+                        throw new IllegalStateException
+                            ("unresolved variable in condition: " + c);
+                    }
+
+                    JFrame left = (JFrame) joins.removeFirst();
+                    while (true) {
+                        used = frames(m_condition);
+                        used.removeAll(right.defined);
+                        used.removeAll(left.defined);
+                        if (used.isEmpty()) {
+                            Code join = left.join;
+                            if (flags.outer) {
+                                join = join.add(" left");
+                            }
+                            join = join.add(" join ").add(right.join)
+                                .add(" on ").add(c);
+                            JFrame frame = new JFrame(join, left, right);
+                            frame.filterable = !flags.outer;
+                            joins.addFirst(frame);
+                            break;
+                        } else if (joins.isEmpty()) {
+                            throw new IllegalStateException
+                                ("unresolved variable in condition: " + c);
+                        } else {
+                            JFrame lefter = (JFrame) joins.removeFirst();
+                            Code join = lefter.join.add(" cross join ")
+                                .add(left.join);
+                            JFrame cross = new JFrame(join, lefter, left);
+                            left = cross;
+                        }
+                    }
+                }
+
+                emitted.add(c);
+            }
         }
 
-        if (m_outer) { outer[0] = true; }
-
-        defined.addAll(defs);
-
-        if (first) {
-            return null;
-        } else {
-            return result;
+        if (m_outer) {
+            flags.outer = outer;
         }
     }
 
@@ -433,7 +436,10 @@ class QFrame {
         Set result = new HashSet();
         for (Iterator it = values.iterator(); it.hasNext(); ) {
             QValue value = (QValue) it.next();
-            result.add(value.getFrame().getDuplicate());
+            QFrame frame = value.getFrame().getDuplicate();
+            if (frame.getRoot().equals(getRoot())) {
+                result.add(frame);
+            }
         }
         return result;
     }
@@ -476,7 +482,7 @@ class QFrame {
     boolean isSelect() {
         if (m_hoisted) {
             return false;
-        } else if (render(new ArrayList(), new HashSet()) == null) {
+        } else if (render(new ArrayList()) == null) {
             return false;
         } else {
             return true;
@@ -885,23 +891,23 @@ class QFrame {
             result.append(" cond ");
             result.append(m_condition);
         }
-        if (m_nonnull != null && !m_nonnull.isEmpty()) {
-            result.append("\n");
-            indent(result, depth);
-            result.append(" nn ");
-            if (m_parent != null && m_nonnull == m_parent.m_nonnull) {
-                result.append("--> (parent)");
-            } else {
+        if (m_nonnull != null) {
+            if (m_parent == null || m_nonnull != m_parent.m_nonnull) {
+                if (!m_nonnull.isEmpty()) {
+                    result.append("\n");
+                    indent(result, depth);
+                }
+                result.append(" nn ");
                 result.append(m_nonnull);
             }
         }
-        if (m_equiset != null && !m_equiset.getSets().isEmpty()) {
-            result.append("\n");
-            indent(result, depth);
-            result.append(" eq ");
-            if (m_parent != null && m_equiset == m_parent.m_equiset) {
-                result.append("--> (parent)");
-            } else {
+        if (m_equiset != null) {
+            if (m_parent == null || m_equiset != m_parent.m_equiset) {
+                if (!m_equiset.getSets().isEmpty()) {
+                    result.append("\n");
+                    indent(result, depth);
+                }
+                result.append(" eq ");
                 result.append(m_equiset);
             }
         }

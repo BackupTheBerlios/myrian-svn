@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2004/03/16 $
+ * @version $Revision: #15 $ $Date: 2004/03/18 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#14 $ by $Author: rhs $, $DateTime: 2004/03/16 15:39:46 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#15 $ by $Author: rhs $, $DateTime: 2004/03/18 17:18:33 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 

@@ -110,29 +110,96 @@
   </test>
 
   <test>
-    <query subselects="0" joins="1" outers="1">
-      query(all(test.Node).parent, id = id, name = name)
+    <query fetched="pid,pname" subselects="0" joins="1" outers="1">
+      query(all(test.Node).parent, pid = id, pname = name)
     </query>
-    <query>
-      query(all(test.StaticNode).parent, id = id, name = name)
+    <query fetched="pid,pname">
+      query(all(test.StaticNode).parent, pid = id, pname = name)
     </query>
-    <query fetched="id" subselects="0" joins="0">
-      query(all(test.Node).parent, id = id)
+    <query fetched="pid" subselects="0" joins="0">
+      query(all(test.Node).parent, pid = id)
     </query>
-    <query fetched="id">
-      query(all(test.StaticNode).parent, id = id)
+    <query fetched="pid">
+      query(all(test.StaticNode).parent, pid = id)
+    </query>
+    <query fetched="pid">
+      query(all(test.Node), pid = parent.id)
+    </query>
+    <query fetched="pid,pname">
+      query(all(test.Node), pid = parent.id, pname = parent.name)
+    </query>
+    <query fetched="pid,pname,id,name">
+      query(all(test.Node), pid = parent.id, pname = parent.name, id = id,
+            name = name)
+    </query>
+    <query fetched="pid,pname,id,name,tid">
+      query(all(test.Node), id = id, name = name, pid = parent.id,
+            pname = parent.name, tid = type.id)
+    </query>
+    <query fetched="pid,pname,id,name,tid,tname">
+      query(all(test.Node), id = id, name = name, pid = parent.id,
+            pname = parent.name, tid = type.id, tname = type.name)
+    </query>
+    <query fetched="pid,pname,id,name,tid,tname,ptid,ptname">
+      query(all(test.Node), id = id, name = name, pid = parent.id,
+            pname = parent.name, tid = type.id, tname = type.name,
+            ptid = parent.type.id, ptname = parent.type.name)
+    </query>
+    <query fetched="pid,pname,id,name,tid,tname,ptid,ptname,description">
+      query(join(a = all(test.Node), b = all(test.Node), a.id == b.id).b,
+            id = id,
+            name = name,
+            description = description,
+            tid = type.id,
+            tname = type.name,
+            pid = parent.id,
+            pname = parent.name,
+            ptid = parent.type.id,
+            ptname = parent.type.name)
+    </query>
+    <query fetched="pid,pname,id,name,tid,tname,ptid,ptname,description">
+      query(join(a = all(test.Node), b = all(test.Node), a.id == b.id).b,
+            id = id,
+            pid = parent.id,
+            pname = parent.name,
+            ptid = parent.type.id,
+            ptname = parent.type.name,
+            tid = type.id,
+            tname = type.name,
+            name = name,
+            description = description)
     </query>
     <results>
-      <row id="null" name="null"/>
-      <row id="30" name="Thirty"/>
-      <row id="30" name="Thirty"/>
-      <row id="30" name="Thirty"/>
-      <row id="33" name="Thirty Three"/>
-      <row id="33" name="Thirty Three"/>
-      <row id="33" name="Thirty Three"/>
-      <row id="36" name="Thirty Six"/>
-      <row id="37" name="Thirty Seven"/>
-      <row id="38" name="Thirty Eight"/>
+      <row id="30" name="Thirty" tid="1" tname="Type 1"
+           pid="null" pname="null" ptid="null" ptname="null"
+           description="null"/>
+      <row id="31" name="Thirty One" tid="1" tname="Type 1"
+           pid="30" pname="Thirty" ptid="1" ptname="Type 1"
+           description="null"/>
+      <row id="32" name="Thirty Two" tid="1" tname="Type 1"
+           pid="30" pname="Thirty" ptid="1" ptname="Type 1"
+           description="null"/>
+      <row id="33" name="Thirty Three" tid="1" tname="Type 1"
+           pid="30" pname="Thirty" ptid="1" ptname="Type 1"
+           description="null"/>
+      <row id="34" name="Thirty Four" tid="1" tname="Type 1"
+           pid="33" pname="Thirty Three" ptid="1" ptname="Type 1"
+           description="null"/>
+      <row id="35" name="Thirty Five" tid="1" tname="Type 1"
+           pid="33" pname="Thirty Three" ptid="1" ptname="Type 1"
+           description="null"/>
+      <row id="36" name="Thirty Six" tid="1" tname="Type 1"
+           pid="33" pname="Thirty Three" ptid="1" ptname="Type 1"
+           description="null"/>
+      <row id="37" name="Thirty Seven" tid="1" tname="Type 1"
+           pid="36" pname="Thirty Six" ptid="1" ptname="Type 1"
+           description="null"/>
+      <row id="38" name="Thirty Eight" tid="1" tname="Type 1"
+           pid="37" pname="Thirty Seven" ptid="1" ptname="Type 1"
+           description="null"/>
+      <row id="39" name="Thirty Nine" tid="1" tname="Type 1"
+           pid="38" pname="Thirty Eight" ptid="1" ptname="Type 1"
+           description="null"/>
     </results>
   </test>
 
