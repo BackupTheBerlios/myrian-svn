@@ -44,12 +44,12 @@ import java.util.List;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/04 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#2 $ by $Author: rhs $, $DateTime: 2004/08/04 17:43:54 $";
 
     private RDBMSEngine m_engine;
     private Operation m_op = null;
@@ -110,7 +110,13 @@ public abstract class SQLWriter {
                     ps.setNull(index, type);
                 } else {
                     Adapter ad = root.getAdapter(obj.getClass());
-                    ad.bind(ps, index, obj, type);
+                    try {
+                        ad.bind(ps, index, obj, type);
+                    } catch (Throwable t) {
+                        throw new Error
+                            ("bind error[" + index + "]: " + obj + " " +
+                             type + "\n" + getSQL(), t);
+                    }
                 }
                 if (cycle != null) { cycle.endSet(); }
             } catch (SQLException e) {
