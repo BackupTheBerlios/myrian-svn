@@ -2,7 +2,7 @@
 
 # Author:  Vadim Nasardinov (vadimn@redhat.com)
 # Since:   2004-09-28
-# Version: $Id: //eng/persistence/dev/bin/rename-package.py#4 $
+# Version: $Id: //eng/persistence/dev/bin/rename-package.py#5 $
 
 '''Usage:
     $ rename-package.py --from <old-package-name> --to <new-package-name> <dir1> [<dir2> ...]
@@ -26,14 +26,15 @@ class Config:
         u_opts = OptionGroup(parser, "User options",
                              "User-facing options.")
 
-        u_opts.add_option("-f", "--from", dest="from_pkg",
-                          metavar="FROM_PKG",
-                          help="[required] (Part of) a java package name that" +
-                          " you'd like to rename, e.g. 'com.arsdigita'")
-        u_opts.add_option("-t", "--to", dest="to_pkg", metavar="TO_PKG",
-                          help="[required] The new (possibly partial) java" +
-                          "package name to which FROM_PKG is to be renamed," +
-                          " e.g. 'org.acme'.")
+        u_opts.add_option("-f", "--from", dest="from_pkgs",
+                          metavar="FROM_PKGS",
+                          help="[required] A comma-separated list of java " +
+                          "package names that you'd like to rename, e.g. " +
+                          "'com.arsdigita,com.redhat'")
+        u_opts.add_option("-t", "--to", dest="to_pkgs", metavar="TO_PKGS",
+                          help="[required] A comma-separated list of the new" +
+                          " java package names to which FROM_PKGS are to be renamed," +
+                          " e.g. 'org.acme,org.foobar'.")
         parser.add_option_group(u_opts)
         special = OptionGroup(parser, "Special options",
                               "Only used by auto-generated shell scripts." +
@@ -46,15 +47,23 @@ class Config:
         (options, self._paths) = parser.parse_args()
 
         if len(self._paths) == 0:
-            self.error("Error: No paths given.")
+            self.error("No paths given.")
 
-        self._from_pkg = options.from_pkg
-        self._to_pkg   = options.to_pkg
+        self._from_pkgs = options.from_pkgs.split(",")
+        self._to_pkgs   = options.to_pkgs.split(",")
+        if len(self._from_pkgs) != len(self._to_pkgs):
+            if len(self._from_pkgs) > len(self._to_pkgs):
+                longer, shorter = self._from_pkgs, self._to_pkgs
+            else:
+                longer, shorter = self._to_pkgs, self._from_pkgs
+            self.error("%d package names in %s, but only %d package name(s) in %s" %
+                       (len(longer), longer, len(shorter), shorter))
+
         self._replace_option = options.replace
 
         if options.replace:
             if not isfile(self.get_fname()):
-                self.error("Error: %s is not a file." % self.get_fname())
+                self.error("%s is not a file." % self.get_fname())
         else:
             for dd in self._paths:
                 if not isdir(dd):
@@ -63,17 +72,17 @@ class Config:
     def get_script(self):
         return self._script
 
-    def get_from_pkg(self):
-        return self._from_pkg
+    def get_from_pkgs(self):
+        return list(self._from_pkgs)
 
-    def get_from_dir(self):
-        return self._from_pkg.replace(".", "/")
+    def get_from_dirs(self):
+        return [dd.replace(".", "/") for dd in self._from_pkgs]
 
-    def get_to_pkg(self):
-        return self._to_pkg
+    def get_to_pkgs(self):
+        return list(self._to_pkgs)
 
-    def get_to_dir(self):
-        return self._to_pkg.replace(".", "/")
+    def get_to_dirs(self):
+        return [dd.replace(".", "/") for dd in self._to_pkgs]
 
     def replace_requested(self):
         return self._replace_option
@@ -126,16 +135,24 @@ class Processor:
         self._count += 1
 
     def _move(self, from_name):
-        from_dir = "/" + self._config.get_from_dir() + "/"
-        if from_name.find(from_dir) < 0: return None
-        to_dir = "/" + self._config.get_to_dir() + "/"
+        cc = self._config
+        from_dirs = ["/" + dd + "/" for dd in cc.get_from_dirs()]
+        to_dirs =   ["/" + dd + "/" for dd in cc.get_to_dirs()]
 
-        (before, after) = from_name.split(from_dir)
-        to_name = before + to_dir + after
-        print "p4 integrate %s %s" % (from_name, to_name)
-        print "p4 delete %s" % from_name
-        self._moved += 1
-        return to_name
+        moved = False
+        for (from_dir, to_dir) in zip(from_dirs, to_dirs):
+            if from_name.find(from_dir) > -1:
+                (before, after) = from_name.split(from_dir)
+                to_name = before + to_dir + after
+                print "p4 integrate %s %s" % (from_name, to_name)
+                print "p4 delete %s" % from_name
+                self._moved += 1
+                moved = True
+                break
+        if moved:
+            return to_name
+        else:
+            return None
 
     def _replace(self, from_name, to_name):
         (root, ext) = splitext(from_name)
@@ -143,19 +160,21 @@ class Processor:
 
         ff = open(from_name)
         needs_editing = False
-        pkg = self._config.get_from_pkg()
-        dir = self._config.get_from_dir()
+        patterns = self._config.get_from_pkgs()
+        patterns.extend(self._config.get_from_dirs())
         for line in ff:
-            for pattern in (pkg, dir):
+            for pattern in patterns:
                 if line.find(pattern) > -1:
                     needs_editing = True
                     break
         ff.close()
         if needs_editing:
             cc = self._config
+            glue = ",".join
             print "p4 edit", to_name
             print "%s --replace --from %s --to %s %s" % \
-                  (cc.get_script(), cc.get_from_pkg(), cc.get_to_pkg(), to_name)
+                  (cc.get_script(), glue(cc.get_from_pkgs()),
+                   glue(cc.get_to_pkgs()), to_name)
 
     def __str__(self):
         return "Moved: %d out of %d %s files" % \
@@ -180,20 +199,18 @@ def generate_script(config):
 def edit_in_place(config):
     fname = config.get_fname()
     if not isfile(fname):
-        config.error("Error: %s is not a file." % fname)
+        config.error("%s is not a file." % fname)
 
     if not os.access(fname, os.W_OK):
-        config.error("Error: %s is not writable." % fname)
+        config.error("%s is not writable." % fname)
 
-    from_pkg = config.get_from_pkg()
-    to_pkg   = config.get_to_pkg()
-    from_dir = config.get_from_dir()
-    to_dir   = config.get_to_dir()
+    pairs = zip(config.get_from_pkgs(), config.get_to_pkgs())
+    pairs.extend(zip(config.get_from_dirs(), config.get_to_dirs()))
 
     for line in fileinput.input(files=fname, inplace=1):
         line = line.rstrip("\n\r ")
-        line = line.replace(from_pkg, to_pkg)
-        line = line.replace(from_dir, to_dir)
+        for (fr, to) in pairs:
+            line = line.replace(fr, to)
         print line
 
 if __name__ == '__main__':
