@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #30 $ $Date: 2003/03/14 $
+ * @version $Revision: #31 $ $Date: 2003/03/15 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#30 $ by $Author: rhs $, $DateTime: 2003/03/14 16:11:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#31 $ by $Author: rhs $, $DateTime: 2003/03/15 02:35:11 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -91,6 +91,9 @@ public class PDL {
 
         m_ast.traverse(new Node.Switch() {
                 public void onObjectType(ObjectTypeNd ot) {
+                    if (ot.hasReturns()) {
+                        m_errors.warn(ot, "returns clause is deprecated");
+                    }
                     m_symbols.define(ot);
                 }
             });

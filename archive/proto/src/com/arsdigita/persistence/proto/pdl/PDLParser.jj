@@ -13,12 +13,12 @@ import com.arsdigita.persistence.proto.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/03/11 $
+ * @version $Revision: #4 $ $Date: 2003/03/15 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDLParser.jj#3 $ by $Author: rhs $, $DateTime: 2003/03/11 16:05:41 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDLParser.jj#4 $ by $Author: rhs $, $DateTime: 2003/03/15 02:35:11 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -194,7 +194,8 @@ ObjectTypeNd object_type() :
        |
         <ADAPTER> n = javaClass() { ot.add(ObjectTypeNd.ADAPTER, n); }
        |
-        <RETURNS> <INT> <DOT> <DOT> ( id() | <INT> ) ) ]
+        <RETURNS> <INT> <DOT> <DOT> ( id() | <INT> )
+        { ot.setReturns(true); } ) ]
     <LBRACE>
         ( statement(ot) )*
     <RBRACE>

@@ -8,12 +8,12 @@ import java.util.*;
  * Select
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2003/02/28 $
+ * @version $Revision: #10 $ $Date: 2003/03/15 $
  **/
 
 class Select extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#9 $ by $Author: rhs $, $DateTime: 2003/02/28 19:58:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#10 $ by $Author: rhs $, $DateTime: 2003/03/15 02:35:11 $";
 
     private Join m_join;
     private Condition m_condition;
@@ -21,6 +21,8 @@ class Select extends Operation {
     private HashMap m_aliases = new HashMap();
     private ArrayList m_order = new ArrayList();
     private HashSet m_ascending = new HashSet();
+    private Integer m_offset = null;
+    private Integer m_limit = null;
 
     public Select(Join join, Condition condition) {
         this(join, condition, new Environment());
@@ -73,6 +75,22 @@ class Select extends Operation {
 
     public Collection getOrder() {
         return m_order;
+    }
+
+    public Integer getOffset() {
+        return m_offset;
+    }
+
+    public void setOffset(Integer offset) {
+        m_offset = offset;
+    }
+
+    public Integer getLimit() {
+        return m_limit;
+    }
+
+    public void setLimit(Integer limit) {
+        m_limit = limit;
     }
 
     void write(SQLWriter w) {

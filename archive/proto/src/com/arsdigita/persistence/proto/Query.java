@@ -8,17 +8,19 @@ import java.util.*;
  * Query
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/03/01 $
+ * @version $Revision: #9 $ $Date: 2003/03/15 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#8 $ by $Author: rhs $, $DateTime: 2003/03/01 02:23:27 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#9 $ by $Author: rhs $, $DateTime: 2003/03/15 02:35:11 $";
 
     private Signature m_signature;
     private Filter m_filter;
     private ArrayList m_order = new ArrayList();
     private HashSet m_ascending = new HashSet();
+    private Integer m_offset = null;
+    private Integer m_limit = null;
     private HashMap m_values;
 
     public Query(Signature signature, Filter filter) {
@@ -72,6 +74,22 @@ public class Query {
     public void clearOrder() {
         m_order.clear();
         m_ascending.clear();
+    }
+
+    public  Integer getOffset() {
+        return m_offset;
+    }
+
+    public void setOffset(Integer offset) {
+        m_offset = offset;
+    }
+
+    public Integer getLimit() {
+        return m_limit;
+    }
+
+    public void setLimit(Integer limit) {
+        m_limit = limit;
     }
 
     public void set(Parameter p, Object value) {

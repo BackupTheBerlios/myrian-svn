@@ -13,12 +13,12 @@ import java.io.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2003/03/14 $
+ * @version $Revision: #15 $ $Date: 2003/03/15 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#14 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#15 $ by $Author: rhs $, $DateTime: 2003/03/15 02:35:11 $";
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -206,6 +206,9 @@ class QGen {
                      Types.INTEGER);
             }
         }
+
+        result.setLimit(m_query.getLimit());
+        result.setOffset(m_query.getOffset());
 
         return result;
     }

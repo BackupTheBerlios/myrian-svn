@@ -18,12 +18,12 @@ import java.util.*;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2003/03/14 $
+ * @version $Revision: #12 $ $Date: 2003/03/15 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#11 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#12 $ by $Author: rhs $, $DateTime: 2003/03/15 02:35:11 $";
 
     private static final FilterFactory FACTORY = new FilterFactoryImpl();
 
@@ -32,6 +32,10 @@ class DataQueryImpl implements DataQuery {
     PersistentCollection m_pc;
     Cursor m_cursor = null;
     private CompoundFilter m_filter = getFilterFactory().and();
+
+    // This indicates the limits on the number of rows returned by the query
+    private int m_lowerBound = 0;
+    private int m_upperBound = Integer.MAX_VALUE;
 
     DataQueryImpl(Session ssn, PersistentCollection pc) {
         m_ssn = ssn;
@@ -66,7 +70,8 @@ class DataQueryImpl implements DataQuery {
 
 
     public boolean isBeforeFirst() {
-        throw new Error("not implemented");
+        checkCursor();
+        return m_cursor.isBeforeFirst();
     }
 
     public boolean isFirst() {
@@ -81,7 +86,8 @@ class DataQueryImpl implements DataQuery {
 
 
     public boolean isAfterLast() {
-        throw new Error("not implemented");
+        checkCursor();
+        return m_cursor.isAfterLast();
     }
 
 
@@ -270,11 +276,22 @@ class DataQueryImpl implements DataQuery {
 
 
     public void setRange(Integer beginIndex) {
-        throw new Error("not implemented");
+        setRange(beginIndex, null);
     }
 
     public void setRange(Integer beginIndex, Integer endIndex) {
-        throw new Error("not implemented");
+        if (endIndex != null && endIndex.compareTo(beginIndex) <= 0) {
+            throw new PersistenceException
+                ("The beginIndex [" + beginIndex + "] must be strictly less " +
+                 "than the endIndex [" + endIndex + "]");
+        }
+
+        m_pc.getDataSet().getQuery().setOffset
+            (new Integer(beginIndex.intValue() - 1));
+        if (endIndex != null) {
+            m_pc.getDataSet().getQuery().setLimit
+                (new Integer(endIndex.intValue() - beginIndex.intValue()));
+        }
     }
 
 
@@ -284,12 +301,16 @@ class DataQueryImpl implements DataQuery {
 
 
     public void setReturnsUpperBound(int upperBound) {
-        throw new Error("not implemented");
+        m_upperBound = upperBound;
     }
 
 
     public void setReturnsLowerBound(int lowerBound) {
-        throw new Error("not implemented");
+        if (lowerBound > 1 || lowerBound < 0) {
+            throw new PersistenceException
+                ("The lower bound for a given query must be 0 or 1.");
+        }
+        m_lowerBound = lowerBound;
     }
 
     public void alias(String fromPrefix, String toPrefix) {
@@ -340,7 +361,23 @@ class DataQueryImpl implements DataQuery {
 
     public boolean next() {
         checkCursor();
-        return m_cursor.next();
+        int pre = getPosition();
+        boolean result = m_cursor.next();
+        if (result) {
+            if (getPosition() == m_upperBound) {
+                if (m_cursor.next()) {
+                    throw new PersistenceException
+                        ("cursor exceeded upper bound");
+                }
+            }
+        } else {
+            if (pre < m_lowerBound) {
+                throw new PersistenceException
+                    ("cursor failed to meet lower bound");
+            }
+        }
+
+        return result;
     }
 
     public long size() {

@@ -4,12 +4,12 @@ package com.arsdigita.persistence.proto.pdl.nodes;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/02/26 $
+ * @version $Revision: #6 $ $Date: 2003/03/15 $
  **/
 
 public class ObjectTypeNd extends Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/ObjectTypeNd.java#5 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/ObjectTypeNd.java#6 $ by $Author: rhs $, $DateTime: 2003/03/15 02:35:11 $";
 
     public static final Field VERSIONED =
         new Field(ObjectTypeNd.class, "versioned", VersionedNd.class, 0, 1);
@@ -64,6 +64,16 @@ public class ObjectTypeNd extends Node {
 
     public ObjectKeyNd getObjectKey() {
         return (ObjectKeyNd) get(OBJECT_KEY);
+    }
+
+    private boolean m_returns = false;
+
+    public boolean hasReturns() {
+        return m_returns;
+    }
+
+    public void setReturns(boolean value) {
+        m_returns = value;
     }
 
 }

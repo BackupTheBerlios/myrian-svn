@@ -11,12 +11,12 @@ import java.sql.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/03/14 $
+ * @version $Revision: #8 $ $Date: 2003/03/15 $
  **/
 
 abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#7 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#8 $ by $Author: rhs $, $DateTime: 2003/03/15 02:35:11 $";
 
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();
@@ -237,6 +237,14 @@ class ANSIWriter extends SQLWriter {
             if (it.hasNext()) {
                 write(", ");
             }
+        }
+
+        if (select.getOffset() != null) {
+            write("\noffset " + select.getOffset());
+        }
+
+        if (select.getLimit() != null) {
+            write("\nlimit " + select.getLimit());
         }
     }
 
