@@ -17,7 +17,7 @@ package com.arsdigita.util;
 
 import java.io.*;
 import javax.servlet.ServletContext;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * Wrapper for getResourceAsStream, so we can get file-based resources
@@ -31,15 +31,15 @@ public class ResourceManager {
         "Must configure ResourceManager by calling setWebappRoot or "
         + "setServletContext before use.";
 
-    private static Category s_log = 
-        Category.getInstance(ResourceManager.class);
+    private static final Logger s_log = 
+        Logger.getLogger(ResourceManager.class);
 
     private static ResourceManager s_instance = new ResourceManager();
 	
     private File m_webappRoot;
     private ServletContext m_servletContext;
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/ResourceManager.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/ResourceManager.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
     /**
      * Empty constructor, which we make private to enforce the singleton

@@ -19,7 +19,7 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 
 import java.util.Map;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -40,7 +40,7 @@ import org.apache.log4j.Category;
  * </ul>
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/13 $
  * @since 4.5
  */
 // Synchronization in this class is primarily because close can be called via 
@@ -49,13 +49,13 @@ import org.apache.log4j.Category;
 // is closed out from underneath this connection.
 public class Connection implements java.sql.Connection {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Connection.java#2 $ $Author: dennis $ $Date: 2002/07/18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Connection.java#3 $ $Author: dennis $ $Date: 2002/08/13 $";
 
     // the connection object that we wrap
     private java.sql.Connection m_conn;	 
 	private BaseConnectionPool  m_pool;
 
-    private static Category s_cat = Category.getInstance(com.arsdigita.db.Connection.class.getName());
+    private static final Logger s_cat = Logger.getLogger(com.arsdigita.db.Connection.class.getName());
 
     private static final java.util.Set dbgConnections = new java.util.HashSet();
     private long dbgTimestamp;

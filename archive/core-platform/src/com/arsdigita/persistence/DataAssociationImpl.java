@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 // imports for deprecated DataAssociation 
 
@@ -49,15 +49,15 @@ import org.apache.log4j.Category;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/07/18 $
+ * @version $Revision: #8 $ $Date: 2002/08/13 $
  */
 
 class DataAssociationImpl extends DataCollectionImpl implements DataAssociation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#7 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#8 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private final static Category s_cat = 
-                    Category.getInstance(DataAssociationImpl.class.getName());
+    private static final Logger s_cat = 
+        Logger.getLogger(DataAssociationImpl.class);
 
 
     private Set m_toAdd = new HashSet();

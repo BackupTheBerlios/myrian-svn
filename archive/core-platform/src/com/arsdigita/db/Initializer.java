@@ -18,13 +18,13 @@ package com.arsdigita.db;
 import com.arsdigita.initializer.Configuration;
 import com.arsdigita.initializer.InitializationException;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 public class Initializer
     implements com.arsdigita.initializer.Initializer {
 
-    private static final Category s_log =
-         Category.getInstance(Initializer.class);
+    private static final Logger s_log =
+         Logger.getLogger(Initializer.class);
 
     // The next set of variables are used to hold a reference to the
     // type of database being used.
@@ -35,7 +35,7 @@ public class Initializer
 
     private Configuration m_conf = new Configuration();
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#5 $ by $Author: randyg $, $DateTime: 2002/08/12 07:48:16 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#6 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
     public Initializer() throws InitializationException {
         m_conf.initParameter("jdbcUrl", 

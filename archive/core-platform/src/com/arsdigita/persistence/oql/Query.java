@@ -6,21 +6,21 @@ import com.arsdigita.persistence.metadata.*;
 import java.util.*;
 import java.io.*;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * The Query class is an optimizing query generator that uses the metadata
  * specified in a PDL file to generate sql queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2002/08/06 $
+ * @version $Revision: #13 $ $Date: 2002/08/13 $
  **/
 
 public class Query extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#12 $ by $Author: randyg $, $DateTime: 2002/08/06 18:07:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#13 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static final Category s_log = Category.getInstance(Query.class);
+    private static final Logger s_log = Logger.getLogger(Query.class);
 
     private Set m_conditions = new HashSet();
     private Set m_selections = new HashSet();

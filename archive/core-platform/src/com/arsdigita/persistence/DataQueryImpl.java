@@ -54,7 +54,7 @@ import java.io.PrintWriter;
 import java.io.PrintStream;
 import java.io.ByteArrayOutputStream;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * The DataQueryImpl class encapsulates a free-form query against an object
@@ -63,7 +63,7 @@ import org.apache.log4j.Category;
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@arsdigita.com">randyg@arsdigita.com</a>
  * @author <a href="mailto:deison@arsdigita.com">deison@arsdigita.com</a>
- * @version $Revision: #7 $ $Date: 2002/08/06 $
+ * @version $Revision: #8 $ $Date: 2002/08/13 $
  */
 // NOTE if we ever support anything other than forward-only,
 // we'll need to shut off the auto-closing functionality
@@ -71,10 +71,10 @@ import org.apache.log4j.Category;
 // results and general confusion.
 class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#7 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#8 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private final static Category log =
-        Category.getInstance(DataQueryImpl.class.getName());
+    private static final Logger log =
+        Logger.getLogger(DataQueryImpl.class);
 
     protected CompoundType m_type;
     private Operation m_op;

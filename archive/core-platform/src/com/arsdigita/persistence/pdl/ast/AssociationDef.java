@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * This represents the "Association" block from a PDL file.  It is used to
@@ -37,14 +37,14 @@ import org.apache.log4j.Category;
  * additional properties and SQL Events.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/02 $
+ * @version $Revision: #6 $ $Date: 2002/08/13 $
  */
 
 public class AssociationDef extends Element {
 
-    private Category s_log = Category.getInstance(AssociationDef.class);
+    private static final Logger s_log = Logger.getLogger(AssociationDef.class);
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AssociationDef.java#5 $ by $Author: randyg $, $DateTime: 2002/08/02 09:15:46 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AssociationDef.java#6 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
     // the two PropertyDefs that define what Objects are being associated
     private PropertyDef m_one;

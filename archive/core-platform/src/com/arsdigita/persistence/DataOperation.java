@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.sql.SQLException;
 import com.arsdigita.db.CallableStatement;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -30,11 +31,11 @@ import com.arsdigita.db.CallableStatement;
  * 
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
  * @since 4.5
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#3 $
  */
 public class DataOperation extends AbstractDataOperation {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
     private Session m_session;
     private DataOperationType m_type;
@@ -43,8 +44,8 @@ public class DataOperation extends AbstractDataOperation {
     // This is used to hold the variables, in order, for a CallableStatement
     private ArrayList variables;
 
-    private static org.apache.log4j.Category s_cat = 
-        org.apache.log4j.Category.getInstance(DataOperation.class.getName());
+    private static final Logger s_cat = 
+        Logger.getLogger(DataOperation.class);
 
     /**
      * Creates a new data operation to run within a particular session.

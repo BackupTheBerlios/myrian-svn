@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Iterator;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -37,15 +37,15 @@ import org.apache.log4j.Category;
  * operations.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#5 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#6 $
  * @since 4.6.3 */
 
 final class PostgresDDLGenerator extends BaseDDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#5 $ by $Author: randyg $, $DateTime: 2002/07/30 10:05:06 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#6 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static Category s_log = 
-        Category.getInstance(PostgresDDLGenerator.class);
+    private static final Logger s_log = 
+        Logger.getLogger(PostgresDDLGenerator.class);
 
     private static final int MAX_COLUMN_NAME_LEN = 26;
 

@@ -12,20 +12,20 @@ import java.util.HashMap;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.ArrayList;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * Node
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2002/08/06 $
+ * @version $Revision: #11 $ $Date: 2002/08/13 $
  **/
 
 abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#10 $ by $Author: randyg $, $DateTime: 2002/08/06 18:07:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#11 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static final Category s_log = Category.getInstance(Node.class);
+    private static final Logger s_log = Logger.getLogger(Node.class);
 
     private Node m_parent;
     private ObjectType m_type;

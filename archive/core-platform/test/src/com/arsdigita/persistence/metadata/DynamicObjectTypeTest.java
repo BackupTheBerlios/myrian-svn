@@ -27,21 +27,21 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Date;
 import java.math.BigDecimal;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * DynamicObjectTypeTest tests to make sure that the DynamicObjectType
  * class works as advertised.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/08/13 $
  */
 
 public class DynamicObjectTypeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/DynamicObjectTypeTest.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
-    private static Category s_log = 
-        Category.getInstance(DynamicObjectTypeTest.class.getName());
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/DynamicObjectTypeTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    private static Logger s_log = 
+        Logger.getLogger(DynamicObjectTypeTest.class.getName());
 
     private MetadataRoot m_root;
     private ArrayList m_tables = new ArrayList();

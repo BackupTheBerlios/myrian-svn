@@ -19,7 +19,7 @@ import java.sql.SQLException;
 
 import com.arsdigita.db.DatabaseConnectionPool;
 
-import org.apache.log4j.Category;	
+import org.apache.log4j.Logger;	
 
 import java.util.LinkedList;
 import java.util.List; 
@@ -29,16 +29,16 @@ import java.util.Collections;
  * Base connection pooling class
  *
  * @author Bob Donald (<a href="mailto:bdonald@arsdigita.com"></a>)
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#2 $ $DateTime: 2002/07/18 13:18:21 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#3 $ $DateTime: 2002/08/13 11:53:00 $
  * @since  
  * 
  */
 
 abstract public class BaseConnectionPool implements DatabaseConnectionPool {
 
-    private static final String versionId = "$Author: dennis $ - $Date: 2002/07/18 $ $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#2 $";
+    private static final String versionId = "$Author: dennis $ - $Date: 2002/08/13 $ $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#3 $";
 
-    private static Category cat = Category.getInstance(BaseConnectionPool.class.getName());	 
+    private static final Logger cat = Logger.getLogger(BaseConnectionPool.class.getName());	 
 
     List m_usedConnections = Collections.synchronizedList(new LinkedList());
     List m_availConnections = Collections.synchronizedList(new LinkedList());

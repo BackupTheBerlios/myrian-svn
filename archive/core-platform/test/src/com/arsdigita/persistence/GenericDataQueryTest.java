@@ -3,21 +3,21 @@ package com.arsdigita.persistence;
 import com.arsdigita.persistence.*;
 import com.arsdigita.db.Initializer;
 import com.arsdigita.persistence.metadata.*;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * GenericDataQueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/30 $
+ * @version $Revision: #4 $ $Date: 2002/08/13 $
  **/
 
 public class GenericDataQueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/GenericDataQueryTest.java#3 $ by $Author: randyg $, $DateTime: 2002/07/30 13:13:50 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/GenericDataQueryTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static final Category s_log =
-        Category.getInstance(GenericDataQueryTest.class);
+    private static final Logger s_log =
+        Logger.getLogger(GenericDataQueryTest.class);
 
     public GenericDataQueryTest(String name) {
         super(name);

@@ -21,21 +21,21 @@ import java.math.*;
 import java.util.*;
 import java.io.*;
 import junit.framework.TestSuite;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * PartyTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/25 $
+ * @version $Revision: #4 $ $Date: 2002/08/13 $
  */
 
 abstract public class PartyTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PartyTest.java#3 $ by $Author: randyg $, $DateTime: 2002/07/25 16:27:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PartyTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static Category s_log = 
-        Category.getInstance(PartyTest.class.getName());
+    private static Logger s_log = 
+        Logger.getLogger(PartyTest.class.getName());
 
     public PartyTest(String name) {
         super(name);

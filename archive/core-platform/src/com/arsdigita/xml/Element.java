@@ -17,7 +17,7 @@ package com.arsdigita.xml;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import com.arsdigita.util.UncheckedWrapperException;
 import java.util.Iterator;
 import org.w3c.dom.NamedNodeMap;
@@ -28,16 +28,16 @@ import org.w3c.dom.Attr;
  * <code>org.jdom.Element</code> using <code>org.w3c.dom.Element</code>.
  *
  * @author Patrick McNeill (pmcneill@arsdigita.com)
- * @version $Revision: #4 $ $Date: 2002/07/18 $
+ * @version $Revision: #5 $ $Date: 2002/08/13 $
  * @since ACS 4.5a
  */
 public class Element {
     public static final String versionId = 
-        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#4 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#5 $" +
         "$Author: dennis $" +
-        "$DateTime: 2002/07/18 13:18:21 $";
+        "$DateTime: 2002/08/13 11:53:00 $";
 
-    private static Category s_log = Category.getInstance
+    private static final Logger s_log = Logger.getLogger
         (Element.class.getName());
 
     protected org.w3c.dom.Element m_element;

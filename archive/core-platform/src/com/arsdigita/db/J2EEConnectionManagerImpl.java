@@ -19,22 +19,22 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * 
  *
  * @author David Dao (<a href="mailto:david@arsdigita.com"></a>)
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/13 $
  * @since 4.5
  * 
  */
 
 public class J2EEConnectionManagerImpl implements DatabaseConnectionPool {
 
-    public static final String versionId = "$Author: dennis $ - $Date: 2002/07/18 $ $Id: //core-platform/dev/src/com/arsdigita/db/J2EEConnectionManagerImpl.java#2 $";
+    public static final String versionId = "$Author: dennis $ - $Date: 2002/08/13 $ $Id: //core-platform/dev/src/com/arsdigita/db/J2EEConnectionManagerImpl.java#3 $";
 
-    private static Category cat = Category.getInstance(J2EEConnectionManagerImpl.class.getName());
+    private static final Logger cat = Logger.getLogger(J2EEConnectionManagerImpl.class.getName());
 
     private String defaultDataSource = "jdbc/db";
 

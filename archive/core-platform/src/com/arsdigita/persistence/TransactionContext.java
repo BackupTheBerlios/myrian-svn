@@ -20,7 +20,7 @@ import com.arsdigita.util.Assert;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -32,20 +32,20 @@ import org.apache.log4j.Category;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/13 $
  */
 
 public class TransactionContext implements com.arsdigita.db.ConnectionUseListener {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/TransactionContext.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/TransactionContext.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
     private String m_url, m_username, m_password;
     private boolean m_inTransaction = false;
 
     private ArrayList m_listeners;
 
-    private static Category s_cat = 
-        Category.getInstance(TransactionContext.class);
+    private static final Logger s_cat = 
+        Logger.getLogger(TransactionContext.class);
 
     /**
      * Flags whether aggressive closing will be used to return

@@ -27,21 +27,21 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * LobTest - for testing Blob and Clob datatype.
  *
  * @author Jeff Teeters (teeters@arsdigita.com)
- * @version $Revision: #3 $ $Date: 2002/07/30 $
+ * @version $Revision: #4 $ $Date: 2002/08/13 $
  */
 
 public class LobTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LobTest.java#3 $ by $Author: randyg $, $DateTime: 2002/07/30 18:09:09 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LobTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
     private Category s_cat = 
-        Category.getInstance(LobTest.class);
+        Logger.getLogger(LobTest.class);
 
     private Session m_session;
     private TransactionContext m_txn;

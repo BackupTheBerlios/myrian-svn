@@ -1,21 +1,21 @@
 package com.arsdigita.persistence;
 
 import java.math.*;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * RefetchTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/07/30 $
+ * @version $Revision: #5 $ $Date: 2002/08/13 $
  **/
 
 public class RefetchTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/RefetchTest.java#4 $ by $Author: randyg $, $DateTime: 2002/07/30 11:44:16 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/RefetchTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static final Category s_log =
-        Category.getInstance(RefetchTest.class);
+    private static final Logger s_log =
+        Logger.getLogger(RefetchTest.class);
 
     private static final BigInteger NODE_ID = BigInteger.ZERO;
     private static final String NODE_NAME = "Node Name";

@@ -28,7 +28,7 @@ import java.sql.ResultSet;
 import com.arsdigita.persistence.metadata.Utilities;
 import com.arsdigita.db.ConnectionManager;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * DataQueryImplTest
@@ -38,14 +38,14 @@ import org.apache.log4j.Category;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/07/25 $
+ * @version $Revision: #5 $ $Date: 2002/08/13 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#4 $ by $Author: randyg $, $DateTime: 2002/07/25 16:42:22 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static Category s_log = 
-        Category.getInstance(DataQueryImplTest.class.getName());
+    private static Logger s_log = 
+        Logger.getLogger(DataQueryImplTest.class.getName());
 
     private static final int NUM_WRITE_ACTIONS = 5;
     public DataQueryImplTest(String name) {

@@ -21,18 +21,18 @@ import java.math.*;
 import java.util.*;
 import java.io.*;
 import junit.framework.TestSuite;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * LinkAttributeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/08/01 $
+ * @version $Revision: #3 $ $Date: 2002/08/13 $
  */
 
 public class DynamicLinkAttributeTest extends LinkAttributeTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DynamicLinkAttributeTest.java#2 $ by $Author: randyg $, $DateTime: 2002/08/01 11:16:42 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DynamicLinkAttributeTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
     public DynamicLinkAttributeTest(String name) {
         super(name);

@@ -18,7 +18,7 @@ package com.arsdigita.db;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * the Sequence class provides functionality akin to Oracle sequences,
@@ -36,10 +36,10 @@ import org.apache.log4j.Category;
 
 public class Sequences {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Sequences.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Sequences.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static Category s_log = 
-        Category.getInstance(Sequences.class);
+    private static final Logger s_log = 
+        Logger.getLogger(Sequences.class);
 
     private static String implName =
     "com.arsdigita.db.oracle.OracleSequenceImpl";

@@ -24,21 +24,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Collection;
 import java.util.Arrays;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * SQLBlockDef
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/07/26 $
+ * @version $Revision: #5 $ $Date: 2002/08/13 $
  */
 
 public class SQLBlockDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/SQLBlockDef.java#4 $ by $Author: randyg $, $DateTime: 2002/07/26 15:40:17 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/SQLBlockDef.java#5 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static Category s_log = 
-        Category.getInstance(SQLBlockDef.class);
+    private static final Logger s_log = 
+        Logger.getLogger(SQLBlockDef.class);
 
     private String m_sql;
     private List m_mapStmts = new ArrayList();

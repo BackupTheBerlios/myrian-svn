@@ -25,7 +25,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * A wrapper class that implements some functionality of 
@@ -36,10 +36,10 @@ import org.apache.log4j.Category;
  * @since ACS 4.5a
  */
 public class Document {
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/xml/Document.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/xml/Document.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static Category s_log = 
-        Category.getInstance(Document.class.getName());
+    private static final Logger s_log = 
+        Logger.getLogger(Document.class.getName());
     
     /**
      * this is the identity XSL stylesheet.  We need to provide the

@@ -17,20 +17,20 @@ package com.arsdigita.persistence;
 
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
 import junit.framework.*;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * PersistenceWrapper
  *
  * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/13 $
  */
 public class PersistenceWrapper extends BaseTestSetup {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceWrapper.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceWrapper.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static Category s_log = 
-        Category.getInstance(PersistenceWrapper.class.getName());
+    private static Logger s_log = 
+        Logger.getLogger(PersistenceWrapper.class.getName());
 
     public PersistenceWrapper(TestSuite suite) {
         super(suite);

@@ -22,7 +22,7 @@ import com.arsdigita.bebop.Page;
 import com.arsdigita.bebop.Label;
 import com.arsdigita.bebop.event.PrintListener;
 import com.arsdigita.bebop.event.PrintEvent;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * This page checks to make sure that the database is still working 
@@ -34,14 +34,14 @@ import org.apache.log4j.Category;
  * and look at the output
  *
  * @author Randy Graebner (randyg@alum.mit.edu)
- * @version $Revision: #2 $, $Date: 2002/07/18 $
+ * @version $Revision: #3 $, $Date: 2002/08/13 $
  */
 public class DBTestPage extends Page {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/DBTestPage.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/DBTestPage.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static Category s_log =
-        Category.getInstance(DBTestPage.class);
+    private static final Logger s_log =
+        Logger.getLogger(DBTestPage.class);
     
     /** 
      *  This creates a new page with the correct label and print listener

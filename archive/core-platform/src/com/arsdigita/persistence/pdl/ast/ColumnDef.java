@@ -21,7 +21,7 @@ import com.arsdigita.persistence.metadata.Column;
 import com.arsdigita.persistence.Utilities;
 
 import java.sql.Types;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -31,15 +31,15 @@ import java.io.StringWriter;
  * data type.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #5 $ $Date: 2002/08/06 $
+ * @version $Revision: #6 $ $Date: 2002/08/13 $
  */
 public class ColumnDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ColumnDef.java#5 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ColumnDef.java#6 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
     private static int count = 0;
-    private static final Category s_log =
-        Category.getInstance(ColumnDef.class.getName());
+    private static final Logger s_log =
+        Logger.getLogger(ColumnDef.class.getName());
 
     // the name of the column
     private String m_column;

@@ -19,21 +19,21 @@ import com.arsdigita.persistence.metadata.MetadataRoot;
 import junit.framework.TestCase;
 import java.util.*;
 import java.io.*;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * PDLTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/08/13 $
  */
 
 public class PDLTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/pdl/PDLTest.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/pdl/PDLTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static Category s_log = 
-        Category.getInstance(PDLTest.class.getName());
+    private static Logger s_log = 
+        Logger.getLogger(PDLTest.class.getName());
 
     static final String PDL_FILE_ROOT_DIR = "com/arsdigita/persistence/pdl/";
     // This is a comma delimited format containing the names of bad PDL test files,

@@ -6,7 +6,7 @@ import com.arsdigita.persistence.metadata.Column;
 import com.arsdigita.persistence.metadata.JoinElement;
 import com.arsdigita.persistence.metadata.ObjectType;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import java.util.Iterator;
 
 /**
@@ -17,15 +17,15 @@ import java.util.Iterator;
  * (link attriubtes of type Integer, String, etc).
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/08/06 $
+ * @version $Revision: #2 $ $Date: 2002/08/13 $
  **/
 
 class CompoundLinkSelection extends Selection {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/CompoundLinkSelection.java#1 $ by $Author: randyg $, $DateTime: 2002/08/06 18:07:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/CompoundLinkSelection.java#2 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static final Category s_log =
-        Category.getInstance(CompoundLinkSelection.class);
+    private static final Logger s_log =
+        Logger.getLogger(CompoundLinkSelection.class);
 
     private String m_path[];
 

@@ -18,7 +18,7 @@ package com.arsdigita.persistence.metadata;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import java.io.PrintStream;
 import java.io.StringWriter;
 import java.io.PrintWriter;
@@ -29,15 +29,15 @@ import java.io.ByteArrayOutputStream;
  * all metadata classes.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/06 $
+ * @version $Revision: #6 $ $Date: 2002/08/13 $
  */
 
 abstract public class Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Element.java#5 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Element.java#6 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static final Category s_log =
-        Category.getInstance(Element.class.getName());
+    private static final Logger s_log =
+        Logger.getLogger(Element.class.getName());
 
     /**
      * This is for backwards compatibility.

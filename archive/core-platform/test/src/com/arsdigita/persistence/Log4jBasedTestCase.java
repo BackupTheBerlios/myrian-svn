@@ -32,7 +32,7 @@ import junit.extensions.*;
 import junit.framework.*;
 
 import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 import org.apache.log4j.TTCCLayout;
 import org.apache.log4j.WriterAppender;
@@ -67,7 +67,7 @@ import org.apache.log4j.varia.StringMatchFilter;
  */
 public class Log4jBasedTestCase extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/Log4jBasedTestCase.java#2 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/Log4jBasedTestCase.java#3 $";
 
     /**
      * The log object.  Should be modified

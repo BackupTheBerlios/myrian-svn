@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * A interface that defines an API to automatically generate SQL queries based
@@ -37,15 +37,15 @@ import org.apache.log4j.Category;
  * type combination ( @see ObjectEvent ).
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresMDSQLGenerator.java#4 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresMDSQLGenerator.java#5 $
  * @since 4.6.3
  */
 
 class PostgresMDSQLGenerator extends BaseMDSQLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresMDSQLGenerator.java#4 $ by $Author: rhs $, $DateTime: 2002/07/19 16:18:07 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresMDSQLGenerator.java#5 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static Category s_log = 
-        Category.getInstance(PostgresMDSQLGenerator.class);
+    private static final Logger s_log = 
+        Logger.getLogger(PostgresMDSQLGenerator.class);
 
 }

@@ -26,21 +26,21 @@ import java.sql.PreparedStatement;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * Class for processing of DB Exceptions.
  * Should be subclassed with database-specific initialization.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #2 $
+ * @version $Revision: #3 $
  * @since 4.6
  */
 public abstract class DbExceptionHandlerBaseImpl implements DbExceptionHandler {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DbExceptionHandlerBaseImpl.java#2 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DbExceptionHandlerBaseImpl.java#3 $";
 
-    private static final Category s_cat = Category.getInstance(DbExceptionHandlerBaseImpl.class.getName());
+    private static final Logger s_cat = Logger.getLogger(DbExceptionHandlerBaseImpl.class.getName());
 
     /**
      * This hashmap should contain strings identifying the error, and

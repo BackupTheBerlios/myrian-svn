@@ -14,13 +14,13 @@ import org.apache.log4j.*;
  * DataObjectManipulator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/13 $
  */
 public class DataObjectManipulator {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataObjectManipulator.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
-    private static final Category s_log =
-        Category.getInstance(DataObjectManipulator.class.getName());
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataObjectManipulator.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    private static final Logger s_log =
+        Logger.getLogger(DataObjectManipulator.class.getName());
     static  {
         s_log.setPriority(Priority.DEBUG);
     }

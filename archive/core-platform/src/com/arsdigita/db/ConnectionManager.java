@@ -16,21 +16,21 @@
 package com.arsdigita.db;
 
 import java.sql.SQLException;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * 
  * Central location for obtaining database connection.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/13 $
  * @since 4.5
  * 
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: dennis $ - $Date: 2002/07/18 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#2 $";
+    public static final String versionId = "$Author: dennis $ - $Date: 2002/08/13 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#3 $";
 
     private static DatabaseConnectionPool s_pool = null;
     private static String s_poolName = 
@@ -50,7 +50,7 @@ public class ConnectionManager {
 
     private static ThreadLocal s_currentThreadConnection = new ThreadLocal();
 
-    private static Category cat = Category.getInstance(com.arsdigita.db.ConnectionManager.class.getName());
+    private static final Logger cat = Logger.getLogger(com.arsdigita.db.ConnectionManager.class.getName());
 
     static void setDefaultConnectionInfo(String url,
                                          String username,

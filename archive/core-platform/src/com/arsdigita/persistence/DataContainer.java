@@ -20,7 +20,7 @@ import com.arsdigita.persistence.metadata.CompoundType;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.metadata.Property;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import java.util.Iterator;
 import java.util.HashMap;
@@ -37,15 +37,15 @@ import java.util.Set;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/08/13 $
  */
 
 public class DataContainer {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataContainer.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataContainer.java#4 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static final Category s_log =
-         Category.getInstance(DataContainer.class.getName());
+    private static final Logger s_log =
+         Logger.getLogger(DataContainer.class.getName());
 
     // The type of the data contained in this data container.
     private CompoundType m_type;

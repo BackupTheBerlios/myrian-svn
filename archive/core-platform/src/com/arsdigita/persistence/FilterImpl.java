@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.lang.StringBuffer;
 import java.io.StringReader;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -30,15 +31,15 @@ import java.io.StringReader;
  * be combined and manipulated to create complex queries.  
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/13 $
  */
 
 class FilterImpl implements Filter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterImpl.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterImpl.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static org.apache.log4j.Category m_log = 
-        org.apache.log4j.Category.getInstance(Filter.class.getName());
+    private static final Logger m_log = 
+        Logger.getLogger(Filter.class.getName());
 
     private String m_conditions;
     private Map m_bindings = new HashMap();

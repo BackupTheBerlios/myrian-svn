@@ -28,16 +28,16 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.math.BigDecimal;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/13 $
  */
 
 public class DynamicAssociationTest extends PersistenceTestCase {
-    private static Category s_log = 
-        Category.getInstance(DynamicAssociationTest.class.getName());
+    private static Logger s_log = 
+        Logger.getLogger(DynamicAssociationTest.class.getName());
 
     private MetadataRoot m_root = MetadataRoot.getMetadataRoot();
     private List m_tables = new ArrayList();

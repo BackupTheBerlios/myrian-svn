@@ -20,22 +20,22 @@ import com.arsdigita.db.SQLExceptionHandler;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * Connection pooling class for PosgreSQL databases.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresConnectionPoolImpl.java#3 $ $DateTime: 2002/07/18 13:18:21 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresConnectionPoolImpl.java#4 $ $DateTime: 2002/08/13 11:53:00 $
  * @since 4.5
  * 
  */
 
 public class PostgresConnectionPoolImpl extends BaseConnectionPool {
 
-    public static final String versionId = "$Author: dennis $ - $Date: 2002/07/18 $ $Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresConnectionPoolImpl.java#3 $";
+    public static final String versionId = "$Author: dennis $ - $Date: 2002/08/13 $ $Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresConnectionPoolImpl.java#4 $";
 
-    private static final Category s_log = Category.getInstance(PostgresConnectionPoolImpl.class.getName());
+    private static final Logger s_log = Logger.getLogger(PostgresConnectionPoolImpl.class.getName());
 
     public void setConnectionInfo(String url, String username,
                                   String password) throws SQLException {

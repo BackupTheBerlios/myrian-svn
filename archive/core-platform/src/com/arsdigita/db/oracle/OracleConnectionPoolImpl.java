@@ -23,24 +23,24 @@ import java.sql.SQLException;
 
 import oracle.jdbc.pool.OracleDataSource;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * Connection pooling class using Oracle implementation.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#3 $ $DateTime: 2002/07/18 13:18:21 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#4 $ $DateTime: 2002/08/13 11:53:00 $
  * @since  
  * 
  */
 
 public class OracleConnectionPoolImpl extends BaseConnectionPool {
 
-    private static final String versionId = "$Author: dennis $ - $Date: 2002/07/18 $ $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#3 $";
+    private static final String versionId = "$Author: dennis $ - $Date: 2002/08/13 $ $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#4 $";
 
     private static OracleDataSource ods = null;
 
-    private static Category cat = Category.getInstance(OracleConnectionPoolImpl.class.getName());
+    private static final Logger cat = Logger.getLogger(OracleConnectionPoolImpl.class.getName());
 
     private static boolean s_useFixFor901 = false;
 

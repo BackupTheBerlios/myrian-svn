@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
+import org.apache.log4j.Logger;
 
 /**
  * An OID represents a unique object ID. An OID is composed of an
@@ -52,10 +53,10 @@ import java.util.StringTokenizer;
  * Copyright (c) 2001, ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $ */
+ * @version $Revision: #4 $ $Date: 2002/08/13 $ */
 
 public class OID {
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OID.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OID.java#4 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
     private ObjectType m_type;
     private Map m_values = new HashMap();
@@ -68,8 +69,8 @@ public class OID {
     /** 
      *  used to log errors
      */
-    private static org.apache.log4j.Category m_log = 
-        org.apache.log4j.Category.getInstance(OID.class.getName());
+    private static final Logger m_log = 
+        Logger.getLogger(OID.class);
 
 
     /**

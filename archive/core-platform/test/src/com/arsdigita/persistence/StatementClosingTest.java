@@ -31,7 +31,7 @@ import junit.extensions.*;
 import junit.framework.*;
 
 import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 import org.apache.log4j.TTCCLayout;
 import org.apache.log4j.WriterAppender;
@@ -47,7 +47,7 @@ import org.apache.log4j.varia.StringMatchFilter;
  */
 public class StatementClosingTest extends Log4jBasedTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/StatementClosingTest.java#2 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/StatementClosingTest.java#3 $";
 
     private Session ssn;
 

@@ -30,7 +30,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Map;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * A simple implementation of the java.sql.ResultSet interface that
@@ -42,14 +42,14 @@ import org.apache.log4j.Category;
  * </ul>
  * 
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/13 $
  * @since 4.5
  */
 public class ResultSet implements java.sql.ResultSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/ResultSet.java#2 $ $Author: dennis $ $Date: 2002/07/18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/ResultSet.java#3 $ $Author: dennis $ $Date: 2002/08/13 $";
 
-    private static Category s_cat = Category.getInstance(com.arsdigita.db.ResultSet.class.getName());
+    private static final Logger s_cat = Logger.getLogger(com.arsdigita.db.ResultSet.class.getName());
 
     private static final java.util.Set dbgResultSets = new java.util.HashSet();
 

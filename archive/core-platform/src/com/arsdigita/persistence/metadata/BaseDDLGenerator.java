@@ -29,7 +29,7 @@ import java.util.Collection;
 import java.sql.Types;
 import java.sql.DatabaseMetaData;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * This class provides an implementationthat automatically generates DDL
@@ -38,15 +38,15 @@ import org.apache.log4j.Category;
  * {@link com.arsdigita.persistence.metadata.DynamicObjectType}.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#4 $
  * @since 4.6.3 */
 
 abstract class BaseDDLGenerator implements DDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#3 $ by $Author: randyg $, $DateTime: 2002/07/30 10:05:06 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#4 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static final Category s_log =
-        Category.getInstance(BaseDDLGenerator.class);
+    private static final Logger s_log =
+        Logger.getLogger(BaseDDLGenerator.class);
     
     // this is used to keep track of which tables have been
     // returned.  This helps avoid duplicate tables between

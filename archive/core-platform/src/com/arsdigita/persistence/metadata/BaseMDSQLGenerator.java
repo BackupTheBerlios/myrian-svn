@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * A class that provides an API to automatically generate SQL queries based
@@ -47,15 +47,15 @@ import org.apache.log4j.Category;
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#9 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#10 $
  * @since 4.6.3
  */
 abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#9 $ by $Author: randyg $, $DateTime: 2002/08/06 18:07:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#10 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static final Category s_log =
-        Category.getInstance(BaseMDSQLGenerator.class);
+    private static final Logger s_log =
+        Logger.getLogger(BaseMDSQLGenerator.class);
 
 
     //////////////////////////////////////////////////////////////

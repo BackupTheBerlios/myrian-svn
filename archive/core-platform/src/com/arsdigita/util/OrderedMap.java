@@ -19,7 +19,7 @@ import java.util.TreeMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Comparator;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * An implementation of Map which preserves the order in which you put
@@ -29,11 +29,11 @@ import org.apache.log4j.Category;
  */
 public class OrderedMap extends TreeMap {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/OrderedMap.java#2 $" +
-        "$Author: justin $" +
-        "$DateTime: 2002/08/01 17:18:12 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/OrderedMap.java#3 $" +
+        "$Author: dennis $" +
+        "$DateTime: 2002/08/13 11:53:00 $";
 
-    private static Category s_log = Category.getInstance
+    private static final Logger s_log = Logger.getLogger
         (OrderedMap.class.getName());
 
     private OrderedComparator m_comparator;

@@ -17,21 +17,21 @@ package com.arsdigita.persistence;
 
 import java.math.*;
 import java.util.Arrays;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * LinkTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/13 $
  **/
 
 public class LinkTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LinkTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LinkTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static Category s_log = 
-        Category.getInstance(LinkTest.class.getName());
+    private static Logger s_log = 
+        Logger.getLogger(LinkTest.class.getName());
 
     public LinkTest(String name) {
         super(name);

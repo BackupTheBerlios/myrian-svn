@@ -19,7 +19,7 @@ import java.util.*;
 import java.io.*;
 import java.sql.*;
 import java.math.*;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import com.arsdigita.db.Initializer;
 
 /**
@@ -27,14 +27,14 @@ import com.arsdigita.db.Initializer;
  * metadata system.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/08 $
+ * @version $Revision: #7 $ $Date: 2002/08/13 $
  **/
 
 public class MetadataRoot extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#6 $ by $Author: randyg $, $DateTime: 2002/08/08 17:08:35 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#7 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static final Category s_cat = Category.getInstance(MetadataRoot.class.getName());
+    private static final Logger s_cat = Logger.getLogger(MetadataRoot.class.getName());
 
     /**
      * The MetadataRoot instance for this JVM.

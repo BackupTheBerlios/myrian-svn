@@ -16,7 +16,7 @@
 package com.arsdigita.persistence.metadata;
 
 import com.arsdigita.db.Initializer;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -24,15 +24,15 @@ import org.apache.log4j.Category;
  * returns it to calling classes.
  * 
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGeneratorFactory.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGeneratorFactory.java#4 $
  * @since 4.6.3
  */
 public class DDLGeneratorFactory {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGeneratorFactory.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGeneratorFactory.java#4 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static Category s_log = 
-        Category.getInstance(DDLGeneratorFactory.class);
+    private static final Logger s_log = 
+        Logger.getLogger(DDLGeneratorFactory.class);
 
     private static DDLGenerator s_generator = null;
 

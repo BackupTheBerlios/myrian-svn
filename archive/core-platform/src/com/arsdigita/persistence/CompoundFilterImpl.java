@@ -20,20 +20,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import com.arsdigita.util.Assert;
+import org.apache.log4j.Logger;
 
 /**
  * CompoundFilters are used to AND or OR multiple filters together. 
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/13 $
  */
 
 class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/CompoundFilterImpl.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/CompoundFilterImpl.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static org.apache.log4j.Category m_log = 
-      org.apache.log4j.Category.getInstance(CompoundFilterImpl.class.getName());
+    private static final Logger m_log = 
+      Logger.getLogger(CompoundFilterImpl.class);
 
     private String m_combineWith;
     private Collection m_filters = new ArrayList();

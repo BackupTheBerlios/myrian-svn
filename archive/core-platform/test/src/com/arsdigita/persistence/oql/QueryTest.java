@@ -5,7 +5,7 @@ import com.arsdigita.persistence.metadata.*;
 import com.arsdigita.persistence.metadata.Table;
 import com.arsdigita.db.Initializer;
 import com.arsdigita.util.StringUtils;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.*;
@@ -14,15 +14,15 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/08/09 $
+ * @version $Revision: #8 $ $Date: 2002/08/13 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#7 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#8 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static final Category s_log =
-        Category.getInstance(QueryTest.class);
+    private static final Logger s_log =
+        Logger.getLogger(QueryTest.class);
 
     public QueryTest(String name) {
         super(name);

@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Date;
 import java.sql.SQLException;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
   * 
@@ -36,7 +36,7 @@ import org.apache.log4j.Category;
  *  com.arsdigita.persistence.metadata.BaseDDLGenerator </p>
  *
  * @author <a href="mailto:jorris@arsdigita.com">jorris@arsdigita.com</a>
- * @version $Revision: #2 $ $Date: 2002/08/06 $
+ * @version $Revision: #3 $ $Date: 2002/08/13 $
  * 
  * @see com.arsdigita.persistence.metadatax.ObjectType
  */
@@ -44,10 +44,10 @@ import org.apache.log4j.Category;
 
 public class BaseDDLGeneratorTest extends PersistenceTestCase {  
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/BaseDDLGeneratorTest.java#2 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/BaseDDLGeneratorTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static Category s_log = 
-        Category.getInstance(BaseDDLGeneratorTest.class.getName());
+    private static Logger s_log = 
+        Logger.getLogger(BaseDDLGeneratorTest.class.getName());
 
     public BaseDDLGeneratorTest(String name) {
         super(name);

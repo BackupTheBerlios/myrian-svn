@@ -27,7 +27,7 @@ import com.arsdigita.util.Assert;
 import java.util.Iterator;
 import java.sql.ResultSet;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -65,16 +65,16 @@ import org.apache.log4j.Category;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/13 $
  */
 
 class DataAssociationCursorImpl extends DataCollectionImpl
       implements DataAssociationCursor {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private final static Category s_cat = 
-                     Category.getInstance(DataAssociationImpl.class.getName());
+    private static final Logger s_cat = 
+        Logger.getLogger(DataAssociationImpl.class);
 
     private GenericDataObject m_parent;
     private String m_role;

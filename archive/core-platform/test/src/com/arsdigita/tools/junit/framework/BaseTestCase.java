@@ -3,12 +3,12 @@ package com.arsdigita.tools.junit.framework;
 import junit.framework.*;
 import com.arsdigita.persistence.Session;
 import com.arsdigita.persistence.SessionManager;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 public abstract class BaseTestCase extends TestCase {
 
-    private static Category s_log = 
-        Category.getInstance(BaseTestCase.class.getName());
+    private static Logger s_log = 
+        Logger.getLogger(BaseTestCase.class.getName());
 
     /**
      * Constructs a test case with the given name.

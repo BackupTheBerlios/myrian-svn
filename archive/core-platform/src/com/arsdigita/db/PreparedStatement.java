@@ -33,22 +33,23 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * A simple implementation of the java.sql.CallableStatement interface
  * that wraps a "real" implementation of java.sql.CallableStatement
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/13 $
  * @since 4.5
  */
 public class PreparedStatement extends com.arsdigita.db.Statement
     implements java.sql.PreparedStatement {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/PreparedStatement.java#2 $ $Author: dennis $ $Date: 2002/07/18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/PreparedStatement.java#3 $ $Author: dennis $ $Date: 2002/08/13 $";
 
-    private Category s_cat = Category.getInstance(com.arsdigita.db.PreparedStatement.class.getName());
+    private static final Logger s_cat = 
+        Logger.getLogger(PreparedStatement.class);
 
     // the statement object that we wrap
     // is in the base class.  This will lead to a lot

@@ -33,7 +33,7 @@ import java.util.ArrayList;
 
 import java.lang.IllegalArgumentException;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -41,14 +41,14 @@ import org.apache.log4j.Category;
  * the SessionManager of them.
  *
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/08/13 $
  **/
 
 public class Initializer
     implements com.arsdigita.initializer.Initializer {
 
-    private static final Category s_log =
-         Category.getInstance(Initializer.class.getName());
+    private static final Logger s_log =
+         Logger.getLogger(Initializer.class.getName());
 
     private Configuration m_conf = new Configuration();
 

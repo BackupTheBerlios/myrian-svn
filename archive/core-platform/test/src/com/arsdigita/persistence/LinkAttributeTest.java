@@ -18,22 +18,22 @@ package com.arsdigita.persistence;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import com.arsdigita.domain.DataObjectNotFoundException;
 
 /**
  * LinkAttributeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/06 $
+ * @version $Revision: #7 $ $Date: 2002/08/13 $
  **/
 
 public abstract class LinkAttributeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LinkAttributeTest.java#6 $ by $Author: randyg $, $DateTime: 2002/08/06 18:07:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LinkAttributeTest.java#7 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static Category s_log = 
-        Category.getInstance(LinkAttributeTest.class.getName());
+    private static Logger s_log = 
+        Logger.getLogger(LinkAttributeTest.class.getName());
 
     public LinkAttributeTest(String name) {
         super(name);

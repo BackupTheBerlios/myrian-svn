@@ -53,7 +53,7 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.io.IOException;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * Title:       DataStore class
@@ -66,15 +66,15 @@ import org.apache.log4j.Category;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/08/06 $
+ * @version $Revision: #8 $ $Date: 2002/08/13 $
  */
 
 public class DataStore {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#7 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#8 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static final Category log =
-        Category.getInstance(DataStore.class.getName());
+    private static final Logger log =
+        Logger.getLogger(DataStore.class.getName());
 
     private TransactionContext m_txnCtx;
     //    private EventBuilder m_builder = new StaticEventBuilder();

@@ -24,7 +24,7 @@ import com.arsdigita.persistence.metadata.Mapping;
 import com.arsdigita.persistence.PersistenceException;
 import com.arsdigita.persistence.Utilities;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import java.util.Iterator;
 import java.io.PrintWriter;
@@ -36,19 +36,19 @@ import java.io.StringWriter;
  * association.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/07/26 $
+ * @version $Revision: #5 $ $Date: 2002/08/13 $
  */
 public class QueryDef extends NamedSQLDef {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/QueryDef.java#4 $ by $Author: randyg $, $DateTime: 2002/07/26 15:26:35 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/QueryDef.java#5 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
     // this determines if it is a "zero or one row ", "one row" query 
     // or a multi-row query
     private int m_lowerBound = 0;
     private int m_upperBound = Integer.MAX_VALUE;
     private static int count = 0;
-    private static final Category s_log =
-        Category.getInstance(QueryDef.class.getName());
+    private static final Logger s_log =
+        Logger.getLogger(QueryDef.class.getName());
 
     /**
      * Create a new QueryDef named "name"

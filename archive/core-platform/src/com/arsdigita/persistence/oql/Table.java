@@ -3,20 +3,20 @@ package com.arsdigita.persistence.oql;
 import com.arsdigita.util.*;
 import com.arsdigita.persistence.metadata.*;
 import java.util.*;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * Table
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/07/18 $
+ * @version $Revision: #7 $ $Date: 2002/08/13 $
  **/
 
 class Table {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Table.java#6 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Table.java#7 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static final Category s_log = Category.getInstance(Table.class);
+    private static final Logger s_log = Logger.getLogger(Table.class);
 
     private Node m_node;
     private String m_name;

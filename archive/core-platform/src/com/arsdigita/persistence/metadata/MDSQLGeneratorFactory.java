@@ -16,22 +16,22 @@
 package com.arsdigita.persistence.metadata;
 
 import com.arsdigita.db.Initializer;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * A factory class that instantiates a MDSQLGenerator implementation and then
  * returns it to calling classes.
  * 
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGeneratorFactory.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGeneratorFactory.java#4 $
  * @since 4.6.3
  */
 public class MDSQLGeneratorFactory {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGeneratorFactory.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGeneratorFactory.java#4 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static Category s_log = 
-        Category.getInstance(MDSQLGeneratorFactory.class);
+    private static final Logger s_log = 
+        Logger.getLogger(MDSQLGeneratorFactory.class);
 
     private static MDSQLGenerator s_generator = null;
 

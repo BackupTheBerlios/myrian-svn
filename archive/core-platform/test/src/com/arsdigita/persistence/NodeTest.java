@@ -19,21 +19,21 @@ import com.arsdigita.persistence.pdl.*;
 import java.sql.*;
 import java.math.*;
 import java.util.*;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 /**
  * NodeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/13 $
  */
 
 public abstract class NodeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/NodeTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/NodeTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private static Category s_log = 
-        Category.getInstance(NodeTest.class.getName());
+    private static Logger s_log = 
+        Logger.getLogger(NodeTest.class.getName());
 
     public NodeTest(String name) {
         super(name);

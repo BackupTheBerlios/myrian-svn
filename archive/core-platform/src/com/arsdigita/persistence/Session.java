@@ -27,7 +27,7 @@ import java.util.Stack;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import java.lang.ref.WeakReference;
 
@@ -42,15 +42,15 @@ import java.lang.ref.WeakReference;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/07/18 $ 
+ * @version $Revision: #5 $ $Date: 2002/08/13 $ 
  * @see com.arsdigita.persistence.SessionManager
  */
 public class Session {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/Session.java#4 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/Session.java#5 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
 
-    private final static Category s_cat = 
-                              Category.getInstance(Session.class.getName());
+    private static final Logger s_cat = 
+        Logger.getLogger(Session.class);
 
     private MetadataRoot m_root; // for qualified type name lookup
     private DataStore m_dataStore;
