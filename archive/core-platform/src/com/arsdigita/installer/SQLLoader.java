@@ -1,7 +1,10 @@
 package com.arsdigita.installer;
 
+import com.arsdigita.util.Assert;
 import com.arsdigita.util.UncheckedWrapperException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -12,12 +15,12 @@ import org.apache.log4j.Logger;
  * SQLLoader
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/02/04 $
+ * @version $Revision: #5 $ $Date: 2004/02/19 $
  **/
 
 public abstract class SQLLoader {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/SQLLoader.java#4 $ by $Author: ashah $, $DateTime: 2004/02/04 16:34:44 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/SQLLoader.java#5 $ by $Author: justin $, $DateTime: 2004/02/19 12:27:41 $";
 
     private static final Logger s_log = Logger.getLogger(SQLLoader.class);
 
@@ -28,6 +31,27 @@ public abstract class SQLLoader {
     }
 
     protected abstract Reader open(String name);
+
+    public static void load(final Connection conn,
+                            final String script) {
+        if (conn == null) throw new IllegalArgumentException();
+        if (script == null) throw new IllegalArgumentException();
+
+        final SQLLoader loader = new SQLLoader(conn) {
+                protected final Reader open(final String name) {
+                    final ClassLoader cload = getClass().getClassLoader();
+                    final InputStream is = cload.getResourceAsStream(name);
+
+                    if (is == null) {
+                        return null;
+                    } else {
+                        return new InputStreamReader(is);
+                    }
+                }
+            };
+
+        loader.load(script);
+    }
 
     public void load(String name) {
         try {
