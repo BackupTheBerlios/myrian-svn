@@ -19,12 +19,12 @@ package com.arsdigita.persistence;
  * DataEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/05/12 $
+ * @version $Revision: #5 $ $Date: 2003/05/27 $
  **/
 
 abstract class DataEvent {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataEvent.java#4 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataEvent.java#5 $ by $Author: rhs $, $DateTime: 2003/05/27 13:17:44 $";
 
     DataObjectImpl m_object;
 
@@ -32,7 +32,14 @@ abstract class DataEvent {
         m_object = object;
     }
 
-    protected abstract void invoke(DataObserver observer);
+    void invoke(DataObserver observer) {
+        if (DataObjectImpl.s_log.isDebugEnabled()) {
+            DataObjectImpl.s_log.debug(this);
+        }
+        doInvoke(observer);
+    }
+
+    abstract void doInvoke(DataObserver observer);
 
     abstract String getName();
 
@@ -68,7 +75,7 @@ class SetEvent extends PropertyEvent {
         m_new = newValue;
     }
 
-    protected void invoke(DataObserver observer) {
+    void doInvoke(DataObserver observer) {
         observer.set(m_object, m_property, m_old, m_new);
     }
 
@@ -85,7 +92,7 @@ class AddEvent extends PropertyEvent {
         m_value = value;
     }
 
-    protected void invoke(DataObserver observer) {
+    void doInvoke(DataObserver observer) {
         observer.add(m_object, m_property, m_value);
     }
 
@@ -102,7 +109,7 @@ class RemoveEvent extends PropertyEvent {
         m_value = value;
     }
 
-    protected void invoke(DataObserver observer) {
+    void doInvoke(DataObserver observer) {
         observer.remove(m_object, m_property, m_value);
     }
 
@@ -115,7 +122,7 @@ class ClearEvent extends PropertyEvent {
         super(object, property);
     }
 
-    protected void invoke(DataObserver observer) {
+    void doInvoke(DataObserver observer) {
         observer.clear(m_object, m_property);
     }
 
@@ -157,8 +164,10 @@ class BeforeSaveEvent extends ObjectDataEvent implements BeforeEvent {
 
     public Class getAfter() { return AfterSaveEvent.class; }
 
-    protected void invoke(DataObserver observer) {
-        observer.beforeSave(m_object);
+    void doInvoke(DataObserver observer) {
+        if (!m_object.isDeleted()) {
+            observer.beforeSave(m_object);
+        }
     }
 
     String getName() { return " before save"; }
@@ -172,8 +181,10 @@ class AfterSaveEvent extends ObjectDataEvent implements AfterEvent {
 
     public Class getBefore() { return BeforeSaveEvent.class; }
 
-    protected void invoke(DataObserver observer) {
-        observer.afterSave(m_object);
+    void doInvoke(DataObserver observer) {
+        if (!m_object.isDeleted()) {
+            observer.afterSave(m_object);
+        }
     }
 
     String getName() { return " after save"; }
@@ -187,7 +198,7 @@ class BeforeDeleteEvent extends ObjectDataEvent implements BeforeEvent {
 
     public Class getAfter() { return AfterDeleteEvent.class; }
 
-    protected void invoke(DataObserver observer) {
+    void doInvoke(DataObserver observer) {
         observer.beforeDelete(m_object);
     }
 
@@ -202,7 +213,7 @@ class AfterDeleteEvent extends ObjectDataEvent implements AfterEvent {
 
     public Class getBefore() { return BeforeDeleteEvent.class; }
 
-    protected void invoke(DataObserver observer) {
+    void doInvoke(DataObserver observer) {
         observer.afterDelete(m_object);
     }
 

@@ -11,14 +11,14 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/05/15 $
+ * @version $Revision: #3 $ $Date: 2003/05/27 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#2 $ by $Author: ashah $, $DateTime: 2003/05/15 11:17:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#3 $ by $Author: rhs $, $DateTime: 2003/05/27 13:17:44 $";
 
-    private final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
+    final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
     private Session m_ssn;
     private OID m_oid;
@@ -394,7 +394,6 @@ class DataObjectImpl implements DataObject {
 
                 entry.setFiring(event);
 
-                if (s_log.isDebugEnabled()) { s_log.debug(event.toString()); }
                 event.invoke(observer);
 
                 DataEvent waiting = entry.clearFiring(event);
