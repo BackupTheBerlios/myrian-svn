@@ -173,7 +173,7 @@ public class PersistenceManagerFactoryImpl
 
     public Properties getProperties() {
         Properties p = new Properties();
-        p.setProperty("VendorName", "XXX");
+        p.setProperty("VendorName", "myrian");
         p.setProperty("VersionNumber", "XXX");
 
         return p;

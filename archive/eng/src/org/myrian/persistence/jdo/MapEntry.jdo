@@ -5,7 +5,7 @@
 <jdo>
   <package name="org.myrian.persistence.jdo">
     <class name="MapEntry" identity-type="datastore">
-      <extension vendor-name="redhat" key="metadata" value="PDL"/>
+      <extension vendor-name="myrian" key="metadata" value="PDL"/>
       <field name="key"       persistence-modifier="persistent"/>
       <field name="value"     persistence-modifier="persistent"/>
     </class>

@@ -13,7 +13,7 @@
     <class name="Address" identity-type="datastore"/>
 
     <class name="Rolodex" identity-type="datastore">
-      <extension vendor-name="redhat" key="metadata" value="PDL"/>
+      <extension vendor-name="myrian" key="metadata" value="PDL"/>
       <field name="m_contacts">
         <collection element-type="Contact" embedded-element="true"/>
       </field>
@@ -24,7 +24,7 @@
 
     <class name="Party" identity-type="datastore">
       <field name="id">
-        <extension vendor-name="redhat" key="primary-key" value="true"/>
+        <extension vendor-name="myrian" key="primary-key" value="true"/>
       </field>
       <field name="auxiliaryEmails">
         <collection element-type="String"/>
@@ -45,7 +45,7 @@
 
     <class name="Order" identity-type="datastore">
       <field name="id">
-        <extension vendor-name="redhat" key="primary-key" value="true"/>
+        <extension vendor-name="myrian" key="primary-key" value="true"/>
       </field>
       <field name="items">
         <collection element-type="Item"/>
@@ -56,7 +56,7 @@
 
     <class name="Product" identity-type="datastore">
       <field name="id">
-        <extension vendor-name="redhat" key="primary-key" value="true"/>
+        <extension vendor-name="myrian" key="primary-key" value="true"/>
       </field>
       <field name="name"/>
       <field name="price"/>
@@ -65,7 +65,7 @@
 
     <class name="Picture" identity-type="datastore">
       <field name="id">
-        <extension vendor-name="redhat" key="primary-key" value="true"/>
+        <extension vendor-name="myrian" key="primary-key" value="true"/>
       </field>
       <field name="caption"/>
       <field name="content"/>
@@ -73,7 +73,7 @@
 
     <class name="Item" identity-type="datastore">
       <field name="id">
-        <extension vendor-name="redhat" key="primary-key" value="true"/>
+        <extension vendor-name="myrian" key="primary-key" value="true"/>
       </field>
       <field name="product"/>
     </class>
@@ -82,7 +82,7 @@
 
     <class name="Magazine" identity-type="datastore">
       <field name="id">
-        <extension vendor-name="redhat" key="primary-key" value="true"/>
+        <extension vendor-name="myrian" key="primary-key" value="true"/>
       </field>
       <field name="title"/>
       <field name="index">

@@ -5,7 +5,7 @@
 <jdo>
   <package name="org.myrian.persistence.jdo">
     <class name="CRPMap" identity-type="datastore">
-      <extension vendor-name="redhat" key="metadata" value="PDL"/>
+      <extension vendor-name="myrian" key="metadata" value="PDL"/>
     </class>
   </package>
 </jdo>
