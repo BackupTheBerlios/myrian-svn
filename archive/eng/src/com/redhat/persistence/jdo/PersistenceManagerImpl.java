@@ -23,7 +23,9 @@ public class PersistenceManagerImpl implements PersistenceManager {
         m_ssn.setAttribute(ATTR_NAME, this);
     }
 
-    final Session getSession() {
+    // XXX: temporary hack to make PandoraTest compile.  Will revert to
+    // package-scoped at first opportunity.
+    public final Session getSession() {
         return m_ssn;
     }
 

@@ -22,3 +22,89 @@ association {
     Department[0..1] dept = join emps.dept_id to depts.id;
     Employee[0..n] emps = join depts.id to emps.dept_id;
 }
+
+
+// Pandora
+
+object type Party class com.redhat.persistence.jdotest.Party
+                  adapter com.redhat.persistence.jdo.ReflectionAdapter {
+    Integer[1..1] id = parties.party_id INTEGER;
+    unique String[1..1] email = parties.primary_email VARCHAR(200);
+
+    object key (id);
+}
+
+association {
+    composite Party[1..1] party =
+        join auxiliary_emails.party_id to parties.party_id;
+    AuxiliaryEmail[0..n] auxiliaryEmails =
+        join parties.party_id to auxiliary_emails.party_id;
+}
+
+object type AuxiliaryEmail class com.redhat.persistence.jdo.ListElement
+                           adapter com.redhat.persistence.jdo.ReflectionAdapter {
+    Integer[1..1] index = auxiliary_emails.index;
+    String[0..1] email = auxiliary_emails.email VARCHAR(200);
+
+    object key (party, index);
+}
+
+object type User extends Party class com.redhat.persistence.jdotest.User {
+    String[1..1] name = users.screen_name VARCHAR(200);
+
+    reference key (users.user_id);
+}
+
+object type Group extends Party class com.redhat.persistence.jdotest.Group {
+    User[0..n] users = join groups.group_id to group_member_map.group_id,
+                       join group_member_map.member_id to users.user_id;
+    String[1..1] name = groups.name VARCHAR(200);
+
+    reference key (groups.group_id);
+}
+
+object type Order class com.redhat.persistence.jdotest.Order
+                  adapter com.redhat.persistence.jdo.ReflectionAdapter {
+    Integer[1..1] id = orders.order_id INTEGER;
+    Party[1..1] party = join orders.party_id to parties.party_id;
+    Date[0..1] purchaseDate = orders.purchase_date DATE;
+
+    object key (id);
+}
+
+association {
+    Order[1..1] order = join items.order_id to orders.order_id;
+    component Item[0..n] items = join orders.order_id to items.order_id;
+}
+
+object type Item class com.redhat.persistence.jdotest.Item
+                 adapter com.redhat.persistence.jdo.ReflectionAdapter {
+    Integer[1..1] id = items.id INTEGER;
+
+    object key (id);
+}
+
+association {
+    Product[0..1] product = join items.product_id to products.id;
+    Item[0..n] items = join products.id to items.product_id;
+}
+
+object type Product class com.redhat.persistence.jdotest.Product
+                    adapter com.redhat.persistence.jdo.ReflectionAdapter {
+    Integer[1..1] id = products.id INTEGER;
+    String[1..1] name = products.name VARCHAR(200);
+    Float[1..1] price = products.price FLOAT; // Use currency instead?
+    Picture[0..1] picture = join products.picture_id to pictures.id;
+
+    object key (id);
+}
+
+object type Picture class com.redhat.persistence.jdotest.Picture
+                    adapter com.redhat.persistence.jdo.ReflectionAdapter {
+    Integer[1..1] id = pictures.id INTEGER;
+    String[1..1] caption = pictures.caption VARCHAR(200);
+    byte[][1..1] content = pictures.content BLOB;
+    Integer[0..1] viewings = pictures.viewings INTEGER;
+
+    object key(id);
+}
