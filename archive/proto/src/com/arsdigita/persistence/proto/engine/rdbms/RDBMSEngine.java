@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #28 $ $Date: 2003/03/31 $
+ * @version $Revision: #29 $ $Date: 2003/03/31 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#28 $ by $Author: rhs $, $DateTime: 2003/03/31 14:34:45 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#29 $ by $Author: ashah $, $DateTime: 2003/03/31 18:25:22 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -296,7 +296,17 @@ public class RDBMSEngine extends Engine {
                     for (Iterator it = pes.iterator(); it.hasNext(); ) {
                         PropertyEvent pe = (PropertyEvent) it.next();
                         addArrow(pe, e);
-                        Object arg = pe.getArgument();
+                        Object arg;
+                        if (pe instanceof SetEvent) {
+                            if (pe.getArgument() != null) {
+                                throw new IllegalStateException
+                                    ("nonnull set arg reachable from delete");
+                            }
+                            arg = ((SetEvent) pe).getPreviousValue();
+                        } else {
+                            arg = pe.getArgument();
+                        }
+
                         addLinkDependency
                             (pe.getProperty(), m_events.getLastEvent(arg), e);
                     }
