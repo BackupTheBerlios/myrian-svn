@@ -6,12 +6,12 @@ import java.util.*;
  * Mist
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/11 $
  **/
 
 class Mist implements Collection {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/metadata/Mist.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/metadata/Mist.java#2 $ by $Author: rhs $, $DateTime: 2003/06/11 15:51:24 $";
 
     private Object m_parent = null;
     private ArrayList m_children = new ArrayList();
@@ -54,7 +54,7 @@ class Mist implements Collection {
 
         if (m_childrenMap.containsKey(key)) {
             throw new IllegalArgumentException
-                ("duplicate key");
+                ("duplicate key: " + key);
         }
 
         m_children.add(child);

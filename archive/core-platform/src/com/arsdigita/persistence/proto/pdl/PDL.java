@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/06/04 $
+ * @version $Revision: #7 $ $Date: 2003/06/11 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#6 $ by $Author: ashah $, $DateTime: 2003/06/04 14:49:04 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#7 $ by $Author: rhs $, $DateTime: 2003/06/11 15:51:24 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -152,7 +152,7 @@ public class PDL {
                      * needs to be set up for cascading deletes to work
                      */
                     if (prop.isComposite()) {
-                        String rev = "~" + prop.getName().getName() +
+                        String rev = "~" + prop.getName().getName() + ":" +
                             type.getQualifiedName().replace('.', '$');
                         Role reverse = new Role(rev, type, true, true, true);
                         role.getType().addProperty(reverse);

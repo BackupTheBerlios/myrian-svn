@@ -13,12 +13,12 @@ import java.io.IOException;
  * PDLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/11 $
  **/
 
 public class PDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDLWriter.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDLWriter.java#2 $ by $Author: rhs $, $DateTime: 2003/06/11 15:51:24 $";
 
     private Writer m_out;
 
@@ -52,16 +52,24 @@ public class PDLWriter {
 	// XXX: We don't store adapter names so we have no way of
 	// writing them out.
 
-	write("{");
+	write(" {");
 
-	for (Iterator it = type.getProperties().iterator(); it.hasNext(); ) {
-	    write((Property) it.next());
+	for (Iterator it = type.getDeclaredProperties().iterator();
+             it.hasNext(); ) {
+            Property prop = (Property) it.next();
+            if (!(prop instanceof Role)) { continue; }
+            Role role = (Role) prop;
+            if (role.getName().startsWith("~")) { continue; }
+            Role rev = role.getReverse();
+            if (rev != null && !rev.getName().startsWith("~")) { continue; }
+            write("\n");
+            write(prop);
 	}
 
 	ObjectMap om = type.getRoot().getObjectMap(type);
 
-	if (type.getSupertype() == null) {
-	    write("    object key(");
+	if (type.getSupertype() == null && type.isKeyed()) {
+	    write("\n\n    object key (");
 	    for (Iterator it = type.getKeyProperties().iterator();
 		 it.hasNext(); ) {
 		Property prop = (Property) it.next();
@@ -70,15 +78,15 @@ public class PDLWriter {
 		    write(", ");
 		}
 	    }
-	    write(");\n");
+	    write(");");
 	} else if (om.getTable() != null) {
-	    write("    reference key(");
+	    write("\n\n    reference key (");
 	    UniqueKey uk = om.getTable().getPrimaryKey();
 	    write(uk.getColumns());
-	    write(");\n");
+	    write(");");
 	}
 
-	write("}");
+	write("\n}");
     }
 
     private void write(Column[] cols) {
@@ -91,9 +99,9 @@ public class PDLWriter {
     }
 
     private void write(Column col) {
-	write(col.getName());
-	write(".");
 	write(col.getTable().getName());
+	write(".");
+	write(col.getName());
     }
 
     private void write(Property prop) {
@@ -101,9 +109,16 @@ public class PDLWriter {
 
 	if (prop.isComponent()) {
 	    write("component ");
-	}
+	} else if (prop.isComposite()) {
+            write("composite ");
+        }
 
-	write(prop.getType().getQualifiedName());
+        ObjectType type = prop.getType();
+        if (type.getModel().getName().equals("global")) {
+            write(type.getName());
+        } else {
+            write(type.getQualifiedName());
+        }
 
 	if (prop.isCollection()) {
 	    write("[0..n] ");
@@ -114,40 +129,76 @@ public class PDLWriter {
 	}
 
 	write(prop.getName());
+        write(" = ");
 
 	ObjectMap om = prop.getRoot().getObjectMap(prop.getContainer());
 
 	Mapping m = om.getMapping(Path.get(prop.getName()));
-	m.dispatch(new Mapping.Switch() {
+        if (m == null) {
+            write("<no mapping for " + prop.getName() + " in " +
+                  prop.getContainer().getName() + ">");
+        } else {
+            m.dispatch(new Mapping.Switch() {
 		public void onValue(Value v) {
-		    write(v.getColumn());
+                    Column col = v.getColumn();
+		    write(col);
+                    write(" ");
+                    write(Column.getTypeName(col.getType()));
+                    if (col.getSize() >= 0) {
+                        write("(" + col.getSize());
+                        if (col.getPrecision() >= 0) {
+                            write(", " + col.getPrecision());
+                        }
+                        write(")");
+                    }
 		}
 
 		public void onJoinTo(JoinTo j) {
-		    write("join to ");
+		    write("join ");
 		    write(j.getKey().getColumns());
-		    write(")");
+                    write(" to ");
+                    write(j.getKey().getUniqueKey().getColumns());
 		}
 
 		public void onJoinFrom(JoinFrom j) {
-		    write("join from (");
+		    write("join ");
+                    write(j.getKey().getUniqueKey().getColumns());
+                    write(" to ");
 		    write(j.getKey().getColumns());
-		    write(")");
 		}
 
 		public void onJoinThrough(JoinThrough j) {
-		    write("join through (");
+		    write("join ");
+                    write(j.getFrom().getUniqueKey().getColumns());
+                    write(" to ");
 		    write(j.getFrom().getColumns());
-		    write("), (");
+                    write(", join ");
 		    write(j.getTo().getColumns());
+                    write(" to ");
+                    write(j.getTo().getUniqueKey().getColumns());
 		}
 
 		public void onStatic(Static s) {
-		    // do nothing
+		    write("<static>");
 		}
 	    });
+        }
 
-	write(";\n");
+	write(";");
+    }
+
+    public void writeAssociation(Property prop) {
+        Role role = (Role) prop;
+        Role rev = role.getReverse();
+        if (rev == null) {
+            throw new IllegalArgumentException
+                ("not a two way");
+        }
+        write("association {\n");
+        write(role);
+        write("\n");
+        write(rev);
+        write("\n}");
     }
 
 }

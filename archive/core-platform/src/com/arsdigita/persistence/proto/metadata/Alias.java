@@ -4,12 +4,12 @@ package com.arsdigita.persistence.proto.metadata;
  * Alias
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/11 $
  **/
 
 public class Alias extends Property {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/metadata/Alias.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/metadata/Alias.java#2 $ by $Author: rhs $, $DateTime: 2003/06/11 15:51:24 $";
 
     private Property m_target;
 
@@ -36,6 +36,10 @@ public class Alias extends Property {
 
     public boolean isComponent() {
         return m_target.isComponent();
+    }
+
+    public boolean isComposite() {
+        return m_target.isComposite();
     }
 
     public void dispatch(Switch sw) {

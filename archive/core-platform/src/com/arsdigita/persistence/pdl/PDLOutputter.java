@@ -16,13 +16,12 @@
 package com.arsdigita.persistence.pdl;
 
 import com.arsdigita.persistence.metadata.*;
+import com.arsdigita.persistence.proto.pdl.PDLWriter;
+import com.arsdigita.persistence.proto.metadata.Root;
 
-import java.util.Iterator;
+import java.io.*;
+import java.util.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 
 /**
  * An class that outputs the PDL associated with a particular
@@ -31,7 +30,7 @@ import java.io.PrintStream;
  * file being named after the fully qualified model name.
  *
  * @author Patrick McNeill
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDLOutputter.java#6 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDLOutputter.java#7 $
  */
 public class PDLOutputter {
     /**
@@ -44,12 +43,20 @@ public class PDLOutputter {
         throws IOException {
         Iterator models = root.getModels();
 
+        Root rt = Root.getRoot();
+
         while (models.hasNext()) {
-            Model model = (Model)models.next();
-            PrintStream out = new PrintStream(new FileOutputStream(new File(directory, model.getName() + ".pdl")));
-	    if (true) { throw new Error("not implemented"); }
-            //model.outputPDL(out);
-            out.close();
+            Model model = (Model) models.next();
+            FileWriter writer =
+                new FileWriter(new File(directory, model.getName() + ".pdl"));
+            PDLWriter out = new PDLWriter(writer);
+            for (Iterator it = model.getObjectTypes().iterator();
+                 it.hasNext(); ) {
+                ObjectType ot = (ObjectType) it.next();
+                out.write(rt.getObjectType(ot.getQualifiedName()));
+                writer.write("\n\n");
+            }
+            writer.close();
         }
     }
 
