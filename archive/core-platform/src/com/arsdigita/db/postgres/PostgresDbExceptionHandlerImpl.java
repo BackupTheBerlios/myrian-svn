@@ -23,12 +23,12 @@ import com.arsdigita.db.DbExceptionHandlerBaseImpl;
  * Class for processing of Postgres DB Exceptions.
  *
  * @author David Eison
- * @version $Revision: #8 $
+ * @version $Revision: #9 $
  * @since 4.6
  */
 public class PostgresDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresDbExceptionHandlerImpl.java#8 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresDbExceptionHandlerImpl.java#9 $";
 
     static {
         errors.put("Cannot insert a duplicate key into unique index",
@@ -44,6 +44,8 @@ public class PostgresDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
                    com.arsdigita.db.DbNotAvailableException.class);
 
         errors.put("The user property is missing",
+                   com.arsdigita.db.DbNotAvailableException.class);
+        errors.put("This connection has been terminated by the administrator.",
                    com.arsdigita.db.DbNotAvailableException.class);
 
         // These errors are here so that the PersistenceExceptionTest passes
