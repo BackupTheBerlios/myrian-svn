@@ -141,7 +141,12 @@ class StateManagerImpl extends AbstractStateManager {
                     return new CRPSet(ssn(), ssn().retrieve(m_pmap), prop);
                 }
             } else {
-                return ssn().get(ssn().retrieve(m_pmap), prop);
+                final Object object = ssn().retrieve(m_pmap);
+                if (object == null) {
+                    throw new IllegalStateException
+                        ("no object in session for pmap " + m_pmap);
+                }
+                return ssn().get(object, prop);
             }
         }
     }
