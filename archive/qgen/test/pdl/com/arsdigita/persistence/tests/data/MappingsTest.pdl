@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/test-qgen/test/pdl/com/arsdigita/persistence/tests/data/MappingsTest.pdl#1 $
-// $DateTime: 2003/12/10 16:59:20 $
+// $Id: //core-platform/test-qgen/test/pdl/com/arsdigita/persistence/tests/data/MappingsTest.pdl#2 $
+// $DateTime: 2004/03/11 14:54:31 $
 
 model com.arsdigita.persistence.tests.data.mappings;
 
@@ -111,4 +111,12 @@ object type ReferenceMappingTable extends Base {
     Target[0..1] target = join t_rmaps.id to t_rmaps_map.rmap_id,
                           join t_rmaps_map.target_id to t_targets.id;
     reference key (t_rmaps.id);
+}
+
+object type NakedJoin extends Base{
+    String other = t_nj_other.other;
+
+    reference key (t_nj.id);
+
+    join t_nj.id to t_nj_other.id;
 }
