@@ -217,7 +217,7 @@ public class DbHelper {
             }
             break;
         default:
-            DbHelper.unsupportedDatabaseError("versioning");
+            DbHelper.unsupportedDatabaseError("varcharLength");
         }
 
         if ( result == 0 ) return 1;
