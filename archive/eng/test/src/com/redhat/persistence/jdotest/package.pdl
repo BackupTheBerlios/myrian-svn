@@ -1,0 +1,24 @@
+model com.redhat.persistence.jdotest;
+
+object type Department class com.redhat.persistence.jdotest.Department
+    adapter com.redhat.persistence.jdo.JDOAdapter {
+
+    BigInteger[1..1] id = depts.id INTEGER;
+    String[1..1] name = depts.name VARCHAR(200);
+
+    object key (id);
+}
+
+object type Employee class com.redhat.persistence.jdotest.Employee 
+    adapter com.redhat.persistence.jdo.JDOAdapter {
+
+    BigInteger[1..1] id = emps.id INTEGER;
+    String[0..1] name = emps.name VARCHAR(200);
+    Float[0..1] salary = emps.salary FLOAT;
+    object key (id);
+}
+
+association {
+    Department[0..1] dept = join emps.dept_id to depts.id;
+    Employee[0..n] emps = join depts.id to emps.dept_id;
+}
