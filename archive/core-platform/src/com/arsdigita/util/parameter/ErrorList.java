@@ -28,17 +28,22 @@ import org.apache.log4j.Logger;
 /**
  * Subject to change.
  *
- * This won't extend ArrayList for long.
+ * A collection to store <code>ParameterError</code>s that are
+ * encountered during parameter reading or validation.  This
+ * collection is used in the lifecycle methods of
+ * <code>Parameter</code>.  It is ordinarily returned to the
+ * parameter-using code so that it can handle errors.
  *
+ * @see ParameterError
+ * @see Parameter
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ErrorList.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ErrorList.java#3 $
  */
-//public final class ErrorList extends ArrayList {
 public final class ErrorList {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ErrorList.java#2 $" +
-        "$Author: jorris $" +
-        "$DateTime: 2003/10/28 18:36:21 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ErrorList.java#3 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/11/10 11:45:06 $";
 
     private static final Logger s_log = Logger.getLogger(ErrorList.class);
 
@@ -47,11 +52,20 @@ public final class ErrorList {
     // XXX temporarily package access
     final ArrayList m_errors;
 
+    /**
+     * Constructs a new error list.
+     */
     public ErrorList() {
         m_params = new ArrayList();
         m_errors = new ArrayList();
     }
 
+    /**
+     * Adds <code>error</code> to the error list.
+     *
+     * @param error A <code>ParameterError</code> representing a read
+     * or validation error; it cannot be null
+     */
     public final void add(final ParameterError error) {
         Assert.exists(error, ParameterError.class);
 
@@ -66,14 +80,34 @@ public final class ErrorList {
         m_errors.add(error);
     }
 
+    /**
+     * Gets an iterator over the currently stored errors.
+     *
+     * @see ParameterError
+     * @return An <code>Iterator</code> of
+     * <code>ParameterError</code>s; it cannot be null
+     */
     public final Iterator iterator() {
         return m_errors.iterator();
     }
 
+    /**
+     * Tells whether the error collection is empty or not.
+     *
+     * @return <code>true</code> if the collection is empty, otherwise
+     * <code>false</code>
+     */
     public final boolean isEmpty() {
         return m_errors.isEmpty();
     }
 
+    /**
+     * Throws a <code>ParameterException</code> containing the error
+     * list.  This method is for use when the client code wants the
+     * program to fail via an exception if there are errors.
+     *
+     * @throws ParameterException if the error list is not empty
+     */
     public final void check() throws ParameterException {
         if (!isEmpty()) {
             final StringWriter writer = new StringWriter();
@@ -85,6 +119,12 @@ public final class ErrorList {
         }
     }
 
+    /**
+     * Prints parameter errors to <code>out</code> with formatting
+     * appropriate to the console.
+     *
+     * @param out The <code>Writer</code> to print the errors to
+     */
     public final void report(final Writer out) {
         try {
             Assert.exists(out, PrintWriter.class);

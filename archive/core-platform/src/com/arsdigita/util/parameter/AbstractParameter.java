@@ -31,13 +31,13 @@ import org.apache.commons.beanutils.ConversionException;
  *
  * @see Parameter
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameter.java#4 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameter.java#5 $
  */
 public abstract class AbstractParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameter.java#4 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/AbstractParameter.java#5 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/11/10 11:04:29 $";
+        "$DateTime: 2003/11/10 11:45:06 $";
 
     private final String m_name;
     private final Class m_type;
@@ -46,7 +46,7 @@ public abstract class AbstractParameter implements Parameter {
     private ParameterInfo m_info;
 
     /**
-     * Constructs a new parameter with the defualt value
+     * Constructs a new parameter with the default value
      * <code>defaalt</code> and using the beanutils converter
      * registered for <code>type</code>.
      *
