@@ -11,23 +11,22 @@ import org.apache.log4j.Category;
  * MultiThreadDataObjectTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/07/30 $
  **/
 
 public class MultiThreadDataObjectTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/MultiThreadDataObjectTest.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/MultiThreadDataObjectTest.java#4 $ by $Author: randyg $, $DateTime: 2002/07/30 11:12:48 $";
 
     private static final Category s_log = Category.getInstance(
         MultiThreadDataObjectTest.class.getName()
         );
 
-    static {
+    protected void persistenceSetUp() {
         load("com/arsdigita/persistence/testpdl/static/Node.pdl");
         load("com/arsdigita/persistence/testpdl/mdsql/Party.pdl");
-
+        super.persistenceSetUp();
     }
-
 
     public MultiThreadDataObjectTest(String name) {
         super(name);
