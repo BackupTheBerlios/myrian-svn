@@ -28,13 +28,13 @@ import org.apache.log4j.Logger;
  *
  * @see java.lang.System
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/SystemProperties.java#4 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/SystemProperties.java#5 $
  */
 public final class SystemProperties {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/SystemProperties.java#4 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/SystemProperties.java#5 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/23 12:32:59 $";
+        "$DateTime: 2003/09/23 14:12:40 $";
 
     private static final Logger s_log = Logger.getLogger
         (SystemProperties.class);
@@ -62,21 +62,21 @@ public final class SystemProperties {
         final ParameterValue value = s_loader.load(param);
 
         if (value == null) {
-            return param.getDefaultValue();
+            final ParameterValue dephault = new ParameterValue();
+
+            dephault.setObject(param.getDefaultValue());
+
+            param.validate(dephault);
+
+            param.check(dephault);
+
+            return dephault.getObject();
         } else {
-            if (!value.getErrors().isEmpty()) {
-                throw new ConfigError
-                    ("Parameter " + param.getName() + ": " +
-                     value.getErrors());
-            }
+            param.check(value);
 
             param.validate(value);
 
-            if (!value.getErrors().isEmpty()) {
-                throw new ConfigError
-                    ("Parameter " + param.getName() + ": " +
-                     value.getErrors());
-            }
+            param.check(value);
 
             return value.getObject();
         }

@@ -24,13 +24,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#4 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#5 $
  */
 public abstract class AbstractParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#4 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#5 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/23 11:43:44 $";
+        "$DateTime: 2003/09/23 14:12:40 $";
 
     private final String m_name;
     private final Class m_type;
@@ -122,5 +122,27 @@ public abstract class AbstractParameter implements Parameter {
 
     protected void validate(final Object value, final List errors) {
         // Nothing by default
+    }
+
+    public final void check(final ParameterValue value)
+            throws ParameterException {
+        Assert.exists(value, ParameterValue.class);
+
+        final List errors = value.getErrors();
+
+        if (!errors.isEmpty()) {
+            final StringBuffer buffer = new StringBuffer();
+
+            final Iterator iter = errors.iterator();
+
+            while (iter.hasNext()) {
+                buffer.append("\n\t");
+                buffer.append(iter.next().toString());
+            }
+
+            throw new ParameterException
+                ("Parameter " + this + " failed with the following errors: "
+                 + buffer.toString(), errors);
+        }
     }
 }

@@ -31,26 +31,26 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterLoader
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#4 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#5 $
  */
 public abstract class ParameterRecord {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#4 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#5 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/23 12:32:59 $";
+        "$DateTime: 2003/09/23 14:12:40 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterRecord.class);
 
     private final String m_name;
     private final ArrayList m_params;
-    private final HashMap m_values;
+    private final Map m_values;
     private final Properties m_info;
 
     protected ParameterRecord(final String name) {
         m_name = name;
         m_params = new ArrayList();
-        m_values = new HashMap();
+        m_values = Collections.synchronizedMap(new HashMap());
         m_info = new Properties();
 
         ParameterPrinter.register(this);
@@ -90,25 +90,11 @@ public abstract class ParameterRecord {
      * wish to retrieve; it cannot be null
      */
     protected final Object get(final Parameter param) {
-        Assert.exists(param, Parameter.class);
+        final ParameterValue value = getValue(param);
 
-        synchronized (m_values) {
-            return m_values.get(param);
-        }
-    }
+        param.check(value);
 
-    /**
-     * Sets the value of <code>param</code> to <code>value</code>.
-     *
-     * @param param The named <code>Parameter</code> whose value you
-     * wish to set; it cannot be null
-     * @param value The new value of <code>param</code>; it can be
-     * null
-     */
-    protected final void set(final Parameter param, final Object value) {
-        Assert.exists(param, Parameter.class);
-
-        set(param, new ParameterValue(value));
+        return value.getObject();
     }
 
     /**
@@ -138,6 +124,68 @@ public abstract class ParameterRecord {
         }
     }
 
+    // Does not param.check.
+    protected final ParameterValue getValue(final Parameter param) {
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Getting value of " + param);
+        }
+
+        if (Assert.isEnabled()) {
+            Assert.exists(param, Parameter.class);
+            Assert.truth(m_params.contains(param),
+                         param + " has not been registered");
+        }
+
+        final ParameterValue value = (ParameterValue) m_values.get(param);
+
+        if (value == null) {
+            final ParameterValue dephault = new ParameterValue();
+
+            dephault.setObject(param.getDefaultValue());
+
+            param.validate(dephault);
+
+            return dephault;
+        } else {
+            return value;
+        }
+    }
+
+    /**
+     * Sets the value of <code>param</code> to <code>value</code>.
+     *
+     * @param param The named <code>Parameter</code> whose value you
+     * wish to set; it cannot be null
+     * @param value The new value of <code>param</code>; it can be
+     * null
+     */
+    protected final void set(final Parameter param, final Object object) {
+        Assert.exists(param, Parameter.class);
+
+        final ParameterValue value = new ParameterValue(object);
+
+        param.validate(value);
+
+        param.check(value);
+
+        set(param, value);
+    }
+
+    protected final void setValue(final Parameter param,
+                                  final ParameterValue value) {
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Setting " + param + " to " + value);
+        }
+
+        if (Assert.isEnabled()) {
+            Assert.exists(param, Parameter.class);
+            Assert.truth(m_params.contains(param),
+                         param + " has not been registered");
+        }
+
+        m_values.put(param, value);
+    }
+
     /**
      * Returns a <code>String</code> representation of this object.
      *
@@ -151,7 +199,7 @@ public abstract class ParameterRecord {
     // Private classes and methods
     //
 
-    private Object load(final Parameter param, final ParameterLoader loader) {
+    private void load(final Parameter param, final ParameterLoader loader) {
         if (s_log.isDebugEnabled()) {
             s_log.debug("Loading " + param + " from " + loader);
         }
@@ -165,46 +213,11 @@ public abstract class ParameterRecord {
 
         final ParameterValue value = loader.load(param);
 
-        if (value == null) {
-            return set(param, new ParameterValue(param.getDefaultValue()));
-        } else {
-            if (!value.getErrors().isEmpty()) {
-                throw new IllegalArgumentException
-                    ("Parameter " + param.getName() + ": " +
-                     value.getErrors().toString());
-            }
-
-            return set(param, value);
-        }
-    }
-
-    private Object set(final Parameter param, final ParameterValue value) {
-        if (s_log.isDebugEnabled()) {
-            s_log.debug("Setting " + param + " to " + value);
+        if (value != null) {
+            param.check(value);
         }
 
-        if (Assert.isEnabled()) {
-            Assert.exists(param, Parameter.class);
-            Assert.exists(value, ParameterValue.class);
-            Assert.truth(m_params.contains(param),
-                         param + " has not been registered");
-        }
-
-        param.validate(value);
-
-        if (!value.getErrors().isEmpty()) {
-            throw new ConfigError
-                ("Parameter " + param.getName() + ": " +
-                 value.getErrors().toString());
-        }
-
-        final Object result = value.getObject();
-
-        synchronized (m_values) {
-            m_values.put(param, result);
-        }
-
-        return result;
+        setValue(param, value);
     }
 
     private class Info implements ParameterInfo {
