@@ -30,13 +30,13 @@ import org.apache.log4j.Logger;
  * @author David Lutterkort
  * @author Uday Mathur
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#12 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#13 $
  */
 public class Assert {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#12 $" +
-        "$Author: vadim $" +
-        "$DateTime: 2003/04/16 16:32:11 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#13 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/04/26 19:14:38 $";
 
     private static final Logger s_log = Logger.getLogger
         (Assert.class);
@@ -63,6 +63,25 @@ public class Assert {
     public static final void truth(final boolean condition,
                                    final String message) {
         if (!condition) {
+            s_log.error(message);
+
+            throw new Error(message);
+        }
+    }
+
+    /**
+     * Asserts that an arbitrary condition is true and throws an
+     * error with message <code>message</code> if the condition is
+     * false.
+     *
+     * @param condition The condition asserted
+     * @param message An error message
+     * @throws java.lang.Error if the condition is false
+     */
+    public static final void truth(final boolean condition) {
+        if (!condition) {
+            final String message = "Assertion failure";
+
             s_log.error(message);
 
             throw new Error(message);
