@@ -11,7 +11,7 @@ insert into application_types
 select
   acs_object_id_seq.nextval, 'com.arsdigita.ui.admin.Admin',
   'CCM Admin Application', 'CCM user and group administration',
-  't', 't', 'f', 'f', package_type_id
+  '1', '1', '0', '0', package_type_id
 from apm_package_types
 where package_key = 'admin';
 
@@ -23,7 +23,7 @@ insert into application_types
 select
   acs_object_id_seq.nextval, 'com.arsdigita.ui.sitemap.SiteMap',
   'SiteMap Admin Application', 'CCM sitemap administration',
-  't', 't', 'f', 'f', package_type_id
+  '1', '1', '0', '0', package_type_id
 from apm_package_types
 where package_key = 'sitemap';
 
