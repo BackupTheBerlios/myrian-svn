@@ -31,16 +31,13 @@ import org.apache.log4j.*;
  * DataObjectManipulator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/04/02 $
  */
 public class DataObjectManipulator {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataObjectManipulator.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataObjectManipulator.java#2 $ by $Author: ashah $, $DateTime: 2003/04/02 11:45:55 $";
     private static final Logger s_log =
         Logger.getLogger(DataObjectManipulator.class.getName());
-    static  {
-        s_log.setPriority(Priority.DEBUG);
-    }
 
     public DataObjectManipulator(Session session) {
         m_session = session;
@@ -245,6 +242,10 @@ public class DataObjectManipulator {
         public void updateAllPropertyCombinations(Property p, DataObject data) throws Exception {
             OID id = data.getOID();
             s_log.info("Property " + p.getName() + " class is: " + p.getJavaClass());
+            // Verify that nulls are handled correctly for all columns
+            setProperty(p, data, null);
+            data = getSession().retrieve(id);
+
             Iterator iter = getVariantValues().iterator();
             while(iter.hasNext()) {
                 Object value = iter.next();
@@ -255,11 +256,6 @@ public class DataObjectManipulator {
                 // to a constrained column.
                 data = getSession().retrieve(id);
             }
-
-            // Verify that nulls are handled correctly for all columns
-            setProperty(p, data, null);
-            data = getSession().retrieve(id);
-
         }
 
         /**
@@ -290,11 +286,7 @@ public class DataObjectManipulator {
                 savedNullInRequiredField = ( p.isRequired() && valueIsNull );
             } catch (Exception t) {
                 if( p.isRequired() && valueIsNull ) {
-                    if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
-                        throw new AbortMetaTestException();
-                    } else {
-                        return;
-                    }
+                    return;
                 }
                 if( p.isNullable() && valueIsNull ) {
                     String msg = "Failed to save DataObject: " +  data.getObjectType().getName();
@@ -387,8 +379,12 @@ public class DataObjectManipulator {
         manip = new SimpleTypeManipulator(java.lang.Character.class) {
                 void makeVariants() {
                     m_variants = new LinkedList();
-                    m_variants.add(new Character(Character.MIN_VALUE));
-                    m_variants.add(new Character((char)(Character.MIN_VALUE + 1)));
+                    if (DbHelper.getDatabase() != DbHelper.DB_POSTGRES) {
+                        // pg jdbc seems to barf on this
+                        m_variants.add(new Character(Character.MIN_VALUE));
+                    }
+                    m_variants.add(new Character
+                                   ((char) (Character.MIN_VALUE + 1)));
                     m_variants.add(new Character('a'));
                     m_variants.add(new Character('b'));
                     m_variants.add(new Character('c'));
@@ -562,8 +558,7 @@ public class DataObjectManipulator {
                     m_variants = new LinkedList();
                     m_variants.add("FooBar");
                     m_variants.add("");
-                    m_variants.add(repeatChar('a', 500));
-                    m_variants.add(repeatChar('a', 5000));
+                    m_variants.add(repeatChar('a', 5));
                 }
                 /**
                  *  Iterates over all of the variantValues for the given Property and
@@ -579,7 +574,7 @@ public class DataObjectManipulator {
                     super.updateAllPropertyCombinations(p, data);
                     Column column = p.getColumn();
                     // Verify that the boundary cases for column size are correctly handled.
-                    if( column != null && column.getSize() > 0 ) {
+                    if (column != null && column.getSize() > 0) {
                         try {
                             OID id = data.getOID();
                             final int size = column.getSize();
@@ -591,6 +586,10 @@ public class DataObjectManipulator {
                             setProperty(p, data, atBoundary);
                             data = getSession().retrieve(id);
 
+                            if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+                                return;
+                            }
+
                             String justAboveBoundary = repeatChar('X', size + 1);
                             setProperty(p, data, justAboveBoundary);
                             data = getSession().retrieve(id);
@@ -600,7 +599,6 @@ public class DataObjectManipulator {
                             s_log.debug("Column: " + column.getQualifiedName() + " Size: " + column.getSize());
                             throw e;
                         }
-
                     }
                 }
                 /**
