@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/08/05 $
+ * @version $Revision: #3 $ $Date: 2004/08/06 $
  **/
 
 public class Code {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Code.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Code.java#3 $ by $Author: rhs $, $DateTime: 2004/08/06 11:52:43 $";
 
     private static final Logger s_log = Logger.getLogger(Code.class);
 
@@ -90,9 +90,16 @@ public class Code {
     private int m_upper;
     private int m_hash = 0;
     private List m_bindings;
+    private boolean m_used = false;
 
-    private Code(StringBuffer sql, List bindings) {
-        m_sql = sql;
+    private Code(Code orig, List bindings) {
+        if (orig.m_used) {
+            m_sql = new StringBuffer();
+            append(orig.getSQL());
+        } else {
+            m_sql = orig.m_sql;
+            orig.m_used = true;
+        }
         m_bindings = bindings;
     }
 
@@ -142,7 +149,7 @@ public class Code {
     }
 
     Code add(String sql) {
-        Code result = new Code(m_sql, m_bindings);
+        Code result = new Code(this, m_bindings);
         result.m_lower = m_lower;
         result.append(sql);
         return result;
@@ -159,7 +166,7 @@ public class Code {
             bindings.addAll(m_bindings);
             bindings.addAll(code.m_bindings);
         }
-        Code result = new Code(m_sql, bindings);
+        Code result = new Code(this, bindings);
         result.m_lower = m_lower;
         result.append(code.m_sql, code.m_lower, code.m_upper);
         return result;
