@@ -27,6 +27,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -96,6 +97,8 @@ public class ResultComparator {
         tran.transform(new JDOMSource(new Document(index)), indexHtml);
         FileWriter indexFile = new FileWriter(htmlOutputDir + "/index.html");
         out.output(indexHtml.getDocument(), indexFile);
+
+        out.output(new Document(index), new FileOutputStream("report_index_" + currentChangelist + ".xml"));
     }
 
     private static void compareFiles(String canonical, String newFile) throws JDOMException, TransformerException, IOException {
