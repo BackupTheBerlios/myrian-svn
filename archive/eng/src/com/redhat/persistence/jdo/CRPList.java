@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2004/07/21 $
+ * @version $Revision: #13 $ $Date: 2004/07/21 $
  **/
 
 class CRPList implements List {
@@ -66,6 +66,64 @@ class CRPList implements List {
             throw new IndexOutOfBoundsException(index.toString());
         }
         return oldValue;
+    }
+
+    private class CRPListIterator implements ListIterator {
+        private int m_index;
+        private Iterator m_elements;
+
+        CRPListIterator(int from) {
+            m_index = from;
+
+            Query query = getPMI().newQuery
+                ("oql",
+                 C.concat("sort(filter(elements.",
+                          m_fieldName,
+                          ", sql {key >= :key}), key)"));
+                          // ", sql {key >= :key}), value)"));
+
+            Map map = new HashMap();
+            map.put("elements", elements);
+            map.put("key", new Integer(m_index));
+            Collection coll = (Collection) query.executeWithMap(map);
+            m_elements = coll.iterator();
+        }
+
+        public int nextIndex() {
+            throw new UnsupportedOperationException();
+        }
+
+        public int previousIndex() {
+            throw new UnsupportedOperationException();
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        public boolean hasNext() {
+            return m_elements.hasNext();
+        }
+
+        public boolean hasPrevious() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Object next() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Object previous() {
+            throw new UnsupportedOperationException();
+        }
+
+        public void add(Object element) {
+            throw new UnsupportedOperationException();
+        }
+
+        public void set(Object element) {
+            throw new UnsupportedOperationException();
+        }
     }
 
 
@@ -237,10 +295,10 @@ class CRPList implements List {
     }
 
     public ListIterator listIterator() {
-        throw new UnsupportedOperationException();
+        return new CRPListIterator(0);
     }
 
     public ListIterator listIterator(int index) {
-        throw new UnsupportedOperationException();
+        return new CRPListIterator(index);
     }
 }
