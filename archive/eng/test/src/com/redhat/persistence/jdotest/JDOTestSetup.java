@@ -1,21 +1,21 @@
 package com.redhat.persistence.jdotest;
 
 import com.arsdigita.util.jdbc.Connections;
-import com.redhat.persistence.metadata.Root;
 import com.redhat.persistence.jdo.PersistenceManagerFactoryImpl;
-import junit.extensions.TestSetup;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Properties;
-import java.sql.Connection;
-import javax.jdo.PersistenceManager;
-import javax.jdo.PersistenceManagerFactory;
-import javax.jdo.JDOHelper;
+import com.redhat.persistence.metadata.Root;
 import com.redhat.persistence.pdl.PDL;
 import com.redhat.persistence.pdl.Schema;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.util.Properties;
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+import javax.jdo.PersistenceManagerFactory;
 
-import junit.framework.Test;;
+import junit.extensions.TestSetup;
+import junit.framework.Test;
 
 public class JDOTestSetup extends TestSetup {
     private static int s_id = 0;

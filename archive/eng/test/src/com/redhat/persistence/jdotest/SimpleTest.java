@@ -1,21 +1,5 @@
 package com.redhat.persistence.jdotest;
 
-import com.arsdigita.util.jdbc.Connections;
-import com.redhat.persistence.jdo.PersistenceManagerFactoryImpl;
-import com.redhat.persistence.metadata.Root;
-import com.redhat.persistence.pdl.PDL;
-import com.redhat.persistence.pdl.Schema;
-import java.io.*;
-import java.sql.*;
-import java.util.*;
-import java.math.BigInteger;
-import javax.jdo.*;
-
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 public class SimpleTest extends AbstractCase {
     public void test1() {
         String eName = "seb";

@@ -1,20 +1,12 @@
 package com.redhat.persistence.jdotest;
 
-import com.arsdigita.util.jdbc.Connections;
-import com.redhat.persistence.jdo.PersistenceManagerFactoryImpl;
-import com.redhat.persistence.metadata.Root;
-import com.redhat.persistence.pdl.PDL;
-import com.redhat.persistence.pdl.Schema;
-import java.io.*;
-import java.sql.*;
-import java.util.*;
 import java.math.BigInteger;
-import javax.jdo.*;
+import java.util.Properties;
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+import javax.jdo.PersistenceManagerFactory;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 public abstract class AbstractCase extends TestCase {
 
