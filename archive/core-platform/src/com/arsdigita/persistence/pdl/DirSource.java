@@ -9,23 +9,39 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 /**
- * DirSource
+ * An implementation of PDLSource that loads all files under a
+ * directory.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/10/28 $
+ * @version $Revision: #3 $ $Date: 2003/11/06 $
  **/
 
 public class DirSource implements PDLSource {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/DirSource.java#2 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/DirSource.java#3 $ by $Author: rhs $, $DateTime: 2003/11/06 00:02:45 $";
 
     private final File m_dir;
     private final PDLFilter m_filter;
+
+    /**
+     * Constructs a new PDLSource that loads all files under
+     * <code>dir</code> that meet the criteria specified by
+     * <code>filter</code>.
+     *
+     * @param dir the base directory
+     * @param filter the PDLFilter used to restrict results
+     **/
 
     public DirSource(File dir, PDLFilter filter) {
         m_dir = dir;
         m_filter = filter;
     }
+
+    /**
+     * Parses the contents of this PDLSource using the given PDLCompiler.
+     *
+     * @param compiler the PDLCompiler used to parse this source
+     **/
 
     public void parse(PDLCompiler compiler) {
         parse(compiler, m_dir);

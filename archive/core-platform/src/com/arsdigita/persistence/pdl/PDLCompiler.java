@@ -4,17 +4,22 @@ import com.arsdigita.persistence.metadata.MetadataRoot;
 import java.io.Reader;
 
 /**
- * PDLCompiler
+ * This class is used to parse object-relational metadata specified in
+ * PDL files, and emit it into a MetadataRoot.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/10/28 $
+ * @version $Revision: #3 $ $Date: 2003/11/06 $
  **/
 
 public class PDLCompiler {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDLCompiler.java#2 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDLCompiler.java#3 $ by $Author: rhs $, $DateTime: 2003/11/06 00:02:45 $";
 
     private final com.redhat.persistence.pdl.PDL m_pdl;
+
+    /**
+     * Constructs a new and empty PDLCompiler.
+     **/
 
     public PDLCompiler() {
         m_pdl = new com.redhat.persistence.pdl.PDL();
