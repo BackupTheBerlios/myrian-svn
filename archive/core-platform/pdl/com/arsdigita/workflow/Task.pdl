@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/workflow/Task.pdl#9 $
-// $DateTime: 2002/11/11 19:11:24 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/workflow/Task.pdl#10 $
+// $DateTime: 2003/02/04 17:46:07 $
 
 model com.arsdigita.workflow.simple;
 
@@ -133,5 +133,29 @@ query getTasks {
         taskParentId = cw_tasks.parent_task_id;
         taskLabel = cw_tasks.label;
         taskDescription = cw_tasks.description;
+    }
+}
+
+query getCommentsInWorkflow {
+    TaskComment comment;
+
+    do {
+        select c.comment_id,
+               c.task_id,
+               c.task_comment,
+               c.comment_date,
+               c.party_id
+          from cw_task_comments c,
+               cw_tasks t1,
+               cw_tasks t2
+         where t1.task_id = :taskID
+           and t2.parent_task_id = t1.parent_task_id
+           and c.task_id = t2.task_id
+    } map {
+        comment.id = c.comment_id;
+        comment.taskID = c.task_id;
+        comment.taskComment = c.task_comment;
+        comment.commentDate = c.comment_date;
+        comment.partyID = c.party_id;
     }
 }
