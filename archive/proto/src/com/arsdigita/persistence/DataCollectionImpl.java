@@ -7,20 +7,19 @@ import com.arsdigita.persistence.proto.PersistentCollection;
  * DataCollectionImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/03/14 $
+ * @version $Revision: #7 $ $Date: 2003/04/04 $
  **/
 
 class DataCollectionImpl extends DataQueryImpl implements DataCollection {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataCollectionImpl.java#6 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataCollectionImpl.java#7 $ by $Author: rhs $, $DateTime: 2003/04/04 20:45:14 $";
 
     DataCollectionImpl(Session ssn, PersistentCollection pc) {
         super(ssn, pc);
     }
 
     public ObjectType getObjectType() {
-        return C.fromType(m_pc.getDataSet().getQuery().getSignature()
-                          .getObjectType());
+        return C.fromType(getOriginal().getSignature().getObjectType());
     }
 
     public DataObject getDataObject() {

@@ -15,26 +15,62 @@
 
 package com.arsdigita.persistence;
 
-import com.arsdigita.persistence.metadata.MetadataRoot;
-import com.arsdigita.persistence.metadata.QueryType;
-import com.arsdigita.persistence.metadata.Property;
-import com.arsdigita.persistence.metadata.Operation;
-import com.arsdigita.persistence.metadata.Mapping;
+import com.arsdigita.persistence.proto.common.*;
+import com.arsdigita.persistence.proto.metadata.*;
+import com.arsdigita.persistence.proto.Cursor;
+import com.arsdigita.persistence.proto.Query;
+import com.arsdigita.persistence.proto.RecordSet;
+import com.arsdigita.persistence.proto.Signature;
+
+import java.io.StringReader;
 
 /**
  * GenericDataQuery
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/09 $
+ * @version $Revision: #3 $ $Date: 2003/04/04 $
  */
 
 public class GenericDataQuery extends DataQueryImpl {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/GenericDataQuery.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/GenericDataQuery.java#3 $ by $Author: rhs $, $DateTime: 2003/04/04 20:45:14 $";
+
+    private SQLBlock m_block;
 
     public GenericDataQuery(Session s, String sql, String[] columns) {
-        super(s, null);
-        throw new Error("not implemented");
+        super(s, makeQuery(sql, columns));
+	SQLParser p = new SQLParser(new StringReader(sql));
+	try {
+	    p.sql();
+	} catch (ParseException e) {
+	    throw new PersistenceException(e);
+	}
+	m_block = new SQLBlock(p.getSQL());
+	for (int i = 0; i < columns.length; i++) {
+	    Path path = Path.get(columns[i]);
+	    m_block.addMapping(path, path);
+	}
+    }
+
+    private static final Query makeQuery(String sql, String[] paths) {
+	ObjectType propType = Root.getRoot().getObjectType("global.Object");
+	ObjectType type = new ObjectType(Model.getInstance("gdq"), sql, null);
+	Signature sig = new Signature(type);
+	for (int i = 0; i < paths.length; i++) {
+	    type.addProperty
+		(new Role(paths[i], propType, false, false, true));
+	    sig.addPath(Path.get(paths[i]));
+	}
+	return new Query(sig, null);
+    }
+
+    protected Cursor execute(final Query query) {
+	return new Cursor(getSession().getProtoSession(), query) {
+		protected RecordSet execute() {
+		    return GenericDataQuery.this.getSession().getEngine()
+			.execute(query, m_block);
+		}
+	    };
     }
 
 }

@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #30 $ $Date: 2003/04/04 $
+ * @version $Revision: #31 $ $Date: 2003/04/04 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#30 $ by $Author: ashah $, $DateTime: 2003/04/04 11:35:17 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#31 $ by $Author: rhs $, $DateTime: 2003/04/04 20:45:14 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -193,10 +193,14 @@ public class RDBMSEngine extends Engine {
     }
 
     public RecordSet execute(Query query) {
+	return execute(query, null);
+    }
+
+    public RecordSet execute(Query query, SQLBlock block) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Executing " + query);
         }
-        QGen qg = new QGen(query);
+        QGen qg = new QGen(query, block);
         Select sel = qg.generate();
         return new RDBMSRecordSet(query.getSignature(), this, execute(sel),
                                   qg.getMappings(sel));
@@ -429,7 +433,7 @@ public class RDBMSEngine extends Engine {
         return execute(op, new RetainUpdatesWriter());
     }
 
-    public static final Path[] getKeyPaths(ObjectType type, Path prefix) {
+    static final Path[] getKeyPaths(ObjectType type, Path prefix) {
         LinkedList result = new LinkedList();
         LinkedList stack = new LinkedList();
         stack.add(prefix);
@@ -457,7 +461,7 @@ public class RDBMSEngine extends Engine {
         return (Path[]) result.toArray(new Path[0]);
     }
 
-    public static final Object get(Object obj, Path path) {
+    static final Object get(Object obj, Path path) {
         if (path == null) {
             return obj;
         }

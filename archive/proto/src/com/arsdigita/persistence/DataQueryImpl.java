@@ -20,20 +20,20 @@ import java.util.*;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #17 $ $Date: 2003/04/04 $
+ * @version $Revision: #18 $ $Date: 2003/04/04 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#17 $ by $Author: rhs $, $DateTime: 2003/04/04 15:25:34 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#18 $ by $Author: rhs $, $DateTime: 2003/04/04 20:45:14 $";
 
     private static final FilterFactory FACTORY = new FilterFactoryImpl();
 
     private Session m_ssn;
     private com.arsdigita.persistence.proto.Session m_pssn;
     private HashMap m_bindings = new HashMap();
+    final private Query m_original;
     private Query m_query;
-    PersistentCollection m_pc;
     Cursor m_cursor = null;
     private CompoundFilter m_filter = getFilterFactory().and();
 
@@ -42,14 +42,22 @@ class DataQueryImpl implements DataQuery {
     private int m_upperBound = Integer.MAX_VALUE;
 
     DataQueryImpl(Session ssn, PersistentCollection pc) {
+	this(ssn, pc.getDataSet().getQuery());
+    }
+
+    DataQueryImpl(Session ssn, Query query) {
         m_ssn = ssn;
         m_pssn = ssn.getProtoSession();
-        m_pc = pc;
-	m_query = new Query(m_pc.getDataSet().getQuery(), null);
+	m_original = query;
+	m_query = new Query(m_original, null);
     }
 
     Session getSession() {
         return m_ssn;
+    }
+
+    Query getOriginal() {
+	return m_original;
     }
 
     public CompoundType getType() {
@@ -64,7 +72,7 @@ class DataQueryImpl implements DataQuery {
 	close();
 	m_cursor = null;
         m_bindings.clear();
-	m_query = new Query(m_pc.getDataSet().getQuery(), null);
+	m_query = new Query(m_original, null);
 	m_filter = getFilterFactory().and();
 	m_lowerBound = 0;
 	m_upperBound = Integer.MAX_VALUE;
@@ -419,12 +427,15 @@ class DataQueryImpl implements DataQuery {
     private void checkCursor() {
         if (m_cursor == null) {
 	    try {
-		m_cursor = m_pssn.retrieve(makeQuery())
-		    .getDataSet().getCursor();
+		m_cursor = execute(makeQuery());
 	    } catch (UnboundParameterException e) {
 		throw new PersistenceException(e);
 	    }
         }
+    }
+
+    protected Cursor execute(Query query) {
+	return m_pssn.retrieve(query).getDataSet().getCursor();
     }
 
     public boolean next() {

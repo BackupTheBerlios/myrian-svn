@@ -8,12 +8,12 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #18 $ $Date: 2003/04/04 $
+ * @version $Revision: #19 $ $Date: 2003/04/04 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#18 $ by $Author: rhs $, $DateTime: 2003/04/04 18:09:54 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#19 $ by $Author: rhs $, $DateTime: 2003/04/04 20:45:14 $";
 
     private ArrayList m_paths = new ArrayList();
 
@@ -203,10 +203,7 @@ public class Signature {
     }
 
     private void addKeyProperties() {
-        ObjectType type = getObjectType();
-        Collection props = type.getRoot().getObjectMap(type)
-            .getKeyProperties();
-        addProperties(props);
+        addProperties(getObjectType().getKeyProperties());
     }
 
     public boolean isImmediate(Path path) {

@@ -13,12 +13,12 @@ import java.io.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #20 $ $Date: 2003/04/04 $
+ * @version $Revision: #21 $ $Date: 2003/04/04 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#20 $ by $Author: rhs $, $DateTime: 2003/04/04 09:30:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#21 $ by $Author: rhs $, $DateTime: 2003/04/04 20:45:14 $";
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -52,17 +52,23 @@ class QGen {
 
 
     private Query m_query;
+    private SQLBlock m_block;
     private HashMap m_columns = new HashMap();
     private HashMap m_keys = new HashMap();
     private HashMap m_tables = new HashMap();
     private HashMap m_joins = new HashMap();
 
     public QGen(Query query) {
+	this(query, null);
+    }
+
+    public QGen(Query query, SQLBlock block) {
         if (query.getSignature().getSources().size() == 0) {
             throw new IllegalArgumentException
                 ("no sources");
         }
         m_query = query;
+	m_block = block;
     }
 
     private Path getColumn(Path prefix) {
@@ -111,6 +117,22 @@ class QGen {
         return result;
     }
 
+    private boolean isStatic(Source src) {
+	if (src.getPath() == null && m_block != null) {
+	    return true;
+	} else {
+	    return hasSQLBlock(src);
+	}
+    }
+
+    private SQLBlock getBlock(Source src) {
+	if (m_block != null && src.getPath() == null) {
+	    return m_block;
+	} else {
+	    return getSQLBlock(src);
+	}
+    }
+
     public Select generate() {
         Signature sig = m_query.getSignature();
 
@@ -121,8 +143,8 @@ class QGen {
 
             Join j;
 
-            if (hasSQLBlock(src)) {
-                SQLBlock block = getSQLBlock(src);
+            if (isStatic(src)) {
+                SQLBlock block = getBlock(src);
                 Path prefix = getPrefix(block);
                 for (Iterator iter = block.getPaths().iterator();
                      iter.hasNext(); ) {

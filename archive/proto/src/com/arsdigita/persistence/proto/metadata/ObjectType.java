@@ -7,12 +7,12 @@ import java.util.*;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2003/03/27 $
+ * @version $Revision: #12 $ $Date: 2003/04/04 $
  **/
 
 public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#11 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#12 $ by $Author: rhs $, $DateTime: 2003/04/04 20:45:14 $";
 
     private Model m_model;
     private String m_name;
@@ -118,6 +118,7 @@ public class ObjectType extends Element {
 
     public boolean isKey(Path path) {
         Property prop = getProperty(path);
+	if (getRoot() == null) { return false; }
         ObjectMap map = getRoot().getObjectMap(prop.getContainer());
         return map.getKeyProperties().contains(prop);
     }
@@ -129,6 +130,7 @@ public class ObjectType extends Element {
     }
 
     public Collection getKeyProperties() {
+	if (getRoot() == null) { return Collections.EMPTY_LIST; }
         ObjectMap map = getRoot().getObjectMap(this);
         if (map == null) { return Collections.EMPTY_LIST; }
         return map.getKeyProperties();
@@ -143,6 +145,7 @@ public class ObjectType extends Element {
     }
 
     public boolean isKeyed() {
+	if (getRoot() == null) { return false; }
         ObjectMap map = getRoot().getObjectMap(this);
         if (map == null) { return false; }
         if (map.getKeyProperties().size() == 0) { return false;}
