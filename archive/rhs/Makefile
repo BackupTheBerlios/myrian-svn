@@ -14,6 +14,7 @@ CLASSPATH:=$(CLASSPATH):$(subst $(space),:,$(wildcard lib/*.zip))
 CLASSPATH:=$(CLASSPATH):$(SOURCEPATH)
 
 JSTAMPS:=$(SOURCES:%=$(BUILD)/%.jstamp)
+JARS:=$(SOURCES:%=$(BUILD)/%.jar)
 
 PKGS:=$(shell find $(SOURCES) -type d -exec sh -c "find {} -maxdepth 1 -type f | fgrep -q .java" \; -printf "%P\n" | sort -u | sed s@/@.@g)
 JD:=javadoc
@@ -24,15 +25,16 @@ DOC_DEST:=$(BUILD)/doc
 
 all: $(JSTAMPS)
 
+jars: $(JARS)
+
 -include $(SOURCES:%=$(BUILD)/%.jmake)
 
 clean:
 	rm -rf $(BUILD)
 
-jar: all
-	jar cf $(BUILD)/crp.jar -C $(BUILD)/src .
-	cd src; find . -name "*.pdl" -or -name "*.xsl" | \
-		xargs jar uf ../$(BUILD)/crp.jar
+doc:
+	@mkdir -p $(DOC_DEST)
+	$(JD) $(JD_FLAGS) $(PKGS) -d $(DOC_DEST)
 
 tags:
 	rm -f TAGS
@@ -40,10 +42,6 @@ tags:
 		--language=none \
 		--regex='/^\([ \t]\|public\|private\|static\|protected\|final\|abstract\)*[ \t\n]*\(class\|interface\)+[ \t\n]+\([a-zA-Z0-9_]+\)/\3/' \
 		--output=TAGS
-
-$(BUILD)/%.java: %.jj
-	@mkdir -p $(dir $(BUILD)/$<)
-	@$(JAVACC) -OUTPUT_DIRECTORY=$(dir $(BUILD)/$<) $<
 
 $(BUILD)/%.jmake: %
 	@echo generating $@
@@ -65,6 +63,11 @@ $(BUILD)/%.jmake: %
 	@echo "" >> $@
 	@find $< -type d -printf "%p:\n" >> $@
 
-doc:
-	@mkdir -p $(DOC_DEST)
-	$(JD) $(JD_FLAGS) $(PKGS) -d $(DOC_DEST)
+$(BUILD)/%.java: %.jj
+	@mkdir -p $(dir $(BUILD)/$<)
+	@$(JAVACC) -OUTPUT_DIRECTORY=$(dir $(BUILD)/$<) $<
+
+$(BUILD)/%.jar: $(BUILD)/%.jstamp
+	jar cf $@ -C $(BUILD)/$* .
+	find $* \( -name "*.pdl" -or -name "*.xsl" \) -printf "-C $* %P\n" | \
+		xargs -r jar uf $@
