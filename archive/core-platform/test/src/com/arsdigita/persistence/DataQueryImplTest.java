@@ -38,11 +38,11 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #20 $ $Date: 2004/01/22 $
+ * @version $Revision: #21 $ $Date: 2004/03/15 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#20 $ by $Author: ashah $, $DateTime: 2004/01/22 17:43:25 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#21 $ by $Author: ashah $, $DateTime: 2004/03/15 13:47:44 $";
 
     private static Logger s_log =
         Logger.getLogger(DataQueryImplTest.class.getName());
@@ -74,6 +74,8 @@ public class DataQueryImplTest extends DataQueryTest {
         final String ORDER_FIELD = "id";
         final String PRIORITY = "priority";
 
+        // twice to see if something funny happens
+        dq.addOrder(ORDER_FIELD);
         dq.addOrder(ORDER_FIELD);
         assertTrue( "Should be several items in this query set!", dq.next() );
         BigDecimal priorValue = (BigDecimal) dq.get(ORDER_FIELD);
