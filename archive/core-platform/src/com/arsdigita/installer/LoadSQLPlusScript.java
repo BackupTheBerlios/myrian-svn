@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 
 public class LoadSQLPlusScript {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#12 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#13 $ by $Author: jorris $, $DateTime: 2003/08/27 19:15:38 $";
 
     private static final Logger s_log =
             Logger.getLogger(LoadSQLPlusScript.class);
@@ -134,6 +134,8 @@ public class LoadSQLPlusScript {
     }
 
     private void load(final String filename) {
+
+        s_log.info("Loading " + filename);
         try {
             StatementParser sp = new StatementParser
                     (filename, new FileReader(filename),
@@ -145,10 +147,14 @@ public class LoadSQLPlusScript {
                                     include(filename, include);
                                 }
                             });
+            s_log.debug("Parsing");
             sp.parse();
+            s_log.debug("Parsed");
         } catch (ParseException e) {
+            s_log.error("ParseException", e);
             throw new UncheckedWrapperException(e);
         } catch (FileNotFoundException e) {
+            s_log.error("FileNotFound", e);
             throw new UncheckedWrapperException(e);
         }
     }
@@ -171,18 +177,27 @@ public class LoadSQLPlusScript {
     private void executeStatement (String sql) {
         m_stmtCount++;
         s_log.info ("Statement count: " + m_stmtCount);
-        if (m_echoSQLStatement) {
-            s_log.info (sql);
-        }
+        s_log.info ("SQL is: " + sql);
 
         try {
-            int rowsAffected = m_stmt.executeUpdate(sql);
+
+            s_log.debug("Statement status. Closed: " + m_con.isClosed() +
+                    " ReadOnly: " + m_con.isReadOnly());
+            s_log.debug("Warnings: " + m_con.getWarnings());
+
+            s_log.debug("executing");
+            final int rowsAffected = m_stmt.executeUpdate(sql);
+            //m_stmt.execute(sql);
             s_log.warn ("  " + rowsAffected + " row(s) affected");
             m_con.commit();
-        } catch (SQLException e) {
+            s_log.debug("committed");
+        } catch (Throwable e) {
             try {
+                s_log.error("Error encountered. Rolling back", e);
                 m_con.rollback();
-            } catch (SQLException se) {
+                s_log.debug("rolled back");
+            } catch (Throwable se) {
+                s_log.error("new error encountered on rollback", se);
                 throw new UncheckedWrapperException(se);
             }
             m_exitValue = 1;
@@ -191,6 +206,8 @@ public class LoadSQLPlusScript {
             if (!m_onErrorContinue) {
                 throw new UncheckedWrapperException(e);
             }
+        } finally {
+            s_log.debug("exiting method");
         }
     }
 
