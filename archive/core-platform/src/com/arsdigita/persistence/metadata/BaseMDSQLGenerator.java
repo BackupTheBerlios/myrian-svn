@@ -47,12 +47,12 @@ import org.apache.log4j.Logger;
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#16 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#17 $
  * @since 4.6.3
  */
 abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#16 $ by $Author: rhs $, $DateTime: 2002/10/16 13:29:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#17 $ by $Author: rhs $, $DateTime: 2002/10/16 16:22:05 $";
 
     private static final Logger s_log =
         Logger.getLogger(BaseMDSQLGenerator.class);
@@ -380,9 +380,11 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
             String tableName = (String)pq.dequeue();
             Table table = MetadataRoot.getMetadataRoot().getTable(tableName);
             Map columns = (Map) columnMap.get(tableName);
+
             Operation block;
-            if (type.getReferenceKey() == null &&
-                type.getSupertype() != null) {
+
+            if (type.getSupertype() != null &&
+                type.getSupertype().isAttributeStorage(table)) {
                 block = makeUpdate(type, table, columns);
             } else {
                 block = makeInsert(type, table, columns);
