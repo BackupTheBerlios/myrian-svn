@@ -34,37 +34,15 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #1 $ $Date: 2003/05/09 $
+ * @version $Revision: #2 $ $Date: 2003/05/09 $
  */
 public class VersioningMetadata {
     private final static Logger s_log =
         Logger.getLogger(VersioningMetadata.class);
 
-    private final Node.Switch m_switch;
     private final Set m_versionedTypes;
     private final Set m_unversionedProps;
-
-    /**
-     * The reason for this change listener is to avoid tight coupling between
-     * the versioning and persistence packages. The versioning package must have
-     * some sort of access to the PDL abstract syntax tree in order to be able
-     * to determine whether or not an object type is marked "versioned".
-     *
-     * <p>The easiest route would be to add a boolean method
-     * <code>isMarkedVersioned()</code> to the ObjectType class. However, we
-     * want to try to avoid joining versioning and persistence at the hip like
-     * that. Therefore, instead of adding said boolean method to the ObjectType
-     * class, we use this class - i.e. VersioningMetadata - as a communication
-     * medium.</p>
-     *
-     * <p>The idea is that the PDL parser will indirectly expose its underlying
-     * PDL AST to this class via the callback provided by nodeSwitch(). This
-     * will enable this class to keep track of object types that are marked
-     * versioned. However, the versioning package must be made aware of any
-     * changes in the object type metadata. Such changes may occur as new object
-     * types are added, e.g. as a result of creating a user-defined content-type
-     * at runtime. </p>
-     **/
+    private Node.Switch m_switch;
     private ChangeListener m_changeListener;
 
     private final static VersioningMetadata s_singleton =
@@ -73,56 +51,16 @@ public class VersioningMetadata {
     private VersioningMetadata() {
         m_versionedTypes = new HashSet();
         m_unversionedProps = new HashSet();
-
-        m_switch = new Node.Switch() {
-                public void onObjectType(ObjectTypeNd ot) {
-                    final String fqn = ot.getQualifiedName();
-
-                    if ( ot.isVersioned() ) {
-                        m_versionedTypes.add(fqn);
-                    }
-                    s_log.info("onObjectType: " + fqn);
-                    if ( m_changeListener != null ) {
-                        m_changeListener.onObjectType(fqn, ot.isVersioned());
-                    }
-                }
-
-                public void onProperty(PropertyNd prop) {
-                    if ( !prop.isUnversioned() ) return;
-
-                    Node parent = prop.getParent();
-                    String containerName = null;
-                    if ( parent instanceof ObjectTypeNd ) {
-                        containerName = ((ObjectTypeNd) parent).getQualifiedName();
-                    } else if ( parent instanceof AssociationNd) {
-                        throw new Error("not implemented: " + prop);
-                    } else {
-                        throw new IllegalStateException("can'g get here.");
-                    }
-
-                    Property property = 
-                        getProperty(containerName, prop.getName().getName());
-
-                    if ( property.isKeyProperty() ) {
-                        throw new IllegalStateException
-                            ("Cannot mark a key property 'unversioned': " +
-                             property);
-                    }
-                    s_log.info("onProperty: " + property);
-                    m_unversionedProps.add(property);
-
-                    if ( m_changeListener != null ) {
-                        m_changeListener.onUnversionedProperty(property);
-                    }
-                }
-            };
     }
 
     public static VersioningMetadata getVersioningMetadata() {
         return s_singleton;
     }
 
-    public Node.Switch nodeSwitch() {
+    synchronized Node.Switch nodeSwitch(SymbolTable symTable) {
+        if ( m_switch == null ) {
+            m_switch = new NodeSwitch(symTable);
+        }
         return m_switch;
     }
 
@@ -194,6 +132,76 @@ public class VersioningMetadata {
          * AST that is marked <code>unversioned</code>.
          **/
         void onUnversionedProperty(Property property);
+    }
+
+    private class NodeSwitch extends Node.Switch {
+        private SymbolTable m_symTable;
+
+        public NodeSwitch(SymbolTable symTable) {
+            m_symTable = symTable;
+        }
+
+        public void onObjectType(ObjectTypeNd ot) {
+            final String fqn = ot.getQualifiedName();
+
+            if ( ot.isVersioned() ) {
+                m_versionedTypes.add(fqn);
+            }
+            s_log.info("onObjectType: " + fqn);
+            if ( m_changeListener != null ) {
+                m_changeListener.onObjectType(fqn, ot.isVersioned());
+            }
+        }
+
+        public void onProperty(PropertyNd prop) {
+            if ( !prop.isUnversioned() ) return;
+
+            String containerName = getContainerName(prop);
+            Property property = 
+                getProperty(containerName, prop.getName().getName());
+
+            if ( property.isKeyProperty() ) {
+                throw new IllegalStateException
+                    ("Cannot mark a key property 'unversioned': " +
+                     property);
+            }
+            s_log.info("onProperty: " + property);
+            m_unversionedProps.add(property);
+
+            if ( m_changeListener != null ) {
+                m_changeListener.onUnversionedProperty(property);
+            }
+        }
+
+        private String getContainerName(PropertyNd prop) {
+            Node parent = prop.getParent();
+            if ( parent instanceof ObjectTypeNd ) {
+                return ((ObjectTypeNd) parent).getQualifiedName();
+            }
+
+            if ( !(parent instanceof AssociationNd) ) {
+                throw new IllegalStateException("can'g get here.");
+            } 
+
+            AssociationNd assoc = (AssociationNd) parent;
+
+            PropertyNd other = null;
+            if ( prop.equals(assoc.getRoleOne()) ) {
+                other = assoc.getRoleTwo();
+            } else if ( prop.equals(assoc.getRoleTwo()) ) {
+                other = assoc.getRoleOne();
+            } else {
+                throw new IllegalStateException("can't get here");
+            }
+
+            System.err.println("other.getType()=" + other);
+            if ( m_symTable.lookup(other.getType()) == null ) {
+                // FIXME: figure out why this lookup fails to find the resolved
+                // TypeNd.
+                throw new IllegalStateException("null");
+            }
+            return m_symTable.lookup(other.getType());
+        }
     }
 }
 
