@@ -13,7 +13,7 @@ import javax.jdo.Query;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2004/07/13 $
+ * @version $Revision: #12 $ $Date: 2004/07/13 $
  **/
 class CRPMap implements Map {
     private Set entries;
@@ -78,7 +78,8 @@ class CRPMap implements Map {
     }
 
     public Set entrySet() {
-        throw new UnsupportedOperationException();
+        // XXX: the returned set should not support add and addAll.
+        return entries;
     }
 
     public void putAll(Map map) {

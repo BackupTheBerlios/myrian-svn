@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
  * MapTest
  *
  * @since 2004-07-13
- * @version $Revision: #1 $ $Date: 2004/07/13 $
+ * @version $Revision: #2 $ $Date: 2004/07/13 $
  **/
 public class MapTest extends WithTxnCase {
     private final static Logger s_log = Logger.getLogger(MapTest.class);
@@ -63,5 +63,11 @@ public class MapTest extends WithTxnCase {
         assertEquals("PAGE 3", PAGE1, idx.remove(TOPIC1));
         assertTrue("has TOPIC1", !idx.containsKey(TOPIC1));
         assertTrue("has TOPIC2", idx.keySet().contains(TOPIC2));
+    }
+
+    public void testMagazine2() {
+        Map.Entry entry = new Entry(TOPIC2, PAGE2);
+        assertTrue("entrySet has (TOPIC2, PAGE2)",
+                   m_mag.getIndex().entrySet().contains(entry));
     }
 }
