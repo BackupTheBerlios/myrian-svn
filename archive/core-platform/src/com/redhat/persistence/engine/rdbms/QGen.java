@@ -15,6 +15,7 @@
 
 package com.redhat.persistence.engine.rdbms;
 
+import com.arsdigita.util.WrappedError;
 import com.redhat.persistence.Condition;
 import com.redhat.persistence.Expression;
 import com.redhat.persistence.Parameter;
@@ -52,12 +53,12 @@ import org.apache.log4j.Logger;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2003/12/11 $
+ * @version $Revision: #14 $ $Date: 2004/02/12 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/QGen.java#13 $ by $Author: ashah $, $DateTime: 2003/12/11 13:58:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/QGen.java#14 $ by $Author: vadim $, $DateTime: 2004/02/12 15:53:46 $";
 
     private static final Logger LOG = Logger.getLogger(QGen.class);
 
@@ -698,7 +699,7 @@ class QGen {
             try {
                 p.sql();
             } catch (ParseException pe) {
-                throw new Error(pe.getMessage());
+                throw new WrappedError(pe);
             }
         }
     };

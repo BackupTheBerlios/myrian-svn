@@ -15,6 +15,7 @@
 
 package com.redhat.persistence.pdl;
 
+import com.arsdigita.util.WrappedError;
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.common.SQLParser;
 import com.redhat.persistence.metadata.Adapter;
@@ -79,12 +80,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #15 $ $Date: 2003/11/17 $
+ * @version $Revision: #16 $ $Date: 2004/02/12 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#15 $ by $Author: vadim $, $DateTime: 2003/11/17 17:03:49 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#16 $ by $Author: vadim $, $DateTime: 2004/02/12 15:53:46 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -106,7 +107,7 @@ public class PDL {
             FileNd file = p.file(filename);
             m_ast.add(AST.FILES, file);
         } catch (ParseException e) {
-            throw new Error(filename + ": " + e.getMessage());
+            throw new WrappedError(filename, e);
         }
     }
 
