@@ -31,13 +31,13 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterStore
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#6 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#7 $
  */
 public class BaseConfig {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#6 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#7 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/11 11:49:32 $";
+        "$DateTime: 2003/09/11 12:20:08 $";
 
     private static final Logger s_log = Logger.getLogger
         (BaseConfig.class);
@@ -138,7 +138,12 @@ public class BaseConfig {
         return value.getValue();
     }
 
+    /**
+     * Returns a <code>String</code> representation of this object.
+     *
+     * @return super.toString() + ":" + parameterStore.toString()
+     */
     public final String toString() {
-        return super.toString() + " [" + m_store + "]";
+        return super.toString() + ":" + m_store;
     }
 }
