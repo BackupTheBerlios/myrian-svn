@@ -26,12 +26,12 @@ import org.apache.log4j.Logger;
  * MultiThreadDataObjectTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/06/09 $
+ * @version $Revision: #10 $ $Date: 2003/07/01 $
  **/
 
 public class MultiThreadDataObjectTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/MultiThreadDataObjectTest.java#9 $ by $Author: ashah $, $DateTime: 2003/06/09 16:15:22 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/MultiThreadDataObjectTest.java#10 $ by $Author: ashah $, $DateTime: 2003/07/01 10:09:59 $";
 
     private static final Logger s_log = Logger.getLogger(MultiThreadDataObjectTest.class);
 
@@ -424,6 +424,7 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
             txn.beginTxn();
 
             assertTrue("test was not disconnected", test.isDisconnected());
+            test = ssn.retrieve(TEST);
             icle = (DataObject) test.get("required");
             icle.set("name", "will abort");
 
