@@ -22,12 +22,12 @@ import java.sql.Types;
  * Defines a database datatype.  It contains the datatype name, and optionally
  * a size (such as the 400 in varchar(400)).
  *
- * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #5 $ $Date: 2002/10/07 $
+ * @author Patrick McNeill
+ * @version $Revision: #6 $ $Date: 2002/12/11 $
  */
 public class DataTypeDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/DataTypeDef.java#5 $ by $Author: rhs $, $DateTime: 2002/10/07 19:00:30 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/DataTypeDef.java#6 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     // the type name
     private String m_type;

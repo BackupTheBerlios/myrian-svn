@@ -38,14 +38,14 @@ import org.apache.log4j.Logger;
  * A simple implementation of the java.sql.CallableStatement interface
  * that wraps a "real" implementation of java.sql.CallableStatement
  *
- * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #6 $ $Date: 2002/11/01 $
+ * @author Mark Thomas
+ * @version $Revision: #7 $ $Date: 2002/12/11 $
  * @since 4.5
  */
 public class PreparedStatement extends com.arsdigita.db.Statement
     implements java.sql.PreparedStatement {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/PreparedStatement.java#6 $ $Author: vadim $ $Date: 2002/11/01 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/PreparedStatement.java#7 $ $Author: dennis $ $Date: 2002/12/11 $";
 
     private static final Logger s_cat =
         Logger.getLogger(PreparedStatement.class);

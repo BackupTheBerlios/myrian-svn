@@ -31,12 +31,12 @@ package com.arsdigita.util;
  * <tt>new UncheckedWrapperException(e);</tt> is more correct than
  * <tt>new UncheckedWrapperException(e.getMessage(), e);</tt>
  *
- * @author David Eison (eison@arsdigita.com)
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#3 $
+ * @author David Eison 
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#4 $
  */
 public class UncheckedWrapperException extends RuntimeException {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#3 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#4 $";
 
     Throwable m_rootCause;
 

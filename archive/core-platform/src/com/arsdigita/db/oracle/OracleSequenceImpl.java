@@ -28,12 +28,12 @@ import java.sql.PreparedStatement;
 /**
  * Implementation of the Sequence class for the Oracle RDBMS.
  *
- * @author <A HREF="mailto:kevin@arsdigita.com">Kevin Scaldeferri</A>
+ * @author Kevin Scaldeferri
  */
 
 public class OracleSequenceImpl extends SequenceImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleSequenceImpl.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleSequenceImpl.java#4 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     private String m_sequenceName;
 

@@ -28,14 +28,14 @@ import java.util.Map;
  * columns.  This is to avoid data loss and allow rolling back of UDCT
  * operations.
  *
- * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @author <a href="mailto:randyg@arsdigita.com">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGenerator.java#5 $
+ * @author Patrick McNeill
+ * @author Randy Graebner
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGenerator.java#6 $
  * @since 4.6.3 */
 
 public interface DDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGenerator.java#5 $ by $Author: vadim $, $DateTime: 2002/12/04 12:14:16 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGenerator.java#6 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
     /**
      * This takes an ObjectType name and model, and generates a unique
      * table name that can be used to store the object type.

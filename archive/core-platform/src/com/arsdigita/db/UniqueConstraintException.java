@@ -21,14 +21,14 @@ import java.sql.SQLException;
  * An exception class that is used when a unique constraint
  * violation is thrown by the database.
  *
- * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #3 $
+ * @author David Eison
+ * @version $Revision: #4 $
  * @since 4.6
  */
 
 public class UniqueConstraintException extends DbException {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/UniqueConstraintException.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/UniqueConstraintException.java#4 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     /**
      * Default constructor.  setRootCause should be called

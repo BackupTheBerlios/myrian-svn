@@ -38,12 +38,12 @@ import java.util.HashSet;
  *              through inheritance.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #19 $ $Date: 2002/11/01 $
+ * @version $Revision: #20 $ $Date: 2002/12/11 $
  */
 
 public class GenericDataObject implements DataObject {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#19 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#20 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     private ObjectType    m_type;
     private Session       m_session;
@@ -940,7 +940,7 @@ public class GenericDataObject implements DataObject {
      * @exception PersistenceException Thrown if the object type does
      * not have the specified property
      *
-     * @author <a href="mailto:mbryzek@arsdigita.com">Michael Bryzek</a>
+     * @author Michael Bryzek
      **/
     private Property checkProperty(String name)
         throws PersistenceException

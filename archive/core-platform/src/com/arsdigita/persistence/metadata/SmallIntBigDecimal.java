@@ -28,8 +28,7 @@ import java.math.BigInteger;
  *  This class is intended to be used within MetadataRoot when instantiating
  *  values from the database.
  *
- * @author <a href="mailto:jorris@arsdigita.com">jorris@arsdigita.com</a>
- * @version $Revision: #4 $ $Date: 2002/10/16 $
+ * @version $Revision: #5 $ $Date: 2002/12/11 $
  *
  */
 class SmallIntBigDecimal extends BigDecimal {

@@ -22,12 +22,12 @@ import org.apache.log4j.Logger;
 /**
  * PersistenceWrapper
  *
- * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @author Jon Orris
+ * @version $Revision: #5 $ $Date: 2002/12/11 $
  */
 public class PersistenceWrapper extends BaseTestSetup {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceWrapper.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceWrapper.java#5 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     private static Logger s_log =
         Logger.getLogger(PersistenceWrapper.class.getName());

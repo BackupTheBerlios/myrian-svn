@@ -31,13 +31,12 @@ import java.util.Collection;
  * it does not make any sense to instantiate this without other
  * methods (e.g. execute or executeQuery)
  *
- * @author <a href="mailto:randyg@arsdigita.com">randyg@arsdigita.com</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/12/11 $
  */
 
 abstract class AbstractDataOperation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/AbstractDataOperation.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/AbstractDataOperation.java#4 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     protected ObjectType m_paramType = new ObjectType("<params>");
     protected DataContainer m_source = new DataContainer(m_paramType);

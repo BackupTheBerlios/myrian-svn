@@ -29,7 +29,7 @@ package com.arsdigita.persistence;
  * is removed immediately after it has run.
  *
  * @see com.arsdigita.persistence.TransactionContext
- * @author <a href="mailto:dan@arsdigita.com">Daniel Berrange</a>
+ * @author Daniel Berrange
  */
 
 public interface TransactionListener {

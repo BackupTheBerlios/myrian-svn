@@ -21,12 +21,12 @@ package com.arsdigita.util;
  * information.  Specifically, we recognize plain text, HTML, and
  * preformatted text.
  *
- * @author Kevin Scaldeferri (kevin@arsdigita.com)
+ * @author Kevin Scaldeferri 
  */
 
 public class TypedText {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/TypedText.java#4 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/TypedText.java#5 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     public static final String TEXT_HTML = "text/html";
     public static final String TEXT_PLAIN = "text/plain";

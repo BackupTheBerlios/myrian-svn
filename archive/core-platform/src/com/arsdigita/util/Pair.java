@@ -24,13 +24,12 @@ import java.util.Map;
  * <code>value</code> set in the constructor.
  * </p>
  *
- * @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
- * @author <a href="mailto:lutter@arsdigita.com">David Lutterkort</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @author David Lutterkort
+ * @version $Revision: #4 $ $Date: 2002/12/11 $
  */
 public class Pair implements Map.Entry, Cloneable {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Pair.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Pair.java#4 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     private Object m_key;
     private Object m_value;

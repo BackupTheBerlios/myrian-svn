@@ -24,15 +24,15 @@ import org.apache.log4j.Logger;
 /**
  *
  *
- * @author David Dao (<a href="mailto:david@arsdigita.com"></a>)
- * @version $Revision: #5 $ $Date: 2002/10/02 $
+ * @author David Dao
+ * @version $Revision: #6 $ $Date: 2002/12/11 $
  * @since 4.5
  *
  */
 
 public class J2EEConnectionManagerImpl implements DatabaseConnectionPool {
 
-    public static final String versionId = "$Author: rhs $ - $Date: 2002/10/02 $ $Id: //core-platform/dev/src/com/arsdigita/db/J2EEConnectionManagerImpl.java#5 $";
+    public static final String versionId = "$Author: dennis $ - $Date: 2002/12/11 $ $Id: //core-platform/dev/src/com/arsdigita/db/J2EEConnectionManagerImpl.java#6 $";
 
     private static final Logger cat = Logger.getLogger(J2EEConnectionManagerImpl.class.getName());
 

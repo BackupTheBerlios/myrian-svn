@@ -23,13 +23,13 @@ import java.io.PrintStream;
  * to specify a join order. JoinElement is used by JoinPath to specify a
  * complete path from one object type or table to another.
  *
- * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinElement.java#4 $
+ * @author Patrick McNeill
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinElement.java#5 $
  * @since 4.6
  **/
 public class JoinElement extends Element {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinElement.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinElement.java#5 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
     private Column m_from = null;
     // column belonging to the start table, or closest to it
 

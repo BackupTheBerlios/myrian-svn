@@ -22,13 +22,13 @@ import com.arsdigita.db.DbExceptionHandlerBaseImpl;
 /**
  * Class for processing of Postgres DB Exceptions.
  *
- * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #7 $
+ * @author David Eison
+ * @version $Revision: #8 $
  * @since 4.6
  */
 public class PostgresDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresDbExceptionHandlerImpl.java#7 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresDbExceptionHandlerImpl.java#8 $";
 
     static {
         errors.put("Cannot insert a duplicate key into unique index",

@@ -20,14 +20,14 @@ package com.arsdigita.persistence;
  * UndefinedEventException - Thrown when the persistence system attempts to invoke
  * an event, such as a property retrieve event, which is undefined.
  *
- * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #4 $ $Date: 2002/11/01 $
+ * @author Jon Orris
+ * @version $Revision: #5 $ $Date: 2002/12/11 $
  */
 
 public class UndefinedEventException extends PersistenceException {
 
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/UndefinedEventException.java#4 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/UndefinedEventException.java#5 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     public UndefinedEventException(String msg) {
         super(msg, null);

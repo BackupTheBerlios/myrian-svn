@@ -21,11 +21,11 @@ import junit.framework.Test;
 /**
  * MetadataSuite - Suite of tests for persistence.metadata
  *
- * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #5 $ $Date: 2002/08/14 $
+ * @author Jon Orris
+ * @version $Revision: #6 $ $Date: 2002/12/11 $
  */
 public class MetadataxSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/MetadataxSuite.java#5 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/MetadataxSuite.java#6 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     public static Test suite() {
         MetadataxSuite suite = new MetadataxSuite();

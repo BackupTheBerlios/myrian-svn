@@ -33,13 +33,13 @@ import org.apache.log4j.Logger;
  * DELETE do not have this restriction).  These restrictions may be removed
  * in the future, but we do not consider them to be essential at the moment.
  *
- * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#10 $
+ * @author Patrick McNeill
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#11 $
  * @since 4.6.3
  */
 class OracleMDSQLGenerator extends BaseMDSQLGenerator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#10 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleMDSQLGenerator.java#11 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     private static final Logger s_log =
         Logger.getLogger(OracleMDSQLGenerator.class.getName());

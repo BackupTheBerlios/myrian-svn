@@ -35,8 +35,8 @@ import org.apache.log4j.Level;
  * Initializer gets the information required to create Sessions and informs
  * the SessionManager of them.
  *
- * @author Archit Shah
- * @version $Revision: #13 $ $Date: 2002/12/11 $
+ * @author Archit Shah 
+ * @version $Revision: #14 $ $Date: 2002/12/11 $
  **/
 
 public class Initializer

@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * Defines a database column, including the table name, column name, and
  * data type.
  *
- * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #10 $ $Date: 2002/11/01 $
+ * @author Patrick McNeill
+ * @version $Revision: #11 $ $Date: 2002/12/11 $
  */
 public class ColumnDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ColumnDef.java#10 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ColumnDef.java#11 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     private static int count = 0;
     private static final Logger s_log =

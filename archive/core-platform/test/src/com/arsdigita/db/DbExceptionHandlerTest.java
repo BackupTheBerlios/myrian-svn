@@ -25,11 +25,11 @@ import java.sql.SQLException;
  * This test verifies the exception-type-narrowing functionality
  * of the DbExceptionHandler
  *
- * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
+ * @author David Eison
  */
 public class DbExceptionHandlerTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DbExceptionHandlerTest.java#5 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DbExceptionHandlerTest.java#6 $";
 
     private static java.sql.Connection conn;
 

@@ -18,9 +18,8 @@ package com.arsdigita.util;
 /**
  * Special MIME types useful for typing Message objects.
  *
- * @author Ron Henderson (ron@arsdigita.com)
- * @author richardl@arsdigita.com
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/MessageType.java#3 $
+ * @author Ron Henderson 
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/MessageType.java#4 $
  */
 
 public interface MessageType {

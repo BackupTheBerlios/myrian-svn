@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
  * unless one does not exist in which case a new connection will be
  * retrieved and closed by the specific implementation class.
  *
- * @author <A HREF="mailto:kevin@arsdigita.com">Kevin Scaldeferri</A>
+ * @author Kevin Scaldeferri
  */
 
 public class Sequences {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Sequences.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Sequences.java#5 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     private static final Logger s_log =
         Logger.getLogger(Sequences.class);

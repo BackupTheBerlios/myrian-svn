@@ -24,12 +24,12 @@ import org.apache.log4j.Priority;
 import org.apache.log4j.SimpleLayout;
 
 /**
- * @author <a href="mailto:dennis@arsdigita.com">Dennis Gregorovic</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @author Dennis Gregorovic
+ * @version $Revision: #4 $ $Date: 2002/12/11 $
  */
 public class UtilSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/UtilSuite.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/UtilSuite.java#4 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     public static Test suite() {
         initializeLogging();

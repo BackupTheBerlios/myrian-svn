@@ -22,12 +22,12 @@ import java.util.Map;
  * Decorate a data query so that its behavior can be changed and additional
  * methods can be added to a stock data query.
  *
- * @author <a href="mailto:lutter@arsdigita.com">David Lutterkort</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDecorator.java#4 $
+ * @author David Lutterkort
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDecorator.java#5 $
  */
 public class DataQueryDecorator implements DataQuery {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDecorator.java#4 $ by $Author: randyg $, $DateTime: 2002/09/09 16:52:30 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDecorator.java#5 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     private DataQuery m_dq;
 

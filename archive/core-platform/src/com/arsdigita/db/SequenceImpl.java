@@ -26,12 +26,12 @@ import java.sql.SQLException;
  * this abstract class should be implemented by concrete classes
  * appropriate to a given database
  *
- * @author <A HREF="mailto:kevin@arsdigita.com">Kevin Scaldeferri</A>
+ * @author Kevin Scaldeferri
  */
 
 public abstract class SequenceImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/SequenceImpl.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/SequenceImpl.java#4 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     public abstract BigDecimal getCurrentValue() throws SQLException;
 

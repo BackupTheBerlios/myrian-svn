@@ -26,12 +26,12 @@ import java.util.*;
  *
  *  This data must be loaded as a precondition of this test running.
  *
- * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @author Jon Orris
+ * @version $Revision: #4 $ $Date: 2002/12/11 $
  */
 public class DataAssociationCursorTest extends DataCollectionTest {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataAssociationCursorTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataAssociationCursorTest.java#4 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     OrderAssociation m_orderAssoc;
 

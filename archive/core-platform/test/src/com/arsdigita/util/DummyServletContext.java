@@ -24,13 +24,12 @@ import java.util.Set;
  *  Dummy ServletContext object for unit testing of form methods that
  *  include requests in their signatures.
  *
- * @author <a href="mailto:richardl@arsdigita.com">richardl@arsdigita.com</a>
- * @version $Revision: #4 $ $Date: 2002/10/21 $
+ * @version $Revision: #5 $ $Date: 2002/12/11 $
  */
 
 public class DummyServletContext implements ServletContext {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/DummyServletContext.java#4 $ by $Author: jorris $, $DateTime: 2002/10/21 17:18:48 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/DummyServletContext.java#5 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     private HashMap m_attributes = new HashMap();
     private HashMap m_dispachers = new HashMap();

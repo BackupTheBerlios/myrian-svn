@@ -33,8 +33,8 @@ import java.util.Collection;
 /**
  *  Initializer
  *
- * @author <a href="mailto:dennis@arsdigita.com">Dennis Gregorovic</a>
- * @version $Revision: #4 $ $Date: 2002/08/26 $
+ * @author Dennis Gregorovic
+ * @version $Revision: #5 $ $Date: 2002/12/11 $
  */
 
 public class Initializer {

@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  *
  *  This data must be loaded as a precondition of this test running.
  *
- * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #5 $ $Date: 2002/08/30 $
+ * @author Jon Orris
+ * @version $Revision: #6 $ $Date: 2002/12/11 $
  */
 public class DataCollectionImplTest extends DataCollectionTest
 {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataCollectionImplTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataCollectionImplTest.java#6 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
     private static Logger s_log =
         Logger.getLogger(DataCollectionImplTest.class.getName());
     private ObjectType m_nodeType;

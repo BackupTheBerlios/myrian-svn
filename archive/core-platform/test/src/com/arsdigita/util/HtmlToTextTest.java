@@ -24,7 +24,6 @@ import java.io.FileReader;
  * set of target files that contain HTML fragments and corresponding
  * text files with the expected conversion.
  *
- * @author ron@arsdigita.com
  */
 
 public class HtmlToTextTest extends TestCase {

@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
  * A wrapper class that implements some functionality of
  * <code>org.jdom.Document</code> using <code>org.w3c.dom.Document</code>.
  *
- * @author Patrick McNeill (pmcneill@arsdigita.com)
+ * @author Patrick McNeill 
  * @version ACS 4.5a
  * @since ACS 4.5a
  */
 public class Document {
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/xml/Document.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/xml/Document.java#5 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     private static final Logger s_log =
         Logger.getLogger(Document.class.getName());

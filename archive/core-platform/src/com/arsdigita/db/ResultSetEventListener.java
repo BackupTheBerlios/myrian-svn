@@ -19,13 +19,13 @@ package com.arsdigita.db;
 /**
  * Simple listener for result set events.
  *
- * @author <a href="mailto:eison@arsdigita.com">David Eison</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/ResultSetEventListener.java#3 $
+ * @author David Eison
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/ResultSetEventListener.java#4 $
  * @since 4.6
  */
 public interface ResultSetEventListener extends java.util.EventListener {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/ResultSetEventListener.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/ResultSetEventListener.java#4 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     /**
      * Called when resultSet closes.

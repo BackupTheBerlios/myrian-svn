@@ -11,16 +11,16 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/test/sql/default/domain/package.sql#3 $
--- $DateTime: 2002/10/16 14:12:35 $
+-- $Id: //core-platform/dev/test/sql/default/domain/package.sql#4 $
+-- $DateTime: 2002/12/11 13:49:53 $
 
 
 --
 -- This file contains the data model for the package dependency
 -- test cases.
 --
--- @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
--- @version $Revision: #3 $ $Date: 2002/10/16 $
+-- @author Jon Orris
+-- @version $Revision: #4 $ $Date: 2002/12/11 $
 --
 
 create table t_package (

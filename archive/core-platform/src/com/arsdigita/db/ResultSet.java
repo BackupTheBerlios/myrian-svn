@@ -41,13 +41,13 @@ import org.apache.log4j.Logger;
  * thereby enabling close-after-use Statements.</li>
  * </ul>
  *
- * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #5 $ $Date: 2002/10/04 $
+ * @author Mark Thomas
+ * @version $Revision: #6 $ $Date: 2002/12/11 $
  * @since 4.5
  */
 public class ResultSet implements java.sql.ResultSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/ResultSet.java#5 $ $Author: rhs $ $Date: 2002/10/04 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/ResultSet.java#6 $ $Author: dennis $ $Date: 2002/12/11 $";
 
     private static final Logger s_cat = Logger.getLogger(com.arsdigita.db.ResultSet.class.getName());
 

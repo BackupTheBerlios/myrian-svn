@@ -22,14 +22,14 @@ package com.arsdigita.persistence.metadata;
  * generateSQL function, which will generate an event for an object type/event
  * type combination ( @see ObjectEvent ).
  *
- * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#7 $
+ * @author Patrick McNeill
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#8 $
  * @since 4.6.3
  */
 
 public interface MDSQLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#7 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#8 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
     /**
      * Generates an Event of a particular Event type for a certain
      * ObjectType.  New Event is automatically added to the object type

@@ -43,11 +43,11 @@ import org.apache.log4j.varia.StringMatchFilter;
  * are closed when their ResultSet is closed, by looking for appropriate
  * log statements.
  *
- * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
+ * @author David Eison
  */
 public class StatementClosingTest extends Log4jBasedTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/StatementClosingTest.java#6 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/StatementClosingTest.java#7 $";
 
     private Session ssn;
 

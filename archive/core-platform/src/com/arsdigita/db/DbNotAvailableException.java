@@ -21,14 +21,14 @@ import java.sql.SQLException;
  * An exception class that is used when a unique constraint
  * violation is thrown by the database.
  *
- * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #4 $
+ * @author David Eison
+ * @version $Revision: #5 $
  * @since 4.6
  */
 
 public class DbNotAvailableException extends DbException {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DbNotAvailableException.java#4 $ by $Author: rhs $, $DateTime: 2002/10/10 11:39:36 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DbNotAvailableException.java#5 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     /**
      * Default constructor.  setRootCause should be called

@@ -18,15 +18,15 @@ package com.arsdigita.db;
 /**
  *
  *
- * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Revision: #4 $ $Date: 2002/10/02 $
+ * @author David Dao
+ * @version $Revision: #5 $ $Date: 2002/12/11 $
  * @since 4.5
  *
  */
 
 public interface DatabaseConnectionPool {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DatabaseConnectionPool.java#4 $ by $Author: rhs $, $DateTime: 2002/10/02 13:49:31 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DatabaseConnectionPool.java#5 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     public java.sql.Connection getConnection() throws java.sql.SQLException;
 

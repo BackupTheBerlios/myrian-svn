@@ -20,13 +20,13 @@ import junit.framework.TestCase;
 /**
  * Test
  *
- * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #4 $ $Date: 2002/08/30 $
+ * @author Archit Shah 
+ * @version $Revision: #5 $ $Date: 2002/12/11 $
  */
 
 public class SessionManagerTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/SessionManagerTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/SessionManagerTest.java#5 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
 
     public SessionManagerTest(String name) {
         super(name);
