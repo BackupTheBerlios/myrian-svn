@@ -25,13 +25,13 @@ import org.apache.oro.text.perl.Perl5Util;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/csv/CSVParameterLoader.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/csv/CSVParameterLoader.java#2 $
  */
 public final class CSVParameterLoader implements ParameterLoader {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/csv/CSVParameterLoader.java#1 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/09/23 01:57:55 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/csv/CSVParameterLoader.java#2 $" +
+        "$Author: rhs $" +
+        "$DateTime: 2003/09/26 13:11:30 $";
 
     private final LineNumberReader m_reader;
     private final Parameter[] m_params;
@@ -47,6 +47,9 @@ public final class CSVParameterLoader implements ParameterLoader {
         final ParameterValue value = new ParameterValue();
 
         value.setString((String) m_line.get(param));
+
+        param.unmarshal(value);
+        param.check(value);
 
         return value;
     }
@@ -68,7 +71,11 @@ public final class CSVParameterLoader implements ParameterLoader {
             final String[] elems = parseLine(line);
 
             for (int i = 0; i < m_params.length; i++) {
-                m_line.put(m_params[i], elems[i]);
+                if (i < elems.length) {
+                    m_line.put(m_params[i], elems[i]);
+                } else {
+                    m_line.put(m_params[i], null);
+                }
             }
 
             return true;
