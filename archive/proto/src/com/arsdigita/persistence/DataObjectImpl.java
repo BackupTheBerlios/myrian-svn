@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #17 $ $Date: 2003/04/08 $
+ * @version $Revision: #18 $ $Date: 2003/04/30 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#17 $ by $Author: ashah $, $DateTime: 2003/04/08 10:31:44 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#18 $ by $Author: ashah $, $DateTime: 2003/04/30 09:49:58 $";
 
     private final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -30,7 +30,7 @@ class DataObjectImpl implements DataObject {
     private static final class ObserverEntry {
 
         private DataObserver m_observer;
-        private Set m_firing = new HashSet();
+        private Map m_firing = new HashMap();
 
         ObserverEntry(DataObserver observer) {
             m_observer = observer;
@@ -40,16 +40,42 @@ class DataObjectImpl implements DataObject {
             return m_observer;
         }
 
+        public boolean isFiring(Class cls) {
+            return m_firing.containsKey(cls);
+        }
+
         public boolean isFiring(DataEvent event) {
-            return m_firing.contains(event.getClass());
+            return isFiring(event.getClass());
         }
 
         public void setFiring(DataEvent event) {
-            m_firing.add(event.getClass());
+            // this event is firing, so it is unscheduled to follow some other
+            // event
+            Class toClear = null;
+            for (Iterator it = m_firing.entrySet().iterator();
+                 it.hasNext(); ) {
+                Map.Entry me = (Map.Entry) it.next();
+                DataEvent value = (DataEvent) me.getValue();
+                if (value == null) { continue; }
+                if (value.getClass().equals(event.getClass())) {
+                    m_firing.put(toClear, null);
+                    break;
+                }
+            }
+
+            m_firing.put(event.getClass(), null);
         }
 
-        public void clearFiring(DataEvent event) {
-            m_firing.remove(event.getClass());
+        public void scheduleEvent(Class cls, DataEvent event) {
+            if (isFiring(cls)) {
+                m_firing.put(cls, event);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public DataEvent clearFiring(DataEvent event) {
+            return (DataEvent) m_firing.remove(event.getClass());
         }
 
         public int hashCode() {
@@ -315,29 +341,31 @@ class DataObjectImpl implements DataObject {
             for (Iterator it = m_observers.iterator(); it.hasNext(); ) {
                 ObserverEntry entry = (ObserverEntry) it.next();
                 final DataObserver observer = entry.getObserver();
-                if (entry.isFiring(event)) {
-//                     if (event instanceof BeforeSaveEvent
-//                         || event instanceof BeforeDeleteEvent
-//                         || event instanceof AfterDeleteEvent) {
-                    if (false) {
-                        throw new PersistenceException
-                            ("Loop detected while firing a DataObserver. " +
-                             "This probably resulted from calling the save " +
-                             "method of a data object from within a " +
-                             "beforeSave observer registered on that " +
-                             "same data object, or the analogous situation " +
-                             "with delete and beforeDelete/afterDelete. " +
-                             entry  + " " + event);
+                if (entry.isFiring(event)) { continue; }
+
+                if (event instanceof AfterSaveEvent
+                    && entry.isFiring(BeforeSaveEvent.class)) {
+                    entry.scheduleEvent(BeforeSaveEvent.class, event);
+                    continue;
+                }
+
+                if (event instanceof AfterDeleteEvent
+                    && entry.isFiring(BeforeDeleteEvent.class)) {
+                    entry.scheduleEvent(BeforeDeleteEvent.class, event);
+                    continue;
+                }
+
+                try {
+                    entry.setFiring(event);
+                    m_firing = entry;
+                    if (s_log.isDebugEnabled()) {
+                        s_log.debug(event + " " + observer);
                     }
-                } else {
-                    try {
-                        entry.setFiring(event);
-                        m_firing = entry;
-                        s_log.debug(event);
-                        event.invoke(observer);
-                    } finally {
-                        entry.clearFiring(event);
-                    }
+                    event.invoke(observer);
+                    DataEvent waiting = entry.clearFiring(event);
+                    if (waiting != null) { fireObserver(waiting); }
+                } finally {
+                    entry.clearFiring(event);
                 }
             }
         } finally {
@@ -346,7 +374,8 @@ class DataObjectImpl implements DataObject {
     }
 
     public DataHandler setDataHandler(DataHandler handler) {
-        throw new Error("not implemented");
+        // throw new Error("not implemented");
+        return null;
     }
 
     public boolean equals(Object o) {

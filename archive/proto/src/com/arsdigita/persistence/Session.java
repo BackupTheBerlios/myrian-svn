@@ -55,7 +55,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #27 $ $Date: 2003/04/18 $
+ * @version $Revision: #28 $ $Date: 2003/04/30 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -63,6 +63,8 @@ public class Session {
     private static final Logger LOG = Logger.getLogger(Session.class);
 
     private List m_dataObjects = new ArrayList();
+    private FlushEventProcessor m_beforeFP;
+    private FlushEventProcessor m_afterFP;
 
     private void addDataObject(DataObject obj) {
         m_dataObjects.add(new WeakReference(obj));
@@ -178,6 +180,10 @@ public class Session {
 
                     public void onSet(
                         com.arsdigita.persistence.proto.SetEvent e) {
+                        if (e.getProperty().getName().charAt(0) == '~') {
+                            return;
+                        }
+
                         fireEvent(new SetEvent((DataObjectImpl) e.getObject(),
                                                e.getProperty().getName(),
                                                e.getPreviousValue(),
@@ -186,6 +192,10 @@ public class Session {
 
                     public void onAdd(
                         com.arsdigita.persistence.proto.AddEvent e) {
+                        if (e.getProperty().getName().charAt(0) == '~') {
+                            return;
+                        }
+
                         fireEvent(new AddEvent((DataObjectImpl) e.getObject(),
                                                e.getProperty().getName(),
                                                (DataObjectImpl) e.getArgument()));
@@ -193,6 +203,10 @@ public class Session {
 
                     public void onRemove(
                         com.arsdigita.persistence.proto.RemoveEvent e) {
+                        if (e.getProperty().getName().charAt(0) == '~') {
+                            return;
+                        }
+
                         fireEvent(new RemoveEvent((DataObjectImpl) e.getObject(),
                                                   e.getProperty().getName(),
                                                   (DataObjectImpl) e.getArgument()));
@@ -203,9 +217,10 @@ public class Session {
             public void flush() { }
         });
 
-        m_ssn.addBeforeFlush(new FlushEventProcessor(true));
-
-        m_ssn.addAfterFlush(new FlushEventProcessor(false));
+        m_beforeFP = new FlushEventProcessor(true);
+        m_afterFP = new FlushEventProcessor(false);
+        m_ssn.addBeforeFlush(m_beforeFP);
+        m_ssn.addAfterFlush(m_afterFP);
     }
 
     private static class FlushEventProcessor extends EventProcessor {
@@ -213,6 +228,13 @@ public class Session {
         private List m_events = new ArrayList();
 
         FlushEventProcessor(boolean before) { m_before = before; }
+
+        void clear() {
+            if (m_events.size() > 0) {
+                LOG.error("events left over: " + m_events);
+            }
+            m_events.clear();
+        }
 
         public void write(Event e) {
             if (e.getObject() instanceof DataObjectImpl) {
@@ -634,6 +656,8 @@ public class Session {
     }
 
     void invalidateDataObjects(boolean connectedOnly) {
+        m_beforeFP.clear();
+        m_afterFP.clear();
         for (Iterator it = m_dataObjects.iterator(); it.hasNext(); ) {
             WeakReference ref = (WeakReference) it.next();
             DataObjectImpl obj = (DataObjectImpl) ref.get();
