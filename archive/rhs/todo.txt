@@ -1,3 +1,14 @@
+ * gcj support
+ * discriminator support
+ * collection modification flags
+ * cursor closing
+ * successive logging seems to cause PropertyCondition's Code object
+   to mutate, could be from repeated calls to emit methods in the
+   toString()
+ * need two way order -> line item for ordering to work correctly
+ * seperate various behavior control bits from one way, two way,
+   composite, component, etc
+ * sql generation interface
  * removed hardcoded jdbc url from tests
  * find better way to initialize session than in static block in
    PersistenceTestCase
@@ -9,3 +20,7 @@
  * make session aware of both object identity and datastore identity
    and all the various permutations and mappings in between the two
    kinds of identity
+ * support aggregation via implicitly generating group by for
+   aggregate operations on collection properties and also providing
+   construct for creating derived types, e.g.
+   group(all(User), firstName == "Bob")
