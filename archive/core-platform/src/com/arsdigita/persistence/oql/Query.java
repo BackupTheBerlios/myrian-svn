@@ -28,12 +28,12 @@ import org.apache.log4j.Logger;
  * specified in a PDL file to generate sql queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #17 $ $Date: 2002/11/26 $
+ * @version $Revision: #18 $ $Date: 2003/02/28 $
  **/
 
 public class Query extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#17 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#18 $ by $Author: justin $, $DateTime: 2003/02/28 16:46:36 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -61,6 +61,10 @@ public class Query extends Node {
      * is typically only used for Associations.
      */
     public void addLinkAttributes(Property parentProperty, ObjectType link) {
+        if (!parentProperty.isCollection()) {
+            return;
+        }
+
         if (link != null) {
             // The properties that are not key properties are the "link"
             // properties
