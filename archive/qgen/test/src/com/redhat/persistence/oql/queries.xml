@@ -169,6 +169,32 @@
             name = name,
             description = description)
     </query>
+    <query fetched="pid,pname,id,name,tid,tname,ptid,ptname,description">
+      query(left(this = all(test.Node), 
+                 parent = all(test.Node), this.parent == parent),
+            id = this.id,
+            pid = parent.id,
+            pname = parent.name,
+            ptid = parent.type.id,
+            ptname = parent.type.name,
+            tid = this.type.id,
+            tname = this.type.name,
+            name = this.name,
+            description = this.description)
+    </query>
+    <query fetched="pid,pname,id,name,tid,tname,ptid,ptname,description">
+      query(right(parent = all(test.Node),
+                  this = all(test.Node), this.parent == parent),
+            id = this.id,
+            pid = parent.id,
+            pname = parent.name,
+            ptid = parent.type.id,
+            ptname = parent.type.name,
+            tid = this.type.id,
+            tname = this.type.name,
+            name = this.name,
+            description = this.description)
+    </query>
     <results>
       <row id="30" name="Thirty" tid="1" tname="Type 1"
            pid="null" pname="null" ptid="null" ptname="null"
