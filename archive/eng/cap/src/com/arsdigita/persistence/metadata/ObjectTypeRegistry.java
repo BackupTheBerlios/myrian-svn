@@ -17,7 +17,7 @@
  */
 package com.arsdigita.persistence.metadata;
 
-import com.arsdigita.util.Assert;
+import org.myrian.util.Assert;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -27,16 +27,16 @@ import org.apache.log4j.Logger;
 /**
  * Provides a general purpose object type adapter
  * registry, which is aware of the type hierarchy
- * 
+ *
  * @author Daniel Berrange
  * @see com.arsdigita.search.MetadataProviderRegistry
  **/
 public class ObjectTypeRegistry {
-    
+
     private static final Logger s_log = Logger.getLogger(ObjectTypeRegistry.class);
 
     private Map m_adapters = new HashMap();
-    
+
     /**
      * Registers an adapter for a type
      * @param type the object type name
@@ -47,7 +47,7 @@ public class ObjectTypeRegistry {
         registerAdapter(MetadataRoot.getMetadataRoot().getObjectType(type),
                         adapter);
     }
-    
+
     /**
      * Unregisters an adapter for a type
      * @param type the object type name
@@ -68,12 +68,12 @@ public class ObjectTypeRegistry {
         Assert.exists(type, Object.class);
 
         if (s_log.isDebugEnabled()) {
-            s_log.debug("Registering adapter " + adapter.getClass().getName() + 
+            s_log.debug("Registering adapter " + adapter.getClass().getName() +
                         " for " + type.getQualifiedName());
         }
         m_adapters.put(type, adapter);
     }
-    
+
     /**
      * Unregisters an adapter for a type
      * @param type the object type
@@ -84,12 +84,12 @@ public class ObjectTypeRegistry {
         Assert.exists(type, Object.class);
 
         if (s_log.isDebugEnabled()) {
-            s_log.debug("Unregistering adapter for " + 
+            s_log.debug("Unregistering adapter for " +
                         type.getQualifiedName());
         }
         m_adapters.remove(type);
     }
-    
+
     /**
      * Retrieves the adapter registered against this
      * type, or null if none is registered.
@@ -108,7 +108,7 @@ public class ObjectTypeRegistry {
      */
     public Object getAdapter(ObjectType type) {
         Assert.exists(type, ObjectType.class);
-        
+
         Object adapter = m_adapters.get(type);
         if (s_log.isDebugEnabled()) {
             s_log.debug("Returning adapter " + (adapter == null ? "<none>" :
@@ -117,7 +117,7 @@ public class ObjectTypeRegistry {
         }
         return adapter;
     }
-    
+
     /**
      * Retrieves the best matching adapter for a
      * object type. Returns the exact match if present,
@@ -138,11 +138,11 @@ public class ObjectTypeRegistry {
      */
     public Object findAdapter(ObjectType type) {
         Assert.exists(type, ObjectType.class);
-        
+
         if (s_log.isDebugEnabled()) {
             s_log.debug("Finding adapter for " + type.getQualifiedName());
         }
-        
+
         Object adapter = getAdapter(type);
         if (adapter == null) {
             ObjectType parent = type.getSupertype();

@@ -19,19 +19,19 @@ package com.arsdigita.persistence;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.redhat.persistence.oql.Expression;
-import com.redhat.persistence.oql.Static;
+import org.myrian.persistence.oql.Expression;
+import org.myrian.persistence.oql.Static;
 
 /**
  * SimpleFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 class SimpleFilter extends FilterImpl {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/SimpleFilter.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/SimpleFilter.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     String m_conditions;
 

@@ -19,7 +19,7 @@ package com.arsdigita.persistence.tests.data;
 
 import com.arsdigita.persistence.*;
 import com.arsdigita.persistence.metadata.*;
-import com.arsdigita.util.*;
+import org.myrian.util.*;
 
 import org.apache.log4j.Logger;
 
@@ -29,12 +29,12 @@ import java.util.*;
  * Testlet
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 public abstract class Testlet {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/tests/data/Testlet.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/tests/data/Testlet.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static final Logger LOG = Logger.getLogger(Testlet.class);
 

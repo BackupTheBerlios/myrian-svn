@@ -18,7 +18,7 @@
 package com.arsdigita.persistence.metadata;
 
 import com.arsdigita.persistence.PersistenceException;
-import com.arsdigita.util.Assert;
+import org.myrian.util.Assert;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -30,15 +30,15 @@ import java.util.Iterator;
  * be marked as special "key" properties.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 public class ObjectType extends CompoundType {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/ObjectType.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/ObjectType.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     static ObjectType
-	wrap(com.redhat.persistence.metadata.ObjectType type) {
+	wrap(org.myrian.persistence.metadata.ObjectType type) {
 	if (type == null) {
 	    return null;
 	} else {
@@ -50,17 +50,17 @@ public class ObjectType extends CompoundType {
 	ArrayList result = new ArrayList(types.size());
 	for (Iterator it = types.iterator(); it.hasNext(); ) {
 	    result.add
-		(wrap((com.redhat.persistence.metadata.ObjectType)
+		(wrap((org.myrian.persistence.metadata.ObjectType)
 		      it.next()));
 	}
 	return result;
     }
 
 
-    private com.redhat.persistence.metadata.ObjectType m_type;
+    private org.myrian.persistence.metadata.ObjectType m_type;
 
     private
-	ObjectType(com.redhat.persistence.metadata.ObjectType type) {
+	ObjectType(org.myrian.persistence.metadata.ObjectType type) {
 	super(type);
         m_type = type;
     }

@@ -17,16 +17,16 @@
  */
 package com.arsdigita.tools.junit.extensions;
 
-import com.arsdigita.util.*;
-import com.arsdigita.db.*;
+import org.myrian.util.*;
+import org.myrian.db.*;
 
 import java.sql.*;
 import java.io.*;
 
 import com.arsdigita.installer.SQLLoader;
-import com.arsdigita.util.jdbc.*;
-import com.redhat.persistence.TestConfig;
-import com.redhat.persistence.pdl.*;
+import org.myrian.util.jdbc.*;
+import org.myrian.persistence.TestConfig;
+import org.myrian.persistence.pdl.*;
 import junit.extensions.TestDecorator;
 import junit.framework.Protectable;
 import junit.framework.Test;

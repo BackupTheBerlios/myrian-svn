@@ -17,25 +17,25 @@
  */
 package com.arsdigita.persistence.metadata;
 
-import com.redhat.persistence.metadata.Root;
+import org.myrian.persistence.metadata.Root;
 
 /**
  * The ModelElement class represents metadata elements that are components of
  * a Model.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 abstract public class ModelElement extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/ModelElement.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/ModelElement.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private Root m_root;
-    private com.redhat.persistence.metadata.Model m_model;
+    private org.myrian.persistence.metadata.Model m_model;
 
     ModelElement(Root root,
-		 com.redhat.persistence.metadata.Model model,
+		 org.myrian.persistence.metadata.Model model,
 		 Object obj) {
 	super(root, obj);
 	m_root = root;

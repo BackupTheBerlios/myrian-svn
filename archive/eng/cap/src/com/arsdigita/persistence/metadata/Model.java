@@ -17,7 +17,7 @@
  */
 package com.arsdigita.persistence.metadata;
 
-import com.redhat.persistence.metadata.Root;
+import org.myrian.persistence.metadata.Root;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -28,15 +28,15 @@ import java.util.Set;
  * Associations.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  */
 
 public class Model extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/Model.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/Model.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     static Model wrap(Root root,
-		      com.redhat.persistence.metadata.Model model) {
+		      org.myrian.persistence.metadata.Model model) {
 	if (model == null) {
 	    return null;
 	} else {
@@ -45,14 +45,14 @@ public class Model extends Element {
     }
 
     private Root m_root;
-    private com.redhat.persistence.metadata.Model m_model;
+    private org.myrian.persistence.metadata.Model m_model;
 
     /**
      * Constructs a new model with the given name.
      **/
 
     private Model(Root root,
-		  com.redhat.persistence.metadata.Model model) {
+		  org.myrian.persistence.metadata.Model model) {
         super(root, model);
 	m_root = root;
         m_model = model;
@@ -117,8 +117,8 @@ public class Model extends Element {
 
 	for (Iterator it = m_root.getObjectTypes().iterator();
 	     it.hasNext(); ) {
-	    com.redhat.persistence.metadata.ObjectType ot =
-		(com.redhat.persistence.metadata.ObjectType)
+	    org.myrian.persistence.metadata.ObjectType ot =
+		(org.myrian.persistence.metadata.ObjectType)
 		it.next();
 	    if (ot.getModel().equals(m_model)) {
 		result.add(ot);

@@ -19,7 +19,7 @@ package com.arsdigita.persistence;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import com.arsdigita.db.DbHelper;
+import org.myrian.db.DbHelper;
 
 /**
  * DataOperationText
@@ -30,11 +30,11 @@ import com.arsdigita.db.DbHelper;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  */
 public class DataOperationTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/DataOperationTest.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/DataOperationTest.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     public DataOperationTest(String name) {
         super(name);

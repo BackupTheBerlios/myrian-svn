@@ -17,7 +17,7 @@
  */
 package com.arsdigita.persistence.metadata;
 
-import com.redhat.persistence.metadata.Root;
+import org.myrian.persistence.metadata.Root;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
  * metadata system.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 public class MetadataRoot extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/MetadataRoot.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/MetadataRoot.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static final Logger s_cat = Logger.getLogger(MetadataRoot.class.getName());
 

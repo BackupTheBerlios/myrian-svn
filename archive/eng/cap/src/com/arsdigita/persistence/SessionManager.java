@@ -17,9 +17,9 @@
  */
 package com.arsdigita.persistence;
 
-import com.arsdigita.db.DbHelper;
+import org.myrian.db.DbHelper;
 import com.arsdigita.persistence.metadata.MetadataRoot;
-import com.redhat.persistence.EventProcessorManager;
+import org.myrian.persistence.EventProcessorManager;
 //import com.arsdigita.versioning.Versions;
 
 import java.sql.Connection;
@@ -42,13 +42,13 @@ import org.apache.log4j.Logger;
  * information and the MetadataRoot to the SessionManager.
  *
  * @see Initializer
- * @author Archit Shah 
- * @version $Revision: #4 $ $Date: 2004/10/01 $
+ * @author Archit Shah
+ * @version $Revision: #5 $ $Date: 2004/10/01 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/SessionManager.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
+    public static final String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/SessionManager.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static final Logger s_log = Logger.getLogger
         (SessionManager.class.getName());
@@ -177,7 +177,7 @@ public class SessionManager {
 
     /**
      * This method provides an indirect way for applications to
-     * register {@link com.redhat.persistence.EventProcessor event
+     * register {@link org.myrian.persistence.EventProcessor event
      * processors} with the {@link Session session} object.
      *
      * <p>This works like so</p>
@@ -188,13 +188,13 @@ public class SessionManager {
      *
      *  <li>Each {@link Session session} returned by {@link
      *  #getSession()} will have a reference to a single (per thread)
-     *  instance of the {@link com.redhat.persistence.EventProcessor
+     *  instance of the {@link org.myrian.persistence.EventProcessor
      *  event processor} managed the {@link EventProcessorManager
      *  event processor manager} that you registered.</li>
      *
-     *  <li>The {@link com.redhat.persistence.Session session} will
+     *  <li>The {@link org.myrian.persistence.Session session} will
      *  dispatch events from its {@link
-     *  com.redhat.persistence.Session#flush()} method to to your
+     *  org.myrian.persistence.Session#flush()} method to to your
      *  event processor's <code>write(Event)</code> method. </li>
      * </ul>
      **/

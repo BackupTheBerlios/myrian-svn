@@ -20,8 +20,8 @@ package com.arsdigita.persistence.pdl;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.Model;
 import com.arsdigita.persistence.metadata.ObjectType;
-import com.redhat.persistence.metadata.Root;
-import com.redhat.persistence.pdl.PDLWriter;
+import org.myrian.persistence.metadata.Root;
+import org.myrian.persistence.pdl.PDLWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -35,7 +35,7 @@ import java.util.Iterator;
  * file being named after the fully qualified model name.
  *
  * @author Patrick McNeill
- * @version $Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/pdl/PDLOutputter.java#3 $
+ * @version $Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/pdl/PDLOutputter.java#4 $
  */
 public class PDLOutputter {
     /**

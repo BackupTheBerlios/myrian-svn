@@ -18,16 +18,16 @@
 package com.arsdigita.persistence;
 
 import java.util.Map;
-import com.redhat.persistence.common.Path;
-import com.redhat.persistence.oql.Equals;
-import com.redhat.persistence.oql.Expression;
-import com.redhat.persistence.oql.Literal;
-import com.redhat.persistence.oql.Not;
-import com.redhat.persistence.oql.Static;
+import org.myrian.persistence.common.Path;
+import org.myrian.persistence.oql.Equals;
+import org.myrian.persistence.oql.Expression;
+import org.myrian.persistence.oql.Literal;
+import org.myrian.persistence.oql.Not;
+import org.myrian.persistence.oql.Static;
 
 class EqualsFilter extends FilterImpl {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/EqualsFilter.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/EqualsFilter.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private final String m_attribute;
     private final String m_bindName;

@@ -24,15 +24,15 @@ package com.arsdigita.persistence.metadata;
  * the atoms from which compound types are built.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  */
 
 public class SimpleType extends DataType {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/SimpleType.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/SimpleType.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     static final SimpleType
-	wrap(com.redhat.persistence.metadata.ObjectType obj) {
+	wrap(org.myrian.persistence.metadata.ObjectType obj) {
 	if (obj == null) {
 	    return null;
 	} else {
@@ -40,14 +40,14 @@ public class SimpleType extends DataType {
 	}
     }
 
-    private com.redhat.persistence.metadata.ObjectType m_type;
+    private org.myrian.persistence.metadata.ObjectType m_type;
 
     /**
      * Constructs a new SimpleType with the given name.
      **/
 
     private SimpleType
-	(com.redhat.persistence.metadata.ObjectType obj) {
+	(org.myrian.persistence.metadata.ObjectType obj) {
         super(obj);
 	m_type = obj;
     }

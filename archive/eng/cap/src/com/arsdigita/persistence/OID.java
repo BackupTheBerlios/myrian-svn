@@ -21,7 +21,7 @@ import com.arsdigita.persistence.metadata.SimpleType;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.metadata.Property;
-import com.arsdigita.util.Assert;
+import org.myrian.util.Assert;
 
 import java.lang.reflect.*;
 
@@ -56,10 +56,10 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/09/30 $ */
+ * @version $Revision: #5 $ $Date: 2004/10/01 $ */
 
 public class OID {
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/OID.java#4 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/OID.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private ObjectType m_type;
     private Map m_values = new HashMap();
@@ -502,7 +502,7 @@ public class OID {
         return (m_type.getBasetype().hashCode() + m_values.hashCode());
     }
 
-    void set(com.redhat.persistence.Session ssn, Object obj) {
+    void set(org.myrian.persistence.Session ssn, Object obj) {
         for (Iterator it = m_type.getKeyProperties(); it.hasNext(); ) {
             Property p = (Property) it.next();
             ssn.set(obj, C.prop(ssn.getRoot(), p), get(p.getName()));

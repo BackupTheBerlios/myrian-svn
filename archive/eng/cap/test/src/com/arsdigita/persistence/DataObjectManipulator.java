@@ -16,17 +16,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package com.arsdigita.persistence;
-import com.arsdigita.db.DbHelper;
+import org.myrian.db.DbHelper;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.Property;
-import com.arsdigita.util.CheckedWrapperException;
-import com.arsdigita.util.StringUtils;
-import com.redhat.persistence.common.Path;
-import com.redhat.persistence.metadata.Column;
-import com.redhat.persistence.metadata.Mapping;
-import com.redhat.persistence.metadata.ObjectMap;
-import com.redhat.persistence.metadata.Root;
-import com.redhat.persistence.metadata.Value;
+import org.myrian.util.CheckedWrapperException;
+import org.myrian.util.StringUtils;
+import org.myrian.persistence.common.Path;
+import org.myrian.persistence.metadata.Column;
+import org.myrian.persistence.metadata.Mapping;
+import org.myrian.persistence.metadata.ObjectMap;
+import org.myrian.persistence.metadata.Root;
+import org.myrian.persistence.metadata.Value;
 import org.apache.log4j.Logger;
 
 import java.math.BigDecimal;
@@ -44,11 +44,11 @@ import java.util.Map;
  * DataObjectManipulator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  */
 public class DataObjectManipulator {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/DataObjectManipulator.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/DataObjectManipulator.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
     private static final Logger s_log =
             Logger.getLogger(DataObjectManipulator.class.getName());
 

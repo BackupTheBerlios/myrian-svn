@@ -26,12 +26,12 @@ import java.util.Iterator;
  * property contained in a CompoundType has an associated DataType.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  */
 
 abstract public class CompoundType extends DataType {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/CompoundType.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/CompoundType.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
 
     /**
@@ -43,7 +43,7 @@ abstract public class CompoundType extends DataType {
      **/
 
     public CompoundType
-	(com.redhat.persistence.metadata.ObjectType obj) {
+	(org.myrian.persistence.metadata.ObjectType obj) {
         super(obj);
     }
 

@@ -17,18 +17,18 @@
  */
 package com.arsdigita.util.cmd;
 
-import com.arsdigita.util.Assert;
+import org.myrian.util.Assert;
 import java.util.List;
 
 /**
  * @deprecated Use CLI (http://jakarta.apache.org/commons/cli/index.html) instead.
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 public abstract class Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/util/cmd/Switch.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/util/cmd/Switch.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     public static abstract class Type {
         abstract String[] parse(CommandLine cmd, List args);

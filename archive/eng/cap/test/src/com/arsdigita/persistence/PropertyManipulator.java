@@ -17,7 +17,7 @@
  */
 package com.arsdigita.persistence;
 import com.arsdigita.persistence.metadata.*;
-import com.arsdigita.util.StringUtils;
+import org.myrian.util.StringUtils;
 
 import junit.framework.*;
 import java.math.*;
@@ -41,11 +41,11 @@ import org.apache.log4j.*;
  * for common cases as Attribute Properties, Key Properties, etc.
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #4 $ $Date: 2004/09/15 $
+ * @version $Revision: #5 $ $Date: 2004/10/01 $
  */
 public class PropertyManipulator {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PropertyManipulator.java#4 $ by $Author: rhs $, $DateTime: 2004/09/15 13:47:13 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PropertyManipulator.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
     private static final Logger s_log =
         Logger.getLogger(PropertyManipulator.class.getName());
     static  {

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package com.arsdigita.persistence;
-import com.arsdigita.util.Assert;
+import org.myrian.util.Assert;
 import com.arsdigita.persistence.metadata.*;
 import java.math.*;
 import java.util.*;
@@ -29,12 +29,12 @@ import org.apache.log4j.*;
  * Attemps to generate default keys for DataObjects. Used in the 'MetaTest' framework.
  * Needs further doc.
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  */
 
 public class KeyGenerator {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/KeyGenerator.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/KeyGenerator.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     static Map s_keys = new HashMap();
     private KeyGenerator()

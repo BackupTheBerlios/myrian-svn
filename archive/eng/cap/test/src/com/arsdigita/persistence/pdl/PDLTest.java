@@ -17,9 +17,9 @@
  */
 package com.arsdigita.persistence.pdl;
 
-import com.redhat.persistence.metadata.*;
-import com.redhat.persistence.pdl.PDL;
-import com.redhat.persistence.pdl.PDLException;
+import org.myrian.persistence.metadata.*;
+import org.myrian.persistence.pdl.PDL;
+import org.myrian.persistence.pdl.PDLException;
 import junit.framework.TestCase;
 import java.util.*;
 import java.io.*;
@@ -29,12 +29,12 @@ import org.apache.log4j.Logger;
  * PDLTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/09/16 $
+ * @version $Revision: #5 $ $Date: 2004/10/01 $
  */
 
 public class PDLTest extends TestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/pdl/PDLTest.java#4 $ by $Author: rhs $, $DateTime: 2004/09/16 15:55:26 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/pdl/PDLTest.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static Logger s_log =
         Logger.getLogger(PDLTest.class.getName());

@@ -19,7 +19,7 @@ package com.arsdigita.persistence;
 import com.arsdigita.persistence.metadata.DataType;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.metadata.Property;
-import com.arsdigita.util.Assert;
+import org.myrian.util.Assert;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 import org.apache.log4j.Level;
@@ -30,12 +30,12 @@ import java.util.Iterator;
  * ObjectTypeValidator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  */
 
 public class ObjectTypeValidator  {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/ObjectTypeValidator.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/ObjectTypeValidator.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
     private static final Logger s_log =
         Logger.getLogger(ObjectTypeValidator.class.getName());
     DataObjectManipulator m_manipulator;

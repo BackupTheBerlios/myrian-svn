@@ -17,10 +17,10 @@
  */
 package com.arsdigita.persistence.pdl;
 
-import com.arsdigita.db.DbHelper;
+import org.myrian.db.DbHelper;
 import com.arsdigita.persistence.metadata.MetadataRoot;
-import com.redhat.persistence.metadata.Table;
-import com.redhat.persistence.pdl.DDLWriter;
+import org.myrian.persistence.metadata.Table;
+import org.myrian.persistence.pdl.DDLWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;

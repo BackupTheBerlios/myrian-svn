@@ -17,9 +17,9 @@
  */
 package com.arsdigita.persistence;
 
-import com.redhat.persistence.metadata.Root;
-import com.redhat.persistence.oql.Expression;
-import com.redhat.persistence.oql.Static;
+import org.myrian.persistence.metadata.Root;
+import org.myrian.persistence.oql.Expression;
+import org.myrian.persistence.oql.Static;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
  * be combined and manipulated to create complex queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  */
 
 abstract class FilterImpl implements Filter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/FilterImpl.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/FilterImpl.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static final Logger m_log =
         Logger.getLogger(Filter.class.getName());
@@ -427,7 +427,7 @@ abstract class FilterImpl implements Filter {
 			   " the old value " + m_bindings.get(parameterName) +
 			   " with " + value);
 	    }
-        } 
+        }
         m_bindings.put(parameterName, value);
         return this;
     }

@@ -19,11 +19,11 @@ package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.metadata.Property;
-import com.redhat.persistence.PropertyMap;
-import com.redhat.persistence.ProtoException;
-import com.redhat.persistence.Session;
-import com.redhat.persistence.metadata.ObjectMap;
-import com.redhat.persistence.metadata.Root;
+import org.myrian.persistence.PropertyMap;
+import org.myrian.persistence.ProtoException;
+import org.myrian.persistence.Session;
+import org.myrian.persistence.metadata.ObjectMap;
+import org.myrian.persistence.metadata.Root;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,12 +39,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/09/30 $
+ * @version $Revision: #7 $ $Date: 2004/10/01 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataObjectImpl.java#6 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataObjectImpl.java#7 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -61,7 +61,7 @@ class DataObjectImpl implements DataObject {
     // package-scoped, written and read by Session
     PropertyMap p_pMap;
      // package-scoped, read/written by Session
-    com.redhat.persistence.metadata.ObjectType p_objectType;
+    org.myrian.persistence.metadata.ObjectType p_objectType;
 
     private final class ObserverEntry {
 
@@ -169,7 +169,7 @@ class DataObjectImpl implements DataObject {
         return m_ssn;
     }
 
-    private com.redhat.persistence.metadata.Property convert(String property) {
+    private org.myrian.persistence.metadata.Property convert(String property) {
         return C.prop(m_ssn.getRoot(), getObjectType().getProperty(property));
     }
 
@@ -255,7 +255,7 @@ class DataObjectImpl implements DataObject {
             }
         }
 
-        com.redhat.persistence.Session ssn =
+        org.myrian.persistence.Session ssn =
             SessionManager.getSession().getProtoSession();
 
         Object me = ssn.retrieve(C.pmap(ssn.getRoot(), m_oid));
@@ -532,7 +532,7 @@ class DataObjectImpl implements DataObject {
     }
 
     private Object get(Session s,
-                       com.redhat.persistence.metadata.Property p) {
+                       org.myrian.persistence.metadata.Property p) {
         try {
             return s.get(this, p);
         } catch (ProtoException pe) {

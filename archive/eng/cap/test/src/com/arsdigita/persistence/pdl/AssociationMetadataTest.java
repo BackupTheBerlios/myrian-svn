@@ -17,9 +17,9 @@
  */
 package com.arsdigita.persistence.pdl;
 
-import com.redhat.persistence.metadata.*;
-import com.redhat.persistence.pdl.*;
-import com.redhat.persistence.pdl.PDL;
+import org.myrian.persistence.metadata.*;
+import org.myrian.persistence.pdl.*;
+import org.myrian.persistence.pdl.PDL;
 
 import java.io.*;
 
@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * AssociationMetadataTest
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 public class AssociationMetadataTest extends TestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/pdl/AssociationMetadataTest.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/pdl/AssociationMetadataTest.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static Logger s_log =
         Logger.getLogger(AssociationMetadataTest.class);

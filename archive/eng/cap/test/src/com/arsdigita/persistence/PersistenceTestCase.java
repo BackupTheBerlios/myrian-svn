@@ -17,10 +17,10 @@
  */
 package com.arsdigita.persistence;
 
-import com.arsdigita.db.DbHelper;
+import org.myrian.db.DbHelper;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.pdl.*;
-import com.redhat.persistence.engine.rdbms.RDBMSEngine;
+import org.myrian.persistence.engine.rdbms.RDBMSEngine;
 import junit.framework.TestCase;
 
 import java.util.HashSet;
@@ -35,12 +35,12 @@ import org.apache.log4j.Logger;
  * PersistenceTestCase
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/10/01 $
+ * @version $Revision: #6 $ $Date: 2004/10/01 $
  */
 
 public class PersistenceTestCase extends TestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PersistenceTestCase.java#5 $ by $Author: ashah $, $DateTime: 2004/10/01 16:02:13 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PersistenceTestCase.java#6 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static final Logger LOG =
         Logger.getLogger(PersistenceTestCase.class);
@@ -139,7 +139,7 @@ public class PersistenceTestCase extends TestCase {
         MetadataRoot root = MetadataRoot.getMetadataRoot();
         SessionManager.configure
             ("default", root, new PooledConnectionSource
-             (com.redhat.persistence.TestConfig.getJDBCURL(),
+             (org.myrian.persistence.TestConfig.getJDBCURL(),
               10, 30000));
         PDLCompiler pdl = new PDLCompiler();
         PDLSource testpdl = new ManifestSource
@@ -168,7 +168,7 @@ public class PersistenceTestCase extends TestCase {
         return m_session;
     }
 
-    protected com.redhat.persistence.Session getProtoSession() {
+    protected org.myrian.persistence.Session getProtoSession() {
         return m_session.getProtoSession();
     }
 

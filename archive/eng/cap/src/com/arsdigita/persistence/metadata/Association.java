@@ -17,7 +17,7 @@
  */
 package com.arsdigita.persistence.metadata;
 
-import com.redhat.persistence.common.CompoundKey;
+import org.myrian.persistence.common.CompoundKey;
 
 /**
  * The Association class is used to link together the properties of two object
@@ -25,12 +25,12 @@ import com.redhat.persistence.common.CompoundKey;
  * link.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 public class Association extends ModelElement {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/Association.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/Association.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private Property m_roleOne;
     private Property m_roleTwo;

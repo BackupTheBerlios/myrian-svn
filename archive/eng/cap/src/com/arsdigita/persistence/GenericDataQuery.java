@@ -17,12 +17,12 @@
  */
 package com.arsdigita.persistence;
 
-import com.redhat.persistence.DataSet;
-import com.redhat.persistence.Signature;
-import com.redhat.persistence.common.ParseException;
-import com.redhat.persistence.common.Path;
-import com.redhat.persistence.common.SQLParser;
-import com.redhat.persistence.metadata.*;
+import org.myrian.persistence.DataSet;
+import org.myrian.persistence.Signature;
+import org.myrian.persistence.common.ParseException;
+import org.myrian.persistence.common.Path;
+import org.myrian.persistence.common.SQLParser;
+import org.myrian.persistence.metadata.*;
 
 import java.io.StringReader;
 import java.util.Collections;
@@ -31,12 +31,12 @@ import java.util.Collections;
  * GenericDataQuery
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/09/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/01 $
  */
 
 public class GenericDataQuery extends DataQueryImpl {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/GenericDataQuery.java#4 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/GenericDataQuery.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     public GenericDataQuery(Session s, String sql, String[] columns) {
         super(s, ds(s, sql, columns));
@@ -66,8 +66,8 @@ public class GenericDataQuery extends DataQueryImpl {
         // XXX: now that oql runs on object maps we could actually put
         // the sql in the object map's retrieve all rather than using
         // a static.
-        com.redhat.persistence.oql.Static st =
-            new com.redhat.persistence.oql.Static
+        org.myrian.persistence.oql.Static st =
+            new org.myrian.persistence.oql.Static
             (p.getSQL(), columns, false, Collections.EMPTY_MAP) {
                 protected boolean hasMap() { return true; }
                 protected ObjectMap getMap() { return map; }

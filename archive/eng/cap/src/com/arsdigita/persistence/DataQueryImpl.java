@@ -18,32 +18,32 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.CompoundType;
-import com.arsdigita.util.Assert;
-import com.redhat.persistence.Cursor;
-import com.redhat.persistence.DataSet;
-import com.redhat.persistence.ProtoException;
-import com.redhat.persistence.Signature;
-import com.redhat.persistence.Source;
-import com.redhat.persistence.common.ParseException;
-import com.redhat.persistence.common.Path;
-import com.redhat.persistence.common.SQLParser;
-import com.redhat.persistence.metadata.ObjectType;
-import com.redhat.persistence.metadata.Property;
-import com.redhat.persistence.metadata.Root;
-import com.redhat.persistence.oql.All;
-import com.redhat.persistence.oql.Define;
-import com.redhat.persistence.oql.Equals;
-import com.redhat.persistence.oql.Exists;
-import com.redhat.persistence.oql.Expression;
-import com.redhat.persistence.oql.LeftJoin;
-import com.redhat.persistence.oql.Limit;
-import com.redhat.persistence.oql.Literal;
-import com.redhat.persistence.oql.Offset;
-import com.redhat.persistence.oql.Query;
-import com.redhat.persistence.oql.Sort;
-import com.redhat.persistence.oql.Static;
-import com.redhat.persistence.oql.Variable;
-import com.redhat.persistence.pdl.PDL;
+import org.myrian.util.Assert;
+import org.myrian.persistence.Cursor;
+import org.myrian.persistence.DataSet;
+import org.myrian.persistence.ProtoException;
+import org.myrian.persistence.Signature;
+import org.myrian.persistence.Source;
+import org.myrian.persistence.common.ParseException;
+import org.myrian.persistence.common.Path;
+import org.myrian.persistence.common.SQLParser;
+import org.myrian.persistence.metadata.ObjectType;
+import org.myrian.persistence.metadata.Property;
+import org.myrian.persistence.metadata.Root;
+import org.myrian.persistence.oql.All;
+import org.myrian.persistence.oql.Define;
+import org.myrian.persistence.oql.Equals;
+import org.myrian.persistence.oql.Exists;
+import org.myrian.persistence.oql.Expression;
+import org.myrian.persistence.oql.LeftJoin;
+import org.myrian.persistence.oql.Limit;
+import org.myrian.persistence.oql.Literal;
+import org.myrian.persistence.oql.Offset;
+import org.myrian.persistence.oql.Query;
+import org.myrian.persistence.oql.Sort;
+import org.myrian.persistence.oql.Static;
+import org.myrian.persistence.oql.Variable;
+import org.myrian.persistence.pdl.PDL;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -59,12 +59,12 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/09/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/01 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataQueryImpl.java#4 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataQueryImpl.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 
@@ -89,7 +89,7 @@ class DataQueryImpl implements DataQuery {
     }
 
     private Session m_ssn;
-    private com.redhat.persistence.Session m_pssn;
+    private org.myrian.persistence.Session m_pssn;
     private HashMap m_bindings = new HashMap();
 
     final Signature m_originalSig;
@@ -135,7 +135,7 @@ class DataQueryImpl implements DataQuery {
     }
 
     /**
-     * Returns the com.redhat.persistence type of the query.
+     * Returns the org.myrian.persistence type of the query.
      */
     ObjectType getTypeInternal() {
         return m_originalSig.getObjectType();
@@ -312,7 +312,7 @@ class DataQueryImpl implements DataQuery {
                 }
 
                 Expression cond = new Exists
-                    (new com.redhat.persistence.oql.Filter
+                    (new org.myrian.persistence.oql.Filter
                      (prevColl,
                       new Equals
                       (new Variable(alias), new Variable("target"))));
@@ -335,7 +335,7 @@ class DataQueryImpl implements DataQuery {
 
                 addJoin(assoc);
                 Path pathThroughLink = Path.add(resolvePath(coll), assocName);
-                m_expr = new com.redhat.persistence.oql.Filter
+                m_expr = new org.myrian.persistence.oql.Filter
                     (m_expr, new Equals
                      (Expression.valueOf(pathThroughLink),
                       Expression.valueOf(resolvePath(assoc))));
@@ -602,7 +602,7 @@ class DataQueryImpl implements DataQuery {
         Expression expr = m_expr;
 
         if (filter != null) {
-            expr = new com.redhat.persistence.oql.Filter
+            expr = new org.myrian.persistence.oql.Filter
                 (expr, filter);
         }
 

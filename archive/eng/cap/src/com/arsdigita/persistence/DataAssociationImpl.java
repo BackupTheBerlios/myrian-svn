@@ -18,24 +18,24 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.Property;
-import com.redhat.persistence.ProtoException;
+import org.myrian.persistence.ProtoException;
 
 /**
  * DataAssociationImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/09/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/01 $
  **/
 
 class DataAssociationImpl extends DataAssociationCursorImpl
     implements DataAssociation {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataAssociationImpl.java#4 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataAssociationImpl.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
-    private com.redhat.persistence.Session m_pssn;
+    private org.myrian.persistence.Session m_pssn;
     private DataObjectImpl m_data;
     private Property m_prop;
-    private com.redhat.persistence.metadata.Property m_pprop;
+    private org.myrian.persistence.metadata.Property m_pprop;
 
     DataAssociationImpl(Session ssn, DataObjectImpl data, Property prop) {
         super(ssn, data, prop);
@@ -55,7 +55,7 @@ class DataAssociationImpl extends DataAssociationCursorImpl
         }
     }
 
-    com.redhat.persistence.metadata.Property getProperty() {
+    org.myrian.persistence.metadata.Property getProperty() {
         return m_pprop;
     }
 

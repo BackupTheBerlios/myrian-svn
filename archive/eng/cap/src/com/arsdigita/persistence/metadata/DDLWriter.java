@@ -24,12 +24,12 @@ import java.util.Set;
  * DDLWriter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
-public class DDLWriter extends com.redhat.persistence.pdl.DDLWriter {
+public class DDLWriter extends org.myrian.persistence.pdl.DDLWriter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/DDLWriter.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/DDLWriter.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     public DDLWriter(String base,
                      Set files) {

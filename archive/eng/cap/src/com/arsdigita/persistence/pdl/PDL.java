@@ -18,17 +18,17 @@
 package com.arsdigita.persistence.pdl;
 
 
-import com.arsdigita.db.DbHelper;
+import org.myrian.db.DbHelper;
 import com.arsdigita.persistence.Utilities;
 import com.arsdigita.persistence.metadata.MetadataRoot;
-import com.arsdigita.util.Assert;
+import org.myrian.util.Assert;
 import com.arsdigita.util.cmd.BooleanSwitch;
 import com.arsdigita.util.cmd.CommandLine;
 import com.arsdigita.util.cmd.FileSwitch;
 import com.arsdigita.util.cmd.PathSwitch;
 import com.arsdigita.util.cmd.StringSwitch;
-import com.redhat.persistence.metadata.Table;
-import com.redhat.persistence.pdl.DDLWriter;
+import org.myrian.persistence.metadata.Table;
+import org.myrian.persistence.pdl.DDLWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -61,12 +61,12 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/10/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/01 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/pdl/PDL.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/pdl/PDL.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;

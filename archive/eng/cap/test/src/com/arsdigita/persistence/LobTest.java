@@ -18,8 +18,8 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.*;
-import com.arsdigita.db.DbHelper;
-import com.arsdigita.db.OraLob;
+import org.myrian.db.DbHelper;
+import org.myrian.db.OraLob;
 
 import java.io.StringReader;
 import java.io.Writer;
@@ -35,13 +35,13 @@ import org.apache.log4j.Logger;
 /**
  * LobTest - for testing Blob and Clob datatype.
  *
- * @author Jeff Teeters 
- * @version $Revision: #4 $ $Date: 2004/09/01 $
+ * @author Jeff Teeters
+ * @version $Revision: #5 $ $Date: 2004/10/01 $
  */
 
 public class LobTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/LobTest.java#4 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/LobTest.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private Logger s_cat =
         Logger.getLogger(LobTest.class);

@@ -18,22 +18,22 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.Property;
-import com.redhat.persistence.Signature;
-import com.redhat.persistence.common.Path;
-import com.redhat.persistence.metadata.Link;
-import com.redhat.persistence.metadata.ObjectType;
+import org.myrian.persistence.Signature;
+import org.myrian.persistence.common.Path;
+import org.myrian.persistence.metadata.Link;
+import org.myrian.persistence.metadata.ObjectType;
 
 /**
  * DataAssociationCursorImpl
  *
  * @author Archit Shah &lt;ashah@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 class DataAssociationCursorImpl extends DataCollectionImpl
     implements DataAssociationCursor {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private DataAssociationImpl m_assn;
 
@@ -57,7 +57,7 @@ class DataAssociationCursorImpl extends DataCollectionImpl
     ObjectType getTypeInternal() {
         if (m_originalSig.isSource(Path.get("link"))) {
             return m_originalSig.getSource
-                (Path.get(com.redhat.persistence.Session.LINK_ASSOCIATION))
+                (Path.get(org.myrian.persistence.Session.LINK_ASSOCIATION))
                 .getObjectType();
         } else {
             return super.getTypeInternal();
@@ -81,7 +81,7 @@ class DataAssociationCursorImpl extends DataCollectionImpl
 
         if (path == null || getTypeInternal().getProperty(path) != null) {
             path = Path.add
-                (com.redhat.persistence.Session.LINK_ASSOCIATION, path);
+                (org.myrian.persistence.Session.LINK_ASSOCIATION, path);
         }
 
         return super.resolvePath(path);

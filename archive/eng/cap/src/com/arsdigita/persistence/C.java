@@ -20,8 +20,8 @@ package com.arsdigita.persistence;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.metadata.Property;
-import com.redhat.persistence.PropertyMap;
-import com.redhat.persistence.metadata.Root;
+import org.myrian.persistence.PropertyMap;
+import org.myrian.persistence.metadata.Root;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -29,36 +29,36 @@ import java.util.Map;
  * C
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 final class C {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/C.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/C.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
-    public static final com.redhat.persistence.metadata.ObjectType type
+    public static final org.myrian.persistence.metadata.ObjectType type
         (Root root, String qname) {
         return root.getObjectType(qname);
     }
 
-    public static final com.redhat.persistence.metadata.ObjectType type
+    public static final org.myrian.persistence.metadata.ObjectType type
         (Root root, ObjectType type) {
         return type(root, type.getQualifiedName());
     }
 
     public static final ObjectType fromType
-        (MetadataRoot root, com.redhat.persistence.metadata.ObjectType type) {
+        (MetadataRoot root, org.myrian.persistence.metadata.ObjectType type) {
         return root.getObjectType(type.getQualifiedName());
     }
 
-    public static final com.redhat.persistence.metadata.Property prop
+    public static final org.myrian.persistence.metadata.Property prop
         (Root root, Property prop) {
         return type(root, prop.getContainer().getQualifiedName())
             .getProperty(prop.getName());
     }
 
     public static final PropertyMap pmap(Root root, OID oid) {
-        com.redhat.persistence.metadata.ObjectType type =
+        org.myrian.persistence.metadata.ObjectType type =
             type(root, oid.getObjectType());
         PropertyMap result = new PropertyMap(type);
         for (Iterator it = oid.getProperties().entrySet().iterator();

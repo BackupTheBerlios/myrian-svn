@@ -17,29 +17,29 @@
  */
 package com.arsdigita.persistence;
 
-import com.arsdigita.db.DbHelper;
+import org.myrian.db.DbHelper;
 //import com.arsdigita.developersupport.DeveloperSupportProfiler;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
-import com.redhat.persistence.CreateEvent;
-import com.redhat.persistence.DataSet;
-import com.redhat.persistence.DeleteEvent;
-import com.redhat.persistence.Engine;
-import com.redhat.persistence.Event;
-import com.redhat.persistence.EventProcessor;
-import com.redhat.persistence.PropertyEvent;
-import com.redhat.persistence.PropertyMap;
-import com.redhat.persistence.ProtoException;
-import com.redhat.persistence.QuerySource;
-import com.redhat.persistence.common.Path;
-import com.redhat.persistence.engine.rdbms.OracleWriter;
-import com.redhat.persistence.engine.rdbms.PostgresWriter;
-import com.redhat.persistence.engine.rdbms.RDBMSEngine;
-import com.redhat.persistence.metadata.Adapter;
-import com.redhat.persistence.metadata.Property;
-import com.redhat.persistence.metadata.Root;
-import com.redhat.persistence.profiler.rdbms.StatementProfiler;
-import com.redhat.persistence.profiler.rdbms.CompoundProfiler;
+import org.myrian.persistence.CreateEvent;
+import org.myrian.persistence.DataSet;
+import org.myrian.persistence.DeleteEvent;
+import org.myrian.persistence.Engine;
+import org.myrian.persistence.Event;
+import org.myrian.persistence.EventProcessor;
+import org.myrian.persistence.PropertyEvent;
+import org.myrian.persistence.PropertyMap;
+import org.myrian.persistence.ProtoException;
+import org.myrian.persistence.QuerySource;
+import org.myrian.persistence.common.Path;
+import org.myrian.persistence.engine.rdbms.OracleWriter;
+import org.myrian.persistence.engine.rdbms.PostgresWriter;
+import org.myrian.persistence.engine.rdbms.RDBMSEngine;
+import org.myrian.persistence.metadata.Adapter;
+import org.myrian.persistence.metadata.Property;
+import org.myrian.persistence.metadata.Root;
+import org.myrian.persistence.profiler.rdbms.StatementProfiler;
+import org.myrian.persistence.profiler.rdbms.CompoundProfiler;
 import java.lang.ref.WeakReference;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2004/09/30 $
+ * @version $Revision: #9 $ $Date: 2004/10/01 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -87,8 +87,8 @@ public class Session {
         m_source = source;
         m_database = database;
 
-        com.redhat.persistence.engine.rdbms.ConnectionSource src =
-            new com.redhat.persistence.engine.rdbms.ConnectionSource() {
+        org.myrian.persistence.engine.rdbms.ConnectionSource src =
+            new org.myrian.persistence.engine.rdbms.ConnectionSource() {
                 public Connection acquire() {
                     return m_source.acquire();
                 }
@@ -171,7 +171,7 @@ public class Session {
         return m_database;
     }
 
-    com.redhat.persistence.Session getProtoSession() {
+    org.myrian.persistence.Session getProtoSession() {
         return m_ssn;
     }
 
@@ -485,7 +485,7 @@ public class Session {
      **/
 
     public DataQuery retrieveQuery(String name) {
-        com.redhat.persistence.metadata.ObjectType ot
+        org.myrian.persistence.metadata.ObjectType ot
             = getRoot().getObjectType(name);
         if (ot == null) {
             throw new PersistenceException("no such query: " + name);
@@ -525,7 +525,7 @@ public class Session {
      **/
 
     public DataOperation retrieveDataOperation(String name) {
-        com.redhat.persistence.metadata.DataOperation op
+        org.myrian.persistence.metadata.DataOperation op
             = getRoot().getDataOperation(Path.get(name));
         if (op == null) {
             throw new PersistenceException("no such data operation: " + name);
@@ -600,21 +600,21 @@ public class Session {
 
                 public void onDelete(DeleteEvent e) { }
 
-                public void onSet(com.redhat.persistence.SetEvent e) {
+                public void onSet(org.myrian.persistence.SetEvent e) {
                     new SetEvent((DataObjectImpl) e.getObject(),
                                  e.getProperty().getName(),
                                  e.getPreviousValue(),
                                  e.getArgument()).fire();
                 }
 
-                public void onAdd(com.redhat.persistence.AddEvent e) {
+                public void onAdd(org.myrian.persistence.AddEvent e) {
                     new AddEvent((DataObjectImpl) e.getObject(),
                                  e.getProperty().getName(),
                                  (DataObjectImpl) e.getArgument()).fire();
                 }
 
                 public void onRemove
-                    (com.redhat.persistence.RemoveEvent e) {
+                    (org.myrian.persistence.RemoveEvent e) {
                     new RemoveEvent((DataObjectImpl) e.getObject(),
                                     e.getProperty().getName(),
                                     (DataObjectImpl) e.getArgument()).fire();
@@ -721,15 +721,15 @@ public class Session {
 
     private static class DataObjectAdapter extends Adapter {
         public Object getObject
-            (com.redhat.persistence.metadata.ObjectType type,
+            (org.myrian.persistence.metadata.ObjectType type,
              PropertyMap props,
-             com.redhat.persistence.Session ssn) {
+             org.myrian.persistence.Session ssn) {
 
             if (!type.isKeyed()) {
                 return props;
             }
 
-            com.redhat.persistence.metadata.ObjectType sp = type;
+            org.myrian.persistence.metadata.ObjectType sp = type;
 
             if (type.hasProperty("objectType")) {
                 Property p = type.getProperty("objectType");
@@ -779,7 +779,7 @@ public class Session {
             return dobj.p_pMap;
         }
 
-        public com.redhat.persistence.metadata.ObjectType
+        public org.myrian.persistence.metadata.ObjectType
             getObjectType(Object obj) {
 
             if (obj instanceof PropertyMap) {
@@ -796,14 +796,14 @@ public class Session {
         }
     }
 
-    private class PSession extends com.redhat.persistence.Session {
+    private class PSession extends org.myrian.persistence.Session {
         PSession(Root root, Engine engine, QuerySource source) {
             super(root, engine, source);
         }
         private Session getOldSession() { return Session.this; }
     }
 
-    static Session getSessionFromProto(com.redhat.persistence.Session ssn) {
+    static Session getSessionFromProto(org.myrian.persistence.Session ssn) {
         try {
             return ((PSession) ssn).getOldSession();
         } catch (ClassCastException cce) {

@@ -18,19 +18,19 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.ObjectType;
-import com.redhat.persistence.DataSet;
-import com.redhat.persistence.common.Path;
+import org.myrian.persistence.DataSet;
+import org.myrian.persistence.common.Path;
 
 /**
  * DataCollectionImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/09/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/01 $
  **/
 
 class DataCollectionImpl extends DataQueryImpl implements DataCollection {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataCollectionImpl.java#4 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataCollectionImpl.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     DataCollectionImpl(Session ssn, DataSet ds) {
         super(ssn, ds);

@@ -22,6 +22,6 @@ log4j.appender.console = org.apache.log4j.ConsoleAppender
 # Change logger priorities below here:
 
 # For debugging all queries run by persistence
-#log4j.logger.com.redhat.persistence.engine.rdbms.RDBMSEngine = INFO
-log4j.logger.com.redhat.persistence.jdo.PersistenceManagerImpl = INFO
+#log4j.logger.org.myrian.persistence.engine.rdbms.RDBMSEngine = INFO
+log4j.logger.org.myrian.persistence.jdo.PersistenceManagerImpl = INFO
 log4j.logger.Neo = WARN

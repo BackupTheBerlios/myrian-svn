@@ -17,7 +17,7 @@
  */
 package com.arsdigita.persistence.metadata;
 
-import com.redhat.persistence.metadata.*;
+import org.myrian.persistence.metadata.*;
 
 import junit.framework.*;
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public class ConstraintTest extends TestCase {
     public void testUniqueKeyConstraint() {
         ArrayList names = new ArrayList();
 
-        // test to make sure there is an exception for adding the same 
+        // test to make sure there is an exception for adding the same
         // constraint twice
         UniqueKey key = new UniqueKey(m_table, null, columns);
         names.add(key.getName());
@@ -68,29 +68,29 @@ public class ConstraintTest extends TestCase {
 
         Column[] cols = key.getColumns();
         for (int i = 0; i < columns.length; i++) {
-            assertTrue("Incorrect columns returned", 
+            assertTrue("Incorrect columns returned",
                        columns[i].equals(cols[i]));
         }
 
         // test name generation
         names.add(columns[0].getName());
         String name = (new UniqueKey(null, columns[1])).getName();
-        assertTrue("name: " + name + " was generated twice", 
+        assertTrue("name: " + name + " was generated twice",
                    !names.contains(name));
         names.add(name);
 
         name = (new UniqueKey(null, columns[2])).getName();
-        assertTrue("name: " + name + " was generated twice", 
+        assertTrue("name: " + name + " was generated twice",
                    !names.contains(name));
         names.add(name);
 
         name = (new UniqueKey(null, columns[3])).getName();
-        assertTrue("name: " + name + " was generated twice", 
+        assertTrue("name: " + name + " was generated twice",
                    !names.contains(name));
         names.add(name);
 
         name = (new UniqueKey(null, columns[4])).getName();
-        assertTrue("name: " + name + " was generated twice", 
+        assertTrue("name: " + name + " was generated twice",
                    !names.contains(name));
         names.add(name);
         // now, make sure that we get the same name for the same item
@@ -105,7 +105,7 @@ public class ConstraintTest extends TestCase {
 	m_table.addColumn(column3);
         Constraint con3 = (new UniqueKey(null, column3));
         assertTrue("A similar name for the column returned the same " +
-                   "constraint name: " + con3.getName(), 
+                   "constraint name: " + con3.getName(),
                    !con3.getName().equals(con1.getName()));
 
         Table table = new Table("table_with_relatively_long_name");

@@ -17,7 +17,7 @@
  */
 package com.arsdigita.xml;
 
-import com.arsdigita.util.Assert;
+import org.myrian.util.Assert;
 
 import java.io.IOException;
 import java.io.InputStream;

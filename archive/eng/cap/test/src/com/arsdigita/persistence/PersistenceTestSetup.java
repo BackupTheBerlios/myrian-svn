@@ -19,7 +19,7 @@ package com.arsdigita.persistence;
 
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
 
-import com.redhat.persistence.pdl.*;
+import org.myrian.persistence.pdl.*;
 import java.sql.*;
 
 import junit.framework.*;
@@ -28,12 +28,12 @@ import junit.framework.*;
  * PersistenceTestSetup
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/09/01 $
+ * @version $Revision: #3 $ $Date: 2004/10/01 $
  **/
 
 public class PersistenceTestSetup extends BaseTestSetup {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PersistenceTestSetup.java#2 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PersistenceTestSetup.java#3 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     public PersistenceTestSetup(TestSuite suite) {
         super(suite);

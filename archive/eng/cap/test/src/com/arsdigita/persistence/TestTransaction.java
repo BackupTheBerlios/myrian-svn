@@ -17,7 +17,7 @@
  */
 package com.arsdigita.persistence;
 
-import com.redhat.persistence.TestSession;
+import org.myrian.persistence.TestSession;
 
 public class TestTransaction {
 

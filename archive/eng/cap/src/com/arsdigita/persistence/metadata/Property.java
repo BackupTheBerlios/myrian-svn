@@ -17,10 +17,10 @@
  */
 package com.arsdigita.persistence.metadata;
 
-import com.redhat.persistence.metadata.Link;
-import com.redhat.persistence.metadata.Role;
-import com.redhat.persistence.metadata.Link;
-import com.redhat.persistence.pdl.PDL;
+import org.myrian.persistence.metadata.Link;
+import org.myrian.persistence.metadata.Role;
+import org.myrian.persistence.metadata.Link;
+import org.myrian.persistence.pdl.PDL;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +36,7 @@ import java.util.Iterator;
  * REQUIRED, and COLLECTION.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 public class Property extends Element {
@@ -73,11 +73,11 @@ public class Property extends Element {
         "[0..n]"
     };
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/Property.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/metadata/Property.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
 
     static Property
-	wrap(com.redhat.persistence.metadata.Property prop) {
+	wrap(org.myrian.persistence.metadata.Property prop) {
 	if (prop == null) {
 	    return null;
 	} else {
@@ -88,8 +88,8 @@ public class Property extends Element {
     static Collection wrap(Collection props) {
 	ArrayList result = new ArrayList(props.size());
 	for (Iterator it = props.iterator(); it.hasNext(); ) {
-	    com.redhat.persistence.metadata.Property prop =
-		(com.redhat.persistence.metadata.Property) it.next();
+	    org.myrian.persistence.metadata.Property prop =
+		(org.myrian.persistence.metadata.Property) it.next();
 	    if (prop.getName().charAt(0) != '~'
                 && prop.getName().indexOf(PDL.LINK) == -1) {
 		result.add(wrap(prop));
@@ -99,9 +99,9 @@ public class Property extends Element {
     }
 
 
-    com.redhat.persistence.metadata.Property m_prop;
+    org.myrian.persistence.metadata.Property m_prop;
 
-    private Property(com.redhat.persistence.metadata.Property prop) {
+    private Property(org.myrian.persistence.metadata.Property prop) {
         super(prop.getRoot(), prop);
 	m_prop = prop;
     }

@@ -17,13 +17,13 @@
  */
 package com.arsdigita.persistence;
 
-import com.arsdigita.db.DbHelper;
-import com.redhat.persistence.common.Path;
-import com.redhat.persistence.metadata.MetadataException;
-import com.redhat.persistence.metadata.ObjectMap;
-import com.redhat.persistence.metadata.ObjectType;
-import com.redhat.persistence.metadata.Root;
-import com.redhat.persistence.metadata.SQLBlock;
+import org.myrian.db.DbHelper;
+import org.myrian.persistence.common.Path;
+import org.myrian.persistence.metadata.MetadataException;
+import org.myrian.persistence.metadata.ObjectMap;
+import org.myrian.persistence.metadata.ObjectType;
+import org.myrian.persistence.metadata.Root;
+import org.myrian.persistence.metadata.SQLBlock;
 import java.util.Iterator;
 import org.apache.log4j.Logger;
 
@@ -31,14 +31,14 @@ import org.apache.log4j.Logger;
  * InFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 class InFilter extends SimpleFilter implements Filter {
 
     private static Logger s_log = Logger.getLogger(InFilter.class);
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/InFilter.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/InFilter.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     InFilter(Root root, String property, String subqueryProperty,
              String query) {

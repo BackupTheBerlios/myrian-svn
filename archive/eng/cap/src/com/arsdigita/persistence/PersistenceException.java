@@ -23,12 +23,12 @@ package com.arsdigita.persistence;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/10/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/01 $
  */
 
 public class PersistenceException extends RuntimeException {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/PersistenceException.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/PersistenceException.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     /**
      * Constructor for a PersistenceException which does not wrap
@@ -94,9 +94,9 @@ public class PersistenceException extends RuntimeException {
      */
     public static final PersistenceException newInstance(String s,
                                                          Throwable rootCause) {
-        if (rootCause instanceof com.redhat.persistence.FlushException) {
+        if (rootCause instanceof org.myrian.persistence.FlushException) {
             return new FlushException
-                (s, (com.redhat.persistence.FlushException) rootCause);
+                (s, (org.myrian.persistence.FlushException) rootCause);
         }
         return new PersistenceException(s, rootCause);
     }

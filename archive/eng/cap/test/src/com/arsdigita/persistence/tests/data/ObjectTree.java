@@ -17,7 +17,7 @@
  */
 package com.arsdigita.persistence.tests.data;
 
-import com.arsdigita.util.*;
+import org.myrian.util.*;
 import com.arsdigita.persistence.metadata.*;
 
 import java.util.*;
@@ -26,12 +26,12 @@ import java.util.*;
  * ObjectTree
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 public class ObjectTree {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/tests/data/ObjectTree.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/tests/data/ObjectTree.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private ObjectType m_type;
     private ObjectTree m_parent;

@@ -18,13 +18,13 @@
 package com.arsdigita.persistence.oql;
 
 import com.arsdigita.persistence.PersistenceTestCase;
-import com.redhat.persistence.Signature;
-import com.redhat.persistence.common.*;
-import com.redhat.persistence.oql.*;
-import com.redhat.persistence.metadata.*;
-import com.redhat.persistence.engine.rdbms.*;
-import com.redhat.persistence.Session;
-import com.arsdigita.util.StringUtils;
+import org.myrian.persistence.Signature;
+import org.myrian.persistence.common.*;
+import org.myrian.persistence.oql.*;
+import org.myrian.persistence.metadata.*;
+import org.myrian.persistence.engine.rdbms.*;
+import org.myrian.persistence.Session;
+import org.myrian.util.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -34,12 +34,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/09/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/01 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/oql/QueryTest.java#4 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/oql/QueryTest.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);

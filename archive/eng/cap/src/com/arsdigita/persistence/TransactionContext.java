@@ -17,7 +17,7 @@
  */
 package com.arsdigita.persistence;
 
-import com.arsdigita.util.Assert;
+import org.myrian.util.Assert;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -31,19 +31,19 @@ import org.apache.log4j.Logger;
  * This class is intentionally <em>not</em> threadsafe.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/09/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/01 $
  */
 
 public class TransactionContext {
 
-    String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/TransactionContext.java#4 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/TransactionContext.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
 
     private static final Logger s_cat =
         Logger.getLogger(TransactionContext.class);
 
     private Session m_ossn;
     // used in test infrastructure
-    com.redhat.persistence.Session m_ssn;
+    org.myrian.persistence.Session m_ssn;
     private Map m_attrs = new HashMap();
     private ArrayList m_listeners = new ArrayList();
     private boolean m_inTxn = false;
