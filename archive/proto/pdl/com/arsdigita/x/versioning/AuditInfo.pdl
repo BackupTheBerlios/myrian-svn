@@ -10,24 +10,19 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/pdl/com/arsdigita/x/versioning/DataObjectChange.pdl#3 $ 
+// $Id: //core-platform/proto/pdl/com/arsdigita/x/versioning/AuditInfo.pdl#1 $ 
 // $DateTime: 2003/03/12 18:42:42 $
 
 model com.arsdigita.x.versioning;
 
 import com.arsdigita.kernel.*;
 
-object type DataObjectChange {
-  BigInteger[1..1]  id = vcx_obj_changes.change_id INTEGER;
-  String[0..1]      tag = vcx_obj_changes.tag VARCHAR(400);
+object type AuditInfo {
+    BigInteger[1..1]  id = vcx_audit_info.id INTEGER;
+    String[0..1]      modifying_ip = vcx_audit_info.modifying_ip VARCHAR(400);
+    Date[0..1]        timestamp = vcx_audit_info.timestamp TIMESTAMP;
+    User[0..1] modUser = join vcx_audit_info.modifying_user 
+                           to users.user_id;
 
-  AuditInfo[1..1] auditInfo = join vcx_obj_changes.audit_id
-                                to vcx_audit_info.id;
-
-  Operation[0..n] operations = join vcx_obj_changes.change_id
-                                 to vcx_operations.change_id;
-
-  String[1..1] oid = vcx_obj_changes.obj_id VARCHAR(400);
-
-  object key (id);
+    object key (id);
 }
