@@ -2,6 +2,7 @@ package com.redhat.persistence.jdo;
 
 import com.redhat.persistence.*;
 import com.redhat.persistence.metadata.*;
+import com.redhat.persistence.oql.Expression;
 import java.util.*;
 import javax.jdo.*;
 import javax.jdo.spi.PersistenceCapable;
@@ -389,8 +390,99 @@ public class PersistenceManagerImpl implements PersistenceManager {
     /**
      * Create a new Query using the specified language.
      */
-    public Query newQuery(String language, Object query) {
-        throw new Error("not implemented");
+    public Query newQuery(String language, final Object query) {
+        // XXX: right now we abuse the language string to figure out
+        // the type returned by the query expression eventually we
+        // should be able to kill this once the whole Signature/Query
+        // mess is cleared up in CRP.
+        final ObjectType type = m_ssn.getRoot().getObjectType(language);
+        return new Query() {
+
+            private boolean m_ignoreCache = false;
+
+            public void closeAll() {
+                throw new Error("not implemented");
+            }
+            public void close(Object result) {
+                throw new Error("not implemented");
+            }
+            public PersistenceManager getPersistenceManager() {
+                return PersistenceManagerImpl.this;
+            }
+            public Object executeWithMap(Map parameters) {
+                // XXX: need to use parameters
+                final Expression expr = Expression.valueOf((String) query);
+                return new CRPCollection(m_ssn) {
+                    ObjectType type() {
+                        return type;
+                    }
+                    Expression expression() {
+                        return expr;
+                    }
+                    public boolean add(Object o) {
+                        throw new UnsupportedOperationException();
+                    }
+                    public boolean remove(Object o) {
+                        throw new UnsupportedOperationException();
+                    }
+                    public void clear() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+            public Object executeWithArray(Object[] parameters) {
+                Map m = new HashMap();
+                for (int i = 0; i < parameters.length; i++) {
+                    m.put("$" + i, parameters[i]);
+                }
+                return executeWithMap(m);
+            }
+            public Object execute() {
+                return executeWithArray(new Object[0]);
+            }
+            public Object execute(Object p1) {
+                return executeWithArray(new Object[] {p1});
+            }
+            public Object execute(Object p1, Object p2) {
+                return executeWithArray(new Object[] {p1, p2});
+            }
+            public Object execute(Object p1, Object p2, Object p3) {
+                return executeWithArray(new Object[] {p1, p2, p3});
+            }
+            public void compile() {
+                throw new Error("not implemented");
+            }
+            public boolean getIgnoreCache() {
+                return m_ignoreCache;
+            }
+            public void setIgnoreCache(boolean value) {
+                m_ignoreCache = value;
+            }
+            public void setOrdering(String ordering) {
+                throw new Error("not implemented");
+            }
+            public void declareVariables(String variables) {
+                throw new Error("not implemented");
+            }
+            public void declareParameters(String parameters) {
+                throw new Error("not implemented");
+            }
+            public void declareImports(String imports) {
+                throw new Error("not implemented");
+            }
+            public void setFilter(String filter) {
+                throw new Error("not implemented");
+            }
+            public void setCandidates(Collection pcs) {
+                throw new Error("not implemented");
+            }
+            public void setCandidates(Extent pcs) {
+                throw new Error("not implemented");
+            }
+            public void setClass(Class pcs) {
+                throw new Error("not implemented");
+            }
+        };
     }
 
     /**

@@ -16,24 +16,34 @@ package com.redhat.persistence.oql;
 
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.metadata.*;
+import java.io.*;
 import java.util.*;
 
 /**
  * Expression
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/06/23 $
  **/
 
 public abstract class Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Expression.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Expression.java#2 $ by $Author: rhs $, $DateTime: 2004/06/23 20:43:08 $";
 
     public static Expression valueOf(Path path) {
         if (path.getParent() == null) {
             return new Variable(path.getName());
         } else {
             return new Get(valueOf(path.getParent()), path.getName());
+        }
+    }
+
+    public static Expression valueOf(String expression) {
+        OQLParser p = new OQLParser(new StringReader(expression));
+        try {
+            return p.expression();
+        } catch (ParseException e) {
+            throw new Error(expression, e);
         }
     }
 
