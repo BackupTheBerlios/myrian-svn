@@ -18,7 +18,7 @@ import com.arsdigita.kernel.permissions.Privilege;
 import com.arsdigita.portal.Portlet;
 
 // @author Justin Ross (justin@arsdigita.com)
-// @version $Id: //core-platform/dev/pdl/com/arsdigita/kernel/Application.pdl#4 $
+// @version $Id: //core-platform/dev/pdl/com/arsdigita/kernel/Application.pdl#5 $
 
 object type ApplicationType extends ResourceType {
 
@@ -51,10 +51,6 @@ association {
 object type Application extends Resource {
     String primaryURL = applications.primary_url VARCHAR(4000);
     Date[1..1] timestamp = applications.timestamp TIMESTAMP;
-
-    ApplicationType[1..1] applicationType =
-        join applications.application_type_id 
-            to application_types.application_type_id;
 }
 
 
