@@ -24,12 +24,12 @@ import java.io.PrintStream;
  * link.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/08/02 $
  **/
 
 public class Association extends ModelElement {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Association.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Association.java#4 $ by $Author: randyg $, $DateTime: 2002/08/02 09:15:46 $";
 
 
     /**
@@ -215,9 +215,15 @@ public class Association extends ModelElement {
             }
         }
 
+
         m_roles[0].outputPDLEvents(out);
         m_roles[1].outputPDLEvents(out);
-
+        if (m_linkType.getEvent(CompoundType.UPDATE) != null) {
+            out.println();
+            out.print("     update  ");
+            m_linkType.getEvent(CompoundType.UPDATE).outputPDL(out);
+            out.println();
+        }
         out.println("}");
     }
 

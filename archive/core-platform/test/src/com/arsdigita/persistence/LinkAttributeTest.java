@@ -19,17 +19,18 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import org.apache.log4j.Category;
+import com.arsdigita.domain.DataObjectNotFoundException;
 
 /**
  * LinkAttributeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/01 $
+ * @version $Revision: #5 $ $Date: 2002/08/02 $
  **/
 
 public abstract class LinkAttributeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LinkAttributeTest.java#4 $ by $Author: randyg $, $DateTime: 2002/08/01 11:13:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LinkAttributeTest.java#5 $ by $Author: randyg $, $DateTime: 2002/08/02 09:15:46 $";
 
     private static Category s_log = 
         Category.getInstance(LinkAttributeTest.class.getName());
@@ -82,7 +83,7 @@ public abstract class LinkAttributeTest extends PersistenceTestCase {
     }
 
 
-    public void testLinkAttributes() {
+    public void testLinkAttributes() throws DataObjectNotFoundException {
         Session ssn = SessionManager.getSession();
         DataObject article = ssn.create(getModelName() + ".Article");
         article.set("id", BigInteger.ZERO);
@@ -107,6 +108,8 @@ public abstract class LinkAttributeTest extends PersistenceTestCase {
             DataObject image = samples.getDataObject();
             DataObject link = images.add(image);
             link.set("caption", captionPrefix + image.getOID());
+            //link.set("user", ssn.retrieve(new OID("com.arsdigita.kernel.User", 
+            //                                      new BigDecimal(-202))));
         }
 
         article.save();
@@ -117,6 +120,9 @@ public abstract class LinkAttributeTest extends PersistenceTestCase {
         while (cursor.next()) {
             DataObject image = cursor.getDataObject();
             DataObject link = cursor.getLink();
+            //DataObject user = (DataObject)link.get("user");
+            //assertEquals("The retrieved user is not correct; user = " + user,
+            //             "-202", user.get("id").toString());
             assertEquals("bad link object",
                          captionPrefix + image.getOID(),
                          link.get("caption"));

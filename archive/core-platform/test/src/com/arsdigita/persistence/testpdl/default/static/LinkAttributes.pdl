@@ -1,5 +1,7 @@
 model linkAttributes;
 
+import com.arsdigita.kernel.*;
+
 object type Article {
     BigInteger[1..1] id = t_articles.article_id INTEGER;
     String[0..1] text   = t_articles.text CLOB;
@@ -25,10 +27,11 @@ association {
                            to t_images.image_id;
 
     String[0..1] caption = t_article_image_map.caption VARCHAR(4000);
+    User[0..1] user = t_article_image_map.user_id;
 
     retrieve images {
         do {
-            select m.caption, i.*
+            select m.caption, m.user_id, i.*
             from t_article_image_map m, t_images i
             where article_id = :articles.id
             and m.image_id = i.image_id
@@ -36,30 +39,45 @@ association {
             images.id = i.image_id;
             images.bytes = i.bytes;
             caption = m.caption;
+            user.id = m.user_id;
         }
     }
 
     retrieve articles {
         do {
-            select m.caption, a.*
+            select m.caption, m.user_id, a.*
             from t_article_image_map m, t_articles a
             where image_id = :images.id
             and m.article_id = a.article_id
         } map {
+            user.id = m.user_id;
             articles.id = a.article_id;
             articles.text = a.text;
             caption = m.caption;
         }
     }
 
-    add {
+    add images {
         do {
             insert into t_article_image_map
-            (image_id, article_id, caption)
+            (image_id, article_id, caption, user_id)
             values
-            (:images.id, :articles.id, :caption)
+            (:images.id, :articles.id, :caption, :user.id)
         }
     }
+
+    add articles {
+        do {
+            insert into t_article_image_map
+            (image_id, article_id, caption, user_id)
+            values
+            (:images.id, :articles.id, :caption, :user.id)
+        }
+    }
+
+
+    // this must be here because of the way the association code works
+    add user {}
 
     update {
         do {
@@ -70,7 +88,15 @@ association {
         }
     }
 
-    remove {
+    remove images {
+        do {
+            delete from t_article_image_map
+            where image_id = :images.id
+            and article_id = :articles.id
+        }
+    }
+
+    remove articles {
         do {
             delete from t_article_image_map
             where image_id = :images.id

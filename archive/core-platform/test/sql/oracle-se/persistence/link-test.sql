@@ -16,7 +16,7 @@
 -- This file contains the data model for the party test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #2 $ $Date: 2002/07/18 $
+-- @version $Revision: #3 $ $Date: 2002/08/02 $
 --
 
 create table t_articles (
@@ -33,6 +33,7 @@ create table t_article_image_map (
     article_id    integer references t_articles,
     image_id      integer references t_images,
     caption       varchar(4000),
+    user_id       integer references users,
     primary key (article_id, image_id)
 );
 

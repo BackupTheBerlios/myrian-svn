@@ -13,12 +13,12 @@ import org.apache.log4j.Category;
  * specified in a PDL file to generate sql queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2002/08/01 $
+ * @version $Revision: #11 $ $Date: 2002/08/02 $
  **/
 
 public class Query extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#10 $ by $Author: randyg $, $DateTime: 2002/08/01 11:13:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#11 $ by $Author: randyg $, $DateTime: 2002/08/02 09:15:46 $";
 
     private static final Category s_log = Category.getInstance(Query.class);
 
@@ -47,17 +47,11 @@ public class Query extends Node {
      */
     public void addLinkAttributes(Property parentProperty, ObjectType link) {
         if (link != null) {
-            Collection keyProperties = new ArrayList();
-            for (Iterator it = link.getKeyProperties(); it.hasNext(); ) {
-                Property p = (Property)it.next();
-                keyProperties.add(p);
-            }
-            
             // The properties that are not key properties are the "link"
             // properties
             for (Iterator it = link.getProperties(); it.hasNext(); ) {
                 Property property = (Property) it.next();
-                if (!keyProperties.contains(property)) {
+                if (!link.isKeyProperty(property)) {
                     
                     if (property.isAttribute()) {
                         if (property.getColumn() == null) {

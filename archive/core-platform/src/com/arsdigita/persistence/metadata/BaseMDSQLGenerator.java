@@ -47,12 +47,12 @@ import org.apache.log4j.Category;
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#5 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#6 $
  * @since 4.6.3
  */
 abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#5 $ by $Author: randyg $, $DateTime: 2002/08/01 11:13:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#6 $ by $Author: randyg $, $DateTime: 2002/08/02 09:15:46 $";
 
     private static final Category s_log =
         Category.getInstance(BaseMDSQLGenerator.class);
@@ -101,6 +101,31 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
         return event;
     }
 
+
+    /**
+     *  This generates events specifically for associations.  That is,
+     *  if an association requires a different type of event (e.g. an
+     *  update) then this will call the associations event.  Otherwise,
+     *  it delegates to {@link generateEvent}
+     */
+    public Event generateAssociationEvent(ObjectType type, int eventType) {
+        if (type == null) {
+            return null;
+        }
+        Event event = null;
+        if (eventType == CompoundType.UPDATE) {
+            event = generateAssociationUpdate(type);
+        } else {
+            event = generateEvent(type, eventType);
+        }
+        if (event != null) {
+            type.setEvent(eventType, event);
+        }
+
+        return event;
+    }
+
+
     /**
      * Generates an Event of a particular type for a certain Property.
      * New event is automatically added to the Property.
@@ -111,7 +136,8 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
      *                  {@link com.arsdigita.persistence.metadata.Property}
      * @return the new Event, or null if it could not be created
      */
-    public Event generateEvent(ObjectType type, Property prop, int eventType, ObjectType link) {
+    public Event generateEvent(ObjectType type, Property prop, int eventType, 
+                               ObjectType link) {
         Event event = null;
 
         // don't waste time
@@ -994,6 +1020,165 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
         return event;
     }
 
+
+    /**
+     * Generates an Update event that is used by associations for updating
+     * link attributes.  This currently assumes the following:
+     * <ul>
+     * <li>The link attribute is within a mapping table</li>
+     * <li>The join path is exactly two segments long</li>
+     * <li>The mapping table is keyed off of the object key of the given
+     *     property (e.g. it is keyed off of the "id" property).  This
+     *     property must be the first (probably only) key property for the
+     *     type.</li>
+     * <li>The passed in object type has exactly two key properties (which
+     * is standard for an association)</li>
+     * <li>The "to" column of the first join element in the join path
+     *     for the association is the column that can be used in the "where"
+     *     segment of the DML</li>
+     * <li></li>
+     * </ul>
+     *
+     * @param link The object type containing information about the
+     *             link attributes
+     * @return an UPDATE Event
+     */
+    public Event generateAssociationUpdate(ObjectType link) {
+        PriorityQueue pq = new PriorityQueue();
+        Map columnMap = new HashMap();
+        Map columns = new HashMap();
+        Property propertyOne = null;
+        Property propertyTwo = null;
+
+        // The properties that are not key properties are the "link"
+        // properties.  The first step is to loop through all
+        // properties and get a list of columns and tables used by
+        // the link attributes
+        for (Iterator it = link.getProperties(); it.hasNext(); ) {
+            Property property = (Property) it.next();
+            if (link.isKeyProperty(property)) {
+                if (propertyOne == null) {
+                    propertyOne = property;
+                } else if (propertyTwo == null) {
+                    propertyTwo = property;
+                } else {
+                    throw new IllegalStateException
+                        (link.getName() + " has more than two key properties."+
+                         " It should only have two.");
+                }
+                continue;
+            }
+                           
+            // if we have reached this point then we are dealing with a link
+            // attribute
+                
+            if (!property.isAttribute()) {
+                // this is not yet supported so we continue
+                continue;
+            }
+
+            Column col = property.getColumn();
+            if (col == null) {
+                // if the link attribute does not have a column we
+                // cannot generate the DML
+                return null;
+            }
+            
+            columns = (HashMap)columnMap.get(col.getTableName());
+            if (columns == null) {
+                columns = new HashMap();
+                columnMap.put(col.getTableName(), columns);
+            }
+
+            columns.put(col.getColumnName(), ":" + property.getName());
+            if (pq != null) {
+                pq.enqueue(col.getTableName(), 0);
+            }
+        }
+
+
+        Event ev = new Event();
+        ev.setLineInfo(link);
+
+        // now that we have a list of columns and tables, we can
+        // actually start to generate the SQL
+        while (!pq.isEmpty()) {
+            String tableName = (String)pq.dequeue();
+            Iterator cols = ((Map)columnMap.get(tableName))
+                                .entrySet().iterator();
+
+            StringBuffer sb = new StringBuffer();
+            String where = null;
+            boolean first = true;
+
+            sb.append("update ")
+              .append(tableName)
+              .append("\n set ");
+
+            while (cols.hasNext()) {
+                Map.Entry me = (Map.Entry)cols.next();
+                String value = (String)me.getValue();
+
+                if (!first) {
+                    sb.append(",\n");
+                } else {
+                    first = false;
+                }
+                
+                sb.append((String)me.getKey())
+                    .append(" = ")
+                    .append(value);
+            }
+
+            // now add the keys.  Since we assume that this is an association
+            // going through a mapping table (where else would you have
+            // a link attribute?) we are just using the two properties.
+
+            first = true;
+            for (Iterator it = link.getKeyProperties(); it.hasNext(); ) {
+                Property p = (Property)it.next();
+                if (first) {
+                    sb.append("\n where ");
+                    first = false;
+                } else {
+                    sb.append("\n and ");
+                }
+
+                // we should have two key properties.  They are both
+                // compound types so we have to get the type and then
+                // get the key property from it.
+                ObjectType type = (ObjectType)p.getType();
+                Property activeProperty = null;
+                if (p.getName().equals(propertyOne.getName())) {
+                    activeProperty = type.getProperty(propertyTwo.getName());
+                } else {
+                    activeProperty = type.getProperty(propertyOne.getName());
+                }
+
+                // we want the second item of the first path element
+                Column columnToJoin = ((JoinElement)activeProperty
+                                       .getJoinPath().getJoinElements()
+                                       .next()).getTo();
+
+                // This makes the assumption that things are keyed off of
+                // the first key property returned by the type.  Most of 
+                // the time this should work becuase it will be the only
+                // key property
+                String key = ((Property)((ObjectType)activeProperty.getType())
+                              .getKeyProperties().next()).getName();
+                
+                sb.append(columnToJoin.getQualifiedName() +
+                          " = :" + p.getName() + "." + key);
+            }
+            System.out.println("UPDATE = " + sb.toString());
+
+            Operation block = new Operation(sb.toString());
+            block.setLineInfo(link);
+            ev.addOperation(block);
+        }
+
+        return ev;
+    }
 
     //**********************************************************//
     // Utility methods                                          //

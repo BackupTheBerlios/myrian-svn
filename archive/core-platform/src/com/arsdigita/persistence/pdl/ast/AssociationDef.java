@@ -37,14 +37,14 @@ import org.apache.log4j.Category;
  * additional properties and SQL Events.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/07/31 $
+ * @version $Revision: #5 $ $Date: 2002/08/02 $
  */
 
 public class AssociationDef extends Element {
 
     private Category s_log = Category.getInstance(AssociationDef.class);
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AssociationDef.java#4 $ by $Author: dan $, $DateTime: 2002/07/31 09:53:16 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AssociationDef.java#5 $ by $Author: randyg $, $DateTime: 2002/08/02 09:15:46 $";
 
     // the two PropertyDefs that define what Objects are being associated
     private PropertyDef m_one;
@@ -242,7 +242,7 @@ public class AssociationDef extends Element {
                 Property prop = link.getProperty(ed.getName());
                 if (prop != null) {
                     if (prop.getEvent(ed.getTypeCode()) == null) {
-			prop.setEvent(ed.getTypeCode(), ed.generateEvent());
+                        prop.setEvent(ed.getTypeCode(), ed.generateEvent());
                     } else {
                         ed.error(
                             "Duplicate " + ed.getType() +
@@ -251,17 +251,9 @@ public class AssociationDef extends Element {
                             );
                     }
                 }
-	    }
+            }
         }
-
-        //
-        // TODO: We need to generate events for the link object type.
-        //       It's ignored right now since it doesn't have a key.
-        //
-	// XXX generate the UPDATE event, this is currently
-	// failing due to MDSQL generator getTableColumns
-	// not work for the link object type
-	generator.generateEvent(link, CompoundType.UPDATE);
+        generator.generateAssociationEvent(link, CompoundType.UPDATE);
     }
 
     /**
