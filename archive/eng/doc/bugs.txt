@@ -1,5 +1,5 @@
 # Since:   2004-06-29
-# Version: $Id: //eng/persistence/dev/doc/bugs.txt#2 $
+# Version: $Id: //eng/persistence/dev/doc/bugs.txt#3 $
 
 * Opened
 .. PersistenceManager.makePersistent(Object) fails silently (rather
@@ -15,6 +15,14 @@
    memory state become the canonical version of the state for that identity.
 
    Reported: 2004-06-23
+   By: rhs
+
+.. PersistenceManager.makePersistent(Object) correctly barfs if
+   currentTransaction().begin() has not been called. However fetching
+   existing persistent objects and modifying them succeeds without
+   calling currentTransaction.begin().
+
+   Reported: 07/08/2004
    By: rhs
 
 * Closed
