@@ -16,6 +16,13 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.MetadataRoot;
+import com.arsdigita.persistence.proto.EventProcessor;
+import com.arsdigita.persistence.proto.EventProcessorManager;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -28,18 +35,19 @@ import org.apache.log4j.Logger;
  *
  * @see Initializer
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #2 $ $Date: 2003/01/09 $
+ * @version $Revision: #3 $ $Date: 2003/02/28 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/SessionManager.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/SessionManager.java#3 $ by $Author: vadim $, $DateTime: 2003/02/28 16:01:18 $";
 
     private static String s_url = null;           // the jdbc URL
     private static String s_username = null;      // the database username
     private static String s_password = null;      // the database password
     private static ThreadLocal s_session;  // the session
     private static SQLUtilities s_sqlUtil;
+    private static Set s_procManagers = new HashSet();
 
     private static final Logger s_cat =
         Logger.getLogger(SessionManager.class.getName());
@@ -64,6 +72,35 @@ public class SessionManager {
      */
     public static Session getSession() {
         return (Session) s_session.get();
+    }
+
+    /**
+     * This method provides an indirect way for applications to register {@link
+     * com.arsdigita.persistence.proto.EventProcessor event processors} with the
+     * {@link Session session} object.
+     *
+     * <p>This works like so</p>
+     *
+     * <ul>
+     *  <li>You register your {@link EventProcessorManager event processor manager}
+     *      with this session manager.</li>
+     *
+     *  <li>Each {@link Session session} returned by {@link #getSession()} will
+     *  have a reference to a single (per thread) instance of the {@link
+     *  com.arsdigita.persistence.proto.EventProcessor event processor} managed
+     *  the {@link EventProcessorManager event processor manager} that you
+     *  registered.</li>
+     *
+     *  <li>The {@link com.arsdigita.persistence.proto.Session session} will
+     *  dispatch events from its {@link
+     *  com.arsdigita.persistence.proto.Session#flush()} method to to your event
+     *  processor's <code>write(Event)</code> method. </li>
+     * </ul>
+     **/
+    public static synchronized void addEventProcessorManager
+        (EventProcessorManager manager) {
+
+        s_procManagers.add(manager);
     }
 
      /**
@@ -115,6 +152,11 @@ public class SessionManager {
                                                         sb.toString());
                     }
                     Session s = new Session();
+                    for (Iterator ii=s_procManagers.iterator(); ii.hasNext(); ) {
+                        EventProcessorManager mngr = 
+                            (EventProcessorManager) ii.next();
+                        s.getProtoSession().addEventProcessor(mngr.getEventProcessor());
+                    }
                     return s;
                 }
             };

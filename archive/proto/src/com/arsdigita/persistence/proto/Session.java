@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #38 $ $Date: 2003/02/28 $
+ * @version $Revision: #39 $ $Date: 2003/02/28 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#38 $ by $Author: ashah $, $DateTime: 2003/02/28 13:50:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#39 $ by $Author: vadim $, $DateTime: 2003/02/28 16:01:18 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -40,7 +40,7 @@ public class Session {
 
     private Set m_violations = new HashSet();
 
-    private final static Set EVENT_PROCESSORS = new HashSet();
+    private final Set m_eventProcessors = new HashSet();
 
     public Session(Engine engine, QuerySource source) {
         m_engine = engine;
@@ -500,7 +500,7 @@ public class Session {
             ev.sync();
         }
 
-        for (Iterator ii = EVENT_PROCESSORS.iterator(); ii.hasNext(); ) {
+        for (Iterator ii = m_eventProcessors.iterator(); ii.hasNext(); ) {
             EventProcessor ep = (EventProcessor) ii.next();
             for (Iterator events = written.iterator(); events.hasNext(); ) {
                 Event event = (Event) events.next();
@@ -697,9 +697,15 @@ public class Session {
 
     void removeViolation(PropertyData pd) { m_violations.remove(pd); }
 
-    public static void addEventProcessor(EventProcessor ep) {
+    // FIXME: Once the old Session class and proto.Session are merged, this
+    // method should be made package-private. It is (and should be) only used by
+    // SessionManager. -- vadimn@redhat.com, 2003-02-28
+    /**
+     * <span style="color:FireBrick">FIXME</span> this shouldn't be public.
+     **/
+    public void addEventProcessor(EventProcessor ep) {
         Assert.assertNotNull(ep, "event processor");
-        EVENT_PROCESSORS.add(ep);
+        m_eventProcessors.add(ep);
     }
 
     void dump() {
