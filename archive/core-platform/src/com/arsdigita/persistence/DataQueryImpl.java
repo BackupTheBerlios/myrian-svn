@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #24 $ $Date: 2003/06/12 $
+ * @version $Revision: #25 $ $Date: 2003/06/26 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#24 $ by $Author: rhs $, $DateTime: 2003/06/12 16:30:59 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#25 $ by $Author: rhs $, $DateTime: 2003/06/26 18:40:22 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 
@@ -383,7 +383,7 @@ class DataQueryImpl implements DataQuery {
         return (int) m_cursor.getPosition();
     }
 
-    private Query makeQuery() {
+    Query makeQuery() {
         String conditions = m_filter.getConditions();
 	Query q;
         if (conditions == null || conditions.equals("")) {

@@ -1,4 +1,4 @@
-select i.icle_id as column0
+select i.icle_id as c_1
 from icles i,
      collection c
 where c.test_id = ? and c.element_id = i.icle_id

@@ -13,12 +13,12 @@ import com.arsdigita.persistence.proto.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/06/02 $
+ * @version $Revision: #4 $ $Date: 2003/06/26 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDLParser.jj#3 $ by $Author: rhs $, $DateTime: 2003/06/02 10:49:07 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDLParser.jj#4 $ by $Author: rhs $, $DateTime: 2003/06/26 18:40:22 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -170,7 +170,7 @@ FileNd file(String filename) :
 }
 {
     n = model() <SEMI> { f.add(FileNd.MODEL, n); }
-    ( n = pimpwhore() <SEMI> { f.add(FileNd.IMPORTS, n); } )*
+    ( n = pdl_import() <SEMI> { f.add(FileNd.IMPORTS, n); } )*
     (   n = object_type() { f.add(FileNd.OBJECT_TYPES, n); }
       | n = association() { f.add(FileNd.ASSOCIATIONS, n); }
       | n = data_operation() { f.add(FileNd.DATA_OPERATIONS, n); } )*
@@ -188,7 +188,7 @@ ModelNd model() :
     t = <MODEL> idpath(m, ModelNd.PATH) { ln(m, t); return m; }
 }
 
-ImportNd pimpwhore() :
+ImportNd pdl_import() :
 {
     ImportNd i = new ImportNd();
     Node n;

@@ -9,12 +9,12 @@ import java.util.*;
  * Select
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/26 $
  **/
 
 class Select extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#2 $ by $Author: rhs $, $DateTime: 2003/06/26 18:40:22 $";
 
     private Join m_join;
     private Expression m_filter;
@@ -24,6 +24,7 @@ class Select extends Operation {
     private HashSet m_ascending = new HashSet();
     private Integer m_offset = null;
     private Integer m_limit = null;
+    private boolean m_isCount = false;
 
     public Select(Join join, Expression filter) {
         this(join, filter, new Environment(null));
@@ -56,6 +57,14 @@ class Select extends Operation {
 
     public Collection getSelections() {
         return m_selections;
+    }
+
+    public void setCount(boolean value) {
+        m_isCount = value;
+    }
+
+    public boolean isCount() {
+        return m_isCount;
     }
 
     public void addOrder(Expression expr, boolean isAscending) {

@@ -15,12 +15,12 @@ import org.apache.log4j.Logger;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/06/25 $
+ * @version $Revision: #5 $ $Date: 2003/06/26 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#4 $ by $Author: rhs $, $DateTime: 2003/06/25 21:48:22 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#5 $ by $Author: rhs $, $DateTime: 2003/06/26 18:40:22 $";
 
     private static final Logger LOG = Logger.getLogger(QGen.class);
 
@@ -102,6 +102,7 @@ class QGen {
         RESERVED.add("as");
         RESERVED.add("in");
         RESERVED.add("to");
+        RESERVED.add("c_");
     }
 
     private String abbreviateHard(String name) {
@@ -314,10 +315,10 @@ class QGen {
         Select result = new Select(join, filter, env);
         result.setMappings(m_columns);
 
-        int col = 0;
+        int col = 1;
         for (Iterator it = sig.getPaths().iterator(); it.hasNext(); ) {
             Path path = (Path) it.next();
-            result.addSelection(getColumn(path), "column" + (col++));
+            result.addSelection(getColumn(path), "c_" + (col++));
         }
 
         for (Iterator it = m_query.getOrder().iterator(); it.hasNext(); ) {

@@ -6,12 +6,12 @@ import com.arsdigita.persistence.proto.metadata.ObjectType;
  * DataSet
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/26 $
  **/
 
 public class DataSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/DataSet.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/DataSet.java#2 $ by $Author: rhs $, $DateTime: 2003/06/26 18:40:22 $";
 
     private Session m_ssn;
     private Query m_query;
@@ -42,11 +42,8 @@ public class DataSet {
     }
 
     public long size(Expression filter) {
-        // XXX: This is dumb, it needs to be replaced.
-        Cursor c = getCursor(filter);
-        long result = 0;
-        while (c.next()) { result++; }
-        return result;
+        m_ssn.flush();
+        return m_ssn.getEngine().size(new Query(m_query, filter));
     }
 
     public boolean isEmpty() {

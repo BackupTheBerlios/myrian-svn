@@ -13,12 +13,12 @@ import java.io.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/06/09 $
+ * @version $Revision: #5 $ $Date: 2003/06/26 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#4 $ by $Author: rhs $, $DateTime: 2003/06/09 19:03:29 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#5 $ by $Author: rhs $, $DateTime: 2003/06/26 18:40:22 $";
 
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();
@@ -409,34 +409,32 @@ public abstract class SQLWriter {
 
 class ANSIWriter extends SQLWriter {
 
-    public void write(Select select) {
+    protected void writeSelect(Select select) {
         write("select ");
 
         Collection sels = select.getSelections();
-        Join join = select.getJoin();
-        Expression filter = select.getFilter();
 
-        if (sels.size() == 0) {
-            write("*");
+        if (select.isCount()) {
+            write("count(*)\nfrom (\nselect 1");
         } else {
-            for (Iterator it = sels.iterator(); it.hasNext(); ) {
-                Path path = (Path) it.next();
-                write(path);
-                write(" as ");
-                write(select.getAlias(path));
-                if (it.hasNext()) {
-                    write(",\n       ");
+            if (sels.size() == 0) {
+                write("*");
+            } else {
+                for (Iterator it = sels.iterator(); it.hasNext(); ) {
+                    Path path = (Path) it.next();
+                    write(path);
+                    write(" as ");
+                    write(select.getAlias(path));
+                    if (it.hasNext()) {
+                        write(",\n       ");
+                    }
                 }
             }
         }
+    }
 
-        write("\nfrom ");
-        write(join);
-
-        if (filter != null) {
-            write("\nwhere ");
-            write(filter);
-        }
+    protected void writeOrder(Select select) {
+        if (select.isCount()) { return; }
 
         Collection order = select.getOrder();
 
@@ -456,6 +454,23 @@ class ANSIWriter extends SQLWriter {
                 write(", ");
             }
         }
+    }
+
+    public void write(Select select) {
+        writeSelect(select);
+
+        Join join = select.getJoin();
+        Expression filter = select.getFilter();
+
+        write("\nfrom ");
+        write(join);
+
+        if (filter != null) {
+            write("\nwhere ");
+            write(filter);
+        }
+
+        writeOrder(select);
 
         if (select.getOffset() != null) {
             write("\noffset " + select.getOffset());
@@ -463,6 +478,10 @@ class ANSIWriter extends SQLWriter {
 
         if (select.getLimit() != null) {
             write("\nlimit " + select.getLimit());
+        }
+
+        if (select.isCount()) {
+            write("\n) count__");
         }
     }
 

@@ -13,12 +13,12 @@ import java.util.*;
  * MemoryEngine
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/26 $
  **/
 
 public class MemoryEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#2 $ by $Author: rhs $, $DateTime: 2003/06/26 18:40:22 $";
 
     private static final Logger LOG = Logger.getLogger(MemoryEngine.class);
 
@@ -54,6 +54,13 @@ public class MemoryEngine extends Engine {
             LOG.debug("result: " + drs);
         }
         return drs;
+    }
+
+    protected long size(Query query) {
+        RecordSet rs = execute(query);
+        long result = 0;
+        while (rs.next()) { result++; }
+        return result;
     }
 
     private final Event.Switch m_switch = new Event.Switch() {

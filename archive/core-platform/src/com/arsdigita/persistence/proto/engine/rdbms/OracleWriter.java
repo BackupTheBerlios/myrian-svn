@@ -10,12 +10,12 @@ import java.sql.*;
  * OracleWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/26 $
  **/
 
 public class OracleWriter extends ANSIWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/OracleWriter.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/OracleWriter.java#2 $ by $Author: rhs $, $DateTime: 2003/06/26 18:40:22 $";
 
     private static final Expression and(Expression left, Expression right) {
         if (left == null) { return right; }
@@ -54,25 +54,11 @@ public class OracleWriter extends ANSIWriter {
             write("select * from (\n");
         }
 
-        write("select ");
+        writeSelect(select);
 
         Collection sels = select.getSelections();
         Join join = select.getJoin();
         Expression filter = select.getFilter();
-
-        if (sels.size() == 0) {
-            write("*");
-        } else {
-            for (Iterator it = sels.iterator(); it.hasNext(); ) {
-                Path path = (Path) it.next();
-                write(path);
-                write(" as ");
-                write(select.getAlias(path));
-                if (it.hasNext()) {
-                    write(",\n       ");
-                }
-            }
-        }
 
         if (offlimits) {
             if (sels.size() == 0) {
@@ -93,24 +79,7 @@ public class OracleWriter extends ANSIWriter {
             write(filter);
         }
 
-        Collection order = select.getOrder();
-
-        if (order.size() > 0) {
-            write("\norder by ");
-        }
-
-        for (Iterator it = order.iterator(); it.hasNext(); ) {
-            Expression e = (Expression) it.next();
-            write(e);
-
-            if (!select.isAscending(e)) {
-                write(" desc");
-            }
-
-            if (it.hasNext()) {
-                write(", ");
-            }
-        }
+        writeOrder(select);
 
         if (offlimits) {
             write(")\nwhere ");
@@ -134,6 +103,10 @@ public class OracleWriter extends ANSIWriter {
             }
 
             write("rownum__ <= " + upper);
+        }
+
+        if (select.isCount()) {
+            write("\n) count__");
         }
     }
 

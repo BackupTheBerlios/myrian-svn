@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/06/09 $
+ * @version $Revision: #5 $ $Date: 2003/06/26 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#4 $ by $Author: rhs $, $DateTime: 2003/06/09 19:03:29 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#5 $ by $Author: rhs $, $DateTime: 2003/06/26 18:40:22 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -196,6 +196,53 @@ public class RDBMSEngine extends Engine {
         Select sel = qg.generate();
         return new RDBMSRecordSet(query.getSignature(), this, execute(sel),
                                   qg.getMappings(sel));
+    }
+
+    public long size(Query query) {
+        return size(query, null);
+    }
+
+    public long size(Query query, SQLBlock block) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Executing size " + query);
+        }
+        QGen qg = new QGen(query, block);
+        Select sel = qg.generate();
+        sel.setCount(true);
+        ResultSet rs = execute(sel);
+        if (rs == null) {
+            throw new IllegalStateException
+                ("null result set");
+        }
+        try {
+            try {
+                long result;
+                if (rs.next()) {
+                    result = rs.getLong(1);
+                } else {
+                    throw new IllegalStateException
+                        ("count returned no rows");
+                }
+                if (rs.next()) {
+                    throw new IllegalStateException
+                        ("count returned too many rows");
+                }
+                return result;
+            } catch (SQLException e) {
+                throw new RDBMSException(e.getMessage()) {};
+            }
+        } finally {
+            try {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug
+                        ("Closing Statement because resultset was closed.");
+                }
+                rs.getStatement().close();
+                rs.close();
+            } catch (SQLException e) {
+                throw new RDBMSException(e.getMessage()) {};
+            }
+        }
     }
 
     private Aggregator m_aggregator = new Aggregator();

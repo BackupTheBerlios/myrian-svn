@@ -20,16 +20,18 @@ import com.arsdigita.persistence.proto.metadata.Property;
  * Engine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/05/22 $
+ * @version $Revision: #3 $ $Date: 2003/06/26 $
  **/
 
 public abstract class Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Engine.java#2 $ by $Author: ashah $, $DateTime: 2003/05/22 14:50:15 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Engine.java#3 $ by $Author: rhs $, $DateTime: 2003/06/26 18:40:22 $";
 
     protected abstract void write(Event ev);
     protected abstract void flush();
     protected abstract void rollback();
     protected abstract void commit();
     protected abstract RecordSet execute(Query query);
+    protected abstract long size(Query query);
+
 }
