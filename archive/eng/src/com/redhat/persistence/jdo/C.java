@@ -92,27 +92,6 @@ class C {
         return cursor(ssn, klass, new All(klass.getName()));
     }
 
-    public static Object create(Session ssn, Class klass, Object[] args) {
-        return create(ssn, klass.getName(), args);
-    }
-
-    public static Object create(Session ssn, String klass, Object[] args) {
-        Root root = ssn.getRoot();
-        ObjectType type = root.getObjectType(klass);
-        Adapter ad = root.getAdapter(type);
-        PropertyMap pmap = new PropertyMap(type);
-        Collection props = type.getImmediateProperties();
-        int index = 0;
-        for (Iterator it = props.iterator();
-             it.hasNext() && index < args.length; ) {
-            Property prop = (Property) it.next();
-            pmap.put(prop, args[index++]);
-        }
-        Object obj = ad.getObject(type.getBasetype(), pmap, ssn);
-        ssn.create(obj);
-        return obj;
-    }
-
     public static void lock(Session ssn, Expression expr) {
         DataSet ds = new DataSet
             (ssn, new Signature() {

@@ -44,7 +44,7 @@ import org.apache.log4j.Logger;
  * PandoraTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/29 $
+ * @version $Revision: #2 $ $Date: 2004/06/29 $
  **/
 
 public class PandoraTest extends AbstractCase {
@@ -237,16 +237,17 @@ public class PandoraTest extends AbstractCase {
     public void testMain() {
         Picture[] pictures = new Picture[10];
         for (int i = 0; i < pictures.length; i++) {
-            pictures[i] = (Picture) C.create
-                (m_ssn, Picture.class, new Object[] { new Integer(i) });
+            pictures[i] = new Picture(i);
+            m_pm.makePersistent(pictures[i]);
             pictures[i].setCaption("Caption " + i);
             pictures[i].setContent(new byte[32]);
         }
 
         Product[] products = new Product[10];
         for (int i = 0; i < products.length; i++) {
-            products[i] = (Product) C.create
-                (m_ssn, Product.class, new Object[] { new Integer(i) });
+            products[i] = new Product(i);
+            m_pm.makePersistent(products[i]);
+
             products[i].setName("Product " + i);
             products[i].setPrice((float)3.14);
             products[i].setPicture(pictures[i]);
@@ -325,8 +326,8 @@ public class PandoraTest extends AbstractCase {
             order.setParty(rhs);
             Collection items = order.getItems();
             for (int j = 0; j < 10; j++) {
-                Item item = (Item) C.create
-                    (m_ssn, Item.class, new Object[] { new Integer(j + 10*i) });
+                Item item = new Item(j + 10*i);
+                m_pm.makePersistent(item);
                 item.setProduct(products[i]);
                 items.add(item);
             }
