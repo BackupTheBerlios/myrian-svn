@@ -7,10 +7,10 @@ public class JDOSuite extends TestSuite {
     public static Test suite() {
         JDOSuite suite = new JDOSuite();
 
-        // suite.addTestSuite(SimpleTest.class);
-        // suite.addTestSuite(PandoraTest.class);
+        suite.addTestSuite(SimpleTest.class);
+        suite.addTestSuite(PandoraTest.class);
 
-        suite.addTest(new PandoraTest("testMain"));
+        // suite.addTest(new PandoraTest("testMain"));
 
         return new JDOTestSetup(suite);
     }
