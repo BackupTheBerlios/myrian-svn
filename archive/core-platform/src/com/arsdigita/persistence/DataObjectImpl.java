@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2003/07/02 $
+ * @version $Revision: #10 $ $Date: 2003/07/02 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#9 $ by $Author: ashah $, $DateTime: 2003/07/02 01:16:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#10 $ by $Author: ashah $, $DateTime: 2003/07/02 17:18:32 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -242,7 +242,7 @@ class DataObjectImpl implements DataObject {
                 m_ssn.set(this, convert(property), value);
             }
         } catch (ProtoException pe) {
-            throw new PersistenceException(pe);
+            throw PersistenceException.newInstance(pe);
         }
     }
 
@@ -337,7 +337,7 @@ class DataObjectImpl implements DataObject {
             m_ssn.flush();
             m_ssn.assertFlushed(this);
         } catch (ProtoException pe) {
-            throw new PersistenceException(pe);
+            throw PersistenceException.newInstance(pe);
         }
     }
 
@@ -375,7 +375,7 @@ class DataObjectImpl implements DataObject {
                 getSession().m_afterFP.fireNow(new AfterSaveEvent(this));
             }
         } catch (ProtoException pe) {
-            throw new PersistenceException(pe);
+            throw PersistenceException.newInstance(pe);
         }
     }
 
@@ -469,9 +469,7 @@ class DataObjectImpl implements DataObject {
         try {
             return s.get(this, p);
         } catch (ProtoException pe) {
-            throw new PersistenceException(pe);
-        } catch (MetadataException pe) {
-            throw new PersistenceException(pe);
+            throw PersistenceException.newInstance(pe);
         }
     }
 

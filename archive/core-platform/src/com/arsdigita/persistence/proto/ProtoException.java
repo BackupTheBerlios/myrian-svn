@@ -32,16 +32,16 @@ public abstract class ProtoException extends RuntimeException {
     // internal or external exception
     private boolean m_internal = true;
 
-    ProtoException() { super(); }
+    protected ProtoException() { super(); }
 
-    ProtoException(boolean internal) {
+    protected ProtoException(boolean internal) {
         super();
         setInternal(internal);
     }
 
-    ProtoException(String msg) { super(msg); }
+    protected ProtoException(String msg) { super(msg); }
 
-    ProtoException(String msg, boolean internal) {
+    protected ProtoException(String msg, boolean internal) {
         super(msg);
         setInternal(internal);
     }

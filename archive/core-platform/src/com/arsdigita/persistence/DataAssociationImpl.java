@@ -7,13 +7,13 @@ import com.arsdigita.persistence.proto.ProtoException;
  * DataAssociationImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2003/05/12 $
+ * @version $Revision: #14 $ $Date: 2003/07/02 $
  **/
 
 class DataAssociationImpl extends DataAssociationCursorImpl
     implements DataAssociation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#13 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#14 $ by $Author: ashah $, $DateTime: 2003/07/02 17:18:32 $";
 
     private com.arsdigita.persistence.proto.Session m_pssn;
     private DataObject m_data;
@@ -33,7 +33,7 @@ class DataAssociationImpl extends DataAssociationCursorImpl
         try {
             return (DataObject) m_pssn.add(m_data, m_pprop, obj);
         } catch (ProtoException pe) {
-            throw new PersistenceException(pe);
+            throw PersistenceException.newInstance(pe);
         }
     }
 
@@ -58,7 +58,7 @@ class DataAssociationImpl extends DataAssociationCursorImpl
         try {
             m_pssn.remove(m_data, m_pprop, obj);
         } catch (ProtoException pe) {
-            throw new PersistenceException(pe);
+            throw PersistenceException.newInstance(pe);
         }
     }
 

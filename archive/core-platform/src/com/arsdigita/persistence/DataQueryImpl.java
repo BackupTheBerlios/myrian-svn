@@ -4,7 +4,7 @@ import com.arsdigita.persistence.metadata.*;
 import com.arsdigita.persistence.proto.common.ParseException;
 import com.arsdigita.persistence.proto.common.Path;
 import com.arsdigita.persistence.proto.common.SQLParser;
-import com.arsdigita.persistence.proto.engine.rdbms.UnboundParameterException;
+import com.arsdigita.persistence.proto.ProtoException;
 import com.arsdigita.persistence.proto.PersistentCollection;
 import com.arsdigita.persistence.proto.DataSet;
 import com.arsdigita.persistence.proto.Cursor;
@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #26 $ $Date: 2003/07/02 $
+ * @version $Revision: #27 $ $Date: 2003/07/02 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#26 $ by $Author: ashah $, $DateTime: 2003/07/02 01:16:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#27 $ by $Author: ashah $, $DateTime: 2003/07/02 17:18:32 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 
@@ -95,8 +95,8 @@ class DataQueryImpl implements DataQuery {
     public boolean isEmpty() {
 	try {
 	    return m_pssn.retrieve(makeQuery()).getDataSet().isEmpty();
-	} catch (UnboundParameterException e) {
-	    throw new PersistenceException(e);
+	} catch (ProtoException e) {
+	    throw PersistenceException.newInstance(e);
 	}
     }
 
@@ -363,8 +363,8 @@ class DataQueryImpl implements DataQuery {
         Path path = unalias(Path.get(propertyName));
 	try {
 	    return m_cursor.get(path);
-	} catch (CursorException e) {
-	    throw new PersistenceException(e);
+	} catch (ProtoException e) {
+	    throw PersistenceException.newInstance(e);
 	}
     }
 
@@ -411,8 +411,8 @@ class DataQueryImpl implements DataQuery {
         if (m_cursor == null) {
 	    try {
 		m_cursor = execute(makeQuery());
-	    } catch (UnboundParameterException e) {
-		throw new PersistenceException(e);
+	    } catch (ProtoException e) {
+		throw PersistenceException.newInstance(e);
 	    }
         }
     }
@@ -432,8 +432,8 @@ class DataQueryImpl implements DataQuery {
 	boolean result;
 	try {
 	    result = m_cursor.next();
-	} catch (UnboundParameterException e) {
-	    throw new PersistenceException(e);
+	} catch (ProtoException e) {
+	    throw PersistenceException.newInstance(e);
 	}
 
         if (result) {
@@ -456,8 +456,8 @@ class DataQueryImpl implements DataQuery {
     public long size() {
 	try {
 	    return m_pssn.retrieve(makeQuery()).getDataSet().size();
-	} catch (UnboundParameterException e) {
-	    throw new PersistenceException(e);
+	} catch (ProtoException e) {
+	    throw PersistenceException.newInstance(e);
 	}
     }
 

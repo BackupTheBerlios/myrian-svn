@@ -17,20 +17,21 @@ package com.arsdigita.persistence;
 
 import com.arsdigita.util.UncheckedWrapperException;
 import com.arsdigita.db.DbException;
+import com.arsdigita.persistence.proto.ProtoException;
 
 /**
  * PersistenceException
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/11/01 $
+ * @version $Revision: #5 $ $Date: 2003/07/02 $
  */
 
 public class PersistenceException extends UncheckedWrapperException {
 
     private String m_messageStack = null;
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/PersistenceException.java#4 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/PersistenceException.java#5 $ by $Author: ashah $, $DateTime: 2003/07/02 17:18:32 $";
 
     /**
      * Constructor for a PersistenceException which does not wrap
@@ -124,6 +125,11 @@ public class PersistenceException extends UncheckedWrapperException {
                        com.arsdigita.db.DbNotAvailableException) {
                 return new DbNotAvailableException(s, (DbException)rootCause);
             }
+        } else if (rootCause instanceof
+                   com.arsdigita.persistence.proto.DuplicateObjectException) {
+            return new UniqueConstraintException
+                (s, (com.arsdigita.persistence.proto.DuplicateObjectException)
+                 rootCause);
         }
         return new PersistenceException(s, rootCause);
     }

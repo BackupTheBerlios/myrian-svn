@@ -31,7 +31,7 @@ import java.math.BigInteger;
  */
 public class PersistenceExceptionTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceExceptionTest.java#6 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceExceptionTest.java#7 $";
 
     private Session ssn;
 
@@ -55,9 +55,9 @@ public class PersistenceExceptionTest extends PersistenceTestCase {
         dt.set("id", BigInteger.ZERO);
         dt.save();
 
-        dt = ssn.create("examples.Datatype");
-        dt.set("id", BigInteger.ZERO);
         try {
+            dt = ssn.create("examples.Datatype");
+            dt.set("id", BigInteger.ZERO);
             dt.save();
             fail("Unique constraint violation should have caused error");
         } catch (UniqueConstraintException e) {

@@ -29,6 +29,7 @@ import com.arsdigita.persistence.proto.Event;
 import com.arsdigita.persistence.proto.CreateEvent;
 import com.arsdigita.persistence.proto.DeleteEvent;
 import com.arsdigita.persistence.proto.ObjectEvent;
+import com.arsdigita.persistence.proto.ProtoException;
 import com.arsdigita.persistence.proto.PropertyEvent;
 import com.arsdigita.persistence.proto.metadata.Root;
 import com.arsdigita.persistence.proto.metadata.Property;
@@ -59,7 +60,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #18 $ $Date: 2003/06/25 $
+ * @version $Revision: #19 $ $Date: 2003/07/02 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -516,7 +517,11 @@ public class Session {
 
     public DataObject create(OID oid) {
         DataObject result = new DataObjectImpl(oid);
-        m_ssn.create(result);
+        try {
+            m_ssn.create(result);
+        } catch (ProtoException e) {
+            throw PersistenceException.newInstance(e);
+        }
         return result;
     }
 

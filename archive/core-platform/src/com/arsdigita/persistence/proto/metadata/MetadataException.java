@@ -1,18 +1,23 @@
 package com.arsdigita.persistence.proto.metadata;
 
+import com.arsdigita.persistence.proto.ProtoException;
+
 /**
  * MetadataException
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/07/02 $
  **/
 
-public class MetadataException extends RuntimeException {
+public class MetadataException extends ProtoException {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/metadata/MetadataException.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/metadata/MetadataException.java#2 $ by $Author: ashah $, $DateTime: 2003/07/02 17:18:32 $";
+
+    private final Object m_element;
 
     public MetadataException(Object element, String msg) {
-	super(message(element, msg));
+	super(message(element, msg), false);
+        m_element = element;
     }
 
     private static String message(Object element, String msg) {
@@ -24,6 +29,10 @@ public class MetadataException extends RuntimeException {
 	} else {
 	    return msg;
 	}
+    }
+
+    public Object getMetadataElement() {
+        return m_element;
     }
 
 }
