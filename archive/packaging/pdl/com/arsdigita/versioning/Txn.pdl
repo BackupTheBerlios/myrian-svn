@@ -1,0 +1,43 @@
+// Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/test-packaging/pdl/com/arsdigita/versioning/Txn.pdl#1 $
+// $DateTime: 2003/08/14 14:53:20 $
+
+model com.arsdigita.versioning;
+
+import com.arsdigita.kernel.*;
+
+object type Txn {
+    BigInteger[1..1]    id = vcx_txns.id         INTEGER;
+    // audit info
+    String[0..1]  modifyingIP  = vcx_txns.modifying_ip VARCHAR(400);
+    Date[1..1]       timestamp = vcx_txns.timestamp TIMESTAMP;
+
+    User[0..1]         modUser = join vcx_txns.modifying_user
+                                 to users.user_id;
+
+    component Tag[0..n] tags = join vcx_txns.id to vcx_tags.txn_id;
+
+    DataObjectChange[0..n] changes = join vcx_txns.id
+                                     to vcx_obj_changes.txn_id;
+    object key (id);
+}
+
+object type Tag {
+    BigInteger[1..1]  id = vcx_tags.id         INTEGER;
+
+    String[0..1]       tag = vcx_tags.tag        VARCHAR;
+    String[0..1] taggedOID = vcx_tags.tagged_oid VARCHAR;
+
+    object key(id);
+}

@@ -1,0 +1,76 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/test-packaging/pdl/com/arsdigita/lucene/Document.pdl#1 $ 
+// $DateTime: 2003/08/14 14:53:20 $
+
+model com.arsdigita.lucene;
+
+object type Document {
+    BigDecimal[1..1] id            = lucene_docs.document_id INTEGER;
+    String[1..1] type              = lucene_docs.type VARCHAR(200);
+    String[0..1] typeSpecificInfo  = lucene_docs.type_info VARCHAR;
+    Date[1..1] timestamp           = lucene_docs.timestamp TIMESTAMP;
+    Integer[1..1] dirty            = lucene_docs.dirty INTEGER;
+    Boolean[1..1] isDeleted        = lucene_docs.is_deleted BIT;
+    String[0..1] language          = lucene_docs.language CHAR(2);
+    String[0..1] country           = lucene_docs.country CHAR(2);
+    String[1..1] title             = lucene_docs.title VARCHAR(4000);
+    String[0..1] summary           = lucene_docs.summary VARCHAR(4000);
+    String[0..1] content           = lucene_docs.content CLOB;
+    Date[0..1] creationDate        = lucene_docs.creation_date TIMESTAMP;
+    BigDecimal[0..1] creationParty = lucene_docs.creation_party INTEGER;
+    Date[0..1] lastModifiedDate    = lucene_docs.last_modified_date TIMESTAMP;
+    BigDecimal[0..1] lastModifiedParty =
+        lucene_docs.last_modified_party INTEGER;
+
+    object key(id);
+
+
+    // To avoid race conditions between indexers, we
+    // never 'set' the dirty flag - we just toggle
+    // our bit.
+    update {
+      do {
+        update lucene_docs set
+           type = :type,
+           type_info = :typeSpecificInfo,
+           timestamp = :timestamp,
+           is_deleted = :isDeleted,
+           language = :language,
+           country = :country,
+           title = :title,
+           summary = :summary,
+           content = :content,
+           creation_date = :creationDate,
+           creation_party = :creationParty,
+           last_modified_date = :lastModifiedDate,
+           last_modified_party = :lastModifiedParty,
+           dirty = lucene_update_dirty(timestamp, :timestamp, dirty, :dirty)
+        where document_id = :id
+      }
+    }
+}
+
+query dirtyDocuments {
+  BigDecimal id;
+
+  do {
+    select document_id 
+      from lucene_docs
+     where bitand(dirty, :dirty) > 0
+  } map {
+    id = document_id;
+  }
+}
+

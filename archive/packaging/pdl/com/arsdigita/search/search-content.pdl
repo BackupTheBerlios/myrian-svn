@@ -1,0 +1,63 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/test-packaging/pdl/com/arsdigita/search/search-content.pdl#1 $ 
+// $DateTime: 2003/08/14 14:53:20 $
+
+model com.arsdigita.search;
+
+// Object SearchContent is used to allow updating the search-content table, (i.e.
+// the table that contains the content to be searched).  This object is used in
+// the SearchableObserver class to update the search-content table when objects
+// of type Searchable change.
+
+object type SearchContent {
+
+  BigDecimal id = search_content.object_id INTEGER;
+  String     object_type = search_content.object_type VARCHAR(100);
+  String     link_text = search_content.link_text VARCHAR(1000);
+  String     url_stub = search_content.url_stub VARCHAR(100);
+  String     summary = search_content.summary VARCHAR(4000);
+  String[0..1] xml_content = search_content.xml_content CLOB;
+  Blob[0..1] raw_content = search_content.raw_content BLOB;
+  String     language = search_content.language VARCHAR(3);
+
+  object key (id);
+}
+
+// Following returns the search content for an object
+query searchContentForObject {
+    BigDecimal id;
+    String object_type;
+    String link_text;
+    String url_stub;
+    String summary;
+    String xml_content;
+    Blob raw_content;
+    String language;
+   do {
+       select object_id, object_type, link_text, url_stub, summary, 
+       xml_content, raw_content, language
+       from
+       search_content
+    } map {
+        id = search_content.object_id;     
+        object_type = search_content.object_type;
+        link_text = search_content.link_text;
+        url_stub = search_content.url_stub;
+        summary = search_content.summary;
+        xml_content = search_content.xml_content;
+        raw_content = search_content.raw_content;
+        language = search_content.language;
+    }
+}

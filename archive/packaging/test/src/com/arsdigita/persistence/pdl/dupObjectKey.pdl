@@ -1,0 +1,7 @@
+model dupObjectKey;
+
+object type Foo {
+    BigInteger id = foos.id;
+    object key(id);
+    object key(id);
+}

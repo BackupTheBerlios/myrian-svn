@@ -1,0 +1,1 @@
+create index CW_TASK_COMMENTS_TASK_ID_idx on CW_TASK_COMMENTS(TASK_ID);

@@ -1,0 +1,79 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/test-packaging/test/pdl/com/arsdigita/persistence/mdsql/Datatype.pdl#1 $ 
+// $DateTime: 2003/08/14 14:53:20 $
+
+model examples;
+
+object type Datatype {
+    BigInteger[1..1] id = t_datatypes.id INTEGER;
+    BigInteger       bigInteger = t_datatypes.j_big_integer INTEGER;
+    BigDecimal       bigDecimal = t_datatypes.j_big_decimal DECIMAL;
+    Boolean          boolean = t_datatypes.j_boolean CHAR;
+    Byte             byte = t_datatypes.j_byte INTEGER;
+    Character        character = t_datatypes.j_character CHAR;
+    Date             date = t_datatypes.j_date TIMESTAMP;
+    Double           double = t_datatypes.j_double FLOAT;
+    Float            float = t_datatypes.j_float FLOAT;
+    Integer          integer = t_datatypes.j_integer INTEGER;
+    Long             long = t_datatypes.j_long BIGINT;
+    Short            short = t_datatypes.j_short INTEGER;
+    String           string = t_datatypes.j_string VARCHAR(4000);
+    // XXX: Should be byte[], but that isn't supported yet.
+    Blob             blob = t_datatypes.j_blob BLOB;
+    String           clob = t_datatypes.j_clob CLOB;
+
+    object key(id);
+
+}
+
+query TypedQuery {
+    BigInteger[1..1] id;
+    BigInteger       bigInteger;
+    BigDecimal       bigDecimal;
+    Boolean          boolean;
+    Byte             byte;
+    Character        character;
+    Date             date;
+    Double           double;
+    Float            float;
+    Integer          integer;
+    Long             long;
+    Short            short;
+    String           string;
+    // XXX: Should be byte[], but that isn't supported yet.
+    Blob             blob;
+    String           clob;
+
+    do {
+        select *
+	from t_datatypes
+    } map {
+	id = t_datatypes.id;
+	bigInteger = t_datatypes.j_big_integer;
+	bigDecimal = t_datatypes.j_big_decimal;
+	boolean = t_datatypes.j_boolean;
+	byte = t_datatypes.j_byte;
+	character = t_datatypes.j_character;
+	date = t_datatypes.j_date;
+	double = t_datatypes.j_double;
+	float = t_datatypes.j_float;
+	integer = t_datatypes.j_integer;
+	long = t_datatypes.j_long;
+	short = t_datatypes.j_short;
+	string = t_datatypes.j_string;
+	blob = t_datatypes.j_blob;
+	clob = t_datatypes.j_clob;
+    }
+}

@@ -1,0 +1,11 @@
+model dupReferenceKey;
+
+object type Foo {
+    BigInteger id = foos.id;
+    object key(id);
+}
+
+object type Bar extends Foo {
+    reference key(bars.id);
+    reference key(bars.id);
+}

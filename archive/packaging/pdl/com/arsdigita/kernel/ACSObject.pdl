@@ -1,0 +1,59 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/test-packaging/pdl/com/arsdigita/kernel/ACSObject.pdl#1 $ 
+// $DateTime: 2003/08/14 14:53:20 $
+
+model com.arsdigita.kernel;
+
+object type ACSObject {
+    BigDecimal[1..1] id = acs_objects.object_id INTEGER;
+    immediate String[1..1] objectType = acs_objects.object_type VARCHAR(100);
+
+    // <font color="red">Experimental</font>
+    String[1..1] displayName = acs_objects.display_name VARCHAR(200);
+
+    // <font color="red">Experimental</font>
+    String[0..1] defaultDomainClass = acs_objects.default_domain_class VARCHAR(100);
+
+    // <font color="red">Experimental</font>
+    // The value of this property is maintained automatically by
+    // the ACSObject java class.  Derived classes define a getContainer()
+    // method, and ACSObject.save() will denormalize the result of
+    // getContainer() by storing a reference to it in this property.
+    ACSObject[0..1] container = 
+         join acs_objects.object_id to object_container_map.object_id, 
+         join object_container_map.container_id to acs_objects.object_id;
+
+    object key (id);
+
+    // aggressive load (container.id);
+}
+
+query PackageInstanceForObject {
+    PackageInstance packageInstance;
+
+    do {
+        SELECT ap.package_id, ap.pretty_name,
+               o.object_type, o.display_name, o.default_domain_class
+        FROM apm_packages ap, acs_objects o
+        WHERE ap.package_id = o.object_id
+        AND ap.package_id = package_id_for_object_id(:objectID)
+    } map {
+        packageInstance.id = ap.package_id;
+        packageInstance.prettyName = ap.pretty_name;
+        packageInstance.objectType = o.object_type;
+        packageInstance.displayName = o.display_name;
+        packageInstance.defaultDomainClass = o.default_domain_class;
+    }
+}

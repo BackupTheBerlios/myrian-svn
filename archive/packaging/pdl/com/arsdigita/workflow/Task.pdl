@@ -1,0 +1,119 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/test-packaging/pdl/com/arsdigita/workflow/Task.pdl#1 $
+// $DateTime: 2003/08/14 14:53:20 $
+
+model com.arsdigita.workflow.simple;
+
+import com.arsdigita.kernel.*;
+
+object type Task extends ACSObject {
+
+    String[1..1]     label = cw_tasks.label VARCHAR(200);
+    String[1..1]     description = cw_tasks.description VARCHAR(4000);
+    Boolean[1..1]     isActive = cw_tasks.is_active CHAR(1);
+    BigDecimal[0..1] parentTaskID = cw_tasks.parent_task_id INTEGER;
+    String[1..1]     taskState = cw_tasks.task_state VARCHAR(16);
+
+    reference key (cw_tasks.task_id);
+
+
+
+   // delete all of dependency list , delete other dependency
+   // list that has this task def.  The delete may fail
+   // if there other foreign key references on task
+   // TODO: delete dependencies too.
+    delete {
+        do {
+            delete from cw_task_comments
+            where task_id = :id
+        }
+
+        do {
+            delete from cw_tasks
+            where  task_id = :id
+        }
+
+    }
+}
+
+association {
+    Task[0..n] dependsOn = join cw_tasks.task_id
+                              to cw_task_dependencies.task_id,
+                            join cw_task_dependencies.dependent_task_id
+                              to cw_tasks.task_id;
+    Task[0..n] dependents =
+        join cw_tasks.task_id to cw_task_dependencies.dependent_task_id,
+        join cw_task_dependencies.task_id to cw_tasks.task_id;
+}
+
+association {
+    Task[0..n] task = join cw_tasks.task_id
+                        to cw_task_listeners.listener_task_id,
+                      join cw_task_listeners.task_id
+                        to cw_tasks.task_id;
+    Task[0..n] taskFinishedListeners = join cw_tasks.task_id
+                                         to cw_task_listeners.task_id,
+                                       join cw_task_listeners.listener_task_id
+                                         to cw_tasks.task_id;
+}
+
+query getTasks {
+    BigDecimal taskId;
+    BigDecimal taskParentId;
+    String taskLabel;
+    String taskDescription;
+
+    do {
+        select cw_tasks.task_id,
+               cw_tasks.parent_task_id,
+               cw_tasks.label,
+               cw_tasks.description,
+               acs_objects.object_type
+        from   cw_tasks,
+               acs_objects
+        where
+               acs_objects.object_id =
+                        cw_tasks.task_id
+    } map {
+        taskId = cw_tasks.task_id;
+        taskParentId = cw_tasks.parent_task_id;
+        taskLabel = cw_tasks.label;
+        taskDescription = cw_tasks.description;
+    }
+}
+
+query getCommentsInWorkflow {
+    TaskComment comment;
+
+    do {
+        select c.comment_id,
+               c.task_id,
+               c.task_comment,
+               c.comment_date,
+               c.party_id
+          from cw_task_comments c,
+               cw_tasks t1,
+               cw_tasks t2
+         where t1.task_id = :taskID
+           and t2.parent_task_id = t1.parent_task_id
+           and c.task_id = t2.task_id
+    } map {
+        comment.id = c.comment_id;
+        comment.task = c.task_id;
+        comment.taskComment = c.task_comment;
+        comment.commentDate = c.comment_date;
+        comment.partyID = c.party_id;
+    }
+}

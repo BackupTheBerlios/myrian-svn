@@ -1,0 +1,42 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/test-packaging/pdl/com/arsdigita/messaging/query-getMessageTree.pg.pdl#1 $ 
+// $DateTime: 2003/08/14 14:53:20 $
+
+model com.arsdigita.messaging;
+
+// Use this query to retrieve all related messages in a threaded
+// discussion.   The modification of the sort_key column is required
+// to get level 0 message to sort correctly with respect to their
+// children. 
+
+query getMessageTree {
+    BigDecimal root;
+    String sortKey;
+    BigDecimal id;
+    BigDecimal object;
+    do {
+        select   message_id,
+                 object_id,
+                 coalesce(root_id,message_id) as root_id,
+                 coalesce(sort_key,'---') as sort_key
+        from     messages
+        order by root_id, sort_key
+    } map {
+        id      = message_id;
+        object  = object_id;
+        root    = root_id;
+        sortKey = sort_key;
+    }
+}

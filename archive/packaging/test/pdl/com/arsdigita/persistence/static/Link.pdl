@@ -1,0 +1,95 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/test-packaging/test/pdl/com/arsdigita/persistence/static/Link.pdl#1 $ 
+// $DateTime: 2003/08/14 14:53:20 $
+
+model linkTest;
+
+object type Article {
+    BigInteger id = t_articles.article_id INTEGER;
+    String text = t_articles.text CLOB;
+    component ArticleImageLink[0..n] images;
+
+    object key (id);
+    delete {
+        do { delete from t_article_image_map where article_id = :id }
+        do { delete from t_articles where article_id = :id }
+    }
+
+    retrieve images {
+        do {
+            select m.article_id, i.image_id, m.caption, i.bytes
+            from t_article_image_map m, t_images i
+            where m.image_id = i.image_id
+            and m.article_id = :id
+        } map {
+            images.article.id = m.article_id;
+            images.image.id = i.image_id;
+            images.image.bytes = i.bytes;
+            images.caption = m.caption;
+        }
+    }
+
+    add images {
+        do {
+            insert into t_article_image_map
+            (article_id, image_id, caption)
+            values
+            (:images.article.id, :images.image.id, :images.caption)
+        }
+    }
+}
+
+object type ArticleImageLink {
+    Article[1..1] article;
+    Image[1..1] image;
+    String caption = t_article_image_map.caption VARCHAR(4000);
+
+    object key (article, image);
+
+    insert { }
+    add image { }
+    add article { }
+
+    update {}
+    delete {}
+    retrieve all {
+        do {
+            select a.article_id, a.text, m.caption, i.image_id, i.bytes
+            from t_articles a, t_article_image_map m, t_images i
+            where a.article_id = m.article_id
+            and m.image_id = i.image_id
+        } map {
+            article.id = a.article_id;
+            article.text = a.text;
+            image.id = i.image_id;
+            image.bytes = i.bytes;
+            caption = m.caption;
+        }
+    }
+}
+
+object type Image {
+    BigInteger id = t_images.image_id INTEGER;
+    Blob bytes = t_images.bytes BLOB;
+
+    object key (id);
+
+
+    delete {
+        do { delete from t_article_image_map where image_id = :id }
+        do { delete from t_images where image_id = :id }
+    }
+
+}
