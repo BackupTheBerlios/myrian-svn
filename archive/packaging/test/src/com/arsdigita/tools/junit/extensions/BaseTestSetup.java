@@ -92,7 +92,7 @@ public class BaseTestSetup extends TestDecorator {
     protected void setUp() throws Exception {
         if (m_suite.testCount() > 0) {
             final Connection conn = Connections.acquire
-                (Init.getConfig().getJDBCURL());
+                (RuntimeConfig.getConfig().getJDBCURL());
             new Startup(conn).run();
 
             ResourceManager.getInstance().setServletContext(new DummyServletContext());
@@ -126,7 +126,8 @@ public class BaseTestSetup extends TestDecorator {
 
     private void runScripts(final List scripts) throws Exception {
         LoadSQLPlusScript loader = new LoadSQLPlusScript();
-        Connection conn = Connections.acquire(Init.getConfig().getJDBCURL());
+        Connection conn = Connections.acquire
+	    (RuntimeConfig.getConfig().getJDBCURL());
 
         loader.setConnection(conn);
 
