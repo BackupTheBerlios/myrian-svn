@@ -22,6 +22,7 @@ create or replace function parties_add_subgroup (
     v_subgroup_id alias for $2;
     v_path_increment integer;
     new_entry record;
+    v_exists_p integer;
   begin
 
       perform parties_add_subgroup_members(v_group_id, v_subgroup_id);
@@ -42,13 +43,17 @@ create or replace function parties_add_subgroup (
             v_path_increment := new_entry.n_paths;
           end if;
 
-          update group_subgroup_trans_index
-          set n_paths = n_paths + v_path_increment
+          select count(*) into v_exists_p
+          from group_subgroup_trans_index
           where group_id = new_entry.group_id
             and subgroup_id = new_entry.subgroup_id;
 
-          if (NOT FOUND) then
-
+          IF (v_exists_p > 0) THEN          
+             update group_subgroup_trans_index
+              set n_paths = n_paths + v_path_increment
+              where group_id = new_entry.group_id
+               and subgroup_id = new_entry.subgroup_id;
+          else 
               insert into group_subgroup_trans_index
               (group_id, subgroup_id, n_paths)
               values
@@ -119,6 +124,7 @@ create or replace function parties_add_member (
     v_member_id alias for $2;
     v_path_increment integer;
     new_entry record;
+    v_exists_p integer;
   begin
 
       for new_entry in 
@@ -133,13 +139,17 @@ create or replace function parties_add_member (
             v_path_increment := new_entry.n_paths;
           end if;
 
-          update group_member_trans_index
-          set n_paths = n_paths + v_path_increment
+          select count(*) into v_exists_p
+          from group_subgroup_trans_index
           where group_id = new_entry.group_id
-            and member_id = v_member_id;
+            and subgroup_id = new_entry.subgroup_id;
 
-          if (NOT FOUND) then
-
+          IF (v_exists_p > 0) THEN          
+              update group_member_trans_index
+              set n_paths = n_paths + v_path_increment
+              where group_id = new_entry.group_id
+                and member_id = v_member_id;
+          else 
               insert into group_member_trans_index
               (group_id, member_id, n_paths)
               values
@@ -221,13 +231,17 @@ create or replace function parties_add_subgroup_members (
             v_path_increment := new_entry.n_paths;
           end if;
 
-          update group_member_trans_index
-          set n_paths = n_paths + v_path_increment
+          select count(*) into v_exists_p
+          from group_subgroup_trans_index
           where group_id = new_entry.group_id
-            and member_id = new_entry.member_id;
+            and subgroup_id = new_entry.subgroup_id;
 
-          if (NOT FOUND) then
-
+          IF (v_exists_p > 0) THEN          
+              update group_member_trans_index
+              set n_paths = n_paths + v_path_increment
+              where group_id = new_entry.group_id
+                and member_id = new_entry.member_id;
+          else 
               insert into group_member_trans_index
               (group_id, member_id, n_paths)
               values

@@ -186,11 +186,15 @@
     v_has_children integer;
   begin
 
-    update object_grants
-    set n_grants = n_grants +1
+    select count(*) into v_has_children 
+    from object_grants
     where object_id = v_object_id;
 
-    if NOT FOUND then
+    if FOUND then
+        update object_grants
+        set n_grants = n_grants +1
+        where object_id = v_object_id;
+    else 
         insert into object_grants
         (object_id, n_grants)
         values

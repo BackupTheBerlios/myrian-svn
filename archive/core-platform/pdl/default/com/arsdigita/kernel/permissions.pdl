@@ -122,85 +122,6 @@ object type Permission {
 
 }
 
-// query that is encapsulated by ObjectPermissionCollection.
-// This is one nasty query that includes display information about
-// the grantee, which may be a user or group (hence the union).
-query ObjectPermissionCollection {
-    String privilege;
-    Boolean isInherited;
-    BigDecimal granteeID;
-    Boolean granteeIsUser;
-    String granteeName;
-    String granteeEmail;
-    String granteeGivenName;
-    String granteeFamilyName;
-    BigDecimal granteeNameID;
-    do {
-        select acs_permissions.privilege,
-               decode(acs_permissions.object_id, 
-                      :objectID, 0, 1) as inherited_p,
-               acs_permissions.grantee_id,
-               parties.user_p,
-               parties.name,
-               parties.primary_email,
-               parties.given_name,
-               parties.family_name,
-               parties.name_id
-        from acs_permissions,
-             (select groups.group_id as party_id,
-                     0 as user_p,
-                     groups.name as name,
-                     parties.primary_email as primary_email,
-                     '' as given_name,
-                     '' as family_name,
-                     0 as name_id
-              from groups, parties
-              where groups.group_id = parties.party_id) parties
-        where acs_permissions.object_id in (
-                  select implied_context_id 
-                  from granted_trans_context_map c 
-                  where object_id =:objectID)
-          and acs_permissions.grantee_id = parties.party_id
-        UNION ALL
-        select acs_permissions.privilege,
-               decode(acs_permissions.object_id, 
-                      :objectID, 0, 1) as inherited_p,
-               acs_permissions.grantee_id,
-               parties.user_p,
-               parties.name,
-               parties.primary_email,
-               parties.given_name,
-               parties.family_name,
-               parties.name_id
-        from acs_permissions,
-             (select users.user_id as party_id,
-                     1 as user_p,
-                     '' as name,
-                     parties.primary_email as primary_email,
-                     person_names.given_name as given_name,
-                     person_names.family_name as family_name,
-                     users.name_id
-              from users, parties, person_names
-              where users.user_id = parties.party_id
-                and users.name_id = person_names.name_id) parties
-        where acs_permissions.object_id in (
-                  select implied_context_id 
-                  from granted_trans_context_map 
-                  where object_id = :objectID)
-          and acs_permissions.grantee_id = parties.party_id
-    } map {
-        privilege = acs_permissions.privilege;
-        isInherited = inherited_p;
-        granteeID = acs_permissions.grantee_id;
-        granteeIsUser = parties.user_p;
-        granteeName = parties.name;
-        granteeEmail = parties.primary_email;
-        granteeGivenName = parties.given_name;
-        granteeFamilyName = parties.family_name;
-        granteeNameID = parties.name_id;        
-    }
-}
-
 
 // query that is encapsulated by ObjectDirectPermissionCollection.
 // This is one nasty query that includes display information about
@@ -668,3 +589,91 @@ object type ParameterizedPrivilege {
         }
     }
 }
+
+// query that is encapsulated by ObjectPermissionCollection.
+// This is one nasty query that includes display information about
+// the grantee, which may be a user or group (hence the union).
+query ObjectPermissionCollection {
+    String privilege;
+    Boolean isInherited;
+    BigDecimal granteeID;
+    Boolean granteeIsUser;
+    String granteeName;
+    String granteeEmail;
+    String granteeGivenName;
+    String granteeFamilyName;
+    BigDecimal granteeNameID;
+    do {
+        select acs_permissions.privilege,
+               CASE 
+                 WHEN acs_permissions.object_id = :objectID THEN
+                    0
+                 ELSE 
+                    1
+               END as inherited_p,
+               acs_permissions.grantee_id,
+               parties.user_p,
+               parties.name,
+               parties.primary_email,
+               parties.given_name,
+               parties.family_name,
+               parties.name_id
+        from acs_permissions,
+             (select groups.group_id as party_id,
+                     0 as user_p,
+                     groups.name as name,
+                     parties.primary_email as primary_email,
+                     '' as given_name,
+                     '' as family_name,
+                     0 as name_id
+              from groups, parties
+              where groups.group_id = parties.party_id) parties
+        where acs_permissions.object_id in (
+                  select implied_context_id 
+                  from granted_trans_context_map c 
+                  where object_id =:objectID)
+          and acs_permissions.grantee_id = parties.party_id
+        UNION ALL
+        select acs_permissions.privilege,
+               CASE 
+                 WHEN acs_permissions.object_id = :objectID THEN
+                    0
+                 ELSE 
+                    1
+               END as inherited_p,
+               acs_permissions.grantee_id,
+               parties.user_p,
+               parties.name,
+               parties.primary_email,
+               parties.given_name,
+               parties.family_name,
+               parties.name_id
+        from acs_permissions,
+             (select users.user_id as party_id,
+                     1 as user_p,
+                     '' as name,
+                     parties.primary_email as primary_email,
+                     person_names.given_name as given_name,
+                     person_names.family_name as family_name,
+                     users.name_id
+              from users, parties, person_names
+              where users.user_id = parties.party_id
+                and users.name_id = person_names.name_id) parties
+        where acs_permissions.object_id in (
+                  select implied_context_id 
+                  from granted_trans_context_map 
+                  where object_id = :objectID)
+          and acs_permissions.grantee_id = parties.party_id
+    } map {
+        privilege = acs_permissions.privilege;
+        isInherited = inherited_p;
+        granteeID = acs_permissions.grantee_id;
+        granteeIsUser = parties.user_p;
+        granteeName = parties.name;
+        granteeEmail = parties.primary_email;
+        granteeGivenName = parties.given_name;
+        granteeFamilyName = parties.family_name;
+        granteeNameID = parties.name_id;        
+    }
+}
+
