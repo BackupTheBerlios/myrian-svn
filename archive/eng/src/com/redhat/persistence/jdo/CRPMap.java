@@ -16,7 +16,7 @@ import javax.jdo.spi.PersistenceCapable;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/07/09 $
+ * @version $Revision: #6 $ $Date: 2004/07/12 $
  **/
 
 class CRPMap implements Map {
@@ -76,10 +76,6 @@ class CRPMap implements Map {
                 } else {
                     if (m_container == null) {
                         m_container = pp;
-                        System.err.println("set container to " + pp +
-                                           "(name=" + pp.getName() + "); " +
-                                           "KEY=" + KEY +
-                                           "; KEY==name: " + (KEY.equals(pp.getName())));
                     } else {
                         throw new IllegalStateException
                             ("can't happen: container already set to " +
