@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/search/SearchIndexHelpTest.pdl#6 $ 
-// $DateTime: 2003/06/27 19:41:23 $
+// $Id: //core-platform/dev/test/pdl/com/arsdigita/search/SearchIndexHelpTest.pdl#1 $ 
+// $DateTime: 2003/07/18 17:31:04 $
 
 model com.arsdigita.search;
 
