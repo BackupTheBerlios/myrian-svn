@@ -14,12 +14,12 @@ import java.util.*;
  * PooledConnectionSourceTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/11/25 $
+ * @version $Revision: #3 $ $Date: 2004/03/30 $
  **/
 
 public class PooledConnectionSourceTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PooledConnectionSourceTest.java#2 $ by $Author: rhs $, $DateTime: 2003/11/25 16:19:46 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PooledConnectionSourceTest.java#3 $ by $Author: jorris $, $DateTime: 2004/03/30 11:56:49 $";
 
     private static final String JDBC_PREFIX = "jdbc:test:";
     private static final Map CONNECTIONS = new HashMap();
@@ -161,13 +161,13 @@ public class PooledConnectionSourceTest extends TestCase {
                 competitors[i].join();
             }
         } catch (InterruptedException e) {
+            Competitor.exit();
             throw new UncheckedWrapperException(e);
         }
+        
 
         // Turn off the contention.
-        for (int i = 0; i < contenders.length; i++) {
-            contenders[i].exit();
-        }
+        Competitor.exit();
 
         // Check that we did not exceed the connection pool size limit.
         assertEquals
@@ -204,7 +204,7 @@ public class PooledConnectionSourceTest extends TestCase {
         private ConnectionSource m_src;
         private long m_length;
         private int m_count;
-        private boolean m_exit = false;
+        private static boolean s_exit = false;
 
         public Competitor(ConnectionSource src, long length) {
             m_src = src;
@@ -220,8 +220,8 @@ public class PooledConnectionSourceTest extends TestCase {
             return m_count;
         }
 
-        public void exit() {
-            m_exit = true;
+        public static void exit() {
+            s_exit = true;
         }
 
         public void run() {
@@ -233,7 +233,7 @@ public class PooledConnectionSourceTest extends TestCase {
                 Connection conn = m_src.acquire();
                 m_count++;
                 m_src.release(conn);
-            } while (!m_exit
+            } while (!s_exit
                      && (m_length == 0 || elapsed < m_length));
         }
     }
