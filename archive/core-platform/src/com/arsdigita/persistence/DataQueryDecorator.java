@@ -23,11 +23,11 @@ import java.util.Map;
  * methods can be added to a stock data query.
  *
  * @author <a href="mailto:lutter@arsdigita.com">David Lutterkort</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDecorator.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDecorator.java#4 $
  */
 public class DataQueryDecorator implements DataQuery {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDecorator.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDecorator.java#4 $ by $Author: randyg $, $DateTime: 2002/09/09 16:52:30 $";
 
     private DataQuery m_dq;
 
@@ -171,6 +171,11 @@ public class DataQueryDecorator implements DataQuery {
 
     public void addOrder(String order) throws PersistenceException {
         m_dq.addOrder(order);
+    }
+
+    public void addOrderWithNull(String orderOne, Object orderTwo, 
+                                 boolean isAscending) {
+        m_dq.addOrderWithNull( orderOne, orderTwo, isAscending );
     }
 
     public void clearOrder() {
