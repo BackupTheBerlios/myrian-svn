@@ -3,6 +3,7 @@ package com.arsdigita.persistence;
 import com.arsdigita.persistence.metadata.*;
 import com.arsdigita.persistence.proto.ProtoException;
 import com.arsdigita.persistence.proto.Session;
+
 import java.util.*;
 import org.apache.log4j.Logger;
 
@@ -10,19 +11,21 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #16 $ $Date: 2003/04/04 $
+ * @version $Revision: #17 $ $Date: 2003/04/08 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#16 $ by $Author: ashah $, $DateTime: 2003/04/04 12:58:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#17 $ by $Author: ashah $, $DateTime: 2003/04/08 10:31:44 $";
 
     private final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
     private Session m_ssn;
     private OID m_oid;
     private Set m_observers = new HashSet();
-    private boolean m_isDisconnected = false;
+    private Map m_disconnect = null;
+    private boolean m_valid = true;
+    private boolean m_crossTransactions = false;
 
     private static final class ObserverEntry {
 
@@ -84,10 +87,11 @@ class DataObjectImpl implements DataObject {
     }
 
     public com.arsdigita.persistence.Session getSession() {
-        return SessionManager.getSession();
+        return com.arsdigita.persistence.Session.getSessionFromProto(m_ssn);
     }
 
     public ObjectType getObjectType() {
+        validate();
         return m_oid.getObjectType();
     }
 
@@ -96,25 +100,51 @@ class DataObjectImpl implements DataObject {
     }
 
     public Object get(String property) {
+        validate();
         Property prop = getObjectType().getProperty(property);
         if (prop == null) {
             throw new PersistenceException
                 ("no such property: " + property + " for " + this);
         }
         if (prop.isCollection()) {
-            return new DataAssociationImpl(getSession(), this, prop);
+            if (isDisconnected()) {
+                return new DataAssociationImpl
+                    (SessionManager.getSession(), this, prop);
+            } else {
+                return new DataAssociationImpl(getSession(), this, prop);
+            }
         }
 
         if (prop.isKeyProperty()) {
             return m_oid.get(property);
         } else if (m_oid.isInitialized()) {
-            return m_ssn.get(this, convert(property));
+            if (isDisconnected()) {
+                Object obj = m_disconnect.get(prop);
+
+                if (!(obj instanceof DataObjectImpl)) {
+                    return obj;
+                }
+
+                DataObjectImpl result = (DataObjectImpl) obj;
+
+                if (!result.isValid()) {
+                    result = (DataObjectImpl) SessionManager.getSession().
+                        getProtoSession().get(this, convert(property));
+                    ((DataObjectImpl) result).disconnect();
+                }
+
+                m_disconnect.put(prop, result);
+                return result;
+            } else {
+                return m_ssn.get(this, convert(property));
+            }
         } else {
             return null;
         }
     }
 
     public void set(String property, Object value) {
+        validate(true);
         // all entry points for empty strings need to be converted to null
         if ("".equals(value)) { value = null; }
         try {
@@ -137,38 +167,87 @@ class DataObjectImpl implements DataObject {
     }
 
     public boolean isNew() {
+        validate();
         // handle calls to isNew before key is set
         return !m_oid.isInitialized() ||
             (m_ssn.isNew(this) && !m_ssn.isPersisted(this));
     }
 
     public boolean isDeleted() {
+        validate();
         return m_ssn.isDeleted(this);
     }
 
     public boolean isDisconnected() {
-        // throw new Error("not implemented");
-        return m_isDisconnected;
+        return m_disconnect != null || !isValid();
+    }
+
+    void invalidate(boolean connectedOnly) {
+        if (!isDisconnected() || (!connectedOnly && m_ssn.isModified(this))) {
+            m_valid = false;
+        }
+
+        m_crossTransactions = true;
     }
 
     public void disconnect() {
-        // throw new Error("not implemented");
-        m_isDisconnected = true;
+        if (!m_oid.isInitialized()) {
+            throw new PersistenceException
+                ("can't disconnect uninitialized: " + this);
+        } else if (isModified()) {
+            throw new PersistenceException
+                ("can't disconnect modified: " + this);
+        } else if (isDisconnected()) { return; }
+
+        m_disconnect = new HashMap();
+        for (Iterator it = getObjectType().getProperties(); it.hasNext(); ) {
+            Property prop = (Property) it.next();
+            if (prop.isCollection() || prop.isKeyProperty()) { continue; }
+            m_disconnect.put(prop, m_ssn.get(this, C.prop(prop)));
+        }
     }
 
     public boolean isModified() {
+        validate();
         return !m_ssn.isFlushed(this);
     }
 
     public boolean isPropertyModified(String name) {
+        validate();
         return !m_ssn.isFlushed(this, convert(name));
     }
 
     public boolean isValid() {
-        throw new Error("not implemented");
+        return m_valid;
+    }
+
+    private void validate() {
+        validate(false);
+    }
+
+    private void validate(boolean write) {
+        if (!isValid()) {
+            throw new PersistenceException("invalid data object: " + this);
+        }
+
+        if (write && isDisconnected()) {
+            throw new PersistenceException
+                ("can not write to disconnected data object: " + this);
+        }
+
+        if (!isDisconnected()
+            && !m_crossTransactions
+            && m_ssn != null
+            && m_ssn != SessionManager.getSession().getProtoSession()) {
+            throw new PersistenceException
+                ("This data object: (" + this + ") is being accessed from "
+                 + "another thread before its originating transaction has "
+                 + "terminated.");
+        }
     }
 
     public void delete() {
+        validate(true);
         try {
             m_ssn.delete(this);
             m_ssn.flush();
@@ -179,6 +258,7 @@ class DataObjectImpl implements DataObject {
     }
 
     public void specialize(String subtypeName) {
+        validate();
         ObjectType subtype =
             MetadataRoot.getMetadataRoot().getObjectType(subtypeName);
 
@@ -190,10 +270,12 @@ class DataObjectImpl implements DataObject {
     }
 
     public void specialize(ObjectType subtype) {
+        validate();
         m_oid.specialize(subtype);
     }
 
     public void save() {
+        validate(true);
         try {
             if (m_ssn.isDeleted(this)) {
                 throw new PersistenceException("can't save a deleted object");
@@ -207,6 +289,7 @@ class DataObjectImpl implements DataObject {
     }
 
     public void addObserver(DataObserver observer) {
+        validate();
         if (observer == null) {
             throw new IllegalArgumentException("Can't add a null observer.");
         }

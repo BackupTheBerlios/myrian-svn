@@ -26,16 +26,14 @@ import org.apache.log4j.Logger;
  * MultiThreadDataObjectTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/02/27 $
+ * @version $Revision: #3 $ $Date: 2003/04/08 $
  **/
 
 public class MultiThreadDataObjectTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/MultiThreadDataObjectTest.java#2 $ by $Author: rhs $, $DateTime: 2003/02/27 11:41:38 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/MultiThreadDataObjectTest.java#3 $ by $Author: ashah $, $DateTime: 2003/04/08 10:31:44 $";
 
-    private static final Logger s_log = Logger.getLogger(
-                                                         MultiThreadDataObjectTest.class.getName()
-                                                         );
+    private static final Logger s_log = Logger.getLogger(MultiThreadDataObjectTest.class);
 
     protected void persistenceSetUp() {
         load("com/arsdigita/persistence/testpdl/static/Node.pdl");
@@ -64,6 +62,7 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
                         node.set("id", new BigDecimal(i));
                         node.set("name", "Node " + i);
                         node.save();
+                        node.disconnect();
                         objects.put(node.get("id"), node);
                     }
 
@@ -98,7 +97,12 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
                     // Do nothing
                 }
             }
-
+        } catch (RuntimeException re) {
+            s_log.warn("got RuntimeException", re);
+            throw re;
+        } catch (Error e) {
+            s_log.warn("got Error", e);
+            throw e;
         } finally {
             Session ssn = SessionManager.getSession();
 
@@ -196,6 +200,7 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
             node.set("name", "SavedNode");
             OID savedOID = node.getOID();
             node.save();
+            node.disconnect();
             txn.commitTxn();
             assertTrue(node.isValid() && node.isDisconnected());
 
@@ -217,9 +222,9 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
 
             txn.beginTxn();
             node = ssn.retrieve(savedOID);
+            node.disconnect();
             txn.commitTxn();
             assertTrue(node.isValid() && node.isDisconnected());
-
             assertEquals("Disconnected Lazy load failed on ID!", savedId, node.get("id") );
             assertEquals("Disconnected Lazy load failed on name!", "SavedNode", node.get("name") );
 
@@ -276,6 +281,10 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
             members.add(jon);
             qa.save();
 
+            color.disconnect();
+            jon.disconnect();
+            qa.disconnect();
+
             txn.commitTxn();
             assertTrue(qa.isValid() && qa.isDisconnected());
             assertTrue(jon.isValid() && jon.isDisconnected());
@@ -318,6 +327,12 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
             txn.abortTxn();
             //assertTrue(members.isValid() && members.isDisconnected());
 
+        } catch (RuntimeException re) {
+            s_log.warn("got RuntimeException", re);
+            throw re;
+        } catch (Error e) {
+            s_log.warn("got Error", e);
+            throw e;
         } finally {
             if( txn.inTxn() ) {
                 txn.abortTxn();
@@ -412,18 +427,25 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
 
             test = ssn.retrieve(TEST);
 
+            test.disconnect();
+
+            icle = (DataObject) test.get("required");
+
             txn.commitTxn();
             txn.beginTxn();
 
             assertTrue("test was not disconnected", test.isDisconnected());
-            icle = (DataObject) test.get("required");
-
-            txn.abortTxn();
-            txn.beginTxn();
-
             assertTrue("icle was not invalidated", !icle.isValid());
             icle = (DataObject) test.get("required");
             assertTrue("icle was not refetched", icle.isValid());
+
+            txn.abortTxn();
+        } catch (RuntimeException re) {
+            s_log.warn("got RuntimeException", re);
+            throw re;
+        } catch (Error e) {
+            s_log.warn("got Error", e);
+            throw e;
         } finally {
             if (!txn.inTxn()) {
                 txn.beginTxn();

@@ -22,12 +22,12 @@ package com.arsdigita.persistence;
  * Description: The TransactionContext class encapsulates a database transaction.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/03/28 $
+ * @version $Revision: #5 $ $Date: 2003/04/08 $
  */
 
 public class TransactionContext {
 
-    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/TransactionContext.java#4 $ by $Author: rhs $, $DateTime: 2003/03/28 13:41:52 $";
+    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/TransactionContext.java#5 $ by $Author: ashah $, $DateTime: 2003/04/08 10:31:44 $";
 
     private static boolean s_aggressive = false;
 
@@ -65,9 +65,10 @@ public class TransactionContext {
 
     public void commitTxn() {
 	try {
-	    m_ssn.commit();
+            m_ssn.commit();
 	} finally {
-	    m_ossn.freeConnection();
+            m_ossn.freeConnection();
+            m_ossn.invalidateDataObjects(true);
 	}
     }
 
@@ -84,6 +85,7 @@ public class TransactionContext {
 	    m_ssn.rollback();
 	} finally {
 	    m_ossn.freeConnection();
+            m_ossn.invalidateDataObjects(false);
 	}
     }
 

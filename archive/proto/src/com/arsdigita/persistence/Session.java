@@ -35,6 +35,7 @@ import com.arsdigita.persistence.proto.engine.rdbms.RDBMSEngine;
 import com.arsdigita.persistence.proto.engine.rdbms.RDBMSQuerySource;
 import com.arsdigita.persistence.proto.engine.rdbms.ConnectionSource;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 
 import java.sql.Connection;
@@ -54,18 +55,26 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #24 $ $Date: 2003/04/02 $
+ * @version $Revision: #25 $ $Date: 2003/04/08 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
+    private List m_dataObjects = new ArrayList();
+
+    private void addDataObject(DataObject obj) {
+        m_dataObjects.add(new WeakReference(obj));
+    }
+
     // This is just a temporary way to get an adapter registered.
     static {
         Adapter ad = new Adapter() {
                 public void setSession(Object obj, com.arsdigita.persistence.proto.Session ssn) {
-                    ((DataObjectImpl) obj).setSession(ssn);
+                    DataObjectImpl dobj = (DataObjectImpl) obj;
+                    dobj.setSession(ssn);
+                    getSessionFromProto(ssn).addDataObject(dobj);
                 }
 
                 public Object getObject(com.arsdigita.persistence.proto.metadata.ObjectType type,
@@ -132,10 +141,24 @@ public class Session {
 		}
 	    }
         };
-    private RDBMSQuerySource m_qs = new RDBMSQuerySource();
-    private RDBMSEngine m_engine = new RDBMSEngine(m_cs);
-    private com.arsdigita.persistence.proto.Session m_ssn =
-        new com.arsdigita.persistence.proto.Session(m_engine, m_qs);
+    private final RDBMSQuerySource m_qs = new RDBMSQuerySource();
+    private final RDBMSEngine m_engine = new RDBMSEngine(m_cs);
+
+    private class PSession extends com.arsdigita.persistence.proto.Session {
+        PSession() { super(Session.this.m_engine, Session.this.m_qs); }
+        private Session getOldSession() { return Session.this; }
+    }
+
+    private PSession m_ssn = this.new PSession();
+
+    static Session getSessionFromProto(
+        com.arsdigita.persistence.proto.Session ssn) {
+        try {
+            return ((PSession) ssn).getOldSession();
+        } catch (ClassCastException cce) {
+            return null;
+        }
+    }
 
     private TransactionContext m_ctx = new TransactionContext(this);
     private MetadataRoot m_root = MetadataRoot.getMetadataRoot();
@@ -617,4 +640,15 @@ public class Session {
         return "";
     }
 
+    void invalidateDataObjects(boolean connectedOnly) {
+        for (Iterator it = m_dataObjects.iterator(); it.hasNext(); ) {
+            WeakReference ref = (WeakReference) it.next();
+            DataObjectImpl obj = (DataObjectImpl) ref.get();
+            if (obj != null) {
+                obj.invalidate(connectedOnly);
+            }
+        }
+
+        m_dataObjects.clear();
+    }
 }
