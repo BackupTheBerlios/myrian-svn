@@ -21,108 +21,30 @@ model com.arsdigita.auditing;
 import com.arsdigita.kernel.*;
 
 object type BasicAuditTrail {
-  BigDecimal[1..1]  id;
-  User[0..1]        creationUser;
-  Date[1..1]        creationDate;
-  String[0..1]      creationIP;
-  User[0..1]        lastModifiedUser;
-  Date[0..1]        lastModifiedDate;
-  String[0..1]      lastModifiedIP;
+  BigDecimal[1..1]  id = acs_auditing.object_id INTEGER;
+  Date[1..1]        creationDate = acs_auditing.creation_date TIMESTAMP;
+  String[0..1]      creationIP = acs_auditing.creation_ip VARCHAR(50); 
+  Date[1..1]        lastModifiedDate = acs_auditing.last_modified TIMESTAMP;
+  String[0..1]      lastModifiedIP = acs_auditing.modifying_ip VARCHAR(50);
 
+  User[1..1]        creationUser = join acs_auditing.creation_user to users.user_id;
+  User[1..1]        lastModifiedUser = join acs_auditing.modifying_user to users.user_id;
 
   object key (id);
-
-  retrieve {
-    do {
-      select creation_date, creation_ip, last_modified, modifying_ip
-        from
-      acs_auditing
-        where
-      object_id = :id
-    } map {
-        creationDate = acs_auditing.creation_date;
-        creationIP = acs_auditing.creation_ip;
-        lastModifiedDate = acs_auditing.last_modified;
-        lastModifiedIP = acs_auditing.modifying_ip;
-    }
-  }
-
-  insert {
-    do {
-    insert into acs_auditing (
-      object_id, creation_user, creation_date, creation_ip,
-      last_modified, modifying_user, modifying_ip
-    ) values (
-      :id, :creationUser.id, :creationDate, :creationIP,
-      :lastModifiedDate, :lastModifiedUser.id, :lastModifiedIP
-    )
-    }
-  }
-
-  update {
-    do {
-    update acs_auditing
-    set last_modified = :lastModifiedDate,
-        modifying_user = :lastModifiedUser.id,
-        modifying_ip = :lastModifiedIP
-    where object_id = :id
-    }
-  }
-
-  delete {
-    do {
-    delete from acs_auditing
-      where object_id = :id
-    }
-  }
-
-  retrieve creationUser {
-        do {
-            select users.user_id, 
-	               users.screen_name,
-	               parties.uri, acs_objects.object_type
-              from users, parties, acs_objects, acs_auditing
-             where parties.party_id = users.user_id
-	           and acs_objects.object_id = parties.party_id
-                   and acs_auditing.creation_user = users.user_id
-                   and acs_auditing.object_id = :id
-        } map {
-            creationUser.id = users.user_id;
-            creationUser.screenName = users.screen_name;
-            creationUser.uri = parties.uri;
-            creationUser.objectType = acs_objects.object_type;
-        }
-  }
 
   add creationUser {}
   remove creationUser {}
 
-  retrieve lastModifiedUser {
-        do {
-            select users.user_id, 
-	               users.screen_name,
-	               parties.uri, acs_objects.object_type
-              from users, parties, acs_objects, acs_auditing
-             where parties.party_id = users.user_id
-	           and acs_objects.object_id = parties.party_id
-                   and acs_auditing.modifying_user = users.user_id
-                   and acs_auditing.object_id = :id
-        } map {
-            lastModifiedUser.id = users.user_id;
-            lastModifiedUser.screenName = users.screen_name;
-            lastModifiedUser.uri = parties.uri;
-            lastModifiedUser.objectType = acs_objects.object_type;
-        }
-  }
   add lastModifiedUser {}
   remove lastModifiedUser {}
 }
 
 //Used to retrieve the BasicAuditTrail for an ACSObject
 query auditTrailForACSObject {
+    BigDecimal id;
 	do {
-            select object_id from acs_auditing
+        select object_id from acs_auditing
 	} map {
-            id = acs_auditing.object_id;
-        }
+        id = acs_auditing.object_id;
+    }
 }

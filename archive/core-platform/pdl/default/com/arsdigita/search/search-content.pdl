@@ -20,80 +20,34 @@ model com.arsdigita.search;
 // of type Searchable change.
 
 object type SearchContent {
-  BigDecimal id;
-  String     object_type;
-  String     link_text;
-  String     url_stub;
-  String     summary;
-  String[0..1] xml_content;  // Really a CLOB
-  Blob[0..1] raw_content;
-  String     language;
+
+  BigDecimal id = search_content.object_id INTEGER;
+  String     object_type = search_content.object_type VARCHAR(100);
+  String     link_text = search_content.link_text VARCHAR(1000);
+  String     url_stub = search_content.url_stub VARCHAR(100);
+  String     summary = search_content.summary VARCHAR(4000);
+  String[0..1] xml_content = search_content.xml_content CLOB;
+  Blob[0..1] raw_content = search_content.raw_content BLOB;
+  String     language = search_content.language VARCHAR(3);
 
   object key (id);
-
-  retrieve {
-    do {
-    select object_type, link_text, url_stub, summary, xml_content, raw_content, language
-    from
-      search_content
-    where
-      object_id = :id
-    } map {
-        object_type = search_content.object_type;
-        link_text = search_content.link_text;
-        url_stub = search_content.url_stub;
-        summary = search_content.summary;
-        xml_content = search_content.xml_content;
-        raw_content = search_content.raw_content;
-        language = search_content.language;
-    }
-  }
-
-  insert {
-    do {
-    insert into search_content (
-        object_id, object_type, link_text, url_stub, summary, xml_content, raw_content, language
-    ) values (
-        :id, :object_type, :link_text, :url_stub, :summary, :xml_content, :raw_content, :language
-    )
-    } map {
-        xml_content: CLOB;
-        raw_content: BLOB;
-    }    
-  }
-
-  update {
-    do {
-    update search_content set 
-        object_type = :object_type,
-        link_text = :link_text,
-        url_stub = :url_stub,
-        summary = :summary,
-        xml_content = :xml_content,
-        raw_content = :raw_content,
-        language = :language
-    where object_id = :id
-    } map {
-        xml_content: CLOB;
-        raw_content: BLOB;
-    }
-  }
-
-  delete {
-    do {
-    delete from search_content
-      where object_id = :id
-    }
-  }
-
 }
 
 // Following returns the search content for an object
 query searchContentForObject {
+    BigDecimal id;
+    String object_type;
+    String link_text;
+    String url_stub;
+    String summary;
+    String xml_content;
+    Blob raw_content;
+    String language;
    do {
-    select object_id, object_type, link_text, url_stub, summary, xml_content, raw_content, language
-    from
-      search_content
+       select object_id, object_type, link_text, url_stub, summary, 
+       xml_content, raw_content, language
+       from
+       search_content
     } map {
         id = search_content.object_id;     
         object_type = search_content.object_type;

@@ -20,44 +20,15 @@ import com.arsdigita.kernel.*;
 
 
 object type SearchableNote extends ACSObject {
-    String     title;
-    String     body;
-    Date       creationDate;
-    Date       lastModified;
+    String[1..1]     title = searchable_notes.title VARCHAR(255);
+    String[0..1]     body = searchable_notes.body VARCHAR(4000);
+    Date[1..1]       creationDate = searchable_notes.creation_date TIMESTAMP;
+    Date[1..1]       lastModified = searchable_notes.last_modified TIMESTAMP;
 
-    retrieve {
-        do {
-            select n.note_id, n.title, n.body, n.creation_date, n.last_modified, 
-	           o.object_type
-	           from searchable_notes n, acs_objects o
-            where note_id=:id
-	    and o.object_id = n.note_id
-	} map {
-            id = n.note_id;
-            title = n.title;
-            body = n.body;
-            creationDate = n.creation_date;
-            lastModified = n.last_modified;
-            objectType = acs_objects.object_type;
-	}
-    }
+    reference key (searchable_notes.note_id);
 
-    retrieve all {
-        do {
-            select n.note_id, n.title, n.body, n.creation_date, n.last_modified, 
-	    o.object_type 
-	          from searchable_notes n, acs_objects o
-            where o.object_id = n.note_id
-	} map {
-            id = n.note_id;
-            title = n.title;
-            body = n.body;
-            creationDate = n.creation_date;
-            lastModified = n.last_modified;
-            objectType = acs_objects.object_type;
-	}
-    }
-
+    // being left so it can default to sysdate...this should be moved
+    // in to the java code or PDL should be extended to allow this
     insert {
     super;
         do {
@@ -67,29 +38,17 @@ object type SearchableNote extends ACSObject {
             (:id, :title, :body, sysdate, sysdate)
 	}
     }
-
-    update {
-        do {
-            update searchable_notes
-            set title = :title,
-            body = :body,
-            last_modified = sysdate,
-	    modified_by = :modifiedBy.id
-            where note_id = :id
-	}
-    super;
-    }
-
-    delete {
-        do {
-            delete from searchable_notes
-            where note_id = :id
-	}
-    super;
-    }
 }
 
 query SearchableNotesRetrieveAll {
+    BigDecimal id;
+    String title;
+    String body;
+    BigDecimal categoryID;
+    String categoryName;
+    Date creationDate;
+    Date lastModified;
+    BigDecimal noteNum;
         do {
             select n.note_id, m.category_id, m.name, n.title, n.body, 
                    n.creation_date, n.last_modified, 
@@ -113,6 +72,11 @@ query SearchableNotesRetrieveAll {
 
 // Following returns a SearchableNote by applying a filter
 query searchableNoteRetrieve {
+    BigDecimal id;
+    String title;
+    String body;
+    Date creationDate;
+    Date lastModified;
    do {
     select n.note_id, n.title, n.body, n.creation_date, n.last_modified
     from

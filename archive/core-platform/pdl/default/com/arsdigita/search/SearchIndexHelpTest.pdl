@@ -33,60 +33,13 @@ import com.arsdigita.kernel.*;
 //*******************************************
 
 object type SearchTestBook extends ACSObject {
-    String     title;
+    String title = search_test_book.title VARCHAR(100);
 
     composite SearchTestChapter[0..n] chapters;
 
-    retrieve {
-        super;
-        do {
-            select b.title
-	           from search_test_book b
-            where book_id=:id
-	} map {
-            id = b.book_id;
-            title = b.title;
-	}
-    }
+    reference key (search_test_book.book_id);
 
-    retrieve all {
-        do {
-            select b.title, a.object_type,
-	      from search_test_book b, acs_objects a
-             where b.book_id = a.object_id
-	} map {
-            title = b.title;
-            objectType = a.object_type;
-	}
-    }
 
-    insert {
-	super;
-	do {
-	    insert into search_test_book
-	    (book_id, title)
-	    values
-	    (:id, :title)
-	} 
-    }
-
-    update {
-        do {
-            update search_test_book
-            set title = :title
-            where book_id = :id
-	}
-	super;
-    }
-
-    delete {
-        do {
-            delete from search_test_book
-            where book_id = :id
-	}
-	super;
-    }
-	
     retrieve chapters {
         do {
             select c.chapter_num, c.content, c.chapter_id,
@@ -137,64 +90,13 @@ object type SearchTestBook extends ACSObject {
 //*******************************************
 
 object type SearchTestChapter extends ACSObject {
-    Integer    chapterNum;
-    String     content;
+    Integer    chapterNum = search_test_book_chapter.chapter_num INTEGER;
+    String     content = search_test_book_chapter.content CLOB;
 
     composite SearchTestBook[1..1] book;
     SearchTestAuthor[1..n] authors;
 
-    retrieve {
-        super;
-        do {
-            select c.chapter_id, c.chapter_num, c.content
-	           from search_test_book_chapter c
-            where chapter_id=:id
-	} map {
-            id = c.chapter_id;
-	    chapterNum = c.chapter_num;
-            content = c.content;
-	}
-    }
-
-    retrieve all {
-        do {
-            select c.chapter_num, c.content, o.object_type
-	           from search_test_book_chapter c, acs_objects o
-              and c.chapter_id = o.object_id
-	} map {
-	    chapterNum = c.chapter_num;
-            content = c.content;
-            objectType = o.object_type;
-	}
-    }
-
-    insert {
-    super;
-	do {
-	    insert into search_test_book_chapter
-	    (chapter_id, chapter_num, content)
-	    values
-	    (:id, :chapterNum, :content)
-	} 
-    }
-
-    update {
-        do {
-            update search_test_book_chapter
-            set chapter_num = :chapterNum,
-	        content = :content
-            where book_id = :id
-	}
-    super;
-    }
-
-    delete {
-        do {
-            delete from search_test_book_chapter
-            where chapter_id = :id
-	}
-    super;
-    }
+    reference key (search_test_book_chapter.chapter_id);
 
     retrieve book {
         do {
@@ -284,59 +186,11 @@ object type SearchTestChapter extends ACSObject {
 //*******************************************
 
 object type SearchTestAuthor extends ACSObject {
-    String     name;
+    String     name = search_test_author.name VARCHAR(100);
+
     SearchTestChapter[0..n] chapters;
 
-    retrieve {
-        super;
-        do {
-            select a.name
-	           from search_test_author a
-            where author_id=:id
-	} map {
-            id = a.author_id;
-            name = a.name;
-	}
-    }
-
-    retrieve all {
-        do {
-            select a.name, o.object_type
-	      from search_test_author a,
-	           acs_objects o
-	     where a.author_id = o.object_id
-	} map {
-            name = a.name;
-            objectType = o.object_type;
-	}
-    }
-
-    insert {
-    super;
-	do {
-	    insert into search_test_author
-	    (author_id, name)
-	    values
-	    (:id, :name)
-	} 
-    }
-
-    update {
-        do {
-            update search_test_author
-            set name = :name
-            where author_id = :id
-	}
-    super;
-    }
-
-    delete {
-        do {
-            delete from search_test_author
-            where author_id = :id
-	}
-    super;
-    }
+    reference key (search_test_author.author_id);
 
     retrieve chapters {
         do {
@@ -386,60 +240,12 @@ object type SearchTestAuthor extends ACSObject {
 //*******************************************
 
 object type SearchTestBookH extends ACSObject {
-    String     title;
+    String     title = search_test_book.title VARCHAR(100);
 
     composite SearchTestChapterH[0..n] chapters;
 
-    retrieve {
-        super;
-        do {
-            select b.title
-	           from search_test_book b
-            where book_id=:id
-	} map {
-            id = b.book_id;
-            title = b.title;
-	}
-    }
+	reference key (search_test_book.book_id);
 
-    retrieve all {
-        do {
-            select b.title, o.object_type
-	      from search_test_book b, acs_objects o
-             where b.book_id = o.object_id
-	} map {
-            title = b.title;
-            objectType = o.object_type;
-	}
-    }
-
-    insert {
-	super;
-	do {
-	    insert into search_test_book
-	    (book_id, title)
-	    values
-	    (:id, :title)
-	} 
-    }
-
-    update {
-        do {
-            update search_test_book
-            set title = :title
-            where book_id = :id
-	}
-	super;
-    }
-
-    delete {
-        do {
-            delete from search_test_book
-            where book_id = :id
-	}
-	super;
-    }
-	
     retrieve chapters {
         do {
             select c.chapter_num, c.content, c.chapter_id,
@@ -490,10 +296,13 @@ object type SearchTestBookH extends ACSObject {
 //*******************************************
 
 object type SearchTestChapterH extends ACSObject {
-    Integer    chapterNum;
-    String     content;
+    Integer    chapterNum = search_test_book_chapter.chapter_num INTEGER;
+    String     content = search_test_book_chapter.content CLOB;
 
     composite SearchTestBookH[1..1] book;
+
+    reference key (search_test_book_chapter.chapter_id);
+
 
     retrieve {
         super;

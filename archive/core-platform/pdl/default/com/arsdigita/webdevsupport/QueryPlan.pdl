@@ -16,6 +16,16 @@ data operation deleteQueryPlan {
 }
 
 query queryPlan {
+    BigDecimal id;
+    BigDecimal parentID;
+    String level;
+    String operation;
+    String execOptions;
+    String objectName;
+    String cardinality;
+    String bytes;
+    String cost;
+
     do { 
         select id, 
                parent_id,

@@ -57,6 +57,7 @@ object type ContentChangeTime {
 // to find earliest
 
 query getTimeEarliestNonSyncedChange {
+    BigDecimal timeEarliestChange;
    do {
         select nvl(min(change_time),0) as time_first_change
         from content_change_time
