@@ -26,6 +26,8 @@ class C {
     public static ObjectType type(PersistenceCapable pc) {
         PersistenceManagerImpl pmi = (PersistenceManagerImpl)
             pc.jdoGetPersistenceManager();
+        if (pmi == null) { throw new IllegalStateException("pmi==null"); }
+
         Class cls = pc.getClass();
         Root root = pmi.getSession().getRoot();
         ObjectType type = root.getObjectType(cls.getName());

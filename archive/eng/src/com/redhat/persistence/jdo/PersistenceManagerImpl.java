@@ -6,7 +6,11 @@ import java.util.*;
 import javax.jdo.*;
 import javax.jdo.spi.PersistenceCapable;
 
+import org.apache.log4j.Logger;
+
 public class PersistenceManagerImpl implements PersistenceManager {
+    private static final Logger s_log =
+        Logger.getLogger(PersistenceManagerImpl.class);
 
     private Session m_ssn;
     private Transaction m_txn = new TransactionImpl(this);
@@ -25,6 +29,7 @@ public class PersistenceManagerImpl implements PersistenceManager {
      * on it.
      */
     public void close() {
+        s_log.debug("close(): m_ssn = null");
         m_ssn = null;
     }
 
