@@ -30,7 +30,7 @@ import java.util.Stack;
  *
  * @author Archit Shah (ashah@mit.edu)
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/05/12 $
+ * @version $Date: 2003/07/31 $
  * @since 2003-01-22
  **/
 public class Graphs {
@@ -209,6 +209,10 @@ public class Graphs {
         Assert.assertNotNull(writer, "writer");
 
         writer.println("digraph " + graph.getLabel() + " {");
+        String graphAttrs = fmtr.graphAttributes(graph);
+        if ( graphAttrs != null ) {
+            writer.println(graphAttrs);
+        }
         for (Iterator nodes=graph.getNodes().iterator(); nodes.hasNext(); ) {
             Object node = nodes.next();
             int nodeCount = graph.outgoingEdgeCount(node) +

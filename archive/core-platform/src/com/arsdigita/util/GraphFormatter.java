@@ -19,10 +19,34 @@ package com.arsdigita.util;
  * Implementations of this interface can be used for pretty-printing graphs.
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/05/12 $
+ * @version $Date: 2003/07/31 $
  * @since 2003-01-23
  **/
 public interface GraphFormatter {
+
+    /**
+     * Returns graph attributes.
+     * 
+     * <p>For example, if you choose to pretty-print your graph in the DOT
+     * language, then the graph attributes section may look like so:</p>
+     *
+     * <pre>
+     *  digraph mygraph {
+     *     // the following two lines are graph attributes
+     *     node[shape=box,fontsize=8,fontname=verdana,height=0.2,width=0.2,style=filled];
+     *     ranksep=0.05;
+     *
+     *     // the following lines are nodes and edges
+     *     A -> B -> C -> D;
+     *     B -> E -> F;
+     *     C -> G;
+     *     D -> I;
+     *     D -> J -> H;
+     *  }
+
+     **/
+    String graphAttributes(Graph graph);
+
     /**
      * Returns a textual representation of the node, preferably a short one that
      * can be used in the following plain-text representation of the tree.
