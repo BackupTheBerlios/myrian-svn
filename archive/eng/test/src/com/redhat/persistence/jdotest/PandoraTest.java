@@ -44,7 +44,7 @@ import org.apache.log4j.Logger;
  * PandoraTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/06/24 $
+ * @version $Revision: #5 $ $Date: 2004/06/24 $
  **/
 
 public class PandoraTest extends AbstractCase {
@@ -314,8 +314,8 @@ public class PandoraTest extends AbstractCase {
         for (int i = 0; i < 10; i++) {
             Order order = new Order();
 
+            order.setId(i);
             m_pm.makePersistent(order);
-            order.setId(intID());
 
             order.setParty(rhs);
             Collection items = order.getItems();
