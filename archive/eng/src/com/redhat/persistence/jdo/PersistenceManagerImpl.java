@@ -321,7 +321,6 @@ public class PersistenceManagerImpl implements PersistenceManager {
 
         if (current == null) {
             Map values = new HashMap();
-            Map keys = new HashMap();
 
             fill(values, smi, cls, pc);
 
