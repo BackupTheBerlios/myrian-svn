@@ -22,12 +22,12 @@ import java.math.*;
  * ObserverTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2003/05/19 $
  **/
 
 public class ObserverTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/ObserverTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/ObserverTest.java#4 $ by $Author: ashah $, $DateTime: 2003/05/19 02:05:40 $";
 
     public ObserverTest(String name) {
         super(name);
@@ -52,7 +52,10 @@ public class ObserverTest extends PersistenceTestCase {
 
     private static final DataObject createTest() {
         Session ssn = SessionManager.getSession();
-        return ssn.create(new OID("test.Test", BigInteger.ZERO));
+        DataObject obj = ssn.create(new OID("test.Test", BigInteger.ZERO));
+        obj.set(REQUIRED, ssn.create(new OID("test.Icle", BigInteger.ONE)));
+        obj.save();
+        return obj;
     }
 
     private static final DataObject createIcle() {
@@ -131,10 +134,7 @@ public class ObserverTest extends PersistenceTestCase {
     }
 
     public void testBeforeAndAfterSave() {
-        DataObject icle = createIcle();
-        icle.save();
         DataObject data = createTest();
-        data.set(REQUIRED, icle);
 
         TestObserver observer = new TestObserver();
         data.addObserver(observer);
@@ -148,10 +148,6 @@ public class ObserverTest extends PersistenceTestCase {
 
     public void testBeforeAndAfterDelete() {
         DataObject data = createTest();
-        DataObject icle = createIcle();
-        icle.save();
-        data.set(REQUIRED, icle);
-        data.save();
 
         Session ssn = SessionManager.getSession();
         data = ssn.retrieve(new OID("test.Test", BigInteger.ZERO));

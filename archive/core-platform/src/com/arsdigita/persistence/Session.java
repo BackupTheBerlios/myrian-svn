@@ -59,7 +59,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/05/12 $
+ * @version $Revision: #12 $ $Date: 2003/05/19 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -194,6 +194,9 @@ public class Session {
                     if (pe.getProperty().getName().charAt(0) == '~') {
                         return;
                     }
+
+                     DataObjectImpl doi = (DataObjectImpl) ev.getObject();
+                     if (doi.isDeleted()) { return; }
                 }
 
                 ev.dispatch(new Event.Switch() {
