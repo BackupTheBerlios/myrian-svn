@@ -17,18 +17,18 @@
  */
 package com.arsdigita.util.cmd;
 
-import org.myrian.util.StringUtils;
+import com.arsdigita.util.StringUtils;
 import java.io.File;
 
 /**
  * @deprecated Use CLI (http://jakarta.apache.org/commons/cli/index.html) instead.
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/10/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 public class PathSwitch extends Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/util/cmd/PathSwitch.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/util/cmd/PathSwitch.java#5 $ by $Author: ashah $, $DateTime: 2004/10/04 11:13:41 $";
 
     public PathSwitch(String name, String usage, File[] defValue) {
         super(name, PARAMETER, usage, defValue);
