@@ -21,7 +21,7 @@ import com.redhat.persistence.metadata.ObjectType;
  * A generic class to persist and an appropriate adapter.
  *
  * @author <a href="mailto:ashah@redhat.com">Archit Shah</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/06/17 $
  **/
 
 public class Generic {
@@ -32,7 +32,9 @@ public class Generic {
     public static class Adapter
         extends com.redhat.persistence.metadata.Adapter {
 
-        public Object getObject(ObjectType type, PropertyMap properties) {
+        public Object getObject(ObjectType type,
+                                PropertyMap properties,
+                                Session ssn) {
             return new Generic(type, properties.get(type.getProperty("id")));
         }
 

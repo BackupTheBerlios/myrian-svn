@@ -27,12 +27,12 @@ import java.util.Iterator;
  * Adapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/06/17 $
  **/
 
 public abstract class Adapter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Adapter.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Adapter.java#2 $ by $Author: vadim $, $DateTime: 2004/06/17 13:28:47 $";
 
     private Root m_root;
 
@@ -97,7 +97,10 @@ public abstract class Adapter {
 
     public void setSession(Object obj, Session ssn) { return; }
 
-    public Object getObject(ObjectType basetype, PropertyMap props) {
+    public Object getObject(ObjectType basetype,
+                            PropertyMap props,
+                            Session ssn) {
+
         throw new UnsupportedOperationException
             ("not a compound adapter: " + getClass().getName());
     }

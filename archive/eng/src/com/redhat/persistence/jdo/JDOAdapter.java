@@ -7,10 +7,13 @@ import javax.jdo.spi.*;
 
 public class JDOAdapter extends Adapter {
 
-    public Object getObject(ObjectType basetype, PropertyMap props) {
+    public Object getObject(ObjectType base, PropertyMap props, Session ssn) {
+        if (ssn == null) { throw new NullPointerException("ssn"); }
+
         ObjectType type = props.getObjectType();
         Class klass = type.getJavaClass();
-        StateManagerImpl smi = new StateManagerImpl();
+        StateManagerImpl smi =
+            new StateManagerImpl(new PersistenceManagerImpl(ssn));
         PersistenceCapable pc = JDOImplHelper.getInstance().newInstance
             (klass, smi);
         smi.cacheKeyProperties(pc, props);

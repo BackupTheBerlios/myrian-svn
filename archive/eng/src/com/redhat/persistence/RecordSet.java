@@ -29,12 +29,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/06/17 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/RecordSet.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/RecordSet.java#2 $ by $Author: vadim $, $DateTime: 2004/06/17 13:28:47 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -126,7 +126,7 @@ public abstract class RecordSet {
 			}
 
 			if (obj == null) {
-			    obj = adapter.getObject(type, pmap);
+			    obj = adapter.getObject(type, pmap, ssn);
                             if (previous != obj) {
                                 ssn.use(obj);
                             }

@@ -59,7 +59,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/06/17 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -701,7 +701,9 @@ public class Session {
 
         public Object getObject
             (com.redhat.persistence.metadata.ObjectType type,
-             PropertyMap props) {
+             PropertyMap props,
+             com.redhat.persistence.Session ssn) {
+
             if (!type.isKeyed()) {
                 return props;
             }

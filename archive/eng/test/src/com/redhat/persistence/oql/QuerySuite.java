@@ -39,12 +39,12 @@ import java.util.*;
  * QuerySuite
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/06/17 $
  **/
 
 public class QuerySuite extends TestSuite {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/QuerySuite.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/QuerySuite.java#2 $ by $Author: vadim $, $DateTime: 2004/06/17 13:28:47 $";
 
     public QuerySuite() {}
 
@@ -226,7 +226,7 @@ public class QuerySuite extends TestSuite {
                 } else {
                     Object obj = m_ssn.retrieve(pmap);
                     if (obj == null) {
-                        obj = ad.getObject(type, pmap);
+                        obj = ad.getObject(type, pmap, m_ssn);
                         m_ssn.create(obj);
                     }
                     return obj;

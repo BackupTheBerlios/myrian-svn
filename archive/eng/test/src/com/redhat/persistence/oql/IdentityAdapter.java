@@ -21,14 +21,16 @@ import com.redhat.persistence.metadata.*;
  * IdentityAdapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/06/17 $
  **/
 
 public class IdentityAdapter extends Adapter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/IdentityAdapter.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/IdentityAdapter.java#2 $ by $Author: vadim $, $DateTime: 2004/06/17 13:28:47 $";
 
-    public Object getObject(ObjectType basetype, PropertyMap props) {
+    public Object getObject(ObjectType basetype,
+                            PropertyMap props,
+                            Session ssn) {
         return props;
     }
 
