@@ -3,7 +3,7 @@
 if [ -z "$1" ]; then
     script=`basename $0`
     echo "Usage:"
-    echo "   $script <jre-args>"
+    echo "   $script <jre-args> | $script --classpath"
     echo "Example:"
     echo "   $script com.redhat.persistence.TestRunner com.redhat.persistence.jdotest.SimpleTest"
     exit 1
@@ -26,9 +26,9 @@ fi
 extend lib/*.jar lib/*.zip conf
 extend `find $BUILD -name "*.jmake" | sed s/\\.jmake\$//g`
 extend `find $BUILD -name "*.jmake" | sed s/\\.jmake\$//g | sed s%^$BUILD/%%g`
-if [ ! -z $VERBOSE ]; then
-	echo $CLASSPATH
+
+if [ "--classpath" == "$1" ]; then
+	echo -n $CLASSPATH
+else
+	exec java "$@"
 fi
-
-exec java "$@"
-
