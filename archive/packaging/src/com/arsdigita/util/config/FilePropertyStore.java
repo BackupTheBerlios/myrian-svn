@@ -24,13 +24,13 @@ import java.util.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/FilePropertyStore.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/FilePropertyStore.java#2 $
  */
 public class FilePropertyStore implements ParameterStore {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/FilePropertyStore.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/FilePropertyStore.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/26 11:56:51 $";
+        "$DateTime: 2003/08/26 12:54:51 $";
 
     private final Properties m_props;
 
@@ -49,7 +49,14 @@ public class FilePropertyStore implements ParameterStore {
     }
 
     public String read(final Parameter param) {
-        return m_props.getProperty(param.getName());
+        final String name = param.getName();
+        final String value = System.getProperty(name);
+
+        if (value == null) {
+            return m_props.getProperty(name);
+        } else {
+            return value;
+        }
     }
 
     public List readList(final Parameter param) {
