@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/categorization/query-getRootCategory.pg.pdl#2 $ 
-// $DateTime: 2002/10/16 14:12:35 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/categorization/query-getRootCategory.pg.pdl#3 $ 
+// $DateTime: 2003/06/06 18:54:33 $
 
 model com.arsdigita.categorization;
 
@@ -20,19 +20,27 @@ query getRootCategory {
     BigDecimal id;
     String name;
     BigDecimal nchild;
+    Boolean isAbstract;
 
     do {
         select g.name, 
                g.category_id,
-               count(map.category_id) as sub_count
+               count(map.category_id) as sub_count,
+                g.abstract_p
         from cat_categories g
              left join cat_category_category_map map on 
                        (g.category_id = map.category_id)
         where g.category_id = :objectID
-        group by g.name, g.category_id
+        group by g.name, g.category_id, g.abstract_p
     } map {
         id = g.category_id;
         name = g.name;
         nchild = sub_count;
+        isAbstract = g.abstract_p;
+
+
+
+
+
     }
 }
