@@ -112,3 +112,7 @@ jdo-tests: $(JSTAMPS)
 persistence-tests: $(JSTAMPS)
 	bin/run com.redhat.persistence.TestRunner \
 		com.arsdigita.persistence.PersistenceSuite
+
+oql-tests: $(JSTAMPS)
+	bin/run com.redhat.persistence.TestRunner \
+		com.redhat.persistence.oql.QuerySuite
