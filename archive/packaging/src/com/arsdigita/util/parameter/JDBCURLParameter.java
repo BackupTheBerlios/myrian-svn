@@ -25,17 +25,17 @@ import org.apache.oro.text.perl.Perl5Util;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/JDBCURLParameter.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/JDBCURLParameter.java#2 $
  */
 public class JDBCURLParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/JDBCURLParameter.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/JDBCURLParameter.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/28 00:48:42 $";
+        "$DateTime: 2003/08/28 18:40:59 $";
 
     private static final Perl5Util s_perl = new Perl5Util();
     private static final String s_regex =
-        "/^jdbc\\:[a-bA-B1-9]+\\:[a-bA-B1-9\\@\\/\\?\\=]+$/";
+        "/^jdbc\\:[a-zA-Z1-9]+\\:[a-zA-Z1-9\\@\\/\\?\\=]+$/";
 
     public JDBCURLParameter(final String name) {
         super(name);

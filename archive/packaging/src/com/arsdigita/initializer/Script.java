@@ -31,12 +31,12 @@ import java.util.List;
  * Script
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/08/27 $
+ * @version $Revision: #4 $ $Date: 2003/08/28 $
  */
 
 public class Script {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/initializer/Script.java#3 $ by $Author: justin $, $DateTime: 2003/08/27 12:51:55 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/initializer/Script.java#4 $ by $Author: justin $, $DateTime: 2003/08/28 18:40:59 $";
 
     private static final Logger s_log =
         Logger.getLogger(Script.class);
@@ -189,7 +189,7 @@ public class Script {
         HashSet initializersRun = new HashSet();
         boolean loggerIsInitialized = false;
         Initializer ini = null;
-        try {
+//         try {
             for (int i = 0; i < m_initializers.size(); i++) {
                 ini = (Initializer) m_initializers.get(i);
                 if (loggerIsInitialized) {
@@ -210,12 +210,12 @@ public class Script {
                 }
             }
 
-        } catch(Throwable t) {
-            logInitializationFailure(ini, loggerIsInitialized, t);
-            throw new InitializationException(
-                "Initialization Script startup error!", t
-            );
-        }
+//         } catch(Throwable t) {
+//             logInitializationFailure(ini, loggerIsInitialized, t);
+//             throw new InitializationException(
+//                 "Initialization Script startup error!", t
+//             );
+//         }
         m_isStarted = true;
         s_log.info("Initialization Complete");
         return initializersRun;
