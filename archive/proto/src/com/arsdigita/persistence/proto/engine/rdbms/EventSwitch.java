@@ -10,12 +10,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/02/17 $
+ * @version $Revision: #7 $ $Date: 2003/02/18 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#6 $ by $Author: rhs $, $DateTime: 2003/02/17 20:13:29 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#7 $ by $Author: rhs $, $DateTime: 2003/02/18 00:22:02 $";
 
     private static final Path KEY = Path.get("__key__");
     private static final Path KEY_FROM = Path.get("__key_from__");
@@ -91,6 +91,8 @@ class EventSwitch extends Event.Switch {
             return;
         }
 
+        final Role role = (Role) e.getProperty();
+
         m.dispatch(new Mapping.Switch() {
                 public void onValue(ValueMapping vm) {
                     Column col = vm.getColumn();
@@ -113,7 +115,14 @@ class EventSwitch extends Event.Switch {
                         // smarter by canceling out inserts and updates which
                         // we don't do right now.
                         if (op != null) { return; }
-                        op = m_engine.getOperation(arg, obj, table);
+
+                        boolean one2n = role.isReversable() &&
+                            !role.getReverse().isCollection();
+                        if (one2n) {
+                            op = m_engine.getOperation(arg, null, table);
+                        } else {
+                            op = m_engine.getOperation(arg, obj, table);
+                        }
                         if (op != null) { return; }
 
                         if (e instanceof AddEvent ||
@@ -122,24 +131,39 @@ class EventSwitch extends Event.Switch {
                             op = new Insert(table);
                             op.set(from, RDBMSEngine.getKeyValue(obj));
                             op.set(to, RDBMSEngine.getKeyValue(arg));
+                            m_engine.addOperation(obj, arg, op);
                         } else if (e instanceof RemoveEvent ||
                                    e instanceof SetEvent &&
                                    arg == null) {
-                            op = new Delete
-                                (table, new AndCondition
+                            Condition cond;
+                            if (e instanceof SetEvent) {
+                                cond = new EqualsCondition(getPath(from),
+                                                           KEY_FROM);
+                            } else if (one2n) {
+                                cond = new EqualsCondition(getPath(to),
+                                                           KEY_TO);
+                            } else {
+                                cond = new AndCondition
                                     (new EqualsCondition(getPath(from),
                                                          KEY_FROM),
                                      new EqualsCondition(getPath(to),
-                                                         KEY_TO)));
+                                                         KEY_TO));
+                            }
+
+                            op = new Delete(table, cond);
                             op.set(KEY_FROM, RDBMSEngine.getKeyValue(obj),
                                    from.getType());
                             op.set(KEY_TO, RDBMSEngine.getKeyValue(arg),
                                    to.getType());
+                            if (one2n) {
+                                m_engine.addOperation(arg, null, op);
+                            } else {
+                                m_engine.addOperation(obj, arg, op);
+                            }
                         } else {
                             throw new IllegalArgumentException
                                 ("not a set, add, or remove");
                         }
-                        m_engine.addOperation(obj, arg, op);
                     } else if (rm.isJoinTo()) {
                         Column col = rm.getJoin(0).getFrom();
                         DML op = findOperation(obj, col.getTable());
