@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/05/19 $
+ * @version $Revision: #4 $ $Date: 2003/05/20 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#3 $ by $Author: ashah $, $DateTime: 2003/05/19 17:42:44 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#4 $ by $Author: ashah $, $DateTime: 2003/05/20 14:37:22 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -176,13 +176,13 @@ public class PDL {
 
 			ot.addProperty(rone);
 			Role revOne = new Role("~" + rone.getName(), ot,
-					       rtwo.isComponent(), true, true);
+					       true, true, true);
 			rone.getType().addProperty(revOne);
 			rone.setReverse(revOne);
 
 			ot.addProperty(rtwo);
 			Role revTwo = new Role("~" + rtwo.getName(), ot,
-					       rone.isComponent(), true, true);
+					       true, true, true);
 			rtwo.getType().addProperty(revTwo);
 			rtwo.setReverse(revTwo);
 
