@@ -24,16 +24,16 @@ import java.util.Iterator;
  * to flush.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/07/30 $
+ * @version $Revision: #8 $ $Date: 2004/07/30 $
  **/
 
 public class FlushException extends ProtoException {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/FlushException.java#7 $ by $Author: mbooth $, $DateTime: 2004/07/30 07:33:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/FlushException.java#8 $ by $Author: mbooth $, $DateTime: 2004/07/30 13:15:43 $";
 
     private final Object m_obj;
 
-    private static String msg(Object obj, Collection pds, String msg) {
+    private static String msg(Object obj, Collection pds) {
         StringBuffer sb = new StringBuffer();
         if (obj == null) {
             sb.append("Unable to send all events to database");
@@ -41,7 +41,7 @@ public class FlushException extends ProtoException {
             sb.append("Unable to send all events to database for object ");
             sb.append(obj);
         }
-        sb.append(' ').append(msg);
+        sb.append(" because these required properties are null:");
 
         for (Iterator it = pds.iterator(); it.hasNext(); ) {
             PropertyData pd = (PropertyData) it.next();
@@ -54,20 +54,16 @@ public class FlushException extends ProtoException {
     }
 
     FlushException(Object obj, Collection pds) {
-        this(obj, pds, "because these required properties are null");
-    }
-
-    FlushException(Collection pds) {
-        this(null, pds);
-    }
-
-    FlushException(Object obj, Collection pds, String msg) {
-        super(msg(obj, pds, msg), false);
+	super(msg(obj, pds), false);
         m_obj = obj;
 
         if (Session.LOG.isInfoEnabled()) {
             Session.LOG.info("Unable to send all events to database.", this);
         }
+    }
+
+    FlushException(Collection pds) {
+        this(null, pds);
     }
 
     public Object getObject() { return m_obj; }

@@ -47,12 +47,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #15 $ $Date: 2004/07/30 $
+ * @version $Revision: #16 $ $Date: 2004/07/30 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Session.java#15 $ by $Author: mbooth $, $DateTime: 2004/07/30 07:33:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Session.java#16 $ by $Author: mbooth $, $DateTime: 2004/07/30 13:15:43 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -76,6 +76,7 @@ public class Session {
     private final Set m_afterActivate = new HashSet();
     private final Set m_beforeFlush = new HashSet();
     private final Set m_afterFlush = new HashSet();
+
     private final Set m_flushStates = new HashSet();
 
     private Event m_beforeFlushMarker = null;
@@ -648,7 +649,7 @@ public class Session {
      * datastore are consistent with the contents of the in memory data cache.
      **/
     public void flush() {
-        Set flushState = new HashSet( m_events.getEvents() );
+        FlushState flushState = new FlushState();
 
         try {
             if (LOG.isDebugEnabled()) {
@@ -659,7 +660,7 @@ public class Session {
             // If the current state is in the stack, there is a loop
 
             if( m_flushStates.contains( flushState ) ) {
-                throw new FlushException( null, flushState, "because a loop has been detected. This state has been previously visited: " );
+                throw new LoopException();
             }
             m_flushStates.add( flushState );
 
@@ -1151,6 +1152,34 @@ public class Session {
                 buf.append(msg);
             }
             LOG.debug(buf.toString());
+        }
+    }
+
+    private class FlushState {
+        Object[] m_stateVars;
+        
+        FlushState() {
+            m_stateVars = new Object[] {
+                new HashSet( m_events.getEvents() ),
+                ((HashSet) m_beforeFlush).clone(),
+                ((HashSet) m_afterFlush).clone(),
+                m_beforeFlushMarker
+            };
+        };
+
+        public boolean equals( Object o ) {
+            if( null == o || !( o instanceof FlushState ) ) return false;
+            FlushState state = (FlushState) o;
+
+            for( int i = 0; i < m_stateVars.length; i++ ) {
+                if( null == m_stateVars[i] ) {
+                    if( null != state.m_stateVars[i] ) return false;
+                } else if( !m_stateVars[i].equals( state.m_stateVars[i] ) ) {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
