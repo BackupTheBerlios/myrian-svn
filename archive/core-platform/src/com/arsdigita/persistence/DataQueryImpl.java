@@ -54,7 +54,7 @@ import org.apache.log4j.Logger;
  * model.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #20 $ $Date: 2002/12/11 $
+ * @version $Revision: #21 $ $Date: 2003/04/23 $
  */
 // NOTE if we ever support anything other than forward-only,
 // we'll need to shut off the auto-closing functionality
@@ -62,7 +62,7 @@ import org.apache.log4j.Logger;
 // results and general confusion.
 class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#20 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#21 $ by $Author: ashah $, $DateTime: 2003/04/23 17:42:01 $";
 
     private static final Logger log =
         Logger.getLogger(DataQueryImpl.class);
@@ -1398,7 +1398,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
     }
 
-    private String[] unalias(String[] path) {
+    String[] unalias(String[] path) {
         String[] result = path;
 
 	if (log.isDebugEnabled()) {

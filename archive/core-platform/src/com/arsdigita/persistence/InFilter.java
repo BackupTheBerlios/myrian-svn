@@ -8,12 +8,12 @@ import java.util.*;
  * InFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/03/19 $
+ * @version $Revision: #2 $ $Date: 2003/04/23 $
  **/
 
 class InFilter extends FilterImpl implements Filter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/InFilter.java#1 $ by $Author: rhs $, $DateTime: 2003/03/19 18:16:01 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/InFilter.java#2 $ by $Author: ashah $, $DateTime: 2003/04/23 17:42:01 $";
 
     private String m_prop;
     private String m_subProp;
@@ -32,18 +32,24 @@ class InFilter extends FilterImpl implements Filter {
     }
 
     private String getColumn(String property, Operation op) {
-	String[] path = StringUtils.split(property, '.');
+        return getColumn(StringUtils.split(property, '.'), op);
+    }
+
+    private String getColumn(String[] path, Operation op) {
 	Mapping m = op.getMapping(path);
 	if (m != null) {
 	    return m.getColumn();
 	} else {
 	    throw new IllegalArgumentException
-		("no such property (" + property + ") in operation: " + op);
+		("no such property (" + StringUtils.join(path, ".")
+                 + ") in operation: " + op);
 	}
     }
 
     public String getSQL(DataQuery query) {
-	String col = getColumn(m_prop, ((DataQueryImpl) query).getOperation());
+        DataQueryImpl dqi = (DataQueryImpl) query;
+	String[] path = StringUtils.split(m_prop, '.');
+	String col = getColumn(dqi.unalias(path), dqi.getOperation());
 	Operation op = getOperation(m_query);
 
 	String subProp;
