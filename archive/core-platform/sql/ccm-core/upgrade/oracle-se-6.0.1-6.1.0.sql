@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/upgrade/oracle-se-6.0.1-6.1.0.sql#7 $
--- $DateTime: 2004/03/21 16:01:53 $
+-- $Id: //core-platform/dev/sql/ccm-core/upgrade/oracle-se-6.0.1-6.1.0.sql#8 $
+-- $DateTime: 2004/03/22 14:04:38 $
 
 PROMPT Red Hat WAF 6.0.1 -> 6.1.0 Upgrade Script (Oracle)
 
@@ -33,6 +33,8 @@ alter table cms_mime_extensions (mime_type null);
 alter table cms_mime_extensions add constraint
   cms_mim_exten_mim_type_f_7pwwd foreign key(mime_type)
   references cms_mime_types(mime_type);
+
+update apm_package_types set package_uri = 'http://arsdigita.com/sitemap' where package_uri = 'http://arsdigita.com/admin/sitemap';
 
 create index AGENTPORT_SUPERPORT_ID_IDX on AGENTPORTLETS(SUPERPORTLET_ID);
 create index INIT_REQS_REQD_INIT_IDX on INIT_REQUIREMENTS(REQUIRED_INIT);
