@@ -24,15 +24,15 @@ import java.sql.Types;
  * This class provides an implementationthat automatically generates DDL
  * statements based on the information passed in.  The primary use for
  * this class is to provide DDL to create and alter tables used by
- * {@link com.arsdigita.persistence.metadata.DynamicObjectType}.
+ * {@link com.arsdigita.metadata.DynamicObjectType}.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleDDLGenerator.java#5 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleDDLGenerator.java#6 $
  * @since 4.6.3 */
 
 final class OracleDDLGenerator extends BaseDDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleDDLGenerator.java#5 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleDDLGenerator.java#6 $ by $Author: vadim $, $DateTime: 2002/12/04 12:14:16 $";
 
     private static final int MAX_COLUMN_NAME_LEN = 26;
 

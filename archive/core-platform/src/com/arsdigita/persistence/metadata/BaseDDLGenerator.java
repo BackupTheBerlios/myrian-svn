@@ -32,15 +32,15 @@ import org.apache.log4j.Logger;
  * This class provides an implementationthat automatically generates DDL
  * statements based on the information passed in.  The primary use for
  * this class is to provide DDL to create and alter tables used by
- * {@link com.arsdigita.persistence.metadata.DynamicObjectType}.
+ * {@link com.arsdigita.metadata.DynamicObjectType}.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#8 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#9 $
  * @since 4.6.3 */
 
 abstract class BaseDDLGenerator implements DDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#8 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#9 $ by $Author: vadim $, $DateTime: 2002/12/04 12:14:16 $";
 
     private static final Logger s_log =
         Logger.getLogger(BaseDDLGenerator.class);

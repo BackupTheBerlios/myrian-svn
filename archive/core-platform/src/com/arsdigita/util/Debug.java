@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2002-08-23
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Debug.java#1 $ $Date: 2002/11/10 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Debug.java#2 $ $Date: 2002/12/04 $
  **/
 public class Debug {
     private static final Logger s_log = Logger.getLogger(Debug.class);
@@ -62,7 +62,7 @@ public class Debug {
     /**
      * Dump a character array to the file.
      *
-     * @see dumpToFile(String, String)
+     * @see #dumpToFile(String, String)
      **/
     public static void dumpToFile(String filename, char[] chars) {
         Writer writer = getWriter(filename);
