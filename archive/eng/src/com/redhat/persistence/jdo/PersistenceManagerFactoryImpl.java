@@ -5,6 +5,7 @@ import com.redhat.persistence.Engine;
 import com.redhat.persistence.QuerySource;
 import com.redhat.persistence.Session;
 import com.redhat.persistence.engine.rdbms.ConnectionSource;
+import com.redhat.persistence.engine.rdbms.PooledConnectionSource;
 import com.redhat.persistence.engine.rdbms.OracleWriter;
 import com.redhat.persistence.engine.rdbms.PostgresWriter;
 import com.redhat.persistence.engine.rdbms.RDBMSEngine;
@@ -64,6 +65,8 @@ public class PersistenceManagerFactoryImpl
     private int m_maxPool = 10;
     private int m_mswait = 100;
 
+    private ConnectionSource m_connSrc;
+
     private transient Root m_root = new Root();
 
     private static boolean bool(String value) {
@@ -76,15 +79,21 @@ public class PersistenceManagerFactoryImpl
     public static PersistenceManagerFactory getPersistenceManagerFactory(
         Properties props) {
 
+
         synchronized(s_instances) {
-            PersistenceManagerFactoryImpl result = (PersistenceManagerFactoryImpl)
-                s_instances.get(props);
+            PersistenceManagerFactoryImpl result =
+                (PersistenceManagerFactoryImpl) s_instances.get(props);
             if (result == null) {
                 result = new PersistenceManagerFactoryImpl(props);
+                // XXX: the polling interval is currently hardcoded to 0
+                result.m_connSrc = new PooledConnectionSource
+                    (result.m_url, result.m_maxPool, 0);
                 s_instances.put(props, result);
+
             }
             return result;
         }
+
     }
 
     public PersistenceManagerFactoryImpl(Properties p) {
@@ -152,27 +161,15 @@ public class PersistenceManagerFactoryImpl
     }
 
     public PersistenceManager getPersistenceManager(String user, String pw) {
-        final Connection conn;
-        try {
-            conn = DriverManager.getConnection(m_url, user, pw);
-            conn.setAutoCommit(false);
-        } catch (SQLException se) {
-            throw new RuntimeException(se);
-        }
-
-        // XXX pull PooledConnectionSource from c.a.p?
-        ConnectionSource src = new ConnectionSource() {
-            public Connection acquire() { return conn; }
-            public void release(Connection conn) {}
-        };
+        // XXX: this currently ignores "user" and "pw"
 
         final RDBMSEngine engine;
         switch (DbHelper.getDatabaseFromURL(m_url)) {
         case DbHelper.DB_ORACLE:
-            engine = new RDBMSEngine(src, new OracleWriter());
+            engine = new RDBMSEngine(m_connSrc, new OracleWriter());
             break;
         case DbHelper.DB_POSTGRES:
-            engine = new RDBMSEngine(src, new PostgresWriter());
+            engine = new RDBMSEngine(m_connSrc, new PostgresWriter());
             break;
         default:
             DbHelper.unsupportedDatabaseError("persistence");
@@ -314,7 +311,6 @@ public class PersistenceManagerFactoryImpl
     public int getMsWait() {
         return m_mswait;
     }
-
 
     public void setMsWait(int value) {
         unmodifiable();
