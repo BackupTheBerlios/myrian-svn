@@ -29,10 +29,10 @@ import org.apache.log4j.Logger;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/05/12 $
+ * @version $Revision: #11 $ $Date: 2003/07/29 $
  */
 public class FilterTest extends PersistenceTestCase {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/FilterTest.java#10 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/FilterTest.java#11 $ by $Author: rhs $, $DateTime: 2003/07/29 17:09:21 $";
 
     private static Logger s_log =
         Logger.getLogger(FilterTest.class.getName());
@@ -732,6 +732,12 @@ public class FilterTest extends PersistenceTestCase {
           (BigDecimal) dq.get("priority"));
           assertTrue("The query should only return one line", !dq.next());
         */
+    }
+
+    public void testFilterWithNVL() {
+        DataQuery dq = getDefaultQuery();
+        dq.addFilter("nvl('zero', 'zero') = nvl('one', 'one')");
+        assertEquals("nvl filter silently failed", 0, dq.size());
     }
 
 
