@@ -31,12 +31,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/01/29 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/arsdigita/persistence/oql/QueryTest.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/arsdigita/persistence/oql/QueryTest.java#2 $ by $Author: ashah $, $DateTime: 2004/01/29 16:44:04 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);
@@ -66,12 +66,20 @@ public class QueryTest extends PersistenceTestCase {
 
     private void doTest(String name, Query query) {
         // Test oracle specific syntax.
-        OracleWriter ow = new OracleWriter();
+        OracleWriter ow = new OracleWriter() {
+            public RDBMSEngine getEngine() {
+                return QueryTest.this.getEngine();
+            }
+        };
         ow.write(query);
         String oraResult = compare("oracle-se/" + name + ".op", ow.getSQL());
 
         // Test pg syntax.
-        PostgresWriter pw = new PostgresWriter();
+        PostgresWriter pw = new PostgresWriter() {
+            public RDBMSEngine getEngine() {
+                return QueryTest.this.getEngine();
+            }
+        };
         pw.write(query);
         String pgResult = compare("postgres/" + name + ".op", pw.getSQL());
 
