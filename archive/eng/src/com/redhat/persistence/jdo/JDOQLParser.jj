@@ -460,7 +460,7 @@ Expression postfixExpression() :
         | expr = literal()
         | <THIS> { expr = new Variable("this"); }
         | t = <IDENTIFIER> {
-              // XXX need to prefix "this." for some paths
+              // XXX need to support jdo variables 
               if (getParameters().containsKey(t.image)) {
                   Object value = getParameters().get(t.image);
                   if (value instanceof Expression) {
@@ -469,7 +469,7 @@ Expression postfixExpression() :
                       expr = new Literal(value);
                   }
               } else {
-                  expr = new Variable(t.image);
+                  expr = new Get(new Variable("this"), t.image);
               }
           }
     )
