@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<ccm:application name="rh-persistence"
+<ccm:application name="persistence"
            prettyName="Red Hat Persistence"
               version="1.0.0"
               release="1"
