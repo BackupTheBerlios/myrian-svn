@@ -21,13 +21,6 @@ public class JDOAdapter extends Adapter {
         return pc;
     }
 
-    public void setSession(Object obj, Session ssn) {
-        // XXX: better to not construct new PMI every time
-        ((PersistenceCapable) obj).jdoReplaceStateManager
-            (new StateManagerImpl(
-                new PersistenceManagerImpl(ssn)));
-    }
-
     public PropertyMap getProperties(Object obj) {
         // XXX: do we need this? (copied from c.a.p)
         // if (obj instanceof PropertyMap) { return (PropertyMap) obj; }

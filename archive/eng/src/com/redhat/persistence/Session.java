@@ -47,12 +47,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/06/17 $
+ * @version $Revision: #3 $ $Date: 2004/06/17 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#2 $ by $Author: vadim $, $DateTime: 2004/06/17 13:28:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#3 $ by $Author: vadim $, $DateTime: 2004/06/17 16:10:26 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -881,8 +881,6 @@ public class Session {
 
     void use(Object obj) {
         Adapter ad = getAdapter(obj);
-        ObjectType type = ad.getObjectType(obj);
-        if (type.isKeyed()) { ad.setSession(obj, this); }
 
         ObjectData odata = getObjectData(obj);
         if (odata != null) {

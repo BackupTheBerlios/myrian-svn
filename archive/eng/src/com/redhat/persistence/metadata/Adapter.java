@@ -27,12 +27,12 @@ import java.util.Iterator;
  * Adapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/06/17 $
+ * @version $Revision: #3 $ $Date: 2004/06/17 $
  **/
 
 public abstract class Adapter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Adapter.java#2 $ by $Author: vadim $, $DateTime: 2004/06/17 13:28:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Adapter.java#3 $ by $Author: vadim $, $DateTime: 2004/06/17 16:10:26 $";
 
     private Root m_root;
 
@@ -94,8 +94,6 @@ public abstract class Adapter {
         throw new UnsupportedOperationException
             ("not a bindable adapter: " + getClass().getName());
     }
-
-    public void setSession(Object obj, Session ssn) { return; }
 
     public Object getObject(ObjectType basetype,
                             PropertyMap props,

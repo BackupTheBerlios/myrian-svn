@@ -59,7 +59,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/06/17 $
+ * @version $Revision: #3 $ $Date: 2004/06/17 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -264,7 +264,7 @@ public class Session {
 		("type must be non null");
 	}
         DataObjectImpl result = new DataObjectImpl(type);
-        result.setSession(m_ssn);
+        addDataObject(result);
         return result;
     }
 
@@ -316,7 +316,8 @@ public class Session {
      **/
 
     public DataObject create(OID oid) {
-        DataObject result = new DataObjectImpl(oid);
+        DataObjectImpl result = new DataObjectImpl(oid);
+        addDataObject(result);
         try {
             m_ssn.create(result);
         } catch (ProtoException e) {
@@ -536,7 +537,8 @@ public class Session {
         }
     }
 
-    private void addDataObject(DataObject obj) {
+    private void addDataObject(DataObjectImpl obj) {
+        obj.setSession(m_ssn);
         m_dataObjects.add(new WeakReference(obj));
     }
 
@@ -692,13 +694,6 @@ public class Session {
     }
 
     private static class DataObjectAdapter extends Adapter {
-        public void setSession
-            (Object obj, com.redhat.persistence.Session ssn) {
-            DataObjectImpl dobj = (DataObjectImpl) obj;
-            dobj.setSession(ssn);
-            getSessionFromProto(ssn).addDataObject(dobj);
-        }
-
         public Object getObject
             (com.redhat.persistence.metadata.ObjectType type,
              PropertyMap props,
@@ -729,7 +724,11 @@ public class Session {
                 Property prop = (Property) it.next();
                 oid.set(prop.getName(), props.get(prop));
             }
-            return new DataObjectImpl(oid);
+
+            DataObjectImpl dobj = new DataObjectImpl(oid);
+
+            getSessionFromProto(ssn).addDataObject(dobj);
+            return dobj;
         }
 
         public PropertyMap getProperties(Object obj) {

@@ -35,7 +35,7 @@ import java.util.Map;
  */
 class Expander extends Event.Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Expander.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Expander.java#2 $ by $Author: vadim $, $DateTime: 2004/06/17 16:10:26 $";
 
     final private Session m_ssn;
     final private Collection m_deleting = new HashSet();
@@ -118,7 +118,6 @@ class Expander extends Event.Switch {
         }
 
         Adapter a = m_ssn.getAdapter(obj);
-        a.setSession(obj, m_ssn);
 
         addEvent(e);
 
