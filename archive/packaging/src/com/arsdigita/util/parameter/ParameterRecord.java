@@ -30,18 +30,18 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterReader
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#15 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#16 $
  */
 public abstract class ParameterRecord extends AbstractParameterContext {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#15 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#16 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/20 01:48:17 $";
+        "$DateTime: 2003/10/20 22:11:50 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterRecord.class);
 
     protected ParameterRecord(final String name) {
-        super(name);
+        super();
     }
 }

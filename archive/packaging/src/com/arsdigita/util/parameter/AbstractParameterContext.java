@@ -24,13 +24,13 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameterContext.java#3 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameterContext.java#4 $
  */
 public abstract class AbstractParameterContext implements ParameterContext {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameterContext.java#3 $" +
-        "$Author: rhs $" +
-        "$DateTime: 2003/10/17 15:34:34 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameterContext.java#4 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/10/20 22:11:50 $";
 
     private static final Logger s_log = Logger.getLogger
         (AbstractParameterContext.class);
@@ -39,8 +39,8 @@ public abstract class AbstractParameterContext implements ParameterContext {
     private final HashMap m_map;
     private final Properties m_info;
 
-    public AbstractParameterContext(final String name) {
-        m_param = new MapParameter(name);
+    public AbstractParameterContext() {
+        m_param = new MapParameter("root");
         m_map = new HashMap();
         m_info = new Properties();
     }
