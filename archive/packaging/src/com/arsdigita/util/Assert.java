@@ -30,13 +30,13 @@ import org.apache.log4j.Logger;
  * @author David Lutterkort &lt;dlutter@redhat.com&gt;
  * @author Uday Mathur
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/Assert.java#4 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/Assert.java#5 $
  */
 public class Assert {
     public static final String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/Assert.java#4 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/Assert.java#5 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/03 12:09:13 $";
+        "$DateTime: 2003/10/04 00:03:52 $";
 
     private static final Logger s_log = Logger.getLogger
         (Assert.class);
@@ -46,7 +46,8 @@ public class Assert {
     private static final boolean s_enabled;
 
     static {
-        final String enabled = System.getProperty("waf.util.assert_enabled");
+        final String enabled = System.getProperty
+	    (Assert.class.getName() + ".enabled");
 
         if (enabled == null) {
             s_enabled = false;
