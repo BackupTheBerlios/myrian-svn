@@ -11,15 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/default/kernel/view-object_context_trans_map.sql#1 $
--- $DateTime: 2003/10/23 15:28:18 $
+-- $Id: //core-platform/dev/sql/ccm-core/default/kernel/index-dnm_granted_context.sql#1 $
+-- $DateTime: 2004/01/15 10:03:14 $
+-- autor: Aram Kananov <aram@kananov.com>
 
--- Use with caution.  For some objects, this view will contain
--- the implicit mapping (object_id, object_id, 0).  For some objects this
--- view WILL NOT contain this implicit mapping.
-create view object_context_trans_map
-as select object_id, implied_context_id, n_generations
-   from granted_trans_context_map
-   UNION ALL
-   select object_id, implied_context_id, n_generations
-   from ungranted_trans_context_map;
+create unique index dnm_gc_uk on dnm_granted_context ( pd_object_id, pd_context_id);

@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/permissions.pdl#18 $
-// $DateTime: 2003/12/18 17:01:51 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/permissions.pdl#19 $
+// $DateTime: 2004/01/15 10:03:14 $
 
 model com.arsdigita.kernel.permissions;
 
@@ -202,223 +202,96 @@ query ObjectDirectPermissionCollection {
 }
 
 
-
-query PermissionFilterQuery {
-    BigDecimal objectID;
+query PartyPermissionFilterQuery {
+    Boolean hasPermission;
     do {
-        select oc.object_id
-        from object_context oc
-        where (exists
-                   (select 1
-                      from granted_context_non_leaf_map c,
-                           acs_permissions p
-                     where c.implied_context_id = p.object_id
-		       and context_id = c.object_id
-                       and (p.grantee_id in :partyList or
-                            exists (select 1
-                                    from group_member_trans_map
-                                    where member_id in :partyList
-				    and p.grantee_id = group_id))
-                        and p.privilege in :privilegeList
-                   )
-               or exists
-                   (select 1
-                      from acs_permissions p
-		      where p.object_id = oc.object_id
-                      and (p.grantee_id in :partyList or
-                            exists (select 1
-                                    from group_member_trans_map
-                                    where member_id in :partyList
-				    and p.grantee_id = group_id))
-                        and p.privilege in :privilegeList
-                   )
-              )
+	select 1 as permission_p 
+	  from dnm_object_1_granted_context dogc,
+	       dnm_granted_context dgc,
+	       dnm_permissions dp,
+	       dnm_group_membership dgm
+          where dogc.pd_context_id = dgc.pd_object_id
+	    and dgc.pd_context_id = dp.pd_object_id
+	    and dgm.pd_member_id = :partyID
+	    and dp.pd_grantee_id = dgm.pd_group_id
     } map {
-        objectID=oc.object_id;
+        hasPermission = permission_p;
     }
 }
 
-query GroupPermissionFilterQuery {
-    BigDecimal objectID;
-    do {
-        select oc.object_id
-        from object_context oc
-        where (exists
-                   (select 1
-                      from granted_context_non_leaf_map c,
-                           acs_permissions p
-                     where c.implied_context_id = p.object_id
-		       and context_id = c.object_id
-                       and exists (select 1
-                                   from group_subgroup_trans_map
-                                   where subgroup_id in :partyList
-				   and p.grantee_id = group_id)
-                        and p.privilege in :privilegeList
-                   )
-               or exists
-                   (select 1
-                      from acs_permissions p
-		      where oc.object_id = p.object_id
-                      and exists (select 1
-                                   from group_subgroup_trans_map
-                                   where subgroup_id in :partyList
-				   and p.grantee_id = group_id)
-                        and p.privilege in :privilegeList
-                   )
-              )
-    } map {
-        objectID=oc.object_id;
-    }
-}
 
-// Three cases for grantee:
-//  - User
-//  - Party
-//  - Site-wide admin
 
+// aram@kananov.com
+// It is very strange query
+// I just changed it to use new denormalization
+//
 query ObjectPermissionFilterQuery {
     BigDecimal granteeID;
     do {
-        select member_id as grantee_id
-          from party_member_trans_map m,
-               (select p.grantee_id
-                  from granted_context_non_leaf_map c,
-                       acs_permissions p,
-                       object_context oc
-                 where c.implied_context_id = p.object_id
-                   and oc.context_id = c.object_id
-                   and oc.object_id = :objectID
-                   and p.privilege in :privilegeList
-                 union all
-                select p.grantee_id
-                  from acs_permissions p
-                 where p.object_id = :objectID
-                   and p.privilege in :privilegeList) g
-         where m.party_id = g.grantee_id
-         union all
-        select grantee_id
-          from acs_permissions
-         where object_id = 0
-           and privilege in :privilegeList
+	select dgm.pd_member_id
+	  from dnm_object_1_granted_context dogc,
+	       dnm_granted_context dgc,
+	       dnm_permissions dp,
+	       dnm_group_membership dgm
+          where dogc.pd_object_id = :objectID
+            and dogc.pd_context_id = dgc.pd_object_id
+	    and dgc.pd_context_id = dp.pd_object_id
+	    and dp.pd_grantee_id = dgm.pd_group_id
     } map {
-        granteeID = p.grantee_id;
+        granteeID = dgm.pd_member_id;
     }
 }
 
-query CheckPermissionForUser {
+
+query PermissionCheckPlaceholder {
+    Boolean hasPermission;
+    do {
+	select 1 as permission_p from dual
+    } map {
+        hasPermission = permission_p;
+    }
+}
+
+
+query CheckPermissionForParty {
+    Boolean hasPermission;
+    do {
+	select 1 as permission_p 
+	  from dnm_object_1_granted_context dogc,
+	       dnm_granted_context dgc,
+	       dnm_permissions dp,
+	       dnm_group_membership dgm
+          where dogc.pd_object_id = :objectID
+	    and dogc.pd_context_id = dgc.pd_object_id
+	    and dgc.pd_context_id = dp.pd_object_id
+	    and dgm.pd_member_id = :partyID
+	    and dp.pd_grantee_id = dgm.pd_group_id
+    } map {
+        hasPermission = permission_p;
+    }
+}
+
+query CheckUninheritedPermissionForParty {
     Boolean hasPermission;
     do {
         select 1 as permission_p
-        from object_context
-        where object_id = :objectID
-          and (exists (
-                   select 1
-                     from granted_context_non_leaf_map c,
-                          acs_permissions p
-                    where c.implied_context_id = p.object_id
-		      and context_id = c.object_id
-                      and (  p.grantee_id in :partyList or
-                             exists
-                                (select 1
-                                   from group_member_trans_map
-                                  where member_id in :partyList
-				  and p.grantee_id = group_id)
-                          )
-                      and p.privilege in :privilegeList
-                  )
-               or exists (
-                    select 1
-                      from acs_permissions p
-		      where :objectID = p.object_id
-                      and (  p.grantee_id in :partyList or
-                              exists
-                                  (select 1
-                                     from group_member_trans_map
-                                    where member_id in :partyList
-				    and p.grantee_id = group_id)
-                           )
-                       and p.privilege in :privilegeList
-                  )
-              )
+            from  dnm_permissions dp,
+        	  dnm_group_membership dgm
+            where dp.pd_object_id = :objectID
+              and dp.pd_grantee_id = dgm.pd_group_id 
+              and dgm.pd_member_id = :partyID
     } map {
         hasPermission = permission_p;
     }
 }
 
-query CheckPermissionForGroup {
+query CheckDirectGrantWithImpliedPrivileges {
     Boolean hasPermission;
     do {
         select 1 as permission_p
-        from object_context
-        where object_id = :objectID
-          and (exists (
-                   select 1
-                     from granted_context_non_leaf_map c,
-                          acs_permissions p
-                    where c.implied_context_id = p.object_id
-		      and context_id = c.object_id
-                      and exists
-                                (select 1
-                                   from group_subgroup_trans_map
-                                  where subgroup_id in :partyList
-				   and p.grantee_id = group_id)
-                      and p.privilege in :privilegeList
-                  )
-               or exists (
-                    select 1
-                      from acs_permissions p
-                     where p.object_id = :objectID
-		     and exists
-                                  (select 1
-                                     from group_subgroup_trans_map
-                                    where subgroup_id in :partyList
-				     and p.grantee_id = group_id)
-                       and p.privilege in :privilegeList
-                  )
-              )
-    } map {
-        hasPermission = permission_p;
-    }
-}
-
-query CheckUninheritedPermissionForUser {
-    Boolean hasPermission;
-    do {
-        select 1 as permission_p from dual
-        where exists (
-            select 1
-            from  acs_permissions
-            where acs_permissions.object_id = :objectID
-              and (acs_permissions.grantee_id in :partyList
-                   or exists  (
-                          select 1
-                          from group_member_trans_map
-                          where member_id in :partyList
-			  and acs_permissions.grantee_id = group_id
-                   ))
-              and (acs_permissions.privilege in :privilegeList)
-        )
-    } map {
-        hasPermission = permission_p;
-    }
-}
-
-query CheckUninheritedPermissionForGroup {
-    Boolean hasPermission;
-    do {
-        select 1 as permission_p from dual
-        where exists (
-            select 1
-            from  acs_permissions
-            where acs_permissions.object_id = :objectID
-              and (exists (
-                          select 1
-                          from group_subgroup_trans_map
-                          where subgroup_id in :partyList
-			  and acs_permissions.grantee_id = group_id
-                   ))
-              and (acs_permissions.privilege in :privilegeList)
-        )
+          from dnm_permissions dp
+          where dp.pd_grantee_id = :partyID
+            and dp.pd_object_id = :objectID
     } map {
         hasPermission = permission_p;
     }
@@ -433,7 +306,7 @@ query CheckDirectGrant {
             from acs_permissions
             where acs_permissions.grantee_id = :partyID
               and acs_permissions.object_id = :objectID
-              and acs_permissions.privilege in :privileges
+              and acs_permissions.privilege = :privilege
         )
     } map {
         hasPermission = permission_p;
@@ -447,71 +320,43 @@ data operation RevokePartyPermissions {
     }
 }
 
-query PrivilegesForUser {
-    String privilege;
-    do {
-          select acs_permissions.privilege
-            from acs_permissions
-           where (acs_permissions.grantee_id = :partyID
-                  or exists (
-                          select 1
-                          from group_member_trans_map
-                          where member_id = :partyID
-			  and acs_permissions.grantee_id = group_id
-                  ))
-             and acs_permissions.object_id = :objectID
-          UNION
-          select acs_permissions.privilege
-            from acs_permissions,
-                 object_context oc,
-                 granted_trans_context_index map
-           where oc.object_id = :objectID
-             and oc.context_id = map.object_id
-             and map.implied_context_id = acs_permissions.object_id
-             and (acs_permissions.grantee_id = :partyID
-                   or exists (
-                          select 1
-                          from group_member_trans_map
-                          where member_id = :partyID
-			  and acs_permissions.grantee_id = group_id
-                  ))
-    } map {
-        privilege = acs_permissions.privilege;
-    }
+query PrivilegesForParty {
+  String privilege;
+  do {
+    select distinct ap.privilege
+      from acs_permissions ap,
+        dnm_object_1_granted_context dogc,
+        dnm_granted_context dgc,
+        dnm_group_membership dgm
+      where dogc.pd_object_id = :objectID
+        and dogc.pd_context_id = dgc.pd_object_id
+        and dgc.pd_context_id = ap.object_id
+        and ap.grantee_id = dgm.pd_group_id
+        and dgm.pd_member_id = :partyID
+  } map {
+        privilege = ap.privilege;
+  }
 }
 
-query PrivilegesForGroup {
-    String privilege;
-    do {
-          select acs_permissions.privilege
-            from acs_permissions
-           where exists (
-                          select 1
-                          from group_subgroup_trans_map
-                          where subgroup_id = :partyID
-			  and acs_permissions.grantee_id = group_id
-                 )
-             and acs_permissions.object_id = :objectID
-          UNION
-          select acs_permissions.privilege
-            from acs_permissions,
-                 object_context oc,
-                 granted_trans_context_index map
-           where oc.object_id = :objectID
-             and oc.context_id = map.object_id
-             and map.implied_context_id = acs_permissions.object_id
-             and exists (
-                          select 1
-                          from group_subgroup_trans_map
-                          where subgroup_id = :partyID
-			  and acs_permissions.grantee_id = group_id
-                 )
-    } map {
-        privilege = acs_permissions.privilege;
-    }
+query ImpliedPrivilegesForParty {
+  String privilege;
+  do {
+    select distinct dphm.pd_child_privilege
+      from acs_permissions ap,
+        dnm_object_1_granted_context dogc,
+        dnm_granted_context dgc,
+        dnm_group_membership dgm,
+        dnm_privilege_hierarchy_map dphm
+      where dogc.pd_object_id = :objectID
+        and dogc.pd_context_id = dgc.pd_object_id
+        and dgc.pd_context_id = ap.object_id
+        and ap.grantee_id = dgm.pd_group_id
+        and dgm.pd_member_id = :partyID
+        and ap.privilege = dphm.pd_privilege
+  } map {
+        privilege = dphm.pd_child_privilege;
+  }
 }
-
-
 
 
 //
@@ -521,6 +366,48 @@ object type Privilege {
     String privilege = acs_privileges.privilege VARCHAR(100);
 
     object key (privilege);
+}
+
+
+//
+// Privilege Column name map
+//
+query PrivilegeColumnNameMap {
+  String columnName;
+  do {
+    select dpcm.column_name 
+      from dnm_privilege_col_map dpcm
+      where dpcm.pd_privilege =:privilege
+  } map {
+     columnName = dpcm.column_name;
+  }
+}
+
+
+query ImpliedPrivilege {
+  String privilege;
+  do {
+    select dphm.pd_privilege
+      from dnm_privilege_hierarchy_map dphm
+      where dphm.pd_child_privilege =:childPrivilege
+  } map {
+     privilege = dpcm.pd_privilege;
+  }
+}
+
+
+//
+// Add child privilege
+//
+data operation addChildPrivilege {
+  do {
+    insert into acs_privilege_hierarchy (
+	privilege,
+	child_privilege
+    ) values (
+      :privilege, :childPrivilege
+    )
+  }
 }
 
 
@@ -646,9 +533,11 @@ query ObjectPermissionCollection {
                     p.grantee_id
              from
                   acs_permissions p,
-                  granted_trans_context_map map
-             where map.object_id = :objectID
-               and p.object_id = map.implied_context_id) acs_permissions,
+                  dnm_object_1_granted_context dogc,
+                  dnm_granted_context dgc
+             where dogc.pd_object_id = :objectID
+               and dogc.pd_context_id = dgc.pd_object_id
+               and p.object_id = dgc.pd_context_id) acs_permissions,
              (select groups.group_id as party_id,
                      0 as user_p,
                      groups.name as name,
@@ -681,9 +570,11 @@ query ObjectPermissionCollection {
                     p.grantee_id
              from
                   acs_permissions p,
-                  granted_trans_context_map map
-             where map.object_id = :objectID
-               and p.object_id = map.implied_context_id) acs_permissions,
+                  dnm_object_1_granted_context dogc,
+                  dnm_granted_context dgc
+             where dogc.pd_object_id = :objectID
+               and dogc.pd_context_id = dgc.pd_object_id
+               and p.object_id = dgc.pd_context_id) acs_permissions,
              (select users.user_id as party_id,
                      1 as user_p,
                      '' as name,

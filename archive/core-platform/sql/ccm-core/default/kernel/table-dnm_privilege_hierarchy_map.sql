@@ -11,9 +11,14 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/default/categorization/insert-acs_privileges.sql#3 $
+-- $Id: //core-platform/dev/sql/ccm-core/default/kernel/table-dnm_privilege_hierarchy_map.sql#1 $
 -- $DateTime: 2004/01/15 10:03:14 $
+-- autor: Aram Kananov <aram@kananov.com>
 
-insert into acs_privileges (privilege) values ('map_to_category');
-insert into acs_privilege_hierarchy (child_privilege, privilege)
-  values ('map_to_category', 'admin');
+create table dnm_privilege_hierarchy_map (
+  pd_privilege  varchar(100),
+  pd_child_privilege varchar(100),
+  constraint dnm_privileges_hier_map_pk 
+        primary key (pd_privilege, pd_child_privilege)
+);
+

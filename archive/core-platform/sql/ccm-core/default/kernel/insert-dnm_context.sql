@@ -11,16 +11,14 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/default/kernel/table-object_context_map.sql#1 $
--- $DateTime: 2003/10/23 15:28:18 $
+-- $Id: //core-platform/dev/sql/ccm-core/default/kernel/insert-dnm_context.sql#1 $
+-- $DateTime: 2004/01/15 10:03:14 $
+-- autor: Aram Kananov <aram@kananov.com>
 
-create table object_context_map (
-       object_id            integer not null
-                            constraint ocm_object_id_fk 
-                            references acs_objects (object_id)
-                            constraint ocm_object_id_pk primary key,
-       context_id           integer constraint ocm_context_id_fk
-                            references acs_objects(object_id)
-);
+insert into dnm_object_1_granted_context (pd_object_id, pd_context_id, pd_non_effective_context_id )
+  values (0,0,0);
 
--- XXX organization index;
+insert into dnm_object_grants values (0,1);
+
+insert into dnm_granted_context (pd_object_id, pd_context_id, pd_dummy_flag) values (0,0,1);
+

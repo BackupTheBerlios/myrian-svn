@@ -11,9 +11,11 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/default/categorization/insert-acs_privileges.sql#3 $
+-- $Id: //core-platform/dev/sql/ccm-core/default/kernel/index-dnm_object_1_granted_context.sql#1 $
 -- $DateTime: 2004/01/15 10:03:14 $
+-- autor: Aram Kananov <aram@kananov.com>
 
-insert into acs_privileges (privilege) values ('map_to_category');
-insert into acs_privilege_hierarchy (child_privilege, privilege)
-  values ('map_to_category', 'admin');
+create unique index dnm_o1gc_uk1 on dnm_object_1_granted_context (pd_object_id, pd_context_id);
+create index dnm_o1gc_uk on dnm_object_1_granted_context (pd_context_id);
+create index dnm_o1gc_nfci on dnm_object_1_granted_context (pd_non_effective_context_id);
+create unique index dnm_o1gc_necid_oid on dnm_object_1_granted_context (pd_non_effective_context_id, pd_object_id);

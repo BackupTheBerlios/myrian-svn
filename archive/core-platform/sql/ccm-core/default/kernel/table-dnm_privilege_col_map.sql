@@ -11,14 +11,15 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/default/kernel/view-ungranted_trans_context_map.sql#1 $
--- $DateTime: 2003/10/23 15:28:18 $
+-- $Id: //core-platform/dev/sql/ccm-core/default/kernel/table-dnm_privilege_col_map.sql#1 $
+-- $DateTime: 2004/01/15 10:03:14 $
+-- autor: Aram Kananov <aram@kananov.com>
 
-create view ungranted_trans_context_map
-as select o.object_id, map.implied_context_id, n_generations+1 as n_generations
-from object_context_map o, ungranted_context_non_leaf_map map
-where o.context_id = map.object_id
-UNION ALL
-select o.object_id, o.context_id, 1
-from object_context_map o left outer join object_grants g
-on o.object_id = g.object_id and g.object_id = null;
+create table dnm_privilege_col_map ( 
+    pd_privilege        varchar(100) 
+        constraint dnm_priv_col_map_priv_nn not null
+        constraint dnm_priv_col_map_pk primary key,
+    column_name varchar(100) 
+        constraint dnm_priv_col_map_cname_nn not null 
+        constraint dnm_priv_col_map_un unique
+);

@@ -11,12 +11,15 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/default/kernel/view-all_context_non_leaf_map.sql#1 $
--- $DateTime: 2003/10/23 15:28:18 $
+-- $Id: //core-platform/dev/sql/ccm-core/postgres/kernel/table-dnm_ungranted_context.sql#1 $
+-- $DateTime: 2004/01/15 10:03:14 $
+-- autor: Aram Kananov <aram@kananov.com>
 
-create view all_context_non_leaf_map
-as select object_id, implied_context_id, n_generations
-   from granted_context_non_leaf_map
-   UNION ALL
-   select object_id, implied_context_id, n_generations
-   from ungranted_context_non_leaf_map;
+create table dnm_ungranted_context (
+   granted_context_id integer not null,
+   object_id integer not null ,
+   ancestor_id integer not null,
+   n_generations integer not null
+      constraint dnm_ungranted_ctx_n_gen_chk check (n_generations >= 0),
+   constraint dnm_ungranted_context_pk primary key (ancestor_id, object_id)
+);

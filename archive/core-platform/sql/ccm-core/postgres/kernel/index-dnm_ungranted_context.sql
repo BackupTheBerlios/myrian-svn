@@ -11,14 +11,9 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/oracle-se/kernel/view-ungranted_trans_context_index.sql#1 $
--- $DateTime: 2003/10/23 15:28:18 $
+-- $Id: //core-platform/dev/sql/ccm-core/postgres/kernel/index-dnm_ungranted_context.sql#1 $
+-- $DateTime: 2004/01/15 10:03:14 $
+-- autor: Aram Kananov <aram@kananov.com>
 
-create view ungranted_trans_context_index
-as select o.object_id, map.implied_context_id, n_generations+1 as n_generations
-from object_context_map o, ungranted_context_non_leaf_map map
-where o.context_id = map.object_id
-UNION ALL
-select o.object_id, o.context_id, 1
-from object_context_map o, object_grants g
-where o.object_id = g.object_id(+) and g.object_id=null;
+create index dnm_ungranted_context_gctx_idx on dnm_ungranted_context(granted_context_id);
+create unique index dnm_ungranted_context_un on dnm_ungranted_context( object_id, ancestor_id);

@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/oracle-se-create.sql#1 $
--- $DateTime: 2003/10/23 15:28:18 $
+-- $Id: //core-platform/dev/sql/ccm-core/oracle-se-create.sql#2 $
+-- $DateTime: 2004/01/15 10:03:14 $
 
 @@ oracle-se/function-currentDate.sql
 
@@ -68,34 +68,55 @@
 @@ default/kernel/index-group_subgroup_map_grp_id_idx.sql
 
 @@ default/kernel/comment-acs_privileges.sql
-@@ default/kernel/insert-privileges.sql
+@@ default/kernel/table-acs_privilege_hierarchy.sql
+@@ default/kernel/index-acs_privilege_hierarchy.sql
+@@ default/kernel/comment-acs_privilege_hierarchy.sql
+
+@@ default/kernel/table-dnm_privileges.sql
+@@ default/kernel/comment-dnm_privileges.sql
+@@ default/kernel/table-dnm_privilege_col_map.sql
+@@ default/kernel/comment-dnm_privilege_col_map.sql
+@@ default/kernel/table-dnm_privilege_hierarchy_map.sql
+@@ default/kernel/table-dnm_privilege_hierarchy.sql
+@@ default/kernel/comment-dnm_privilege_hierarchy.sql
+
+@@ oracle-se/kernel/package-dnm_privileges.sql
+@@ oracle-se/kernel/triggers-dnm_privileges.sql
+@@ default/kernel/table-dnm_permissions.sql
+@@ default/kernel/comment-dnm_permissions.sql
+@@ default/kernel/index-dnm_permissions.sql
+
 @@ default/kernel/comment-acs_permissions.sql
+
+@@ default/kernel/insert-privileges.sql
 
 @@ default/kernel/comment-object_context.sql
 @@ default/kernel/insert-object_zero.sql
 
-@@ default/kernel/table-granted_context_non_leaf_map.sql
-@@ default/kernel/index-granted_context_non_leaf_map.sql
-@@ default/kernel/table-ungranted_context_non_leaf_map.sql
-@@ default/kernel/index-ungranted_context_non_leaf_map.sql
-@@ default/kernel/table-object_grants.sql
-@@ default/kernel/table-context_child_counts.sql
-@@ default/kernel/table-object_context_map.sql
-@@ default/kernel/index-object_context_map.sql
-@@ default/kernel/view-all_context_non_leaf_map.sql
+@@ default/kernel/table-dnm_object_1_granted_context.sql
+@@ default/kernel/table-dnm_object_grants.sql
+@@ default/kernel/table-dnm_granted_context.sql
 
-@@ default/kernel/package-permission_denormalization.sql
-@@ default/kernel/trigger-acs_permissions.sql
+@@ default/kernel/index-dnm_object_1_granted_context.sql
+@@ default/kernel/index-dnm_granted_context.sql
+
+@@ oracle-se/kernel/package-dnm_context.sql
+@@ default/kernel/insert-dnm_context.sql
+@@ oracle-se/kernel/triggers-dnm_context.sql
+
+@@ default/kernel/table-dnm_group_membership.sql
+@@ default/kernel/index-dnm_group_membership.sql
+@@ default/kernel/table-dnm_party_grants.sql
+
+@@ oracle-se/kernel/package-dnm_parties.sql
+@@ default/kernel/insert-dnm_group_membership.sql
+@@ oracle-se/kernel/triggers-dnm_parties.sql
+
 @@ default/kernel/index-acs_permissions.sql
 
 @@ default/kernel/insert-users.sql
 @@ default/kernel/insert-groups.sql
 @@ default/kernel/insert-permissions.sql
-@@ default/kernel/view-granted_trans_context_index.sql
-@@ default/kernel/view-granted_trans_context_map.sql
-@@ oracle-se/kernel/view-ungranted_trans_context_index.sql
-@@ oracle-se/kernel/view-ungranted_trans_context_map.sql
-@@ default/kernel/view-object_context_trans_map.sql
 
 @@ default/kernel/index-site_nodes.sql
 @@ default/kernel/index-apm_packages.sql

@@ -11,9 +11,9 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/default/categorization/insert-acs_privileges.sql#3 $
+-- $Id: //core-platform/dev/sql/ccm-core/default/kernel/index-dnm_group_membership.sql#1 $
 -- $DateTime: 2004/01/15 10:03:14 $
+-- autor: Aram Kananov <aram@kananov.com>
 
-insert into acs_privileges (privilege) values ('map_to_category');
-insert into acs_privilege_hierarchy (child_privilege, privilege)
-  values ('map_to_category', 'admin');
+-- query to speed up reverse lookup. i.e by pd_member_id
+create unique index dnm_group_membership_mem_idx on dnm_group_membership (pd_member_id, pd_group_id);

@@ -11,9 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/default/categorization/insert-acs_privileges.sql#3 $
+-- $Id: //core-platform/dev/sql/ccm-core/default/kernel/index-dnm_permissions.sql#1 $
 -- $DateTime: 2004/01/15 10:03:14 $
+-- autor: Aram Kananov <aram@kananov.com>
 
-insert into acs_privileges (privilege) values ('map_to_category');
-insert into acs_privilege_hierarchy (child_privilege, privilege)
-  values ('map_to_category', 'admin');
+create index dnm_permissions_grid_idx on dnm_permissions(pd_grantee_id);

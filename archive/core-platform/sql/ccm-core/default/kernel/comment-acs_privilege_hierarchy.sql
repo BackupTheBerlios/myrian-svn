@@ -11,9 +11,16 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/default/categorization/insert-acs_privileges.sql#3 $
+-- $Id: //core-platform/dev/sql/ccm-core/default/kernel/comment-acs_privilege_hierarchy.sql#1 $
 -- $DateTime: 2004/01/15 10:03:14 $
+-- autor: Aram Kananov <aram@kananov.com>
 
-insert into acs_privileges (privilege) values ('map_to_category');
-insert into acs_privilege_hierarchy (child_privilege, privilege)
-  values ('map_to_category', 'admin');
+comment on TABLE ACS_PRIVILEGE_HIERARCHY is '
+  To reduce number of permission records, and to simplify permission
+queries and associated business logic in Java layer, this table stores
+privilege hierarchy.  This hierarchy allows child nodes to have multiple
+parents, and parents to have multiple children.
+  This table stores only direct (parent,child) mappings, which is often
+referred as adjacency model, resulting in small table.  
+';
+

@@ -11,9 +11,15 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/default/categorization/insert-acs_privileges.sql#3 $
+-- $Id: //core-platform/dev/sql/ccm-core/default/kernel/table-dnm_object_1_granted_context.sql#1 $
 -- $DateTime: 2004/01/15 10:03:14 $
+-- autor: Aram Kananov <aram@kananov.com>
 
-insert into acs_privileges (privilege) values ('map_to_category');
-insert into acs_privilege_hierarchy (child_privilege, privilege)
-  values ('map_to_category', 'admin');
+
+create table dnm_object_1_granted_context (
+   pd_object_id integer not null,
+   constraint dnm_o1gc_obj_pk primary key (pd_object_id),
+   pd_context_id integer not null ,
+   pd_non_effective_context_id integer not null
+)
+;

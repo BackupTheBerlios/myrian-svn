@@ -11,13 +11,10 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/default/kernel/view-granted_trans_context_map.sql#1 $
--- $DateTime: 2003/10/23 15:28:18 $
+-- $Id: //core-platform/dev/sql/ccm-core/default/kernel/comment-dnm_permissions.sql#1 $
+-- $DateTime: 2004/01/15 10:03:14 $
+-- autor: Aram Kananov <aram@kananov.com>
 
-create view granted_trans_context_map
-as select o.object_id, map.implied_context_id, n_generations+1 as n_generations
-from object_context_map o, granted_context_non_leaf_map map
-where o.context_id = map.object_id
-UNION ALL
-select object_id, object_id, 0
-from object_grants;
+comment on table dnm_permissions is ' The dnm_permissions contains one row 
+per unique object_id, grantee_id pair, plus horisontaly denormalized privileges
+';

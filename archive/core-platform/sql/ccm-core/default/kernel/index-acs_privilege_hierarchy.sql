@@ -11,8 +11,9 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/default/kernel/index-granted_context_non_leaf_map.sql#1 $
--- $DateTime: 2003/10/23 15:28:18 $
+-- $Id: //core-platform/dev/sql/ccm-core/default/kernel/index-acs_privilege_hierarchy.sql#1 $
+-- $DateTime: 2004/01/15 10:03:14 $
+-- autor: Aram Kananov <aram@kananov.com>
 
-create unique index gcnlm_context_obj_idx
-    on granted_context_non_leaf_map (implied_context_id, object_id);
+create index acs_priv_hier_child_priv_idx 
+    on acs_privilege_hierarchy (child_privilege);
