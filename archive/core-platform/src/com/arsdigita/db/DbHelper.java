@@ -83,6 +83,38 @@ public class DbHelper {
         }
     }
 
+    private static final String[] DB_SUFFIXES = { "ora", "pg" };
+
+    /**
+     * Gets the filename suffix used to distinguish between resource files
+     * based on database.
+     **/
+
+    public static String getDatabaseSuffix() {
+        return getDatabaseSuffix(s_database);
+    }
+
+    /**
+     * Gets the filename suffix used to distinguish between resource files
+     * based on database.
+     **/
+
+    public static String getDatabaseSuffix(int database) {
+        switch (database) {
+        case DB_ORACLE:
+            return DB_SUFFIXES[0];
+        case DB_POSTGRES:
+            return DB_SUFFIXES[1];
+        default:
+            return null;
+        }
+    }
+
+    public static String[] getDatabaseSuffixes() {
+        return DB_SUFFIXES;
+    }
+
+
     /**
      * Parses the JDBC url to determine the database
      * type, will return DB_DEFAULT if no supported

@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
  * the SessionManager of them.
  *
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #7 $ $Date: 2002/08/22 $
+ * @version $Revision: #8 $ $Date: 2002/09/30 $
  **/
 
 public class Initializer
@@ -157,13 +157,7 @@ public class Initializer
         }
 
         //SessionManager.setSessionFactory();
-        // Load the default pdl files
-        String defaultDir = DbHelper.getDatabaseDirectory(DbHelper.DB_DEFAULT);
-        PDL.loadPDLFiles(new File(pdlDir + "/" + defaultDir));
-
-        // NOw the database specific ones
-        String databaseDir = DbHelper.getDatabaseDirectory(database);
-        PDL.loadPDLFiles(new File(pdlDir + "/" + databaseDir));
+        PDL.loadPDLFiles(new File(pdlDir));
 
         // Finally the files out of the database
         try {

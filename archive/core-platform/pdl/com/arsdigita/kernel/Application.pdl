@@ -1,0 +1,171 @@
+//
+// Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+//
+// The contents of this file are subject to the ArsDigita Public 
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.arsdigita.com/ADPL.txt
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+
+model com.arsdigita.kernel;
+
+import com.arsdigita.kernel.permissions.Privilege;
+import com.arsdigita.portal.Portlet;
+
+// @author Justin Ross (justin@arsdigita.com)
+// @version $Id: //core-platform/dev/pdl/com/arsdigita/kernel/Application.pdl#1 $
+
+object type ApplicationType {
+    BigDecimal id = application_types.application_type_id INTEGER;
+    String objectType = application_types.object_type VARCHAR(100);
+    String defaultDomainClass = 
+        application_types.default_domain_class VARCHAR(100);
+    String title = application_types.title VARCHAR(200);
+    String description = application_types.description VARCHAR(4000);
+    Boolean isWorkspaceApplication = 
+        application_types.workspace_application_p BIT;
+    Boolean hasFullPageView = application_types.has_full_page_view_p BIT;
+    Boolean hasEmbeddedView = application_types.has_embedded_view_p BIT;
+    Boolean isSingleton = application_types.singleton_p BIT;
+    String profile = application_types.profile VARCHAR(20);
+
+    Privilege[0..n] relevantPrivileges =
+        join application_types.application_type_id 
+          to application_type_privilege_map.application_type_id,
+        join application_type_privilege_map.privilege
+          to acs_privileges.privilege;
+
+    object key (id);
+}
+
+association {
+    ApplicationType[0..1] providerApplicationType =
+        join application_types.provider_id 
+            to application_types.application_type_id;
+    ApplicationType[0..n] dependentApplicationType =
+        join application_types.application_type_id
+            to application_types.provider_id;
+}
+
+association {
+    PackageType[1..1] packageType =
+        join application_types.package_type_id 
+            to apm_package_types.package_type_id;
+    ApplicationType[0..n] applicationType =
+        join apm_package_types.package_type_id
+            to application_types.package_type_id;
+}
+
+
+
+
+object type Application extends ACSObject {
+    String title = applications.title VARCHAR(200);
+    String description = applications.description VARCHAR(4000);
+    String primaryURL = applications.primary_url VARCHAR(4000);
+    Integer cellNumber = applications.cell_number INTEGER;
+    Integer sortKey = applications.sort_key INTEGER;
+    Date[1..1] timestamp = applications.timestamp TIMESTAMP;
+
+    ApplicationType[1..1] applicationType =
+        join applications.application_type_id 
+            to application_types.application_type_id;
+
+    Application[0..n] childApplication = 
+        join applications.application_id to applications.parent_application_id;
+
+    Application[0..1] parentApplication = 
+        join applications.parent_application_id to applications.application_id;
+
+    reference key (applications.application_id);
+
+    aggressive load 
+        (applicationType.id, 
+         applicationType.isWorkspaceApplication,
+         applicationType.hasFullPageView,
+         applicationType.hasEmbeddedView,
+         applicationType.isSingleton,
+         applicationType.profile,
+         applicationType.title,
+         parentApplication.id,
+         parentApplication.objectType,
+         parentApplication.defaultDomainClass,
+         parentApplication.title,
+         parentApplication.primaryURL);
+}
+
+// XXX: If I try to use this two-way association instead of the inline ones
+// defined above, I get runtime errors complaining that 
+// applicationType.isWorkspaceApplication is not mapped.
+//
+// association {
+//     ApplicationType[1..1] applicationType =
+//         join applications.application_type_id 
+//             to application_types.application_type_id;
+//     Application[0..n] application = 
+//         join application_types.application_type_id
+//             to applications.application_type_id;
+// }
+
+association {
+    PackageInstance[1..1] packageInstance =
+        join applications.package_id to apm_packages.package_id;
+    Application[0..1] application = 
+        join apm_packages.package_id to applications.package_id;
+}
+
+// XXX: Same problem as above.
+//
+// association {
+//     Application[0..1] parentApplication = 
+//         join applications.parent_application_id to applications.application_id;
+//     Application[0..n] childApplication = 
+//         join applications.application_id to applications.parent_application_id;
+// }
+
+query applicationForSiteNodeID {
+    Application application;
+
+    do {
+        select
+          acs_objects.object_id,
+          acs_objects.object_type,
+          acs_objects.display_name,
+          acs_objects.default_domain_class,
+          applications.parent_application_id,
+          applications.package_id,
+          applications.title,
+          applications.description,
+          applications.primary_url,
+          applications.cell_number,
+          applications.sort_key
+        from
+          site_nodes,
+          apm_packages,
+          applications,
+          acs_objects
+        where
+          site_nodes.node_id = :siteNodeID
+          -- joins
+          and site_nodes.object_id = apm_packages.package_id
+          and apm_packages.package_id = applications.package_id
+          and applications.application_id = acs_objects.object_id
+    } map {
+        application.id = acs_objects.object_id;
+        application.objectType = acs_objects.object_type;
+        application.displayName = acs_objects.display_name;
+        application.defaultDomainClass = acs_objects.default_domain_class;
+        application.parentApplication.id = applications.parent_application_id;
+        application.packageInstance.id = applications.package_id;
+        application.title = applications.title;
+        application.description = applications.description;
+        application.primaryURL = applications.primary_url;
+        application.cellNumber = applications.cell_number;
+        application.sortKey = applications.sort_key;
+    }
+}

@@ -62,12 +62,12 @@ import org.apache.log4j.Priority;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #13 $ $Date: 2002/08/27 $
+ * @version $Revision: #14 $ $Date: 2002/09/30 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#13 $ by $Author: rhs $, $DateTime: 2002/08/27 17:17:22 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#14 $ by $Author: rhs $, $DateTime: 2002/09/30 19:27:24 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
 
@@ -180,7 +180,7 @@ public class PDL {
             ));
         CMD.addSwitch(new StringSwitch("-dot", "undocumented", null));
         CMD.addSwitch(new StringSwitch("-database", "target database", null));
-        CMD.addSwitch(new StringSwitch("-sqldir", "sql directory", null));
+        CMD.addSwitch(new FileSwitch("-sqldir", "sql directory", null));
         CMD.addSwitch(new BooleanSwitch("-debug", "sets logging to DEBUG",
                                         Boolean.FALSE));
         CMD.addSwitch(new BooleanSwitch("-verbose", "sets logging to INFO",
@@ -223,10 +223,8 @@ public class PDL {
             DbHelper.getDatabaseDirectory(DbHelper.getDatabase());
 
 
-        List library = findPDLFiles((File[]) options.get("-library-path"),
-                                    defaultDir, databaseDir);
-        List files = findPDLFiles((File[]) options.get("-path"),
-                                  defaultDir, databaseDir);
+        List library = findPDLFiles((File[]) options.get("-library-path"));
+        List files = findPDLFiles((File[]) options.get("-path"));
         files.addAll(Arrays.asList(args));
 
         if (files.size() < 1) {
@@ -252,9 +250,10 @@ public class PDL {
         String ddlDir = (String) options.get("-generate-ddl");
         if (ddlDir != null) {
             Set sqlFiles = new HashSet();
-            String sqldir = (String)options.get("-sqldir");
-            findSQLFiles(new File(sqldir + "/" + defaultDir), sqlFiles);
-            findSQLFiles(new File(sqldir + "/" + databaseDir), sqlFiles);
+            File sqldir = (File) options.get("-sqldir");
+            if (sqldir != null) {
+                findSQLFiles(sqldir, sqlFiles);
+            }
 
             DDLWriter writer = new DDLWriter(ddlDir, sqlFiles);
 
@@ -352,17 +351,12 @@ public class PDL {
      * Finds all the PDL files in a given path.
      **/
 
-    public static List findPDLFiles(File[] path,
-                                    String defaultDir,
-                                    String databaseDir) {
+    public static List findPDLFiles(File[] path) {
         List result = new ArrayList();
 
         for (int i = 0; i < path.length; i++) {
-            s_log.debug("Loading default PDL files from " + defaultDir);
-            findPDLFiles(new File(path[i], defaultDir), result);
-
-            s_log.debug("Loading database PDL files from " + databaseDir);
-            findPDLFiles(new File(path[i], databaseDir), result);
+            s_log.debug("Loading default PDL files from " + path[i]);
+            findPDLFiles(path[i], result);
         }
 
         return result;
@@ -373,45 +367,74 @@ public class PDL {
      */
     public static List findPDLFiles(File dir) {
         List files = new ArrayList();
-        findFiles(dir, files, ".pdl", false);
+        findFiles(dir, files, "pdl", false);
         return files;
     }
 
     /**
      * Searches a directory for all PDL files
      */
-    public static void findPDLFiles(File base,
-                                    Collection files) {
-        findFiles(base, files, ".pdl", false);
+    public static void findPDLFiles(File base, Collection files) {
+        findFiles(base, files, "pdl", false);
     }
 
-    public static void findSQLFiles(File base,
-                                    Collection files) {
-        findFiles(base, files, ".sql", true);
+    public static void findSQLFiles(File base, Collection files) {
+        findFiles(base, files, "sql", true);
     }
 
-    public static void findFiles(File base,
-                                 Collection files,
-                                 final String extension,
-                                 boolean trimPath) {
+    private static final Set SUFFIXES = new HashSet();
+
+    static {
+        String[] sfxs = DbHelper.getDatabaseSuffixes();
+        for (int i = 0; i < sfxs.length; i++) {
+            SUFFIXES.add(sfxs[i]);
+        }
+    }
+
+    private static void findFiles(File base, Collection files,
+                                  final String extension,
+                                  boolean trimPath) {
         if (!base.exists()) {
-            s_log.warn("Skipping directory " + base + " since it doesn't exist");
+            s_log.warn("Skipping directory " + base +
+                       " since it doesn't exist");
             return;
         }
 
-        Assert.assertTrue(base.isDirectory(), "directory " + base + " is directory");
+        Assert.assertTrue(base.isDirectory(), "directory " + base +
+                          " is directory");
 
+        final String suffix = DbHelper.getDatabaseSuffix();
         Stack dirs = new Stack();
         dirs.push(base);
+        Set toAdd = new HashSet();
 
         while (dirs.size() > 0) {
             File dir = (File) dirs.pop();
             File[] listing = dir.listFiles(new FileFilter() {
                     public boolean accept(File file) {
-                        return file.isDirectory() ||
-                            file.getName().endsWith(extension);
+                        if (file.isDirectory()) {
+                            return true;
+                        }
+
+                        String name = file.getName();
+                        String base = base(name);
+                        String sfx = suffix(name);
+                        String ext = extension(name);
+
+                        if (ext != null && ext.equals(extension)) {
+                            if (sfx != null) {
+                                return sfx.equals(suffix);
+                            } else {
+                                return true;
+                            }
+                        }
+
+                        return false;
                     }
                 });
+
+            toAdd.clear();
+
             for (int i = 0; i < listing.length; i++) {
                 if (listing[i].isDirectory()) {
                     if (s_log.isDebugEnabled()) {
@@ -426,18 +449,75 @@ public class PDL {
                             if (index != -1) {
                                 path = path.substring(index + 1);
                             }
+                            path = base(path) + "." + extension;
                         }
-                        if (s_log.isDebugEnabled()) {
-                            s_log.debug("Found file " + path);
-                        }
-                        files.add(path);
+
+                        toAdd.add(path);
                     } catch (IOException e) {
-                        throw new UncheckedWrapperException(
-                                                            "cannot get file path", e
-                                                            );
+                        throw new UncheckedWrapperException
+                            ("cannot get file path", e);
                     }
                 }
             }
+
+            if (suffix != null) {
+                for (Iterator it = toAdd.iterator(); it.hasNext(); ) {
+                    String path = (String) it.next();
+                    String shadow = base(path) + "." + suffix + "." +
+                        extension;
+                    if (!path.equals(shadow) && toAdd.contains(shadow)) {
+                        if (s_log.isDebugEnabled()) {
+                            s_log.debug(
+                                "Ignoring " + path +
+                                " because it is shadowed by  " + shadow
+                                );
+                        }
+                        it.remove();
+                    } else if (s_log.isDebugEnabled()) {
+                        s_log.debug("Found file " + path);
+                    }
+                }
+            }
+
+            files.addAll(toAdd);
+        }
+    }
+
+    private static final String base(String path) {
+        String suffix = suffix(path);
+        if (suffix == null) {
+            return basename(path);
+        } else {
+            return basename(basename(path));
+        }
+    }
+
+    private static final String suffix(String path) {
+        String result = extension(basename(path));
+        if (SUFFIXES.contains(result)) {
+            return result;
+        } else {
+            return null;
+        }
+    }
+
+    private static final String extension(String path) {
+        if (path == null) { return null; }
+
+        int idx = path.lastIndexOf('.');
+        if (idx > -1) {
+            return path.substring(idx + 1);
+        } else {
+            return null;
+        }
+    }
+
+    private static final String basename(String path) {
+        int idx = path.lastIndexOf('.');
+        if (idx > -1) {
+            return path.substring(0, idx);
+        } else {
+            return path;
         }
     }
 
