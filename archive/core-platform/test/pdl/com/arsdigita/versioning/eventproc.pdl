@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/test/pdl/com/arsdigita/versioning/eventproc.pdl#2 $ 
-// $DateTime: 2003/06/17 19:14:34 $
+// $Id: //core-platform/dev/test/pdl/com/arsdigita/versioning/eventproc.pdl#3 $ 
+// $DateTime: 2003/08/01 11:29:04 $
 
 model versioning.events;
 
@@ -122,10 +122,26 @@ versioned object type VT4 {
     object key(id);
 }
 
+
+versioned object type VT5 {
+    BigInteger[1..1] id = te_vt5.id INTEGER;
+    String[0..1] name = te_vt5.name VARCHAR;
+    UT2[0..n] ut2s = join te_vt5.id to te_ut2.vt5_id;
+
+    object key(id);
+}
+
 object type UT1 {
     BigInteger[1..1] id = te_ut1.id;
 
     String[0..1] name   = te_ut1.name VARCHAR;
+
+    object key(id);
+}
+
+object type UT2 {
+    BigInteger[1..1] id = te_ut2.id INTEGER;
+    String[0..1] name = te_ut2.name VARCHAR;
 
     object key(id);
 }
