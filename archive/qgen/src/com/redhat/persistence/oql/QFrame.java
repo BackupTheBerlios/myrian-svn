@@ -10,12 +10,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #23 $ $Date: 2004/03/21 $
+ * @version $Revision: #24 $ $Date: 2004/03/22 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#23 $ by $Author: rhs $, $DateTime: 2004/03/21 00:40:57 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#24 $ by $Author: richardl $, $DateTime: 2004/03/22 14:14:33 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
