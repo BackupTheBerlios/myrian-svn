@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/x/versioning/insert-vcx_java_classes.sql#1 $
--- $DateTime: 2003/05/12 18:19:45 $
+-- $Id: //core-platform/dev/sql/default/x/versioning/insert-vcx_java_classes.sql#2 $
+-- $DateTime: 2003/05/29 16:47:41 $
 
 -- NOTE: this needs to be kept in sync with
 -- com.arsdigita.x.versioning.serialization.Types
@@ -61,4 +61,7 @@ values (13, 'java.lang.Short');
 
 insert into vcx_java_classes (id, name) 
 values (14, 'java.lang.String');
+
+insert into vcx_java_classes (id, name) 
+values (15, 'java.sql.Timestamp');
 
