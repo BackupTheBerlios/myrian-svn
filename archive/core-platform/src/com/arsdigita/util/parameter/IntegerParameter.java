@@ -8,13 +8,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/IntegerParameter.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/IntegerParameter.java#2 $
  */
-public class IntegerParameter extends StringParameter {
+public class IntegerParameter extends AbstractParameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/IntegerParameter.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/IntegerParameter.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/09 14:53:22 $";
+        "$DateTime: 2003/09/26 15:31:04 $";
 
     static {
         Converters.set(Integer.class, new IntegerConverter());

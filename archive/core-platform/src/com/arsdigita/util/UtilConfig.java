@@ -18,32 +18,36 @@ package com.arsdigita.util;
 import com.arsdigita.logging.*;
 import com.arsdigita.util.config.*;
 import com.arsdigita.util.parameter.*;
+import java.io.*;
+import java.util.*;
 import org.apache.log4j.Logger;
 
 /**
  * @author Justin Ross
  * @see com.arsdigita.util.Util
  */
-final class UtilConfig extends BaseConfig {
+final class UtilConfig extends ParameterRecord {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/UtilConfig.java#4 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/UtilConfig.java#5 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/09 14:53:22 $";
+        "$DateTime: 2003/09/26 15:31:04 $";
 
     private static final Logger s_log = Logger.getLogger(UtilConfig.class);
 
-    private final String m_dir;
+    private final Parameter m_dir;
 
     UtilConfig() {
-        super("/util.properties");
+        super("util");
 
-        final StringParameter dir = new StringParameter
+        // XXX need conf URL support here
+        m_dir = new StringParameter
             ("waf.util.logging.error_report_dir", Parameter.OPTIONAL, null);
-        m_dir = (String) initialize(dir);
 
-        if (m_dir != null) {
-            ErrorReport.initializeAppender(m_dir);
-        }
+        register(m_dir);
+    }
+
+    final String getErrorReportDirectory() {
+        return (String) get(m_dir);
     }
 
     final void setAssertEnabled(final boolean isEnabled) {

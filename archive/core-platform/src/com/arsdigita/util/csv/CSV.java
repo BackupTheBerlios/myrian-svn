@@ -25,33 +25,30 @@ import javax.mail.internet.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/csv/CSV.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/csv/CSV.java#2 $
  */
 public final class CSV {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/csv/CSV.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/csv/CSV.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/09 14:53:22 $";
+        "$DateTime: 2003/09/26 15:31:04 $";
 
-    public static final Object[][] read(final Reader reader,
+    public static final Object[][] load(final Reader reader,
                                         final Parameter[] params) {
-        final CSVParameterStore store = new CSVParameterStore
+        final CSVParameterLoader loader = new CSVParameterLoader
             (reader, params);
 
         final ArrayList rows = new ArrayList();
         Object[] row;
         ParameterValue value;
 
-        while (store.next()) {
+        while (loader.next()) {
             row = new Object[params.length];
 
             for (int i = 0; i < params.length; i++) {
-                value = params[i].unmarshal(store);
+                value = loader.load(params[i]);
 
-                if (!value.getErrors().isEmpty()) {
-                    throw new IllegalArgumentException
-                        (value.getErrors().toString());
-                }
+                params[i].check(value);
 
 //                 params[i].validate(value);
 //
@@ -60,7 +57,7 @@ public final class CSV {
 //                         (value.getErrors().toString());
 //                 }
 
-                row[i] = value.getValue();
+                row[i] = value.getObject();
             }
 
             rows.add(row);
@@ -81,7 +78,7 @@ public final class CSV {
             new EmailParameter("email")
         };
 
-        final Object[][] rows = CSV.read(new StringReader(csv), params);
+        final Object[][] rows = CSV.load(new StringReader(csv), params);
         Object[] row;
 
         for (int i = 0; i < rows.length; i++) {

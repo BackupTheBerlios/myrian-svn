@@ -15,35 +15,25 @@
 
 package com.arsdigita.util.parameter;
 
-import com.arsdigita.util.*;
-import java.net.*;
 import java.util.*;
-import org.apache.commons.beanutils.converters.*;
-import org.apache.oro.text.perl.Perl5Util;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/BooleanParameter.java#2 $
+ * @version $Revision: #1 $ $Date: 2003/09/26 $
  */
-public class BooleanParameter extends AbstractParameter {
+public interface ParameterInfo {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/BooleanParameter.java#2 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterInfo.java#1 $" +
         "$Author: justin $" +
         "$DateTime: 2003/09/26 15:31:04 $";
 
-    static {
-        Converters.set(Boolean.class, new BooleanConverter());
-    }
+    String getTitle();
 
-    public BooleanParameter(final String name) {
-        super(name, Boolean.class);
-    }
+    String getPurpose();
 
-    public BooleanParameter(final String name,
-                            final int multiplicity,
-                            final Object defaalt) {
-        super(name, multiplicity, defaalt, Boolean.class);
-    }
+    String getExample();
+
+    String getFormat();
 }

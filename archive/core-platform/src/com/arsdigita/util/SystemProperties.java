@@ -13,9 +13,9 @@
  *
  */
 
-package com.arsdigita.util.config;
+package com.arsdigita.util;
 
-import com.arsdigita.util.*;
+import com.arsdigita.util.config.*;
 import com.arsdigita.util.parameter.*;
 import java.io.*;
 import java.util.*;
@@ -24,19 +24,22 @@ import org.apache.log4j.Logger;
 /**
  * Subject to change.
  *
+ * Static utility methods for handling Java system properties.
+ *
+ * @see java.lang.System
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/config/SystemProperties.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/SystemProperties.java#1 $
  */
 public final class SystemProperties {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/config/SystemProperties.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/SystemProperties.java#1 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/09 14:53:22 $";
+        "$DateTime: 2003/09/26 15:31:04 $";
 
     private static final Logger s_log = Logger.getLogger
         (SystemProperties.class);
 
-    private static final ParameterStore s_store = new JavaPropertyStore
+    private static final ParameterLoader s_loader = new JavaPropertyLoader
         (System.getProperties());
 
     /**
@@ -44,25 +47,38 @@ public final class SystemProperties {
      * value of a Java system property.
      *
      * @param param The <code>Parameter</code> representing the type
-     * and name of the field you wish to recover
+     * and name of the field you wish to recover; it cannot be null
      * @return A value that may be cast to the type enforced by the
-     * parameter
+     * parameter; it can be null
      */
     public static final Object get(final Parameter param) {
-        final ParameterValue value = param.unmarshal(s_store);
-
-        if (!value.getErrors().isEmpty()) {
-            throw new ConfigurationError
-                ("Parameter " + param.getName() + ": " + value.getErrors());
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Getting the value of " + param + " from " +
+                        "the system properties");
         }
 
-        param.validate(value);
+        Assert.exists(param, Parameter.class);
 
-        if (!value.getErrors().isEmpty()) {
-            throw new ConfigurationError
-                ("Parameter " + param.getName() + ": " + value.getErrors());
+        final ParameterValue value = s_loader.load(param);
+
+        if (value == null) {
+            final ParameterValue dephault = new ParameterValue();
+
+            dephault.setObject(param.getDefaultValue());
+
+            param.validate(dephault);
+
+            param.check(dephault);
+
+            return dephault.getObject();
+        } else {
+            param.check(value);
+
+            param.validate(value);
+
+            param.check(value);
+
+            return value.getObject();
         }
-
-        return value.getValue();
     }
 }
