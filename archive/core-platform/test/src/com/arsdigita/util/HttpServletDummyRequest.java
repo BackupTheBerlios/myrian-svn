@@ -34,11 +34,11 @@ import javax.servlet.*;
 */
 
 public class HttpServletDummyRequest implements HttpServletRequest {
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyRequest.java#5 $ by $Author: jorris $, $DateTime: 2002/08/26 01:17:47 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyRequest.java#6 $ by $Author: jorris $, $DateTime: 2002/08/26 18:26:50 $";
 
     private HashMap parameters;
     private HashMap attributes;
-    private String m_url;
+    private String m_url = "/";
     private String m_queryString;
     private HttpSession m_session;
     private boolean m_isSecure;
