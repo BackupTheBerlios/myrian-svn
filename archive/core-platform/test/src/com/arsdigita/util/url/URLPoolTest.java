@@ -30,12 +30,13 @@ public class URLPoolTest extends TestCase {
     URLPool m_pool = new URLPool();
 
     public void testFetchURL() throws Exception {
-        File cwd = new File("");
-        String url = "file://" + cwd.getAbsolutePath() + "/build.xml";
-        String data = m_pool.fetchURL(url);
 
-        String buildxml = readFile("./build.xml");
-        assertEquals("File not loaded by Pool!",  buildxml, data);
+        final String file = System.getProperty("test.initscript");
+        final String url = "file://" + file;
+        final String urlData = m_pool.fetchURL(url);
+
+        String fileData = readFile(file);
+        assertEquals("File not loaded by Pool!",  fileData, urlData);
 
         try {
             m_pool.fetchURL(null);
