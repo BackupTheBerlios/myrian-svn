@@ -13,12 +13,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/02/13 $
+ * @version $Revision: #13 $ $Date: 2003/02/13 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#12 $ by $Author: rhs $, $DateTime: 2003/02/13 11:20:06 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#13 $ by $Author: ashah $, $DateTime: 2003/02/13 15:47:05 $";
 
 
     private static class Generic {
@@ -49,27 +49,33 @@ public class ProtoTest extends TestCase {
     public void test() throws Exception {
         PDL.main(new String[] {"test/pdl/Test.pdl"});
 
-        ObjectType TEST = Root.getRoot().getObjectType("test.Icle");
+        ObjectType TEST = Root.getRoot().getObjectType("test.Test");
+        ObjectType ICLE = Root.getRoot().getObjectType("test.Icle");
+        ObjectType COMPONENT = Root.getRoot().getObjectType("test.Component");
 
-        Adapter.addAdapter(Generic.class, TEST, new Adapter() {
-                public Object getObject(ObjectType type,
-                                        PropertyMap properties) {
-                    return new Generic
-                        (type,
-                         (BigInteger) properties.get(type.getProperty("id")));
-                }
+        Adapter a = new Adapter() {
+            public Object getObject(ObjectType type,
+                                    PropertyMap properties) {
+                return new Generic
+                    (type,
+                     (BigInteger) properties.get(type.getProperty("id")));
+            }
 
-                public PropertyMap getProperties(Object obj) {
-                    PropertyMap result = new PropertyMap();
-                    result.put(getObjectType(obj).getProperty("id"),
-                               ((Generic) obj).getID());
-                    return result;
-                }
+            public PropertyMap getProperties(Object obj) {
+                PropertyMap result = new PropertyMap();
+                result.put(getObjectType(obj).getProperty("id"),
+                           ((Generic) obj).getID());
+                return result;
+            }
 
-                public ObjectType getObjectType(Object obj) {
-                    return ((Generic) obj).getType();
-                }
-            });
+            public ObjectType getObjectType(Object obj) {
+                return ((Generic) obj).getType();
+            }
+        };
+
+        Adapter.addAdapter(Generic.class, TEST, a);
+        Adapter.addAdapter(Generic.class, ICLE, a);
+        Adapter.addAdapter(Generic.class, COMPONENT, a);
 
         Generic test = new Generic(TEST, BigInteger.ZERO);
         Property NAME = TEST.getProperty("name");

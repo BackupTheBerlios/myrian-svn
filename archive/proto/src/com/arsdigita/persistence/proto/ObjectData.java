@@ -8,12 +8,12 @@ import java.io.*;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/02/12 $
+ * @version $Revision: #8 $ $Date: 2003/02/13 $
  **/
 
 class ObjectData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#7 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#8 $ by $Author: ashah $, $DateTime: 2003/02/13 15:47:05 $";
 
     private Session m_ssn;
     private Object m_object;
@@ -27,9 +27,11 @@ class ObjectData {
         public String toString() { return m_name; }
     };
 
+    public static final State INFANTILE = new State("infantile");
     public static final State NUBILE = new State("nubile");
     public static final State AGILE = new State("agile");
     public static final State SENILE = new State("senile");
+    public static final State DEAD = new State("dead");
 
     private State m_state;
 
@@ -61,6 +63,7 @@ class ObjectData {
 
     public void addEvent(ObjectEvent ev) {
         m_events.add(ev);
+        ev.setObjectData(this);
     }
 
     void removeEvent(ObjectEvent ev) {
@@ -130,11 +133,15 @@ class ObjectData {
         return evMod;
     }
 
+    public boolean isInfantile() { return m_state.equals(INFANTILE); }
+
     public boolean isNubile() { return m_state.equals(NUBILE); }
 
     public boolean isAgile() { return m_state.equals(AGILE); }
 
     public boolean isSenile() { return m_state.equals(SENILE); }
+
+    public boolean isDead() { return m_state.equals(DEAD); }
 
     public void setState(State state) { m_state = state; }
 

@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #25 $ $Date: 2003/02/13 $
+ * @version $Revision: #26 $ $Date: 2003/02/13 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#25 $ by $Author: rhs $, $DateTime: 2003/02/13 11:20:06 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#26 $ by $Author: ashah $, $DateTime: 2003/02/13 15:47:05 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -27,10 +27,13 @@ public class Session {
         new PersistentObjectSource();
 
     private final Engine m_engine = Engine.getInstance(this);
+
     private HashMap m_odata = new HashMap();
 
-    // These are kept up to date by code in Event.java
-    LinkedList m_events = new LinkedList();
+    private LinkedList m_events = new LinkedList();
+    private LinkedList m_pending = new LinkedList();
+
+    private Set m_toCheck = new HashSet();
 
     public void create(Object obj) {
         if (LOG.isDebugEnabled()) {
@@ -52,7 +55,8 @@ public class Session {
         // existed and was modified the new object will pick up all the
         // changes made to the old one. Not sure what to do about this except
         // perhaps disallow it at some point.
-        addEvent(new CreateEvent(this, obj), od);
+        addEvent(new CreateEvent(this, obj));
+        processPending();
 
         PropertyMap props = getAdapter(obj).getProperties(obj);
         for (Iterator it = props.entrySet().iterator(); it.hasNext(); ) {
@@ -65,8 +69,13 @@ public class Session {
         }
     }
 
-
     public boolean delete(Object obj) {
+        boolean result = deleteInternal(obj);
+        processPending();
+        return result;
+    }
+    
+    private boolean deleteInternal(Object obj) {
         if (LOG.isDebugEnabled()) {
             trace("delete", new Object[] {obj});
         }
@@ -89,7 +98,7 @@ public class Session {
                  it.hasNext(); ) {
                 Role role = (Role) it.next();
                 if (role.isCollection()) {
-                    clear(obj, role);
+                    clearInternal(obj, role);
                 }
             }
 
@@ -98,7 +107,7 @@ public class Session {
                 Role role = (Role) it.next();
 
                 if (!role.isCollection() && !keys.contains(role)) {
-                    set(obj, role, null);
+                    setInternal(obj, role, null);
                 }
             }
 
@@ -147,7 +156,7 @@ public class Session {
             containerOD.setState(ObjectData.SENILE);
         }
 
-        delete(containee);
+        deleteInternal(containee);
 
         if (me) { containerOD.setState(ObjectData.SENILE); }
     }
@@ -168,8 +177,11 @@ public class Session {
             addEvent(new RemoveEvent(this, target, rev, source));
         } else if (rev.isNullable()) {
             addEvent(new SetEvent(this, target, rev, null));
-        } else if (!fetchObjectData(target).isSenile() && !isDeleted(target)) {
-            throw new IllegalStateException("can't set 1..1 to null");
+        } else {
+            ObjectData od = fetchObjectData(target);
+            if (od != null && !od.isSenile()) {
+                m_toCheck.add(fetchPropertyData(target, rev));
+            }
         }
     }
 
@@ -192,9 +204,11 @@ public class Session {
             if (old != null) {
                 if (role.isNullable()) {
                     addEvent(new SetEvent(this, old, role, null));
-                } else if (!fetchObjectData(old).isSenile() &&
-                           !isDeleted(old)) {
-                    throw new IllegalStateException("can't set 1..1 to null");
+                } else {
+                    ObjectData od = fetchObjectData(old);
+                    if (od != null && !od.isSenile()) {
+                        m_toCheck.add(fetchPropertyData(old, role));
+                    }
                 }
             }
 
@@ -202,8 +216,13 @@ public class Session {
         }
     }
 
-
     public void set(final Object obj, Property prop, final Object value) {
+        setInternal(obj, prop, value);
+        processPending();
+    }
+
+    private void setInternal(final Object obj, Property prop,
+                             final Object value) {
         if (LOG.isDebugEnabled()) {
             trace("set", new Object[] {obj, prop.getName(), value});
         }
@@ -291,6 +310,13 @@ public class Session {
 
 
     public Object add(final Object obj, Property prop, final Object value) {
+        Object result = addInternal(obj, prop, value);
+        processPending();
+        return result;
+    }
+
+    private Object addInternal(final Object obj, Property prop,
+                               final Object value) {
         if (LOG.isDebugEnabled()) {
             trace("add", new Object[] {obj, prop.getName(), value});
         }
@@ -322,6 +348,13 @@ public class Session {
     }
 
     public void remove(final Object obj, Property prop, final Object value) {
+        removeInternal(obj, prop, value);
+        processPending();
+    }
+
+
+    private void removeInternal(final Object obj, Property prop,
+                                final Object value) {
         if (LOG.isDebugEnabled()) {
             trace("remove", new Object[] {obj, prop.getName(), value});
         }
@@ -353,6 +386,11 @@ public class Session {
 
 
     public void clear(Object obj, Property prop) {
+        clearInternal(obj, prop);
+        processPending();
+    }
+
+    private void clearInternal(Object obj, Property prop) {
         if (LOG.isDebugEnabled()) {
             trace("clear", new Object[] {obj, prop.getName()});
         }
@@ -361,7 +399,7 @@ public class Session {
             (PersistentCollection) get(obj, prop);
         Cursor c = pc.getDataSet().getCursor();
         while (c.next()) {
-            remove(obj, prop, c.get());
+            removeInternal(obj, prop, c.get());
         }
 
         if (LOG.isDebugEnabled()) {
@@ -401,49 +439,50 @@ public class Session {
             getObjectData(obj).getPropertyData(prop).isModified();
     }
 
+    private void processPending() {
+        for (ListIterator li = m_pending.listIterator(0); li.hasNext(); ) {
+            Event ev = (Event) li.next();
+            processEvent(ev);
+        }
+
+        m_pending.clear();
+    }
 
     /**
      * Performs all operations queued up by the session. This is automatically
      * called when necessary in order to insure that queries performed by the
      * datastore are consistent with the contents of the in memory data cache.
      **/
-    public void flush() { flush(true, true, true); }
+    public void flush() {
+//         if (m_toCheck.size() > 0) {
+//             for (Iterator it = m_toCheck.iterator(); it.hasNext(); ) {
+//                 PropertyData pd = (PropertyData) it.next();
+//                 if (pd.get() == null) {
+//                     LOG.debug("1..1 null: " + pd);
+//                     throw new IllegalStateException("1..1 null");
+//                 }
+//             }
 
-    void flushNubileAgile() { flush(true, true, false); }
+//             m_toCheck = new HashSet();
+//         }
 
-    private void flush(boolean nubile, boolean agile, boolean senile) {
         if (LOG.isDebugEnabled()) {
-            trace("flush", new Object[] {
-                nubile ? Boolean.TRUE : Boolean.FALSE,
-                agile ? Boolean.TRUE : Boolean.FALSE,
-                senile ? Boolean.TRUE : Boolean.FALSE});
+            trace("flush", new Object[] {});
         }
-
-        LinkedList written = new LinkedList();
-        LinkedList deferred = new LinkedList();
 
         for (ListIterator li = m_events.listIterator(0); li.hasNext(); ) {
             Event ev = (Event) li.next();
-            ObjectData od = getObjectData(ev.getObject());
-
-            if ((nubile && od.isNubile()) ||
-                (agile && od.isAgile()) ||
-                (senile && od.isSenile())) {
-                m_engine.write(ev);
-                written.add(ev);
-            } else {
-                deferred.add(ev);
-            }
+            m_engine.write(ev);
         }
 
         m_engine.flush();
 
-        for (ListIterator li = written.listIterator(0); li.hasNext(); ) {
+        for (ListIterator li = m_events.listIterator(0); li.hasNext(); ) {
             Event ev = (Event) li.next();
             ev.sync();
         }
 
-        m_events = deferred;
+        m_events.clear();
 
         if (LOG.isDebugEnabled()) {
             untrace("flush");
@@ -459,6 +498,7 @@ public class Session {
     public void commit() {
         flush();
         m_engine.commit();
+        m_odata.clear();
     }
 
 
@@ -470,7 +510,7 @@ public class Session {
     public void rollback() {
         // should properly roll back java state
         m_odata.clear();
-        m_events = new LinkedList();
+        m_events.clear();
         m_engine.rollback();
     }
 
@@ -500,24 +540,33 @@ public class Session {
         }
     }
 
-    private void appendEvent(Event ev) {
+    private void addEvent(Event ev) {
+        m_pending.add(ev);
+    }
+
+    private void processEvent(Event ev) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("event processed: " + ev);
+        }
+        if (ev instanceof PropertyEvent) {
+            processEvent((PropertyEvent) ev);
+        } else {
+            processEvent((ObjectEvent) ev);
+        }
+
         m_events.add(ev);
     }
 
-    private void addEvent(ObjectEvent ev) {
-        addEvent(ev, fetchObjectData(ev.getObject()));
+    private void processEvent(ObjectEvent ev) {
+        processEvent(ev, fetchObjectData(ev.getObject()));
     }
 
-    private void addEvent(ObjectEvent ev, ObjectData od) {
-        ev.setObjectData(od);
-        appendEvent(ev);
+    private void processEvent(ObjectEvent ev, ObjectData od) {
         od.addEvent(ev);
     }
 
-    private void addEvent(PropertyEvent ev) {
+    private void processEvent(PropertyEvent ev) {
         PropertyData pd = fetchPropertyData(ev.getObject(), ev.getProperty());
-        ev.setPropertyData(pd);
-        appendEvent(ev);
         pd.addEvent(ev);
     }
 
