@@ -8,12 +8,12 @@ import com.arsdigita.persistence.proto.metadata.*;
  * RDBMSQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/05/15 $
  **/
 
 public class RDBMSQuerySource extends QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSQuerySource.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSQuerySource.java#2 $ by $Author: rhs $, $DateTime: 2003/05/15 16:48:35 $";
 
     private DynamicQuerySource m_dqs = new DynamicQuerySource();
     private StaticQuerySource m_sqs = new StaticQuerySource();
@@ -26,7 +26,7 @@ public class RDBMSQuerySource extends QuerySource {
     private boolean isStatic(ObjectMap om, Property prop) {
         Path path = Path.get(prop.getName());
         Mapping m = om.getMapping(path);
-        return m.getRetrieve() != null;
+        return m instanceof Static || m.getRetrieve() != null;
     }
 
     public Query getQuery(ObjectType type) {

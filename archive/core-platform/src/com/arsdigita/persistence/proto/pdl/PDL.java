@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/05/15 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#2 $ by $Author: rhs $, $DateTime: 2003/05/15 16:48:35 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -372,6 +372,8 @@ public class PDL {
 
     }
 
+    private HashMap m_primaryKeys = new HashMap();
+
     private void unique(Node nd, Column[] cols, boolean primary) {
         Table table = cols[0].getTable();
         if (table.getUniqueKey(cols) != null) {
@@ -380,7 +382,18 @@ public class PDL {
         }
         UniqueKey key = new UniqueKey(table, null, cols);
         if (primary) {
+            UniqueKey pk = table.getPrimaryKey();
+            if (pk != null) {
+                Node prev = (Node) m_primaryKeys.get(pk);
+                m_errors.warn
+                    (nd, "table already has primary key: " +
+                     prev.getLocation());
+                if (prev instanceof ObjectKeyNd) {
+                    return;
+                }
+            }
             table.setPrimaryKey(key);
+            m_primaryKeys.put(key, nd);
 	    m_root.setLocation(table, nd.getFile().getName(), nd.getLine(),
 			       nd.getColumn());
         }
@@ -964,6 +977,21 @@ public class PDL {
         return blocks;
     }
 
+
+    private static Collection add(Collection a, Collection b) {
+        if (a == null) {
+            return b;
+        }
+        if (b == null) {
+            return a;
+        }
+
+        ArrayList result = new ArrayList();
+        result.addAll(a);
+        result.addAll(b);
+        return result;
+    }
+
     private void setSQLBlocks(ObjectMap om, EventNd.Type type, String role,
                               Collection blocks) {
         if (type.equals(EventNd.INSERT)) {
@@ -974,7 +1002,8 @@ public class PDL {
             om.setDeclaredDeletes(blocks);
         } else if (type.equals(EventNd.RETRIEVE)) {
             if (role == null) {
-                om.setDeclaredRetrieves(blocks);
+                om.setDeclaredRetrieves
+                    (add(blocks, om.getDeclaredRetrieves()));
             } else {
                 throw new Error("single block event");
             }
@@ -985,7 +1014,7 @@ public class PDL {
         } else if (type.equals(EventNd.CLEAR)) {
             // do nothing
         } else if (type.equals(EventNd.RETRIEVE_ATTRIBUTES)) {
-            // do nothing
+            om.setDeclaredRetrieves(add(om.getDeclaredRetrieves(), blocks));
         } else {
             throw new IllegalArgumentException("bad event type: " + type);
         }

@@ -13,12 +13,12 @@ import java.io.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/05/15 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#2 $ by $Author: rhs $, $DateTime: 2003/05/15 16:48:35 $";
 
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();
@@ -353,7 +353,9 @@ public abstract class SQLWriter {
         Path[] leftCols = expand(left);
         Path[] rightCols = expand(right);
         if (leftCols.length != rightCols.length) {
-            throw new IllegalArgumentException(left + ", " + right);
+            throw new IllegalArgumentException
+                (left + ": " + Arrays.asList(leftCols) + ", " +
+                 right + ": " + Arrays.asList(rightCols));
         }
 
         for (int i = 0; i < leftCols.length; i++) {

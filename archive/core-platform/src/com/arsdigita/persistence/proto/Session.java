@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/05/15 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Session.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Session.java#2 $ by $Author: rhs $, $DateTime: 2003/05/15 16:48:35 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -730,7 +730,7 @@ public class Session {
             pd = new PropertyData
                 (od, prop, POS.getPersistentCollection
                  (this, new DataSet(this, m_qs.getQuery(obj, prop))));
-        } else if (od.isNew()){
+        } else if (od.isInfantile()){
             pd = new PropertyData(od, prop, null);
         } else {
             RecordSet rs = m_engine.execute(m_qs.getQuery(obj, prop));
