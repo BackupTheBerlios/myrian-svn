@@ -15,37 +15,69 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
-import com.arsdigita.tools.junit.framework.PackageTestSuite;
-import junit.framework.Test;
-import junit.framework.TestCase;
+import junit.framework.*;
 
 import com.redhat.persistence.pdl.*;
 import java.sql.*;
+import java.util.regex.*;
 
 /**
  * PersistenceSuite
  *
  * @author Jon Orris
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/07/08 $
  */
-public class PersistenceSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PersistenceSuite.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
-
-    public PersistenceSuite() {
-        super();
-    }
-
-    public PersistenceSuite(Class theClass) {
-        super(theClass);
-    }
-
-    public PersistenceSuite(String name) {
-        super(name);
-    }
+public class PersistenceSuite extends TestSuite {
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PersistenceSuite.java#2 $ by $Author: rhs $, $DateTime: 2004/07/08 17:46:05 $";
 
     public static Test suite() {
         PersistenceSuite suite = new PersistenceSuite();
-        populateSuite(suite);
+
+        suite.addTestSuite(InitializerTest.class);
+
+        suite.addTestSuite(MetadataDebuggingTest.class);
+
+        // API tests
+        suite.addTestSuite(OIDTest.class);
+        suite.addTestSuite(GenericDataObjectTest.class);
+        suite.addTestSuite(GenericDataQueryTest.class);
+        suite.addTestSuite(DataQueryImplTest.class);
+        suite.addTestSuite(DataCollectionImplTest.class);
+        suite.addTestSuite(DataAssociationImplTest.class);
+        suite.addTestSuite(DataAssociationCursorTest.class);
+        suite.addTestSuite(DataOperationTest.class);
+        suite.addTestSuite(FilterTest.class);
+
+        // Datatype tests
+        suite.addTestSuite(LobTest.class);
+        suite.addTestSuite(DatatypeTest.class);
+
+        // Tests of more subtle semantics
+        suite.addTestSuite(DeletionTest.class);
+        suite.addTestSuite(ExtendLobTest.class);
+        suite.addTestSuite(LazyLoadFailureTest.class);
+        suite.addTestSuite(RefetchTest.class);
+        suite.addTestSuite(ObserverTest.class);
+        suite.addTestSuite(MultiThreadDataObjectTest.class);
+
+        // Connection/transaction related tests
+        suite.addTestSuite(AggressiveConnectionCloseTest.class);
+        suite.addTestSuite(StatementClosingTest.class);
+        suite.addTestSuite(PooledConnectionSourceTest.class);
+        suite.addTestSuite(TransactionContextTest.class);
+
+        // Data manipulation tests
+        suite.addTest(MetaTest.suite());
+        suite.addTestSuite(DynamicLinkAttributeTest.class);
+        suite.addTestSuite(DynamicLinkTest.class);
+        suite.addTestSuite(DynamicNodeTest.class);
+        suite.addTestSuite(DynamicOrderTest.class);
+        suite.addTestSuite(DynamicPartyTest.class);
+        suite.addTestSuite(StaticLinkAttributeTest.class);
+        suite.addTestSuite(StaticLinkTest.class);
+        suite.addTestSuite(StaticNodeTest.class);
+        suite.addTestSuite(StaticOrderTest.class);
+        suite.addTestSuite(StaticPartyTest.class);
 
         BaseTestSetup wrapper = new BaseTestSetup(suite) {
             protected void setUp() throws Exception {
@@ -71,11 +103,6 @@ public class PersistenceSuite extends PackageTestSuite {
         wrapper.addSQLTeardownScript("com/arsdigita/persistence/teardown.sql");
 
         return wrapper;
-    }
-
-    public static void main(String[] args) throws Exception {
-        junit.textui.TestRunner.run( suite() );
-
     }
 
 }

@@ -106,4 +106,9 @@ run-tests: $(JSTAMPS)
 	bin/run-tests
 
 jdo-tests: $(JSTAMPS)
-	bin/run com.redhat.persistence.TestRunner com.redhat.persistence.jdo.JDOSuite
+	bin/run com.redhat.persistence.TestRunner \
+		com.redhat.persistence.jdo.JDOSuite
+
+persistence-tests: $(JSTAMPS)
+	bin/run com.redhat.persistence.TestRunner \
+		com.arsdigita.persistence.PersistenceSuite
