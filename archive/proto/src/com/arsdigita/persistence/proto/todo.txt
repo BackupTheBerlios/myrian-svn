@@ -1,11 +1,11 @@
 Functionality:
- * Observers (3,2,2) (2,4)
+ * Observers
 
      Infinite loop prevention. Reentrance.
 
      Status: Reentrance works. Bug fixing. Preventing infinite loops.
 
- * Link attributes (2,2,2) (0,4)
+ * Link attributes
 
      Desugar into object model that uses compound keys + containment
      by multiple objects.
@@ -22,17 +22,7 @@ Functionality:
       - extraneous join for queries only fetching ids, genPath should
         map id props to parent join if it exists
 
- * Disconnected data (1,0.5,0.5) (0.5,0)
-
-     On disconnect store HashMap of object data in wrapper layer. Also
-     requires some simple state management to make sure writing is not
-     allowed and to throw out objects from rolled back txns. We should
-     be able to dig most of that code out of perforce.
-
-     Status: API implemented with incorrect semantics. No longer
-             blocking.
-
- * Data Operations (2,1.5,1.5) (0.5,0)
+ * Data Operations
 
      Must be loaded into metadata structures.
      Requires API for creating an operation, setting any required
@@ -44,32 +34,15 @@ Functionality:
      Status: Basic functionality in place. Not all exotic forms may be
              supported, but this is not currently blocking.
 
- * GenericDataQuery (1,1,1) (0,0)
-
-     Requires exposing methods on RDBMSEngine and writing some wrapper
-     code.
-
-     Status: Not started, nonblocking.
-
- * order with null (1,1,1) (0,0)
-
-     Passthrough code + some minor API additions to Query and friends.
-
-     Status: Not started, nonblocking.
-
- * Session.getConnection() (1,1,0.5) (0,0.5)
+ * Session.getConnection()
 
      Passthrough code.
 
      Status: Not started, nonblocking.
 
- * Better connection source (1,1,0.5) (0,0)
+      - need to flush before executing stuff on returned connection
 
-     Look at old connection handling code, copy/reimplement.
-
-     Status: Not started, nonblocking.
-
- * Size (1,1,1) (0,0)
+ * Size
 
      API additions + minor implementation. API additions can be done
      cheesily for now, but at some point we need a consistent story
@@ -77,45 +50,39 @@ Functionality:
 
      Status: Not started, nonblocking.
 
- * Query caching (1,1,1) (0,0)
+ * Query caching
 
      Cache data structures, cache invalidation.
 
      Status: Not started, nonblocking.
 
- * Weak refs (0.5,0.5,0.5) (0,0)
+ * Weak refs
 
      Do it.
 
      Status: Not started, nonblocking.
 
- * Oracle (1,1,1) (0,0)
-
-     Oracle implementation of SQLWriter.
-
-     Status: Not started.
-
- * LOBs (1,1,1) (0,0)
+ * LOBs
 
      Dig up Oracle specific code from perforce. Figure out how to call
      it without hack up RDBMSEngine to be oracle specific.
 
      Status: Not started.
 
+ * DynamicObjectType and DynamicAssociation
+
 Error Checking/Handling:
- * null/"" handling (0.5,0.5,1) (0.5,0)
+ * null/"" handling
 
      Plan A: DOI.set converts ""-> null. Session disallows "". Deal
              with filtering.
 
- * Auto-detect two wayness and warn (1,1,1) (0,0)
+ * Auto-detect two wayness and warn
 
      Status: Not started, nonblocking.
 
 Cleanup:
  * Public way to access new session for calling flush()
- * Eliminate old metadata & PDL parser
- * Move DDL generator
  * Adapters
  * Rename everything
  * better solution for bind variable and object property name
@@ -141,7 +108,46 @@ Disable all cascading deletes.
 
 -= D O N E =-
 
- * Reorder DML in relational engine (2,0) (1)
+ * Eliminate old metadata & PDL parser
+
+ * Move DDL generator
+
+ * Better connection source
+
+     Look at old connection handling code, copy/reimplement.
+
+     Status: Not started, nonblocking.
+
+ * GenericDataQuery
+
+     Requires exposing methods on RDBMSEngine and writing some wrapper
+     code.
+
+     Status: Not started, nonblocking.
+
+ * order with null
+
+     Passthrough code + some minor API additions to Query and friends.
+
+     Status: Not started, nonblocking.
+
+ * Disconnected data
+
+     On disconnect store HashMap of object data in wrapper layer. Also
+     requires some simple state management to make sure writing is not
+     allowed and to throw out objects from rolled back txns. We should
+     be able to dig most of that code out of perforce.
+
+     Status: API implemented with incorrect semantics. No longer
+             blocking.
+
+ * Oracle
+
+     Oracle implementation of SQLWriter.
+
+     Status: Not started.
+
+ * Reorder DML in relational engine
 
      SQL Generation must be made to obey event ordering constraints.
      Optionally optimize with dotted arrow constraints for MDSQL
@@ -155,43 +161,43 @@ Disable all cascading deletes.
              loops were previously guaranteed to cause constraint
              violations.
 
- * Compound keys (1,0) (1)
+ * Compound keys
 
      Mostly done in checkout. Difficult to confirm due to lack of
      significant test coverage.
 
      Status: Done
 
- * sub query filtering (1,0) (0.5)
+ * sub query filtering
 
      Simple addition to anonymous mapper in QGen.java, may require
      some fanciness for legacy bind variable support.
 
      Status: Done
 
- * throwing appropriate exceptions save() (1,0) (1)
+ * throwing appropriate exceptions save()
 
      Plan A: Be fundamental. Adjust fundament as appropriate.
 
      Status: Done
 
- * GDflush() (0.5,0) (0.5)
+ * GDflush()
 
      Status: Done
 
- * DataQuery.setRange (1,0) (0.5)
+ * DataQuery.setRange
 
      API addtions + minor implementation.
 
      Status: Done
 
- * DataQuery.set/getParameter (1,0) (1)
+ * DataQuery.set/getParameter
 
      Passthrough code ???
 
      Status: Done
 
- * immediate properties/specialize (1, 0) (0.5)
+ * immediate properties/specialize
 
      Plan A: New PDL keyword. Error checking for queries that don't
      fetch immediate properties. Adapter must be modified to use
@@ -204,6 +210,6 @@ Disable all cascading deletes.
 
      Status: Plan B implemented, Plan A deferred.
 
- * type checks for PropertyEvent (0.5,0) (0)
+ * type checks for PropertyEvent
 
      Status: Done
