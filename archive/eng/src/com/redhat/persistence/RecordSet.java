@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/08/05 $
+ * @version $Revision: #6 $ $Date: 2004/08/06 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/RecordSet.java#5 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/RecordSet.java#6 $ by $Author: rhs $, $DateTime: 2004/08/06 14:26:20 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -86,7 +86,9 @@ public abstract class RecordSet {
             Object key = type.getBasetype();
             for (Iterator it = props.iterator(); it.hasNext(); ) {
                 Property p = (Property) it.next();
-                key = new CompoundKey(key, key(Path.add(path, p.getName())));
+                Object subKey = key(Path.add(path, p.getName()));
+                if (subKey == null) { return null; }
+                key = new CompoundKey(key, subKey);
             }
             return key;
         } else if (m_signature.isSource(path)) {
@@ -97,7 +99,12 @@ public abstract class RecordSet {
             }
             return pmap;
         } else {
-            return new CompoundKey(key(path.getParent()), path.getName());
+            Object key = key(path.getParent());
+            if (key == null) {
+                return null;
+            } else {
+                return new CompoundKey(key, path.getName());
+            }
         }
     }
 
@@ -123,6 +130,7 @@ public abstract class RecordSet {
 
     private Object reify(Session ssn, Path path) {
         Object key = key(path);
+        if (key == null) { return null; }
         ObjectData odata = ssn.getObjectDataByKey(key);
         if (odata == null) {
             ObjectType type = m_signature.getType(path);
@@ -158,11 +166,17 @@ public abstract class RecordSet {
                     && m_signature.isSource(parent))) {
                 values.put(path, value);
             } else {
-                ssn.load(container, prop, value);
-                ObjectMap map = getObjectMap(path);
-                if (map.isNested() && map.isCompound()) {
-                    ObjectData odata = ssn.getObjectData(value);
-                    odata.setContainer(container);
+                if (container != null) {
+                    ssn.load(container, prop, value);
+                    ObjectMap map = getObjectMap(path);
+                    if (map.isNested() && map.isCompound()) {
+                        ObjectData odata = ssn.getObjectData(value);
+                        odata.setContainer(container);
+                    }
+                } else if (value != null) {
+                    throw new IllegalStateException
+                        ("value at " + path + " has a null container: " +
+                         ssn.str(value));
                 }
             }
         }

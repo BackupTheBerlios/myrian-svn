@@ -26,6 +26,7 @@ object type Employee class com.redhat.persistence.jdo.Employee
     BigInteger[1..1] id = emps.id INTEGER;
     String[0..1] name = emps.name VARCHAR(200);
     Float[0..1] salary = emps.salary FLOAT;
+    Department[0..1] dept = join emps.dept_id to depts.id;
     Address[0..1] address;
     address.m_street = emps.street;
     address.m_apt = emps.apt;
@@ -57,11 +58,6 @@ query Employee$Gen class com.redhat.persistence.PropertyMap
     } map {
         id = id;
     }
-}
-
-association {
-    Department[0..1] dept = join emps.dept_id to depts.id;
-    Employee[0..n] emps = join depts.id to emps.dept_id;
 }
 
 object type Rolodex class com.redhat.persistence.jdo.Rolodex

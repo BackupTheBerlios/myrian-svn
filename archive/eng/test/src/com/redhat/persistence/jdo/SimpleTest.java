@@ -102,4 +102,18 @@ public class SimpleTest extends WithTxnCase {
         assertFalse(it.hasNext());
     }
 
+    public void testNullResurrection() {
+        String name = "Departmentless";
+        Employee e = new Employee(name, null);
+        m_pm.makePersistent(e);
+        commit();
+
+        Collection emps = (Collection) m_pm.newQuery(Employee.class).execute();
+        OQLQuery q = (OQLQuery) m_pm.newQuery("oql", "filter($1, name == $2)");
+        q.addPath("dept");
+        Collection emp = (Collection) q.execute(emps, name);
+        e = (Employee) emp.iterator().next();
+        assertNull(e.getDept());
+    }
+
 }
