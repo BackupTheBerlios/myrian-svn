@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/proto/sql/oracle-se-create.sql#4 $
--- $DateTime: 2003/04/10 15:12:46 $
+-- $Id: //core-platform/proto/sql/oracle-se-create.sql#5 $
+-- $DateTime: 2003/04/24 15:32:09 $
 
 @@ oracle-se/function-currentDate.sql
 
@@ -239,5 +239,7 @@
 @@ default/web/index-application_type_privilege_map.sql
 
 @@ default/kernel/index-foreign_keys.sql
+
+@@ default/mimetypes/insert-cms_mime_status.sql
 
 @@ ddl/oracle-se/deferred.sql
