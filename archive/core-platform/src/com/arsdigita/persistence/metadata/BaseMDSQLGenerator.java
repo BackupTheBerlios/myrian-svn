@@ -47,12 +47,12 @@ import org.apache.log4j.Logger;
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#12 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#13 $
  * @since 4.6.3
  */
 abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#12 $ by $Author: rhs $, $DateTime: 2002/09/16 18:59:05 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#13 $ by $Author: rhs $, $DateTime: 2002/10/02 14:58:38 $";
 
     private static final Logger s_log =
         Logger.getLogger(BaseMDSQLGenerator.class);
@@ -927,12 +927,6 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
                 .append("\nwhere ")
                 .append(type1Ref.getColumnName())
                 .append(" = :")
-                .append(type1Key.getName())
-                .append(" and ")
-                .append(type2Ref.getColumnName())
-                .append(" = :")
-                .append(prop.getName())
-                .append(".")
                 .append(type1Key.getName());
         }
 

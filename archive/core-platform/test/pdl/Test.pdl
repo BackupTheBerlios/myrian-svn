@@ -37,3 +37,10 @@ association {
     Test[1..1] test = join components.test_id to tests.test_id;
     component Component[0..n] components = join tests.test_id to components.test_id;
 }
+
+association {
+    Test[0..1] opt2manyBack = join icles.icle_id to opt2many.icle_id,
+                              join opt2many.test_id to tests.test_id;
+    Icle[0..n] opt2many = join tests.test_id to opt2many.test_id,
+                          join opt2many.icle_id to icles.icle_id;
+}
