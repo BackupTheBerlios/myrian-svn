@@ -19,12 +19,12 @@ package com.redhat.persistence;
  * Engine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 
 public abstract class Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/Engine.java#1 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/Engine.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     protected abstract void write(Event ev);
     protected abstract void flush();

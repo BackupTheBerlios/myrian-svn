@@ -30,13 +30,13 @@ import org.apache.log4j.Logger;
  * @author David Lutterkort &lt;dlutter@redhat.com&gt;
  * @author Uday Mathur
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/proto/src/com/arsdigita/util/Assert.java#8 $
+ * @version $Id: //core-platform/proto/src/com/arsdigita/util/Assert.java#9 $
  */
 public class Assert {
     public static final String versionId =
-        "$Id: //core-platform/proto/src/com/arsdigita/util/Assert.java#8 $" +
+        "$Id: //core-platform/proto/src/com/arsdigita/util/Assert.java#9 $" +
         "$Author: dennis $" +
-        "$DateTime: 2003/08/04 15:56:00 $";
+        "$DateTime: 2003/08/04 16:15:53 $";
 
     private static final Logger s_log = Logger.getLogger
         (Assert.class);

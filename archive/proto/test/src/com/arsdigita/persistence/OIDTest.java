@@ -29,14 +29,14 @@ import org.apache.log4j.Logger;
  *
  * @author Michael Bryzek
  * @date $Date: 2003/08/04 $
- * @version $Revision: #4 $
+ * @version $Revision: #5 $
  *
  * @see com.arsdigita.persistence.OID
  **/
 
 public class OIDTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/OIDTest.java#4 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/OIDTest.java#5 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     private static Logger s_log =
         Logger.getLogger(OIDTest.class.getName());

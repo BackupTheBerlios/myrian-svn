@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/proto/sql/default/persistence/table-persistence_dynamic_ot.sql#4 $
--- $DateTime: 2003/08/04 15:56:00 $
+-- $Id: //core-platform/proto/sql/default/persistence/table-persistence_dynamic_ot.sql#5 $
+-- $DateTime: 2003/08/04 16:15:53 $
 
 create table persistence_dynamic_ot (
     pdl_id                 integer

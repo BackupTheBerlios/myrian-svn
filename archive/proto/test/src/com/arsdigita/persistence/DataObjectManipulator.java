@@ -37,11 +37,11 @@ import org.apache.log4j.*;
  * DataObjectManipulator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #6 $ $Date: 2003/08/04 $
+ * @version $Revision: #7 $ $Date: 2003/08/04 $
  */
 public class DataObjectManipulator {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataObjectManipulator.java#6 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataObjectManipulator.java#7 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
     private static final Logger s_log =
         Logger.getLogger(DataObjectManipulator.class.getName());
 

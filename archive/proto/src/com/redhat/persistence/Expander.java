@@ -12,7 +12,7 @@ import java.util.*;
  */
 class Expander extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/Expander.java#1 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/Expander.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     final private Session m_ssn;
     final private Collection m_deleting = new HashSet();

@@ -9,12 +9,12 @@ import java.util.*;
  * Select
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 
 class Select extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/engine/rdbms/Select.java#1 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/engine/rdbms/Select.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     private Join m_join;
     private Expression m_filter;

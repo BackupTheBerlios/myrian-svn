@@ -32,7 +32,7 @@ import org.apache.log4j.Level;
  * the SessionManager of them.
  *
  * @author Archit Shah 
- * @version $Revision: #9 $ $Date: 2003/08/04 $
+ * @version $Revision: #10 $ $Date: 2003/08/04 $
  **/
 
 public class Initializer

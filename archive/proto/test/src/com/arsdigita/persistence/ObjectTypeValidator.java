@@ -25,12 +25,12 @@ import org.apache.log4j.*;
  * ObjectTypeValidator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #3 $ $Date: 2003/08/04 $
+ * @version $Revision: #4 $ $Date: 2003/08/04 $
  */
 
 public class ObjectTypeValidator  {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/ObjectTypeValidator.java#3 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/ObjectTypeValidator.java#4 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
     private static final Logger s_log =
         Logger.getLogger(ObjectTypeValidator.class.getName());
     private Session m_session;

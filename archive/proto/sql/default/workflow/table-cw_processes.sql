@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/proto/sql/default/workflow/table-cw_processes.sql#4 $
--- $DateTime: 2003/08/04 15:56:00 $
+-- $Id: //core-platform/proto/sql/default/workflow/table-cw_processes.sql#5 $
+-- $DateTime: 2003/08/04 16:15:53 $
 
 create table cw_processes (
   process_id             integer 

@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #21 $ $Date: 2003/08/04 $
+ * @version $Revision: #22 $ $Date: 2003/08/04 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#21 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#22 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 

@@ -27,12 +27,12 @@ package com.arsdigita.persistence.metadata;
  * @see CompoundType
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/08/04 $
+ * @version $Revision: #5 $ $Date: 2003/08/04 $
  */
 
 abstract public class DataType extends ModelElement {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/DataType.java#4 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/DataType.java#5 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     private com.redhat.persistence.metadata.ObjectType m_type;
 

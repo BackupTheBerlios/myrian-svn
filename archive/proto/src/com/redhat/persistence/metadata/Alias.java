@@ -4,12 +4,12 @@ package com.redhat.persistence.metadata;
  * Alias
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 
 public class Alias extends Property {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/metadata/Alias.java#1 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/metadata/Alias.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     private Property m_target;
 

@@ -33,11 +33,11 @@ import org.apache.log4j.Logger;
  * </p>
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Revision: #5 $ $Date: 2003/08/04 $
+ * @version $Revision: #6 $ $Date: 2003/08/04 $
  */
 public abstract class HierarchyDenormalization {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/util/HierarchyDenormalization.java#5 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/util/HierarchyDenormalization.java#6 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     private final static Logger s_log =
         Logger.getLogger(HierarchyDenormalization.class);

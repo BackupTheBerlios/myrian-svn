@@ -28,11 +28,11 @@ import org.apache.log4j.Logger;
  *
  * @author Patrick McNeill
  * @since 4.5
- * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#8 $
+ * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#9 $
  */
 public class DataOperation {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#8 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#9 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     private static final Logger s_cat =
         Logger.getLogger(DataOperation.class);

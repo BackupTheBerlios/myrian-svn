@@ -19,9 +19,9 @@ import junit.framework.TestCase;
 
 public class AssertTest extends TestCase {
     public static final String versionId =
-        "$Id: //core-platform/proto/test/src/com/arsdigita/util/AssertTest.java#4 $" +
+        "$Id: //core-platform/proto/test/src/com/arsdigita/util/AssertTest.java#5 $" +
         "$Author: dennis $" +
-        "$DateTime: 2003/08/04 15:56:00 $";
+        "$DateTime: 2003/08/04 16:15:53 $";
 
     public AssertTest(String name) {
         super(name);

@@ -22,12 +22,12 @@ import com.redhat.persistence.metadata.Root;
  * a Model.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/08/04 $
+ * @version $Revision: #5 $ $Date: 2003/08/04 $
  **/
 
 abstract public class ModelElement extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/ModelElement.java#4 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/ModelElement.java#5 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     private Root m_root;
     private com.redhat.persistence.metadata.Model m_model;

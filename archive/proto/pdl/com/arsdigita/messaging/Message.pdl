@@ -1,0 +1,38 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/proto/pdl/com/arsdigita/messaging/Message.pdl#4 $ 
+// $DateTime: 2003/08/04 16:15:53 $
+
+model com.arsdigita.messaging;
+
+import com.arsdigita.kernel.*;
+
+object type Message extends ACSObject {
+
+    String[0..1]     replyTo = messages.reply_to VARCHAR(250);
+    String[1..1]     subject = messages.subject VARCHAR(250);
+    String[1..1]     body = messages.body VARCHAR(4000);
+    String[1..1]     type = messages.type VARCHAR(50);
+    Date[1..1]       sent = messages.sent_date TIMESTAMP;
+    BigDecimal[0..1] inReplyTo = messages.in_reply_to INTEGER;
+    BigDecimal objectID = messages.object_id INTEGER;
+    String[0..1]     messageID = messages.rfc_message_id VARCHAR(1000);
+
+    Party[1..1] sender = join messages.sender to parties.party_id;
+
+    component MessagePart[0..n] messagePart = 
+        join messages.message_id to message_parts.message_id;
+
+    reference key (messages.message_id);
+}

@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/proto/sql/default/formbuilder/table-forms_lstnr_tmpl_email.sql#4 $
--- $DateTime: 2003/08/04 15:56:00 $
+-- $Id: //core-platform/proto/sql/default/formbuilder/table-forms_lstnr_tmpl_email.sql#5 $
+-- $DateTime: 2003/08/04 16:15:53 $
 
 create table forms_lstnr_tmpl_email (
     listener_id integer

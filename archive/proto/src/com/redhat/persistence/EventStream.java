@@ -9,12 +9,12 @@ import java.util.*;
  * for filtering the stream down to the set of events that are of interest.
  *
  * @author <a href="mailto:ashah@redhat.com">Archit Shah</a>
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 
 public class EventStream {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/EventStream.java#1 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/EventStream.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     // all events
     private final LinkedList m_events = new LinkedList();

@@ -26,12 +26,12 @@ import org.apache.log4j.Logger;
  * be combined and manipulated to create complex queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/08/04 $
+ * @version $Revision: #9 $ $Date: 2003/08/04 $
  */
 
 abstract class FilterImpl implements Filter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/FilterImpl.java#8 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/FilterImpl.java#9 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     private static final Logger m_log =
         Logger.getLogger(Filter.class.getName());

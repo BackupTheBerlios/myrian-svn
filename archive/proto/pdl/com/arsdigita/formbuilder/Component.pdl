@@ -1,0 +1,46 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/proto/pdl/com/arsdigita/formbuilder/Component.pdl#5 $ 
+// $DateTime: 2003/08/04 16:15:53 $
+
+model com.arsdigita.formbuilder;
+
+
+// The pdl parser will not let me import just ACSObject
+import com.arsdigita.kernel.*;
+
+object type Component extends ACSObject {
+    String[0..1] adminName = bebop_components.admin_name VARCHAR(100);
+    String[0..1] description = bebop_components.description VARCHAR(4000);
+    String[0..1] attributeString = bebop_components.attribute_string VARCHAR(4000);
+    Boolean[0..1] isActive = bebop_components.active_p CHAR(1);
+
+    reference key (bebop_components.component_id);
+}
+
+//
+// Disabled pending reworking of the whole PersistentContainerHelper
+// class and removal of the old UI.
+association {
+    Component[0..n] componentContainer = join bebop_components.component_id
+                                  to bebop_component_hierarchy.component_id,
+                                join bebop_component_hierarchy.container_id
+                                  to bebop_components.component_id;
+    Component[0..n] \component = join bebop_components.component_id
+                                   to bebop_component_hierarchy.container_id,
+                                 join bebop_component_hierarchy.component_id
+                                   to bebop_components.component_id;
+    BigDecimal[1..1] orderNumber = bebop_component_hierarchy.order_number INTEGER;
+    Boolean[1..1] isSelected = bebop_component_hierarchy.selected_p CHAR(1);
+}

@@ -4,12 +4,12 @@ package com.redhat.persistence.pdl.nodes;
  * BindingNd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 
 public class BindingNd extends Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/pdl/nodes/BindingNd.java#1 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/pdl/nodes/BindingNd.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     public static final Field PATH =
         new Field(BindingNd.class, "path", PathNd.class, 1, 1);

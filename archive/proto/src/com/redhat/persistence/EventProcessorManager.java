@@ -19,7 +19,7 @@ package com.redhat.persistence;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-28
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 public interface EventProcessorManager {
     /**

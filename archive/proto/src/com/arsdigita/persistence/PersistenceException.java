@@ -23,14 +23,14 @@ import com.arsdigita.db.DbException;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/08/04 $
+ * @version $Revision: #4 $ $Date: 2003/08/04 $
  */
 
 public class PersistenceException extends UncheckedWrapperException {
 
     private String m_messageStack = null;
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/PersistenceException.java#3 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/PersistenceException.java#4 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     /**
      * Constructor for a PersistenceException which does not wrap

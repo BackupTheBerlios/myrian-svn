@@ -24,12 +24,12 @@ import com.arsdigita.tools.junit.framework.BaseTestCase;
  * model.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/08/04 $
+ * @version $Revision: #6 $ $Date: 2003/08/04 $
  **/
 
 public class MappingsTest extends BaseTestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/tests/data/MappingsTest.java#5 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/tests/data/MappingsTest.java#6 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     public MappingsTest(String name) {
         super(name);

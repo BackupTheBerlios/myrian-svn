@@ -4,12 +4,12 @@ package com.redhat.persistence;
  * PersistentObjectSource
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 
 public class PersistentObjectSource {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/PersistentObjectSource.java#1 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/PersistentObjectSource.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     public PersistentCollection getPersistentCollection(final Session ssn,
                                                         final DataSet set) {

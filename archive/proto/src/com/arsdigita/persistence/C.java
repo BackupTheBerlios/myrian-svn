@@ -9,12 +9,12 @@ import java.util.*;
  * C
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/08/04 $
+ * @version $Revision: #5 $ $Date: 2003/08/04 $
  **/
 
 final class C {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/C.java#4 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/C.java#5 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     public static final com.redhat.persistence.metadata.ObjectType type(String qname) {
         return Root.getRoot().getObjectType(qname);

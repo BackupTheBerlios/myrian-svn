@@ -1,0 +1,247 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/proto/test/pdl/com/arsdigita/persistence/static/Party.pdl#3 $ 
+// $DateTime: 2003/08/04 16:15:53 $
+
+model examples;
+
+object type Party {
+    BigInteger id = t_parties.party_id INTEGER;
+    String[1..1] email = t_parties.email VARCHAR(100);
+
+    object key (id);
+
+    retrieve {
+        do {
+            select email
+            from t_parties
+            where party_id = :id
+        } map {
+            email = email;
+        }
+    }
+
+    insert {
+        do {
+            insert into t_parties
+            (party_id, email)
+            values
+            (:id, :email)
+        }
+    }
+
+    update {
+        do {
+            update t_parties
+            set email = :email
+            where party_id = :id
+        }
+    }
+
+    delete {
+        do {
+            delete from t_parties
+            where party_id = :id
+        }
+    }
+}
+
+object type User extends Party {
+    String[1..1] firstName;
+    String[1..1] lastNames;
+    String bio;
+    component Color[0..1] favorateColor
+        = join t_users.favorate_color_id to t_colors.color_id;
+
+    reference key (t_users.user_id);
+
+    retrieve {
+        super;
+
+        do {
+            select first_name, last_names
+            from t_users
+            where user_id = :id
+        } map {
+            firstName = t_users.first_name;
+            lastNames = t_users.last_names;
+        }
+    }
+
+    retrieve attributes {
+        do {
+            select *
+            from t_users
+            where user_id = :id
+        } map {
+            firstName = t_users.first_name;
+            lastNames = t_users.last_names;
+            bio = t_users.bio;
+        }
+    }
+
+    insert {
+        super;
+
+        do {
+            insert into t_users
+            (user_id, first_name, last_names, bio)
+            values
+            (:id, :firstName, :lastNames, :bio)
+        }
+    }
+
+    update {
+        super;
+
+        do {
+            update t_users
+            set first_name = :firstName,
+                last_names = :lastNames,
+                bio = :bio
+            where user_id = :id
+        }
+    }
+
+    delete {
+        do {
+            delete from t_users
+            where user_id = :id
+        }
+
+        super;
+    }
+}
+
+object type Color {
+    BigInteger[1..1] id = t_colors.color_id INTEGER;
+    String[1..1] name = t_colors.name VARCHAR(100);
+
+    object key(id);
+}
+
+object type Group extends Party {
+    String[1..1] name;
+
+    retrieve {
+        super;
+
+        do {
+            select name
+            from t_groups
+            where group_id = :id
+        } map {
+            name = name;
+        }
+    }
+
+    insert {
+        super;
+
+        do {
+            insert into t_groups
+            (group_id, name)
+            values
+            (:id, :name)
+        }
+    }
+
+    update {
+        super;
+
+        do {
+            update t_groups
+            set name = :name
+            where group_id = :id
+        }
+    }
+
+    delete {
+        do {
+            delete from t_groups
+            where group_id = :id
+        }
+
+        super;
+    }
+}
+
+association {
+    Group[0..n] groups;
+    User[0..n] members;
+
+    retrieve groups {
+        do {
+            select g.group_id, p.email, name
+            from t_parties p, t_groups g, t_user_group_map m
+            where party_id = g.group_id
+            and g.group_id = m.group_id
+            and member_id = :id
+        } map {
+	    groups.id = g.group_id;
+            groups.email = p.email;
+            groups.name = g.name;
+        }
+    }
+
+    retrieve members {
+        do {
+            select p.party_id, p.email, first_name, last_names, bio
+            from t_parties p, t_users u, t_user_group_map
+            where party_id = user_id
+            and user_id = member_id
+            and group_id = :id
+        } map {
+	    members.id = p.party_id;
+            members.email = p.email;
+            members.firstName = u.first_name;
+            members.lastNames = u.last_names;
+            members.bio = u.bio;
+        }
+    }
+
+    add members {
+        do {
+            insert into t_user_group_map
+            (group_id, member_id)
+            values
+            (:id, :members.id)
+        }
+    }
+
+    remove members {
+        do {
+            delete from t_user_group_map
+            where group_id = :id
+            and member_id = :members.id
+        }
+    }
+
+    add groups {
+        do {
+            insert into t_user_group_map
+            (group_id, member_id)
+            values
+            (:groups.id, :id)
+        }
+    }
+
+    remove groups {
+        do {
+            delete from t_user_group_map
+            where group_id = :groups.id
+            and member_id = :id
+        }
+    }
+}

@@ -7,7 +7,7 @@ import com.redhat.persistence.metadata.ObjectType;
  * A generic class to persist and an appropriate adapter.
  *
  * @author <a href="mailto:ashah@redhat.com">Archit Shah</a>
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 
 public class Generic {

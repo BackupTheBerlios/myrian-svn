@@ -8,12 +8,12 @@ import java.util.*;
  * SymbolTable
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 
 class SymbolTable {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/pdl/SymbolTable.java#1 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/pdl/SymbolTable.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     private HashMap m_types = new HashMap();
     private ArrayList m_order = new ArrayList();

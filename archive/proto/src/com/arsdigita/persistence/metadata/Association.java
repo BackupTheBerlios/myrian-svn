@@ -23,12 +23,12 @@ import com.redhat.persistence.common.*;
  * link.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/08/04 $
+ * @version $Revision: #6 $ $Date: 2003/08/04 $
  **/
 
 public class Association extends ModelElement {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/Association.java#5 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/Association.java#6 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     private Property m_roleOne;
     private Property m_roleTwo;

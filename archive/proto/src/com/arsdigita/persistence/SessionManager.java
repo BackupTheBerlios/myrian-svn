@@ -34,12 +34,12 @@ import org.apache.log4j.Logger;
  *
  * @see Initializer
  * @author Archit Shah 
- * @version $Revision: #7 $ $Date: 2003/08/04 $
+ * @version $Revision: #8 $ $Date: 2003/08/04 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/SessionManager.java#7 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/SessionManager.java#8 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     private static String s_url = null;           // the jdbc URL
     private static String s_username = null;      // the database username

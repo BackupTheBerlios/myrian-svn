@@ -19,12 +19,12 @@ package com.redhat.persistence.metadata;
  * ForeignKey
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 
 public class ForeignKey extends Constraint {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/metadata/ForeignKey.java#1 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/metadata/ForeignKey.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     private UniqueKey m_key;
     private boolean m_cascade;

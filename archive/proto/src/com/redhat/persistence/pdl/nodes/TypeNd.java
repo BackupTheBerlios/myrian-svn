@@ -6,12 +6,12 @@ import java.util.*;
  * Type
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 
 public class TypeNd extends Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/pdl/nodes/TypeNd.java#1 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/pdl/nodes/TypeNd.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     public static final Field IDENTIFIERS =
         new Field(TypeNd.class, "identifiers", IdentifierNd.class, 1);

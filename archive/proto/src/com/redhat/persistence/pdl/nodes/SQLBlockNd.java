@@ -6,12 +6,12 @@ import java.util.*;
  * SQLBlockNd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 
 public class SQLBlockNd extends Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/pdl/nodes/SQLBlockNd.java#1 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/pdl/nodes/SQLBlockNd.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     public static final Field MAPPINGS =
         new Field(SQLBlockNd.class, "mappings", MappingNd.class, 0);

@@ -8,12 +8,12 @@ import java.sql.*;
  * BigIntegerAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 
 public class BigIntegerAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/pdl/adapters/BigIntegerAd.java#1 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/pdl/adapters/BigIntegerAd.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     public BigIntegerAd() {
 	super(Root.getRoot().getObjectType("global.BigInteger"),

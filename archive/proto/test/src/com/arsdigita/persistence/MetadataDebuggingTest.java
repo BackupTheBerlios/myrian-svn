@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 
 public class MetadataDebuggingTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/MetadataDebuggingTest.java#1 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/MetadataDebuggingTest.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     private static Logger s_log = Logger.getLogger(MetadataDebuggingTest.class);
 

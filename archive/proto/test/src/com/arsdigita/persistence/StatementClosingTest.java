@@ -47,7 +47,7 @@ import org.apache.log4j.varia.StringMatchFilter;
  */
 public class StatementClosingTest extends Log4jBasedTestCase {
 
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/StatementClosingTest.java#6 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/StatementClosingTest.java#7 $";
 
     private Session ssn;
 

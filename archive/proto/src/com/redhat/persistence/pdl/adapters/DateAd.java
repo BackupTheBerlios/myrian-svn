@@ -10,12 +10,12 @@ import java.sql.*;
  * DateAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 
 public class DateAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/pdl/adapters/DateAd.java#1 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/pdl/adapters/DateAd.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     public DateAd() {
         super(Root.getRoot().getObjectType("global.Date"), Types.TIMESTAMP);

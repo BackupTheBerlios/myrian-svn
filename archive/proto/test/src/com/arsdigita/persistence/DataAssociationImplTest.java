@@ -30,14 +30,14 @@ import org.apache.log4j.Logger;
  *
  * @author Michael Bryzek
  * @date $Date: 2003/08/04 $
- * @version $Revision: #6 $
+ * @version $Revision: #7 $
  *
  * @see com.arsdigita.persistence.DataAssociationImpl
  **/
 
 public class DataAssociationImplTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataAssociationImplTest.java#6 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataAssociationImplTest.java#7 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
     private static Logger log =
         Logger.getLogger(DataAssociationImplTest.class.getName());
 

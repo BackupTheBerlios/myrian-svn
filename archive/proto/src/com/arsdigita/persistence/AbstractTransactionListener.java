@@ -9,12 +9,12 @@ package com.arsdigita.persistence;
  * @see TransactionContext
  * @see TransactionListener
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 
 public class AbstractTransactionListener implements TransactionListener {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/AbstractTransactionListener.java#1 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/AbstractTransactionListener.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     /**
      * Called immediately before the transaction has committed

@@ -8,12 +8,12 @@ import java.util.*;
  * RDBMSStatement
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 
 public class RDBMSStatement {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/engine/rdbms/RDBMSStatement.java#1 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/engine/rdbms/RDBMSStatement.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     private final String m_text;
     private final ArrayList m_events = new ArrayList();

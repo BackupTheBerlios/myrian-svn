@@ -54,12 +54,12 @@ import java.io.StringWriter;
  * </ul>
  *
  * @author Mark Thomas
- * @version $Revision: #5 $ $Date: 2003/08/04 $
+ * @version $Revision: #6 $ $Date: 2003/08/04 $
  * @since 4.5
  */
 public class Statement implements java.sql.Statement, ResultSetEventListener {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/Statement.java#5 $ $Author: dennis $ $Date: 2003/08/04 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/Statement.java#6 $ $Author: dennis $ $Date: 2003/08/04 $";
 
     private static final java.util.Set dbgStatements = new java.util.HashSet();
 

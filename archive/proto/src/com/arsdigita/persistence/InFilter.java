@@ -12,14 +12,14 @@ import org.apache.log4j.Logger;
  * InFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/08/04 $
+ * @version $Revision: #7 $ $Date: 2003/08/04 $
  **/
 
 class InFilter extends FilterImpl implements Filter {
 
     private static Logger s_log = Logger.getLogger(InFilter.class);
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/InFilter.java#6 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/InFilter.java#7 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     private String m_prop;
     private String m_subProp;

@@ -6,12 +6,12 @@ import java.util.*;
  * Association
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 
 public class AssociationNd extends StatementNd {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/pdl/nodes/AssociationNd.java#1 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/pdl/nodes/AssociationNd.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     public static final Field ROLE_ONE =
         new Field(AssociationNd.class, "roleOne", PropertyNd.class, 1, 1);

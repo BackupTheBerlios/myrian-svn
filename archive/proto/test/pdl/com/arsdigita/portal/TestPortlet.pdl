@@ -1,0 +1,6 @@
+model com.arsdigita.portal;
+
+
+object type TestPortlet extends com.arsdigita.portal.Portlet {
+    reference key(t_test_portlet.id);   
+}

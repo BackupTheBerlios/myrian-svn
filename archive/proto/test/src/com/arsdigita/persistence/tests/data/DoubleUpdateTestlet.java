@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 
 public class DoubleUpdateTestlet extends Testlet {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/tests/data/DoubleUpdateTestlet.java#3 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/tests/data/DoubleUpdateTestlet.java#4 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     private static final Logger s_log = Logger.getLogger(DoubleUpdateTestlet.class);
 

@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/proto/sql/postgres/upgrade/5.2.0-5.2.1/index-nt_requests.sql#1 $
--- $DateTime: 2003/08/04 15:56:00 $
+-- $Id: //core-platform/proto/sql/postgres/upgrade/5.2.0-5.2.1/index-nt_requests.sql#2 $
+-- $DateTime: 2003/08/04 16:15:53 $
 
 create index nt_requests_digest_id_idx on nt_requests(digest_id);
 create index nt_requests_message_id_idx on nt_requests(message_id);

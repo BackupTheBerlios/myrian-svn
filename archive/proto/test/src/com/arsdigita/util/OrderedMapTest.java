@@ -21,7 +21,7 @@ import junit.framework.*;
 /**
  * @author Jim Parsons
  * @author Justin Ross
- * @version $Id: //core-platform/proto/test/src/com/arsdigita/util/OrderedMapTest.java#1 $
+ * @version $Id: //core-platform/proto/test/src/com/arsdigita/util/OrderedMapTest.java#2 $
  */
 public class OrderedMapTest extends TestCase {
     public void testOrderedMap() {

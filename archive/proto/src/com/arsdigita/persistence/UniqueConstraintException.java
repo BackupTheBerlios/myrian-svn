@@ -27,13 +27,13 @@ import java.sql.SQLException;
  * PersistenceException instead of SQLException.
  *
  * @author David Eison
- * @version $Revision: #4 $
+ * @version $Revision: #5 $
  * @since 4.6
  */
 
 public class UniqueConstraintException extends PersistenceException {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/UniqueConstraintException.java#4 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/UniqueConstraintException.java#5 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     /**
      * No public constructor.

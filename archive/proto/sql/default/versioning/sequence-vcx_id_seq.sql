@@ -11,7 +11,7 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/proto/sql/default/versioning/sequence-vcx_id_seq.sql#1 $
--- $DateTime: 2003/08/04 15:56:00 $
+-- $Id: //core-platform/proto/sql/default/versioning/sequence-vcx_id_seq.sql#2 $
+-- $DateTime: 2003/08/04 16:15:53 $
 
 create sequence vcx_id_seq;

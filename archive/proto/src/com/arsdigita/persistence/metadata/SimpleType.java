@@ -22,12 +22,12 @@ package com.arsdigita.persistence.metadata;
  * the atoms from which compound types are built.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/08/04 $
+ * @version $Revision: #6 $ $Date: 2003/08/04 $
  */
 
 public class SimpleType extends DataType {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/SimpleType.java#5 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/SimpleType.java#6 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     static final SimpleType
 	wrap(com.redhat.persistence.metadata.ObjectType obj) {

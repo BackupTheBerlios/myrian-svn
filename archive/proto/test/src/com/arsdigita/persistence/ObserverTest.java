@@ -22,12 +22,12 @@ import java.math.*;
  * ObserverTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/08/04 $
+ * @version $Revision: #4 $ $Date: 2003/08/04 $
  **/
 
 public class ObserverTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/ObserverTest.java#3 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/ObserverTest.java#4 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     public ObserverTest(String name) {
         super(name);

@@ -1,0 +1,38 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/proto/pdl/com/arsdigita/portal/Portlet.pdl#4 $ 
+// $DateTime: 2003/08/04 16:15:53 $
+
+model com.arsdigita.portal;
+
+import com.arsdigita.web.ApplicationType;
+import com.arsdigita.kernel.ResourceType;
+import com.arsdigita.kernel.Resource;
+
+
+object type PortletType extends ResourceType {
+    ApplicationType[0..1] providerApplicationType =
+        join application_types.provider_id to application_types.application_type_id;
+    String profile = application_types.profile VARCHAR(20);
+}
+
+object type Portlet extends Resource {
+    Integer cellNumber = applications.cell_number INTEGER;
+    Integer sortKey = applications.sort_key INTEGER;
+
+    reference key (portlets.portlet_id);
+
+}
+
+

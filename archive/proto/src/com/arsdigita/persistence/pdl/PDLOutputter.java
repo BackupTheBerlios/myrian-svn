@@ -30,7 +30,7 @@ import java.util.*;
  * file being named after the fully qualified model name.
  *
  * @author Patrick McNeill
- * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/PDLOutputter.java#5 $
+ * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/PDLOutputter.java#6 $
  */
 public class PDLOutputter {
     /**

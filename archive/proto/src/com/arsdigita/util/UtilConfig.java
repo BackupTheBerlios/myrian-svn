@@ -23,9 +23,9 @@ import org.apache.log4j.Logger;
  */
 final class UtilConfig extends Record {
     public static final String versionId =
-        "$Id: //core-platform/proto/src/com/arsdigita/util/UtilConfig.java#3 $" +
+        "$Id: //core-platform/proto/src/com/arsdigita/util/UtilConfig.java#4 $" +
         "$Author: dennis $" +
-        "$DateTime: 2003/08/04 15:56:00 $";
+        "$DateTime: 2003/08/04 16:15:53 $";
 
     private static final Logger s_log = Logger.getLogger(UtilConfig.class);
 

@@ -27,12 +27,12 @@ import java.io.*;
  * be marked as special "key" properties.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/08/04 $
+ * @version $Revision: #5 $ $Date: 2003/08/04 $
  **/
 
 public class ObjectType extends CompoundType {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/ObjectType.java#4 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/ObjectType.java#5 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     static ObjectType
 	wrap(com.redhat.persistence.metadata.ObjectType type) {

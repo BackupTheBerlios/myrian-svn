@@ -6,7 +6,7 @@ import com.redhat.persistence.metadata.ObjectType;
  * TypeException
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 
 public class TypeException extends ProtoException {

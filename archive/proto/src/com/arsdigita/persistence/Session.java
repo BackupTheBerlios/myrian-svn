@@ -58,7 +58,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #32 $ $Date: 2003/08/04 $
+ * @version $Revision: #33 $ $Date: 2003/08/04 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {

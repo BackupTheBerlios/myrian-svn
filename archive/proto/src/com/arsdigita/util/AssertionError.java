@@ -22,7 +22,7 @@ package com.arsdigita.util;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since  2003-05-21
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 public class AssertionError extends Error {
 

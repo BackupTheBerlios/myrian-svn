@@ -11,15 +11,15 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/proto/test/sql/postgres/persistence/data-query-test.sql#3 $
--- $DateTime: 2003/08/04 15:56:00 $
+-- $Id: //core-platform/proto/test/sql/postgres/persistence/data-query-test.sql#4 $
+-- $DateTime: 2003/08/04 16:15:53 $
 
 
 --
 -- This file contains the data model for the data query test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #3 $ $Date: 2003/08/04 $
+-- @version $Revision: #4 $ $Date: 2003/08/04 $
 --
 
 create table t_data_query (

@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/proto/sql/default/versioning/insert-vcx_event_types.sql#1 $
--- $DateTime: 2003/08/04 15:56:00 $
+-- $Id: //core-platform/proto/sql/default/versioning/insert-vcx_event_types.sql#2 $
+-- $DateTime: 2003/08/04 16:15:53 $
 
 -- NOTE: this needs to be kept in sync with
 -- com.arsdigita.x.versioning.Event

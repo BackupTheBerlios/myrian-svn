@@ -4,12 +4,12 @@ package com.redhat.persistence.metadata;
  * Property
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 
 public abstract class Property extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/metadata/Property.java#1 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/metadata/Property.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
 
     public static abstract class Switch {

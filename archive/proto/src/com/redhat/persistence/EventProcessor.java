@@ -19,13 +19,13 @@ package com.redhat.persistence;
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
  * @since 2003-02-20
- * @version $Revision: #1 $ $Date: 2003/08/04 $
+ * @version $Revision: #2 $ $Date: 2003/08/04 $
  **/
 public abstract class EventProcessor {
 
     public final static String versionId =
-        "$Id: //core-platform/proto/src/com/redhat/persistence/EventProcessor.java#1 $" +
-        " by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+        "$Id: //core-platform/proto/src/com/redhat/persistence/EventProcessor.java#2 $" +
+        " by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     /**
      * During this method, calls into the session to which the event processor

@@ -23,11 +23,11 @@ import java.util.Map;
  * methods can be added to a stock data query.
  *
  * @author David Lutterkort
- * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryDecorator.java#4 $
+ * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryDecorator.java#5 $
  */
 public class DataQueryDecorator implements DataQuery {
 
-    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryDecorator.java#4 $ by $Author: dennis $, $DateTime: 2003/08/04 15:56:00 $";
+    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryDecorator.java#5 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
 
     private DataQuery m_dq;
 

@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/proto/sql/oracle-se/mimetypes/index-convert_to_html_index.sql#1 $
--- $DateTime: 2003/08/04 15:56:00 $
+-- $Id: //core-platform/proto/sql/oracle-se/mimetypes/index-convert_to_html_index.sql#2 $
+-- $DateTime: 2003/08/04 16:15:53 $
 
 
 create index convert_to_html_index on pre_convert_html(content) indextype is
