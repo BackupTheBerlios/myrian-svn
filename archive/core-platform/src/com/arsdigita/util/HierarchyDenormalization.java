@@ -22,18 +22,18 @@ import com.arsdigita.domain.DomainObject;
 
 /**
  * <p>
- * A class to allow a column with denormazliation to be maintained.
+ * A class to allow a column with denormalization to be maintained.
  * This abstract class can be subclassed to allow an object to easily
  * maintain a denormalized hierarcy (such as the default parents for
- * a category).  
+ * a category).
  * </p>
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Revision: #1 $ $Date: 2002/08/28 $
+ * @version $Revision: #2 $ $Date: 2002/10/14 $
  */
 public abstract class HierarchyDenormalization {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/HierarchyDenormalization.java#1 $ by $Author: randyg $, $DateTime: 2002/08/28 17:43:50 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/HierarchyDenormalization.java#2 $ by $Author: richardl $, $DateTime: 2002/10/14 17:27:59 $";
 
     private String m_attributeName;
     private String m_id;
@@ -49,7 +49,7 @@ public abstract class HierarchyDenormalization {
     }
 
     // id must be a property in the OID
-    public HierarchyDenormalization(String operationName, DomainObject object, 
+    public HierarchyDenormalization(String operationName, DomainObject object,
                                     String attributeName, String id) {
         m_id = id;
         m_operationName = operationName;
@@ -61,7 +61,7 @@ public abstract class HierarchyDenormalization {
     /**
      *  This should be called by a domain object before calling super.save()
      *  so that the correct variables can be set in preparation for the
-     *  {@link afterSave()} call.
+     *  {@link #afterSave()} call.
      */
     public void beforeSave() {
         m_oldAttributeValue = null;
@@ -78,7 +78,7 @@ public abstract class HierarchyDenormalization {
                 DataCollection collection =
                     SessionManager.getSession().retrieve
                     (m_domainObject.getObjectType().getQualifiedName());
-                collection.addEqualsFilter(m_id, 
+                collection.addEqualsFilter(m_id,
                                            m_domainObject.getOID().get(m_id));
                 if (collection.next()) {
                     m_oldAttributeValue = (String)collection.get
@@ -101,7 +101,7 @@ public abstract class HierarchyDenormalization {
                 (m_operationName);
             operation.setParameter("id", m_domainObject.getOID().get(m_id));
             operation.setParameter("newPrefix", getAttributeValue());
-            operation.setParameter("oldPrefixLength", 
+            operation.setParameter("oldPrefixLength",
                                    new Integer(m_oldAttributeValue.length()));
             operation.setParameter("oldPrefix", m_oldAttributeValue);
             operation.execute();
@@ -115,4 +115,3 @@ public abstract class HierarchyDenormalization {
      */
     public abstract String getAttributeValue();
 }
-

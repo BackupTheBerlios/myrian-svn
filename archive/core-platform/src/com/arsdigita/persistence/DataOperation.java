@@ -31,11 +31,11 @@ import org.apache.log4j.Logger;
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
  * @since 4.5
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#5 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#6 $
  */
 public class DataOperation extends AbstractDataOperation {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#5 $ by $Author: jorris $, $DateTime: 2002/08/22 10:38:41 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#6 $ by $Author: richardl $, $DateTime: 2002/10/14 17:27:59 $";
 
     private Session m_session;
     private DataOperationType m_type;
@@ -88,7 +88,7 @@ public class DataOperation extends AbstractDataOperation {
      * Explicitly closes this DataOperation if it was used to
      * execute a PL/SQL function (CallableStatement).
      * It should be called after your program is finished calling
-     * {@link get(String parameterName)}
+     * {@link #get(String parameterName)}
      */
     public synchronized void close() {
         if (m_callableStatement != null) {

@@ -28,12 +28,12 @@ import org.apache.log4j.Logger;
  * specified in a PDL file to generate sql queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #15 $ $Date: 2002/08/14 $
+ * @version $Revision: #16 $ $Date: 2002/10/14 $
  **/
 
 public class Query extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#15 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#16 $ by $Author: richardl $, $DateTime: 2002/10/14 17:27:59 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -47,7 +47,7 @@ public class Query extends Node {
      * Constructs a query for retrieving all objects of the given type. By
      * default fetches only the key properties of the type (see {@link
      * #fetchKey()}). Additional properties can be fetched via the {@link
-     * #fetchDefault()} and {@link #fetch()} methods.
+     * #fetchDefault()} and {@link #fetch(String)} methods.
      *
      * @param type The object type for the query to fetch.
      **/
