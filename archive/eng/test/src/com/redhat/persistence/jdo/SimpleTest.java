@@ -19,8 +19,11 @@ package com.redhat.persistence.jdo;
 
 import java.util.*;
 import javax.jdo.*;
+import org.apache.log4j.Logger;
 
 public class SimpleTest extends WithTxnCase {
+    private static final Logger s_log = Logger.getLogger(SimpleTest.class);
+
     public void testModification() {
         Employee e = new Employee("name", null);
         e.setSalary(new Float(1.0f));
@@ -127,6 +130,50 @@ public class SimpleTest extends WithTxnCase {
         Collection emp = (Collection) q.execute(emps, name);
         e = (Employee) emp.iterator().next();
         assertNull(e.getDept());
+    }
+
+    public void testIsPersistent() {
+        String name = "dummy";
+        Employee e = new Employee(name, null);
+        m_pm.makePersistent(e);
+        m_pm.currentTransaction().commit();
+
+        m_pm.currentTransaction().begin();
+        assertTrue(JDOHelper.isPersistent(e));
+        m_pm.currentTransaction().commit();
+
+        PersistenceManager pm2 =
+            m_pm.getPersistenceManagerFactory().getPersistenceManager();
+        pm2.currentTransaction().begin();
+        pm2.deletePersistent(pm2.getObjectById(m_pm.getObjectId(e), true));
+        pm2.currentTransaction().commit();
+
+        m_pm.currentTransaction().begin();
+        assertFalse(JDOHelper.isPersistent(e));
+        m_pm.currentTransaction().commit();
+    }
+
+    public void testAssociateUnknown() {
+        String eName = "pk";
+        String dName = "ER";
+
+        Employee e = new Employee(eName, null);
+        Department d = new Department(dName);
+        m_pm.makePersistent(e);
+        m_pm.makePersistent(d);
+        m_pm.currentTransaction().commit();
+
+        m_pm.currentTransaction().begin();
+        e.setDepartment(d);
+        m_pm.currentTransaction().commit();
+
+        m_pm.currentTransaction().begin();
+        assertTrue("Bad employee name", eName.equals(e.getName()));
+        assertNotNull("null instance returned by getDept", e.getDept());
+        assertTrue("Bad department name", dName.equals(e.getDept().getName()));
+        m_pm.deletePersistent(e.getDept());
+        m_pm.deletePersistent(e);
+        m_pm.currentTransaction().commit();
     }
 
 }

@@ -76,6 +76,11 @@ class StateManagerImpl extends AbstractStateManager {
     }
 
     JDOState getState() {
+        if (m_state.isHollow()) {
+            if (m_pmi.currentTransaction().isActive()) {
+                m_state.readWithDatastoreTxn();
+            }
+        }
         return m_state;
     }
 
@@ -130,9 +135,9 @@ class StateManagerImpl extends AbstractStateManager {
                                  Object currentValue) {
 
         if (m_pmi.currentTransaction().isActive()) {
-            m_state.readWithDatastoreTxn();
+            getState().readWithDatastoreTxn();
         } else {
-            m_state.readOutsideTxn();
+            getState().readOutsideTxn();
         }
 
         final Class declaredClass =
@@ -186,9 +191,9 @@ class StateManagerImpl extends AbstractStateManager {
     public boolean isDeleted(PersistenceCapable pc) {
         final boolean rhpResult = ssn().isDeleted(pc);
         // sanity check
-        if (rhpResult != m_state.isDeleted()) {
+        if (rhpResult != getState().isDeleted()) {
             throw new JDOFatalInternalException
-                ("ssn.isDeleted=" + rhpResult + ", but m_state=" + m_state);
+                ("ssn.isDeleted=" + rhpResult + ", but m_state=" + getState());
         }
         return rhpResult;
     }
@@ -198,9 +203,9 @@ class StateManagerImpl extends AbstractStateManager {
      */
     public boolean isDirty(PersistenceCapable pc) {
         final boolean rhpResult = ssn().isModified(pc);
-        if (rhpResult != m_state.isDirty()) {
+        if (rhpResult != getState().isDirty()) {
             throw new JDOFatalInternalException
-                ("ssn.isModified=" + rhpResult + ", but m_state=" + m_state);
+                ("ssn.isModified=" + rhpResult + ", but m_state=" + getState());
         }
         return rhpResult;
     }
@@ -217,9 +222,9 @@ class StateManagerImpl extends AbstractStateManager {
      */
     public boolean isNew(PersistenceCapable pc) {
         final boolean isNew = ssn().isNew(pc);
-        if (isNew && !(m_state.isHollow() || m_state.isNew())) {
+        if (isNew != getState().isNew()) {
             throw new JDOFatalInternalException
-                ("ssn.isNew=" + isNew + ", but m_state=" + m_state);
+                ("ssn.isNew=" + isNew + ", but m_state=" + getState());
         }
         return isNew;
     }
@@ -228,14 +233,21 @@ class StateManagerImpl extends AbstractStateManager {
      * Tests whether this object is persistent.
      */
     public boolean isPersistent(PersistenceCapable pc) {
-        return m_state.isPersistent();
+        final boolean isPersistent = ssn().isPersisted(pc) || ssn().isNew(pc);
+        if (isPersistent != getState().isPersistent()) {
+            throw new JDOFatalInternalException
+                ("ssn.isPersisted=" + ssn().isPersisted(pc)
+                 + " and " + "ssn.isNew=" + ssn().isNew(pc)
+                 + ", but m_state=" + getState());
+        }
+        return isPersistent;
     }
 
     /**
      * Tests whether this object is transactional.
      */
     public boolean isTransactional(PersistenceCapable pc) {
-        return m_state.isTransactional();
+        return getState().isTransactional();
     }
 
     /**
@@ -338,6 +350,12 @@ class StateManagerImpl extends AbstractStateManager {
 
         if (isTransientTransactional(pc, field)) {
             return;
+        }
+
+        if (m_pmi.currentTransaction().isActive()) {
+            getState().writeWithTxn();
+        } else {
+            getState().writeOutsideTxn();
         }
 
         if (isComponent(pc, field)) {

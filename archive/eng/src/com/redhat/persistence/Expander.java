@@ -41,7 +41,7 @@ import java.util.Map;
  */
 class Expander extends Event.Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Expander.java#9 $ by $Author: rhs $, $DateTime: 2004/09/13 15:50:48 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Expander.java#10 $ by $Author: ashah $, $DateTime: 2004/09/28 10:52:16 $";
 
     final private Session m_ssn;
     final private Collection m_deleting = new HashSet();
@@ -124,10 +124,10 @@ class Expander extends Event.Switch {
             od = m_ssn.getObjectDataByKey(key);
         }
 
-        if (od == null || !od.isLoaded() || od.isDeleted()) {
+        if (od == null || od.isDeleted() || od.isNot()) {
             od = new ObjectData(m_ssn, obj, od.INFANTILE);
             if (map != null) { od.setObjectMap(map); }
-        } else if (!od.isDeleted()) {
+        } else {
             ProtoException pe = new DuplicateObjectException(obj);
             pe.setInternal(false);
             throw pe;

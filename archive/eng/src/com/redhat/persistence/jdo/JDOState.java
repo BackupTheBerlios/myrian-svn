@@ -237,7 +237,6 @@ final class JDOState {
     }
 
     // Non-static fields and methods begin here.
-
     private byte m_state = S_HOLLOW;
 
     private void transition(int action) {
@@ -358,7 +357,8 @@ final class JDOState {
     }
 
     public boolean isDirty() {
-        return m_state == S_P_DIRTY || m_state == S_T_DIRTY;
+        return isNew() || isDeleted() || m_state == S_P_DIRTY
+            || m_state == S_T_DIRTY;
     }
 
     public boolean isNew() {

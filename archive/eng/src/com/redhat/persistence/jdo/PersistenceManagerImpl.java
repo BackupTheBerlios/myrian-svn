@@ -83,6 +83,9 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
         StateManagerImpl smi = new StateManagerImpl
             (this, pmap, container == null ? pc : container, prefix);
         pc.jdoReplaceStateManager(smi);
+        if (m_txn.isActive()) {
+            smi.getState().makeTransactional();
+        }
         m_smiMap.put(pc, smi);
         return pc;
     }
@@ -97,6 +100,7 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
             (this, pmap, container, prefix);
         m_smiMap.put(pc, smi);
         pc.jdoReplaceStateManager(smi);
+        smi.getState().makeTransient();
         return smi;
     }
 

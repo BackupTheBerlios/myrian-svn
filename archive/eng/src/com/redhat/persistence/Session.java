@@ -54,12 +54,12 @@ import org.apache.commons.collections.map.ReferenceIdentityMap;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #21 $ $Date: 2004/09/23 $
+ * @version $Revision: #22 $ $Date: 2004/09/28 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#21 $ by $Author: ashah $, $DateTime: 2004/09/23 14:12:24 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#22 $ by $Author: ashah $, $DateTime: 2004/09/28 10:52:16 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -120,12 +120,11 @@ public class Session {
         ObjectData odata = getObjectDataByKey(key);
 
         if (odata != null && odata.isLoaded()) {
-            if (odata.isDeleted()) { return null; }
+            if (odata.isDeleted() || odata.isNot()) { return null; }
 
             ObjectType requested = keys.getObjectType();
             ObjectType current = getObjectType(odata.getObject());
 
-            // this duplicates logic in RecordSet.load [ashah]
             if (current.isSubtypeOf(requested)) {
                 return odata.getObject();
             } else if (!requested.isSubtypeOf(current)) {
@@ -545,13 +544,13 @@ public class Session {
     }
 
     public boolean hasObjectMap(Object obj) {
-        ObjectData odata = getObjectDataInternal(obj);
+        ObjectData odata = getObjectData(obj);
         if (odata == null) { return false; }
         return odata.getObjectMap() != null;
     }
 
     public ObjectMap getObjectMap(Object obj) {
-        ObjectData odata = getObjectDataInternal(obj);
+        ObjectData odata = getObjectData(obj);
         if (odata == null) {
             throw new IllegalArgumentException
                 ("not a session managed object: " + str(obj));
@@ -565,7 +564,7 @@ public class Session {
     }
 
     public Object getContainer(Object obj) {
-        ObjectData odata = getObjectDataInternal(obj);
+        ObjectData odata = getObjectData(obj);
         if (odata == null) {
             throw new IllegalArgumentException
                 ("not a session managed object: " + str(obj));
@@ -575,7 +574,7 @@ public class Session {
 
     public PropertyMap getProperties(Object obj) {
         if (hasObjectMap(obj)) {
-            return getObjectDataInternal(obj).getProperties();
+            return getObjectData(obj).getProperties();
         } else {
             return getAdapter(obj).getProperties(obj);
         }
@@ -646,7 +645,12 @@ public class Session {
     }
 
     public boolean isPersisted(Object obj) {
-        return hasObjectData(obj) && !getObjectData(obj).isInfantile();
+        if (hasObjectData(obj)) {
+            ObjectData od = getObjectData(obj);
+            return !od.isInfantile() && !od.isNot();
+        } else {
+            return false;
+        }
     }
 
     private static final Integer s_zero = new Integer(0);
@@ -916,7 +920,7 @@ public class Session {
     }
 
     public Object getSessionKey(Object obj) {
-        ObjectData odata = getObjectDataInternal(obj);
+        ObjectData odata = getObjectData(obj);
         if (odata == null) {
             throw new IllegalArgumentException("no key for object: " + obj);
         }
@@ -952,25 +956,12 @@ public class Session {
         return (ObjectData) m_keyodata.get(key);
     }
 
-    private boolean hasObjectDataInternal(Object obj) {
+    boolean hasObjectData(Object obj) {
         return m_objodata.containsKey(obj);
     }
 
-    private ObjectData getObjectDataInternal(Object obj) {
-        return (ObjectData) m_objodata.get(obj);
-    }
-
-    boolean hasObjectData(Object obj) {
-        return getObjectData(obj) != null;
-    }
-
     ObjectData getObjectData(Object obj) {
-        ObjectData odata = getObjectDataInternal(obj);
-        if (odata != null && odata.isLoaded()) {
-            return odata;
-        } else {
-            return null;
-        }
+        return (ObjectData) m_objodata.get(obj);
     }
 
     void addObjectData(ObjectData odata) {
@@ -1002,17 +993,22 @@ public class Session {
     }
 
     ObjectData fetchObjectData(Object obj) {
-        if (!hasObjectData(obj)) {
+        ObjectData od = getObjectData(obj);
+        if (od == null || !od.isLoaded()) {
             RecordSet rs = getDataSet(obj).getCursor().execute();
             if (rs.next()) {
                 do {
                     rs.load(this);
                 } while (rs.next());
+                if (od == null) {
+                    od = getObjectData(obj);
+                }
+            } else if (od != null) {
+                od.setState(ObjectData.NONE);
             }
         }
 
-        ObjectData od = getObjectData(obj);
-        if (od != null && od.isDeleted()) {
+        if (od == null || od.isDeleted() || od.isNot()) {
             return null;
         } else {
             return od;

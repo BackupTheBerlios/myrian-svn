@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
  * Tests lifecycle of JDO instances across transactions.
  *
  * @since 2004-08-04
- * @version $Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdo/BiTxnTest.java#6 $
+ * @version $Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdo/BiTxnTest.java#7 $
  **/
 public class BiTxnTest extends AbstractCase {
     private final static Logger s_log = Logger.getLogger(BiTxnTest.class);
@@ -96,9 +96,8 @@ public class BiTxnTest extends AbstractCase {
         m_pm.makePersistent(group);
 
         assertTrue("is transactional", JDOHelper.isTransactional(group));
-        checkpoint();
+        m_pm.currentTransaction().commit();
         assertTrue("is nontransactional", !JDOHelper.isTransactional(group));
         assertEquals("email", email, group.getEmail());
-        m_pm.currentTransaction().commit();
     }
 }

@@ -25,12 +25,12 @@ import java.util.*;
  * NestedObjectTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/09/16 $
+ * @version $Revision: #7 $ $Date: 2004/09/28 $
  **/
 
 public class NestedObjectTest extends WithTxnCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdo/NestedObjectTest.java#6 $ by $Author: rhs $, $DateTime: 2004/09/16 12:02:28 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdo/NestedObjectTest.java#7 $ by $Author: ashah $, $DateTime: 2004/09/28 10:52:16 $";
 
     private Collection query(Class klass) {
         return (Collection) m_pm.newQuery(klass).execute();
@@ -215,9 +215,20 @@ public class NestedObjectTest extends WithTxnCase {
 
         commit();
 
+        contacts = r.getContacts();
+        for (Iterator it = contacts.iterator(); it.hasNext(); ) {
+            m_pm.deletePersistent(it.next());
+        }
+
+        Collection cs = query("$1.m_contacts", r);
+        assertEquals("deleted nested objects", 2, cs.size());
+
         m_pm.deletePersistent(r);
 
         commit();
+
+        Collection rs = query("$1", r);
+        assertEquals("failed to delete", 0, rs.size());
     }
 
 }

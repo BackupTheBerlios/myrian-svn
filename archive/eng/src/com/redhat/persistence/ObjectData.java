@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2004/09/23 $
+ * @version $Revision: #12 $ $Date: 2004/09/28 $
  **/
 
 class ObjectData implements Violation {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/ObjectData.java#11 $ by $Author: ashah $, $DateTime: 2004/09/23 14:12:24 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/ObjectData.java#12 $ by $Author: ashah $, $DateTime: 2004/09/28 10:52:16 $";
 
     private static final Logger LOG = Logger.getLogger(ObjectData.class);
 
@@ -59,6 +59,7 @@ class ObjectData implements Violation {
     public static final State SENILE = new State("senile");
     public static final State DEAD = new State("dead");
     public static final State UNKNOWN = new State("unknown");
+    public static final State NONE = new State("none");
 
     private boolean m_startedNew = false;
 
@@ -189,7 +190,7 @@ class ObjectData implements Violation {
 
     public boolean isDeleted() { check(); return isDead() || isSenile(); }
 
-    public boolean isModified() { check(); return !isNubile(); }
+    public boolean isModified() { check(); return !isNubile() && !isNot(); }
 
     public boolean isInfantile() { check(); return m_state.equals(INFANTILE); }
 
@@ -201,17 +202,23 @@ class ObjectData implements Violation {
 
     public boolean isDead() { check(); return m_state.equals(DEAD); }
 
+    public boolean isNot() { check(); return m_state.equals(NONE); }
+
     private void check() {
         if (!isLoaded()) {
-            throw new IllegalStateException
-                ("unloaded object data with key " + getKey());
+            if (getSession().retrieve(getProperties()) == null) {
+                setState(NONE);
+            }
         }
     }
 
     public boolean isLoaded() { return !m_state.equals(UNKNOWN); }
 
     public boolean isFlushed() {
-        check();
+        if (!isLoaded()) {
+            return false;
+        }
+
         if (getSession().getEventStream().getLastEvent(getObject()) != null) {
             return false;
         }
@@ -235,8 +242,6 @@ class ObjectData implements Violation {
             getSession().addModified(getObject());
         }
     }
-
-    public State getState() { return m_state; }
 
     public Collection getDependentEvents() {
         return Collections.singletonList
