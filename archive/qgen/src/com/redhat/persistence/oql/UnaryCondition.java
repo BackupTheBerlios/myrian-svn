@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * UnaryCondition
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/01/16 $
+ * @version $Revision: #2 $ $Date: 2004/01/23 $
  **/
 
 public abstract class UnaryCondition extends Condition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/UnaryCondition.java#1 $ by $Author: rhs $, $DateTime: 2004/01/16 16:27:01 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/UnaryCondition.java#2 $ by $Author: rhs $, $DateTime: 2004/01/23 15:34:30 $";
 
     Expression m_operand;
 
@@ -23,6 +23,11 @@ public abstract class UnaryCondition extends Condition {
         pane.constrained = new ConstraintNode() {
             void updateConstraints() {}
         };
+    }
+
+    Code.Frame frame(Code code) {
+        m_operand.frame(code);
+        return null;
     }
 
 }

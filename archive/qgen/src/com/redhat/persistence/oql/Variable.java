@@ -1,5 +1,6 @@
 package com.redhat.persistence.oql;
 
+import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
 import java.util.*;
 
@@ -7,12 +8,12 @@ import java.util.*;
  * Variable
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/01/16 $
+ * @version $Revision: #3 $ $Date: 2004/01/23 $
  **/
 
 public class Variable extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Variable.java#2 $ by $Author: rhs $, $DateTime: 2004/01/16 16:27:01 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Variable.java#3 $ by $Author: rhs $, $DateTime: 2004/01/23 15:34:30 $";
 
     private String m_name;
 
@@ -42,6 +43,43 @@ public class Variable extends Expression {
                 }
             }
         };
+    }
+
+    Code.Frame frame(Code code) {
+        Code.Frame parent = code.get(m_name);
+        Property prop = parent.type.getProperty(m_name);
+        Code.Frame frame = code.frame(prop.getType());
+        // XXX: hack for package lookup
+        if (parent.type.getQualifiedName().equals("root")) {
+            code.addPackage(this);
+        } else {
+            frame.alias();
+            code.setContext(this, parent);
+            code.setFrame(this, frame);
+        }
+        return frame;
+    }
+
+    void emit(Code code) {
+        // XXX: hack for package lookup
+        if (code.isPackage(this)) { return; }
+
+        Code.Frame parent = code.getContext(this);
+        Property prop = parent.type.getProperty(m_name);
+        Code.Frame frame = code.getFrame(this);
+
+        String[] columns = parent.getColumns(prop);
+        code.append("(select ");
+        if (columns == null) {
+            code.alias(prop, frame.getColumns());
+            code.append(" from ");
+            code.table(prop);
+            code.append(" where ");
+            code.condition(prop, parent.getColumns());
+        } else {
+            code.alias(columns, frame.getColumns());
+        }
+        code.append(")");
     }
 
     public String toString() {

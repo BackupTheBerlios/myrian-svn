@@ -7,12 +7,12 @@ import java.util.*;
  * Expression
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/01/16 $
+ * @version $Revision: #3 $ $Date: 2004/01/23 $
  **/
 
 public abstract class Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Expression.java#2 $ by $Author: rhs $, $DateTime: 2004/01/16 16:27:01 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Expression.java#3 $ by $Author: rhs $, $DateTime: 2004/01/23 15:34:30 $";
 
     private static Map KEYS = new HashMap();
 
@@ -35,6 +35,10 @@ public abstract class Expression {
     }
 
     abstract void graph(Pane pane);
+
+    abstract Code.Frame frame(Code code);
+
+    abstract void emit(Code code);
 
     abstract String summary();
 

@@ -7,12 +7,12 @@ import java.util.*;
  * Define
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/01/19 $
+ * @version $Revision: #4 $ $Date: 2004/01/23 $
  **/
 
 public class Define extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Define.java#3 $ by $Author: rhs $, $DateTime: 2004/01/19 17:32:28 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Define.java#4 $ by $Author: rhs $, $DateTime: 2004/01/23 15:34:30 $";
 
     private Expression m_expr;
     private String m_name;
@@ -41,6 +41,17 @@ public class Define extends Expression {
                 }
             }
         };
+    }
+
+    Code.Frame frame(Code code) {
+        Code.Frame expr = m_expr.frame(code);
+        Code.Frame frame = code.frame(define(m_name, expr.type));
+        frame.setColumns(frame.type.getProperty(m_name), expr.getColumns());
+        return frame;
+    }
+
+    void emit(Code code) {
+        m_expr.emit(code);
     }
 
     private static ObjectType define(final String name,

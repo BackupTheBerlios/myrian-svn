@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * BinaryCondition
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/01/16 $
+ * @version $Revision: #3 $ $Date: 2004/01/23 $
  **/
 
 public abstract class BinaryCondition extends Condition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/BinaryCondition.java#2 $ by $Author: rhs $, $DateTime: 2004/01/16 16:27:01 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/BinaryCondition.java#3 $ by $Author: rhs $, $DateTime: 2004/01/23 15:34:30 $";
 
     Expression m_left;
     Expression m_right;
@@ -24,6 +24,26 @@ public abstract class BinaryCondition extends Condition {
         Pane right = pane.frame.graph(m_right);
         pane.variables =
             new UnionVariableNode(left.variables, right.variables);
+    }
+
+    Code.Frame frame(Code code) {
+        code.setFrame(m_left, m_left.frame(code));
+        code.setFrame(m_right, m_right.frame(code));
+        return null;
+    }
+
+    void emit(Code code) {
+        code.append("(");
+        m_left.emit(code);
+        code.append(")");
+        String op = getOperator();
+        if (op.equals("==")) {
+            op = "=";
+        }
+        code.append(" " + op + " ");
+        code.append("(");
+        m_right.emit(code);
+        code.append(")");
     }
 
     private String str(Expression e) {

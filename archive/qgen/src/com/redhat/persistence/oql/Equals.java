@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * Equals
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/01/19 $
+ * @version $Revision: #4 $ $Date: 2004/01/23 $
  **/
 
 public class Equals extends BinaryCondition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Equals.java#3 $ by $Author: rhs $, $DateTime: 2004/01/19 14:43:24 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Equals.java#4 $ by $Author: rhs $, $DateTime: 2004/01/23 15:34:30 $";
 
     Equals(Expression left, Expression right) {
         super(left, right);
@@ -34,6 +34,23 @@ public class Equals extends BinaryCondition {
                 return nd.lower != null && nd.lower.intValue() > 0;
             }
         };
+    }
+
+    void emit(Code code) {
+        Code.Frame left = code.getFrame(m_left);
+        Code.Frame right = code.getFrame(m_right);
+        if (left.getColumns().length <= 1) {
+            super.emit(code);
+            return;
+        }
+
+        code.append("exists(select * from ");
+        m_left.emit(code);
+        code.append(" leq cross join ");
+        m_right.emit(code);
+        code.append(" req where ");
+        code.equals(left.getColumns(), right.getColumns());
+        code.append(")");
     }
 
     String getOperator() {

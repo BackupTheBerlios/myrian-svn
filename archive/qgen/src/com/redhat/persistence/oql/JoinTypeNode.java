@@ -7,12 +7,12 @@ import java.util.*;
  * JoinTypeNode
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/01/16 $
+ * @version $Revision: #2 $ $Date: 2004/01/23 $
  **/
 
 class JoinTypeNode extends TypeNode {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/JoinTypeNode.java#1 $ by $Author: rhs $, $DateTime: 2004/01/16 16:27:01 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/JoinTypeNode.java#2 $ by $Author: rhs $, $DateTime: 2004/01/23 15:34:30 $";
 
     private TypeNode m_left;
     private TypeNode m_right;
@@ -30,14 +30,18 @@ class JoinTypeNode extends TypeNode {
         }
     }
 
-    private static ObjectType join(final ObjectType left,
-                                   final ObjectType right) {
+    static ObjectType join(final ObjectType left, final ObjectType right) {
         Model anon = Model.getInstance("anonymous.join");
         ObjectType result = new ObjectType
             (anon, left.getQualifiedName() + "$" + right.getQualifiedName(),
              null) {
             public String toString() {
                 return left + " + " + right;
+            }
+            public List getKeyProperties() {
+                ArrayList result = new ArrayList();
+                result.addAll(getProperties());
+                return result;
             }
         };
         addProperties(result, left);

@@ -10,14 +10,14 @@ import java.util.*;
  * Main
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/01/20 $
+ * @version $Revision: #4 $ $Date: 2004/01/23 $
  **/
 
 public class Main {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Main.java#3 $ by $Author: rhs $, $DateTime: 2004/01/20 12:41:29 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Main.java#4 $ by $Author: rhs $, $DateTime: 2004/01/23 15:34:30 $";
 
-    public static final void main(String[] args) throws Exception {
+    public static final void main(String[] args) throws Throwable {
         PDL pdl = new PDL();
         List expressions = new ArrayList();
         for (int i = 0; i < args.length; i++) {
@@ -38,19 +38,30 @@ public class Main {
         pdl.emit(root);
 
         Frame frame = Frame.root(root);
+        frame.type.update();
 
         for (Iterator it = expressions.iterator(); it.hasNext(); ) {
             Expression e = (Expression) it.next();
-            frame.graph(e);
+            //frame.graph(e);
+            Code code = new Code();
+            Code.Frame cframe = code.frame(frame.type.type);
+            code.push(cframe);
+            try {
+                e.frame(code);
+            } finally {
+                code.pop();
+            }
+            e.emit(code);
+            System.out.println(code.getSQL() + ";");
         }
 
-        Propogator p = new Propogator();
+        /*Propogator p = new Propogator();
         p.add(frame.type);
         p.propogate();
 
         Writer w = new OutputStreamWriter(System.out);
         frame.dump(new Indentor(w, "  "));
-        w.flush();
+        w.flush();*/
     }
 
 }

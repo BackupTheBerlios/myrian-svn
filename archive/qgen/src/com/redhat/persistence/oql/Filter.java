@@ -7,12 +7,12 @@ import java.util.*;
  * Filter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/01/19 $
+ * @version $Revision: #5 $ $Date: 2004/01/23 $
  **/
 
 public class Filter extends Query {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Filter.java#4 $ by $Author: rhs $, $DateTime: 2004/01/19 17:32:28 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Filter.java#5 $ by $Author: rhs $, $DateTime: 2004/01/23 15:34:30 $";
 
     private Expression m_expr;
     private Expression m_condition;
@@ -31,6 +31,25 @@ public class Filter extends Query {
             (expr.variables, new ExternalVariableNode(cond.variables));
         pane.injection = expr.injection;
         pane.keys = new FilterKeyNode(expr.keys, cond.constrained);
+    }
+
+    Code.Frame frame(Code code) {
+        Code.Frame frame = m_expr.frame(code);
+        code.push(frame);
+        try {
+            m_condition.frame(code);
+        } finally {
+            code.pop();
+        }
+        return frame;
+    }
+
+    void emit(Code code) {
+        code.append("(select * from ");
+        m_expr.emit(code);
+        code.append(" f where ");
+        m_condition.emit(code);
+        code.append(")");
     }
 
     public String toString() {

@@ -7,12 +7,12 @@ import java.util.*;
  * AbstractJoin
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/01/19 $
+ * @version $Revision: #4 $ $Date: 2004/01/23 $
  **/
 
 public abstract class AbstractJoin extends Query {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/AbstractJoin.java#3 $ by $Author: rhs $, $DateTime: 2004/01/19 14:43:24 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/AbstractJoin.java#4 $ by $Author: rhs $, $DateTime: 2004/01/23 15:34:30 $";
 
     private Expression m_left;
     private Expression m_right;
@@ -38,6 +38,52 @@ public abstract class AbstractJoin extends Query {
                 (pane.variables, new ExternalVariableNode(cond.variables));
             pane.keys = new FilterKeyNode(pane.keys, cond.constrained);
         }
+    }
+
+    Code.Frame frame(Code code) {
+        Code.Frame left = m_left.frame(code);
+        Code.Frame right = m_right.frame(code);
+        Code.Frame frame =
+            code.frame(JoinTypeNode.join(left.type, right.type));
+        for (Iterator it = frame.type.getKeyProperties().iterator();
+             it.hasNext(); ) {
+            Property prop = (Property) it.next();
+            if (left.type.hasProperty(prop.getName())) {
+                frame.setColumns(prop, left.getColumns(prop.getName()));
+            } else {
+                frame.setColumns(prop, right.getColumns(prop.getName()));
+            }
+        }
+
+        if (m_condition != null) {
+            code.push(frame);
+            try {
+                m_condition.frame(code);
+            } finally {
+                code.pop();
+            }
+        }
+        return frame;
+    }
+
+    void emit(Code code) {
+        code.append("(select * from ");
+        m_left.emit(code);
+        code.append(" l ");
+        String type = getJoinType();
+        code.append(type);
+        code.append(" ");
+        if (!type.equals("join")) {
+            code.append("join ");
+        }
+        m_right.emit(code);
+        code.append(" r");
+
+        if (m_condition != null) {
+            code.append(" on ");
+            m_condition.emit(code);
+        }
+        code.append(")");
     }
 
     public String toString() {
