@@ -1,18 +1,45 @@
 package com.redhat.persistence.oql;
 
+import java.util.*;
+
 /**
  * Equals
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/02/09 $
+ * @version $Revision: #8 $ $Date: 2004/02/21 $
  **/
 
 public class Equals extends BinaryCondition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Equals.java#7 $ by $Author: ashah $, $DateTime: 2004/02/09 16:16:05 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Equals.java#8 $ by $Author: rhs $, $DateTime: 2004/02/21 13:11:19 $";
 
     public Equals(Expression left, Expression right) {
         super(left, right);
+    }
+
+    void frame(Generator gen) {
+        super.frame(gen);
+        QFrame left = gen.getFrame(m_left);
+        QFrame right = gen.getFrame(m_right);
+        if (left == null || right == null) { return; }
+        List lvals = left.getValues();
+        List rvals = right.getValues();
+        for (int i = 0; i < lvals.size(); i++) {
+            gen.addEquality
+                (this, (QValue) lvals.get(i), (QValue) rvals.get(i));
+        }
+    }
+
+    String emit(Generator gen) {
+        String left = m_left.emit(gen);
+        String right = m_right.emit(gen);
+        if ("null".equals(left)) {
+            return right + " is " + left;
+        } else if ("null".equals(right)) {
+            return left + " is " + right;
+        } else {
+            return left + " = " + right;
+        }
     }
 
     void graph(Pane pane) {
@@ -36,7 +63,16 @@ public class Equals extends BinaryCondition {
         };
     }
 
+    Code.Frame frame(Code code) {
+        Code.Frame frame = super.frame(code);
+        Code.Frame left = code.getFrame(m_left);
+        Code.Frame right = code.getFrame(m_right);
+        frame.condition(left.getColumns(), right.getColumns());
+        return frame;
+    }
+
     void emit(Code code) {
+        Code.Frame frame = code.getFrame(this);
         Code.Frame left = code.getFrame(m_left);
         Code.Frame right = code.getFrame(m_right);
         if (left.getColumns().length <= 1) {

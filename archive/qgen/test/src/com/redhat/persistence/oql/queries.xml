@@ -111,6 +111,23 @@
   </test>
 
   <test>
+    <query>query(all(test.Node).parent, id = id, name = name)</query>
+    <query>query(all(test.StaticNode).parent, id = id, name = name)</query>
+    <results>
+      <row id="null" name="null"/>
+      <row id="30" name="Thirty"/>
+      <row id="30" name="Thirty"/>
+      <row id="30" name="Thirty"/>
+      <row id="33" name="Thirty Three"/>
+      <row id="33" name="Thirty Three"/>
+      <row id="33" name="Thirty Three"/>
+      <row id="36" name="Thirty Six"/>
+      <row id="37" name="Thirty Seven"/>
+      <row id="38" name="Thirty Eight"/>
+    </results>
+  </test>
+
+  <test>
     <query>query(filter(all(test.Node), exists(parent)), id = id)</query>
     <query>query(filter(all(test.StaticNode), exists(parent)), id = id)</query>
     <query>query(filter(all(test.Node), not (parent == null)), id = id)</query>

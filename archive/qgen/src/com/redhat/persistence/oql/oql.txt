@@ -101,19 +101,19 @@ generic function and/or method calls.
               '---> GreaterThan
 
 Inheritence Tree:
-Expression.java
-  Variable.java
-  Define.java
-  Get.java
-  Condition.java
-    UnaryCondition.java
-      Not.java
-      Exists.java
-    BinaryCondition.java
-      And.java
-      Or.java
-      Equals.java
   Query.java
+  Expression.java
+    Variable.java
+    Define.java
+    Get.java
+    Condition.java
+      UnaryCondition.java
+        Not.java
+        Exists.java
+      BinaryCondition.java
+        And.java
+        Or.java
+        Equals.java
     AbstractJoin.java
       Join.java
       CrossJoin.java
@@ -121,3 +121,8 @@ Expression.java
       LeftJoin.java
       RightJoin.java
     Filter.java
+    Sort.java
+    Range.java
+      Offset.java
+      Limit.java
+    Size.java

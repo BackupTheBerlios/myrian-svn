@@ -7,12 +7,12 @@ import java.util.*;
  * AbstractJoin
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/02/06 $
+ * @version $Revision: #7 $ $Date: 2004/02/21 $
  **/
 
 public abstract class AbstractJoin extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/AbstractJoin.java#6 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/AbstractJoin.java#7 $ by $Author: rhs $, $DateTime: 2004/02/21 13:11:19 $";
 
     private Expression m_left;
     private Expression m_right;
@@ -22,6 +22,34 @@ public abstract class AbstractJoin extends Expression {
         m_left = left;
         m_right = right;
         m_condition = condition;
+    }
+
+    void frame(Generator gen) {
+        m_left.frame(gen);
+        QFrame left = gen.getFrame(m_left);
+        m_right.frame(gen);
+        QFrame right = gen.getFrame(m_right);
+        QFrame frame = gen.frame
+            (this, JoinTypeNode.join(left.getType(), right.getType()));
+        frame.addChild(left);
+        frame.addChild(right);
+        List values = new ArrayList();
+        values.addAll(left.getValues());
+        values.addAll(right.getValues());
+        frame.setValues(values);
+        if (m_condition != null) {
+            gen.push(frame);
+            try {
+                m_condition.frame(gen);
+            } finally {
+                gen.pop();
+            }
+            frame.setCondition(m_condition);
+        }
+    }
+
+    String emit(Generator gen) {
+        return gen.getFrame(this).emit();
     }
 
     void graph(Pane pane) {
@@ -63,10 +91,38 @@ public abstract class AbstractJoin extends Expression {
             }
         }
 
+        code.setFrame(this, frame);
         return frame;
     }
 
+    void opt(Code code) {
+        m_left.opt(code);
+        m_right.opt(code);
+        if (m_condition != null) { m_condition.opt(code); }
+
+        Code.Frame frame = code.getFrame(this);
+        Code.Frame left = code.getFrame(m_left);
+        Code.Frame right = code.getFrame(m_right);
+        Code.Frame cond = null;
+        if (m_condition != null) {
+            cond = code.getFrame(m_condition);
+        }
+
+        frame.suckAll(left);
+        frame.suckAll(right);
+        if (cond != null) {
+            frame.suckConstrained(cond);
+        }
+    }
+
     void emit(Code code) {
+        Code.Frame frame = code.getFrame(this);
+        String join = frame.join();
+        if (join != null) {
+            code.append(join);
+            code.append(" cross join ");
+        }
+
         m_left.emit(code);
         code.append(" ");
         String type = getJoinType();

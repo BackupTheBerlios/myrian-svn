@@ -7,16 +7,20 @@ import com.redhat.persistence.metadata.Static;
 import java.io.*;
 import java.util.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/02/13 $
+ * @version $Revision: #9 $ $Date: 2004/02/21 $
  **/
 
 class Code {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#8 $ by $Author: ashah $, $DateTime: 2004/02/13 21:49:42 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#9 $ by $Author: rhs $, $DateTime: 2004/02/21 13:11:19 $";
+
+    private static final Logger s_log = Logger.getLogger(Code.class);
 
     private Root m_root;
     private LinkedList m_stack = new LinkedList();
@@ -96,21 +100,298 @@ class Code {
         return result;
     }
 
+    class Var {
+        String alias;
+        String column;
+        Var(String alias, String column) {
+            this.alias = alias;
+            this.column = column;
+        }
+        Var(String qualified) {
+            Path p = Path.get(qualified);
+            column = p.getName();
+            alias = p.getParent() == null ? null : p.getParent().getPath();
+        }
+        public String toString() {
+            if (alias == null) {
+                return column;
+            } else {
+                return alias + "." + column;
+            }
+        }
+    }
+
+    class Cond {
+        Var left;
+        Var right;
+        Cond(Var left, Var right) {
+            this.left = left;
+            this.right = right;
+        }
+        public String toString() {
+            String l = "" + left;
+            String r = "" + right;
+            if (l.equals("null")) {
+                return right + " is " + left;
+            } else if (r.equals("null")) {
+                return left + " is " + right;
+            } else {
+                return left + " = " + right;
+            }
+        }
+    }
+
+    // alias -> table
+    Map tables = new HashMap();
+    // {alias, alias}
+    Set duplicates = new HashSet();
+
+    void setTable(String alias, String table) {
+        tables.put(alias, table);
+    }
+
+    String getTable(String alias) {
+        return (String) tables.get(alias);
+    }
+
+    private boolean isConstrained(String table, Collection columns) {
+        Table t = m_root.getTable(table);
+        if (t == null) { return false; }
+        outer: for (Iterator it = t.getConstraints().iterator();
+                    it.hasNext(); ) {
+            Object o = it.next();
+            if (o instanceof UniqueKey) {
+                UniqueKey key = (UniqueKey) o;
+                Column[] cols = key.getColumns();
+                for (int i = 0; i < cols.length; i++) {
+                    if (!columns.contains(cols[i].getName())) {
+                        continue outer;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void fillConstraints(Collection aliases, Collection conditions,
+                                 Map columns, Map constraints) {
+        for (Iterator it = aliases.iterator(); it.hasNext(); ) {
+            String alias = (String) it.next();
+            for (Iterator iter = conditions.iterator(); iter.hasNext(); ) {
+                Cond cond = (Cond) iter.next();
+                Var me, outer;
+                if (alias.equals(cond.left.alias)) {
+                    me = cond.left;
+                    outer = cond.right;
+                } else if (alias.equals(cond.right.alias)) {
+                    me = cond.right;
+                    outer = cond.left;
+                } else {
+                    continue;
+                }
+                if (!aliases.contains(outer.alias)) {
+                    Set cols = (Set) columns.get(me.alias);
+                    if (cols == null) {
+                        cols = new HashSet();
+                        columns.put(me.alias, cols);
+                    }
+                    cols.add(me.column);
+
+                    List l = (List) constraints.get(me.alias);
+                    if (l == null) {
+                        l = new ArrayList();
+                        constraints.put(me.alias, l);
+                    }
+                    l.add(cond);
+                }
+            }
+        }
+    }
+
+    List frames = new ArrayList();
+
     class Frame {
 
         ObjectType type;
         private String[] m_columns = null;
 
+        // vars
+        List vars = null;
+        // aliases
+        List aliases = new ArrayList();
+        // var = var
+        List conditions = new ArrayList();
+
         private Frame(ObjectType type) {
             this.type = type;
+            frames.add(this);
+        }
+
+        void addCondition(Var left, Var right) {
+            conditions.add(new Cond(left, right));
+        }
+
+        void dups() {
+            for (Iterator it = aliases.iterator(); it.hasNext(); ) {
+                String alias = (String) it.next();
+                dups(alias);
+            }
+        }
+
+        void dups(String alias) {
+            String table = getTable(alias);
+            if (table == null) { return; }
+
+            List selfConditions = new ArrayList();
+            for (Iterator it = conditions.iterator(); it.hasNext(); ) {
+                Cond c = (Cond) it.next();
+                if ((alias.equals(c.left.alias)
+                     && table.equals(getTable(c.right.alias)))
+                    || (alias.equals(c.right.alias)
+                        && table.equals(getTable(c.left.alias)))) {
+                    if (c.left.column.equals(c.right.column)) {
+                        selfConditions.add(c);
+                    }
+                }
+            }
+
+            List others = new ArrayList(aliases);
+            others.remove(alias);
+
+            Map cols = new HashMap();
+            Map conds = new HashMap();
+
+            fillConstraints(others, selfConditions, cols, conds);
+
+            for (Iterator it = others.iterator(); it.hasNext(); ) {
+                String oalias = (String) it.next();
+                Collection c = (Collection) cols.get(oalias);
+                if (c == null) { continue; }
+                if (isConstrained(getTable(oalias), c)) {
+                    duplicates.add(new CompoundKey(oalias, alias));
+                }
+            }
+        }
+
+        void suckAll(Frame other) {
+            if (this.equals(other)) { return; }
+            aliases.addAll(other.aliases);
+            conditions.addAll(other.conditions);
+            other.aliases.clear();
+            other.conditions.clear();
+        }
+
+        void suckConstrained(Frame other) {
+            if (this.equals(other)) { return; }
+
+            if (other.aliases.isEmpty()) {
+                conditions.addAll(other.conditions);
+                other.conditions.clear();
+                return;
+            }
+
+            int before;
+            do {
+                before = aliases.size() + conditions.size();
+                suckOnce(other);
+            } while (aliases.size() + conditions.size() > before);
+        }
+
+        private void suckOnce(Frame other) {
+            Map columns = new HashMap();
+            Map conds = new HashMap();
+            fillConstraints(other.aliases, other.conditions, columns, conds);
+            for (Iterator it = other.aliases.iterator(); it.hasNext(); ) {
+                String alias = (String) it.next();
+                Collection cols = (Collection) columns.get(alias);
+                if (cols == null) { continue; }
+                String table = (String) tables.get(alias);
+                if (isConstrained(table, cols)) {
+                    aliases.add(alias);
+                    it.remove();
+                    List l = (List) conds.get(alias);
+                    if (l != null) {
+                        conditions.addAll(l);
+                        other.conditions.removeAll(l);
+                    }
+                }
+            }
+        }
+
+        String join() {
+            Set joined = new HashSet();
+            List conds = new ArrayList(conditions);
+            StringBuffer buf = null;
+            for (Iterator it = aliases.iterator(); it.hasNext(); ) {
+                String alias = (String) it.next();
+                joined.add(alias);
+                StringBuffer on = null;
+                for (Iterator iter = conds.iterator(); iter.hasNext(); ) {
+                    Cond c = (Cond) iter.next();
+                    if (joined.contains(c.left.alias) &&
+                        joined.contains(c.right.alias)) {
+                        if (on == null) {
+                            on = new StringBuffer();
+                        } else {
+                            on.append(" and ");
+                        }
+                        on.append(c);
+                        iter.remove();
+                    }
+                }
+
+                if (buf == null) {
+                    buf = new StringBuffer();
+                } else if (on == null) {
+                    buf.append(" cross join ");
+                } else {
+                    buf.append(" join ");
+                }
+
+                buf.append(getTable(alias));
+                buf.append(" ");
+                buf.append(alias);
+
+                if (on != null) {
+                    buf.append(" on ");
+                    buf.append(on.toString());
+                }
+            }
+
+            if (!conds.isEmpty()) {
+                if (buf == null) {
+                    buf = new StringBuffer();
+                    buf.append("(select 1) " + var("fd"));
+                }
+                buf.append(" join ");
+                buf.append("(select 2) " + var("fd"));
+                buf.append(" on ");
+
+                for (Iterator it = conds.iterator(); it.hasNext(); ) {
+                    Cond c = (Cond) it.next();
+                    buf.append(c.toString());
+                    if (it.hasNext()) {
+                        buf.append(" and ");
+                    }
+                }
+            }
+
+            if (buf == null) {
+                return null;
+            } else {
+                return buf.toString();
+            }
         }
 
         void setColumns(String[] columns) {
+            vars = new ArrayList();
             for (int i = 0; i < columns.length; i++) {
                 if (columns[i] == null) {
                     throw new IllegalArgumentException
                         ("null column: " + Arrays.asList(columns));
                 }
+                vars.add(new Var(columns[i]));
             }
             m_columns = columns;
         }
@@ -139,24 +420,86 @@ class Code {
 
         String alias(Property prop) {
             String alias = var("t");
+            aliases.add(alias);
             setColumns(columns(prop, alias));
             return alias;
         }
 
         String alias(ObjectType type) {
             String alias = var("t");
+            aliases.add(alias);
             setColumns(columns(type, alias));
             return alias;
         }
 
         String alias(int ncolumns) {
             String alias = var("t");
+            aliases.add(alias);
             String[] columns = new String[ncolumns];
             for (int i = 0; i < columns.length; i++) {
                 columns[i] = alias + ".col" + i;
             }
             setColumns(columns);
             return alias;
+        }
+
+        void condition(Property prop, final String alias, final String[] key) {
+            Mapping m = getMapping(prop);
+
+            if (m.getRetrieve() != null) {
+                StringBuffer buf = new StringBuffer();
+                buf.append("exists(select 1 from (");
+                bind(m.getRetrieve().getSQL(),
+                     map(paths(prop.getContainer(), null), key), buf);
+                buf.append(") sg where ");
+                Path[] paths = paths(prop.getType(), Path.get(prop.getName()));
+                Code.this.equals
+                    (concat("sg.", columns(paths, m.getRetrieve())),
+                     columns(prop.getType(), alias), buf);
+                buf.append(")");
+                final String cond = buf.toString();
+                conditions.add(new Cond(new Var(null, null),
+                                        new Var(null, null)) {
+                    public String toString() {
+                        return cond;
+                    }
+                });
+                return;
+            }
+
+            m.dispatch(new Mapping.Switch() {
+                public void onValue(Value v) {
+                    condition(v.getTable().getPrimaryKey(), alias, key);
+                }
+                public void onJoinTo(JoinTo j) {
+                    condition(j.getTable().getPrimaryKey(), alias, key);
+                }
+                public void onJoinFrom(JoinFrom j) {
+                    condition(j.getKey(), alias, key);
+                }
+                public void onJoinThrough(JoinThrough jt) {
+                    condition(jt.getFrom(), alias, key);
+                }
+                public void onStatic(Static s) {}
+            });
+        }
+
+        void condition(Constraint c, String alias, String[] columns) {
+            condition(c.getColumns(), alias, columns);
+        }
+
+        void condition(Column[] left, String alias, String[] right) {
+            condition(names(left, alias), right);
+        }
+
+        void condition(String[] left, String[] right) {
+            if (left.length != right.length) {
+                throw new IllegalArgumentException
+                    ("left size does not match right size");
+            }
+            for (int i = 0; i < left.length; i++) {
+                addCondition(new Var(left[i]), new Var(right[i]));
+            }
         }
 
         public String toString() {
@@ -174,6 +517,8 @@ class Code {
                     }
                 }
             }
+            buf.append(" vars = " + vars);
+            buf.append(" aliases = " + aliases);
             buf.append(">");
             return buf.toString();
         }
@@ -184,7 +529,11 @@ class Code {
         String[] result = new String[columns.length];
         for (int i = 0; i < columns.length; i++) {
             Column col = columns[i];
-            result[i] = alias + "." + col.getName();
+            if (alias == null) {
+                result[i] = col.getName();
+            } else {
+                result[i] = alias + "." + col.getName();
+            }
         }
         return result;
     }
@@ -198,11 +547,10 @@ class Code {
         return buf.toString();
     }
 
-    Mapping getMapping(Property prop) {
+    static Mapping getMapping(Property prop) {
         Root root = prop.getRoot();
         if (root == null) {
-            throw new IllegalStateException
-                ("null root: " + prop + "\n" + getTrace());
+            throw new IllegalStateException("null root: " + prop);
         }
         ObjectMap om = root.getObjectMap(prop.getContainer());
         if (om == null) {
@@ -225,7 +573,7 @@ class Code {
         }
     }
 
-    String[] columns(Property prop, final String alias) {
+    static String[] columns(Property prop, final String alias) {
         Mapping m = getMapping(prop);
 
         if (m.getRetrieve() != null) {
@@ -264,7 +612,7 @@ class Code {
         if (m.getRetrieve() != null) {
             append("exists(select 1 from (");
             bind(m.getRetrieve().getSQL(),
-                 map(paths(prop.getContainer(), null), key));
+                 map(paths(prop.getContainer(), null), key), m_sql);
             append(") sg where ");
             Path[] paths = paths(prop.getType(), Path.get(prop.getName()));
             equals(concat("sg.", columns(paths, m.getRetrieve())),
@@ -299,57 +647,64 @@ class Code {
     }
 
     void equals(String[] left, String[] right) {
+        equals(left, right, m_sql);
+    }
+
+    static void equals(String[] left, String[] right, StringBuffer buf) {
         if (left.length != right.length) {
             throw new IllegalArgumentException
-                ("left size does not match right size");
+                ("left size does not match right size" +
+                 "\nleft = " + Arrays.asList(left) +
+                 "\nright= " + Arrays.asList(right));
         }
         for (int i = 0; i < left.length; i++) {
-            append(left[i]);
-            append(" = ");
-            append(right[i]);
+            buf.append(left[i]);
+            buf.append(" = ");
+            buf.append(right[i]);
             if (i < left.length - 1) {
-                append(" and ");
+                buf.append(" and ");
             }
         }
     }
 
-    void table(final Property prop) {
+    static String table(final Property prop) {
         Mapping m = getMapping(prop);
 
         if (m.getRetrieve() != null) {
-            table(prop.getType());
-            return;
+            return table(prop.getType());
         }
+
+        final String[] result = new String[] { null };
 
         m.dispatch(new Mapping.Switch() {
             public void onValue(Value v) {
-                append(v.getTable().getName());
+                result[0] = v.getTable().getName();
             }
             public void onJoinTo(JoinTo j) {
-                append(j.getTable().getName());
+                result[0] = j.getTable().getName();
             }
             public void onJoinFrom(JoinFrom j) {
-                append(j.getKey().getTable().getName());
+                result[0] = j.getKey().getTable().getName();
             }
             public void onJoinThrough(JoinThrough jt) {
-                append(jt.getFrom().getTable().getName());
+                result[0] = jt.getFrom().getTable().getName();
             }
             public void onStatic(Static s) {}
         });
+
+        return result[0];
     }
 
-    void table(ObjectType type) {
+    static String table(ObjectType type) {
         ObjectMap om = type.getRoot().getObjectMap(type);
         if (om.getRetrieveAll() != null) {
-            append("(");
-            bind(om.getRetrieveAll().getSQL(), Collections.EMPTY_MAP);
-            append(")");
+            return "(" + om.getRetrieveAll().getSQL() + ")";
         } else {
-            append(om.getTable().getName());
+            return om.getTable().getName();
         }
     }
 
-    void bind(SQL sql, Map values) {
+    static void bind(SQL sql, Map values, StringBuffer buf) {
         for (SQLToken t = sql.getFirst(); t != null; t = t.getNext()) {
             if (t.isBind()) {
                 Path key = Path.get(t.getImage().substring(1));
@@ -358,9 +713,9 @@ class Code {
                     throw new IllegalStateException
                         ("no value for: " + key + " in " + values);
                 }
-                append(value);
+                buf.append(value);
             } else {
-                append(t.getImage());
+                buf.append(t.getImage());
             }
         }
     }
@@ -407,8 +762,12 @@ class Code {
     static String[] columns(ObjectType type, String alias) {
         ObjectMap om = type.getRoot().getObjectMap(type);
         if (om.getRetrieveAll() != null) {
-            return concat
-                (alias + ".", columns(paths(type, null), om.getRetrieveAll()));
+            String[] columns = columns(paths(type, null), om.getRetrieveAll());
+            if (alias == null) {
+                return columns;
+            } else {
+                return concat(alias + ".", columns);
+            }
         } else {
             return names(om.getTable().getPrimaryKey().getColumns(), alias);
         }
@@ -549,4 +908,13 @@ class Code {
     List getChildren(com.redhat.persistence.oql.Static expr) {
         return (List) m_staticChildren.get(expr);
     }
+
+    void opt(Expression expr) {
+        Expression qualias = (Expression) m_qualiases.get(expr);
+        qualias.opt(this);
+        Frame f = getFrame(expr);
+        Frame q = getFrame(qualias);
+        f.suckAll(q);
+    }
+
 }

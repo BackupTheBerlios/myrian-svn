@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * Sort
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/02/06 $
+ * @version $Revision: #5 $ $Date: 2004/02/21 $
  **/
 
 public class Sort extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Sort.java#4 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Sort.java#5 $ by $Author: rhs $, $DateTime: 2004/02/21 13:11:19 $";
 
     public static class Order {
         private Order() {}
@@ -32,6 +32,25 @@ public class Sort extends Expression {
         this(query, key, ASCENDING);
     }
 
+    void frame(Generator gen) {
+        m_query.frame(gen);
+        QFrame query = gen.getFrame(m_query);
+        QFrame frame = gen.frame(this, query.getType());
+        frame.addChild(query);
+        frame.setValues(query.getValues());
+        frame.setOrder(m_key, m_order == ASCENDING);
+        gen.push(frame);
+        try {
+            m_key.frame(gen);
+        } finally {
+            gen.pop();
+        }
+    }
+
+    String emit(Generator gen) {
+        return gen.getFrame(this).emit();
+    }
+
     void graph(Pane pane) {
         Pane query = pane.frame.graph(m_query);
         Frame frame = new Frame(pane.frame, query.type);
@@ -49,12 +68,22 @@ public class Sort extends Expression {
         code.setAlias(this, frame.alias(query.getColumns().length));
         code.push(query);
         try {
-            code.setFrame(m_key, m_key.frame(code));
+            m_key.frame(code);
         } finally {
             code.pop();
         }
-        code.setFrame(m_query, query);
+        code.setFrame(this, frame);
         return frame;
+    }
+
+    void opt(Code code) {
+        m_query.opt(code);
+        m_key.opt(code);
+        Code.Frame frame = code.getFrame(this);
+        Code.Frame query = code.getFrame(m_query);
+        Code.Frame key = code.getFrame(m_key);
+        frame.suckAll(query);
+        frame.suckConstrained(key);
     }
 
     void emit(Code code) {
@@ -74,11 +103,11 @@ public class Sort extends Expression {
     }
 
     String summary() {
-        return "order";
+        return "sort";
     }
 
     public String toString() {
-        return "order(" + m_query + ", " + m_key + ")";
+        return "sort(" + m_query + ", " + m_key + ")";
     }
 
 }

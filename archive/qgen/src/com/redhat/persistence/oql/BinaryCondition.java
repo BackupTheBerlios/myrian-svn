@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * BinaryCondition
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/02/06 $
+ * @version $Revision: #5 $ $Date: 2004/02/21 $
  **/
 
 public abstract class BinaryCondition extends Condition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/BinaryCondition.java#4 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/BinaryCondition.java#5 $ by $Author: rhs $, $DateTime: 2004/02/21 13:11:19 $";
 
     Expression m_left;
     Expression m_right;
@@ -17,6 +17,16 @@ public abstract class BinaryCondition extends Condition {
     BinaryCondition(Expression left, Expression right) {
         m_left = left;
         m_right = right;
+    }
+
+    void frame(Generator gen) {
+        m_left.frame(gen);
+        m_right.frame(gen);
+    }
+
+    String emit(Generator gen) {
+        String op = getOperator();
+        return m_left.emit(gen) + " " + op + " " + m_right.emit(gen);
     }
 
     void graph(Pane pane) {
@@ -27,9 +37,22 @@ public abstract class BinaryCondition extends Condition {
     }
 
     Code.Frame frame(Code code) {
-        code.setFrame(m_left, m_left.frame(code));
-        code.setFrame(m_right, m_right.frame(code));
-        return null;
+        Code.Frame frame = code.frame(null);
+        m_left.frame(code);
+        m_right.frame(code);
+        code.setFrame(this, frame);
+        return frame;
+    }
+
+    void opt(Code code) {
+        m_left.opt(code);
+        m_right.opt(code);
+
+        Code.Frame frame = code.getFrame(this);
+        Code.Frame left = code.getFrame(m_left);
+        Code.Frame right = code.getFrame(m_right);
+        frame.suckConstrained(left);
+        frame.suckConstrained(right);
     }
 
     void emit(Code code) {

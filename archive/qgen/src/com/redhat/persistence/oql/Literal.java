@@ -7,17 +7,28 @@ import java.util.Iterator;
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/02/13 $
+ * @version $Revision: #8 $ $Date: 2004/02/21 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#7 $ by $Author: ashah $, $DateTime: 2004/02/13 21:49:42 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#8 $ by $Author: rhs $, $DateTime: 2004/02/21 13:11:19 $";
 
     private Object m_value;
 
     public Literal(Object value) {
         m_value = value;
+    }
+
+    void frame(Generator gen) {
+        // XXX: ???
+        QFrame frame = gen.frame(this, null);
+        frame.setValues(new String[] { convert(m_value) });
+    }
+
+    String emit(Generator gen) {
+        // XXX: ???
+        return gen.getFrame(this).emit();
     }
 
     void graph(Pane pane) {
@@ -95,6 +106,8 @@ public class Literal extends Expression {
         result.append("'");
         return result.toString();
     }
+
+    void opt(Code code) { }
 
     void emit(Code code) {
         code.materialize(this);

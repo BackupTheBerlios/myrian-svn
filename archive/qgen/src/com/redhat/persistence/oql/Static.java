@@ -12,33 +12,56 @@ import java.util.*;
  * Static
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/02/13 $
+ * @version $Revision: #4 $ $Date: 2004/02/21 $
  **/
 
 public class Static extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#3 $ by $Author: ashah $, $DateTime: 2004/02/13 21:49:42 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#4 $ by $Author: rhs $, $DateTime: 2004/02/21 13:11:19 $";
 
     private SQL m_sql;
+    private String m_type;
+    private String[] m_columns;
+    private boolean m_map;
     private Map m_bindings;
-    private boolean m_mapPaths;
+    private List m_expressions = new ArrayList();
 
     public Static(String sql) {
-        this(sql, Collections.EMPTY_MAP, true);
+        this(sql, Collections.EMPTY_MAP);
     }
 
-    public Static(SQL sql) {
-        this(sql, Collections.EMPTY_MAP, true);
+    public Static(String sql, Map bindings) {
+        this(parse(sql), null, null, true, bindings);
     }
 
-    public Static(String sql, Map bindings, boolean mapPaths) {
-        this(parse(sql), bindings, mapPaths);
-    }
-
-    public Static(SQL sql, Map bindings, boolean mapPaths) {
+    Static(SQL sql, String type, String[] columns, boolean map, Map bindings) {
         m_sql = sql;
+        m_type = type;
+        m_columns = columns;
+        m_map = map;
         m_bindings = bindings;
-        m_mapPaths = mapPaths;
+
+        for(SQLToken t = m_sql.getFirst(); t != null; t = t.getNext()) {
+            if (isExpression(t)) {
+                String image = t.getImage();
+                Expression e;
+                if (t.isBind()) {
+                    e = bind(image);
+                } else if (m_map && t.isPath()) {
+                    e = new Choice(new All(image, m_bindings), path(image));
+                } else if (!m_map && t.isPath()) {
+                    e = new Choice(new All(image, m_bindings), image);
+                } else {
+                    throw new IllegalStateException
+                        ("don't know how to deal with token: " + t);
+                }
+                m_expressions.add(e);
+            }
+        }
+    }
+
+    private boolean isExpression(SQLToken tok) {
+        return tok.isBind() || tok.isPath();
     }
 
     private static SQL parse(String sql) {
@@ -53,87 +76,133 @@ public class Static extends Expression {
         return p.getSQL();
     }
 
-    private static Expression expression(Path path) {
+    private static Expression bind(String image) {
+        return expression(Path.get(image), true);
+    }
+
+    private static Expression path(String image) {
+        return expression(Path.get(image), false);
+    }
+
+    private static Expression expression(Path path, boolean isBind) {
         if (path.getParent() == null) {
-            return new Variable(path.getName());
+            String name = path.getName();
+            if (isBind) {
+                return new Literal(name.substring(1));
+            } else {
+                return new Variable(name);
+            }
         } else {
-            return new Get(expression(path.getParent()), path.getName());
+            return new Get
+                (expression(path.getParent(), isBind), path.getName());
         }
     }
 
-    void graph(Pane pane) {
-//         pane.variables = new VariableNode() { void updateVariables() {} };
-//         Pane[] panes = new Pane[m_expressions.length];
-//         for (int i = 0; i < panes.length; i++) {
-//             panes[i] = pane.frame.graph(m_expressions[i]);
-//             pane.variables =
-//                 new UnionVariableNode(pane.variables, panes[i].variables);
-//         }
-//         pane.constrained =
-//             new ConstraintNode() { void updateConstraints() {} };
-        throw new UnsupportedOperationException();
+    void frame(Generator gen) {
+        for (Iterator it = m_expressions.iterator(); it.hasNext(); ) {
+            Expression e = (Expression) it.next();
+            e.frame(gen);
+        }
+        if (m_type != null) {
+            QFrame frame = gen.frame(this, gen.getType(m_type));
+            frame.setValues(m_columns);
+            frame.setTable(this);
+        } else if (m_expressions.size() == 1
+                   && m_sql.getFirst().equals(m_sql.getLast())) {
+            Expression e = (Expression) m_expressions.get(0);
+            if (gen.hasFrame(e)) {
+                QFrame child = gen.getFrame(e);
+                QFrame frame = gen.frame(this, child.getType());
+                frame.addChild(child);
+                frame.setValues(child.getValues());
+            }
+        }
     }
 
-    Code.Frame frame(Code code) {
-        List exprs = new ArrayList();
+    String emit(Generator gen) {
+        if (m_type == null && gen.hasFrame(this)) {
+            return gen.getFrame(this).emit();
+        }
 
-        for(SQLToken t = m_sql.getFirst(); t != null; t = t.getNext()) {
-            if (t.isBind()) {
-                // XXX :foo.id needs to be handled
-                Literal value = new Literal(m_bindings.get(t.getImage()));
-                exprs.add(value);
-            } else if (t.isPath() && m_mapPaths) {
-                String image = t.getImage();
-                ObjectType ot = code.getType(image);
-                if (ot == null) {
-                    exprs.add(expression(Path.get(image)));
-                } else {
-                    ObjectMap map = ot.getRoot().getObjectMap(ot);
-                    exprs.add(new Static
-                              (map.getRetrieveAll().getSQL(),
-                               m_bindings,
-                               false) {
-                        void emit(Code code) {
-                            code.append("(");
-                            super.emit(code);
-                            code.append(") ");
-                            code.append(code.var("st"));
-                        }
-                    });
+        StringBuffer buf = new StringBuffer();
+        int index = 0;
+        if (m_type != null) { buf.append("("); }
+        for (SQLToken t = m_sql.getFirst(); t != null; t = t.getNext()) {
+            if (isExpression(t)) {
+                Expression e = (Expression) m_expressions.get(index++);
+                buf.append(e.emit(gen));
+            } else {
+                // XXX: need to handle raw
+                buf.append(t.getImage());
+            }
+        }
+        if (m_type != null) { buf.append(")"); }
+        return buf.toString();
+    }
+
+    private class Choice extends Expression {
+
+        private All m_all;
+        private Expression m_expression;
+        private String m_image;
+
+        Choice(All all, Expression alternative) {
+            m_all = all;
+            m_expression = alternative;
+        }
+
+        Choice(All all, String alternative) {
+            m_all = all;
+            m_image = alternative;
+        }
+
+        void frame(Generator gen) {
+            QFrame child = null;
+            if (gen.hasType(m_all.getType())) {
+                m_all.frame(gen);
+                child = gen.getFrame(m_all);
+            } else if (m_expression != null) {
+                m_expression.frame(gen);
+                if (gen.hasFrame(m_expression)) {
+                    child = gen.getFrame(m_expression);
                 }
             }
-        }
-
-        for (Iterator it = exprs.iterator(); it.hasNext(); ) {
-            Expression expr = (Expression) it.next();
-            code.setFrame(expr, expr.frame(code));
-        }
-
-        code.setChildren(this, exprs);
-        code.addVirtual(this);
-        return code.frame(null);
-    }
-
-    void emit(Code code) {
-        int index = 0;
-        for (SQLToken t = m_sql.getFirst(); t != null; t = t.getNext()) {
-            // XXX: need to handle raw
-            if ((t.isPath() && m_mapPaths) || t.isBind()) {
-                Expression expr =
-                    (Expression) code.getChildren(this).get(index++);
-                code.materialize(expr);
-            } else {
-                code.append(t.getImage());
+            if (child != null) {
+                QFrame frame = gen.frame(this, child.getType());
+                frame.addChild(child);
+                frame.setValues(child.getValues());
             }
         }
+
+        String emit(Generator gen) {
+            if (gen.hasFrame(this)) {
+                return gen.getFrame(this).emit();
+            } else if (m_expression != null) {
+                return m_expression.emit(gen);
+            } else {
+                return m_image;
+            }
+        }
+
+        void graph(Pane pane) {}
+        Code.Frame frame(Code code) { return null; }
+        void opt(Code code) {}
+        void emit(Code code) {}
+        String summary() { return this.toString(); }
+
     }
 
+    void graph(Pane pane) {}
+    Code.Frame frame(Code code) { return null; }
+    void opt(Code code) { }
+    void emit(Code code) { }
+
     public String toString() {
-        return "{" + m_sql + "}";
+        return "sql {" + m_sql + "}";
     }
 
     String summary() {
-        return "static: " + this;
+        return toString();
     }
 
 }

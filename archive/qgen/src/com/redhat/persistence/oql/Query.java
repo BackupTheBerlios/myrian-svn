@@ -3,16 +3,20 @@ package com.redhat.persistence.oql;
 import com.redhat.persistence.metadata.*;
 import java.util.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/02/09 $
+ * @version $Revision: #5 $ $Date: 2004/02/21 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#4 $ by $Author: rhs $, $DateTime: 2004/02/09 14:57:03 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#5 $ by $Author: rhs $, $DateTime: 2004/02/21 13:11:19 $";
+
+    private static final Logger s_log = Logger.getLogger(Query.class);
 
     private Expression m_query;
     private List m_names;
@@ -38,35 +42,61 @@ public class Query {
     }
 
     public String generate(Root root) {
-        Code code = new Code(root);
-        Code.Frame frame = m_query.frame(code);
-        code.push(frame);
+        Generator gen = new Generator(root);
+        m_query.frame(gen);
+
+        if (m_names.isEmpty()) {
+            return m_query.emit(gen);
+        }
+
+        QFrame qframe = gen.getFrame(m_query);
+        gen.push(qframe);
         try {
             for (Iterator it = m_names.iterator(); it.hasNext(); ) {
                 Expression e = get((String) it.next());
-                code.setFrame(e, e.frame(code));
+                e.frame(gen);
             }
         } finally {
-            code.pop();
+            gen.pop();
         }
 
-        code.append("select ");
-        if (m_names.isEmpty()) {
-            code.append("*");
-        } else {
-            for (Iterator it = m_names.iterator(); it.hasNext(); ) {
-                String name = (String) it.next();
-                Expression e = get(name);
-                code.materialize(e);
-                code.append(" as ");
-                code.append(name);
-                if (it.hasNext()) { code.append(", "); }
+        s_log.info("unoptimized frame: " + qframe);
+
+        boolean modified;
+        do {
+            modified = false;
+            for (Iterator it = gen.getFrames().iterator(); it.hasNext(); ) {
+                QFrame qf = (QFrame) it.next();
+                modified |= qf.hoist();
+            }
+        } while (modified);
+
+        s_log.info("hoisted frame: " + qframe);
+
+        for (Iterator it = gen.getFrames().iterator(); it.hasNext(); ) {
+            QFrame qf = (QFrame) it.next();
+            qf.shrink();
+        }
+
+        s_log.info("shrunk frame: " + qframe);
+
+        StringBuffer sql = new StringBuffer();
+        sql.append("select ");
+        for (Iterator it = m_names.iterator(); it.hasNext(); ) {
+            String name = (String) it.next();
+            Expression e = get(name);
+            sql.append(e.emit(gen));
+            sql.append(" as ");
+            sql.append(name);
+            if (it.hasNext()) {
+                sql.append(", ");
             }
         }
-        code.append("\nfrom ");
-        m_query.emit(code);
 
-        return code.getSQL();
+        sql.append("\nfrom ");
+        sql.append(qframe.emit(false));
+
+        return sql.toString();
     }
 
     public String toString() {

@@ -8,17 +8,26 @@ import java.util.*;
  * Variable
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/02/09 $
+ * @version $Revision: #8 $ $Date: 2004/02/21 $
  **/
 
 public class Variable extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Variable.java#7 $ by $Author: ashah $, $DateTime: 2004/02/09 16:16:05 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Variable.java#8 $ by $Author: rhs $, $DateTime: 2004/02/21 13:11:19 $";
 
     private String m_name;
 
     public Variable(String name) {
         m_name = name;
+    }
+
+    void frame(Generator gen) {
+        QFrame parent = gen.resolve(m_name);
+        Get.frame(gen, parent, m_name, this);
+    }
+
+    String emit(Generator gen) {
+        return gen.getFrame(this).emit();
     }
 
     void graph(Pane pane) {
@@ -60,7 +69,10 @@ public class Variable extends Expression {
             frame = code.frame(prop.getType());
             String[] columns = parent.getColumns(prop);
             if (columns == null) {
-                code.setAlias(this, frame.alias(prop));
+                String alias = frame.alias(prop);
+                code.setAlias(this, alias);
+                code.setTable(alias, code.table(prop));
+                frame.condition(prop, alias, parent.getColumns());
             } else {
                 frame.setColumns(columns);
             }
@@ -68,6 +80,14 @@ public class Variable extends Expression {
         code.setContext(this, parent);
         code.setFrame(this, frame);
         return frame;
+    }
+
+    void opt(Code code) {
+        Code.Frame parent = code.getContext(this);
+        Property prop = parent.type.getProperty(m_name);
+        if (code.isQualias(prop)) {
+            code.opt(this);
+        }
     }
 
     void emit(Code code) {
@@ -78,21 +98,27 @@ public class Variable extends Expression {
 
         if (code.isQualias(prop)) {
             code.emit(this);
-            return;
-        }
-
-        String[] columns = parent.getColumns(prop);
-        if (columns == null) {
-            code.table(prop);
-            code.append(" ");
-            code.append(alias);
-            if (prop.isNullable() && !prop.isCollection()) {
-                code.append(" right");
-            }
-            code.append(" join (select 1) " + code.var("d") + " on ");
-            code.condition(prop, alias, parent.getColumns());
         } else {
-            code.append("(select 2) " + code.var("d"));
+            String join = frame.join();
+            if (join != null) {
+                code.append(join);
+            } else {
+                code.append("(select 1) " + code.var("d"));
+            }
+
+            /*String[] columns = parent.getColumns(prop);
+            if (columns == null) {
+                code.append(code.table(prop));
+                code.append(" ");
+                code.append(alias);
+                if (prop.isNullable() && !prop.isCollection()) {
+                    code.append(" right");
+                }
+                code.append(" join (select 1) " + code.var("d") + " on ");
+                code.condition(prop, alias, parent.getColumns());
+            } else {
+                code.append("(select 2) " + code.var("d"));
+                }*/
         }
     }
 
