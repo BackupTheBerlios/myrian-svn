@@ -1,27 +1,121 @@
 Functionality:
- * Reorder DML in relational engine
- * Observers
- * Size
- * DataQuery.setRange
- * DataQuery.set/getParameter
- * Query caching
- * Link attributes
- * LOBs
- * Weak refs
- * Compound keys
- * Exceptions
- * type checks for PropertyEvent
- * null/"" handling (maybe: DOI.set converts ""-> null. Session disallows "".)
- * throwing appropriate exceptions save()
- * Disconnected data
- * Auto-detect two wayness and warn
- * Better connection source
- * Session.getConnection()
- * GenericDataQuery
- * immediate properties/specialize
- * Data Operations
- * sub query filtering
- * order with null
+ * Reorder DML in relational engine (2)
+
+     Delete order needs to be finished. SQL Generation must be made to
+     obey event ordering constraints. Optionally optimize with dotted
+     arrow constraints.
+
+ * Observers (3)
+
+     Infinite loop prevention. Reentrance.
+     Plan: beforeActive --> afterActivate, make top level flush be the
+     only flush to write to event processors, track events produced by
+     DataObservers in wrapper layer and don't send them back to their
+     own observer.
+
+ * Link attributes (2)
+
+     Desugar into object model that uses compound keys + containment
+     by multiple objects.
+
+ * Compound keys (1)
+
+     Mostly done in checkout. Difficult to confirm due to lack of
+     significant test coverage.
+
+ * sub query filtering (1)
+
+     Simple addition to anonymous mapper in QGen.java, may require
+     some fanciness for legacy bind variable support.
+
+ * Disconnected data (1)
+
+     On disconnect store HashMap of object data in wrapper layer. Also
+     requires some simple state management to make sure writing is not
+     allowed and to throw out objects from rolled back txns. We should
+     be able to dig most of that code out of perforce.
+
+ * Data Operations (2)
+
+     Must be loaded into metadata structures.
+     Requires API for creating an operation, setting any required
+     parameters and accessing the results. May require expanding the
+     session/engine interface or adding a new kind of event.
+     Alternatively we could do a temporary solution by exposing methods
+     on RDBMSEngine and doing the implementation in the wrapper layer.
+
+ * GenericDataQuery (1)
+
+     Requires exposing methods on RDBMSEngine and writing some wrapper
+     code.
+
+ * immediate properties/specialize (1)
+
+     Plan A: New PDL keyword. Error checking for queries that don't
+     fetch immediate properties. Adapter must be modified to use
+     object type column to determine the correct type when it exists.
+
+     Plan B: Somehow support specialize by removing any direct storage
+     of the object type in new persistence and always delegate to the
+     object. Then store specific object type in wrapper layer and do
+     specialization via the wrapper layer.
+
+ * order with null (1)
+
+     Passthrough code + some minor API additions to Query and friends.
+
+ * Session.getConnection() (1)
+
+     Passthrough code.
+
+ * DataQuery.setRange (1)
+
+     API addtions + minor implementation.
+
+ * DataQuery.set/getParameter (1)
+
+     Passthrough code ???
+
+ * Better connection source (1)
+
+     Look at old connection handling code, copy/reimplement.
+
+ * Size (1)
+
+     API additions + minor implementation. API additions can be done
+     cheesily for now, but at some point we need a consistent story
+     W.R.T. aggregation, functions, etc.
+
+ * Query caching (1)
+
+     Cache data structures, cache invalidation.
+
+ * Weak refs (0.5)
+
+     Do it.
+
+ * Oracle (1)
+
+     Oracle implementation of SQLWriter.
+
+ * LOBs (1)
+
+     Dig up Oracle specific code from perforce. Figure out how to call
+     it without hack up RDBMSEngine to be oracle specific.
+
+Error Checking/Handling:
+ * type checks for PropertyEvent (0.5)
+
+ * null/"" handling (0.5)
+
+     Plan A: DOI.set converts ""-> null. Session disallows "".
+
+ * throwing appropriate exceptions save() (1)
+
+     Plan A: Be fundamental. Adjust fundament as appropriate.
+
+ * GDflush() (0.5)
+ * Auto-detect two wayness and warn (1)
 
 Cleanup:
  * Eliminate old metadata & PDL parser
@@ -37,5 +131,6 @@ Documentation:
  * javadoc
  * Design documents
  * release notes
+   - "super" ignored
 
 Disable all cascading deletes.
