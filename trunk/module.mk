@@ -6,7 +6,10 @@ define MODULE_HELP
 @echo "    Remove all files generated during a full build."
 @echo ""
 @echo "  make jars"
-@echo "    Build all module jars."
+@echo "    Build jars for all modules."
+@echo ""
+@echo "  make docs"
+@echo "    Build javadoc for all modules."
 @echo ""
 @echo "  make <module>"
 @echo "    Build just one module."
@@ -18,6 +21,10 @@ define MODULE_HELP
 @echo "    Build the jar for <module>. The result will be placed in"
 @echo "    build/<module>.jar."
 @echo ""
+@echo "  make <module>-docs"
+@echo "    Build javadoc for <module>. The result will be placed in"
+@echo "    build/<module>/doc"
+@echo ""
 @echo "Available modules: $(MODULES)"
 endef
 
@@ -25,16 +32,24 @@ ifndef BUILD
 BUILD:=build
 endif
 
+ifndef JAVADOC
+JAVADOC:=javadoc
+endif
+
+ifndef JAVADOC_OPTS
+JAVADOC_OPTS:=-version -author -quiet
+endif
+
 .PHONY: all
 
 all: $(MODULES)
 
-JARS:=$(MODULES:%=$(BUILD)/%.jar)
-
-jars: $(JARS)
+jars: $(MODULES:%=%.jar)
 
 clean:
 	rm -rf $(BUILD)
+
+docs: $(MODULES:%=%-docs)
 
 empty:=
 space:=$(empty) $(empty)
@@ -64,9 +79,10 @@ define MODULE_TEMPLATE
 @M_SOURCES:=$(@M_SOURCES:%.jj=$(BUILD)/%.java)
 @M_RESOURCES:=$(filter-out %.java %.jj,$(@M_FILES))
 @M_JDO_FILES:=$(filter %.jdo,$(@M_RESOURCES))
+@M_EXPANDED_DEPS:=$(call expand-deps,@M)
 
 @M_DEP_CP:=$(call list2path,$(patsubst \
-		%,$(BUILD)/%/classes,$(call expand-deps,@M)))
+		%,$(BUILD)/%/classes,$(@M_EXPANDED_DEPS)))
 @M_CLASSPATH:=$(CLASSPATH):$(@M_DEP_CP)
 @M_CLASSPATH_LIST:=$(call path2list,$(@M_CLASSPATH))
 @M_CLASSPATH:=$(@M_CLASSPATH):$(@M_CLASSES)
@@ -87,10 +103,6 @@ $(@M_JAR): $(@M_TIMESTAMP) $(@M_RESOURCES)
 	@jar cf $(@M_JAR) -C $(@M_CLASSES) . \
 	    $(@M_RESOURCES:@M/src/%=-C @M/src %)
 
-clean-@M:
-	rm -f $(@M_JAR)
-	rm -rf $(BUILD)/@M
-
 $(@M_TIMESTAMP): JAVA_MOD=$(filter %.java,$?)
 $(@M_TIMESTAMP): JDO_MOD=$(filter %.jdo,$?)
 $(@M_TIMESTAMP): REBUILD=$(if $(JDO_MOD),$(@M_SOURCES),$(JAVA_MOD))
@@ -108,6 +120,28 @@ $(@M_TIMESTAMP): $(@M_SOURCES) $(@M_JDO_FILES) $(@M_DEPS)
 		-s @M/src:$(@M_CLEAN_CLASSPATH) \
 		$(CLASSES))
 	@touch $(@M_TIMESTAMP)
+
+@M_JAVADOC_DEST:=$(BUILD)/@M/doc
+@M_JAVADOC_STAMP:=$(BUILD)/@M/doc/timestamp
+@M_JAVADOC_SOURCES:=$(filter %.java,$(@M_FILES))
+
+.PHONY: @M-docs
+
+@M-docs: $(@M_JAVADOC_STAMP)
+
+$(@M_JAVADOC_STAMP): $(@M_JAVADOC_SOURCES) $(@M_TIMESTAMP) \
+		$(@M.deps:%=$(BUILD)/%/doc/timestamp)
+	@mkdir -p $(@M_JAVADOC_DEST)
+	@$(JAVADOC) $(JAVADOC_OPTS) -classpath $(@M_CLASSPATH) \
+		$(foreach dep,$(@M_EXPANDED_DEPS), \
+		    -link ../../$(dep)/doc) \
+		-d $(@M_JAVADOC_DEST) \
+		$(@M_JAVADOC_SOURCES)
+	@touch $(@M_JAVADOC_STAMP)
+
+clean-@M:
+	rm -f $(@M_JAR)
+	rm -rf $(BUILD)/@M
 endef
 
 APPLY_MODULE=$(eval $(subst @M,$(module),$(value MODULE_TEMPLATE)))
