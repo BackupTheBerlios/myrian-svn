@@ -2,13 +2,7 @@
 
 # Author:  Vadim Nasardinov (vadimn@redhat.com)
 # Since:   2004-09-28
-# Version: $Id: //eng/persistence/dev/bin/rename-package.py#5 $
-
-'''Usage:
-    $ rename-package.py --from <old-package-name> --to <new-package-name> <dir1> [<dir2> ...]
-Example:
-    $ rename-package.py --from com.arsdigita --to cap src cap test bin conf doc sql
-'''
+# Version: $Id: //eng/persistence/dev/bin/rename-package.py#6 $
 
 import sys
 import os
@@ -183,7 +177,7 @@ class Processor:
 def generate_script(config):
     walker = Walker()
 
-    extensions = ("java", "properties", "jj", "pdl", "xml", "sql", \
+    extensions = ("java", "properties", "jj", "pdl", "xml", "sql", "in", \
                   "txt", "xsl", "csv", "dat", "dtd", "html", "jdo", "jpg")
     extensions = ["." + ext for ext in extensions]
 
