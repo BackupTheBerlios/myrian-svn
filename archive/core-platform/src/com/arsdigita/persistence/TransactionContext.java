@@ -29,12 +29,12 @@ import org.apache.log4j.Logger;
  * Description: The TransactionContext class encapsulates a database transaction.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/06/10 $
+ * @version $Revision: #13 $ $Date: 2003/06/17 $
  */
 
 public class TransactionContext {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/TransactionContext.java#12 $ by $Author: jorris $, $DateTime: 2003/06/10 10:53:05 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/TransactionContext.java#13 $ by $Author: vadim $, $DateTime: 2003/06/17 11:22:20 $";
 
     private static final Logger s_cat =
         Logger.getLogger(TransactionContext.class);
@@ -295,11 +295,11 @@ public class TransactionContext {
     }
 
     /**
-     * Set an attribute inside of this <code>TransactionContext</code>.
-     * The attribute will exist as long as the transaction is opened.
-     * When the transaction is closed or aborted, the attribute will
-     * be discarded. This method is analogous to
-     * {@link #ServletRequest.setAttribute(String, Object)}
+     * Set an attribute inside of this <code>TransactionContext</code>.  The
+     * attribute will exist as long as the transaction is opened.  When the
+     * transaction is closed or aborted, the attribute will be discarded. This
+     * method is analogous to {@link
+     * javax.servlet.ServletRequest#setAttribute(String, Object)}
      *
      * @param name the name of the attribute
      * @param value the value of the attribute
@@ -310,11 +310,11 @@ public class TransactionContext {
     }
 
     /**
-     * Get an attribute inside of this <code>TransactionContext</code>.
-     * The attribute will exist as long as the transaction is opened.
-     * When the transaction is closed or aborted, the attribute will
-     * be discarded. This method is analogous to
-     * {@link #ServletRequest.getAttribute(String)}
+     * Get an attribute inside of this <code>TransactionContext</code>.  The
+     * attribute will exist as long as the transaction is opened.  When the
+     * transaction is closed or aborted, the attribute will be discarded. This
+     * method is analogous to {@link
+     * javax.servlet.ServletRequest#getAttribute(String)}
      *
      * @param name the name of the attribute
      * @return the value of the attribute, or null if no attribute with
@@ -325,9 +325,9 @@ public class TransactionContext {
     }
 
     /**
-     * Remove an attribute from this <code>TransactionContext</code>.
-     * be discarded. This method is analogous to
-     * {@link #ServletRequest.removeAttribute(String)}
+     * Remove an attribute from this <code>TransactionContext</code>.  be
+     * discarded. This method is analogous to {@link
+     * javax.servlet.ServletRequest#removeAttribute(String)}
      *
      * @param name the name of the attribute to remove
      * @post getAttribute(name) == null
