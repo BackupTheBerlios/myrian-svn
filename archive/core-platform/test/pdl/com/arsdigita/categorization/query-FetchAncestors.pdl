@@ -1,0 +1,14 @@
+model com.arsdigita.categorization;
+
+
+query fetchAncestors {
+    String ancestors;
+
+    do {
+      select c.default_ancestors
+        from cat_categories c
+       where c.category_id = :id
+    } map {
+      ancestors = c.default_ancestors;
+    }
+}
