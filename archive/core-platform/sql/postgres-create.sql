@@ -55,6 +55,7 @@ begin;
 \i default/kernel/index-acs_permissions.sql
 
 \i default/kernel/insert-users.sql
+\i default/kernel/insert-groups.sql
 \i postgres/kernel/insert-permissions.sql
 \i default/kernel/view-granted_trans_context_index.sql
 \i default/kernel/view-granted_trans_context_map.sql

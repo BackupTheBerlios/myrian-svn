@@ -66,6 +66,7 @@
 @@ default/kernel/index-acs_permissions.sql
 
 @@ default/kernel/insert-users.sql
+@@ default/kernel/insert-groups.sql
 @@ default/kernel/insert-permissions.sql
 @@ default/kernel/view-granted_trans_context_index.sql
 @@ default/kernel/view-granted_trans_context_map.sql
