@@ -30,13 +30,13 @@ import java.util.Stack;
  *
  * @author Archit Shah (ashah@mit.edu)
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/03/07 $
+ * @version $Date: 2003/03/11 $
  * @since 2003-01-22
  **/
-public class GraphUtil {
+public class Graphs {
     private static final String INDENT = "    ";
 
-    private GraphUtil() {}
+    private Graphs() {}
 
     /**
      * Finds a path in <code>graph</code> from begin to end

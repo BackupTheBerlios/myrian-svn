@@ -26,10 +26,10 @@ import junit.framework.TestCase;
 
 /**
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/03/07 $
+ * @version $Date: 2003/03/11 $
  * @since 2003-01-22
  **/
-public class GraphUtilTest extends TestCase {
+public class GraphsTest extends TestCase {
     private static final String A = "A";
     private static final String B = "B";
     private static final String C = "C";
@@ -53,20 +53,20 @@ public class GraphUtilTest extends TestCase {
     public void testFindPath() {
         List expectedPath =
             Arrays.asList(new String[] {A, C, D, E});
-        List computedPath = GraphUtil.edgePathToNodePath
-            (GraphUtil.findPath(m_graph, A, E));
+        List computedPath = Graphs.edgePathToNodePath
+            (Graphs.findPath(m_graph, A, E));
         assertEquals("path from A to E", expectedPath, computedPath);
 
         expectedPath =
             Arrays.asList(new String[] {D, E, A, C});
-        computedPath = GraphUtil.edgePathToNodePath
-            (GraphUtil.findPath(m_graph, D, C));
+        computedPath = Graphs.edgePathToNodePath
+            (Graphs.findPath(m_graph, D, C));
         assertEquals("path from D to C", expectedPath, computedPath);
     }
 
     public void testNodesReachableFrom() {
         List computedResult =
-            GraphUtil.nodesReachableFrom(m_graph, A).getNodes();
+            Graphs.nodesReachableFrom(m_graph, A).getNodes();
         Collections.sort(computedResult);
         List expectedResult = Arrays.asList
             (new String[] {A, C, D, E});
@@ -74,7 +74,7 @@ public class GraphUtilTest extends TestCase {
         assertEquals("nodes reachable from A", expectedResult, computedResult);
 
         computedResult =
-            GraphUtil.nodesReachableFrom(m_graph, B).getNodes();
+            Graphs.nodesReachableFrom(m_graph, B).getNodes();
         Collections.sort(computedResult);
         expectedResult = Arrays.asList
             (new String[] {B, C, D, E, A});
@@ -84,7 +84,7 @@ public class GraphUtilTest extends TestCase {
         Graph simpleGraph = new GraphSet();
         simpleGraph.setLabel("simple_graph");
         simpleGraph.addEdge(A, B, "a -> b");
-        Graph result = GraphUtil.nodesReachableFrom
+        Graph result = Graphs.nodesReachableFrom
             (simpleGraph, B);
         result.setLabel("reachable_from_b");
         assertTrue("b is reachable from b",
@@ -93,14 +93,14 @@ public class GraphUtilTest extends TestCase {
     }
 
     public void testGetSinkNodes() {
-        List sinkNodes = GraphUtil.getSinkNodes(m_graph);
+        List sinkNodes = Graphs.getSinkNodes(m_graph);
         assertEquals("sink node count in m_graph", 0, sinkNodes.size());
 
         Graph gg = new GraphSet();
         gg.addEdge(A, B, "a -> b");
         gg.addEdge(A, C, "a -> c");
         gg.addEdge(B, D, "b -> d");
-        sinkNodes = GraphUtil.getSinkNodes(gg);
+        sinkNodes = Graphs.getSinkNodes(gg);
         assertEquals("sink node count in gg", 2, sinkNodes.size());
     }
 
@@ -112,7 +112,7 @@ public class GraphUtilTest extends TestCase {
         aa.addChild(E);
         StringWriter swriter = new StringWriter();
         PrintWriter writer = new PrintWriter(swriter);
-        GraphUtil.printTree(aa, new GraphFormatter() {
+        Graphs.printTree(aa, new GraphFormatter() {
                 public String nodeName(Object node) {
                     return (String) node;
                 }
