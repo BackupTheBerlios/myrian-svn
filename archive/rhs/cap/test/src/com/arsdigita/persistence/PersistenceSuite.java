@@ -26,10 +26,10 @@ import java.sql.*;
  * PersistenceSuite
  *
  * @author Jon Orris
- * @version $Revision: #3 $ $Date: 2004/05/28 $
+ * @version $Revision: #4 $ $Date: 2004/05/28 $
  */
 public class PersistenceSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/PersistenceSuite.java#3 $ by $Author: rhs $, $DateTime: 2004/05/28 09:10:39 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/PersistenceSuite.java#4 $ by $Author: rhs $, $DateTime: 2004/05/28 09:15:25 $";
 
     public PersistenceSuite() {
         super();
@@ -50,6 +50,8 @@ public class PersistenceSuite extends PackageTestSuite {
         BaseTestSetup wrapper = new BaseTestSetup(suite) {
             protected void setUp() throws Exception {
                 super.setUp();
+                // XXX: hack for getting session to load via static
+                // initializer in PersistenceTestCase
                 Class dummy = PersistenceTestCase.class;
                 Session ssn = SessionManager.getSession();
                 Connection conn = ssn.getConnection();
