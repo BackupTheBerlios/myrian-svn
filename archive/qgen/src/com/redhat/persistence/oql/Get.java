@@ -11,12 +11,12 @@ import java.util.*;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2004/02/21 $
+ * @version $Revision: #13 $ $Date: 2004/02/21 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#12 $ by $Author: rhs $, $DateTime: 2004/02/21 16:50:28 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#13 $ by $Author: rhs $, $DateTime: 2004/02/21 18:22:56 $";
 
     private Expression m_expr;
     private String m_name;
@@ -163,10 +163,6 @@ public class Get extends Expression {
             return buf.toString();
         }
 
-        void graph(Pane pane) {}
-        Code.Frame frame(Code code) { return null; }
-        void opt(Code code) {}
-        void emit(Code code) {}
         String summary() {
             return toString();
         }
@@ -250,101 +246,10 @@ public class Get extends Expression {
             return gen.getFrame(this).emit();
         }
 
-        void graph(Pane pane) {}
-        Code.Frame frame(Code code) { return null; }
-        void opt(Code code) {}
-        void emit(Code code) {}
         String summary() {
             return "this";
         }
 
-    }
-
-    void graph(Pane pane) {
-        final Pane expr = pane.frame.graph(m_expr);
-        pane.type = new GetTypeNode(expr.type, m_name);
-        pane.variables = expr.variables;
-        pane.injection = new PropertyNode() {
-            { add(expr.type); add(expr.keys); }
-            void updateProperties() {
-                Property prop = expr.type.type.getProperty(m_name);
-                if (expr.keys.contains(Collections.singleton(prop))) {
-                    properties.add(prop);
-                }
-            }
-        };
-        pane.constrained = expr.constrained;
-        pane.keys = new GetKeyNode(expr.keys, expr.type, m_name);
-    }
-
-    Code.Frame frame(Code code) {
-        Code.Frame expr = m_expr.frame(code);
-        Property prop = expr.type.getProperty(m_name);
-        if (prop == null) {
-            throw new IllegalStateException
-                ("no such property: " + m_name + " in " + expr.type);
-        }
-        Code.Frame frame;
-        if (code.isQualias(prop)) {
-            frame = code.frame(this, expr, prop);
-        } else {
-            frame = code.frame(prop.getType());
-            String[] columns = expr.getColumns(prop);
-            if (columns == null) {
-                String alias = frame.alias(prop);
-                code.setAlias(this, alias);
-                code.setTable(alias, code.table(prop));
-                frame.condition(prop, alias, expr.getColumns());
-            } else {
-                frame.setColumns(columns);
-            }
-        }
-        code.setFrame(this, frame);
-        return frame;
-    }
-
-    void opt(Code code) {
-        m_expr.opt(code);
-        Code.Frame frame = code.getFrame(this);
-        Code.Frame expr = code.getFrame(m_expr);
-        frame.suckAll(expr);
-        Property prop = expr.type.getProperty(m_name);
-        if (code.isQualias(prop)) {
-            code.opt(this);
-        }
-    }
-
-    void emit(Code code) {
-        Code.Frame expr = code.getFrame(m_expr);
-        Property prop = expr.type.getProperty(m_name);
-        Code.Frame frame = code.getFrame(this);
-        String alias = code.getAlias(this);
-
-        m_expr.emit(code);
-
-        if (code.isQualias(prop)) {
-            code.append(" cross join ");
-            code.emit(this);
-        } else {
-            String join = frame.join();
-            if (join != null) {
-                code.append(" cross join ");
-                code.append(join);
-            }
-
-            /*String[] columns = expr.getColumns(prop);
-            if (columns == null) {
-                if (prop.isNullable() && !prop.isCollection()) {
-                    code.append(" left");
-                }
-                code.append(" join ");
-                code.append(code.table(prop));
-                code.append(" ");
-                code.append(alias);
-                code.append(" on ");
-                code.condition(prop, alias, expr.getColumns());
-                }*/
-        }
     }
 
     public String toString() {

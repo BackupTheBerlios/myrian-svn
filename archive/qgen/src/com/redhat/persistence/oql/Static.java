@@ -12,12 +12,12 @@ import java.util.*;
  * Static
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/02/21 $
+ * @version $Revision: #5 $ $Date: 2004/02/21 $
  **/
 
 public class Static extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#4 $ by $Author: rhs $, $DateTime: 2004/02/21 13:11:19 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#5 $ by $Author: rhs $, $DateTime: 2004/02/21 18:22:56 $";
 
     private SQL m_sql;
     private String m_type;
@@ -184,18 +184,9 @@ public class Static extends Expression {
             }
         }
 
-        void graph(Pane pane) {}
-        Code.Frame frame(Code code) { return null; }
-        void opt(Code code) {}
-        void emit(Code code) {}
         String summary() { return this.toString(); }
 
     }
-
-    void graph(Pane pane) {}
-    Code.Frame frame(Code code) { return null; }
-    void opt(Code code) { }
-    void emit(Code code) { }
 
     public String toString() {
         return "sql {" + m_sql + "}";

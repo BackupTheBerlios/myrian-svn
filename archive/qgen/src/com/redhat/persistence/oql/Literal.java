@@ -7,12 +7,12 @@ import java.util.Iterator;
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/02/21 $
+ * @version $Revision: #10 $ $Date: 2004/02/21 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#9 $ by $Author: ashah $, $DateTime: 2004/02/21 17:35:23 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#10 $ by $Author: rhs $, $DateTime: 2004/02/21 18:22:56 $";
 
     private Object m_value;
 
@@ -29,25 +29,6 @@ public class Literal extends Expression {
     String emit(Generator gen) {
         // XXX: ???
         return gen.getFrame(this).emit();
-    }
-
-    void graph(Pane pane) {
-        throw new UnsupportedOperationException();
-    }
-
-    Code.Frame frame(Code code) {
-        Code.Frame frame;
-        if (m_value == null) {
-            frame = code.frame(null);
-        } else {
-            frame = code.frame(code.getType(m_value));
-        }
-        // XXX: should have option to use bind variables here
-        String literal = convert(m_value);
-        frame.setColumns(new String[] { literal });
-        code.addVirtual(this);
-        code.setFrame(this, frame);
-        return frame;
     }
 
     private static String convert(Object value) {
@@ -111,12 +92,6 @@ public class Literal extends Expression {
         }
         result.append("'");
         return result.toString();
-    }
-
-    void opt(Code code) { }
-
-    void emit(Code code) {
-        code.materialize(this);
     }
 
     public String toString() {

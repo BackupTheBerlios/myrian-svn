@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * Size
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/02/21 $
+ * @version $Revision: #4 $ $Date: 2004/02/21 $
  **/
 
 public class Size extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Size.java#3 $ by $Author: rhs $, $DateTime: 2004/02/21 13:11:19 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Size.java#4 $ by $Author: rhs $, $DateTime: 2004/02/21 18:22:56 $";
 
     private Expression m_query;
 
@@ -26,26 +26,6 @@ public class Size extends Expression {
     String emit(Generator gen) {
         QFrame query = gen.getFrame(m_query);
         return "(select count(*) from " + query.emit(false) + ")";
-    }
-
-    void graph(Pane pane) {
-        Pane query = pane.frame.graph(m_query);
-        pane.variables = query.variables;
-    }
-
-    Code.Frame frame(Code code) {
-        m_query.frame(code);
-        return null;
-    }
-
-    void opt(Code code) {
-        m_query.opt(code);
-    }
-
-    void emit(Code code) {
-        code.append("(select count(*) from ");
-        m_query.emit(code);
-        code.append(") " + code.var("c"));
     }
 
     public String toString() {
