@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
  * PandoraTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/07/08 $
+ * @version $Revision: #6 $ $Date: 2004/07/12 $
  **/
 
 public class PandoraTest extends WithTxnCase {
@@ -336,7 +336,7 @@ public class PandoraTest extends WithTxnCase {
             m_pm.makePersistent(order);
 
             order.setParty(rhs);
-            Collection items = order.getItems();
+            Set items = order.getItems();
             for (int j = 0; j < 10; j++) {
                 Item item = new Item(j + 10*i);
                 m_pm.makePersistent(item);

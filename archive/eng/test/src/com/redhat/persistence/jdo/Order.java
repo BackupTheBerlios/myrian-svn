@@ -1,23 +1,24 @@
 package com.redhat.persistence.jdo;
 
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
 
 /**
  * Order
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/29 $
+ * @version $Revision: #2 $ $Date: 2004/07/12 $
  **/
 public class Order {
     private int id;
-    private Collection items;
+    private Set items;
     private Party party;
     private Date purchaseDate;
 
     public Order() {
-        items = new LinkedList();
+        items = new HashSet();
     }
 
     public int getId() {
@@ -28,11 +29,11 @@ public class Order {
         this.id = id;
     }
 
-    public Collection getItems() {
+    public Set getItems() {
         return items;
     }
 
-    public void setItems(Collection items) {
+    public void setItems(Set items) {
         this.items = items;
     }
 
