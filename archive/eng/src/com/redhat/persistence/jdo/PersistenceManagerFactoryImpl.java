@@ -60,9 +60,10 @@ public class PersistenceManagerFactoryImpl
         JDOImplHelper.getInstance().addRegisterClassListener(s_generator);
     }
 
-    private final PDLGenerator m_generator = new PDLGenerator(new Root());
-
-    private final Registrar m_registrar = new Registrar();
+    private static final Registrar s_registrar = new Registrar();
+    static {
+        JDOImplHelper.getInstance().addRegisterClassListener(s_registrar);
+    }
 
     private static Collection m_options;
     static {
@@ -91,6 +92,8 @@ public class PersistenceManagerFactoryImpl
 
         m_options = Collections.unmodifiableCollection(options);
     }
+
+    private boolean m_mutable = true;
 
     private String m_user = "";
     private String m_pass = "";
@@ -126,6 +129,8 @@ public class PersistenceManagerFactoryImpl
 
     }
 
+    public PersistenceManagerFactoryImpl() {}
+
     public PersistenceManagerFactoryImpl(Properties p) {
         for (Enumeration e = p.propertyNames(); e.hasMoreElements(); ) {
             String k = (String) e.nextElement();
@@ -150,13 +155,13 @@ public class PersistenceManagerFactoryImpl
             } else if ("javax.jdo.option.ConnectionFactory2Name".equals(k)) {
                 setConnectionFactory2Name(v);
             } else if ("javax.jdo.option.ConnectionUserName".equals(k)) {
-                _setConnectionUserName(v);
+                setConnectionUserName(v);
             } else if ("javax.jdo.option.ConnectionPassword".equals(k)) {
-                _setConnectionPassword(v);
+                setConnectionPassword(v);
             } else if ("javax.jdo.option.ConnectionURL".equals(k)) {
-                _setConnectionURL(v);
+                setConnectionURL(v);
             } else if ("javax.jdo.option.ConnectionDriverName".equals(k)) {
-                _setConnectionDriverName(v);
+                setConnectionDriverName(v);
             } else {
                 // See 11.1 Interface PersistenceManagerFactory, p. 80:
                 // Any property not recognized by the implementation must be
@@ -164,10 +169,7 @@ public class PersistenceManagerFactoryImpl
                 ;
             }
         }
-        JDOImplHelper.getInstance().addRegisterClassListener(m_registrar);
-
-        // XXX: the polling interval is currently hardcoded to 0
-        m_connSrc = new PooledConnectionSource(m_url, s_defaultMaxPool, 0);
+        m_mutable = false;
     }
 
     static Root getMetadataRoot() {
@@ -213,7 +215,7 @@ public class PersistenceManagerFactoryImpl
 
         Session ssn = new Session(s_generator.getRoot(), engine,
                                   new QuerySource());
-        return new PersistenceManagerImpl(this, ssn, prof, m_registrar);
+        return new PersistenceManagerImpl(this, ssn, prof, s_registrar);
     }
 
     ConnectionSource getConnectionSource() {
@@ -228,15 +230,15 @@ public class PersistenceManagerFactoryImpl
      * See pp. 70-71 and p. 84: The returned PersistenceManagerFactory is not
      * configurable (the setXXX methods will throw an exception).
      */
-    private void unmodifiable() {
-        throw new UnsupportedOperationException("unmodifiable");
+    private void checkMutability() {
+        if (!m_mutable) {
+            throw new JDOFatalUserException
+                ("not a mutable PersistenceManagerFactory");
+        }
     }
 
     public void setConnectionDriverName(String value) {
-        unmodifiable();
-    }
-
-    private void _setConnectionDriverName(String value) {
+        checkMutability();
         try {
             Class.forName(value);
         } catch (ClassNotFoundException cnfe) {
@@ -250,11 +252,10 @@ public class PersistenceManagerFactoryImpl
     }
 
     public void setConnectionURL(String value) {
-        throw new UnsupportedOperationException("unmodifiable");
-    }
-
-    private void _setConnectionURL(String value) {
+        checkMutability();
         m_url = value;
+        // XXX: the polling interval is currently hardcoded to 0
+        m_connSrc = new PooledConnectionSource(m_url, s_defaultMaxPool, 0);
     }
 
     public String getConnectionUserName() {
@@ -263,19 +264,12 @@ public class PersistenceManagerFactoryImpl
 
 
     public void setConnectionUserName(String value) {
-        unmodifiable();
-
-    }
-
-    private void _setConnectionUserName(String value) {
+        checkMutability();
         m_user = value;
     }
 
     public void setConnectionPassword(String value) {
-        unmodifiable();
-    }
-
-    private void _setConnectionPassword(String value) {
+        checkMutability();
         m_pass = value;
     }
 
@@ -316,7 +310,9 @@ public class PersistenceManagerFactoryImpl
     }
 
     public void setIgnoreCache(boolean value) {
-        throw new JDOFatalUserException("not implemented");
+        if (!value) {
+            throw new JDOFatalUserException("not implemented");
+        }
     }
 
     public int getMinPool() {
@@ -325,10 +321,7 @@ public class PersistenceManagerFactoryImpl
 
 
     public void setMinPool(int value) {
-        unmodifiable();
-    }
-
-    private void _setMinPool(int value) {
+        checkMutability();
         m_minPool = value;
     }
 
@@ -337,6 +330,7 @@ public class PersistenceManagerFactoryImpl
     }
 
     public void setMaxPool(int value) {
+        checkMutability();
         m_connSrc.setSize(value);
     }
 
@@ -345,10 +339,7 @@ public class PersistenceManagerFactoryImpl
     }
 
     public void setMsWait(int value) {
-        unmodifiable();
-    }
-
-    private void _setMsWait(int value) {
+        checkMutability();
         m_mswait = value;
     }
 
