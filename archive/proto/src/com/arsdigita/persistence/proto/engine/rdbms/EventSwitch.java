@@ -12,12 +12,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #18 $ $Date: 2003/03/31 $
+ * @version $Revision: #19 $ $Date: 2003/03/31 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#18 $ by $Author: rhs $, $DateTime: 2003/03/31 10:58:30 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#19 $ by $Author: rhs $, $DateTime: 2003/03/31 14:34:45 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -141,6 +141,7 @@ class EventSwitch extends Event.Switch {
             Update up = new Update(table, null);
             filter(up, table.getPrimaryKey(), KEY, obj);
             m_engine.addOperation(obj, up);
+	    m_engine.markUpdate(obj, up);
             op = up;
         }
 
@@ -177,7 +178,6 @@ class EventSwitch extends Event.Switch {
                 m_engine.addOperation(obj, del);
             }
         }
-        
     }
 
     private List getObjectMaps(ObjectMap om) {
@@ -197,7 +197,14 @@ class EventSwitch extends Event.Switch {
             Collections.reverse(oms);
         }
 
-        m_engine.clearOperations(obj);
+	if (e instanceof DeleteEvent) {
+	    m_engine.removeUpdates(obj);
+	} else {
+	    if (m_engine.hasUpdates(obj)) {
+		throw new IllegalStateException
+		    ("updates exist for object being created");
+	    }
+	}
 
         for (Iterator it = oms.iterator(); it.hasNext(); ) {
             ObjectMap om = (ObjectMap) it.next();
@@ -316,11 +323,9 @@ class EventSwitch extends Event.Switch {
         onPropertyEvent(e);
 
         Object obj = e.getObject();
-        Collection ops = m_engine.getOperations(obj);
-        if (ops == null) {
-            m_engine.clearOperations(obj);
+	if (!m_engine.hasUpdates(obj)) {
+	    m_engine.markUpdate(obj);
             addOperations(obj, e.getObjectMap().getUpdates(), false);
-            ops = m_engine.getOperations(obj);
         }
 
         Property prop = e.getProperty();
@@ -358,13 +363,17 @@ class EventSwitch extends Event.Switch {
     private void addOperations(Object obj, Collection blocks,
 			       boolean initialize) {
         ObjectType type = Session.getObjectType(obj);
-        m_engine.addOperations(obj);
         for (Iterator it = blocks.iterator(); it.hasNext(); ) {
             SQLBlock block = (SQLBlock) it.next();
             Environment env = m_engine.getEnvironment(obj);
             StaticOperation op = new StaticOperation(block, env, initialize);
             set(env, type, obj, null);
-            m_engine.addOperation(obj, op);
+            m_engine.addOperation(op);
+	    // We're overloading initialize here to figure out that
+	    // this is an update
+	    if (!initialize) {
+		m_engine.markUpdate(obj, op);
+	    }
         }
     }
 

@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #27 $ $Date: 2003/03/31 $
+ * @version $Revision: #28 $ $Date: 2003/03/31 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#27 $ by $Author: rhs $, $DateTime: 2003/03/31 10:58:30 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#28 $ by $Author: rhs $, $DateTime: 2003/03/31 14:34:45 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -73,18 +73,24 @@ public class RDBMSEngine extends Engine {
         if (dml instanceof Delete) {
             DML prev = (DML) m_operationMap.get(key);
             if (prev != null) {
-                m_operations.remove(prev);
+		removeOperation(obj, prev);
             }
         }
         m_operationMap.put(key, dml);
-        m_operations.add(dml);
+        addOperation(dml);
+    }
+
+    void removeOperation(Object obj, DML dml) {
+        Object key = new CompoundKey(obj, dml.getTable());
+	m_operationMap.remove(key);
+	m_operations.remove(dml);
     }
 
     void addOperation(Object from, Object to, DML dml) {
         Object key =
             new CompoundKey(new CompoundKey(from, to), dml.getTable());
         m_operationMap.put(key, dml);
-        m_operations.add(dml);
+        addOperation(dml);
     }
 
     DML getOperation(Object obj, Table table) {
@@ -97,39 +103,43 @@ public class RDBMSEngine extends Engine {
         return (DML) m_operationMap.get(key);
     }
 
-    Collection addOperations(Object obj) {
-        ArrayList ops;
-        if (m_operationMap.containsKey(obj)) {
-            ops = (ArrayList) m_operationMap.get(obj);
-        } else {
-            ops = new ArrayList();
-            m_operationMap.put(obj, ops);
-        }
-        return ops;
+    void clearUpdates(Object obj) {
+	m_operationMap.remove(obj);
     }
 
-    void clearOperations(Object obj) {
-        Collection ops = getOperations(obj);
+    void removeUpdates(Object obj) {
+        ArrayList ops = (ArrayList) m_operationMap.get(obj);
         if (ops != null) {
             for (Iterator it = ops.iterator(); it.hasNext(); ) {
                 Operation op = (Operation) it.next();
-                m_operations.remove(op);
+		if (op instanceof DML) {
+		    removeOperation(obj, (DML) op);
+		} else {
+		    m_operations.remove(op);
+		}
                 it.remove();
             }
         }
+	clearUpdates(obj);
     }
 
-    void addOperation(Object obj, StaticOperation op) {
-        Collection ops = addOperations(obj);
-        ops.add(op);
-        addOperation(op);
+    void markUpdate(Object obj) {
+	if (!hasUpdates(obj)) {
+	    m_operationMap.put(obj, new ArrayList());
+	}
     }
 
-    Collection getOperations(Object obj) {
-        return (Collection) m_operationMap.get(obj);
+    void markUpdate(Object obj, Operation op) {
+	markUpdate(obj);
+	ArrayList ops = (ArrayList) m_operationMap.get(obj);
+	ops.add(op);
     }
 
-    void addOperation(StaticOperation op) {
+    boolean hasUpdates(Object obj) {
+	return m_operationMap.containsKey(obj);
+    }
+
+    void addOperation(Operation op) {
         m_operations.add(op);
     }
 
