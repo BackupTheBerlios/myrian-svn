@@ -50,8 +50,7 @@ public class MapEntry implements Map.Entry {
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("MapEntry <container=").append(container);
-        sb.append("; key=").append(key).append("; value=");
-        sb.append(value).append(">");
+        sb.append("; key=").append(key).append(">");
         return sb.toString();
     }
 }
