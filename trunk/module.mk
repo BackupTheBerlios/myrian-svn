@@ -21,16 +21,20 @@ define MODULE_HELP
 @echo "Available modules: $(MODULES)"
 endef
 
+ifndef BUILD
+BUILD:=build
+endif
+
 .PHONY: all
 
 all: $(MODULES)
 
-JARS:=$(MODULES:%=build/%.jar)
+JARS:=$(MODULES:%=$(BUILD)/%.jar)
 
 jars: $(JARS)
 
 clean:
-	rm -rf build
+	rm -rf $(BUILD)
 
 empty:=
 space:=$(empty) $(empty)
@@ -38,10 +42,10 @@ space:=$(empty) $(empty)
 list2path=$(subst $(space),:,$(1))
 path2list=$(subst :,$(space),$(1))
 
-MODULE_CLASSPATH_LIST:=$(MODULES:%=build/%/classes) $(MODULES:%=%/src)
+MODULE_CLASSPATH_LIST:=$(MODULES:%=$(BUILD)/%/classes) $(MODULES:%=%/src)
 MODULE_CLASSPATH:=$(call list2path,$(MODULE_CLASSPATH_LIST))
 
-build/%.java: %.jj
+$(BUILD)/%.java: %.jj
 	@mkdir -p $(@D)
 	@javacc -OUTPUT_DIRECTORY=$(@D) $<
 
@@ -51,18 +55,18 @@ expand-deps=$(sort $(foreach mod,$(1),\
 FILE_EXISTS=$(shell if test -e $(lib); then echo $(lib); fi)
 
 define MODULE_TEMPLATE
-@M_JAR:=build/@M.jar
-@M_TIMESTAMP:=build/@M/timestamp
-@M_DEPS:=$(@M.deps:%=build/%/timestamp)
-@M_CLASSES:=build/@M/classes
+@M_JAR:=$(BUILD)/@M.jar
+@M_TIMESTAMP:=$(BUILD)/@M/timestamp
+@M_DEPS:=$(@M.deps:%=$(BUILD)/%/timestamp)
+@M_CLASSES:=$(BUILD)/@M/classes
 @M_FILES:=$(shell find @M/src -path "*/.svn" -prune -or -type f -print)
 @M_SOURCES:=$(filter %.java %.jj,$(@M_FILES))
-@M_SOURCES:=$(@M_SOURCES:%.jj=build/%.java)
+@M_SOURCES:=$(@M_SOURCES:%.jj=$(BUILD)/%.java)
 @M_RESOURCES:=$(filter-out %.java %.jj,$(@M_FILES))
 @M_JDO_FILES:=$(filter %.jdo,$(@M_RESOURCES))
 
 @M_DEP_CP:=$(call list2path,$(patsubst \
-		%,build/%/classes,$(call expand-deps,@M)))
+		%,$(BUILD)/%/classes,$(call expand-deps,@M)))
 @M_CLASSPATH:=$(CLASSPATH):$(@M_DEP_CP)
 @M_CLASSPATH_LIST:=$(call path2list,$(@M_CLASSPATH))
 @M_CLASSPATH:=$(@M_CLASSPATH):$(@M_CLASSES)
@@ -83,7 +87,7 @@ $(@M_JAR): $(@M_TIMESTAMP) $(@M_RESOURCES)
 
 clean-@M:
 	rm -f $(@M_JAR)
-	rm -rf build/@M
+	rm -rf $(BUILD)/@M
 
 $(@M_TIMESTAMP): JAVA_MOD=$(filter %.java,$?)
 $(@M_TIMESTAMP): JDO_MOD=$(filter %.jdo,$?)
@@ -94,7 +98,7 @@ $(@M_TIMESTAMP): $(@M_SOURCES) $(@M_JDO_FILES) $(@M_DEPS)
 	$(if $(REBUILD),@echo compiling $(words $(REBUILD)) \
 		files from @M/src to $(@M_CLASSES))
 	$(if $(REBUILD),@javac -classpath $(@M_CLASSPATH) \
-		-sourcepath build/@M/src \
+		-sourcepath $(BUILD)/@M/src \
 		-d $(@M_CLASSES) $(REBUILD))
 	$(if $(REBUILD),@echo enhancing $(words $(CLASSES)) \
 		files in $(@M_CLASSES))
