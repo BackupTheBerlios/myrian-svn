@@ -21,23 +21,35 @@ package com.arsdigita.util;
  * @author Archit Shah (ashah@mit.edut)
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-01-22
- * @version $Revision: #1 $ $Date: 2003/03/04 $
+ * @version $Revision: #2 $ $Date: 2003/05/08 $
  **/
 public final class GraphEdge implements Graph.Edge {
     private Object m_tail;
     private Object m_head;
     private Object m_label;
 
+    /**
+     * @pre tail != null
+     * @pre head != null
+     **/
     public GraphEdge(Object tail, Object head, Object label) {
+        Assert.exists(tail, Object.class);
+        Assert.exists(head, Object.class);
         m_tail = tail;
         m_head = head;
         m_label = label;
     }
 
+    /**
+     * @set return != null
+     **/
     public Object getTail() {
         return m_tail;
     }
 
+    /**
+     * @set return != null
+     **/
     public Object getHead() {
         return m_head;
     }
@@ -50,23 +62,29 @@ public final class GraphEdge implements Graph.Edge {
         return m_label.toString();
     }
 
-    public boolean equals(Object other) {
-        if (other instanceof Graph.Edge) {
-            Graph.Edge edge = (Graph.Edge) other;
+    public boolean equals(Object obj) {
+        if ( obj == null ) return false;
+
+        if (obj instanceof Graph.Edge) {
+            Graph.Edge that = (Graph.Edge) obj;
+            Object thatLabel = that.getLabel();
+
+            boolean equalLabels =
+                (m_label == null && thatLabel == null ) ||
+                (m_label != null && m_label.equals(thatLabel)) ||
+                (thatLabel != null && thatLabel.equals(m_label));
+
             return
-                this.m_tail.equals(edge.getTail()) &&
-                this.m_head.equals(edge.getHead()) &&
-                this.m_label.equals(edge.getLabel());
+                m_tail.equals(that.getTail()) &&
+                m_head.equals(that.getHead()) &&
+                equalLabels;
         } else {
             return false;
         }
     }
 
     public int hashCode() {
-        return hashCode(m_tail) + hashCode(m_head) + hashCode(m_label);
-    }
-
-    private static int hashCode(Object obj) {
-        return obj == null ? 0 : obj.hashCode();
+        return m_tail.hashCode() + m_head.hashCode() +
+            (m_label == null ? 0 : m_label.hashCode());
     }
 }
