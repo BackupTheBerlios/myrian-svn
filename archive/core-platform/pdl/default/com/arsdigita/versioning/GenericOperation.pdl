@@ -15,7 +15,7 @@
 model com.arsdigita.versioning;
 
 object type GenericOperation extends Operation {
-  String[1..1]      datatype = vc_generic_operations.datatype VARCHAR(200);
+  String[0..1]      datatype = vc_generic_operations.datatype VARCHAR(200);
   String[0..1]      old_value = vc_generic_operations.old_value VARCHAR(4000);
   String[0..1]      new_value = vc_generic_operations.new_value VARCHAR(4000);
 

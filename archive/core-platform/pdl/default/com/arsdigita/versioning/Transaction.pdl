@@ -17,21 +17,21 @@ model com.arsdigita.versioning;
 import com.arsdigita.kernel.*;
 
 object type Transaction {
-  BigDecimal[1..1]  id = vc_transactions.transaction_id;
-  String[0..1]      modifying_ip = vc_transactions.modifying_ip;
-  Date[0..1]        timestamp = vc_transactions.timestamp;
-  String[0..1]      description = vc_transactions.description;
-  String[0..1]      tag = vc_transactions.tag;
-  User[0..1]        modUser = join vc_transactions.modifying_user 
-                                to users.user_id;
+  BigDecimal[1..1]  id = vc_transactions.transaction_id INTEGER;
+  String[0..1]      modifying_ip = vc_transactions.modifying_ip VARCHAR(400);
+  Date[0..1]        timestamp = vc_transactions.timestamp TIMESTAMP;
+  String[0..1]      description = vc_transactions.description VARCHAR(4000);
+  String[0..1]      tag = vc_transactions.tag VARCHAR(400);
+  User[0..1] modUser = join vc_transactions.modifying_user 
+                                   to users.user_id;
 
-  component Operation[0..n] operations = join vc_transactions.transaction_id
+  Operation[0..n] operations = join vc_transactions.transaction_id
                                            to vc_operations.transaction_id;
 
   VersionedACSObject[1..1]  master = join vc_transactions.master_id 
-                                       to acs_objects.object_id;
-  VersionedACSObject[1..1]  acsObject = join vc_transactions.object_id 
-                                          to acs_objects.object_id;
+                                                 to acs_objects.object_id;
+  VersionedACSObject[1..1] acsObject = join vc_transactions.object_id
+                                                   to acs_objects.object_id;
 
   object key (id);
 

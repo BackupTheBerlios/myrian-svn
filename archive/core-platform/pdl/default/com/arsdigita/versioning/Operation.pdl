@@ -18,12 +18,12 @@ model com.arsdigita.versioning;
 import com.arsdigita.kernel.*;
 
 object type Operation {
-  BigDecimal[1..1]     id = vc_operations.operation_id;
-  String[1..1]         action = vc_operations.action;
-  String[1..1]         attribute = vc_operations.attribute;
-  String[1..1]         classname = vc_operations.classname;
-  Transaction[1..1]    transaction = join vc_operations.transaction_id 
-                                       to vc_transactions.transaction_id;
+  BigDecimal[1..1]     id = vc_operations.operation_id INTEGER;
+  String[1..1]         action = vc_operations.action VARCHAR(200);
+  String[1..1]         attribute = vc_operations.attribute VARCHAR(200);
+  String[1..1]         classname = vc_operations.classname VARCHAR(4000);
+  composite Transaction[1..1] transaction = join vc_operations.transaction_id 
+                                              to vc_transactions.transaction_id;
   object key (id);
 
   aggressive load (transaction.id);
