@@ -1,0 +1,228 @@
+package com.arsdigita.util;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.OutputStream;
+import java.io.FileNotFoundException;
+import java.util.zip.ZipOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Iterator;
+import com.arsdigita.util.Assert;
+
+import org.apache.log4j.Logger;
+
+
+/**
+ * Commonly used file utilities.
+ *
+ * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
+ * @author Randy Graebner &lt;randyg@alum.mit.edu&gt;
+ * @version $Revision: #1 $ $Date: 2003/11/18 $
+ **/
+
+public final class Files {
+
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Files.java#1 $ by $Author: randyg $, $DateTime: 2003/11/18 15:46:04 $";
+
+    private static final Logger s_log = 
+        Logger.getLogger(Files.class);
+
+    private Files() {}
+
+    public static void delete(File file) {
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                delete(files[i]);
+            }
+        }
+
+        file.delete();
+    }
+
+    public static void copy(File from, File to) throws IOException {
+        if (to.isDirectory()) {
+            to = new File(to, from.getName());
+        }
+
+        if (from.isDirectory()) {
+            to.mkdir();
+            if (!(to.exists() && to.isDirectory())) {
+                throw new IOException("couldn't make directory: " + to);
+            }
+        } else {
+            InputStream is = new FileInputStream(from);
+            OutputStream os = new FileOutputStream(to);
+            byte[] buf = new byte[64*1024];
+            int bytes;
+            while ((bytes = is.read(buf)) >= 0) {
+                os.write(buf, 0, bytes);
+            }
+            os.close();
+            is.close();
+        }
+
+        if (from.isDirectory()) {
+            File[] files = from.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                copy(files[i], to);
+            }
+        }
+    }
+
+
+    /**
+     *  A convenience method that will create a FileOutputStream
+     *  so that the zip file can be written to outputFileName
+     */
+    public static void writeZipFile(String outputFileName,
+                                    String[] includedFiles,
+                                    File baseFile) {
+        try {
+            writeZipFile(new FileOutputStream(outputFileName), includedFiles,
+                          baseFile);
+        } catch (FileNotFoundException e) {
+            s_log.error("Error creating the file output stream for file " +
+                        outputFileName, e);
+        }
+    }
+
+
+    /**
+     *  This writes a zip file to the given output stream and has 
+     *  several options for how the file should be written.  
+     *
+     *  @param outputStream The output stream to write the file.
+     *                      This is typically the response output stream
+     *                      if the file is download or a FileOutputStream if
+     *                      it is written to disk.
+     *  @param fileList A string list of the files to be included in the
+     *                  zip file.  The strings are relative to the 
+     *                  baseFile or are absolute if the baseFile is null.
+     *  @param baseFile The file that is used as the base of the zip.
+     *                  This basically allows us to "cd" to the directory
+     *                  and then perform the "zip" from that directory
+     *                  as opposed to doing everything from "/".
+     *  @pre outputStream != null && fileList != null
+     */
+    public static void writeZipFile(OutputStream outputStream,
+                                     String[] fileList,
+                                     File baseFile) {
+        // Create a buffer for reading the files
+        byte[] buffer = new byte[1024];
+    
+        try {
+            ZipOutputStream out = new ZipOutputStream(outputStream);
+    
+            for (int i=0; i<fileList.length; i++) {
+                File inputFile = new File(baseFile, fileList[i]);
+                if (inputFile.isDirectory()) {
+                    // we don't need to put the empty directory in the zip
+                    continue;
+                }
+
+                FileInputStream in = new FileInputStream(inputFile);
+                    
+                ZipEntry zipEntry = new ZipEntry(fileList[i]);
+                out.putNextEntry(zipEntry);
+
+                if (s_log.isDebugEnabled()) {
+                    long compressed = zipEntry.getCompressedSize();
+                    long original = zipEntry.getSize();
+                    long ratio = ((original-compressed)*100) / original;
+                    s_log.debug("Compressing file " + fileList[i] +
+                                "; original size = " + original + "; compressed = " +
+                                compressed + "; ratio = " + ratio);
+                }
+
+                // Transfer bytes from the file to the ZIP file
+                int len = 0;
+                while ((len=in.read(buffer)) > -1) {
+                    out.write(buffer, 0, len);
+                }
+    
+                // Close the streams
+                out.closeEntry();
+                in.close();
+            }
+    
+            // Complete the ZIP file
+            out.close();
+        } catch (IOException e) {
+            throw new UncheckedWrapperException("Error Creating the Zip File", e);
+        }
+    }
+
+    /**
+     *  This recursively builds a list of file paths, including all files
+     *  that meet the requirements of the file filter, if specified.  This
+     *  does not include the base directory but it does include all other
+     *  directories
+     *
+     *  @param FilenameFilter This is applied to the list.  If it is null,
+     *                        all files in the directory tree are returned.
+     *  @pre baseDirectory != null && baseDirectory.isDirectory() == true
+     */
+    public static String[] listFilesInTree(File baseDirectory,
+                                           FilenameFilter filter) {
+        return listFilesInTree(baseDirectory, filter, new ArrayList(), null);
+    }
+
+    /**
+     *  This provides the same funcationality as listFilesInTree but
+     *  also takes in the collection that is used to build the array
+     *  and can call itself recursively.
+     *  @param prefix this is the string that will go at the beginning of
+     *  the name in the returned array.  This is needed so tha the code
+     *  can recursively call itself.  Pass in "null" if there is no
+     *  prefix that is desired.
+     */
+    private static String[] listFilesInTree(File baseDirectory,
+                                            FilenameFilter filter,
+                                            Collection files,
+                                            String prefix) {
+        // TODO: there has to be a better way to do this...
+        Assert.truth(baseDirectory.isDirectory(), 
+                     "Base Directory must be a directory but is actually a file.");
+        if (prefix != null && prefix.trim().length() == 0) {
+            prefix = null;
+        }
+        File tempFile = null;
+        String[] list = baseDirectory.list(filter);
+        ArrayList directories = new ArrayList();
+        for (int i = 0; i < list.length; i++) {
+            tempFile = new File(baseDirectory, list[i]);
+            if (tempFile.isDirectory()) {
+                directories.add(tempFile);
+            } else {
+                if (prefix == null) {
+                    files.add(list[i]);
+                } else {
+                    files.add(prefix + "/" + list[i]);
+                }
+            }
+        }
+
+        Iterator iter = directories.iterator();
+        while (iter.hasNext()) {
+            tempFile = (File)iter.next();
+            if (prefix == null) {
+                files.add(tempFile.getName());
+                listFilesInTree(tempFile, filter, files, tempFile.getName());
+            } else {
+                String name = prefix + "/" + tempFile.getName();
+                files.add(name);
+                listFilesInTree(tempFile, filter, files, name);
+            }
+        }
+
+        return (String[]) files.toArray(new String[0]);
+    }
+}
