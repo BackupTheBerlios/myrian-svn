@@ -14,6 +14,7 @@
  */
 package com.redhat.persistence.oql;
 
+import com.redhat.persistence.ProtoException;
 import com.redhat.persistence.metadata.*;
 import java.util.*;
 
@@ -23,12 +24,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/07/21 $
+ * @version $Revision: #4 $ $Date: 2004/07/21 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Query.java#3 $ by $Author: rhs $, $DateTime: 2004/07/21 11:20:26 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Query.java#4 $ by $Author: rhs $, $DateTime: 2004/07/21 12:38:43 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -69,7 +70,10 @@ public class Query {
         try {
             return generateInternal(root, oracle);
         } catch (Throwable t) {
-            throw new Error("oql compilation error: " + this, t);
+            ProtoException e =
+                new ProtoException("oql compilation error: " + this) {};
+            e.initCause(t);
+            throw e;
         }
     }
 
