@@ -22,16 +22,13 @@ package org.myrian.persistence;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-28
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 public interface EventProcessorManager {
     /**
-     * Returns the singleton instance of {@link EventProcessor} for this thread.
-     * Each thread must have its own. In other words,
-     * <code>EventProcessorManager</code> and <code>EventProcessor</code> must
-     * have the same semantics as {@link
-     * com.arsdigita.persistence.SessionManager} and {@link
-     * com.arsdigita.persistence.Session}.
+     * Returns the instance of {@link EventProcessor} for this thread. Each
+     * event processor manager implementation should maintain exactly one
+     * event processor per thread.
      **/
     EventProcessor getEventProcessor();
 }

@@ -34,12 +34,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/org/myrian/persistence/ProtoTest.java#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/org/myrian/persistence/ProtoTest.java#2 $ by $Author: ashah $, $DateTime: 2004/10/04 11:30:49 $";
 
 
     public ProtoTest(String name) {
@@ -47,7 +47,7 @@ public class ProtoTest extends TestCase {
     }
 
     private static final String TEST_PDL =
-        "com/arsdigita/persistence/Test.pdl";
+        "org/myrian/persistence/Test.pdl";
 
     public void test() throws Exception {
         Root root = new Root();
