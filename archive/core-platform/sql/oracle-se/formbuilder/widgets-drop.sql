@@ -15,11 +15,18 @@
 -- service
 --
 -- @author <a href="mailto:pmarklun@arsdigita.com">Peter Marklund</a>
--- @version $Id: //core-platform/dev/sql/oracle-se/formbuilder/formbuilder-drop.sql#3 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/formbuilder/widgets-drop.sql#1 $
 --
 
+drop sequence forms_unique_id_seq;
 
-@@ widgets-drop.sql
-@@ bebop-drop.sql
+drop table forms_dd_select;
+drop table forms_dataquery;
 
+drop table forms_lstnr_xml_email;
+drop table forms_lstnr_tmpl_email;
+drop table forms_lstnr_simple_email;
+drop table forms_lstnr_conf_redirect;
+drop table forms_lstnr_conf_email;
 
+drop table forms_widget_label;

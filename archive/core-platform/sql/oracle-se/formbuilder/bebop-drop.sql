@@ -15,11 +15,17 @@
 -- service
 --
 -- @author <a href="mailto:pmarklun@arsdigita.com">Peter Marklund</a>
--- @version $Id: //core-platform/dev/sql/oracle-se/formbuilder/formbuilder-drop.sql#3 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/formbuilder/bebop-drop.sql#1 $
 --
 
-
-@@ widgets-drop.sql
-@@ bebop-drop.sql
-
-
+drop table bebop_listener_map;
+drop table bebop_component_hierarchy;
+drop table bebop_widgets;
+drop table bebop_form_process_listeners;
+drop table bebop_process_listeners;
+drop table bebop_form_sections;
+drop table bebop_components;
+drop table bebop_options;
+drop table bebop_listeners;
+drop table bebop_meta_object;
+drop table bebop_object_type;
