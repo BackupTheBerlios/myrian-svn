@@ -27,26 +27,18 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterPrinter.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterPrinter.java#2 $
  */
 final class ParameterPrinter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterPrinter.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterPrinter.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/23 01:57:55 $";
+        "$DateTime: 2003/10/09 10:25:57 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterPrinter.class);
 
     private static final ArrayList s_records = new ArrayList();
-
-    static void register(final ParameterRecord record) {
-        if (s_log.isInfoEnabled()) {
-            s_log.info("Registering " + record);
-        }
-
-        s_records.add(record);
-    }
 
     private static void writeXML(final PrintWriter out) {
         out.write("<?xml version=\"1.0\"?>");
@@ -62,23 +54,21 @@ final class ParameterPrinter {
         out.close();
     }
 
+    private static void register(final String classname) {
+        s_records.add((ParameterRecord) Classes.newInstance(classname));
+    }
+
     public static final void main(final String[] args) throws IOException {
-        try {
-            // XXX These are cheats to get the config parameters
-            // registered.
+        register("com.arsdigita.runtime.RuntimeConfig");
+        register("com.arsdigita.templating.TemplatingConfig");
+        register("com.arsdigita.mail.MailConfig");
+        register("com.arsdigita.versioning.VersioningConfig");
+        register("com.arsdigita.web.WebConfig");
+        register("com.arsdigita.bebop.BebopConfig");
 
-            Classes.newInstance("com.arsdigita.util.UtilConfig");
-            Classes.newInstance("com.arsdigita.init.InitConfig");
-            Classes.newInstance("com.arsdigita.templating.TemplatingConfig");
-            Classes.newInstance("com.arsdigita.mail.MailConfig");
-            Classes.newInstance("com.arsdigita.versioning.VersioningConfig");
-            Classes.newInstance("com.arsdigita.web.WebConfig");
-            Classes.newInstance("com.arsdigita.bebop.BebopConfig");
-        } catch (Exception e) {
-            s_log.error(e.getMessage(), e);
-        }
-
-        if (args[0].equals("--html") && args.length == 2) {
+        if (args.length == 0) {
+            System.out.println("Usage: ParameterPrinter [--html] output-file");
+        } else if (args[0].equals("--html") && args.length == 2) {
             final StringWriter sout = new StringWriter();
             final PrintWriter out = new PrintWriter(sout);
 
@@ -98,7 +88,7 @@ final class ParameterPrinter {
 
             writeXML(out);
         } else {
-            System.out.println("Usage: command [--html] output-file");
+            System.out.println("Usage: ParameterPrinter [--html] output-file");
         }
     }
 }

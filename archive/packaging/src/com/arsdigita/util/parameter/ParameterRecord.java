@@ -31,13 +31,13 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterLoader
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#10 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#11 $
  */
 public abstract class ParameterRecord {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#10 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#11 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/06 12:21:50 $";
+        "$DateTime: 2003/10/09 10:25:57 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterRecord.class);
@@ -54,8 +54,6 @@ public abstract class ParameterRecord {
         m_loaded = new HashSet();
         m_values = Collections.synchronizedMap(new HashMap());
         m_info = new Properties();
-
-        ParameterPrinter.register(this);
     }
 
     public final Parameter[] getParameters() {
@@ -279,34 +277,14 @@ public abstract class ParameterRecord {
                 out.write("<required/>");
             }
 
-            final Object defaalt = param.getDefaultValue();
-
-            if (defaalt != null) {
-                if (defaalt instanceof Object[]) {
-                    final Object[] elems = (Object[]) defaalt;
-                    final StringBuffer buffer = new StringBuffer();
-
-                    for (int i = 0; i < elems.length; i++) {
-                        buffer.append(elems[i].toString());
-                        buffer.append(", ");
-                    }
-
-                    final int len = buffer.length();
-
-                    if (len > 2) {
-                        field(out, "default", buffer.substring(0, len - 2));
-                    }
-                } else {
-                    field(out, "default", defaalt.toString());
-                }
-            }
-
             final ParameterInfo info = param.getInfo();
 
-            field(out, "title", info.getTitle());
-            field(out, "purpose", info.getPurpose());
-            field(out, "example", info.getExample());
-            field(out, "format", info.getFormat());
+            if (info != null) {
+                field(out, "title", info.getTitle());
+                field(out, "purpose", info.getPurpose());
+                field(out, "example", info.getExample());
+                field(out, "format", info.getFormat());
+            }
 
             out.write("</parameter>");
         }
