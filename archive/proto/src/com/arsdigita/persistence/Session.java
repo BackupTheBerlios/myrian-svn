@@ -29,6 +29,7 @@ import com.arsdigita.persistence.proto.Event;
 import com.arsdigita.persistence.proto.CreateEvent;
 import com.arsdigita.persistence.proto.DeleteEvent;
 import com.arsdigita.persistence.proto.ObjectEvent;
+import com.arsdigita.persistence.proto.PropertyEvent;
 import com.arsdigita.persistence.proto.metadata.Root;
 import com.arsdigita.persistence.proto.metadata.Property;
 import com.arsdigita.persistence.proto.engine.MemoryEngine;
@@ -58,7 +59,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #29 $ $Date: 2003/05/07 $
+ * @version $Revision: #30 $ $Date: 2003/05/12 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -66,8 +67,8 @@ public class Session {
     private static final Logger LOG = Logger.getLogger(Session.class);
 
     private List m_dataObjects = new ArrayList();
-    private FlushEventProcessor m_beforeFP;
-    private FlushEventProcessor m_afterFP;
+    FlushEventProcessor m_beforeFP;
+    FlushEventProcessor m_afterFP;
 
     private void addDataObject(DataObject obj) {
         m_dataObjects.add(new WeakReference(obj));
@@ -183,14 +184,18 @@ public class Session {
     private TransactionContext m_ctx = new TransactionContext(this);
     private MetadataRoot m_root = MetadataRoot.getMetadataRoot();
 
-    private static final void fireEvent(DataEvent e) {
-        e.m_object.fireObserver(e);
-    }
-
     {
         m_ssn.addAfterActivate(new EventProcessor() {
             public void write(Event ev) {
                 if (!(ev.getObject() instanceof DataObjectImpl)) { return; }
+
+                if (ev instanceof PropertyEvent) {
+                    PropertyEvent pe = (PropertyEvent) ev;
+                    if (pe.getProperty().getName().charAt(0) == '~') {
+                        return;
+                    }
+                }
+
                 ev.dispatch(new Event.Switch() {
                     public void onCreate(CreateEvent e) { }
 
@@ -198,36 +203,24 @@ public class Session {
 
                     public void onSet(
                         com.arsdigita.persistence.proto.SetEvent e) {
-                        if (e.getProperty().getName().charAt(0) == '~') {
-                            return;
-                        }
-
-                        fireEvent(new SetEvent((DataObjectImpl) e.getObject(),
-                                               e.getProperty().getName(),
-                                               e.getPreviousValue(),
-                                               e.getArgument()));
+                        new SetEvent((DataObjectImpl) e.getObject(),
+                                     e.getProperty().getName(),
+                                     e.getPreviousValue(),
+                                     e.getArgument()).fire();
                     }
 
                     public void onAdd(
                         com.arsdigita.persistence.proto.AddEvent e) {
-                        if (e.getProperty().getName().charAt(0) == '~') {
-                            return;
-                        }
-
-                        fireEvent(new AddEvent((DataObjectImpl) e.getObject(),
-                                               e.getProperty().getName(),
-                                               (DataObjectImpl) e.getArgument()));
+                        new AddEvent((DataObjectImpl) e.getObject(),
+                                     e.getProperty().getName(),
+                                     (DataObjectImpl) e.getArgument()).fire();
                     }
 
                     public void onRemove(
                         com.arsdigita.persistence.proto.RemoveEvent e) {
-                        if (e.getProperty().getName().charAt(0) == '~') {
-                            return;
-                        }
-
-                        fireEvent(new RemoveEvent((DataObjectImpl) e.getObject(),
-                                                  e.getProperty().getName(),
-                                                  (DataObjectImpl) e.getArgument()));
+                        new RemoveEvent((DataObjectImpl) e.getObject(),
+                                        e.getProperty().getName(),
+                                        (DataObjectImpl) e.getArgument()).fire();
                     }
                 });
             }
@@ -241,9 +234,10 @@ public class Session {
         m_ssn.addAfterFlush(m_afterFP);
     }
 
-    private static class FlushEventProcessor extends EventProcessor {
+    static class FlushEventProcessor extends EventProcessor {
         final private boolean m_before;
         private List m_events = new ArrayList();
+        private List m_toFire = new LinkedList();
 
         FlushEventProcessor(boolean before) { m_before = before; }
 
@@ -252,10 +246,19 @@ public class Session {
                 LOG.error("events left over: " + m_events);
             }
             m_events.clear();
+            if (m_toFire.size() > 0) {
+                LOG.error("data events left over: " + m_toFire);
+            }
+            m_toFire.clear();
         }
 
         public void write(Event e) {
             if (e.getObject() instanceof DataObjectImpl) {
+                if (e instanceof PropertyEvent
+                    && ((PropertyEvent) e).getProperty().getName().charAt(0)
+                        == '~') {
+                    return;
+                }
                 m_events.add(e);
             }
         }
@@ -268,30 +271,48 @@ public class Session {
                 DataObjectImpl obj = (DataObjectImpl) e.getObject();
 
                 if (!objs.contains(obj)) {
-                    events.add(0, e);
                     objs.add(obj);
-                }
-            }
+                    DataEvent toFire;
+                    if (e instanceof DeleteEvent) {
+                        if (m_before) {
+                            toFire = new BeforeDeleteEvent(obj);
+                        } else {
+                            toFire = new AfterDeleteEvent(obj);
+                        }
+                    } else {
+                        if (m_before) {
+                            toFire = new BeforeSaveEvent(obj);
+                        } else {
+                            toFire = new AfterSaveEvent(obj);
+                        }
+                    }
 
-            for (Iterator it = events.iterator(); it.hasNext(); ) {
-                Event e = (Event) it.next();
-                DataObjectImpl obj = (DataObjectImpl) e.getObject();
-                if (e instanceof DeleteEvent) {
-                    if (m_before) {
-                        fireEvent(new BeforeDeleteEvent(obj));
-                    } else {
-                        fireEvent(new AfterDeleteEvent(obj));
-                    }
-                } else {
-                    if (m_before) {
-                        fireEvent(new BeforeSaveEvent(obj));
-                    } else {
-                        fireEvent(new AfterSaveEvent(obj));
-                    }
+                    events.add(0, toFire);
                 }
             }
 
             m_events.clear();
+
+            if (LOG.isInfoEnabled()) {
+                LOG.info((m_before ? "before flush:" : "after flush: ") + events);
+            }
+
+            m_toFire.addAll(events);
+
+            for (Iterator it = events.iterator(); it.hasNext(); ) {
+                DataEvent e = (DataEvent) it.next();
+                e.schedule();
+            }
+
+            for (Iterator it = events.iterator(); it.hasNext(); ) {
+                DataEvent e = (DataEvent) it.next();
+                if (m_toFire.remove(e)) { e.fire(); }
+            }
+        }
+
+        void fireNow(DataEvent e) {
+            m_toFire.remove(e);
+            e.fire();
         }
     }
 
