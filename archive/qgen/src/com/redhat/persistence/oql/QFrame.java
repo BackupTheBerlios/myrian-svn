@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #21 $ $Date: 2004/03/19 $
+ * @version $Revision: #22 $ $Date: 2004/03/20 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#21 $ by $Author: rhs $, $DateTime: 2004/03/19 17:28:49 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#22 $ by $Author: rhs $, $DateTime: 2004/03/20 20:50:09 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -524,14 +524,6 @@ class QFrame {
         return true;
     }
 
-    QFrame getInnerRoot() {
-        if (m_parent == null || m_outer) {
-            return this;
-        } else {
-            return m_parent.getInnerRoot();
-        }
-    }
-
     List getInnerConditions() {
         List result = new ArrayList();
         addInnerConditions(result);
@@ -693,7 +685,7 @@ class QFrame {
     }
 
     private List getEquals() {
-        List conditions = getConditions();
+        List conditions = getInnerConditions();
         List equals = new ArrayList();
         for (int i = 0; i < conditions.size(); i++) {
             Expression c = (Expression) conditions.get(i);

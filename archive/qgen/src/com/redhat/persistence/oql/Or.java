@@ -6,15 +6,21 @@ import java.util.*;
  * Or
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/03/09 $
+ * @version $Revision: #7 $ $Date: 2004/03/20 $
  **/
 
 public class Or extends BinaryCondition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Or.java#6 $ by $Author: rhs $, $DateTime: 2004/03/09 21:48:49 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Or.java#7 $ by $Author: rhs $, $DateTime: 2004/03/20 20:50:09 $";
 
     public Or(Expression left, Expression right) {
         super(left, right);
+    }
+
+    void frame(Generator gen) {
+        gen.addBoolean(m_left);
+        gen.addBoolean(m_right);
+        super.frame(gen);
     }
 
     Code emit(Generator gen) {
@@ -27,7 +33,7 @@ public class Or extends BinaryCondition {
         } else if (left.isTrue() || right.isTrue()) {
             return Code.TRUE;
         } else {
-            return left.add(" or ").add(right);
+            return emit(left, "or", right);
         }
     }
 

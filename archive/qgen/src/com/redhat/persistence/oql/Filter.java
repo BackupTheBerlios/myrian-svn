@@ -7,12 +7,12 @@ import java.util.*;
  * Filter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2004/03/09 $
+ * @version $Revision: #13 $ $Date: 2004/03/20 $
  **/
 
 public class Filter extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Filter.java#12 $ by $Author: rhs $, $DateTime: 2004/03/09 21:48:49 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Filter.java#13 $ by $Author: rhs $, $DateTime: 2004/03/20 20:50:09 $";
 
     private Expression m_expr;
     private Expression m_condition;
@@ -29,6 +29,7 @@ public class Filter extends Expression {
         frame.addChild(expr);
         frame.setValues(expr.getValues());
         gen.addUses(this, gen.getUses(m_expr));
+        gen.addBoolean(m_condition);
         gen.push(frame);
         try {
             m_condition.frame(gen);

@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2004/03/16 $
+ * @version $Revision: #13 $ $Date: 2004/03/20 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#12 $ by $Author: rhs $, $DateTime: 2004/03/16 15:39:46 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#13 $ by $Author: rhs $, $DateTime: 2004/03/20 20:50:09 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -22,6 +22,7 @@ class Generator {
     private List m_frames = new ArrayList();
     private Map m_queries = new HashMap();
     private LinkedList m_stack = new LinkedList();
+    private Set m_boolean = new HashSet();
     private MultiMap m_equalities = new MultiMap();
     private Set m_sufficient = new HashSet();
     private MultiMap m_uses = new MultiMap();
@@ -113,6 +114,14 @@ class Generator {
                 ("unable to resolve type: " + name);
         }
         return result;
+    }
+
+    void addBoolean(Expression expr) {
+        m_boolean.add(expr);
+    }
+
+    boolean isBoolean(Expression expr) {
+        return m_boolean.contains(expr);
     }
 
     Set getEqualities(Expression expr) {

@@ -7,30 +7,39 @@ import java.util.*;
  * AbstractJoin
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2004/03/09 $
+ * @version $Revision: #11 $ $Date: 2004/03/20 $
  **/
 
 public abstract class AbstractJoin extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/AbstractJoin.java#10 $ by $Author: rhs $, $DateTime: 2004/03/09 21:48:49 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/AbstractJoin.java#11 $ by $Author: rhs $, $DateTime: 2004/03/20 20:50:09 $";
 
     private Expression m_left;
     private Expression m_right;
-    private Expression m_condition;
 
-    AbstractJoin(Expression left, Expression right, Expression condition) {
+    AbstractJoin(Expression left, Expression right) {
         m_left = left;
         m_right = right;
-        m_condition = condition;
+    }
+
+    AbstractJoin(Expression left, Expression right, Expression condition) {
+        this(left, new Filter(right, condition));
     }
 
     void frame(Generator gen) {
         m_left.frame(gen);
         QFrame left = gen.getFrame(m_left);
-        m_right.frame(gen);
+        gen.push(left);
+        try {
+            m_right.frame(gen);
+        } finally {
+            gen.pop();
+        }
         QFrame right = gen.getFrame(m_right);
-        QFrame frame = gen.frame
-            (this, join(left.getType(), right.getType()));
+        if (this instanceof LeftJoin) {
+            right.setOuter(true);
+        }
+        QFrame frame = gen.frame(this, join(left.getType(), right.getType()));
         frame.addChild(left);
         frame.addChild(right);
         List values = new ArrayList();
@@ -39,16 +48,6 @@ public abstract class AbstractJoin extends Expression {
         frame.setValues(values);
         gen.addUses(this, gen.getUses(m_left));
         gen.addUses(this, gen.getUses(m_right));
-        if (m_condition != null) {
-            gen.push(frame);
-            try {
-                m_condition.frame(gen);
-            } finally {
-                gen.pop();
-            }
-            frame.setCondition(m_condition);
-            gen.addUses(this, gen.getUses(m_condition));
-        }
     }
 
     Code emit(Generator gen) {
@@ -56,8 +55,7 @@ public abstract class AbstractJoin extends Expression {
     }
 
     public String toString() {
-        return getJoinType() + "(" + m_left + ", " + m_right +
-            (m_condition == null ? "" : ", " + m_condition) + ")";
+        return getJoinType() + "(" + m_left + ", " + m_right + ")";
     }
 
     abstract String getJoinType();

@@ -219,6 +219,6 @@ association {
 
 query IdsLessThanThree {
     do {
-        id < 3
+        a_id < 3
     }
 }
