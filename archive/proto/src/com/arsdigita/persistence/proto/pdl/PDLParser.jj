@@ -13,12 +13,12 @@ import com.arsdigita.persistence.proto.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/05/05 $
+ * @version $Revision: #8 $ $Date: 2003/05/05 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDLParser.jj#7 $ by $Author: vadim $, $DateTime: 2003/05/05 16:42:06 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDLParser.jj#8 $ by $Author: vadim $, $DateTime: 2003/05/05 18:24:29 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -83,6 +83,7 @@ TOKEN:
 {
     <OBJECTTYPE: "object" <WS> "type">
   | <VERSIONED: "versioned">
+  | <UNVERSIONED: "unversioned">
   | <RETRIEVE: "retrieve">
   | <INSERT: "insert">
   | <UPDATE: "update">
@@ -303,6 +304,7 @@ PropertyNd property() :
     Node n;
 }
 {
+    [ <UNVERSIONED> { p.setUnversioned(); } ]
     [ <UNIQUE> { p.setUnique(true); } ]
     [ ( <COMPONENT> { p.setComponent(true); } |
         <COMPOSITE> { p.setComposite(true); } ) ]

@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #6 $ $Date: 2003/05/05 $
+ * @version $Revision: #7 $ $Date: 2003/05/05 $
  */
 public class VersioningMetadata {
     private final static Logger LOG =
@@ -80,6 +80,13 @@ public class VersioningMetadata {
                     while ( ii.hasNext() ) {
                         ((ChangeListener) ii.next()).onObjectType
                             (fqn, ot.isVersioned());
+                    }
+                }
+
+                public void onProperty(PropertyNd prop) {
+                    if ( prop.isUnversioned() ) {
+                        LOG.info("onProperty: " + prop.getName().getName() +
+                                 " is unversioned");
                     }
                 }
             };

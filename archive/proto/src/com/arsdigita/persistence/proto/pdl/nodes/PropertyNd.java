@@ -4,12 +4,12 @@ package com.arsdigita.persistence.proto.pdl.nodes;
  * Property
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/03/03 $
+ * @version $Revision: #5 $ $Date: 2003/05/05 $
  **/
 
 public class PropertyNd extends StatementNd {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/PropertyNd.java#4 $ by $Author: rhs $, $DateTime: 2003/03/03 12:39:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/PropertyNd.java#5 $ by $Author: vadim $, $DateTime: 2003/05/05 18:24:29 $";
 
     public static final Field TYPE =
         new Field(PropertyNd.class, "type", TypeNd.class, 1, 1);
@@ -23,6 +23,7 @@ public class PropertyNd extends StatementNd {
     private boolean m_isComposite = false;
     private boolean m_isCollection = false;
     private boolean m_isNullable = true;
+    private boolean m_isUnversioned = false;
 
     public void setUnique(boolean b) {
         m_isUnique = b;
@@ -44,6 +45,9 @@ public class PropertyNd extends StatementNd {
         m_isNullable = b;
     }
 
+    public void setUnversioned() {
+        m_isUnversioned = true;
+    }
     public boolean isUnique() {
         return m_isUnique;
     }
@@ -64,6 +68,10 @@ public class PropertyNd extends StatementNd {
         return m_isNullable;
     }
 
+    public boolean isUnversioned() {
+        return m_isUnversioned;
+    }
+
     public void dispatch(Switch sw) {
         super.dispatch(sw);
         sw.onProperty(this);
@@ -80,5 +88,4 @@ public class PropertyNd extends StatementNd {
     public Node getMapping() {
         return (Node) get(MAPPING);
     }
-
 }
