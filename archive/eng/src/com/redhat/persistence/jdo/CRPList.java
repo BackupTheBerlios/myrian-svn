@@ -14,12 +14,14 @@ import javax.jdo.JDOHelper;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/07/08 $
+ * @version $Revision: #5 $ $Date: 2004/07/08 $
  **/
 
 class CRPList extends CRPCollection implements List {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPList.java#4 $ by $Author: vadim $, $DateTime: 2004/07/08 13:45:51 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPList.java#5 $ by $Author: vadim $, $DateTime: 2004/07/08 17:05:37 $";
+
+    private final static String INDEX = "index";
 
     transient private Session m_ssn;
     transient private Object m_object;
@@ -50,13 +52,15 @@ class CRPList extends CRPCollection implements List {
         for (Iterator it = properties.iterator(); it.hasNext(); ) {
             Property p = (Property) it.next();
             if (p.isKeyProperty()) {
-                if (Number.class.isAssignableFrom
-                    (p.getType().getJavaClass())) {
-                    if (m_index == null) {
-                        m_index = p;
+                if (INDEX.equals(p.getName())) {
+                    Class indexClass = p.getType().getJavaClass();
+                    if (Number.class.isAssignableFrom(indexClass)) {
+                            m_index = p;
                     } else {
                         throw new IllegalStateException
-                            ("ambiguous index property for " + type);
+                            (p + " is not of an integral type: " +
+                             indexClass.getName());
+
                     }
                 } else {
                     if (m_container == null) {
@@ -387,7 +391,7 @@ class CRPList extends CRPCollection implements List {
                      (elements(), new Static
                       (idx + (direction == FORWARD ? " >= " : " <= ") +
                        ":index", Collections.singletonMap
-                       ("index", new Integer(m_index)))),
+                       (INDEX, new Integer(m_index)))),
                      new Variable(idx),
                      direction == FORWARD ? Sort.ASCENDING : Sort.DESCENDING);
                 m_cursor = C.cursor(ssn(), m_property.getType(), expr);
