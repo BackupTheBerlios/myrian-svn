@@ -9,18 +9,22 @@ import com.arsdigita.persistence.proto.Query;
 import com.arsdigita.persistence.proto.Signature;
 import com.arsdigita.persistence.proto.PassthroughFilter;
 
+import com.arsdigita.util.StringUtils;
+
 import java.util.*;
 
 /**
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/02/28 $
+ * @version $Revision: #9 $ $Date: 2003/02/28 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#8 $ by $Author: rhs $, $DateTime: 2003/02/28 17:44:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#9 $ by $Author: rhs $, $DateTime: 2003/02/28 19:58:14 $";
+
+    private static final FilterFactory FACTORY = new FilterFactoryImpl();
 
     private Session m_ssn;
     private com.arsdigita.persistence.proto.Session m_pssn;
@@ -165,7 +169,7 @@ class DataQueryImpl implements DataQuery {
     }
 
     public FilterFactory getFilterFactory() {
-        return new FilterFactoryImpl();
+        return FACTORY;
     }
 
 
@@ -175,7 +179,22 @@ class DataQueryImpl implements DataQuery {
 
 
     public void addOrder(String order) {
-        throw new Error("not implemented");
+        String[] orders = StringUtils.split(order, ',');
+        for (int i = 0; i < orders.length; i++) {
+            String[] parts = StringUtils.split(orders[i].trim(), ' ');
+            boolean isAscending;
+            if (parts.length == 1) {
+                isAscending = true;
+            } else if (parts.length == 2) {
+                isAscending = parts[1].startsWith("asc");
+            } else {
+                throw new IllegalArgumentException
+                    ("bad order: " + order);
+            }
+
+            m_pc.getDataSet().getQuery().addOrder(Path.get(parts[0]),
+                                                  isAscending);
+        }
     }
 
 
@@ -237,7 +256,9 @@ class DataQueryImpl implements DataQuery {
     }
 
     public void close() {
-        throw new Error("not implemented");
+        if (m_cursor != null) {
+            m_cursor.close();
+        }
     }
 
     public void rewind() {

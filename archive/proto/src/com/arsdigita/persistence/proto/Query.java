@@ -1,21 +1,24 @@
 package com.arsdigita.persistence.proto;
 
+import com.arsdigita.persistence.proto.common.*;
+
 import java.util.*;
 
 /**
  * Query
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/02/28 $
+ * @version $Revision: #7 $ $Date: 2003/02/28 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#6 $ by $Author: rhs $, $DateTime: 2003/02/28 17:44:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#7 $ by $Author: rhs $, $DateTime: 2003/02/28 19:58:14 $";
 
     private Signature m_signature;
     private Filter m_filter;
-    private ArrayList m_orders = new ArrayList();
+    private ArrayList m_order = new ArrayList();
+    private HashSet m_ascending = new HashSet();
     private HashMap m_values;
 
     public Query(Signature signature, Filter filter) {
@@ -33,6 +36,9 @@ public class Query {
             Parameter p = (Parameter) it.next();
             set(p, query.get(p));
         }
+
+        m_order.addAll(query.m_order);
+        m_ascending.addAll(query.m_ascending);
     }
 
     public Signature getSignature() {
@@ -43,12 +49,24 @@ public class Query {
         return m_filter;
     }
 
-    public void addOrder(Order order) {
-        m_orders.add(order);
+    public void addOrder(Path path, boolean isAscending) {
+        if (m_order.contains(path)) {
+            throw new IllegalArgumentException
+                ("already ordered by path: " + path);
+        }
+
+        m_order.add(path);
+        if (isAscending) {
+            m_ascending.add(path);
+        }
     }
 
-    public Collection getOrders() {
-        return m_orders;
+    public Collection getOrder() {
+        return m_order;
+    }
+
+    public boolean isAscending(Path p) {
+        return m_ascending.contains(p);
     }
 
     public void set(Parameter p, Object value) {
@@ -62,8 +80,12 @@ public class Query {
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append(m_signature + "\nfilter(" + m_filter + ")\norder(");
-        for (Iterator it = m_orders.iterator(); it.hasNext(); ) {
-            buf.append(it.next());
+        for (Iterator it = m_order.iterator(); it.hasNext(); ) {
+            Path p = (Path) it.next();
+            buf.append(p);
+            if (!isAscending(p)) {
+                buf.append(" desc");
+            }
             if (it.hasNext()) {
                 buf.append(", ");
             }

@@ -16,12 +16,12 @@ import java.io.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2003/02/28 $
+ * @version $Revision: #11 $ $Date: 2003/02/28 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#10 $ by $Author: rhs $, $DateTime: 2003/02/28 17:44:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#11 $ by $Author: rhs $, $DateTime: 2003/02/28 19:58:14 $";
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -154,6 +154,11 @@ class QGen {
             genPath(path);
         }
 
+        for (Iterator it = m_query.getOrder().iterator(); it.hasNext(); ) {
+            Path path = (Path) it.next();
+            genPath(path);
+        }
+
         Condition condition = filter(m_query.getFilter());
 
         Join join = null;
@@ -172,6 +177,11 @@ class QGen {
         for (Iterator it = sig.getPaths().iterator(); it.hasNext(); ) {
             Path path = (Path) it.next();
             result.addSelection(getColumn(path), "column" + (col++));
+        }
+
+        for (Iterator it = m_query.getOrder().iterator(); it.hasNext(); ) {
+            Path path = (Path) it.next();
+            result.addOrder(getColumn(path), m_query.isAscending(path));
         }
 
         for (Iterator it = sig.getParameters().iterator(); it.hasNext(); ) {

@@ -10,12 +10,12 @@ import java.sql.*;
  * RDBMSRecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/02/17 $
+ * @version $Revision: #3 $ $Date: 2003/02/28 $
  **/
 
 class RDBMSRecordSet extends RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSRecordSet.java#2 $ by $Author: rhs $, $DateTime: 2003/02/17 20:13:29 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSRecordSet.java#3 $ by $Author: rhs $, $DateTime: 2003/02/28 19:58:14 $";
 
     final private RDBMSEngine m_engine;
     final private ResultSet m_rs;
@@ -45,6 +45,14 @@ class RDBMSRecordSet extends RecordSet {
         } catch (SQLException e) {
             throw new Error
                 ("error fetching path (" + p + "): " + e.getMessage());
+        }
+    }
+
+    public void close() {
+        try {
+            m_rs.close();
+        } catch (SQLException e) {
+            throw new Error(e.getMessage());
         }
     }
 

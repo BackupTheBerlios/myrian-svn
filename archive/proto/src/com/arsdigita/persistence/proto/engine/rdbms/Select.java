@@ -8,17 +8,19 @@ import java.util.*;
  * Select
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/02/26 $
+ * @version $Revision: #9 $ $Date: 2003/02/28 $
  **/
 
 class Select extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#8 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#9 $ by $Author: rhs $, $DateTime: 2003/02/28 19:58:14 $";
 
-    private ArrayList m_selections = new ArrayList();
-    private HashMap m_aliases = new HashMap();
     private Join m_join;
     private Condition m_condition;
+    private ArrayList m_selections = new ArrayList();
+    private HashMap m_aliases = new HashMap();
+    private ArrayList m_order = new ArrayList();
+    private HashSet m_ascending = new HashSet();
 
     public Select(Join join, Condition condition) {
         this(join, condition, new Environment());
@@ -28,6 +30,14 @@ class Select extends Operation {
         super(env);
         m_join = join;
         m_condition = condition;
+    }
+
+    public Join getJoin() {
+        return m_join;
+    }
+
+    public Condition getCondition() {
+        return m_condition;
     }
 
     public void addSelection(Path path, String alias) {
@@ -45,12 +55,24 @@ class Select extends Operation {
         return m_selections;
     }
 
-    public Join getJoin() {
-        return m_join;
+    public void addOrder(Path path, boolean isAscending) {
+        if (m_order.contains(path)) {
+            throw new IllegalArgumentException
+                ("already ordered by this path");
+        }
+
+        m_order.add(path);
+        if (isAscending) {
+            m_ascending.add(path);
+        }
     }
 
-    public Condition getCondition() {
-        return m_condition;
+    public boolean isAscending(Path path) {
+        return m_ascending.contains(path);
+    }
+
+    public Collection getOrder() {
+        return m_order;
     }
 
     void write(SQLWriter w) {

@@ -11,12 +11,12 @@ import java.sql.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/02/28 $
+ * @version $Revision: #6 $ $Date: 2003/02/28 $
  **/
 
 abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#5 $ by $Author: rhs $, $DateTime: 2003/02/28 17:44:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#6 $ by $Author: rhs $, $DateTime: 2003/02/28 19:58:14 $";
 
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();
@@ -204,6 +204,24 @@ class ANSIWriter extends SQLWriter {
         if (cond != null) {
             write("\nwhere ");
             write(cond);
+        }
+
+        Collection order = select.getOrder();
+
+        if (order.size() > 0) {
+            write("\norder by ");
+        }
+
+        for (Iterator it = order.iterator(); it.hasNext(); ) {
+            Path p = (Path) it.next();
+            write(p);
+            if (!select.isAscending(p)) {
+                write(" desc");
+            }
+
+            if (it.hasNext()) {
+                write(", ");
+            }
         }
     }
 
