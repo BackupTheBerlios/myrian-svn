@@ -49,11 +49,7 @@ docs:
 	$(JD) $(JD_FLAGS) -d $(DOC_DEST) `find $(SOURCES) -name "*.java"`
 
 tags:
-	rm -f TAGS
-	find $(SOURCES) -name "*.java" | xargs etags -a \
-		--language=none \
-		--regex='/^\([ \t]\|public\|private\|static\|protected\|final\|abstract\)*[ \t\n]*\(class\|interface\)+[ \t\n]+\([a-zA-Z0-9_]+\)/\3/' \
-		--output=TAGS
+	bin/jtags TAGS $(SOURCES)
 
 $(BUILD)/%.jmake: %
 	@echo generating $@
