@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/postgres/kernel/package-dnm_context.sql#3 $
--- $DateTime: 2004/01/20 14:16:30 $
+-- $Id: //core-platform/dev/sql/ccm-core/postgres/kernel/package-dnm_context.sql#4 $
+-- $DateTime: 2004/02/04 18:03:07 $
 -- autor: Aram Kananov <aram@kananov.com>
 
 
@@ -204,6 +204,7 @@ create or replace function dnm_context_change_context (
     v_new_granted_context integer;
     v_old_granted_context_id integer;
     v_old_context_id integer;
+    c record;
   begin
 
     v_context_id = coalesce(p_context_id,0);
@@ -259,16 +260,31 @@ create or replace function dnm_context_change_context (
       
       -- delete old ancesctors for p_object_id and its children in 
       -- dnm_ungranted_context
-      delete from dnm_ungranted_context
-	where object_id in ( select p_object_id
-                             union all
-                             select object_id 
-                               from dnm_ungranted_context
-                               where ancestor_id = p_object_id)
-          and ancestor_id in ( select ancestor_id 
-                                from dnm_ungranted_context
-                                where object_id = p_object_id)
-      ;
+-- ACHTUNG i couldnt make this query to use index instead 
+-- of seq scan. So have to convert it to the loop. 
+-- Hopefully it works better in PG 7.4 
+--      delete from dnm_ungranted_context
+--	where object_id in ( select p_object_id
+--                             union all
+--                             select object_id 
+--                               from dnm_ungranted_context
+--                               where ancestor_id = p_object_id)
+--          and ancestor_id in ( select ancestor_id 
+--                                from dnm_ungranted_context
+--                                where object_id = p_object_id)
+--      ;
+      for c in select ancestor_id from dnm_ungranted_context
+                                where object_id = p_object_id
+      loop
+        delete from dnm_ungranted_context
+	  where ancestor_id = c.ancestor_id
+            and object_id in ( select p_object_id
+                               union all
+                               select object_id 
+                                 from dnm_ungranted_context
+                                 where ancestor_id = p_object_id)
+        ;
+      end loop;
 
       -- if v_context_id is not granted object_id
       if v_context_id != v_new_granted_context then
