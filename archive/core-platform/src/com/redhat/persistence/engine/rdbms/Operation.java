@@ -12,12 +12,12 @@ import java.util.*;
  * Operation
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/07/20 $
+ * @version $Revision: #3 $ $Date: 2003/07/20 $
  **/
 
 abstract class Operation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Operation.java#2 $ by $Author: rhs $, $DateTime: 2003/07/20 14:25:59 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Operation.java#3 $ by $Author: rhs $, $DateTime: 2003/07/20 14:45:16 $";
 
     private static final Logger LOG = Logger.getLogger(Operation.class);
 
@@ -92,7 +92,11 @@ abstract class Operation {
     }
 
     Collection getEvents() {
-        return m_events;
+        if (m_events == null) {
+            return Collections.EMPTY_LIST;
+        } else {
+            return m_events;
+        }
     }
 
     void setQuery(Query query) {
