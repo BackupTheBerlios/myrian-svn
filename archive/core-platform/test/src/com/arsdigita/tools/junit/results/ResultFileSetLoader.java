@@ -19,9 +19,11 @@ import com.arsdigita.util.UncheckedWrapperException;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,10 +31,11 @@ import java.util.Map;
  *  ResultFileSetLoader
  *
  *  @author <a href="mailto:jorris@redhat.com">Jon Orris</a>
- *  @version $Revision: #3 $ $Date Nov 6, 2002 $
+ *  @version $Revision: #4 $ $Date Nov 6, 2002 $
  */
 public class ResultFileSetLoader {
 
+    private static Logger s_log = Logger.getLogger(ResultFileSetLoader.class);
     private static final FilenameFilter s_testFilter = new FilenameFilter() {
         public boolean accept(File dir, String name) {
             final boolean isTestFile = name.startsWith("TEST") && name.endsWith(".xml");
@@ -76,8 +79,12 @@ public class ResultFileSetLoader {
             return res;
         } catch(JDOMException e) {
             // This is likely due to an empty document
+            s_log.warn("JDOM error: " + e.getMessage(), e);
             EmptyXMLResult res = new EmptyXMLResult(filename);
             return res;
+        } catch(IOException e) {
+            s_log.error("Error loading file: " + e.getMessage(), e);
+            throw new UncheckedWrapperException(e);
         }
     }
 
