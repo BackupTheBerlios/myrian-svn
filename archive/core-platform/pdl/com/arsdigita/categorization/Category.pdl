@@ -41,10 +41,10 @@ object type Category extends ACSObject {
     composite Category[0..n]  validParents;
     composite SortedCategory[0..n]  immediateParents;
 
-    String[0..1] description = cat_categories.description;
-    String[1..1] name = cat_categories.name;
-    Boolean[1..1] isEnabled = cat_categories.enabled_p;
-    Boolean[1..1] isAbstract = cat_categories.abstract_p;
+    String[0..1] description = cat_categories.description VARCHAR(4000);
+    String[1..1] name = cat_categories.name VARCHAR(200);
+    Boolean[1..1] isEnabled = cat_categories.enabled_p CHAR(1);
+    Boolean[1..1] isAbstract = cat_categories.abstract_p CHAR(1);
 
     reference key (cat_categories.category_id);
 

@@ -19,18 +19,20 @@ import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.Property;
 import com.arsdigita.persistence.metadata.DataType;
 import com.arsdigita.persistence.metadata.SimpleType;
+import com.arsdigita.persistence.Utilities;
+
 
 /**
  * Defines a property of an ObjectType, which contains a name and type, a
  * multiplicity, and whether or not the property is composite.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/07/28 $
  */
 
 public class PropertyDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/PropertyDef.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/PropertyDef.java#4 $ by $Author: randyg $, $DateTime: 2002/07/28 12:21:11 $";
 
     // property name
     private String m_name;
@@ -176,16 +178,31 @@ public class PropertyDef extends Element {
         return prop;
     }
 
+
+    /** 
+     * Ensure that this element is in a valid state
+     */
+    void validate() {
+        if (getColumn() != null) {
+            getColumn().validate("Object Type: " +getModelDef().getName() + 
+                                 "." + getObjectDef().getName() + 
+                                 Utilities.LINE_BREAK + 
+                                 "Property: " + m_name +
+                                 Utilities.LINE_BREAK);
+        }
+    }
+
+
     /**
      * Returns a string representation of this object.
      *
      * @return a string representation of this object
      */
     public String toString() {
-        if (m_mult == null)
+        if (m_mult == null) {
             return m_type + " " + m_name;
-        else
+        } else {
             return m_type.toString() + m_mult + " " + m_name;
+        }
     }
-
 }

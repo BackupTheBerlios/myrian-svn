@@ -18,9 +18,9 @@ import com.arsdigita.kernel.*;
 
 object type CategoryPurpose extends ACSObject {
 
-    String[1..1]  key         = cat_purposes.key; 
-    String[0..1]  description = cat_purposes.description;
-    String[1..1]  name        = cat_purposes.name;
+    String[1..1]  key         = cat_purposes.key VARCHAR(40);
+    String[0..1]  description = cat_purposes.description VARCHAR(4000);
+    String[1..1]  name        = cat_purposes.name VARCHAR(200);
 
     reference key (cat_purposes.purpose_id);
 

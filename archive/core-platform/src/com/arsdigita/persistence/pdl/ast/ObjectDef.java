@@ -36,12 +36,12 @@ import java.util.Iterator;
  * Outputs a metadata ObjectType.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/07/28 $
  */
 
 public class ObjectDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ObjectDef.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ObjectDef.java#3 $ by $Author: randyg $, $DateTime: 2002/07/28 12:21:11 $";
 
     // object name
     private String m_name;
@@ -294,6 +294,11 @@ public class ObjectDef extends Element {
             EventDef ed = (EventDef) m_events.get(i);
             ed.validateMappings(m_type);
         }
+        // for now, this is placed here because this method
+        // is called even though the validate() method is not.
+        // when the validate method is once again called then
+        // this line should be removed
+        validate(m_props);
     }   
 
     /**

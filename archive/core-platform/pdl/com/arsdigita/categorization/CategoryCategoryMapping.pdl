@@ -17,10 +17,10 @@ model com.arsdigita.categorization;
 import com.arsdigita.kernel.*;
 
 object type CategoryCategoryMapping {
-    BigDecimal[1..1] id    = cat_category_category_map.category_category_map_id;
-    Integer[1..1]    sortKey    = cat_category_category_map.sort_key;
-    Boolean[1..1]    isDefault  = cat_category_category_map.default_p;
-    String[1..1]     relationType = cat_category_category_map.relation_type;
+    BigDecimal[1..1] id    = cat_category_category_map.category_category_map_id INTEGER;
+    Integer[1..1]    sortKey    = cat_category_category_map.sort_key INTEGER;
+    Boolean[1..1]    isDefault  = cat_category_category_map.default_p CHAR(1);
+    String[1..1]     relationType = cat_category_category_map.relation_type VARCHAR(10);
 
     Category[1..1]   parentCategory =
         join cat_category_category_map.category_id to

@@ -16,19 +16,28 @@
 package com.arsdigita.persistence.pdl.ast;
 
 import com.arsdigita.persistence.metadata.Column;
+import com.arsdigita.persistence.Utilities;
 
 import java.sql.Types;
+import org.apache.log4j.Category;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 
 /**
  * Defines a database column, including the table name, column name, and 
  * data type.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/07/28 $
  */
 public class ColumnDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ColumnDef.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ColumnDef.java#4 $ by $Author: randyg $, $DateTime: 2002/07/28 12:21:11 $";
+
+    private static int count = 0;
+    private static final Category s_log =
+        Category.getInstance(ColumnDef.class.getName());
 
     // the name of the column
     private String m_column;
@@ -110,6 +119,37 @@ public class ColumnDef extends Element {
 
         return result;
     }
+
+    void validate() {
+        validate("");
+    }
+
+    /**
+     *  This validates that the column has the correct properties,
+     *  including a jdbc type that was set by the PDL.
+     * 
+     *  @param beginningMessage This value will show up in the message
+     *  at the beginning of the description to help users debug.  This
+     *  is used, for instance, by PropertyDef to pass in the name of the
+     *  object type as well as the actual property.
+     */
+    void validate(String beginningMessage) {
+        if (m_type == null) {
+            count++;
+            if (beginningMessage == null) {
+                beginningMessage = "";
+            }
+            String warning = 
+                ("Warning: The following Column does not have a SQL " +
+                 " type specified.  For backwards compatibility, we " +
+                 " are going to try to guess the type.  The type " +
+                 " should be added as soon as possible. " +
+                 Utilities.LINE_BREAK +
+                 beginningMessage + count + "Column: " + getName());
+            s_log.warn(warning);
+        } 
+    }
+
 
     /**
      * Returns a string representation of this object.
