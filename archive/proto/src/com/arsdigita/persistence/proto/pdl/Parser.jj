@@ -14,12 +14,12 @@ import com.arsdigita.persistence.proto.pdl.nodes.*;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #7 $ $Date: 2003/02/18 $
+ * @version $Revision: #8 $ $Date: 2003/02/19 $
  */
 
 class Parser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/Parser.jj#7 $ by $Author: vadim $, $DateTime: 2003/02/18 19:30:21 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/Parser.jj#8 $ by $Author: rhs $, $DateTime: 2003/02/19 10:14:49 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -223,7 +223,7 @@ void query() :
     <LBRACE>
          ( property() <SEMI> )*
          [ option_block() ]
-         block()
+         sql_block()
     <RBRACE>
 }
 
@@ -379,33 +379,48 @@ void event() :
       ( ( <ADD> | <REMOVE> | <CLEAR> ) [ id() ] ) |
       ( <RETRIEVE> [ <ALL> | <ATTRIBUTES> | id() ] ) )
     <LBRACE>
-        ( block() | <SUPER> <SEMI> )*
+        ( sql_block() | <SUPER> <SEMI> )*
     <RBRACE>
 }
 
-void block() :
-{}
+SQLBlockNd sql_block() :
 {
-    ( <CALL> | <DO> ) <SQL>
-    [ <MAP> <LBRACE> ( mapStatement() <SEMI> )+ <RBRACE> ]
+    SQLBlockNd sql;
+    Node n;
+    Token l, t;
+}
+{
+    ( l = <CALL> | l = <DO> ) t = <SQL> { sql = new SQLBlockNd(t.image); }
+    [ <MAP> <LBRACE> ( mapStatement(sql) <SEMI> )+ <RBRACE> ]
+    { ln(sql, l); return sql; }
 }
 
-void mapStatement() :
+void mapStatement(SQLBlockNd sql) :
 {}
 {
-    ( LOOKAHEAD(binding()) binding() | mapping() )
+    ( LOOKAHEAD(binding()) binding(sql) | mapping(sql) )
 }
 
-void binding() :
-{}
+void binding(SQLBlockNd sql) :
 {
-    path() <COLON> db_type()
+    BindingNd b = new BindingNd();
+    Node n;
+}
+{
+    n = path() { ln(b, n); b.add(BindingNd.PATH, n); } <COLON>
+    n = db_type() { b.add(BindingNd.TYPE, n); }
+    { sql.add(SQLBlockNd.BINDINGS, b); }
 }
 
-void mapping() :
-{}
+void mapping(SQLBlockNd sql) :
 {
-    path() <EQ> id() [ <DOT> id() ]
+    MappingNd m = new MappingNd();
+    Node n;
+}
+{
+    n = path() { ln(m, n); m.add(MappingNd.PATH, n); } <EQ>
+    n = path() { m.add(MappingNd.COLUMN, n); }
+    { sql.add(SQLBlockNd.MAPPINGS, m); }
 }
 
 void option_block() :
