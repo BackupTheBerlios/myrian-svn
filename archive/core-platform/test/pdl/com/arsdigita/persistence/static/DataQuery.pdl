@@ -11,12 +11,12 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/test/pdl/com/arsdigita/persistence/static/DataQuery.pdl#1 $ 
-// $DateTime: 2003/02/19 22:26:51 $
+// $Id: //core-platform/dev/test/pdl/com/arsdigita/persistence/static/DataQuery.pdl#2 $ 
+// $DateTime: 2003/07/02 11:25:25 $
 
 model examples;
 
-query DataQuery returns 0..n {
+query DataQuery {
     BigDecimal id;
     String action;
     String description;
@@ -187,7 +187,7 @@ query DataQueryWithIn {
 }
 
 
-query DataQueryOneRow returns 1..1 {
+query DataQueryZeroOrOneRow {
     BigDecimal id;
     
     do {
@@ -199,33 +199,16 @@ query DataQueryOneRow returns 1..1 {
 }
 
 
-query DataQueryZeroOrOneRow returns 0..1 {
+query multipleIDs {
     BigDecimal id;
-    
+    BigDecimal id2;
+
     do {
-        select max(entry_id) as entry_id
-        from t_data_query
+        select t1.entry_id, t2.entry_id
+        from t_data_query t1, t_data_query t2
+        where t1.entry_id != t2.entry_id
     } map {
-        id = t_data_query.entry_id;
-    }
-}
-
-
-object type multipleObjectIDs {
-    BigDecimal id;
-    BigDecimal objectID;
-    
-    object key (id);
-    
-    retrieve {
-        do {
-            select messages.object_id, acs_objects.object_id
-            from   messages, acs_objects
-            where  messages.message_id = acs_objects.object_id
-            and  messages.message_id = :id
-        } map {
-            objectID = messages.object_id;
-            id = acs_objects.object_id;
-        }
+        id = t1.entry_id;
+        id2 = t2.entry_id;
     }
 }

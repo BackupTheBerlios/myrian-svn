@@ -38,11 +38,11 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/07/02 $
+ * @version $Revision: #12 $ $Date: 2003/07/02 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#11 $ by $Author: ashah $, $DateTime: 2003/07/02 01:16:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#12 $ by $Author: ashah $, $DateTime: 2003/07/02 11:25:25 $";
 
     private static Logger s_log =
         Logger.getLogger(DataQueryImplTest.class.getName());
@@ -581,38 +581,6 @@ public class DataQueryImplTest extends DataQueryTest {
                !query.next());
     }
 
-
-    public void testOneRow() throws Exception {
-        // make sure that using it correctly works.
-        DataQuery query = getSession().retrieveQuery
-            ("examples.DataQueryOneRow");
-        query.next();
-
-        // now try calling it on a query with more than one row
-        query = getDefaultQuery();
-        query.setReturnsUpperBound(1);
-        try {
-            query.next();
-            fail("Calling query.next() on something without exactly one row " +
-                 "should fail");
-        } catch (PersistenceException e) {
-            // this should happen
-        }
-
-        query = getSession().retrieveQuery
-            ("examples.DataQueryOneRow");
-        query.addEqualsFilter("id", new Integer(-1));
-
-        // this does not return any rows so it should throw an error
-        try {
-            query.next();
-            fail("Calling query.next() and not getting anything back " +
-                 "on a 1row should lead to an exception being thrown");
-        } catch (PersistenceException e) {
-            // this should happen
-        }
-    }
-
     public void testReachedEndHandling() throws java.sql.SQLException {
         DataQuery dq = getDefaultQuery();
         Connection conn = ConnectionManager.getConnection();
@@ -798,23 +766,22 @@ public class DataQueryImplTest extends DataQueryTest {
     }
 
 
-
     /**
      *  This test shows that if you select columns of the same
      *  name out of two tables then there are problems with the mapping.
-     *  To get this to work, you have to make sure you have stuff in
-     *  the "messages" table and then set the ID below
      */
-    public void FAILStestRetrieveObectID() {
-        BigDecimal id = new BigDecimal(1304);
-        DataObject object = SessionManager.getSession()
-            .retrieve(new OID("examples.multipleObjectIDs", id));
+    public void FAILStestColumnMapping() {
+        DataQuery dq =
+            SessionManager.getSession().retrieveQuery("examples.multipleIDs");
 
-        System.out.println("id = " + object.get("id"));
-        System.out.println("objectID = " + object.get("objectID"));
-        assertTrue("The ID is not what it should be.  It should be " + id +
-               " but it is actually " + object.get("id"),
-               id == (BigDecimal)object.get("id"));
+        while (dq.next()) {
+            if (!dq.get("id").equals(dq.get("id2"))) {
+                dq.close();
+                return;
+            }
+        }
+
+        fail("The mapping failed, properties should differ at some point");
     }
 
 
