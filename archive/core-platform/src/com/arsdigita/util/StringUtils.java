@@ -1274,7 +1274,7 @@ public class StringUtils {
      * Given a slash-separated path like <code>"/foo/bar/baz/quux/"</code>, this
      * iterator returns the following path fragments (in this order):
      * <code>"/foo/bar/baz/quux/"</code>, <code>"/foo/bar/baz/"</code>,
-     * <code>"/foo/bar/"</code>, and <code>"/foo/"</code>.
+     * <code>"/foo/bar/"</code>, <code>"/foo/"</code>, and <code>"/"</code>.
      *
      * <p>The returned iterator does not support {@link Iterator#remove()}.</p>
      *
@@ -1310,7 +1310,7 @@ public class StringUtils {
         }
 
         public boolean hasNext() {
-            return m_last > 0;
+            return m_last > -1;
         }
 
         public Object next() {

@@ -382,8 +382,13 @@ public class StringUtilsTest extends TestCase {
         final String path = "/foo/bar/baz//quux/";
         List elems = Arrays.asList
             (new String[] {path, "/foo/bar/baz//", "/foo/bar/baz/",
-                           "/foo/bar/", "/foo/"});
+                           "/foo/bar/", "/foo/", "/"});
         testPathFinder(path, elems);
+
+        final String path2 = "/content/";
+        testPathFinder(path2, Arrays.asList(new String[] {path2, "/"}));
+
+        testPathFinder("/", Arrays.asList(new String[] {"/"}));
     }
 
     private void testPathFinder(String path, List expected) {
