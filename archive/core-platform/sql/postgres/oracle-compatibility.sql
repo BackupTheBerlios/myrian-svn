@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres/oracle-compatibility.sql#2 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/postgres/oracle-compatibility.sql#3 $
+-- $DateTime: 2003/06/26 12:13:42 $
 
 -- The equivalent of oracle's dual table.
 create view dual as select 1;
@@ -29,3 +29,32 @@ begin
     end if;
 end;
 ' language 'plpgsql';
+
+
+-- Replacements for PG's special operators that cause persistence's
+-- SQL parser to barf
+
+create or replace function bitand(integer, integer) returns integer as '
+begin
+    return $1 & $2;
+end;
+' language 'plpgsql';
+
+create or replace function bitor(integer, integer) returns integer as '
+begin
+    return $1 | $2;
+end;
+' language 'plpgsql';
+
+create or replace function bitxor(integer, integer) returns integer as '
+begin
+    return $1 # $2;
+end;
+' language 'plpgsql';
+
+create or replace function bitneg(integer) returns integer as '
+begin
+    return ~$1;
+end;
+' language 'plpgsql';
+

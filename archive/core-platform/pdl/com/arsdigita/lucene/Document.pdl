@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/lucene/Document.pdl#4 $ 
-// $DateTime: 2003/05/05 15:56:50 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/lucene/Document.pdl#5 $ 
+// $DateTime: 2003/06/26 12:13:42 $
 
 model com.arsdigita.lucene;
 
@@ -21,7 +21,7 @@ object type Document {
     String[1..1] type              = lucene_docs.type VARCHAR(200);
     String[0..1] typeSpecificInfo  = lucene_docs.type_info VARCHAR;
     Date[1..1] timestamp           = lucene_docs.timestamp TIMESTAMP;
-    Boolean[1..1] isDirty          = lucene_docs.is_dirty BIT;
+    Integer[1..1] isDirty          = lucene_docs.is_dirty INTEGER;
     Boolean[1..1] isDeleted        = lucene_docs.is_deleted BIT;
     String[0..1] language          = lucene_docs.language CHAR(2);
     String[0..1] country           = lucene_docs.country CHAR(2);
@@ -38,7 +38,7 @@ object type Document {
 
 
     // To avoid race conditions between indexers, we
-    // never 'set' the dirty flag - we just toggle
+    // never 'set' the isDirty flag - we just toggle
     // our bit.
     update {
       do {
@@ -60,5 +60,17 @@ object type Document {
         where document_id = :id
       }
     }
+}
+
+query dirtyDocuments {
+  BigDecimal id;
+
+  do {
+    select document_id 
+      from lucene_docs
+     where bitand(is_dirty, :isDirty) > 0
+  } map {
+    id = document_id;
+  }
 }
 
