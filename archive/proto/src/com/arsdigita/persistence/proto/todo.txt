@@ -1,0 +1,7 @@
+ * Static SQL (Query & DML)
+ * Link attributes
+ * Eliminate old metadata & PDL parser
+ * Move DDL generator
+ * Reorder DML in relational engine
+ * Review everything
+ * Rename everything
