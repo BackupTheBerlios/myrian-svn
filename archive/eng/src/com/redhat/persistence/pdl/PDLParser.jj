@@ -1,8 +1,16 @@
-options {
-    STATIC = false;
-    DEBUG_PARSER = false;
-}
-
+/*
+ * Copyright (C) 2003-2004 Red Hat, Inc.  All Rights Reserved.
+ *
+ * This program is Open Source software; you can redistribute it and/or
+ * modify it under the terms of the Open Software License version 2.1 as
+ * published by the Open Source Initiative.
+ *
+ * You should have received a copy of the Open Software License along
+ * with this program; if not, you may obtain a copy of the Open Software
+ * License version 2.1 from http://www.opensource.org/licenses/osl-2.1.php
+ * or by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
+ * 3001 King Ranch Road, Ukiah, CA 95482.
+ */
 PARSER_BEGIN(PDLParser)
 
 package com.redhat.persistence.pdl;
@@ -13,12 +21,12 @@ import com.redhat.persistence.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/08/18 $
+ * @version $Revision: #4 $ $Date: 2004/08/30 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLParser.jj#3 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLParser.jj#4 $ by $Author: dennis $, $DateTime: 2004/08/30 14:24:55 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);

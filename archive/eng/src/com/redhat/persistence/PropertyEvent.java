@@ -1,16 +1,15 @@
 /*
- * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat, Inc.  All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the
- * License at http://www.redhat.com/licenses/ccmpl.html.
+ * This program is Open Source software; you can redistribute it and/or
+ * modify it under the terms of the Open Software License version 2.1 as
+ * published by the Open Source Initiative.
  *
- * Software distributed under the License is distributed on an
- * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
- * or implied. See the License for the specific language
- * governing rights and limitations under the License.
- *
+ * You should have received a copy of the Open Software License along
+ * with this program; if not, you may obtain a copy of the Open Software
+ * License version 2.1 from http://www.opensource.org/licenses/osl-2.1.php
+ * or by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
+ * 3001 King Ranch Road, Ukiah, CA 95482.
  */
 package com.redhat.persistence;
 
@@ -22,12 +21,12 @@ import java.io.PrintWriter;
  * PropertyEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/08/06 $
+ * @version $Revision: #4 $ $Date: 2004/08/30 $
  **/
 
 public abstract class PropertyEvent extends Event {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/PropertyEvent.java#3 $ by $Author: rhs $, $DateTime: 2004/08/06 08:43:09 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/PropertyEvent.java#4 $ by $Author: dennis $, $DateTime: 2004/08/30 14:24:55 $";
 
     final private Property m_prop;
     final private Object m_arg;

@@ -1,16 +1,15 @@
 /*
- * Copyright (C) 2002-2004 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2002-2004 Red Hat, Inc.  All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the
- * License at http://www.redhat.com/licenses/ccmpl.html.
+ * This program is Open Source software; you can redistribute it and/or
+ * modify it under the terms of the Open Software License version 2.1 as
+ * published by the Open Source Initiative.
  *
- * Software distributed under the License is distributed on an
- * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
- * or implied. See the License for the specific language
- * governing rights and limitations under the License.
- *
+ * You should have received a copy of the Open Software License along
+ * with this program; if not, you may obtain a copy of the Open Software
+ * License version 2.1 from http://www.opensource.org/licenses/osl-2.1.php
+ * or by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
+ * 3001 King Ranch Road, Ukiah, CA 95482.
  */
 package com.arsdigita.util;
 
@@ -31,11 +30,11 @@ package com.arsdigita.util;
  * <tt>new UncheckedWrapperException(e.getMessage(), e);</tt>
  *
  * @author David Eison 
- * @version $Id: //eng/persistence/dev/cap/test/src/com/arsdigita/util/CheckedWrapperException.java#1 $
+ * @version $Id: //eng/persistence/dev/cap/test/src/com/arsdigita/util/CheckedWrapperException.java#2 $
  */
 public class CheckedWrapperException extends Exception {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/util/CheckedWrapperException.java#1 $";
+    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/util/CheckedWrapperException.java#2 $";
     private static final String NEW_LINE = System.getProperty("line.separator");
     Throwable m_rootCause;
 
