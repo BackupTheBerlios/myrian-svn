@@ -10,12 +10,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #28 $ $Date: 2004/03/23 $
+ * @version $Revision: #29 $ $Date: 2004/03/24 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#28 $ by $Author: rhs $, $DateTime: 2004/03/23 19:48:30 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#29 $ by $Author: rhs $, $DateTime: 2004/03/24 16:36:49 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -751,15 +751,14 @@ class QFrame {
                 // XXX: compound keys
                 if (m_to.size() == 1) {
                     QValue target = (QValue) m_to.get(0);
-                    Set vals = m_parent.m_equiset.get(target);
+                    List vals = m_parent.m_equiset.get(target);
                     if (vals != null) {
                         QValue key = (QValue) m_from.get(0);
                         String table = key.getTable();
                         String column = key.getColumn();
                         if (table != null && column != null) {
-                            for (Iterator it = vals.iterator();
-                                 it.hasNext(); ) {
-                                QValue qv = (QValue) it.next();
+                            for (int i = 0; i < vals.size(); i++) {
+                                QValue qv = (QValue) vals.get(i);
                                 if (table.equals(qv.getTable())
                                     && column.equals(qv.getColumn())
                                     && m_parent.nn(qv)) {
@@ -795,10 +794,10 @@ class QFrame {
     }
 
     private boolean nn(QValue qv) {
-        Set s = m_equiset.get(qv);
+        List p = m_equiset.get(qv);
         for (Iterator it = m_nonnull.iterator(); it.hasNext(); ) {
             QValue nn = (QValue) it.next();
-            if (nn.equals(qv) || s != null && s == m_equiset.get(nn)) {
+            if (nn.equals(qv) || p != null && p == m_equiset.get(nn)) {
                 return true;
             }
         }
@@ -905,10 +904,6 @@ class QFrame {
     void shrink() {
         if (m_parent == null || m_equiset != m_parent.m_equiset) {
             List framesets = m_equiset.getFrameSets();
-            if (framesets == null) {
-                m_equiset.collapse();
-                framesets = m_equiset.getFrameSets();
-            }
             QFrame[] frames = new QFrame[framesets.size()];
             shrink(frames, framesets);
         }
@@ -996,7 +991,7 @@ class QFrame {
         }
         if (m_equiset != null) {
             if (m_parent == null || m_equiset != m_parent.m_equiset) {
-                if (!m_equiset.getSets().isEmpty()) {
+                if (!m_equiset.isEmpty()) {
                     result.append("\n");
                     indent(result, depth);
                 }
