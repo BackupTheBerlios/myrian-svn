@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/categorization/Category.pdl#16 $
-// $DateTime: 2003/06/05 16:29:48 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/categorization/Category.pdl#17 $
+// $DateTime: 2003/06/09 18:33:58 $
 
 model com.arsdigita.categorization;
 
@@ -74,35 +74,6 @@ association {
                 sort_key
             ) values (
                 :categories.id,
-                :id,
-                :isDefault,
-                :isIndex,
-                (select CASE WHEN (:sortKey is null) THEN
-                            (select CASE WHEN (max(sort_key) is null)
-                                               THEN
-                                                0
-                                               ELSE
-                                                max(sort_key)
-                                          END + 1
-                                     from cat_object_category_map)
-                             ELSE
-                                 (:sortKey)
-                             END
-                   from dual)
-            )
-        }
-    }
-
-    add childObjects {
-        do {
-            insert into cat_object_category_map (
-                category_id,
-                object_id,
-                default_p,
-                index_p,
-                sort_key
-            ) values (
-                :id,
                 :childObjects.id,
                 :isDefault,
                 :isIndex,
@@ -121,6 +92,7 @@ association {
             )
         }
     }
+
 }
 
 
