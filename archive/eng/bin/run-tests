@@ -7,6 +7,10 @@ if [ -z $BUILD ]; then
 	BUILD=build
 fi
 
+if [ -z $TESTRUNNER ]; then
+    TESTRUNNER=com.redhat.persistence.TestRunner
+fi
+
 for word in $*; do
     case $word in
     -*) SWITCHES="$SWITCHES $word";;
@@ -25,5 +29,10 @@ for f in `find $ARGS -name "*Suite.java"`; do
 
     sfx="`echo $package | sed s@\\\.@/@g`/${class}.java"
     pfx=`echo $f | sed s@${sfx}@@g`
-    bin/run -Dtest.base.dir=${BUILD}/${pfx} $SWITCHES com.redhat.persistence.TestRunner $qname > "${BUILD}/TEST-${qname}.txt"
+    if [ -x $FORMATTER ]; then
+      bin/run -Dtest.base.dir=${BUILD}/${pfx} $SWITCHES $TESTRUNNER $qname > "${BUILD}/TEST-${qname}.txt"
+    else
+      bin/run -Dtest.base.dir=${BUILD}/${pfx} $SWITCHES $TESTRUNNER $qname "${FORMATTER},TEST-${qname}.xml"
+    fi
 done
+exit 0
