@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2004/09/16 $
+ * @version $Revision: #14 $ $Date: 2004/09/16 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#13 $ by $Author: rhs $, $DateTime: 2004/09/16 12:02:28 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#14 $ by $Author: rhs $, $DateTime: 2004/09/16 15:55:26 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -65,7 +65,7 @@ public class PDL {
     public void loadResource(String s) {
         InputStream is = getClass().getClassLoader().getResourceAsStream(s);
         if (is == null) {
-            throw new Error("No such resource: " + s);
+            throw new PDLException("No such resource: " + s);
         }
         load(new InputStreamReader(is), s);
     }
