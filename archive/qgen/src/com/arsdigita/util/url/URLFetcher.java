@@ -75,7 +75,7 @@ public class URLFetcher {
      * the cache for the url, if not present fetches the url & stores it in
      * the cache.Returns the data for the page, or null if the fetch failed.
      *
-     * @deprecated use {@link fetchURLData(String url, String key)} instead
+     * @deprecated use {@link #fetchURLData(String url, String key)} instead
     */
     public static String fetchURL(String url, String key) {
         URLData data = fetchURLData(url, key);

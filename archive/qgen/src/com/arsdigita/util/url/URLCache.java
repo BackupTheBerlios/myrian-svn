@@ -168,7 +168,7 @@ public class  URLCache {
     };
 
     /**
-     *  @deprecated use {@link store(String url, URLData data)}
+     *  @deprecated use {@link #store(String url, URLData data)}
      */
     public synchronized void store(String url, String data) {
         URLData urlData = new URLData(url);
@@ -189,7 +189,7 @@ public class  URLCache {
 
 
     /**
-     *  @deprecated use {@link store(String url, URLData data, long expiry)}
+     *  @deprecated use {@link #store(String url, URLData data, long expiry)}
      */
     public synchronized void store(String url, String data, long expiry) {
         URLData urlData = new URLData(url);
@@ -315,7 +315,7 @@ public class  URLCache {
     /**
      *retrieves a url from the cache, returning null if not present or it has
      *expired.
-     * @deprecated use {@link retrieveData(String url)}
+     * @deprecated use {@link #retrieveData(String url)}
      */
     public String retrieve(String url) {
         URLData data = retrieveData(url);

@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
  * ResultCycle
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/03/03 $
+ * @version $Revision: #3 $ $Date: 2004/03/15 $
  **/
 
 class ResultCycle {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/ResultCycle.java#2 $ by $Author: rhs $, $DateTime: 2004/03/03 18:47:37 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/ResultCycle.java#3 $ by $Author: bche $, $DateTime: 2004/03/15 11:50:05 $";
 
     private static final Logger LOG = Logger.getLogger(ResultCycle.class);
 

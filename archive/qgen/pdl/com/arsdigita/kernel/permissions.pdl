@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/test-qgen/pdl/com/arsdigita/kernel/permissions.pdl#2 $
-// $DateTime: 2004/01/29 12:35:08 $
+// $Id: //core-platform/test-qgen/pdl/com/arsdigita/kernel/permissions.pdl#3 $
+// $DateTime: 2004/03/15 11:50:05 $
 
 model com.arsdigita.kernel.permissions;
 
@@ -451,69 +451,6 @@ object type ObjectContext {
 }
 
 
-object type ParameterizedPrivilege {
-    String[1..1] basePrivilege = parameterized_privileges.base_privilege VARCHAR(100);
-    String[1..1] paramKey = parameterized_privileges.param_key VARCHAR(100);
-    String[0..1] paramName = parameterized_privileges.param_name VARCHAR(100);
-
-    // this are 0..1 to avoid persistence 1..1 checks
-    // actually set with the basePrivilege property above
-    Privilege[0..1] basePriv =
-        join parameterized_privileges.base_privilege
-          to acs_privileges.privilege;
-
-    object key (paramKey, basePrivilege);
-
-    insert {
-        do {
-            insert into parameterized_privileges
-            (base_privilege, param_key, param_name)
-            values
-            (:basePrivilege, :paramKey, :paramName)
-        }
-    }
-
-    update {
-        do {
-            update parameterized_privileges
-            set base_privilege = :basePrivilege,
-            param_key = :paramKey,
-            param_name = :paramName
-        }
-    }
-
-    delete {
-        do {
-            delete from parameterized_privileges
-            where param_key = :paramKey
-            and base_privilege = :basePrivilege
-        }
-    }
-
-    retrieve {
-        do {
-            select base_privilege, param_key, param_name
-            from parameterized_privileges
-            where base_privilege = :basePrivilege
-              and param_key = :paramKey
-        } map {
-            basePrivilege = parameterized_privileges.base_privilege;
-            paramKey = parameterized_privileges.param_key;
-            paramName = parameterized_privileges.param_name;
-        }
-    }
-
-    retrieve all {
-        do {
-            select base_privilege, param_key, param_name
-            from parameterized_privileges
-        } map {
-            basePrivilege = parameterized_privileges.base_privilege;
-            paramKey = parameterized_privileges.param_key;
-            paramName = parameterized_privileges.param_name;
-        }
-    }
-}
 
 // query that is encapsulated by ObjectPermissionCollection.
 // This is one nasty query that includes display information about

@@ -160,7 +160,7 @@ public class URLPool {
      * @param url The URL to fetch data from
      *
      * @return Data from the URL, or null if unable to fetch.
-     * @deprecated Use {@link fetchURLData(String url)} instead
+     * @deprecated Use {@link #fetchURLData(String)} instead
      */
     public String fetchURL(String url) {
         URLData data = fetchURLData(url);
