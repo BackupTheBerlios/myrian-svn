@@ -37,12 +37,12 @@ import java.util.Set;
  * DDLWriter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2002/08/29 $
+ * @version $Revision: #11 $ $Date: 2002/11/13 $
  **/
 
 public class DDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#10 $ by $Author: randyg $, $DateTime: 2002/08/29 17:18:20 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#11 $ by $Author: jorris $, $DateTime: 2002/11/13 16:28:25 $";
 
     private File m_base;
     private boolean m_overwrite;
@@ -69,12 +69,12 @@ public class DDLWriter {
     public DDLWriter(File base,
                      Set files,
                      boolean overwrite) {
+        if (!base.isDirectory()) {
+            throw new IllegalArgumentException("Expecting directory. " + base.getAbsolutePath() + " is not a directory.");
+        }
         m_base = base;
         m_overwrite = overwrite;
         m_files = files;
-        if (!m_base.isDirectory()) {
-            throw new IllegalArgumentException("expecting directory");
-        }
     }
 
     public void setTestPDL(boolean isTestPDL) {

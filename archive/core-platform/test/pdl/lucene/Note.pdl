@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/test/pdl/com/arsdigita/lucene/Note.pdl#2 $ 
-// $DateTime: 2002/10/16 14:12:35 $
+// $Id: //core-platform/dev/test/pdl/lucene/Note.pdl#1 $ 
+// $DateTime: 2002/11/13 16:28:25 $
 
 model com.arsdigita.lucene;
 

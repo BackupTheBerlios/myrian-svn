@@ -49,7 +49,7 @@ object type ParasiteTwo extends Base {
 
 // This class uses both its own table and the table of its base type.
 object type SymbioteOne extends Base {
-    Date when = t_bases.when TIMESTAMP;
+    Date when = t_bases.when_col TIMESTAMP;
     String color = t_symbiotes.color VARCHAR(100);
     Target target = join t_bases.target_id to t_targets.id;
     Target[0..n] targets = join t_bases.id to t_targets_map.base_id,
@@ -62,7 +62,7 @@ object type SymbioteOne extends Base {
 // This class hijacks all of SymbioteOne's columns for its own
 // attributes.
 object type SymbioteTwo extends Base {
-    Date myWhen = t_bases.when TIMESTAMP;
+    Date myWhen = t_bases.when_col TIMESTAMP;
     String myColor = t_symbiotes.color VARCHAR(100);
     Target myTarget = join t_bases.target_id to t_targets.id;
     Target[0..n] myTargets = join t_bases.id to t_targets_map.base_id,
