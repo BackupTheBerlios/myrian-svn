@@ -1,0 +1,44 @@
+model com.arsdigita.webdevsupport;
+
+query planTableExists {
+    do {
+        select 1 from dual
+        where exists (select 1
+                      from user_tables
+                      where table_name = 'PLAN_TABLE')
+    }
+}
+
+data operation deleteQueryPlan {
+    do {
+       delete from plan_table where statement_id = :planID
+    }
+}
+
+query queryPlan {
+    do { 
+        select id, 
+               parent_id,
+               level,
+	       lpad(operation,length(operation)+ (level-1)* 2,'--') operation,
+	       options exec_options,
+	       object_name,
+	       cardinality, 
+               bytes,
+               cost
+        from plan_table
+	start with id = 0 and statement_id = :plan_id
+        connect by prior id = parent_id 
+        and prior statement_id = statement_id
+    } map {
+        id = id;
+        parentID = parent_id;
+        level = level;
+        operation = operation;
+        execOptions = exec_options;
+        objectName = object_name;
+        cardinality = cardinality;
+        bytes = bytes;
+        cost = cost;
+    }
+}
