@@ -1222,4 +1222,24 @@
            last="null"/>
     </results>
   </test>
+
+  <test name="parties">
+    <query>
+        query(all(parties.Party), id = id, class = discriminator1)
+    </query>
+    <query>
+        query(all(parties.Party), id = id, class = discriminator2)
+    </query>
+    <results>
+      <row id="0" class="parties.User"/>
+      <row id="1" class="parties.User"/>
+      <row id="2" class="parties.User"/>
+      <row id="3" class="parties.Group"/>
+      <row id="4" class="parties.Group"/>
+      <row id="5" class="parties.Group"/>
+      <row id="6" class="parties.Role"/>
+      <row id="7" class="parties.Role"/>
+      <row id="8" class="parties.Role"/>
+    </results>
+  </test>
 </tests>

@@ -1,0 +1,46 @@
+model parties;
+
+object type Party class com.redhat.persistence.PropertyMap
+                  adapter com.redhat.persistence.oql.IdentityAdapter {
+    BigInteger id = oql_parties.party_id;
+    // "user", "group", or "role"
+    String type = oql_parties.type;
+    String email = oql_parties.email;
+
+    String discriminator1 = qualias {
+        if(type == "user", "parties.User",
+           if(type == "group", "parties.Group",
+              if(type == "role", "parties.Role", null)))
+    };
+
+    String discriminator2 = qualias {
+        if(filter(u = all(parties.User), this == u) == null,
+           if(filter(g = all(parties.Group), this == g) == null,
+              if(filter(r = all(parties.Role), this == r) == null, null,
+                 "parties.Role"),
+              "parties.Group"),
+           "parties.User")
+    };
+
+    object key (id);
+}
+
+object type User extends Party {
+    String firstName = oql_users.first_name VARCHAR(200);
+    String lastName = oql_users.last_name VARCHAR(200);
+
+    reference key (oql_users.user_id);
+}
+
+object type Group extends Party {
+    String name = oql_groups.name VARCHAR(200);
+
+    reference key (oql_groups.group_id);
+}
+
+object type Role extends Party {
+    String name = oql_roles.name VARCHAR(200);
+    Party occupant = join oql_roles.occupant_id to oql_parties.party_id;
+
+    reference key (oql_roles.role_id);
+}

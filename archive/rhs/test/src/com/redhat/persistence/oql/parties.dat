@@ -1,0 +1,13 @@
+<data>
+  <parties.User id="0" type="user" firstName="Zero" lastName="Zero"/>
+  <parties.User id="1" type="user" firstName="One" lastName="One"/>
+  <parties.User id="2" type="user" firstName="Two" lastName="Two"/>
+
+  <parties.Group id="3" type="group" name="Three"/>
+  <parties.Group id="4" type="group" name="Four"/>
+  <parties.Group id="5" type="group" name="Five"/>
+
+  <parties.Role id="6" type="role" name="Six" occupant.id="3"/>
+  <parties.Role id="7" type="role" name="Seven" occupant.id="1"/>
+  <parties.Role id="8" type="role" name="Eight"/>
+</data>

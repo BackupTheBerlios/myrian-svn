@@ -39,12 +39,12 @@ import java.util.*;
  * QuerySuite
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/05/04 $
+ * @version $Revision: #3 $ $Date: 2004/05/05 $
  **/
 
 public class QuerySuite extends TestSuite {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/test/src/com/redhat/persistence/oql/QuerySuite.java#2 $ by $Author: rhs $, $DateTime: 2004/05/04 14:28:06 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/test/src/com/redhat/persistence/oql/QuerySuite.java#3 $ by $Author: rhs $, $DateTime: 2004/05/05 22:05:00 $";
 
     public QuerySuite() {}
 
@@ -74,6 +74,7 @@ public class QuerySuite extends TestSuite {
 
         PDL pdl = new PDL();
         pdl.loadResource("com/redhat/persistence/oql/test.pdl");
+        pdl.loadResource("com/redhat/persistence/oql/parties.pdl");
         pdl.emit(m_root);
     }
 
@@ -94,7 +95,8 @@ public class QuerySuite extends TestSuite {
         Session ssn = new Session(m_root, engine, new QuerySource());
 
         DataLoader loader = new DataLoader(ssn);
-        XML.parseResource("com/redhat/persistence/oql/data.xml", loader);
+        XML.parseResource("com/redhat/persistence/oql/test.dat", loader);
+        XML.parseResource("com/redhat/persistence/oql/parties.dat", loader);
         ssn.flush();
     }
 

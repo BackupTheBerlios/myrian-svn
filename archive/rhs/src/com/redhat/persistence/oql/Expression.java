@@ -22,12 +22,12 @@ import java.util.*;
  * Expression
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/05/02 $
+ * @version $Revision: #3 $ $Date: 2004/05/05 $
  **/
 
 public abstract class Expression {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/oql/Expression.java#2 $ by $Author: rhs $, $DateTime: 2004/05/02 13:12:27 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/oql/Expression.java#3 $ by $Author: rhs $, $DateTime: 2004/05/05 22:05:00 $";
 
     public static Expression valueOf(Path path) {
         if (path.getParent() == null) {
@@ -44,5 +44,14 @@ public abstract class Expression {
     abstract void hash(Generator generator);
 
     abstract String summary();
+
+    // XXX: consider splitting this out into a separate interface
+    static abstract class Emitter extends Expression {
+        void frame(Generator gen) {};
+        void hash(Generator gen) {};
+        String summary() {
+            return toString();
+        }
+    }
 
 }

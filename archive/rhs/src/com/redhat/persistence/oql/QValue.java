@@ -20,16 +20,17 @@ import com.redhat.persistence.metadata.*;
  * QValue
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/05/02 $
+ * @version $Revision: #3 $ $Date: 2004/05/05 $
  **/
 
 class QValue {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/oql/QValue.java#2 $ by $Author: rhs $, $DateTime: 2004/05/02 13:12:27 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/oql/QValue.java#3 $ by $Author: rhs $, $DateTime: 2004/05/05 22:05:00 $";
 
     private QFrame m_frame;
     private String m_column = null;
     private Code m_sql = null;
+    private Expression m_expression = null;
 
     QValue(QFrame frame, String column) {
         m_frame = frame;
@@ -39,6 +40,11 @@ class QValue {
     QValue(QFrame frame, Code sql) {
         m_frame = frame;
         m_sql = sql;
+    }
+
+    QValue(QFrame frame, Expression expr) {
+        m_frame = frame;
+        m_expression = expr;
     }
 
     QFrame getFrame() {
@@ -67,6 +73,8 @@ class QValue {
     Code emit() {
         if (m_sql != null) {
             return m_sql;
+        } else if (m_expression != null) {
+            return m_expression.emit(m_frame.getGenerator());
         } else {
             return new Code(m_frame.alias() + "." + m_column);
         }
@@ -75,6 +83,8 @@ class QValue {
     public String toString() {
         if (m_sql != null) {
             return m_sql.toString();
+        } else if (m_expression != null) {
+            return m_expression.toString();
         } else {
             return m_frame.alias() + "." + m_column;
         }
