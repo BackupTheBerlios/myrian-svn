@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/upgrade/oracle-se-6.0.1-6.1.0.sql#9 $
--- $DateTime: 2004/03/23 20:32:03 $
+-- $Id: //core-platform/dev/sql/ccm-core/upgrade/oracle-se-6.0.1-6.1.0.sql#10 $
+-- $DateTime: 2004/03/25 10:41:01 $
 
 PROMPT Red Hat WAF 6.0.1 -> 6.1.0 Upgrade Script (Oracle)
 
@@ -28,9 +28,9 @@ PROMPT Red Hat WAF 6.0.1 -> 6.1.0 Upgrade Script (Oracle)
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/deferred.sql
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/update-host-unique-index.sql
 @@ ../oracle-se/upgrade/6.0.1-6.1.0/update-cat_root_cat_object_map.sql
--- @@ ../oracle-se/upgrade/6.0.1-6.1.0/update-applications.sql
+@@ ../oracle-se/upgrade/6.0.1-6.1.0/update-applications.sql
 
-alter table cms_mime_extensions (mime_type null);
+alter table cms_mime_extensions modify (mime_type null);
 alter table cms_mime_extensions add constraint
   cms_mim_exten_mim_type_f_7pwwd foreign key(mime_type)
   references cms_mime_types(mime_type);
@@ -94,6 +94,14 @@ drop view granted_trans_context_map;
 drop view ungranted_trans_context_index;
 drop view ungranted_trans_context_map;
 drop view object_context_trans_map;
+
+drop trigger object_context_in_tr;
+drop trigger object_context_up_tr;
+drop trigger object_context_del_tr;
+drop trigger acs_objects_context_in_tr;
+drop trigger acs_permissions_in_tr;
+drop trigger acs_permissions_up_tr;
+drop trigger acs_permissions_del_tr;
 
 declare
   v_exists char(1);
