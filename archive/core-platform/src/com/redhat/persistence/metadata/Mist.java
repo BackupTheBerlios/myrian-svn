@@ -15,6 +15,7 @@
 
 package com.redhat.persistence.metadata;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,12 +25,12 @@ import java.util.Iterator;
  * Mist
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/10/28 $
+ * @version $Revision: #4 $ $Date: 2004/03/25 $
  **/
 
-class Mist implements Collection {
+class Mist extends AbstractList {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Mist.java#3 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Mist.java#4 $ by $Author: ashah $, $DateTime: 2004/03/25 16:08:06 $";
 
     private Object m_parent = null;
     private ArrayList m_children = new ArrayList();
@@ -61,7 +62,7 @@ class Mist implements Collection {
 	return key;
     }
 
-    public boolean add(Object o) {
+    public void add(int index, Object o) {
 	Object key = check(o);
 	Element child = (Element) o;
 
@@ -75,40 +76,17 @@ class Mist implements Collection {
                 ("duplicate key: " + key);
         }
 
-        m_children.add(child);
+        m_children.add(index, child);
         m_childrenMap.put(key, child);
         child.setParent(m_parent);
-        return true;
     }
 
-    public boolean addAll(Collection c) {
-        boolean result = false;
-        for (Iterator it = c.iterator(); it.hasNext(); ) {
-            if (add(it.next())) {
-                result = true;
-            }
-        }
-        return result;
+    public Object get(int index) {
+        return m_children.get(index);
     }
 
     public int size() {
         return m_children.size();
-    }
-
-    public Iterator iterator() {
-        return m_children.iterator();
-    }
-
-    public boolean isEmpty() {
-        return m_children.isEmpty();
-    }
-
-    public boolean contains(Object o) {
-        return m_children.contains(o);
-    }
-
-    public boolean containsAll(Collection c) {
-        return m_children.containsAll(c);
     }
 
     public void clear() {
@@ -126,14 +104,6 @@ class Mist implements Collection {
 	m_childrenMap.remove(key);
 	child.setParent(null);
 	return true;
-    }
-
-    public boolean removeAll(Collection c) {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean retainAll(Collection c) {
-        throw new UnsupportedOperationException();
     }
 
     public Object[] toArray() {

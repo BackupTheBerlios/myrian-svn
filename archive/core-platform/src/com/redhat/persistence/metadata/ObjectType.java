@@ -26,12 +26,12 @@ import java.util.List;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/03/11 $
+ * @version $Revision: #6 $ $Date: 2004/03/25 $
  **/
 
 public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/ObjectType.java#5 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:56 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/ObjectType.java#6 $ by $Author: ashah $, $DateTime: 2004/03/25 16:08:06 $";
 
     private final Model m_model;
     private final String m_name;
@@ -40,6 +40,10 @@ public class ObjectType extends Element {
     private final ObjectType m_super;
     private final Mist m_properties = new Mist(this);
     private final ArrayList m_immediates = new ArrayList();
+    private final ArrayList m_roles = new ArrayList();
+    private final List m_allProps;
+    private final List m_allRoles;
+    private List m_allImmediates;
 
     public ObjectType(Model model, String name, ObjectType supertype) {
         m_model = model;
@@ -50,6 +54,18 @@ public class ObjectType extends Element {
         } else {
             m_qualifiedName = m_model.getQualifiedName() + "." + m_name;
         }
+
+        if (m_super == null) {
+            m_allProps = Collections.unmodifiableList(m_properties);
+            m_allRoles = Collections.unmodifiableList(m_roles);
+        } else {
+            m_allProps = Collections.unmodifiableList
+                (new UnionList(m_properties, m_super.m_allProps));
+            m_allRoles = Collections.unmodifiableList
+                (new UnionList(m_roles, m_super.m_allRoles));
+        }
+
+        m_allImmediates = null;
     }
 
     public Root getRoot() {
@@ -104,6 +120,9 @@ public class ObjectType extends Element {
 
     public void addProperty(Property prop) {
         m_properties.add(prop);
+        if (prop instanceof Role) {
+            m_roles.add(prop);
+        }
     }
 
     public Collection getDeclaredProperties() {
@@ -114,17 +133,8 @@ public class ObjectType extends Element {
         return (Property) m_properties.get(name);
     }
 
-    private void getProperties(Collection result) {
-        if (m_super != null) {
-            m_super.getProperties(result);
-        }
-        result.addAll(m_properties);
-    }
-
     public Collection getProperties() {
-        ArrayList result = new ArrayList();
-        getProperties(result);
-        return result;
+        return m_allProps;
     }
 
     public Property getProperty(String name) {
@@ -191,15 +201,19 @@ public class ObjectType extends Element {
         return map.getKeyProperties();
     }
 
-    public Collection getImmediateProperties() {
-	if (isKeyed()) {
-            ArrayList result = new ArrayList();
-	    result.addAll(getKeyProperties());
-            result.addAll(getBasetype().m_immediates);
-            return result;
-	} else {
-	    return getProperties();
-	}
+    public List getImmediateProperties() {
+        if (m_allImmediates == null) {
+            List keys = getKeyProperties();
+            if (keys.size() > 0) {
+                m_allImmediates = m_super == null
+                    ? Collections.unmodifiableList(new UnionList
+                                                   (keys, m_immediates))
+                    : m_super.getImmediateProperties();
+            }
+        }
+
+        // for nonkeyed types, return all properties
+        return (m_allImmediates == null) ? m_allProps : m_allImmediates;
     }
 
     public void addImmediateProperty(Property prop) {
@@ -234,13 +248,7 @@ public class ObjectType extends Element {
     }
 
     public Collection getRoles() {
-        Collection result = getProperties();
-        for (Iterator it = result.iterator(); it.hasNext(); ) {
-            if (!(it.next() instanceof Role)) {
-                it.remove();
-            }
-        }
-        return result;
+        return m_allRoles;
     }
 
     public ObjectType getBasetype() {
