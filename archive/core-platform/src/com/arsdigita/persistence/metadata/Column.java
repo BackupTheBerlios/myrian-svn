@@ -15,7 +15,7 @@
 
 package com.arsdigita.persistence.metadata;
 
-import com.arsdigita.db.Initializer;
+import com.arsdigita.db.DbHelper;
 
 import java.io.PrintStream;
 import java.sql.Types;
@@ -26,12 +26,12 @@ import java.util.*;
  * the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/12 $
+ * @version $Revision: #6 $ $Date: 2002/08/14 $
  */
 
 public class Column extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Column.java#5 $ by $Author: randyg $, $DateTime: 2002/08/12 07:53:32 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Column.java#6 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
 
     /**
      * The table this Column belongs to.
@@ -373,16 +373,13 @@ public class Column extends Element {
     private static final String getDatabaseType(int type) {
         Integer key = new Integer(type);
 
-        switch (Initializer.getDatabase()) {
-        case Initializer.POSTGRES:
+        switch (DbHelper.getDatabase()) {
+        case DbHelper.DB_POSTGRES:
             if (POSTGRES.containsKey(key)) {
                 return (String) POSTGRES.get(key);
             }
             break;
-        case Initializer.ORACLE:
-            if (ORACLE.containsKey(key)) {
-                return (String) ORACLE.get(key);
-            }
+        case DbHelper.DB_ORACLE:
         default:
             if (ORACLE.containsKey(key)) {
                 return (String) ORACLE.get(key);

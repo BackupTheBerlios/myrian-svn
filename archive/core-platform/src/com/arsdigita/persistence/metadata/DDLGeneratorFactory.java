@@ -15,8 +15,8 @@
 
 package com.arsdigita.persistence.metadata;
 
-import com.arsdigita.db.Initializer;
 import org.apache.log4j.Logger;
+import com.arsdigita.db.DbHelper;
 
 
 /**
@@ -24,12 +24,12 @@ import org.apache.log4j.Logger;
  * returns it to calling classes.
  * 
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGeneratorFactory.java#4 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGeneratorFactory.java#5 $
  * @since 4.6.3
  */
 public class DDLGeneratorFactory {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGeneratorFactory.java#4 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGeneratorFactory.java#5 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
 
     private static final Logger s_log = 
         Logger.getLogger(DDLGeneratorFactory.class);
@@ -57,9 +57,9 @@ public class DDLGeneratorFactory {
 
     public static DDLGenerator getInstance() {
         if (s_generator == null) {
-            if (Initializer.getDatabase() == Initializer.ORACLE) {
+            if (DbHelper.getDatabase() == DbHelper.DB_ORACLE) {
                 setDDLGenerator(ORACLE_GENERATOR);
-            } else if (Initializer.getDatabase() == Initializer.POSTGRES) {
+            } else if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
                 setDDLGenerator(POSTGRES_GENERATOR);
             } else {
                 setDDLGenerator(null);

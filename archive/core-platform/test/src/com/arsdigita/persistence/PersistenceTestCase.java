@@ -30,12 +30,12 @@ import java.io.InputStream;
  * PersistenceTestCase
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/01 $
+ * @version $Revision: #7 $ $Date: 2002/08/14 $
  */
 
 public class PersistenceTestCase extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#6 $ by $Author: randyg $, $DateTime: 2002/08/01 11:16:42 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#7 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
 
     // Prevent loading the same PDL file twice
     private static Set s_loadedPDLResources = new HashSet();
@@ -65,8 +65,8 @@ public class PersistenceTestCase extends TestCase {
                 (0, resource.indexOf("testpdl") + 8);
             String suffix = resource.substring(resource.indexOf("testpdl") + 7);
             resource = prefix + "default" + suffix;
-            if (com.arsdigita.db.Initializer.getDatabase() ==
-                com.arsdigita.db.Initializer.POSTGRES) {
+            if (com.arsdigita.db.DbHelper.getDatabase() ==
+                com.arsdigita.db.DbHelper.DB_POSTGRES) {
                 extraResource = prefix + "postgres" + suffix;
             } else {
                 extraResource = prefix + "oracle-se" + suffix;

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the ArsDigita Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
  * the License at http://www.arsdigita.com/ADPL.txt
@@ -19,65 +19,59 @@ import com.arsdigita.initializer.Configuration;
 import com.arsdigita.initializer.InitializationException;
 
 import org.apache.log4j.Logger;
+import com.arsdigita.db.postgres.*;
+import com.arsdigita.db.oracle.*;
 
 public class Initializer
     implements com.arsdigita.initializer.Initializer {
 
     private static final Logger s_log =
-         Logger.getLogger(Initializer.class);
-
-    // The next set of variables are used to hold a reference to the
-    // type of database being used.
-    public static final int NOT_SPECIFIED = 0;
-    public static final int ORACLE = 1;
-    public static final int POSTGRES = 2;
-    private static int m_database = NOT_SPECIFIED;
+        Logger.getLogger(Initializer.class);
 
     private Configuration m_conf = new Configuration();
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#6 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#7 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
+
+    public static final String JDBC_URL = "jdbcUrl";
+    public static final String DB_USERNAME = "dbUsername";
+    public static final String DB_PASSWORD = "dbPassword";
+    public static final String CONNECTION_RETRY_LIMIT = "connectionRetryLimit";
+    public static final String CONNECTION_RETRY_SLEEP = "connectionRetrySleep";
+    public static final String CONNECTION_POOL_SIZE = "connectionPoolSize";
+    public static final String DRIVER_SPECIFIC_PARAM1 = "driverSpecificParam1";
+    public static final String USE_FIX_FOR_ORACLE_901 = "useFixForOracle901";
 
     public Initializer() throws InitializationException {
-        m_conf.initParameter("jdbcUrl", 
+        m_conf.initParameter(JDBC_URL,
                              "The JDBC URL for the database.",
                              String.class,
-			     "jdbc:oracle:oci8:@");
-        m_conf.initParameter("dbUsername",
+                             "jdbc:oracle:oci8:@");
+        m_conf.initParameter(DB_USERNAME,
                              "The username to use for the JDBC URL.",
                              String.class);
-        m_conf.initParameter("dbPassword",
+        m_conf.initParameter(DB_PASSWORD,
                              "The password to use for the JDBC URL.",
                              String.class);
-        m_conf.initParameter("DatabaseConnectionPool",
-                             "DatabaseConnectionPool implementation used for" +
-                             "talking to the database.",
-                             String.class);
-        m_conf.initParameter("SequenceImpl",
-                             "SequenceImpl implementation used by Sequences.",
-                             String.class);
-        m_conf.initParameter("DbExceptionHandlerImpl",
-                             "DbExceptionHandler implementation used for" +
-                             "parsing errors from the database.",
-                             String.class);
-        m_conf.initParameter("connectionRetryLimit",
+        m_conf.initParameter(CONNECTION_RETRY_LIMIT,
                              "Number of times ConnectionManager should retry " +
                              "getting a connection.",
                              Integer.class);
-        m_conf.initParameter("connectionRetrySleep",
+        m_conf.initParameter(CONNECTION_RETRY_SLEEP,
                              "Number of ms ConnectionManager should sleep " +
                              "between retries when getting a connection.",
                              Integer.class);
-        m_conf.initParameter("connectionPoolSize",
+        m_conf.initParameter(CONNECTION_POOL_SIZE,
                              "Number of connections to be used by pool " +
                              "(ignored for non-pooling connection managers).",
                              Integer.class);
-        m_conf.initParameter("driverSpecificParam1",
+        m_conf.initParameter(DRIVER_SPECIFIC_PARAM1,
                              "An optional driver-specific variable.  " +
                              "Meaning is determined by the particular " +
                              "connection pool in use.",
                              String.class);
-        m_conf.initParameter("useFixForOracle901",
-                             "Turns on a fix specific to oracle 9.0.1. Corrects qctcte1 bug",
+        m_conf.initParameter(USE_FIX_FOR_ORACLE_901,
+                             "Turns on a fix specific to oracle 9.0.1. " +
+                             "Corrects qctcte1 bug",
                              String.class);
     }
 
@@ -87,78 +81,107 @@ public class Initializer
 
     public void startup() {
         s_log.warn("Database Initializer starting...");
-        String dbPool = (String)m_conf.getParameter("DatabaseConnectionPool");
-        String sImpl  = (String)m_conf.getParameter("SequenceImpl");
-        String dbErrorHandler = 
-            (String)m_conf.getParameter("DbExceptionHandlerImpl");
-        Integer retryLimit = 
-            (Integer)m_conf.getParameter("connectionRetryLimit");
-        Integer retrySleep = 
-            (Integer)m_conf.getParameter("connectionRetrySleep");
-        Integer maxConnections = 
-            (Integer)m_conf.getParameter("connectionPoolSize");
-        String driverSpecificParam1 = 
-            (String)m_conf.getParameter("driverSpecificParam1");
 
-        String useFixForOracle901 = (String) m_conf.getParameter("useFixForOracle901");
+        String jdbcUrl = (String)m_conf.getParameter(JDBC_URL);
+        int database = DbHelper.getDatabaseFromURL(jdbcUrl);
+        DbHelper.setDatabase(database);
+
 
         try {
-            SQLExceptionHandler.setDbExceptionHandlerImplName(dbErrorHandler);
-        } catch (Exception e) {
-            s_log.error("Error setting up exception handler", e);
+            if (database == DbHelper.DB_ORACLE) {
+                SQLExceptionHandler.setDbExceptionHandlerImplName(
+                    OracleDbExceptionHandlerImpl.class.getName()
+                );
+            } else if (database == DbHelper.DB_POSTGRES) {
+                SQLExceptionHandler.setDbExceptionHandlerImplName(
+                    PostgresDbExceptionHandlerImpl.class.getName()
+                );
+            } else { 
+                DbHelper.unsupportedDatabaseError("SQL Exception Handler");
+            }
+        } catch (Exception ex) {
             throw new InitializationException(
-                "Error setting DbExceptionHandlerImpl", e);
-        }
-
-        if ( dbPool == null ) {
-            dbPool = "com.arsdigita.db.oracle.OracleConnectionPoolImpl";
+                "Cannot set database exception handler", ex
+            );
         }
 
 
-        if ( sImpl == null ) {
-            sImpl = "com.arsdigita.db.oracle.OracleSequenceImpl";
+
+        if (database == DbHelper.DB_ORACLE) {
+            Sequences.setSequenceImplName(
+                OracleSequenceImpl.class.getName()
+            );
+        } else if (database == DbHelper.DB_POSTGRES) {
+            Sequences.setSequenceImplName(
+                PostgresSequenceImpl.class.getName()
+            );
+        } else {
+            DbHelper.unsupportedDatabaseError("Sequences");
         }
 
-        setDatabase(dbPool);
 
-        if (null != useFixForOracle901 &&  useFixForOracle901.equals("true") &&
-            getDatabase() == ORACLE) {
-            com.arsdigita.db.oracle.OracleConnectionPoolImpl.setUseFixFor901(true);
+        if (database == DbHelper.DB_ORACLE) {
+            ConnectionManager.setDatabaseConnectionPoolName(
+                OracleConnectionPoolImpl.class.getName()
+            );
+        } else if (database == DbHelper.DB_POSTGRES) {
+            ConnectionManager.setDatabaseConnectionPoolName(
+                PostgresConnectionPoolImpl.class.getName()
+            );
+        } else {
+            DbHelper.unsupportedDatabaseError("Connection Pool");
         }
 
+
+        if (DbHelper.getDatabase() == DbHelper.DB_ORACLE) {
+            String useFixForOracle901 = (String) m_conf.getParameter(
+                USE_FIX_FOR_ORACLE_901
+            );
+
+            if (null != useFixForOracle901 &&  
+                useFixForOracle901.equals("true")) {
+                com.arsdigita.db.oracle.OracleConnectionPoolImpl.setUseFixFor901(true);
+            }
+        }
+
+        Integer retryLimit =
+            (Integer)m_conf.getParameter(CONNECTION_RETRY_LIMIT);
         if (retryLimit == null) {
             retryLimit = new Integer(0);
         }
-        
+
+        Integer retrySleep =
+            (Integer)m_conf.getParameter(CONNECTION_RETRY_SLEEP);
         if (retrySleep == null) {
             retrySleep = new Integer(100);
         }
 
+        Integer maxConnections =
+            (Integer)m_conf.getParameter(CONNECTION_POOL_SIZE);
         if (maxConnections == null) {
             maxConnections = new Integer(8);
         }
 
-        // driverSpecificParam1 may be null.
-
-        Sequences.setSequenceImplName(sImpl);
-        ConnectionManager.setDatabaseConnectionPoolName(dbPool);
         ConnectionManager.setRetryLimit(retryLimit.intValue());
         ConnectionManager.setRetrySleep(retrySleep.intValue());
         ConnectionManager.setConnectionPoolSize(maxConnections.intValue());
 
         s_log.info("Setting ConnectionManager default connection info...");
-
-        try {									
+        
+        String dbUsername = (String)m_conf.getParameter(DB_USERNAME);
+        String dbPassword = (String)m_conf.getParameter(DB_PASSWORD);
+        try {
             ConnectionManager.setDefaultConnectionInfo(
-                (String) m_conf.getParameter("jdbcUrl"),
-                (String) m_conf.getParameter("dbUsername"),
-                (String) m_conf.getParameter("dbPassword"));
+                jdbcUrl, dbUsername, dbPassword
+            );
         } catch (java.sql.SQLException e) {
             throw new InitializationException(
                 "SQLException initializing " +
                 "dbapi " + e.getMessage());
         }
 
+        String driverSpecificParam1 =
+            (String)m_conf.getParameter(DRIVER_SPECIFIC_PARAM1);
         if (driverSpecificParam1 != null) {
             ConnectionManager.setDriverSpecificParameter(
                 "param1", driverSpecificParam1);
@@ -169,43 +192,6 @@ public class Initializer
     }
 
     public void shutdown() {
-		ConnectionManager.freeConnections();
-	}
-
-
-    /**
-     *  @param className This is the string representation of a class that
-     *  can be used to determine the type of database.  For instance,
-     *  com.arsdigita.oracle.* or com.arsdigita.postgres.* both work.
-     */
-    private void setDatabase(String className) {
-        if (className == null) {
-            setDatabase(NOT_SPECIFIED);
-        } else if (className.toLowerCase().indexOf("oracle") > -1) {
-            setDatabase(ORACLE);
-        } else if (className.toLowerCase().indexOf("postgres") > -1) {
-            setDatabase(POSTGRES);
-        } else {
-            setDatabase(NOT_SPECIFIED);
-        }
-    }
-
-
-    /**
-     *  This will return the type of database that is being used by
-     *  the system.  It will return NOT_SPECIFIED if no database has been
-     *  specified.  Otherwise, it will return an int corresponding to
-     *  one of the database constants defined in this file.
-     */
-    public static int getDatabase() {
-        return m_database;
-    }
-
-    /**
-     *  This allows external sources to set the database so that it
-     *  is possible to set it from the command line
-     */
-    public static void setDatabase(int database) {
-        m_database = database;
+        ConnectionManager.freeConnections();
     }
 }

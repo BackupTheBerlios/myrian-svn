@@ -1,41 +1,59 @@
 package com.arsdigita.persistence.metadata;
 
-import com.arsdigita.util.*;
+import com.arsdigita.util.Assert;
 
-import com.arsdigita.db.Initializer;
+import com.arsdigita.db.DbHelper;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Comparator;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * DDLWriter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/12 $
+ * @version $Revision: #6 $ $Date: 2002/08/14 $
  **/
 
 public class DDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#5 $ by $Author: rhs $, $DateTime: 2002/08/12 16:19:25 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#6 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
 
     private File m_base;
     private boolean m_overwrite;
+    private Set m_files;
 
-    public DDLWriter(String base) {
-        this(new File(base), false);
+    public DDLWriter(String base,
+                     Set files) {
+        this(new File(base), files, false);
     }
 
-    public DDLWriter(String base, boolean overwrite) {
-        this(new File(base), overwrite);
+    public DDLWriter(String base, 
+                     Set files,
+                     boolean overwrite) {
+        this(new File(base), files, overwrite);
+    } 
+
+    public DDLWriter(File base,
+                     Set files) {
+        this(base, files, false);
     }
 
-    public DDLWriter(File base) {
-        this(base, false);
-    }
-
-    public DDLWriter(File base, boolean overwrite) {
+    public DDLWriter(File base,
+                     Set files,
+                     boolean overwrite) {
         m_base = base;
         m_overwrite = overwrite;
+        m_files = files;
         if (!m_base.isDirectory()) {
             throw new IllegalArgumentException("expecting directory");
         }
@@ -51,12 +69,12 @@ public class DDLWriter {
 
         for (Iterator it = tables.iterator(); it.hasNext(); ) {
             Table table = (Table) it.next();
+            
+            String tableFile = "table-" + table.getName() + ".sql";
+            String viewFile = "view-" + table.getName() + ".sql";
 
-            File tab = new File(m_base, "table-" + table.getName() +
-                                ".sql");
-            File view = new File(m_base, "view-" + table.getName() +
-                                 ".sql");
-            if (!m_overwrite && (tab.exists() || view.exists())) {
+            if (!m_overwrite && 
+                (m_files.contains(tableFile) || m_files.contains(viewFile))) {
                 skipped.add(table);
                 continue;
             }
@@ -143,14 +161,13 @@ public class DDLWriter {
             if (skipped.contains(table)) {
                 //writer.write("@@table-" + table.getName() + ".sql\n");
             } else {
-                if (Initializer.getDatabase() == Initializer.POSTGRES) {
-                    // we have to prefix it with the ../build/sql/ since
-                    // postgres reads everything relative to the directory
-                    // from which it is being executed
-                    writer.write("\\i ../" + m_base + "/table-" + 
+                String dir = DbHelper.getDatabaseDirectory();
+                if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+                    writer.write("\\i ddl/" + dir + "/table-" + 
                                  table.getName() + "-auto.sql\n");
                 } else {
-                    writer.write("@@table-" + table.getName() + "-auto.sql\n");
+                    writer.write("@ddl/" + dir + "/table-" + 
+                                 table.getName() + "-auto.sql\n");
                 }
             }
         }

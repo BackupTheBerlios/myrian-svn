@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the ArsDigita Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
  * the License at http://www.arsdigita.com/ADPL.txt
@@ -15,29 +15,29 @@
 
 package com.arsdigita.persistence.metadata;
 
-import com.arsdigita.db.Initializer;
 import org.apache.log4j.Logger;
+import com.arsdigita.db.DbHelper;
 
 /**
  * A factory class that instantiates a MDSQLGenerator implementation and then
  * returns it to calling classes.
- * 
+ *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGeneratorFactory.java#4 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGeneratorFactory.java#5 $
  * @since 4.6.3
  */
 public class MDSQLGeneratorFactory {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGeneratorFactory.java#4 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGeneratorFactory.java#5 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
 
     private static final Logger s_log = 
         Logger.getLogger(MDSQLGeneratorFactory.class);
 
     private static MDSQLGenerator s_generator = null;
 
-    private static String ORACLE_GENERATOR =
+    public static String ORACLE_GENERATOR =
         "com.arsdigita.persistence.metadata.OracleMDSQLGenerator";
-    private static String POSTGRES_GENERATOR = 
+    public static String POSTGRES_GENERATOR =
         "com.arsdigita.persistence.metadata.PostgresMDSQLGenerator";
 
     public static void setMDSQLGenerator(String impl) {
@@ -56,9 +56,9 @@ public class MDSQLGeneratorFactory {
 
     public static MDSQLGenerator getInstance() {
         if (s_generator == null) {
-            if (Initializer.getDatabase() == Initializer.ORACLE) {
+            if (DbHelper.getDatabase() == DbHelper.DB_ORACLE) {
                 setMDSQLGenerator(ORACLE_GENERATOR);
-            } else if (Initializer.getDatabase() == Initializer.POSTGRES) {
+            } else if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
                 setMDSQLGenerator(POSTGRES_GENERATOR);
             } else {
                 setMDSQLGenerator(null);

@@ -1,4 +1,4 @@
-@@ ../build/sql/create.sql
+@@ ddl/oracle-se/create.sql
 
 @@ default/globalization/table-g11n_charsets.sql
 @@ default/globalization/index-g11n_charsets.sql
@@ -213,4 +213,4 @@
 
 @@ default/kernel/index-foreign_keys.sql 
 
-@@ ../build/sql/deferred.sql
+@@ ddl/oracle-se/deferred.sql

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the ArsDigita Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
  * the License at http://www.arsdigita.com/ADPL.txt
@@ -15,23 +15,21 @@
 
 package com.arsdigita.persistence;
 
+import com.arsdigita.db.DbHelper;
 import com.arsdigita.initializer.Configuration;
 import com.arsdigita.initializer.InitializationException;
 import com.arsdigita.persistence.metadata.MDSQLGeneratorFactory;
-import com.arsdigita.util.ResourceManager;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.pdl.PDL;
 import com.arsdigita.persistence.pdl.PDLException;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.StringReader;
 
-import java.util.List;
-import java.util.ArrayList;
 
 import java.lang.IllegalArgumentException;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -41,7 +39,7 @@ import org.apache.log4j.Logger;
  * the SessionManager of them.
  *
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #4 $ $Date: 2002/08/13 $
+ * @version $Revision: #5 $ $Date: 2002/08/14 $
  **/
 
 public class Initializer
@@ -52,30 +50,35 @@ public class Initializer
 
     private Configuration m_conf = new Configuration();
 
+    public static final String PDL_DIRECTORY = 
+        "pdlDirectory";
+    public static final String AGGRESSIVE_CONNECTION_CLOSE = 
+        "aggressiveConnectionClose";
+    public static final String OPTIMIZE_BY_DEFAULT = 
+        "optimizeByDefault";
+    public static final String METADATA_XML_FILE_NAMES = 
+        "metadataXmlFileNames";
+
     public Initializer() throws InitializationException {
-        m_conf.initParameter("pdlDirectory",
+        m_conf.initParameter(PDL_DIRECTORY,
                              "The directory where a server's PDL files are " +
-                             "stored.", 
-			     String.class,
-			     "/WEB-INF/pdl");
+                             "stored.",
+                             String.class,
+                             "/WEB-INF/pdl");
 
-        m_conf.initParameter("mdsqlGenerator",
-                             "The MDSQLGenerator implementation to use",
-                             String.class);
-
-        m_conf.initParameter("aggressiveConnectionClose",
+        m_conf.initParameter(AGGRESSIVE_CONNECTION_CLOSE,
                              "Aggressively soft-close connections as soon as " +
                              "there are no users when connection has not " +
                              "been used to modify data",
                              Boolean.class);
-        m_conf.initParameter("optimizeByDefault",
+        m_conf.initParameter(OPTIMIZE_BY_DEFAULT,
                              "Use the optimizing query generator by default.",
                              Boolean.class,
                              ObjectType.getOptimizeDefault() ?
                              Boolean.TRUE : Boolean.FALSE);
 
         // here for legacy purposes
-        m_conf.initParameter("metadataXmlFileNames", 
+        m_conf.initParameter(METADATA_XML_FILE_NAMES,
                              "The names of the xml file defining the " +
                              "persistence metadata. This file must be in " +
                              "your classpath", List.class);
@@ -95,75 +98,62 @@ public class Initializer
     public void startup() {
         s_log.warn("Persistence initializer is starting");
 
+        int database = DbHelper.getDatabase();
+
         // Set the utilities
-        if (com.arsdigita.db.Initializer.getDatabase() == com.arsdigita.db.Initializer.POSTGRES) {
+        if (database == DbHelper.DB_ORACLE) {
+            Session.setSQLUtilities(new OracleSQLUtilities());
+        } else if (database == DbHelper.DB_POSTGRES) {
             Session.setSQLUtilities(new PostgresSQLUtilities());
         } else {
-            Session.setSQLUtilities(new OracleSQLUtilities());
+            DbHelper.unsupportedDatabaseError("SQL Utilities");
         }
         ObjectType.setOptimizeDefault(
-            m_conf.getParameter("optimizeByDefault").equals(Boolean.TRUE)
-            );
+            m_conf.getParameter(OPTIMIZE_BY_DEFAULT).equals(Boolean.TRUE)
+        );
 
-        try {
+        if (database == DbHelper.DB_ORACLE) {
             MDSQLGeneratorFactory.setMDSQLGenerator(
-                (String)m_conf.getParameter("mdsqlGenerator"));
-        } catch (Exception e) {
-            throw new InitializationException(
-                "Error instantiating MDSQLGenerator");
+                MDSQLGeneratorFactory.ORACLE_GENERATOR
+            );
+        } else if (database == DbHelper.DB_POSTGRES) {
+            MDSQLGeneratorFactory.setMDSQLGenerator(
+                MDSQLGeneratorFactory.POSTGRES_GENERATOR
+            );
+        } else {
+            DbHelper.unsupportedDatabaseError("MDSQL generator");
         }
 
-        String pdlDir = (String)m_conf.getParameter("pdlDirectory");
+        String pdlDir = (String)m_conf.getParameter(PDL_DIRECTORY);
 
-        if ((m_conf.getParameter("metadataXmlFileNames") != null) && 
+        if ((m_conf.getParameter(METADATA_XML_FILE_NAMES) != null) &&
             (pdlDir == null)) {
             throw new InitializationException(
                 "Invalid persistence configuration.  Please replace " +
                 "metadataXmlFileNames with pdlDirectory.");
         }
 
-        /*Boolean aggressiveClose = 
-          Boolean.valueOf(((String)m_conf.getParameter("aggressiveConnectionClose")));*/
-        Boolean aggressiveClose = 
-                (Boolean)m_conf.getParameter("aggressiveConnectionClose");
+        Boolean aggressiveClose =
+            (Boolean)m_conf.getParameter(AGGRESSIVE_CONNECTION_CLOSE);
         if (aggressiveClose != null && aggressiveClose.booleanValue()) {
             s_log.info("Using aggressive connection closing");
             TransactionContext.setAggressiveClose(true);
         } else {
-            s_log.info("Not using aggressive connection closing " + 
+            s_log.info("Not using aggressive connection closing " +
                        "[aggressiveConnectionClose parameter]");
         }
 
         SessionManager.setSchemaConnectionInfo( "",  "", "", "");
 
-        ResourceManager rm = ResourceManager.getInstance();
+        // Load the default pdl files
+        String defaultDir = DbHelper.getDatabaseDirectory(DbHelper.DB_DEFAULT);
+        PDL.loadPDLFiles(new File(pdlDir + "/" + defaultDir));
 
-        File webAppRoot = rm.getWebappRoot();
-        File dir;
-        
-        // If we're not running inside a webapp, we don't want the wrong
-        // thing to happen.
-        if ( webAppRoot == null ) {
-            dir = new File(pdlDir);
-        } else {
-            dir = new File(webAppRoot + pdlDir);
-        }
+        // NOw the database specific ones
+        String databaseDir = DbHelper.getDatabaseDirectory(database);
+        PDL.loadPDLFiles(new File(pdlDir + "/" + databaseDir));
 
-        List files = new ArrayList();
-
-        findPDLFiles(dir, files);
-
-        s_log.warn("Found " + files.size() + " files in the " + dir.toString() + " directory.");
-
-        try {
-            PDL.compilePDL(files);
-        } catch (PDLException e) {
-                throw new InitializationException
-                    ("Persistence Initialization error while trying to " +
-                     "compile the PDL files: " + e.getMessage());
-        }
-
-        // now we load the files out of the database
+        // Finally the files out of the database
         try {
             Session session = SessionManager.getSession();
             TransactionContext txn = session.getTransactionContext();
@@ -184,7 +174,7 @@ public class Initializer
                     // that has already been defined so we write an error
                     s_log.warn
                         ("The Object Type [" + currentFile + "] has already " +
-                         "been defined in the static files.  Ignoring " + 
+                         "been defined in the static files.  Ignoring " +
                          "object type definition from the database");
                     continue;
                 }
@@ -198,7 +188,7 @@ public class Initializer
                 .retrieve("com.arsdigita.persistence.DynamicAssociation");
 
             while (collection.next()) {
-                String currentFile = "Association from " + 
+                String currentFile = "Association from " +
                     collection.get("objectType1") + " to " +
                     collection.get("objectType2");
 
@@ -228,42 +218,12 @@ public class Initializer
 
             txn.commitTxn();
         } catch (PDLException e) {
-                throw new InitializationException
-                    ("Persistence Initialization error while trying to " +
-                     "compile the PDL files: " + e.getMessage());
+            throw new InitializationException
+                ("Persistence Initialization error while trying to " +
+                 "compile the PDL files: " + e.getMessage());
         }
     }
 
-    private void findPDLFiles(File dir, List files) {
-        if (!dir.exists()) {
-            return;
-        }
-
-        if (!dir.isDirectory()) {
-            files.add(dir.toString());
-            return;
-        }
-
-        File[] contents = dir.listFiles(new PDLFileFilter());
-		
-        for (int i = 0; i < contents.length; i++) {
-            findPDLFiles(contents[i], files);
-        }
-    }
 
     public void shutdown() {}
 }
-
-/**
- * Filter out files that do not end in ".pdl".
- */
-class PDLFileFilter implements FileFilter {
-	public boolean accept(File file) {
-		if (file.isDirectory() || file.getName().endsWith("pdl")) {
-			return true;
-		} else {
-			return false;
-		} 
-	}
-}
-

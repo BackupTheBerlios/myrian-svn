@@ -18,7 +18,7 @@ package com.arsdigita.persistence;
 import java.math.BigDecimal;
 import com.arsdigita.db.ConnectionManager;
 import java.util.Date;
-import com.arsdigita.db.Initializer;
+import com.arsdigita.db.DbHelper;
 
 /**
  * DataOperationText
@@ -29,11 +29,11 @@ import com.arsdigita.db.Initializer;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/07/26 $
+ * @version $Revision: #6 $ $Date: 2002/08/14 $
  */
 public class DataOperationTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataOperationTest.java#5 $ by $Author: randyg $, $DateTime: 2002/07/26 11:26:26 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataOperationTest.java#6 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
 
     public DataOperationTest(String name) {
         super(name);
@@ -187,7 +187,7 @@ public class DataOperationTest extends PersistenceTestCase {
         maxQuery.close();
 
         String return_value = null;
-        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+        if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
             DataQuery operationQuery = getSession().retrieveQuery
                 ("examples.DataOperationFunction");
             operationQuery.next();
@@ -210,7 +210,7 @@ public class DataOperationTest extends PersistenceTestCase {
                newID + 1 == nextID);
         newID = nextID;
 
-        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+        if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
             DataQuery operationQuery = getSession().retrieveQuery
                 ("examples.DataOperationProcWithOut");
             operationQuery.setParameter("oldID", null);
@@ -233,7 +233,7 @@ public class DataOperationTest extends PersistenceTestCase {
         newID = nextID;
 
         String stringValue = Integer.toString(Integer.parseInt(return_value) + 8);
-        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+        if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
             DataQuery operationQuery = getSession().retrieveQuery
                 ("examples.DataOperationProcWithInOut");
             operationQuery.setParameter("oldID", new Integer(stringValue));
@@ -261,7 +261,7 @@ public class DataOperationTest extends PersistenceTestCase {
 
         Integer integerValue = new Integer(Integer.parseInt(return_value) + 8);
         Integer return_integer = null;
-        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+        if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
             DataQuery operationQuery = getSession().retrieveQuery
                 ("examples.DataOperationProcWithInOutInt");
             operationQuery.setParameter("oldID", integerValue);
@@ -290,7 +290,7 @@ public class DataOperationTest extends PersistenceTestCase {
 
         // now we test using Dates
         Date date = new Date();
-        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+        if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
             DataQuery operationQuery = getSession().retrieveQuery
                 ("examples.DataOperationProcWithDates");
             operationQuery.setParameter("idToUpdate", integerValue);
@@ -342,7 +342,7 @@ public class DataOperationTest extends PersistenceTestCase {
     public void testPLSQLWithRandomArgs() {
         // Postgres does not have default values so there is no reason
         // to test for it.
-        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+        if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
             return;
         }
         // make sure that the table is empty

@@ -134,15 +134,15 @@ void useSQLStatement (Object obj, Method invokingMethod)
         {
             Token tok;
             StringBuffer sb = new StringBuffer(token.toString());
-            int database = com.arsdigita.db.Initializer.getDatabase();
+            int database = com.arsdigita.db.DbHelper.getDatabase();
             while (true) {
                 tok = getNextToken();
                 if (tok.kind == SLASH && 
-                    database == com.arsdigita.db.Initializer.ORACLE) {
+                    database == com.arsdigita.db.DbHelper.DB_ORACLE) {
                     break;
                 }
                 if (tok.kind == LANGUAGE_PHRASE &&
-                    database == com.arsdigita.db.Initializer.POSTGRES) {
+                    database == com.arsdigita.db.DbHelper.DB_POSTGRES) {
                     sb.append(" ").append(tok.image);
                     // consume the next token which is a semi-colon
                     tok = getNextToken();

@@ -1,7 +1,7 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.*;
-import com.arsdigita.db.Initializer;
+import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.metadata.*;
 import org.apache.log4j.Logger;
 
@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * GenericDataQueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/13 $
+ * @version $Revision: #5 $ $Date: 2002/08/14 $
  **/
 
 public class GenericDataQueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/GenericDataQueryTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/GenericDataQueryTest.java#5 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
 
     private static final Logger s_log =
         Logger.getLogger(GenericDataQueryTest.class);
@@ -27,7 +27,7 @@ public class GenericDataQueryTest extends PersistenceTestCase {
 
     private DataQuery makeTestQuery() {
         if (SELECT == null) {
-            if (Initializer.getDatabase() == Initializer.POSTGRES) {
+            if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
                 SELECT = "select 1 as one ";
             } else {
                 SELECT = "select 1 as one from dual";

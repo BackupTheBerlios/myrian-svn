@@ -1,6 +1,6 @@
 package com.arsdigita.persistence.oql;
 
-import com.arsdigita.db.Initializer;
+import com.arsdigita.db.DbHelper;
 import com.arsdigita.util.*;
 import com.arsdigita.persistence.metadata.*;
 import java.util.*;
@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * specified in a PDL file to generate sql queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #13 $ $Date: 2002/08/13 $
+ * @version $Revision: #14 $ $Date: 2002/08/14 $
  **/
 
 public class Query extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#13 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#14 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -438,11 +438,15 @@ public class Query extends Node {
 
     public String getSQL() {
         final StringBuffer result = new StringBuffer();
-        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+	int database = DbHelper.getDatabase();
+        if (database == DbHelper.DB_POSTGRES) {
             writePostgresSQL(result);
-        } else {
+        } else if (database == DbHelper.DB_ORACLE) {
             writeOracleSQL(result);
-        }
+        } else {
+	    DbHelper.unsupportedDatabaseError("optimizing query generator");
+	}
+
         return result.toString();
     }
 

@@ -16,7 +16,7 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.*;
-import com.arsdigita.db.Initializer;
+import com.arsdigita.db.DbHelper;
 
 import java.io.StringReader;
 import java.io.Writer;
@@ -33,12 +33,12 @@ import org.apache.log4j.Logger;
  * LobTest - for testing Blob and Clob datatype.
  *
  * @author Jeff Teeters (teeters@arsdigita.com)
- * @version $Revision: #5 $ $Date: 2002/08/13 $
+ * @version $Revision: #6 $ $Date: 2002/08/14 $
  */
 
 public class LobTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LobTest.java#5 $ by $Author: randyg $, $DateTime: 2002/08/13 13:13:11 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LobTest.java#6 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
 
     private Logger s_cat = 
         Logger.getLogger(LobTest.class);
@@ -115,7 +115,7 @@ public class LobTest extends PersistenceTestCase {
 
     public void testLargeClobsDatabaseSpecificSyntax() {
         String db = null;
-        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+        if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
             db = "postgres";
         } else {
             db = "oracle";
@@ -321,7 +321,7 @@ public class LobTest extends PersistenceTestCase {
             Connection conn = getSession().getTransactionContext()
                 .getConnection();
 
-            if (Initializer.getDatabase() == Initializer.POSTGRES) {
+            if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
                 executePostgresUpdate(conn, testString);
             } else {
                 executeOracleUpdate(conn, testString);
@@ -349,7 +349,7 @@ public class LobTest extends PersistenceTestCase {
                 msg = msg.substring(0,500) + "...";
             }
             String dbName = null;
-            if (Initializer.getDatabase() == Initializer.POSTGRES) {
+            if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
                 dbName = "Postgres";
             } else {
                 dbName = "Oracle";

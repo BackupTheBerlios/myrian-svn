@@ -2,7 +2,7 @@ begin;
 
 create view dual as select 1;
 
-\i ../build/sql/create.sql
+\i ddl/postgres/create.sql
 \i default/globalization/table-g11n_charsets.sql
 \i default/globalization/index-g11n_charsets.sql
 \i default/globalization/table-g11n_locales.sql
@@ -197,6 +197,6 @@ create view dual as select 1;
 
 --\i default/kernel/index-foreign_keys.sql 
 
-\i ../build/sql/deferred.sql
+\i ddl/postgres/deferred.sql
 
 commit;

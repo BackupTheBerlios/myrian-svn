@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the ArsDigita Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
  * the License at http://www.arsdigita.com/ADPL.txt
@@ -19,20 +19,21 @@ import java.util.*;
 import java.io.*;
 import java.sql.*;
 import java.math.*;
+
 import org.apache.log4j.Logger;
-import com.arsdigita.db.Initializer;
+import com.arsdigita.db.DbHelper;
 
 /**
  * The MetadataRoot is a singleton class that serves as an entry point for the
  * metadata system.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/08/13 $
+ * @version $Revision: #8 $ $Date: 2002/08/14 $
  **/
 
 public class MetadataRoot extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#7 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#8 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
 
     private static final Logger s_cat = Logger.getLogger(MetadataRoot.class.getName());
 
@@ -94,12 +95,12 @@ public class MetadataRoot extends Element {
                 // using char(1) and the jdbc driver uses "false" and "true"
                 // we have to do this converstion.  Long term, we want
                 // to remove this
-                if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
                     boolean booleanValue = ((Boolean) value).booleanValue();
                     if (booleanValue) {
-                        ps.setString(index, "1"); 
+                        ps.setString(index, "1");
                     } else {
-                        ps.setString(index, "0"); 
+                        ps.setString(index, "0");
                     }
                 } else {
                     ps.setBoolean(index, ((Boolean) value).booleanValue());
@@ -282,7 +283,7 @@ public class MetadataRoot extends Element {
 
             public void doRefresh(ResultSet rs, String column, Object value)
                 throws SQLException {
-                if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
                     // do nothing
                 } else {
                     oracle.sql.CLOB clob =
@@ -308,7 +309,7 @@ public class MetadataRoot extends Element {
                     if (value == null) {
                         return super.getLiteral(value, jdbcType);
                     } else {
-                        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                        if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
                             return " ? ";
                         } else {
                             return " empty_clob() ";
@@ -325,9 +326,9 @@ public class MetadataRoot extends Element {
                 switch (jdbcType) {
                 case Types.CLOB:
                     //CLOB.bind(ps, index, value, jdbcType);
-                    if (Initializer.getDatabase() != Initializer.POSTGRES) {
+                    if (DbHelper.getDatabase() != DbHelper.DB_POSTGRES) {
                         return 0;
-                    } 
+                    }
                 default:
                     ps.setString(index, (String) value);
                     break;
@@ -339,8 +340,8 @@ public class MetadataRoot extends Element {
             public Object fetch(ResultSet rs, String column)
                 throws SQLException {
                 ResultSetMetaData md = rs.getMetaData();
-                if (md.getColumnType(rs.findColumn(column)) == Types.CLOB && 
-                    Initializer.getDatabase() != Initializer.POSTGRES) {
+                if (md.getColumnType(rs.findColumn(column)) == Types.CLOB &&
+                    DbHelper.getDatabase() != DbHelper.DB_POSTGRES) {
                     return CLOB.fetch(rs, column);
                 } else {
                     return rs.getString(column);
@@ -356,7 +357,7 @@ public class MetadataRoot extends Element {
 
             public void doRefresh(ResultSet rs, String column, Object value)
                 throws SQLException {
-                if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
                     // do nothing
                 } else {
                     oracle.sql.BLOB blob =
@@ -382,7 +383,7 @@ public class MetadataRoot extends Element {
                     if (value == null) {
                         return super.getLiteral(value, jdbcType);
                     } else {
-                        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                        if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
                             return " ? ";
                         } else {
                             return " empty_blob() ";
@@ -396,7 +397,7 @@ public class MetadataRoot extends Element {
 
             public int bindValue(PreparedStatement ps, int index, Object value,
                              int jdbcType) throws SQLException {
-                if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
                     byte[] bytes = (byte[]) value;
                 // This is supported by the oracle OCI driver and the PG driver
                 // http://www.oradoc.com/ora816/java.816/a81354/oralob2.htm#1058119
@@ -410,7 +411,7 @@ public class MetadataRoot extends Element {
 
             public Object fetch(ResultSet rs, String column)
                 throws SQLException {
-                if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
                     return rs.getBytes(column);
                 } else {
                     Blob blob = rs.getBlob(column);
@@ -679,9 +680,9 @@ public class MetadataRoot extends Element {
     }
 
     /**
-     * Returns a collection of the object types in this metadata root  
+     * Returns a collection of the object types in this metadata root
      *
-     * @return a collection of the object types in this metadata root  
+     * @return a collection of the object types in this metadata root
      */
     public Collection getObjectTypes() {
         Iterator it = m_models.values().iterator();

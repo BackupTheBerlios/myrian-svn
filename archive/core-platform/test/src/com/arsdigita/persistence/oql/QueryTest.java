@@ -3,7 +3,7 @@ package com.arsdigita.persistence.oql;
 import com.arsdigita.persistence.*;
 import com.arsdigita.persistence.metadata.*;
 import com.arsdigita.persistence.metadata.Table;
-import com.arsdigita.db.Initializer;
+import com.arsdigita.db.DbHelper;
 import com.arsdigita.util.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -14,12 +14,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2002/08/13 $
+ * @version $Revision: #9 $ $Date: 2002/08/14 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#8 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#9 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);
@@ -54,7 +54,7 @@ public class QueryTest extends PersistenceTestCase {
         if (is == null) {
             // this means it is a db specific file
             String database = null;
-            if (Initializer.getDatabase() == Initializer.POSTGRES) {
+            if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
                 database = "postgres";
             } else {
                 database = "oracle-se";
