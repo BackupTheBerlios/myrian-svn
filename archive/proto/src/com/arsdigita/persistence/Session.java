@@ -55,7 +55,7 @@ import java.sql.SQLException;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #18 $ $Date: 2003/03/11 $
+ * @version $Revision: #19 $ $Date: 2003/03/13 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -156,7 +156,7 @@ public class Session {
     }
 
         {
-            m_ssn.addBeforeActivate(new EventProcessor() {
+            m_ssn.addAfterActivate(new EventProcessor() {
                     public void write(Event e) {
                         if (e instanceof PropertyEvent) {
                             fireEvent(e);

@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #43 $ $Date: 2003/03/12 $
+ * @version $Revision: #44 $ $Date: 2003/03/13 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#43 $ by $Author: rhs $, $DateTime: 2003/03/12 15:21:10 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#44 $ by $Author: ashah $, $DateTime: 2003/03/13 14:39:32 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -41,7 +41,7 @@ public class Session {
 
     private Set m_violations = new HashSet();
 
-    private final Set m_beforeActivate = new HashSet();
+    private final Set m_afterActivate = new HashSet();
     private final Set m_beforeFlush = new HashSet();
     private final Set m_afterFlush = new HashSet();
 
@@ -66,6 +66,15 @@ public class Session {
     }
 
     public void create(Object obj) {
+        try {
+            createInternal(obj);
+            processPending();
+        } finally {
+            cleanUp();
+        }
+    }
+
+    private void createInternal(Object obj) {
         if (LOG.isDebugEnabled()) {
             trace("create", new Object[] {obj});
         }
@@ -83,17 +92,14 @@ public class Session {
 
         getAdapter(obj).setSession(obj, this);
 
-        try {
-            addEvent(new CreateEvent(this, obj));
-            processPending();
+        addEvent(new CreateEvent(this, obj));
+        // XXX: needed?
+        processPending();
 
-            PropertyMap props = getAdapter(obj).getProperties(obj);
-            for (Iterator it = props.entrySet().iterator(); it.hasNext(); ) {
-                Map.Entry me = (Map.Entry) it.next();
-                set(obj, (Property) me.getKey(), me.getValue());
-            }
-        } finally {
-            cleanUp();
+        PropertyMap props = getAdapter(obj).getProperties(obj);
+        for (Iterator it = props.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry me = (Map.Entry) it.next();
+            setInternal(obj, (Property) me.getKey(), me.getValue());
         }
 
         if (LOG.isDebugEnabled()) {
@@ -440,8 +446,8 @@ public class Session {
         }
     }
 
-    private void clearInternal(Object obj, Property prop) {
-        if (LOG.isDebugEnabled()) {
+    private void clearInternal(Object obj, Property prop) { 
+       if (LOG.isDebugEnabled()) {
             trace("clear", new Object[] {obj, prop.getName()});
         }
 
@@ -473,6 +479,13 @@ public class Session {
         return getAdapter(obj).getProperties(obj);
     }
 
+    /**
+     * @return true iff this session has outstanding events
+     **/
+    public boolean isModified() {
+        return m_events.size() > 0;
+    }
+
     public boolean isNew(Object obj) {
         return hasObjectData(obj) && getObjectData(obj).isNew();
     }
@@ -485,26 +498,45 @@ public class Session {
         return hasObjectData(obj) && getObjectData(obj).isModified();
     }
 
+    public boolean isModified(Object obj, Property prop) {
+        if (!hasObjectData(obj)) {
+            return false;
+        }
+
+        PropertyData pd = getObjectData(obj).getPropertyData(prop);
+        if (pd == null) {
+            return false;
+        }
+
+        return pd.isModified();
+    }
+
     public boolean isPersisted(Object obj) {
         return hasObjectData(obj) && !getObjectData(obj).isInfantile();
     }
 
-    public boolean isModified(Object obj, Property prop) {
-        return hasObjectData(obj) &&
-            getObjectData(obj).getPropertyData(prop).isModified();
-    }
+    private static final Integer s_zero = new Integer(0);
 
     private void process(Collection processors, List events) {
+        HashMap marker = new HashMap();
         for (Iterator it = processors.iterator(); it.hasNext(); ) {
             EventProcessor ep = (EventProcessor) it.next();
-            write(ep, events);
+            marker.put(ep, s_zero);
+        }
+
+        for (Iterator it = processors.iterator(); it.hasNext(); ) {
+            EventProcessor ep = (EventProcessor) it.next();
+            int start = ((Integer) marker.get(ep)).intValue();
+            int max = events.size();
+            write(ep, events, start, max);
+            marker.put(ep, new Integer(events.size()));
             ep.flush();
         }
     }
 
-    private void write(EventProcessor ep, List events) {
-        int max = events.size();
-        for (int i = 0; i < max; i++) {
+    private void write(EventProcessor ep, List events,
+                       int start, int stop) {
+        for (int i = start; i < stop; i++) {
             Event ev = (Event) events.get(i);
             ep.write(ev);
         }
@@ -550,6 +582,13 @@ public class Session {
             flushInternal();
         } finally {
             m_flushing = false;
+        }
+    }
+
+    public void flushAll() {
+        flush();
+        if (isModified()) {
+            throw new IllegalStateException("XXX");
         }
     }
 
@@ -600,10 +639,7 @@ public class Session {
      **/
 
     public void commit() {
-        flush();
-        if (m_events.size() > 0) {
-            throw new IllegalStateException();
-        }
+        flushAll();
 
         m_odata.clear();
         m_events.clear();
@@ -660,19 +696,22 @@ public class Session {
     }
 
     private void processPending() {
-        process(m_beforeActivate, m_pending);
-
         for (Iterator it = m_pending.iterator(); it.hasNext(); ) {
             Event ev = (Event) it.next();
             m_eventsChanged = true;
             ev.activate();
-            it.remove();
         }
 
-        // XXX: m_visiting.size() should be 0. but we can't check right now
+        List activated = new ArrayList();
+        activated.addAll(m_pending);
+        m_pending.clear();
+
+        // XXX: m_visiting. size() should be 0. but we can't check right now
         // because exceptions don't clear m_visiting on the way out of
         // every top level method
         m_visiting.clear();
+
+        process(m_afterActivate, activated);
     }
 
     static Object getSessionKey(Object obj) {
@@ -783,9 +822,9 @@ public class Session {
         }
     }
 
-    public void addBeforeActivate(EventProcessor ep) {
+    public void addAfterActivate(EventProcessor ep) {
         check(ep);
-        m_beforeActivate.add(ep);
+        m_afterActivate.add(ep);
     }
 
     public void addBeforeFlush(EventProcessor ep) {
