@@ -13,12 +13,12 @@ import java.io.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #22 $ $Date: 2003/04/07 $
+ * @version $Revision: #23 $ $Date: 2003/04/07 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#22 $ by $Author: rhs $, $DateTime: 2003/04/07 12:12:49 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#23 $ by $Author: rhs $, $DateTime: 2003/04/07 19:44:54 $";
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -145,31 +145,14 @@ class QGen {
 
             if (isStatic(src)) {
                 SQLBlock block = getBlock(src);
-                Path prefix = getPrefix(block);
-                for (Iterator iter = block.getPaths().iterator();
-                     iter.hasNext(); ) {
-                    Path path = (Path) iter.next();
-                    Path column = block.getMapping(path);
-                    if (prefix != null) {
-                        path = prefix.getRelative(path);
-                    }
-                    setColumns(path, new Path[] {column});
-                    if (src.getObjectType().isKey(path)) {
-                        Path parent = path.getParent();
-                        setColumns
-                            (parent, getColumns
-                             (block, RDBMSEngine.getKeyPaths
-                              (src.getObjectType().getType(path), parent)));
-                    }
-                }
                 Path alias;
 		if (src.getPath() == null) {
 		    alias = Path.get("__static");
 		} else {
 		    alias = Path.get(src.getPath() + "__static");
 		}
-                j = new StaticJoin(new StaticOperation(block, env, false),
-				   alias);
+                j = new StaticJoin
+		    (new StaticOperation(block, env, false), alias);
             } else {
                 ObjectMap map =
 		    Root.getRoot().getObjectMap(src.getObjectType());
@@ -363,17 +346,42 @@ class QGen {
     }
 
     private boolean genPathRecursive(final Path path) {
+	// Make sure we don't generate stuff twice.
         Path[] cols = getColumns(path);
         if (cols != null) {
             return true;
         }
 
+	// Handle parameters
         Parameter p = m_query.getSignature().getParameter(path);
         if (p != null) {
             setColumns(path, RDBMSEngine.getKeyPaths
                        (p.getObjectType(), p.getPath()));
             return true;
         }
+
+	// Handle staticly mapped paths
+	Source src = getSource(path);
+	if (isStatic(src)) {
+	    SQLBlock block = getBlock(src);
+	    Path prefix = getPrefix(block);
+	    Path[] paths = RDBMSEngine.getKeyPaths
+		(m_query.getSignature().getType(path), Path.add(prefix, path));
+	    cols = new Path[paths.length];
+	    boolean failed = false;
+	    for (int i = 0; i < cols.length; i++) {
+		cols[i] = block.getMapping(paths[i]);
+		if (cols[i] == null) {
+		    failed = true;
+		    break;
+		}
+	    }
+
+	    if (!failed) {
+		setColumns(path, cols);
+		return true;
+	    }
+	}
 
 	if (path == null) {
 	    return false;
