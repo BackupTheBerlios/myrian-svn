@@ -19,7 +19,7 @@
 --
 -- @author Bryan Quinn (bquinn@arsdigita.com) 
 -- @creation-date May 16, 2001 20:16:43
--- @version $Id: //core-platform/dev/sql/oracle-se/kernel/core-platform-create.sql#4 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/kernel/core-platform-create.sql#5 $
 --
 
 @@ ../globalization/g11n-create.sql
@@ -42,3 +42,4 @@
 @@ ../formbuilder/formbuilder-create.sql
 @@ ../addresses/us-addresses-create.sql
 @@ ../persistence/persistence-create.sql
+@@ fk-indices-create.sql
