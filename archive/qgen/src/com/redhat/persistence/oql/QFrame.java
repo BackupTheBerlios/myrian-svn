@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2004/03/03 $
+ * @version $Revision: #13 $ $Date: 2004/03/03 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#12 $ by $Author: rhs $, $DateTime: 2004/03/03 16:00:32 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#13 $ by $Author: rhs $, $DateTime: 2004/03/03 16:06:50 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -523,8 +523,9 @@ class QFrame {
     }
 
     void shrink() {
+        if (m_parent != null) { return; }
         Set frames = new HashSet();
-        List conds = getRoot().getConditions();
+        List conds = getConditions();
         Map equisets = m_generator.equisets(conds);
         shrink(frames, conds, equisets);
     }
