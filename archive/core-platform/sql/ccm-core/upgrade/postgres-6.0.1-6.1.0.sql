@@ -11,23 +11,31 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/upgrade/postgres-6.0.1-6.1.0.sql#4 $
--- $DateTime: 2004/03/16 11:15:39 $
+-- $Id: //core-platform/dev/sql/ccm-core/upgrade/postgres-6.0.1-6.1.0.sql#5 $
+-- $DateTime: 2004/03/16 19:04:14 $
 
 \echo Red Hat WAF 6.0.1 -> 6.1.0 Upgrade Script (PostgreSQL)
 
 begin;
 
+\i ../postgres/upgrade/6.0.1-6.1.0/table-admin_app-auto.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/table-agentportlets-auto.sql
-\i ../postgres/upgrade/6.0.1-6.1.0/table-inits-auto.sql
+\i ../postgres/upgrade/6.0.1-6.1.0/table-forms_lstnr_rmt_svr_post-auto.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/table-init_requirements-auto.sql
+\i ../postgres/upgrade/6.0.1-6.1.0/table-inits-auto.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/table-keystore-auto.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/table-lucene_ids-auto.sql
+\i ../postgres/upgrade/6.0.1-6.1.0/table-sitemap_app-auto.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/table-webapps-auto.sql
-\i ../postgres/upgrade/6.0.1-6.1.0/table-forms_lstnr_rmt_svr_post-auto.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/deferred.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/update-host-unique-index.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/update-cat_root_cat_object_map.sql
+
+alter table content_sections drop content_expiration_digest_id;
+drop table ct_item_file_attachments;
+drop table parameterized_privileges;
+create index agentport_superport_id_idx on agentportlets(superportlet_id);
+create index init_reqs_reqd_init_idx on init_requirements(required_init);
 
 -- Upgrade script for new permission denormalization
 -- Privilege Hierarchy
@@ -75,6 +83,14 @@ begin;
 \i ../postgres/upgrade/6.0.1-6.1.0/triggers-dnm_privileges.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/triggers-dnm_context.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/triggers-dnm_parties.sql
+
+create index dnm_group_membership_grp_idx on dnm_group_membership(pd_group_id);
+create index dnm_ungranted_context_obj_idx on dnm_ungranted_context(object_id);
+
+drop index dnm_gc_uk;
+drop index dnm_o1gc_necid_oid;
+drop index dnm_o1gc_uk1;
+drop index dnm_ungranted_context_un;
 
 drop trigger object_context_in_tr on object_context;
 drop trigger object_context_up_tr on object_context;
