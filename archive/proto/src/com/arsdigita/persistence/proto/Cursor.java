@@ -10,12 +10,12 @@ import java.util.*;
  * Cursor
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #18 $ $Date: 2003/04/04 $
+ * @version $Revision: #19 $ $Date: 2003/04/04 $
  **/
 
 public class Cursor {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Cursor.java#18 $ by $Author: rhs $, $DateTime: 2003/04/04 15:25:34 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Cursor.java#19 $ by $Author: rhs $, $DateTime: 2003/04/04 18:09:54 $";
 
     final private Session m_ssn;
     final private Query m_query;
@@ -40,17 +40,6 @@ public class Cursor {
 	return m_closed;
     }
 
-    private boolean check(Path path) {
-	for (Iterator it = m_signature.getPaths().iterator(); it.hasNext(); ) {
-	    Path p = (Path) it.next();
-	    if (path.isAncestor(p)) {
-		return true;
-	    }
-	}
-
-	return false;
-    }
-
     private Object getInternal(Path path) {
 	if (m_signature.isSource(path)) {
 	    return m_values.get(path);
@@ -65,7 +54,7 @@ public class Cursor {
 	    throw new ClosedException(this);
 	}
 
-        if (!check(path)) {
+        if (!m_signature.isFetched(path)) {
             throw new NotFetchedException(this, path);
         }
 

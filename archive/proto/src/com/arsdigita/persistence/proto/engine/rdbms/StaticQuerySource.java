@@ -10,12 +10,12 @@ import java.util.*;
  * StaticQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/04/04 $
+ * @version $Revision: #6 $ $Date: 2003/04/04 $
  **/
 
 class StaticQuerySource extends QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/StaticQuerySource.java#5 $ by $Author: rhs $, $DateTime: 2003/04/04 17:02:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/StaticQuerySource.java#6 $ by $Author: rhs $, $DateTime: 2003/04/04 18:09:54 $";
 
     private synchronized Source getSource(ObjectType type, SQLBlock block,
                                           Path prefix) {
@@ -37,16 +37,36 @@ class StaticQuerySource extends QuerySource {
 
         for (Iterator it = block.getPaths().iterator(); it.hasNext(); ) {
             Path path = (Path) it.next();
+	    Path toAdd;
+	    if (prefix == null) {
+		toAdd = path;
+	    } else {
+		toAdd = prefix.getRelative(path);
+	    }
 	    try {
-		if (prefix == null) {
-		    sig.addPath(path);
-		} else {
-		    sig.addPath(prefix.getRelative(path));
-		}
+		sig.addPath(toAdd);
 	    } catch (NoSuchPathException e) {
 		throw new MetadataException(block, "mapping not in signature");
 	    }
         }
+
+	ArrayList unfetched = null;
+	for (Iterator it = sig.getObjectType()
+		 .getImmediateProperties().iterator(); it.hasNext(); ) {
+	    Property prop = (Property) it.next();
+	    Path p = Path.get(prop.getName());
+	    if (!sig.isFetched(p)) {
+		if (unfetched == null) {
+		    unfetched = new ArrayList();
+		}
+		unfetched.add(p);
+	    }
+	}
+
+	if (unfetched != null) {
+	    throw new MetadataException
+		(block, "unfetched immediate properties: " + unfetched);
+	}
 
         if (from != null) {
             for (Iterator it = from.getKeyProperties().iterator();

@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/test/src/com/arsdigita/persistence/testpdl/static/DataOperationExtra.pg.pdl#1 $ 
-// $DateTime: 2002/11/27 19:51:05 $
+// $Id: //core-platform/proto/test/src/com/arsdigita/persistence/testpdl/static/DataOperationExtra.pg.pdl#2 $ 
+// $DateTime: 2003/04/04 18:09:54 $
 
 model examples;
 
@@ -64,7 +64,6 @@ query DataOperationProcWithOut {
 }
 
 query DataOperationProcWithInOut {
-    Integer oldID;
     String newID;
     do {
         select DataOperationProcWithInOut(:oldID) as newID
