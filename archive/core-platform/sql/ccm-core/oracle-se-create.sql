@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/oracle-se-create.sql#3 $
--- $DateTime: 2004/01/20 12:05:11 $
+-- $Id: //core-platform/dev/sql/ccm-core/oracle-se-create.sql#4 $
+-- $DateTime: 2004/01/26 15:55:50 $
 
 @@ oracle-se/function-currentDate.sql
 
@@ -278,6 +278,7 @@
 @@ default/kernel/index-foreign_keys.sql
 
 @@ oracle-se/mimetypes/index-convert_to_html_index.sql
+@@ oracle-se/mimetypes/function-convert_to_html.sql
 @@ default/mimetypes/insert-cms_mime_status.sql
 
 @@ ddl/oracle-se/deferred.sql
