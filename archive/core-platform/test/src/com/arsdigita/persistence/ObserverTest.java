@@ -22,12 +22,12 @@ import java.math.*;
  * ObserverTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/09/10 $
+ * @version $Revision: #8 $ $Date: 2003/09/30 $
  **/
 
 public class ObserverTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/ObserverTest.java#7 $ by $Author: ashah $, $DateTime: 2003/09/10 11:04:03 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/ObserverTest.java#8 $ by $Author: ashah $, $DateTime: 2003/09/30 14:53:49 $";
 
     public ObserverTest(String name) {
         super(name);
@@ -167,6 +167,32 @@ public class ObserverTest extends PersistenceTestCase {
         assertEquals(BEFORE_DELETE, observer.getFirstEvent());
         assertEquals(AFTER_DELETE, observer.getLastEvent());
         assertEquals(component, observer.getDataObject());
+    }
+
+    public void testManualCascadingDelete() {
+        DataObject data = createTest();
+        DataObject icle1 = createIcle();
+        DataObject icle2 = createIcle();
+
+        DataAssociation da = (DataAssociation) data.get("opt2many");
+        da.add(icle1);
+        da.add(icle2);
+        data.save();
+
+        data.addObserver(new DataObserver() {
+            public void beforeDelete(DataObject dobj) {
+                DataAssociation da = (DataAssociation) dobj.get("opt2many");
+                DataAssociationCursor dac = da.cursor();
+                while (dac.next()) {
+                    DataObject icle = dac.getDataObject();
+                    icle.delete();
+                }
+            }
+        });
+
+        data.delete();
+        assertNull(data.getSession().retrieve(icle1.getOID()));
+        assertNull(data.getSession().retrieve(icle2.getOID()));
     }
 
     public void testBeforeDeleteDataAccess() {
