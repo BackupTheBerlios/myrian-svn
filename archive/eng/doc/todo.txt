@@ -50,3 +50,5 @@
    object creation
  * figure out what to do for reference qualii in fetchPropertyData
  * figure out if session should flush in fetchPropertyData
+ * run persistence tests on objects that throw errors if toString() or
+   equals() are called from within persistence code
