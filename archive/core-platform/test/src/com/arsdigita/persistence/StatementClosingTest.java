@@ -47,7 +47,7 @@ import org.apache.log4j.varia.StringMatchFilter;
  */
 public class StatementClosingTest extends Log4jBasedTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/StatementClosingTest.java#8 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/StatementClosingTest.java#9 $";
 
     private Session ssn;
 
@@ -102,7 +102,10 @@ public class StatementClosingTest extends Log4jBasedTestCase {
 
         assertLogDoesNotContain(closeString);
 
-        dt = ssn.retrieve(new OID("examples.Datatype", BigInteger.ZERO));
+        DataCollection dc = ssn.retrieve("examples.Datatype");
+        dc.addEqualsFilter("id", BigInteger.ZERO);
+        dc.next();
+        dc.close();
         assertLogContains(closeString);
     }
 
@@ -113,7 +116,7 @@ public class StatementClosingTest extends Log4jBasedTestCase {
      */
     public void testDataAssociationClosing() {
         StringMatchFilter daFilter = new StringMatchFilter();
-        String daString = "was not closed by programmer";
+        String daString = "Statement was not closed by programmer";
         daFilter.setStringToMatch(daString);
         daFilter.setAcceptOnMatch(true);
         log.addFilter(daFilter);

@@ -22,12 +22,12 @@ import java.math.*;
  * ObserverTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/05/19 $
+ * @version $Revision: #5 $ $Date: 2003/07/01 $
  **/
 
 public class ObserverTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/ObserverTest.java#4 $ by $Author: ashah $, $DateTime: 2003/05/19 02:05:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/ObserverTest.java#5 $ by $Author: ashah $, $DateTime: 2003/07/01 09:38:11 $";
 
     public ObserverTest(String name) {
         super(name);
@@ -117,20 +117,6 @@ public class ObserverTest extends PersistenceTestCase {
         assertEquals(data, observer.getDataObject());
         assertEquals(COLLECTION, observer.getProperty());
         assertEquals(icle, observer.getValue());
-    }
-
-    public void testClear() {
-        DataObject data = createTest();
-        TestObserver observer = new TestObserver();
-        data.addObserver(observer);
-
-        DataAssociation assn = (DataAssociation) data.get(COLLECTION);
-        assn.clear();
-
-        assertEquals(1, observer.getEvents().size());
-        assertEquals(CLEAR, observer.getLastEvent());
-        assertEquals(data, observer.getDataObject());
-        assertEquals(COLLECTION, observer.getProperty());
     }
 
     public void testBeforeAndAfterSave() {
