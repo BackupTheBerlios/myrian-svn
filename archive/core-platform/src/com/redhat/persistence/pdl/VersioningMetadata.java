@@ -25,6 +25,7 @@ import com.redhat.persistence.pdl.nodes.ObjectTypeNd;
 import com.redhat.persistence.pdl.nodes.PropertyNd;
 import com.arsdigita.util.Assert;
 import com.arsdigita.util.AssertionError;
+import com.arsdigita.versioning.Versions;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -37,7 +38,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/29 $
  */
 public class VersioningMetadata {
     private final static Logger s_log =
@@ -45,7 +46,6 @@ public class VersioningMetadata {
 
     private final Set m_versionedTypes;
     private final Set m_unversionedProps;
-    private NodeVisitor m_nodeVisitor;
 
     private final static VersioningMetadata s_singleton =
         new VersioningMetadata();
@@ -102,19 +102,6 @@ public class VersioningMetadata {
     }
 
     /**
-     * Adds a visitor via which you can receive a callback whenever the
-     * versioning metadata changes.
-     **/
-    public void registerNodeVisitor(NodeVisitor visitor) {
-        if ( m_nodeVisitor != null ) {
-            throw new IllegalStateException
-                ("Already registered " + m_nodeVisitor);
-        }
-        Assert.exists(visitor, NodeVisitor.class);
-        m_nodeVisitor = visitor;
-    }
-
-    /**
      * @see #registerNodeVisitor(VersioningMetadata.NodeVisitor)
      **/
     public interface NodeVisitor {
@@ -154,14 +141,12 @@ public class VersioningMetadata {
                 m_versionedTypes.add(fqn);
             }
 
-            if ( m_nodeVisitor != null ) {
-                // This returns null for things like "global.BigDecimal".
-                ObjectType objType =
-                    MetadataRoot.getMetadataRoot().getObjectType(fqn);
+            // This returns null for things like "global.BigDecimal".
+            ObjectType objType =
+                MetadataRoot.getMetadataRoot().getObjectType(fqn);
 
-                if ( objType != null ) {
-                    m_nodeVisitor.onObjectType(objType, ot.isVersioned());
-                }
+            if ( objType != null ) {
+                Versions.NODE_VISITOR.onObjectType(objType, ot.isVersioned());
             }
         }
 
@@ -179,20 +164,20 @@ public class VersioningMetadata {
             }
             m_unversionedProps.add(property);
 
-            if ( m_nodeVisitor != null ) {
-                if ( prop.isUnversioned() ) {
-                    m_nodeVisitor.onUnversionedProperty(property);
-                } else if ( prop.isVersioned() ) {
-                    if ( property.getType().isSimple() ) {
-                        throw new IllegalStateException
-                            ("Simple properties are versioned by default. " +
-                             "They cannot be marked 'versioned'. " + property);
-                    }
-                    m_nodeVisitor.onVersionedProperty(property);
-                } else {
-                    throw new AssertionError("es impossible");
+
+            if ( prop.isUnversioned() ) {
+                Versions.NODE_VISITOR.onUnversionedProperty(property);
+            } else if ( prop.isVersioned() ) {
+                if ( property.getType().isSimple() ) {
+                    throw new IllegalStateException
+                        ("Simple properties are versioned by default. " +
+                         "They cannot be marked 'versioned'. " + property);
                 }
+                Versions.NODE_VISITOR.onVersionedProperty(property);
+            } else {
+                throw new AssertionError("es impossible");
             }
+
         }
 
         private String getContainerName(PropertyNd prop) {
