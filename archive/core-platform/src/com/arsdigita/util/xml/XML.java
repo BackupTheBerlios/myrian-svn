@@ -36,9 +36,9 @@ public class XML {
         setupFactory("javax.xml.parsers.DocumentBuilderFactory",
                      getConfig().getDOMBuilderFactory());
         setupFactory("javax.xml.parsers.SAXParserFactory",
-                     getConfig().getDOMBuilderFactory());
+                     getConfig().getSAXParserFactory());
         setupFactory("javax.xml.transform.TransformerFactory",
-                     getConfig().getDOMBuilderFactory());
+                     getConfig().getXSLTransformerFactory());
     }
     
     static void setupFactory(String name,
