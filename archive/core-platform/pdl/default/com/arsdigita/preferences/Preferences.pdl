@@ -21,9 +21,9 @@ object type Preferences {
     String[0..1] description = preferences.description VARCHAR(4000);
     BigDecimal isNode = preferences.is_node INTEGER;
     String preferenceType = preferences.preference_type VARCHAR(16);
-    composite PreferenceParameter[0..n] keyValuePairs = 
+    component PreferenceParameter[0..n] keyValuePairs = 
               join preferences.preference_id to preferences.parent_id;
-    composite Preferences[0..n] preferenceNodes =
+    component Preferences[0..n] preferenceNodes =
               join preferences.preference_id to preferences.parent_id;
 
     object key (id);

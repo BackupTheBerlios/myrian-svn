@@ -19,7 +19,7 @@ object type Order {
     String[1..1] buyer = t_orders.buyer VARCHAR(100);
     String seller = t_orders.seller VARCHAR(100);
     String shippingAddress = t_orders.shipping_address VARCHAR(200);
-    composite LineItem[0..n] items = join t_orders.order_id to t_line_items.order_id;
+    component LineItem[0..n] items = join t_orders.order_id to t_line_items.order_id;
     Date shippingDate = t_orders.shipping_date DATE;
     Boolean hasShipped = t_orders.shipped_p;
 

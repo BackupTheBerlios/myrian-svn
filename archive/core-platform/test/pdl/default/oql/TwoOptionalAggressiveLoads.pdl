@@ -19,9 +19,9 @@ import com.arsdigita.kernel.ACSObject;
 import com.arsdigita.versioning.VersionedACSObject;
 
 object type TwoOptionalAggressiveLoads extends ACSObject {
-    composite File[0..1] portrait = join up_profiles.portrait_id 
+    component File[0..1] portrait = join up_profiles.portrait_id 
 			   to docs_resources.resource_id;
-    composite File[0..1] thumbnail = join up_profiles.thumbnail_id 
+    component File[0..1] thumbnail = join up_profiles.thumbnail_id 
 			   to docs_resources.resource_id;
     String bio = up_profiles.bio VARCHAR(4000);
     String skills = up_profiles.skills VARCHAR(4000);
@@ -109,7 +109,7 @@ object type TwoOptionalAggressiveLoads extends ACSObject {
 }
 
 association {
-    composite User[1..1] user = join up_profiles.user_id to users.user_id;
+    component User[1..1] user = join up_profiles.user_id to users.user_id;
     TwoOptionalAggressiveLoads[0..1] profile = join users.user_id to up_profiles.user_id;
 }
 

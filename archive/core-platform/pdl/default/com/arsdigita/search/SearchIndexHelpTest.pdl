@@ -19,7 +19,7 @@ import com.arsdigita.kernel.*;
 // Define objects to test SearchIndexHelp class.
 // The following objects are defined:
 //  SearchTestBook      -- a book.
-//  SearchTestChapter   -- a chapter, composite of book.
+//  SearchTestChapter   -- a chapter, component of book.
 //  SearchTestAuthor    -- an author, aggregate of book.
 //  SearchTestBookH     -- book, pdl same as SearchTestBook,
 //                         but object (java class) uses 
@@ -35,7 +35,7 @@ import com.arsdigita.kernel.*;
 object type SearchTestBook extends ACSObject {
     String title = search_test_book.title VARCHAR(100);
 
-    composite SearchTestChapter[0..n] chapters;
+    component SearchTestChapter[0..n] chapters;
 
     reference key (search_test_book.book_id);
 
@@ -93,7 +93,7 @@ object type SearchTestChapter extends ACSObject {
     Integer    chapterNum = search_test_book_chapter.chapter_num INTEGER;
     String     content = search_test_book_chapter.content CLOB;
 
-    composite SearchTestBook[1..1] book;
+    component SearchTestBook[1..1] book;
     SearchTestAuthor[1..n] authors;
 
     reference key (search_test_book_chapter.chapter_id);
@@ -242,7 +242,7 @@ object type SearchTestAuthor extends ACSObject {
 object type SearchTestBookH extends ACSObject {
     String     title = search_test_book.title VARCHAR(100);
 
-    composite SearchTestChapterH[0..n] chapters;
+    component SearchTestChapterH[0..n] chapters;
 
 	reference key (search_test_book.book_id);
 
@@ -299,7 +299,7 @@ object type SearchTestChapterH extends ACSObject {
     Integer    chapterNum = search_test_book_chapter.chapter_num INTEGER;
     String     content = search_test_book_chapter.content CLOB;
 
-    composite SearchTestBookH[1..1] book;
+    component SearchTestBookH[1..1] book;
 
     reference key (search_test_book_chapter.chapter_id);
 

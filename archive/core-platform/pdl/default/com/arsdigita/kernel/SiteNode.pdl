@@ -20,7 +20,7 @@ model com.arsdigita.kernel;
 // to an application instance.
 //
 // @author <a href="mailto:bquinn@arsdigita.com">Bryan Quinn</a>
-// @version "$Id: //core-platform/dev/pdl/default/com/arsdigita/kernel/SiteNode.pdl#2 $" 
+// @version "$Id: //core-platform/dev/pdl/default/com/arsdigita/kernel/SiteNode.pdl#3 $" 
 //
 
 object type SiteNode extends ACSObject {
@@ -37,7 +37,7 @@ object type SiteNode extends ACSObject {
 
     SiteNode[0..1] parent = join site_nodes.parent_id to site_nodes.node_id;
 
-    composite SiteNode[0..n] children =
+    component SiteNode[0..n] children =
         join site_nodes.node_id to site_nodes.parent_id;
 
     PackageInstance[0..1] mountedObject =

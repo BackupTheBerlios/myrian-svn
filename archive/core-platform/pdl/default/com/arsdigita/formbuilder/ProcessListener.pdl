@@ -16,7 +16,7 @@ association {
                                to bebop_form_process_listeners.listener_id,
                              join bebop_form_process_listeners.form_section_id 
                                to bebop_form_sections.form_section_id;
-    composite ProcessListener[0..n] listeners = join bebop_form_sections.form_section_id 
+    component ProcessListener[0..n] listeners = join bebop_form_sections.form_section_id 
                                to bebop_form_process_listeners.form_section_id,
                              join bebop_form_process_listeners.listener_id 
                                to bebop_process_listeners.listener_id;

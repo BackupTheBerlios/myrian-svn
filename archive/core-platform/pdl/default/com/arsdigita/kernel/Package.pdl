@@ -15,7 +15,7 @@
 // Definiton of Package Metadata
 //
 // @author <a href="mailto:bquinn@arsdigita.com">Bryan Quinn</a>
-// @version "$Id: //core-platform/dev/pdl/default/com/arsdigita/kernel/Package.pdl#2 $" 
+// @version "$Id: //core-platform/dev/pdl/default/com/arsdigita/kernel/Package.pdl#3 $" 
 
 model com.arsdigita.kernel;
 
@@ -40,7 +40,7 @@ object type PackageType {
                              to apm_package_type_listener_map.package_type_id, 
                            join apm_package_type_listener_map.listener_id 
                              to apm_listeners.listener_id;
-    composite PackageInstance[0..n] packageInstance =
+    component PackageInstance[0..n] packageInstance =
                     join apm_package_types.package_type_id 
                       to apm_packages.package_type_id;
 

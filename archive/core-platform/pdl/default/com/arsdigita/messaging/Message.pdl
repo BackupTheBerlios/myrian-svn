@@ -28,7 +28,7 @@ object type Message extends ACSObject {
     String[1..1]     messageID = messages.rfc_message_id INTEGER;
    
     Party[1..1] sender = join messages.sender to parties.party_id;
-    composite MessagePart[0..n] messagePart = 
+    component MessagePart[0..n] messagePart = 
         join messages.message_id to message_parts.message_id;
 
     reference key (messages.message_id);

@@ -26,7 +26,7 @@ object type User extends Party {
     String[1..1] firstName = t_users.first_name VARCHAR(100);
     String[1..1] lastNames = t_users.last_names VARCHAR(100);
     String bio = t_users.bio VARCHAR(4000);
-    composite Color[0..1] favorateColor
+    component Color[0..1] favorateColor
         = join t_users.favorate_color_id to t_colors.color_id;
 
 	reference key (t_users.user_id);

@@ -28,18 +28,18 @@ import com.arsdigita.kernel.*;
 
 object type Category extends ACSObject {
     // "SortedCategory" is a temporary workaround for the lack of link attributes.
-    composite SortedCategory[0..n] relatedCategories;
-    composite CategoryCategoryMapping[0..n] childCategoryAssociations;
+    component SortedCategory[0..n] relatedCategories;
+    component CategoryCategoryMapping[0..n] childCategoryAssociations;
 
-    composite SortedACSObject[0..n] childObjects;
-    composite ObjectCategoryMapping[0..n]  childObjectAssociations;
-    composite CategoryCategoryMapping[0..n]  categoryParentCategoryAssociations;
-    composite CategoryCategoryMapping[0..n]  categoryRelatedCategoryAssociations;
-    composite SortedCategory[0..n]  categorySubtree;
-    composite ACSObject[0..n]  objectSubtree;
-    composite Category[0..n]  defaultAncestors;
-    composite Category[0..n]  validParents;
-    composite SortedCategory[0..n]  immediateParents;
+    component SortedACSObject[0..n] childObjects;
+    component ObjectCategoryMapping[0..n]  childObjectAssociations;
+    component CategoryCategoryMapping[0..n]  categoryParentCategoryAssociations;
+    component CategoryCategoryMapping[0..n]  categoryRelatedCategoryAssociations;
+    component SortedCategory[0..n]  categorySubtree;
+    component ACSObject[0..n]  objectSubtree;
+    component Category[0..n]  defaultAncestors;
+    component Category[0..n]  validParents;
+    component SortedCategory[0..n]  immediateParents;
 
     String[0..1] description = cat_categories.description VARCHAR(4000);
     String[1..1] name = cat_categories.name VARCHAR(200);

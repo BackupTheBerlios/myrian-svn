@@ -24,7 +24,7 @@ object type Transaction {
   String[0..1]      description;   
   String[0..1]      tag;   
 
-  composite Operation[0..n] operations;
+  component Operation[0..n] operations;
 
   VersionedACSObject[1..1]  master;
   VersionedACSObject[1..1]  acsObject;

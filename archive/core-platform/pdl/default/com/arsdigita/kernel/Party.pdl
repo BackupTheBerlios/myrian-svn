@@ -64,7 +64,7 @@ object type PartyEmail {
 
 association {
     Party[1..1] party;
-    composite PartyEmail[0..n] emailAddresses;
+    component PartyEmail[0..n] emailAddresses;
 
     retrieve emailAddresses {
       do {

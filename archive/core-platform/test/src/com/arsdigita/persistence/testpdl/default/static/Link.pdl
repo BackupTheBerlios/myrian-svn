@@ -3,7 +3,7 @@ model examples;
 object type Article {
     BigInteger id = t_articles.article_id INTEGER;
     String text = t_articles.text CLOB;
-    composite ArticleImageLink[0..n] images;
+    component ArticleImageLink[0..n] images;
 
     object key (id);
     delete {

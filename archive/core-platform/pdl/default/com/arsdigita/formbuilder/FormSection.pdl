@@ -24,14 +24,14 @@
 // 
 // For the form hierarchy I would like to use Link attributes.
 // However, those will not be implemented until September. As a work around
-// I tried using a composite association with a FormSectionComposite datatype.
+// I tried using a component association with a FormSectionComposite datatype.
 // However, this was inefficient and forced me to change my datamodel in undesirable
 // ways. Until Link attributes are supported I am now instead using a query for
 // retrieval of component children, and data operations for the adding and removing
 // of children.
 
 // @author <a href="mailto:pmarklun@arsdigita.com">Peter Marklund</a>
-// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/formbuilder/FormSection.pdl#3 $
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/formbuilder/FormSection.pdl#4 $
 //
 
 model com.arsdigita.formbuilder;

@@ -23,7 +23,7 @@ object type Task extends ACSObject {
     String[1..1]     isActive = cw_tasks.is_active CHAR(1);
     BigDecimal[0..1] parentTaskID = cw_tasks.parent_task_id INTEGER;
     String[1..1]     taskState = cw_tasks.task_state VARCHAR(16);
-    composite TaskComment[0..n] comments = 
+    component TaskComment[0..n] comments = 
               join cw_tasks.task_id to cw_task_comments.task_id;
 	
     reference key (cw_tasks.task_id);

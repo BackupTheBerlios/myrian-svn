@@ -35,10 +35,10 @@ object type Datatype extends VersionedACSObject {
   Datatype[0..1]   related;
   Datatype[0..n]   mappedObjects;
 
-  composite Datatype [0..1] child;
+  component Datatype [0..1] child;
 
   // Composite relation goes both ways
-  composite Datatype[0..n] composites; 
+  component Datatype[0..n] composites; 
   Datatype[0..1]   parent;
   
   retrieve {
