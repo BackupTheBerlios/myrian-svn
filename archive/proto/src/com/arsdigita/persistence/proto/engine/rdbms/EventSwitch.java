@@ -12,12 +12,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #25 $ $Date: 2003/05/08 $
+ * @version $Revision: #26 $ $Date: 2003/05/09 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#25 $ by $Author: rhs $, $DateTime: 2003/05/08 15:05:52 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#26 $ by $Author: rhs $, $DateTime: 2003/05/09 19:01:23 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -270,52 +270,44 @@ class EventSwitch extends Event.Switch {
             }
 
             public void onJoinThrough(JoinThrough m) {
-                Table table = m.getFrom().getTable();
-
-                DML op = m_engine.getOperation(obj, arg, table);
-                // This should eliminate duplicates, but we could be
-                // smarter by canceling out inserts and updates which
-                // we don't do right now.
-                if (op != null) { return; }
-
-                boolean one2n = role.isReversable() &&
-                    !role.getReverse().isCollection();
-                if (one2n && e instanceof RemoveEvent) {
-                    op = m_engine.getOperation(arg, null, table);
-                } else {
-                    op = m_engine.getOperation(arg, obj, table);
+                if (role.isReversable()) {
+                    Role rev = role.getReverse();
+                    if (role.getName().compareTo(rev.getName()) < 0) {
+                        return;
+                    }
                 }
-                if (op != null) { return; }
 
-                if (e instanceof AddEvent ||
-                    e instanceof SetEvent &&
-                    arg != null) {
-                    op = new Insert(table);
-                    set(op, m.getFrom(), obj);
-                    set(op, m.getTo(), arg);
-                    m_engine.addOperation(obj, arg, op);
-                } else if (e instanceof RemoveEvent ||
-                           e instanceof SetEvent &&
-                           arg == null) {
-                    Delete del = new Delete(table, null);
-                    if (e instanceof SetEvent) {
-                        filter(del, m.getFrom(), KEY_FROM, obj);
-                    } else if (one2n) {
-                        filter(del, m.getTo(), KEY_TO, arg);
-                    } else {
-                        filter(del, m.getFrom(), KEY_FROM, obj);
-                        filter(del, m.getTo(), KEY_TO, arg);
+                if (e instanceof SetEvent) {
+                    remove(m, obj, ((SetEvent) e).getPreviousValue());
+                    if (arg != null) {
+                        add(m, obj, arg);
                     }
-
-                    if (one2n) {
-                        m_engine.addOperation(arg, null, del);
-                    } else {
-                        m_engine.addOperation(obj, arg, del);
-                    }
+                } else if (e instanceof AddEvent) {
+                    add(m, obj, arg);
+                } else if (e instanceof RemoveEvent) {
+                    remove(m, obj, arg);
                 } else {
                     throw new IllegalArgumentException
                         ("not a set, add, or remove");
                 }
+            }
+
+            private void add(JoinThrough m, Object obj, Object arg) {
+                Table table = m.getFrom().getTable();
+
+                Insert ins = new Insert(table);
+                set(ins, m.getFrom(), obj);
+                set(ins, m.getTo(), arg);
+                m_engine.addOperation(ins);
+            }
+
+            private void remove(JoinThrough m, Object obj, Object arg) {
+                Table table = m.getFrom().getTable();
+
+                Delete del = new Delete(table, null);
+                filter(del, m.getFrom(), KEY_FROM, obj);
+                filter(del, m.getTo(), KEY_TO, arg);
+                m_engine.addOperation(del);
             }
         });
     }

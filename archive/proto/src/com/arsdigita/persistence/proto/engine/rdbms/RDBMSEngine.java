@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #35 $ $Date: 2003/05/08 $
+ * @version $Revision: #36 $ $Date: 2003/05/09 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#35 $ by $Author: rhs $, $DateTime: 2003/05/08 15:05:52 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#36 $ by $Author: rhs $, $DateTime: 2003/05/09 19:01:23 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -91,20 +91,8 @@ public class RDBMSEngine extends Engine {
 	m_operations.remove(dml);
     }
 
-    void addOperation(Object from, Object to, DML dml) {
-        Object key =
-            new CompoundKey(new CompoundKey(from, to), dml.getTable());
-        m_operationMap.put(key, dml);
-        addOperation(dml);
-    }
-
     DML getOperation(Object obj, Table table) {
         Object key = new CompoundKey(obj, table);
-        return (DML) m_operationMap.get(key);
-    }
-
-    DML getOperation(Object from, Object to, Table table) {
-        Object key = new CompoundKey(new CompoundKey(from, to), table);
         return (DML) m_operationMap.get(key);
     }
 
