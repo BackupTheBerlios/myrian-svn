@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/permissions.pdl#12 $
-// $DateTime: 2003/05/14 17:03:14 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/permissions.pdl#13 $
+// $DateTime: 2003/05/20 08:24:13 $
 
 model com.arsdigita.kernel.permissions;
 
@@ -114,8 +114,8 @@ object type Permission {
 	           and acs_objects.object_id = parties.party_id
                    and acs_permissions.creation_user = users.user_id
                    and acs_permissions.object_id = :objectId
-                   and acs_permissions.party_id = :partyId
-                   and acs_permissions.privilege_id = :privilege
+                   and acs_permissions.grantee_id = :partyId
+                   and acs_permissions.privilege = :privilege
         } map {
             creationUser.id = users.user_id;
             creationUser.screenName = users.screen_name;
