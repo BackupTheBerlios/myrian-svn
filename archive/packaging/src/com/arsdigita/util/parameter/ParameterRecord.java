@@ -29,30 +29,20 @@ import org.apache.log4j.Logger;
  * com.arsdigita.util.parameter parameters} to recover configuration
  * from a persistent store.
  *
- * @see com.arsdigita.util.parameter.ParameterLoader
+ * @see com.arsdigita.util.parameter.ParameterReader
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#13 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#14 $
  */
 public abstract class ParameterRecord extends AbstractParameterContext {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#13 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#14 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/20 01:22:54 $";
+        "$DateTime: 2003/10/20 01:32:46 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterRecord.class);
 
     protected ParameterRecord(final String name) {
         super(name);
-    }
-
-    public final void load(final ParameterLoader loader) {
-        if (s_log.isDebugEnabled()) {
-            s_log.debug("Loading all registered params on " + this);
-        }
-
-        Assert.exists(loader, ParameterLoader.class);
-
-        load((ParameterReader) loader);
     }
 }
