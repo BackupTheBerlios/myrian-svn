@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * TestRunner
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/07/27 $
+ * @version $Revision: #5 $ $Date: 2004/08/03 $
  **/
 
 public class TestRunner {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/TestRunner.java#4 $ by $Author: rhs $, $DateTime: 2004/07/27 10:58:56 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/TestRunner.java#5 $ by $Author: rhs $, $DateTime: 2004/08/03 14:02:15 $";
 
     private static final Logger s_log = Logger.getLogger(TestRunner.class);
 
@@ -30,10 +30,12 @@ public class TestRunner {
         final boolean halt = "true".equals
             (System.getProperty("junit.haltonfailure"));
         final String filter = System.getProperty("junit.test");
+        final String exclude = System.getProperty("junit.exclude");
 
         final TestResult result = new TestResult() {
             protected void run(TestCase test) {
                 String name = "" + test;
+                if (exclude != null && name.matches(exclude)) { return; }
                 if (filter == null || name.matches(filter)) {
                     super.run(test);
                 }
