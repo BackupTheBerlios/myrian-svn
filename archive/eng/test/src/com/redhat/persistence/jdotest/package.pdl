@@ -64,7 +64,7 @@ object type Group extends Party class com.redhat.persistence.jdotest.Group {
 }
 
 object type Order class com.redhat.persistence.jdotest.Order
-                  adapter com.redhat.persistence.jdo.ReflectionAdapter {
+                  adapter com.redhat.persistence.jdo.JDOAdapter {
     Integer[1..1] id = orders.order_id INTEGER;
     Party[1..1] party = join orders.party_id to parties.party_id;
     Date[0..1] purchaseDate = orders.purchase_date DATE;

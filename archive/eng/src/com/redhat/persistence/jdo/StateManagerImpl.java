@@ -90,7 +90,9 @@ class StateManagerImpl implements StateManager {
      */
     public Object getObjectField(PersistenceCapable pc, int field,
                                  Object currentValue) {
-        return ssn().get(pc, prop(pc, field));
+        Object result = ssn().get(pc, prop(pc, field));
+        s_log.debug("getObjectField: " + (result == null ? "null" : result.getClass().getName()));
+        return result;
     }
 
     public boolean getBooleanField(PersistenceCapable pc, int field,

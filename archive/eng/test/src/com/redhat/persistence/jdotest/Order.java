@@ -1,27 +1,43 @@
 package com.redhat.persistence.jdotest;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
 
 /**
  * Order
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/22 $
+ * @version $Revision: #2 $ $Date: 2004/06/23 $
  **/
+public class Order {
+    private int id;
+    private Collection items;
+    private Party party;
+    private Date purchaseDate;
 
-public abstract class Order {
+    public int getId() {
+        return id;
+    }
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdotest/Order.java#1 $ by $Author: vadim $, $DateTime: 2004/06/22 13:25:03 $";
+    public Collection getItems() {
+        return items;
+    }
 
-    public abstract int getId();
+    public void setItems(Collection items) {
+        this.items = items;
+    }
 
-    public abstract Collection getItems();
+    public Party getParty() {
+        return party;
+    }
 
-    public abstract Party getParty();
+    public void setParty(Party party) {
+        this.party = party;
+    }
 
-    public abstract void setParty(Party party);
-
-    public abstract Date getPurchaseDate();
+    public Date getPurchaseDate() {
+        return purchaseDate;
+    }
 
     public String toString() {
         return "<order #" + getId() + ">";

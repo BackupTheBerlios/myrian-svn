@@ -6,11 +6,24 @@
       <field name="id"/>
       <field name="name"/>
     </class>
+
     <class name="Employee" identity-type="datastore">
       <field name="id"/>
       <field name="name"/>
       <field name="salary"/>
       <field name="dept"/>
     </class>
+
+    <!-- Pandora -->
+
+    <class name="Order" identity-type="datastore">
+      <field name="id"/>
+      <field name="items"/>
+      <field name="purchaseDate"/>
+      <!--
+      <field name="party"/>
+      -->
+    </class>
+
   </package>
 </jdo>
