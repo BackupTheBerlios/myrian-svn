@@ -61,7 +61,10 @@ Functionality:
      requires the same logic that is in RecordSet.load() in order to
      deal with specializing the object that the session stores. This
      will result in some additional test failures due to changing
-     semantics.
+     semantics. Do the query if the requested type is a subtype of the
+     currently cached type so we detected DataObjectNotFoundException
+     in the case where the id exists, but is not an instance of the
+     requested type.
 
      Status: Not started, nonblocking.
 
