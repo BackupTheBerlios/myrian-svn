@@ -15,6 +15,8 @@
 
 package com.arsdigita.util;
 
+import org.apache.log4j.Logger;
+
 /**
  * A wrapper exception that can be used to rethrow another
  * exception.
@@ -31,12 +33,12 @@ package com.arsdigita.util;
  * <tt>new UncheckedWrapperException(e);</tt> is more correct than
  * <tt>new UncheckedWrapperException(e.getMessage(), e);</tt>
  *
- * @author David Eison 
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#4 $
+ * @author David Eison
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#5 $
  */
 public class UncheckedWrapperException extends RuntimeException {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#4 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#5 $";
 
     Throwable m_rootCause;
 
@@ -68,6 +70,22 @@ public class UncheckedWrapperException extends RuntimeException {
     public UncheckedWrapperException (String s, Throwable rootCause) {
         super(s);
         this.m_rootCause = rootCause;
+    }
+
+    /**
+     * Throws an UncheckedWrapperException, and ensurs that it is logged at ERROR priority.
+     *
+     * @param source Class having the error. For Log4J reporting
+     * @param msg Error message
+     * @param rootCause The root cause exception
+     *
+     * @throws UncheckedWrapperException
+     */
+    public static void throwLoggedException(Class source, String msg, Throwable rootCause) throws UncheckedWrapperException {
+        Logger log = Logger.getLogger(source);
+        log.error(msg, rootCause);
+
+        throw new UncheckedWrapperException(msg, rootCause);
     }
 
     /**
