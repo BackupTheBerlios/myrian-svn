@@ -35,12 +35,12 @@ import com.arsdigita.persistence.DataHandler;
  * be marked as special "key" properties.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/10/01 $
+ * @version $Revision: #8 $ $Date: 2002/10/08 $
  **/
 
 public class ObjectType extends CompoundType {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#7 $ by $Author: rhs $, $DateTime: 2002/10/01 16:08:31 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#8 $ by $Author: rhs $, $DateTime: 2002/10/08 15:21:46 $";
 
     private static boolean m_optimizeDefault = true;
 
@@ -806,8 +806,14 @@ public class ObjectType extends CompoundType {
                                      "a supertype.");
             }
             if (!m_referenceKey.isForeignKey()) {
-                new ForeignKey(null, m_referenceKey, m_super.getColumn(),
-                               true);
+                Column col = m_super.getColumn();
+                if (!col.isUniqueKey()) {
+                    col.error
+                        ("Error generating DDL for object type '" +
+                         getQualifiedName() +
+                         "'. No unique key for superclass column.");
+                }
+                new ForeignKey(null, m_referenceKey, col, true);
             }
         }
 
