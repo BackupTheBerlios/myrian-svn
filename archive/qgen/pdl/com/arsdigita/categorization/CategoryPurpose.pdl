@@ -1,0 +1,44 @@
+//
+// Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/test-qgen/pdl/com/arsdigita/categorization/CategoryPurpose.pdl#1 $ 
+// $DateTime: 2003/12/10 16:59:20 $
+
+model com.arsdigita.categorization;
+
+import com.arsdigita.kernel.*;
+
+object type CategoryPurpose extends ACSObject {
+
+    String[1..1]  key         = cat_purposes.key VARCHAR(40);
+    String[0..1]  description = cat_purposes.description VARCHAR(4000);
+    String[1..1]  name        = cat_purposes.name VARCHAR(200);
+
+    reference key (cat_purposes.purpose_id);
+
+}
+
+association {
+   CategoryPurpose[0..n] purposes =
+       join cat_categories.category_id to
+            cat_category_purpose_map.category_id,
+       join cat_category_purpose_map.purpose_id to
+            cat_purposes.purpose_id;
+
+   Category[0..n] purposeCategories =
+       join cat_purposes.purpose_id to
+            cat_category_purpose_map.purpose_id,
+       join cat_category_purpose_map.category_id to
+            cat_categories.category_id;
+
+}

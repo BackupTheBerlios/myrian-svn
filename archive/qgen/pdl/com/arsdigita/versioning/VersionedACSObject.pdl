@@ -1,0 +1,27 @@
+//
+// Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/test-qgen/pdl/com/arsdigita/versioning/VersionedACSObject.pdl#1 $ 
+// $DateTime: 2003/12/10 16:59:20 $
+
+model com.arsdigita.versioning;
+
+import com.arsdigita.kernel.*;
+
+versioned object type VersionedACSObject extends ACSObject {
+    Boolean[1..1]             isDeleted = vc_objects.is_deleted CHAR(1);
+    VersionedACSObject[0..1]  master = join vc_objects.master_id 
+                                         to vc_objects.object_id;
+
+    reference key (vc_objects.object_id);
+}

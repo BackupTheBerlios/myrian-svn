@@ -1,0 +1,62 @@
+//
+// Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/test-qgen/test/pdl/com/arsdigita/persistence/Test.pdl#1 $ 
+// $DateTime: 2003/12/10 16:59:20 $
+
+model test;
+
+object type Test {
+    BigInteger[1..1] id = tests.test_id INTEGER;
+    String[0..1] name = tests.name VARCHAR(200);
+    Test[0..1] optionalSelf = join tests.optional_self_id to tests.test_id;
+    Test[0..n] collectionSelf = join tests.test_id to collection_self.test_id,
+                            join collection_self.element_id to tests.test_id;
+    Icle[0..1] optional = join tests.optional_id to icles.icle_id;
+    Icle[1..1] required = join tests.required_id to icles.icle_id;
+    Icle[0..n] collection = join tests.test_id to collection.test_id,
+                            join collection.element_id to icles.icle_id;
+
+    object key (id);
+}
+
+association {
+    composite Test[0..1] parent = join tests.parent_id to tests.test_id;
+    Test[0..n] children = join tests.test_id to tests.parent_id;
+}
+
+object type Icle {
+    BigInteger[1..1] id = icles.icle_id INTEGER;
+    String[0..1] name = icles.name VARCHAR(200);
+
+    object key (id);
+}
+
+object type Component {
+    BigInteger[1..1] id = components.component_id INTEGER;
+    String[0..1] name = components.name VARCHAR(200);
+
+    object key (id);
+}
+
+association {
+    Test[1..1] test = join components.test_id to tests.test_id;
+    component Component[0..n] components = join tests.test_id to components.test_id;
+}
+
+association {
+    Test[0..1] opt2manyBack = join icles.icle_id to opt2many.icle_id,
+                              join opt2many.test_id to tests.test_id;
+    Icle[0..n] opt2many = join tests.test_id to opt2many.test_id,
+                          join opt2many.icle_id to icles.icle_id;
+}

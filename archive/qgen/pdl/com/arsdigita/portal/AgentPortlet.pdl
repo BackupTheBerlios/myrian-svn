@@ -1,0 +1,18 @@
+model com.arsdigita.portal;
+
+//This PDL file defines a Portlet that stores a reference to another
+//Portlet, and then uses that Portlet for rendering.
+//
+//This pattern is used with SubPortal customization, because Portlets
+//can not be deep copied at the domain level. The associated Portlet
+//is a Portlet in a SuperPortal, that is NOT in a locked region.
+
+
+object type AgentPortlet extends Portlet {
+
+    composite Portlet[1..1] superportlet = join agentportlets.superportlet_id to portlets.portlet_id; 
+
+    reference key (agentportlets.portlet_id);
+
+}
+

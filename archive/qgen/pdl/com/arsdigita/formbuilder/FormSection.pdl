@@ -1,0 +1,114 @@
+//
+// Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/test-qgen/pdl/com/arsdigita/formbuilder/FormSection.pdl#1 $ 
+// $DateTime: 2003/12/10 16:59:20 $
+
+model com.arsdigita.formbuilder;
+
+object type FormSection extends Component {
+    String[0..1] action = bebop_form_sections.action VARCHAR(500);
+
+    reference key (bebop_form_sections.form_section_id);    
+}
+
+
+query RetrieveComponents {
+
+    Boolean isSelected;
+    BigDecimal componentID;
+    String defaultDomainClass;
+    do {
+        select bebop_component_hierarchy.component_id,
+               bebop_component_hierarchy.selected_p,
+               acs_objects.default_domain_class
+          from bebop_component_hierarchy, acs_objects
+          where bebop_component_hierarchy.container_id = 
+            :containerID
+               and bebop_component_hierarchy.component_id =
+                 acs_objects.object_id                      
+          order by bebop_component_hierarchy.order_number
+    } map {
+        componentID = bebop_component_hierarchy.component_id;
+        isSelected = bebop_component_hierarchy.selected_p;
+        defaultDomainClass = acs_objects.default_domain_class;
+    }
+}
+
+data operation UpdateOrderBeforeAdd {
+
+    // First increase the order numbers by 1
+    do {
+        update bebop_component_hierarchy
+          set order_number = order_number + 1
+          where container_id = :containerID
+          and order_number >= :orderNumber
+    }
+}
+
+data operation AddComponent {
+    do {
+        insert into bebop_component_hierarchy (container_id, component_id, order_number, selected_p)
+          values (:containerID, :componentID, :orderNumber, :isSelected)        
+    }
+}
+
+data operation UpdateOrderBeforeRemove {
+
+    // Decrease order numbers by 1
+    do {
+        update bebop_component_hierarchy
+          set order_number = order_number - 1
+          where container_id = :containerID
+          and order_number > (select order_number from bebop_component_hierarchy
+                              where container_id = :containerID
+                              and component_id = :componentID)
+    }
+}
+
+data operation RemoveComponent {
+    do {
+        delete from bebop_component_hierarchy 
+          where container_id = :containerID
+            and component_id = :componentID
+    }
+}
+
+data operation ClearComponents {
+    do {
+        delete from bebop_component_hierarchy
+            where container_id = :containerID
+    }
+}
+
+query NumberOfComponents {
+
+    Integer numberOfComponents;
+    do {
+        select count(*) as number_of_components
+          from bebop_component_hierarchy
+          where container_id = :containerID
+    } map {
+        numberOfComponents = number_of_components;
+    }
+}
+
+data operation SetComponentSelected {
+
+    do {
+        update bebop_component_hierarchy
+           set selected_p = :isSelected
+        where container_id = :containerID
+        and component_id = :componentID
+    }
+}

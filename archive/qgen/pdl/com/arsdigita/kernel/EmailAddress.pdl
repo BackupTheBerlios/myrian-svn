@@ -1,0 +1,63 @@
+//
+// Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/test-qgen/pdl/com/arsdigita/kernel/EmailAddress.pdl#1 $ 
+// $DateTime: 2003/12/10 16:59:20 $
+
+model com.arsdigita.kernel;
+
+object type EmailAddress {
+    String[1..1] emailAddress = email_addresses.email_address VARCHAR(100);
+    Boolean[1..1] isBouncing = email_addresses.bouncing_p BIT;
+    Boolean[1..1] isVerified = email_addresses.verified_p BIT;
+
+    object key (emailAddress);
+
+    retrieve {
+        do {
+            select email_address, bouncing_p, verified_p
+            from email_addresses
+            where email_address = lower(:emailAddress)
+        } map {
+            emailAddress = email_addresses.email_address;
+            isBouncing = email_addresses.bouncing_p;
+            isVerified = email_addresses.verified_p;
+        }
+    }
+
+    insert {
+        do {
+            insert into email_addresses
+            (email_address, bouncing_p, verified_p)
+            values
+            (lower(:emailAddress), :isBouncing, :isVerified)
+        }
+    }
+
+    update {
+        do {
+            update email_addresses
+            set bouncing_p = :isBouncing,
+                verified_p = :isVerified
+            where email_address = lower(:emailAddress)
+        }
+    }
+
+    delete {
+        do {
+            delete from email_addresses 
+            where email_address = lower(:emailAddress)
+        }
+    }
+
+}
