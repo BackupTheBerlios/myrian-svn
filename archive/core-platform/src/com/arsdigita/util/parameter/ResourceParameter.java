@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.arsdigita.util.parameter;
 
 import java.io.File;
@@ -31,13 +30,13 @@ import org.apache.log4j.Logger;
  * @deprecated Use {@link URLParameter} instead.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ResourceParameter.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ResourceParameter.java#4 $
  */
 public class ResourceParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ResourceParameter.java#3 $" +
-        "$Author: rhs $" +
-        "$DateTime: 2003/11/07 13:13:09 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ResourceParameter.java#4 $" +
+        "$Author: dennis $" +
+        "$DateTime: 2004/03/30 17:47:27 $";
 
     private static final Logger s_log = Logger.getLogger(ResourceParameter.class);
 

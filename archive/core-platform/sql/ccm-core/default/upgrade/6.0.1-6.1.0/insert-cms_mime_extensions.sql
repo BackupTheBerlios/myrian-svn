@@ -1,6 +1,18 @@
--- This populates the mime type extensions table which was previously not
--- populated by the loaders.  In newer versions of WAF, the Loader code
--- automatially does this population.
+--
+-- Copyright (C) 2004 Red Hat Inc. All Rights Reserved.
+--
+-- The contents of this file are subject to the Open Software License v2.1
+-- (the "License"); you may not use this file except in compliance with the
+-- License. You may obtain a copy of the License at
+-- http://rhea.redhat.com/licenses/osl2.1.html.
+--
+-- Software distributed under the License is distributed on an "AS
+-- IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+-- implied. See the License for the specific language governing
+-- rights and limitations under the License.
+--
+-- $Id: //core-platform/dev/sql/ccm-core/default/upgrade/6.0.1-6.1.0/insert-cms_mime_extensions.sql#2 $
+-- $DateTime: 2004/03/30 17:47:27 $
 insert into cms_mime_extensions (file_extension, mime_type) select 'bin', 'application/octet-stream' from dual where not exists (select 1 from cms_mime_extensions where file_extension = 'bin');
 insert into cms_mime_extensions (file_extension, mime_type) select 'uu', 'application/octet-stream' from dual where not exists (select 1 from cms_mime_extensions where file_extension = 'uu');
 insert into cms_mime_extensions (file_extension, mime_type) select 'saveme', 'application/octet-stream' from dual where not exists (select 1 from cms_mime_extensions where file_extension = 'saveme');

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.arsdigita.persistence.metadata;
 
 import com.redhat.persistence.metadata.Root;
@@ -24,12 +23,12 @@ import org.apache.log4j.Logger;
  * all metadata classes.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/08/15 $
+ * @version $Revision: #11 $ $Date: 2004/03/30 $
  */
 
 abstract public class Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Element.java#10 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Element.java#11 $ by $Author: dennis $, $DateTime: 2004/03/30 17:47:27 $";
 
     private static final Logger s_log =
         Logger.getLogger(Element.class.getName());

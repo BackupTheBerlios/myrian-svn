@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2002-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.arsdigita.tools.junit.framework;
 import junit.framework.*;
 import java.lang.reflect.*;
@@ -42,11 +41,11 @@ import java.io.File;
  *  the framework will look here. test.testpath must be the fully qualified path name.
  *
  * @author Jon Orris
- * @version $Revision: #10 $ $Date: 2003/10/23 $
+ * @version $Revision: #11 $ $Date: 2004/03/30 $
  */
 
 public class PackageTestSuite extends TestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/tools/junit/framework/PackageTestSuite.java#10 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/tools/junit/framework/PackageTestSuite.java#11 $ by $Author: dennis $, $DateTime: 2004/03/30 17:47:27 $";
 
     public PackageTestSuite() {
         super();

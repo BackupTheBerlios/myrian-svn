@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.arsdigita.persistence;
 
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
@@ -25,10 +24,10 @@ import junit.framework.TestCase;
  * PersistenceSuite
  *
  * @author Jon Orris
- * @version $Revision: #11 $ $Date: 2003/12/23 $
+ * @version $Revision: #12 $ $Date: 2004/03/30 $
  */
 public class PersistenceSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceSuite.java#11 $ by $Author: dennis $, $DateTime: 2003/12/23 17:32:53 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceSuite.java#12 $ by $Author: dennis $, $DateTime: 2004/03/30 17:47:27 $";
 
     public PersistenceSuite() {
         super();

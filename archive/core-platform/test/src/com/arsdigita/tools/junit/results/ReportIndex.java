@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2002-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.arsdigita.tools.junit.results;
 
 import org.jdom.Element;
@@ -21,7 +20,7 @@ import org.jdom.Element;
  *  ReportIndex
  *
  *  @author <a href="mailto:jorris@redhat.com">Jon Orris</a>
- *  @version $Revision: #5 $ $Date Nov 6, 2002 $
+ *  @version $Revision: #6 $ $Date Nov 6, 2002 $
  */
 public class ReportIndex extends Element {
     public ReportIndex(String previousChangelist, String currentChangelist, String databaseType) {

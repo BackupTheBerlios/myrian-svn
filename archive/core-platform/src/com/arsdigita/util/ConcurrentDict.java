@@ -1,10 +1,10 @@
 /*
  * Copyright (C) 2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.arsdigita.util;
 
 import java.text.DecimalFormat;
@@ -47,7 +46,7 @@ import org.apache.log4j.Logger;
  *
  * @author  Vadim Nasardinov (vadimn@redhat.com)
  * @since   2004-02-20
- * @version $Revision: #1 $ $DateTime: 2004/02/20 12:36:50 $
+ * @version $Revision: #2 $ $DateTime: 2004/03/30 17:47:27 $
  **/
 public final class ConcurrentDict {
     // We may want to make it possible to specify the bucket size at

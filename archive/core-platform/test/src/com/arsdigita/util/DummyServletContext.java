@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2002-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.arsdigita.util;
 
 import org.apache.log4j.Logger;
@@ -26,12 +25,12 @@ import java.util.Set;
  *  Dummy ServletContext object for unit testing of form methods that
  *  include requests in their signatures.
  *
- * @version $Revision: #8 $ $Date: 2003/09/22 $
+ * @version $Revision: #9 $ $Date: 2004/03/30 $
  */
 
 public class DummyServletContext implements ServletContext {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/DummyServletContext.java#8 $ by $Author: jorris $, $DateTime: 2003/09/22 16:33:30 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/DummyServletContext.java#9 $ by $Author: dennis $, $DateTime: 2004/03/30 17:47:27 $";
 
     private HashMap m_attributes = new HashMap();
     private HashMap m_dispachers = new HashMap();

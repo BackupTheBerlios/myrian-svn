@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2002-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
+ * The contents of this file are subject to the Open Software License v2.1
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://rhea.redhat.com/licenses/osl2.1.html.
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,7 +12,6 @@
  * rights and limitations under the License.
  *
  */
-
 package com.arsdigita.persistence.pdl;
 
 import com.arsdigita.persistence.metadata.MetadataRoot;
@@ -33,7 +32,7 @@ import java.util.Iterator;
  * file being named after the fully qualified model name.
  *
  * @author Patrick McNeill
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDLOutputter.java#11 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDLOutputter.java#12 $
  */
 public class PDLOutputter {
     /**
