@@ -60,13 +60,6 @@ query DataQueryWithMoreBinds {
     }
 }
 
-query DataOperationWithPLSQLAndArgsAndReturn {
-    do {
-        select DataOperationProcWithReturn(:entryID) as entry from dual
-    } map {
-        Item = dual.entry;
-    }
-}
 
 
 query DataQueryWithDateBindVariable {
@@ -148,14 +141,6 @@ query DataQueryWithIn {
         description = t.description;
         priority = t.priority;
         actionTime = t.action_time;
-    }
-}
-
-query SubQuery {
-    do {
-        select 1
-        from dual
-        where 2 = :two
     }
 }
 
