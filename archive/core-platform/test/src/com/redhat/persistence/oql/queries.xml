@@ -1160,4 +1160,16 @@
       <row id="2"/>
     </results>
   </test>
+
+  <test>
+    <!-- Encountered when fetching through certain qualias mappings. -->
+    <query fetched="uname,name,desc" joins="1">
+      query(filter(u = all(test.User), u.id == 1), uname = u.name,
+            name = filter(n = all(test.NodeType), n.id == u.id).n.name,
+            desc = filter(n = all(test.NodeType), n.id == u.id).n.description)
+    </query>
+    <results>
+      <row uname="Britney" name="Type 1" desc="Type 1 Description"/>
+    </results>
+  </test>
 </tests>
