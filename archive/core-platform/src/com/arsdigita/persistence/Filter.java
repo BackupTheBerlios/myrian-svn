@@ -78,12 +78,12 @@ import java.util.Map;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2003/03/19 $
  */
 
 public interface Filter {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/Filter.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/Filter.java#4 $ by $Author: rhs $, $DateTime: 2003/03/19 18:16:01 $";
 
     // this string is used as the namespace for the bind variables
     String FILTER = "__FILTERPARAMS__";
@@ -111,12 +111,6 @@ public interface Filter {
      */
     Map getBindings();
 
-
-    /**
-     *  This returns the string representation of this Filter before
-     *  any bindings are applied
-     */
-    String getConditions();
 
     /**
      * Returns the SQL required to apply this filter to the given data query.

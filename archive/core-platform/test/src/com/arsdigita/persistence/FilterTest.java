@@ -29,10 +29,10 @@ import org.apache.log4j.Logger;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2002/10/01 $
+ * @version $Revision: #9 $ $Date: 2003/03/19 $
  */
 public class FilterTest extends PersistenceTestCase {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/FilterTest.java#8 $ by $Author: rhs $, $DateTime: 2002/10/01 15:44:47 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/FilterTest.java#9 $ by $Author: rhs $, $DateTime: 2003/03/19 18:16:01 $";
 
     private static Logger s_log =
         Logger.getLogger(FilterTest.class.getName());
@@ -593,8 +593,7 @@ public class FilterTest extends PersistenceTestCase {
         DataQuery query = getDefaultQuery();
         query.addFilter(FilterImpl.equals("priority", new Integer(3)));
         long size = query.size();
-        FilterImpl f = new FilterImpl(null);
-        f.setConditions("description = :description");
+        SimpleFilter f = new SimpleFilter("description = :description");
         Map map = new HashMap();
         map.put("description", "something that will not match");
         f.addBindings(map);
