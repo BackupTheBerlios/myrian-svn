@@ -139,7 +139,7 @@ public class DbHelper {
         }
 
         String driver = url.substring(5, pos);
-        s_log.info("Got driver name " + driver, new  Throwable());
+        s_log.debug("Got driver name " + driver, new  Throwable());
 
         if ("oracle".equals(driver)) {
             return DB_ORACLE;
