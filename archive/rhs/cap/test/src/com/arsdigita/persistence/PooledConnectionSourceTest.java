@@ -28,12 +28,12 @@ import java.util.*;
  * PooledConnectionSourceTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/05/04 $
+ * @version $Revision: #3 $ $Date: 2004/05/28 $
  **/
 
 public class PooledConnectionSourceTest extends TestCase {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/PooledConnectionSourceTest.java#2 $ by $Author: rhs $, $DateTime: 2004/05/04 14:18:14 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/PooledConnectionSourceTest.java#3 $ by $Author: rhs $, $DateTime: 2004/05/28 09:10:39 $";
 
     private static final String JDBC_PREFIX = "jdbc:test:";
     private static final Map CONNECTIONS = new HashMap();
@@ -263,16 +263,16 @@ public class PooledConnectionSourceTest extends TestCase {
             } else {
                 Connection result = new MockConnection() {
 
-                    public DatabaseMetaData getMetaData() throws SQLException {
-                        if (url.indexOf(":fail:") >= 0) {
-                            throw new SQLException("mock fatal error");
-                        }
-
+                    public DatabaseMetaData getMetaData() {
                         return new MockDatabaseMetaData() {
                             public ResultSet getTables
                                 (String cat, String scm, String tbl,
-                                 String[] types) {
-                                return new MockSingleRowResultSet();
+                                 String[] types) throws SQLException {
+                                if (url.indexOf(":fail:") >= 0) {
+                                    throw new SQLException("mock fatal error");
+                                } else {
+                                    return new MockSingleRowResultSet();
+                                }
                             }
                             public String getDatabaseProductName() {
                                 return "Mock Product Name";

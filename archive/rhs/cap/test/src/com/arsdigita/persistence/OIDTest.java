@@ -18,7 +18,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import com.arsdigita.persistence.metadata.ObjectType;
-import java.math.BigDecimal;
+import java.math.*;
 import org.apache.log4j.Logger;
 
 /**
@@ -27,21 +27,25 @@ import org.apache.log4j.Logger;
  *
  *
  * @author Michael Bryzek
- * @date $Date: 2004/05/03 $
- * @version $Revision: #1 $
+ * @date $Date: 2004/05/28 $
+ * @version $Revision: #2 $
  *
  * @see com.arsdigita.persistence.OID
  **/
 
 public class OIDTest extends TestCase {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/OIDTest.java#1 $ by $Author: rhs $, $DateTime: 2004/05/03 11:48:01 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/OIDTest.java#2 $ by $Author: rhs $, $DateTime: 2004/05/28 09:10:39 $";
 
     private static Logger s_log =
         Logger.getLogger(OIDTest.class.getName());
 
     private OID oid;
     private static final String TYPE = "mdsql.Node";
+    private static final String LINK = "mdsql.linkTest.ArticleImageLink";
+    private static final String ARTICLE = "mdsql.linkTest.Article";
+    private static final String COMPOUND2 = "test.oid.CompoundTwo";
+    private static final String COMPOUND3 = "test.oid.CompoundThree";
     private static final int ID = 42;
 
     /**
@@ -87,7 +91,7 @@ public class OIDTest extends TestCase {
 
         oid = new OID(TYPE);
         try {
-            oid = new OID("com.arsdigita.notification.QueueItem", ID);
+            oid = new OID(LINK, ID);
             fail("Shouldn't be able to use a compound key!");
         }
         catch(PersistenceException e) {
@@ -100,6 +104,8 @@ public class OIDTest extends TestCase {
      * This test makes sure we can serialize and deserialize OID's
      **/
     public void testSerialization() throws Exception {
+        Session ssn = SessionManager.getSession();
+
         String serial = oid.toString();
         s_log.info("OID Serial: " + serial);
         OID parsed = OID.valueOf(serial);
@@ -109,20 +115,19 @@ public class OIDTest extends TestCase {
         parseInvalidOID("comlete nonsense");
 
         // now we test with multiple integer keys
-        OID multiKey = new OID
-            ("com.arsdigita.notification.QueueItem");
-        multiKey.set("requestID", new BigDecimal(3));
-        multiKey.set("partyTo", new BigDecimal(8));
+        OID multiKey = new OID(COMPOUND2);
+        multiKey.set("one", new Integer(3));
+        multiKey.set("two", new Integer(8));
         parsed = OID.valueOf(multiKey.toString());
 
         assertTrue("Parsing of OID with multiple big decimal keys failed",
-               multiKey.equals(parsed));
+                   multiKey.equals(parsed));
 
         // now we test with multiple keys of multiple types
-        OID multiKeyMulti = new OID("com.arsdigita.kernel.permissions.Permission");
-        multiKeyMulti.set("objectId", new BigDecimal(4));
-        multiKeyMulti.set("partyId", new BigDecimal(4));
-        multiKeyMulti.set("privilege", "my privilege");
+        OID multiKeyMulti = new OID(COMPOUND3);
+        multiKeyMulti.set("one", new Integer(4));
+        multiKeyMulti.set("two", new BigInteger("4"));
+        multiKeyMulti.set("three", "my privilege");
         parsed = OID.valueOf(multiKeyMulti.toString());
         assertTrue("Parsing of OID with multiple keys failed",
                multiKeyMulti.equals(parsed));
@@ -157,7 +162,7 @@ public class OIDTest extends TestCase {
     }
 
     public void testSetCompoundTypeValidation() {
-        oid = new OID("mdsql.linkTest.ArticleImageLink");
+        oid = new OID(LINK);
 
         try {
             oid.set("article", new Integer(12));
@@ -175,8 +180,7 @@ public class OIDTest extends TestCase {
             // ignore
         }
 
-        DataObject article = SessionManager.getSession().create
-            ("mdsql.linkTest.Article");
+        DataObject article = SessionManager.getSession().create(ARTICLE);
         try {
             oid.set("image", article);
             fail("Initializing Image field w/ " +

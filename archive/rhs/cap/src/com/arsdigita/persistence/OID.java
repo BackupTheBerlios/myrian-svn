@@ -20,6 +20,8 @@ import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.metadata.Property;
 import com.arsdigita.util.Assert;
 
+import java.lang.reflect.*;
+
 import java.math.BigDecimal;
 
 import java.text.MessageFormat;
@@ -28,6 +30,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -50,10 +53,10 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/05/03 $ */
+ * @version $Revision: #2 $ $Date: 2004/05/28 $ */
 
 public class OID {
-    public final static String versionId = "$Id: //users/rhs/persistence/cap/src/com/arsdigita/persistence/OID.java#1 $ by $Author: rhs $, $DateTime: 2004/05/03 11:00:53 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/cap/src/com/arsdigita/persistence/OID.java#2 $ by $Author: rhs $, $DateTime: 2004/05/28 09:10:39 $";
 
     private ObjectType m_type;
     private Map m_values = new HashMap();
@@ -411,6 +414,8 @@ public class OID {
         return m_format.format(args);
     }
 
+    private static final Class[] STRING = { String.class };
+
 
     // Couldn't get MessageFormat to work, so I cheated
     public static OID valueOf(String s) throws IllegalArgumentException {
@@ -425,53 +430,45 @@ public class OID {
             }
         }
 
-        String type = st.nextToken();
+        ObjectType type = lookup(st.nextToken());
 
-        try {
-            // we know that the first item is the type of the object
-            // represented by this OID
-            OID oid = new OID(type);
+        // we know that the first item is the type of the object
+        // represented by this OID
+        OID oid = new OID(type);
 
-            // for the rest of them, we are going to "split" on the
-            // "=" sign
-            int nTokens = 0;
-            while (st.hasMoreTokens()) {
-                String nextToken = st.nextToken();
-                int index = nextToken.indexOf("=");
-                String key = (nextToken.substring(0, index));
-                String value = nextToken.substring(index + 1);
+        // for the rest of them, we are going to "split" on the
+        // "=" sign
+        int nTokens = 0;
+        while (st.hasMoreTokens()) {
+            String nextToken = st.nextToken();
+            int index = nextToken.indexOf("=");
+            String key = (nextToken.substring(0, index));
+            String value = nextToken.substring(index + 1);
 
-                // we need the key to loose the single space before it that
-                // is created by the HashMap.  We cannot use trim because
-                // we don't want to loose trailing spaces
-                if (nTokens > 0) {
-                    key = key.substring(1);
-                }
-
-                // if it can be a BigDecimal, that is what we make it
-                boolean bigDecimal = true;
-                for (int i = 0; i < value.length(); i++) {
-                    char c = value.charAt(i);
-                    if (!('0' <= c && c <= '9') &&
-                        !((i == 0) && (c == '-'))) {
-                        bigDecimal = false;
-                        break;
-                    }
-                }
-
-                if (bigDecimal) {
-                    oid.set(key, new BigDecimal(value));
-                } else {
-                    oid.set(key, value);
-                }
-                nTokens++;
+            // we need the key to loose the single space before it that
+            // is created by the HashMap.  We cannot use trim because
+            // we don't want to loose trailing spaces
+            if (nTokens > 0) {
+                key = key.substring(1);
             }
-            return oid;
-        } catch (PersistenceException e) {
-            throw new IllegalArgumentException
-                ("Invalid OID '" + s + "'. The type specified [" + type +
-                 "] is not defined");
+
+            Property prop = type.getProperty(key);
+            Class klass = ((SimpleType) prop.getType()).getJavaClass();
+            try {
+                Constructor cons = klass.getConstructor(STRING);
+                oid.set(key, cons.newInstance(new Object[] { value }));
+            } catch (NoSuchMethodException e) {
+                throw new Error(e);
+            } catch (InstantiationException e) {
+                throw new Error(e);
+            } catch (IllegalAccessException e) {
+                throw new Error(e);
+            } catch (InvocationTargetException e) {
+                throw new Error(e);
+            }
+            nTokens++;
         }
+        return oid;
     }
 
     /**

@@ -11,8 +11,8 @@
 // or implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/static/LinkAttributes.pdl#2 $
-// $DateTime: 2004/05/03 15:41:58 $
+// $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/static/LinkAttributes.pdl#3 $
+// $DateTime: 2004/05/28 09:10:39 $
 model examples;
 
 object type Article {
@@ -70,7 +70,7 @@ association {
         }
     }
 
-    add images {
+    add {
         do {
             insert into t_article_image_map
             (image_id, article_id, caption, user_id)
@@ -78,16 +78,6 @@ association {
             (:images.id, :articles.id, :caption, :user.id)
         }
     }
-
-    add articles {
-        do {
-            insert into t_article_image_map
-            (image_id, article_id, caption, user_id)
-            values
-            (:images.id, :articles.id, :caption, :user.id)
-        }
-    }
-
 
     // this must be here because of the way the association code works
     add user {}
@@ -101,7 +91,7 @@ association {
         }
     }
 
-    remove images {
+    remove {
         do {
             delete from t_article_image_map
             where image_id = :images.id
@@ -109,11 +99,4 @@ association {
         }
     }
 
-    remove articles {
-        do {
-            delete from t_article_image_map
-            where image_id = :images.id
-            and article_id = :articles.id
-        }
-    }
 }

@@ -11,22 +11,22 @@
 // or implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/Association.pdl#1 $
-// $DateTime: 2004/05/03 13:36:20 $
+// $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/Association.pdl#2 $
+// $DateTime: 2004/05/28 09:10:39 $
 model Association;
 
 object type Obj1 {
-    BigInteger[1..1] id;
+    BigInteger[1..1] id = t_o1.id;
     object key (id);
 }
 
 object type Obj2 {
-    BigInteger[1..1] id;
+    BigInteger[1..1] id = t_o2.id;
     object key (id);
 }
 
 object type Obj3 {
-    BigInteger[1..1] id;
+    BigInteger[1..1] id = t_o3.id;
     object key (id);
 }
 

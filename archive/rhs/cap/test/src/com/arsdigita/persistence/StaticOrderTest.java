@@ -18,21 +18,16 @@ package com.arsdigita.persistence;
  * PartyTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/05/03 $
+ * @version $Revision: #2 $ $Date: 2004/05/28 $
  */
 
 public class StaticOrderTest extends OrderTest {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/StaticOrderTest.java#1 $ by $Author: rhs $, $DateTime: 2004/05/03 11:48:01 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/StaticOrderTest.java#2 $ by $Author: rhs $, $DateTime: 2004/05/28 09:10:39 $";
 
     public StaticOrderTest(String name) {
         super(name);
         m_testType = "static";
-    }
-
-    protected void persistenceSetUp() {
-        load("com/arsdigita/persistence/testpdl/static/Order.pdl");
-        super.persistenceSetUp();
     }
 
     String getModelName() {

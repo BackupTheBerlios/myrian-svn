@@ -11,12 +11,12 @@
 // or implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/static/Order.pdl#2 $
-// $DateTime: 2004/05/25 17:44:35 $
+// $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/static/Order.pdl#3 $
+// $DateTime: 2004/05/28 09:10:39 $
 model examples;
 
 object type Order {
-    BigDecimal id;
+    BigDecimal id = t_orders.order_id;
     String[1..1] buyer;
     String seller;
     String shippingAddress;
@@ -179,7 +179,7 @@ object type OrderExt extends Order {
 }
 
 object type LineItem {
-    BigDecimal id;
+    BigDecimal id = t_line_items.item_id;
     Float[1..1] price;
     String[1..1] name;
     Boolean[0..1] inStock;
@@ -282,7 +282,7 @@ query OrdersNumberOfLineItems {
 
 
 object type OtherItem {
-    BigDecimal id;
+    BigDecimal id = t_other_items.other_id;
     Float[1..1] price;
     String[1..1] name;
     Boolean[0..1] inStock;
@@ -378,14 +378,6 @@ association {
         }
     }
 
-    add relatedOtherItems {
-        do {
-            insert into t_order_other_item_map (order_id, other_item_id)
-            values
-            (:id, :relatedOtherItems.id)
-        }
-    }
-
     remove order {
         do {
             delete from t_order_other_item_map 
@@ -393,12 +385,6 @@ association {
         }
     }
 
-    remove relatedOtherItems {
-        do {
-            delete from t_order_other_item_map 
-            where order_id = :id and other_item_id = :relatedOtherItems.id
-        }
-    }
 }
 
 

@@ -20,3 +20,4 @@ com/arsdigita/persistence/static/LinkAttributes.pdl
 com/arsdigita/persistence/static/Node.pdl
 com/arsdigita/persistence/static/Order.pdl
 com/arsdigita/persistence/static/Party.pdl
+com/arsdigita/persistence/OIDTest.pdl

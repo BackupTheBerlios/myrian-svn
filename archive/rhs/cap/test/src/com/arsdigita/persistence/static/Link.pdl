@@ -11,8 +11,8 @@
 // or implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/static/Link.pdl#2 $
-// $DateTime: 2004/05/03 15:41:58 $
+// $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/static/Link.pdl#3 $
+// $DateTime: 2004/05/28 09:10:39 $
 model linkTest;
 
 object type Article {
@@ -51,11 +51,13 @@ object type Article {
 }
 
 object type ArticleImageLink {
-    Article[1..1] article;
-    Image[1..1] image;
+    Article[1..1] article =
+        join t_article_image_map.article_id to t_articles.article_id;
+    Image[1..1] image =
+        join t_article_image_map.image_id to t_images.image_id;
     String caption = t_article_image_map.caption VARCHAR(4000);
 
-    object key (article, image);
+    object key (image, article);
 
     insert { }
     add image { }

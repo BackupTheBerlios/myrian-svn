@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
 
 public class MetadataDebuggingTest extends TestCase {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/MetadataDebuggingTest.java#1 $ by $Author: rhs $, $DateTime: 2004/05/03 11:48:01 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/MetadataDebuggingTest.java#2 $ by $Author: rhs $, $DateTime: 2004/05/28 09:10:39 $";
 
     private static Logger s_log = Logger.getLogger(MetadataDebuggingTest.class);
 
@@ -36,12 +36,13 @@ public class MetadataDebuggingTest extends TestCase {
             PDL p = new PDL();
             String pdl = "model debug;\n"
                 + "object type Debug {\n"
-                + "    BigInteger[1..1] id;\n"
+                + "    BigInteger[1..1] id = t_debug.id;\n"
                 + "    object key(id);\n"
                 + "}";
             p.load(new StringReader(pdl), "testfile");
-            p.generateMetadata(MetadataRoot.getMetadataRoot());
-            m_ot = MetadataRoot.getMetadataRoot().getObjectType("debug.Debug");
+            MetadataRoot root = new MetadataRoot();
+            p.generateMetadata(root);
+            m_ot = root.getObjectType("debug.Debug");
             if (m_ot == null) { fail("failed to load pdl"); }
         }
     }

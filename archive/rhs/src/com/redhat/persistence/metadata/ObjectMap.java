@@ -25,12 +25,12 @@ import java.util.List;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/05/02 $
+ * @version $Revision: #4 $ $Date: 2004/05/28 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/ObjectMap.java#3 $ by $Author: rhs $, $DateTime: 2004/05/02 13:12:27 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/ObjectMap.java#4 $ by $Author: rhs $, $DateTime: 2004/05/28 09:10:39 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -124,13 +124,29 @@ public class ObjectMap extends Element {
     }
 
     public Collection getFetchedPaths() {
-        ObjectMap sm = getSuperMap();
-        if (sm == null) {
-            return getDeclaredFetchedPaths();
-        } else {
-            Collection result = sm.getFetchedPaths();
-            result.addAll(getDeclaredFetchedPaths());
+        return getFetchedPaths(true);
+    }
+
+    private Collection getFetchedPaths(boolean first) {
+        SQLBlock sql = getRetrieveAll();
+        if (first && sql != null) {
+            List result = new ArrayList();
+            for (Iterator it = sql.getPaths().iterator(); it.hasNext(); ) {
+                Object o = it.next();
+                if (!result.contains(o)) {
+                    result.add(o);
+                }
+            }
             return result;
+        } else {
+            ObjectMap sm = getSuperMap();
+            if (sm == null) {
+                return getDeclaredFetchedPaths();
+            } else {
+                Collection result = sm.getFetchedPaths(false);
+                result.addAll(getDeclaredFetchedPaths());
+                return result;
+            }
         }
     }
 
@@ -161,18 +177,6 @@ public class ObjectMap extends Element {
             Object o = it.next();
             if (!result.contains(o)) {
                 result.add(o);
-            }
-        }
-
-        if (result.size() == 0) {
-            SQLBlock sql = getRetrieveAll();
-            if (sql != null) {
-                for (Iterator it = sql.getPaths().iterator(); it.hasNext(); ) {
-                    Object o = it.next();
-                    if (!result.contains(o)) {
-                        result.add(o);
-                    }
-                }
             }
         }
 

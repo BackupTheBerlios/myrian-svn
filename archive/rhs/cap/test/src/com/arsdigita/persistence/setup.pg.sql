@@ -11,8 +11,8 @@
 -- or implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/setup.pg.sql#2 $
--- $DateTime: 2004/05/25 17:44:35 $
+-- $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/setup.pg.sql#3 $
+-- $DateTime: 2004/05/28 09:10:39 $
 
 
 --
@@ -20,10 +20,24 @@
 -- tests to run.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #2 $ $Date: 2004/05/25 $
+-- @version $Revision: #3 $ $Date: 2004/05/28 $
 --
 
+-- The equivalent of oracle's dual table.
 create view dual as select 1;
+
+-- A pseudo replacement for nvl. It doesn't have the same semantics
+-- since nvl isn't a function in oracle but an operator, but it will
+-- suffice in a large number of cases.
+create or replace function nvl(varchar, varchar) returns varchar as '
+begin
+    if $1 is null then
+        return $2;
+    else
+        return $1;
+    end if;
+end;
+' language 'plpgsql';
 
 @@ data-operation-test.sql
 @@ aggressive-test.sql

@@ -20,7 +20,7 @@ import com.arsdigita.tools.junit.framework.BaseTestCase;
  *
 */
 
-public class TransactionContextTest extends BaseTestCase {
+public class TransactionContextTest extends PersistenceTestCase {
 
     public TransactionContextTest(String name) {
    	super(name);
