@@ -26,12 +26,12 @@ import org.apache.log4j.*;
  * MetaTest
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #3 $ $Date: 2003/09/03 $
+ * @version $Revision: #4 $ $Date: 2003/10/01 $
  */
 
 public class MetaTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/MetaTest.java#3 $ by $Author: justin $, $DateTime: 2003/09/03 12:09:13 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/MetaTest.java#4 $ by $Author: rhs $, $DateTime: 2003/10/01 15:48:49 $";
     private static final Logger s_log =
         Logger.getLogger(MetaTest.class.getName());
     static  {
@@ -59,8 +59,11 @@ public class MetaTest extends PersistenceTestCase {
 
     public void testGenericCRUD()  throws Exception {
         try {
-            ObjectTypeValidator validator =
-                new ObjectTypeValidator(getSession());
+            Session ssn = getSession();
+            if (ssn == null) {
+                throw new IllegalStateException("null session");
+            }
+            ObjectTypeValidator validator = new ObjectTypeValidator(ssn);
             validator.performCRUDTest(m_objectTypeName);
         } catch (AbortMetaTestException e) {
             // This happens on postgres when the validator encounters a valid

@@ -33,18 +33,15 @@ import org.apache.log4j.Logger;
  * LobTest - for testing Blob and Clob datatype.
  *
  * @author Jeff Teeters 
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/10/01 $
  */
 
 public class LobTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/LobTest.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public static final String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/LobTest.java#3 $ by $Author: rhs $, $DateTime: 2003/10/01 15:48:49 $";
 
     private Logger s_cat =
         Logger.getLogger(LobTest.class);
-
-    private Session m_session;
-    private TransactionContext m_txn;
 
     private static final int HI = 255;
     private static final int LO = 1;
@@ -67,6 +64,10 @@ public class LobTest extends PersistenceTestCase {
     protected void persistenceTearDown() {
         load("com/arsdigita/persistence/testpdl/mdsql/Datatype.pdl");
         super.persistenceTearDown();
+    }
+
+    private int getDatabase() {
+        return DbHelper.getDatabase(getSession().getConnection());
     }
 
     public void testDoNothing() {
@@ -114,7 +115,7 @@ public class LobTest extends PersistenceTestCase {
 
     public void testLargeClobsDatabaseSpecificSyntax() {
         String db = null;
-        if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+        if (getDatabase() == DbHelper.DB_POSTGRES) {
             db = "postgres";
         } else {
             db = "oracle";
@@ -319,7 +320,7 @@ public class LobTest extends PersistenceTestCase {
 
             Connection conn = getSession().getConnection();
 
-            if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+            if (getDatabase() == DbHelper.DB_POSTGRES) {
                 executePostgresUpdate(conn, testString, size);
             } else {
                 executeOracleUpdate(conn, testString, size);
@@ -350,7 +351,7 @@ public class LobTest extends PersistenceTestCase {
                 msg = msg.substring(0,500) + "...";
             }
             String dbName = null;
-            if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+            if (getDatabase() == DbHelper.DB_POSTGRES) {
                 dbName = "Postgres";
             } else {
                 dbName = "Oracle";

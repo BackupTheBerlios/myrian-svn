@@ -37,11 +37,11 @@ import org.apache.log4j.*;
  * DataObjectManipulator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #3 $ $Date: 2003/09/10 $
+ * @version $Revision: #4 $ $Date: 2003/10/01 $
  */
 public class DataObjectManipulator {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/DataObjectManipulator.java#3 $ by $Author: rhs $, $DateTime: 2003/09/10 10:46:29 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/DataObjectManipulator.java#4 $ by $Author: rhs $, $DateTime: 2003/10/01 15:48:49 $";
     private static final Logger s_log =
         Logger.getLogger(DataObjectManipulator.class.getName());
 
@@ -58,8 +58,11 @@ public class DataObjectManipulator {
     }
 
     public DataObjectManipulator(Session session) {
+        if (session == null) {
+            throw new IllegalArgumentException("session: " + session);
+        }
         m_session = session;
-        makeManipulators();
+        makeManipulators(session);
 
     }
 
@@ -318,7 +321,7 @@ public class DataObjectManipulator {
                     s_log.debug("Failed to set property " + p.getName());
                     s_log.debug("Checking error");
                     checkSetError(t, p, data, value);
-                    //                    if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+                    //                    if (DbHelper.getDatabase(getSession().getConnection()) == DbHelper.DB_POSTGRES) {
                         throw new AbortMetaTestException();
                         //                    } else {
                         //                        return;
@@ -340,8 +343,7 @@ public class DataObjectManipulator {
     }  // end SimpleTypeManipulator
 
 
-    private void makeManipulators() {
-
+    private void makeManipulators(final Session ssn) {
         SimpleTypeManipulator manip;
 
         manip = new SimpleTypeManipulator(java.math.BigInteger.class) {
@@ -397,7 +399,8 @@ public class DataObjectManipulator {
         manip = new SimpleTypeManipulator(java.lang.Character.class) {
                 void makeVariants() {
                     m_variants = new LinkedList();
-                    if (DbHelper.getDatabase() != DbHelper.DB_POSTGRES) {
+                    if (DbHelper.getDatabase(ssn.getConnection())
+                        != DbHelper.DB_POSTGRES) {
                         // pg jdbc seems to barf on this
                         m_variants.add(new Character(Character.MIN_VALUE));
                     }
@@ -604,7 +607,9 @@ public class DataObjectManipulator {
                             setProperty(p, data, atBoundary);
                             data = getSession().retrieve(id);
 
-                            if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+                            if (DbHelper.getDatabase
+                                (getSession().getConnection())
+                                == DbHelper.DB_POSTGRES) {
                                 return;
                             }
 

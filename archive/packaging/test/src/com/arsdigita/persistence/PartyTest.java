@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * PartyTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/10/01 $
  */
 
 abstract public class PartyTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/PartyTest.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/PartyTest.java#3 $ by $Author: rhs $, $DateTime: 2003/10/01 15:48:49 $";
 
     private static Logger s_log =
         Logger.getLogger(PartyTest.class.getName());
@@ -260,7 +260,8 @@ abstract public class PartyTest extends PersistenceTestCase {
         OID oid = new OID(getModelName() + ".Group", new BigInteger("1"));
 
         /*
-        if (com.arsdigita.db.DbHelper.getDatabase() !=
+        if (com.arsdigita.db.DbHelper.getDatabase
+            (getSession().getConnection()) !=
             com.arsdigita.db.DbHelper.DB_POSTGRES && 
             !"mdsql".equals(getModelName())) {
             group = getSession().retrieve(oid);

@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * SQLLoader
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/09/28 $
+ * @version $Revision: #5 $ $Date: 2003/10/01 $
  **/
 
 public abstract class SQLLoader {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/installer/SQLLoader.java#4 $ by $Author: justin $, $DateTime: 2003/09/28 23:15:43 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/installer/SQLLoader.java#5 $ by $Author: rhs $, $DateTime: 2003/10/01 15:48:49 $";
 
     private static final Logger s_log = Logger.getLogger(SQLLoader.class);
 

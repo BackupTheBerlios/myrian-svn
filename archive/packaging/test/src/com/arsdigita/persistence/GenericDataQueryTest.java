@@ -24,12 +24,12 @@ import org.apache.log4j.Logger;
  * GenericDataQueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/10/01 $
  **/
 
 public class GenericDataQueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/GenericDataQueryTest.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/GenericDataQueryTest.java#3 $ by $Author: rhs $, $DateTime: 2003/10/01 15:48:49 $";
 
     private static final Logger s_log =
         Logger.getLogger(GenericDataQueryTest.class);
@@ -42,7 +42,8 @@ public class GenericDataQueryTest extends PersistenceTestCase {
 
     private DataQuery makeTestQuery() {
         if (SELECT == null) {
-            if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+            if (DbHelper.getDatabase
+                (getSession().getConnection()) == DbHelper.DB_POSTGRES) {
                 SELECT = "select 1 as one ";
             } else {
                 SELECT = "select 1 as one from dual";
