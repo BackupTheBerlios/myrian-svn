@@ -6,12 +6,12 @@ import com.redhat.persistence.metadata.*;
  * ParameterTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/09/22 $
+ * @version $Revision: #2 $ $Date: 2004/10/01 $
  **/
 
 public class ParameterTest extends PDLTest {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/pdl/ParameterTest.java#1 $ by $Author: rhs $, $DateTime: 2004/09/22 15:20:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/pdl/ParameterTest.java#2 $ by $Author: rhs $, $DateTime: 2004/10/01 15:07:31 $";
 
     private void foo() {
         line("model test;");
@@ -36,7 +36,14 @@ public class ParameterTest extends PDLTest {
         line("    Foo<Integer, String, Long> foo;");
         line("}");
         Root root = parse();
-        System.out.println(dump(root));
+        ObjectType integer = root.getObjectType("global.Integer");
+        ObjectType str = root.getObjectType("global.String");
+        ObjectType lng = root.getObjectType("global.Long");
+        ObjectType foo = root.getObjectType("test.Bar")
+            .getProperty("foo").getType();
+        assertEquals(integer, foo.getProperty("a").getType());
+        assertEquals(str, foo.getProperty("b").getType());
+        assertEquals(lng, foo.getProperty("c").getType());
     }
 
     public void testCycle() {
@@ -44,12 +51,17 @@ public class ParameterTest extends PDLTest {
         line("object type Node<T> {");
         line("    Integer id;");
         line("    Node<T>[0..n] children;");
+        line("    T value;");
         line("}");
         line("object type Foo {");
         line("    Node<String> nodes;");
         line("}");
         Root root = parse();
-        System.out.println(dump(root));
+        ObjectType str = root.getObjectType("global.String");
+        ObjectType nodeStr = root.getObjectType("test.Foo")
+            .getProperty("nodes").getType();
+        assertEquals(nodeStr, nodeStr.getProperty("children").getType());
+        assertEquals(str, nodeStr.getProperty("value").getType());
     }
 
     public void testIndirectInstantiation() {
@@ -64,7 +76,11 @@ public class ParameterTest extends PDLTest {
         line("  Bar<Integer> bar;");
         line("}");
         Root root = parse();
-        System.out.println(dump(root));
+        ObjectType integer = root.getObjectType("global.Integer");
+        ObjectType baz = root.getObjectType("test.Baz");
+        ObjectType barInt = baz.getProperty("bar").getType();
+        ObjectType fooInt = barInt.getProperty("foo").getType();
+        assertEquals(integer, fooInt.getProperty("a").getType());
     }
 
     public void testMutualRecursion() {
@@ -80,7 +96,15 @@ public class ParameterTest extends PDLTest {
         line("  Bar<String> bar;");
         line("}");
         Root root = parse();
-        System.out.println(dump(root));
+        ObjectType baz = root.getObjectType("test.Baz");
+        ObjectType fooInt = baz.getProperty("foo").getType();
+        ObjectType barStr = baz.getProperty("bar").getType();
+        ObjectType fooStr = barStr.getProperty("b").getType();
+        ObjectType barInt = fooInt.getProperty("a").getType();
+        assertEquals(barInt, fooInt.getProperty("a").getType());
+        assertEquals(barStr, fooStr.getProperty("a").getType());
+        assertEquals(fooInt, barInt.getProperty("b").getType());
+        assertEquals(fooStr, barStr.getProperty("b").getType());
     }
 
     public void testQualifiedReference() {
@@ -93,7 +117,28 @@ public class ParameterTest extends PDLTest {
         line("file2", "  test.Foo<Integer> foo;");
         line("file2", "}");
         Root root = parse();
-        System.out.println(dump(root));
+        ObjectType integer = root.getObjectType("global.Integer");
+        ObjectType bar = root.getObjectType("bar.Bar");
+        assertEquals
+            (integer, bar.getProperty("foo").getType()
+             .getProperty("a").getType());
+    }
+
+    public void testSubclassing() {
+        line("model test;");
+        line("object type Foo<A> extends A {");
+        line("  Integer foo;");
+        line("}");
+        line("object type Bar {");
+        line("  Integer id;");
+        line("}");
+        line("object type Baz {");
+        line("  Foo<Bar> foobar;");
+        line("}");
+        Root root = parse();
+        ObjectType bar = root.getObjectType("test.Bar");
+        ObjectType baz = root.getObjectType("test.Baz");
+        assertEquals(bar, baz.getProperty("foobar").getType().getSupertype());
     }
 
 }

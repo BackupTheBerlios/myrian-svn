@@ -28,25 +28,25 @@ import java.util.List;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/09/30 $
+ * @version $Revision: #7 $ $Date: 2004/10/01 $
  **/
 
 public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/ObjectType.java#6 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/ObjectType.java#7 $ by $Author: rhs $, $DateTime: 2004/10/01 15:07:31 $";
 
     private final Model m_model;
     private final String m_name;
     private final List m_parameters;
     private final String m_qualifiedName;
     private Class m_class;
-    private final ObjectType m_super;
+    private final TypeReference m_super;
     private final Mist m_properties = new Mist(this);
     private final ArrayList m_immediates = new ArrayList();
     private final ArrayList m_roles = new ArrayList();
-    private final List m_allProps;
-    private final List m_allRoles;
-    private List m_allImmediates;
+    private List m_allProps = null;
+    private List m_allRoles = null;
+    private List m_allImmediates = null;
 
     public ObjectType(Model model, String name, ObjectType supertype) {
         this(model, name, null, supertype);
@@ -54,27 +54,22 @@ public class ObjectType extends Element {
 
     public ObjectType(Model model, String name, List parameters,
                       ObjectType supertype) {
+        this(model, name, parameters, supertype == null ?
+             null : TypeReference.get(supertype));
+    }
+
+    public ObjectType(Model model, String name, List parameters,
+                      TypeReference supertype) {
         m_model = model;
         m_name = name;
         m_parameters = parameters;
         m_super = supertype;
+
         if (m_model == null) {
             m_qualifiedName = m_name;
         } else {
             m_qualifiedName = m_model.getQualifiedName() + "." + m_name;
         }
-
-        if (m_super == null) {
-            m_allProps = Collections.unmodifiableList(m_properties);
-            m_allRoles = Collections.unmodifiableList(m_roles);
-        } else {
-            m_allProps = Collections.unmodifiableList
-                (new UnionList(m_properties, m_super.m_allProps));
-            m_allRoles = Collections.unmodifiableList
-                (new UnionList(m_roles, m_super.m_allRoles));
-        }
-
-        m_allImmediates = null;
     }
 
     public Root getRoot() {
@@ -99,7 +94,7 @@ public class ObjectType extends Element {
 
     public Class getJavaClass() {
         if (m_class == null && m_super != null) {
-            return m_super.getJavaClass();
+            return getSupertype().getJavaClass();
         } else {
             return m_class;
         }
@@ -109,8 +104,16 @@ public class ObjectType extends Element {
         return m_qualifiedName;
     }
 
-    public ObjectType getSupertype() {
+    public TypeReference getSupertypeReference() {
         return m_super;
+    }
+
+    public ObjectType getSupertype() {
+        if (m_super == null) {
+            return null;
+        } else {
+            return m_super.get();
+        }
     }
 
     public boolean hasDeclaredProperty(String name) {
@@ -121,7 +124,7 @@ public class ObjectType extends Element {
         if (hasDeclaredProperty(name)) {
             return true;
         } else if (m_super != null) {
-            return m_super.hasProperty(name);
+            return getSupertype().hasProperty(name);
         } else {
             return false;
         }
@@ -142,7 +145,7 @@ public class ObjectType extends Element {
         }
     }
 
-    public Collection getDeclaredProperties() {
+    public List getDeclaredProperties() {
         return m_properties;
     }
 
@@ -150,7 +153,16 @@ public class ObjectType extends Element {
         return (Property) m_properties.get(name);
     }
 
-    public Collection getProperties() {
+    public List getProperties() {
+        if (m_allProps == null) {
+            if (m_super == null) {
+                m_allProps = Collections.unmodifiableList(m_properties);
+            } else {
+                m_allProps = Collections.unmodifiableList
+                    (new UnionList
+                     (m_properties, getSupertype().getProperties()));
+            }
+        }
         return m_allProps;
     }
 
@@ -158,7 +170,7 @@ public class ObjectType extends Element {
         if (hasDeclaredProperty(name)) {
             return getDeclaredProperty(name);
         } else if (m_super != null) {
-            return m_super.getProperty(name);
+            return getSupertype().getProperty(name);
         } else {
             return null;
         }
@@ -225,12 +237,12 @@ public class ObjectType extends Element {
                 m_allImmediates = m_super == null
                     ? Collections.unmodifiableList(new UnionList
                                                    (keys, m_immediates))
-                    : m_super.getImmediateProperties();
+                    : getSupertype().getImmediateProperties();
             }
         }
 
         // for nonkeyed types, return all properties
-        return (m_allImmediates == null) ? m_allProps : m_allImmediates;
+        return (m_allImmediates == null) ? getProperties() : m_allImmediates;
     }
 
     public void addImmediateProperty(Property prop) {
@@ -268,7 +280,15 @@ public class ObjectType extends Element {
         return !isCompound();
     }
 
-    public Collection getRoles() {
+    public List getRoles() {
+        if (m_allRoles == null) {
+            if (m_super == null) {
+                m_allRoles = Collections.unmodifiableList(m_roles);
+            } else {
+                m_allRoles = Collections.unmodifiableList
+                    (new UnionList(m_roles, getSupertype().getRoles()));
+            }
+        }
         return m_allRoles;
     }
 
@@ -276,7 +296,7 @@ public class ObjectType extends Element {
         if (m_super == null) {
             return this;
         } else {
-            return m_super.getBasetype();
+            return getSupertype().getBasetype();
         }
     }
 
@@ -288,7 +308,7 @@ public class ObjectType extends Element {
         if (this.equals(type)) {
             return true;
         } else if (m_super != null) {
-            return m_super.isSubtypeOf(type);
+            return getSupertype().isSubtypeOf(type);
         } else {
             return false;
         }

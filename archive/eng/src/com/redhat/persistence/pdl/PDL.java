@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #16 $ $Date: 2004/09/30 $
+ * @version $Revision: #17 $ $Date: 2004/10/01 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#16 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#17 $ by $Author: rhs $, $DateTime: 2004/10/01 15:07:31 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -184,6 +184,14 @@ public class PDL {
                 m_symbols.addEmitted(ot);
             }
         });
+
+        for (Iterator it = m_symbols.getObjectTypes().iterator();
+             it.hasNext(); ) {
+            ObjectTypeNd otn = (ObjectTypeNd) it.next();
+            ObjectType ot = m_symbols.getEmitted(otn);
+            emit(otn, ot);
+            m_root.addObjectType(ot);
+        }
 
         m_ast.traverse(new Node.Switch() {
             private Role define(ObjectType type, PropertyNd prop) {
@@ -333,14 +341,6 @@ public class PDL {
         }));
 
         m_errors.check();
-
-        for (Iterator it = m_symbols.getObjectTypes().iterator();
-             it.hasNext(); ) {
-            ObjectTypeNd otn = (ObjectTypeNd) it.next();
-            ObjectType ot = m_symbols.getEmitted(otn);
-            emit(otn, ot);
-            m_root.addObjectType(ot);
-        }
 
         m_ast.traverse(new Node.Switch() {
             public void onObjectType(ObjectTypeNd otn) {

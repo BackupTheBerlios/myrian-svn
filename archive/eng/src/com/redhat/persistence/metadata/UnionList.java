@@ -25,6 +25,12 @@ class UnionList extends AbstractList {
     private List m_right;
 
     UnionList(List left, List right) {
+        if (left == null) {
+            throw new IllegalArgumentException("left is null");
+        }
+        if (right == null) {
+            throw new IllegalArgumentException("right is null");
+        }
         m_left = left;
         m_right = right;
     }

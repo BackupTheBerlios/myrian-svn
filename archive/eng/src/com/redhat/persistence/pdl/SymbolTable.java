@@ -25,12 +25,12 @@ import java.util.*;
  * SymbolTable
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/09/22 $
+ * @version $Revision: #6 $ $Date: 2004/10/01 $
  **/
 
 class SymbolTable {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/SymbolTable.java#5 $ by $Author: rhs $, $DateTime: 2004/09/22 15:20:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/SymbolTable.java#6 $ by $Author: rhs $, $DateTime: 2004/10/01 15:07:31 $";
 
     private Map m_types = new HashMap();
     private List m_order = new ArrayList();
@@ -281,9 +281,9 @@ class SymbolTable {
                 IdentifierNd param = (IdentifierNd) params.get(i);
                 parameters.add(param.getName());
             }
-            ObjectType sup = null;
+            TypeReference sup = null;
             if (ot.getExtends() != null) {
-                sup = getEmitted(ot.getExtends());
+                sup = getTypeReference(ot.getExtends());
             }
             ObjectType type = new ObjectType(model, name, parameters, sup);
             addEmitted(type);

@@ -6,12 +6,12 @@ import java.util.*;
  * TypeReference
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/09/22 $
+ * @version $Revision: #2 $ $Date: 2004/10/01 $
  **/
 
 public abstract class TypeReference {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/TypeReference.java#1 $ by $Author: rhs $, $DateTime: 2004/09/22 15:20:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/TypeReference.java#2 $ by $Author: rhs $, $DateTime: 2004/10/01 15:07:31 $";
 
     private static final ObjectType UNRESOLVED =
         new ObjectType(null, "#unresolved", null);
@@ -81,8 +81,9 @@ public abstract class TypeReference {
                     for (Iterator it = params.iterator(); it.hasNext(); ) {
                         env.put(it.next(), arguments.get(idx++));
                     }
-                    // XXX: supertype
-                    ObjectType inst = new ObjectType(model, name, null);
+                    ObjectType inst = new ObjectType
+                        (model, name, null,
+                         sub(tmpl.getSupertypeReference(), env));
                     Collection props = tmpl.getDeclaredProperties();
                     for (Iterator it = props.iterator(); it.hasNext(); ) {
                         Role role = (Role) it.next();
