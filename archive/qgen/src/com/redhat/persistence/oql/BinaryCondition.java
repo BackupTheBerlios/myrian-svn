@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * BinaryCondition
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/03/20 $
+ * @version $Revision: #10 $ $Date: 2004/03/20 $
  **/
 
 public abstract class BinaryCondition extends Condition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/BinaryCondition.java#9 $ by $Author: rhs $, $DateTime: 2004/03/20 20:50:09 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/BinaryCondition.java#10 $ by $Author: ashah $, $DateTime: 2004/03/20 21:47:41 $";
 
     Expression m_left;
     Expression m_right;
@@ -27,7 +27,7 @@ public abstract class BinaryCondition extends Condition {
     }
 
     private Code paren(Code sql, Expression e) {
-        if (e instanceof BinaryCondition) {
+        if (e instanceof BinaryCondition || e instanceof Static) {
             sql = new Code("(").add(sql).add(")");
         }
         return sql;

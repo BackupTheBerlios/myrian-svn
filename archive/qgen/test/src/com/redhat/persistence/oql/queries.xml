@@ -1096,6 +1096,10 @@
       query(filter(filter(all(test.A), id == 0),
                    1 == id and (id == 0 or 1 == id)), id = id)
     </query>
+    <query fetched="id">
+      query(filter(all(test.A),
+                   sql { 1 = 0 } and sql { 1 = 0 or 0 = 0 }), id = id)
+    </query>
     <results></results>
   </test>
 
