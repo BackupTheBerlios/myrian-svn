@@ -1,15 +1,19 @@
 /*
  * Copyright (C) 2001-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the
- * License at http://www.redhat.com/licenses/ccmpl.html.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
  *
- * Software distributed under the License is distributed on an
- * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
- * or implied. See the License for the specific language
- * governing rights and limitations under the License.
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
  */
 package com.arsdigita.db;
@@ -27,14 +31,14 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao
- * @version $Revision: #25 $ $Date: 2004/04/07 $
+ * @version $Revision: #26 $ $Date: 2004/08/16 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: dennis $ - $Date: 2004/04/07 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#25 $";
+    public static final String versionId = "$Author: dennis $ - $Date: 2004/08/16 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#26 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);

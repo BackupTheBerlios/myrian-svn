@@ -1,15 +1,19 @@
 /*
  * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the
- * License at http://www.redhat.com/licenses/ccmpl.html.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
  *
- * Software distributed under the License is distributed on an
- * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
- * or implied. See the License for the specific language
- * governing rights and limitations under the License.
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
  */
 package com.redhat.persistence.pdl.adapters;
@@ -23,12 +27,12 @@ import java.sql.Types;
  * ByteAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/04/07 $
+ * @version $Revision: #7 $ $Date: 2004/08/16 $
  **/
 
 public class ByteAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/adapters/ByteAd.java#6 $ by $Author: dennis $, $DateTime: 2004/04/07 16:07:11 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/adapters/ByteAd.java#7 $ by $Author: dennis $, $DateTime: 2004/08/16 18:10:38 $";
 
     public ByteAd() {
 	super("global.Byte", Types.TINYINT);
