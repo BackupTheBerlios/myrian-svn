@@ -63,7 +63,7 @@ import org.apache.log4j.Category;
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@arsdigita.com">randyg@arsdigita.com</a>
  * @author <a href="mailto:deison@arsdigita.com">deison@arsdigita.com</a>
- * @version $Revision: #6 $ $Date: 2002/07/25 $
+ * @version $Revision: #7 $ $Date: 2002/08/06 $
  */
 // NOTE if we ever support anything other than forward-only,
 // we'll need to shut off the auto-closing functionality
@@ -71,7 +71,7 @@ import org.apache.log4j.Category;
 // results and general confusion.
 class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#6 $ by $Author: randyg $, $DateTime: 2002/07/25 15:26:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#7 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
 
     private final static Category log =
         Category.getInstance(DataQueryImpl.class.getName());
@@ -1302,8 +1302,9 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
         for (Iterator it = m_op.getMappings(); it.hasNext(); ) {
             Mapping mapping = (Mapping) it.next();
             if (Arrays.equals(mapping.getPath(), newPath)) {
-                Column col = mapping.getColumn();
-                return Identifier.getInstance(new String[] {col.getColumnName()});
+                return Identifier.getInstance(
+                    new String[] {mapping.getColumn()}
+                    );
             }
         }
 

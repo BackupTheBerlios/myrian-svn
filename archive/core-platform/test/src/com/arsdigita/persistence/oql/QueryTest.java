@@ -2,6 +2,7 @@ package com.arsdigita.persistence.oql;
 
 import com.arsdigita.persistence.*;
 import com.arsdigita.persistence.metadata.*;
+import com.arsdigita.persistence.metadata.Table;
 import com.arsdigita.db.Initializer;
 import com.arsdigita.util.StringUtils;
 import org.apache.log4j.Category;
@@ -13,12 +14,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/07/30 $
+ * @version $Revision: #6 $ $Date: 2002/08/06 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#5 $ by $Author: randyg $, $DateTime: 2002/07/30 15:12:50 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#6 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
 
     private static final Category s_log =
         Category.getInstance(QueryTest.class);
@@ -43,8 +44,11 @@ public class QueryTest extends PersistenceTestCase {
 
         query.generate();
         Operation actual = query.getOperation();
+        compare(name + ".op", actual.toString());
+    }
 
-        String op = "com/arsdigita/persistence/oql/" + name + ".op";
+    private void compare(String expectedResource, String actual) {
+        String op = "com/arsdigita/persistence/oql/" + expectedResource;
         InputStream is = getClass().getClassLoader().getResourceAsStream(op);
 
         if (is == null) {
@@ -56,7 +60,7 @@ public class QueryTest extends PersistenceTestCase {
                 database = "oracle-se";
             }
             op = "com/arsdigita/persistence/oql/" + database + "/" + 
-                name + ".op";
+                expectedResource;
             is = getClass().getClassLoader().getResourceAsStream(op);
         }
         assertTrue("No such resource: " + op + "\n\nActual:\n" + actual,
@@ -75,7 +79,7 @@ public class QueryTest extends PersistenceTestCase {
             fail(e.getMessage());
         }
 
-        doDiff(expected.toString(), actual.toString());
+        doDiff(expected.toString(), actual);
     }
 
     private void doDiff(String expected, String actual) {
@@ -205,6 +209,33 @@ public class QueryTest extends PersistenceTestCase {
                    "id",
                    "optional"
                });
+    }
+
+    private void doTableTest(String tableName) {
+        MetadataRoot root = MetadataRoot.getMetadataRoot();
+        Table table = root.getTable(tableName);
+        assertTrue("No such table: " + tableName, table != null);
+        compare(table.getName() + ".sql", table.getSQL());
+    }
+
+    public void testTest() {
+        doTableTest("tests");
+    }
+
+    public void testIcles() {
+        doTableTest("icles");
+    }
+
+    public void testComponents() {
+        doTableTest("components");
+    }
+
+    public void testCollectionSelf() {
+        doTableTest("collection_self");
+    }
+
+    public void testCollection() {
+        doTableTest("collection");
     }
 
 }

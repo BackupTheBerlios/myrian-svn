@@ -35,5 +35,5 @@ object type Component {
 
 association {
     Test[1..1] test = join components.test_id to tests.test_id;
-    Component[0..n] components = join tests.test_id to components.component_id;
+    Component[0..n] components = join tests.test_id to components.test_id;
 }

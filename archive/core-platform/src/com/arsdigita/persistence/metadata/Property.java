@@ -16,6 +16,7 @@
 package com.arsdigita.persistence.metadata;
 
 import java.io.PrintStream;
+import java.util.*;
 
 /**
  * The Property class represents one property of a CompoundType. Each property
@@ -27,7 +28,7 @@ import java.io.PrintStream;
  * REQUIRED, and COLLECTION.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/08/06 $
  **/
 
 public class Property extends Element {
@@ -81,7 +82,13 @@ public class Property extends Element {
         "[0..n]"
     };
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#4 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+
+    /**
+     * The container type of the property.
+     **/
+
+    private CompoundType m_container;
 
     /**
      * The name of the Property.
@@ -127,6 +134,7 @@ public class Property extends Element {
      **/
     private Event[] m_events = new Event[NUM_EVENT_TYPES];
 
+
     /**
      * Constructs a new Property with the given name and DataType. By default
      * the multiplicity is set to NULLABLE and isComponent defaults to true if
@@ -139,7 +147,6 @@ public class Property extends Element {
     public Property(String name, DataType type) {
         this(name, type, NULLABLE);
     }
-
 
     /**
      * Constructs a new Property with the given name, DataType, and
@@ -199,6 +206,17 @@ public class Property extends Element {
         m_isComponent = isComponent;
     }
 
+    void setContainer(CompoundType container) {
+        m_container = container;
+    }
+
+    /**
+     * Returns the container of this property.
+     **/
+
+    public CompoundType getContainer() {
+        return m_container;
+    }
 
     /**
      * Returns the name of this Property.
@@ -540,6 +558,55 @@ public class Property extends Element {
             }
             out.print("= ");
             m_joinPath.outputPDL(out);
+        }
+    }
+
+    public boolean isKeyProperty() {
+        if (m_container instanceof ObjectType) {
+            ObjectType ot = (ObjectType) m_container;
+            return ot.isKeyProperty(m_name);
+        } else {
+            return false;
+        }
+    }
+
+    void setNullability() {
+        if (m_column != null) {
+            if (isKeyProperty()) {
+                m_column.setNullable(false);
+            } else {
+                m_column.setNullable(isNullable());
+            }
+        }
+
+        if (m_joinPath != null) {
+            List path = m_joinPath.getPath();
+            switch (path.size()) {
+            case 1:
+                JoinElement je = m_joinPath.getJoinElement(0);
+                if (isCollection()) {
+                    je.getTo().setNullable(true);
+                } else {
+                    je.getFrom().setNullable(isNullable());
+                }
+                break;
+            case 2:
+                JoinElement one = m_joinPath.getJoinElement(0);
+                JoinElement two = m_joinPath.getJoinElement(1);
+                one.getTo().setNullable(false);
+                two.getFrom().setNullable(false);
+                break;
+            default:
+                m_joinPath.error("Don't know how to deal with length " +
+                                 path.size() + " join paths.");
+                break;
+            }
+        }
+    }
+
+    void generateForeignKeys() {
+        if (m_joinPath != null) {
+            m_joinPath.generateForeignKeys();
         }
     }
 

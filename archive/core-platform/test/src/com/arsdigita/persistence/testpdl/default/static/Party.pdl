@@ -15,8 +15,8 @@
 model examples;
 
 object type Party {
-    BigInteger id = t_parties.party_id;
-    String[1..1] email = t_parties.email;
+    BigInteger id = t_parties.party_id INTEGER;
+    String[1..1] email = t_parties.email VARCHAR(100);
 
     object key (id);
 

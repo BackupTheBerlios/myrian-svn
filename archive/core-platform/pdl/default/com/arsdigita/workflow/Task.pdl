@@ -50,12 +50,12 @@ object type Task extends ACSObject {
 
 association {
     Task[1..1] task = join cw_tasks.task_id 
-                        to cw_task_listeners.task_id,
+                        to cw_task_listeners.listener_task_id,
                       join cw_task_listeners.task_id
                         to cw_tasks.task_id;
     Task[0..n] taskFinishedListeners = join cw_tasks.task_id 
                                          to cw_task_listeners.task_id, 
-                                       join cw_task_listeners.task_id
+                                       join cw_task_listeners.listener_task_id
                                          to cw_tasks.task_id;
 
     add task {}

@@ -31,12 +31,12 @@ import com.arsdigita.util.StringUtils;
  * be marked as special "key" properties.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/06 $
  **/
 
 public class ObjectType extends CompoundType {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#3 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
 
     private static boolean m_optimizeDefault = true;
 
@@ -98,7 +98,6 @@ public class ObjectType extends CompoundType {
         initOption("OPTIMIZE",
                    getOptimizeDefault() ? Boolean.TRUE : Boolean.FALSE);
     }
-
 
     /**
      * Returns the supertype of this ObjectType or null if this is a base
@@ -383,6 +382,37 @@ public class ObjectType extends CompoundType {
         return m_referenceKey;
     }
 
+    public Column getColumn() {
+        if (m_super == null) {
+            return ((Property) getKeyProperties().next()).getColumn();
+        }
+
+        if (m_referenceKey != null) {
+            return m_referenceKey;
+        }
+
+        return m_super.getColumn();
+    }
+
+    Set getKeyColumns() {
+        Set result = new HashSet();
+
+        if (m_super == null) {
+            for (Iterator it = getKeyProperties(); it.hasNext(); ) {
+                Property prop = (Property) it.next();
+                Column col = prop.getColumn();
+                if (col == null) {
+                    col = prop.getJoinPath().getJoinElement(0).getFrom();
+                }
+                result.add(col);
+            }
+        } else {
+            result.add(getColumn());
+        }
+
+        return result;
+    }
+
     /**
      * Forces a role reference attribute to be loaded in the default retrieve
      * events created by MDSQL.
@@ -609,4 +639,102 @@ public class ObjectType extends CompoundType {
     public void outputPDL(PrintStream out) {
         outputPDL(out, true);
     }
+
+    void setNullability() {
+        if (m_referenceKey != null) {
+            m_referenceKey.setNullable(false);
+        }
+
+        for (Iterator it = getProperties(); it.hasNext(); ) {
+            Property prop = (Property) it.next();
+            prop.setNullability();
+        }
+    }
+
+    void generateUniqueKeys() {
+        if (m_referenceKey == null) {
+            List keyCols = new ArrayList();
+            boolean mdsql = true;
+            for (Iterator it = getKeyProperties(); it.hasNext(); ) {
+                Property prop = (Property) it.next();
+                Column col = prop.getColumn();
+
+                if (col == null) {
+                    // Not MDSQL enabled, can't generate key
+                    mdsql = false;
+                } else {
+                    keyCols.add(col);
+                }
+            }
+
+            if (mdsql) {
+                Column[] cols = (Column[]) keyCols.toArray(new Column[0]);
+
+                if (cols.length > 0) {
+                    Table table = cols[0].getTable();
+                    for (int i = 0; i < cols.length; i++) {
+                        if (cols[i].getTable() != table) {
+                            error("Not all key columns are from the " +
+                                  "same table.");
+                        }
+                    }
+                    if (table.getPrimaryKey() == null) {
+                        table.setPrimaryKey(new UniqueKey(table, null, cols));
+                    }
+                }
+            }
+        } else {
+            Table table = m_referenceKey.getTable();
+            if (table.getPrimaryKey() == null) {
+                table.setPrimaryKey(new UniqueKey(null, m_referenceKey));
+            }
+        }
+
+        for (Iterator it = getJoinPaths(); it.hasNext(); ) {
+            JoinPath jp = (JoinPath) it.next();
+            if (jp.getPath().size() != 1) {
+                jp.error("Only length 1 join paths are allowed here.");
+            }
+
+            JoinElement je = jp.getJoinElement(0);
+            Set keyCols = getKeyColumns();
+            Column ext = null;
+            if (keyCols.contains(je.getFrom())) {
+                ext = je.getTo();
+            } else if (keyCols.contains(je.getTo())) {
+                ext = je.getFrom();
+            } else {
+                jp.error("Join path must join key column of object " +
+                         "type with extension table.");
+            }
+
+            Table table = ext.getTable();
+            if (table.getPrimaryKey() == null) {
+                table.setPrimaryKey(new UniqueKey(null, ext));
+            }
+        }
+    }
+
+    void generateForeignKeys() {
+        if (m_referenceKey != null) {
+            if (m_super == null) {
+                m_referenceKey.error("Cannot specify reference key without " +
+                                     "a supertype.");
+            }
+            if (!m_referenceKey.isForeignKey()) {
+                new ForeignKey(null, m_referenceKey, m_super.getColumn());
+            }
+        }
+
+        for (Iterator it = getProperties(); it.hasNext(); ) {
+            Property prop = (Property) it.next();
+            prop.generateForeignKeys();
+        }
+
+        for (Iterator it = getJoinPaths(); it.hasNext(); ) {
+            JoinPath jp = (JoinPath) it.next();
+            jp.generateForeignKeys();
+        }
+    }
+
 }

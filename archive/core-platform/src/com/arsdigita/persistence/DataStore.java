@@ -66,12 +66,12 @@ import org.apache.log4j.Category;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/07/18 $
+ * @version $Revision: #7 $ $Date: 2002/08/06 $
  */
 
 public class DataStore {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#6 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#7 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
 
     private static final Category log =
         Category.getInstance(DataStore.class.getName());
@@ -154,7 +154,7 @@ public class DataStore {
             }
             SimpleType type = (SimpleType) prop.getType();
             try {
-                String colName = mapping.getColumn().getColumnName();
+                String colName = mapping.getColumn();
                 Object obj = type.fetch(rs, colName);
                 logAssignment(path, obj, colName);
                 target.initPath(path, obj);
@@ -426,7 +426,7 @@ public class DataStore {
                      mappings.hasNext(); ) {
                     Mapping mapping = (Mapping) mappings.next();
                     if (mapping.getPath()[0].equals(prop.getName())) {
-                        String colName = mapping.getColumn().getColumnName();
+                        String colName = mapping.getColumn();
                         type.doRefresh(rs, colName, value);
                         rs.close();
                         break;

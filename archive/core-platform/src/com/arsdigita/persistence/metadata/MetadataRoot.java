@@ -27,12 +27,12 @@ import com.arsdigita.db.Initializer;
  * metadata system.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/07/29 $
+ * @version $Revision: #5 $ $Date: 2002/08/06 $
  **/
 
 public class MetadataRoot extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#4 $ by $Author: randyg $, $DateTime: 2002/07/29 16:44:42 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#5 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
 
     private static final Category s_cat = Category.getInstance(MetadataRoot.class.getName());
 
@@ -523,6 +523,7 @@ public class MetadataRoot extends Element {
      * The primitive types.
      **/
     private Map m_primitives = new HashMap();
+    private Map m_tables = new HashMap();
 
 
     /**
@@ -531,6 +532,28 @@ public class MetadataRoot extends Element {
 
     MetadataRoot() {}
 
+    public void addTable(Table table) {
+        if (hasTable(table.getName())) {
+            throw new IllegalArgumentException(
+                "This MetadataRoot already has a table named: " +
+                table.getName()
+                );
+        }
+
+        m_tables.put(table.getName(), table);
+    }
+
+    public Table getTable(String name) {
+        return (Table) m_tables.get(name);
+    }
+
+    public boolean hasTable(String name) {
+        return m_tables.containsKey(name);
+    }
+
+    public Collection getTables() {
+        return m_tables.values();
+    }
 
     /**
      * Adds the given Model to this MetadataRoot.
@@ -659,7 +682,19 @@ public class MetadataRoot extends Element {
 
         return retval;
     }
-        
+
+    public Set getAssociations() {
+        Iterator it = m_models.values().iterator();
+        Set retval = new HashSet();
+
+        while (it.hasNext()) {
+            Model m = (Model)it.next();
+
+            retval.addAll(m.getAssociations());
+        }
+
+        return retval;
+    }
 
     /**
      * Gets the QueryType given the fully qualified type name of the query.
@@ -748,6 +783,49 @@ public class MetadataRoot extends Element {
             m.outputPDL(out);
             out.println();
         }
+    }
+
+    private Set m_generatedTypes = new HashSet();
+    private Set m_generatedAssns = new HashSet();
+
+    public void generateDDL() {
+        Collection types = getObjectTypes();
+        types.removeAll(m_generatedTypes);
+        Set assns = getAssociations();
+        assns.removeAll(m_generatedAssns);
+
+        for (Iterator it = types.iterator(); it.hasNext(); ) {
+            ObjectType ot = (ObjectType) it.next();
+            ot.setNullability();
+        }
+
+        for (Iterator it = assns.iterator(); it.hasNext(); ) {
+            Association ass = (Association) it.next();
+            ass.setNullability();
+        }
+
+        for (Iterator it = types.iterator(); it.hasNext(); ) {
+            ObjectType ot = (ObjectType) it.next();
+            ot.generateUniqueKeys();
+        }
+
+        for (Iterator it = assns.iterator(); it.hasNext(); ) {
+            Association ass = (Association) it.next();
+            ass.generateUniqueKeys();
+        }
+
+        for (Iterator it = types.iterator(); it.hasNext(); ) {
+            ObjectType ot = (ObjectType) it.next();
+            ot.generateForeignKeys();
+        }
+
+        for (Iterator it = assns.iterator(); it.hasNext(); ) {
+            Association ass = (Association) it.next();
+            ass.generateForeignKeys();
+        }
+
+        m_generatedTypes.addAll(types);
+        m_generatedAssns.addAll(assns);
     }
 
 }

@@ -7,12 +7,12 @@ import com.arsdigita.persistence.metadata.*;
  * Selection
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/07/18 $
+ * @version $Revision: #6 $ $Date: 2002/08/06 $
  **/
 
 class Selection {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Selection.java#5 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Selection.java#6 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
 
     private Node m_node;
     private Property m_property;
@@ -47,13 +47,9 @@ class Selection {
 
     public Mapping getMapping() {
         String path = m_node.getPrefix() + m_property.getName();
-        com.arsdigita.persistence.metadata.Column col =
-            new com.arsdigita.persistence.metadata.Column(
-                m_column.getTable().getAlias(),
-                getAlias()
-                );
-        col.setLineInfo(m_property.getColumn());
-        Mapping mapping = new Mapping(StringUtils.split(path, '.'), col);
+        Mapping mapping = new Mapping(StringUtils.split(path, '.'),
+                                      m_column.getTable().getAlias(),
+                                      getAlias());
         mapping.setLineInfo(m_property);
         return mapping;
     }

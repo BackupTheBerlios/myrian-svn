@@ -10,12 +10,12 @@ import com.arsdigita.persistence.metadata.Property;
  * the name.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/08/01 $
+ * @version $Revision: #2 $ $Date: 2002/08/06 $
  **/
 
 class LinkSelection extends Selection {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/LinkSelection.java#1 $ by $Author: randyg $, $DateTime: 2002/08/01 11:13:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/LinkSelection.java#2 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
 
     LinkSelection(Node node, Property property) {
         super(node, property);
@@ -27,12 +27,10 @@ class LinkSelection extends Selection {
      * it simply uses the attribute name (e.g. "caption");
      */
     public Mapping getMapping() {
-        com.arsdigita.persistence.metadata.Column col =
-            new com.arsdigita.persistence.metadata.Column
-            (getColumn().getTable().getAlias(), getAlias());
-        col.setLineInfo(getProperty().getColumn());
         String path[] = {getProperty().getName()};
-        Mapping mapping = new Mapping(path, col);
+        Mapping mapping = new Mapping(path,
+                                      getColumn().getTable().getAlias(),
+                                      getAlias());
         mapping.setLineInfo(getProperty());
         return mapping;
     }

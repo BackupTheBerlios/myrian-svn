@@ -36,7 +36,7 @@ import org.apache.log4j.Category;
  *  com.arsdigita.persistence.metadata.BaseDDLGenerator </p>
  *
  * @author <a href="mailto:jorris@arsdigita.com">jorris@arsdigita.com</a>
- * @version $Revision: #1 $ $Date: 2002/07/25 $
+ * @version $Revision: #2 $ $Date: 2002/08/06 $
  * 
  * @see com.arsdigita.persistence.metadatax.ObjectType
  */
@@ -44,7 +44,7 @@ import org.apache.log4j.Category;
 
 public class BaseDDLGeneratorTest extends PersistenceTestCase {  
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/BaseDDLGeneratorTest.java#1 $ by $Author: randyg $, $DateTime: 2002/07/25 17:33:29 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/BaseDDLGeneratorTest.java#2 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
 
     private static Category s_log = 
         Category.getInstance(BaseDDLGeneratorTest.class.getName());
@@ -284,7 +284,7 @@ public class BaseDDLGeneratorTest extends PersistenceTestCase {
                                     ("com.arsdigita.kernel.ACSObject"));
         
         ObjectType objectType = dot.getObjectType();
-        String tableName = objectType.getReferenceKey().getTableName();
+        Table table = objectType.getReferenceKey().getTable();
 
         // let's test to make sure that it gives back different columns
         for (int i = 0; i < 200; i++) {
@@ -297,7 +297,7 @@ public class BaseDDLGeneratorTest extends PersistenceTestCase {
                                              Property.REQUIRED);
             
             columns.add(columnName.toLowerCase());
-            property.setColumn(new Column(tableName, columnName,
+            property.setColumn(new Column(table, columnName,
                                           java.sql.Types.INTEGER, 32));
             objectType.addProperty(property);
         }

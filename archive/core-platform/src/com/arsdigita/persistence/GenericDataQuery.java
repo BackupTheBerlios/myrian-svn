@@ -26,12 +26,12 @@ import com.arsdigita.persistence.metadata.Column;
  * GenericDataQuery
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/06 $
  */
 
 public class GenericDataQuery extends DataQueryImpl {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataQuery.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataQuery.java#3 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
 
     public GenericDataQuery(Session s, String sql, String[] columns) {
         super(
@@ -47,8 +47,7 @@ public class GenericDataQuery extends DataQueryImpl {
             m_type.addProperty(new Property(columns[i],
                                             MetadataRoot.OBJECT));
             op.addMapping(
-                new Mapping(new String[] {columns[i]},
-                            new Column(null, columns[i]))
+                new Mapping(new String[] {columns[i]}, null, columns[i])
                     );
         }
     }

@@ -25,7 +25,7 @@ import java.util.Map;
  * property contained in a CompoundType has an associated DataType.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/08/06 $
  */
 
 abstract public class CompoundType extends DataType {
@@ -47,7 +47,7 @@ abstract public class CompoundType extends DataType {
         "retrieve attributes"
     };
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/CompoundType.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/CompoundType.java#4 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
 
     /**
      * This Map contains all the properties this CompoundType has. It is keyed
@@ -83,6 +83,7 @@ abstract public class CompoundType extends DataType {
      **/
 
     public void addProperty(Property property) {
+        property.setContainer(this);
         m_properties.put(property.getName(), property);
     }
 

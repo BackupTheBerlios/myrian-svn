@@ -12,7 +12,7 @@
 // rights and limitations under the License.
 //
 
-// $Id: //core-platform/dev/pdl/default/com/arsdigita/notification/Notification.pdl#2 $
+// $Id: //core-platform/dev/pdl/default/com/arsdigita/notification/Notification.pdl#3 $
 
 model com.arsdigita.notification;
 
@@ -20,7 +20,7 @@ import com.arsdigita.kernel.*;
 
 object type QueueItem {
 
-   BigDecimal requestID = nt_requests.request_id INTEGER;
+   BigDecimal requestID = nt_queue.request_id INTEGER;
    BigDecimal messageID = nt_requests.message_id INTEGER;
    BigDecimal partyTo = nt_queue.party_to INTEGER;
    String     partyToAddr = parties.primary_email VARCHAR(100);
@@ -31,7 +31,7 @@ object type QueueItem {
 
    object key (requestID, partyTo);
 
-    join nt_queue.party_to to parties.party_id,
+    join nt_queue.party_to to parties.party_id;
     join nt_queue.request_id to nt_requests.request_id;
 
    retrieve {

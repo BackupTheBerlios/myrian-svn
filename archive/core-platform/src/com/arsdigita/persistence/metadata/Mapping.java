@@ -23,12 +23,12 @@ import java.io.PrintStream;
  * with a single SQL statement.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/06 $
  **/
 
 public class Mapping extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Mapping.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Mapping.java#3 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
 
     /**
      * The path into a network of DataTypes.
@@ -36,9 +36,14 @@ public class Mapping extends Element {
     private String[] m_path;
 
     /**
-     * The Column that holds the value for the specified path.
+     * The table that holds the value for the specified path.
      **/
-    private Column m_column;
+    private String m_table;
+
+    /**
+     * The column that holds the value for the specified path.
+     **/
+    private String m_column;
 
 
     /**
@@ -48,7 +53,7 @@ public class Mapping extends Element {
      * @param column The column that holds the value for the specified path.
      **/
 
-    public Mapping(String[] path, Column column) {
+    public Mapping(String[] path, String table, String column) {
         if (path == null || path.length == 0) {
             throw new IllegalArgumentException(
                 "The path must be non null and non empty."
@@ -62,6 +67,7 @@ public class Mapping extends Element {
         }
 
         m_path = path;
+        m_table = table;
         m_column = column;
     }
 
@@ -78,12 +84,23 @@ public class Mapping extends Element {
 
 
     /**
-     * Returns the Column for this mapping.
+     * Returns the table for this mapping.
      *
-     * @return The Column for this mapping.
+     * @return The table for this mapping.
      **/
 
-    public Column getColumn() {
+    public String getTable() {
+        return m_table;
+    }
+
+
+    /**
+     * Returns the column for this mapping.
+     *
+     * @return The column for this mapping.
+     **/
+
+    public String getColumn() {
         return m_column;
     }
 
@@ -96,7 +113,7 @@ public class Mapping extends Element {
         }
 
         out.print(" = ");
-        out.print(m_column.getTableName() + "." + m_column.getColumnName());
+        out.print(m_table + "." + m_column);
     }
 
 }

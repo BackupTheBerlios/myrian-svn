@@ -19,6 +19,7 @@ import com.arsdigita.util.StringUtils;
 
 import com.arsdigita.persistence.pdl.ast.AST;
 import com.arsdigita.persistence.Utilities;
+import com.arsdigita.persistence.metadata.DDLWriter;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.oql.Query;
@@ -48,12 +49,12 @@ import org.apache.log4j.Priority;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/01 $
+ * @version $Revision: #5 $ $Date: 2002/08/06 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#4 $ by $Author: randyg $, $DateTime: 2002/08/01 11:13:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#5 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
 
     private static final Category s_log = Category.getInstance(PDL.class);
 
@@ -147,6 +148,7 @@ public class PDL {
         OPTIONS.put("-debugDirectory", null);
         OPTIONS.put("-path", null);
         OPTIONS.put("-dot", null);
+        OPTIONS.put("-ddl", null);
     }
 
     /**
@@ -227,7 +229,21 @@ public class PDL {
             BasicConfigurator.configure();
             Category.getRoot().setPriority(Priority.toPriority("info"));
 
+            DDLWriter writer = null;
+            String base = (String) OPTIONS.get("-ddl");
+            if (base != null) {
+                writer = new DDLWriter(base);
+            }
+
             compilePDL(files);
+
+            if (writer != null) {
+                try {
+                    writer.write(MetadataRoot.getMetadataRoot());
+                } catch (IOException ioe) {
+                    throw new PDLException(ioe.getMessage());
+                }
+            }
 
             String dot = (String) OPTIONS.get("-dot");
             if (dot != null) {

@@ -15,6 +15,8 @@
 
 package com.arsdigita.persistence.pdl.ast;
 
+import com.arsdigita.persistence.metadata.MetadataRoot;
+import com.arsdigita.persistence.metadata.Table;
 import com.arsdigita.persistence.metadata.Column;
 import com.arsdigita.persistence.Utilities;
 
@@ -29,11 +31,11 @@ import java.io.StringWriter;
  * data type.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #4 $ $Date: 2002/07/28 $
+ * @version $Revision: #5 $ $Date: 2002/08/06 $
  */
 public class ColumnDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ColumnDef.java#4 $ by $Author: randyg $, $DateTime: 2002/07/28 12:21:11 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ColumnDef.java#5 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
 
     private static int count = 0;
     private static final Category s_log =
@@ -71,6 +73,14 @@ public class ColumnDef extends Element {
         this(table, column, null);
     }
 
+    String getTable() {
+        return m_table;
+    }
+
+    String getColumn() {
+        return m_column;
+    }
+
     /**
      * Get the column name.
      *  
@@ -85,14 +95,50 @@ public class ColumnDef extends Element {
      *
      * @returns the Column that this ColumnDef represents.
      */
-    public Column generateLogicalModel() {
+    public Column generateLogicalModel(int defaultJDBCType) {
+        MetadataRoot root = MetadataRoot.getMetadataRoot();
         Column result;
 
+        Table table = root.getTable(m_table);
+        if (table == null) {
+            table = new Table(m_table);
+            root.addTable(table);
+        }
+
+        result = table.getColumn(m_column);
+
         if (m_type != null) {
-            result = new Column(m_table, m_column, m_type.getTypeCode(),
-                                m_type.getSize());
+            if (result == null) {
+                result = new Column(table, m_column, m_type.getTypeCode(),
+                                    m_type.getSize());
+            } else {
+                if (result.getType() == Integer.MIN_VALUE) {
+                    result.setType(m_type.getTypeCode());
+                } else if (result.getType() != m_type.getTypeCode()) {
+                    error("Column type definition conflicts " +
+                          "with previous definition: " + result.getLocation());
+                }
+
+                if (result.getSize() < 0) {
+                    result.setSize(m_type.getSize());
+                } else if (result.getSize() != m_type.getSize()) {
+                    error("Column type definition conflicts " +
+                          "with previous definition: " + result.getLocation());
+                }
+            }
         } else {
-            result = new Column(m_table, m_column);
+            if (result == null) {
+                result = new Column(table, m_column, defaultJDBCType);
+            } else {
+                if (result.getType() == Integer.MIN_VALUE &&
+                    defaultJDBCType != Integer.MIN_VALUE) {
+                    result.setType(defaultJDBCType);
+                } else if (defaultJDBCType != Integer.MIN_VALUE &&
+                           result.getType() != defaultJDBCType) {
+                    error("Column type definition conflicts " +
+                          "with previous definition: " + result.getLocation());
+                }
+            }
         }
 
         initLineInfo(result);
@@ -105,19 +151,8 @@ public class ColumnDef extends Element {
      *
      * @returns the Column that this ColumnDef represents.
      */
-    public Column generateLogicalModel(int defaultJDBCType) {
-        Column result;
-
-        if (m_type != null) {
-            result = new Column(m_table, m_column, m_type.getTypeCode(),
-                                m_type.getSize());
-        } else {
-            result = new Column(m_table, m_column, defaultJDBCType);
-        }
-
-        initLineInfo(result);
-
-        return result;
+    public Column generateLogicalModel() {
+        return generateLogicalModel(Integer.MIN_VALUE);
     }
 
     void validate() {

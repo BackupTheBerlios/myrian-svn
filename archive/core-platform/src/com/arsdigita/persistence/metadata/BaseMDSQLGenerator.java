@@ -47,12 +47,12 @@ import org.apache.log4j.Category;
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#7 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#8 $
  * @since 4.6.3
  */
 abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#7 $ by $Author: randyg $, $DateTime: 2002/08/02 09:28:19 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#8 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
 
     private static final Category s_log =
         Category.getInstance(BaseMDSQLGenerator.class);
@@ -233,8 +233,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
         Property p = (Property) type.getKeyProperties().next();
         Mapping keyMapping = op.getMapping(new String[] {p.getName()});
-        sb.append(keyMapping.getColumn().getTableName() + "." +
-                  keyMapping.getColumn().getColumnName());
+        sb.append(keyMapping.getTable() + "." + keyMapping.getColumn());
         sb.append(" = :" + p.getName() + "\n");
 
         op.setSQL(sb.toString());

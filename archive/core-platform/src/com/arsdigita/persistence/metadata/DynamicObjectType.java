@@ -51,12 +51,12 @@ import java.util.HashMap;
  *
  * @deprecated Use com.arsdigita.metadata.DynamicObjectType instead.
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/07/31 $ 
+ * @version $Revision: #5 $ $Date: 2002/08/06 $ 
  */
 
 public class DynamicObjectType {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DynamicObjectType.java#4 $ by $Author: dan $, $DateTime: 2002/07/31 09:53:16 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DynamicObjectType.java#5 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
 
     // The DDL generator used
     private static DDLGenerator m_generator = DDLGeneratorFactory.getInstance();
@@ -71,7 +71,7 @@ public class DynamicObjectType {
     private DataObject m_dataObject;
 
     // this is a convenience member variable
-    private String m_tableName = null;
+    private Table m_table = null;
 
     // this is the string buffer that is used to hold the
     // DDL statement
@@ -183,13 +183,14 @@ public class DynamicObjectType {
         model.addDataType(m_objectType);
 
         // set up the table name and the reference key
-        m_tableName = m_generator.generateTableName(
-                                    m_objectType.getModel().getName(), 
-                                    name);
+        m_table = new Table(m_generator.generateTableName(
+            m_objectType.getModel().getName(), 
+            name));
+        MetadataRoot.getMetadataRoot().addTable(m_table);
 
         // now we try to create a reference key 
         String columnName = m_objectType.getName() + "_id";
-        Column key = new Column(m_tableName, columnName,
+        Column key = new Column(m_table, columnName,
                                 java.sql.Types.INTEGER, 32);
         m_keyColumn = key;
 
@@ -294,10 +295,10 @@ public class DynamicObjectType {
 
         Column referenceColumn = m_objectType.getReferenceKey();
         if (referenceColumn != null) {
-            m_tableName = referenceColumn.getTableName();
+            m_table = referenceColumn.getTable();
         } else {
-            m_tableName = ((Property)m_objectType.getKeyProperties().next())
-                .getColumn().getTableName();
+            m_table = ((Property)m_objectType.getKeyProperties().next())
+                .getColumn().getTable();
         }
         m_isNew = false;
     }
@@ -485,7 +486,7 @@ public class DynamicObjectType {
             size = -1;
         }
 
-        property.setColumn(new Column(m_tableName, columnName,
+        property.setColumn(new Column(m_table, columnName,
                                       propertyType.getJDBCtype(), size));
 
         m_newProperties.add(property);
@@ -658,7 +659,7 @@ public class DynamicObjectType {
             Column refkey = Utilities.getColumn(type);
 
             Column foreignKey =
-                new Column(Utilities.getColumn(m_objectType).getTableName(),
+                new Column(Utilities.getColumn(m_objectType).getTable(),
                            columnName,
                            refkey.getType());
 
@@ -667,8 +668,9 @@ public class DynamicObjectType {
             property.setJoinPath(jp);
         } else {
             // we need to create a mapping table here
-            String tableName = 
-                m_generator.generateMappingTableName(m_objectType, name);
+            Table table = new Table(
+                m_generator.generateMappingTableName(m_objectType, name)
+                );
 
             Column baseKey = Utilities.getColumn(m_objectType);
             Column foreignKey = Utilities.getColumn(type);
@@ -679,11 +681,11 @@ public class DynamicObjectType {
                 m_generator.generateColumnName(m_objectType,
                                                foreignKey.getColumnName());
 
-            Column column1 = new Column(tableName,
+            Column column1 = new Column(table,
                                         columnName1,
                                         baseKey.getType());
 
-            Column column2 = new Column(tableName,
+            Column column2 = new Column(table,
                                         columnName2,
                                         foreignKey.getType());
 

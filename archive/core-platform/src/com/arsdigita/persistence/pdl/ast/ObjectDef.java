@@ -36,12 +36,12 @@ import java.util.Iterator;
  * Outputs a metadata ObjectType.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/07/31 $
+ * @version $Revision: #5 $ $Date: 2002/08/06 $
  */
 
 public class ObjectDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ObjectDef.java#4 $ by $Author: dan $, $DateTime: 2002/07/31 09:53:16 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ObjectDef.java#5 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
 
     // object name
     private String m_name;
@@ -408,10 +408,9 @@ public class ObjectDef extends Element {
                     Mapping mapping = (Mapping)maps.next();
 
                     String[] path = mapping.getPath();
-                    Column col = mapping.getColumn();
                     MapStatement map = new MappingDef(path,
-                                                      col.getTableName(),
-                                                      col.getColumnName());
+                                                      mapping.getTable(),
+                                                      mapping.getColumn());
 
                     blockDef.add(map);
                 }

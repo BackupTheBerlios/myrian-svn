@@ -27,13 +27,13 @@ import org.apache.log4j.Category;
  * This class performs unit tests on com.arsdigita.persistence.metadata.BaseMDSQLGenerator </p>
  *
  * author <a href="mailto:jorriarsdigita.com">jorriarsdigita.com</a>
- * version $Revision: #1 $ $Date: 2002/07/30 $
+ * version $Revision: #2 $ $Date: 2002/08/06 $
  * 
  */
 
 public class BaseMDSQLGeneratorTest extends PersistenceTestCase {  
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/BaseMDSQLGeneratorTest.java#1 $ by $Author: randyg $, $DateTime: 2002/07/30 16:44:08 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/BaseMDSQLGeneratorTest.java#2 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
 
     private static Category s_log = 
         Category.getInstance(BaseMDSQLGeneratorTest.class.getName());
@@ -214,7 +214,7 @@ public class BaseMDSQLGeneratorTest extends PersistenceTestCase {
         assert("Too many operations created", !it.hasNext());
 
         it = op.getMappings();
-        Column aggCol = null;
+        String aggCol = null;
 
         while (it.hasNext()) {
             Mapping map = (Mapping)it.next();
@@ -342,14 +342,35 @@ public class BaseMDSQLGeneratorTest extends PersistenceTestCase {
                              SimpleType dataType,
                              String tableName,
                              String columnName) {
-
         Property prop = new Property(propertyName, dataType);
-        Column column = new Column(tableName, columnName, dataType.getJDBCtype());
+        Column column = getColumn(getTable(tableName),
+                                  columnName, dataType.getJDBCtype());
         prop.setColumn(column);
         type.addProperty(prop);
                                     
     }
-    
+
+    private Column getColumn(Table table, String columnName, int type) {
+        Column column = table.getColumn(columnName);
+        if (column == null) {
+            column = new Column(table, columnName, type);
+        } else {
+            assertEquals(type, column.getType());
+        }
+
+        return column;
+    }
+
+    private Table getTable(String tableName) {
+        MetadataRoot root = MetadataRoot.getMetadataRoot();
+        Table table = root.getTable(tableName);
+        if (table == null) {
+            table = new Table(tableName);
+            root.addTable(table);
+        }
+        return table;
+    }
+
     private void addRoleReference(ObjectType type,
                                   String refName,
                                   ObjectType refType,
@@ -359,7 +380,9 @@ public class BaseMDSQLGeneratorTest extends PersistenceTestCase {
         JoinPath jp = new JoinPath();
 
         Column end = Utilities.getColumn(refType);
-        Column start = new Column(tableName, columnName, end.getType());
+
+        Column start = getColumn(getTable(tableName), columnName,
+                                 end.getType());
         jp.addJoinElement(start, end);
 
         prop.setJoinPath(jp);

@@ -23,16 +23,16 @@ import java.sql.Types;
  * a size (such as the 400 in varchar(400)). 
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/06 $
  */
 public class DataTypeDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/DataTypeDef.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/DataTypeDef.java#3 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
 
     // the type name
     private String m_type;
 
-    // the size.  0 for no size
+    // the size.  -1 for no size
     private int m_size;
 
     // mapping of written database types to integer type codes
@@ -70,7 +70,7 @@ public class DataTypeDef extends Element {
      * Create a new DataTypeDef with the given type and size.
      * 
      * @param type the datatype
-     * @param size the size, 0 for no size
+     * @param size the size, -1 for no size
      * @pre type != null
      */
     public DataTypeDef(String type, int size) {
@@ -85,7 +85,7 @@ public class DataTypeDef extends Element {
      * @pre type != null
      */
     public DataTypeDef(String type) {
-        this(type, 0);
+        this(type, -1);
     }
 
     /**
@@ -94,7 +94,7 @@ public class DataTypeDef extends Element {
      * @return the name of this datatype
      */
     public String getName() {
-        if ( m_size == 0 ) {
+        if ( m_size < 0 ) {
             return m_type;
         } else {
             return m_type + "(" + m_size + ")";
