@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default-create.sql#7 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default-create.sql#8 $
+-- $DateTime: 2003/02/13 14:09:25 $
 
 include default/function-currentDate.sql
 
@@ -193,7 +193,6 @@ include default/versioning/table-vc_generic_operations.sql
 include default/versioning/comment-vc_generic_operations.sql
 include default/versioning/table-vc_clob_operations.sql
 include default/versioning/table-vc_blob_operations.sql
-include default/versioning/function-last_attr_value.sql
 
 include default/workflow/sequence-cw_sequences.sql
 include default/workflow/table-cw_tasks.sql

@@ -11,9 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/x/versioning/index-vcx_obj_changes.sql#1 $
--- $DateTime: 2003/02/12 20:42:45 $
+-- $Id: //core-platform/dev/sql/default/x/versioning/index-vcx_obj_changes.sql#2 $
+-- $DateTime: 2003/02/13 14:09:25 $
 
 create index vcx_obj_changes_master_id_idx on vcx_obj_changes(master_id);
--- index the timestamp -- avoids full table scans for last_attr_value.
 create index vcx_obj_changes_tstamp_idx on vcx_obj_changes(timestamp);

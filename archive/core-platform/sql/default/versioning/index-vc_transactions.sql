@@ -11,9 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/versioning/index-vc_transactions.sql#2 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/versioning/index-vc_transactions.sql#3 $
+-- $DateTime: 2003/02/13 14:09:25 $
 
 create index vc_transactions_master_id_idx on vc_transactions(master_id);
--- index the timestamp -- avoids full table scans for last_attr_value.
 create index vc_transactions_tstamp_idx on vc_transactions(timestamp);
