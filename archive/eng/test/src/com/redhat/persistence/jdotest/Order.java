@@ -1,13 +1,14 @@
 package com.redhat.persistence.jdotest;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Date;
 
 /**
  * Order
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/06/23 $
+ * @version $Revision: #3 $ $Date: 2004/06/24 $
  **/
 public class Order {
     private int id;
@@ -15,8 +16,16 @@ public class Order {
     private Party party;
     private Date purchaseDate;
 
+    public Order() {
+        items = new LinkedList();
+    }
+
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Collection getItems() {

@@ -14,8 +14,18 @@ public abstract class AbstractCase extends TestCase {
     private static PersistenceManagerFactory s_pmf;
     protected PersistenceManager m_pm;
 
+    public AbstractCase() {}
+
+    public AbstractCase(String name) {
+        super(name);
+    }
+
     protected BigInteger id() {
         return BigInteger.valueOf(s_id++);
+    }
+
+    protected int intID() {
+        return s_id++;
     }
 
     protected void setUp() throws Exception {

@@ -10,6 +10,8 @@ public class JDOSuite extends TestSuite {
         suite.addTestSuite(SimpleTest.class);
         suite.addTestSuite(PandoraTest.class);
 
+        // suite.addTest(new PandoraTest("testMain"));
+
         return new JDOTestSetup(suite);
     }
 }

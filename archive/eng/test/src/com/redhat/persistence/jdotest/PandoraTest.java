@@ -38,15 +38,25 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.apache.log4j.Logger;
+
 /**
  * PandoraTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/06/23 $
+ * @version $Revision: #4 $ $Date: 2004/06/24 $
  **/
 
 public class PandoraTest extends AbstractCase {
+    private final static Logger s_log = Logger.getLogger(PandoraTest.class);
+
     private Session m_ssn;
+
+    public PandoraTest() {}
+
+    public PandoraTest(String name) {
+        super(name);
+    }
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -302,14 +312,20 @@ public class PandoraTest extends AbstractCase {
         }
 
         for (int i = 0; i < 10; i++) {
-            Order o = (Order) Main.create
-                (m_ssn, Order.class, new Object[] { new Integer(i) });
-            o.setParty(rhs);
-            Collection items = o.getItems();
+            Order order = new Order();
+
+            m_pm.makePersistent(order);
+            order.setId(intID());
+
+            order.setParty(rhs);
+            Collection items = order.getItems();
+            s_log.debug("items.hash=" + System.identityHashCode(items) +
+                        ";items.getClass()=" + items.getClass().getName());
             for (int j = 0; j < 10; j++) {
                 Item item = (Item) Main.create
                     (m_ssn, Item.class, new Object[] { new Integer(j + 10*i) });
                 item.setProduct(products[i]);
+                s_log.debug("Adding item: " + item);
                 items.add(item);
             }
         }
@@ -332,6 +348,7 @@ public class PandoraTest extends AbstractCase {
         }
 
         m_ssn.flushAll();
+        m_pm.currentTransaction().commit();
     }
 
    private void _assertEquals(String message, Object o1, Object o2) {
