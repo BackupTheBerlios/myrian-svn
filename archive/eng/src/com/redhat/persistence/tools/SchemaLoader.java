@@ -13,19 +13,27 @@ import javax.jdo.spi.*;
  * SchemaLoader
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/09/22 $
+ * @version $Revision: #2 $ $Date: 2004/09/24 $
  **/
 
 public class SchemaLoader {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/tools/SchemaLoader.java#1 $ by $Author: rhs $, $DateTime: 2004/09/22 18:18:11 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/tools/SchemaLoader.java#2 $ by $Author: rhs $, $DateTime: 2004/09/24 08:26:32 $";
 
-    private static final void die(String message) {
+    private static void die(String message) {
         System.err.println(message);
         System.exit(1);
     }
 
-    public static final void main(String[] argv) throws Exception {
+    public static final void main(String[] argv) {
+        try {
+            run(argv);
+        } catch (Exception e) {
+            die(e.getMessage());
+        }
+    }
+
+    private static void run(String[] argv) throws Exception {
         Properties props = new Properties();
 
         boolean load = true;
@@ -46,7 +54,7 @@ public class SchemaLoader {
 
         if (args.size() == 0) {
             die("usage: SchemaLoader [ -load | -unload ] " +
-                "<directory_1> ... <directory_n>");
+                "<class_1> ... <class_n>");
         }
 
         InputStream is =
@@ -61,17 +69,22 @@ public class SchemaLoader {
         conn.setAutoCommit(false);
 
         List classes = new ArrayList();
+        List nonpc = new ArrayList();
         for (Iterator it = args.iterator(); it.hasNext(); ) {
-            File dir = new File((String) it.next());
-            findClasses(dir, classes);
+            Class klass = Class.forName((String) it.next());
+            System.out.println("Found: " + klass);
+            if (PersistenceCapable.class.isAssignableFrom(klass)) {
+                classes.add(klass);
+            } else {
+                nonpc.add(klass);
+            }
         }
 
-        if (classes.isEmpty()) {
-            die("no classes found");
-        }
-
-        for (int i = 0; i < classes.size(); i++) {
-            System.out.println("Found: " + classes.get(i));
+        if (!nonpc.isEmpty()) {
+            for (Iterator it = nonpc.iterator(); it.hasNext(); ) {
+                System.err.println("not persistence capable: " + it.next());
+            }
+            System.exit(1);
         }
 
         System.out.print((load ? "L" : "Unl") + "oading schema...");
@@ -83,48 +96,6 @@ public class SchemaLoader {
         }
         conn.commit();
         System.out.println("done.");
-    }
-
-    private static void findClasses(File dir, List classes) {
-        findClasses(dir, classes, "");
-    }
-
-    private static void findClasses(File dir, List classes, String prefix) {
-        File[] files = dir.listFiles(new FileFilter() {
-            public boolean accept(File f) {
-                return f.isDirectory() || f.getName().endsWith(".class");
-            }
-        });
-
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].isDirectory()) {
-                String newPrefix;
-                if (prefix.equals("")) {
-                    newPrefix = files[i].getName();
-                } else {
-                    newPrefix = prefix + "." + files[i].getName();
-                }
-                findClasses(files[i], classes, newPrefix);
-            } else {
-                String name = files[i].getName();
-                name = name.substring(0, name.length() - 6);
-                String qname;
-                if (prefix.equals("")) {
-                    qname = name;
-                } else {
-                    qname = prefix + "." + name;
-                }
-                try {
-                    Class klass = Class.forName(qname);
-                    if (PersistenceCapable.class.isAssignableFrom(klass)) {
-                        classes.add(klass);
-                    }
-                } catch (ClassNotFoundException e) {
-                    die("unable to load class " + qname + " for file " +
-                        files[i]);
-                }
-            }
-        }
     }
 
 }
