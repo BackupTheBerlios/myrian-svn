@@ -24,14 +24,17 @@ import org.apache.log4j.Logger;
 /**
  * Subject to change.
  *
+ * Static utility methods for handling Java system properties.
+ *
+ * @see java.lang.System
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/SystemProperties.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/SystemProperties.java#2 $
  */
 public final class SystemProperties {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/SystemProperties.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/SystemProperties.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/04 23:40:23 $";
+        "$DateTime: 2003/09/11 13:03:22 $";
 
     private static final Logger s_log = Logger.getLogger
         (SystemProperties.class);
@@ -44,11 +47,18 @@ public final class SystemProperties {
      * value of a Java system property.
      *
      * @param param The <code>Parameter</code> representing the type
-     * and name of the field you wish to recover
+     * and name of the field you wish to recover; it cannot be null
      * @return A value that may be cast to the type enforced by the
-     * parameter
+     * parameter; it can be null
      */
     public static final Object get(final Parameter param) {
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Getting the value of " + param + " from " +
+                        "the system properties");
+        }
+
+        Assert.exists(param, Parameter.class);
+
         final ParameterValue value = param.unmarshal(s_store);
 
         if (!value.getErrors().isEmpty()) {
