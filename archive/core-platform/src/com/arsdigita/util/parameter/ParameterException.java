@@ -22,16 +22,20 @@ import org.apache.log4j.Logger;
 /**
  * Subject to change.
  *
- * An error to indicate invalid configurations.
+ * An exception to indicate invalid parameter states.  This exception
+ * should only be used when the client code of a parameter opts in to
+ * using exceptions rather than handling parameter errors itself.  See
+ * {@link com.arsdigita.util.parameter.ErrorList#check()}.
  *
+ * @see com.arsdigita.util.parameter.ErrorList
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterException.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterException.java#4 $
  */
 public final class ParameterException extends RuntimeException {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterException.java#3 $" +
-        "$Author: jorris $" +
-        "$DateTime: 2003/10/28 18:36:21 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterException.java#4 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/11/06 12:54:46 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterException.class);
@@ -44,6 +48,8 @@ public final class ParameterException extends RuntimeException {
      *
      * @param message A <code>String</code> describing what's wrong;
      * it cannot be null
+     * @param errors The <code>ErrorList</code> containing the errors
+     * that prompted this exception; it cannot be null
      */
     public ParameterException(final String message, final ErrorList errors) {
         super(message);
@@ -56,6 +62,11 @@ public final class ParameterException extends RuntimeException {
         m_errors = errors;
     }
 
+    /**
+     * Gets the set of errors associated with the exception.
+     *
+     * @return The <code>ErrorList</code> of errors; it cannot be null
+     */
     public final ErrorList getErrors() {
         return m_errors;
     }
