@@ -17,35 +17,26 @@
  */
 package com.redhat.persistence.pdl;
 
-import com.redhat.persistence.metadata.Model;
-import com.redhat.persistence.metadata.ObjectType;
-import com.redhat.persistence.metadata.Root;
-import com.redhat.persistence.pdl.nodes.FileNd;
-import com.redhat.persistence.pdl.nodes.ImportNd;
-import com.redhat.persistence.pdl.nodes.Node;
-import com.redhat.persistence.pdl.nodes.ObjectTypeNd;
-import com.redhat.persistence.pdl.nodes.TypeNd;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+import com.redhat.persistence.metadata.*;
+import com.redhat.persistence.pdl.nodes.*;
+import java.util.*;
 
 /**
  * SymbolTable
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/09/07 $
+ * @version $Revision: #5 $ $Date: 2004/09/22 $
  **/
 
 class SymbolTable {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/SymbolTable.java#4 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/SymbolTable.java#5 $ by $Author: rhs $, $DateTime: 2004/09/22 15:20:55 $";
 
-    private HashMap m_types = new HashMap();
-    private ArrayList m_order = new ArrayList();
-    private HashMap m_resolutions = new HashMap();
-    private HashMap m_emitted = new HashMap();
+    private Map m_types = new HashMap();
+    private List m_order = new ArrayList();
+    private Map m_resolutions = new HashMap();
+    private Map m_references = new HashMap();
+    private Map m_emitted = new HashMap();
     private ErrorReport m_report;
     private Root m_root;
 
@@ -72,58 +63,111 @@ class SymbolTable {
     }
 
     public String resolve(TypeNd type) {
+        if (m_resolutions.containsKey(type)) {
+            return (String) m_resolutions.get(type);
+        }
+
         String result = null;
+        TypeReference ref = null;
 
         if (type.isQualified()) {
             String qname = type.getQualifiedName();
             if (isDefined(qname)) {
                 result = qname;
+                ref = TypeReference.get(m_root, qname);
             }
         } else {
-            FileNd file = type.getFile();
-            Collection imps = file.getImports();
-
-            ArrayList qnames = new ArrayList();
-
-
-            // First check imports
-            for (Iterator it = imps.iterator(); it.hasNext(); ) {
-                ImportNd imp = (ImportNd) it.next();
-                String qname = imp.qualify(type);
-                if (qname != null && isDefined(qname)) {
-                    qnames.add(qname);
+            // check parameters
+            ObjectTypeNd container = null;
+            for (Node parent = type.getParent(); parent != null;
+                 parent = parent.getParent()) {
+                if (parent instanceof ObjectTypeNd) {
+                    container = (ObjectTypeNd) parent;
+                    break;
                 }
             }
-
-            if (qnames.size() == 0) {
-                String[] special = new String[] {
-                    file.getModel().getName() + "." + type.getName(),
-                    "global." + type.getName()
-                };
-
-                for (int i = 0; i < special.length; i++) {
-                    if (isDefined(special[i])) {
-                        result = special[i];
+            if (container != null) {
+                List params = container.getParameters();
+                for (int i = 0; i < params.size(); i++) {
+                    IdentifierNd param = (IdentifierNd) params.get(i);
+                    if (param.getName().equals(type.getName())) {
+                        result = container.getQualifiedName() + ":" +
+                            param.getName();
+                        ref = TypeReference.get(param.getName());
                         break;
                     }
                 }
-            } else if (qnames.size() > 1) {
-                m_report.fatal(type, "ambiguous symbol, resolves to: " +
-                               qnames);
-                return null;
-            } else {
-                result = (String) qnames.get(0);
+            }
+
+            if (result == null) {
+                // check imports
+                FileNd file = type.getFile();
+                Collection imps = file.getImports();
+
+                ArrayList qnames = new ArrayList();
+
+                for (Iterator it = imps.iterator(); it.hasNext(); ) {
+                    ImportNd imp = (ImportNd) it.next();
+                    String qname = imp.qualify(type);
+                    if (qname != null && isDefined(qname)) {
+                        qnames.add(qname);
+                    }
+                }
+
+                if (qnames.size() == 0) {
+                    String[] special = new String[] {
+                        file.getModel().getName() + "." + type.getName(),
+                        "global." + type.getName()
+                    };
+
+                    for (int i = 0; i < special.length; i++) {
+                        if (isDefined(special[i])) {
+                            result = special[i];
+                            ref = TypeReference.get(m_root, special[i]);
+                            break;
+                        }
+                    }
+                } else if (qnames.size() > 1) {
+                    m_report.fatal(type, "ambiguous symbol, resolves to: " +
+                                   qnames);
+                    return null;
+                } else {
+                    result = (String) qnames.get(0);
+                    ref = TypeReference.get(m_root, result);
+                }
             }
         }
 
         if (result == null) {
             m_report.fatal(type, "unresolved symbol: " +
-                           type.getName());
-        } else {
-            m_resolutions.put(type, result);
+                           (type.isQualified() ?
+                            type.getQualifiedName() : type.getName()));
+            return null;
         }
 
+        List arguments = type.getArguments();
+        if (!arguments.isEmpty()) {
+            List args = new ArrayList();
+            for (int i = 0; i < arguments.size(); i++) {
+                TypeNd arg = (TypeNd) arguments.get(i);
+                resolve(arg);
+                TypeReference argref = (TypeReference) m_references.get(arg);
+                if (argref == null) {
+                    return null;
+                }
+                args.add(argref);
+            }
+            ref = TypeReference.get(ref, args);
+        }
+
+        m_resolutions.put(type, result);
+        m_references.put(type, ref);
+
         return result;
+    }
+
+    public TypeReference getTypeReference(TypeNd type) {
+        return (TypeReference) m_references.get(type);
     }
 
     private boolean isDefined(String qualifiedName) {
@@ -229,14 +273,19 @@ class SymbolTable {
     public void emit() {
         for (Iterator it = m_order.iterator(); it.hasNext(); ) {
             ObjectTypeNd ot = (ObjectTypeNd) it.next();
+            Model model = Model.getInstance(ot.getFile().getModel().getName());
+            String name = ot.getName().getName();
+            List parameters = new ArrayList();
+            List params = ot.getParameters();
+            for (int i = 0; i < params.size(); i++) {
+                IdentifierNd param = (IdentifierNd) params.get(i);
+                parameters.add(param.getName());
+            }
             ObjectType sup = null;
             if (ot.getExtends() != null) {
                 sup = getEmitted(ot.getExtends());
             }
-            ObjectType type =
-                new ObjectType
-                    (Model.getInstance(ot.getFile().getModel().getName()),
-                     ot.getName().getName(), sup);
+            ObjectType type = new ObjectType(model, name, parameters, sup);
             addEmitted(type);
             setLocation(type, ot);
         }

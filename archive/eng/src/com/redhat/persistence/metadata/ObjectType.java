@@ -28,15 +28,16 @@ import java.util.List;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/09/07 $
+ * @version $Revision: #5 $ $Date: 2004/09/22 $
  **/
 
 public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/ObjectType.java#4 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/ObjectType.java#5 $ by $Author: rhs $, $DateTime: 2004/09/22 15:20:55 $";
 
     private final Model m_model;
     private final String m_name;
+    private final List m_parameters;
     private final String m_qualifiedName;
     private Class m_class;
     private final ObjectType m_super;
@@ -48,8 +49,14 @@ public class ObjectType extends Element {
     private List m_allImmediates;
 
     public ObjectType(Model model, String name, ObjectType supertype) {
+        this(model, name, null, supertype);
+    }
+
+    public ObjectType(Model model, String name, List parameters,
+                      ObjectType supertype) {
         m_model = model;
         m_name = name;
+        m_parameters = parameters;
         m_super = supertype;
         if (m_model == null) {
             m_qualifiedName = m_name;
@@ -80,6 +87,10 @@ public class ObjectType extends Element {
 
     public String getName() {
         return m_name;
+    }
+
+    public List getParameters() {
+        return m_parameters;
     }
 
     public void setJavaClass(Class klass) {

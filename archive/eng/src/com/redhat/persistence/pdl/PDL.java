@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2004/09/16 $
+ * @version $Revision: #15 $ $Date: 2004/09/22 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#14 $ by $Author: rhs $, $DateTime: 2004/09/16 15:55:26 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#15 $ by $Author: rhs $, $DateTime: 2004/09/22 15:20:55 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -169,6 +169,8 @@ public class PDL {
 
         m_symbols.emit();
 
+        m_errors.check();
+
 	m_ast.traverse(new Node.Switch() {
             public void onAssociation(AssociationNd assn) {
                 if (assn.getProperties().size() == 0) {
@@ -212,10 +214,16 @@ public class PDL {
                     return null;
                 }
 
+                TypeReference tref =
+                    m_symbols.getTypeReference(prop.getType());
+                if (tref == null) {
+                    throw new IllegalStateException
+                        ("type doesn't have reference: " + prop.getType());
+                }
                 // Create the property
                 Role result =
                     new Role(prop.getName().getName(),
-                             m_symbols.getEmitted(prop.getType()),
+                             tref,
                              prop.isComponent() || prop.getNestedMap() != null,
                              prop.isCollection(),
                              prop.isNullable());
@@ -1720,37 +1728,8 @@ public class PDL {
     }
 
     private static void print(Root root, Writer w) {
-        try {
-            PDLWriter pw = new PDLWriter(w);
-            Set written = new HashSet();
-            for (Iterator it = root.getObjectTypes().iterator();
-                 it.hasNext(); ) {
-                com.redhat.persistence.metadata.ObjectType ot =
-                    (com.redhat.persistence.metadata.ObjectType) it.next();
-                pw.write(ot);
-                w.write("\n");
-                for (Iterator iter = ot.getProperties().iterator();
-                     iter.hasNext(); ) {
-                    Object o = (Object) iter.next();
-                    if (!(o instanceof Role) || written.contains(o)) {
-                        continue;
-                    }
-                    Role p = (Role) o;
-                    if (p.isReversable()) {
-                        w.write("\n");
-                        pw.writeAssociation(p);
-                        w.write("\n");
-                    }
-                    written.add(p);
-                    written.add(p.getReverse());
-                }
-                if (it.hasNext()) {
-                    w.write("\n");
-                }
-            }
-        } catch (IOException e) {
-            throw new Error(e);
-        }
+        PDLWriter pw = new PDLWriter(w);
+        pw.write(root);
     }
 
 }

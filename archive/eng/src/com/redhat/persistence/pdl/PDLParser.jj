@@ -30,12 +30,12 @@ import com.redhat.persistence.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2004/09/14 $
+ * @version $Revision: #9 $ $Date: 2004/09/22 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLParser.jj#8 $ by $Author: rhs $, $DateTime: 2004/09/14 17:42:52 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLParser.jj#9 $ by $Author: rhs $, $DateTime: 2004/09/22 15:20:55 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -94,6 +94,8 @@ TOKEN:
   | <LPAREN: "(">
   | <RPAREN: ")">
   | <COLON: ":">
+  | <LT: "<">
+  | <GT: ">">
 }
 
 TOKEN:
@@ -230,6 +232,7 @@ ObjectTypeNd object_type() :
     [ <NESTED> { ot.setNested(); } ]
     ( t = <QUERY> | t = <OBJECTTYPE> )
         n = id() { ot.add(ObjectTypeNd.NAME, n); }
+    [ <LT> parameter(ot) (<COMMA> parameter(ot))* <GT> ]
     [ <EXTENDS> n = type() { ot.add(ObjectTypeNd.EXTENDS, n); } ]
     [ <CLASS> n = javaClass() { ot.add(ObjectTypeNd.CLASS, n); }
       [ <ADAPTER> n = javaClass() { ot.add(ObjectTypeNd.ADAPTER, n); } ] ]
@@ -239,6 +242,14 @@ ObjectTypeNd object_type() :
         ( statement(ot) )*
     <RBRACE>
     { ln(ot, t); return ot; }
+}
+
+void parameter(ObjectTypeNd ot) :
+{
+    Node n;
+}
+{
+    n = id() { ot.add(ObjectTypeNd.PARAMETERS, n); }
 }
 
 AssociationNd association() :
@@ -676,7 +687,16 @@ TypeNd type() :
 }
 {
     idpath(t, TypeNd.IDENTIFIERS)
+        [ <LT> argument(t) (<COMMA> argument(t))* <GT> ]
     { return t; }
+}
+
+void argument(TypeNd n) :
+{
+    TypeNd arg;
+}
+{
+    arg = type() { n.add(TypeNd.ARGUMENTS, arg); }
 }
 
 PathNd path() :

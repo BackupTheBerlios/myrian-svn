@@ -17,19 +17,23 @@
  */
 package com.redhat.persistence.pdl.nodes;
 
+import java.util.*;
+
 /**
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/09/07 $
+ * @version $Revision: #5 $ $Date: 2004/09/22 $
  **/
 
 public class ObjectTypeNd extends Node {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/nodes/ObjectTypeNd.java#4 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/nodes/ObjectTypeNd.java#5 $ by $Author: rhs $, $DateTime: 2004/09/22 15:20:55 $";
 
     public static final Field NAME =
         new Field(ObjectTypeNd.class, "name", IdentifierNd.class, 1, 1);
+    public static final Field PARAMETERS =
+        new Field(ObjectTypeNd.class, "parameters", IdentifierNd.class);
     public static final Field EXTENDS =
         new Field(ObjectTypeNd.class, "extends", TypeNd.class, 0, 1);
     public static final Field CLASS =
@@ -70,6 +74,10 @@ public class ObjectTypeNd extends Node {
 
     public IdentifierNd getName() {
         return (IdentifierNd) get(NAME);
+    }
+
+    public List getParameters() {
+        return (List) get(PARAMETERS);
     }
 
     public void setVersioned() {

@@ -21,20 +21,20 @@ package com.redhat.persistence.metadata;
  * Role
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/09/07 $
+ * @version $Revision: #4 $ $Date: 2004/09/22 $
  **/
 
 public class Role extends Property {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Role.java#3 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Role.java#4 $ by $Author: rhs $, $DateTime: 2004/09/22 15:20:55 $";
 
-    private ObjectType m_type;
+    private TypeReference m_type;
     private Role m_reverse;
     private boolean m_isComponent;
     private boolean m_isCollection;
     private boolean m_isNullable;
 
-    public Role(String name, ObjectType type, boolean isComponent,
+    public Role(String name, TypeReference type, boolean isComponent,
                 boolean isCollection, boolean isNullable) {
         super(name);
         m_type = type;
@@ -43,7 +43,17 @@ public class Role extends Property {
         m_isNullable = isNullable;
     }
 
+    public Role(String name, final ObjectType type, boolean isComponent,
+                boolean isCollection, boolean isNullable) {
+        this(name, TypeReference.get(type), isComponent, isCollection,
+             isNullable);
+    }
+
     public ObjectType getType() {
+        return m_type.get();
+    }
+
+    public TypeReference getTypeReference() {
         return m_type;
     }
 

@@ -18,36 +18,21 @@
 package com.redhat.persistence.pdl;
 
 import com.arsdigita.util.UncheckedWrapperException;
-import com.redhat.persistence.common.Path;
-import com.redhat.persistence.metadata.Column;
-import com.redhat.persistence.metadata.JoinFrom;
-import com.redhat.persistence.metadata.JoinThrough;
-import com.redhat.persistence.metadata.JoinTo;
-import com.redhat.persistence.metadata.Mapping;
-import com.redhat.persistence.metadata.Nested;
-import com.redhat.persistence.metadata.ObjectMap;
-import com.redhat.persistence.metadata.ObjectType;
-import com.redhat.persistence.metadata.Property;
-import com.redhat.persistence.metadata.Role;
-import com.redhat.persistence.metadata.Root;
-import com.redhat.persistence.metadata.Static;
-import com.redhat.persistence.metadata.UniqueKey;
-import com.redhat.persistence.metadata.Value;
-import com.redhat.persistence.metadata.Qualias;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Iterator;
+import com.redhat.persistence.common.*;
+import com.redhat.persistence.metadata.*;
+import java.io.*;
+import java.util.*;
 
 /**
  * PDLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/09/07 $
+ * @version $Revision: #6 $ $Date: 2004/09/22 $
  **/
 
 public class PDLWriter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLWriter.java#5 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLWriter.java#6 $ by $Author: rhs $, $DateTime: 2004/09/22 15:20:55 $";
 
     private Writer m_out;
 
@@ -61,6 +46,33 @@ public class PDLWriter {
 	} catch (IOException e) {
 	    throw new UncheckedWrapperException(e);
 	}
+    }
+
+    public void write(Root root) {
+        Set written = new HashSet();
+        for (Iterator it = root.getObjectTypes().iterator(); it.hasNext(); ) {
+            ObjectType ot = (ObjectType) it.next();
+            write(ot);
+            write("\n");
+            for (Iterator iter = ot.getProperties().iterator();
+                 iter.hasNext(); ) {
+                Object o = (Object) iter.next();
+                if (!(o instanceof Role) || written.contains(o)) {
+                    continue;
+                }
+                Role p = (Role) o;
+                if (p.isReversable()) {
+                    write("\n");
+                    writeAssociation(p);
+                    write("\n");
+                }
+                written.add(p);
+                written.add(p.getReverse());
+            }
+            if (it.hasNext()) {
+                write("\n");
+            }
+        }
     }
 
     public void write(ObjectType type) {
