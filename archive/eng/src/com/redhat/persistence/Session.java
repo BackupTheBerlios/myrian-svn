@@ -47,12 +47,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2004/08/03 $
+ * @version $Revision: #10 $ $Date: 2004/08/04 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#9 $ by $Author: ashah $, $DateTime: 2004/08/03 17:51:39 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#10 $ by $Author: ashah $, $DateTime: 2004/08/04 13:50:11 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -369,6 +369,13 @@ public class Session {
         try {
             if (LOG.isDebugEnabled()) {
                 trace("set", new Object[] { obj, prop, value });
+            }
+
+            // FIXME will be unnecessary once in memory querying works
+            if (value == null
+                && isNew(obj)
+                && !getObjectData(obj).hasPropertyData(prop)) {
+                return;
             }
 
             final Expander e = new Expander(this);
