@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
  * SQLLoader
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/11/10 $
+ * @version $Revision: #4 $ $Date: 2004/02/04 $
  **/
 
 public abstract class SQLLoader {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/SQLLoader.java#3 $ by $Author: rhs $, $DateTime: 2003/11/10 12:56:19 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/SQLLoader.java#4 $ by $Author: ashah $, $DateTime: 2004/02/04 16:34:44 $";
 
     private static final Logger s_log = Logger.getLogger(SQLLoader.class);
 
@@ -128,9 +128,9 @@ public abstract class SQLLoader {
         }
 
         try {
-            int rowsAffected = stmt.executeUpdate(sql);
+            stmt.execute(sql);
             if (s_log.isDebugEnabled()) {
-                s_log.debug("  " + rowsAffected + " row(s) affected");
+                s_log.debug(stmt.getUpdateCount() + " row(s) affected");
             }
         } catch (SQLException e) {
             throw new UncheckedWrapperException(sql, e);
