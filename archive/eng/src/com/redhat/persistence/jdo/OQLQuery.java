@@ -49,7 +49,7 @@ public class OQLQuery implements javax.jdo.Query {
         return new CRPCollection() {
             Session ssn() { return m_pmi.getSession(); }
             ObjectType type() { return type; }
-            Expression expression() { return expr; }
+            public Expression expression() { return expr; }
             public boolean add(Object o) {
                 throw new UnsupportedOperationException();
             }

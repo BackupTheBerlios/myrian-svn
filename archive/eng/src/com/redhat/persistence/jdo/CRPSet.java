@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
  * CRPSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/07/13 $
+ * @version $Revision: #6 $ $Date: 2004/07/14 $
  **/
 
 class CRPSet extends CRPCollection implements Set {
@@ -39,7 +39,7 @@ class CRPSet extends CRPCollection implements Set {
         return m_property.getType();
     }
 
-    Expression expression() {
+    public Expression expression() {
         return new Get(new Literal(m_object), m_property.getName());
     }
 

@@ -14,12 +14,12 @@ import javax.jdo.JDOHelper;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/07/12 $
+ * @version $Revision: #7 $ $Date: 2004/07/14 $
  **/
 
 class CRPList extends CRPCollection implements List {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPList.java#6 $ by $Author: vadim $, $DateTime: 2004/07/12 12:09:36 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPList.java#7 $ by $Author: vadim $, $DateTime: 2004/07/14 15:53:40 $";
 
     private final static String INDEX = "index";
 
@@ -99,7 +99,7 @@ class CRPList extends CRPCollection implements List {
         return m_element.getType();
     }
 
-    Expression expression() {
+    public Expression expression() {
         return new Get(elements(), m_element.getName());
     }
 

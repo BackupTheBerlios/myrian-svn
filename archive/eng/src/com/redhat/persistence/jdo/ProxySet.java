@@ -1,5 +1,7 @@
 package com.redhat.persistence.jdo;
 
+import com.redhat.persistence.oql.Expression;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -9,14 +11,18 @@ import java.util.Set;
  *
  * @author  Vadim Nasardinov (vadimn@redhat.com)
  * @since   2004-07-14
- * @version $Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/ProxySet.java#1 $
+ * @version $Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/ProxySet.java#2 $
  **/
-class ProxySet implements Set {
-    private final Set m_set;
+class ProxySet implements Set, OQLCollection {
+    private final CRPSet m_set;
 
-    ProxySet(Set proxied) {
+    ProxySet(CRPSet proxied) {
         if (proxied == null) { throw new NullPointerException("proxied"); }
         m_set = proxied;
+    }
+
+    public Expression expression() {
+        return m_set.expression();
     }
 
     public int size() {
