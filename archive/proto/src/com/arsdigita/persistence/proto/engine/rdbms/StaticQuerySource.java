@@ -10,12 +10,12 @@ import java.util.*;
  * StaticQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/02/26 $
+ * @version $Revision: #3 $ $Date: 2003/03/18 $
  **/
 
 class StaticQuerySource extends QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/StaticQuerySource.java#2 $ by $Author: rhs $, $DateTime: 2003/02/26 20:44:08 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/StaticQuerySource.java#3 $ by $Author: ashah $, $DateTime: 2003/03/18 14:36:37 $";
 
     private synchronized Source getSource(ObjectType type, SQLBlock block,
                                           Path prefix) {
@@ -32,7 +32,7 @@ class StaticQuerySource extends QuerySource {
     }
 
     private Signature getSignature(ObjectType type, SQLBlock block,
-                                   Path prefix, boolean addParams) {
+                                   Path prefix, ObjectType from) {
         Signature sig = new Signature(getSource(type, block, prefix));
 
         for (Iterator it = block.getPaths().iterator(); it.hasNext(); ) {
@@ -44,8 +44,8 @@ class StaticQuerySource extends QuerySource {
             }
         }
 
-        if (addParams) {
-            for (Iterator it = type.getKeyProperties().iterator();
+        if (from != null) {
+            for (Iterator it = from.getKeyProperties().iterator();
                  it.hasNext(); ) {
                 Property key = (Property) it.next();
                 Parameter p = new Parameter
@@ -59,7 +59,7 @@ class StaticQuerySource extends QuerySource {
 
     public Query getQuery(ObjectType type) {
         ObjectMap om = Root.getRoot().getObjectMap(type);
-        Signature sig = getSignature(type, om.getRetrieveAll(), null, false);
+        Signature sig = getSignature(type, om.getRetrieveAll(), null, null);
         return new Query(sig, null);
     }
 
@@ -77,8 +77,7 @@ class StaticQuerySource extends QuerySource {
             return getQuery(om, props, keyProp);
         }
 
-        Signature sig = getSignature(type, om.getRetrieveAll(),
-                                     null, false);
+        Signature sig = getSignature(type, om.getRetrieveAll(), null, null);
         Parameter keyParam = new Parameter
             (keyProp.getType(), Path.get("__key__"));
         sig.addParameter(keyParam);
@@ -97,7 +96,7 @@ class StaticQuerySource extends QuerySource {
                 (Property) type.getKeyProperties().iterator().next();
             return getQuery(obj, key);
         }
-        Signature sig = getSignature(type, om.getRetrieveAll(), null, false);
+        Signature sig = getSignature(type, om.getRetrieveAll(), null, null);
         Parameter start = new Parameter(type, Path.get("__start__"));
         sig.addParameter(start);
         Query result = new Query
@@ -114,18 +113,21 @@ class StaticQuerySource extends QuerySource {
     private Query getQuery(ObjectMap om, PropertyMap props, Property prop) {
         Path path = Path.get(prop.getName());
         Signature sig;
+        SQLBlock block;
         if (prop.isCollection()) {
             ObjectType type = prop.getType();
             Mapping m = om.getMapping(path);
-            sig = getSignature(type, m.getRetrieve(), path, true);
+            block = m.getRetrieve();
+            sig = getSignature(type, block, path, props.getObjectType());
         } else {
             ObjectType type = om.getObjectType();
             sig = null;
             for (Iterator it = om.getRetrieves().iterator(); it.hasNext(); ) {
-                SQLBlock block = (SQLBlock) it.next();
+                block = (SQLBlock) it.next();
                 if (block.hasMapping(path) ||
                     om.getKeyProperties().contains(prop)) {
-                    sig = getSignature(type, block, null, true);
+                    sig = getSignature
+                        (type, block, null, props.getObjectType());
                     if (!sig.hasPath(path)) {
                         sig.addPath(path);
                     }
@@ -135,7 +137,9 @@ class StaticQuerySource extends QuerySource {
 
             if (sig == null) {
                 Mapping m = om.getMapping(path);
-                sig = getSignature(type, m.getRetrieve(), null, true);
+                block = m.getRetrieve();
+                sig = getSignature
+                    (prop.getType(), block, null, props.getObjectType());
             }
         }
 

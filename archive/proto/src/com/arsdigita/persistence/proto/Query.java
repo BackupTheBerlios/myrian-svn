@@ -8,12 +8,12 @@ import java.util.*;
  * Query
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/03/15 $
+ * @version $Revision: #10 $ $Date: 2003/03/18 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#9 $ by $Author: rhs $, $DateTime: 2003/03/15 02:35:11 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#10 $ by $Author: ashah $, $DateTime: 2003/03/18 14:36:37 $";
 
     private Signature m_signature;
     private Filter m_filter;
@@ -93,6 +93,12 @@ public class Query {
     }
 
     public void set(Parameter p, Object value) {
+        if (p == null) {
+            throw new IllegalArgumentException("null parameter can't be set");
+        }
+        if (!m_signature.isParameter(p.getPath())) {
+            throw new IllegalArgumentException("paramter not in signature");
+        }
         m_values.put(p, value);
     }
 

@@ -13,12 +13,12 @@ import java.io.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #16 $ $Date: 2003/03/15 $
+ * @version $Revision: #17 $ $Date: 2003/03/18 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#16 $ by $Author: rhs $, $DateTime: 2003/03/15 12:47:21 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#17 $ by $Author: ashah $, $DateTime: 2003/03/18 14:36:37 $";
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -329,7 +329,8 @@ class QGen {
                 }
 
                 public void onStatic(Static m) {
-                    // do nothing
+                    throw new IllegalStateException
+                        ("no mapping for: " + m.getPath());
                 }
             });
     }
