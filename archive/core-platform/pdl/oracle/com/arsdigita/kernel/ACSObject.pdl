@@ -96,25 +96,3 @@ object type ACSObject {
     remove container {}
 
 }
-
-query PackageInstanceForObject {
-    PackageInstance packageInstance;
-
-    do {
-        SELECT ap.package_id, ap.pretty_name,
-               o.object_type, o.display_name, o.default_domain_class
-        FROM apm_packages ap, acs_objects o
-        WHERE ap.package_id = o.object_id
-        AND (ap.package_id = :objectID OR 
-             ap.package_id in (select container_id 
-                               from object_container_map
-                               start with object_id = :objectID
-                               connect by prior container_id = object_id))
-    } map {
-        packageInstance.id = ap.package_id;
-        packageInstance.prettyName = ap.pretty_name;
-        packageInstance.objectType = o.object_type;
-        packageInstance.displayName = o.display_name;
-        packageInstance.defaultDomainClass = o.default_domain_class;
-    }
-}
