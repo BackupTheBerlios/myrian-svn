@@ -4,7 +4,8 @@ import com.redhat.persistence.*;
 import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.oql.Expression;
 import com.redhat.persistence.profiler.rdbms.StatementProfiler;
-import org.apache.commons.collections.map.IdentityMap;
+import org.apache.commons.collections.map.AbstractReferenceMap;
+import org.apache.commons.collections.map.ReferenceIdentityMap;
 import java.sql.Connection;
 import java.util.*;
 import javax.jdo.*;
@@ -32,7 +33,8 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
     private final StatementProfiler m_prof;
     private final ClassInfo m_classInfo;
 
-    private Map m_smiMap = new IdentityMap();
+    private Map m_smiMap = new ReferenceIdentityMap
+        (AbstractReferenceMap.WEAK, AbstractReferenceMap.WEAK);
 
     public PersistenceManagerImpl(Session ssn,
                                   StatementProfiler prof,
