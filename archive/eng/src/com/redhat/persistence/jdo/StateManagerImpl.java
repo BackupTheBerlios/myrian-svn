@@ -17,12 +17,21 @@ class StateManagerImpl extends AbstractStateManager {
 
     private PersistenceManagerImpl m_pmi;
     private PropertyMap m_pmap;
+    private String m_prefix;
+    private Map m_components = new HashMap();
 
-    StateManagerImpl(PersistenceManagerImpl pmi, PropertyMap pmap) {
+    StateManagerImpl(PersistenceManagerImpl pmi, PropertyMap pmap,
+                     String prefix) {
         if (pmi == null) { throw new NullPointerException("pmi"); }
         if (pmap == null) { throw new NullPointerException("pmap"); }
+        if (prefix == null) { throw new NullPointerException("prefix"); }
         m_pmi = pmi;
         m_pmap = pmap;
+        m_prefix = prefix;
+    }
+
+    StateManagerImpl(PersistenceManagerImpl pmi, PropertyMap pmap) {
+        this(pmi, pmap, "");
     }
 
     private final Session ssn() {
@@ -31,6 +40,10 @@ class StateManagerImpl extends AbstractStateManager {
 
     PropertyMap getPropertyMap() {
         return m_pmap;
+    }
+
+    String getPrefix() {
+        return m_prefix;
     }
 
     /**
@@ -53,14 +66,19 @@ class StateManagerImpl extends AbstractStateManager {
 
     private ObjectType type(PersistenceCapable pc) {
         if (pc == null) { throw new NullPointerException("pc"); }
+        return m_pmap.getObjectType();
 
-        return ssn().getRoot().getObjectType(pc.getClass().getName());
+        //        return ssn().getRoot().getObjectType(pc.getClass().getName());
+    }
+
+    private String name(PersistenceCapable pc, int field) {
+        return m_prefix + C.numberToName(pc.getClass(), field);
     }
 
     private Property prop(PersistenceCapable pc, int field) {
         ObjectType type = type(pc);
 
-        String name = C.numberToName(pc.getClass(), field);
+        String name = name(pc, field);
 
         Property prop = type.getProperty(name);
 
@@ -71,22 +89,40 @@ class StateManagerImpl extends AbstractStateManager {
         return prop;
     }
 
+    private boolean isComponent(PersistenceCapable pc, int field) {
+        return C.isComponent(type(pc), name(pc, field));
+    }
+
     /**
      * Return the value for the field.
      */
     public Object getObjectField(PersistenceCapable pc, int field,
                                  Object currentValue) {
-        Property prop = prop(pc, field);
-        Class type = (Class) C.getAllTypes(pc.getClass()).get(field);
-
-        if (prop.isKeyProperty()) {
-            return getPropertyMap().get(prop);
-        } else if (type.equals(Collection.class)) {
-            return new CRPSet(ssn(), pc, prop);
-        } else if (type.equals(List.class)) {
-            return new CRPList(ssn(), pc, prop);
+        if (isComponent(pc, field)) {
+            String name = name(pc, field);
+            if (m_components.containsKey(name)) {
+                return m_components.get(name);
+            } else {
+                // XXX: should we do something else if currentValue is
+                // not null?
+                Class klass = (Class) C.getAllTypes(pc.getClass()).get(field);
+                if (klass.equals(List.class)) {
+                    klass = CRPList.class;
+                }
+                Object obj = m_pmi.newPC(m_pmap, klass, name + "$");
+                m_components.put(name, obj);
+                return obj;
+            }
         } else {
-            return ssn().get(pc, prop);
+            Property prop = prop(pc, field);
+
+            if (prop.isKeyProperty()) {
+                return getPropertyMap().get(prop);
+            } else if (prop.isCollection()) {
+                return new CRPSet(ssn(), pc, prop);
+            } else {
+                return ssn().get(pc, prop);
+            }
         }
     }
 

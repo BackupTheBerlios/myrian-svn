@@ -33,12 +33,12 @@ import org.apache.log4j.Logger;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/07/08 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Signature.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Signature.java#2 $ by $Author: rhs $, $DateTime: 2004/07/08 11:51:12 $";
 
     private static final Logger s_log = Logger.getLogger(Signature.class);
 
@@ -272,6 +272,7 @@ public class Signature {
         Root root = type.getRoot();
         if (root == null) { return; }
         ObjectMap om = root.getObjectMap(type);
+        if (om == null) { return; }
         makePathLoadable(path, om.getFetchedPaths());
     }
 

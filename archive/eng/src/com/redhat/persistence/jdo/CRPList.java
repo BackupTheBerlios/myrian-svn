@@ -8,30 +8,34 @@ import com.redhat.persistence.oql.Static;
 import com.redhat.persistence.oql.Expression;
 
 import java.util.*;
+import javax.jdo.JDOHelper;
 
 /**
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/06/29 $
+ * @version $Revision: #3 $ $Date: 2004/07/08 $
  **/
 
 class CRPList extends CRPCollection implements List {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPList.java#2 $ by $Author: vadim $, $DateTime: 2004/06/29 15:21:16 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPList.java#3 $ by $Author: rhs $, $DateTime: 2004/07/08 11:51:12 $";
 
-    private Object m_object;
-    private Property m_property;
-    private Property m_container;
-    private Property m_index;
-    private Property m_element;
+    transient private Session m_ssn;
+    transient private Object m_object;
+    transient private Property m_property;
+    transient private Property m_container;
+    transient private Property m_index;
+    transient private Property m_element;
 
     CRPList(Session ssn, Object object, Property property) {
-        super(ssn);
+        m_ssn = ssn;
         m_object = object;
         m_property = property;
+    }
 
-        ObjectType type = property.getType();
+    private void init() {
+        ObjectType type = m_property.getType();
         List keys = type.getKeyProperties();
         if (keys.size() != 2) {
             throw new IllegalStateException
@@ -71,6 +75,28 @@ class CRPList extends CRPCollection implements List {
         }
     }
 
+    CRPList() {}
+
+    Session ssn() {
+        if (m_ssn == null) {
+            PersistenceManagerImpl pmi = ((PersistenceManagerImpl) JDOHelper
+                                          .getPersistenceManager(this));
+            m_ssn = pmi.getSession();
+            StateManagerImpl smi = pmi.getStateManager(this);
+            PropertyMap pmap = smi.getPropertyMap();
+            m_object = m_ssn.retrieve(pmap);
+            ObjectType type = pmap.getObjectType();
+            String name = smi.getPrefix() + "elements";
+            m_property = type.getProperty(name);
+            if (m_property == null) {
+                throw new IllegalStateException("no " + name + " in " + type);
+            }
+            init();
+        }
+
+        return m_ssn;
+    }
+
     ObjectType type() {
         return m_element.getType();
     }
@@ -84,22 +110,22 @@ class CRPList extends CRPCollection implements List {
     }
 
     private void lock() {
-        C.lock(m_ssn, m_object);
+        C.lock(ssn(), m_object);
     }
 
     public void clear() {
-        m_ssn.clear(m_object, m_property);
+        ssn().clear(m_object, m_property);
     }
 
     private ListElement create(int index, Object object) {
         PropertyMap pmap = new PropertyMap(m_property.getType());
         pmap.put(m_index, new Integer(index));
         pmap.put(m_container, m_object);
-        Adapter ad = m_ssn.getRoot().getAdapter(ListElement.class);
+        Adapter ad = ssn().getRoot().getAdapter(ListElement.class);
         ListElement element = (ListElement) ad.getObject
-            (pmap.getObjectType().getBasetype(), pmap, m_ssn);
-        m_ssn.create(element);
-        m_ssn.set(element, m_element, object);
+            (pmap.getObjectType().getBasetype(), pmap, ssn());
+        ssn().create(element);
+        ssn().set(element, m_element, object);
         return element;
     }
 
@@ -134,7 +160,7 @@ class CRPList extends CRPCollection implements List {
         expr = new Sort(expr, new Variable(m_index.getName()),
                         first ? Sort.ASCENDING : Sort.DESCENDING);
         expr = new Limit(expr, new Literal(new Integer(1)));
-        Cursor c = C.cursor(m_ssn, m_property.getType(), expr);
+        Cursor c = C.cursor(ssn(), m_property.getType(), expr);
         try {
             if (c.next()) {
                 ListElement el = (ListElement) c.get();
@@ -174,7 +200,7 @@ class CRPList extends CRPCollection implements List {
         for (int size = size(); index < size - 1; index++) {
             set(index, get(index + 1));
         }
-        m_ssn.delete(getElement(index));
+        ssn().delete(getElement(index));
         return result;
     }
 
@@ -210,11 +236,11 @@ class CRPList extends CRPCollection implements List {
             }
             return null;
         } else {
-            Object result = m_ssn.get(el, m_element);
+            Object result = ssn().get(el, m_element);
             if (obj == null && el.getIndex().intValue() < size - 1) {
-                m_ssn.delete(el);
+                ssn().delete(el);
             } else {
-                m_ssn.set(el, m_element, obj);
+                ssn().set(el, m_element, obj);
             }
             return result;
         }
@@ -224,7 +250,7 @@ class CRPList extends CRPCollection implements List {
         Expression expr = elements();
         expr = new Filter(expr, new Equals(new Variable(m_index.getName()),
                                            new Literal(new Integer(index))));
-        Cursor c = C.cursor(m_ssn, m_property.getType(), expr);
+        Cursor c = C.cursor(ssn(), m_property.getType(), expr);
         try {
             if (c.next()) {
                 return (ListElement) c.get();
@@ -241,7 +267,7 @@ class CRPList extends CRPCollection implements List {
         if (el == null) {
             return null;
         } else {
-            return m_ssn.get(el, m_element);
+            return ssn().get(el, m_element);
         }
     }
 
@@ -257,7 +283,11 @@ class CRPList extends CRPCollection implements List {
     private static final String MAX = "max";
 
     public int size() {
-        ObjectType integer = m_ssn.getRoot().getObjectType("global.Integer");
+        // XXX: fix this
+        ObjectType integer = ssn().getRoot().getObjectType("global.Integer");
+        if (integer == null) {
+            integer = ssn().getRoot().getObjectType("Integer");
+        }
         Signature sig = new Signature() {
             public Query makeQuery(Expression e) {
                 Query q = new Query(e);
@@ -274,7 +304,7 @@ class CRPList extends CRPCollection implements List {
         };
         sig.addSource(integer, Path.get(MAX));
         sig.addPath(MAX);
-        DataSet ds = new DataSet(m_ssn, sig, elements());
+        DataSet ds = new DataSet(ssn(), sig, elements());
         Cursor c = ds.getCursor();
         try {
             if (c.next()) {
@@ -346,6 +376,11 @@ class CRPList extends CRPCollection implements List {
                     }
                 }
 
+                // XXX
+                if (CRPList.this.m_index == null) {
+                    ssn();
+                }
+
                 String idx = CRPList.this.m_index.getName();
                 Expression expr = new Sort
                     (new Filter
@@ -355,7 +390,7 @@ class CRPList extends CRPCollection implements List {
                        ("index", new Integer(m_index)))),
                      new Variable(idx),
                      direction == FORWARD ? Sort.ASCENDING : Sort.DESCENDING);
-                m_cursor = C.cursor(m_ssn, m_property.getType(), expr);
+                m_cursor = C.cursor(ssn(), m_property.getType(), expr);
                 m_direction = direction;
             }
 
@@ -395,7 +430,7 @@ class CRPList extends CRPCollection implements List {
             if (m_current == null) {
                 return null;
             } else {
-                return m_ssn.get(m_current, m_element);
+                return ssn().get(m_current, m_element);
             }
         }
 

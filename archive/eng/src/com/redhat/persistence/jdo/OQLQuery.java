@@ -2,6 +2,7 @@ package com.redhat.persistence.jdo;
 
 import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.oql.*;
+import com.redhat.persistence.Session;
 import java.util.*;
 import javax.jdo.*;
 
@@ -24,7 +25,8 @@ public class OQLQuery implements javax.jdo.Query {
         // XXX: need to use parameters
         final Expression expr = Expression.valueOf(m_query, parameters);
         final ObjectType type = expr.getType(m_pmi.getSession().getRoot());
-        return new CRPCollection(m_pmi.getSession()) {
+        return new CRPCollection() {
+            Session ssn() { return m_pmi.getSession(); }
             ObjectType type() { return type; }
             Expression expression() { return expr; }
             public boolean add(Object o) {

@@ -63,6 +63,10 @@ class C {
         return (String) getAllFields(pcClass).get(field);
     }
 
+    public static Class numberToType(Class pcClass, int field) {
+        return (Class) getAllTypes(pcClass).get(field);
+    }
+
     /**
      * Returns the first occurrence of the specified field in the most derived
      * class.
@@ -71,6 +75,18 @@ class C {
         return getAllFields(pcClass).lastIndexOf(fieldName);
     }
 
+    public static boolean isComponent(ObjectType type, String name) {
+        if (type.hasProperty(name)) {
+            return false;
+        }
+        for (Iterator it = type.getProperties().iterator(); it.hasNext(); ) {
+            Property p = (Property) it.next();
+            if (p.getName().startsWith(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public static Cursor cursor(Session ssn, ObjectType type, Expression expr) {
         DataSet ds = new DataSet(ssn, new Signature(type), expr);
@@ -104,7 +120,7 @@ class C {
         Adapter ad = root.getAdapter(obj.getClass());
         ObjectType type = ad.getObjectType(obj);
         Expression expr = new Filter
-            (new Define(new All(type.getQualifiedName()),"this"),
+            (new Define(new All(type.getQualifiedName()), "this"),
              new Equals(new Variable("this"), new Literal(obj)));
         lock(ssn, expr);
     }

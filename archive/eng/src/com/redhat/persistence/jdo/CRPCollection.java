@@ -11,25 +11,23 @@ import java.util.*;
  * CRPCollection
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/22 $
+ * @version $Revision: #2 $ $Date: 2004/07/08 $
  **/
 
 abstract class CRPCollection implements Collection {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPCollection.java#1 $ by $Author: vadim $, $DateTime: 2004/06/22 13:25:03 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/CRPCollection.java#2 $ by $Author: rhs $, $DateTime: 2004/07/08 11:51:12 $";
 
-    final Session m_ssn;
+    CRPCollection() {}
 
-    CRPCollection(Session ssn) {
-        m_ssn = ssn;
-    }
+    abstract Session ssn();
 
     abstract ObjectType type();
 
     abstract Expression expression();
 
     private DataSet data() {
-        return new DataSet(m_ssn, new Signature(type()), expression());
+        return new DataSet(ssn(), new Signature(type()), expression());
     }
 
     public abstract void clear();
@@ -52,7 +50,7 @@ abstract class CRPCollection implements Collection {
 
     public boolean contains(Object o) {
         DataSet ds = new DataSet
-            (m_ssn, new Signature(), new Filter
+            (ssn(), new Signature(), new Filter
              (new Define(expression(), "this"),
               new Equals(new Variable("this"), new Literal(o))));
         return !ds.isEmpty();

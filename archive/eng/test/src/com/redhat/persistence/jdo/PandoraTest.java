@@ -31,12 +31,7 @@ import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 
@@ -44,7 +39,7 @@ import org.apache.log4j.Logger;
  * PandoraTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/07/06 $
+ * @version $Revision: #4 $ $Date: 2004/07/08 $
  **/
 
 public class PandoraTest extends WithTxnCase {
@@ -110,37 +105,32 @@ public class PandoraTest extends WithTxnCase {
 
     private void testObject(Object pc, Object[] values) {
         final Class klass = pc.getClass();
-        ObjectType type = m_ssn.getRoot().getObjectType(klass.getName());
-        PropertyMap props = new PropertyMap(type);
+        Map props = new LinkedHashMap();
         for (int i = 0; i < values.length; i+=2) {
             String name = (String) values[i];
             Object value = values[i+1];
-            Property p = type.getProperty(name);
-            if (p == null) {
-                throw new IllegalArgumentException
-                    ("no such property: " + name);
-            }
-            props.put(p, value);
+            props.put(name, value);
         }
 
-        for (Iterator it = type.getProperties().iterator(); it.hasNext(); ) {
-            Property p = (Property) it.next();
-            if (!p.isKeyProperty() && props.contains(p)) {
-                String name = setter(p.getName());
-                Object[] args =  new Object[] { props.get(p) };
-                Method setter = Reflection.dispatch(klass, name, args);
-                if (setter == null) {
-                    throw new IllegalArgumentException
-                        ("no such method: " + p.getName() + " " +
-                         Arrays.asList(args));
-                }
-                try {
-                    setter.invoke(pc, args);
-                } catch (IllegalAccessException e) {
-                    throw new Error(e);
-                } catch (InvocationTargetException e) {
-                    throw new Error(e);
-                }
+        ObjectType type = m_ssn.getRoot().getObjectType(klass.getName());
+
+        for (Iterator it = props.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry me = (Map.Entry) it.next();
+            String key = (String) me.getKey();
+            String name = setter(key);
+            Object[] args =  new Object[] { me.getValue() };
+            Method setter = Reflection.dispatch(klass, name, args);
+            if (setter == null) {
+                if (type.isKeyProperty(key)) { continue; }
+                throw new IllegalArgumentException
+                    ("no such method: " + name + " " + Arrays.asList(args));
+            }
+            try {
+                setter.invoke(pc, args);
+            } catch (IllegalAccessException e) {
+                throw new Error(e);
+            } catch (InvocationTargetException e) {
+                throw new Error(e);
             }
         }
 
@@ -153,22 +143,22 @@ public class PandoraTest extends WithTxnCase {
             Property p = (Property) keys.get(i);
             expr = new Filter
                 (expr, new Equals(new Variable(p.getName()),
-                                  new Literal(props.get(p))));
+                                  new Literal(props.get(p.getName()))));
         }
         Cursor c = C.cursor(m_ssn, klass, expr);
 
         if (c.next()) {
             Object obj = c.get();
-            for (Iterator it = type.getProperties().iterator();
-                 it.hasNext(); ) {
-                Property p = (Property) it.next();
-                if (!props.contains(p)) { continue; }
-                Method getter = Reflection.dispatch
-                    (klass, getter(p.getName()), new Object[0]);
+            for (Iterator it = props.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry me = (Map.Entry) it.next();
+                String key = (String) me.getKey();
+                String name = getter(key);
+                Method getter =
+                    Reflection.dispatch(klass, name, new Object[0]);
                 if (getter == null) { continue; }
                 try {
                     Object result = getter.invoke(obj, null);
-                    _assertEquals("wrong " + p.getName(), result, props.get(p));
+                    _assertEquals("wrong " + name, result, props.get(key));
                 } catch (IllegalAccessException e) {
                     throw new Error(e);
                 } catch (InvocationTargetException e) {

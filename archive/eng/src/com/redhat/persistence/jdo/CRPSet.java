@@ -13,20 +13,25 @@ import org.apache.log4j.Logger;
  * CRPSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/06/29 $
+ * @version $Revision: #4 $ $Date: 2004/07/08 $
  **/
 
 class CRPSet extends CRPCollection implements Set {
 
     private final static Logger s_log = Logger.getLogger(CRPSet.class);
 
+    private Session m_ssn;
     private Object m_object;
     private Property m_property;
 
     CRPSet(Session ssn, Object object, Property property) {
-        super(ssn);
+        m_ssn = ssn;
         m_object = object;
         m_property = property;
+    }
+
+    Session ssn() {
+        return m_ssn;
     }
 
     ObjectType type() {

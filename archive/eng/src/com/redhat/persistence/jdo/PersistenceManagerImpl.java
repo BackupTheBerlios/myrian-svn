@@ -41,14 +41,16 @@ public class PersistenceManagerImpl implements PersistenceManager {
         return null;
     }
 
-    StateManagerImpl getStateManager(PersistenceCapable pc) {
+    StateManagerImpl getStateManager(Object pc) {
         return (StateManagerImpl) m_smiMap.get(pc);
     }
 
     PersistenceCapable newPC(PropertyMap pmap) {
-        ObjectType type = pmap.getObjectType();
-        Class klass = type.getJavaClass();
-        StateManagerImpl smi = new StateManagerImpl(this, pmap);
+        return newPC(pmap, pmap.getObjectType().getJavaClass(), "");
+    }
+
+    PersistenceCapable newPC(PropertyMap pmap, Class klass, String prefix) {
+        StateManagerImpl smi = new StateManagerImpl(this, pmap, prefix);
         PersistenceCapable pc = JDOImplHelper.getInstance().newInstance
             (klass, smi);
         m_smiMap.put(pc, smi);
@@ -56,7 +58,12 @@ public class PersistenceManagerImpl implements PersistenceManager {
     }
 
     private StateManagerImpl newSM(PersistenceCapable pc, PropertyMap pmap) {
-        StateManagerImpl smi = new StateManagerImpl(this, pmap);
+        return newSM(pc, pmap, "");
+    }
+
+    private StateManagerImpl newSM(PersistenceCapable pc, PropertyMap pmap,
+                                   String prefix) {
+        StateManagerImpl smi = new StateManagerImpl(this, pmap, prefix);
         // set pmap here for objects requiring id gen
         m_smiMap.put(pc, smi);
         pc.jdoReplaceStateManager(smi);
@@ -94,7 +101,13 @@ public class PersistenceManagerImpl implements PersistenceManager {
                 List props = C.getAllFields(cls);
                 for (int i = 0; i < props.size(); i++) {
                     String propName = (String) props.get(i);
+                    // XXX: right now we ignore the possibility of a
+                    // component being a key
+                    if (C.isComponent(type, propName)) { continue; }
                     Property prop = type.getProperty(propName);
+                    if (prop == null) {
+                        throw new Error("no " + propName + " in " + type);
+                    }
                     if (prop.isKeyProperty()) {
                         pmap.put(prop, smTemp.provideField(pc, i));
                     }
@@ -310,14 +323,7 @@ public class PersistenceManagerImpl implements PersistenceManager {
             Map values = new HashMap();
             Map keys = new HashMap();
 
-            List props = C.getAllFields(cls);
-            for (int i = 0; i < props.size(); i++) {
-                String propName = (String) props.get(i);
-                Property prop = type.getProperty(propName);
-                if (!prop.isKeyProperty()) {
-                    values.put(prop, smi.provideField(pc, i));
-                }
-            }
+            fill(values, smi, cls, pc);
 
             m_ssn.create(pc);
 
@@ -327,7 +333,7 @@ public class PersistenceManagerImpl implements PersistenceManager {
                 Object value = me.getValue();
 
                 if (value != null) {
-                    if (prop.isCollection()) {
+                    if (value instanceof Collection) {
                         Collection c = (Collection) value;
                         for (Iterator vals = c.iterator(); vals.hasNext(); ) {
                             Object val = vals.next();
@@ -342,6 +348,33 @@ public class PersistenceManagerImpl implements PersistenceManager {
                         }
                         m_ssn.set(obj, prop, value);
                     }
+                }
+            }
+        }
+    }
+
+    private void fill(Map values, StateManagerImpl smi, Class cls,
+                      PersistenceCapable pc) {
+        PropertyMap pmap = smi.getPropertyMap();
+        ObjectType type = pmap.getObjectType();
+        List props = C.getAllFields(cls);
+        List types = C.getAllTypes(cls);
+        for (int i = 0; i < props.size(); i++) {
+            String propName = smi.getPrefix() + ((String) props.get(i));
+            Object obj = smi.provideField(pc, i);
+            if (C.isComponent(type, propName)) {
+                PersistenceCapable comp = (PersistenceCapable) obj;
+                if (comp == null) { continue; }
+                StateManagerImpl csmi = newSM(comp, pmap, propName + "$");
+                Class klass = (Class) types.get(i);
+                if (klass.equals(List.class)) {
+                    klass = CRPList.class;
+                }
+                fill(values, csmi, klass, comp);
+            } else {
+                Property prop = type.getProperty(propName);
+                if (!prop.isKeyProperty()) {
+                    values.put(prop, obj);
                 }
             }
         }

@@ -96,6 +96,11 @@ abstract class AbstractStateManager implements StateManager {
         try {
             m_tmpValue = null;
             pc.jdoProvideField(field);
+            Class klass = C.numberToType(pc.getClass(), field);
+            if (klass.equals(java.util.List.class)) {
+                // XXX: ignoring initial elements
+                m_tmpValue = new CRPList();
+            }
             return m_tmpValue;
         } finally {
             m_tmpValue = null;

@@ -57,9 +57,9 @@ object type Party class com.redhat.persistence.jdo.Party
 }
 
 association {
-    composite Party[1..1] party =
+    Party[1..1] party =
         join auxiliary_emails.party_id to parties.party_id;
-    AuxiliaryEmail[0..n] auxiliaryEmails =
+    component AuxiliaryEmail[0..n] auxiliaryEmails$elements =
         join parties.party_id to auxiliary_emails.party_id;
 }
 
