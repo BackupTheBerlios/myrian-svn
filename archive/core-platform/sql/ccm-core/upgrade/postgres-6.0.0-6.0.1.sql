@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2004 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,6 +11,13 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
+-- $Id: //core-platform/dev/sql/ccm-core/upgrade/postgres-6.0.0-6.0.1.sql#1 $
+-- $DateTime: 2004/03/11 12:01:18 $
 
-@@ ../oracle-se/upgrade/6.0.0-6.0.1/function-convert_to_html.sql
-@@ ../default/kernel/package-parties_denormalization.sql
+\echo Red Hat WAF 6.0.0 -> 6.0.1 Upgrade Script (PostgreSQL)
+
+begin;
+
+\i ../postgres/kernel/package-parties_denormalization.sql
+
+commit;
