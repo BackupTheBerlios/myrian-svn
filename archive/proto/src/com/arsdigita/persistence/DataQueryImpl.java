@@ -6,6 +6,7 @@ import com.arsdigita.persistence.proto.engine.rdbms.UnboundParameterException;
 import com.arsdigita.persistence.proto.PersistentCollection;
 import com.arsdigita.persistence.proto.DataSet;
 import com.arsdigita.persistence.proto.Cursor;
+import com.arsdigita.persistence.proto.CursorException;
 import com.arsdigita.persistence.proto.Query;
 import com.arsdigita.persistence.proto.Signature;
 import com.arsdigita.persistence.proto.Parameter;
@@ -19,12 +20,12 @@ import java.util.*;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #16 $ $Date: 2003/04/04 $
+ * @version $Revision: #17 $ $Date: 2003/04/04 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#16 $ by $Author: rhs $, $DateTime: 2003/04/04 09:30:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#17 $ by $Author: rhs $, $DateTime: 2003/04/04 15:25:34 $";
 
     private static final FilterFactory FACTORY = new FilterFactoryImpl();
 
@@ -60,7 +61,13 @@ class DataQueryImpl implements DataQuery {
     }
 
     public void reset() {
-        throw new Error("not implemented");
+	close();
+	m_cursor = null;
+        m_bindings.clear();
+	m_query = new Query(m_pc.getDataSet().getQuery(), null);
+	m_filter = getFilterFactory().and();
+	m_lowerBound = 0;
+	m_upperBound = Integer.MAX_VALUE;
     }
 
 
@@ -235,7 +242,7 @@ class DataQueryImpl implements DataQuery {
 
 	if (orderOne == null) {
 	    p1 = Path.get("__order" + m_order++);
-	    setParameter(p1.getPath(), null);
+	    m_bindings.put(p1.getPath(), null);
 	} else {
 	    p1 = Path.get(orderOne);
 	}
@@ -244,7 +251,7 @@ class DataQueryImpl implements DataQuery {
 	    p2 = Path.get((String) orderTwo);
 	    if (!m_query.getSignature().exists(p2)) {
 		p2 = Path.get("__order" + m_order++);
-		setParameter(p2.getPath(), orderTwo);
+		m_bindings.put(p2.getPath(), orderTwo);
 		if (orderOne != null) {
 		    if (m_query.getSignature().getType(p1) !=
 			m_pssn.getObjectType(orderTwo)) {
@@ -255,7 +262,7 @@ class DataQueryImpl implements DataQuery {
 	    }
 	} else {
 	    p2 = Path.get("__order" + m_order++);
-	    setParameter(p2.getPath(), orderTwo);
+	    m_bindings.put(p2.getPath(), orderTwo);
 	}
 
 	addOrder(p1.getPath() + (isAscending ? " asc" : " desc"),
@@ -370,7 +377,11 @@ class DataQueryImpl implements DataQuery {
 
 
     public Object get(String propertyName) {
-        return m_cursor.get(propertyName);
+	try {
+	    return m_cursor.get(propertyName);
+	} catch (CursorException e) {
+	    throw new PersistenceException(e);
+	}
     }
 
 
@@ -418,8 +429,19 @@ class DataQueryImpl implements DataQuery {
 
     public boolean next() {
         checkCursor();
+	if (m_cursor.isClosed()) {
+	    return false;
+	}
+
         int pre = getPosition();
-        boolean result = m_cursor.next();
+
+	boolean result;
+	try {
+	    result = m_cursor.next();
+	} catch (UnboundParameterException e) {
+	    throw new PersistenceException(e);
+	}
+
         if (result) {
             if (getPosition() == m_upperBound) {
                 if (m_cursor.next()) {

@@ -10,12 +10,12 @@ import java.util.*;
  * Cursor
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #17 $ $Date: 2003/03/27 $
+ * @version $Revision: #18 $ $Date: 2003/04/04 $
  **/
 
 public class Cursor {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Cursor.java#17 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Cursor.java#18 $ by $Author: rhs $, $DateTime: 2003/04/04 15:25:34 $";
 
     final private Session m_ssn;
     final private Query m_query;
@@ -24,6 +24,7 @@ public class Cursor {
     private RecordSet m_rs = null;
     private Map m_values = null;
     private long m_position = 0;
+    private boolean m_closed = false;
 
     protected Cursor(Session ssn, Query query) {
         m_ssn = ssn;
@@ -33,6 +34,10 @@ public class Cursor {
 
     public Session getSession() {
         return m_ssn;
+    }
+
+    public boolean isClosed() {
+	return m_closed;
     }
 
     private boolean check(Path path) {
@@ -56,28 +61,46 @@ public class Cursor {
     }
 
     public Object get(Path path) {
+	if (m_closed) {
+	    throw new ClosedException(this);
+	}
+
         if (!check(path)) {
-            throw new IllegalArgumentException
-                ("Path is not in Cursor signature: " + path);
+            throw new NotFetchedException(this, path);
         }
 
         if (m_position <= 0) {
-            throw new IllegalStateException
-                ("Cursor not currently on row.");
+	    throw new NoRowException(this);
         }
 
         return getInternal(path);
     }
 
     public Object get(String path) {
+	if (m_closed) {
+	    throw new ClosedException(this);
+	}
+
         return get(Path.get(path));
     }
 
     public Object get() {
+	if (m_closed) {
+	    throw new ClosedException(this);
+	}
+
         return m_values.get(null);
     }
 
     public boolean next() {
+	if (m_closed) {
+	    throw new ClosedException(this);
+	}
+
+	if (m_position == -1) {
+	    return false;
+	}
+
         if (m_rs == null) {
             m_ssn.flush();
             m_rs = m_ssn.getEngine().execute(m_query);
@@ -90,24 +113,40 @@ public class Cursor {
             return true;
         } else {
             m_position = -1;
-            close();
+            free();
             return false;
         }
     }
 
     public boolean isBeforeFirst() {
+	if (m_closed) {
+	    throw new ClosedException(this);
+	}
+
         return m_position == 0;
     }
 
     public boolean isFirst() {
+	if (m_closed) {
+	    throw new ClosedException(this);
+	}
+
         return m_position == 1;
     }
 
     public boolean isAfterLast() {
+	if (m_closed) {
+	    throw new ClosedException(this);
+	}
+
         return m_position == -1;
     }
 
     public long getPosition() {
+	if (m_closed) {
+	    throw new ClosedException(this);
+	}
+
         if (m_position > 0) {
             return m_position;
         } else {
@@ -116,15 +155,21 @@ public class Cursor {
     }
 
     public void rewind() {
-        m_rs.close();
-        m_rs = null;
+        close();
         m_position = 0;
+	m_closed = false;
+    }
+
+    private void free() {
+        if (m_rs != null) {
+            m_rs.close();
+	    m_rs = null;
+        }
     }
 
     public void close() {
-        if (m_rs != null) {
-            m_rs.close();
-        }
+	free();
+	m_closed = true;
     }
 
 }
