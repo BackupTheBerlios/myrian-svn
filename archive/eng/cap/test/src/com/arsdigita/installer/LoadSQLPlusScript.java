@@ -18,7 +18,6 @@
 package com.arsdigita.installer;
 
 import com.arsdigita.db.DbHelper;
-import com.arsdigita.util.UncheckedWrapperException;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
@@ -30,7 +29,7 @@ import org.apache.log4j.Logger;
 
 public class LoadSQLPlusScript {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/installer/LoadSQLPlusScript.java#1 $ by $Author: ashah $, $DateTime: 2004/10/01 15:19:06 $";
+    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/installer/LoadSQLPlusScript.java#2 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
 
     private static final Logger s_log =
             Logger.getLogger(LoadSQLPlusScript.class);
@@ -80,9 +79,9 @@ public class LoadSQLPlusScript {
             m_con = DriverManager.getConnection(jdbcUrl, dbUsername,
                     dbPassword);
         } catch (SQLException e) {
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         } catch (ClassNotFoundException e) {
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -107,7 +106,7 @@ public class LoadSQLPlusScript {
         try {
             m_con.commit();
         } catch (SQLException e) {
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         }
     }
 

@@ -17,19 +17,18 @@
  */
 package com.arsdigita.persistence;
 
-import com.arsdigita.util.UncheckedWrapperException;
 
 /**
  * PersistenceException
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  */
 
-public class PersistenceException extends UncheckedWrapperException {
+public class PersistenceException extends RuntimeException {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/PersistenceException.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/PersistenceException.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
 
     /**
      * Constructor for a PersistenceException which does not wrap

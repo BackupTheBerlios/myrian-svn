@@ -18,7 +18,6 @@
 package com.redhat.test;
 
 import com.arsdigita.util.Assert;
-import com.arsdigita.util.UncheckedWrapperException;
 
 import java.io.FileOutputStream;
 import java.io.File;
@@ -86,7 +85,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003/02/06
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 public final class SQLDebugger {
 
@@ -134,9 +133,9 @@ public final class SQLDebugger {
                  (new OutputStreamWriter
                   (new FileOutputStream(outputFile), "UTF-8")));
         } catch (UnsupportedEncodingException ex) {
-            throw new UncheckedWrapperException("This can't happen.", ex);
+            throw new RuntimeException("This can't happen.", ex);
         } catch (IOException ex) {
-            throw new UncheckedWrapperException
+            throw new RuntimeException
                 ("Error opening '" + outputFile.getAbsolutePath() + "'", ex);
         }
     }
@@ -163,7 +162,7 @@ public final class SQLDebugger {
             s_log.debug("starting new file: " + out.getAbsolutePath());
             setOutputFile(out);
         } catch (IOException ex) {
-            throw new UncheckedWrapperException
+            throw new RuntimeException
                 ("Error opening a debug file prefixed with " + prefix, ex);
         }
         debugger().setConnection(conn);

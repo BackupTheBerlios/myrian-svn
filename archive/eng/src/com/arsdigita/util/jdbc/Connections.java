@@ -20,7 +20,6 @@ package com.arsdigita.util.jdbc;
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.util.Assert;
 import com.arsdigita.util.Classes;
-import com.arsdigita.util.UncheckedWrapperException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -36,9 +35,9 @@ import org.apache.log4j.Logger;
  */
 public final class Connections {
     public static final String versionId =
-        "$Id: //eng/persistence/dev/src/com/arsdigita/util/jdbc/Connections.java#3 $" +
-        "$Author: dennis $" +
-        "$DateTime: 2004/09/07 10:26:15 $";
+        "$Id: //eng/persistence/dev/src/com/arsdigita/util/jdbc/Connections.java#4 $" +
+        "$Author: vadim $" +
+        "$DateTime: 2004/10/01 15:29:46 $";
 
     private static final Logger s_log = Logger.getLogger(Connections.class);
 
@@ -88,7 +87,7 @@ public final class Connections {
 
             return conn;
         } catch (SQLException e) {
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         }
     }
 }

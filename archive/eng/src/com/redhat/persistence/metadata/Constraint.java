@@ -27,18 +27,17 @@ import java.util.List;
 import java.util.Set;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
-import com.arsdigita.util.UncheckedWrapperException;
 
 /**
  * Constraint
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/09/07 $
+ * @version $Revision: #5 $ $Date: 2004/10/01 $
  **/
 
 public abstract class Constraint {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Constraint.java#4 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Constraint.java#5 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
 
     private Table m_table;
     private String m_name;
@@ -115,7 +114,7 @@ public abstract class Constraint {
             }
             buf.append("_" + new String(hash));
         } catch (GeneralSecurityException e) {
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         }
         String result = buf.toString();
         return result;

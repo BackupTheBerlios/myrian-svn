@@ -19,7 +19,6 @@ package com.arsdigita.persistence;
 
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.metadata.MetadataRoot;
-import com.arsdigita.util.UncheckedWrapperException;
 import com.redhat.persistence.EventProcessorManager;
 //import com.arsdigita.versioning.Versions;
 
@@ -44,12 +43,12 @@ import org.apache.log4j.Logger;
  *
  * @see Initializer
  * @author Archit Shah 
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/SessionManager.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public static final String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/SessionManager.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
 
     private static final Logger s_log = Logger.getLogger
         (SessionManager.class.getName());
@@ -116,7 +115,7 @@ public class SessionManager {
                 database =
                     DbHelper.getDatabaseFromURL(conn.getMetaData().getURL());
             } catch (SQLException e) {
-                throw new UncheckedWrapperException(e);
+                throw new RuntimeException(e);
             }
         } finally {
             source.release(conn);

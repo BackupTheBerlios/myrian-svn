@@ -17,7 +17,6 @@
  */
 package com.arsdigita.persistence.pdl;
 
-import com.arsdigita.util.UncheckedWrapperException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,12 +30,12 @@ import java.util.Iterator;
  * manifest file that lists resources located in the java classpath.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 public class ManifestSource implements PDLSource {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/pdl/ManifestSource.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/pdl/ManifestSource.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
 
     private final String m_manifest;
     private final PDLFilter m_filter;
@@ -119,10 +118,10 @@ public class ManifestSource implements PDLSource {
                 }
             }
         } catch (IOException e) {
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         } finally {
             try { is.close(); }
-            catch (IOException e) { throw new UncheckedWrapperException(e); }
+            catch (IOException e) { throw new RuntimeException(e); }
         }
     }
 

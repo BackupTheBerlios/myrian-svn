@@ -19,7 +19,6 @@ package com.arsdigita.db;
 
 
 import com.arsdigita.util.Assert;
-import com.arsdigita.util.UncheckedWrapperException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -71,7 +70,7 @@ public class DbHelper {
         try {
             return getDatabaseFromURL(md.getURL());
         } catch (SQLException e) {
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -79,7 +78,7 @@ public class DbHelper {
         try {
             return getDatabase(conn.getMetaData());
         } catch (SQLException e) {
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -87,7 +86,7 @@ public class DbHelper {
         try {
             return getDatabase(stmt.getConnection());
         } catch (SQLException e) {
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -95,7 +94,7 @@ public class DbHelper {
         try {
             return getDatabase(rs.getStatement());
         } catch (SQLException e) {
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -250,7 +249,7 @@ public class DbHelper {
             try {
                 result = str.getBytes(DEFAULT_ENCODING).length;
             } catch (java.io.UnsupportedEncodingException ex) {
-                throw new UncheckedWrapperException
+                throw new RuntimeException
                     (DEFAULT_ENCODING + " not supported by JRE", ex);
             }
             break;

@@ -18,7 +18,6 @@
 package com.redhat.persistence.profiler.rdbms;
 
 import com.arsdigita.util.Assert;
-import com.arsdigita.util.UncheckedWrapperException;
 import com.redhat.persistence.Event;
 import com.redhat.persistence.Signature;
 import com.redhat.persistence.engine.rdbms.RDBMSProfiler;
@@ -108,7 +107,7 @@ public class StatementProfiler implements RDBMSProfiler {
             m_out = new PrintWriter
                 (new BufferedWriter(new FileWriter(file())));
         } catch (IOException ioe) {
-            throw new UncheckedWrapperException(ioe);
+            throw new RuntimeException(ioe);
         }
 
         m_out.write("<?xml version=\"1.0\"?>");
@@ -166,7 +165,7 @@ public class StatementProfiler implements RDBMSProfiler {
         try {
             return File.createTempFile("profile", ".xml");
         } catch (IOException ioe) {
-            throw new UncheckedWrapperException(ioe);
+            throw new RuntimeException(ioe);
         }
     }
 

@@ -17,7 +17,6 @@
  */
 package com.redhat.persistence;
 
-import com.arsdigita.util.UncheckedWrapperException;
 import com.redhat.persistence.common.CompoundKey;
 import com.redhat.persistence.common.IdentityKey;
 import com.redhat.persistence.metadata.Adapter;
@@ -42,7 +41,7 @@ import java.util.Map;
  */
 class Expander extends Event.Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Expander.java#11 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Expander.java#12 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
 
     final private Session m_ssn;
     final private Collection m_deleting = new HashSet();
@@ -84,7 +83,7 @@ class Expander extends Event.Switch {
             if (re instanceof ProtoException) {
                 ProtoException pe = (ProtoException) re;
                 if (pe.isInternal()) {
-                    throw new UncheckedWrapperException
+                    throw new RuntimeException
                         ("internal persistence exception", pe);
                 } else {
                     pe.setInternal(true);

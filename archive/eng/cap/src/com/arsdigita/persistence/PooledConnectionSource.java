@@ -17,7 +17,6 @@
  */
 package com.arsdigita.persistence;
 
-import com.arsdigita.util.UncheckedWrapperException;
 import com.arsdigita.util.jdbc.Connections;
 
 import java.sql.*;
@@ -29,12 +28,12 @@ import org.apache.log4j.Logger;
  * PooledConnectionSource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 public class PooledConnectionSource implements ConnectionSource {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/PooledConnectionSource.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/PooledConnectionSource.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
 
     private static final Logger s_log =
         Logger.getLogger(PooledConnectionSource.class);
@@ -73,7 +72,7 @@ public class PooledConnectionSource implements ConnectionSource {
             } else {
                 try { wait(); }
                 catch (InterruptedException e) {
-                    throw new UncheckedWrapperException(e);
+                    throw new RuntimeException(e);
                 }
             }
         }
@@ -120,7 +119,7 @@ public class PooledConnectionSource implements ConnectionSource {
             while (true) {
                 try { Thread.sleep(m_interval); }
                 catch (InterruptedException e) {
-                    throw new UncheckedWrapperException(e);
+                    throw new RuntimeException(e);
                 }
                 testAvailable();
             }
@@ -136,7 +135,7 @@ public class PooledConnectionSource implements ConnectionSource {
                     if (m_untested.isEmpty()) {
                         try { m_untested.wait(); }
                         catch (InterruptedException e) {
-                            throw new UncheckedWrapperException(e);
+                            throw new RuntimeException(e);
                         }
                     }
                     untested.addAll(m_untested);

@@ -17,7 +17,6 @@
  */
 package com.redhat.persistence.profiler.rdbms;
 
-import com.arsdigita.util.UncheckedWrapperException;
 import com.redhat.persistence.common.ParseException;
 import com.redhat.persistence.common.SQL;
 import com.redhat.persistence.common.SQLParser;
@@ -29,12 +28,12 @@ import java.util.HashMap;
  * SQLSummary
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/09/07 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 class SQLSummary {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/profiler/rdbms/SQLSummary.java#3 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/profiler/rdbms/SQLSummary.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
 
     private static final HashMap SUMMARIES = new HashMap();
 
@@ -74,7 +73,7 @@ class SQLSummary {
         try {
             p.sql();
         } catch (ParseException e) {
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         }
         SQL sql = p.getSQL();
         SQLToken first = sql.getFirst();

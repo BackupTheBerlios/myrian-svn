@@ -17,7 +17,6 @@
  */
 package com.arsdigita.persistence.pdl;
 
-import com.arsdigita.util.UncheckedWrapperException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collection;
@@ -34,12 +33,12 @@ import java.util.zip.ZipInputStream;
  * zip or jar file.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 class ZipSource implements PDLSource {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/pdl/ZipSource.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/pdl/ZipSource.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
 
     private final ZipFile m_file;
     private final PDLFilter m_filter;
@@ -86,9 +85,9 @@ class ZipSource implements PDLSource {
                         }
                     }, name);
             } catch (IOException e) {
-                throw new UncheckedWrapperException(e);
+                throw new RuntimeException(e);
             } catch (IllegalStateException e) {
-                throw new UncheckedWrapperException(e);
+                throw new RuntimeException(e);
             }
         }
     }

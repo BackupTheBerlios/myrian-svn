@@ -31,12 +31,12 @@ import java.util.*;
  * PooledConnectionSourceTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/09/30 $
+ * @version $Revision: #2 $ $Date: 2004/10/01 $
  **/
 
 public class PooledConnectionSourceTest extends TestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/engine/rdbms/PooledConnectionSourceTest.java#1 $ by $Author: ashah $, $DateTime: 2004/09/30 17:47:51 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/engine/rdbms/PooledConnectionSourceTest.java#2 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
 
     private static final String JDBC_PREFIX = "jdbc:test:";
     private static final Map CONNECTIONS = new HashMap();
@@ -55,7 +55,7 @@ public class PooledConnectionSourceTest extends TestCase {
         try {
             DriverManager.registerDriver(new TestDriver());
         } catch (SQLException e) {
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -110,7 +110,7 @@ public class PooledConnectionSourceTest extends TestCase {
             thread.join();
             assertTrue("acquire did not succeed", acquired[0]);
         } catch (InterruptedException e) {
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         }
 
         assertEquals
@@ -179,7 +179,7 @@ public class PooledConnectionSourceTest extends TestCase {
             }
         } catch (InterruptedException e) {
             Competitor.exit();
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         }
         
 

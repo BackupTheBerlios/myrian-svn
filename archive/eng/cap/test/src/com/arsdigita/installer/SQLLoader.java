@@ -18,7 +18,6 @@
 package com.arsdigita.installer;
 
 import com.arsdigita.util.Assert;
-import com.arsdigita.util.UncheckedWrapperException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,12 +31,12 @@ import org.apache.log4j.Logger;
  * SQLLoader
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/10/01 $
+ * @version $Revision: #2 $ $Date: 2004/10/01 $
  **/
 
 public abstract class SQLLoader {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/installer/SQLLoader.java#1 $ by $Author: ashah $, $DateTime: 2004/10/01 15:19:06 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/installer/SQLLoader.java#2 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
 
     private static final Logger s_log = Logger.getLogger(SQLLoader.class);
 
@@ -83,7 +82,7 @@ public abstract class SQLLoader {
                 stmt.close();
             }
         } catch (SQLException e) {
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -118,9 +117,9 @@ public abstract class SQLLoader {
             sp.parse();
             reader.close();
         } catch (ParseException e) {
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         } catch (IOException e) {
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -178,7 +177,7 @@ public abstract class SQLLoader {
                 s_log.debug(stmt.getUpdateCount() + " row(s) affected");
             }
         } catch (SQLException e) {
-            throw new UncheckedWrapperException(sql, e);
+            throw new RuntimeException(sql, e);
         }
     }
 

@@ -39,7 +39,6 @@ import com.redhat.persistence.oql.Expression;
 import com.redhat.persistence.oql.Query;
 import com.redhat.persistence.oql.Variable;
 import com.redhat.persistence.oql.Size;
-import com.arsdigita.util.UncheckedWrapperException;
 import com.arsdigita.util.WrappedError;
 
 import java.sql.Connection;
@@ -63,12 +62,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/09/13 $
+ * @version $Revision: #9 $ $Date: 2004/10/01 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#8 $ by $Author: rhs $, $DateTime: 2004/09/13 16:23:12 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#9 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -457,7 +456,7 @@ public class RDBMSEngine extends Engine {
                 LOG.warn("failed operation: " + op);
                 throw re;
             } catch (SQLWriterException ex) {
-                throw new UncheckedWrapperException
+                throw new RuntimeException
                     ("failed operation: " + op.toSafeString(), ex);
             }
 

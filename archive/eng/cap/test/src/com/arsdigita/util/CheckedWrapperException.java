@@ -30,21 +30,21 @@ package com.arsdigita.util;
  *
  * Note that it is not necessary to provide a string along
  * with a root cause; in particular, the following usage:
- * <tt>new UncheckedWrapperException(e);</tt> is more correct than
- * <tt>new UncheckedWrapperException(e.getMessage(), e);</tt>
+ * <tt>new RuntimeException(e);</tt> is more correct than
+ * <tt>new RuntimeException(e.getMessage(), e);</tt>
  *
  * @author David Eison 
- * @version $Id: //eng/persistence/dev/cap/test/src/com/arsdigita/util/CheckedWrapperException.java#3 $
+ * @version $Id: //eng/persistence/dev/cap/test/src/com/arsdigita/util/CheckedWrapperException.java#4 $
  */
 public class CheckedWrapperException extends Exception {
 
-    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/util/CheckedWrapperException.java#3 $";
+    public static final String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/util/CheckedWrapperException.java#4 $";
     private static final String NEW_LINE = System.getProperty("line.separator");
     Throwable m_rootCause;
 
     /**
      * Constructor which only takes a msg, which will cause this
-     * UncheckedWrapperException to behave like a normal RuntimeException.
+     * RuntimeException to behave like a normal RuntimeException.
      * While it doesn't seem to make a lot of sense to have a wrapper
      * exception that doesn't wrap anything, this is needed so that it
      * can be used as a direct replacement for RuntimeException.

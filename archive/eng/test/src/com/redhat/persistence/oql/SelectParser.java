@@ -18,7 +18,6 @@
 package com.redhat.persistence.oql;
 
 import com.redhat.persistence.common.*;
-import com.arsdigita.util.UncheckedWrapperException;
 import com.arsdigita.util.Assert;
 
 import java.util.Arrays;
@@ -36,7 +35,7 @@ import org.apache.log4j.Logger;
  * Use for counting subselects, inner, and outer joins.
  *
  * @author jorris@redhat.com
- * @version $Revision $1 $ $Date: 2004/09/01 $
+ * @version $Revision $1 $ $Date: 2004/10/01 $
  */
 public class SelectParser {
 
@@ -117,7 +116,7 @@ public class SelectParser {
         try {
             parser.sql();
         } catch (com.redhat.persistence.common.ParseException e) {
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         }
 
        return parser.getSQL();

@@ -17,7 +17,6 @@
  */
 package com.redhat.persistence.pdl;
 
-import com.arsdigita.util.UncheckedWrapperException;
 import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
 import java.io.*;
@@ -27,12 +26,12 @@ import java.util.*;
  * PDLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/09/22 $
+ * @version $Revision: #7 $ $Date: 2004/10/01 $
  **/
 
 public class PDLWriter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLWriter.java#6 $ by $Author: rhs $, $DateTime: 2004/09/22 15:20:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLWriter.java#7 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
 
     private Writer m_out;
 
@@ -44,7 +43,7 @@ public class PDLWriter {
 	try {
 	    m_out.write(str);
 	} catch (IOException e) {
-	    throw new UncheckedWrapperException(e);
+	    throw new RuntimeException(e);
 	}
     }
 

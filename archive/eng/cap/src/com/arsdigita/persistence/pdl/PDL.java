@@ -22,7 +22,6 @@ import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.Utilities;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.util.Assert;
-import com.arsdigita.util.UncheckedWrapperException;
 import com.arsdigita.util.cmd.BooleanSwitch;
 import com.arsdigita.util.cmd.CommandLine;
 import com.arsdigita.util.cmd.FileSwitch;
@@ -62,12 +61,12 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/pdl/PDL.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/pdl/PDL.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;
@@ -301,7 +300,7 @@ public class PDL {
                 try {
                     new ZipSource(new ZipFile(f), filter).parse(compiler);
                 } catch (IOException e) {
-                    throw new UncheckedWrapperException(e);
+                    throw new RuntimeException(e);
                 }
             } else {
                 filenames.add(f.getPath());
@@ -343,7 +342,7 @@ public class PDL {
         try {
             return compilePDLFiles(files);
         } catch (PDLException ex) {
-            throw new UncheckedWrapperException
+            throw new RuntimeException
                 ("error while trying to compile PDL files", ex);
         }
     }
@@ -471,7 +470,7 @@ public class PDL {
 
                         toAdd.add(path);
                     } catch (IOException e) {
-                        throw new UncheckedWrapperException
+                        throw new RuntimeException
                             ("cannot get file path", e);
                     }
                 }

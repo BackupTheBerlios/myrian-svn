@@ -23,7 +23,7 @@ package com.redhat.persistence;
  * implementation. If code in the implementation determines the exception is
  * fault of the client, the exception is flagged so that it is not internal.
  * At the top level internal exceptions are converted to
- * UncheckedWrapperExceptions so that they will not be caught as persistence
+ * RuntimeExceptions so that they will not be caught as persistence
  * exceptions.
  **/
 public abstract class ProtoException extends RuntimeException {

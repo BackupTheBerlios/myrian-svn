@@ -46,12 +46,12 @@ import java.security.*;
  * value of the correct type for the specified property.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 public class DataSource {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/tests/data/DataSource.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/tests/data/DataSource.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
 
     private static final Logger LOG = Logger.getLogger(DataSource.class);
 
@@ -157,7 +157,7 @@ public class DataSource {
             MessageDigest digest = MessageDigest.getInstance("MD5");
             hash = digest.digest(toHash.getBytes());
         } catch (NoSuchAlgorithmException e) {
-            throw new UncheckedWrapperException(e);
+            throw new RuntimeException(e);
         }
 
         DataType type = prop.getType();

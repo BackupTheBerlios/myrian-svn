@@ -31,9 +31,9 @@ import java.util.Arrays;
  */
 public final class Classes {
     public static final String versionId =
-        "$Id: //eng/persistence/dev/src/com/arsdigita/util/Classes.java#3 $" +
-        "$Author: dennis $" +
-        "$DateTime: 2004/09/07 10:26:15 $";
+        "$Id: //eng/persistence/dev/src/com/arsdigita/util/Classes.java#4 $" +
+        "$Author: vadim $" +
+        "$DateTime: 2004/10/01 15:29:46 $";
 
     private static final Logger s_log = Logger.getLogger(Classes.class);
 
@@ -49,7 +49,7 @@ public final class Classes {
         try {
             return Class.forName(clacc);
         } catch (ClassNotFoundException ex) {
-            throw new UncheckedWrapperException(ex);
+            throw new RuntimeException(ex);
         }
     }
 
@@ -79,16 +79,16 @@ public final class Classes {
 
             return constructor.newInstance(values);
         } catch (NoSuchMethodException ex) {
-            throw new UncheckedWrapperException
+            throw new RuntimeException
                 (message(clacc, params, values), ex);
         } catch (IllegalAccessException ex) {
-            throw new UncheckedWrapperException
+            throw new RuntimeException
                 (message(clacc, params, values), ex);
         } catch (InvocationTargetException ex) {
-            throw new UncheckedWrapperException
+            throw new RuntimeException
                 (message(clacc, params, values), ex);
         } catch (InstantiationException ex) {
-            throw new UncheckedWrapperException
+            throw new RuntimeException
                 (message(clacc, params, values), ex);
         }
     }

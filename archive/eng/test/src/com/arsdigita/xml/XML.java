@@ -17,7 +17,6 @@
  */
 package com.arsdigita.xml;
 
-import com.arsdigita.util.UncheckedWrapperException;
 import com.arsdigita.util.Assert;
 
 import java.io.IOException;
@@ -99,16 +98,16 @@ public class XML {
             SAXParser parser = spf.newSAXParser();
             parser.parse(source, handler);
         } catch (ParserConfigurationException e) {
-            throw new UncheckedWrapperException("error parsing stream", e);
+            throw new RuntimeException("error parsing stream", e);
         } catch (SAXException e) {
             if (e.getException() != null) {
-                throw new UncheckedWrapperException("error parsing stream",
+                throw new RuntimeException("error parsing stream",
                                                     e.getException());
             } else {
-                throw new UncheckedWrapperException("error parsing stream", e);
+                throw new RuntimeException("error parsing stream", e);
             }
         } catch (IOException e) {
-            throw new UncheckedWrapperException("error parsing stream", e);
+            throw new RuntimeException("error parsing stream", e);
         }
     }
 
