@@ -71,6 +71,7 @@ query getProcesses {
         from cw_processes , acs_objects 
         where cw_processes.object_id = acs_objects.object_id
     } map {
+        id = cw_processes.process_id;
         processID = cw_processes.process_id;
         processDefID = cw_processes.process_def_id;
         processObjectType = acs_objects.object_type;
