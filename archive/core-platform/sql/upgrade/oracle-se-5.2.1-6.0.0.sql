@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/upgrade/oracle-se-5.2.1-6.0.0.sql#11 $
--- $DateTime: 2003/08/16 20:47:25 $
+-- $Id: //core-platform/dev/sql/upgrade/oracle-se-5.2.1-6.0.0.sql#12 $
+-- $DateTime: 2003/08/18 12:57:27 $
 
 PROMPT Red Hat WAF 5.2.1 -> 6.0.0 Upgrade Script (Oracle)
 
@@ -21,7 +21,6 @@ PROMPT Red Hat WAF 5.2.1 -> 6.0.0 Upgrade Script (Oracle)
 @@ ../default/upgrade/5.2.1-6.0.0/sequence-vcx_txns_id_seq.sql
 @@ ../default/upgrade/5.2.1-6.0.0/alter-categories.sql
 @@ ../default/upgrade/5.2.1-6.0.0/table-web_hosts-auto.sql
-@@ ../oracle-se/upgrade/5.2.1-6.0.0/add-permissions-rebuild.sql
 @@ ../oracle-se/upgrade/5.2.1-6.0.0/update-web-hosts.sql
 @@ ../oracle-se/upgrade/5.2.1-6.0.0/alter-lucene.sql
 @@ ../oracle-se/upgrade/5.2.1-6.0.0/mime-types.sql

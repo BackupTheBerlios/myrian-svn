@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres/upgrade/5.2.1-6.0.0/auto-upgrade.sql#3 $
--- $DateTime: 2003/08/15 13:46:34 $
+-- $Id: //core-platform/dev/sql/postgres/upgrade/5.2.1-6.0.0/auto-upgrade.sql#4 $
+-- $DateTime: 2003/08/18 12:57:27 $
 
 
 --------------------------------------------------------------------------------
@@ -215,10 +215,6 @@ ALTER TABLE users ADD CONSTRAINT users_user_id_f_t_lso FOREIGN KEY(user_id) refe
 ALTER TABLE vc_generic_operations ADD CONSTRAINT vc_gen_operations_fk FOREIGN KEY(operation_id) references vc_operations(operation_id);
 ALTER TABLE vc_objects ADD CONSTRAINT vc_objects_mst_fk FOREIGN KEY(master_id) references acs_objects(object_id);
 ALTER TABLE vc_objects ADD CONSTRAINT vc_objects_obj_fk FOREIGN KEY(object_id) references acs_objects(object_id);
-ALTER TABLE vc_operations ADD CONSTRAINT vc_operations_actions_fk FOREIGN KEY(action) references vc_actions(action);
-ALTER TABLE vc_operations ADD CONSTRAINT vc_operations_trans_id_fk FOREIGN KEY(transaction_id) references vc_transactions(transaction_id);
-ALTER TABLE vc_transactions ADD CONSTRAINT vc_trans_masters_fk FOREIGN KEY(master_id) references vc_objects(object_id);
-ALTER TABLE vc_transactions ADD CONSTRAINT vc_trans_objects_fk FOREIGN KEY(object_id) references vc_objects(object_id);
 
 
 --------------------------------------------------------------------------------

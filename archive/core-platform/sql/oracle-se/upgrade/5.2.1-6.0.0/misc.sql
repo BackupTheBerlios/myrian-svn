@@ -11,8 +11,13 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/5.2.1-6.0.0/misc.sql#5 $
--- $DateTime: 2003/08/15 13:46:34 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/5.2.1-6.0.0/misc.sql#6 $
+-- $DateTime: 2003/08/18 12:57:27 $
+
+ALTER TABLE vc_operations DROP CONSTRAINT vc_operations_actions_fk;
+ALTER TABLE vc_operations DROP CONSTRAINT vc_operations_trans_id_fk;
+ALTER TABLE vc_transactions DROP CONSTRAINT vc_trans_masters_fk;
+ALTER TABLE vc_transactions DROP CONSTRAINT vc_trans_objects_fk;
 
 drop function last_attr_value;
 
