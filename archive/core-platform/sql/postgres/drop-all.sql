@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres/drop-all.sql#2 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/postgres/drop-all.sql#3 $
+-- $DateTime: 2003/03/17 16:02:47 $
 
 create or replace function drop_all(varchar) returns boolean as '
 declare
@@ -24,14 +24,12 @@ begin
                from pg_class, pg_user
                where pg_class.relowner = pg_user.usesysid
                and cast(usename as varchar) = username
-               and relkind in (''r'', ''v'', ''i'', ''S'')
+               and relkind in (''r'', ''v'', ''S'')
                and relname not like ''pg_%'' loop
         if row.relkind = ''r'' then
           drop_type := ''table'';
         elsif row.relkind = ''v'' then
           drop_type := ''view'';
-        elsif row.relkind = ''i'' then
-          drop_type := ''index'';
         elsif row.relkind = ''S'' then
           drop_type := ''sequence'';
         else
