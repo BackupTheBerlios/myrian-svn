@@ -31,13 +31,13 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterLoader
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#5 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#6 $
  */
 public abstract class ParameterRecord {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#5 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#6 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/23 14:12:40 $";
+        "$DateTime: 2003/09/23 14:39:23 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterRecord.class);
@@ -84,20 +84,6 @@ public abstract class ParameterRecord {
     }
 
     /**
-     * Gets the value of <code>param</code>.
-     *
-     * @param param The named <code>Parameter</code> whose value you
-     * wish to retrieve; it cannot be null
-     */
-    protected final Object get(final Parameter param) {
-        final ParameterValue value = getValue(param);
-
-        param.check(value);
-
-        return value.getObject();
-    }
-
-    /**
      * Loads source data for <code>ParameterInfo</code> objects from
      * the file <code>parameter.info</code> next to
      * <code>this.getClass()</code>.
@@ -124,6 +110,28 @@ public abstract class ParameterRecord {
         }
     }
 
+    /**
+     * Gets the value of <code>param</code>.
+     *
+     * @param param The named <code>Parameter</code> whose value you
+     * wish to retrieve; it cannot be null
+     */
+    protected final Object get(final Parameter param) {
+        final ParameterValue value = getValue(param);
+
+        if (value == null) {
+            return param.getDefaultValue();
+        } else {
+            param.check(value);
+
+            param.validate(value);
+
+            param.check(value);
+
+            return value.getObject();
+        }
+    }
+
     // Does not param.check.
     protected final ParameterValue getValue(final Parameter param) {
         if (s_log.isDebugEnabled()) {
@@ -136,19 +144,7 @@ public abstract class ParameterRecord {
                          param + " has not been registered");
         }
 
-        final ParameterValue value = (ParameterValue) m_values.get(param);
-
-        if (value == null) {
-            final ParameterValue dephault = new ParameterValue();
-
-            dephault.setObject(param.getDefaultValue());
-
-            param.validate(dephault);
-
-            return dephault;
-        } else {
-            return value;
-        }
+        return (ParameterValue) m_values.get(param);
     }
 
     /**
@@ -162,7 +158,9 @@ public abstract class ParameterRecord {
     protected final void set(final Parameter param, final Object object) {
         Assert.exists(param, Parameter.class);
 
-        final ParameterValue value = new ParameterValue(object);
+        final ParameterValue value = new ParameterValue();
+
+        value.setObject(object);
 
         param.validate(value);
 
