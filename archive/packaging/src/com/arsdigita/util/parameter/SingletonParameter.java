@@ -22,13 +22,13 @@ import java.util.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/SingletonParameter.java#3 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/SingletonParameter.java#4 $
  */
 public class SingletonParameter extends ClassParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/SingletonParameter.java#3 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/SingletonParameter.java#4 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/02 12:40:15 $";
+        "$DateTime: 2003/10/17 14:28:55 $";
 
     public SingletonParameter(final String name) {
         super(name);
@@ -40,7 +40,7 @@ public class SingletonParameter extends ClassParameter {
         super(name, multiplicity, defaalt);
     }
 
-    protected Object unmarshal(final String value, final List errors) {
+    public Object unmarshal(final String value, final ErrorList errors) {
         final Class clacc = (Class) super.unmarshal(value, errors);
 
         try {

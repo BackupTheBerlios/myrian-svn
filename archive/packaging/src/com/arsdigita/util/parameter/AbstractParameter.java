@@ -24,13 +24,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#7 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#8 $
  */
 public abstract class AbstractParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#7 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#8 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/06 12:21:50 $";
+        "$DateTime: 2003/10/17 14:28:55 $";
 
     private final String m_name;
     private final Class m_type;
@@ -83,23 +83,20 @@ public abstract class AbstractParameter implements Parameter {
     // Lifecycle events
     //
 
-    public final void unmarshal(final ParameterValue value) {
-        Assert.exists(value, ParameterValue.class);
+    public Object read(final ParameterReader reader,
+                       final ErrorList errors) {
+        Assert.exists(reader, ParameterReader.class);
 
-        final String string = value.getString();
+        final String string = reader.read(this, errors);
 
         if (string == null) {
-            value.setObject(getDefaultValue());
+            return getDefaultValue();
         } else {
-            final List errors = value.getErrors();
-
-            final Object result = unmarshal(string, errors);
-
-            value.setObject(result);
+            return unmarshal(string, errors);
         }
     }
 
-    protected Object unmarshal(final String value, final List errors) {
+    public Object unmarshal(final String value, final ErrorList errors) {
         try {
             return Converters.convert(m_type, value);
         } catch (ConversionException ce) {
@@ -109,19 +106,28 @@ public abstract class AbstractParameter implements Parameter {
         }
     }
 
-    public final void validate(final ParameterValue value) {
-        final Object object = value.getObject();
-        final List errors = value.getErrors();
-
-        if (isRequired() && object == null) {
+    public void validate(final Object value, final ErrorList errors) {
+        if (isRequired() && value == null) {
             errors.add("The value must not be null");
         } else {
-            validate(object, errors);
+            validate(value, (List) errors);
         }
     }
 
     protected void validate(final Object value, final List errors) {
-        // Nothing by default
+        // Nothing
+    }
+
+    public void write(final ParameterWriter writer, final Object value) {
+        writer.write(this, marshal(value));
+    }
+
+    protected String marshal(final Object value) {
+        if (value == null) {
+            return null;
+        } else {
+            return value.toString();
+        }
     }
 
     public final void check(final ParameterValue value)
