@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/06/27 $
+ * @version $Revision: #7 $ $Date: 2003/06/30 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#6 $ by $Author: rhs $, $DateTime: 2003/06/27 17:35:31 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#7 $ by $Author: jorris $, $DateTime: 2003/06/30 11:13:04 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -409,9 +409,7 @@ public class RDBMSEngine extends Engine {
                     return null;
                 }
             } catch (SQLException e) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(m_operations);
-                }
+                LOG.error(m_operations, e);
                 throw new RDBMSException(e.getMessage()) {};
             }
         } finally {
