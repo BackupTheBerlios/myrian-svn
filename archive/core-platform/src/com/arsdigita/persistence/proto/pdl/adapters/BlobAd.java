@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * BlobAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/05/29 $
  **/
 
 public class BlobAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/adapters/BlobAd.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/adapters/BlobAd.java#2 $ by $Author: bche $, $DateTime: 2003/05/29 18:28:35 $";
 
     public BlobAd() {
 	super(Root.getRoot().getObjectType("global.Blob"), Types.BLOB);
@@ -24,8 +24,9 @@ public class BlobAd extends SimpleAdapter {
 
     public void bind(PreparedStatement ps, int index, Object obj, int type)
 	throws SQLException {
-	byte[] bytes = (byte[]) obj;
-	ps.setBytes(index, bytes);
+	ps.setBinaryStream(index, 
+			   new ByteArrayInputStream((byte[])obj), 
+			   ((byte[])obj).length);
     }
 
     public Object fetch(ResultSet rs, String column) throws SQLException {
