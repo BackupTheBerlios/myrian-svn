@@ -21,7 +21,7 @@ cases where other storage mechanisms may be desirable.
 
 Client Interface of the Session Layer:
 
-   ----------------------------------------------
+  .----------------------------------------------.
   |                   Session                    |
   |----------------------------------------------|
   | retrieve(Query): PersistentCollection        |
@@ -32,24 +32,24 @@ Client Interface of the Session Layer:
   | remove(OID, Property, Object)                |
   | commit()                                     |
   | rollback()                                   |
-   ----------------------------------------------
+  '----------------------------------------------'
       /|\1    /|\1
        |       |
        |       | n
-       |      -----------------------         --------------------------------
+       |     .-----------------------.       .--------------------------------.
        |     |   PersistentObject    |       |              OID               |
        |     |-----------------------|      1|--------------------------------|
        |     | getSession(): Session |------>| getObjectType(): ObjectType    |
        |     | getOID(): OID         |       |                                |
-       |      -----------------------         --------------------------------
+       |     '-----------------------'       '--------------------------------'
        |
-       |      ---------------------          -----------
+       |     .---------------------.        .-----------.
        |     |       DataSet       |        |   Query   |
        |     |---------------------|       1|-----------|
-        -----|                     |------->|           |
+       '-----|                     |------->|           |
              | getCursor(): Cursor |        |           |
              |                     |        |           |
-              ---------------------          -----------
+              ---------------------'        '-----------'
 
 
 The following diagram describes the form of a query made against the
@@ -69,10 +69,10 @@ results are to be returned based on the values in the Signature.
     |    1
     |-----> Signature
     |          |  |     1
-    |          |   ------> ObjectType
+    |          |  '------> ObjectType
     |          |n
     |       1 \|/       1
-    |      -->Path ------> Property
+    |     .-->Path ------> Property
     |     |___| /|\
     |           1|__________
     |    1                  |
@@ -89,7 +89,7 @@ results are to be returned based on the values in the Signature.
     |         |--In         |
     |          --Contains   |
     |    n                  |
-     -----> Order           |
+    '-----> Order           |
               |             |
               |_____________|
                      |
@@ -105,9 +105,9 @@ use of the begin, commit, rollback and execute(EventStream) methods.
 
   Session
     /|\ 1
-     |          ----------------------------------------------
+     |         .----------------------------------------------.
      |      1  |                   Engine                     |
-      -------->|----------------------------------------------|
+     '-------->|----------------------------------------------|
                | commit()                                     |
                | rollback()                                   |
                | execute(Query): RecordSet                    |
@@ -122,7 +122,7 @@ use of the begin, commit, rollback and execute(EventStream) methods.
                | getSet(PropertyData, Object): SetEvent       |
                | getAdd(PropertyData, Object): AddEvent       |
                | getRemove(PropertyData, Object): RemoveEvent |
-                ----------------------------------------------
+               '----------------------------------------------'
 
 
   PersistentCollection---->DataSet<-----Cursor
@@ -143,9 +143,9 @@ use of the begin, commit, rollback and execute(EventStream) methods.
     /_\ /_\              |                    |
      |   |               |                    |
      |   |              \|/ n                 |
-     |    ---------- ObjectEvent              |
+     |   '---------- ObjectEvent              |
      |                                       \|/ n
-      ---------------------------------- PropertyEvent
+     '---------------------------------- PropertyEvent
 
 
  Unexpanded Logical Event Stream ----> Expanded Logical Event Stream
@@ -262,3 +262,187 @@ Issues:
   * Filter API, bind vs passed in values, passed in values vs other Path's.
   * Link Attributes
   * Arbitrary SQL in filters.
+
+
+fetch(Order o, Item i)
+filter(o.items.contains(i) and o = :oid)
+
+Metadata UML:
+
+
+             1
+  ObjectType<----.
+     <*> 1       |
+      |          |
+      |          |
+      |          |
+     \|/ n       |
+   Property------'
+     /_\
+      |
+      |--- Attribute
+      |
+      |        1
+      |--- Role<--.
+      |    1|     |
+      |      -----'
+      |
+      |            1
+      |--- Link ---> Path
+      |
+      |
+      '--- Alias
+
+
+               1      n           1        n
+          Root<*>----->ObjectType<*>------->Property
+          <*>1            /|\ 1
+           |               |
+           |               |
+          \|/n             |
+         ObjectMap---------'
+          <*> 1
+           |
+           |
+          \|/ n   1
+        Mapping--->Path
+          /_\
+           |
+           |                  1      1
+           |---ValueMapping--->Column<---.
+           |                             |
+           |                      1      |
+           '---ReferenceMapping--->Join--|
+                                    /|\  |
+                                   1 '---'
+
+                              n
+          .--Table<*>--------->Column
+          |   <*>               /|\ n
+          |    |                 |
+          |    |                 |
+          |   \|/n               |
+          |  Constraint          |
+          |   /_\                |
+          |    |                 |
+          |    |---ForeignKey    |
+          |    |      |          |
+          |    |      |          |
+          |    |     \|/1        |
+          |    '---UniqueKey-----'
+          |        /|\
+          '---------' 1
+
+
+
+ * stored by value in a column
+ * fk to shared table
+ * fk to dedicated table (nix)
+ * fk from shared table
+ * fk from dedicated table
+ * mapping to shared
+ * mapping to dedicated (nix)
+
+hasProps vs Opaque
+hasKey vs Keyless
+
+Something that hasProps but is Keyless (e.g. links, compound
+attributes, etc) screws up the session's handling of two way
+associations since to be consistent we should have a reverse property
+pointing back from the keyless object, but we can't expand events
+properly since the keyless object would have no OID. Alternatively we
+may could say that things that point to keyless objects are
+attributes, not roles and so there is no back pointer, but this could
+be odd for link attributes because the pointers on the link to each
+end of the association wouldn't actually be the opposite ends of the
+association to the links themselves. This could be made to work, but
+it might be better just to say that they have OIDs. Without a link
+having an OID, updating the values of link attributes may be
+difficult.
+
+Should link OIDs be OIDs of other OIDs, OIDs of other
+PersistentObjects, or OIDs of Paths. Logically they should probably
+just be OIDs of Properties. Internally Paths maybe.
+
+Types that don't have keys or don't have identity don't make sense
+with dedicated storage. Unless of course the key depends on the
+mapping, not the type. Oy.
+
+Also link types can be viewed as being contained by value by each side
+of the association and not having a key at all, but that may screw up
+Session's two way handling, of course opaque types may do that
+anyways.
+
+Given a purely logical description of the object model as shown above,
+we need some way to map it to the database. Because we are not
+distinguishing in the logical model between types stored in columns
+(previously referred to as primitive or simple types) and types stored
+as rows in tables (previously referred to as compound types) it is
+possible for a single type to be mapped in multiple ways depending on
+the context. This stems from the fact that each time a String is
+stored somewhere it is mapped to a different column. The following
+table lists the different ways a type can be mapped:
+
+Single Value:
+  The entire type is stored directly in a single column. Examples of
+  this are all the "primitive" types; String, Integer, etc.
+
+Multi Value/Inline Association/True Composition
+  The type is stored in multiple columns. Examples of this might be
+  Content, a type made up of a LOB column storing content and a
+  VARCHAR column storing a mime type. This is basically a mapping that
+  applies to a special case of a composite association.
+
+Map to a table.
+
+Map to a supertypes table (this has some overlap with multi value above.
+
+
+A property of a given type can be stored in the following ways:
+
+0..1/1..1
+  * in a column
+  * a fk to a shared table
+  * a pk/fk in a dedicated table pointing back to containing object
+  * a shared table with a unique fk pointing back to containing object
+
+0..n
+  * a mapping table between the containing table and a dedicated table
+  * a mapping table between the containing table and a shared table
+  * a shared table with a non unique fk pointing back to containing
+    object
+  * a dedicated table with a non unique fk pointing back to containing
+    object
+
+Conclusions:
+
+Links probably should have OIDs so that they can be updated properly
+and fetched independently, etc. Session should probably be made to not
+depend on every property being two way. This means enhancing the query
+interface to allow queries for one way associations, and for the case
+of order line item style association with only one end named, that
+should probably just be checked for and flagged as an error.
+
+
+    object type Item {
+        BigDecimal id = items.item_id INTEGER;
+        Content body = join bodies.item_id to items.item_id;
+        body.mimeType = bodies.mime_type VARCHAR(200);
+        body.bytes = bodies.bytes CLOB;
+        body.bytes = bodies.search CLOB;
+        content is body.bytes;
+
+        ImageLinks[0..n] imageLinks =
+            join item_image_map.item_id to items.item_id;
+        images is imageLinks.image;
+    }
+
+    object type ImageLinks {
+        composite Item[1..1] item =
+            join item_image_map.item_id to items.item_id;
+        composite Image[1..1] image =
+            join item_image_map.image_id to images.image_id;
+        String caption = item_image_map.caption VARCHAR(4000);
+
+        object key(item, image);
+    }

@@ -1,0 +1,598 @@
+options {
+    STATIC = false;
+    DEBUG_PARSER = false;
+}
+
+PARSER_BEGIN(PDL)
+
+package com.arsdigita.persistence.proto.pdl;
+
+import com.arsdigita.persistence.proto.pdl.nodes.*;
+import com.arsdigita.persistence.proto.metadata.Role;
+import java.io.FileReader;
+import java.util.Iterator;
+
+/**
+ * PDL
+ *
+ * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
+ * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
+ * @version $Revision: #1 $ $Date: 2002/12/31 $
+ */
+
+public class PDL {
+
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.jj#1 $ by $Author: rhs $, $DateTime: 2002/12/31 15:39:17 $";
+
+    private String m_filename;
+
+    private static final void ln(Node node, Token t) {
+        node.setLine(t.beginLine);
+        node.setColumn(t.beginColumn);
+    }
+
+    private static final void ln(Node node, Node from) {
+        node.setLine(from.getLine());
+        node.setColumn(from.getColumn());
+    }
+
+    public static final void main(String[] args) throws Exception {
+        AST ast = new AST();
+        for (int i = 0; i < args.length; i++) {
+            try {
+                PDL p = new PDL(new FileReader(args[i]));
+                File file = p.file(args[i]);
+                ast.add(AST.FILES, file);
+            } catch (ParseException e) {
+                System.err.println(args[i] + ": " + e.getMessage());
+                break;
+            }
+        }
+//        System.out.println(ast);
+
+        final ErrorReport rep = new ErrorReport();
+        final SymbolTable st = new SymbolTable(rep);
+
+        ast.traverse(new Node.Switch() {
+                public void onObjectType(ObjectType ot) {
+                    st.define(ot);
+                }
+            });
+        ast.traverse(new Node.Switch() {
+                public void onType(Type t) {
+                    st.resolve(t);
+                }
+            });
+
+        st.sort();
+
+        st.emit();
+
+        ast.traverse(new Node.Switch() {
+                private void define(ObjectType type, Property prop) {
+                    String name = prop.getName().getName();
+                    if (st.getEmitted(type).hasProperty(name)) {
+                        rep.fatal(prop, "duplicate property: " + name);
+                        return;
+                    }
+
+                    st.getEmitted(type).addProperty
+                        (new Role(prop.getName().getName(),
+                                  st.getEmitted(st.lookup(prop.getType()))));
+                }
+
+                public void onProperty(Property prop) {
+                    define((ObjectType) prop.getParent(), prop);
+                }
+
+                public void onAssociation(Association assn) {
+                    define(st.lookup(assn.getRoleOne().getType()),
+                           assn.getRoleTwo());
+                    define(st.lookup(assn.getRoleTwo().getType()),
+                           assn.getRoleOne());
+                }
+            }, new Node.IncludeFilter(new Node.Field[] {
+                AST.FILES, File.OBJECT_TYPES, ObjectType.PROPERTIES,
+                File.ASSOCIATIONS
+            }));
+
+        for (Iterator it = rep.getMessages().iterator(); it.hasNext(); ) {
+            System.out.println(it.next());
+        }
+
+        for (Iterator it = st.getObjectTypes().iterator(); it.hasNext(); ) {
+            ObjectType ot = (ObjectType) it.next();
+            System.out.println(st.getEmitted(ot).getQualifiedName() + ":");
+            for (Iterator jit = st.getEmitted(ot).getDeclaredProperties().iterator();
+                 jit.hasNext(); ) {
+                com.arsdigita.persistence.proto.metadata.Property prop =
+                    (com.arsdigita.persistence.proto.metadata.Property)
+                    jit.next();
+                System.out.println("  " + prop.getType().getQualifiedName() +
+                                   " " + prop.getName());
+            }
+        }
+    }
+
+}
+
+PARSER_END(PDL)
+
+<DEFAULT,BEGIN> SKIP:
+{
+    " "
+  | "\t"
+  | "\n"
+  | "\r"
+  | "\f"
+}
+
+TOKEN:
+{
+    <SEMI: ";">
+  | <EQ: "=">
+  | <DOT: ".">
+  | <COMMA: ",">
+  | <STAR: "*">
+  | <LBRACE: "{">
+  | <RBRACE: "}">
+  | <LBRACKET: "[">
+  | <RBRACKET: "]">
+  | <LPAREN: "(">
+  | <RPAREN: ")">
+  | <COLON: ":">
+}
+
+TOKEN:
+{
+    <OBJECTTYPE: "object" <WS> "type">
+  | <RETRIEVE: "retrieve">
+  | <INSERT: "insert">
+  | <UPDATE: "update">
+  | <DELETE: "delete">
+  | <ADD: "add">
+  | <REMOVE: "remove">
+  | <CLEAR: "clear">
+  | <ATTRIBUTES: "attributes">
+  | <MODEL: "model">
+  | <IMPORT: "import">
+  | <FOREIGNKEY: "foreign" <WS> "key">
+  | <OBJECTKEY: "object" <WS> "key">
+  | <ALL: "all">
+  | <ASSOCIATION: "association">
+  | <UNIQUE: "unique">
+  | <COMPOSITE: "composite">
+  | <COMPONENT: "component">
+  | <EXTENDS: "extends">
+  | <QUERY: "query">
+  | <RETURNS: "returns">
+  | <DML: "data" <WS> "operation">
+  | <CALL: "do" <WS> "call"> : BEGIN
+  | <DO: "do"> : BEGIN
+  | <MAP: "map">
+  | <SUPER: "super">
+  | <JOIN: "join">
+  | <TO: "to">
+  | <REFERENCEKEY: "reference" <WS> "key">
+  | <OPTION: "option">
+  | <OPTIONS: "options">
+  | <TRUE: "true">
+  | <FALSE: "false">
+  | <AGGRESSIVE: "aggressive" <WS> "load">
+  | <#WS: ([" ", "\t", "\n", "\r", "\f"])+>
+}
+
+<BEGIN> MORE:
+{
+  <"{"> { image.deleteCharAt(image.length() - 1); } : INSQL
+}
+
+<INSQL> TOKEN:
+{
+    <SQL: "}">
+    {
+        image.deleteCharAt(image.length() - 1);
+        matchedToken.image = image.toString();
+    } : DEFAULT
+}
+
+<INSQL> MORE:
+{
+    <~[]>
+}
+
+TOKEN:
+{
+    <ID: (<ESC>|<CH>) (<ESC>|<CH>|<DIGIT>)*>
+  | <#CH: ["a" - "z", "A" - "Z", "_", "$"]>
+  | <#ESC: "\\" ~[]>
+  | <INT: (<DIGIT>)+>
+  | <#DIGIT: ["0" - "9"]>
+  | <STRINGLIT: "\"" ( ~["\""] | "\\\"" )* "\"">
+}
+
+SPECIAL_TOKEN:
+{
+    <COMMENT: "//" (~["\n", "\r"])* ("\n"|"\r"|"\r\n")>
+}
+
+/**
+ * Top level constructs.
+ **/
+
+File file(String filename) :
+{
+    File f = new File(filename);
+    Node n;
+    f.setLine(0);
+    f.setColumn(0);
+}
+{
+    n = model() <SEMI> { f.add(File.MODEL, n); }
+    ( n = pimpwhore() <SEMI> { f.add(File.IMPORTS, n); } )*
+    (   n = object_type() { f.add(File.OBJECT_TYPES, n); }
+      | n = association() { f.add(File.ASSOCIATIONS, n); }
+      | query() )*
+    <EOF>
+    { return f; }
+}
+
+Model model() :
+{
+    Model m = new Model();
+    Node n;
+    Token t;
+}
+{
+    t = <MODEL> idpath(m, Model.PATH) { ln(m, t); return m; }
+}
+
+Import pimpwhore() :
+{
+    Import i = new Import();
+    Node n;
+    Token t;
+}
+{
+    t = <IMPORT> idpath(i, Import.PATH)
+    [ <DOT> <STAR> { i.setWildcard(true); } ]
+    { ln(i, t); return i; }
+}
+
+ObjectType object_type() :
+{
+    Token t;
+    ObjectType ot = new ObjectType();
+    Node n;
+}
+{
+    t = <OBJECTTYPE> n = id() { ot.add(ObjectType.NAME, n); }
+    [ <EXTENDS> n = type() { ot.add(ObjectType.EXTENDS, n); } ]
+    <LBRACE>
+        ( statement(ot) )*
+    <RBRACE>
+    { ln(ot, t); return ot; }
+}
+
+Association association() :
+{
+    Token t;
+    Association a = new Association();
+    Node n;
+}
+{
+    t = <ASSOCIATION>
+    <LBRACE>
+        n = property() <SEMI> { a.add(Association.ROLE_ONE, n); }
+        n = property() <SEMI> { a.add(Association.ROLE_TWO, n); }
+        ( n = property() <SEMI> { a.add(Association.PROPERTIES, n); } )*
+      [ option_block() ]
+      ( event() )*
+    <RBRACE>
+    { ln(a, t); return a; }
+}
+
+void query() :
+{}
+{
+    ( <QUERY> | <DML> ) id()
+    [ <RETURNS> <INT> <DOT> <DOT> ( id() | <INT> ) ]
+    <LBRACE>
+         ( property() <SEMI> )*
+         [ option_block() ]
+         block()
+    <RBRACE>
+}
+
+/**
+ * First level constructs.
+ **/
+
+void statement(ObjectType ot) :
+{}
+{
+    (   simple_statement(ot) <SEMI>
+      | compound_statement(ot) )
+}
+
+void simple_statement(ObjectType ot) :
+{}
+{
+    (  LOOKAHEAD(property_stmt()) property_stmt(ot)
+     | object_key(ot)
+     | reference_key(ot)
+     | unique_key(ot)
+     | aggressive_load(ot)
+     | join_stmt(ot) )
+}
+
+void compound_statement(ObjectType ot) :
+{}
+{
+    (  event()
+     | option_block() )
+}
+
+/**
+ * Simple statements
+ **/
+
+void property_stmt(ObjectType ot) :
+{
+    Property p;
+}
+{
+    p = property() { ot.add(ObjectType.PROPERTIES, p); }
+}
+
+Property property() :
+{
+    Property p = new Property();
+    Node n;
+}
+{
+    [ <UNIQUE> { p.setUnique(true); } ]
+    [ ( <COMPONENT> { p.setComponent(true); } |
+        <COMPOSITE> { p.setComposite(true); } ) ]
+    n = type() { p.add(Property.TYPE, n); }
+    [ multiplicity() ]
+    n = id() { p.add(Property.NAME, n); ln(p, n); }
+    [ <EQ> ( n = column() { p.add(Property.MAPPING, n); } |
+             n = join_path() { p.add(Property.MAPPING, n); } ) ]
+    { return p; }
+}
+
+void multiplicity() :
+{}
+{
+    <LBRACKET> integer() <DOT> <DOT> ( id() | integer() ) <RBRACKET>
+}
+
+void object_key(ObjectType ot) :
+{
+    Token t;
+    ObjectKey k = new ObjectKey();
+    Node n;
+}
+{
+    t = <OBJECTKEY>
+    <LPAREN>
+        n = id() { k.add(ObjectKey.PROPERTIES, n); }
+        ( <COMMA> n = id() { k.add(ObjectKey.PROPERTIES, n); } )*
+    <RPAREN>
+    { ln(k, t); ot.add(ObjectType.OBJECT_KEY, k); }
+}
+
+void reference_key(ObjectType ot) :
+{
+    Token t;
+    ReferenceKey k = new ReferenceKey();
+    Node n;
+}
+{
+    t = <REFERENCEKEY>
+    <LPAREN>
+        n = column() { k.add(ReferenceKey.COLUMN, n); }
+    <RPAREN>
+    { ln(k, t); ot.add(ObjectType.REFERENCE_KEY, k); }
+}
+
+void unique_key(ObjectType ot) :
+{
+    Token t;
+    UniqueKey k = new UniqueKey();
+    Node n;
+}
+{
+    t = <UNIQUE>
+    <LPAREN>
+        n = id() { k.add(UniqueKey.PROPERTIES, n); }
+        ( <COMMA> n = id() { k.add(UniqueKey.PROPERTIES, n); } )*
+    <RPAREN>
+    { ln(k, t); ot.add(ObjectType.UNIQUE_KEYS, k); }
+}
+
+void aggressive_load(ObjectType ot) :
+{
+    Token t;
+    AggressiveLoad l = new AggressiveLoad();
+    Node n;
+}
+{
+    t = <AGGRESSIVE>
+    <LPAREN>
+        n = path() { l.add(AggressiveLoad.PATHS, n); }
+        ( <COMMA> n = path() { l.add(AggressiveLoad.PATHS, n); } )*
+    <RPAREN>
+    { ln(l, t); ot.add(ObjectType.AGGRESSIVE_LOAD, l); }
+}
+
+void join_stmt(ObjectType ot) :
+{
+    JoinPath j;
+}
+{
+    j = join_path() { ot.add(ObjectType.JOIN_PATHS, j); }
+}
+
+/**
+ * Compound statements
+ **/
+
+void event() :
+{}
+{
+    ( ( <INSERT> | <UPDATE> | <DELETE> ) |
+      ( ( <ADD> | <REMOVE> | <CLEAR> ) [ id() ] ) |
+      ( <RETRIEVE> [ <ALL> | <ATTRIBUTES> | id() ] ) )
+    <LBRACE>
+        ( block() | <SUPER> <SEMI> )*
+    <RBRACE>
+}
+
+void block() :
+{}
+{
+    ( <CALL> | <DO> ) <SQL>
+    [ <MAP> <LBRACE> ( mapStatement() <SEMI> )+ <RBRACE> ]
+}
+
+void mapStatement() :
+{}
+{
+    ( LOOKAHEAD(binding()) binding() | mapping() )
+}
+
+void binding() :
+{}
+{
+    path() <COLON> db_type()
+}
+
+void mapping() :
+{}
+{
+    path() <EQ> id() [ <DOT> id() ]
+}
+
+void option_block() :
+{}
+{
+    <OPTIONS> <LBRACE> ( option() <SEMI> )+ <RBRACE>
+}
+
+void option() :
+{}
+{
+    id() <EQ> optionValue()
+}
+
+void optionValue() :
+{}
+{
+    <TRUE>
+  | <FALSE>
+  | <STRINGLIT>
+}
+
+/**
+ * Shared definitions
+ **/
+
+JoinPath join_path() :
+{
+    JoinPath p = new JoinPath();
+    Node n;
+}
+{
+    n = join() { ln(p, n); p.add(JoinPath.JOINS, n); }
+    ( <COMMA> n = join() { p.add(JoinPath.JOINS, n); } )*
+    { return p; }
+}
+
+Join join() :
+{
+    Token t;
+    Join j = new Join();
+    Node n;
+}
+{
+    t = <JOIN> n = column() { j.add(Join.FROM, n); }
+    <TO> n = column() { j.add(Join.TO, n); }
+    { ln(j, t); return j; }
+}
+
+Column column() :
+{
+    Column c = new Column();
+    Node n;
+}
+{
+    n = id() { ln(c, n); c.add(Column.TABLE, n); }
+    <DOT> n = id() { c.add(Column.COLUMN, n); }
+    [ n = db_type() { c.add(Column.TYPE, n); } ]
+    { return c; }
+}
+
+DbType db_type() :
+{
+    DbType d = new DbType();
+    Node n;
+    int i;
+}
+{
+    n = id() { d.add(DbType.NAME, n); }
+    [ <LPAREN>
+          i = integer() { d.setSize(i); }
+          [ <COMMA> i = integer() { d.setPrecision(i); } ]
+    <RPAREN> ]
+    { ln(d, n); return d; }
+}
+
+Type type() :
+{
+    Type t = new Type();
+}
+{
+    idpath(t, Type.IDENTIFIERS)
+    { return t; }
+}
+
+Path path() :
+{
+    Path p = new Path();
+}
+{
+    idpath(p, Path.PATH)
+    { return p; }
+}
+
+void idpath(Node n, Node.Field f) :
+{
+    Identifier i;
+}
+{
+    i = id() { ln(n, i); n.add(f, i); }
+    ( LOOKAHEAD(2) <DOT> i = id() { n.add(f, i); } )*
+}
+
+Identifier id() :
+{
+    Identifier i;
+    Token t;
+}
+{
+    t = <ID> {
+        i = new Identifier(t.image);
+        ln(i, t);
+        return i;
+    }
+}
+
+int integer() :
+{
+    Token t;
+}
+{
+    t = <INT> { return Integer.parseInt(t.image); }
+}
