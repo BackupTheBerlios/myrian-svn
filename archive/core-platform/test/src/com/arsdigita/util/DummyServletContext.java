@@ -17,6 +17,7 @@ package com.arsdigita.util;
 
 import javax.servlet.http.*;
 import java.util.*;
+import java.io.IOException;
 import javax.servlet.*;
 
 /**
@@ -24,14 +25,15 @@ import javax.servlet.*;
  *  include requests in their signatures.
  *
  * @author <a href="mailto:richardl@arsdigita.com">richardl@arsdigita.com</a>
- * @version $Revision: #2 $ $Date: 2002/10/13 $
+ * @version $Revision: #3 $ $Date: 2002/10/17 $
  */
 
 public class DummyServletContext implements ServletContext {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/DummyServletContext.java#2 $ by $Author: jorris $, $DateTime: 2002/10/13 21:43:37 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/DummyServletContext.java#3 $ by $Author: jorris $, $DateTime: 2002/10/17 15:09:52 $";
 
     private HashMap attributes;
+    private HashMap m_dispachers = new HashMap();
 
     public DummyServletContext() {
         attributes = new HashMap();
@@ -70,7 +72,7 @@ public class DummyServletContext implements ServletContext {
     }
 
     public RequestDispatcher getNamedDispatcher(String name) {
-        return null;
+        return (RequestDispatcher) m_dispachers.get(name);
     }
 
     public String getRealPath(String path) {
@@ -131,6 +133,20 @@ public class DummyServletContext implements ServletContext {
 
     public String getServletContextName() {
         return null;
+    }
+
+    public void addDispacher(String name, final Servlet servlet) {
+        RequestDispatcher rd = new RequestDispatcher() {
+            public void forward(ServletRequest servletRequest, ServletResponse servletResponse) throws ServletException, IOException {
+                servlet.service(servletRequest, servletResponse);
+            }
+
+            public void include(ServletRequest servletRequest, ServletResponse servletResponse) throws ServletException, IOException {
+                throw new UnsupportedOperationException("Not yet supported");
+            }
+        };
+
+        m_dispachers.put(name, rd);
     }
 
 }

@@ -34,7 +34,7 @@ import javax.servlet.*;
 */
 
 public class HttpServletDummyRequest implements HttpServletRequest {
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyRequest.java#6 $ by $Author: jorris $, $DateTime: 2002/08/26 18:26:50 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyRequest.java#7 $ by $Author: jorris $, $DateTime: 2002/10/17 15:09:52 $";
 
     private HashMap parameters;
     private HashMap attributes;
@@ -42,7 +42,7 @@ public class HttpServletDummyRequest implements HttpServletRequest {
     private String m_queryString;
     private HttpSession m_session;
     private boolean m_isSecure;
-
+   private String m_pathInfo;
      private final static String REQUEST_CONTEXT_ATTR =
          "com.arsdigita.dispatcher.RequestContext";
 
@@ -177,13 +177,30 @@ public class HttpServletDummyRequest implements HttpServletRequest {
 
     public java.util.Enumeration getHeaders(java.lang.String name) { return null; }
 
-    public java.util.Enumeration getHeaderNames() { return null; }
+    public java.util.Enumeration getHeaderNames() {
+      return new Enumeration() {
+         public boolean hasMoreElements() {
+            return false;
+         }
+
+         public Object nextElement() {
+            return null;
+         }
+      };
+    };
 
     public int getIntHeader(java.lang.String name) { return 0; }
 
     public java.lang.String getMethod() { return null; }
 
-    public java.lang.String getPathInfo() { return null; }
+   public java.lang.String getPathInfo() {
+      return m_pathInfo;
+   }
+   public void setPathInfo(String info) {
+      m_pathInfo = info;
+   }
+
+
 
     public java.lang.String getPathTranslated() { return null; }
 
