@@ -13,12 +13,12 @@ import java.util.*;
  * Parser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/14 $
  */
 
 class Parser {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Parser.jj#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Parser.jj#2 $ by $Author: rhs $, $DateTime: 2002/05/14 20:16:28 $";
 
     private String m_filename;
 
@@ -68,6 +68,8 @@ TOKEN:
   | <LE: "<=">
   | <PUT: "=>">
   | <GE: ">=">
+  | <BEGIN_HINT: "/*+">
+  | <END_HINT: "*/">
 }
 
 TOKEN [IGNORE_CASE]:
@@ -172,6 +174,8 @@ Symbol symbol() :
   | t = <LE>
   | t = <PUT>
   | t = <GE>
+  | t = <BEGIN_HINT>
+  | t = <END_HINT>
   | t = <NULL>
   | t = <IS_NULL>
   | t = <IS_NOT_NULL>

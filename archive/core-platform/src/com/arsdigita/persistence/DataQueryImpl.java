@@ -63,7 +63,7 @@ import org.apache.log4j.Category;
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@arsdigita.com">randyg@arsdigita.com</a>
  * @author <a href="mailto:deison@arsdigita.com">deison@arsdigita.com</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/14 $
  */
 // NOTE if we ever support anything other than forward-only,
 // we'll need to shut off the auto-closing functionality
@@ -71,7 +71,7 @@ import org.apache.log4j.Category;
 // results and general confusion.
 class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#2 $ by $Author: rhs $, $DateTime: 2002/05/14 20:16:28 $";
 
     private final static Category log =
         Category.getInstance(DataQueryImpl.class.getName());
@@ -1037,7 +1037,8 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
             // select count(*) from (<above>)
             // down towards the end of this proc
 
-            sql.append("select * from (select outerResults.*, " +
+            sql.append("select /*+ FIRST_ROWS */ *\n" +
+                       " from (select outerResults.*, " +
                        "rownum as fakeRownum from (");
             if (m_wrap) {
                 sql.append("select * ");
