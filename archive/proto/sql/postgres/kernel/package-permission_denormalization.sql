@@ -1,6 +1,19 @@
 --
--- pl/sql procedures to help maintain the denormalizations
+-- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
 --
+-- The contents of this file are subject to the CCM Public
+-- License (the "License"); you may not use this file except in
+-- compliance with the License. You may obtain a copy of
+-- the License at http://www.redhat.com/licenses/ccmpl.html
+--
+-- Software distributed under the License is distributed on an "AS
+-- IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+-- implied. See the License for the specific language governing
+-- rights and limitations under the License.
+--
+-- $Id: //core-platform/proto/sql/postgres/kernel/package-permission_denormalization.sql#2 $
+-- $DateTime: 2003/04/09 16:35:55 $
+
 
   create or replace function permissions_add_context (
     integer, integer
@@ -183,14 +196,15 @@
   returns integer as '
   declare
     v_object_id alias for $1;
-    v_has_children integer;
+    v_num_children integer;
+    v_num_grants   integer;
   begin
 
-    select count(*) into v_has_children 
+    select count(*) into v_num_grants
     from object_grants
     where object_id = v_object_id;
 
-    if (v_has_children > 0) then
+    if (v_num_grants > 0) then
         update object_grants
         set n_grants = n_grants +1
         where object_id = v_object_id;
@@ -200,11 +214,11 @@
         values
         (v_object_id, 1);
 
-        select count(*) into v_has_children
+        select count(*) into v_num_children
         from object_context_map
         where context_id = v_object_id;
 
-        if (v_has_children=1) then
+        if (v_num_children > 0) then
 
             -- insert a row stating that this object has itself as an 
             -- implied context

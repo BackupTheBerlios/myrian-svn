@@ -12,6 +12,7 @@
  * rights and limitations under the License.
  *
  */
+
 package com.arsdigita.tools.junit.results;
 
 import org.jdom.Element;
@@ -20,14 +21,16 @@ import org.jdom.Element;
  *  ReportIndex
  *
  *  @author <a href="mailto:jorris@redhat.com">Jon Orris</a>
- *  @version $Revision: #1 $ $Date Nov 6, 2002 $
+ *  @version $Revision: #2 $ $Date Nov 6, 2002 $
  */
 public class ReportIndex extends Element {
-    public ReportIndex(String previousChangelist, String currentChangelist) {
+    public ReportIndex(String previousChangelist, String currentChangelist, String databaseType) {
         super("junit_index");
         setAttribute("previous_changelist", previousChangelist);
         setAttribute("current_changelist", currentChangelist);
+        setAttribute("database_type", databaseType);
         setAttribute("changes", "0");
+        setAttribute("warnings", "0");
     }
 
     public void addResult(ResultDiff diff) {
@@ -50,19 +53,33 @@ public class ReportIndex extends Element {
         elem.setAttribute("new_tests", Integer.toString(diff.newTestCount()));
         elem.setAttribute("missing_tests", Integer.toString(diff.missingTestCount()));
 
-        final boolean warning = testDelta < 0 || failureDelta > 0 || errorDelta > 0 || diff.missingTestCount() > 0;
+        final boolean warningsExist = testDelta < 0 || failureDelta > 0 || errorDelta > 0 || diff.missingTestCount() > 0;
 
-        elem.setAttribute("warning", "" + warning);
-
+        elem.setAttribute("warning", "" + warningsExist);
+		
         final boolean changesExist = !(testDelta == 0 &&
                 failureDelta == 0 && errorDelta == 0 && diff.missingTestCount() == 0 && diff.newTestCount() == 0);
 
         if (changesExist) {
-            int changes = Integer.parseInt(getAttributeValue("changes"));
-            changes++;
-            setAttribute("changes", Integer.toString(changes));
+            incrementChangeCount();
+        } 
+        
+        if(warningsExist) {
+            incrementWarningCount();
         }
 
         addContent(elem);
+    }
+
+    public void incrementWarningCount() {
+        int warnings = Integer.parseInt(getAttributeValue("warnings"));
+        warnings++;
+        setAttribute("warnings", Integer.toString(warnings));
+    }
+
+    public void incrementChangeCount() {
+        int changes = Integer.parseInt(getAttributeValue("changes"));
+        changes++;
+        setAttribute("changes", Integer.toString(changes));
     }
 }

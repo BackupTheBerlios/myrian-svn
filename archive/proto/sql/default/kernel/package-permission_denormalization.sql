@@ -1,6 +1,19 @@
 --
--- pl/sql procedures to help maintain the denormalizations
+-- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
 --
+-- The contents of this file are subject to the CCM Public
+-- License (the "License"); you may not use this file except in
+-- compliance with the License. You may obtain a copy of
+-- the License at http://www.redhat.com/licenses/ccmpl.html
+--
+-- Software distributed under the License is distributed on an "AS
+-- IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+-- implied. See the License for the specific language governing
+-- rights and limitations under the License.
+--
+-- $Id: //core-platform/proto/sql/default/kernel/package-permission_denormalization.sql#2 $
+-- $DateTime: 2003/04/09 16:35:55 $
+
 create or replace package permission_denormalization
 as
   procedure add_context (
@@ -17,6 +30,7 @@ as
   procedure remove_grant (
     object_id   in acs_objects.object_id%TYPE
   );
+  procedure rebuild;
 end;
 /
 show errors
@@ -200,7 +214,7 @@ as
     object_id   in acs_objects.object_id%TYPE
   )
   as
-      v_has_children integer;
+      v_num_children integer;
   begin
 
     update object_grants
@@ -213,11 +227,11 @@ as
         values
         (add_grant.object_id, 1);
 
-        select count(*) into v_has_children
+        select count(*) into v_num_children
         from object_context_map
         where context_id = add_grant.object_id;
 
-        if (v_has_children=1) then
+        if (v_num_children > 0) then
 
             -- insert a row stating that this object has itself as an 
             -- implied context
@@ -289,6 +303,24 @@ as
     end if;
 
   end remove_grant;
+
+  procedure rebuild
+  as
+  begin
+    delete from object_context_map;
+    delete from granted_context_non_leaf_map;
+    delete from ungranted_context_non_leaf_map;
+    delete from object_grants;
+
+    for row in (select * from object_context
+                where context_id is not null) loop
+      add_context(row.object_id, row.context_id);
+    end loop;
+
+    for row in (select * from acs_permissions) loop
+      add_grant(row.object_id);
+    end loop;
+  end rebuild;
 
 end;
 /

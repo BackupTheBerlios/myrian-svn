@@ -22,8 +22,7 @@ import java.util.*;
  *
  * <p> This class performs unit tests on com.arsdigita.persistence.metadatax.ObjectType </p>
  *
- * @author <a href="mailto:jorris@arsdigita.com">jorris@arsdigita.com</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/04/09 $
  *
  * @see com.arsdigita.persistence.metadatax.ObjectType
  */
@@ -31,7 +30,7 @@ import java.util.*;
 
 public class ObjectTypeTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/metadata/ObjectTypeTest.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/metadata/ObjectTypeTest.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     public ObjectTypeTest(String name) {
         super(name);

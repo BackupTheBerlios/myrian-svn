@@ -23,13 +23,13 @@ import java.util.*;
  * is shared across multiple threads.  Also includes a static global
  * cache, whose methods <em>are</em> threadsafe.
  *
- * @author Bill Schneider (bschneid@arsdigita.com)
- * @version $Revision: #1 $, $Date: 2002/11/27 $
+ * @author Bill Schneider 
+ * @version $Revision: #2 $, $Date: 2003/04/09 $
  */
 
 public class Cache {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/util/Cache.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/util/Cache.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     // map keys to their values
     private static Cache instance = new Cache(32000);

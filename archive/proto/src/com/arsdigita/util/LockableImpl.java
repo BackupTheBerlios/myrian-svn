@@ -20,8 +20,8 @@ package com.arsdigita.util;
  *
  * @see Lockable
  *
- * @author <a href="mbryzek@arsdigita.com">Michael Bryzek</a>
- * @version $Id: //core-platform/proto/src/com/arsdigita/util/LockableImpl.java#1 $
+ * @author Michael Bryzek
+ * @version $Id: //core-platform/proto/src/com/arsdigita/util/LockableImpl.java#2 $
  **/
 
 public class LockableImpl implements Lockable {

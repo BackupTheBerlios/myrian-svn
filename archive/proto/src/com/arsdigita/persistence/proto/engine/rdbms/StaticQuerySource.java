@@ -10,12 +10,12 @@ import java.util.*;
  * StaticQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/04/07 $
+ * @version $Revision: #8 $ $Date: 2003/04/09 $
  **/
 
 class StaticQuerySource extends QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/StaticQuerySource.java#7 $ by $Author: rhs $, $DateTime: 2003/04/07 19:44:54 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/StaticQuerySource.java#8 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     private synchronized Source getSource(ObjectType type, SQLBlock block,
                                           Path prefix) {
@@ -33,6 +33,12 @@ class StaticQuerySource extends QuerySource {
 
     private Signature getSignature(ObjectType type, SQLBlock block,
                                    Path prefix, ObjectType from) {
+	return getSignature(type, block, prefix, from, true);
+    }
+
+    private Signature getSignature(ObjectType type, SQLBlock block,
+                                   Path prefix, ObjectType from,
+				   boolean requireKey) {
         Signature sig = new Signature(getSource(type, block, prefix));
 
         for (Iterator it = block.getPaths().iterator(); it.hasNext(); ) {
@@ -50,11 +56,18 @@ class StaticQuerySource extends QuerySource {
 		 .getImmediateProperties().iterator(); it.hasNext(); ) {
 	    Property prop = (Property) it.next();
 	    Path p = Path.get(prop.getName());
-	    if (!sig.isFetched(p)) {
-		if (unfetched == null) {
-		    unfetched = new ArrayList();
+	    if (!requireKey && sig.getObjectType().isKey(p)) {
+		continue;
+	    }
+	    Path[] paths = RDBMSEngine.getKeyPaths
+		(prop.getType(), Path.add(prefix, p));
+	    for (int i = 0; i < paths.length; i++) {
+		if (block.getMapping(paths[i]) == null) {
+		    if (unfetched == null) {
+			unfetched = new ArrayList();
+		    }
+		    unfetched.add(p);
 		}
-		unfetched.add(p);
 	    }
 	}
 
@@ -63,7 +76,7 @@ class StaticQuerySource extends QuerySource {
 		(block, "unfetched immediate properties: " + unfetched);
 	}
 
-        if (from != null) {
+	if (from != null) {
             for (Iterator it = from.getKeyProperties().iterator();
                  it.hasNext(); ) {
                 Property key = (Property) it.next();
@@ -151,7 +164,7 @@ class StaticQuerySource extends QuerySource {
                 if (block.hasMapping(path) ||
                     om.getKeyProperties().contains(prop)) {
                     sig = getSignature
-                        (type, block, null, props.getObjectType());
+                        (type, block, null, props.getObjectType(), false);
                     if (!sig.hasPath(path)) {
                         sig.addPath(path);
                     }

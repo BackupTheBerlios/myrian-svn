@@ -16,9 +16,16 @@
 package com.arsdigita.tools.junit.extensions;
 
 import java.sql.Connection;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.Iterator;
+import java.io.FileNotFoundException;
+
 import com.arsdigita.db.ConnectionManager;
+import com.arsdigita.db.DbHelper;
 import com.arsdigita.initializer.Script;
 import com.arsdigita.installer.LoadSQLPlusScript;
+import com.arsdigita.installer.ParseException;
 import junit.extensions.*;
 import junit.framework.*;
 
@@ -32,9 +39,10 @@ public class BaseTestSetup extends TestDecorator {
     protected boolean performInitialization = true;
     protected String scriptName;
     protected String iniName;
-    protected String setupSQLScript;
-    protected String teardownSQLScript;
     protected TestSuite suite;
+
+    private List m_setupSQLScripts = new LinkedList();
+    private List m_teardownSQLScripts = new LinkedList();
 
     public BaseTestSetup(Test test, TestSuite suite) {
         super(test);
@@ -56,20 +64,20 @@ public class BaseTestSetup extends TestDecorator {
         result.runProtected(this, p);
     }
 
-    public void setSetupSQLScript(String setupSQLScript) {
-        this.setupSQLScript = setupSQLScript;
+    public void addSQLSetupScript(String setupSQLScript) {
+        m_setupSQLScripts.add(setupSQLScript);
+    }
+    public void addSQLTeardownScript(String teardown) {
+        m_teardownSQLScripts.add(teardown);
     }
 
-    public String getSetupSQLScript() {
-        return setupSQLScript;
+    public void setSetupSQLScript(String setupSQLScript) {
+        m_setupSQLScripts.add(setupSQLScript);
     }
+
 
     public void setTeardownSQLScript(String teardownSQLScript) {
-        this.teardownSQLScript = teardownSQLScript;
-    }
-
-    public String getTeardownSQLScript() {
-        return teardownSQLScript;
+        m_teardownSQLScripts.add(teardownSQLScript);
     }
 
     public void setInitScript(String scriptName) {
@@ -124,21 +132,25 @@ public class BaseTestSetup extends TestDecorator {
     }
 
     protected void setupSQL () throws Exception {
-        if (setupSQLScript != null) {
-
-            LoadSQLPlusScript loader = new LoadSQLPlusScript();
-            loader.setConnection ( ConnectionManager.getConnection() );
-            loader.loadSQLPlusScript ( setupSQLScript );
-
+        if (m_setupSQLScripts.size() > 0) {
+            runScripts(m_setupSQLScripts);
         }
     }
 
-    protected void teardownSQL() throws Exception {
-        if (teardownSQLScript != null) {
 
+    protected void teardownSQL() throws Exception {
+        if (m_teardownSQLScripts.size() > 0) {
+            runScripts(m_teardownSQLScripts);
+        }
+    }
+
+    private void runScripts(List scripts) throws Exception {
+        for (Iterator iterator = scripts.iterator(); iterator.hasNext();) {
+            String script = (String) iterator.next();
             LoadSQLPlusScript loader = new LoadSQLPlusScript();
             loader.setConnection ( ConnectionManager.getConnection() );
-            loader.loadSQLPlusScript ( teardownSQLScript );
+            loader.setDatabase(DbHelper.getDatabaseDirectory());
+            loader.loadSQLPlusScript ( script );
 
         }
     }

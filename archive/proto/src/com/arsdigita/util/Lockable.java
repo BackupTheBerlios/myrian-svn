@@ -50,12 +50,12 @@ package com.arsdigita.util;
  * point on, it is read-only and should throw exceptions whenever an
  * attempt is made to modify it.
  *
- * @author David Lutterkort (lutter@arsdigita.com)
- * @version $Id: //core-platform/proto/src/com/arsdigita/util/Lockable.java#1 $ */
+ * @author David Lutterkort 
+ * @version $Id: //core-platform/proto/src/com/arsdigita/util/Lockable.java#2 $ */
 
 public interface Lockable {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/util/Lockable.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/util/Lockable.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
     /**
      * Lock an object. Locked objects are to be considered immutable. Any
      * attempt to modify them, e.g., through a <code>setXXX</code> method

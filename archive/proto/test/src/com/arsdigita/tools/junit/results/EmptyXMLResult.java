@@ -12,6 +12,7 @@
  * rights and limitations under the License.
  *
  */
+
 package com.arsdigita.tools.junit.results;
 
 import com.arsdigita.util.Assert;
@@ -20,7 +21,7 @@ import com.arsdigita.util.Assert;
  *  EmptyXMLResult
  *
  *  @author <a href="mailto:jorris@redhat.com">Jon Orris</a>
- *  @version $Revision: #1 $ $Date Nov 6, 2002 $
+ *  @version $Revision: #2 $ $Date Nov 6, 2002 $
  */
 public class EmptyXMLResult extends XMLResult {
     public EmptyXMLResult(String filename) {

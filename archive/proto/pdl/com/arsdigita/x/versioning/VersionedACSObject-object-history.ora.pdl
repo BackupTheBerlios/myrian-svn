@@ -1,0 +1,64 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/proto/pdl/com/arsdigita/x/versioning/VersionedACSObject-object-history.ora.pdl#1 $
+// $DateTime: 2003/04/09 16:35:55 $
+
+model com.arsdigita.x.versioning;
+
+import com.arsdigita.kernel.*;
+
+query objectHistoryQuery {
+
+  BigDecimal    transID;
+  DataObjectChange   change;
+  Date          timestamp;
+  String        userEmail;
+  String        comment;
+
+  do {
+    select  
+      qq.change_id, qq.timestamp, qq.primary_email, qq.tag,
+      qq.is_last
+    from (select
+      q.change_id, q.timestamp, q.primary_email, q.tag,
+      q.is_last
+    from (
+      select
+        t.change_id, t.timestamp, p.primary_email, t.tag, 
+        '0' as is_last
+      from
+        vcx_obj_changes t, parties p
+      where
+        master_id = :masterID
+      and
+        p.party_id = t.modifying_user(+)
+      and
+        t.tag is not null
+    union
+      select
+        :dummyID as change_id, to_date('') as timestamp, 
+        null as primary_email, null as tag, '1' as is_last
+      from
+        dual
+      where
+        :showCurrent = '1'
+    ) q order by is_last, timestamp) qq
+  } map {
+    transID    = change_id;
+    change.id   = change_id;
+    timestamp  = timestamp;
+    userEmail  = primary_email;
+    comment    = tag;
+  }
+}

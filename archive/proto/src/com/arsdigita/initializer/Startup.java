@@ -28,15 +28,15 @@ import java.util.Collection;
  * values for web app root and script name, or set java properties with names
  * WEB_APP_ROOT or SCRIPT_NAME.
  *
- * @author <a href="mbryzek@arsdigita.com">Michael Bryzek</a>
- * @author <a href="dennis@arsdigita.com">Dennis Gregorovic</a>
- * @version $Revision: #2 $ $Date: 2002/12/09 $
+ * @author Michael Bryzek
+ * @author Dennis Gregorovic
+ * @version $Revision: #3 $ $Date: 2003/04/09 $
  * @since ACS 4.7
  *
  **/
 public class Startup {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/initializer/Startup.java#2 $ by $Author: rhs $, $DateTime: 2002/12/09 12:29:30 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/initializer/Startup.java#3 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     /** The name of the property containing the web app root **/
     public static final String WEB_APP_ROOT = "webAppRoot";

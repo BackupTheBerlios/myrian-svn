@@ -1,17 +1,17 @@
 /*
-* Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
-*
-* The contents of this file are subject to the CCM Public
-* License (the "License"); you may not use this file except in
-* compliance with the License. You may obtain a copy of
-* the License at http://www.redhat.com/licenses/ccmpl.html
-*
-* Software distributed under the License is distributed on an "AS
-* IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-* implied. See the License for the specific language governing
-* rights and limitations under the License.
-*
-*/
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.redhat.com/licenses/ccmpl.html
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
 
 package com.arsdigita.util;
 
@@ -32,7 +32,7 @@ import org.apache.cactus.ServletURL;
  */
 
 public class HttpServletDummyRequest implements HttpServletRequest {
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/util/HttpServletDummyRequest.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/util/HttpServletDummyRequest.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     private HashMap parameters = new HashMap();
     private HashMap attributes = new HashMap();
@@ -52,7 +52,7 @@ public class HttpServletDummyRequest implements HttpServletRequest {
         this(true);
     }
     public HttpServletDummyRequest(boolean isDebug) {
-        this("localhost", "", "", "", null, isDebug);
+        this("localhost", "", "/someservlet", "/", null, isDebug);
     }
 
 
@@ -267,11 +267,11 @@ public class HttpServletDummyRequest implements HttpServletRequest {
 
     public java.lang.String getProtocol() { return null; }
 
-    public java.lang.String getScheme() { return null; }
+    public java.lang.String getScheme() { return "http"; }
 
-    public java.lang.String getServerName() { return null; }
+    public java.lang.String getServerName() { return "localhost"; }
 
-    public int getServerPort() { return 0; }
+    public int getServerPort() { return 8080; }
 
     public java.io.BufferedReader getReader()
             throws java.io.IOException { return null; }

@@ -30,11 +30,11 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/04/09 $
  */
 public class GenericDataObjectTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/GenericDataObjectTest.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/GenericDataObjectTest.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     public GenericDataObjectTest(String name) {
         super(name);
@@ -101,7 +101,7 @@ public class GenericDataObjectTest extends PersistenceTestCase {
      * even if the association has not previously been fetched.  See
      * bug report 145705
      *
-     * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
+     * @author Patrick McNeill
      */
     public void testSetAssociationToNull() {
         DataObject parent = getSession().create("examples.Node");

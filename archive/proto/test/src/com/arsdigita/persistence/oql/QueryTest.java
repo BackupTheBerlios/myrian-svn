@@ -29,12 +29,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/04/09 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/oql/QueryTest.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/oql/QueryTest.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);
@@ -76,6 +76,7 @@ public class QueryTest extends PersistenceTestCase {
             }
             op = "com/arsdigita/persistence/oql/" + database + "/" +
                 expectedResource;
+
             is = getClass().getClassLoader().getResourceAsStream(op);
         }
         assertTrue("No such resource: " + op + "\n\nActual:\n" + actual,
@@ -99,18 +100,19 @@ public class QueryTest extends PersistenceTestCase {
 
     private void doDiff(String expected, String actual) {
         StringTokenizer expectedTokens = new StringTokenizer(expected, "\n\r");
-        StringTokenizer actualTokens = new StringTokenizer(expected, "\n\r");
+        StringTokenizer actualTokens = new StringTokenizer(actual, "\n\r");
 
-        int lineNumber = 1;
+        int lineNumber = 0;
         while (expectedTokens.hasMoreTokens()) {
+	    lineNumber++;
+	    String expectedLine = stripWhitespace(expectedTokens.nextToken());
             if (actualTokens.hasMoreTokens()) {
-                String expectedLine = stripWhitespace(expectedTokens.nextToken());
                 String actualLine = stripWhitespace(actualTokens.nextToken());
                 if(!expectedLine.equals(actualLine)) {
-                    fail(expected, actual, lineNumber);
+                    fail(expectedLine, actualLine, lineNumber, actual);
                 }
             } else {
-                fail(expected, actual, lineNumber);
+                fail(expectedLine, null, lineNumber, actual);
             }
 
         }
@@ -142,9 +144,11 @@ public class QueryTest extends PersistenceTestCase {
         return result.toString().trim();
     }
 
-    private static final void fail(String expected, String actual, int lineNumber) {
-
-        fail("Failed at line " + lineNumber + " Expected: \n" + expected + "\n\nActual:\n " + actual);
+    private static final void fail(String expected, String actual,
+				   int lineNumber, String output) {
+        fail("Diff failed at line " + lineNumber +
+	     "\nExpected line:\n" + expected + "\n\nActual line:\n" + actual +
+	     "\n\nTest output:\n" + output);
     }
 
     /**

@@ -25,8 +25,7 @@ import junit.framework.TestCase;
  *
  * <p> This class performs unit tests on com.arsdigita.persistence.metadatax.Model </p>
  *
- * @author <a href="mailto:jorris@arsdigita.com">jorris@arsdigita.com</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/04/09 $
  *
  * @see com.arsdigita.persistence.metadata.Model
  */
@@ -34,7 +33,7 @@ import junit.framework.TestCase;
 public class ModelTest extends TestCase
 {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/metadata/ModelTest.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/metadata/ModelTest.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     public ModelTest(String name) {
         super(name);

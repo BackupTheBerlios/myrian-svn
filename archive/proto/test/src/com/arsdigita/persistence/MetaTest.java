@@ -26,12 +26,12 @@ import org.apache.log4j.*;
  * MetaTest
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #2 $ $Date: 2003/03/28 $
+ * @version $Revision: #3 $ $Date: 2003/04/09 $
  */
 
 public class MetaTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/MetaTest.java#2 $ by $Author: rhs $, $DateTime: 2003/03/28 17:56:58 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/MetaTest.java#3 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
     private static final Logger s_log =
         Logger.getLogger(MetaTest.class.getName());
     static  {
@@ -80,7 +80,7 @@ public class MetaTest extends PersistenceTestCase {
         suite.addTest(new MetaTest("mdsql.User"));
         suite.addTest(new MetaTest("mdsql.Group"));
         suite.addTest(new MetaTest("linkTest.Article"));
-        //        suite.addTest(new MetaTest("examples.ArticleImageLink"));
+        //        suite.addTest(new MetaTest("linkTest.ArticleImageLink"));
         suite.addTest(new MetaTest("linkTest.Image"));
         suite.addTest(new MetaTest("examples.Node"));
         suite.addTest(new MetaTest("examples.Order"));

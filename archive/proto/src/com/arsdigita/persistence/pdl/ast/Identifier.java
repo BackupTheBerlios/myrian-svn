@@ -26,12 +26,12 @@ import java.util.*;
  * a scope).  If no scope is provided, the default scope is assumed.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/04/09 $
  */
 
 public class Identifier extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/ast/Identifier.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/ast/Identifier.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     // the identifier name
     private String m_name;
@@ -152,7 +152,7 @@ public class Identifier extends Element {
                 if (type != null) {
                     models.add(m.getName());
                 }
-            } else if (elem.endsWith(m_name)) {
+            } else if (elem.endsWith("." + m_name)) {
                 type = root.getObjectType(elem);
 
                 if (type == null) {
@@ -165,7 +165,7 @@ public class Identifier extends Element {
                 }
 
                 if (type != null) {
-                    models.add(m_model.getName());
+                    models.add(type.getModel().getName());
                 }
             }
         }

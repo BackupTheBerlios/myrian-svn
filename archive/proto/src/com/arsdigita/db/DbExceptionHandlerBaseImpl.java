@@ -26,13 +26,13 @@ import org.apache.log4j.Logger;
  * Class for processing of DB Exceptions.
  * Should be subclassed with database-specific initialization.
  *
- * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #1 $
+ * @author David Eison
+ * @version $Revision: #2 $
  * @since 4.6
  */
 public abstract class DbExceptionHandlerBaseImpl implements DbExceptionHandler {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/DbExceptionHandlerBaseImpl.java#1 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/DbExceptionHandlerBaseImpl.java#2 $";
 
     private static final Logger s_cat = Logger.getLogger(DbExceptionHandlerBaseImpl.class.getName());
 

@@ -24,13 +24,14 @@ import org.apache.log4j.Logger;
  * An implementation of Map which preserves the order in which you put
  * entries into it.
  *
- * @author Justin Ross &lt;<a href="mailto:jross@redhat.com">jross@redhat.com</a>&gt;
+ * @deprecated use {@link com.arsdigita.util.SequentialMap} instead
+ * @author Justin Ross &lt;jross@redhat.com&gt;
  */
 public class OrderedMap extends TreeMap {
     public static final String versionId =
-        "$Id: //core-platform/proto/src/com/arsdigita/util/OrderedMap.java#2 $" +
+        "$Id: //core-platform/proto/src/com/arsdigita/util/OrderedMap.java#3 $" +
         "$Author: rhs $" +
-        "$DateTime: 2002/12/09 12:29:30 $";
+        "$DateTime: 2003/04/09 16:35:55 $";
 
     private static final Logger s_log = Logger.getLogger(OrderedMap.class);
 

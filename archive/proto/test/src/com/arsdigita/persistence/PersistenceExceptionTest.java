@@ -27,11 +27,11 @@ import java.math.BigInteger;
 /**
  * This test verifies the exception-type-narrowing functionality.
  *
- * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
+ * @author David Eison
  */
 public class PersistenceExceptionTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/PersistenceExceptionTest.java#1 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/PersistenceExceptionTest.java#2 $";
 
     private Session ssn;
 

@@ -29,13 +29,13 @@ import java.sql.SQLException;
  * setDbExceptionHandlerImplName before using this class
  * (normally this is called via the DB Initializer).
  *
- * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #1 $
+ * @author David Eison
+ * @version $Revision: #2 $
  * @since 4.6
  */
 public class SQLExceptionHandler {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/SQLExceptionHandler.java#1 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/SQLExceptionHandler.java#2 $";
 
     private static String s_exceptionHandlerName = "com.arsdigita.db.oracle.OracleDbExceptionHandlerImpl";
 

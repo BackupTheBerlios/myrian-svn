@@ -28,12 +28,12 @@ import java.sql.PreparedStatement;
 /**
  * Implementation of the Sequence class for the Postgres RDBMS.
  *
- * @author <A HREF="mailto:pmcneill@arsdigita.com">Patrick McNeill</A>
+ * @author Patrick McNeill
  */
 
 public class PostgresSequenceImpl extends SequenceImpl {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/postgres/PostgresSequenceImpl.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/postgres/PostgresSequenceImpl.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     private String m_sequenceName;
 

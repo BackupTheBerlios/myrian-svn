@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/pdl/com/arsdigita/formbuilder/ProcessListener.pdl#1 $ 
-// $DateTime: 2002/11/27 19:51:05 $
+// $Id: //core-platform/proto/pdl/com/arsdigita/formbuilder/ProcessListener.pdl#2 $ 
+// $DateTime: 2003/04/09 16:35:55 $
 
 model com.arsdigita.formbuilder;
 
@@ -37,71 +37,4 @@ association {
                              join bebop_form_process_listeners.listener_id 
                                to bebop_process_listeners.listener_id;
     BigDecimal position = bebop_form_process_listeners.position;
-}
-
-
-query RetrieveProcessListeners {
-    BigDecimal id;
-    String defaultDomainClass;
-    Integer position;
-
-    do {
-        select o.object_id,
-            o.default_domain_class,
-            fpl.position
-        from bebop_form_process_listeners fpl,
-            acs_objects o
-        where o.object_id = fpl.listener_id
-        and fpl.form_section_id = :formSectionID
-    } map {
-        id = o.object_id;
-        defaultDomainClass = o.default_domain_class;
-        position = fpl.position;
-    }
-}
-
-data operation AddProcessListener {
-    do {
-        begin
-            update bebop_form_process_listeners
-              set position = position + 1
-              where form_section_id = :formSectionID
-              and position >= :position;
-
-            insert into bebop_form_process_listeners
-                (form_section_id, listener_id, position)
-            values 
-                (:formSectionID, :listenerID, :position);
-        end;
-    }
-}
-
-
-data operation RemoveProcessListener {
-    do {
-        begin
-            delete from bebop_form_process_listeners 
-              where form_section_id = :formSectionID
-              and listener_id = :listenerID;
-
-            update bebop_form_process_listeners
-              set position = position - 1
-              where form_section_id = :formSectionID
-              and position > :position;
-        end;
-    }
-}
-
-data operation ClearProcessListeners {
-    do {
-        begin
-            delete from bebop_form_process_listeners
-                where form_section_id = :formSectionID;
-
-            delete from bebop_process_listeners
-                where listener_id not in 
-                (select listener_id
-                 from bebop_form_process_listeners);
-        end;
-    }
 }

@@ -42,11 +42,11 @@ import org.apache.log4j.varia.StringMatchFilter;
  * This test verifies the aggressive connection closing functionality
  * by looking for appropriate log statements.
  *
- * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
+ * @author David Eison
  */
 public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
 
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/AggressiveConnectionCloseTest.java#3 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/AggressiveConnectionCloseTest.java#4 $";
 
     private Session ssn;
 

@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/pdl/com/arsdigita/categorization/Category.pdl#2 $
-// $DateTime: 2002/12/09 12:29:30 $
+// $Id: //core-platform/proto/pdl/com/arsdigita/categorization/Category.pdl#3 $
+// $DateTime: 2003/04/09 16:35:55 $
 
 model com.arsdigita.categorization;
 
@@ -271,9 +271,10 @@ query validParents {
          where trans.category_id = :rootID
            and cat_categories.category_id = trans.subcategory_id
            and cat_categories.category_id = acs_objects.object_id
-           and cat_categories.category_id not in (select subcategory_id
-                                      from cat_cat_subcat_trans_index
-                                     where category_id = :id)
+           and not exists (select 1
+                           from cat_cat_subcat_trans_index
+                           where category_id = :id
+			   and cat_categories.category_id = subcategory_id)
     } map {
         validParent.id = cat_categories.category_id;
         validParent.name = cat_categories.name;
@@ -294,10 +295,11 @@ query topLevelCategories {
         select category_id, description, name, enabled_p, abstract_p,
                default_ancestors
         from cat_categories
-        where category_id not in (
-            select related_category_id
+        where not exists (
+            select 1
             from cat_category_category_map
             where relation_type = 'child'
+	    and category_id = related_category_id
         )
     } map {
         category.id = category.category_id;

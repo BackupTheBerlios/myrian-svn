@@ -1,5 +1,20 @@
--- Explanation of request status:
 --
+-- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+--
+-- The contents of this file are subject to the CCM Public
+-- License (the "License"); you may not use this file except in
+-- compliance with the License. You may obtain a copy of
+-- the License at http://www.redhat.com/licenses/ccmpl.html
+--
+-- Software distributed under the License is distributed on an "AS
+-- IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+-- implied. See the License for the specific language governing
+-- rights and limitations under the License.
+--
+-- $Id: //core-platform/proto/sql/default/notification/table-nt_queue.sql#2 $
+-- $DateTime: 2003/04/09 16:35:55 $
+
+-- Explanation of request status:
 -- pending             request is only in the request table, not queued
 -- queued              request is in the queue, failed 0 or more times
 -- sent                request has been processed successfully

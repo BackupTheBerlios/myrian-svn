@@ -23,9 +23,9 @@ import java.util.TreeSet;
  * Ordering of the dequeues (ascending or descending) is specified at creation
  * time.  Note that this class defers synchronization to the user.
  *
- * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
+ * @author Patrick McNeill
  * @since 4.7
- * @version $Id: //core-platform/proto/src/com/arsdigita/util/PriorityQueue.java#1 $
+ * @version $Id: //core-platform/proto/src/com/arsdigita/util/PriorityQueue.java#2 $
  */
 public class PriorityQueue {
     private TreeSet m_model = new TreeSet(new PQComparator());

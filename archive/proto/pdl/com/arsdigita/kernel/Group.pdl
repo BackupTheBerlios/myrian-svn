@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/pdl/com/arsdigita/kernel/Group.pdl#1 $ 
-// $DateTime: 2002/11/27 19:51:05 $
+// $Id: //core-platform/proto/pdl/com/arsdigita/kernel/Group.pdl#2 $ 
+// $DateTime: 2003/04/09 16:35:55 $
 
 model com.arsdigita.kernel;
 
@@ -180,6 +180,8 @@ association {
 // Queries and operations to support Group API -- these are subject to change.
 
 query ContainedParties {
+    BigDecimal id;
+
     do {
         select member_id as party_id
         from group_member_map
@@ -188,10 +190,14 @@ query ContainedParties {
         select subgroup_id as party_id
         from group_subgroup_map
         where group_id = :groupID
+    } map {
+        id = party_id;
     }
 }
 
 query AllContainedParties {
+    BigDecimal id;
+
     do {
         select member_id as party_id
         from group_member_trans_map
@@ -200,6 +206,8 @@ query AllContainedParties {
         select subgroup_id as party_id
         from group_subgroup_trans_map
         where group_id = :groupID and subgroup_id != :groupID
+    } map {
+        id = party_id;
     }
 }
 

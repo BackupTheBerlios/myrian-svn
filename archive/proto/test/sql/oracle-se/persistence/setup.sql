@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/proto/test/sql/oracle-se/persistence/setup.sql#1 $
--- $DateTime: 2002/11/27 19:51:05 $
+-- $Id: //core-platform/proto/test/sql/oracle-se/persistence/setup.sql#2 $
+-- $DateTime: 2003/04/09 16:35:55 $
 
 
 --
@@ -20,12 +20,12 @@
 -- tests to run.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #1 $ $Date: 2002/11/27 $
+-- @version $Revision: #2 $ $Date: 2003/04/09 $
 --
 
-@@ create.sql
+
 @@ ../../default/persistence/setup.sql
 @@ data-query-test.sql
 @@ sql-operation-test.sql
 @@ data-operation-test.sql
-@@ deferred.sql
+

@@ -43,8 +43,7 @@ import org.apache.oro.text.perl.Perl5Util;
  * }
  * </pre>
  *
- * @author ron@arsdigita.com
- * @version $Id: //core-platform/proto/src/com/arsdigita/util/HtmlToText.java#1 $
+ * @version $Id: //core-platform/proto/src/com/arsdigita/util/HtmlToText.java#2 $
  */
 
 public class HtmlToText {

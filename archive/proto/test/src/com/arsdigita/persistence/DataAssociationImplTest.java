@@ -28,16 +28,16 @@ import org.apache.log4j.Logger;
  *     DataAssociationImpl implements
  *     com.arsdigita.persistence.DataAssociation </p>
  *
- * @author <a href="mbryzek@arsdigita.com">Michael Bryzek</a>
- * @date $Date: 2003/04/04 $
- * @version $Revision: #3 $
+ * @author Michael Bryzek
+ * @date $Date: 2003/04/09 $
+ * @version $Revision: #4 $
  *
  * @see com.arsdigita.persistence.DataAssociationImpl
  **/
 
 public class DataAssociationImplTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataAssociationImplTest.java#3 $ by $Author: ashah $, $DateTime: 2003/04/04 14:28:00 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataAssociationImplTest.java#4 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
     private static Logger log =
         Logger.getLogger(DataAssociationImplTest.class.getName());
 

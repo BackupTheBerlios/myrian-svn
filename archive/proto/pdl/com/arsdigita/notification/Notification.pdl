@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/pdl/com/arsdigita/notification/Notification.pdl#1 $ 
-// $DateTime: 2002/11/27 19:51:05 $
+// $Id: //core-platform/proto/pdl/com/arsdigita/notification/Notification.pdl#2 $ 
+// $DateTime: 2003/04/09 16:35:55 $
 
 model com.arsdigita.notification;
 
@@ -194,10 +194,11 @@ query GetCompleteNotifications {
 data operation DeleteNotificationQueued {
     do {
         delete from nt_queue 
-        where  request_id in 
-                   (select request_id
+        where  exists
+                   (select 1
                     from   nt_requests 
-                    where  status in ('sent', 'failed', 'failed_partial'))
+                    where  status in ('sent', 'failed', 'failed_partial')
+		    and nt_queue.request_id = nt_requests.request_id)
     }
 }
 

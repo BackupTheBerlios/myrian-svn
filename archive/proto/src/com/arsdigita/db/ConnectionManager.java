@@ -23,15 +23,15 @@ import org.apache.log4j.Logger;
  *
  * Central location for obtaining database connection.
  *
- * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @author David Dao
+ * @version $Revision: #2 $ $Date: 2003/04/09 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: dennis $ - $Date: 2002/11/27 $ $Id: //core-platform/proto/src/com/arsdigita/db/ConnectionManager.java#1 $";
+    public static final String versionId = "$Author: rhs $ - $Date: 2003/04/09 $ $Id: //core-platform/proto/src/com/arsdigita/db/ConnectionManager.java#2 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);

@@ -53,13 +53,13 @@ import java.io.StringWriter;
  * off)</li>
  * </ul>
  *
- * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #2 $ $Date: 2002/12/09 $
+ * @author Mark Thomas
+ * @version $Revision: #3 $ $Date: 2003/04/09 $
  * @since 4.5
  */
 public class Statement implements java.sql.Statement, ResultSetEventListener {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/Statement.java#2 $ $Author: rhs $ $Date: 2002/12/09 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/Statement.java#3 $ $Author: rhs $ $Date: 2003/04/09 $";
 
     private static final java.util.Set dbgStatements = new java.util.HashSet();
 

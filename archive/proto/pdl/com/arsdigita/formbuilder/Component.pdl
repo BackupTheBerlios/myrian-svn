@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/pdl/com/arsdigita/formbuilder/Component.pdl#1 $ 
-// $DateTime: 2002/11/27 19:51:05 $
+// $Id: //core-platform/proto/pdl/com/arsdigita/formbuilder/Component.pdl#2 $ 
+// $DateTime: 2003/04/09 16:35:55 $
 
 model com.arsdigita.formbuilder;
 
@@ -33,7 +33,7 @@ object type Component extends ACSObject {
 // Disabled pending reworking of the whole PersistentContainerHelper
 // class and removal of the old UI.
 association {
-    Component[0..1] componentContainer = join bebop_components.component_id
+    Component[0..n] componentContainer = join bebop_components.component_id
                                   to bebop_component_hierarchy.component_id,
                                 join bebop_component_hierarchy.container_id
                                   to bebop_components.component_id;

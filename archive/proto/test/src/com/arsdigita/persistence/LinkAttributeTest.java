@@ -24,12 +24,12 @@ import com.arsdigita.domain.DataObjectNotFoundException;
  * LinkAttributeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/03/27 $
+ * @version $Revision: #3 $ $Date: 2003/04/09 $
  **/
 
 public abstract class LinkAttributeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/LinkAttributeTest.java#2 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/LinkAttributeTest.java#3 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
 
     private static Logger s_log =

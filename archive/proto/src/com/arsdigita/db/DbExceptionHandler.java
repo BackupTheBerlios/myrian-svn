@@ -26,13 +26,13 @@ import java.sql.SQLException;
  * or create a new SQLException of the correct specific type based
  * on a provided message.
  *
- * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #1 $
+ * @author David Eison
+ * @version $Revision: #2 $
  * @since 4.6
  */
 public interface DbExceptionHandler {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/DbExceptionHandler.java#1 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/DbExceptionHandler.java#2 $";
 
     /**
      * This method wraps the given SQLException in a more-specific

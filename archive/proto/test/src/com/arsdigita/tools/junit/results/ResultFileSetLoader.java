@@ -12,6 +12,7 @@
  * rights and limitations under the License.
  *
  */
+
 package com.arsdigita.tools.junit.results;
 
 import com.arsdigita.util.UncheckedWrapperException;
@@ -28,7 +29,7 @@ import java.util.Map;
  *  ResultFileSetLoader
  *
  *  @author <a href="mailto:jorris@redhat.com">Jon Orris</a>
- *  @version $Revision: #1 $ $Date Nov 6, 2002 $
+ *  @version $Revision: #2 $ $Date Nov 6, 2002 $
  */
 public class ResultFileSetLoader {
 

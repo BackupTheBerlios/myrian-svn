@@ -1,3 +1,19 @@
+--
+-- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+--
+-- The contents of this file are subject to the CCM Public
+-- License (the "License"); you may not use this file except in
+-- compliance with the License. You may obtain a copy of
+-- the License at http://www.redhat.com/licenses/ccmpl.html
+--
+-- Software distributed under the License is distributed on an "AS
+-- IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+-- implied. See the License for the specific language governing
+-- rights and limitations under the License.
+--
+-- $Id: //core-platform/proto/sql/postgres-create.sql#3 $
+-- $DateTime: 2003/04/09 16:35:55 $
+
 begin;
 
 \i postgres/oracle-compatibility.sql
@@ -34,6 +50,10 @@ begin;
 \i default/kernel/view-group_subgroup_trans_map.sql
 \i default/kernel/view-group_member_trans_map.sql
 \i default/kernel/view-party_member_trans_map.sql
+\i default/kernel/index-party_email_map.sql
+\i default/kernel/index-users.sql
+\i default/kernel/index-user_authentication.sql
+\i default/kernel/index-apm_package_type_listener_map.sql
 
 
 \i default/kernel/insert-privileges.sql
@@ -63,11 +83,17 @@ begin;
 \i default/kernel/view-ungranted_trans_context_map.sql
 \i default/kernel/view-object_context_trans_map.sql
 \i postgres/kernel/function-package_id_for_object_id.sql
+\i default/kernel/constraint-email_addresses.sql
+\i default/kernel/constraint-group_subgroup_map.sql
+\i default/kernel/constraint-site_nodes.sql
+\i default/kernel/constraint-roles.sql
+
 
 -- XXX
 --\i default/kernel/view-object_package_map.sql
 
 \i default/categorization/table-cat_categories.sql
+\i default/categorization/index-cat_cat_deflt_ancestors.sql
 \i default/categorization/comment-cat_categories.sql
 \i default/categorization/table-cat_category_category_map.sql
 \i default/categorization/comment-cat_category_category_map.sql
@@ -83,6 +109,8 @@ begin;
 \i default/categorization/table-cat_cat_subcat_trans_index.sql
 \i postgres/categorization/trigger-cat_category_category_map.sql
 \i default/categorization/insert-acs_privileges.sql
+\i default/categorization/index-cat_cat_subcat_trans_index.sql
+\i default/categorization/index-cat_root_cat_object_map.sql
 
 \i default/auditing/table-acs_auditing.sql
 \i default/auditing/index-acs_auditing.sql
@@ -111,20 +139,6 @@ begin;
 --\i default/search/insert-dummy.sql
 --\i default/search/package-search_indexing.sql
 
-\i default/places/table-places.sql
-\i default/places/table-place_hierarchy.sql
-\i default/places/index-place_hierarchy.sql
-\i default/places/table-place_hierarchy_tc.sql
-\i default/places/index-place_hierarchy_tc.sql
-\i default/places/trigger-place_hierarchy.sql
-\i default/places/table-pl_countries.sql
-\i default/places/table-pl_regions.sql
-\i default/places/table-pl_municipalities.sql
-\i default/places/table-pl_postal_codes.sql
-\i default/places/table-pl_us_states.sql
-\i default/places/table-pl_us_counties.sql
-\i default/places/index-pl_us_counties.sql
-
 \i default/versioning/table-vc_objects.sql
 \i default/versioning/comment-vc_objects.sql
 \i default/versioning/table-vc_transactions.sql
@@ -138,7 +152,20 @@ begin;
 \i default/versioning/comment-vc_operations.sql
 \i default/versioning/table-vc_generic_operations.sql
 \i default/versioning/comment-vc_generic_operations.sql
-\i postgres/versioning/function-last_attr_value.sql
+
+\i default/x/versioning/table-vcx_objects.sql
+\i default/x/versioning/comment-vcx_objects.sql
+\i default/x/versioning/table-vcx_obj_changes.sql
+\i default/x/versioning/index-vcx_obj_changes.sql
+\i default/x/versioning/comment-vcx_obj_changes.sql
+\i default/x/versioning/table-vcx_actions.sql
+\i default/x/versioning/comment-vcx_actions.sql
+\i default/x/versioning/insert-vcx_actions.sql
+\i default/x/versioning/table-vcx_operations.sql
+\i default/x/versioning/index-vcx_operations.sql
+\i default/x/versioning/comment-vcx_operations.sql
+\i default/x/versioning/table-vcx_generic_operations.sql
+\i default/x/versioning/comment-vcx_generic_operations.sql
 
 \i default/x/versioning/insert-vcx_events.sql
 
@@ -197,13 +224,18 @@ begin;
 \i default/formbuilder/comment-forms_dd_select.sql
 \i default/formbuilder/sequence-forms_unique_id_seq.sql
 \i default/formbuilder/comment-forms_unique_id_seq.sql
-
-\i default/addresses/table-us_addresses.sql
+\i default/formbuilder/index-forms_widget_label.sql
+\i default/formbuilder/index-forms_dd_select.sql
 
 \i postgres/persistence/table-persistence_dynamic_ot.sql
 \i postgres/persistence/table-persistence_dynamic_assoc.sql
 
 \i default/kernel/index-foreign_keys.sql 
+
+\i default/portal/index-portlets.sql
+\i default/web/index-applications.sql
+\i default/web/index-application_types.sql
+\i default/web/index-application_type_privilege_map.sql
 
 \i ddl/postgres/deferred.sql
 

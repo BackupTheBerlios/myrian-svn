@@ -12,6 +12,7 @@
  * rights and limitations under the License.
  *
  */
+
 package com.arsdigita.tools.junit.results;
 
 import org.jdom.Document;
@@ -77,7 +78,8 @@ public class ResultComparator {
             diffs.add(diff);
         }
 
-        ReportIndex index = new ReportIndex(previousChangelist, currentChangelist);
+		String databaseType = System.getProperty("database.key");
+        ReportIndex index = new ReportIndex(previousChangelist, currentChangelist, databaseType);
         XMLOutputter out = new XMLOutputter("  ", true);
         final String ACS_HOME = System.getProperty("ACS_HOME");
         Transformer tran =  TransformerFactory.newInstance().newTransformer(new StreamSource(ACS_HOME + "/test/xsl/junit.xsl"));

@@ -64,11 +64,11 @@ import org.apache.log4j.varia.StringMatchFilter;
  * ...
  * </pre>
  *
- * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
+ * @author David Eison
  */
 public class Log4jBasedTestCase extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/Log4jBasedTestCase.java#2 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/Log4jBasedTestCase.java#3 $";
 
     /**
      * The log object.  Should be modified

@@ -75,8 +75,10 @@ public class DbHelper {
 
         switch (database) {
         case DB_ORACLE:
+            s_log.info("ORACLE");
             return "oracle-se";
         case DB_POSTGRES:
+            s_log.info("POSTGRES");
             return "postgres";
         default:
             return "default";
@@ -122,19 +124,19 @@ public class DbHelper {
      */
     public static int getDatabaseFromURL(String url) {
         if (!url.startsWith("jdbc:")) {
-            throw new RuntimeException("JDBC URL " +
+            throw new IllegalArgumentException("JDBC URL " +
                                        url + " doesn't start with jdbc:");
         }
 
         int pos = url.indexOf(":", 5);
 
         if (pos == -1) {
-            throw new RuntimeException("JDBC URL " + url +
+            throw new IllegalArgumentException("JDBC URL " + url +
                                        " is not of the form jdbc:[dbname]:xyz");
         }
 
         String driver = url.substring(5, pos);
-        s_log.info("Got driver name " + driver);
+        s_log.info("Got driver name " + driver, new  Throwable());
 
         if ("oracle".equals(driver)) {
             return DB_ORACLE;

@@ -41,12 +41,12 @@ import java.io.File;
  *  package as the derived Suite class. Optionally, if the property test.testpath is defined,
  *  the framework will look here. test.testpath must be the fully qualified path name.
  *
- * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @author Jon Orris
+ * @version $Revision: #2 $ $Date: 2003/04/09 $
  */
 
 public class PackageTestSuite extends TestSuite {
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/tools/junit/framework/PackageTestSuite.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/tools/junit/framework/PackageTestSuite.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     public PackageTestSuite() {
         super();
@@ -180,8 +180,13 @@ public class PackageTestSuite extends TestSuite {
 
         File testFileDir = new File(testCasePath);
         String[] filenames = testFileDir.list();
-        if( filenames != null ) {
+        if( filenames != null && filenames.length > 0) {
             addTestCases(filenames, suite);
+        } else {
+            System.err.println("Warning: No tests found for test path: " + testCasePath);
+        }
+        if (suite.countTestCases() == 0) {
+            System.err.println("Warning: no tests added for test path: " + testCasePath);
         }
 
     }

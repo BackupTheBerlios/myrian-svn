@@ -24,13 +24,12 @@ import com.arsdigita.dispatcher.RequestContext;
  *  Dummy RequestContext object for unit testing of form methods that
  *  include requests in their signatures.
  *
- * @author <a href="mailto:richardl@arsdigita.com">richardl@arsdigita.com</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/04/09 $
  */
 
 public class DummyRequestContext implements RequestContext {
 
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/util/DummyRequestContext.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/util/DummyRequestContext.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     private ServletContext m_servletContext;
     private HttpServletRequest m_request;

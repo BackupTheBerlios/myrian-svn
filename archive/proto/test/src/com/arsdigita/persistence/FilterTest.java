@@ -29,10 +29,10 @@ import org.apache.log4j.Logger;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/09 $
+ * @version $Revision: #3 $ $Date: 2003/04/09 $
  */
 public class FilterTest extends PersistenceTestCase {
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/FilterTest.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/FilterTest.java#3 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     private static Logger s_log =
         Logger.getLogger(FilterTest.class.getName());
@@ -437,6 +437,26 @@ public class FilterTest extends PersistenceTestCase {
         assertTrue("when only selected a small portion of items, " +
                    "the number should be less than the total.",
                    query.size() < totalItems);
+    }
+
+
+    /**
+     *  This tests the setConditions and AddBindings methods in FilterImpl
+     */
+    public void testFilterSetConditionsAndAddBindings() {
+
+        DataQuery query = getDefaultQuery();
+        query.addFilter(FilterImpl.equals("priority", new Integer(3)));
+        long size = query.size();
+        SimpleFilter f = new SimpleFilter("description = :description");
+        Map map = new HashMap();
+        map.put("description", "something that will not match");
+        f.addBindings(map);
+        query.addFilter(f);
+
+        assertTrue("adding a filter on description should narrow the results in " +
+               "test setConditions ", size > query.size());
+
     }
 
 

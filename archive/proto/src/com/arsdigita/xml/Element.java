@@ -27,15 +27,15 @@ import org.w3c.dom.Attr;
  * A wrapper class that implements some functionality of
  * <code>org.jdom.Element</code> using <code>org.w3c.dom.Element</code>.
  *
- * @author Patrick McNeill (pmcneill@arsdigita.com)
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @author Patrick McNeill 
+ * @version $Revision: #2 $ $Date: 2003/04/09 $
  * @since ACS 4.5a
  */
 public class Element {
     public static final String versionId =
-        "$Id: //core-platform/proto/src/com/arsdigita/xml/Element.java#1 $" +
-        "$Author: dennis $" +
-        "$DateTime: 2002/11/27 19:51:05 $";
+        "$Id: //core-platform/proto/src/com/arsdigita/xml/Element.java#2 $" +
+        "$Author: rhs $" +
+        "$DateTime: 2003/04/09 16:35:55 $";
 
     private static final Logger s_log = Logger.getLogger
         (Element.class.getName());

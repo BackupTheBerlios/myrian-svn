@@ -26,13 +26,13 @@ import java.util.HashMap;
  * A generic Sequence implementation appropriate for use with databases
  * that don't support Oracle style sequences.
  *
- * @author <A HREF="mailto:kevin@arsdigita.com">Kevin Scaldeferri</A>
+ * @author Kevin Scaldeferri
  */
 
 
 public class GenericSequenceImpl extends SequenceImpl {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/GenericSequenceImpl.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/GenericSequenceImpl.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     /* This is a pseudo-Singleton implementation.  We create a
      * single instance for each sequence.

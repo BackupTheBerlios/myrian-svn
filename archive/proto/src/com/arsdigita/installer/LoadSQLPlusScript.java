@@ -27,18 +27,18 @@ import org.apache.log4j.Logger;
 
 public class LoadSQLPlusScript {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/installer/LoadSQLPlusScript.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/installer/LoadSQLPlusScript.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     private static final Logger s_log =
         Logger.getLogger(LoadSQLPlusScript.class);
 
-    private Connection s_con;
-    private Statement s_stmt;
-    private int s_stmtCount = 0;
-    private boolean s_onErrorContinue = false;
-    private boolean s_echoSQLStatement = false;
-    private int s_exitValue = 0;
-    private String s_database = "oracle";
+    private Connection m_con;
+    private Statement m_stmt;
+    private int m_stmtCount = 0;
+    private boolean m_onErrorContinue = false;
+    private boolean m_echoSQLStatement = false;
+    private int m_exitValue = 0;
+    private String m_database = "oracle";
 
     public static void main (String args[]) {
 
@@ -72,22 +72,22 @@ public class LoadSQLPlusScript {
     }
 
     public void setDatabase (String database) {
-        s_database = database;
+        m_database = database;
     }
 
     public void setConnection (Connection connection) {
-        s_con = connection;
+        m_con = connection;
     }
 
     public void setConnection (String jdbcUrl, String dbUsername, String dbPassword)
         throws SQLException {
-        s_con = DriverManager.getConnection(jdbcUrl,
+        m_con = DriverManager.getConnection(jdbcUrl,
                                             dbUsername,
                                             dbPassword);
     }
 
     public int getExitValue () {
-        return s_exitValue;
+        return m_exitValue;
     }
 
     public void loadSQLPlusScript (String scriptFilename)
@@ -97,18 +97,21 @@ public class LoadSQLPlusScript {
                FileNotFoundException,
                IllegalAccessException,
                NoSuchMethodException {
-
+        /*
         if (System.getProperty("sql.verbose") != null  &&
             System.getProperty("sql.verbose").equals("true")) {
-            s_echoSQLStatement = true;
+            m_echoSQLStatement = true;
         }
 
         if (System.getProperty("sql.continue") != null  &&
             System.getProperty("sql.continue").equals("true")) {
-            s_onErrorContinue = true;
+            m_onErrorContinue = true;
         }
+        */
+        m_echoSQLStatement = true;
+        m_onErrorContinue = false;
 
-        m_loadSQLPlusScript(scriptFilename);
+        loadScript(scriptFilename);
     }
 
     public void loadSQLPlusScript (String scriptFilename,
@@ -117,37 +120,39 @@ public class LoadSQLPlusScript {
         throws ClassNotFoundException, SQLException,
                ParseException, FileNotFoundException,
                IllegalAccessException, NoSuchMethodException {
-        s_echoSQLStatement = echoSQLStatement;
-        s_onErrorContinue = onErrorContinue;
-        m_loadSQLPlusScript (scriptFilename);
+        m_echoSQLStatement = echoSQLStatement;
+        m_onErrorContinue = onErrorContinue;
+        loadScript (scriptFilename);
     }
 
-    protected void m_loadSQLPlusScript (String scriptFilename)
+    protected void loadScript (String scriptFilename)
         throws ClassNotFoundException, SQLException,
                ParseException, FileNotFoundException,
                IllegalAccessException, NoSuchMethodException {
 
-        if (s_database.equals("postgres")) {
+        if (m_database.equals("postgres")) {
             Class.forName("org.postgresql.Driver");
         } else {
             Class.forName("oracle.jdbc.driver.OracleDriver");
         }
 
+        s_log.warn("Using database " + m_database);
         // Parse SQL script and feed JDBC with one statement at the time
         s_log.warn ("Trying to open: '" + scriptFilename + "'");
         SimpleSQLParser parser = new SimpleSQLParser(scriptFilename);
 
         // iterate over parser.SQLStamentList();
 
-        s_stmt = s_con.createStatement();
+        m_stmt = m_con.createStatement();
 
         try {
             parser.useSQLStatement(this, "executeOneStatement");
         } catch (InvocationTargetException e) {
         }
 
-        s_stmt.close();
-        s_con.close();
+        m_stmt.close();
+        m_con.commit();
+        m_con.close();
 
     }
 
@@ -162,19 +167,19 @@ public class LoadSQLPlusScript {
 
     public void executeOneStatement (String sqlString)
         throws SQLException {
-        s_stmtCount++;
-        s_log.info ("Statement count: " + s_stmtCount);
-        if (s_echoSQLStatement) {
+        m_stmtCount++;
+        s_log.info ("Statement count: " + m_stmtCount);
+        if (m_echoSQLStatement) {
             s_log.info (sqlString);
         }
 
         try {
-            int rowsAffected = s_stmt.executeUpdate(sqlString);
+            int rowsAffected = m_stmt.executeUpdate(sqlString);
             s_log.warn ("  " + rowsAffected + " row(s) affected");
         } catch (SQLException e) {
-            s_exitValue = 1;
+            m_exitValue = 1;
             s_log.warn (" -- FAILED: " + e.getMessage());
-            if (!s_onErrorContinue) {
+            if (!m_onErrorContinue) {
                 throw e;
             }
         }

@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/pdl/com/arsdigita/kernel/User.pdl#3 $
-// $DateTime: 2003/03/27 18:06:50 $
+// $Id: //core-platform/proto/pdl/com/arsdigita/kernel/User.pdl#4 $
+// $DateTime: 2003/04/09 16:35:55 $
 
 model com.arsdigita.kernel;
 
@@ -39,7 +39,7 @@ query UserPrimaryEmail {
     String lowerPrimaryEmailAddress;
     String screenName;
     String lowerScreenName;
-  
+
     do {
 	select users.user_id,
 	       users.screen_name,

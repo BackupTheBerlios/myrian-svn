@@ -23,16 +23,16 @@ import org.apache.log4j.Logger;
  * The static methods in this class provide a standard way of asserting
  * certain conditions.
  *
- * @author David Lutterkort (lutter@arsdigita.com)
- * @author Uday Mathur (umathur@arsdigita.com)
- * @version $Id: //core-platform/proto/src/com/arsdigita/util/Assert.java#1 $
+ * @author David Lutterkort
+ * @author Uday Mathur
+ * @version $Id: //core-platform/proto/src/com/arsdigita/util/Assert.java#2 $
  *
  */
 public class Assert {
     public static final String versionId =
-        "$Id: //core-platform/proto/src/com/arsdigita/util/Assert.java#1 $" +
-        "$Author: dennis $" +
-        "$DateTime: 2002/11/27 19:51:05 $";
+        "$Id: //core-platform/proto/src/com/arsdigita/util/Assert.java#2 $" +
+        "$Author: rhs $" +
+        "$DateTime: 2003/04/09 16:35:55 $";
 
     private static final Logger s_log = Logger.getLogger
         (Assert.class);
@@ -210,7 +210,6 @@ public class Assert {
                     "Illegal access to a locked " + l.getClass().getName());
     }
 
-
     /**
      * This is the equivalent of assertTrue(false, msg).
      *
@@ -218,5 +217,12 @@ public class Assert {
      */
     public static void fail(String msg) {
         assertTrue(false, msg);
+    }
+
+    /**
+     * This is the equivalent of assertTrue(false).
+     */
+    public static void fail() {
+        assertTrue(false);
     }
 }

@@ -32,14 +32,14 @@ import java.util.Map;
  * A simple implementation of the java.sql.CallableStatement interface
  * that wraps a "real" implementation of java.sql.CallableStatement
  *
- * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @author Mark Thomas
+ * @version $Revision: #2 $ $Date: 2003/04/09 $
  * @since 4.5
  */
 public class CallableStatement extends com.arsdigita.db.PreparedStatement
     implements java.sql.CallableStatement {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/CallableStatement.java#1 $ $Author: dennis $ $Date: 2002/11/27 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/CallableStatement.java#2 $ $Author: rhs $ $Date: 2003/04/09 $";
 
     // Constructor: use the "wrap" class method to create instances
     private CallableStatement(com.arsdigita.db.Connection conn,

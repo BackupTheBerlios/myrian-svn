@@ -19,13 +19,13 @@ package com.arsdigita.db;
 /**
  * Provides information about the source of a result set event.
  *
- * @author <a href="mailto:eison@arsdigita.com">David Eison</a>
- * @version $Id: //core-platform/proto/src/com/arsdigita/db/ResultSetEvent.java#1 $
+ * @author David Eison
+ * @version $Id: //core-platform/proto/src/com/arsdigita/db/ResultSetEvent.java#2 $
  * @since 4.6
  */
 public class ResultSetEvent extends java.util.EventObject {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/ResultSetEvent.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/ResultSetEvent.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     /**
      * Creates a result set event with the specified source.

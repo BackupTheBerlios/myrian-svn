@@ -20,11 +20,11 @@ import com.arsdigita.tools.junit.framework.PackageTestSuite;
 import junit.framework.Test;
 
 /**
- * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @author Jon Orris
+ * @version $Revision: #2 $ $Date: 2003/04/09 $
  */
 public class DBTestSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/db/DBTestSuite.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/db/DBTestSuite.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     public static Test suite() {
         DBTestSuite suite = new DBTestSuite();

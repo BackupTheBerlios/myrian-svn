@@ -22,12 +22,12 @@ import java.sql.SQLException;
  * when someone tries to add an object to the database with a
  * primary key that is already used.
  *
- * @author <A HREF="mailto:kevin@arsdigita.com">Kevin Scaldeferri</A>
+ * @author Kevin Scaldeferri
  */
 
 public class DBDuplicatePrimaryKeyException extends SQLException {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/DBDuplicatePrimaryKeyException.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/DBDuplicatePrimaryKeyException.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     public DBDuplicatePrimaryKeyException() {
         super();

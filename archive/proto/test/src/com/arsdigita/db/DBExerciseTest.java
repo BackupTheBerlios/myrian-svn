@@ -26,13 +26,13 @@ import java.sql.SQLException;
  * methods.  It should ultimately be extended to include most or
  * all such methods.
  *
- * @author <A HREF="mailto:kevin@arsdigita.com">Kevin Scaldeferri</A>
+ * @author Kevin Scaldeferri
  */
 
 
 public class DBExerciseTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/db/DBExerciseTest.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/db/DBExerciseTest.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
 
     private static java.sql.Connection conn;
 
