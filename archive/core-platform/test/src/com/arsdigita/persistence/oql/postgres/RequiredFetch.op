@@ -1,0 +1,11 @@
+         do {
+ select required__refs.ref_attribute as required__refs__ref_attribute,
+        required__refs.ref_id as required__refs__ref_id,
+        sub.sub_id as sub_id
+   from sub sub
+        join refs required__refs on (sub.required_id = required__refs.ref_id)
+        } map {
+            id = sub.sub_id;
+            required.refAttribute = required__refs.required__refs__ref_attribute;
+            required.id = required__refs.required__refs__ref_id;
+        }

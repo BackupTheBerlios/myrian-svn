@@ -2,6 +2,8 @@ package com.arsdigita.persistence.oql;
 
 import com.arsdigita.persistence.*;
 import com.arsdigita.persistence.metadata.*;
+import com.arsdigita.db.Initializer;
+import com.arsdigita.util.StringUtils;
 import org.apache.log4j.Category;
 
 import java.io.*;
@@ -11,12 +13,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/07/18 $
+ * @version $Revision: #5 $ $Date: 2002/07/30 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#4 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#5 $ by $Author: randyg $, $DateTime: 2002/07/30 15:12:50 $";
 
     private static final Category s_log =
         Category.getInstance(QueryTest.class);
@@ -45,6 +47,18 @@ public class QueryTest extends PersistenceTestCase {
         String op = "com/arsdigita/persistence/oql/" + name + ".op";
         InputStream is = getClass().getClassLoader().getResourceAsStream(op);
 
+        if (is == null) {
+            // this means it is a db specific file
+            String database = null;
+            if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                database = "postgres";
+            } else {
+                database = "oracle-se";
+            }
+            op = "com/arsdigita/persistence/oql/" + database + "/" + 
+                name + ".op";
+            is = getClass().getClassLoader().getResourceAsStream(op);
+        }
         assertTrue("No such resource: " + op + "\n\nActual:\n" + actual,
                    is != null);
 
@@ -75,6 +89,7 @@ public class QueryTest extends PersistenceTestCase {
     private static final String stripWhitespace(String str) {
         StringBuffer result = new StringBuffer();
 
+        str = StringUtils.stripWhiteSpace(str);
         for (int i = 0; i < str.length(); i++) {
             char c = str.charAt(i);
             if (Character.isWhitespace(c)) {

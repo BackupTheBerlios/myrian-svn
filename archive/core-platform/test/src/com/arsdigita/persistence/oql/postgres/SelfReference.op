@@ -1,0 +1,22 @@
+         do {
+ select parent__objects.id as parent__objects__id,
+        parent__objects.type as parent__objects__type,
+        parent__query_tests.name as parent__query_tests__name,
+        parent_parent__objects.id as parent_parent__objects__id,
+        parent_parent__objects.type as parent_parent__objects__type,
+        parent_parent__query_tests.name as prnt_prnt__qry_tsts__nm,
+        query_tests.id as id
+   from query_tests query_tests
+        left join query_tests parent__query_tests on (query_tests.parent_id = parent__query_tests.id)
+        left join objects parent__objects on (parent__query_tests.id = parent__objects.id)
+        left join query_tests parent_parent__query_tests on (parent__query_tests.parent_id = parent_parent__query_tests.id)
+        left join objects parent_parent__objects on (parent_parent__query_tests.id = parent_parent__objects.id)
+        } map {
+            id = query_tests.id;
+            parent.name = parent__query_tests.parent__query_tests__name;
+            parent.type = parent__objects.parent__objects__type;
+            parent.id = parent__objects.parent__objects__id;
+            parent.parent.name = parent_parent__query_tests.prnt_prnt__qry_tsts__nm;
+            parent.parent.type = parent_parent__objects.parent_parent__objects__type;
+            parent.parent.id = parent_parent__objects.parent_parent__objects__id;
+        }
