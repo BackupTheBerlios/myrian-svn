@@ -99,6 +99,12 @@ public class GraphSet implements Graph {
         return new ArrayList(m_nodes);
     }
 
+    public void removeAll() {
+        m_nodes.clear();
+        m_outgoingEdges.clear();
+        m_incomingEdges.clear();
+    }
+
     private Set outgoingEdges(Object nodeName) {
         Set edges = (Set) m_outgoingEdges.get(nodeName);
         if (edges == null) {

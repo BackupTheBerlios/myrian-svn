@@ -90,6 +90,25 @@ public class GraphSetTest extends TestCase {
                       getPartialDiff(graphX, graphY));
     }
 
+    public void testRemoveAll() {
+        Graph graph = new GraphSet();
+        graph.setLabel("X");
+        graph.addEdge(NODE_A, NODE_B, "a -> b");
+        graph.addEdge(NODE_A, NODE_C, "a -> c");
+        graph.addEdge(NODE_B, NODE_C, "b -> c");
+
+        List edges = graph.getOutgoingEdges(NODE_A);
+        edges.addAll(graph.getIncomingEdges(NODE_C));
+        graph.removeAll();
+
+        assertEquals("node count", 0, graph.nodeCount());
+
+        for (Iterator ii=edges.iterator(); ii.hasNext(); ) {
+            Graph.Edge edge = (Graph.Edge) ii.next();
+            assertTrue("no such edge", !graph.hasEdge(edge));
+        }
+    }
+
     private static String getPartialDiff(Graph xx, Graph yy) {
         String diff = diffNodesOneWay(xx, yy);
         if (diff != null ) {

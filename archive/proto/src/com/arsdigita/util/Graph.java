@@ -85,6 +85,11 @@ public interface Graph {
     List getNodes();
 
     /**
+     * Removes all nodes and edges.
+     **/
+    void removeAll();
+
+    /**
      * Returns a list of outgoing edges leaving this node.
      **/
     List getOutgoingEdges(Object node);
