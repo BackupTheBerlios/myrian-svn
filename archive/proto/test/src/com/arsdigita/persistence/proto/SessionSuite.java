@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * SessionSuite
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #3 $ $Date: 2003/02/12 $
+ * @version $Revision: #4 $ $Date: 2003/02/13 $
  **/
 
 public class SessionSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/SessionSuite.java#3 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/SessionSuite.java#4 $";
 
     private static final Logger s_log = Logger.getLogger(SessionSuite.class);
 
@@ -219,20 +219,17 @@ public class SessionSuite extends PackageTestSuite {
         m_two = createKeyedType(m_model, "Two");
 
         Adapter a = new Adapter() {
-            public Object load(ObjectType type, Map properties) {
-                return new Generic(type, properties.get("id"));
+            public Object getObject(ObjectType type, PropertyMap properties) {
+                return new Generic
+                    (type,
+                     (Integer) properties.get(type.getProperty("id")));
             }
 
-            public Object get(Object obj, Property prop) {
-                if (!prop.getName().equals("id")) {
-                    throw new IllegalArgumentException(prop.toString());
-                }
-
-                return ((Generic) obj).getID();
-            }
-
-            public Object getKey(Object obj) {
-                return ((Generic) obj).getID();
+            public PropertyMap getProperties(Object obj) {
+                PropertyMap result = new PropertyMap();
+                result.put(getObjectType(obj).getProperty("id"),
+                           ((Generic) obj).getID());
+                return result;
             }
 
             public ObjectType getObjectType(Object obj) {

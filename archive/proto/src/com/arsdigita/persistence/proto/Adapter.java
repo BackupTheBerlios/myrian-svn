@@ -9,12 +9,12 @@ import java.util.*;
  * Adapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/02/12 $
+ * @version $Revision: #4 $ $Date: 2003/02/13 $
  **/
 
 public abstract class Adapter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Adapter.java#3 $ by $Author: ashah $, $DateTime: 2003/02/12 17:00:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Adapter.java#4 $ by $Author: rhs $, $DateTime: 2003/02/13 11:20:06 $";
 
     private static final Map ADAPTERS = new HashMap();
 
@@ -25,8 +25,8 @@ public abstract class Adapter {
     }
 
     public static final Adapter getAdapter(Class javaClass) {
-        for (; javaClass != null; javaClass = javaClass.getSuperclass()) {
-            Adapter a = (Adapter) ADAPTERS.get(javaClass);
+        for (Class c = javaClass; c != null; c = c.getSuperclass()) {
+            Adapter a = (Adapter) ADAPTERS.get(c);
             if (a != null) { return a; }
         }
 
@@ -34,49 +34,44 @@ public abstract class Adapter {
     }
 
     public static final Adapter getAdapter(ObjectType type) {
-        ObjectType superType = type;
 
-        while (superType != null) {
-            Adapter a = (Adapter) ADAPTERS.get(type);
+        for (ObjectType ot = type; ot != null; ot = ot.getSupertype()) {
+            Adapter a = (Adapter) ADAPTERS.get(ot);
             if (a != null) { return a; }
-
-            if (type == null) {
-                superType = null;
-            } else {
-                superType = type;
-                type = type.getSupertype();
-            }
         }
+
+        Adapter a = (Adapter) ADAPTERS.get(null);
+        if (a != null) { return a; }
 
         throw new IllegalArgumentException("no adapter for: " + type);
     }
 
     Object getSessionKey(Object obj) {
-        return new CompoundKey(getObjectType(obj), getKey(obj));
+        return getSessionKey(getObjectType(obj), getProperties(obj));
     }
 
-    public Object getJDBC(Object java, int type) {
-        throw new UnsupportedOperationException("not a simple type");
+    Object getSessionKey(ObjectType basetype, PropertyMap props) {
+        Collection keys = basetype.getKeyProperties();
+        Object key = null;
+
+        for (Iterator it = keys.iterator(); it.hasNext(); ) {
+            Object value = props.get((Property) it.next());
+            if (key == null) {
+                key = value;
+            } else {
+                key = new CompoundKey(key, value);
+            }
+        }
+
+        return new CompoundKey(basetype, key);
     }
 
-    public Object getJava(Object jdbc, int type) {
-        throw new UnsupportedOperationException("not a simple type");
-    }
-
-    public Object load(ObjectType baseType, Map properties) {
+    public Object getObject(ObjectType basetype, PropertyMap props) {
         throw new UnsupportedOperationException("not a compound type");
     }
 
-    public Object get(Object obj, Property prop) {
-        throw new UnsupportedOperationException("not a compound type");
-    }
+    public abstract PropertyMap getProperties(Object obj);
 
-    public Object getKey(Object obj) {
-        throw new UnsupportedOperationException("not a keyed type");
-    }
-
-    public ObjectType getObjectType(Object obj) {
-        throw new UnsupportedOperationException("not a keyed type");
-    }
+    public abstract ObjectType getObjectType(Object obj);
 
 }

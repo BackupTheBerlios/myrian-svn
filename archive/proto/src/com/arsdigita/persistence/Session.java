@@ -20,6 +20,11 @@ import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.proto.Adapter;
 import com.arsdigita.persistence.proto.Signature;
 import com.arsdigita.persistence.proto.Query;
+import com.arsdigita.persistence.proto.PropertyMap;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import java.sql.Connection;
 
@@ -34,7 +39,7 @@ import java.sql.Connection;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/02/12 $
+ * @version $Revision: #7 $ $Date: 2003/02/13 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -42,8 +47,16 @@ public class Session {
     // This is just a temporary way to get an adapter registered.
     static {
         Adapter.addAdapter(DataObjectImpl.class, null, new Adapter() {
-                public Object getKey(Object obj) {
-                    return ((DataObjectImpl) obj).getOID();
+                public PropertyMap getProperties(Object obj) {
+                    OID oid = ((DataObjectImpl) obj).getOID();
+                    PropertyMap result = new PropertyMap();
+                    for (Iterator it =
+                             oid.getProperties().entrySet().iterator();
+                         it.hasNext(); ) {
+                        Map.Entry me = (Map.Entry) it.next();
+                        result.put((com.arsdigita.persistence.proto.metadata.Property) me.getKey(), me.getValue());
+                    }
+                    return result;
                 }
 
                 public com.arsdigita.persistence.proto.metadata.ObjectType

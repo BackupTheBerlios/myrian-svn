@@ -10,12 +10,12 @@ import java.util.*;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/02/12 $
+ * @version $Revision: #7 $ $Date: 2003/02/13 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#6 $ by $Author: ashah $, $DateTime: 2003/02/12 16:39:50 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#7 $ by $Author: rhs $, $DateTime: 2003/02/13 11:20:06 $";
 
     private Signature m_signature;
     private Adapter m_adapter;
@@ -37,7 +37,7 @@ public abstract class RecordSet {
         Collection paths = m_signature.getPaths();
         ObjectType type = m_signature.getObjectType();
 
-        HashMap keys = new HashMap();
+        HashMap pmaps = new HashMap();
 
         // First load up the objects.
         for (Iterator it = paths.iterator(); it.hasNext(); ) {
@@ -45,20 +45,20 @@ public abstract class RecordSet {
             Path parent = p.getParent();
             if (type.isKey(p)) {
                 Object value = get(p);
-                Map key;
-                if (keys.containsKey(parent)) {
-                    key = (Map) keys.get(parent);
+                PropertyMap props;
+                if (pmaps.containsKey(parent)) {
+                    props = (PropertyMap) pmaps.get(parent);
                 } else {
                     if (value == null) {
-                        key = null;
+                        props = null;
                     } else {
-                        key = new HashMap();
+                        props = new PropertyMap();
                     }
-                    keys.put(parent, key);
+                    pmaps.put(parent, props);
                 }
 
                 if (value != null) {
-                    key.put(p.getName(), value);
+                    props.put(type.getProperty(p), value);
                 }
             }
         }
@@ -66,20 +66,24 @@ public abstract class RecordSet {
         HashMap objs = new HashMap();
 
         // Instantiate all the objects
-        for (Iterator it = keys.entrySet().iterator(); it.hasNext(); ) {
+        for (Iterator it = pmaps.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry me = (Map.Entry) it.next();
-            if (me.getValue() == null) {
-                objs.put(me.getKey(), null);
+            PropertyMap props = (PropertyMap) me.getValue();
+            if (props == null) {
+                objs.put(props, null);
             } else {
                 Path p = (Path) me.getKey();
+                ObjectType ot;
                 if (p == null) {
-                    objs.put(p, m_adapter.load
-                             (type.getBasetype(), (Map) me.getValue()));
+                    ot = type.getBasetype();
                 } else {
-                    objs.put(p, m_adapter.load
-                             (m_signature.getProperty(p).getType(),
-                              (Map) me.getValue()));
+                    ot = m_signature.getProperty(p).getType();
                 }
+                Object obj = ssn.getObject(m_adapter.getSessionKey(ot, props));
+                if (obj == null) {
+                    obj = m_adapter.getObject(ot, props);
+                }
+                objs.put(p, obj);
             }
         }
 

@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #24 $ $Date: 2003/02/12 $
+ * @version $Revision: #25 $ $Date: 2003/02/13 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#24 $ by $Author: rhs $, $DateTime: 2003/02/12 17:18:17 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#25 $ by $Author: rhs $, $DateTime: 2003/02/13 11:20:06 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -53,6 +53,12 @@ public class Session {
         // changes made to the old one. Not sure what to do about this except
         // perhaps disallow it at some point.
         addEvent(new CreateEvent(this, obj), od);
+
+        PropertyMap props = getAdapter(obj).getProperties(obj);
+        for (Iterator it = props.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry me = (Map.Entry) it.next();
+            set(obj, (Property) me.getKey(), me.getValue());
+        }
 
         if (LOG.isDebugEnabled()) {
             untrace("create");
@@ -252,15 +258,8 @@ public class Session {
 
         prop.dispatch(new Property.Switch() {
                 public void onRole(Role role) {
-                    // Should probably use seperate subclass of property for
-                    // this dispatch.
-                    if (getObjectMap(obj).getKeyProperties().contains(role)) {
-                        Adapter ad = getAdapter(obj);
-                        result[0] = ad.get(obj, role);
-                    } else {
-                        PropertyData pd = fetchPropertyData(obj, role);
-                        result[0] = pd.get();
-                    }
+                    PropertyData pd = fetchPropertyData(obj, role);
+                    result[0] = pd.get();
                 }
 
                 public void onAlias(Alias alias) {
@@ -486,9 +485,6 @@ public class Session {
 
         ObjectData od = getObjectData(obj);
         if (od == null) {
-            // We may need to change the signature of this to read in enough
-            // data to allow type negotiation to happen properly without
-            // requiring another db hit.
             od = new ObjectData(this, obj, od.AGILE);
         }
 
@@ -528,6 +524,14 @@ public class Session {
     private Object getSessionKey(Object obj) {
         Adapter ad = getAdapter(obj);
         return ad.getSessionKey(obj);
+    }
+
+    Object getObject(Object key) {
+        if (m_odata.containsKey(key)) {
+            return ((ObjectData) m_odata.get(key)).getObject();
+        } else {
+            return null;
+        }
     }
 
     boolean hasObjectData(Object obj) {

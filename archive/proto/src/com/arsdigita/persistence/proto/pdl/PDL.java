@@ -1,6 +1,7 @@
 package com.arsdigita.persistence.proto.pdl;
 
 import com.arsdigita.persistence.proto.Adapter;
+import com.arsdigita.persistence.proto.PropertyMap;
 import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.pdl.nodes.*;
 import com.arsdigita.persistence.proto.metadata.*;
@@ -15,12 +16,12 @@ import java.util.*;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2003/02/12 $
+ * @version $Revision: #12 $ $Date: 2003/02/13 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#11 $ by $Author: ashah $, $DateTime: 2003/02/12 16:39:50 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#12 $ by $Author: rhs $, $DateTime: 2003/02/13 11:20:06 $";
 
     private AST m_ast = new AST();
     private ErrorReport m_errors = new ErrorReport();
@@ -56,9 +57,9 @@ public class PDL {
             m_type = type;
         }
 
-        public Object getJDBC(Object java, int type) { return java; }
-
-        public Object getJava(Object jdbc, int type) { return jdbc; }
+        public PropertyMap getProperties(Object obj) {
+            return PropertyMap.EMPTY;
+        }
 
         public ObjectType getObjectType(Object obj) { return m_type; }
     }
@@ -153,10 +154,21 @@ public class PDL {
         m_errors.check();
 
         if (loadingGlobal) {
-            ObjectType type = root.getObjectType("global.Integer");
-            Adapter.addAdapter(Integer.class, type, new SimpleAdapter(type));
-            type = root.getObjectType("global.String");
-            Adapter.addAdapter(String.class, type, new SimpleAdapter(type));
+            String[] types = new String[] {
+                "global.Integer",
+                "global.BigInteger",
+                "global.String"
+            };
+            Class[] classes = new Class[] {
+                Integer.class,
+                java.math.BigInteger.class,
+                String.class
+            };
+
+            for (int i = 0; i < types.length; i++) {
+                ObjectType type = root.getObjectType(types[i]);
+                Adapter.addAdapter(classes[i], type, new SimpleAdapter(type));
+            }
         }
     }
 
