@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/01/06 $
+ * @version $Revision: #8 $ $Date: 2003/01/06 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#7 $ by $Author: rhs $, $DateTime: 2003/01/06 16:31:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#8 $ by $Author: rhs $, $DateTime: 2003/01/06 17:58:56 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -155,17 +155,17 @@ public class Session {
 
 
     /**
-     * Returns a PersistentCollection that corresponds to the given Binding.
+     * Returns a PersistentCollection that corresponds to the given Query.
      *
      * @param query A query object that specifies which objects are to be
      *              included in the collection and which properties are to be
      *              preloaded.
      *
-     * @return A PersistentCollection that corresponds to the given Binding.
+     * @return A PersistentCollection that corresponds to the given Query.
      **/
 
-    public PersistentCollection retrieve(Binding binding) {
-        return POS.getPersistentCollection(this, new DataSet(this, binding));
+    public PersistentCollection retrieve(Query query) {
+        return POS.getPersistentCollection(this, new DataSet(this, query));
     }
 
 
@@ -613,43 +613,39 @@ public class Session {
         return result;
     }
 
-    private Binding getRetrieveQuery(OID oid) {
+    private Query getRetrieveQuery(OID oid) {
         ObjectType type = oid.getObjectType();
         Signature sig = getRetrieveSignature(type);
-        Query q = new Query(sig);
-        q.addSource(new Source(type));
+        sig.addSource(new Source(type));
         Parameter start = new Parameter(type, Path.getInstance("__start__"));
-        q.addParameter(start);
-        q.setFilter(m_engine.getEquals(Path.getInstance("__start__"),
-                                        null));
-        Binding b = new Binding(q);
-        b.set(start, POS.getPersistentObject(this, oid));
-        return b;
+        sig.addParameter(start);
+        Query q = new Query
+            (sig, m_engine.getEquals(Path.getInstance("__start__"), null));
+        q.set(start, POS.getPersistentObject(this, oid));
+        return q;
     }
 
-    private Binding getRetrieveQuery(OID oid, Property prop) {
+    private Query getRetrieveQuery(OID oid, Property prop) {
         if (isAttribute(prop)) {
             ObjectType type = oid.getObjectType();
             Signature sig = new Signature(type);
             sig.addPath(prop.getName());
-            Query q = new Query(sig);
-            q.addSource(new Source(type));
+            sig.addSource(new Source(type));
             Parameter start = new Parameter(type,
                                             Path.getInstance("__start__"));
-            q.addParameter(start);
-            q.setFilter(m_engine.getEquals(Path.getInstance("__start__"),
-                                           null));
-            Binding b = new Binding(q);
-            b.set(start, POS.getPersistentObject(this, oid));
-            return b;
+            sig.addParameter(start);
+            Query q = new Query
+                (sig,
+                 m_engine.getEquals(Path.getInstance("__start__"), null));
+            q.set(start, POS.getPersistentObject(this, oid));
+            return q;
         } else {
             ObjectType type = prop.getType();
             Signature sig = getRetrieveSignature(type);
-            Query q = new Query(sig);
-            q.addSource(new Source(type));
+            sig.addSource(new Source(type));
             Parameter start = new Parameter(prop.getContainer(),
                                             Path.getInstance("__start__"));
-            q.addParameter(start);
+            sig.addParameter(start);
 
             // should filter to associated object(s)
             // should deal with one way associations
@@ -664,11 +660,9 @@ public class Session {
                      null);
             }
 
-            q.setFilter(f);
-            Binding b = new Binding(q);
-            b.set(start, POS.getPersistentObject(this, oid));
-
-            return b;
+            Query q = new Query(sig, f);
+            q.set(start, POS.getPersistentObject(this, oid));
+            return q;
         }
     }
 

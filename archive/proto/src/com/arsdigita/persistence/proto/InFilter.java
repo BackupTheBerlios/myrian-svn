@@ -4,30 +4,30 @@ package com.arsdigita.persistence.proto;
  * InFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/01/06 $
+ * @version $Revision: #3 $ $Date: 2003/01/06 $
  **/
 
 public abstract class InFilter extends Filter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/InFilter.java#2 $ by $Author: rhs $, $DateTime: 2003/01/06 16:31:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/InFilter.java#3 $ by $Author: rhs $, $DateTime: 2003/01/06 17:58:56 $";
 
     private Path m_path;
-    private Binding m_binding;
+    private Query m_query;
 
-    protected InFilter(Path path, Binding binding) {
+    protected InFilter(Path path, Query query) {
         m_path = path;
-        m_binding = binding;
+        m_query = query;
     }
 
     public Path getPath() {
         return m_path;
     }
 
-    public Binding getBinding() {
-        return m_binding;
+    public Query getQuery() {
+        return m_query;
     }
 
     public String toString() {
-        return m_path + " in (" + m_binding + ")";
+        return m_path + " in (" + m_query + ")";
     }
 }

@@ -13,12 +13,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/01/06 $
+ * @version $Revision: #6 $ $Date: 2003/01/06 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#5 $ by $Author: rhs $, $DateTime: 2003/01/06 16:31:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#6 $ by $Author: rhs $, $DateTime: 2003/01/06 17:58:56 $";
 
     public ProtoTest(String name) {
         super(name);
@@ -31,15 +31,20 @@ public class ProtoTest extends TestCase {
 
         OID oid = new OID("test.Test", BigInteger.ZERO);
         Property NAME = oid.getObjectType().getProperty("name");
+        Property COLLECTION = oid.getObjectType().getProperty("collection");
         Property OPT2MANY = oid.getObjectType().getProperty("opt2many");
+        doTest(oid, NAME, COLLECTION);
+        doTest(oid, NAME, OPT2MANY);
+    }
 
+    private void doTest(OID oid, Property str, Property col) {
         Session ssn = new Session();
         PersistentObject po = ssn.create(oid);
         PersistentObject po2 = ssn.retrieve(oid);
         assertTrue(po == po2);
 
-        ssn.set(oid, NAME, "foo");
-        assertEquals("foo", ssn.get(oid, NAME));
+        ssn.set(oid, str, "foo");
+        assertEquals("foo", ssn.get(oid, str));
 
         ssn.delete(oid);
         assertEquals(null, ssn.retrieve(oid));
@@ -47,7 +52,7 @@ public class ProtoTest extends TestCase {
         ssn.create(oid);
 
         PersistentCollection pc =
-            (PersistentCollection) ssn.get(oid, OPT2MANY);
+            (PersistentCollection) ssn.get(oid, col);
 
         Object one = ssn.create
             (new OID("test.Icle", new BigInteger("1")));
@@ -56,17 +61,17 @@ public class ProtoTest extends TestCase {
         Object three = ssn.create
             (new OID("test.Icle", new BigInteger("3")));
 
-        ssn.add(oid, OPT2MANY, one);
+        ssn.add(oid, col, one);
         assertCollection(new Object[] {one}, pc);
-        ssn.add(oid, OPT2MANY, two);
+        ssn.add(oid, col, two);
         assertCollection(new Object[] {one, two}, pc);
-        ssn.add(oid, OPT2MANY, three);
+        ssn.add(oid, col, three);
         assertCollection(new Object[] {one, two, three}, pc);
-        ssn.remove(oid, OPT2MANY, two);
+        ssn.remove(oid, col, two);
         assertCollection(new Object[] {one, three}, pc);
-        ssn.remove(oid, OPT2MANY, three);
+        ssn.remove(oid, col, three);
         assertCollection(new Object[] {one}, pc);
-        ssn.add(oid, OPT2MANY, three);
+        ssn.add(oid, col, three);
         assertCollection(new Object[] {one, three}, pc);
 
         System.out.println();
