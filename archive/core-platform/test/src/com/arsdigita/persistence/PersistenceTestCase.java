@@ -29,12 +29,12 @@ import java.io.InputStream;
  * PersistenceTestCase
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/22 $
+ * @version $Revision: #4 $ $Date: 2002/07/30 $
  */
 
 public class PersistenceTestCase extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#3 $ by $Author: randyg $, $DateTime: 2002/07/22 11:33:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#4 $ by $Author: randyg $, $DateTime: 2002/07/30 16:44:08 $";
 
     // Prevent loading the same PDL file twice
     private static Set s_loadedPDLResources = new HashSet();
@@ -50,9 +50,11 @@ public class PersistenceTestCase extends TestCase {
         if (s_loadedPDLResources.contains(resource)) {
             return;
         }
+
         s_loadedPDLResources.add(resource);
 
         String extraResource = null;
+
         if (resource.indexOf("testpdl") > -1) {
             String prefix = resource.substring
                 (0, resource.indexOf("testpdl") + 8);
@@ -68,7 +70,8 @@ public class PersistenceTestCase extends TestCase {
 
         try {
             PDL m = new PDL();
-            if (m.getClass().getClassLoader().getResourceAsStream
+            if (extraResource != null &&
+                m.getClass().getClassLoader().getResourceAsStream
                 (extraResource) != null) {
                 m.loadResource(extraResource);
                 s_loadedPDLResources.add(extraResource);

@@ -24,34 +24,33 @@ import org.apache.log4j.Category;
 
 /**
  * 
- * This class performs unit tests on com.arsdigita.persistence.metadata.OracleMDSQLGenerator </p>
+ * This class performs unit tests on com.arsdigita.persistence.metadata.BaseMDSQLGenerator </p>
  *
  * author <a href="mailto:jorriarsdigita.com">jorriarsdigita.com</a>
- * version $Revision: #3 $ $Date: 2002/07/30 $
+ * version $Revision: #1 $ $Date: 2002/07/30 $
  * 
  */
 
-public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {  
+public class BaseMDSQLGeneratorTest extends PersistenceTestCase {  
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/OracleMDSQLGeneratorTest.java#3 $ by $Author: randyg $, $DateTime: 2002/07/30 16:44:08 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/BaseMDSQLGeneratorTest.java#1 $ by $Author: randyg $, $DateTime: 2002/07/30 16:44:08 $";
 
     private static Category s_log = 
-        Category.getInstance(OracleMDSQLGeneratorTest.class.getName());
+        Category.getInstance(BaseMDSQLGeneratorTest.class.getName());
 
-    public OracleMDSQLGeneratorTest(String name) {
+    public BaseMDSQLGeneratorTest(String name) {
         super(name);
     }
 
     protected void persistenceSetUp() {
-        super.persistenceSetUp();
         load("com/arsdigita/persistence/testpdl/mdsql/Order.pdl");
         load("com/arsdigita/persistence/pdl/aggressiveLoad.pdl");
+        super.persistenceSetUp();
     }
 
     protected void persistenceTearDown() {
         super.persistenceTearDown();
     }
-
 
     public void testAll() {
         ObjectType type =  MetadataRoot.getMetadataRoot().getObjectType("mdsql.Order");
@@ -68,7 +67,7 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
     }
 
     private void checkRetrieve(ObjectType type) {
-        OracleMDSQLGenerator gen = (OracleMDSQLGenerator) MDSQLGeneratorFactory.getInstance();
+        BaseMDSQLGenerator gen = (BaseMDSQLGenerator) MDSQLGeneratorFactory.getInstance();
         Event e = gen.generateRetrieve(type);
 
         Iterator iter = e.getOperations();
@@ -95,7 +94,7 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
     }
 
     private void checkRetrieveAll(ObjectType type) {
-        OracleMDSQLGenerator gen = (OracleMDSQLGenerator) MDSQLGeneratorFactory.getInstance();
+        BaseMDSQLGenerator gen = (BaseMDSQLGenerator) MDSQLGeneratorFactory.getInstance();
         Event e = gen.generateRetrieveAll(type);
 
         Iterator iter = e.getOperations();
@@ -123,7 +122,7 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
     }
 
     private void checkInsert(ObjectType type) {
-        OracleMDSQLGenerator gen = (OracleMDSQLGenerator) MDSQLGeneratorFactory.getInstance();
+        BaseMDSQLGenerator gen = (BaseMDSQLGenerator) MDSQLGeneratorFactory.getInstance();
         Event e = gen.generateInsert(type);
         s_log.info("Insert!");
         s_log.info(e);
@@ -165,7 +164,7 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
     }
 
     private void checkDelete(ObjectType type) {
-        OracleMDSQLGenerator gen = (OracleMDSQLGenerator) MDSQLGeneratorFactory.getInstance();
+        BaseMDSQLGenerator gen = (BaseMDSQLGenerator) MDSQLGeneratorFactory.getInstance();
         Event e = gen.generateDelete(type);
         s_log.info("Delete!");
         s_log.info(e);
@@ -192,7 +191,7 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
 
 
     private void checkUpdate(ObjectType type) {
-        OracleMDSQLGenerator gen = (OracleMDSQLGenerator) MDSQLGeneratorFactory.getInstance();
+        BaseMDSQLGenerator gen = (BaseMDSQLGenerator) MDSQLGeneratorFactory.getInstance();
         Event e = gen.generateUpdate(type);
         s_log.info("Update!");
         s_log.info(e);
@@ -201,7 +200,7 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
 
     public void testAggressiveLoading() {
         ObjectType type = makeDefaultObjectType();
-        OracleMDSQLGenerator gen = (OracleMDSQLGenerator) MDSQLGeneratorFactory.getInstance();
+        BaseMDSQLGenerator gen = (BaseMDSQLGenerator) MDSQLGeneratorFactory.getInstance();
         Event retrieve = gen.generateRetrieve(type);
 
         assert("No retrieve event created", retrieve != null);
@@ -299,7 +298,7 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
         assertAttributeValue(user3, "referer.referer.name", "David Eison");
         assert("referer.name not null in user 1", user1.get("referer") == null);
     }
-    
+
     /**
      * Makes an ObjectType with properties for every SimpleType in MetadataRoot.
      *
