@@ -51,11 +51,28 @@ drop index vc_transactions_object_id_idx;
 create index vc_transactions_master_id_idx on vc_transactions(master_id);
 
 alter table vc_operations add (
-    classname varchar2(4000) 
-              constraint vc_operations_classname_nn not null
+    classname varchar2(4000)
+);
+
+update vc_operations vo
+set classname = (decode(
+    (select 1 from vc_generic_operations vgo
+     where vgo.operation_id = vo.operation_id
+     union all
+     select 2 from vc_clob_operations vco
+     where vco.operation_id = vo.operation_id
+     union all
+     select 3 from vc_blob_operations vbo
+     where vbo.operation_id = vo.operation_id),
+    1, 'com.arsdigita.versioning.GenericOperation',
+    2, 'com.arsdigita.versioning.ClobOperation',
+    3, 'com.arsdigita.versioning.BlobOperation'))
+where classname is null;
+
+alter table vc_operations modify (
+    classname varchar2(4000) constraint vc_operations_classname_nn not null
 );
 
 comment on column vc_operations.classname is '
   Java classname of the specific class for the operation
 ';
-
