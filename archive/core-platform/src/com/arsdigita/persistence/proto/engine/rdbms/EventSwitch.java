@@ -12,12 +12,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/05/15 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#2 $ by $Author: rhs $, $DateTime: 2003/05/15 16:45:22 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -244,12 +244,25 @@ class EventSwitch extends Event.Switch {
 
         final ObjectMap om = e.getObjectMap();
         Mapping m = om.getMapping(Path.get(e.getProperty().getName()));
-        if ((e instanceof AddEvent && m.getAdds() != null) ||
-            (e instanceof RemoveEvent && m.getRemoves() != null)) {
-            return;
-        }
 
         final Role role = (Role) e.getProperty();
+
+        if (e instanceof AddEvent && m.getAdds() != null) {
+            addOperations(obj, role, arg, m.getAdds());
+            return;
+        } else if (e instanceof RemoveEvent && m.getRemoves() != null) {
+            addOperations(obj, role, arg, m.getRemoves());
+            return;
+        } else if (e instanceof SetEvent) {
+            SetEvent se = (SetEvent) e;
+            Object prev = se.getPreviousValue();
+            if (prev != null && m.getRemoves() != null) {
+                addOperations(obj, role, prev, m.getRemoves());
+            }
+            if (arg != null && m.getAdds() != null) {
+                addOperations(obj, role, arg, m.getAdds());
+            }
+        }
 
         m.dispatch(new Mapping.Switch() {
             public void onStatic(Static m) {
@@ -278,7 +291,11 @@ class EventSwitch extends Event.Switch {
                 }
 
                 if (e instanceof SetEvent) {
-                    remove(m, obj, ((SetEvent) e).getPreviousValue());
+                    SetEvent se = ((SetEvent) e);
+                    Object prev = se.getPreviousValue();
+                    if (prev != null) {
+                        remove(m, obj, prev);
+                    }
                     if (arg != null) {
                         add(m, obj, arg);
                     }
@@ -293,21 +310,25 @@ class EventSwitch extends Event.Switch {
             }
 
             private void add(JoinThrough m, Object obj, Object arg) {
-                Table table = m.getFrom().getTable();
+                if (m.getAdds() == null) {
+                    Table table = m.getFrom().getTable();
 
-                Insert ins = new Insert(table);
-                set(ins, m.getFrom(), obj);
-                set(ins, m.getTo(), arg);
-                m_engine.addOperation(ins);
+                    Insert ins = new Insert(table);
+                    set(ins, m.getFrom(), obj);
+                    set(ins, m.getTo(), arg);
+                    m_engine.addOperation(ins);
+                }
             }
 
             private void remove(JoinThrough m, Object obj, Object arg) {
-                Table table = m.getFrom().getTable();
+                if (m.getRemoves() == null) {
+                    Table table = m.getFrom().getTable();
 
-                Delete del = new Delete(table, null);
-                filter(del, m.getFrom(), KEY_FROM, obj);
-                filter(del, m.getTo(), KEY_TO, arg);
-                m_engine.addOperation(del);
+                    Delete del = new Delete(table, null);
+                    filter(del, m.getFrom(), KEY_FROM, obj);
+                    filter(del, m.getTo(), KEY_TO, arg);
+                    m_engine.addOperation(del);
+                }
             }
         });
     }
@@ -368,23 +389,10 @@ class EventSwitch extends Event.Switch {
 
     public void onAdd(AddEvent e) {
         onPropertyEvent(e);
-
-        Property prop = e.getProperty();
-        Mapping m = e.getObjectMap().getMapping(Path.get(prop.getName()));
-        if (m.getAdds() != null) {
-            addOperations(e.getObject(), prop, e.getArgument(), m.getAdds());
-        }
     }
 
     public void onRemove(final RemoveEvent e) {
         onPropertyEvent(e);
-
-        Property prop = e.getProperty();
-        Mapping m = e.getObjectMap().getMapping(Path.get(prop.getName()));
-        if (m.getRemoves() != null) {
-            addOperations(e.getObject(), prop, e.getArgument(),
-                          m.getRemoves());
-        }
     }
 
     private void addOperations(Object obj, Collection blocks) {
