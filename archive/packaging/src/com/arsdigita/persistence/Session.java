@@ -58,7 +58,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/08/29 $
+ * @version $Revision: #5 $ $Date: 2003/09/12 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -698,7 +698,8 @@ public class Session {
                 }
             }
 
-            OID oid = new OID(sp.getQualifiedName());
+            MetadataRoot old = MetadataRoot.getMetadataRoot(sp.getRoot());
+            OID oid = new OID(old.getObjectType(sp.getQualifiedName()));
             for (Iterator it = sp.getKeyProperties().iterator();
                  it.hasNext(); ) {
                 Property prop = (Property) it.next();

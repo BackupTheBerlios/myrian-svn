@@ -29,12 +29,12 @@ import org.apache.log4j.Logger;
  * metadata system.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/09/10 $
+ * @version $Revision: #6 $ $Date: 2003/09/12 $
  **/
 
 public class MetadataRoot extends Element {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/metadata/MetadataRoot.java#5 $ by $Author: rhs $, $DateTime: 2003/09/10 13:16:17 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/metadata/MetadataRoot.java#6 $ by $Author: rhs $, $DateTime: 2003/09/12 16:32:14 $";
 
     private static final Logger s_cat = Logger.getLogger(MetadataRoot.class.getName());
 
@@ -62,10 +62,6 @@ public class MetadataRoot extends Element {
     // This is for backword compatibility with data queries.
     public static SimpleType OBJECT;
 
-    static {
-        s_root = new MetadataRoot();
-    }
-
     public static final void loadPrimitives() {
 	BIGINTEGER = s_root.getPrimitiveType("BigInteger");
 	BIGDECIMAL = s_root.getPrimitiveType("BigDecimal");
@@ -90,6 +86,12 @@ public class MetadataRoot extends Element {
     }
 
 
+    private static final Map OLD_ROOTS = new WeakHashMap();
+
+    public static final MetadataRoot getMetadataRoot(Root root) {
+        return (MetadataRoot) OLD_ROOTS.get(root);
+    }
+
     /**
      * Returns the MetadataRoot instance for this JVM.
      *
@@ -99,12 +101,17 @@ public class MetadataRoot extends Element {
         return s_root;
     }
 
+    static {
+        s_root = new MetadataRoot();
+    }
+
 
     private final Root m_root;
 
     private MetadataRoot(Root root) {
 	super(root, root);
 	m_root = root;
+        OLD_ROOTS.put(m_root, this);
     }
 
     public MetadataRoot() {
