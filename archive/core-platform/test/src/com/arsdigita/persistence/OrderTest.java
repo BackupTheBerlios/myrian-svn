@@ -25,12 +25,12 @@ import java.sql.SQLException;
  * Test
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/07/01 $
+ * @version $Revision: #12 $ $Date: 2003/07/02 $
  */
 
 public abstract class OrderTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderTest.java#11 $ by $Author: ashah $, $DateTime: 2003/07/01 11:28:55 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderTest.java#12 $ by $Author: ashah $, $DateTime: 2003/07/02 10:30:00 $";
 
     public OrderTest(String name) {
         super(name);
@@ -338,14 +338,18 @@ public abstract class OrderTest extends PersistenceTestCase {
         assertEquals("saves not cascaded", 0, cursor.size());
     }
 
-    public void FAILStestDeletingCompositions() {
+    public void testDeletingCompositions() {
         int numItems = 10;
         DataObject order = makeOrder(numItems);
         order.save();
 
         DataAssociation items = (DataAssociation) order.get("items");
+        DataCollection dc =
+            getSession().retrieve(getModelName() + ".LineItem");
 
         assertEquals("order not saved properly", numItems, items.size());
+
+        long start = dc.size();
 
         DataAssociationCursor cursor = items.cursor();
         while (cursor.next()) {
@@ -354,10 +358,11 @@ public abstract class OrderTest extends PersistenceTestCase {
 
         order.save();
 
-        assertEquals("deletes not cascaded", 0, items.size());
+        long end = dc.size();
+        assertEquals("deletes not cascaded", numItems, start - end);
     }
 
-    public void FAILStestClear() {
+    public void testClear() {
         int numItems = 10;
         DataObject order = makeOrder(numItems);
         order.save();
