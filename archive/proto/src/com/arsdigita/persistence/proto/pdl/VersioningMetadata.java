@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #5 $ $Date: 2003/05/13 $
+ * @version $Revision: #6 $ $Date: 2003/05/13 $
  */
 public class VersioningMetadata {
     private final static Logger s_log =
@@ -119,11 +119,12 @@ public class VersioningMetadata {
     public interface NodeVisitor {
         /**
          * This method is called whenever an object type node is traversed in
-         * the PDL AST.
-         *
-         * @param objectTypeFQN the fully qualified name of the object
+         * the PDL AST.  To reiterate, this method is called upon visiting any
+         * object type, whereas {@link #onVersionedProperty(Property)} and
+         * {@link #onUnversionedProperty(Property)} are only called for a subset
+         * of property nodes.
          **/
-        void onObjectType(String objectTypeFQN, boolean isMarkedVersioned);
+        void onObjectType(ObjectType objType, boolean isMarkedVersioned);
 
         /**
          * This method is called whenever we traverse a property node of the PDL
@@ -151,9 +152,15 @@ public class VersioningMetadata {
             if ( ot.isVersioned() ) {
                 m_versionedTypes.add(fqn);
             }
-            s_log.info("onObjectType: " + fqn);
+
             if ( m_nodeVisitor != null ) {
-                m_nodeVisitor.onObjectType(fqn, ot.isVersioned());
+                // This returns null for things like "global.BigDecimal".
+                ObjectType objType =
+                    MetadataRoot.getMetadataRoot().getObjectType(fqn);
+
+                if ( objType != null ) {
+                    m_nodeVisitor.onObjectType(objType, ot.isVersioned());
+                }
             }
         }
 
@@ -169,7 +176,6 @@ public class VersioningMetadata {
                     ("Cannot mark a key property 'unversioned': " +
                      property);
             }
-            s_log.info("onProperty: " + property);
             m_unversionedProps.add(property);
 
             if ( m_nodeVisitor != null ) {
