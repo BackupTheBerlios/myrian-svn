@@ -21,6 +21,7 @@ class StateManagerImpl extends AbstractStateManager {
     private PersistenceCapable m_container;
     private String m_prefix;
     private Map m_components = new HashMap();
+    private final JDOState m_state = new JDOState();
 
     StateManagerImpl(PersistenceManagerImpl pmi, PropertyMap pmap,
                      PersistenceCapable container, String prefix) {
@@ -54,6 +55,10 @@ class StateManagerImpl extends AbstractStateManager {
 
     String getPrefix() {
         return m_prefix;
+    }
+
+    JDOState getState() {
+        return m_state;
     }
 
     /**
@@ -105,6 +110,12 @@ class StateManagerImpl extends AbstractStateManager {
      */
     public Object getObjectField(PersistenceCapable pc, int field,
                                  Object currentValue) {
+
+        if (m_pmi.currentTransaction().isActive()) {
+            m_state.readWithDatastoreTxn();
+        } else {
+            m_state.readOutsideTxn();
+        }
 
         final Class declaredClass =
             (Class) m_pmi.getAllTypes(pc.getClass()).get(field);

@@ -156,7 +156,16 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
     /**
      * Delete the persistent instance from the data store.
      */
-    public void deletePersistent(Object pc) {
+    public void deletePersistent(Object obj) {
+        PersistenceCapable pc = checkAndCast(obj);
+        requireActiveTxn();
+
+        StateManagerImpl smi = getStateManager(pc);
+        if (smi == null) {
+            throw new JDOFatalInternalException
+                ("implementation error: null smi for pc=" + pc);
+        }
+        smi.getState().deletePersistent();
         m_ssn.delete(pc);
     }
 
@@ -298,10 +307,13 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
         throw new JDOUnsupportedOptionException("nontransactional");
     }
 
-    /**
-     * Make the transient instance persistent in this PersistenceManager.
-     */
-    public void makePersistent(Object obj) {
+    private void requireActiveTxn() {
+        if (!m_txn.isActive()) {
+            throw new JDOUserException("No active transaction");
+        }
+    }
+
+    private PersistenceCapable checkAndCast(Object obj) {
         if (obj == null) { throw new NullPointerException("obj"); }
 
         if (!(obj instanceof PersistenceCapable)) {
@@ -309,8 +321,14 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
                 ("Expected " + obj.getClass().getName() + " to implement " +
                  PersistenceCapable.class.getName());
         }
+        return (PersistenceCapable) obj;
+    }
 
-        PersistenceCapable pc = (PersistenceCapable) obj;
+    /**
+     * Make the transient instance persistent in this PersistenceManager.
+     */
+    public void makePersistent(Object obj) {
+        PersistenceCapable pc = checkAndCast(obj);
 
         Class cls = pc.getClass();
         Root root = m_ssn.getRoot();
@@ -325,10 +343,7 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
     }
 
     void makePersistent(PersistenceCapable pc, ObjectType type) {
-        if (!m_txn.isActive()) {
-            throw new JDOUserException("No active transaction");
-        }
-
+        requireActiveTxn();
         Class cls = pc.getClass();
         if (!hasStateManager(pc)) {
             PropertyMap pmap = pmap(pc, type);
@@ -348,6 +363,8 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
                 }
             }
         }
+        StateManagerImpl smi = getStateManager(pc);
+        smi.getState().makePersistent();
     }
 
     /**

@@ -221,7 +221,7 @@ final class JDOState {
 
     // Non-static fields and methods begin here.
 
-    private byte m_state = S_TRANSIENT;
+    private byte m_state = S_HOLLOW;
 
     private void transition(int action) {
         final byte nextState = STATE_TRANSITIONS[action][m_state];
@@ -334,7 +334,7 @@ final class JDOState {
         transition(A_WRITE_OR_MAKE_DIRTY_WITH_TXN);
     }
 
-    // Interrogatives
+    // Interrogatives supported by PersistenceManager
 
     public boolean isDeleted() {
         return m_state == S_P_DELETED || m_state == S_P_NEW_DELETED;
@@ -356,5 +356,14 @@ final class JDOState {
     public boolean isTransactional() {
         return m_state != S_HOLLOW && m_state != S_P_NONTRANSACTIONAL
             && m_state != S_TRANSIENT;
+    }
+
+
+    // Interrogatives available to the implementation but invisible to the
+    // application
+
+
+    boolean isHollow() {
+        return m_state == S_HOLLOW;
     }
 }
