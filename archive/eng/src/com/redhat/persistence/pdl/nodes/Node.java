@@ -29,12 +29,12 @@ import java.util.List;
  * Node
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/09/07 $
+ * @version $Revision: #6 $ $Date: 2004/09/13 $
  **/
 
 public abstract class Node {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/nodes/Node.java#5 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/nodes/Node.java#6 $ by $Author: rhs $, $DateTime: 2004/09/13 16:23:12 $";
 
 
     /**
@@ -164,6 +164,7 @@ public abstract class Node {
         public void onType(TypeNd type) {}
         public void onJavaClass(JavaClassNd jc) {}
         public void onPath(PathNd path) {}
+        public void onPropertyMapping(PropertyMappingNd pmn) {}
         public void onColumn(ColumnNd col) {}
         public void onDbType(DbTypeNd type) {}
         public void onJoinPath(JoinPathNd jp) {}

@@ -21,12 +21,12 @@ package com.redhat.persistence.pdl.nodes;
  * Property
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/09/07 $
+ * @version $Revision: #5 $ $Date: 2004/09/13 $
  **/
 
 public class PropertyNd extends StatementNd {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/nodes/PropertyNd.java#4 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/nodes/PropertyNd.java#5 $ by $Author: rhs $, $DateTime: 2004/09/13 16:23:12 $";
 
     public static final Field TYPE =
         new Field(PropertyNd.class, "type", TypeNd.class, 1, 1);
@@ -174,5 +174,9 @@ public class PropertyNd extends StatementNd {
 
     public Node getMapping() {
         return (Node) get(MAPPING);
+    }
+
+    public NestedMapNd getNestedMap() {
+        return (NestedMapNd) get(NESTED_MAP);
     }
 }

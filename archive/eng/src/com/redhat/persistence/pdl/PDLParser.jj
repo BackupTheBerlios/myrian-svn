@@ -30,12 +30,12 @@ import com.redhat.persistence.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2004/09/07 $
+ * @version $Revision: #7 $ $Date: 2004/09/13 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLParser.jj#6 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLParser.jj#7 $ by $Author: rhs $, $DateTime: 2004/09/13 16:23:12 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -340,13 +340,47 @@ PropertyNd property() :
     { return p; }
 }
 
+/*
+... = value(foo.bar);
+... = reference(foo.bar_id);
+... = mapping(map.foo_id1, map.foo_id2, map.bar_id);
+... = inverse(bar.foo_id);
+*/
+
 Node property_mapping() :
 {
-    Node n;
+    Token t;
+    PropertyMappingNd pmn = new PropertyMappingNd();
+    Node n = pmn;
 }
 {
-    ( n = column() | n = join_path() | n = qualias() )
+    ( LOOKAHEAD(2) t = <ID> <LPAREN> columns(pmn) <RPAREN> {
+        if (t.image.equals("value")) {
+            pmn.setValue();
+        } else if (t.image.equals("reference")) {
+            pmn.setReference();
+        } else if (t.image.equals("inverse")) {
+            pmn.setInverse();
+        } else if (t.image.equals("mapping")) {
+            pmn.setMapping();
+        } else {
+            throw new IllegalStateException
+            ("unrecognized mapping: " + t.image);
+        }
+    }
+      | n = column()
+      | n = join_path()
+      | n = qualias() )
     { return n; }
+}
+
+void columns(PropertyMappingNd n) :
+{
+    Node c;
+}
+{
+    c = column() { ln(n, c); n.add(n.COLUMNS, c); }
+        ( <COMMA> c = column() { n.add(n.COLUMNS, c); } )*
 }
 
 void multiplicity(PropertyNd p) :

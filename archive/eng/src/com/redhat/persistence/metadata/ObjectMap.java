@@ -25,12 +25,12 @@ import java.util.*;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/09/07 $
+ * @version $Revision: #6 $ $Date: 2004/09/13 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/ObjectMap.java#5 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/ObjectMap.java#6 $ by $Author: rhs $, $DateTime: 2004/09/13 16:23:12 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -338,6 +338,42 @@ public class ObjectMap extends Element {
             }
         }
         return result;
+    }
+
+    public Collection getRequiredTables() {
+        Set result = new LinkedHashSet();
+        addRequiredTables(this, result, new HashSet());
+        return result;
+    }
+    private void addRequiredTables(ObjectMap om, final Set result, Set added) {
+        if (added.contains(this)) { return; }
+        added.add(this);
+        if (m_table != null) { result.add(m_table); }
+        for (Iterator it = om.getMappings().iterator(); it.hasNext(); ) {
+            Mapping m = (Mapping) it.next();
+            m.dispatch(new Mapping.Switch() {
+                public void onValue(Value v) {
+                    result.add(v.getColumn().getTable());
+                }
+                public void onJoinTo(JoinTo j) {
+                    result.add(j.getKey().getTable());
+                    result.add(j.getKey().getUniqueKey().getTable());
+                }
+                public void onJoinFrom(JoinFrom j) {
+                    result.add(j.getKey().getTable());
+                    result.add(j.getKey().getUniqueKey().getTable());
+                }
+                public void onJoinThrough(JoinThrough j) {
+                    result.add(j.getFrom().getTable());
+                    result.add(j.getFrom().getUniqueKey().getTable());
+                    result.add(j.getTo().getUniqueKey().getTable());
+                }
+                public void onNested(Nested n) {}
+                public void onQualias(Qualias q) {}
+                public void onStatic(Static s) {}
+            });
+            addRequiredTables(m.getMap(), result, added);
+        }
     }
 
     public SQLBlock getRetrieveAll() {

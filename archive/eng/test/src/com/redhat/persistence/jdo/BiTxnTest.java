@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
  * Tests lifecycle of JDO instances across transactions.
  *
  * @since 2004-08-04
- * @version $Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdo/BiTxnTest.java#5 $
+ * @version $Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdo/BiTxnTest.java#6 $
  **/
 public class BiTxnTest extends AbstractCase {
     private final static Logger s_log = Logger.getLogger(BiTxnTest.class);
@@ -44,9 +44,9 @@ public class BiTxnTest extends AbstractCase {
     // ordering is currently hardcoded and need to be kept in sync with the
     // data model by hand.
     private final static String[] TABLES =
-    {"items", "orders", "products", "pictures", "group_member_map", "groups",
-     "users", "auxiliary_emails", "parties", "emps", "depts", "mag_index",
-     "magazines"};
+    {"items", "orders", "products", "pictures", "groups_users", "groups",
+     "users", "partys_auxiliaryemails", "partys", "employees", "departments",
+     "magazines_index", "magazines"};
 
     public BiTxnTest() {}
 

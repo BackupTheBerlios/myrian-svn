@@ -35,12 +35,12 @@ import org.apache.log4j.Logger;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/09/07 $
+ * @version $Revision: #6 $ $Date: 2004/09/13 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#5 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#6 $ by $Author: rhs $, $DateTime: 2004/09/13 16:23:12 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -61,6 +61,8 @@ class EventSwitch extends Event.Switch {
     // I think this will be broken if obj is null or if it contains any keys
     // that are null.
     void flatten(Path prefix, Object obj, List paths, Map values) {
+        Session ssn = m_engine.getSession();
+
         LinkedList stack = new LinkedList();
         stack.add(prefix);
         stack.add(obj);
@@ -72,8 +74,11 @@ class EventSwitch extends Event.Switch {
             Collection keys = null;
 
             if (o != null) {
-                ObjectType type = m_engine.getSession().getObjectType(o);
-                keys = type.getKeyProperties();
+                ObjectType type = ssn.getObjectType(o);
+                if (!type.isPrimitive()) {
+                    ObjectMap map = ssn.getObjectMap(o);
+                    keys = map.getKeyMappings();
+                }
             }
 
             if (keys == null || keys.size() == 0) {
@@ -82,19 +87,26 @@ class EventSwitch extends Event.Switch {
                 continue;
             }
 
+            // XXX: should really reconstruct these values from the
+            // event stream
             PropertyMap props = m_engine.getSession().getProperties(o);
             ArrayList revKeys = new ArrayList(keys.size());
             revKeys.addAll(keys);
             Collections.reverse(revKeys);
 
             for (Iterator it = revKeys.iterator(); it.hasNext(); ) {
-                Property key = (Property) it.next();
+                Mapping key = (Mapping) it.next();
                 if (p == null) {
-                    stack.add(Path.get(key.getName()));
+                    stack.add(key.getPath());
                 } else {
-                    stack.add(Path.get(p.getPath() + "." + key.getName()));
+                    stack.add(Path.add(p, key.getPath()));
                 }
-                stack.add(props.get(key));
+                Property prop = key.getProperty();
+                if (prop == null) {
+                    stack.add(ssn.getContainer(o));
+                } else {
+                    stack.add(props.get(prop));
+                }
             }
         }
     }

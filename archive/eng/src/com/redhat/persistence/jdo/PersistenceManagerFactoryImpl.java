@@ -54,6 +54,14 @@ public class PersistenceManagerFactoryImpl
      */
     private final static Map s_instances = new HashMap();
 
+    private static final PDLGenerator s_generator =
+        new PDLGenerator(new Root());
+    static {
+        JDOImplHelper.getInstance().addRegisterClassListener(s_generator);
+    }
+
+    private final PDLGenerator m_generator = new PDLGenerator(new Root());
+
     private final Registrar m_registrar = new Registrar();
 
     private static Collection m_options;
@@ -95,7 +103,7 @@ public class PersistenceManagerFactoryImpl
 
     private PooledConnectionSource m_connSrc;
 
-    private transient Root m_root = new Root();
+    //private transient Root m_root = new Root();
 
     private static boolean bool(String value) {
         // sec 11.1 of spec
@@ -162,8 +170,8 @@ public class PersistenceManagerFactoryImpl
         m_connSrc = new PooledConnectionSource(m_url, s_defaultMaxPool, 0);
     }
 
-    public Root getMetadataRoot() {
-        return m_root;
+    static Root getMetadataRoot() {
+        return s_generator.getRoot();
     }
 
     public Properties getProperties() {
@@ -203,7 +211,8 @@ public class PersistenceManagerFactoryImpl
             throw new IllegalStateException("unreachable stmt to appease javac");
         }
 
-        Session ssn = new Session(m_root, engine, new QuerySource());
+        Session ssn = new Session(s_generator.getRoot(), engine,
+                                  new QuerySource());
         return new PersistenceManagerImpl(this, ssn, prof, m_registrar);
     }
 

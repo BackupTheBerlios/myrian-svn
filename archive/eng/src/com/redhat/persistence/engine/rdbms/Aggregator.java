@@ -40,12 +40,12 @@ import org.apache.log4j.Logger;
  * Aggregator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/09/07 $
+ * @version $Revision: #7 $ $Date: 2004/09/13 $
  **/
 
 class Aggregator extends Event.Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/Aggregator.java#6 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/Aggregator.java#7 $ by $Author: rhs $, $DateTime: 2004/09/13 16:23:12 $";
 
     private static final Logger LOG = Logger.getLogger(Aggregator.class);
 
@@ -297,6 +297,12 @@ class Aggregator extends Event.Switch {
 
         clearAttributeEvent(obj);
 
+        Event ovile = getViolation(obj);
+        if (ovile != null) {
+            nd = merge(nd, findNode(ovile),
+                       "violation from nested type (delete)");
+        }
+
         clearViolation(obj);
     }
 
@@ -314,7 +320,7 @@ class Aggregator extends Event.Switch {
             Event ovile = getViolation(arg);
             if (ovile != null) {
                 nd = merge(findNode(ovile), nd,
-                           "violation from nested type");
+                           "violation from nested type (add)");
                 clearViolation(arg);
             }
         }
@@ -411,6 +417,10 @@ class Aggregator extends Event.Switch {
         if (arg != null) {
             setTwoWayEvent(obj, prop, arg, e);
         }
+
+        if (prev != null && mapping.isNested() && mapping.isCompound()) {
+            setViolation(prev, e);
+        }
     }
 
     public void onAdd(AddEvent e) {
@@ -425,6 +435,11 @@ class Aggregator extends Event.Switch {
         nd = mergeTwoWay(nd, e.getObject(), e.getProperty(), e.getArgument(),
                          "two way from remove");
         setTwoWayEvent(e.getObject(), e.getProperty(), e.getArgument(), e);
+
+        Mapping m = e.getObjectMap().getMapping(e.getProperty());
+        if (m.isNested() && m.isCompound()) {
+            setViolation(e.getArgument(), e);
+        }
     }
 
     public void clear() {

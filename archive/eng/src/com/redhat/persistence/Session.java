@@ -54,12 +54,12 @@ import org.apache.commons.collections.map.ReferenceIdentityMap;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #18 $ $Date: 2004/09/10 $
+ * @version $Revision: #19 $ $Date: 2004/09/13 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#18 $ by $Author: ashah $, $DateTime: 2004/09/10 14:49:17 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#19 $ by $Author: rhs $, $DateTime: 2004/09/13 16:23:12 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -262,7 +262,7 @@ public class Session {
     private DataSet getDataSet(Object obj, Role role) {
         ObjectType propType = role.getType();
         DataSet ds = getDataSet(obj);
-        if (propType.isKeyed()) {
+        if (propType.isCompound()) {
             Signature sig = new Signature(propType);
             Expression expr = ds.getExpression();
             if (!role.isCollection()) {
@@ -576,7 +576,24 @@ public class Session {
     }
 
     public PropertyMap getProperties(Object obj) {
-        return getAdapter(obj).getProperties(obj);
+        if (hasObjectMap(obj)) {
+            ObjectMap map = getObjectMap(obj);
+            PropertyMap result = new PropertyMap(map.getObjectType());
+            List keys = map.getKeyProperties();
+            for (int i = 0; i < keys.size(); i++) {
+                Property p = (Property) keys.get(i);
+                if (isDeleted(obj)) {
+                    ObjectData od = getObjectData(obj);
+                    PropertyData pd = od.getPropertyData(p);
+                    result.put(p, pd.getValue());
+                } else {
+                    result.put(p, get(obj, p));
+                }
+            }
+            return result;
+        } else {
+            return getAdapter(obj).getProperties(obj);
+        }
     }
 
     /**
@@ -1262,7 +1279,7 @@ public class Session {
         }
     }
 
-    static String str(Object obj) {
+    public static String str(Object obj) {
         if (obj == null) {
             return "null";
         } else {

@@ -30,7 +30,7 @@ import javax.jdo.Query;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #28 $ $Date: 2004/09/07 $
+ * @version $Revision: #29 $ $Date: 2004/09/13 $
  **/
 class CRPMap implements Map {
     private final static NullableObject NULL = new NullableObject() {
@@ -78,7 +78,7 @@ class CRPMap implements Map {
         PersistenceManagerImpl pmi = getPMI();
         StateManagerImpl smi = pmi.getStateManager(this);
 
-        MapEntry entry = new MapEntry(getContainer(), key);
+        MapEntry entry = new MapEntry(key);
         entry.setValue(value);
         return entry;
     }

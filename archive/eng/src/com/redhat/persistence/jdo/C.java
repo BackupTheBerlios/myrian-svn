@@ -146,13 +146,14 @@ class C {
     }
 
     public static void lock(Session ssn, Object obj) {
-        Root root = ssn.getRoot();
-        Adapter ad = root.getAdapter(obj.getClass());
-        ObjectType type = ad.getObjectType(obj);
-        Expression expr = new Filter
-            (new Define(new All(type.getQualifiedName()), "this"),
-             new Equals(new Variable("this"), new Literal(obj)));
-        lock(ssn, expr);
+        if (ssn.hasObjectMap(obj)) {
+            ObjectMap map = ssn.getObjectMap(obj);
+            ObjectType type = map.getObjectType();
+            Expression expr = new Filter
+                (new Define(new All(type.getQualifiedName()), "this"),
+                 new Equals(new Variable("this"), new Literal(obj)));
+            lock(ssn, expr);
+        }
     }
 
     // used for application identity

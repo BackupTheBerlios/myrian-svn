@@ -4,67 +4,94 @@
   <package name="com.redhat.persistence.jdo">
 
     <class name="Department" identity-type="datastore"/>
-    <class name="Employee" identity-type="datastore"/>
-    <class name="Address" identity-type="datastore"/>
-    <class name="BigEmployee" identity-type="datastore"/>
+    <class name="Employee" identity-type="datastore">
+      <field name="address" embedded="true"/>
+    </class>
+    <class name="BigEmployee" identity-type="datastore">
+      <field name="address" embedded="true"/>
+    </class>
+    <class name="Address" identity-type="datastore">
+      <extension vendor-name="redhat" key="embedded" value="true"/>
+    </class>
 
-    <class name="Rolodex" identity-type="datastore"/>
-    <class name="Contact" identity-type="datastore"/>
+    <class name="Rolodex" identity-type="datastore">
+      <extension vendor-name="redhat" key="metadata" value="PDL"/>
+      <field name="m_contacts">
+        <collection element-type="Contact" embedded-element="true"/>
+      </field>
+    </class>
+    <class name="Contact" identity-type="datastore">
+      <extension vendor-name="redhat" key="embedded" value="true"/>
+    </class>
 
     <!-- Pandora -->
 
     <class name="Party" identity-type="datastore">
-      <field name="id"/>
-      <field name="email"/>
-      <field name="auxiliaryEmails"/>
+      <field name="id">
+        <extension vendor-name="redhat" key="primary-key" value="true"/>
+      </field>
+      <field name="auxiliaryEmails">
+        <collection element-type="String"/>
+      </field>
     </class>
 
     <class name="User"
       persistence-capable-superclass="Party"
-      identity-type="datastore">
-
-      <field name="name"/>
-    </class>
+      identity-type="datastore"/>
 
     <class name="Group"
       persistence-capable-superclass="Party"
       identity-type="datastore">
-
-      <field name="name"/>
-      <field name="users"/>
+      <field name="users">
+        <collection element-type="User"/>
+      </field>
     </class>
 
     <class name="Order" identity-type="datastore">
-      <field name="id"/>
-      <field name="items"/>
+      <field name="id">
+        <extension vendor-name="redhat" key="primary-key" value="true"/>
+      </field>
+      <field name="items">
+        <collection element-type="Item"/>
+      </field>
       <field name="purchaseDate"/>
       <field name="party"/>
     </class>
 
     <class name="Product" identity-type="datastore">
-      <field name="id"/>
+      <field name="id">
+        <extension vendor-name="redhat" key="primary-key" value="true"/>
+      </field>
       <field name="name"/>
       <field name="price"/>
       <field name="picture"/>
     </class>
 
     <class name="Picture" identity-type="datastore">
-      <field name="id"/>
+      <field name="id">
+        <extension vendor-name="redhat" key="primary-key" value="true"/>
+      </field>
       <field name="caption"/>
       <field name="content"/>
     </class>
 
     <class name="Item" identity-type="datastore">
-      <field name="id"/>
+      <field name="id">
+        <extension vendor-name="redhat" key="primary-key" value="true"/>
+      </field>
       <field name="product"/>
     </class>
 
     <!-- Map-related classes -->
 
     <class name="Magazine" identity-type="datastore">
-      <field name="id"/>
+      <field name="id">
+        <extension vendor-name="redhat" key="primary-key" value="true"/>
+      </field>
       <field name="title"/>
-      <field name="index"/>
+      <field name="index">
+        <map key-type="String" value-type="Integer"/>
+      </field>
     </class>
 
   </package>

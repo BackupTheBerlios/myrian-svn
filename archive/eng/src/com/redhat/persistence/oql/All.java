@@ -25,12 +25,12 @@ import java.util.*;
  * All
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/09/07 $
+ * @version $Revision: #5 $ $Date: 2004/09/13 $
  **/
 
 public class All extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/All.java#4 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/All.java#5 $ by $Author: rhs $, $DateTime: 2004/09/13 16:23:12 $";
 
     private String m_type;
     private Map m_bindings;
@@ -55,6 +55,10 @@ public class All extends Expression {
     void frame(Generator gen) {
         ObjectType type = gen.getType(m_type);
         final ObjectMap map = type.getRoot().getObjectMap(type);
+        if (map == null) {
+            throw new IllegalStateException
+                ("no map for type: " + type.getQualifiedName());
+        }
         SQLBlock block = map.getRetrieveAll();
         String[] columns = Code.columns(map, null);
 

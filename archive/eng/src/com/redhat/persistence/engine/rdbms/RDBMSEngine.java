@@ -63,12 +63,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/09/07 $
+ * @version $Revision: #8 $ $Date: 2004/09/13 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#7 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#8 $ by $Author: rhs $, $DateTime: 2004/09/13 16:23:12 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -171,7 +171,7 @@ public class RDBMSEngine extends Engine {
 
     void removeUpdates(Object obj) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Removing updates for: " + obj);
+            LOG.debug("Removing updates for: " + getSession().str(obj));
         }
         ArrayList ops = (ArrayList) m_operationMap.get(key(obj));
         if (ops != null) {

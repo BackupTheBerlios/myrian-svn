@@ -37,6 +37,17 @@ public class JDOSuite extends TestSuite {
 
         suite.addTest(QueryTest.suite());
 
-        return new JDOTestSetup(suite);
+        JDOTestSetup setup = new JDOTestSetup(suite);
+        setup.load(Employee.class);
+        setup.load(Department.class);
+        setup.load(User.class);
+        setup.load(Group.class);
+        setup.load(Rolodex.class);
+        setup.load(Order.class);
+        setup.load(Item.class);
+        setup.load(Product.class);
+        setup.load(Picture.class);
+        setup.load(Magazine.class);
+        return setup;
     }
 }

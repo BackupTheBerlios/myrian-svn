@@ -17,8 +17,11 @@
  */
 package com.redhat.persistence.jdo;
 
-import java.util.Collection;
-import java.util.Iterator;
+import com.redhat.persistence.pdl.*;
+import com.redhat.persistence.metadata.*;
+
+import java.util.*;
+import java.sql.*;
 import javax.jdo.*;
 
 /**
@@ -98,4 +101,48 @@ public class Extensions {
             ((Closeable) it).close();
         }
     }
+
+    /**
+     * Loads schema for the given list of classes using the specified
+     * connection. This will recursively load the schema for any
+     * related classes.
+     **/
+
+    public static void load(List classes, Connection conn)
+        throws SQLException {
+        Root root = PersistenceManagerFactoryImpl.getMetadataRoot();
+        Schema.load(getTables(root, classes), conn);
+    }
+
+    /**
+     * Drops the schema for the given list of classes using the
+     * specified connection. This will recursively drop the schema for
+     * any related classes.
+     **/
+
+    public static void unload(List classes, Connection conn)
+        throws SQLException {
+        Root root = PersistenceManagerFactoryImpl.getMetadataRoot();
+        Schema.unload(getTables(root, classes), conn);
+    }
+
+    private static List getTables(Root root, List classes) {
+        Set tables = new LinkedHashSet();
+        for (int i = 0; i <  classes.size(); i++) {
+            Class klass = (Class) classes.get(i);
+            ObjectType ot = root.getObjectType(klass.getName());
+            if (ot == null) {
+                throw new IllegalStateException
+                    ("no object type for klass: " + klass);
+            }
+            ObjectMap om = root.getObjectMap(ot);
+            if (om == null) {
+                throw new IllegalStateException
+                    ("no object map for type: " + ot.getQualifiedName());
+            }
+            tables.addAll(om.getRequiredTables());
+        }
+        return new ArrayList(tables);
+    }
+
 }

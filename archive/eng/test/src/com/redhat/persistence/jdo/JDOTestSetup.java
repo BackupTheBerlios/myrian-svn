@@ -19,14 +19,14 @@ package com.redhat.persistence.jdo;
 
 import com.arsdigita.util.jdbc.Connections;
 import com.redhat.persistence.jdo.PersistenceManagerFactoryImpl;
-import com.redhat.persistence.metadata.Root;
+import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.pdl.PDL;
 import com.redhat.persistence.pdl.Schema;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
-import java.util.Properties;
+import java.util.*;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManagerFactory;
 
@@ -37,8 +37,14 @@ public class JDOTestSetup extends TestSetup {
     private static int s_id = 0;
     private static PersistenceManagerFactory s_pmf = null;
 
+    private List m_classes = new ArrayList();
+
     public JDOTestSetup(Test test) {
         super(test);
+    }
+
+    public void load(Class klass) {
+        m_classes.add(klass);
     }
 
     protected void setUp() throws Exception {
@@ -49,33 +55,16 @@ public class JDOTestSetup extends TestSetup {
 
         s_pmf = JDOHelper.getPersistenceManagerFactory(p);
 
-        PDL pdl = new PDL();
-        String pdlFile = "com/redhat/persistence/jdo/package.pdl";
-        InputStream is = cl.getResourceAsStream(pdlFile);
-        if (is != null) {
-            pdl.load(new InputStreamReader(is), pdlFile);
-        }
-
-        pdl.emit(((PersistenceManagerFactoryImpl) s_pmf).getMetadataRoot());
-
-        PersistenceManagerFactoryImpl pmf =
-            (PersistenceManagerFactoryImpl) s_pmf;
-        Root root = pmf.getMetadataRoot();
-        Connection conn = Connections.acquire
-            (s_pmf.getConnectionURL());
-        Schema.load(root, conn);
+        Connection conn = Connections.acquire(s_pmf.getConnectionURL());
+        Extensions.load(m_classes, conn);
         conn.createStatement().execute("create sequence jdotest_seq");
         conn.commit();
         conn.close();
     }
 
     protected void tearDown() throws Exception {
-        PersistenceManagerFactoryImpl pmf =
-            (PersistenceManagerFactoryImpl) s_pmf;
-        Root root = pmf.getMetadataRoot();
-        Connection conn = Connections.acquire
-            (s_pmf.getConnectionURL());
-        Schema.unload(root, conn);
+        Connection conn = Connections.acquire(s_pmf.getConnectionURL());
+        Extensions.unload(m_classes, conn);
         conn.createStatement().execute("drop sequence jdotest_seq");
         conn.commit();
     }

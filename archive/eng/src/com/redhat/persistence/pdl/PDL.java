@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2004/09/07 $
+ * @version $Revision: #11 $ $Date: 2004/09/13 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#10 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#11 $ by $Author: rhs $, $DateTime: 2004/09/13 16:23:12 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -445,13 +445,27 @@ public class PDL {
         m_errors.check();
 
         m_ast.traverse(new Node.Switch() {
-            private void type(ObjectType type, Node mapping) {
-                if (!(mapping instanceof ColumnNd)) { return; }
-                Column col = lookup((ColumnNd) mapping);
+            private void type(ObjectType type, Column col) {
                 if (col.getType() == Integer.MIN_VALUE) {
                     Adapter ad = m_root.getAdapter(type.getJavaClass());
                     col.setType(ad.defaultJDBCType());
                 }
+            }
+            private void type(final ObjectType type, Node mapping) {
+                if (mapping == null) { return; }
+                mapping.dispatch(new Node.Switch() {
+                    public void onColumn(ColumnNd colnd) {
+                        type(type, lookup(colnd));
+                    }
+                    public void onPropertyMapping(PropertyMappingNd pmn) {
+                        if (pmn.isValue()) {
+                            Column[] cols = getColumns(pmn);
+                            for (int i = 0; i < cols.length; i++) {
+                                type(type, cols[i]);
+                            }
+                        }
+                    }
+                });
             }
             public void onProperty(PropertyNd pnd) {
                 ObjectType ot = m_symbols.getEmitted(pnd.getType());
@@ -515,20 +529,20 @@ public class PDL {
 
     private HashMap m_primaryKeys = new HashMap();
 
-    private void unique(Node nd, Column[] cols, boolean primary) {
+    private UniqueKey unique(Node nd, Column[] cols, boolean primary) {
         Table table = cols[0].getTable();
         if (table.getUniqueKey(cols) != null) {
             // Can't warn about this yet since we have no syntax that
             // lets you not specify duplicate keys.
             //m_errors.warn(nd, "duplicate key");
-            return;
+            return table.getUniqueKey(cols);
         }
         UniqueKey key;
         try {
             key = new UniqueKey(table, null, cols);
         } catch (IllegalArgumentException e) {
             m_errors.fatal(nd, e.getMessage());
-            return;
+            return null;
         }
         if (primary) {
             UniqueKey pk = table.getPrimaryKey();
@@ -538,21 +552,24 @@ public class PDL {
                     (nd, "table already has primary key: " +
                      prev.getLocation());
                 if (prev instanceof ObjectKeyNd) {
-                    return;
+                    return key;
                 }
             }
             table.setPrimaryKey(key);
             m_primaryKeys.put(key, nd);
             m_symbols.setLocation(table, nd);
         }
+        return key;
     }
 
-    private void unique(Node nd, Collection ids, boolean primary) {
+    private UniqueKey unique(Node nd, Collection ids, boolean primary) {
         final ArrayList columns = new ArrayList();
         final Node.Traversal firstColumn = new Node.Traversal() {
             public boolean accept(Node child) {
                 Node.Field f = child.getField();
                 if (f == PropertyNd.MAPPING) {
+                    return true;
+                } else if (f == PropertyMappingNd.COLUMNS) {
                     return true;
                 } else if (f == JoinPathNd.JOINS) {
                     return child.getIndex() == 0;
@@ -574,7 +591,7 @@ public class PDL {
                 Property prop = (Property) ot.getProperty(id);
                 if (prop == null) {
                     m_errors.warn(nd, "no such property " + id);
-                    return;
+                    return null;
                 }
                 PropertyNd propNd = (PropertyNd) getNode(prop);
                 int start = columns.size();
@@ -582,7 +599,7 @@ public class PDL {
                 int end = columns.size();
                 if (start == end) {
                     m_errors.warn(nd, "no metadata for " + id);
-                    return;
+                    return null;
                 }
             }
         } else if (nd instanceof PropertyNd) {
@@ -590,7 +607,7 @@ public class PDL {
             if (columns.size() == 0) {
                 m_errors.warn(nd, "no metadata for " +
                               ((PropertyNd) nd).getName().getName());
-                return;
+                return null;
             }
         } else {
             throw new IllegalArgumentException("node type: " + nd.getClass());
@@ -603,7 +620,7 @@ public class PDL {
         for (int i = 0; i < cols.length; i++) {
             cols[i] = (Column) columns.get(i);
         }
-        unique(nd, cols, primary);
+        return unique(nd, cols, primary);
     }
 
     private class NestedKeyTraversal extends Node.Traversal {
@@ -637,6 +654,9 @@ public class PDL {
                 return !m_columns.isEmpty();
             } else if (f == JoinNd.TO) {
                 return m_columns.isEmpty();
+            } else if (f == PropertyMappingNd.COLUMNS) {
+                // XXX: does this work for join throughs?
+                return true;
             } else {
                 return true;
             }
@@ -690,12 +710,19 @@ public class PDL {
         m_ast.traverse(new Node.Switch() {
             public void onObjectKey(ObjectKeyNd nd) {
                 Node parent = nd.getParent();
+                UniqueKey key;
                 if (parent instanceof ObjectTypeNd) {
-                    unique(nd, nd.getProperties(), true);
+                    key = unique(nd, nd.getProperties(), true);
                 } else if (parent instanceof NestedMapNd) {
                     NestedKeyTraversal nkt = new NestedKeyTraversal();
                     nd.traverse(nkt);
-                    unique(nd, nkt.getColumns(), true);
+                    key = unique(nd, nkt.getColumns(), true);
+                } else {
+                    throw new IllegalStateException();
+                }
+                if (key != null) {
+                    ObjectMap om = getMap(parent);
+                    om.setTable(key.getTable());
                 }
             }
 
@@ -704,7 +731,12 @@ public class PDL {
             }
 
             public void onReferenceKey(ReferenceKeyNd nd) {
-                unique(nd, new Column[] { lookup(nd.getCol()) }, true);
+                UniqueKey key = unique
+                    (nd, new Column[] { lookup(nd.getCol()) }, true);
+                if (key != null) {
+                    ObjectMap om = getMap(nd.getParent());
+                    om.setTable(key.getTable());
+                }
             }
 
             public void onProperty(PropertyNd nd) {
@@ -804,6 +836,31 @@ public class PDL {
     }
 
     private void emitMapping() {
+	m_ast.traverse(new Node.Switch() {
+            public void onReferenceKey(ReferenceKeyNd rkn) {
+                Column key = lookup(rkn.getCol());
+                ObjectMap om = getMap(rkn.getParent());
+                Column[] cols = new Column[] {key};
+                if (key.getTable().getForeignKey(cols) == null) {
+                    ObjectMap sm = om.getSuperMap();
+                    Table table = null;
+                    while (sm != null) {
+                        table = sm.getTable();
+                        if (table != null) {
+                            break;
+                        }
+                        sm = sm.getSuperMap();
+                    }
+                    if (table == null) {
+                        throw new IllegalStateException
+                            ("unable to find supertable for " +
+                             om.getObjectType());
+                    }
+                    fk(cols, table.getPrimaryKey());
+                }
+            }
+        });
+
         m_ast.traverse(new Node.Switch() {
             public void onIdentifier(IdentifierNd id) {
                 ObjectMap om = getMap(id.getParent().getParent());
@@ -933,7 +990,7 @@ public class PDL {
                 }
             }
             private void emit(Node nd) {
-                ObjectMap om;
+                final ObjectMap om;
                 if (nd.getParent() instanceof AssociationNd) {
                     Property p = (Property) getEmitted(nd);
                     if (p == null) { return; }
@@ -942,19 +999,29 @@ public class PDL {
                     om = getMap(nd.getParent());
                 }
                 if (om == null) { return; }
-                Role prop = (Role) om.getObjectType().getProperty(getPath(nd));
+                final Role prop =
+                    (Role) om.getObjectType().getProperty(getPath(nd));
                 if (prop == null) { return; }
 
                 Node mapping = getMapping(nd);
                 if (mapping == null) {
                     Path p = Path.get(prop.getName());
                     om.addMapping(new Static(p));
-                } else if (mapping instanceof ColumnNd) {
-                    emitMapping(om, prop, (ColumnNd) mapping);
-                } else if (mapping instanceof JoinPathNd) {
-                    emitMapping(om, prop, (JoinPathNd) mapping);
                 } else {
-                    emitMapping(om, prop, (QualiasNd) mapping);
+                    mapping.dispatch(new Node.Switch() {
+                        public void onColumn(ColumnNd col) {
+                            emitMapping(om, prop, col);
+                        }
+                        public void onPropertyMapping(PropertyMappingNd pmn) {
+                            emitMapping(om, prop, pmn);
+                        }
+                        public void onJoinPath(JoinPathNd jn) {
+                            emitMapping(om, prop, jn);
+                        }
+                        public void onQualias(QualiasNd q) {
+                            emitMapping(om, prop, q);
+                        }
+                    });
                 }
                 if (!prop.getType().isIndependent()) {
                     Mapping m = om.getMapping(prop);
@@ -966,49 +1033,6 @@ public class PDL {
                             m.setMap(getMap(nm));
                         }
                     }
-                }
-            }
-        });
-
-        m_ast.traverse(new Node.Switch() {
-            public void onReferenceKey(ReferenceKeyNd rkn) {
-                Column key = lookup(rkn.getCol());
-                ObjectMap om = getMap(rkn.getParent());
-                om.setTable(key.getTable());
-            }
-
-            public void onObjectKey(ObjectKeyNd okn) {
-                ObjectMap om = getMap(okn.getParent());
-                IdentifierNd prop =
-                    (IdentifierNd) okn.getProperties().iterator().next();
-                Mapping m = om.getMapping(Path.get(prop.getName()));
-                if (m != null) {
-                    om.setTable(m.getTable());
-                }
-            }
-        });
-
-	m_ast.traverse(new Node.Switch() {
-            public void onReferenceKey(ReferenceKeyNd rkn) {
-                Column key = lookup(rkn.getCol());
-                ObjectMap om = getMap(rkn.getParent());
-                Column[] cols = new Column[] {key};
-                if (key.getTable().getForeignKey(cols) == null) {
-                    ObjectMap sm = om.getSuperMap();
-                    Table table = null;
-                    while (sm != null) {
-                        table = sm.getTable();
-                        if (table != null) {
-                            break;
-                        }
-                        sm = sm.getSuperMap();
-                    }
-                    if (table == null) {
-                        throw new IllegalStateException
-                            ("unable to find supertable for " +
-                             om.getObjectType());
-                    }
-                    fk(cols, table.getPrimaryKey());
                 }
             }
         });
@@ -1081,6 +1105,98 @@ public class PDL {
         if (prop.isNullable()) { col.setNullable(true); }
     }
 
+    private ObjectMap getTarget(PropertyMappingNd pmn) {
+        Node parent = pmn.getParent();
+        final ObjectMap[] result = { null };
+        parent.dispatch(new Node.Switch() {
+            public void onProperty(PropertyNd pn) {
+                if (pn.getNestedMap() != null) {
+                    result[0] = getMap(pn.getNestedMap());
+                } else {
+                    Property prop = (Property) getEmitted(pn);
+                    result[0] = m_root.getObjectMap(prop.getType());
+                }
+            }
+            public void onNestedMapping(NestedMappingNd nmn) {
+                if (nmn.getNestedMap() != null) {
+                    result[0] = getMap(nmn.getNestedMap());
+                } else {
+                    ObjectType type = getMap(nmn.getParent()).getObjectType();
+                    Property prop = type.getProperty(nmn.getPath().getPath());
+                    result[0] = m_root.getObjectMap(prop.getType());
+                }
+            }
+        });
+        return result[0];
+    }
+
+    private Column[] getColumns(PropertyMappingNd pmn, int start, int end) {
+        List colnds = pmn.getColumns();
+        Column[] result = new Column[end - start];
+        for (int i = start; i < end; i++) {
+            result[i - start] = lookup((ColumnNd) colnds.get(i));
+        }
+        return result;
+    }
+
+    private Column[] getColumns(PropertyMappingNd pmn) {
+        return getColumns(pmn, 0, pmn.getColumns().size());
+    }
+
+    private void emitMapping(ObjectMap om, Property prop,
+                             PropertyMappingNd pmn) {
+        if (pmn.isValue()) {
+            // XXX: multi column value mappings ignored
+            emitMapping(om, prop, (ColumnNd) pmn.getColumns().get(0));
+        } else {
+            ObjectMap tgt = getTarget(pmn);
+            Role role = (Role) prop;
+            Path p = Path.get(prop.getName());
+            Mapping m;
+            if (pmn.isReference()) {
+                ForeignKey fk =
+                    fk(pmn, getColumns(pmn), tgt.getTable().getPrimaryKey());
+                m = new JoinTo(p, fk);
+                setNullable(fk, prop.isNullable());
+            } else if (pmn.isInverse()) {
+                ForeignKey fk =
+                    fk(pmn, getColumns(pmn), om.getTable().getPrimaryKey());
+                m = new JoinFrom(p, fk);
+                if (!role.isReversable()) {
+                    setNullable(fk, prop.isNullable());
+                }
+            } else if (pmn.isMapping()) {
+                UniqueKey from = om.getTable().getPrimaryKey();
+                UniqueKey to = tgt.getTable().getPrimaryKey();
+                m = new JoinThrough
+                    (p, fk(pmn, getColumns(pmn, 0, from.getColumns().length),
+                           from),
+                     fk(pmn, getColumns(pmn, from.getColumns().length,
+                                        pmn.getColumns().size()),
+                        to));
+            } else {
+                throw new IllegalStateException("bad pmn");
+            }
+            if (role.isReversable()) {
+                Role rev = role.getReverse();
+                emitMapping(pmn, tgt, rev, m.reverse(Path.get(rev.getName())));
+            }
+            emitMapping(pmn, om, prop, m);
+        }
+    }
+
+    private void emitMapping(Node nd, ObjectMap map, Property p, Mapping m) {
+        Mapping prev = map.getMapping(p);
+        if (prev != null) {
+            // XXX:
+            //m_errors.fatal(nd, "duplicate mapping, previously defined: " +
+            //getNode(prev).getLocation());
+            return;
+        }
+        map.addMapping(m);
+        emit(nd, m);
+    }
+
     private ForeignKey fk(JoinNd jn, boolean forward) {
         ColumnNd fromnd;
         ColumnNd tond;
@@ -1116,8 +1232,21 @@ public class PDL {
             }
         }
 
-        fk = fk(new Column[] {from}, uk);
-        emit(fromnd, fk);
+        return fk(fromnd, new Column[] {from}, uk);
+    }
+
+    private ForeignKey fk(Node nd, Column[] from, UniqueKey key) {
+        ForeignKey fk = from[0].getTable().getForeignKey(from);
+        if (fk != null && fk.getUniqueKey().equals(key)) {
+            Node prev = getNode(fk);
+            // XXX:
+            //m_errors.fatal
+            //(nd, "duplicate foreign key definition, previously defined: " +
+            //prev.getLocation());
+            return fk;
+        }
+        fk = fk(from, key);
+        emit(nd, fk);
 	return fk;
     }
 

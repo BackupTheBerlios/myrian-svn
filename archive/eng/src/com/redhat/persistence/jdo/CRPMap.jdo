@@ -4,6 +4,8 @@
   "http://java.sun.com/dtd/jdo_1_0.dtd">
 <jdo>
   <package name="com.redhat.persistence.jdo">
-    <class name="CRPMap" identity-type="datastore"/>
+    <class name="CRPMap" identity-type="datastore">
+      <extension vendor-name="redhat" key="metadata" value="PDL"/>
+    </class>
   </package>
 </jdo>

@@ -21,12 +21,12 @@ package com.redhat.persistence.pdl.nodes;
  * NestedMappingNd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/09/07 $
+ * @version $Revision: #5 $ $Date: 2004/09/13 $
  **/
 
 public class NestedMappingNd extends Node {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/nodes/NestedMappingNd.java#4 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/nodes/NestedMappingNd.java#5 $ by $Author: rhs $, $DateTime: 2004/09/13 16:23:12 $";
 
     public static final Field PATH =
         new Field(NestedMappingNd.class, "path", PathNd.class, 1, 1);
@@ -46,6 +46,10 @@ public class NestedMappingNd extends Node {
 
     public Node getMapping() {
         return (Node) get(MAPPING);
+    }
+
+    public NestedMapNd getNestedMap() {
+        return (NestedMapNd) get(NESTED_MAP);
     }
 
 }

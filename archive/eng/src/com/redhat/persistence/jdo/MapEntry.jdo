@@ -5,7 +5,7 @@
 <jdo>
   <package name="com.redhat.persistence.jdo">
     <class name="MapEntry" identity-type="datastore">
-      <field name="container" persistence-modifier="persistent"/>
+      <extension vendor-name="redhat" key="metadata" value="PDL"/>
       <field name="key"       persistence-modifier="persistent"/>
       <field name="value"     persistence-modifier="persistent"/>
     </class>

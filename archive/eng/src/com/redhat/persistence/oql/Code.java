@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/09/07 $
+ * @version $Revision: #8 $ $Date: 2004/09/13 $
  **/
 
 public class Code {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Code.java#7 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Code.java#8 $ by $Author: rhs $, $DateTime: 2004/09/13 16:23:12 $";
 
     private static final Logger s_log = Logger.getLogger(Code.class);
 
@@ -345,8 +345,12 @@ public class Code {
                 result[0] = columns(j.getKey(), j.getMap(), alias);
             }
             public void onJoinFrom(JoinFrom j) {
-                result[0] = columns
-                    (j.getKey().getTable().getPrimaryKey(), j.getMap(), alias);
+                Constraint pk = j.getKey().getTable().getPrimaryKey();
+                if (pk == null) {
+                    throw new IllegalStateException
+                        ("no key for table: " + j.getKey().getTable());
+                }
+                result[0] = columns(pk, j.getMap(), alias);
             }
             public void onJoinThrough(JoinThrough jt) {
                 result[0] = columns(jt.getTo(), jt.getMap(), alias);

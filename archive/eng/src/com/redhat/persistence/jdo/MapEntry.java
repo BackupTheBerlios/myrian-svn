@@ -21,14 +21,12 @@ import java.util.Map;
 
 public class MapEntry implements Map.Entry {
 
-    private Object container;
     private Object key;
     private Object value;
 
     MapEntry() {}
 
-    MapEntry(Object container, Object key) {
-        this.container = container;
+    MapEntry(Object key) {
         this.key = key;
     }
 
@@ -66,8 +64,7 @@ public class MapEntry implements Map.Entry {
 
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append("MapEntry <container=").append(container);
-        sb.append("; key=").append(key).append(">");
+        sb.append("MapEntry <key=").append(key).append(">");
         return sb.toString();
     }
 }
