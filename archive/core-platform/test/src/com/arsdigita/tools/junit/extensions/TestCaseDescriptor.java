@@ -15,9 +15,17 @@
 
 package com.arsdigita.tools.junit.extensions;
 
+import java.lang.Long;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+
+import junit.extensions.TestDecorator;
+import junit.framework.Test;
+
 /**
  * <P> This class encapsulates data about a particular testcase. It is used
- * to ferry data back and forth from the {@see PerfTiming} class. It also
+ * to ferry data back and forth from the {@link PerfTiming} class. It also
  * provides convenience routines to auto-cast objects.</P>
  *
  * <P> Property type casting: </P>
@@ -35,27 +43,34 @@ package com.arsdigita.tools.junit.extensions;
  *          <li>VARIANCE</li>
  *      </UL>
  * </UL>
+ *
+ * @see PerfTiming
+ * @see Test
+ * @author <a href="mailto:aahmed@redhat.com"> Aizaz Ahmed </a>
  */
-
-import java.lang.Long;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-
-import junit.extensions.TestDecorator;
-import junit.framework.Test;
 
 public class TestCaseDescriptor {
 
     /* keep in sync with xml file tags */
     public static final String TEST_NAME        = "test_name";
     public static final String TEST_CASE_NAME   = "test_case_name";
+    /**
+     * <P> Key used to set and retrieve property </P>
+     */
     public static final String FASTEST          = "fastest";
+    /**
+     * <P> Key used to set and retrieve property </P>
+     */
     public static final String PREVIOUS_FASTEST = "previous_fastest";
+    /**
+     * <P> Key used to set and retrieve property </P>
+     */
     public static final String LAST_UPDATED     = "last_updated";
+    /**
+     * <P> Key used to set and retrieve property </P>
+     */
     public static final String VARIANCE         = "variance";
 
-    public static final String AUTO_RUN         = "auto_run";
     private Map tdata;
 
     
@@ -164,7 +179,7 @@ public class TestCaseDescriptor {
 
 
     /**
-     * <P> A convenience method to set a value for fastest. {@see #getProperty}
+     * <P> A convenience method to set a value for fastest.
      * Don't need to specify fastest as a long object. </P>
      */
     public void setFastest (long fastest) {
@@ -176,12 +191,13 @@ public class TestCaseDescriptor {
      * <P>This returns an iterator over the keySet of stored properties.
      * No distinction is made (yet) between a property that was set by
      * default and one that was explicitly user set</P>
-     *
-     * TODO: This isn't very nice in terms of encapsulation, visibility. 
-     * however, we frequently need to be able to iterate over all the
-     * stored properties. Better way?
-     */ 
+     */
     public Iterator keyIterator() {
+        /*
+         * TODO: This isn't very nice in terms of encapsulation, visibility. 
+         * however, we frequently need to be able to iterate over all the
+         * stored properties. Better way?
+         */ 
         return tdata.keySet().iterator();
     }
 

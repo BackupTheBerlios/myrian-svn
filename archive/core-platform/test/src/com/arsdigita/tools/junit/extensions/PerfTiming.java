@@ -16,73 +16,6 @@
 
 package com.arsdigita.tools.junit.extensions;
 
-/**
- * <P> This Utility class records and provides access to timing results and 
- * other test information stored in an xml file. </P>
- *
- * <P> An example xml file is: </P>
- * <PRE>
- * <?xml version="1.0" encoding="UTF-8"?>
- * <tests>
- *   <defaults>
- *     <variance>5</variance>
- *   </defaults>
- * 
- * <project name="default">
- *     <test test_name="com.arsdigita.categorization.CategoryTest">
- *         <testcase test_case_name="testEquals">
- *             <previous_fastest>454</previous_fastest>
- *             <fastest>441</fastest>
- *             <last_updated>1059080456257</last_updated>
- *         </testcase>
- *     </test>
- * </project>
- * </tests>
- * </PRE>
- *
- * <P> The document node is tests. under tests, there may be 0 or 1 default
- * elements that contain defaults for all tests, as well as one or more
- * project nodes. Each project node may contain one or more 
- * <code>test</code> element, each with a unique <code>test_name</code>
- * attribute. The test_name is the full class name of the TestCase class.
- * Each <code>test</code> element can have one or more <code>testcase</code>
- * elements which store information about a single testcase (corresponding
- * to test method in it's parent <code>test</code>. </P>
- *
- * <P> The information stored for each testcase includes: </P>
- * <UL>
- *      <li><code>fastest</code>: The fastest this test has been
- *              recorded to run. (ms). Optional, auto-set. If this is left
- *              empty, Long.MAX_VALUE will be used.</li>
- *      <li><code>previous_fastest</code>: The previous value of fastest
- *              (ms). Optional, auto-set. This is auto-set when fastest
- *              is updated. </li>
- *      <li><code>last_updated</code>: The time (in ms) that this test
- *              information was last updated. Auto-set</li>
- *      <li><code>variance</code>: This percentage can be added on to a
- *              fastest time recording. This is because no two runs will
- *              complete at the <i>exact</i> same time, as long as it is
- *              less than <code>fastest</code> + <code>variance</code> it
- *              it acceptable. This variance can be set high or low
- *              depending on the test. Manually set.</li> 
- * </UL>
- *
- * <P>The <code>default</code> Element provides default values for all the 
- * other tests. It is optional, and is most useful for specifying a 
- * default variance. </P>
- *
- * <P> This class also acts as a Factory for {@see TestCaseDescriptors}, which
- * are the objects used to transfer data to and from this class.
- *
- * <P> The location of the XML file is accessed through the system property
- * <code>test.perf.results</code>, while the project name is accessed through
- * <code>test.perf.project</code>. If a file is explicitly specified in the
- * <code>load</code> method, the default project name is used.</P>
- *
- * 
- * @author <a href="mailto:aahmed@redhat.com"> Aizaz Ahmed </a>
- */
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -111,8 +44,73 @@ import junit.framework.TestCase;
 
 
 /**
- * Need to run load on this class first
+ * <P> This Utility class records and provides access to timing results and 
+ * other test information stored in an xml file. </P>
+ *
+ * <P> An example xml file is: </P>
+ * <PRE>
+ * &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+ * &lt;tests&gt;
+ *   &lt;defaults&gt;
+ *     &lt;variance&gt;5&lt;/variance&gt;
+ *   &lt;/defaults&gt;
+ * 
+ * &lt;project name="default"&gt;
+ *     &lt;test test_name="com.arsdigita.categorization.CategoryTest"&gt;
+ *         &lt;testcase test_case_name="testEquals"&gt;
+ *             &lt;previous_fastest&gt;454&lt;/previous_fastest&gt;
+ *             &lt;fastest&gt;441&lt;/fastest&gt;
+ *             &lt;last_updated&gt;1059080456257&lt;/last_updated&gt;
+ *         &lt;/testcase&gt;
+ *     &lt;/test&gt;
+ * &lt;/project&gt;
+ * &lt;/tests&gt;
+ * </PRE>
+ *
+ * <P> The document node is tests. under tests, there may be 0 or 1 default
+ * elements that contain defaults for all tests, as well as one or more
+ * project nodes. Each project node may contain one or more 
+ * <code>test</code> element, each with a unique <code>test_name</code>
+ * attribute. The test_name is the full class name of the TestCase class.
+ * Each <code>test</code> element can have one or more <code>testcase</code>
+ * elements which store information about a single testcase (corresponding
+ * to a single test method in the parent <code>test</code>. </P>
+ *
+ * <P> The information stored for each testcase includes: </P>
+ * <UL>
+ *      <li><code>fastest</code>: The fastest this test has been
+ *              recorded to run. (ms). Optional, auto-set. If this is left
+ *              empty, Long.MAX_VALUE will be used.</li>
+ *      <li><code>previous_fastest</code>: The previous value of fastest
+ *              (ms). Optional, auto-set. This is auto-set when fastest
+ *              is updated. </li>
+ *      <li><code>last_updated</code>: The time (in ms) that this test
+ *              information was last updated. Auto-set.</li>
+ *      <li><code>variance</code>: This percentage can be added on to a
+ *              fastest time recording. This is because no two runs will
+ *              complete at the <i>exact</i> same time, as long as it is
+ *              less than <code>fastest</code> + <code>variance</code> it
+ *              it acceptable. This variance can be set high or low
+ *              depending on the test. Manually set.</li> 
+ * </UL>
+ *
+ * <P>The <code>default</code> Element provides default values for all the 
+ * other tests. It is optional, and is most useful for specifying a 
+ * default variance. </P>
+ *
+ * <P> This class also acts as a Factory for {@link TestCaseDescriptor}, which
+ * are the objects used to transfer data to and from this class.
+ *
+ * <P> The location of the XML file is accessed through the system property
+ * <code>test.perf.results</code>, while the project name is accessed through
+ * <code>test.perf.project</code>. If a file is explicitly specified in the
+ * <code>load</code> method, the default project name is used.</P>
+ *
+ * 
+ * @author <a href="mailto:aahmed@redhat.com"> Aizaz Ahmed </a>
  */
+
+
 public class PerfTiming {
 
     /* This stores the parsed xml file */
@@ -135,14 +133,15 @@ public class PerfTiming {
 
     /**
      * <P>This method loads and parses the xml file into memory. If
-     * the file does not exist, it is created.</P>
+     * the file does not exist, it is created</P>
      *
      * @param resultsFile The file to load as xml (contains results info)
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws IOException
+     * @throws ParserConfigurationException If we cannot obtain an
+     *                  appropriate xml parser
+     * @throws SAXException If the xml is not well-formed
+     * @throws IOException If the file cannot be read / written to
      */
-    protected void load ( final File resultsFile  )
+    public void load ( final File resultsFile  )
                                     throws ParserConfigurationException,
                                            SAXException,
                                            IOException {
@@ -168,10 +167,12 @@ public class PerfTiming {
      * the value specified by <code>test.perf.project</code>, or 
      * default if this is not defined.</P>
      *
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws IOException
-     * @throws NullPointerException 
+     * @throws ParserConfigurationException If we cannot obtain an
+     *                  appropriate xml parser
+     * @throws SAXException If the xml is not well-formed
+     * @throws IOException If the file cannot be read / written to
+     * @throws NullPointerException If the test.perf.results system
+     *              variable is not defined
      */
     public void load ( ) throws ParserConfigurationException,
                                 SAXException,
@@ -207,7 +208,7 @@ public class PerfTiming {
         docLastUpdate = xmlFile.lastModified();
     }
 
-    protected void createXMLFile ( ) 
+    private void createXMLFile ( ) 
                             throws IOException, ParserConfigurationException
     {
         try {
@@ -239,7 +240,7 @@ public class PerfTiming {
         save();
     }
 
-    protected static Element findElement ( NodeList list, 
+    private static Element findElement ( NodeList list, 
                                            String attribute, 
                                            String value ) {
 
@@ -254,7 +255,7 @@ public class PerfTiming {
     }
 
 
-    protected Element getProjectElem () {
+    private Element getProjectElem () {
         Element elem = resultsXMLDoc.getDocumentElement();
         NodeList projectList = elem.getElementsByTagName("project");
         return findElement ( projectList, "name", project );
@@ -269,7 +270,7 @@ public class PerfTiming {
      *          <code>testName</code>. Null if there is no existing
      *          Element for this test.
      */
-    protected Element getTestElem ( String testName ) {
+    private Element getTestElem ( String testName ) {
         Element proj = getProjectElem(); 
         if ( proj != null ) {
             NodeList testList= proj.getElementsByTagName("test");
@@ -289,7 +290,7 @@ public class PerfTiming {
      *          <code>testName</code> and <code>testCaseName</code>.
      *          Null if there is no existing Element for this test.
      */
-    protected Element getTestCaseElem ( String testName, String testCaseName ) 
+    private Element getTestCaseElem ( String testName, String testCaseName ) 
     {
         Element testXML = getTestElem ( testName );
         if ( testXML != null ) {
@@ -306,7 +307,7 @@ public class PerfTiming {
      * <code>testName=default</code> <code>testCaseName=default</code> if
      * one exists, or an empty descriptor if none exists.
      */
-    protected TestCaseDescriptor getDefaultDesc ( ) {
+    private TestCaseDescriptor getDefaultDesc ( ) {
 
         TestCaseDescriptor dDesc = null;
         NodeList defList = resultsXMLDoc.getDocumentElement()
@@ -333,7 +334,7 @@ public class PerfTiming {
      * <code>testName</code> or <code>testCaseName</code> set, this needs to
      * be done at a higher level.
      */
-    protected TestCaseDescriptor createDescriptor ( Element elem ) {
+    private TestCaseDescriptor createDescriptor ( Element elem ) {
         if ( elem == null ) {
             return null; 
         }
@@ -356,13 +357,14 @@ public class PerfTiming {
     
 
     /**
-     * <P> Returns a {@see TestCaseDescriptor} for the specified {@see Test}.
+     * <P> Returns a {@link TestCaseDescriptor} for the specified {@link Test}.
      * This is the recommended way to get TestCaseDescriptors. It loads the 
      * values from the xml file if an entry is recorded (adding default 
      * values as necessary), or if no previous entry exists, it returns 
      * the default TestCaseDescriptor.</P>
      *
      * @param test The test to retrieve a TestCaseDescriptor for
+     * @return A TestCaseDescriptor for the specified test
      */
 
     public TestCaseDescriptor getDescriptor ( Test test ) {
@@ -382,8 +384,13 @@ public class PerfTiming {
      * file if an entry is recorded (adding default values as necessary), or
      * if no previous testName, testCaseName combination can be found, it
      * returns a default TestCaseDescriptor.</P>
+     *
+     * @param testName The name of the {@link TestCase} that defines the
+     *                 test method we wish to run
+     * @param testCaseName The name of the actual test method to run
+     * @return A TestCaseDescriptor for the specified test
      */
-    protected TestCaseDescriptor getDescriptor ( String testName, String testCaseName ) {
+    private TestCaseDescriptor getDescriptor ( String testName, String testCaseName ) {
         TestCaseDescriptor tdesc = createDescriptor (getTestCaseElem(testName, testCaseName));
         if ( tdesc == null ) {
             tdesc = new TestCaseDescriptor ();
@@ -406,7 +413,7 @@ public class PerfTiming {
      * store a separate default data stucture in TestCaseDescriptor, to keep
      * these values distint. (and know for sure what to write and what not to)
      */
-    protected void createUpdateElem ( TestCaseDescriptor tdesc ) {
+    private void createUpdateElem ( TestCaseDescriptor tdesc ) {
         String testName = (String) tdesc.getProperty ( TestCaseDescriptor.TEST_NAME );
         String testCaseName = (String) tdesc.getProperty ( TestCaseDescriptor.TEST_CASE_NAME);
 
@@ -428,15 +435,15 @@ public class PerfTiming {
             {
                 Element newKid = resultsXMLDoc.createElement ( kidName );
                 Text value = resultsXMLDoc.createTextNode ( tdesc.getProperty(kidName).toString() );
-                newKid.appendChild ( value );
                 elem.appendChild ( newKid );
+                newKid.appendChild ( value );
             }
         }
         // put in the last updated time
         Element updated = resultsXMLDoc.createElement ( TestCaseDescriptor.LAST_UPDATED );
         Text updatedTime = resultsXMLDoc.createTextNode ( String.valueOf ( new Date().getTime() ));
-        updated.appendChild ( updatedTime );
         elem.appendChild ( updated );
+        updated.appendChild ( updatedTime );
     }
 
     
@@ -444,7 +451,7 @@ public class PerfTiming {
     /**
      * <P> If it exists, it'll clean it out
      */
-    protected Element newTestCaseElem ( String testName, String testCaseName ) {
+    private Element newTestCaseElem ( String testName, String testCaseName ) {
         Element elem = getTestCaseElem( testName, testCaseName );
         if (elem == null) {
             // The exact element was not found, see if the test exists
@@ -491,7 +498,7 @@ public class PerfTiming {
             } catch ( Exception e ) {
                 /*
                  * If we're this deep in the code, it's unlikely that a load
-                 * exception would occur now, and not early. Throw it as an
+                 * exception would occur now, and not earlier. Throw it as an
                  * IOException
                  */
                  throw new IOException ( "Could not reload file: " + xmlFile
@@ -509,7 +516,7 @@ public class PerfTiming {
      *
      * TODO: Output xml nicely formatted.
      */
-    protected void save () throws IOException {
+    private void save () throws IOException {
 
         FileWriter fileOut = new FileWriter ( xmlFile );
         fileOut.write ( toString ( resultsXMLDoc ) );

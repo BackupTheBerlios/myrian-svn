@@ -27,7 +27,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 
 /**
- * <P> TestSuite used to run performance tests using the {@see TimedTestRecord}
+ * <P> TestSuite used to run performance tests using the {@link TimedTestRecord}
  * test decorator. Only actualy TestCases should be added to this suite,
  * <i>not</i> TestSuites or TestDecorators.</P>
  *

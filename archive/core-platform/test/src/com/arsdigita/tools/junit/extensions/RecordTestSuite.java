@@ -25,7 +25,7 @@ import com.clarkware.junitperf.*;
 import com.arsdigita.categorization.*;
 
 /**
- * PopulateSuite
+ * <P>Example of {@link TimedTestRecord} usage </P> 
  *
  * @author <a href="mailto:aahmed@redhat.com">Aizaz Ahmed</a>
  */

@@ -26,13 +26,16 @@ import junit.framework.TestSuite;
 
 
 /**
- * <P>This test decorator is used to decorate TestCases only. It records how 
- * long the tests took to execute. If the test had been run previously
- * it uses the previous 'time to completion' as a basis for  the timeout.
- * I.e. if the test took 'significantly' longer than before, it will fail.
- * {@see PerfTiming} <code>variance</code> field for further details.</P>
+ * <P>This test decorator is used to decorate <code>TestCases</code> only.
+ * It records how long the tests took to execute. If the test had been 
+ * run previously it uses the previous 'time to completion' as a basis for
+ * the timeout. I.e. if the test took 'significantly' longer than before, 
+ * it will fail. {@link PerfTiming}'s <code>variance</code> field for further
+ * details.</P>
  *
- * @see PerfTiming, TestCaseDescriptor
+ * @see PerfTiming
+ * @see TestCaseDescriptor
+ *
  * @author <a href="mailto:aahmed@redhat.com"> Aizaz Ahmed </a>
  */
 public class TimedTestRecord extends TestDecorator {
