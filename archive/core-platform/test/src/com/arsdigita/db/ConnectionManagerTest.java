@@ -23,10 +23,10 @@ import java.sql.SQLException;
 
 public class ConnectionManagerTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/ConnectionManagerTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/ConnectionManagerTest.java#6 $ by $Author: rhs $, $DateTime: 2003/07/27 09:32:36 $";
 
     private String ORACLE_DATE_QUERY = "select sysdate from dual";
-    private String POSTGRES_DATE_QUERY = "select 'now'::datetime";
+    private String POSTGRES_DATE_QUERY = "select 'now'::timestamp";
 
     private static java.sql.Connection conn = null;
 
