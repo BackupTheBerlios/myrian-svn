@@ -22,11 +22,11 @@ package com.arsdigita.persistence;
  * Description: The TransactionContext class encapsulates a database transaction.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/10/16 $
+ * @version $Revision: #8 $ $Date: 2003/02/26 $
  */
 
 public interface TransactionContext extends com.arsdigita.db.ConnectionUseListener {
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/TransactionContext.java#7 $ by $Author: dennis $, $DateTime: 2002/10/16 15:37:20 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/TransactionContext.java#8 $ by $Author: bche $, $DateTime: 2003/02/26 17:08:29 $";
 
     /**
      * 
@@ -122,4 +122,39 @@ public interface TransactionContext extends com.arsdigita.db.ConnectionUseListen
     void setTransactionIsolation(int level)
         throws PersistenceException;
 
+    /**
+     * Set an attribute inside of this <code>TransactionContext</code>.
+     * The attribute will exist as long as the transaction is opened.
+     * When the transaction is closed or aborted, the attribute will
+     * be discarded. This method is analogous to 
+     * {@link #ServletRequest.setAttribute(String, Object)}
+     *
+     * @param name the name of the attribute
+     * @param value the value of the attribute
+     * @post getAttribute(name) == value
+     */
+    public void setAttribute(String name, Object value) throws PersistenceException;
+
+    /**
+     * Get an attribute inside of this <code>TransactionContext</code>.
+     * The attribute will exist as long as the transaction is opened.
+     * When the transaction is closed or aborted, the attribute will
+     * be discarded. This method is analogous to 
+     * {@link #ServletRequest.getAttribute(String)}
+     *
+     * @param name the name of the attribute
+     * @return the value of the attribute, or null if no attribute with
+     *   this value has been stored
+     */
+    public Object getAttribute(String name) throws PersistenceException;
+
+    /**
+     * Remove an attribute from this <code>TransactionContext</code>.
+     * be discarded. This method is analogous to 
+     * {@link #ServletRequest.removeAttribute(String)}
+     *
+     * @param name the name of the attribute to remove
+     * @post getAttribute(name) == null
+     */
+    public void removeAttribute(String name) throws PersistenceException;
 }

@@ -35,9 +35,19 @@ package com.arsdigita.persistence;
 public interface TransactionListener {
 
     /**
+     * Called immediately before the transaction has committed
+     */
+    public void beforeCommit(TransactionContext txn);
+
+    /**
      * Called immediately after the transaction has committed
      */
     public void afterCommit(TransactionContext txn);
+
+    /**
+     * Called immediately before the transaction has aborted
+     */
+    public void beforeAbort(TransactionContext txn);
 
     /**
      * Called immediately after the transaction has aborted

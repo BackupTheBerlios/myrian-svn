@@ -31,10 +31,10 @@ import com.arsdigita.util.Assert;
  * Description: The TransactionContext class encapsulates a database transaction.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/10/16 $
+ * @version $Revision: #3 $ $Date: 2003/02/26 $
  */
 
-class TransactionContextImpl implements TransactionContext {
+class TransactionContextImpl extends AbstractTransactionContext implements TransactionContext {
 
     private String m_url, m_username, m_password;
     private boolean m_inTransaction = false;
@@ -211,7 +211,8 @@ class TransactionContextImpl implements TransactionContext {
      *  @post !inTxn()
      **/
 
-    public void commitTxn() throws PersistenceException {
+    protected void commitTxnImpl() throws PersistenceException {
+        s_cat.debug("in commitTxnImpl");
         boolean valid = false;
         try {
             Connection conn = ConnectionManager.getCurrentThreadConnection();
@@ -223,6 +224,9 @@ class TransactionContextImpl implements TransactionContext {
                 throw new PersistenceException("commitTxn() called while " +
                                                "not in a transaction");
             }
+
+    	    fireBeforeCommitEvent();
+
             m_inTransaction = false;
             if (conn != null) {
                 s_cat.debug("Actually committing " + conn);
@@ -250,7 +254,7 @@ class TransactionContextImpl implements TransactionContext {
      *  @post !inTxn()
      **/
 
-    public void abortTxn() {
+    protected void abortTxnImpl() {
         try {
             Connection conn = ConnectionManager.getCurrentThreadConnection();
             if (s_cat.isDebugEnabled()) {
@@ -261,6 +265,9 @@ class TransactionContextImpl implements TransactionContext {
                 throw new PersistenceException("abortTxn() called while not " +
                                                "in a transaction");
             }
+
+	    fireBeforeAbortEvent();
+	    
             m_inTransaction = false;
             if (conn != null) {
                 s_cat.debug("Actually aborting " + conn);
@@ -297,6 +304,24 @@ class TransactionContextImpl implements TransactionContext {
     /*
      * NB, this method is delibrately private, since we don't
      * want it being fired at any other time than immediately
+     * before the transaction
+     */
+    private void fireBeforeCommitEvent() {
+        Assert.assertTrue(m_inTransaction, 
+                          "The beforeCommit event was fired outside of the transaction");
+    
+        Object listeners[] = m_listeners.toArray();
+    
+        for (int i = 0 ; i < listeners.length ; i++) {
+            s_cat.debug("Firing transaction beforeCommit event");
+            TransactionListener listener = (TransactionListener)listeners[i];
+            listener.beforeCommit(this);
+        }
+    }
+
+    /*
+     * NB, this method is delibrately private, since we don't
+     * want it being fired at any other time than immediately
      * after the transaction
      */
     private void fireCommitEvent() {
@@ -314,6 +339,22 @@ class TransactionContextImpl implements TransactionContext {
         Assert.assertTrue(!m_inTransaction, "transaction commit listener didn't close transaction");
     }
 
+    /*
+     * NB, this method is delibrately private, since we don't
+     * want it being fired at any other time than immediately
+     * before the transaction
+     */
+    private void fireBeforeAbortEvent() {
+        Assert.assertTrue(m_inTransaction, 
+                          "The beforeAbort event was fired outside of the transaction");
+    
+        Object listeners[] = m_listeners.toArray();
+        for (int i = 0 ; i < listeners.length ; i++) {
+            s_cat.debug("Firing transaction beforeAbort event");
+            TransactionListener listener = (TransactionListener)listeners[i];
+            listener.beforeAbort(this);
+        }
+    }
 
     /*
      * NB, this method is delibrately private, since we don't
@@ -417,6 +458,5 @@ class TransactionContextImpl implements TransactionContext {
      */
     protected static boolean getAggressiveClose() {
         return s_aggressiveClose;
-    }
-
+    }    
 }
