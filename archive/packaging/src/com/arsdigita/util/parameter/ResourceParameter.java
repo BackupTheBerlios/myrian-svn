@@ -29,13 +29,13 @@ import org.apache.log4j.Logger;
  * an error.  Otherwise, it returns null.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ResourceParameter.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ResourceParameter.java#2 $
  */
 public class ResourceParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ResourceParameter.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ResourceParameter.java#2 $" +
         "$Author: randyg $" +
-        "$DateTime: 2003/10/13 16:31:29 $";
+        "$DateTime: 2003/10/13 17:35:06 $";
 
     private static final Logger s_log = Logger.getLogger(ResourceParameter.class);
 
@@ -64,15 +64,11 @@ public class ResourceParameter extends StringParameter {
             
             ClassLoader cload = Thread.currentThread().getContextClassLoader();
             URL url = cload.getResource(value);
-            System.out.println("YYYY url = " + url);
-            System.out.println("YYYY urlFile = " + url.getFile());
             InputStream stream = cload.getResourceAsStream(value);
             if (stream == null && isRequired()) {
                 s_log.error(value + " is not a valid file and is required");
                 errors.add(value + " is not a valid File and is required");
             }
-            System.out.println("File found with loader " + cload);
-            System.out.println("File found with loader stream is " + stream);
             return stream;
         } else {
             try {
@@ -82,7 +78,6 @@ public class ResourceParameter extends StringParameter {
                 // be an issue
                 s_log.error(value + " is not a valid file and is required", ioe);
                 errors.add(value + " is not a valid File and is required");
-                System.out.println("YYYY file not found");
                 return null;
             }
         }
