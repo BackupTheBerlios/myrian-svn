@@ -26,15 +26,16 @@ import java.io.*;
  * DatatypeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/07/29 $
  */
 
 public class DatatypeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DatatypeTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DatatypeTest.java#3 $ by $Author: randyg $, $DateTime: 2002/07/29 16:44:42 $";
 
     private Session ssn;
 
+    //    private final static int LOB_SIZE = 1000000;
     private final static int LOB_SIZE = 1000000;
 
     public DatatypeTest(String name) {
@@ -77,15 +78,13 @@ public class DatatypeTest extends PersistenceTestCase {
         }
 
         dt.set("blob", bytes);
-
-	StringBuffer charBuf = new StringBuffer(LOB_SIZE);
-	for (int i = 0; i < LOB_SIZE; i++) {
-	    charBuf.append('a' + (i % 26));
-	}
-	String chars = charBuf.toString();
-
+        
+        StringBuffer charBuf = new StringBuffer(LOB_SIZE);
+        for (int i = 0; i < LOB_SIZE; i++) {
+            charBuf.append('a' + (i % 26));
+        }
+        String chars = charBuf.toString();
         dt.set("clob", chars);
-
         dt.save();
 
         dt = ssn.retrieve(new OID("examples.Datatype", BigInteger.ZERO));
@@ -96,6 +95,7 @@ public class DatatypeTest extends PersistenceTestCase {
         assertEquals("Clob was not retrieved correctly.",
                      chars,
                      dt.get("clob"));
+        
     }
 
     public void testDate() {
@@ -131,45 +131,45 @@ public class DatatypeTest extends PersistenceTestCase {
 	DataQuery dq = ssn.retrieveQuery("examples.TypedQuery");
 	while (dq.next()) {
 	    assertEquals("incorrect 'id'",
-			 BigInteger.ZERO,
-			 dq.get("id"));
+                     BigInteger.ZERO,
+                     dq.get("id"));
 	    assertEquals("incorrect 'bigInteger'",
-			 BigInteger.ONE,
-			 dq.get("bigInteger"));
+                     BigInteger.ONE,
+                     dq.get("bigInteger"));
 	    assertEquals("incorrect 'bigDecimal'",
-			 new BigDecimal(0),
-			 dq.get("bigDecimal"));
+                     new BigDecimal(0),
+                     dq.get("bigDecimal"));
 	    assertEquals("incorrect 'boolean'",
-			 Boolean.TRUE,
-			 dq.get("boolean"));
+                     Boolean.TRUE,
+                     dq.get("boolean"));
 	    assertEquals("incorrect 'byte'",
-			 new Byte((byte)42),
-			 dq.get("byte"));
+                     new Byte((byte)42),
+                     dq.get("byte"));
 	    assertEquals("incorrect 'character'",
-			 new Character('c'),
-			 dq.get("character"));
+                     new Character('c'),
+                     dq.get("character"));
 	    assertEquals("incorrect 'date'",
-			 new java.util.Date(0),
-			 dq.get("date"));
+                     new java.util.Date(0),
+                     dq.get("date"));
 	    assertEquals("incorrect 'double'",
-			 new Double(75),
-			 dq.get("double"));
+                     new Double(75),
+                     dq.get("double"));
 	    assertEquals("incorrect 'float'",
-			 new Float(3.14159),
-			 dq.get("float"));
+                     new Float(3.14159),
+                     dq.get("float"));
 	    assertEquals("incorrect 'integer'",
-			 new Integer(100),
-			 dq.get("integer"));
+                     new Integer(100),
+                     dq.get("integer"));
 	    assertEquals("incorrect 'long'",
-			 new Long(1000000000000L),
-			 dq.get("long"));
+                     new Long(1000000000000L),
+                     dq.get("long"));
 	    assertEquals("incorrect 'short'",
-			 new Short((short)30),
-			 dq.get("short"));
+                     new Short((short)30),
+                     dq.get("short"));
 	    assertEquals("incorrect 'string'",
-			 "This is a string.",
-			 dq.get("string"));
+                     "This is a string.",
+                     dq.get("string"));
 	}
+    dq.close();
     }
-
 }

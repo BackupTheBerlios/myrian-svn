@@ -20,18 +20,19 @@ import java.io.*;
 import java.sql.*;
 import java.math.*;
 import org.apache.log4j.Category;
+import com.arsdigita.db.Initializer;
 
 /**
  * The MetadataRoot is a singleton class that serves as an entry point for the
  * metadata system.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/07/29 $
  **/
 
 public class MetadataRoot extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#4 $ by $Author: randyg $, $DateTime: 2002/07/29 16:44:42 $";
 
     private static final Category s_cat = Category.getInstance(MetadataRoot.class.getName());
 
@@ -268,19 +269,23 @@ public class MetadataRoot extends Element {
 
             public void doRefresh(ResultSet rs, String column, Object value)
                 throws SQLException {
-                oracle.sql.CLOB clob =
-                    (oracle.sql.CLOB) rs.getClob(column);
-                Writer out = clob.getCharacterOutputStream();
-                try {
-                    out.write(((String) value).toCharArray());
-                    out.flush();
-                    out.close();
-                } catch (IOException e) {
-                    // This used to be a persistence exception, but using
-                    // persistence exception here breaks ant verify-pdl
-                    // because the classpath isn't set up to include
-                    // com.arsdigita.util.*
-                    throw new Error("Unable to write LOB: " + e);
+                if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                    // do nothing
+                } else {
+                    oracle.sql.CLOB clob =
+                        (oracle.sql.CLOB) rs.getClob(column);
+                    Writer out = clob.getCharacterOutputStream();
+                    try {
+                        out.write(((String) value).toCharArray());
+                        out.flush();
+                        out.close();
+                    } catch (IOException e) {
+                        // This used to be a persistence exception, but using
+                        // persistence exception here breaks ant verify-pdl
+                        // because the classpath isn't set up to include
+                        // com.arsdigita.util.*
+                        throw new Error("Unable to write LOB: " + e);
+                    }
                 }
             }
 
@@ -290,7 +295,11 @@ public class MetadataRoot extends Element {
                     if (value == null) {
                         return super.getLiteral(value, jdbcType);
                     } else {
-                        return " empty_clob() ";
+                        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                            return " ? ";
+                        } else {
+                            return " empty_clob() ";
+                        }
                     }
 
                 default:
@@ -300,14 +309,16 @@ public class MetadataRoot extends Element {
 
             public int bindValue(PreparedStatement ps, int index, Object value,
                              int jdbcType) throws SQLException {
-		switch (jdbcType) {
-		case Types.CLOB:
-		    //CLOB.bind(ps, index, value, jdbcType);
-                    return 0;
-		default:
-		    ps.setString(index, (String) value);
-		    break;
-		}
+                switch (jdbcType) {
+                case Types.CLOB:
+                    //CLOB.bind(ps, index, value, jdbcType);
+                    if (Initializer.getDatabase() != Initializer.POSTGRES) {
+                        return 0;
+                    } 
+                default:
+                    ps.setString(index, (String) value);
+                    break;
+                }
 
                 return 1;
             }
@@ -315,7 +326,8 @@ public class MetadataRoot extends Element {
             public Object fetch(ResultSet rs, String column)
                 throws SQLException {
                 ResultSetMetaData md = rs.getMetaData();
-                if (md.getColumnType(rs.findColumn(column)) == Types.CLOB) {
+                if (md.getColumnType(rs.findColumn(column)) == Types.CLOB && 
+                    Initializer.getDatabase() != Initializer.POSTGRES) {
                     return CLOB.fetch(rs, column);
                 } else {
                     return rs.getString(column);
@@ -331,19 +343,23 @@ public class MetadataRoot extends Element {
 
             public void doRefresh(ResultSet rs, String column, Object value)
                 throws SQLException {
-                oracle.sql.BLOB blob =
-                    (oracle.sql.BLOB) rs.getBlob(column);
-                OutputStream out = blob.getBinaryOutputStream();
-                try {
-                    out.write((byte[]) value);
-                    out.flush();
-                    out.close();
-                } catch (IOException e) {
-                    // This used to be a persistence exception, but using
-                    // persistence exception here breaks ant verify-pdl
-                    // because the classpath isn't set up to include
-                    // com.arsdigita.util.*
-                    throw new Error("Unable to write LOB: " + e);
+                if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                    // do nothing
+                } else {
+                    oracle.sql.BLOB blob =
+                        (oracle.sql.BLOB) rs.getBlob(column);
+                    OutputStream out = blob.getBinaryOutputStream();
+                    try {
+                        out.write((byte[]) value);
+                        out.flush();
+                        out.close();
+                    } catch (IOException e) {
+                        // This used to be a persistence exception, but using
+                        // persistence exception here breaks ant verify-pdl
+                        // because the classpath isn't set up to include
+                        // com.arsdigita.util.*
+                        throw new Error("Unable to write LOB: " + e);
+                    }
                 }
             }
 
@@ -353,7 +369,11 @@ public class MetadataRoot extends Element {
                     if (value == null) {
                         return super.getLiteral(value, jdbcType);
                     } else {
-                        return " empty_blob() ";
+                        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                            return " ? ";
+                        } else {
+                            return " empty_blob() ";
+                        }
                     }
 
                 default:
@@ -363,23 +383,29 @@ public class MetadataRoot extends Element {
 
             public int bindValue(PreparedStatement ps, int index, Object value,
                              int jdbcType) throws SQLException {
-                return 0;
-//                byte[] bytes = (byte[]) value;
-                // This is only supported by the OCI driver
+                if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                    byte[] bytes = (byte[]) value;
+                // This is supported by the oracle OCI driver and the PG driver
                 // http://www.oradoc.com/ora816/java.816/a81354/oralob2.htm#1058119
-//                ps.setBinaryStream(index, new ByteArrayInputStream(bytes),
-//                                   bytes.length);
-//
-//                return 1;
+                    ps.setBinaryStream(index, new ByteArrayInputStream(bytes),
+                                       bytes.length);
+                    return 1;
+                } else {
+                    return 0;
+                }
             }
 
             public Object fetch(ResultSet rs, String column)
                 throws SQLException {
-                Blob blob = rs.getBlob(column);
-                if (blob == null) {
-                    return null;
+                if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                    return rs.getBytes(column);
                 } else {
-                    return blob.getBytes(1L, (int)blob.length());
+                    Blob blob = rs.getBlob(column);
+                    if (blob == null) {
+                        return null;
+                    } else {
+                        return blob.getBytes(1L, (int)blob.length());
+                    }
                 }
             }
         });
