@@ -18,12 +18,12 @@ import org.apache.log4j.Logger;
  * PDLGenerator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/09/13 $
+ * @version $Revision: #2 $ $Date: 2004/09/22 $
  **/
 
 class PDLGenerator implements RegisterClassListener {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/PDLGenerator.java#1 $ by $Author: rhs $, $DateTime: 2004/09/13 15:27:58 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/PDLGenerator.java#2 $ by $Author: rhs $, $DateTime: 2004/09/22 15:11:14 $";
 
     private static final Logger s_log = Logger.getLogger(PDLGenerator.class);
 
@@ -44,6 +44,9 @@ class PDLGenerator implements RegisterClassListener {
 
     public void registerClass(RegisterClassEvent ev) {
         Class klass = ev.getRegisteredClass();
+        if (s_log.isInfoEnabled()) {
+            s_log.info("Loading metadata for " + klass);
+        }
         ClassLoader loader = klass.getClassLoader();
         PDL pdl = new PDL();
         List resources = getResources(klass);
@@ -57,6 +60,9 @@ class PDLGenerator implements RegisterClassListener {
             String jdoResource = resource + ".jdo";
             InputStream is = loader.getResourceAsStream(jdoResource);
             if (is != null) {
+                if (s_log.isInfoEnabled()) {
+                    s_log.info("Found " + jdoResource);
+                }
                 JDOHandler handler = new JDOHandler(loader, jdoResource);
                 parse(is, handler);
                 String str = handler.getPDL();
@@ -73,6 +79,9 @@ class PDLGenerator implements RegisterClassListener {
             String pdlResource = resource + ".pdl";
             is = loader.getResourceAsStream(pdlResource);
             if (is != null) {
+                if (s_log.isInfoEnabled()) {
+                    s_log.info("Found " + pdlResource);
+                }
                 Reader isr = new InputStreamReader(is);
                 pdl.load(isr, pdlResource);
                 try { isr.close(); } catch(IOException e) {
