@@ -31,7 +31,7 @@ import java.util.*;
  * REQUIRED, and COLLECTION.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/04/18 $
+ * @version $Revision: #3 $ $Date: 2003/05/09 $
  **/
 
 public class Property extends Element {
@@ -68,7 +68,7 @@ public class Property extends Element {
         "[0..n]"
     };
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/Property.java#2 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/Property.java#3 $ by $Author: vadim $, $DateTime: 2003/05/09 12:34:02 $";
 
 
     static Property
@@ -305,4 +305,10 @@ public class Property extends Element {
 	return m_prop.isKeyProperty();
     }
 
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        String container =
+            getContainer() == null ? "" : getContainer().getQualifiedName();
+        return sb.append(container).append(".").append(getName()).toString();
+    }
 }

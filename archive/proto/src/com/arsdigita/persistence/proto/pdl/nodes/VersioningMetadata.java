@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #11 $ $Date: 2003/05/09 $
+ * @version $Revision: #12 $ $Date: 2003/05/09 $
  */
 public class VersioningMetadata {
     private final static Logger s_log =
@@ -98,6 +98,11 @@ public class VersioningMetadata {
                         Property property = 
                             getProperty(containerName, prop.getName().getName());
 
+                        if ( property.isKeyProperty() ) {
+                            throw new IllegalStateException
+                                ("Cannot mark a key property 'unversioned': " +
+                                 property);
+                        }
                         s_log.info("onProperty: " + property);
                         m_unversionedProps.add(property);
 
