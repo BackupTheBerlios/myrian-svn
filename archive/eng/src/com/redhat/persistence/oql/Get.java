@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/08/18 $
+ * @version $Revision: #5 $ $Date: 2004/08/23 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Get.java#4 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Get.java#5 $ by $Author: rhs $, $DateTime: 2004/08/23 13:42:42 $";
 
     private static final Logger s_log = Logger.getLogger(Get.class);
 
@@ -140,17 +140,21 @@ public class Get extends Expression {
         } else if (!keys.contains(mapping)) {
             String[] columns = null;
             String table = null;
+            boolean mappings = false;
             if (expr.hasMappings()) {
                 columns = Code.columns
                     (mapping.getMap().getObjectType(), expr,
                      mapping.getPath());
+                if (columns != null) {
+                    mappings = true;
+                }
             }
             if (columns == null) {
                 columns = Code.columns(mapping, (String) null);
                 table = Code.table(mapping);
             }
 
-            if (table == null) {
+            if (mappings) {
                 QFrame stframe = ((QValue) expr.getValues().get(0)).getFrame();
                 List values = new ArrayList();
                 for (int i = 0; i < columns.length; i++) {
@@ -373,7 +377,15 @@ public class Get extends Expression {
                 public void onJoinThrough(JoinThrough jt) {
                     conditions(jt.getFrom());
                 }
-                public void onStatic(Static s) {}
+                public void onStatic(Static s) {
+                    if (s.isPrimitive()) {
+                        Path[] paths = Code.paths
+                            (m_mapping.getObjectMap().getObjectType(), null);
+                        String[] cols = Code.columns
+                            (paths, m_mapping.getObjectMap().getRetrieveAll());
+                        m_key = new Key(m_frame, cols);
+                    }
+                }
                 public void onNested(Nested n) {
                     throw new Error("nested get");
                 }

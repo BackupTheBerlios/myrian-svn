@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/08/18 $
+ * @version $Revision: #6 $ $Date: 2004/08/23 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Query.java#5 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Query.java#6 $ by $Author: rhs $, $DateTime: 2004/08/23 13:42:42 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -214,7 +214,14 @@ public class Query {
             sql = sql.add("1 as dummy");
         }
 
-        sql = sql.add("\nfrom ").add(qframe.emit(false, !oracle));
+        Code from = qframe.emit(false, !oracle);
+        if (from == null || from.isEmpty()) {
+            if (oracle) {
+                sql = sql.add("\nfrom dual");
+            }
+        } else {
+            sql = sql.add("\nfrom ").add(from);
+        }
 
         Expression offset = qframe.getOffset();
         Expression limit = qframe.getLimit();

@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/08/18 $
+ * @version $Revision: #5 $ $Date: 2004/08/23 $
  **/
 
 public class Code {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Code.java#4 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Code.java#5 $ by $Author: rhs $, $DateTime: 2004/08/23 13:42:42 $";
 
     private static final Logger s_log = Logger.getLogger(Code.class);
 
@@ -411,10 +411,6 @@ public class Code {
             return table(m.getMap());
         }
 
-        if (isStaticAttribute(m)) {
-            return null;
-        }
-
         final String[] result = new String[] { null };
 
         m.dispatch(new Mapping.Switch() {
@@ -431,7 +427,7 @@ public class Code {
                 result[0] = jt.getFrom().getTable().getName();
             }
             public void onStatic(Static s) {
-                throw new IllegalStateException();
+                result[0] = table(s.getObjectMap());
             }
             public void onNested(Nested n) {
                 throw new Error("nested map");
