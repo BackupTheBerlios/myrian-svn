@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/02/19 $
+ * @version $Revision: #12 $ $Date: 2003/02/19 $
  **/
 
 class ObjectData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#11 $ by $Author: ashah $, $DateTime: 2003/02/19 15:49:06 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#12 $ by $Author: ashah $, $DateTime: 2003/02/19 20:50:58 $";
 
     private static final Logger LOG = Logger.getLogger(ObjectData.class);
 
@@ -107,52 +107,19 @@ class ObjectData {
     public boolean isNew() { return m_startedNew; }
 
     public boolean isDeleted() {
-        if (isDead()) {
+        if (isDead() || isSenile()) {
             return true;
+        } else {
+            return false;
         }
-
-        boolean evDel = false;
-        for (int i = m_events.size() - 1; i >= 0; i--) {
-            Event ev = (Event) m_events.get(i);
-            if (ev instanceof DeleteEvent) {
-                evDel = true;
-                break;
-            } else if (ev instanceof CreateEvent) {
-                evDel = false;
-                break;
-            }
-        }
-
-        // senile if del
-        // if (evDel && !isSenile()) {
-        //     throw new IllegalStateException("events and state out of sync");
-        // }
-
-        return evDel;
     }
 
     public boolean isModified() {
-        boolean evMod = false;
-
-        if (m_events.size() > 0) {
-            evMod = true;
+        if (isNubile()) {
+            return false;
         } else {
-            for (Iterator it = m_pdata.values().iterator(); it.hasNext(); ) {
-                PropertyData pdata = (PropertyData) it.next();
-                if (pdata.isModified()) {
-                    evMod = true;
-                    break;
-                }
-            }
+            return true;
         }
-
-        // nubile -> modified
-        // senile -> modified
-        if ((isNubile() || isSenile()) && !evMod) {
-            throw new IllegalStateException("events and state out of sync");
-        }
-
-        return evMod;
     }
 
     public boolean isInfantile() { return m_state.equals(INFANTILE); }

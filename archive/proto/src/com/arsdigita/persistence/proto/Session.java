@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #32 $ $Date: 2003/02/19 $
+ * @version $Revision: #33 $ $Date: 2003/02/19 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#32 $ by $Author: ashah $, $DateTime: 2003/02/19 15:49:06 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#33 $ by $Author: ashah $, $DateTime: 2003/02/19 20:50:58 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -29,6 +29,8 @@ public class Session {
     private final Engine m_engine;
 
     private HashMap m_odata = new HashMap();
+
+    private HashSet m_visiting = new HashSet();
 
     private LinkedList m_events = new LinkedList();
     private LinkedList m_pending = new LinkedList();
@@ -86,10 +88,10 @@ public class Session {
 
         if (od == null) {
             result = false;
-        } else if (od.isSenile()) {
+        } else if (m_visiting.contains(od)) {
             result = false;
         } else {
-            od.setState(od.SENILE);
+            m_visiting.add(od);
 
             ObjectType type = getObjectType(obj);
             Collection keys = type.getKeyProperties();
@@ -110,6 +112,8 @@ public class Session {
                     setInternal(obj, role, null);
                 }
             }
+
+            m_visiting.remove(od);
 
             addEvent(new DeleteEvent(this, obj));
             result = true;
@@ -151,15 +155,15 @@ public class Session {
     private void cascadeDelete(Object container, Object containee) {
         ObjectData containerOD = fetchObjectData(container);
         boolean me = false;
-        ObjectData.State state = containerOD.getState();
-        if (!containerOD.isSenile()) {
+
+        if (!m_visiting.contains(containerOD)) {
             me = true;
-            containerOD.setState(ObjectData.SENILE);
+            m_visiting.add(containerOD);
         }
 
         deleteInternal(containee);
 
-        if (me) { containerOD.setState(state); }
+        if (me) { m_visiting.remove(containerOD); }
     }
 
     /**
@@ -528,6 +532,11 @@ public class Session {
             m_events.add(ev);
             it.remove();
         }
+
+        // XXX: m_visiting.size() should be 0. but we can't check right now
+        // because exceptions don't clear m_visiting on the way out of
+        // every top level method
+        m_visiting.clear();
     }
 
     private Object getSessionKey(Object obj) {
