@@ -20,6 +20,7 @@ association {
                                to bebop_form_process_listeners.form_section_id,
                              join bebop_form_process_listeners.listener_id 
                                to bebop_process_listeners.listener_id;
+    BigDecimal position = bebop_form_process_listeners.position;
 }
 
 
