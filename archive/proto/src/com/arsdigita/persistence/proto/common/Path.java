@@ -6,12 +6,12 @@ import java.util.*;
  * Path
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/03/12 $
+ * @version $Revision: #5 $ $Date: 2003/03/27 $
  **/
 
 public class Path {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/common/Path.java#4 $ by $Author: rhs $, $DateTime: 2003/03/12 18:21:58 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/common/Path.java#5 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
 
     private static final HashMap PATHS = new HashMap();
 
@@ -21,7 +21,7 @@ public class Path {
         }
 
         Path result;
-        
+
         synchronized (PATHS) {
             if (PATHS.containsKey(path)) {
                 result = (Path) PATHS.get(path);
@@ -43,6 +43,10 @@ public class Path {
         }
 
         return result;
+    }
+
+    public static final Path add(String p1, String p2) {
+	return Path.add(Path.get(p1), Path.get(p2));
     }
 
     public static final Path add(Path p1, String p2) {

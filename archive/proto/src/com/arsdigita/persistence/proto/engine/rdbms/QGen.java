@@ -13,12 +13,12 @@ import java.io.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #17 $ $Date: 2003/03/18 $
+ * @version $Revision: #18 $ $Date: 2003/03/27 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#17 $ by $Author: ashah $, $DateTime: 2003/03/18 14:36:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#18 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -69,7 +69,7 @@ class QGen {
         Path[] result = getColumns(prefix);
         if (result.length != 1) {
             throw new IllegalStateException
-                ("once column requested for multi-column prefix");
+                ("one column requested for multi-column prefix");
         }
         return result[0];
     }
@@ -140,7 +140,12 @@ class QGen {
                               (src.getObjectType().getType(path), parent)));
                     }
                 }
-                Path alias = Path.get(src.getPath() + "__static");
+                Path alias;
+		if (src.getPath() == null) {
+		    alias = Path.get("__static");
+		} else {
+		    alias = Path.get(src.getPath() + "__static");
+		}
                 j = new StaticJoin(new StaticOperation(block, env), alias);
             } else {
                 ObjectMap map =
@@ -149,7 +154,14 @@ class QGen {
                 if (start == null) {
                     throw new Error("no metadata");
                 }
-                Path alias = Path.get(src.getPath() + "__" + start.getName());
+                Path alias;
+		if (src.getPath() == null) {
+		    alias = Path.get(start.getName());
+		} else {
+		    alias = Path.get
+			(src.getPath().getPath().replace('.', '_') + "__" +
+			 start.getName());
+		}
                 j = new SimpleJoin(start, alias);
 
                 setColumns(src.getPath(),
@@ -246,7 +258,9 @@ class QGen {
         }
 
         Property prop = m_query.getSignature().getProperty(path);
-        if (prop.isNullable()) {
+	if (prop == null) {
+	    return false;
+	} else if (prop.isNullable()) {
             return true;
         } else {
             return isOuter(path.getParent());
@@ -264,12 +278,20 @@ class QGen {
 
     private Path addJoin(Path path, Constraint constraint) {
         Table table = constraint.getTable();
-        Path alias = Path.get(path.getParent() + "__" + table.getName());
+	Path parent = path.getParent();
 
-        if (!getTables(path.getParent()).contains(table)) {
+	Path alias;
+	if (parent == null) {
+	    alias = Path.get(table.getName());
+	} else {
+	    alias = Path.get(parent.getPath().replace('.', '_') +
+			     "__" + table.getName());
+	}
+
+        if (!getTables(parent).contains(table)) {
             Join join = getJoin(path);
             Join simple = new SimpleJoin(table, alias);
-            Path[] cols = getColumns(path.getParent());
+            Path[] cols = getColumns(parent);
             Condition cond = Condition.equals
                 (cols, getPaths(alias, constraint));
             if (isOuter(path)) {
@@ -278,7 +300,7 @@ class QGen {
                 join = new InnerJoin(join, simple, cond);
             }
             setJoin(path, join);
-            addTable(path.getParent(), table);
+            addTable(parent, table);
         }
 
         return alias;

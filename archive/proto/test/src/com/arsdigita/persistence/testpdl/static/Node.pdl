@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/test/src/com/arsdigita/persistence/testpdl/static/Node.pdl#1 $ 
-// $DateTime: 2002/11/27 19:51:05 $
+// $Id: //core-platform/proto/test/src/com/arsdigita/persistence/testpdl/static/Node.pdl#2 $ 
+// $DateTime: 2003/03/27 15:13:02 $
 
 model examples;
 
@@ -96,8 +96,10 @@ object type Node {
 
 }
 
-
 query nodesQuery {
+    BigDecimal id;
+    String name;
+
     do {
         select * from t_nodes
     } map {

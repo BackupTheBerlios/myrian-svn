@@ -17,18 +17,19 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #32 $ $Date: 2003/03/18 $
+ * @version $Revision: #33 $ $Date: 2003/03/27 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#32 $ by $Author: rhs $, $DateTime: 2003/03/18 15:44:06 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#33 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
     private ErrorReport m_errors = new ErrorReport();
     private SymbolTable m_symbols = new SymbolTable(m_errors);
     private HashMap m_properties = new HashMap();
+    private HashSet m_links = new HashSet();
 
     public PDL() {}
 
@@ -50,16 +51,32 @@ public class PDL {
         load(new InputStreamReader(is), s);
     }
 
-    public void emit(final Root root) {
-        for (Iterator it = root.getObjectTypes().iterator(); it.hasNext(); ) {
+    private String linkName(AssociationNd assn) {
+	Model m = Model.getInstance(assn.getFile().getModel().getName());
+	return m.getQualifiedName() + "." +
+	    linkName(assn.getRoleOne(), assn.getRoleTwo());
+    }
+
+    private String linkName(PropertyNd one, PropertyNd two) {
+	return (m_symbols.lookup(one.getType()) + ":" +
+		one.getName().getName() + "::" +
+		m_symbols.lookup(two.getType()) + ":" +
+		two.getName().getName() +
+		"::Link").replace('.', '_');
+    }
+
+    private Root m_root;
+
+    public void emit(Root root) {
+	m_root = root;
+
+        for (Iterator it = m_root.getObjectTypes().iterator();
+	     it.hasNext(); ) {
             m_symbols.addEmitted((ObjectType) it.next());
         }
 
-        boolean loadingGlobal = false;
-
         if (root.getObjectType("global.String") == null) {
             loadResource("com/arsdigita/persistence/proto/pdl/global.pdl");
-            loadingGlobal = true;
         }
 
         m_ast.traverse(new Node.Switch() {
@@ -78,6 +95,20 @@ public class PDL {
 
         m_symbols.sort();
         m_symbols.emit();
+
+	m_ast.traverse(new Node.Switch() {
+		public void onAssociation(AssociationNd assn) {
+		    if (assn.getProperties().size() == 0) {
+			return;
+		    }
+
+		    ObjectType ot = new ObjectType
+			(Model.getInstance
+			 (assn.getFile().getModel().getName()),
+			 linkName(assn.getRoleOne(), assn.getRoleTwo()), null);
+		    m_symbols.addEmitted(ot);
+		}
+	    });
 
         m_ast.traverse(new Node.Switch() {
                 private Role define(ObjectType type, PropertyNd prop) {
@@ -105,17 +136,46 @@ public class PDL {
                 }
 
                 public void onAssociation(AssociationNd assn) {
-                    Role one =
-                        define(m_symbols.getEmitted
-                               (m_symbols.lookup(assn.getRoleOne().getType())),
-                               assn.getRoleTwo());
-                    Role two =
-                        define(m_symbols.getEmitted
-                               (m_symbols.lookup(assn.getRoleTwo().getType())),
-                               assn.getRoleOne());
-                    if (one != null && two != null) {
-                        one.setReverse(two);
-                    }
+		    PropertyNd one = assn.getRoleOne();
+		    PropertyNd two = assn.getRoleTwo();
+		    Collection props = assn.getProperties();
+		    ObjectType oneot =
+			m_symbols.getEmitted(m_symbols.lookup(one.getType()));
+		    ObjectType twoot =
+			m_symbols.getEmitted(m_symbols.lookup(two.getType()));
+
+		    if (props.size() > 0) {
+			Role rone = new Role(one.getName().getName(), oneot,
+					     one.isComponent(), false, false);
+			Role rtwo = new Role(two.getName().getName(), twoot,
+					     two.isComponent(), false, false);
+
+			ObjectType ot = m_symbols.getEmitted(linkName(assn));
+
+			ot.addProperty(rone);
+			ot.addProperty(rtwo);
+
+			for (Iterator it = props.iterator(); it.hasNext(); ) {
+			    PropertyNd prop = (PropertyNd) it.next();
+			    define(ot, prop);
+			}
+
+			Link l = new Link(rone.getName(), rtwo, rone,
+					  one.isCollection(),
+					  one.isNullable());
+			m_links.add(l);
+			twoot.addProperty(l);
+			l = new Link(rtwo.getName(), rone, rtwo,
+				     two.isCollection(), two.isNullable());
+			oneot.addProperty(l);
+			m_links.add(l);
+		    } else {
+			Role rone = define(oneot, two);
+			Role rtwo = define(twoot, one);
+			if (rone != null && rtwo != null) {
+			    rone.setReverse(rtwo);
+			}
+		    }
                 }
             }, new Node.IncludeFilter(new Node.Field[] {
                 AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.PROPERTIES,
@@ -127,29 +187,36 @@ public class PDL {
         for (Iterator it = m_symbols.getObjectTypes().iterator();
              it.hasNext(); ) {
             ObjectTypeNd ot = (ObjectTypeNd) it.next();
-            root.addObjectType(m_symbols.getEmitted(ot));
+            m_root.addObjectType(m_symbols.getEmitted(ot));
         }
 
         m_ast.traverse(new Node.Switch() {
                 public void onObjectType(ObjectTypeNd otn) {
-                    root.addObjectMap
+                    m_root.addObjectMap
                         (new ObjectMap(m_symbols.getEmitted(otn)));
                 }
+		public void onAssociation(AssociationNd assn) {
+		    ObjectType ot = m_symbols.getEmitted(linkName(assn));
+		    if (ot != null) {
+			m_root.addObjectType(ot);
+			m_root.addObjectMap(new ObjectMap(ot));
+		    }
+		}
             });
 
-        emitDDL(root);
+        emitDDL();
 
         m_errors.check();
 
-        emitMapping(root);
+        emitMapping();
 
         m_errors.check();
 
-        emitEvents(root);
+        emitEvents();
 
         m_errors.check();
 
-        emitDataOperations(root);
+        emitDataOperations();
 
         m_errors.check();
 
@@ -236,7 +303,7 @@ public class PDL {
             m_cols.put(m_id, colnd);
         }
 
-        public void emit(Root root) {
+        public void emit() {
             if (m_cols.size() == 0) {
                 m_errors.warn(m_nd, "no metadata");
                 return;
@@ -251,7 +318,7 @@ public class PDL {
                     m_errors.warn(m_nd, "no metadata for " + id);
                     return;
                 }
-                cols[index++] = lookup(root, colnd);
+                cols[index++] = lookup(colnd);
             }
             unique(m_nd, cols, m_primary);
         }
@@ -270,15 +337,15 @@ public class PDL {
         }
     }
 
-    private void unique(Root root, Node nd, Collection ids, boolean primary) {
+    private void unique(Node nd, Collection ids, boolean primary) {
         UniqueTraversal ut = new UniqueTraversal(nd, ids, primary);
         nd.getParent().traverse(ut);
-        ut.emit(root);
+        ut.emit();
     }
 
-    private void emitDDL(final Root root) {
+    private void emitDDL() {
         final HashMap tables = new HashMap();
-        for (Iterator it = root.getTables().iterator(); it.hasNext(); ) {
+        for (Iterator it = m_root.getTables().iterator(); it.hasNext(); ) {
             Table table = (Table) it.next();
             tables.put(table.getName(), table);
         }
@@ -315,21 +382,21 @@ public class PDL {
         for (Iterator it = tables.values().iterator(); it.hasNext(); ) {
             Table table = (Table) it.next();
             if (table.getRoot() == null) {
-                root.addTable(table);
+                m_root.addTable(table);
             }
         }
 
         m_ast.traverse(new Node.Switch() {
                 public void onObjectKey(ObjectKeyNd nd) {
-                    unique(root, nd, nd.getProperties(), true);
+                    unique(nd, nd.getProperties(), true);
                 }
 
                 public void onUniqueKey(UniqueKeyNd nd) {
-                    unique(root, nd, nd.getProperties(), false);
+                    unique(nd, nd.getProperties(), false);
                 }
 
                 public void onReferenceKey(ReferenceKeyNd nd) {
-                    unique(nd, new Column[] { lookup(root, nd.getCol()) },
+                    unique(nd, new Column[] { lookup(nd.getCol()) },
                            true);
                 }
 
@@ -337,7 +404,7 @@ public class PDL {
                     if (nd.isUnique()) {
                         ArrayList ids = new ArrayList();
                         ids.add(nd.getName());
-                        unique(root, nd, ids, false);
+                        unique(nd, ids, false);
                     }
                 }
             }, new Node.IncludeFilter(new Node.Field[] {
@@ -347,19 +414,41 @@ public class PDL {
                 AssociationNd.ROLE_ONE, AssociationNd.ROLE_TWO,
                 AssociationNd.PROPERTIES
             }));
+
+	m_ast.traverse(new Node.Switch() {
+		private ColumnNd getColumn(PropertyNd role) {
+		    JoinPathNd jpn = (JoinPathNd) role.getMapping();
+		    JoinNd jn = (JoinNd) jpn.getJoins().get(1);
+		    return jn.getFrom();
+		}
+
+		public void onAssociation(AssociationNd assn) {
+		    JoinPathNd jpn =
+			(JoinPathNd) assn.getRoleOne().getMapping();
+		    if (jpn == null || jpn.getJoins().size() != 2) {
+			return;
+		    }
+
+		    ColumnNd from = getColumn(assn.getRoleOne());
+		    ColumnNd to = getColumn(assn.getRoleTwo());
+		    unique(assn, new Column[] { lookup(from), lookup(to) },
+			   true);
+		}
+	    });
     }
 
-    private ObjectMap getMap(Root root, Node nd) {
-        return root.getObjectMap
+    private ObjectMap getMap(Node nd) {
+        return m_root.getObjectMap
             (m_symbols.getEmitted((ObjectTypeNd) nd.getParent()));
     }
 
-    private void emitMapping(final Root root) {
+    private void emitMapping() {
         m_ast.traverse(new Node.Switch() {
                 public void onIdentifier(IdentifierNd id) {
                     ObjectTypeNd ot =
                         (ObjectTypeNd) id.getParent().getParent();
-                    ObjectMap om = root.getObjectMap(m_symbols.getEmitted(ot));
+                    ObjectMap om = m_root.getObjectMap
+			(m_symbols.getEmitted(ot));
                     om.getKeyProperties().add
                         (m_symbols.getEmitted(ot).getProperty(id.getName()));
                 }
@@ -368,33 +457,79 @@ public class PDL {
                 ObjectKeyNd.PROPERTIES
             }));
 
+	m_ast.traverse(new Node.Switch() {
+		public void onAssociation(AssociationNd assn) {
+		    if (assn.getProperties().size() == 0) {
+			return;
+		    }
+
+		    PropertyNd one = assn.getRoleOne();
+		    PropertyNd two = assn.getRoleTwo();
+		    ObjectType ot = m_symbols.getEmitted(linkName(assn));
+		    ObjectMap om = m_root.getObjectMap(ot);
+		    Collection keys = om.getKeyProperties();
+		    Property pone = ot.getProperty(one.getName().getName());
+		    Property ptwo = ot.getProperty(two.getName().getName());
+		    keys.add(pone);
+		    keys.add(ptwo);
+
+		    if (one.getMapping() != null) {
+			emitMapping(pone, (JoinPathNd) one.getMapping(), 1);
+		    } else {
+			om.addMapping(new Static(Path.get(pone.getName())));
+		    }
+
+		    if (two.getMapping() != null) {
+			emitMapping(ptwo, (JoinPathNd) two.getMapping(), 1);
+		    } else {
+			om.addMapping(new Static(Path.get(ptwo.getName())));
+		    }
+
+		    String[] paths = new String[] { pone.getName(),
+						    ptwo.getName() };
+		    for (int i = 0; i < paths.length; i++) {
+			Mapping m = om.getMapping(Path.get(paths[i]));
+			if (m.getTable() != null) {
+			    om.setTable(m.getTable());
+			    break;
+			}
+		    }
+		}
+	    });
+
+	for (Iterator it = m_links.iterator(); it.hasNext(); ) {
+	    Link l = (Link) it.next();
+	    ObjectMap om = m_root.getObjectMap(l.getContainer());
+	    om.addMapping(new Static(Path.get(l.getName())));
+	}
+
         m_ast.traverse(new Node.Switch() {
                 public void onProperty(PropertyNd pn) {
                     Property prop = (Property) m_properties.get(pn);
                     if (prop == null) { return; }
 
-                    ObjectMap om = root.getObjectMap(prop.getContainer());
+                    ObjectMap om = m_root.getObjectMap(prop.getContainer());
 
                     Object mapping = pn.getMapping();
                     if (mapping == null) {
                         om.addMapping(new Static(Path.get(prop.getName())));
                     } else if (mapping instanceof ColumnNd) {
-                        emitMapping(root, prop, (ColumnNd) mapping);
+                        emitMapping(prop, (ColumnNd) mapping);
                     } else {
-                        emitMapping(root, prop, (JoinPathNd) mapping);
+                        emitMapping(prop, (JoinPathNd) mapping);
                     }
                 }
             });
 
         m_ast.traverse(new Node.Switch() {
                 public void onReferenceKey(ReferenceKeyNd rkn) {
-                    Column key = lookup(root, rkn.getCol());
-                    ObjectMap om = getMap(root, rkn);
+                    Column key = lookup(rkn.getCol());
+                    ObjectMap om = getMap(rkn);
                     om.setTable(key.getTable());
                 }
 
                 public void onObjectKey(ObjectKeyNd okn) {
-                    ObjectMap om = getMap(root, okn);
+                    ObjectMap om = getMap(okn);
                     IdentifierNd prop =
                         (IdentifierNd) okn.getProperties().iterator().next();
                     Mapping m = om.getMapping(Path.get(prop.getName()));
@@ -406,11 +541,11 @@ public class PDL {
 
 /*        m_ast.traverse(new Node.Switch() {
                 public void onJoin(JoinNd nd) {
-                    ObjectMap om = root.getObjectMap
+                    ObjectMap om = m_root.getObjectMap
                         (m_symbols.getEmitted
                          ((ObjectTypeNd) nd.getParent().getParent()));
-                    om.addJoin(new Join(lookup(root, nd.getFrom()),
-                                        lookup(root, nd.getTo())));
+                    om.addJoin(new Join(lookup(nd.getFrom()),
+                                        lookup(nd.getTo())));
                 }
             }, new Node.IncludeFilter(new Node.Field[] {
                 AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.JOIN_PATHS,
@@ -419,7 +554,7 @@ public class PDL {
 
         m_ast.traverse(new Node.Switch() {
                 public void onIdentifier(IdentifierNd nd) {
-                    ObjectMap om = root.getObjectMap
+                    ObjectMap om = m_root.getObjectMap
                         (m_symbols.getEmitted
                          ((ObjectTypeNd) nd.getParent().getParent()
                           .getParent()));
@@ -431,13 +566,13 @@ public class PDL {
             }));
     }
 
-    private void emitMapping(Root root, Property prop, ColumnNd colNd) {
-        ObjectMap om = root.getObjectMap(prop.getContainer());
-        Value m = new Value(Path.get(prop.getName()), lookup(root, colNd));
+    private void emitMapping(Property prop, ColumnNd colNd) {
+        ObjectMap om = m_root.getObjectMap(prop.getContainer());
+        Value m = new Value(Path.get(prop.getName()), lookup(colNd));
         om.addMapping(m);
     }
 
-    private ForeignKey fk(Root root, JoinNd jn, boolean forward) {
+    private ForeignKey fk(JoinNd jn, boolean forward) {
         ColumnNd fromnd;
         ColumnNd tond;
 
@@ -449,8 +584,8 @@ public class PDL {
             tond = jn.getFrom();
         }
 
-        Column from = lookup(root, fromnd);
-        Column to = lookup(root, tond);
+        Column from = lookup(fromnd);
+        Column to = lookup(tond);
 
         ForeignKey fk = from.getTable().getForeignKey(new Column[] {from});
         if (fk != null) {
@@ -466,28 +601,32 @@ public class PDL {
             (from.getTable(), null, new Column[] {from}, uk, false);
     }
 
-    private void emitMapping(Root root, Property prop, JoinPathNd jpn) {
-        ObjectMap om = root.getObjectMap(prop.getContainer());
+    private void emitMapping(Property prop, JoinPathNd jpn) {
+	emitMapping(prop, jpn, 0);
+    }
+
+    private void emitMapping(Property prop, JoinPathNd jpn, int start) {
+        ObjectMap om = m_root.getObjectMap(prop.getContainer());
         Path path = Path.get(prop.getName());
         List joins = jpn.getJoins();
         Mapping m;
-        if (joins.size() == 1) {
-            JoinNd jn = (JoinNd) joins.get(0);
-            if (lookup(root, jn.getTo()).isUniqueKey()) {
-                ForeignKey fk = fk(root, jn, true);
+        if (joins.size() - start == 1) {
+            JoinNd jn = (JoinNd) joins.get(start);
+            if (lookup(jn.getTo()).isUniqueKey()) {
+                ForeignKey fk = fk(jn, true);
                 m = new JoinTo(path, fk);
-            } else if (lookup(root, jn.getFrom()).isUniqueKey()) {
-                ForeignKey fk = fk(root, jn, false);
+            } else if (lookup(jn.getFrom()).isUniqueKey()) {
+                ForeignKey fk = fk(jn, false);
                 m = new JoinFrom(path, fk);
             } else {
                 m_errors.fatal(jpn, "neither end unique");
                 return;
             }
-        } else if (joins.size() == 2) {
-            JoinNd first = (JoinNd) joins.get(0);
-            JoinNd second = (JoinNd) joins.get(1);
-            ForeignKey from = fk(root, first, false);
-            ForeignKey to = fk(root, second, true);
+        } else if (joins.size() - start == 2) {
+            JoinNd first = (JoinNd) joins.get(start);
+            JoinNd second = (JoinNd) joins.get(start + 1);
+            ForeignKey from = fk(first, false);
+            ForeignKey to = fk(second, true);
             m = new JoinThrough(path, from, to);
         } else {
             m_errors.fatal(jpn, "bad join path");
@@ -497,145 +636,178 @@ public class PDL {
         om.addMapping(m);
     }
 
-    private Column lookup(Root root, ColumnNd colNd) {
-        Table table = root.getTable(colNd.getTable().getName());
+    private Column lookup(ColumnNd colNd) {
+        Table table = m_root.getTable(colNd.getTable().getName());
         return table.getColumn(colNd.getName().getName());
     }
 
-    private void emitEvents(final Root root) {
+    private void emitEvents() {
         m_ast.traverse(new Node.Switch() {
                 public void onEvent(EventNd nd) {
-                    addEvent(root, nd);
+                    emitEvent(nd);
                 }
             });
     }
 
-    private void addEvent(Root root, EventNd ev) {
+    private void emitEvent(EventNd ev) {
+	String givenName = null;
+	if (ev.getName() != null) {
+	    givenName = ev.getName().getName();
+	}
+
+	ObjectType ot;
+	EventNd.Type type;
+	String name;
+
         if (ev.getParent() instanceof ObjectTypeNd) {
             ObjectTypeNd otn = (ObjectTypeNd) ev.getParent();
-            addEvent(m_symbols.getEmitted(otn), ev, ev.getName());
+	    ot = m_symbols.getEmitted(otn);
+	    type = ev.getType();
+	    name = givenName;
         } else {
             AssociationNd assn = (AssociationNd) ev.getParent();
             String one = assn.getRoleOne().getName().getName();
             String two = assn.getRoleTwo().getName().getName();
-            ObjectType oneType =
-                m_symbols.getEmitted(assn.getRoleOne().getType());
-            ObjectType twoType =
-                m_symbols.getEmitted(assn.getRoleTwo().getType());
+	    ObjectType oneType =
+		m_symbols.getEmitted(assn.getRoleOne().getType());
+	    ObjectType twoType =
+		m_symbols.getEmitted(assn.getRoleTwo().getType());
 
-            if (ev.getName() == null) {
-                addEvent(twoType, ev, one);
-            } else if (ev.getName().getName().equals(one)) {
-                if (!ev.isSingle()) {
-                    Collection blocks = getSQLBlocks(oneType, ev, two);
-                    if (blocks != null && blocks.size() > 0) {
-                        m_errors.warn
-                            (ev, "both ends of a two way specified, " +
-                             "ignoring this event");
-                        return;
-                    }
-                }
-                addEvent(twoType, ev, one);
-            } else if (ev.getName().getName().equals(two)) {
-                if (!ev.isSingle()) {
-                    Collection blocks = getSQLBlocks(twoType, ev, one);
-                    if (blocks != null && blocks.size() > 0) {
-                        m_errors.warn
-                            (ev, "both ends of a two way specified, " +
-                             "ignoring this event");
-                        return;
-                    }
-                }
-                addEvent(oneType, ev, two);
-            } else {
+	    if (assn.getProperties().size() > 0) {
+		ot = m_symbols.getEmitted(linkName(assn));
+		if ((givenName == null ||
+		     givenName.equals(one) ||
+		     givenName.equals(two)) &&
+		    ev.getType().equals(EventNd.ADD)) {
+		    type = EventNd.INSERT;
+		    name = null;
+		} else if ((givenName == null ||
+			    givenName.equals(one) ||
+			    givenName.equals(two)) &&
+			   ev.getType().equals(EventNd.REMOVE)) {
+		    type = EventNd.DELETE;
+		    name = null;
+		} else {
+		    type = ev.getType();
+		    name = givenName;
+		}
+	    } else if (givenName == null || givenName.equals(one)) {
+		if (givenName != null && !ev.isSingle()) {
+		    Collection blocks = getSQLBlocks(oneType, ev.getType(),
+						     two);
+		    if (blocks != null && blocks.size() > 0) {
+			m_errors.warn
+			    (ev, "both ends of a two way specified, " +
+			     "ignoring this event");
+			return;
+		    }
+		}
+
+		ot = twoType;
+		type = ev.getType();
+		name = one;
+	    } else if (givenName.equals(two)) {
+		if (!ev.isSingle()) {
+		    Collection blocks = getSQLBlocks(twoType, ev.getType(),
+						     one);
+		    if (blocks != null && blocks.size() > 0) {
+			m_errors.warn
+			    (ev, "both ends of a two way specified, " +
+			     "ignoring this event");
+			return;
+		    }
+		}
+
+		ot = oneType;
+		type = ev.getType();
+		name = two;
+	    } else {
                 m_errors.warn
                     (ev.getName(), "no such role: " + ev.getName().getName());
+		return;
             }
         }
+
+	// XXX: should add duplicate event checking here
+	addEvent(m_root.getObjectMap(ot), ev, type, name);
     }
 
-    private void addEvent(ObjectType ot, EventNd ev, IdentifierNd role) {
-        addEvent(ot, ev, role == null ? null : role.getName());
+    private Collection getSQLBlocks(ObjectType ot, EventNd.Type type,
+				    String role) {
+        return getSQLBlocks(ot.getRoot().getObjectMap(ot), type, role);
     }
 
-    private void addEvent(ObjectType ot, EventNd ev, String role) {
-        addEvent(ot.getRoot().getObjectMap(ot), ev, role);
+
+    private void setSQLBlocks(ObjectType ot, EventNd.Type type, String role,
+                              Collection blocks) {
+        setSQLBlocks(ot.getRoot().getObjectMap(ot), type, role, blocks);
     }
 
-    private Collection getSQLBlocks(ObjectType ot, EventNd ev, String role) {
-        return getSQLBlocks(ot.getRoot().getObjectMap(ot), ev, role);
-    }
-
-    private Collection getSQLBlocks(ObjectMap om, EventNd ev, String role) {
+    private Collection getSQLBlocks(ObjectMap om, EventNd.Type type,
+				    String role) {
         Collection blocks;
-        if (ev.getType().equals(EventNd.INSERT)) {
+        if (type.equals(EventNd.INSERT)) {
             blocks = om.getDeclaredInserts();
-        } else if (ev.getType().equals(EventNd.UPDATE)) {
+        } else if (type.equals(EventNd.UPDATE)) {
             blocks = om.getDeclaredUpdates();
-        } else if (ev.getType().equals(EventNd.DELETE)) {
+        } else if (type.equals(EventNd.DELETE)) {
             blocks = om.getDeclaredDeletes();
-        } else if (ev.getType().equals(EventNd.RETRIEVE)) {
+        } else if (type.equals(EventNd.RETRIEVE)) {
             if (role == null) {
                 blocks = om.getDeclaredRetrieves();
             } else {
                 throw new Error("single block event");
             }
-        } else if (ev.getType().equals(EventNd.ADD)) {
+        } else if (type.equals(EventNd.ADD)) {
             blocks = getMapping(om, role).getAdds();
-        } else if (ev.getType().equals(EventNd.REMOVE)) {
+        } else if (type.equals(EventNd.REMOVE)) {
             blocks = getMapping(om, role).getRemoves();
-        } else if (ev.getType().equals(EventNd.CLEAR)) {
+        } else if (type.equals(EventNd.CLEAR)) {
             blocks = new ArrayList();
-        } else if (ev.getType().equals(EventNd.RETRIEVE_ATTRIBUTES)) {
+        } else if (type.equals(EventNd.RETRIEVE_ATTRIBUTES)) {
             blocks = new ArrayList();
         } else {
-            m_errors.fatal(ev, "bad event type: " + ev.getType());
-            blocks = new ArrayList();
+            throw new IllegalArgumentException("bad event type: " + type);
         }
 
         return blocks;
     }
 
-    private void setSQLBlocks(ObjectType ot, EventNd ev, String role,
+    private void setSQLBlocks(ObjectMap om, EventNd.Type type, String role,
                               Collection blocks) {
-        setSQLBlocks(ot.getRoot().getObjectMap(ot), ev, role, blocks);
-    }
-
-    private void setSQLBlocks(ObjectMap om, EventNd ev, String role,
-                              Collection blocks) {
-        if (ev.getType().equals(EventNd.INSERT)) {
+        if (type.equals(EventNd.INSERT)) {
             om.setDeclaredInserts(blocks);
-        } else if (ev.getType().equals(EventNd.UPDATE)) {
+        } else if (type.equals(EventNd.UPDATE)) {
             om.setDeclaredUpdates(blocks);
-        } else if (ev.getType().equals(EventNd.DELETE)) {
+        } else if (type.equals(EventNd.DELETE)) {
             om.setDeclaredDeletes(blocks);
-        } else if (ev.getType().equals(EventNd.RETRIEVE)) {
+        } else if (type.equals(EventNd.RETRIEVE)) {
             if (role == null) {
                 om.setDeclaredRetrieves(blocks);
             } else {
                 throw new Error("single block event");
             }
-        } else if (ev.getType().equals(EventNd.ADD)) {
+        } else if (type.equals(EventNd.ADD)) {
             getMapping(om, role).setAdds(blocks);
-        } else if (ev.getType().equals(EventNd.REMOVE)) {
+        } else if (type.equals(EventNd.REMOVE)) {
             getMapping(om, role).setRemoves(blocks);
-        } else if (ev.getType().equals(EventNd.CLEAR)) {
+        } else if (type.equals(EventNd.CLEAR)) {
             // do nothing
-        } else if (ev.getType().equals(EventNd.RETRIEVE_ATTRIBUTES)) {
+        } else if (type.equals(EventNd.RETRIEVE_ATTRIBUTES)) {
             // do nothing
         } else {
-            m_errors.fatal(ev, "bad event type: " + ev.getType());
-            // do nothing
+            throw new IllegalArgumentException("bad event type: " + type);
         }
     }
 
-    private void addEvent(ObjectMap om, EventNd ev, String role) {
-        if (ev.getType().equals(EventNd.RETRIEVE) &&
+    private void addEvent(ObjectMap om, EventNd ev, EventNd.Type type,
+			  String role) {
+        if (type.equals(EventNd.RETRIEVE) &&
             role != null) {
             Mapping m = getMapping(om, role);
             m.setRetrieve(getBlock(ev));
             return;
-        } else if (ev.getType().equals(EventNd.RETRIEVE_ALL)) {
+        } else if (type.equals(EventNd.RETRIEVE_ALL)) {
             om.setRetrieveAll(getBlock(ev));
             return;
         }
@@ -647,7 +819,7 @@ public class PDL {
             blocks.add(getBlock(nd));
         }
 
-        setSQLBlocks(om, ev, role, blocks);
+        setSQLBlocks(om, type, role, blocks);
     }
 
     private SQLBlock getBlock(EventNd ev) {
@@ -695,15 +867,20 @@ public class PDL {
     private Mapping getMapping(ObjectMap om, String role) {
         Path path = Path.get(role);
         Mapping m = om.getMapping(path);
+	if (m == null) {
+	    throw new IllegalStateException
+		("no mapping in type " + om.getObjectType() + " for role: " +
+		 role);
+	}
         return m;
     }
 
-    private void emitDataOperations(final Root root) {
+    private void emitDataOperations() {
         m_ast.traverse(new Node.Switch() {
                 public void onDataOperation(DataOperationNd nd) {
                     Path name = Path.get(nd.getFile().getModel().getName() +
                                          "." + nd.getName().getName());
-                    root.addDataOperation
+                    m_root.addDataOperation
                         (new DataOperation(name, getBlock(nd.getSQL())));
                 }
             });
@@ -714,8 +891,7 @@ public class PDL {
         for (int i = 0; i < args.length; i++) {
             pdl.load(new FileReader(args[i]), args[i]);
         }
-        Root root = Root.getRoot();
-        pdl.emit(root);
+        pdl.emit(Root.getRoot());
     }
 
 }

@@ -11,12 +11,10 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/test/src/com/arsdigita/persistence/testpdl/static/LinkAttributes.pdl#1 $ 
-// $DateTime: 2002/11/27 19:51:05 $
+// $Id: //core-platform/proto/test/src/com/arsdigita/persistence/testpdl/static/LinkAttributes.pdl#2 $
+// $DateTime: 2003/03/27 15:13:02 $
 
-model linkAttributes;
-
-import examples.User;
+model examples;
 
 object type Article {
     BigInteger[1..1] id = t_articles.article_id INTEGER;

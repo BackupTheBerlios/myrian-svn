@@ -10,19 +10,19 @@ import java.util.*;
  * Cursor
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #16 $ $Date: 2003/03/15 $
+ * @version $Revision: #17 $ $Date: 2003/03/27 $
  **/
 
 public class Cursor {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Cursor.java#16 $ by $Author: rhs $, $DateTime: 2003/03/15 02:35:11 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Cursor.java#17 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
 
     final private Session m_ssn;
     final private Query m_query;
     final private Signature m_signature;
 
     private RecordSet m_rs = null;
-    private Object m_current = null;
+    private Map m_values = null;
     private long m_position = 0;
 
     protected Cursor(Session ssn, Query query) {
@@ -35,32 +35,46 @@ public class Cursor {
         return m_ssn;
     }
 
+    private boolean check(Path path) {
+	for (Iterator it = m_signature.getPaths().iterator(); it.hasNext(); ) {
+	    Path p = (Path) it.next();
+	    if (path.isAncestor(p)) {
+		return true;
+	    }
+	}
+
+	return false;
+    }
+
+    private Object getInternal(Path path) {
+	if (m_signature.isSource(path)) {
+	    return m_values.get(path);
+	} else {
+	    Object o = getInternal(path.getParent());
+	    return m_ssn.get(o, Path.get(path.getName()));
+	}
+    }
+
     public Object get(Path path) {
-        if (m_signature.getPath(path.getPath()) == null) {
+        if (!check(path)) {
             throw new IllegalArgumentException
                 ("Path is not in Cursor signature: " + path);
         }
 
-        if (m_current == null) {
+        if (m_position <= 0) {
             throw new IllegalStateException
                 ("Cursor not currently on row.");
         }
-        return m_ssn.get(m_current, path);
+
+        return getInternal(path);
     }
 
     public Object get(String path) {
-        Path p = m_signature.getPath(path);
-
-        if (p == null) {
-            throw new IllegalArgumentException
-                ("Path is not in Cursor signature: " + path);
-        }
-
-        return get(p);
+        return get(Path.get(path));
     }
 
     public Object get() {
-        return m_current;
+        return m_values.get(null);
     }
 
     public boolean next() {
@@ -70,7 +84,7 @@ public class Cursor {
         }
 
         if (m_rs.next()) {
-            m_current = m_rs.load(m_ssn);
+            m_values = m_rs.load(m_ssn);
 
             m_position++;
             return true;

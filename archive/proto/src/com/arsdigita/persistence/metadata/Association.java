@@ -15,6 +15,7 @@
 
 package com.arsdigita.persistence.metadata;
 
+
 import java.util.Iterator;
 import java.io.PrintStream;
 
@@ -24,12 +25,12 @@ import java.io.PrintStream;
  * link.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/03/27 $
  **/
 
 public class Association extends ModelElement {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/Association.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/Association.java#2 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
 
 
     /**
@@ -41,7 +42,7 @@ public class Association extends ModelElement {
      * The type describing any data stored along with the link. This is null
      * if there is no data stored with the link.
      **/
-    private ObjectType m_linkType = new ObjectType("<link>");
+    private ObjectType m_linkType;
 
 
     /**
@@ -64,38 +65,32 @@ public class Association extends ModelElement {
 
     public Association(Property roleOne, Property roleTwo) {
         if (roleOne == null) {
-            throw new IllegalArgumentException(
-                                               "The roleOne parameter must be non null."
-                                               );
+            throw new IllegalArgumentException
+		("The roleOne parameter must be non null.");
         }
 
         if (roleTwo == null) {
-            throw new IllegalArgumentException(
-                                               "The roleTwo parameter must be non null."
-                                               );
+            throw new IllegalArgumentException
+		("The roleTwo parameter must be non null.");
         }
 
         if (!roleOne.isRole()) {
-            throw new IllegalArgumentException(
-                                               "The roleOne parameter must be a role."
-                                               );
+            throw new IllegalArgumentException
+		("The roleOne parameter must be a role.");
         }
 
         if (!roleTwo.isRole()) {
-            throw new IllegalArgumentException(
-                                               "The roleTwo parameter must be a role."
-                                               );
+            throw new IllegalArgumentException
+		("The roleTwo parameter must be a role.");
         }
         if ( roleOne.getAssociation() != null ) {
-            throw new IllegalArgumentException(
-                                               "The roleOne parameter is already joined to an Association!"
-                                               );
+            throw new IllegalArgumentException
+		("The roleOne parameter is already joined to an Association!");
 
         }
         if ( roleTwo.getAssociation() != null ) {
-            throw new IllegalArgumentException(
-                                               "The roleTwo parameter is already joined to an Association!"
-                                               );
+            throw new IllegalArgumentException
+		("The roleTwo parameter is already joined to an Association!");
 
         }
         m_roles[0] = roleOne;
@@ -128,6 +123,12 @@ public class Association extends ModelElement {
                 other.setComponent(true);
             }
         }
+
+	m_linkType = new ObjectType
+	    ((m_roles[0].getType().getQualifiedName() + ":" +
+	      m_roles[0].getName() + "::" +
+	      m_roles[1].getType().getQualifiedName() + ":" +
+	      m_roles[1].getName() + "::Link").replace('.', '_'));
 
         Property prop = new Property(
                                      m_roles[0].getName(), m_roles[0].getType(),

@@ -9,12 +9,12 @@ import java.util.*;
  * Root
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/03/11 $
+ * @version $Revision: #5 $ $Date: 2003/03/27 $
  **/
 
 public class Root {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Root.java#4 $ by $Author: rhs $, $DateTime: 2003/03/11 16:05:41 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Root.java#5 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
 
     private static final Root ROOT = new Root();
 
@@ -51,6 +51,10 @@ public class Root {
 
     public void addObjectMap(ObjectMap map) {
         m_maps.add(map);
+    }
+
+    public Collection getObjectMaps() {
+	return m_maps;
     }
 
     public boolean hasTable(String name) {

@@ -7,13 +7,13 @@ import com.arsdigita.persistence.proto.PersistentCollection;
  * DataAssociationCursorImpl
  *
  * @author Archit Shah &lt;ashah@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/02/12 $
+ * @version $Revision: #6 $ $Date: 2003/03/27 $
  **/
 
 class DataAssociationCursorImpl extends DataCollectionImpl
     implements DataAssociationCursor {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#5 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#6 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
 
     private DataAssociationImpl m_assn;
 
@@ -30,11 +30,11 @@ class DataAssociationCursorImpl extends DataCollectionImpl
     }
 
     public DataObject getLink() {
-        throw new Error("not implemented");
+        return (DataObject) get("link");
     }
 
     public Object getLinkProperty(String prop) {
-        throw new Error("not implemented");
+        return get("link." + prop);
     }
 
     public void remove() {

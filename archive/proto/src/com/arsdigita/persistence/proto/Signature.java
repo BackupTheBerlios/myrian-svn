@@ -8,12 +8,12 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #13 $ $Date: 2003/02/26 $
+ * @version $Revision: #14 $ $Date: 2003/03/27 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#13 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#14 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
 
     private ArrayList m_paths = new ArrayList();
 
@@ -46,9 +46,18 @@ public class Signature {
     }
 
     public void addPath(Path path) {
-        if (!m_paths.contains(path)) {
-            m_paths.add(path);
-        }
+	ObjectType type = getType(path);
+	Collection keys = type.getKeyProperties();
+	if (keys.size() == 0) {
+	    if (!m_paths.contains(path)) {
+		m_paths.add(path);
+	    }
+	} else {
+	    for (Iterator it = keys.iterator(); it.hasNext(); ) {
+		Property prop = (Property) it.next();
+		addPath(Path.add(path, prop.getName()));
+	    }
+	}
     }
 
     Path getPath(String path) {
@@ -178,6 +187,12 @@ public class Signature {
         addProperties(props);
     }
 
+    public boolean isImmediate(Path path) {
+	Property prop = getProperty(path);
+	Collection keys = prop.getContainer().getKeyProperties();
+	return keys.size() == 0 || keys.contains(prop);
+    }
+
     public Property getProperty(Path path) {
         Path parent = path.getParent();
         if (isParameter(parent)) {
@@ -189,6 +204,16 @@ public class Signature {
         } else {
             return getProperty(parent).getType().getProperty(path.getName());
         }
+    }
+
+    public ObjectType getType(Path path) {
+	if (isParameter(path)) {
+	    return getParameter(path).getObjectType();
+	} else if (isSource(path)) {
+	    return getSource(path).getObjectType();
+	} else {
+	    return getProperty(path).getType();
+	}
     }
 
     public String toString() {

@@ -29,12 +29,12 @@ import java.io.PrintStream;
  * Associations.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/03/27 $
  */
 
 public class Model extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/Model.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/Model.java#2 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
 
     /**
      * The name of the model.
@@ -194,6 +194,7 @@ public class Model extends Element {
     public void addAssociation(Association assn) {
         m_assns.add(assn);
         assn.setModel(this);
+	addDataType(assn.getLinkType());
     }
 
     public Set getAssociations() {

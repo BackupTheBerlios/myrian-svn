@@ -8,12 +8,12 @@ import java.io.*;
  * PropertyData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/03/14 $
+ * @version $Revision: #13 $ $Date: 2003/03/27 $
  **/
 
 class PropertyData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyData.java#12 $ by $Author: ashah $, $DateTime: 2003/03/14 15:57:20 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyData.java#13 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
 
     final private ObjectData m_odata;
     final private Property m_prop;
@@ -96,17 +96,29 @@ class PropertyData {
         out.print(m_prop.getName());
         out.print(" = ");
         out.println(m_value);
-        out.println("    Current Property Events:");
         if (m_prop.isCollection()) {
+	    boolean first = true;
             for (Iterator it = getSession().getEventStream().
                      getCurrentEvents(getObject(), getProperty()).iterator();
                  it.hasNext(); ) {
+		if (first) {
+		    first = false;
+		    out.println("    Current Property Events:");
+		}
                 ((Event) it.next()).dump(out);
             }
         } else {
             Event ev = getSession().getEventStream().getLastEvent
                 (getObject(), getProperty());
-            if (ev != null) { ev.dump(out); }
+            if (ev != null) {
+		out.println("    Current Property Events:");
+		ev.dump(out);
+	    }
         }
     }
+
+    public String toString() {
+	return "<pdata " + getObject() + "." + getProperty() + ">";
+    }
+
 }

@@ -55,7 +55,7 @@ import java.sql.SQLException;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #20 $ $Date: 2003/03/25 $
+ * @version $Revision: #21 $ $Date: 2003/03/27 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -272,6 +272,10 @@ public class Session {
      * @see GenericDataObjectFactory
      **/
     public DataObject create(ObjectType type) {
+	if (type == null) {
+	    throw new IllegalArgumentException
+		("type must be non null");
+	}
         DataObjectImpl result = new DataObjectImpl(type);
         result.setSession(m_ssn);
         return result;
@@ -307,7 +311,12 @@ public class Session {
      **/
 
     public DataObject create(String typeName) {
-        return create(m_root.getObjectType(typeName));
+	ObjectType type = m_root.getObjectType(typeName);
+	if (type == null) {
+	    throw new PersistenceException
+		("no such type: " + typeName);
+	}
+        return create(type);
     }
 
 

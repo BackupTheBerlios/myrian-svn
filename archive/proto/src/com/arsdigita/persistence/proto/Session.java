@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #48 $ $Date: 2003/03/25 $
+ * @version $Revision: #49 $ $Date: 2003/03/27 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#48 $ by $Author: vadim $, $DateTime: 2003/03/25 17:26:50 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#49 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -109,8 +109,6 @@ public class Session {
         getAdapter(obj).setSession(obj, this);
 
         addEvent(new CreateEvent(this, obj));
-        // XXX: needed?
-        processPending();
 
         PropertyMap props = getAdapter(obj).getProperties(obj);
         for (Iterator it = props.entrySet().iterator(); it.hasNext(); ) {
@@ -161,7 +159,7 @@ public class Session {
                 }
             }
 
-            for (Iterator it = type.getProperties().iterator();
+            for (Iterator it = type.getRoles().iterator();
                  it.hasNext(); ) {
                 Role role = (Role) it.next();
 
@@ -315,11 +313,12 @@ public class Session {
                 }
 
                 public void onAlias(Alias alias) {
-                    set(obj, alias.getTarget(), value);
+                    setInternal(obj, alias.getTarget(), value);
                 }
 
                 public void onLink(Link link) {
-                    throw new Error("not implemented");
+                    throw new UnsupportedOperationException
+			("cannot set links");
                 }
             });
 
@@ -351,7 +350,7 @@ public class Session {
                 }
 
                 public void onLink(Link link) {
-                    throw new Error("Not implemented yet");
+		    result[0] = retrieve(getQuery(obj, link));
                 }
             });
 
@@ -360,6 +359,49 @@ public class Session {
         }
 
         return result[0];
+    }
+
+
+    private Query getQuery(Object obj, Link link) {
+	return getQuery(obj, link, null);
+    }
+
+    private Query getQuery(Object obj, Link link, Object value) {
+	// XXX: Should probably be replaced with a proper query
+	Query q = m_qs.getQuery(link.getTo().getType());
+	Parameter from = new Parameter
+	    (link.getFrom().getType(), Path.get("__from__"));
+	q.getSignature().addParameter(from);
+	q.set(from, obj);
+	Source s = new Source(link.getLinkType(), Path.get("link"));
+	q.getSignature().addSource(s);
+
+	q.getSignature().addPath("link");
+
+	for (Iterator it = link.getLinkType().getProperties().iterator();
+	     it.hasNext(); ) {
+	    Property prop = (Property) it.next();
+	    if (Signature.isAttribute(prop)) {
+		q.getSignature().addPath(Path.add("link", prop.getName()));
+	    }
+	}
+
+	Parameter to = null;
+	if (value != null) {
+	    to = new Parameter
+		(link.getTo().getType(), Path.get("__to__"));
+	    q.getSignature().addParameter(to);
+	    q.set(to, value);
+	}
+
+	return new Query
+	    (q, new AndFilter
+	     (new EqualsFilter
+	      (Path.add("link", link.getFrom().getName()),
+	       from.getPath()),
+	      new EqualsFilter
+	      (Path.add("link", link.getTo().getName()),
+	       to == null ? null : to.getPath())));
     }
 
     Object get(Object start, Path path) {
@@ -392,6 +434,8 @@ public class Session {
             trace("add", new Object[] {obj, prop.getName(), value});
         }
 
+	final Object[] result = { null };
+
         prop.dispatch(new Property.Switch() {
                 public void onRole(Role role) {
                     PropertyEvent ev;
@@ -407,20 +451,23 @@ public class Session {
                 }
 
                 public void onAlias(Alias alias) {
-                    add(obj, alias.getTarget(), value);
+                    addInternal(obj, alias.getTarget(), value);
                 }
 
                 public void onLink(Link link) {
-                    // should deal with link attributes here
-                    throw new Error("not implemented");
+                    PropertyMap pmap = new PropertyMap(link.getLinkType());
+		    pmap.put(link.getFrom(), obj);
+		    pmap.put(link.getTo(), value);
+		    result[0] = getObject(pmap);
+		    createInternal(result[0]);
                 }
             });
 
         if (LOG.isDebugEnabled()) {
-            untrace("add", null);
+            untrace("add", result[0]);
         }
 
-        return null;
+        return result[0];
     }
 
     public void remove(final Object obj, Property prop, final Object value) {
@@ -463,11 +510,15 @@ public class Session {
                 }
 
                 public void onAlias(Alias alias) {
-                    remove(obj, alias.getTarget(), value);
+                    removeInternal(obj, alias.getTarget(), value);
                 }
 
                 public void onLink(Link link) {
-                    throw new Error("not implemented");
+		    Query q = getQuery(obj, link, value);
+		    Cursor c = retrieve(q).getDataSet().getCursor();
+		    while (c.next()) {
+			deleteInternal(c.get());
+		    }
                 }
             });
 
@@ -488,7 +539,7 @@ public class Session {
         }
     }
 
-    private void clearInternal(Object obj, Property prop) { 
+    private void clearInternal(Object obj, Property prop) {
        if (LOG.isDebugEnabled()) {
             trace("clear", new Object[] {obj, prop.getName()});
         }
@@ -503,6 +554,11 @@ public class Session {
         if (LOG.isDebugEnabled()) {
             untrace("clear");
         }
+    }
+
+    public static Object getObject(PropertyMap pmap) {
+	Adapter ad = Adapter.getAdapter(pmap.getObjectType());
+	return ad.getObject(pmap.getObjectType(), pmap);
     }
 
     public static ObjectType getObjectType(Object obj) {
@@ -704,7 +760,7 @@ public class Session {
 
     /**
      * Reverts all changes made within the transaction and ends the
-     * transaction. 
+     * transaction.
      **/
 
     public void rollback() {

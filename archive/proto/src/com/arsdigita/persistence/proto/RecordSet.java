@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2003/03/14 $
+ * @version $Revision: #14 $ $Date: 2003/03/27 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#13 $ by $Author: rhs $, $DateTime: 2003/03/14 15:06:51 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#14 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -39,87 +39,93 @@ public abstract class RecordSet {
 
     public abstract void close();
 
-    Object load(Session ssn) {
+    Map load(Session ssn) {
         Collection paths = m_signature.getPaths();
-        ObjectType type = m_signature.getObjectType();
 
-        HashMap pmaps = new HashMap();
+	LinkedList remaining = new LinkedList();
+	for (Iterator it = paths.iterator(); it.hasNext(); ) {
+	    Path path = (Path) it.next();
+	    for (Path p = path; p != null; p = p.getParent()) {
+		if (!remaining.contains(p)) {
+		    remaining.add(p);
+		}
+	    }
+	}
 
-        // First load up the objects.
-        for (Iterator it = paths.iterator(); it.hasNext(); ) {
-            Path p = (Path) it.next();
-            Path parent = p.getParent();
-            if (type.isImmediate(p)) {
-                Object value = get(p);
-                PropertyMap props;
-                if (pmaps.containsKey(parent)) {
-                    props = (PropertyMap) pmaps.get(parent);
-                } else {
-                    props = new PropertyMap
-                        (type.getProperty(p).getContainer());
-                    pmaps.put(parent, props);
-                }
+	if (!remaining.contains(null)) {
+	    remaining.add(null);
+	}
 
-                props.put(type.getProperty(p), value);
-            }
-        }
+	HashMap values = new HashMap();
+	int before;
+	do {
+	    before = remaining.size();
 
-        HashMap objs = new HashMap();
+	    OUTER: for (Iterator it = remaining.iterator(); it.hasNext(); ) {
+		Path p = (Path) it.next();
+		ObjectType type = m_signature.getType(p);
+		Collection props = type.getImmediateProperties();
+		if (props.size() == 0) {
+		    values.put(p, get(p));
+		    it.remove();
+		} else {
+		    PropertyMap pmap = new PropertyMap(type);
+		    for (Iterator iter = props.iterator(); iter.hasNext(); ) {
+			Property prop = (Property) iter.next();
+			Path kp = Path.add(p, prop.getName());
+			if (values.containsKey(kp)) {
+			    pmap.put(prop, values.get(kp));
+			} else {
+			    continue OUTER;
+			}
+		    }
 
-        // Instantiate all the objects
-        for (Iterator it = pmaps.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry me = (Map.Entry) it.next();
-            Path p = (Path) me.getKey();
-            PropertyMap props = (PropertyMap) me.getValue();
-            if (props.isNull()) {
-                objs.put(p, null);
-            } else {
-                ObjectType ot;
-                if (p == null) {
-                    ot = type;
-                } else {
-                    ot = m_signature.getProperty(p).getType();
-                }
-                Object obj = null;
-                if (ot.hasKey()) {
-                    obj = ssn.getObject(m_adapter.getSessionKey(ot, props));
-                }
-                if (obj == null) {
-                    obj = m_adapter.getObject(ot, props);
-                    if (ot.hasKey()) {
-                        m_adapter.setSession(obj, ssn);
-                    }
-                }
-                objs.put(p, obj);
-            }
-        }
+		    Object obj = null;
+		    if (!pmap.isNull()) {
+			if (type.isKeyed()) {
+			    obj = ssn.getObject
+				(m_adapter.getSessionKey(type, pmap));
+			}
+			if (obj == null) {
+			    obj = m_adapter.getObject(type, pmap);
+			    if (type.isKeyed()) {
+				m_adapter.setSession(obj, ssn);
+			    }
+			}
+		    }
+		    values.put(p, obj);
+		    it.remove();
+		}
+	    }
+	} while (remaining.size() < before);
 
-        // Now load up the values.
-        for (Iterator it = paths.iterator(); it.hasNext(); ) {
-            Path p = (Path) it.next();
-            Path parent = p.getParent();
+	if (remaining.size() > 0) {
+	    throw new IllegalStateException
+		("unable to load the following paths: " + remaining +
+		 "\nsignature: " + m_signature);
+	}
 
-            Object obj = objs.get(parent);
+	for (Iterator it = values.entrySet().iterator(); it.hasNext(); ) {
+	    Map.Entry me = (Map.Entry) it.next();
+	    Path p = (Path) me.getKey();
+	    if (m_signature.isSource(p)) { continue; }
+	    Property prop = m_signature.getProperty(p);
+	    if (prop.getContainer().isKeyed()) {
+		Object container = values.get(p.getParent());
+		Object value = me.getValue();
+		if (container == null) {
+		    if (value == null) {
+			continue;
+		    } else {
+			throw new IllegalStateException
+			    ("container is null but value isn't");
+		    }
+		}
+		ssn.load(container, prop, value);
+	    }
+	}
 
-            if (obj == null) {
-                Object value = get(p);
-                if (value != null) {
-                    throw new IllegalStateException
-                        ("key was null but value isn't");
-                }
-            } else {
-                Property prop = m_signature.getProperty(p);
-                if (prop.getContainer().hasKey()) {
-                    if (objs.containsKey(p)) {
-                        ssn.load(obj, prop, objs.get(p));
-                    } else {
-                        ssn.load(obj, prop, get(p));
-                    }
-                }
-            }
-        }
-
-        return objs.get(null);
+	return values;
     }
 
 }

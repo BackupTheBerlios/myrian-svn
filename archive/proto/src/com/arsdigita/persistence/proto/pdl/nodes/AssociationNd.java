@@ -1,15 +1,17 @@
 package com.arsdigita.persistence.proto.pdl.nodes;
 
+import java.util.*;
+
 /**
  * Association
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/02/26 $
+ * @version $Revision: #3 $ $Date: 2003/03/27 $
  **/
 
 public class AssociationNd extends StatementNd {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/AssociationNd.java#2 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/AssociationNd.java#3 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
 
     public static final Field ROLE_ONE =
         new Field(AssociationNd.class, "roleOne", PropertyNd.class, 1, 1);
@@ -31,6 +33,10 @@ public class AssociationNd extends StatementNd {
 
     public PropertyNd getRoleTwo() {
         return (PropertyNd) get(ROLE_TWO);
+    }
+
+    public Collection getProperties() {
+	return (Collection) get(PROPERTIES);
     }
 
 }
