@@ -30,11 +30,11 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/07/02 $
+ * @version $Revision: #10 $ $Date: 2003/07/09 $
  */
 public class GenericDataObjectTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/GenericDataObjectTest.java#9 $ by $Author: ashah $, $DateTime: 2003/07/02 12:35:46 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/GenericDataObjectTest.java#10 $ by $Author: ashah $, $DateTime: 2003/07/09 12:47:27 $";
 
     public GenericDataObjectTest(String name) {
         super(name);
@@ -54,7 +54,6 @@ public class GenericDataObjectTest extends PersistenceTestCase {
         super.persistenceTearDown();
     }
 
-
     /**
      * This tests to make sure that a delete followed by a save throws
      * an exception
@@ -66,11 +65,17 @@ public class GenericDataObjectTest extends PersistenceTestCase {
         DataObject node = getSession().create("examples.Node");
         node.set("id", new BigDecimal(0));
         node.set("name", "Root");
+        assertTrue(node.isNew());
+        assertTrue(node.isCommitted() == false);
         node.save();
+        assertTrue(node.isNew() == false);
+        assertTrue(node.isCommitted() == false);
         // Should have no effect.
         node.save();
         node.save();
         node.save();
+        assertTrue(node.isNew() == false);
+        assertTrue(node.isCommitted() == false);
 
 
         // make sure it is there

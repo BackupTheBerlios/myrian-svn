@@ -27,12 +27,12 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *              inheritance.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/07/02 $
+ * @version $Revision: #8 $ $Date: 2003/07/09 $
  */
 
 public interface DataObject {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObject.java#7 $ by $Author: ashah $, $DateTime: 2003/07/02 01:16:18 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObject.java#8 $ by $Author: ashah $, $DateTime: 2003/07/09 12:47:27 $";
 
     /**
      * Returns the type of this persistent object.
@@ -94,6 +94,16 @@ public interface DataObject {
      **/
 
     boolean isDeleted();
+
+    /**
+     * Returns true if the object exists in a committed state in the
+     * database. This does not mean that all changes to this object have been
+     * either written to disk or committed.
+     *
+     * @return True if the object exists in a committed state in the database.
+     **/
+
+    boolean isCommitted();
 
     /**
      * Returns true if this persistent object has been disconnected from

@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2003/07/08 $
+ * @version $Revision: #13 $ $Date: 2003/07/09 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#12 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#13 $ by $Author: ashah $, $DateTime: 2003/07/09 12:47:27 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -255,6 +255,11 @@ class DataObjectImpl implements DataObject {
     public boolean isDeleted() {
         validate();
         return m_ssn.isDeleted(this);
+    }
+
+    public boolean isCommitted() {
+        validate();
+        return m_oid.isInitialized() && !m_ssn.isNew(this);
     }
 
     public boolean isDisconnected() {
