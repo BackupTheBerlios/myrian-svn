@@ -28,13 +28,21 @@ final class ExpectedError {
 
     boolean isExpected(final Throwable error) {
 	boolean isExpected = false;
-	if(m_error.equals(error.getClass().getName())) {
+	if (m_error.equals(error.getClass().getName())) {
 	    isExpected = true;
-	    if(m_msg != null) {
+	    if (m_msg != null) {
 		isExpected = m_msg.equals(error.getMessage().trim());
-		
 	    }
 	}
-	return isExpected;
+        if (isExpected) {
+            return true;
+        } else {
+            Throwable cause = error.getCause();
+            if (cause != null) {
+                return isExpected(cause);
+            } else {
+                return false;
+            }
+        }
     }
 }
