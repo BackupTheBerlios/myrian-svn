@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * LinkAttributeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/11/17 $
+ * @version $Revision: #9 $ $Date: 2003/11/26 $
  */
 
 public class DynamicLinkAttributeTest extends LinkAttributeTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DynamicLinkAttributeTest.java#8 $ by $Author: vadim $, $DateTime: 2003/11/17 17:03:49 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DynamicLinkAttributeTest.java#9 $ by $Author: ashah $, $DateTime: 2003/11/26 17:21:53 $";
 
     public DynamicLinkAttributeTest(String name) {
         super(name);
@@ -139,6 +139,33 @@ public class DynamicLinkAttributeTest extends LinkAttributeTest {
         DataCollection dc = ssn.retrieve(getModelName() + ".Group");
         dc.addEqualsFilter("members.image.link.caption", "0");
         assertEquals(1, dc.size());
+
+        dc = ssn.retrieve(getModelName() + ".User");
+        dc.addPath("image.link.caption");
+        assertEquals(users.length, dc.size());
+        while (dc.next()) {
+            assertEquals
+                (dc.get("id").toString(), dc.get("image.link.caption"));
+        }
+
+        dc = ssn.retrieve(getModelName() + ".User");
+        dc.addPath("image.id");
+        assertEquals(users.length, dc.size());
+        while(dc.next()) {
+            int id = ((BigInteger) dc.get("id")).intValue();
+            assertEquals(BigInteger.valueOf(id/2), dc.get("image.id"));
+        }
+
+        DataCollection dcUp = ssn.retrieve(getModelName() + ".User");
+        DataCollection dcDown = ssn.retrieve(getModelName() + ".User");
+        dcUp.addOrder("image.link.caption asc");
+        dcDown.addOrder("image.link.caption desc");
+        dcUp.next();
+        dcDown.next();
+        assertEquals(BigInteger.valueOf(0), dcUp.get("id"));
+        assertEquals(BigInteger.valueOf(users.length - 1), dcDown.get("id"));
+        dcUp.close();
+        dcDown.close();
 
         dc = ssn.retrieve(getModelName() + ".Group");
         dc.addFilter("members.image.id = 0");
