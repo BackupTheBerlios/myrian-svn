@@ -16,9 +16,18 @@
 -- This file contains the data model for the party test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #2 $ $Date: 2002/07/18 $
+-- @version $Revision: #1 $ $Date: 2002/07/25 $
 --
 
-drop table agg_users;
-drop table agg_colors;
+create table agg_colors (
+    color_id   integer primary key,
+    name       varchar(100) not null
+);
+
+create table agg_users (
+    user_id    integer primary key,
+    name varchar(100) not null,
+    favorite_color_id integer references agg_colors,
+    referer_id integer references agg_users
+);
 

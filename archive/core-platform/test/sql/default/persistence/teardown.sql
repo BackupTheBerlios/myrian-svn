@@ -17,7 +17,7 @@
 -- tests to run.
 --
 -- @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
--- @version $Revision: #4 $ $Date: 2002/07/23 $
+-- @version $Revision: #5 $ $Date: 2002/07/25 $
 --
 
 -- Right now this is duplicated from the individual files. This should
@@ -40,3 +40,4 @@ drop table t_colors;
 drop table t_parties;
 
 drop table PLSQLTestTable;
+@@ aggressive-teardown.sql

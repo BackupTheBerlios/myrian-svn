@@ -41,7 +41,7 @@ query getPostgresTableNames {
     do {
         select tablename from pg_tables
     } map {
-        tableName = pg_tables.table_name;
+        tableName = pg_tables.tablename;
     }
 }
 
