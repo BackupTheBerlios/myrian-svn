@@ -7,12 +7,12 @@ import java.util.*;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/01/16 $
+ * @version $Revision: #3 $ $Date: 2004/01/19 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#2 $ by $Author: rhs $, $DateTime: 2004/01/16 16:27:01 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#3 $ by $Author: rhs $, $DateTime: 2004/01/19 17:32:28 $";
 
     private Expression m_expr;
     private String m_name;
@@ -23,9 +23,18 @@ public class Get extends Expression {
     }
 
     void graph(Pane pane) {
-        Pane expr = pane.frame.graph(m_expr);
+        final Pane expr = pane.frame.graph(m_expr);
         pane.type = new GetTypeNode(expr.type, m_name);
         pane.variables = expr.variables;
+        pane.injection = new PropertyNode() {
+            { add(expr.type); add(expr.keys); }
+            void updateProperties() {
+                Property prop = expr.type.type.getProperty(m_name);
+                if (expr.keys.contains(Collections.singleton(prop))) {
+                    properties.add(prop);
+                }
+            }
+        };
         pane.constrained = expr.constrained;
         pane.keys = new GetKeyNode(expr.keys, expr.type, m_name);
     }

@@ -7,12 +7,12 @@ import java.util.*;
  * Define
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/01/16 $
+ * @version $Revision: #3 $ $Date: 2004/01/19 $
  **/
 
 public class Define extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Define.java#2 $ by $Author: rhs $, $DateTime: 2004/01/16 16:27:01 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Define.java#3 $ by $Author: rhs $, $DateTime: 2004/01/19 17:32:28 $";
 
     private Expression m_expr;
     private String m_name;
@@ -31,6 +31,7 @@ public class Define extends Expression {
             }
         };
         pane.variables = expr.variables;
+        pane.injection = expr.injection;
         pane.constrained = expr.constrained;
         pane.keys = new KeyNode() {
             { add(expr.keys); add(pane.type); }
