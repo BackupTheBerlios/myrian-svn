@@ -36,12 +36,12 @@ import org.apache.log4j.Logger;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/03/01 $
+ * @version $Revision: #6 $ $Date: 2004/03/03 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Signature.java#5 $ by $Author: rhs $, $DateTime: 2004/03/01 11:43:59 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Signature.java#6 $ by $Author: ashah $, $DateTime: 2004/03/03 18:10:03 $";
 
     private static final Logger s_log = Logger.getLogger(Signature.class);
 
@@ -254,7 +254,9 @@ public class Signature {
     }
 
     private void addFetchedPaths(Path path, ObjectType type) {
-        ObjectMap om = type.getRoot().getObjectMap(type);
+        Root root = type.getRoot();
+        if (root == null) { return; }
+        ObjectMap om = root.getObjectMap(type);
         addPathImmediates(path, om.getFetchedPaths());
     }
 
