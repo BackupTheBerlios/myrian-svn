@@ -9,12 +9,12 @@ import java.util.*;
  * Root
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/04/02 $
+ * @version $Revision: #7 $ $Date: 2003/04/04 $
  **/
 
 public class Root {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Root.java#6 $ by $Author: rhs $, $DateTime: 2003/04/02 12:28:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Root.java#7 $ by $Author: rhs $, $DateTime: 2003/04/04 17:02:22 $";
 
     private static final Root ROOT = new Root();
 
@@ -59,6 +59,10 @@ public class Root {
     public void setLocation(Object element, String filename, int line,
 			    int column) {
 	m_locations.put(element, new Location(filename, line, column));
+    }
+
+    public boolean hasLocation(Object element) {
+	return m_locations.containsKey(element);
     }
 
     private Location getLocation(Object element) {

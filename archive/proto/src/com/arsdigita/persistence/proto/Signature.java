@@ -8,12 +8,12 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #16 $ $Date: 2003/03/31 $
+ * @version $Revision: #17 $ $Date: 2003/04/04 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#16 $ by $Author: rhs $, $DateTime: 2003/03/31 10:58:30 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#17 $ by $Author: rhs $, $DateTime: 2003/04/04 17:02:22 $";
 
     private ArrayList m_paths = new ArrayList();
 
@@ -53,6 +53,10 @@ public class Signature {
     }
 
     public void addPath(Path path) {
+	if (!exists(path)) {
+	    throw new NoSuchPathException(path);
+	}
+
 	ObjectType type = getType(path);
 	Collection keys = type.getKeyProperties();
 	if (keys.size() == 0) {

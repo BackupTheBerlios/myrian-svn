@@ -11,12 +11,14 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/test/src/com/arsdigita/persistence/testpdl/static/DataQueryExtra.pg.pdl#1 $ 
-// $DateTime: 2002/11/27 19:51:05 $
+// $Id: //core-platform/proto/test/src/com/arsdigita/persistence/testpdl/static/DataQueryExtra.pg.pdl#2 $ 
+// $DateTime: 2003/04/04 17:02:22 $
 
 model examples;
 
 query DataOperationWithPLSQLAndArgsAndReturn {
+    BigDecimal Item;
+
     do {
         select DataOperationProcWithReturn(:entryID) as entry
     } map {

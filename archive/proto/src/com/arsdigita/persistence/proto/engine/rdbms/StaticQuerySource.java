@@ -10,12 +10,12 @@ import java.util.*;
  * StaticQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/04/04 $
+ * @version $Revision: #5 $ $Date: 2003/04/04 $
  **/
 
 class StaticQuerySource extends QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/StaticQuerySource.java#4 $ by $Author: rhs $, $DateTime: 2003/04/04 09:30:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/StaticQuerySource.java#5 $ by $Author: rhs $, $DateTime: 2003/04/04 17:02:22 $";
 
     private synchronized Source getSource(ObjectType type, SQLBlock block,
                                           Path prefix) {
@@ -37,11 +37,15 @@ class StaticQuerySource extends QuerySource {
 
         for (Iterator it = block.getPaths().iterator(); it.hasNext(); ) {
             Path path = (Path) it.next();
-            if (prefix == null) {
-                sig.addPath(path);
-            } else {
-                sig.addPath(prefix.getRelative(path));
-            }
+	    try {
+		if (prefix == null) {
+		    sig.addPath(path);
+		} else {
+		    sig.addPath(prefix.getRelative(path));
+		}
+	    } catch (NoSuchPathException e) {
+		throw new MetadataException(block, "mapping not in signature");
+	    }
         }
 
         if (from != null) {
