@@ -145,7 +145,7 @@ object type MagazineIndex class com.redhat.persistence.jdo.MapEntry
                           adapter com.redhat.persistence.jdo.JDOAdapter {
 
     String[1..1]  key = mag_index.topic VARCHAR(200);
-    Integer[1..1] val = mag_index.page_number INTEGER;
+    Integer[1..1] value = mag_index.page_number INTEGER;
 
     object key(container, key);
 }

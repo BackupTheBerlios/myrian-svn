@@ -7,7 +7,7 @@
     <class name="MapEntry" identity-type="datastore">
       <field name="container" persistence-modifier="persistent"/>
       <field name="key"       persistence-modifier="persistent"/>
-      <field name="val"       persistence-modifier="persistent"/>
+      <field name="value"     persistence-modifier="persistent"/>
     </class>
   </package>
 </jdo>

@@ -6,7 +6,7 @@ public class MapEntry implements Map.Entry {
 
     private Object container;
     private Object key;
-    private Object val;
+    private Object value;
 
     MapEntry() {}
 
@@ -20,18 +20,18 @@ public class MapEntry implements Map.Entry {
     }
 
     public Object getValue() {
-        return val;
+        return value;
     }
 
-    public Object setValue(Object value) {
-        Object oldValue = val;
-        val = value;
+    public Object setValue(Object newValue) {
+        Object oldValue = value;
+        value = newValue;
         return oldValue;
     }
 
     public int hashCode() {
         return (key==null ? 0 : key.hashCode()) +
-               (val==null ? 0 : val.hashCode());
+               (value==null ? 0 : value.hashCode());
     }
     
     public boolean equals(Object obj) {
@@ -44,7 +44,7 @@ public class MapEntry implements Map.Entry {
         return
             (key == null ? enKey == null : key.equals(enKey))
             &&
-            (val == null ? enVal == null : val.equals(enVal));
+            (value == null ? enVal == null : value.equals(enVal));
     }
 
     public String toString() {
