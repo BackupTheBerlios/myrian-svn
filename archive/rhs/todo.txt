@@ -5,3 +5,4 @@
  * make sql setup and teardown work on oracle
  * remove dead sql scripts
  * import -> resource search
+ * allow adapters to fault properties before object has been resurrected
