@@ -22,11 +22,11 @@ begin
       (new.context_id is null)) then
 
     if old.context_id is not null then
-      permissions_remove_context(old.object_id, 
-                                 old.context_id);
+      perform permissions_remove_context(old.object_id, 
+                                         old.context_id);
     end if;
     if new.context_id is not null then
-      permissions_add_context(new.object_id, new.context_id);
+      perform permissions_add_context(new.object_id, new.context_id);
     end if;
 
   end if;
@@ -41,8 +41,8 @@ for each row execute procedure object_context_up_fn();
 create or replace function object_context_del_fn () returns opaque as '
 begin
   if old.context_id is not null then
-      permissions_remove_context(old.object_id, 
-                                                old.context_id);
+       perform permissions_remove_context(old.object_id, 
+                                          old.context_id);
   end if;
   return null;
 end;' language 'plpgsql';

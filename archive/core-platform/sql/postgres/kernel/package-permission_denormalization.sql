@@ -23,7 +23,7 @@
 --    where object_id = v_context_id;
     select count(*) into child_count
     from object_context_map
-    where context_id = add_context.context_id;
+    where context_id = v_context_id;
 
 --    if NOT FOUND then
     if child_count = 1 then
@@ -76,7 +76,7 @@
             where exists
                 (select 1 
                  from object_context_map
-                 where context_id =  add_context.object_id)) descendants
+                 where context_id =  v_object_id)) descendants
       where ancestors.object_id = v_context_id
         and descendants.implied_context_id = v_object_id;
     
@@ -100,7 +100,7 @@
             where exists
                 (select 1 
                  from object_context_map
-                 where context_id =  add_context.object_id)) descendants
+                 where context_id =  v_object_id)) descendants
       where ancestors.object_id = v_context_id
         and descendants.implied_context_id = v_object_id;
 
@@ -127,12 +127,12 @@
 --      and n_children=1;
     select count(*) into child_count
     from object_context_map
-    where context_id = remove_context.context_id;
+    where context_id = v_context_id;
 
 --    if SQL%NOTFOUND then
 --        update context_child_counts
 --        set n_children = n_children - 1
---        where object_id = remove_context.context_id;
+--        where object_id = v_context_id;
     if child_count > 0 then
         v_delete_context := 0;
     else

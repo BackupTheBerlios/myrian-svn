@@ -115,8 +115,8 @@ create or replace function parties_add_member (
   )
   returns integer as ' 
    declare
-    group_id alias for $1;
-    member_id alias for $2;
+    v_group_id alias for $1;
+    v_member_id alias for $2;
     v_path_increment integer;
     new_entry record;
   begin
@@ -124,10 +124,10 @@ create or replace function parties_add_member (
       for new_entry in 
           select ancestors.group_id, ancestors.n_paths
           from group_subgroup_trans_index ancestors
-          where ancestors.subgroup_id = add_member.group_id
+          where ancestors.subgroup_id = v_group_id
       loop
 
-          if (add_member.group_id = new_entry.group_id) then
+          if (v_group_id = new_entry.group_id) then
             v_path_increment := 1;
           else 
             v_path_increment := new_entry.n_paths;
@@ -136,14 +136,14 @@ create or replace function parties_add_member (
           update group_member_trans_index
           set n_paths = n_paths + v_path_increment
           where group_id = new_entry.group_id
-            and member_id = add_member.member_id;
+            and member_id = v_member_id;
 
           if (NOT FOUND) then
 
               insert into group_member_trans_index
               (group_id, member_id, n_paths)
               values
-              (new_entry.group_id, add_member.member_id, v_path_increment);
+              (new_entry.group_id, v_member_id, v_path_increment);
           end if;
       end loop;
 
