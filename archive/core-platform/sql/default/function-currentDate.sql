@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/function-currentDate.sql#2 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/function-currentDate.sql#3 $
+-- $DateTime: 2003/06/27 08:10:15 $
 
 -- This is a function to allow the postgres and oracle PDL to 
 -- not have to hard code current_timestamp() and sysdate
@@ -21,5 +21,5 @@ create or replace function currentDate()
   returns timestamp as '
   declare
   begin
-    return current_timestamp();
+    return current_timestamp;
 end;' language 'plpgsql';
