@@ -9,12 +9,12 @@ import java.io.*;
  * Element
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/30 $
  **/
 
 public abstract class Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Element.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Element.java#2 $ by $Author: rhs $, $DateTime: 2002/05/30 15:15:09 $";
 
     private static final Map s_cache = new HashMap();
 
@@ -134,19 +134,43 @@ public abstract class Element {
         return result;
     }
 
+    public void output(SQLWriter result, Transformer tran) {
+        if (tran.transform(this, result)) {
+            return;
+        } else {
+            makeString(result, tran);
+        }
+    }
+
     abstract public void addLeafElements(List l);
 
-    abstract String makeString();
+    abstract void makeString(SQLWriter result, Transformer tran);
 
     // This stores the cached string representation of this element.
     private String m_string = null;
 
+    protected final void flush() {
+        m_string = null;
+    }
+
     public final String toString() {
-        if (m_string == null || true) {
-            m_string = makeString();
+        if (m_string == null) {
+            SQLWriter result = new SQLWriter();
+            output(result, NOOP);
+            m_string = result.toString();
         }
 
         return m_string;
     }
+
+    public static interface Transformer {
+        boolean transform(Element el, SQLWriter result);
+    }
+
+    private static final Transformer NOOP = new Transformer() {
+            public boolean transform(Element el, SQLWriter result) {
+                return false;
+            }
+        };
 
 }

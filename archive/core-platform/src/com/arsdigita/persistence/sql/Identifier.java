@@ -9,21 +9,18 @@ import java.util.Map;
  * Identifier
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/30 $
  **/
 
 public class Identifier extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Identifier.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Identifier.java#2 $ by $Author: rhs $, $DateTime: 2002/05/30 15:15:09 $";
 
     private String[] m_path;
     private boolean m_isBindVar = false;
     private List m_leafElements;
 
     private static Map s_hashMap = new HashMap();
-
-    // Cache the result of makeString
-    private String m_pathString;
 
     private Identifier(String[] path) {
         m_path = path;
@@ -57,23 +54,17 @@ public class Identifier extends Element {
         return m_isBindVar;
     }
 
-    String makeString() {
-        if (m_pathString == null) {
-            StringBuffer result = new StringBuffer();
-
-            if (isBindVar()) {
-                result.append(':');
-            }
-
-            for (int i = 0; i < m_path.length; i++) {
-                result.append(m_path[i]);
-                if (i < m_path.length - 1) {
-                    result.append('.');
-                }
-            }
-            m_pathString = result.toString();
+    void makeString(SQLWriter result, Transformer tran) {
+        if (isBindVar()) {
+            result.print(':');
         }
-        return m_pathString;
+
+        for (int i = 0; i < m_path.length; i++) {
+            result.printID(m_path[i]);
+            if (i < m_path.length - 1) {
+                result.print('.');
+            }
+        }
     }
 
     public static Identifier getInstance(String[] path) {

@@ -28,6 +28,7 @@ import com.arsdigita.persistence.metadata.Event;
 import com.arsdigita.persistence.metadata.Operation;
 import com.arsdigita.persistence.metadata.Mapping;
 
+import com.arsdigita.persistence.sql.SQLWriter;
 import com.arsdigita.persistence.sql.Identifier;
 import com.arsdigita.persistence.sql.Element;
 import com.arsdigita.persistence.sql.Statement;
@@ -65,12 +66,12 @@ import org.apache.log4j.Category;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/05/13 $
+ * @version $Revision: #3 $ $Date: 2002/05/30 $
  */
 
 public class DataStore {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#2 $ by $Author: rhs $, $DateTime: 2002/05/13 16:51:14 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#3 $ by $Author: rhs $, $DateTime: 2002/05/30 15:15:09 $";
 
     private static final Category log =
         Category.getInstance(DataStore.class.getName());
@@ -238,7 +239,8 @@ public class DataStore {
         return false;
     }
 
-    public ResultSet fireOperation(Operation op, DataContainer source,
+    public ResultSet fireOperation(final Operation op,
+                                   final DataContainer source,
                                    boolean lazyUpdates) {
         Element el = Element.parse(op.getSQL());
 
@@ -251,48 +253,40 @@ public class DataStore {
             }
         }
 
-        StringBuffer sql = new StringBuffer();
+        SQLWriter sql = new SQLWriter();
 
-        List leafs = el.getLeafElements();
-        final int size = leafs.size();
+        final int size = 10;
+        final List types = new ArrayList(size);
+        final List jdbcTypes = new ArrayList(size);
+        final List values = new ArrayList(size);
+        final List refreshPaths = new ArrayList(size);
 
-        List types = new ArrayList(size);
-        List jdbcTypes = new ArrayList(size);
-        List values = new ArrayList(size);
-        List refreshPaths = new ArrayList(size);
+        el.output(sql, new Element.Transformer() {
+                public boolean transform(Element element,
+                                         SQLWriter result) {
+                    if (element.isBindVar()) {
+                        Identifier id = (Identifier) element;
+                        Object value = source.lookupValue(id.getPath());
+                        values.add(value);
 
-        Element leaf;
-        Identifier id;
-        Object value;
-        Property prop;
-        SimpleType type;
-        int jdbcType;
+                        Property prop = source.lookupProperty(id.getPath());
+                        SimpleType type = (SimpleType) prop.getType();
+                        types.add(type);
 
-        for (int i = 0; i < size; i++) {
-            leaf = (Element) leafs.get(i);
-            if (leaf.isBindVar()) {
-                id = (Identifier) leaf;
+                        int jdbcType = jdbcType(op, id.getPath(), prop);
+                        jdbcTypes.add(new Integer(jdbcType));
 
-                value = source.lookupValue(id.getPath());
-                values.add(value);
+                        result.print(type.getLiteral(value, jdbcType));
+                        if (type.needsRefresh(value, jdbcType)) {
+                            refreshPaths.add(id.getPath());
+                        }
 
-                prop = source.lookupProperty(id.getPath());
-                type = (SimpleType) prop.getType();
-                types.add(type);
-
-                jdbcType = jdbcType(op, id.getPath(), prop);
-                jdbcTypes.add(new Integer(jdbcType));
-
-
-                sql.append(type.getLiteral(value, jdbcType));
-
-                if (type.needsRefresh(value, jdbcType)) {
-                    refreshPaths.add(id.getPath());
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
-            } else {
-                sql.append(" " + leaf + " ");
-            }
-        }
+            });
 
         com.arsdigita.db.PreparedStatement ps;
         // This will only work correctly if conn is really of type 
@@ -313,9 +307,9 @@ public class DataStore {
 
         int index = 1;
         for (int i = 0; i < values.size(); i++) {
-            value = values.get(i);
-            type = (SimpleType) types.get(i);
-            jdbcType = ((Integer) jdbcTypes.get(i)).intValue();
+            Object value = values.get(i);
+            SimpleType type = (SimpleType) types.get(i);
+            int jdbcType = ((Integer) jdbcTypes.get(i)).intValue();
 
             try {
                 index += type.bind(ps, index, value, jdbcType);
@@ -517,7 +511,7 @@ public class DataStore {
                 if (i == 0) {
                     sql.append(" = call ");
                     i++;
-                }                    
+                }
             } else {
                 if (i == 0) {
                     sql.append("call ");

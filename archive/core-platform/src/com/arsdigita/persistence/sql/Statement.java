@@ -6,23 +6,19 @@ import java.util.*;
  * Statement
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/30 $
  **/
 
 public class Statement extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Statement.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Statement.java#2 $ by $Author: rhs $, $DateTime: 2002/05/30 15:15:09 $";
 
     private List m_clauses = new ArrayList();
     private List m_clausesNoMod = Collections.unmodifiableList(m_clauses);
 
-    // Cache the results of makeString. This cached variable is
-    // flushed whenever we modify this object.
-    private String m_textString;
-
     public void addClause(Clause clause) {
         m_clauses.add(clause);
-        flushCache();
+        flush();
     }
 
     public Iterator getClauses() {
@@ -55,28 +51,17 @@ public class Statement extends Element {
             clause = (Clause) it.next();
             clause.addLeafElements(l);
         }
-        flushCache();
+        flush();
     }
 
-    String makeString() {
-        if (m_textString == null) {
-            StringBuffer result = new StringBuffer();
-
-            Clause clause;
-            for (Iterator it = getClauses(); it.hasNext(); ) {
-                clause = (Clause) it.next();
-                result.append(clause);
-                if (it.hasNext()) {
-                    result.append("\n");
-                }
+    void makeString(SQLWriter result, Transformer tran) {
+        for (Iterator it = getClauses(); it.hasNext(); ) {
+            Clause clause = (Clause) it.next();
+            clause.output(result, tran);
+            if (it.hasNext()) {
+                result.println();
             }
-            m_textString = result.toString();
         }
-        return m_textString;
     }
 
-
-    private void flushCache() {
-        m_textString = null;
-    }
 }

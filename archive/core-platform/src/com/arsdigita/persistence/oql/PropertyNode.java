@@ -7,12 +7,12 @@ import java.util.*;
  * PropertyNode
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/05/21 $
+ * @version $Revision: #3 $ $Date: 2002/05/30 $
  **/
 
 class PropertyNode extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/PropertyNode.java#2 $ by $Author: rhs $, $DateTime: 2002/05/21 20:57:49 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/PropertyNode.java#3 $ by $Author: rhs $, $DateTime: 2002/05/30 15:15:09 $";
 
     private Property m_property;
 
@@ -26,7 +26,13 @@ class PropertyNode extends Node {
     }
 
     String getAlias() {
-        return getParent().getAlias() + "_" + m_property.getName();
+        String alias = getParent().getAlias();
+        if (alias == null) {
+            alias = m_property.getName();
+        } else {
+            alias = alias + "_" + m_property.getName();
+        }
+        return  alias;
     }
 
     String getPrefix() {

@@ -6,25 +6,21 @@ import java.util.*;
  * SQL
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/30 $
  **/
 
 public class SQL extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/SQL.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/SQL.java#2 $ by $Author: rhs $, $DateTime: 2002/05/30 15:15:09 $";
 
     private List m_elements = new ArrayList();
     private List m_elementsNoMod = Collections.unmodifiableList(m_elements);
-
-    // Cache the results of makeString. This cached variable is
-    // flushed whenever we modify this object.
-    private String m_textString;
 
     public SQL() {}
 
     public void addElement(Element el) {
         m_elements.add(el);
-        flushCache();
+        flush();
     }
 
     public Iterator getElements() {
@@ -41,27 +37,15 @@ public class SQL extends Element {
             el = (Element) it.next();
             el.addLeafElements(l);
         }
-        flushCache();
+        flush();
     }
 
-    String makeString() {
-        if (m_textString == null) {
-            StringBuffer result = new StringBuffer();
-            Element el;
-            for (Iterator it = getElements(); it.hasNext(); ) {
-                el = (Element) it.next();
-                result.append(el);
-                if (it.hasNext()) {
-                    result.append(" ");
-                }
-            }
-            m_textString = result.toString();
+    void makeString(SQLWriter result, Transformer tran) {
+        Element el;
+        for (Iterator it = getElements(); it.hasNext(); ) {
+            el = (Element) it.next();
+            el.output(result, tran);
         }
-
-        return m_textString;
     }
 
-    private void flushCache() {
-        m_textString = null;
-    }
 }

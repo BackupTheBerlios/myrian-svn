@@ -6,19 +6,15 @@ import java.util.*;
  * SetClause
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/30 $
  **/
 
 public class SetClause extends Clause {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/SetClause.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/SetClause.java#2 $ by $Author: rhs $, $DateTime: 2002/05/30 15:15:09 $";
 
     private List m_assigns = new ArrayList();
     private List m_assignsNoMod = Collections.unmodifiableList(m_assigns);
-
-    // Cache the results of makeString. This cached variable is
-    // flushed whenever we modify this object.
-    private String m_textString;
 
     public SetClause() {}
 
@@ -41,26 +37,17 @@ public class SetClause extends Clause {
         }
     }
 
-    String makeString() {
-        if (m_textString == null) {
-            StringBuffer result = new StringBuffer();
+    void makeString(SQLWriter result, Transformer tran) {
+        result.print("set ");
 
-            result.append("set ");
-
-            for (Iterator it = getAssigns(); it.hasNext(); ) {
-                result.append(it.next());
-                if (it.hasNext()) {
-                    result.append(",\n    ");
-                }
+        result.pushIndent(result.getColumn());
+        for (Iterator it = getAssigns(); it.hasNext(); ) {
+            Element el = (Element) it.next();
+            el.output(result, tran);
+            if (it.hasNext()) {
+                result.println(",");
             }
-
-            m_textString = result.toString();
         }
-
-        return m_textString;
-    }
-
-    private void flushCache() {
-        m_textString = null;
+        result.popIndent();
     }
 }

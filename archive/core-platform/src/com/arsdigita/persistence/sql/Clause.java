@@ -8,20 +8,17 @@ import java.util.Map;
  * Clause
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/30 $
  **/
 
 public class Clause extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Clause.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Clause.java#2 $ by $Author: rhs $, $DateTime: 2002/05/30 15:15:09 $";
 
     private Symbol m_start;
     private SQL m_sql;
 
     private static Map s_hashMap = new HashMap();
-
-    // Cache the results of makeString.
-    private String m_textString;
 
     Clause() {}
 
@@ -58,7 +55,7 @@ public class Clause extends Element {
         if (m_start == null) {
             return start == null;
         } else {
-            return m_start.toString().equalsIgnoreCase(start);
+            return m_start.getText().equalsIgnoreCase(start);
         }
     }
 
@@ -75,11 +72,18 @@ public class Clause extends Element {
         return this instanceof SetClause;
     }
 
-    String makeString() {
-        if (m_textString == null) {
-            m_textString = m_start + " " + m_sql;
+    void makeString(SQLWriter result, Transformer tran) {
+        m_start.output(result, tran);
+
+        if (!isWhere()) {
+            result.pushIndent(result.getColumn());
         }
-        return m_textString;
+
+        m_sql.output(result, tran);
+
+        if (!isWhere()) {
+            result.popIndent();
+        }
     }
 
     public static Clause getInstance(Symbol start, SQL sql) {
@@ -93,7 +97,7 @@ public class Clause extends Element {
     }
 
     private static String generateKey(Symbol start, SQL sql) {
-        return start.makeString() + sql.makeString();
+        return start.toString() + sql.toString();
     }
 
 }
