@@ -15,66 +15,30 @@
 
 package com.redhat.persistence.common;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.arsdigita.util.ConcurrentDict;
 
 /**
  * Path
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2004/02/19 $
+ * @version $Revision: #8 $ $Date: 2004/02/20 $
  **/
 
 public class Path {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#7 $ by $Author: bche $, $DateTime: 2004/02/19 16:41:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#8 $ by $Author: vadim $, $DateTime: 2004/02/20 12:36:50 $";
 
-    private static final int N_BUCKETS = 64;
-    private static final int BITMASK = N_BUCKETS - 1;
-    private static final Map[] BUCKETS = new Map[N_BUCKETS];
     //special case the id path since it shows up so often
     private static final Path ID_PATH = new Path(null, "id");
-    static {
-        for (int ii=0; ii<N_BUCKETS; ii++) {
-            BUCKETS[ii] = new HashMap();
-        }
-    }
+
+    private static final ConcurrentDict DICT =
+        new ConcurrentDict(new Supplier());
 
     public static final Path get(String path) {
-        if (path == null) {
-            return null;
-        }
-
-        //special case the id path since it shows up so often
         if ("id".equals(path)) {
             return ID_PATH;
         }
-
-        Map paths = BUCKETS[path.hashCode() & BITMASK];
-
-        Path result;
-
-        synchronized (paths) {
-            if (paths.containsKey(path)) {
-                result = (Path) paths.get(path);
-            } else {
-                int dot = path.lastIndexOf('.');
-                Path parent;
-                String name;
-                if (dot > -1) {
-                    parent = get(path.substring(0, dot));
-                    name = path.substring(dot + 1);
-                } else {
-                    parent = null;
-                    name = path;
-                }
-
-                result = new Path(parent, name);
-                paths.put(path, result);
-            }
-        }
-
-        return result;
+        return (Path) DICT.get(path);
     }
 
     public static final Path add(String p1, String p2) {
@@ -170,5 +134,24 @@ public class Path {
         StringBuffer sb = new StringBuffer(s1.length() + s2.length() + 1);
         sb.append(s1).append(".").append(s2);
         return sb.toString();
+    }
+
+    private static class Supplier implements ConcurrentDict.EntrySupplier {
+        public Object supply(Object key) {
+            String path = (String) key;
+
+            final int dot = path.lastIndexOf('.');
+            final Path parent;
+            final String name;
+            if (dot > -1) {
+                parent = get(path.substring(0, dot));
+                name = path.substring(dot + 1);
+            } else {
+                parent = null;
+                name = path;
+            }
+
+            return new Path(parent, name);
+        }
     }
 }
