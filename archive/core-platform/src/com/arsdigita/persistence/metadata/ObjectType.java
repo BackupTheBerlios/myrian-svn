@@ -22,8 +22,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
 import java.io.PrintStream;
+
 import com.arsdigita.util.Assert;
 import com.arsdigita.util.StringUtils;
+import com.arsdigita.util.UncheckedWrapperException;
+
+import com.arsdigita.persistence.DataHandler;
 
 /**
  * The ObjectType class is a specialized form of CompoundType that supports
@@ -31,12 +35,12 @@ import com.arsdigita.util.StringUtils;
  * be marked as special "key" properties.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/14 $
+ * @version $Revision: #7 $ $Date: 2002/10/01 $
  **/
 
 public class ObjectType extends CompoundType {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#7 $ by $Author: rhs $, $DateTime: 2002/10/01 16:08:31 $";
 
     private static boolean m_optimizeDefault = true;
 
@@ -74,6 +78,9 @@ public class ObjectType extends CompoundType {
     // unique keys
     private Set m_uniqueKeys = new HashSet();
 
+    // Stores the data handler for this type.
+    private DataHandler m_dataHandler = null;
+
 
     /**
      * Constructs a new base ObjectType of the given name that has no
@@ -100,6 +107,7 @@ public class ObjectType extends CompoundType {
         m_super = supertype;
         initOption("OPTIMIZE",
                    getOptimizeDefault() ? Boolean.TRUE : Boolean.FALSE);
+        initOption("DATA_HANDLER", null);
     }
 
     /**
@@ -130,6 +138,30 @@ public class ObjectType extends CompoundType {
             }
             curr = supertype;
         }
+    }
+
+    /**
+     * Gets the data handler to be used for instances of this object type.
+     **/
+
+    public DataHandler getDataHandler() {
+        if (m_dataHandler == null) {
+            String className = (String) getOption("DATA_HANDLER");
+            if (className != null) {
+                try {
+                    Class dhImpl = Class.forName(className);
+                    m_dataHandler = (DataHandler) dhImpl.newInstance();
+                } catch (ClassNotFoundException e) {
+                    throw new UncheckedWrapperException(e);
+                } catch (InstantiationException e) {
+                    throw new UncheckedWrapperException(e);
+                } catch (IllegalAccessException e) {
+                    throw new UncheckedWrapperException(e);
+                }
+            }
+        }
+
+        return m_dataHandler;
     }
 
 

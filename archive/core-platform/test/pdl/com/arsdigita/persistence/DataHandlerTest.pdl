@@ -1,0 +1,12 @@
+model test.dataHandler;
+
+object type Test {
+    BigInteger id = dh_test.id INTEGER;
+    String value = dh_test.value VARCHAR(100);
+
+    object key (id);
+
+    options {
+        DATA_HANDLER = "com.arsdigita.persistence.FakeDataHandler";
+    }
+}
