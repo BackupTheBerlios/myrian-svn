@@ -501,7 +501,9 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
      * the Extent.
      */
     public Query newQuery(Class cls, Collection cln) {
-        throw new Error("not implemented");
+        Query q = newQuery(cls);
+        q.setCandidates(cln);
+        return q;
     }
 
     /**
@@ -509,7 +511,9 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
      * Collection, and filter.
      */
     public Query newQuery(Class cls, Collection cln, String filter) {
-        throw new Error("not implemented");
+        Query q = newQuery(cls, cln);
+        q.setFilter(filter);
+        return q;
     }
 
     /**
@@ -527,7 +531,9 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
      * candidate Extent.
      */
     public Query newQuery(Extent cln) {
-        throw new Error("not implemented");
+        Query q = newQuery();
+        q.setCandidates(cln);
+        return q;
     }
 
     /**
@@ -535,7 +541,9 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
      * taken from the Extent.
      */
     public Query newQuery(Extent cln, String filter) {
-        throw new Error("not implemented");
+        Query q = newQuery(cln);
+        q.setFilter(filter);
+        return q;
     }
 
     /**
