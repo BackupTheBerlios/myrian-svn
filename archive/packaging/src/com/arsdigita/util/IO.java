@@ -26,14 +26,14 @@ import java.io.IOException;
 public class IO {
     
     /**
-     * Sends the contents of an input stream to another
+     * Copies the contents of an input stream to another
      * output stream.
      *
      * @param src the source file to be sent
      * @param dst the destination to send the file to
      */
-    public static void sendFile(InputStream src,
-                                OutputStream dst) 
+    public static void copy(InputStream src,
+                            OutputStream dst) 
         throws IOException {
         
         byte buf[] = new byte[4096];
