@@ -8,12 +8,12 @@ import java.io.*;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/01/02 $
+ * @version $Revision: #5 $ $Date: 2003/01/10 $
  **/
 
 class ObjectData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#4 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#5 $ by $Author: ashah $, $DateTime: 2003/01/10 19:25:47 $";
 
     private Session m_ssn;
     private PersistentObject m_object;
@@ -80,6 +80,17 @@ class ObjectData {
             } else if (ev instanceof CreateEvent) {
                 return false;
             }
+        }
+
+        return false;
+    }
+
+    public boolean isModified() {
+        if (m_events.size() > 0) { return true; }
+
+        for (Iterator it = m_pdata.values().iterator(); it.hasNext(); ) {
+            PropertyData pdata = (PropertyData) it.next();
+            if (pdata.isModified()) { return true; }
         }
 
         return false;

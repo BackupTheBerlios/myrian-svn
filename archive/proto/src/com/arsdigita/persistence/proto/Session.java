@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/01/10 $
+ * @version $Revision: #13 $ $Date: 2003/01/10 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#12 $ by $Author: rhs $, $DateTime: 2003/01/10 18:29:26 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#13 $ by $Author: ashah $, $DateTime: 2003/01/10 19:25:47 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -427,24 +427,23 @@ public class Session {
 
 
     public boolean isNew(OID oid) {
-        ObjectData od = getObjectData(oid);
-        return od.isNew();
+        return hasObjectData(oid) && getObjectData(oid).isNew();
     }
 
 
     public boolean isDeleted(OID oid) {
-        ObjectData od = getObjectData(oid);
-        return od.isDeleted();
+        return hasObjectData(oid) && getObjectData(oid).isDeleted();
     }
 
 
     public boolean isModified(OID oid) {
-        throw new Error("not implemented");
+        return hasObjectData(oid) && getObjectData(oid).isModified();
     }
 
 
     public boolean isModified(OID oid, Property prop) {
-        throw new Error("not implemented");
+        return hasObjectData(oid) &&
+            getObjectData(oid).getPropertyData(prop).isModified();
     }
 
 
