@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #23 $ $Date: 2003/06/03 $
+ * @version $Revision: #24 $ $Date: 2003/06/12 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#23 $ by $Author: ashah $, $DateTime: 2003/06/03 12:21:32 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#24 $ by $Author: rhs $, $DateTime: 2003/06/12 16:30:59 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 
@@ -471,7 +471,7 @@ class DataQueryImpl implements DataQuery {
     }
 
     private final boolean propertyExists(Path path) {
-        return m_query.getSignature().isFetched(path);
+        return m_query.getSignature().exists(path);
     }
 
     private String unalias(String expr) {
