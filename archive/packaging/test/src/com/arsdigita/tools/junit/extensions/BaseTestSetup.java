@@ -128,12 +128,12 @@ public class BaseTestSetup extends TestDecorator {
             case DbHelper.DB_POSTGRES:
                 Classes.loadClass("org.postgresql.Driver");
                 SQLExceptionHandler.setDbExceptionHandlerImplName
-                    ("com.arsdigita.db.oracle.OracleDbExceptionHandlerImpl");
+                    ("com.arsdigita.db.postgres.PostgresDbExceptionHandlerImpl");
                 break;
             case DbHelper.DB_ORACLE:
                 Classes.loadClass("oracle.jdbc.driver.OracleDriver");
                 SQLExceptionHandler.setDbExceptionHandlerImplName
-                    ("com.arsdigita.db.postgres.PostgresDbExceptionHandlerImpl");
+                    ("com.arsdigita.db.oracle.OracleDbExceptionHandlerImpl");
                 break;
             default:
                 throw new IllegalArgumentException("unsupported database");

@@ -60,12 +60,12 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/09/10 $
+ * @version $Revision: #5 $ $Date: 2003/09/11 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/pdl/PDL.java#4 $ by $Author: rhs $, $DateTime: 2003/09/10 10:46:29 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/pdl/PDL.java#5 $ by $Author: rhs $, $DateTime: 2003/09/11 14:54:54 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;
@@ -89,8 +89,9 @@ public class PDL {
      * @param filename the name of the PDL file read by "r"
      * @throws PDLException thrown on a parsing error.
      */
-    public void load(Reader r, String filename) throws PDLException {
-        m_pdlc.parse(filename, r);
+    public void load(final Reader r, final String filename)
+        throws PDLException {
+        m_pdlc.parse(r, filename);
     }
 
     /**
