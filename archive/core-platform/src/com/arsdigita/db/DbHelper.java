@@ -19,14 +19,14 @@ package com.arsdigita.db;
 import com.arsdigita.util.Assert;
 import com.arsdigita.util.UncheckedWrapperException;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 public class DbHelper {
 
     // Only static methods in this class
     private DbHelper() {}
 
-    private static Category s_log = Category.getInstance(DbHelper.class);
+    private static Logger s_log = Logger.getLogger(DbHelper.class);
 
     public static final int DB_DEFAULT = 0;
     public static final int DB_ORACLE = 1;
