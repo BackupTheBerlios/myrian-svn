@@ -28,12 +28,12 @@ import com.arsdigita.db.oracle.*;
 public class Initializer
     implements com.arsdigita.initializer.Initializer {
 
-    private static final Logger LOG =
+    private static final Logger s_log =
         Logger.getLogger(Initializer.class);
 
     private Configuration m_conf = new Configuration();
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#13 $ by $Author: bche $, $DateTime: 2002/12/03 12:28:57 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#14 $ by $Author: dennis $, $DateTime: 2002/12/11 12:02:13 $";
 
     public static final String JDBC_URL = "jdbcUrl";
     public static final String DB_USERNAME = "dbUsername";
@@ -90,7 +90,6 @@ public class Initializer
     }
 
     public void startup() {
-        LOG.warn("Database Initializer starting...");
 
         String jdbcUrl = (String)m_conf.getParameter(JDBC_URL);
         int database = DbHelper.getDatabaseFromURL(jdbcUrl);
@@ -181,7 +180,7 @@ public class Initializer
         cm.setRetrySleep(retrySleep.intValue());
         cm.setConnectionPoolSize(maxConnections.intValue());
 
-        LOG.info("Setting ConnectionManager default connection info...");
+        s_log.info("Setting ConnectionManager default connection info...");
 
         ConnectionManager.setInstance(cm);
 
@@ -210,7 +209,6 @@ public class Initializer
             throw new InitializationException(e);
         }
 
-        LOG.warn("Database initializer finished.");
     }
 
     public void shutdown() {
