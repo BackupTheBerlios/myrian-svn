@@ -22,15 +22,16 @@ import junit.framework.Test;
 
 /**
  * @author Jon Orris
- * @version $Revision: #6 $ $Date: 2003/10/28 $
+ * @version $Revision: #7 $ $Date: 2003/11/12 $
  */
 public class DBTestSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DBTestSuite.java#6 $ by $Author: jorris $, $DateTime: 2003/10/28 13:22:55 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DBTestSuite.java#7 $ by $Author: jorris $, $DateTime: 2003/11/12 15:41:14 $";
 
     public static Test suite() {
         DBTestSuite suite = new DBTestSuite();
         populateSuite(suite);
-        BaseTestSetup wrapper = new CoreTestSetup(suite);
-        return wrapper;
+        //BaseTestSetup wrapper = new CoreTestSetup(suite);
+        //return wrapper;
+        return suite;
     }
 }
