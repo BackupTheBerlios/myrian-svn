@@ -10,10 +10,10 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/x/versioning/Txn.pdl#3 $
-// $DateTime: 2003/06/09 17:41:12 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/versioning/Txn.pdl#1 $
+// $DateTime: 2003/06/12 16:01:01 $
 
-model com.arsdigita.x.versioning;
+model com.arsdigita.versioning;
 
 import com.arsdigita.kernel.*;
 

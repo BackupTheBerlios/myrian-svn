@@ -10,13 +10,15 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/x/versioning/GenericOperation.pdl#4 $ 
-// $DateTime: 2003/05/19 15:20:26 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/versioning/JavaClass.pdl#1 $ 
+// $DateTime: 2003/06/12 16:01:01 $
 
-model com.arsdigita.x.versioning;
+model com.arsdigita.versioning;
 
-object type GenericOperation extends Operation {
-  String[0..1]    value = vcx_generic_operations.value VARCHAR;
+object type JavaClass {
+  BigInteger[1..1] id = vcx_java_classes.id INTEGER;
 
-  reference key (vcx_generic_operations.operation_id);
+  String[1..1]   name = vcx_java_classes.name VARCHAR(400);
+
+  object key (id);
 }
