@@ -22,6 +22,7 @@ import com.arsdigita.persistence.Utilities;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collection;
 import java.util.Arrays;
 import org.apache.log4j.Category;
 
@@ -29,12 +30,12 @@ import org.apache.log4j.Category;
  * SQLBlockDef
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/07/26 $
  */
 
 public class SQLBlockDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/SQLBlockDef.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/SQLBlockDef.java#4 $ by $Author: randyg $, $DateTime: 2002/07/26 15:40:17 $";
 
     private static Category s_log = 
         Category.getInstance(SQLBlockDef.class);
@@ -195,6 +196,14 @@ public class SQLBlockDef extends Element {
         }
 
         return result.toString();
+    }
+
+
+    /**
+     *  This returns the map statements for the sql block
+     */
+    public Collection getMapStatements() {
+        return m_mapStmts;
     }
 
 
