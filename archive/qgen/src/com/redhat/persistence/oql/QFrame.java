@@ -10,12 +10,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #24 $ $Date: 2004/03/22 $
+ * @version $Revision: #25 $ $Date: 2004/03/22 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#24 $ by $Author: richardl $, $DateTime: 2004/03/22 14:14:33 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#25 $ by $Author: rhs $, $DateTime: 2004/03/22 15:15:14 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -391,6 +391,19 @@ class QFrame {
             defined.addAll(right.defined);
         }
 
+        public String toString() {
+            return "jframe: " + join;
+        }
+
+    }
+
+    String trace(LinkedList joins) {
+        StringBuffer buf = new StringBuffer();
+        for (Iterator it = joins.iterator(); it.hasNext(); ) {
+            buf.append("\n  ");
+            buf.append(it.next());
+        }
+        return buf.toString();
     }
 
     private Code render(List where) {
@@ -435,45 +448,68 @@ class QFrame {
         if (m_condition != null) {
             Code c = m_condition.emit(m_generator);
             if (!c.isTrue() && !emitted.contains(c)) {
-                JFrame right = (JFrame) joins.getFirst();
                 Set used = frames(m_condition);
-                used.removeAll(right.defined);
-                if (used.isEmpty()) {
-                    // We default to putting things in the where
-                    // clause here because oracle won't resolve
-                    // external variable references correctly when
-                    // they appear in join conditions.
-                    if (oroot.equals(root)) {
-                        where.add(c);
-                    } else if (right.froot != null
-                               && oroot.equals(right.froot)) {
-                        right.join = right.join.add(" and ").add(c);
-                    } else {
-                        throw new IllegalStateException
-                            ("unable to place condition: " + c);
+                boolean join = false;
+                for (Iterator it = joins.iterator(); it.hasNext(); ) {
+                    JFrame frame = (JFrame) it.next();
+                    boolean modified = used.removeAll(frame.defined);
+                    if (used.isEmpty()) {
+                        // We default to putting things in the where
+                        // clause here because oracle won't resolve
+                        // external variable references correctly when
+                        // they appear in join conditions.
+                        if (oroot.equals(root)) {
+                            where.add(c);
+                        } else if (frame.froot != null
+                                   && oroot.equals(frame.froot)) {
+                            frame.join = frame.join.add(" and ").add(c);
+                        } else {
+                            throw new IllegalStateException
+                                ("unable to place condition: " + m_condition +
+                                 " " + c + trace(joins));
+                        }
+                    } else if (modified) {
+                        join = true;
+                        break;
                     }
-                } else {
-                    joins.removeFirst();
+                }
+                if (join) {
+                    JFrame right = (JFrame) joins.removeFirst();
 
                     if (joins.isEmpty()) {
                         throw new IllegalStateException
-                            ("unresolved variable in condition: " + c);
+                            ("unresolved variable in condition: " +
+                             m_condition + " " + c + trace(joins));
                     }
 
+                    LinkedList skipped = null;
                     JFrame left = (JFrame) joins.removeFirst();
                     while (true) {
                         used = frames(m_condition);
                         used.removeAll(right.defined);
-                        used.removeAll(left.defined);
+                        boolean cross = used.removeAll(left.defined);
                         if (used.isEmpty()) {
                             joins.addFirst(JFrame.join(left, right, c));
                             break;
                         } else if (joins.isEmpty()) {
                             throw new IllegalStateException
-                                ("unresolved variable in condition: " + c);
-                        } else {
+                                ("unresolved variable in condition: " +
+                                 m_condition + " " + c + trace(joins));
+                        } else if (cross) {
                             JFrame lefter = (JFrame) joins.removeFirst();
                             left = JFrame.cross(lefter, left);
+                        } else {
+                            if (skipped == null) {
+                                skipped = new LinkedList();
+                            }
+                            skipped.addLast(left);
+                            left = (JFrame) joins.removeFirst();
+                        }
+                    }
+
+                    if (skipped != null) {
+                        while (!skipped.isEmpty()) {
+                            joins.addFirst(skipped.removeLast());
                         }
                     }
                 }
@@ -677,9 +713,7 @@ class QFrame {
             }
         }
 
-        if (!m_outer) {
-            modified |= innerizeChildren(this);
-        }
+        modified |= innerizeChildren(this);
 
         if (m_outer) {
             List equals = getEquals();
@@ -800,7 +834,7 @@ class QFrame {
 
     boolean innerizeChildren(QFrame ancestor) {
         boolean modified = false;
-        if (m_outer && containsAnyNN(ancestor)) {
+        if (!this.equals(ancestor) && m_outer && containsAnyNN(ancestor)) {
             m_outer = false;
             modified = true;
         }

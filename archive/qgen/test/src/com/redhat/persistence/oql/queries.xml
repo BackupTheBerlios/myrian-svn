@@ -328,16 +328,57 @@
     </query>
     <query subselects="0" joins="2" outers="0">
       query(join(g = all(test.Group), m = all(test.User),
-                      exists(filter(mg = m.groups, mg == g))),
-                 group = g.name, member = m.firstName)
+                 exists(filter(mg = m.groups, mg == g))),
+            group = g.name, member = m.firstName)
     </query>
     <query subselects="0" joins="2" outers="1">
+      query(right(g = all(test.Group), m = all(test.User),
+                  exists(filter(mg = m.groups, mg == g))),
+            group = g.name, member = m.name)
+    </query>
+
+    <results>
+      <row group="Pop" member="Britney"/>
+      <row group="Pop" member="Christina"/>
+      <row group="Pop" member="Debbie"/>
+      <row group="Pop" member="Gloria"/>
+      <row group="Pop" member="Hillary"/>
+      <row group="Pop" member="Jennifer"/>
+      <row group="Rock" member="Indigo"/>
+      <row group="R&amp;B" member="Ashanti"/>
+      <row group="Country" member="Faith"/>
+      <row group="New Age" member="Enya"/>
+      <row group="Film" member="Hillary"/>
+      <row group="Film" member="Jennifer"/>
+      <row group="Television" member="Hillary"/>
+      <row group="80s" member="Debbie"/>
+      <row group="80s" member="Enya"/>
+      <row group="80s" member="Gloria"/>
+      <row group="90s" member="Britney"/>
+      <row group="90s" member="Christina"/>
+      <row group="90s" member="Faith"/>
+      <row group="90s" member="Gloria"/>
+      <row group="90s" member="Indigo"/>
+      <row group="90s" member="Jennifer"/>
+      <row group="00s" member="Ashanti"/>
+      <row group="00s" member="Britney"/>
+      <row group="00s" member="Christina"/>
+      <row group="00s" member="Faith"/>
+      <row group="00s" member="Hillary"/>
+      <row group="00s" member="Jennifer"/>
+    </results>
+  </test>
+
+  <test>
+    <query subselects="0" joins="2" outers="2">
       query(left(g = all(test.Group), m = all(test.User),
                         exists(filter(u = g.members, m == u))),
                  group = g.name, member = m.name)
     </query>
 
     <results>
+      <row group="Entertainment" member="null"/>
+      <row group="Music" member="null"/>
       <row group="Pop" member="Britney"/>
       <row group="Pop" member="Christina"/>
       <row group="Pop" member="Debbie"/>
