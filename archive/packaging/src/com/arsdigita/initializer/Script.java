@@ -31,12 +31,12 @@ import java.util.List;
  * Script
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/09/17 $
+ * @version $Revision: #8 $ $Date: 2003/09/21 $
  */
 
 public class Script {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/initializer/Script.java#7 $ by $Author: justin $, $DateTime: 2003/09/17 12:24:31 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/initializer/Script.java#8 $ by $Author: dennis $, $DateTime: 2003/09/21 23:01:34 $";
 
     private static final Logger s_log =
         Logger.getLogger(Script.class);
@@ -102,7 +102,7 @@ public class Script {
      * Constructs a new Script
      *
      * @param r Reader for the script parser
-     * @param iniName Name of the last initializer to run, or null. 
+     * @param iniName Name of the last initializer to run, or null.
      * Used to selectively run only part of the initialization script
      *
      * @throws InitializationException
@@ -143,7 +143,7 @@ public class Script {
         final String initializerName = ini.getClass().getName();
         m_initializers.add(ini);
 
-        final boolean continueAddingInitializers = 
+        final boolean continueAddingInitializers =
             !initializerName.equals(m_lastInitializerToRun);
         return continueAddingInitializers;
     }
@@ -172,8 +172,8 @@ public class Script {
      * Starts up the specified initializer and any initializers it requires in
      * order to start.
      *
-     * @param iniName The name of the initializer last to start. Note: 
-     * This parameter is redundant, as if it is set in the constructor, 
+     * @param iniName The name of the initializer last to start. Note:
+     * This parameter is redundant, as if it is set in the constructor,
      * only initializers up to the final one will be parsed.
      *
      * @return A Collection containing the names of all initalizers run
@@ -189,8 +189,7 @@ public class Script {
             if (s_log.isInfoEnabled()) {
                 s_log.info("Running initializer " +
                            ini.getClass().getName() +
-                           " (" + i + " of " + m_initializers.size() +
-                           " complete)");
+                           " (" + (i + 1) + " of " + m_initializers.size() + ")");
             }
 
             final String name = ini.getClass().getName();
@@ -270,10 +269,10 @@ public class Script {
     }
 
     private void logInitializationFailure(Initializer initializer,
-                                          final boolean loggerIsInitialized, 
+                                          final boolean loggerIsInitialized,
                                           Throwable t) {
         InitializerErrorReport report = new InitializerErrorReport(t, initializer);
-        
+
         String msg = "Fatal error loading initialization script";
         if (!loggerIsInitialized) {
             BasicConfigurator.configure();
