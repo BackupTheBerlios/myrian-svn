@@ -11,12 +11,10 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/test/pdl/com/arsdigita/web/TestApplication.pdl#2 $ 
-// $DateTime: 2002/12/09 11:24:18 $
+// $Id: //core-platform/dev/test/pdl/com/arsdigita/web/TestApplication.pdl#3 $ 
+// $DateTime: 2002/12/09 11:50:47 $
 
 model com.arsdigita.web;
-
-import com.arsdigita.web.Application;
 
 object type TestApplication extends Application {
     reference key (test_application.id);
