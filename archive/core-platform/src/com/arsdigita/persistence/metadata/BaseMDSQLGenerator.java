@@ -47,12 +47,12 @@ import org.apache.log4j.Logger;
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#15 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#16 $
  * @since 4.6.3
  */
 abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#15 $ by $Author: rhs $, $DateTime: 2002/10/14 16:12:17 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#16 $ by $Author: rhs $, $DateTime: 2002/10/16 13:29:13 $";
 
     private static final Logger s_log =
         Logger.getLogger(BaseMDSQLGenerator.class);
@@ -376,43 +376,20 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
         Event oe = getSuperEvent(type, CompoundType.INSERT, ev);
 
-        if ((type.getReferenceKey() == null) && (type.getSupertype() != null)) {
-            return oe;
-        }
-
         while (!pq.isEmpty()) {
             String tableName = (String)pq.dequeue();
-            Iterator cols = ((Map)columnMap.get(tableName))
-                .entrySet().iterator();
-
-            StringBuffer sb = new StringBuffer();
-            StringBuffer tmp = new StringBuffer();
-            boolean first = true;
-
-            sb.append("insert into ")
-                .append(tableName)
-                .append("(\n");
-
-            while (cols.hasNext()) {
-                Map.Entry me = (Map.Entry)cols.next();
-
-                if (!first) {
-                    sb.append(", ");
-                    tmp.append(", ");
-                } else {
-                    first = false;
-                }
-
-                sb.append((String)me.getKey());
-                tmp.append((String)me.getValue());
+            Table table = MetadataRoot.getMetadataRoot().getTable(tableName);
+            Map columns = (Map) columnMap.get(tableName);
+            Operation block;
+            if (type.getReferenceKey() == null &&
+                type.getSupertype() != null) {
+                block = makeUpdate(type, table, columns);
+            } else {
+                block = makeInsert(type, table, columns);
             }
 
-            sb.append("\n) values (\n")
-                .append(tmp.toString())
-                .append(")");
+            if (block == null) { continue; }
 
-            Operation block = new Operation(sb.toString());
-            block.setLineInfo(type);
             oe.addOperation(block);
         }
 
@@ -438,52 +415,12 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
         Event oe = getSuperEvent(type, CompoundType.UPDATE, ev);
 
-        if ((type.getReferenceKey() == null) && (type.getSupertype() != null)) {
-            return oe;
-        }
-
         while (!pq.isEmpty()) {
             String tableName = (String)pq.dequeue();
-            Iterator cols = ((Map)columnMap.get(tableName))
-                .entrySet().iterator();
-
-            StringBuffer sb = new StringBuffer();
-            String where = null;
-            boolean first = true;
-
-            sb.append("update ")
-                .append(tableName)
-                .append(" set \n");
-
-            while (cols.hasNext()) {
-                Map.Entry me = (Map.Entry)cols.next();
-                String value = (String)me.getValue();
-
-                if (value.equals(":" + Utilities.getKeyProperty(type).getName())) {
-                    where = (String)me.getKey() + " = " + value;
-                } else {
-                    if (!first) {
-                        sb.append(",\n");
-                    } else {
-                        first = false;
-                    }
-
-                    sb.append((String)me.getKey())
-                        .append(" = ")
-                        .append(value);
-                }
-            }
-
-            // only updating the "id" column or no "id" col, so ignore it
-            if (first || (where == null)) {
-                continue;
-            }
-
-            sb.append("\nwhere ")
-                .append(where);
-
-            Operation block = new Operation(sb.toString());
-            block.setLineInfo(type);
+            Table table = MetadataRoot.getMetadataRoot().getTable(tableName);
+            Map columns = (Map) columnMap.get(tableName);
+            Operation block = makeUpdate(type, table, columns);
+            if (block == null) { continue; }
             oe.addOperation(block);
         }
 
@@ -1526,6 +1463,91 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
         }
 
         return columns;
+    }
+
+    private Operation makeInsert(ObjectType type, Table table, Map columns) {
+        StringBuffer sb = new StringBuffer();
+        StringBuffer tmp = new StringBuffer();
+        boolean first = true;
+
+        sb.append("insert into ")
+            .append(table.getName())
+            .append("\n(");
+
+        for (Iterator it = columns.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry me = (Map.Entry)it.next();
+
+            if (!first) {
+                sb.append(", ");
+                tmp.append(", ");
+            } else {
+                first = false;
+            }
+
+            sb.append((String)me.getKey());
+            tmp.append((String)me.getValue());
+        }
+
+        sb.append(")\nvalues\n(")
+            .append(tmp.toString())
+            .append(")");
+
+        Operation block = new Operation(sb.toString());
+        block.setLineInfo(type);
+        return block;
+    }
+
+    private Operation makeUpdate(ObjectType type, Table table, Map columns) {
+        StringBuffer sb = new StringBuffer();
+        boolean first = true;
+
+        sb.append("update ")
+            .append(table.getName())
+            .append("\nset ");
+
+        for (Iterator it = columns.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry me = (Map.Entry)it.next();
+            String column = (String)me.getKey();
+            String value = (String)me.getValue();
+
+            if (table.getColumn(column) != null &&
+                table.getColumn(column).isPrimaryKey()) {
+                continue;
+            }
+
+            if (!first) {
+                sb.append(",\n   ");
+            } else {
+                first = false;
+            }
+
+            sb.append(column)
+                .append(" = ")
+                .append(value);
+        }
+
+        // only updating the "id" column or no "id" col, so ignore it
+        if (first) {
+            return null;
+        }
+
+        if (table.getPrimaryKey() == null) {
+            return null;
+        }
+
+        if (table.getPrimaryKey().getColumns().length > 1) {
+            return null;
+        }
+
+        Column key = table.getPrimaryKey().getColumns()[0];
+
+        sb.append("\nwhere ")
+            .append(key.getName() + " = :" +
+                    Utilities.getKeyProperty(type).getName());
+
+        Operation block = new Operation(sb.toString());
+        block.setLineInfo(type);
+        return block;
     }
 
 }
