@@ -29,10 +29,10 @@ import org.apache.log4j.Logger;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/07/29 $
+ * @version $Revision: #12 $ $Date: 2003/07/31 $
  */
 public class FilterTest extends PersistenceTestCase {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/FilterTest.java#11 $ by $Author: rhs $, $DateTime: 2003/07/29 17:09:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/FilterTest.java#12 $ by $Author: ashah $, $DateTime: 2003/07/31 17:03:57 $";
 
     private static Logger s_log =
         Logger.getLogger(FilterTest.class.getName());
@@ -381,6 +381,15 @@ public class FilterTest extends PersistenceTestCase {
                lowerSize + upperSize == bothSize);
     }
 
+    public void testCompoundFilterOrSameName() {
+        DataQuery q = getDefaultQuery();
+        FilterFactory ff = q.getFilterFactory();
+        CompoundFilter or = ff.or();
+        or.addFilter(ff.equals("action", "create"));
+        or.addFilter(ff.equals("action", "delete"));
+        q.addFilter(or);
+        assertEquals("must have 10 rows in query", 10, q.size());
+    }
 
     /**
      *  This tests ANDing filters together

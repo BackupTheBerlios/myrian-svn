@@ -10,12 +10,12 @@ import java.sql.*;
  * OracleWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/07/08 $
+ * @version $Revision: #2 $ $Date: 2003/07/31 $
  **/
 
 public class OracleWriter extends ANSIWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/OracleWriter.java#1 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/OracleWriter.java#2 $ by $Author: ashah $, $DateTime: 2003/07/31 17:03:57 $";
 
     private static final Expression and(Expression left, Expression right) {
         if (left == null) { return right; }
@@ -50,24 +50,22 @@ public class OracleWriter extends ANSIWriter {
     public void write(Select select) {
         boolean offlimits = (select.getOffset() != null
                              || select.getLimit() != null);
-        if (offlimits) {
-            write("select * from (\n");
-        }
+        boolean offlimitsAndCount = select.isCount() && offlimits;
 
-        writeSelect(select);
+        if (offlimitsAndCount) {
+            write("select count(*) from (");
+            write("select rownum as rownum__");
+        } else if (offlimits) {
+            write("select * from (");
+            write("select ranged__.*, rownum as rownum__ from (\n");
+            writeSelect(select);
+        } else {
+            writeSelect(select);
+        }
 
         Collection sels = select.getSelections();
         Join join = select.getJoin();
         Expression filter = select.getFilter();
-
-        if (offlimits) {
-            if (sels.size() == 0) {
-                write(", ");
-            } else {
-                write(",\n       ");
-            }
-            write("rownum as rownum__");
-        }
 
         write("\nfrom ");
         write(join);
@@ -81,8 +79,10 @@ public class OracleWriter extends ANSIWriter {
 
         writeOrder(select);
 
-        if (offlimits) {
+        if (offlimitsAndCount) {
             write(")\nwhere ");
+        } else if (offlimits) {
+            write(") ranged__)\nwhere ");
         }
 
         if (select.getOffset() != null) {
@@ -105,7 +105,9 @@ public class OracleWriter extends ANSIWriter {
             write("rownum__ <= " + upper);
         }
 
-        if (select.isCount()) {
+        if (offlimitsAndCount) {
+            // do nothing
+        } else if (select.isCount()) {
             write("\n) count__");
         }
     }

@@ -38,11 +38,11 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/07/02 $
+ * @version $Revision: #13 $ $Date: 2003/07/31 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#12 $ by $Author: ashah $, $DateTime: 2003/07/02 11:25:25 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#13 $ by $Author: ashah $, $DateTime: 2003/07/31 17:03:57 $";
 
     private static Logger s_log =
         Logger.getLogger(DataQueryImplTest.class.getName());
@@ -720,6 +720,50 @@ public class DataQueryImplTest extends DataQueryTest {
         query.close();
     }
 
+    public void testSetRangeWithOrder() {
+        DataQuery query = getDefaultQuery();
+        query.addOrder("action");
+        query.setRange(new Integer(6), new Integer(11));
+        int i = 0;
+        while (query.next()) {
+            i++;
+            assertEquals("delete", query.get("action"));
+        }
+        assertTrue("incorrect number of rows returned", i == 5);
+    }
+
+    public void testSetRangeWithFilterWithOrder() {
+        DataQuery[] qs = { getDefaultQuery(), getDefaultQuery() };
+        for (int i = 0; i < qs.length; i++) {
+            qs[i].addFilter("id >= 10");
+            qs[i].setRange(new Integer(5), new Integer(7));
+        }
+
+        // test both just in case one direction is lucky and happens to
+        // be the default order returned by db
+        qs[0].addOrder("action asc");
+        qs[1].addOrder("action desc");
+
+         assertTrue(qs[0].next());
+         assertEquals("create", qs[0].get("action"));
+         assertTrue(qs[0].next());
+         assertEquals("delete", qs[0].get("action"));
+         assertTrue(qs[0].next() == false);
+         if (qs[0].next()) { fail("query should return 2 rows"); }
+
+         assertTrue(qs[1].next());
+         assertEquals("delete", qs[1].get("action"));
+         assertTrue(qs[1].next());
+         assertEquals("create", qs[1].get("action"));
+         if (qs[1].next()) { fail("query should return 2 rows"); }
+    }
+
+    public void testSetRangeWithFilterWithCount() {
+        DataQuery query = getDefaultQuery();
+        query.addEqualsFilter("action", "create");
+        query.setRange(new Integer(5), new Integer(100));
+        assertTrue("wrong size", query.size() == 1);
+    }
 
     /**
      *  This tests how we change null and makes sure that we only

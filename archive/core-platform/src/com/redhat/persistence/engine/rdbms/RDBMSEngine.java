@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/07/20 $
+ * @version $Revision: #5 $ $Date: 2003/07/31 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#4 $ by $Author: rhs $, $DateTime: 2003/07/20 15:05:30 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#5 $ by $Author: ashah $, $DateTime: 2003/07/31 17:03:57 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -204,8 +204,8 @@ public class RDBMSEngine extends Engine {
     }
 
     public RecordSet execute(Query query, SQLBlock block) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Executing " + query);
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Executing " + query);
         }
         QGen qg = new QGen(query, block);
         Select sel = qg.generate();
@@ -218,8 +218,8 @@ public class RDBMSEngine extends Engine {
     }
 
     public long size(Query query, SQLBlock block) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Executing size " + query);
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Executing size " + query);
         }
         QGen qg = new QGen(query, block);
         Select sel = qg.generate();
@@ -246,8 +246,8 @@ public class RDBMSEngine extends Engine {
                     throw new IllegalStateException
                         ("count returned too many rows");
                 }
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("size = " + result);
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("size = " + result);
                 }
                 return result;
             } catch (SQLException e) {
@@ -391,11 +391,11 @@ public class RDBMSEngine extends Engine {
 
             String sql = w.getSQL();
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(sql);
-                LOG.debug(w.getBindings());
-                LOG.debug(w.getTypeNames());
-                LOG.debug(op.getEnvironment());
+            if (LOG.isInfoEnabled()) {
+                LOG.info(sql);
+                LOG.info(w.getBindings());
+                LOG.info(w.getTypeNames());
+                LOG.info(op.getEnvironment());
             }
 
 
@@ -431,8 +431,8 @@ public class RDBMSEngine extends Engine {
                     int updateCount = ps.getUpdateCount();
                     if (cycle != null) { cycle.endExecute(updateCount); }
 
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug(updateCount + " rows affected");
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info(updateCount + " rows affected");
                     }
 
                     if (cycle != null) { cycle.beginClose(); }
