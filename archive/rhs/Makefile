@@ -15,14 +15,7 @@ CLASSPATH:=$(CLASSPATH):$(SOURCEPATH)
 
 JSTAMPS:=$(SOURCES:%=$(BUILD)/%.jstamp)
 
-PKGS:=com.arsdigita.db com.arsdigita.persistence
-PKGS:=$(PKGS) com.arsdigita.persistence.metadata com.arsdigita.persistence.pdl
-PKGS:=$(PKGS) com.arsdigita.util.cmd com.redhat.persistence
-PKGS:=$(PKGS) com.redhat.persistence.common com.redhat.persistence.engine
-PKGS:=$(PKGS) com.redhat.persistence.engine.rdbms com.redhat.persistence.metadata
-PKGS:=$(PKGS) com.redhat.persistence.oql com.redhat.persistence.pdl
-PKGS:=$(PKGS) com.redhat.persistence.pdl.adapters com.redhat.persistence.pdl.nodes
-PKGS:=$(PKGS) com.redhat.persistence.profiler com.redhat.persistence.profiler.rdbms
+PKGS:=$(shell find $(SOURCES) -type d -exec sh -c "find {} -maxdepth 1 -type f | fgrep -q .java" \; -printf "%P\n" | sort -u | sed s@/@.@g)
 JD:=javadoc
 JD_SOURCEPATH:=-sourcepath src:cap/src
 JD_INCLUDES:=-version -author
