@@ -11,8 +11,8 @@
 -- or implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/setup.pg.sql#1 $
--- $DateTime: 2004/05/05 16:10:50 $
+-- $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/setup.pg.sql#2 $
+-- $DateTime: 2004/05/25 17:44:35 $
 
 
 --
@@ -20,8 +20,10 @@
 -- tests to run.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #1 $ $Date: 2004/05/05 $
+-- @version $Revision: #2 $ $Date: 2004/05/25 $
 --
+
+create view dual as select 1;
 
 @@ data-operation-test.sql
 @@ aggressive-test.sql

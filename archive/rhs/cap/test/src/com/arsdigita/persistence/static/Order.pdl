@@ -11,8 +11,8 @@
 // or implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/static/Order.pdl#1 $
-// $DateTime: 2004/05/03 13:36:20 $
+// $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/static/Order.pdl#2 $
+// $DateTime: 2004/05/25 17:44:35 $
 model examples;
 
 object type Order {
@@ -146,8 +146,6 @@ object type OrderExt extends Order {
     String[1..1]   text;
 
     retrieve {
-        super;
-
         do {
             select *
             from t_orders_ext
@@ -158,8 +156,6 @@ object type OrderExt extends Order {
     }
 
     insert {
-        super;
-
         do {
             insert into t_orders_ext
             (order_id, text)
@@ -169,8 +165,6 @@ object type OrderExt extends Order {
     }
 
     update {
-        super;
-
         do {
             update t_orders_ext
             set text = :text
@@ -180,7 +174,6 @@ object type OrderExt extends Order {
 
     delete {
         do { delete from t_orders_ext where order_id = :id }
-        super;
     }
 
 }
@@ -414,8 +407,6 @@ object type OrderExtWithFailingRetrieve extends Order {
 
     // this is supposed to fail per SDM ticket 147567
     retrieve {
-        super;
-
         do {
             select *
             from t_orders_ext
@@ -427,16 +418,10 @@ object type OrderExtWithFailingRetrieve extends Order {
         }
     }
 
-    insert {
-        super;
-    }
+    insert {}
 
-    update {
-        super;
-    }
+    update {}
 
-    delete {
-        super;
-    }
+    delete {}
 
 }

@@ -11,8 +11,8 @@
 // or implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/static/Party.pdl#1 $
-// $DateTime: 2004/05/03 13:36:20 $
+// $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/static/Party.pdl#2 $
+// $DateTime: 2004/05/25 17:44:35 $
 model examples;
 
 object type Party {
@@ -80,8 +80,6 @@ object type User extends Party {
     }
 
     insert {
-        super;
-
         do {
             insert into t_users
             (user_id, first_name, last_names, bio)
@@ -91,8 +89,6 @@ object type User extends Party {
     }
 
     update {
-        super;
-
         do {
             update t_users
             set first_name = :firstName,
@@ -107,8 +103,6 @@ object type User extends Party {
             delete from t_users
             where user_id = :id
         }
-
-        super;
     }
 }
 
@@ -123,8 +117,6 @@ object type Group extends Party {
     String[1..1] name;
 
     retrieve {
-        super;
-
         do {
             select name
             from t_groups
@@ -135,8 +127,6 @@ object type Group extends Party {
     }
 
     insert {
-        super;
-
         do {
             insert into t_groups
             (group_id, name)
@@ -146,8 +136,6 @@ object type Group extends Party {
     }
 
     update {
-        super;
-
         do {
             update t_groups
             set name = :name
@@ -160,8 +148,6 @@ object type Group extends Party {
             delete from t_groups
             where group_id = :id
         }
-
-        super;
     }
 }
 
