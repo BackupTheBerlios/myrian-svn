@@ -82,6 +82,18 @@
   </test>
 
   <test>
+    <query>query(filter(all(test.Node), exists(children)), id = id)</query>
+    <query>query(filter(all(test.StaticNode), exists(children)), id = id)</query>
+    <results>
+      <row id="30"/>
+      <row id="33"/>
+      <row id="36"/>
+      <row id="37"/>
+      <row id="38"/>
+    </results>
+  </test>
+
+  <test>
     <query>query(all(test.Node).parent, id = id)</query>
     <query>query(all(test.StaticNode).parent, id = id)</query>
     <results>
