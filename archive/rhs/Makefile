@@ -5,7 +5,7 @@ space:=$(empty) $(empty)
 
 JAVACC=java -cp javacc/JavaCC.zip COM.sun.labs.javacc.Main
 
-SOURCES:=src test/src cap/src
+SOURCES:=src test/src cap/src cap/test/src
 
 SOURCEPATH:=$(subst $(space),:,$(SOURCES:%=$(BUILD)/%))
 

@@ -1,0 +1,40 @@
+//
+// Copyright (C) 2001-2004 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the
+// License at http://www.redhat.com/licenses/ccmpl.html.
+//
+// Software distributed under the License is distributed on an
+// "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+// or implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/pdl/aggressiveLoad.pdl#1 $
+// $DateTime: 2004/05/03 11:48:01 $
+model aggressiveLoad;
+
+object type Color {
+    BigDecimal[1..1] id = agg_colors.color_id INTEGER;
+    String[1..1] name = agg_colors.name VARCHAR(100);
+
+    object key(id);
+}
+
+object type User {
+    BigDecimal[1..1] id = agg_users.user_id INTEGER;
+    String[1..1] name = agg_users.name VARCHAR(100);
+    Color[1..1] favColor = join agg_users.favorite_color_id to agg_colors.color_id;
+    User[0..1] referer = join agg_users.referer_id to agg_users.user_id;
+    
+    object key (id);
+
+    // test 1..1, 0..1->1..1, and 0..1->0..1
+    aggressive load (
+        favColor.name,
+        referer.name,
+        referer.favColor.name,
+        referer.referer.name
+    );
+}

@@ -43,6 +43,29 @@ public class StringUtils {
     public static final String NEW_LINE = System.getProperty("line.separator");
 
     /**
+     * Tests if a string is empty.
+     * @param s A string to test
+     * @return <code>true</code> if <code>s</code> is null or empty;
+     * otherwise <code>false</code>
+     */
+    public final static boolean emptyString(String s) {
+        boolean expr = (s == null || s.length() == 0);
+        return expr;
+    }
+
+    /**
+     * Tests if a string is empty.
+     * @param o A string to test
+     * @return <code>true</code> if <code>o</code> is null or empty;
+     * otherwise <code>false</code>
+     */
+    public final static boolean emptyString(Object o) {
+        boolean expr =
+            (o == null || (o instanceof String && ((String)o).length() ==0));
+        return expr;
+    }
+
+    /**
      * Convert a string of items separated by a separator
      * character to an array of the items.  sep is the separator
      * character.  Example: Input - s == "cat,house,dog" sep==','
@@ -121,6 +144,35 @@ public class StringUtils {
         }
 
         return result.toString();
+    }
+
+    /**
+     * Strip extra white space from a string.  This replaces any white space
+     * character or consecutive white space characters with a single space.
+     * It is useful when comparing strings that should be equal except for
+     * possible differences in white space.  Example:  input = "I  \ndo\tsee".
+     * Output = "I do see".
+     * @param s string that may contain extra white space
+     * @return string the same as the input, but with extra white space
+     * removed and replaced by a single space.
+     */
+    static public String stripWhiteSpace(String s) {
+        StringBuffer to = new StringBuffer();
+        boolean inSpace = true;
+        boolean isSpace;
+        char c;
+        for (int i=0; i<s.length(); i++) {
+            c = s.charAt(i);
+            isSpace = Character.isWhitespace(c);
+            if (!isSpace) {
+                to.append(c);
+                inSpace = false;
+            } else if (!inSpace) {
+                to.append(' ');
+                inSpace = true;
+            }
+        }
+        return to.toString().trim();
     }
 
 }
