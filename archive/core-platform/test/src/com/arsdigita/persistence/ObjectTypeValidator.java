@@ -25,12 +25,12 @@ import org.apache.log4j.*;
  * ObjectTypeValidator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2003/07/01 $
  */
 
 public class ObjectTypeValidator  {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/ObjectTypeValidator.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/ObjectTypeValidator.java#5 $ by $Author: ashah $, $DateTime: 2003/07/01 13:40:18 $";
     private static final Logger s_log =
         Logger.getLogger(ObjectTypeValidator.class.getName());
     private Session m_session;
@@ -140,6 +140,21 @@ public class ObjectTypeValidator  {
         s_log.info("");
         s_log.info("Making new object for: " + type.getQualifiedName());
         KeyGenerator.setKeyValues(data);
+
+        ObjectType associated = (associatedObject == null)
+            ? null: associatedObject.getObjectType();
+
+        for (Iterator it = type.getKeyProperties(); it.hasNext(); ) {
+            Property prop = (Property) it.next();
+            if (prop.isAttribute()) { continue; }
+
+            DataType propType = prop.getType();
+            if (propType.equals(associated)) {
+                data.set(prop.getName(), associatedObject);
+            } else {
+                makeChild(prop, data);
+            }
+        }
 
         PropertyManipulator.NonKeyManipulator manip =
             new PropertyManipulator.NonKeyManipulator(type) {

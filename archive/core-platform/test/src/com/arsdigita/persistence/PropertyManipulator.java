@@ -40,11 +40,11 @@ import org.apache.log4j.*;
  * for common cases as Attribute Properties, Key Properties, etc.
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2003/07/01 $
  */
 public class PropertyManipulator {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PropertyManipulator.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PropertyManipulator.java#5 $ by $Author: ashah $, $DateTime: 2003/07/01 13:40:18 $";
     private static final Logger s_log =
         Logger.getLogger(PropertyManipulator.class.getName());
     static  {
@@ -124,32 +124,12 @@ public class PropertyManipulator {
     }
 
     /**
-     * Specialization of ComponentManipulator.
-     * obeys is true for non Collection Component properties.
-     */
-    public static abstract class SingleComponentManipulator extends ComponentManipulator {
-        public boolean obeys(Property p) {
-            return super.obeys(p) && !p.isCollection();
-        }
-    }
-
-    /**
-     * Specialization of ComponentManipulator.
-     * obeys is true for non Component properties that are a Collection.
-     */
-    public static abstract class MultiComponentManipulator extends ComponentManipulator {
-        public boolean obeys(Property p) {
-            return super.obeys(p) && p.isCollection();
-        }
-    }
-
-    /**
      * Partial implementation of PredicateManipulator.
      * obeys is true for Associations, defined as non component RoleReferences.
      */
     public static abstract class AssociationManipulator implements PredicateManipulator {
         public boolean obeys(Property p) {
-            return p.isRole() && !p.isComponent();
+            return p.isRole() && !p.isComponent() && !p.isKeyProperty();
         }
     }
 
