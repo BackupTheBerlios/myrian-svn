@@ -14,12 +14,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/06 $
+ * @version $Revision: #7 $ $Date: 2002/08/09 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#6 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#7 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
 
     private static final Category s_log =
         Category.getInstance(QueryTest.class);
@@ -215,7 +215,7 @@ public class QueryTest extends PersistenceTestCase {
         MetadataRoot root = MetadataRoot.getMetadataRoot();
         Table table = root.getTable(tableName);
         assertTrue("No such table: " + tableName, table != null);
-        compare(table.getName() + ".sql", table.getSQL());
+        compare(table.getName() + ".sql", table.getSQL(false));
     }
 
     public void testTest() {

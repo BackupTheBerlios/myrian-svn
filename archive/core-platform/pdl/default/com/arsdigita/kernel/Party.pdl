@@ -35,6 +35,7 @@ object type Party extends ACSObject {
 object type PartyEmail {
     BigDecimal partyID = party_email_map.party_id INTEGER;
     String[1..1] emailAddress = party_email_map.email_address VARCHAR(100);
+
     object key (partyID, emailAddress);
 
     insert {
@@ -63,8 +64,9 @@ object type PartyEmail {
 }
 
 association {
-    Party[1..1] party;
-    component PartyEmail[0..n] emailAddresses;
+    Party[1..1] party = join party_email_map.party_id to parties.party_id;
+    component PartyEmail[0..n] emailAddresses = join parties.party_id
+                                                  to party_email_map.party_id;
 
     retrieve emailAddresses {
       do {

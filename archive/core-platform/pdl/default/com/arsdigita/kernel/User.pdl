@@ -16,7 +16,7 @@ model com.arsdigita.kernel;
 
 object type User extends Party {
     PersonName[1..1] name = join users.name_id to person_names.name_id;
-    String screenName = users.screen_name VARCHAR(100);
+    unique String screenName = users.screen_name VARCHAR(100);
 
     reference key (users.user_id);
 

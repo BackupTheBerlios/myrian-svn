@@ -20,7 +20,7 @@ model com.arsdigita.kernel;
 // to an application instance.
 //
 // @author <a href="mailto:bquinn@arsdigita.com">Bryan Quinn</a>
-// @version "$Id: //core-platform/dev/pdl/default/com/arsdigita/kernel/SiteNode.pdl#4 $" 
+// @version "$Id: //core-platform/dev/pdl/default/com/arsdigita/kernel/SiteNode.pdl#5 $" 
 //
 
 object type SiteNode extends ACSObject {
@@ -28,12 +28,12 @@ object type SiteNode extends ACSObject {
     String url = site_nodes.url VARCHAR(4000);
     
     // If true, it is legal to create child nodes. 
-    Boolean[1..1] isDirectory = site_nodes.directory_p CHAR(1);
+    Boolean[1..1] isDirectory = site_nodes.directory_p BIT;
 
     // If true, URLs that are logical children of this node should
     // be mapped to this node, e.g. "www.arsdigita.com/news/item123" 
     // would be mapped to this node still.
-    Boolean[1..1] isPattern = site_nodes.pattern_p CHAR(1);
+    Boolean[1..1] isPattern = site_nodes.pattern_p BIT;
 
     SiteNode[0..1] parent = join site_nodes.parent_id to site_nodes.node_id;
 
@@ -47,6 +47,8 @@ object type SiteNode extends ACSObject {
                                       to acs_stylesheet_node_map.node_id,
                                     join acs_stylesheet_node_map.stylesheet_id
                                       to acs_stylesheets.stylesheet_id;
+
+    unique (parent, name);
 
     reference key ( site_nodes.node_id );
 

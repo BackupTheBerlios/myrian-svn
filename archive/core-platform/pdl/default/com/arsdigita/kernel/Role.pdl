@@ -24,13 +24,14 @@ object type Role {
     Group[1..1]      sourceGroup = join roles.group_id to groups.group_id;
 
     // The group which stores members in this role
-    Group[1..1]      implicitGroup = join roles.implicit_group_id
-                                       to groups.group_id;
+    composite Group[1..1]      implicitGroup = join roles.implicit_group_id
+                                                 to groups.group_id;
 
     // A textual description of this role
     String[0..1]     description = roles.description VARCHAR(4000);
 
     object key (roleId);
+    unique (sourceGroup, name);
 
     // we don't want to be able to add or remove the source or implicit groups
     add sourceGroup { }

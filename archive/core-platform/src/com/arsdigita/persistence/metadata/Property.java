@@ -28,7 +28,7 @@ import java.util.*;
  * REQUIRED, and COLLECTION.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/07 $
+ * @version $Revision: #7 $ $Date: 2002/08/09 $
  **/
 
 public class Property extends Element {
@@ -82,7 +82,7 @@ public class Property extends Element {
         "[0..n]"
     };
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#6 $ by $Author: rhs $, $DateTime: 2002/08/07 20:10:44 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#7 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
 
     /**
      * The container type of the property.
@@ -330,7 +330,6 @@ public class Property extends Element {
         return m_multiplicity == REQUIRED;
     }
 
-
     /**
      * Returns true if this property is a component.
      *
@@ -384,6 +383,20 @@ public class Property extends Element {
      */
     public JoinPath getJoinPath() {
         return m_joinPath;
+    }
+
+    Column getKeyColumn() {
+        if (m_column != null) {
+            return m_column;
+        }
+
+        if (m_joinPath != null &&
+            !isCollection() &&
+            m_joinPath.getPath().size() == 1) {
+            return m_joinPath.getJoinElement(0).getFrom();
+        }
+
+        return null;
     }
 
  
@@ -635,10 +648,18 @@ public class Property extends Element {
             boolean cascade = false;
             switch (m_joinPath.getPath().size()) {
             case 1:
-                if (m_joinPath.getJoinElement(0).getFrom().isUniqueKey()) {
+                JoinElement je = m_joinPath.getJoinElement(0);
+                if (je.getFrom().isUniqueKey() && !je.getTo().isUniqueKey()) {
                     cascade = isComponent();
-                } else {
+                } else if (je.getFrom().isUniqueKey() &&
+                           je.getTo().isUniqueKey()) {
+                    cascade = isComposite() || isComponent();
+                } else if (!je.getFrom().isUniqueKey() &&
+                           je.getTo().isUniqueKey()) {
                     cascade = isComposite();
+                } else if (!je.getTo().isUniqueKey() &&
+                           !je.getFrom().isUniqueKey()) {
+                    // Should this be a warning?
                 }
                 break;
             case 2:
@@ -650,7 +671,7 @@ public class Property extends Element {
                 break;
             }
 
-            m_joinPath.generateForeignKeys(cascade);
+            m_joinPath.generateForeignKeys(cascade, isCollection());
         }
     }
 

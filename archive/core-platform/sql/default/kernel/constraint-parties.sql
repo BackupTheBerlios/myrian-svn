@@ -1,8 +1,0 @@
---     In order to work around some optimization issues with MDSQL,
---     we won't bother introducing this foreign key constraint
---     as it introduces circular dependencies between party and 
---     party_email_map.
---
--- alter table parties add constraint parties_primary_email_fk 
---   foreign key (party_id, primary_email) 
---       references party_email_map (party_id, email_address);

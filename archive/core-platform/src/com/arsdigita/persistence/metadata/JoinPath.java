@@ -27,7 +27,7 @@ import java.io.PrintStream;
  * particular columns to join, and in what order.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#5 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#6 $
  * @since 4.6
  *
  * @invariant getPath() != null 
@@ -35,7 +35,7 @@ import java.io.PrintStream;
 
 public class JoinPath extends Element {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#5 $ by $Author: rhs $, $DateTime: 2002/08/07 15:23:06 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#6 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
 
     private List m_path;
     // a List of JoinElements
@@ -137,31 +137,59 @@ public class JoinPath extends Element {
         }
     }
 
-    void generateForeignKeys(boolean cascade) {
-        for (int i = 0; i < m_path.size(); i++) {
-            JoinElement je = getJoinElement(i);
-            if (je.getTo().isUniqueKey() && !je.getFrom().isForeignKey()) {
-                new ForeignKey(null, je.getFrom(), je.getTo(), cascade);
-            } else if (je.getFrom().isUniqueKey() &&
-                       !je.getTo().isForeignKey()) {
-                new ForeignKey(null, je.getTo(), je.getFrom(), cascade);
+    void generateForeignKeys(boolean cascade, boolean isCollection) {
+        if (m_path.size() == 1) {
+            JoinElement je = getJoinElement(0);
+            if (isCollection) {
+                if (je.getFrom().isUniqueKey() &&
+                    !je.getTo().isForeignKey()) {
+                    new ForeignKey(null, je.getTo(), je.getFrom(), cascade);
+                }
+            } else {
+                if (je.getTo().isUniqueKey() &&
+                    !je.getFrom().isForeignKey()) {
+                    new ForeignKey(null, je.getFrom(), je.getTo(), cascade);
+                }
             }
-        }
-
-        if (m_path.size() == 2) {
+        } else if (m_path.size() == 2) {
             JoinElement first = getJoinElement(0);
             JoinElement second = getJoinElement(1);
 
+            // Set up foreign keys
             if (first.getFrom().isUniqueKey() &&
                 second.getTo().isUniqueKey()) {
-                Column[] cols = new Column[] {first.getTo(),
-                                              second.getFrom()};
-                if (cols[0] == cols[1]) {
-                    cols[0].error("Duplicate column");
+                if (!first.getTo().isForeignKey()) {
+                    new ForeignKey(null, first.getTo(), first.getFrom(),
+                                   cascade);
                 }
-                Table table = first.getTo().getTable();
-                if (table.getPrimaryKey() == null) {
-                    table.setPrimaryKey(new UniqueKey(table, null, cols));
+                if (!second.getFrom().isForeignKey()) {
+                    new ForeignKey(null, second.getFrom(), second.getTo(),
+                                   cascade);
+                }
+            }
+                
+
+            // Set up unique keys
+            if (isCollection) {
+                if (first.getFrom().isUniqueKey() &&
+                    second.getTo().isUniqueKey()) {
+                    Column[] cols = new Column[] {first.getTo(),
+                                                  second.getFrom()};
+                    if (cols[0] == cols[1]) {
+                        cols[0].error("Duplicate column");
+                    }
+                    Table table = first.getTo().getTable();
+                    if (table.getPrimaryKey() == null) {
+                        table.setPrimaryKey(new UniqueKey(table, null, cols));
+                    }
+                }
+            } else {
+                if (first.getFrom().isUniqueKey()) {
+                    Table table = first.getTo().getTable();
+                    if (table.getPrimaryKey() == null) {
+                        table.setPrimaryKey(new UniqueKey(null,
+                                                          first.getTo()));
+                    }
                 }
             }
         }

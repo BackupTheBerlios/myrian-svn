@@ -1,3 +1,5 @@
+@@ ../build/sql/create.sql
+
 @@ default/globalization/table-g11n_charsets.sql
 @@ default/globalization/index-g11n_charsets.sql
 @@ default/globalization/table-g11n_locales.sql
@@ -16,28 +18,16 @@
 
 
 @@ default/kernel/sequence-acs_object_id_seq.sql
-@@ default/kernel/table-acs_objects.sql
 @@ default/kernel/index-acs_objects.sql
-@@ default/kernel/table-object_container_map.sql
 @@ default/kernel/index-object_container_map.sql
 
-@@ default/kernel/table-email_addresses.sql
 @@ default/kernel/comment-email_addresses.sql
-@@ default/kernel/table-parties.sql
 @@ default/kernel/index-parties.sql
 @@ default/kernel/comment-parties.sql
-@@ default/kernel/table-party_email_map.sql
 @@ default/kernel/comment-party_email_map.sql
-@@ default/kernel/constraint-parties.sql
-@@ default/kernel/table-person_names.sql
 @@ default/kernel/comment-person_names.sql
-@@ default/kernel/table-users.sql
 @@ default/kernel/comment-users.sql
 
-@@ default/kernel/table-groups.sql
-@@ default/kernel/table-group_member_map.sql
-@@ default/kernel/table-group_subgroup_map.sql
-@@ default/kernel/table-roles.sql
 @@ default/kernel/index-roles.sql
 @@ default/kernel/comment-roles.sql
 
@@ -51,16 +41,10 @@
 @@ default/kernel/view-group_member_trans_map.sql
 @@ default/kernel/view-party_member_trans_map.sql
 
-@@ default/kernel/table-user_authentication.sql
-
-@@ default/kernel/table-acs_privileges.sql
 @@ default/kernel/comment-acs_privileges.sql
-@@ default/kernel/table-parameterized_privileges.sql
 @@ default/kernel/insert-privileges.sql
-@@ oracle-se/kernel/table-acs_permissions.sql
 @@ default/kernel/comment-acs_permissions.sql
 
-@@ default/kernel/table-object_context.sql
 @@ default/kernel/comment-object_context.sql
 @@ default/kernel/insert-object_zero.sql
 
@@ -86,25 +70,13 @@
 @@ oracle-se/kernel/view-ungranted_trans_context_map.sql
 @@ default/kernel/view-object_context_trans_map.sql
 
-@@ default/kernel/table-site_nodes.sql
 @@ default/kernel/index-site_nodes.sql
-@@ default/kernel/table-apm_package_types.sql
-@@ default/kernel/table-apm_listeners.sql
-@@ default/kernel/table-apm_package_type_listener_map.sql
-@@ default/kernel/table-apm_packages.sql
 @@ default/kernel/index-apm_packages.sql
 @@ default/kernel/view-object_package_map.sql
 
-@@ default/kernel/table-acs_stylesheets.sql
 @@ default/kernel/index-acs_stylesheets.sql
-@@ default/kernel/table-acs_stylesheet_type_map.sql
 @@ default/kernel/index-acs_stylesheet_type_map.sql
-@@ default/kernel/table-acs_stylesheet_node_map.sql
 @@ default/kernel/index-acs_stylesheet_node_map.sql
-
-@@ default/kernel/table-note_themes.sql
-@@ default/kernel/table-notes.sql
-@@ default/kernel/table-theme_stylesheet_map.sql
 
 @@ default/categorization/table-cat_categories.sql
 @@ default/categorization/comment-cat_categories.sql
@@ -240,3 +212,4 @@
 
 @@ default/kernel/index-foreign_keys.sql 
 
+@@ ../build/sql/deferred.sql

@@ -6,12 +6,12 @@ import java.util.*;
  * UniqueKey
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/08/06 $
+ * @version $Revision: #2 $ $Date: 2002/08/09 $
  **/
 
 public class UniqueKey extends Constraint {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/UniqueKey.java#1 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/UniqueKey.java#2 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
 
     private Column[] m_columns;
     private Set m_foreignKeys = new HashSet();
@@ -46,7 +46,7 @@ public class UniqueKey extends Constraint {
         m_foreignKeys.add(fk);
     }
 
-    boolean isDeffered() {
+    boolean isDeferred() {
         return false;
     }
 

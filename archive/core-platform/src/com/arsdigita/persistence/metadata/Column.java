@@ -26,12 +26,12 @@ import java.util.*;
  * the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/06 $
+ * @version $Revision: #4 $ $Date: 2002/08/09 $
  */
 
 public class Column extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Column.java#3 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Column.java#4 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
 
     /**
      * The table this Column belongs to.
@@ -397,7 +397,7 @@ public class Column extends Element {
         return result;
     }
 
-    public String getInlineSQL() {
+    String getInlineSQL(boolean defer) {
         StringBuffer result = new StringBuffer();
 
         result.append("    " + m_name + " ");
@@ -424,7 +424,8 @@ public class Column extends Element {
 
         for (Iterator it = m_constraints.iterator(); it.hasNext(); ) {
             Constraint con = (Constraint) it.next();
-            if (con.getColumns().length == 1 && !con.isDeffered()) {
+            if (con.getColumns().length == 1 && (!defer ||
+                                                 !con.isDeferred())) {
                 result.append("\n");
                 result.append(con.getColumnSQL());
             }
@@ -457,11 +458,11 @@ public class Column extends Element {
         return false;
     }
 
-    boolean hasDefferedConstraints() {
+    boolean hasDeferredConstraints() {
         for (Iterator it = m_constraints.iterator(); it.hasNext(); ) {
             Constraint con = (Constraint) it.next();
             if (con.getColumns().length == 1) {
-                if (con.isDeffered()) {
+                if (con.isDeferred()) {
                     return true;
                 }
             }
@@ -471,8 +472,8 @@ public class Column extends Element {
     }
 
     public String getSQL() {
-        return "alter table " + m_table.getName() + " (\n" + getInlineSQL() +
-            "\n);";
+        return "alter table " + m_table.getName() + " (\n" +
+            getInlineSQL(false) + "\n);";
     }
 
 }

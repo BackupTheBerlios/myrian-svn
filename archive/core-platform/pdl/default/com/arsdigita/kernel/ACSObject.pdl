@@ -22,7 +22,7 @@ object type ACSObject {
     String[1..1] displayName = acs_objects.display_name VARCHAR(200);
 
     // <font color="red">Experimental</font>
-    String[1..1] defaultDomainClass = acs_objects.default_domain_class VARCHAR(100);
+    String[0..1] defaultDomainClass = acs_objects.default_domain_class VARCHAR(100);
 
     // <font color="red">Experimental</font>
     // The value of this property is maintained automatically by

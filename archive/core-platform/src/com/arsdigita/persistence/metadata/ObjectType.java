@@ -31,12 +31,12 @@ import com.arsdigita.util.StringUtils;
  * be marked as special "key" properties.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/07 $
+ * @version $Revision: #5 $ $Date: 2002/08/09 $
  **/
 
 public class ObjectType extends CompoundType {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#4 $ by $Author: rhs $, $DateTime: 2002/08/07 15:23:06 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#5 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
 
     private static boolean m_optimizeDefault = true;
 
@@ -70,6 +70,9 @@ public class ObjectType extends CompoundType {
 
     // attributes to be aggressively loaded
     private List m_aggressives = new ArrayList();
+
+    // unique keys
+    private Set m_uniqueKeys = new HashSet();
 
 
     /**
@@ -454,6 +457,31 @@ public class ObjectType extends CompoundType {
 
 
     /**
+     * Marks the specified properties as being part of a unique key for this
+     * object type.
+     **/
+
+    public void addUniqueKey(Property[] properties) {
+        if (hasUniqueKey(properties)) {
+            error("Already has a unique key: " + properties);
+        } else {
+            m_uniqueKeys.add(properties);
+        }
+    }
+
+    public boolean hasUniqueKey(Property[] properties) {
+        for (Iterator it = m_uniqueKeys.iterator(); it.hasNext(); ) {
+            Property[] props = (Property[]) it.next();
+            if (Arrays.equals(props, properties)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
      * @see isSubtypeOf(ObjectType)
      **/
 
@@ -713,6 +741,30 @@ public class ObjectType extends CompoundType {
                 table.setPrimaryKey(new UniqueKey(null, ext));
             }
         }
+
+        for (Iterator it = m_uniqueKeys.iterator(); it.hasNext(); ) {
+            Property[] props = (Property[]) it.next();
+            Column[] cols = new Column[props.length];
+            for (int i = 0; i < props.length; i++) {
+                cols[i] = props[i].getKeyColumn();
+                if (cols[i] == null) {
+                    props[i].error(
+                        "Cannot apply unique constraint to this column."
+                        );
+                }
+            }
+
+            Table table = cols[0].getTable();
+
+            if (table.getUniqueKey(cols) == null) {
+                new UniqueKey(table, null, cols);
+            }
+        }
+
+        /*for (Iterator it = getProperties(); it.hasNext(); ) {
+            Property prop = (Property) it.next();
+            prop.generateUniqueKeys();
+            }*/
     }
 
     void generateForeignKeys() {
@@ -734,7 +786,7 @@ public class ObjectType extends CompoundType {
 
         for (Iterator it = getJoinPaths(); it.hasNext(); ) {
             JoinPath jp = (JoinPath) it.next();
-            jp.generateForeignKeys(true);
+            jp.generateForeignKeys(true, false);
         }
     }
 

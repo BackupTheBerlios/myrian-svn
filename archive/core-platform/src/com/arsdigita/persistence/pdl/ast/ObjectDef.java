@@ -36,12 +36,12 @@ import java.util.Iterator;
  * Outputs a metadata ObjectType.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/06 $
+ * @version $Revision: #6 $ $Date: 2002/08/09 $
  */
 
 public class ObjectDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ObjectDef.java#5 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ObjectDef.java#6 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
 
     // object name
     private String m_name;
@@ -69,6 +69,8 @@ public class ObjectDef extends Element {
 
     // the object's primary key
     private ObjectKeyDef m_key;
+
+    private List m_uniqueKeys = new ArrayList();
 
     // the option block associated with this object type
     private OptionBlock m_options = null;
@@ -215,6 +217,11 @@ public class ObjectDef extends Element {
     public void add(ObjectKeyDef key) {
         m_key = key;
         super.add(m_key);
+    }
+
+    public void add(UniqueKeyDef key) {
+        m_uniqueKeys.add(key);
+        super.add(key);
     }
 
     /**
@@ -472,6 +479,9 @@ mdsqlloop:
             Property prop = pd.generateLogicalModel();
 
             m_type.addProperty(prop);
+            if (pd.isUnique()) {
+                m_type.addUniqueKey(new Property[] { prop });
+            }
         }
 
         if (m_key != null) {
@@ -480,6 +490,11 @@ mdsqlloop:
             m_key.generateKey(m_type);
         } else if ((m_super == null) && (m_props.size() > 0)) {
             error(m_name + " has no object key or super type defined.");
+        }
+
+        for (Iterator it = m_uniqueKeys.iterator(); it.hasNext(); ) {
+            UniqueKeyDef uk = (UniqueKeyDef) it.next();
+            uk.generateKey(m_type);
         }
     }
 

@@ -9,12 +9,12 @@ import java.util.*;
  * DDLWriter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/08/06 $
+ * @version $Revision: #3 $ $Date: 2002/08/09 $
  **/
 
 public class DDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#2 $ by $Author: rhs $, $DateTime: 2002/08/06 18:26:49 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#3 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
 
     private File m_base;
     private boolean m_overwrite;
@@ -50,14 +50,17 @@ public class DDLWriter {
         for (Iterator it = tables.iterator(); it.hasNext(); ) {
             Table table = (Table) it.next();
 
-            File file = new File(m_base, "table-" + table.getName() +
+            File tab = new File(m_base, "table-" + table.getName() +
+                                ".sql");
+            File view = new File(m_base, "view-" + table.getName() +
                                  ".sql");
-            if (!m_overwrite && file.exists()) {
+            if (!m_overwrite && (tab.exists() || view.exists())) {
                 skipped.add(table);
                 continue;
             }
 
-            file = new File(m_base, "table-" + table.getName() + "-auto.sql");
+            File file = new File(m_base, "table-" + table.getName() +
+                                 "-auto.sql");
 
             FileWriter writer = new FileWriter(file);
             writer.write(table.getSQL());
@@ -68,7 +71,7 @@ public class DDLWriter {
         Set deps = new HashSet();
         Set uncreated = new HashSet();
         Set created = new HashSet();
-        Set deffered = new HashSet();
+        Set deferred = new HashSet();
         List createOrder = new ArrayList();
 
         uncreated.addAll(tables);
@@ -88,19 +91,19 @@ public class DDLWriter {
                 if (created.containsAll(deps)) {
                     it.remove();
                     created.add(table);
-                    if (table.isCircular()) {
-                        deffered.add(table);
-                    }
+                    //if (table.isCircular()) {
+                        deferred.add(table);
+                        //}
                     createOrder.add(table);
                 }
             }
 
         } while (created.size() > before);
 
-        if (deffered.size() > 0) {
+        if (deferred.size() > 0) {
             FileWriter writer = new FileWriter(new File(m_base,
-                                                        "deffered.sql"));
-            for (Iterator it = deffered.iterator(); it.hasNext(); ) {
+                                                        "deferred.sql"));
+            for (Iterator it = deferred.iterator(); it.hasNext(); ) {
                 Table table = (Table) it.next();
                 if (skipped.contains(table)) {
                     continue;
@@ -108,7 +111,7 @@ public class DDLWriter {
                 for (Iterator iter = table.getConstraints().iterator();
                      iter.hasNext(); ) {
                     Constraint con = (Constraint) iter.next();
-                    if (con.isDeffered()) {
+                    if (con.isDeferred()) {
                         writer.write("alter table " + table.getName() +
                                      " add\n");
                         writer.write(con.getSQL());
@@ -123,13 +126,13 @@ public class DDLWriter {
         for (Iterator it = createOrder.iterator(); it.hasNext(); ) {
             Table table = (Table) it.next();
             if (skipped.contains(table)) {
-                writer.write("@@table-" + table.getName() + ".sql\n");
+                //writer.write("@@table-" + table.getName() + ".sql\n");
             } else {
                 writer.write("@@table-" + table.getName() + "-auto.sql\n");
             }
         }
-        if (deffered.size() > 0) {
-            writer.write("@@deffered.sql\n");
+        if (deferred.size() > 0) {
+            //writer.write("@@deferred.sql\n");
         }
         writer.close();
 

@@ -17,8 +17,8 @@ model com.arsdigita.kernel;
 object type PersonName {
     BigDecimal id = person_names.name_id INTEGER;
     String[1..1] givenName = person_names.given_name VARCHAR(60);
-    String[0..1] middleNames = person_names.middle_names VARCHAR(60);
-    String[1..1] familyName = person_names.family_name VARCHAR(80);
+    String[0..1] middleNames = person_names.middle_names VARCHAR(80);
+    String[1..1] familyName = person_names.family_name VARCHAR(60);
 
     object key (id);
 }

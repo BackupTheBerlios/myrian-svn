@@ -30,9 +30,15 @@ object type Permission {
     Date[1..1]       creationDate = acs_permissions.creation_date TIMESTAMP;
     String[0..1]     creationIP = acs_permissions.creation_ip VARCHAR(50);
 
-    ACSObject[1..1]  object;
-    Party[1..1]      party;
-    User[0..1]       creationUser;
+    composite ACSObject[1..1]  object =
+                     join acs_permissions.object_id to acs_objects.object_id;
+    composite Party[1..1]      party =
+                     join acs_permissions.grantee_id to parties.party_id;
+    composite Privilege[1..1]  priv =
+                     join acs_permissions.privilege
+                       to acs_privileges.privilege;
+    User[0..1]       creationUser =
+                     join acs_permissions.creation_user to users.user_id;
 
     object key (objectId, partyId, privilege);
 
@@ -499,10 +505,10 @@ object type Privilege {
 object type ObjectContext {
     BigDecimal[1..1] objectId = object_context.object_id INTEGER;
 
-    ACSObject[1..1] object = join object_context.object_id 
-                               to acs_objects.object_id;
-    ACSObject[0..1] context = join object_context.context_id
-                                to acs_objects.object_id;
+    composite ACSObject[1..1] object = join object_context.object_id 
+                                         to acs_objects.object_id;
+    composite ACSObject[0..1] context = join object_context.context_id
+                                          to acs_objects.object_id;
     object key (objectId);
 
     add object {}
@@ -536,6 +542,9 @@ object type ParameterizedPrivilege {
     String[1..1] basePrivilege = parameterized_privileges.base_privilege VARCHAR(100);
     String[1..1] paramKey = parameterized_privileges.param_key VARCHAR(100);
     String[0..1] paramName = parameterized_privileges.param_name VARCHAR(100);
+    Privilege[1..1] basePriv =
+        join parameterized_privileges.base_privilege
+          to acs_privileges.privilege;
 
     object key (paramKey, basePrivilege);
 

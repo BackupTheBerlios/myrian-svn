@@ -27,12 +27,12 @@ import com.arsdigita.persistence.Utilities;
  * multiplicity, and whether or not the property is composite.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/07 $
+ * @version $Revision: #7 $ $Date: 2002/08/09 $
  */
 
 public class PropertyDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/PropertyDef.java#6 $ by $Author: rhs $, $DateTime: 2002/08/07 20:10:44 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/PropertyDef.java#7 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
 
     // property name
     private String m_name;
@@ -48,6 +48,8 @@ public class PropertyDef extends Element {
 
     // if it's composite or not
     private boolean m_isComposite;
+
+    private boolean m_isUnique;
 
     // the column in the database that stores this property
     private ColumnDef m_column = null;
@@ -66,12 +68,14 @@ public class PropertyDef extends Element {
      * @pre type != null
      */
     public PropertyDef(String name, Identifier type, MultiplicityDef mult,
-                       boolean isComponent, boolean isComposite) {
+                       boolean isComponent, boolean isComposite,
+                       boolean isUnique) {
         m_name = name;
         m_type = type;
         m_mult = mult;
         m_isComponent = isComponent;
         m_isComposite = isComposite;
+        m_isUnique = isUnique;
 
         super.add(m_type);
         if (m_mult != null) {
@@ -138,6 +142,10 @@ public class PropertyDef extends Element {
     public boolean isAttribute() {
         return (MetadataRoot.getMetadataRoot()
                             .getPrimitiveType(m_type.getName()) != null);
+    }
+
+    public boolean isUnique() {
+        return m_isUnique;
     }
 
     /**

@@ -19,7 +19,7 @@ model com.arsdigita.kernel;
 //
 
 object type Group extends Party {
-    String      name = groups.name VARCHAR(200);
+    String[1..1]      name = groups.name VARCHAR(200);
     Role[0..n]  roles = join groups.group_id to roles.group_id;
 
     reference key (groups.group_id);
@@ -40,6 +40,57 @@ object type Group extends Party {
 }
 
 
+//
+// MEMBERSHIP ASSOCIATION
+//
+
+association {
+    Group[0..n] groups = join users.user_id to group_member_map.member_id,
+                         join group_member_map.group_id to groups.group_id;
+    User[0..n] members = join groups.group_id to group_member_map.group_id,
+                         join group_member_map.member_id to users.user_id;
+
+    add members {
+        do {
+            insert into group_member_map
+            (group_id, member_id)
+            select
+            :id, :members.id
+            from dual
+            where not exists (select 1 from group_member_map
+                              where group_id = :id
+                              and   member_id = :members.id)
+        }
+    }
+}
+
+//
+// SUBGROUP ASSOCIATION
+//
+
+association {
+    Group[0..n] supergroups = join groups.group_id 
+                                to group_subgroup_map.subgroup_id,
+                              join group_subgroup_map.group_id
+                                to groups.group_id;
+    Group[0..n] subgroups = join groups.group_id 
+                              to group_subgroup_map.group_id, 
+                            join group_subgroup_map.subgroup_id 
+                              to groups.group_id;
+
+    add subgroups {
+        do {
+            insert into group_subgroup_map
+            (group_id, subgroup_id)
+            select
+            :id, :subgroups.id
+            from dual
+            where not exists (select 1 from group_subgroup_map
+                              where group_id = :id
+                              and subgroup_id = :members.id)
+        }
+    }
+}
 
 //
 // ALL MEMBERS ASSOCIATION

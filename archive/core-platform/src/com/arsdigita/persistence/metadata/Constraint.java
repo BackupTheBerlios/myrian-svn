@@ -6,12 +6,12 @@ import java.util.*;
  * Constraint
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/08/06 $
+ * @version $Revision: #2 $ $Date: 2002/08/09 $
  **/
 
 abstract class Constraint {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Constraint.java#1 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Constraint.java#2 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
 
     private Table m_table;
     private String m_name;
@@ -106,7 +106,7 @@ abstract class Constraint {
         return m_columns;
     }
 
-    abstract boolean isDeffered();
+    abstract boolean isDeferred();
 
     abstract String getSuffix();
 

@@ -24,12 +24,12 @@ import java.io.PrintStream;
  * link.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/07 $
+ * @version $Revision: #7 $ $Date: 2002/08/09 $
  **/
 
 public class Association extends ModelElement {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Association.java#6 $ by $Author: rhs $, $DateTime: 2002/08/07 20:10:44 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Association.java#7 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
 
 
     /**
@@ -132,15 +132,14 @@ public class Association extends ModelElement {
         Property prop = new Property(
             m_roles[0].getName(), m_roles[0].getType(),
             Property.REQUIRED, m_roles[0].isComponent(),
-            m_roles[0].isComposite()
-            );
+            m_roles[0].isComposite());
         prop.setLineInfo(m_roles[0]);
         m_linkType.addProperty(prop);            
         m_linkType.addKeyProperty(m_roles[0].getName());
 
         prop = new Property(m_roles[1].getName(), m_roles[1].getType(),
                             Property.REQUIRED, m_roles[1].isComponent(),
-                            m_roles[0].isComposite());
+                            m_roles[1].isComposite());
         prop.setLineInfo(m_roles[1]);
         m_linkType.addProperty(prop);
         m_linkType.addKeyProperty(m_roles[1].getName());

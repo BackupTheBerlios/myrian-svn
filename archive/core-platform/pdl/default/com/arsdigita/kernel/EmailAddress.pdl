@@ -16,8 +16,8 @@ model com.arsdigita.kernel;
 
 object type EmailAddress {
     String[1..1] emailAddress = email_addresses.email_address VARCHAR(100);
-    Boolean[1..1] isBouncing = email_addresses.bouncing_p CHAR(1);
-    Boolean[1..1] isVerified = email_addresses.verified_p CHAR(1);
+    Boolean[1..1] isBouncing = email_addresses.bouncing_p BIT;
+    Boolean[1..1] isVerified = email_addresses.verified_p BIT;
 
     object key (emailAddress);
 

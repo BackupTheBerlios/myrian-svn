@@ -9,12 +9,12 @@ import java.io.*;
  * Table
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/08/06 $
+ * @version $Revision: #2 $ $Date: 2002/08/09 $
  **/
 
 public class Table {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Table.java#1 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Table.java#2 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
 
     private String m_name;
     private Map m_columns = new HashMap();
@@ -98,6 +98,10 @@ public class Table {
     }
 
     public String getSQL() {
+        return getSQL(true);
+    }
+
+    public String getSQL(boolean defer) {
         StringBuffer result = new StringBuffer();
 
         List columns = new ArrayList();
@@ -119,15 +123,15 @@ public class Table {
         for (int i = 0; i < columns.size(); i++) {
             String colName = (String) columns.get(i);
             Column column = getColumn(colName);
-            result.append(column.getInlineSQL());
+            result.append(column.getInlineSQL(defer));
             boolean hasNext = i < columns.size() - 1;
             if (hasNext) {
                 result.append(",\n");
             }
-            if (column.hasDefferedConstraints()) {
+            if (defer && column.hasDeferredConstraints()) {
                 comment = "        -- referential constraint for " +
                     column.getName() +
-                    " deffered due to circular dependencies";
+                    " deferred due to circular dependencies";
                 if (hasNext) {
                     result.append(comment);
                     result.append("\n");
@@ -136,13 +140,13 @@ public class Table {
             }
         }
 
-        boolean compoundDeffered = false;
+        boolean compoundDeferred = false;
 
         for (Iterator it = m_constraints.iterator(); it.hasNext(); ) {
             Constraint con = (Constraint) it.next();
             if (con.getColumns().length > 1) {
-                if (con.isDeffered()) {
-                    compoundDeffered = true;
+                if (con.isDeferred()) {
+                    compoundDeferred = true;
                 } else {
                     if (comment != null) {
                         result.append(",\n");
@@ -163,9 +167,9 @@ public class Table {
             comment = null;
         }
 
-        if (compoundDeffered) {
+        if (compoundDeferred) {
             result.append("\n    -- compound referential constraints " +
-                          "deffered due to circular dependencies");
+                          "deferred due to circular dependencies");
         }
 
         result.append("\n);");
@@ -204,10 +208,10 @@ public class Table {
         return result;
     }
 
-    private void getDependencies(Set result, boolean includeDeffered) {
+    private void getDependencies(Set result, boolean includeDeferred) {
         for (Iterator it = m_constraints.iterator(); it.hasNext(); ) {
             Constraint con = (Constraint) it.next();
-            if (!includeDeffered && con.isDeffered()) {
+            if (!includeDeferred && con.isDeferred()) {
                 continue;
             }
             if (con instanceof ForeignKey) {
