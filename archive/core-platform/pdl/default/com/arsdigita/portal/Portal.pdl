@@ -1,0 +1,37 @@
+//
+// Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+//
+// The contents of this file are subject to the ArsDigita Public 
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.arsdigita.com/ADPL.txt
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+
+model com.arsdigita.portal;
+
+import com.arsdigita.kernel.Application;
+import com.arsdigita.kernel.ACSObject;
+
+// @author Justin Ross (justin@arsdigita.com)
+
+object type Portal extends ACSObject {
+    String title = portals.title VARCHAR(200);
+    Boolean isTemplate = portals.template_p BIT;
+
+    reference key (portals.portal_id);
+}
+
+object type Portlet extends Application {
+    reference key (portlets.portlet_id);
+}
+
+association {
+    Portal[1..1] portal = join portlets.portal_id to portals.portal_id;
+    // XXX: should be component
+    Portlet[0..n] portlet = join portals.portal_id to portlets.portal_id;
+}
