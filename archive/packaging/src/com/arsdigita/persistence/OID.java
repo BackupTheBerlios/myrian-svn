@@ -51,10 +51,10 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $ */
+ * @version $Revision: #3 $ $Date: 2003/09/14 $ */
 
 public class OID {
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/OID.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/OID.java#3 $ by $Author: justin $, $DateTime: 2003/09/14 13:21:18 $";
 
     private ObjectType m_type;
     private Map m_values = new HashMap();
@@ -283,39 +283,38 @@ public class OID {
 
         // We do some type-checking here, to ensure that OIDs are being
         // created with legit types of values.
-        if (Assert.isAssertOn()) {
-            if (prop == null) {
-                StringBuffer valid = new StringBuffer();
-                Iterator i = m_type.getProperties();
-                if (i.hasNext()) {
-                    valid.append(((Property)i.next()).getName());
-                }
-                while (i.hasNext()) {
-                    valid.append(", ").append(((Property)i.next()).getName());
-                }
-                Assert.assertNotNull(prop, "getProperty(" + propertyName +
-                                     ") for type " + m_type.getName() +
-                                     " where valid properties are {" +
-                                     valid + "}");
+        if (prop == null) {
+            throw new PersistenceException
+                ("no such property: " + propertyName
+                 + " for type " + m_type.getName());
+        }
+
+        // null has no type
+        // if prop isn't an attribute, not sure what to do with it.
+        if (prop.isAttribute() && value != null) {
+            // we can be sure this is a simpletype because
+            // isAttribute was true.
+            SimpleType expectedType = (SimpleType)prop.getType();
+            if (!expectedType.getJavaClass()
+                .isAssignableFrom(value.getClass())) {
+                throw new PersistenceException
+                    ("expected " + expectedType.getJavaClass()
+                     + "actual type " + value.getClass());
             }
-            // null has no type
-            // if prop isn't an attribute, not sure what to do with it.
-            if (prop.isAttribute() && value != null) {
-                // we can be sure this is a simpletype because
-                // isAttribute was true.
-                SimpleType expectedType = (SimpleType)prop.getType();
-                Assert.assertTrue
-		    (expectedType.getJavaClass().isAssignableFrom
-		     (value.getClass()),
-		     "expected value of type: " + expectedType.getJavaClass() +
-		     "actual type used:" + value.getClass());
+        } else if (value != null) {
+            if (value instanceof DataObject) {
+                ObjectType ot = (ObjectType) prop.getType();
+                DataObject dobj = (DataObject) value;
+                ObjectType.verifySubtype(ot, dobj.getObjectType());
+            } else {
+                throw new PersistenceException
+                    ("expected DataObject for property " + propertyName
+                     + " but got " + value.getClass());
             }
-            // TODO: can we do any data validation if the key property
-            // isn't an attribute?
         }
 
         if (hasProperty(propertyName)) {
-            throw new IllegalArgumentException
+            throw new PersistenceException
                 (propertyName + " is already set to " + get(propertyName));
         }
 

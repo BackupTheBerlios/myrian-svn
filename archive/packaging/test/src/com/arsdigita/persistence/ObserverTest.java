@@ -22,12 +22,12 @@ import java.math.*;
  * ObserverTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/09/14 $
  **/
 
 public class ObserverTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/ObserverTest.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/ObserverTest.java#3 $ by $Author: justin $, $DateTime: 2003/09/14 13:21:18 $";
 
     public ObserverTest(String name) {
         super(name);
@@ -50,17 +50,22 @@ public class ObserverTest extends PersistenceTestCase {
 
     private static final String VALUE = "Value";
 
-    private static final DataObject createTest() {
+    private int m_counter = 0;
+
+    private final DataObject createTest() {
         Session ssn = SessionManager.getSession();
-        DataObject obj = ssn.create(new OID("test.Test", BigInteger.ZERO));
-        obj.set(REQUIRED, ssn.create(new OID("test.Icle", BigInteger.ONE)));
+        DataObject obj = ssn.create
+            (new OID("test.Test", BigInteger.valueOf(m_counter++)));
+        obj.set(REQUIRED, ssn.create
+                (new OID("test.Icle", BigInteger.valueOf(m_counter++))));
         obj.save();
         return obj;
     }
 
-    private static final DataObject createIcle() {
+    private final DataObject createIcle() {
         Session ssn = SessionManager.getSession();
-        return ssn.create(new OID("test.Icle", BigInteger.ZERO));
+        return ssn.create
+            (new OID("test.Icle", BigInteger.valueOf(m_counter++)));
     }
 
     public void testSet() {
@@ -146,6 +151,53 @@ public class ObserverTest extends PersistenceTestCase {
         assertEquals(BEFORE_DELETE, observer.getFirstEvent());
         assertEquals(AFTER_DELETE, observer.getLastEvent());
         assertEquals(data, observer.getDataObject());
+    }
+
+    public void testComponentBeforeDelete() {
+        DataObject data = createTest();
+        DataObject component = createTest();
+        component.set("parent", data);
+        component.save();
+        TestObserver observer = new TestObserver();
+        component.addObserver(observer);
+
+        data.delete();
+
+        assertEquals(2, observer.getEvents().size());
+        assertEquals(BEFORE_DELETE, observer.getFirstEvent());
+        assertEquals(AFTER_DELETE, observer.getLastEvent());
+        assertEquals(component, observer.getDataObject());
+    }
+
+    public void testBeforeDeleteDataAccess() {
+        DataObject data = createTest();
+        final DataObject newData = createTest();
+        DataObject icle1 = createIcle();
+        DataObject icle2 = createIcle();
+
+        DataAssociation da = (DataAssociation) data.get("collection");
+        da.add(icle1);
+        da.add(icle2);
+        data.save();
+
+        data.addObserver(new DataObserver() {
+            public void beforeDelete(DataObject dobj) {
+                DataAssociation da = (DataAssociation) dobj.get("collection");
+                DataAssociationCursor dac = da.cursor();
+                DataAssociation daNew =
+                    (DataAssociation) newData.get("collection");
+                while (dac.next()) {
+                    DataObject icle = dac.getDataObject();
+                    daNew.add(icle);
+                }
+                newData.save();
+            }
+        });
+
+        data.delete();
+
+        da = (DataAssociation) newData.get("collection");
+        assertEquals(2, da.size());
     }
 
     public void testLoopDetection() {

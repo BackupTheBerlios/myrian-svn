@@ -28,21 +28,21 @@ import org.apache.log4j.Logger;
  *
  *
  * @author Michael Bryzek
- * @date $Date: 2003/08/19 $
- * @version $Revision: #2 $
+ * @date $Date: 2003/09/14 $
+ * @version $Revision: #3 $
  *
  * @see com.arsdigita.persistence.OID
  **/
 
 public class OIDTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/OIDTest.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/OIDTest.java#3 $ by $Author: justin $, $DateTime: 2003/09/14 13:21:18 $";
 
     private static Logger s_log =
         Logger.getLogger(OIDTest.class.getName());
 
     private OID oid;
-    private static final String TYPE = "com.arsdigita.categorization.Category";
+    private static final String TYPE = "mdsql.Node";
     private static final int ID = 42;
 
     /**
@@ -144,7 +144,7 @@ public class OIDTest extends TestCase {
             oid.set("id", new Integer(12));
             fail("Initializing BigDecimal field w/ " +
                  "Integer should have thrown error");
-        } catch (IllegalStateException e) {
+        } catch (PersistenceException e) {
             // ignore
         }
 
@@ -152,9 +152,42 @@ public class OIDTest extends TestCase {
             oid.set("id", "12");
             fail("Initializing BigDecimal field w/ " +
                  "String should have thrown error");
-        } catch (IllegalStateException e) {
+        } catch (PersistenceException e) {
             // ignore
         }
+    }
+
+    public void testSetCompoundTypeValidation() {
+        oid = new OID("mdsql.linkTest.ArticleImageLink");
+
+        try {
+            oid.set("article", new Integer(12));
+            fail("Initializing Article field w/ " +
+                 "Integer should have thrown error");
+        } catch (PersistenceException e) {
+            // ignore
+        }
+
+        try {
+            oid.set("article", "12");
+            fail("Initializing Article field w/ " +
+                 "String should have thrown error");
+        } catch (PersistenceException e) {
+            // ignore
+        }
+
+        DataObject article = SessionManager.getSession().create
+            ("mdsql.linkTest.Article");
+        try {
+            oid.set("image", article);
+            fail("Initializing Image field w/ " +
+                 "Article should have thrown error");
+        } catch (PersistenceException e) {
+            // ignore
+        }
+
+        // should work
+        oid.set("article", article);
     }
 
 

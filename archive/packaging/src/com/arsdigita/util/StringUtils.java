@@ -15,6 +15,8 @@
 
 package com.arsdigita.util;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -905,5 +907,18 @@ public class StringUtils {
 
             appendBuffer.append(val);
         }
+    }
+
+    /**
+     * @throws NullPointerException if <code>throwable</code> is null
+     **/
+    public static String getStackTrace(Throwable throwable) {
+        if (throwable==null) { throw new NullPointerException("throwable"); }
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        throwable.printStackTrace(pw);
+        pw.close();
+        return sw.toString();
     }
 }

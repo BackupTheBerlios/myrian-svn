@@ -28,12 +28,12 @@ import java.io.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/09/09 $
+ * @version $Revision: #5 $ $Date: 2003/09/14 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#4 $ by $Author: justin $, $DateTime: 2003/09/09 13:02:17 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#5 $ by $Author: justin $, $DateTime: 2003/09/14 13:21:18 $";
 
     private RDBMSEngine m_engine;
     private Operation m_op = null;
@@ -384,8 +384,11 @@ public abstract class SQLWriter {
         Path[] rightCols = expand(right);
         if (leftCols.length != rightCols.length) {
             throw new IllegalArgumentException
-                (left + ": " + Arrays.asList(leftCols) + ", " +
-                 right + ": " + Arrays.asList(rightCols));
+                ("left and right of different lengths\n" +
+                 "left expression: " + left +
+                 "; columns: " + Arrays.asList(leftCols) + "\n" +
+                 "right expression: " + right +
+                 "; columns: " + Arrays.asList(rightCols));
         }
 
         for (int i = 0; i < leftCols.length; i++) {
