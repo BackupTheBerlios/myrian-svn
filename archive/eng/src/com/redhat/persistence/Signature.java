@@ -23,6 +23,7 @@ import com.redhat.persistence.metadata.Root;
 import com.redhat.persistence.metadata.SQLBlock;
 import com.redhat.persistence.oql.Expression;
 import com.redhat.persistence.oql.Query;
+import com.redhat.persistence.oql.Define;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -33,14 +34,16 @@ import org.apache.log4j.Logger;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/07/08 $
+ * @version $Revision: #3 $ $Date: 2004/07/13 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Signature.java#2 $ by $Author: rhs $, $DateTime: 2004/07/08 11:51:12 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Signature.java#3 $ by $Author: ashah $, $DateTime: 2004/07/13 17:03:42 $";
 
     private static final Logger s_log = Logger.getLogger(Signature.class);
+
+    private static final String s_value = "value";
 
     private ArrayList m_paths = new ArrayList();
     private ArrayList m_sources = new ArrayList();
@@ -65,7 +68,16 @@ public class Signature {
             throw new IllegalStateException(this + "\n");
         }
 
+        if (isValue()) {
+            expr = new Define(expr, s_value);
+        }
+
         Query q = new Query(expr);
+
+        if (isValue()) {
+            q.fetch(s_value, Expression.valueOf(s_value));
+            return q;
+        }
 
         for (Iterator it = m_paths.iterator(); it.hasNext(); ) {
             Path path = (Path) it.next();
@@ -76,7 +88,15 @@ public class Signature {
         return q;
     }
 
+    private boolean isValue() {
+        return m_paths.size() == 1 && m_paths.get(0) == null;
+    }
+
     public String getColumn(Path p) {
+        if (isValue() && p == null) {
+            return s_value;
+        }
+
         final int size = 30;
         final String path = p.getPath();
         if (path.length() <= size) {
