@@ -8,12 +8,12 @@ import java.io.Reader;
  * PDLCompiler
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/09/10 $
+ * @version $Revision: #2 $ $Date: 2003/09/10 $
  **/
 
 public class PDLCompiler {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/pdl/PDLCompiler.java#1 $ by $Author: rhs $, $DateTime: 2003/09/10 10:46:29 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/pdl/PDLCompiler.java#2 $ by $Author: rhs $, $DateTime: 2003/09/10 13:16:17 $";
 
     private final com.redhat.persistence.pdl.PDL m_pdl;
 
@@ -28,7 +28,9 @@ public class PDLCompiler {
     public void emit(MetadataRoot root) {
         m_pdl.emit(root.getRoot());
         m_pdl.emitVersioned();
-        MetadataRoot.loadPrimitives();
+        if (root.equals(MetadataRoot.getMetadataRoot())) {
+            MetadataRoot.loadPrimitives();
+        }
     }
 
 }
