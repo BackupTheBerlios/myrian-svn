@@ -26,12 +26,12 @@ import java.util.Iterator;
  * ErrorReport
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/09/07 $
+ * @version $Revision: #4 $ $Date: 2004/09/14 $
  **/
 
 class ErrorReport {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/ErrorReport.java#3 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/ErrorReport.java#4 $ by $Author: rhs $, $DateTime: 2004/09/14 17:22:30 $";
 
     private ArrayList m_messages = new ArrayList();
     private boolean m_fatal = false;
@@ -62,7 +62,7 @@ class ErrorReport {
         m_messages.clear();
 
         if (m_fatal) {
-            throw new Error(buf.toString());
+            throw new PDLException(buf.toString());
         } else {
             System.err.println(buf.toString());
         }
