@@ -44,5 +44,18 @@
       <field name="party"/>
     </class>
 
+    <class name="Product" identity-type="datastore">
+      <field name="id"/>
+      <field name="name"/>
+      <field name="price"/>
+      <field name="picture"/>
+    </class>
+
+    <class name="Picture" identity-type="datastore">
+      <field name="id"/>
+      <field name="caption"/>
+      <field name="content"/>
+    </class>
+
   </package>
 </jdo>

@@ -1,31 +1,52 @@
 package com.redhat.persistence.jdotest;
 
-import java.util.*;
-
 /**
  * Product
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/22 $
+ * @version $Revision: #2 $ $Date: 2004/06/28 $
  **/
 
-public abstract class Product {
+public class Product {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdotest/Product.java#1 $ by $Author: vadim $, $DateTime: 2004/06/22 13:25:03 $";
+    private int id;
+    private String name;
+    private float price;
+    private Picture picture;
 
-    public abstract int getId();
+    public Product() {}
 
-    public abstract String getName();
+    public Product(int id) {
+        this.id = id;
+    }
 
-    public abstract void setName(String name);
+    public int getId() {
+        return id;
+    }
 
-    public abstract float getPrice();
+    public String getName() {
+        return name;
+    }
 
-    public abstract void setPrice(float price);
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public abstract Picture getPicture();
+    public float getPrice() {
+        return price;
+    }
 
-    public abstract void setPicture(Picture picture);
+    public void setPrice(float price) {
+        this.price = price;
+    }
+
+    public Picture getPicture() {
+        return picture;
+    }
+
+    public void setPicture(Picture picture) {
+        this.price = price;
+    }
 
     public String toString() {
         return "<product #" + getId() + ">";

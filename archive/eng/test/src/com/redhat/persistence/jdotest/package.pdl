@@ -112,7 +112,7 @@ association {
 }
 
 object type Product class com.redhat.persistence.jdotest.Product
-                    adapter com.redhat.persistence.jdo.ReflectionAdapter {
+                    adapter com.redhat.persistence.jdo.JDOAdapter {
     Integer[1..1] id = products.id INTEGER;
     String[1..1] name = products.name VARCHAR(200);
     Float[1..1] price = products.price FLOAT; // Use currency instead?
@@ -122,7 +122,7 @@ object type Product class com.redhat.persistence.jdotest.Product
 }
 
 object type Picture class com.redhat.persistence.jdotest.Picture
-                    adapter com.redhat.persistence.jdo.ReflectionAdapter {
+                    adapter com.redhat.persistence.jdo.JDOAdapter {
     Integer[1..1] id = pictures.id INTEGER;
     String[1..1] caption = pictures.caption VARCHAR(200);
     byte[][1..1] content = pictures.content BLOB;

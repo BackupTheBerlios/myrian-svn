@@ -4,25 +4,42 @@ package com.redhat.persistence.jdotest;
  * Picture
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/22 $
+ * @version $Revision: #2 $ $Date: 2004/06/28 $
  **/
 
-public abstract class Picture {
+public class Picture {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdotest/Picture.java#1 $ by $Author: vadim $, $DateTime: 2004/06/22 13:25:03 $";
+    private int id;
+    private String caption;
+    private byte[] content;
 
-    public abstract int getId();
+    public Picture() {}
 
-    public abstract String getCaption();
+    public Picture(int id) {
+        this.id = id;
+    }
 
-    public abstract void setCaption(String caption);
+    public int getId() {
+        return id;
+    }
 
-    public abstract byte[] getContent();
+    public String getCaption() {
+        return caption;
+    }
 
-    public abstract void setContent(byte[] content);
+    public void setCaption(String caption) {
+        this.caption = caption;
+    }
+
+    public byte[] getContent() {
+        return content;
+    }
+
+    public void setContent(byte[] content) {
+        this.content = content;
+    }
 
     public String toString() {
         return "<picture #" + getId() + ">";
     }
-
 }
