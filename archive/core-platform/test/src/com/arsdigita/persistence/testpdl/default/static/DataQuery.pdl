@@ -15,6 +15,12 @@
 model examples;
 
 query DataQuery returns 0..n {
+    BigDecimal id;
+    String action;
+    String description;
+    BigDecimal priority;
+    Date actionTime;
+    
     do {
         select entry_id, action, description, priority, action_time
         from t_data_query t
@@ -29,6 +35,8 @@ query DataQuery returns 0..n {
 
 
 query DataQueryMaxID {
+    BigDecimal id;
+
     do {
         select max(entry_id) as entry_id
         from t_data_query t
@@ -39,6 +47,10 @@ query DataQueryMaxID {
 
 
 query DataQueryWithBindVariables {
+    BigDecimal id;
+    String action;
+    BigDecimal priority;
+
     do {
         select *
         from (select * from t_data_query 
@@ -52,6 +64,8 @@ query DataQueryWithBindVariables {
 }
 
 query DataQueryWithMoreBinds {
+    BigDecimal id;
+
     do {
         select * from t_data_query
         where description = :description
@@ -63,6 +77,10 @@ query DataQueryWithMoreBinds {
 
 
 query DataQueryWithDateBindVariable {
+    BigDecimal id;
+    String action;
+    BigDecimal priority;
+
     do {
         select *
         from t_data_query 
@@ -75,6 +93,8 @@ query DataQueryWithDateBindVariable {
 }
 
 query DataQueryWithMax {
+    BigDecimal priority;
+
     do {
         select max(priority) as priority 
         from t_data_query
@@ -85,6 +105,8 @@ query DataQueryWithMax {
 
 
 query DataQueryWithMaxAndSubSelect {
+    BigDecimal priority;
+
     do {
         select max(priority) as priority 
         from t_data_query
@@ -96,6 +118,12 @@ query DataQueryWithMaxAndSubSelect {
 
 
 query DataQueryNoView {
+    BigDecimal id;
+    String action;
+    String description;
+    BigDecimal priority;
+    Date actionTime;
+    
     options {
 	WRAP_QUERIES = false;
     }
@@ -113,6 +141,12 @@ query DataQueryNoView {
 }
 
 query DataQueryUnion {
+    BigDecimal id;
+    String action;
+    String description;
+    BigDecimal priority;
+    Date actionTime;
+    
     do {
         select * 
         from t_data_query 
@@ -131,6 +165,12 @@ query DataQueryUnion {
 }
 
 query DataQueryWithIn {
+    BigDecimal id;
+    String action;
+    String description;
+    BigDecimal priority;
+    Date actionTime;
+    
     do {
         select *
         from t_data_query t
@@ -146,6 +186,8 @@ query DataQueryWithIn {
 
 
 query DataQueryOneRow returns 1..1 {
+    BigDecimal id;
+    
     do {
         select max(entry_id) as entry_id
         from t_data_query
@@ -156,6 +198,8 @@ query DataQueryOneRow returns 1..1 {
 
 
 query DataQueryZeroOrOneRow returns 0..1 {
+    BigDecimal id;
+    
     do {
         select max(entry_id) as entry_id
         from t_data_query
