@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/UserAuthentication.pdl#6 $ 
-// $DateTime: 2002/12/05 19:54:03 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/UserAuthentication.pdl#7 $ 
+// $DateTime: 2002/12/10 19:36:26 $
 
 model com.arsdigita.kernel;
 
@@ -67,6 +67,9 @@ object type UserAuthentication {
 }
 
 query UserAuthenticationForLogin {
+    BigDecimal id;
+    String primaryEmail;
+    String screenName;
     do {
         select user_authentication.auth_id,
 	           users.screen_name,
