@@ -14,14 +14,46 @@ import org.apache.log4j.Logger;
  * SessionSuite
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #8 $ $Date: 2003/02/26 $
+ * @version $Revision: #9 $ $Date: 2003/03/05 $
  **/
 
 public class SessionSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/SessionSuite.java#8 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/SessionSuite.java#9 $";
 
     private static final Logger s_log = Logger.getLogger(SessionSuite.class);
+
+    private static class PassthroughEngine extends Engine {
+
+        private Engine m_engine;
+        private List m_events;
+        private boolean m_recording = false;
+
+        PassthroughEngine(Engine eng) {
+            m_engine = eng;
+            m_events = new LinkedList();
+        }
+
+        void start() { m_recording = true; }
+        List stop() {
+            m_recording = false;
+            List l = m_events;
+            m_events = new LinkedList();
+            return l;
+        }
+
+        protected void write(Event ev) {
+            m_engine.write(ev);
+            if (m_recording) { m_events.add(ev); }
+        }
+
+        protected void flush() { m_engine.flush(); }
+        protected void commit() { m_engine.commit(); }
+        protected void rollback() { m_engine.rollback(); }
+        protected RecordSet execute(Query query) {
+            return m_engine.execute(query);
+        }
+    }
 
     public SessionSuite() {}
 
@@ -34,14 +66,27 @@ public class SessionSuite extends PackageTestSuite {
     }
 
     public static Test suite() {
-        final SessionSuite suite = new SessionSuite();
+        final SessionSuite s = new SessionSuite();
 
-        suite.addTest(new Test() {
-            public int countTestCases() { return 2; }
-            public void run(TestResult result) { suite.sessionTest(result); }
+        s.addTest(new Test() {
+            public int countTestCases() { return 1; }
+            public void run(TestResult result) {
+                try {
+                    result.startTest(this);
+                    s.addTests();
+                } finally {
+                    result.endTest(this);
+                }
+            }
         });
 
-        BaseTestSetup wrapper = new BaseTestSetup(suite);
+        BaseTestSetup wrapper = new BaseTestSetup(s) {
+            protected void setUp() throws Exception {
+                super.setUp();
+                s.initialize();
+            }
+        };
+
         wrapper.setInitScriptTarget("com.arsdigita.persistence.Initializer");
         return wrapper;
     }
@@ -63,9 +108,9 @@ public class SessionSuite extends PackageTestSuite {
     private Map[] m_objs = new Map[] {
         new HashMap(), new HashMap(), new HashMap() };
 
-    public void sessionTest(TestResult result) {
-        result.startTest(this);
+    private PassthroughEngine m_engine;
 
+    public void initialize() {
         PDL pdl = new PDL();
         pdl.emit(Root.getRoot());
 
@@ -73,43 +118,49 @@ public class SessionSuite extends PackageTestSuite {
 
         initializeModel();
 
-        m_ssn = new Session(new MemoryEngine(), new DynamicQuerySource());
+        m_engine = new PassthroughEngine(new MemoryEngine());
+        m_ssn = new Session(m_engine, new DynamicQuerySource());
 
         initializeData();
 
         m_ssn.commit();
-
-        test(m_root);
-
-        test(m_one);
-
-        result.endTest(this);
     }
 
-    private void test(ObjectType type) {
+    public void addTests() {
+        addTests(m_root);
+        addTests(m_one);
+    }
 
-        // XXX: going through roles
+    private void addTests(ObjectType type) {
         Collection roles = type.getRoles();
         Collection keys = type.getKeyProperties();
 
         for (Iterator it = roles.iterator(); it.hasNext(); ) {
-            Role role = (Role) it.next();
+            final Role role = (Role) it.next();
 
             if (keys.contains(role)) { continue; }
 
             if (role.getName().startsWith("-")) { continue; }
 
-            s_log.info("start: " + role.getName());
-
-            if (role.isCollection()) {
-                testCollection(role);
-            } else if (!role.isNullable()) {
-                testRequired(role);
-            } else {
-                testNullable(role);
-            }
-
-            s_log.info("stop: " + role.getName());
+            addTest(new Test() {
+                public int countTestCases() { return 1; }
+                public void run(TestResult result) {
+                    try {
+                        result.startTest(this);
+                        if (role.isCollection()) {
+                            testCollection(role);
+                        } else {
+                            testSingle(role);
+                        }
+                    } catch (junit.framework.AssertionFailedError afe) {
+                        result.addFailure(this, afe);
+                    } catch (RuntimeException re) {
+                        result.addError(this, re);
+                    } finally {
+                        result.endTest(this);
+                    }
+                }
+            });
         }
     }
 
@@ -121,62 +172,47 @@ public class SessionSuite extends PackageTestSuite {
 
         resetState();
 
-        s_log.info("test: 0add1" + role.getName());
+        startTest("test: 0add1" + role.getName());
         m_ssn.add(obj, role, m_objs[0].get(target));
         endTest();
 
-        s_log.info("test: 1rem1" + role.getName());
+        startTest("test: 1rem1" + role.getName());
         m_ssn.remove(obj, role, m_objs[0].get(target));
         endTest();
 
         resetState();
 
-        s_log.info("test: 0add2" + role.getName());
+        startTest("test: 0add2" + role.getName());
         m_ssn.add(obj, role, m_objs[0].get(target));
         m_ssn.add(obj, role, m_objs[1].get(target));
         endTest();
 
-        s_log.info("test: 2add1" + role.getName());
+        startTest("test: 2add1" + role.getName());
         m_ssn.add(obj, role, m_objs[2].get(target));
         endTest();
 
-        s_log.info("test: 3rem1" + role.getName());
+        startTest("test: 3rem1" + role.getName());
         m_ssn.remove(obj, role, m_objs[2].get(target));
         endTest();
 
-        s_log.info("test: 2rem2" + role.getName());
+        startTest("test: 2rem2" + role.getName());
         m_ssn.remove(obj, role, m_objs[0].get(target));
         m_ssn.remove(obj, role, m_objs[1].get(target));
         endTest();
     }
 
-    private void testRequired(Role role) {
+    private void testSingle(Role role) {
         ObjectType source = role.getContainer();
         ObjectType target = role.getType();
 
         Object obj = m_objs[0].get(source);
 
         resetState();
-        s_log.info("test: set " + role.getName());
+        startTest("test: set " + role.getName());
         m_ssn.set(obj, role, m_objs[1].get(target));
         endTest();
 
-        // XXX: negative test
-        // s_log.info("test: null " + role.getName());
-    }
-
-    private void testNullable(Role role) {
-        ObjectType source = role.getContainer();
-        ObjectType target = role.getType();
-
-        Object obj = m_objs[0].get(source);
-
-        resetState();
-        s_log.info("test: set " + role.getName());
-        m_ssn.set(obj, role, m_objs[1].get(target));
-        endTest();
-
-        s_log.info("test: setnull " + role.getName());
+        startTest("test: setnull " + role.getName());
         m_ssn.set(obj, role, null);
         endTest();
     }
@@ -185,8 +221,22 @@ public class SessionSuite extends PackageTestSuite {
         m_ssn.rollback();
     }
 
+    private void startTest(String name) {
+        s_log.info(name);
+        m_engine.stop();
+        m_engine.start();
+    }
+
     private void endTest() {
         m_ssn.flush();
+        List evs = m_engine.stop();
+        if (s_log.isDebugEnabled()) {
+            for (Iterator it = evs.iterator(); it.hasNext(); ) {
+                s_log.debug(it.next());
+            }
+        }
+        s_log.info("stop: " + evs.size());
+        m_engine.start();
     }
 
     private void initializeModel() {
@@ -270,40 +320,45 @@ public class SessionSuite extends PackageTestSuite {
             }
             obj = new Generic(type, new Integer(round));
             m_ssn.create(obj);
+        } else if (!type.isCompound()) {
+            obj = new Integer(round);
         } else {
-            throw new IllegalStateException("can't create keyless object");
+            // compound type
+            throw new IllegalStateException("can't create compound object");
         }
 
         m_objs[round].put(type, obj);
 
         // build up data
         Collection props = type.getProperties();
+        Collection keys = type.getKeyProperties();
 
         for (Iterator it = props.iterator(); it.hasNext(); ) {
             Property prop = (Property) it.next();
 
+            if (keys.contains(prop)) { continue; }
             if (prop.isNullable()) { continue; }
 
             if (prop.isCollection()) {
                 throw new IllegalStateException("nonnullable collection");
             }
-
             if (!(prop instanceof Role)) {
                 throw new IllegalStateException("nonnullable nonrole");
             }
 
             Role role = (Role) prop;
-            ObjectType targetType = role.getType();
 
+            if (prop.getName().startsWith("-")
+                && !role.getReverse().isNullable()) {
+                continue;
+            }
+
+            ObjectType targetType = role.getType();
             Object target = m_objs[round].get(targetType);
 
             if (target != null) {
                 m_ssn.set(obj, role, target);
-            } else if (!targetType.isCompound()) {
-                // XXX: assuming all simple types are integers for this
-                m_ssn.set(obj, role, new Integer(round));
             } else {
-                // compound type
                 m_ssn.set(obj, role, fill(targetType, round));
             }
         }
@@ -401,14 +456,14 @@ public class SessionSuite extends PackageTestSuite {
             (aCollection == true && bComponent == true) ||
             // nonnullable collections are not supported
             (aCollection == true && aNullable == false) ||
-            (bCollection == true && bNullable == false) ||
+            (bCollection == true && bNullable == false)) {
             // with noncollections on both ends
             // only one end can be nullable
             // however if the a end is the nonnullable one,
             // its role to b can not be updated because the reverse
             // would have to be set to null
-            (aCollection == false && bCollection == false
-             && aNullable == false)) {
+//             (aCollection == false && bCollection == false
+//              && aNullable == false)) {
             return;
         }
 
@@ -435,8 +490,8 @@ public class SessionSuite extends PackageTestSuite {
             a.addProperty(arole);
         } catch (IllegalArgumentException iae) {
             if (s_log.isDebugEnabled()) {
-                s_log.info(a.getName());
-                s_log.info(arole.getName());
+                s_log.debug(a.getName());
+                s_log.debug(arole.getName());
             }
             throw iae;
         }
@@ -445,8 +500,8 @@ public class SessionSuite extends PackageTestSuite {
             b.addProperty(brole);
         } catch (IllegalArgumentException iae) {
             if (s_log.isDebugEnabled()) {
-                s_log.info(b.getName());
-                s_log.info(brole.getName());
+                s_log.debug(b.getName());
+                s_log.debug(brole.getName());
             }
             throw iae;
         }
@@ -461,7 +516,7 @@ public class SessionSuite extends PackageTestSuite {
             return;
         }
 
-        if (bComponent && !b.isCompound()) {
+        if (bComponent && !b.hasKey()) {
             return;
         }
 
