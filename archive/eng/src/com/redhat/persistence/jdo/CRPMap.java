@@ -13,7 +13,7 @@ import javax.jdo.Query;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #17 $ $Date: 2004/07/14 $
+ * @version $Revision: #18 $ $Date: 2004/07/14 $
  **/
 class CRPMap implements Map {
     private Set entries;
@@ -137,7 +137,7 @@ class CRPMap implements Map {
     }
 
     public void clear() {
-        throw new UnsupportedOperationException();
+        entries.clear();
     }
 
     public int size() {

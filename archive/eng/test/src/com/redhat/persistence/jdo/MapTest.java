@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
  * MapTest
  *
  * @since 2004-07-13
- * @version $Revision: #4 $ $Date: 2004/07/14 $
+ * @version $Revision: #5 $ $Date: 2004/07/14 $
  **/
 public class MapTest extends WithTxnCase {
     private final static Logger s_log = Logger.getLogger(MapTest.class);
@@ -87,6 +87,15 @@ public class MapTest extends WithTxnCase {
 
     public void testSize() {
         assertEquals("number of elements", 2, m_mag.getIndex().size());
+    }
+
+    public void testClear() {
+        Map idx = m_mag.getIndex();
+        assertFalse("empty", idx.isEmpty());
+        idx.clear();
+        // XXX: remove flushAll once debugged
+        m_ssn.flushAll();
+        assertEquals("size", 0, idx.size());
     }
 
 }
