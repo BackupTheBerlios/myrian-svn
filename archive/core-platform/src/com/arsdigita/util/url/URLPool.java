@@ -191,10 +191,10 @@ public class URLPool {
                 s_log.debug("URL Fetcher interrupted", ex);
             }
         } finally {
-            System.out.println("decrement");
+            s_log.debug("decrement");
             m_currentThreadCount--;
         }
-        System.out.println("Getting data");
+        s_log.debug("Getting data");
         return fetcher.getData();
     }
 
