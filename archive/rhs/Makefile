@@ -16,11 +16,8 @@ CLASSPATH:=$(CLASSPATH):$(SOURCEPATH)
 JSTAMPS:=$(SOURCES:%=$(BUILD)/%.jstamp)
 JARS:=$(SOURCES:%=$(BUILD)/%.jar)
 
-PKGS:=$(shell find $(SOURCES) -type d -exec sh -c "find {} -maxdepth 1 -type f | fgrep -q .java" \; -printf "%P\n" | sort -u | sed s@/@.@g)
 JD:=javadoc
-JD_SOURCEPATH:=-sourcepath src:cap/src
-JD_INCLUDES:=-version -author
-JD_FLAGS:=$(JD_SOURCEPATH) $(JD_INCLUDES)
+JD_FLAGS:=-version -author -quiet
 DOC_DEST:=$(BUILD)/doc
 
 all: $(JSTAMPS)
@@ -32,9 +29,9 @@ jars: $(JARS)
 clean:
 	rm -rf $(BUILD)
 
-doc:
+docs:
 	@mkdir -p $(DOC_DEST)
-	$(JD) $(JD_FLAGS) $(PKGS) -d $(DOC_DEST)
+	$(JD) $(JD_FLAGS) -d $(DOC_DEST) `find $(SOURCES) -name "*.java"`
 
 tags:
 	rm -f TAGS
