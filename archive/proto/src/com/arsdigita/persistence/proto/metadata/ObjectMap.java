@@ -1,17 +1,19 @@
 package com.arsdigita.persistence.proto.metadata;
 
+import com.arsdigita.persistence.proto.common.*;
+
 import java.util.*;
 
 /**
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/01/15 $
+ * @version $Revision: #4 $ $Date: 2003/01/15 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#3 $ by $Author: rhs $, $DateTime: 2003/01/15 09:35:55 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#4 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);

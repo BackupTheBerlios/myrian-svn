@@ -1,17 +1,18 @@
 package com.arsdigita.persistence.proto;
 
+import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.ObjectType;
 
 /**
  * Parameter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/01/06 $
+ * @version $Revision: #2 $ $Date: 2003/01/15 $
  **/
 
 public class Parameter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Parameter.java#1 $ by $Author: rhs $, $DateTime: 2003/01/06 16:31:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Parameter.java#2 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
 
     private ObjectType m_type;
     private Path m_path;

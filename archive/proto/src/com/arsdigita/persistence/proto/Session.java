@@ -1,5 +1,6 @@
 package com.arsdigita.persistence.proto;
 
+import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
 import java.util.*;
 import java.io.*;
@@ -13,12 +14,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2003/01/13 $
+ * @version $Revision: #15 $ $Date: 2003/01/15 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#14 $ by $Author: rhs $, $DateTime: 2003/01/13 16:40:35 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#15 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -289,6 +290,23 @@ public class Session {
         }
 
         return result[0];
+    }
+
+    Object get(OID start, Path path) {
+        if (path.getParent() == null) {
+            return get(start,
+                       start.getObjectType().getProperty(path.getName()));
+        } else {
+            Object value = get(start, path.getParent());
+            if (value instanceof PersistentObject) {
+                OID oid = ((PersistentObject) value).getOID();
+                return get(oid,
+                           oid.getObjectType().getProperty(path.getName()));
+            } else {
+                throw new IllegalArgumentException
+                    ("Path refers to attribute of opaque type: " + path);
+            }
+        }
     }
 
 /*    private OID getLink(OID oid, Property prop, Object value) {
@@ -644,10 +662,10 @@ public class Session {
     private Query getRetrieveQuery(OID oid) {
         ObjectType type = oid.getObjectType();
         Signature sig = getRetrieveSignature(type);
-        Parameter start = new Parameter(type, Path.getInstance("__start__"));
+        Parameter start = new Parameter(type, Path.get("__start__"));
         sig.addParameter(start);
         Query q = new Query
-            (sig, new EqualsFilter(Path.getInstance("__start__"), null));
+            (sig, new EqualsFilter(Path.get("__start__"), null));
         q.set(start, POS.getPersistentObject(this, oid));
         return q;
     }
@@ -657,13 +675,13 @@ public class Session {
             ObjectType type = prop.getType();
             Signature sig = getRetrieveSignature(type);
             Parameter start = new Parameter(prop.getContainer(),
-                                            Path.getInstance("__start__"));
+                                            Path.get("__start__"));
             sig.addParameter(start);
 
             // should filter to associated object(s)
             // should deal with one way associations
             Filter f = new ContainsFilter
-                (Path.getInstance("__start__." + prop.getName()), null);
+                (Path.get("__start__." + prop.getName()), null);
             Query q = new Query(sig, f);
             q.set(start, POS.getPersistentObject(this, oid));
             return q;
@@ -671,12 +689,12 @@ public class Session {
             ObjectType type = oid.getObjectType();
             Signature sig = new Signature(type);
             sig.addPath(prop.getName());
-            sig.addDefaultProperties(Path.getInstance(prop.getName()));
+            sig.addDefaultProperties(Path.get(prop.getName()));
             Parameter start = new Parameter(type,
-                                            Path.getInstance("__start__"));
+                                            Path.get("__start__"));
             sig.addParameter(start);
             Query q = new Query
-                (sig, new EqualsFilter(Path.getInstance("__start__"), null));
+                (sig, new EqualsFilter(Path.get("__start__"), null));
             q.set(start, POS.getPersistentObject(this, oid));
             return q;
         }

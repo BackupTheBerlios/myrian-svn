@@ -26,12 +26,12 @@ import java.util.*;
  * the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/15 $
+ * @version $Revision: #3 $ $Date: 2003/01/15 $
  */
 
 public class Column extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Column.java#2 $ by $Author: rhs $, $DateTime: 2003/01/15 09:35:55 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Column.java#3 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
 
     /**
      * The name of this Column.
@@ -49,6 +49,11 @@ public class Column extends Element {
      **/
     private int m_size;
 
+    /**
+     * The precision of this Column or -1 if the Column has no precision.
+     **/
+    private int m_precision;
+
     private boolean m_isNullable = true;
     private Set m_constraints = new HashSet();
 
@@ -61,24 +66,39 @@ public class Column extends Element {
      * @pre (table != null && columnName != null)
      **/
 
-    public Column(Table table, String columnName) {
-        this(table, columnName, Integer.MIN_VALUE, -1, true);
+    public Column(String columnName) {
+        this(columnName, Integer.MIN_VALUE);
     }
 
     /**
      * Constructs a new Column with the given table, columnName, and JDBC
      * integer type code.
      *
-     * @param table The name of the table this Column belongs to.
      * @param columnName The name of this Column.
      * @param type The JDBC integer type code for this Column.
      *
-     * @pre (table != null && columnName != null)
+     * @pre (columnName != null)
      * @pre Utilities.isJDBCType(type)
      **/
 
-    public Column(Table table, String columnName, int type) {
-        this(table, columnName, type, -1, true);
+    public Column(String columnName, int type) {
+        this(columnName, type, -1);
+    }
+
+
+    /**
+     * Constructs a new column with the given columnName, type and size.
+     *
+     * @param columnName The name of this Column.
+     * @param type The JDBC integer type code for this Column.
+     * @param size The size of this Column.
+     *
+     * @pre (columnName != null)
+     * @pre Utilities.isJDBCType(type)
+     **/
+
+    public Column(String columnName, int type, int size) {
+        this(columnName, type, size, -1);
     }
 
 
@@ -86,54 +106,46 @@ public class Column extends Element {
      * Constructs a new Column with the given table, columnName, JDBC
      * integer type code, and size.
      *
-     * @param table The name of the table this Column belongs to.
      * @param columnName The name of this Column.
      * @param type The JDBC integer type code for this Column.
      * @param size The size of this Column.
      *
-     * @pre (table != null && columnName != null)
+     * @pre (columnName != null)
      * @pre Utilities.isJDBCType(type)
      * @pre size >= -1
      **/
 
-    public Column(Table table, String columnName, int type, int size) {
-        this(table, columnName, type, size, true);
+    public Column(String columnName, int type, int size, int precision) {
+        this(columnName, type, size, precision, true);
     }
 
     /**
      * Constructs a new Column with the given table, columnName, JDBC
      * integer type code, and size.
      *
-     * @param table The name of the table this Column belongs to.
      * @param columnName The name of this Column.
      * @param type The JDBC integer type code for this Column.
      * @param size The size of this Column.
+     * @param precision The precision of this Column.
      * @param isNullable True if the column is nullable.
      *
-     * @pre (table != null && columnName != null)
+     * @pre (columnName != null)
      * @pre Utilities.isJDBCType(type)
      * @pre size >= -1
      **/
 
-    public Column(Table table, String name, int type, int size,
+    public Column(String name, int type, int size, int precision,
                   boolean isNullable) {
         m_name = name;
         m_type = type;
         m_size = size;
+        m_precision = precision;
         m_isNullable = isNullable;
 
         if (m_size == 0) {
-            throw new IllegalArgumentException(
-                                               "Size cannot be zero"
-                                               );
+            throw new IllegalArgumentException
+                ("Size cannot be zero");
         }
-
-        if (table.getColumn(m_name) != null) {
-            throw new IllegalArgumentException(
-                                               "Table already has column: " + m_name
-                                               );
-        }
-        table.addColumn(this);
     }
 
 

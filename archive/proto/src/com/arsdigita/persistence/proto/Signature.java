@@ -1,5 +1,6 @@
 package com.arsdigita.persistence.proto;
 
+import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
 import java.util.*;
 
@@ -7,12 +8,12 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/01/10 $
+ * @version $Revision: #9 $ $Date: 2003/01/15 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#8 $ by $Author: rhs $, $DateTime: 2003/01/10 17:10:28 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#9 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
 
     private ObjectType m_type;
     private HashMap m_paths = new HashMap();
@@ -34,7 +35,7 @@ public class Signature {
 
     public void addPath(String path) {
         if (!m_paths.containsKey(path)) {
-            m_paths.put(path, Path.getInstance(path));
+            m_paths.put(path, Path.get(path));
         }
     }
 
@@ -123,7 +124,7 @@ public class Signature {
             type = m_type;
             prefix = "";
         } else {
-            type = path.getType(m_type);
+            type = m_type.getType(path);
             prefix = path.getPath() + ".";
         }
 
@@ -137,7 +138,7 @@ public class Signature {
     }
 
     public void addDefaultProperties(Path path) {
-        addProperties(path, path.getType(m_type).getProperties());
+        addProperties(path, m_type.getType(path).getProperties());
     }
 
     public void addDefaultProperties() {

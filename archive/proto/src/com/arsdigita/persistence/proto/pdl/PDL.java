@@ -13,12 +13,12 @@ import java.util.*;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/01/15 $
+ * @version $Revision: #6 $ $Date: 2003/01/15 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#5 $ by $Author: rhs $, $DateTime: 2003/01/15 10:39:47 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#6 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
 
     private AST m_ast = new AST();
     private ErrorReport m_errors = new ErrorReport();
@@ -149,6 +149,7 @@ public class PDL {
         }
 
         emitDDL(root);
+        emitMapping(root);
     }
 
     private void emitDDL(Root root) {
@@ -159,15 +160,25 @@ public class PDL {
         }
 
         m_ast.traverse(new Node.Switch() {
-                public void onColumn(ColumnNd col) {
+                public void onColumn(ColumnNd colNd) {
                     Table table =
-                        (Table) tables.get(col.getTable().getName());
+                        (Table) tables.get(colNd.getTable().getName());
                     if (table == null) {
-                        table = new Table(col.getTable().getName());
+                        table = new Table(colNd.getTable().getName());
                         tables.put(table.getName(), table);
+                    }
+
+                    Column col = table.getColumn(colNd.getName().getName());
+                    if (col == null) {
+                        col = new Column(colNd.getName().getName());
+                        table.addColumn(col);
                     }
                 }
             });
+    }
+
+    private void emitMapping(Root root) {
+        
     }
 
     public static final void main(String[] args) throws Exception {

@@ -1,5 +1,6 @@
 package com.arsdigita.persistence.proto.engine;
 
+import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
 import com.arsdigita.persistence.proto.*;
 
@@ -12,12 +13,12 @@ import java.util.*;
  * MemoryEngine
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/01/13 $
+ * @version $Revision: #8 $ $Date: 2003/01/15 $
  **/
 
 public class MemoryEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#7 $ by $Author: rhs $, $DateTime: 2003/01/13 16:40:35 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#8 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
 
     private static final Logger LOG = Logger.getLogger(MemoryEngine.class);
 

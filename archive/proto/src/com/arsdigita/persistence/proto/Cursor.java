@@ -1,5 +1,6 @@
 package com.arsdigita.persistence.proto;
 
+import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.ObjectType;
 import com.arsdigita.persistence.proto.metadata.Property;
 
@@ -9,12 +10,12 @@ import java.util.*;
  * Cursor
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/01/11 $
+ * @version $Revision: #8 $ $Date: 2003/01/15 $
  **/
 
 public class Cursor {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Cursor.java#7 $ by $Author: rhs $, $DateTime: 2003/01/11 09:31:47 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Cursor.java#8 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
 
     private DataSet m_dset;
     private Session m_ssn;
@@ -44,7 +45,7 @@ public class Cursor {
             throw new IllegalStateException
                 ("Cursor not currently on row.");
         }
-        return path.get(m_ssn, m_current);
+        return m_ssn.get(m_current, path);
     }
 
     public Object get(String path) {

@@ -1,15 +1,17 @@
 package com.arsdigita.persistence.proto;
 
+import com.arsdigita.persistence.proto.common.*;
+
 /**
  * ContainsFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/01/13 $
+ * @version $Revision: #4 $ $Date: 2003/01/15 $
  **/
 
 public class ContainsFilter extends Filter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ContainsFilter.java#3 $ by $Author: rhs $, $DateTime: 2003/01/13 16:40:35 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ContainsFilter.java#4 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
 
     private Path m_collection;
     private Path m_element;

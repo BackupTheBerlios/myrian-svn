@@ -24,12 +24,12 @@ import java.io.*;
  * Table
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/15 $
+ * @version $Revision: #3 $ $Date: 2003/01/15 $
  **/
 
 public class Table extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Table.java#2 $ by $Author: rhs $, $DateTime: 2003/01/15 09:35:55 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Table.java#3 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
 
     private String m_name;
     private Mist m_columns = new Mist(this);
@@ -93,7 +93,7 @@ public class Table extends Element {
         return getForeignKey(new Column[] {column});
     }
 
-    void addColumn(Column column) {
+    public void addColumn(Column column) {
         m_columns.add(column);
     }
 

@@ -1,15 +1,17 @@
 package com.arsdigita.persistence.proto;
 
+import com.arsdigita.persistence.proto.common.*;
+
 /**
  * InFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/01/13 $
+ * @version $Revision: #5 $ $Date: 2003/01/15 $
  **/
 
 public class InFilter extends Filter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/InFilter.java#4 $ by $Author: rhs $, $DateTime: 2003/01/13 16:40:35 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/InFilter.java#5 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
 
     private Path m_path;
     private Query m_query;

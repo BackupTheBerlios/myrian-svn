@@ -1,17 +1,18 @@
 package com.arsdigita.persistence.proto.metadata;
 
+import com.arsdigita.persistence.proto.common.*;
 import java.util.*;
 
 /**
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/01/15 $
+ * @version $Revision: #5 $ $Date: 2003/01/15 $
  **/
 
 public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#4 $ by $Author: rhs $, $DateTime: 2003/01/15 09:35:55 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#5 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
 
     private Model m_model;
     private String m_name;
@@ -91,6 +92,26 @@ public class ObjectType extends Element {
         } else {
             return null;
         }
+    }
+
+    public Property getProperty(Path path) {
+        if (path.getParent() == null) {
+            return getProperty(path.getName());
+        } else {
+            Property prop = getProperty(path.getParent());
+            ObjectType type = prop.getType();
+            return type.getProperty(path.getName());
+        }
+    }
+
+    public ObjectType getType(Path path) {
+        return getProperty(path).getType();
+    }
+
+    public boolean isKey(Path path) {
+        Property prop = getProperty(path);
+        ObjectMap map = getRoot().getObjectMap(prop.getContainer());
+        return map.getKeyProperties().contains(prop);
     }
 
     public Collection getRoles() {

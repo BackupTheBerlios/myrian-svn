@@ -1,5 +1,6 @@
 package com.arsdigita.persistence.proto;
 
+import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.ObjectType;
 import com.arsdigita.persistence.proto.metadata.Property;
 
@@ -9,12 +10,12 @@ import java.util.*;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/01/02 $
+ * @version $Revision: #3 $ $Date: 2003/01/15 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#2 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#3 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
 
     private Signature m_signature;
 
@@ -40,7 +41,7 @@ public abstract class RecordSet {
         for (Iterator it = paths.iterator(); it.hasNext(); ) {
             Path p = (Path) it.next();
             Path parent = p.getParent();
-            if (p.isKey(type)) {
+            if (type.isKey(p)) {
                 OID oid;
                 if (oids.containsKey(parent)) {
                     oid = (OID) oids.get(parent);
@@ -48,7 +49,7 @@ public abstract class RecordSet {
                     if (parent == null) {
                         oid = new OID(type);
                     } else {
-                        oid = new OID((ObjectType) parent.getType(type));
+                        oid = new OID(type.getType(parent));
                     }
                     oids.put(parent, oid);
                 }
@@ -70,7 +71,7 @@ public abstract class RecordSet {
 
             Property prop = oid.getObjectType().getProperty(p.getName());
 
-            if (p.isKey(type)) {
+            if (type.isKey(p)) {
                 ssn.load(oid, prop, oid.get(p.getName()));
             } else {
                 ssn.load(oid, prop, get(p));

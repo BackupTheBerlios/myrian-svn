@@ -1,25 +1,32 @@
 package com.arsdigita.persistence.proto.metadata;
 
+import com.arsdigita.persistence.proto.common.*;
+
+import java.util.*;
+
 /**
  * ReferenceMapping
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2002/12/31 $
+ * @version $Revision: #2 $ $Date: 2003/01/15 $
  **/
 
 public class ReferenceMapping extends Mapping {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ReferenceMapping.java#1 $ by $Author: rhs $, $DateTime: 2002/12/31 15:39:17 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ReferenceMapping.java#2 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
 
-    private Join m_join;
+    private ArrayList m_joins = new ArrayList();
 
-    public ReferenceMapping(Path path, Join join) {
+    public ReferenceMapping(Path path) {
         super(path);
-        m_join = join;
     }
 
-    public Join getJoin() {
-        return m_join;
+    public Collection getJoins() {
+        return m_joins;
+    }
+
+    public void addJoin(Join join) {
+        m_joins.add(join);
     }
 
 }
