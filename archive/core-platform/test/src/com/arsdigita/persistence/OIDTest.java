@@ -28,15 +28,15 @@ import org.apache.log4j.Logger;
  *
  *
  * @author Michael Bryzek
- * @date $Date: 2002/12/11 $
- * @version $Revision: #7 $
+ * @date $Date: 2003/06/30 $
+ * @version $Revision: #8 $
  *
  * @see com.arsdigita.persistence.OID
  **/
 
 public class OIDTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OIDTest.java#7 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OIDTest.java#8 $ by $Author: ashah $, $DateTime: 2003/06/30 17:31:41 $";
 
     private static Logger s_log =
         Logger.getLogger(OIDTest.class.getName());
@@ -134,20 +134,12 @@ public class OIDTest extends TestCase {
         assertTrue(oid.arePropertiesNull() == false);
         OID oid2 = new OID(TYPE);
         assertTrue(oid2.arePropertiesNull());
-
-        oid2.set("id", null);
-        assertTrue(oid2.arePropertiesNull());
         oid2.set("id", new BigDecimal(12));
         assertTrue(oid2.arePropertiesNull() == false);
     }
 
     public void testSetTypeValidation() {
-        // should work
-        oid.set("id", null);
-
-        // should work
-        oid.set("id", new BigDecimal(12));
-
+        oid = new OID(TYPE);
         try {
             oid.set("id", new Integer(12));
             fail("Initializing BigDecimal field w/ " +
