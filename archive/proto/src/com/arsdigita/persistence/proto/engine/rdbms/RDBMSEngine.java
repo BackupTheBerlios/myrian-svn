@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #32 $ $Date: 2003/04/15 $
+ * @version $Revision: #33 $ $Date: 2003/04/23 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#32 $ by $Author: ashah $, $DateTime: 2003/04/15 10:07:23 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#33 $ by $Author: ashah $, $DateTime: 2003/04/23 09:29:41 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -249,7 +249,7 @@ public class RDBMSEngine extends Engine {
     }
 
     private void addObjectDependency(Event ev, Object obj) {
-        ObjectEvent oe = m_events.getLastEvent(ev.getObject());
+        ObjectEvent oe = m_events.getLastEvent(obj);
         if (oe != null) {
             addArrow(oe, ev);
         }
