@@ -113,7 +113,7 @@ public class BaseTestSetup extends TestDecorator {
 
             LoadSQLPlusScript loader = new LoadSQLPlusScript();
             loader.setConnection ( ConnectionManager.getConnection() );
-            loader.loadSQLPlusScript ( null, null, null, setupSQLScript );
+            loader.loadSQLPlusScript ( setupSQLScript );
 
         }
     }
@@ -123,7 +123,7 @@ public class BaseTestSetup extends TestDecorator {
 
             LoadSQLPlusScript loader = new LoadSQLPlusScript();
             loader.setConnection ( ConnectionManager.getConnection() );
-            loader.loadSQLPlusScript ( null, null, null, teardownSQLScript );
+            loader.loadSQLPlusScript ( teardownSQLScript );
 
         }
     }
