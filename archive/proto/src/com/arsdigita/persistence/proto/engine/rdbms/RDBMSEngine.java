@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #15 $ $Date: 2003/02/17 $
+ * @version $Revision: #16 $ $Date: 2003/02/18 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#15 $ by $Author: rhs $, $DateTime: 2003/02/17 20:13:29 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#16 $ by $Author: rhs $, $DateTime: 2003/02/18 01:41:05 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -80,6 +80,7 @@ public class RDBMSEngine extends Engine {
     }
 
     protected void commit() {
+        acquire();
         try {
             m_conn.commit();
         } catch (SQLException e) {
@@ -90,6 +91,7 @@ public class RDBMSEngine extends Engine {
     }
 
     protected void rollback() {
+        acquire();
         try {
             m_conn.rollback();
         } catch (SQLException e) {
@@ -116,11 +118,14 @@ public class RDBMSEngine extends Engine {
     }
 
     public void flush() {
-        for (Iterator it = m_operations.iterator(); it.hasNext(); ) {
-            DML dml = (DML) it.next();
-            execute(dml);
+        try {
+            for (Iterator it = m_operations.iterator(); it.hasNext(); ) {
+                DML dml = (DML) it.next();
+                execute(dml);
+            }
+        } finally {
+            clearOperations();
         }
-        clearOperations();
     }
 
     private ResultSet execute(Select select) {

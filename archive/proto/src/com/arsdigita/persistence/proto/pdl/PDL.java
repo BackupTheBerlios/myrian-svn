@@ -20,12 +20,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #18 $ $Date: 2003/02/17 $
+ * @version $Revision: #19 $ $Date: 2003/02/18 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#18 $ by $Author: rhs $, $DateTime: 2003/02/17 20:13:29 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#19 $ by $Author: rhs $, $DateTime: 2003/02/18 01:41:05 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -311,13 +311,127 @@ public class PDL {
                             }
                         }
                     },
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
+                new Binder() {
+                        public void bind(PreparedStatement ps, int index,
+                                         Object obj, int type)
+                            throws SQLException {
+                            byte[] bytes = (byte[]) obj;
+                            ps.setBytes(index, bytes);
+                        }
+
+                        public Object fetch(ResultSet rs, String column)
+                            throws SQLException {
+                            return rs.getBytes(column);
+                        }
+                    },
+                new Binder() {
+                        public void bind(PreparedStatement ps, int index,
+                                         Object obj, int type)
+                            throws SQLException {
+                            ps.setByte(index, ((Byte) obj).byteValue());
+                        }
+
+                        public Object fetch(ResultSet rs, String column)
+                            throws SQLException {
+                            byte b = rs.getByte(column);
+                            if (rs.wasNull()) {
+                                return null;
+                            } else {
+                                return new Byte(b);
+                            }
+                        }
+                    },
+                new Binder() {
+                        public void bind(PreparedStatement ps, int index,
+                                         Object obj, int type)
+                            throws SQLException {
+                            Character charObj = (Character)obj;
+                            if (charObj == null ||
+                                "".equals(charObj.toString())) {
+                                ps.setString(index, null);
+                            } else {
+                                ps.setString(index, charObj.toString());
+                            }
+                        }
+                
+                        public Object fetch(ResultSet rs, String column)
+                            throws SQLException {
+                            String str = rs.getString(column);
+                            if (str != null && str.length() > 0) {
+                                return new Character(str.charAt(0));
+                            } else {
+                                return null;
+                            }
+                        }
+                    },
+                new Binder() {
+                        public void bind(PreparedStatement ps, int index,
+                                         Object obj, int type)
+                            throws SQLException {
+                            ps.setDouble(index, ((Double) obj).doubleValue());
+                        }
+
+                        public Object fetch(ResultSet rs, String column)
+                            throws SQLException {
+                            double d = rs.getDouble(column);
+                            if (rs.wasNull()) {
+                                return null;
+                            } else {
+                                return new Double(d);
+                            }
+                        }
+                    },
+                new Binder() {
+                        public void bind(PreparedStatement ps, int index,
+                                         Object obj, int type)
+                            throws SQLException {
+                            ps.setShort(index, ((Short) obj).shortValue());
+                        }
+                
+                        public Object fetch(ResultSet rs, String column)
+                            throws SQLException {
+                            short s = rs.getShort(column);
+                            if (rs.wasNull()) {
+                                return null;
+                            } else {
+                                return new Short(s);
+                            }
+                        }
+                    },
+                new Binder() {
+                        public void bind(PreparedStatement ps, int index,
+                                         Object obj, int type)
+                            throws SQLException {
+                            ps.setLong(index, ((Long) obj).longValue());
+                        }
+
+                        public Object fetch(ResultSet rs, String column)
+                            throws SQLException {
+                            long l = rs.getLong(column);
+                            if (rs.wasNull()) {
+                                return null;
+                            } else {
+                                return new Long(l);
+                            }
+                        }
+                    },
+                new Binder() {
+                        public void bind(PreparedStatement ps, int index,
+                                         Object obj, int type)
+                            throws SQLException {
+                            ps.setFloat(index, ((Float) obj).floatValue());
+                        }
+
+                        public Object fetch(ResultSet rs, String column)
+                            throws SQLException {
+                            float f = rs.getFloat(column);
+                            if (rs.wasNull()) {
+                                return null;
+                            } else {
+                                return new Float(f);
+                            }
+                        }
+                    }
             };
 
             for (int i = 0; i < types.length; i++) {
