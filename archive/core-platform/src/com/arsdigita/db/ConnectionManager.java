@@ -24,14 +24,14 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Revision: #11 $ $Date: 2002/10/10 $
+ * @version $Revision: #12 $ $Date: 2002/10/10 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: rhs $ - $Date: 2002/10/10 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#11 $";
+    public static final String versionId = "$Author: bche $ - $Date: 2002/10/10 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#12 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);
@@ -142,12 +142,10 @@ public class ConnectionManager {
         } catch (SQLException e) {
             SQLException wrapped = SQLExceptionHandler.wrap(e);
             if (wrapped instanceof DbNotAvailableException) {
-                disconnect();
+                pool.closeConnections();
             }
             throw wrapped;
         }
-
-        m_lastAttempt = System.currentTimeMillis();
 
         // We have to wait until here to set m_pool to the new value since we
         // don't want to make the pool available to other threads without
@@ -232,13 +230,16 @@ public class ConnectionManager {
         throws java.sql.SQLException {
 
         if (m_pool == null) {
-            long since = System.currentTimeMillis() - m_lastAttempt;
-            if (since > m_interval) {
-                connect();
-            } else {
-                throw new DbNotAvailableException
-                    ("The database went down. Will reattempt connecting in " +
-                     (m_interval - since) + " milliseconds.");
+            synchronized (this) {
+                long since = System.currentTimeMillis() - m_lastAttempt;
+                if (since > m_interval) {
+                    m_lastAttempt = System.currentTimeMillis();
+                    connect();
+                } else {
+                    throw new DbNotAvailableException
+                        ("The database went down. Will reattempt connecting in " +
+                         (m_interval - since) + " milliseconds.");
+                }
             }
         }
 

@@ -30,12 +30,12 @@ import java.sql.PreparedStatement;
  * Class for processing of Oracle DB Exceptions.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #9 $
+ * @version $Revision: #10 $
  * @since 4.6
  */
 public class OracleDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleDbExceptionHandlerImpl.java#9 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleDbExceptionHandlerImpl.java#10 $";
 
     static {
         // lots of stuff can keep us away from the DB...
@@ -77,6 +77,9 @@ public class OracleDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
                    com.arsdigita.db.DbNotAvailableException.class);
         // TNS:listener could not find available handler with matching protocol stack
         errors.put("ORA-12516",
+                   com.arsdigita.db.DbNotAvailableException.class);
+        // TNS:listener could not find instance appropriate for the client connection
+        errors.put("ORA-12523",
                    com.arsdigita.db.DbNotAvailableException.class);
 
         // this one is pretty specific, thankfully.
