@@ -15,29 +15,26 @@
 
 package com.arsdigita.util;
 
-import javax.servlet.http.*;
-import java.util.*;
-import java.io.IOException;
 import javax.servlet.*;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  *  Dummy ServletContext object for unit testing of form methods that
  *  include requests in their signatures.
  *
  * @author <a href="mailto:richardl@arsdigita.com">richardl@arsdigita.com</a>
- * @version $Revision: #3 $ $Date: 2002/10/17 $
+ * @version $Revision: #4 $ $Date: 2002/10/21 $
  */
 
 public class DummyServletContext implements ServletContext {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/DummyServletContext.java#3 $ by $Author: jorris $, $DateTime: 2002/10/17 15:09:52 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/DummyServletContext.java#4 $ by $Author: jorris $, $DateTime: 2002/10/21 17:18:48 $";
 
-    private HashMap attributes;
+    private HashMap m_attributes = new HashMap();
     private HashMap m_dispachers = new HashMap();
 
-    public DummyServletContext() {
-        attributes = new HashMap();
-    }
 
     public Object getAttribute(String name) {
         return null;

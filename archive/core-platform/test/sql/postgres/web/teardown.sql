@@ -1,2 +1,2 @@
-drop table test_applicaton;
+drop table test_application;
 

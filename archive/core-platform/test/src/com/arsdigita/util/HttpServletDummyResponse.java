@@ -16,22 +16,18 @@
 package com.arsdigita.util;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import java.lang.UnsupportedOperationException;
+import javax.servlet.http.Cookie;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.io.IOException;
 
 public class HttpServletDummyResponse implements HttpServletResponse {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyResponse.java#5 $ by $Author: jorris $, $DateTime: 2002/10/21 09:09:49 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyResponse.java#6 $ by $Author: jorris $, $DateTime: 2002/10/21 17:18:48 $";
 
     private PrintStream m_out;
     private boolean     m_committed;
     private TestServletContainer m_container;
+   private Cookie m_cookie;
 
     public HttpServletDummyResponse() {
         m_out = System.out;
@@ -49,7 +45,7 @@ public class HttpServletDummyResponse implements HttpServletResponse {
 
 
     public void addCookie(javax.servlet.http.Cookie cookie) {
-        throw new UnsupportedOperationException("Method not implemented");
+      m_cookie = cookie;
     }
 
     public void addDateHeader(String name, long date) {
