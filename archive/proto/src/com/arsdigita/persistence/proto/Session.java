@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #16 $ $Date: 2003/01/17 $
+ * @version $Revision: #17 $ $Date: 2003/01/31 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#16 $ by $Author: rhs $, $DateTime: 2003/01/17 14:04:52 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#17 $ by $Author: rhs $, $DateTime: 2003/01/31 12:34:37 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -469,7 +469,7 @@ public class Session {
         }
 
         for (Event ev = m_head; ev != null; ev = ev.getNext()) {
-            ev.fire(m_engine.getEventHandler());
+            m_engine.write(ev);
         }
 
         m_engine.flush();
