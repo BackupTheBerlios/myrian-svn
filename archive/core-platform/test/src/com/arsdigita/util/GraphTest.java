@@ -1,0 +1,139 @@
+package com.arsdigita.util;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
+import junit.framework.TestCase;
+
+// The easiest way to run this is to add the following target to
+// //core-platform/dev/build.xml:
+// 
+//  <target name="graph-test">
+//    <junit printsummary="yes" fork="yes" haltonfailure="yes">
+//      <classpath refid="build.classpath"/>
+//      <formatter type="plain"/>
+//      <test name="GraphTest"/>
+//      <test name="GraphUtilTest"/>
+//    </junit>
+//  </target>
+
+public class GraphTest extends TestCase {
+    private static final String NODE_A = "A";
+    private static final String NODE_B = "B";
+    private static final String NODE_C = "C";
+    private static final String NODE_D = "D";
+
+    public void testAddNode() {
+        Graph graph = new Graph();
+        graph.addNode(NODE_A);
+        assertTrue("node count=1", graph.nodeCount() == 1);
+        graph.addNode(NODE_B);
+        assertTrue("node count=2", graph.nodeCount() == 2);
+        graph.addNode(NODE_B);
+        assertTrue("after adding twice, node count=2", graph.nodeCount() == 2);
+
+        assertTrue("A has no outgoing edges",
+                   !graph.getOutgoingEdges(NODE_A).iterator().hasNext());
+        assertTrue("A has no incoming edges", 
+                   !graph.getIncomingEdges(NODE_A).hasNext());
+    }
+
+    public void testAddEdge() {
+        Graph graph = new Graph();
+        final String label = "a to b";
+        graph.addEdge(NODE_A, NODE_B, label);
+        countEdges(graph);
+        graph.addEdge(NODE_A, NODE_B, label);
+        graph.addNode(NODE_A);
+        countEdges(graph);
+        graph.addNode(NODE_B);
+        countEdges(graph);
+    }
+
+    private static void countEdges(Graph graph) {
+        assertTrue("node count=2", graph.nodeCount() == 2);
+        assertTrue("A's expected out-edge count: 1. Actual count=" +
+                   graph.outgoingEdgeCount(NODE_A),
+                   graph.outgoingEdgeCount(NODE_A) == 1);
+        assertTrue("A has zero incoming edge count",
+                   graph.incomingEdgeCount(NODE_A) == 0);
+        assertTrue("B has zero outgoing edge count",
+                   graph.outgoingEdgeCount(NODE_B) == 0);
+        assertTrue("B has one incoming edge count",
+                   graph.incomingEdgeCount(NODE_B) == 1);
+    }
+
+    public void testCopy() {
+        Graph graphX = new Graph();
+        graphX.setLabel("X");
+        graphX.addEdge(NODE_A, NODE_B, "a -> b");
+        graphX.addEdge(NODE_A, NODE_C, "a -> c");
+        graphX.addEdge(NODE_B, NODE_C, "b -> c");
+
+        Graph graphY = graphX.copy();
+        graphY.setLabel("Y");
+
+        String diff = getPartialDiff(graphX, graphY);
+        assertNull("diff(X, Y) = " + diff, diff);
+        graphX.addEdge(NODE_C, NODE_D, "a -> d");
+        assertNotNull("X and Y should be different",
+                      getPartialDiff(graphX, graphY));
+    }
+
+    private static String getPartialDiff(Graph xx, Graph yy) {
+        String diff = diffNodesOneWay(xx, yy);
+        if (diff != null ) {
+            return diff;
+        }
+
+        diff = diffNodesOneWay(yy, xx);
+        if ( diff != null ) {
+            return diff;
+        }
+
+        diff = diffEdgesOneWay(xx, yy);
+        if ( diff != null ) {
+            return diff;
+        }
+
+        diff = diffEdgesOneWay(yy, xx);
+        if ( diff != null ) {
+            return diff;
+        }
+
+        return null;
+    }
+
+    private static String diffNodesOneWay(Graph xx, Graph yy) {
+        for (Iterator ii=xx.getNodes().iterator(); ii.hasNext(); ) {
+            Object node = ii.next();
+            if ( ! yy.hasNode(node) ) {
+                return xx.getLabel() + " has node " + nodeToString(node) +
+                    ", but " + yy.getLabel() + " does not";
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @pre nodeSuperset(xx, yy)
+     **/
+    private static String diffEdgesOneWay(Graph xx, Graph yy) {
+        for (Iterator ii=xx.getNodes().iterator(); ii.hasNext(); ) {
+            for (Iterator jj=xx.getOutgoingEdges(ii.next()).iterator(); jj.hasNext(); ) {
+                Graph.Edge edge = (Graph.Edge) jj.next();
+                if ( ! yy.hasEdge(edge) ) {
+                    return xx.getLabel() + " has the edge '" + edge +
+                        "', but " + yy.getLabel() + " does not.";
+                }
+            }
+        }
+        return null;
+    }
+
+    private static String nodeToString(Object node) {
+        return node == null ? "null" : node.toString();
+    }
+}
