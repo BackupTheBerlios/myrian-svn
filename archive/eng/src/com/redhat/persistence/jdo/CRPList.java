@@ -16,12 +16,13 @@ import org.apache.log4j.Logger;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2004/07/21 $
+ * @version $Revision: #12 $ $Date: 2004/07/21 $
  **/
 
 class CRPList implements List {
     private final static Logger s_log = Logger.getLogger(CRPList.class);
-    private final static Integer NOT_FOUND = new Integer(-1);
+    private final static int NEGATIVE_ONE  = -1;
+    private final static Integer NOT_FOUND = new Integer(NEGATIVE_ONE);
 
     private Map elements;
     private transient String m_fieldName;
@@ -147,24 +148,18 @@ class CRPList implements List {
     }
 
     public int lastIndexOf(Object element) {
-        // XXX: there is no syntax for specifying sort order in OQL
         Query query = getPMI().newQuery
             ("oql",
-             C.concat("sort(filter($1.",
+             C.concat("limit(rsort(filter($1.",
                       m_fieldName,
-                      ", value == $2), key)"));
+                      ", value == $2), key), 1)"));
         Collection coll = (Collection) query.execute(elements, element);
         Iterator it = coll.iterator();
-
-        MapEntry entry = null;
-        while (it.hasNext()) {
-            entry = (MapEntry) it.next();
-        }
-
-        if (entry == null) {
-            return -1;
-        } else {
+        if (it.hasNext()) {
+            MapEntry entry = (MapEntry) it.next();
             return ((Integer) entry.getKey()).intValue();
+        } else {
+            return NEGATIVE_ONE;
         }
     }
 
