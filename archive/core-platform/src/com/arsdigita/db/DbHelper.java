@@ -262,24 +262,28 @@ public class DbHelper {
     }
 
     /**
-     * Truncate a string to a specified byte length, respecting
-     * character boundaries.
+     * Truncate a string to a specified length, respecting character
+     * boundaries.
+     *
+     * @param s The string to be truncated.
+     * @param maxLength The maximum length of the string, in units that
+     * are database-dependent (for PG, characters; for Oracle, bytes).
      *
      * @see #varcharLength(String)
      */
-    public static String truncateString(String s, int maxLengthInBytes) {
+    public static String truncateString(String s, int maxLength) {
         String result = null;
 
         switch (getDatabase()) {
         case DB_POSTGRES:
-            result = s;
+            result = s.substring(0, maxLength);
             break;
         case DB_ORACLE:
             byte sBytes[] = s.getBytes();
-            byte sTruncateBytes[] = new byte[maxLengthInBytes];
+            byte sTruncateBytes[] = new byte[maxLength];
 
             // Truncate based on bytes, and construct a new string
-            System.arraycopy(sBytes, 0, sTruncateBytes, 0, maxLengthInBytes);
+            System.arraycopy(sBytes, 0, sTruncateBytes, 0, maxLength);
             String truncateString = new String(sTruncateBytes);
 
             // New string might have partially truncated a multi-byte
