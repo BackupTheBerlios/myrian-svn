@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/02/21 $
+ * @version $Revision: #10 $ $Date: 2004/02/21 $
  **/
 
 class Code {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#9 $ by $Author: rhs $, $DateTime: 2004/02/21 13:11:19 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#10 $ by $Author: rhs $, $DateTime: 2004/02/21 16:37:34 $";
 
     private static final Logger s_log = Logger.getLogger(Code.class);
 
@@ -573,7 +573,7 @@ class Code {
         }
     }
 
-    static String[] columns(Property prop, final String alias) {
+    static String[] columns(final Property prop, final String alias) {
         Mapping m = getMapping(prop);
 
         if (m.getRetrieve() != null) {
@@ -596,7 +596,12 @@ class Code {
             public void onJoinThrough(JoinThrough jt) {
                 result[0] = columns(jt.getTo(), alias);
             }
-            public void onStatic(Static s) {}
+            public void onStatic(Static s) {
+                ObjectMap map = s.getObjectMap();
+                SQLBlock block = map.getRetrieveAll();
+                result[0] = columns
+                    (paths(prop.getType(), s.getPath()), block);
+            }
         });
 
         return result[0];

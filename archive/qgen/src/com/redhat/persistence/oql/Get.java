@@ -11,12 +11,12 @@ import java.util.*;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2004/02/21 $
+ * @version $Revision: #11 $ $Date: 2004/02/21 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#10 $ by $Author: rhs $, $DateTime: 2004/02/21 13:11:19 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#11 $ by $Author: rhs $, $DateTime: 2004/02/21 16:37:34 $";
 
     private Expression m_expr;
     private String m_name;
@@ -79,11 +79,22 @@ public class Get extends Expression {
 
         Collection props = Code.properties(prop.getContainer());
         if (!props.contains(prop)) {
-            frame.setValues(Code.columns(prop, null));
-            frame.setTable(Code.table(prop));
-            PropertyCondition cond = new PropertyCondition(expr, prop, frame);
-            cond.frame(gen);
-            frame.setCondition(cond);
+            String[] columns = Code.columns(prop, null);
+            String table = Code.table(prop);
+            if (table == null) {
+                List values = new ArrayList();
+                for (int i = 0; i < columns.length; i++) {
+                    values.add(new QValue(expr, columns[i]));
+                }
+                frame.setValues(values);
+            } else {
+                frame.setValues(columns);
+                frame.setTable(table);
+                PropertyCondition cond =
+                    new PropertyCondition(expr, prop, frame);
+                cond.frame(gen);
+                frame.setCondition(cond);
+            }
         } else {
             int lower = 0;
             for (Iterator it = props.iterator(); it.hasNext(); ) {
