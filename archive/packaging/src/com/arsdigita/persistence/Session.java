@@ -58,7 +58,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/09/29 $
+ * @version $Revision: #8 $ $Date: 2003/10/03 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -117,7 +117,8 @@ public class Session {
         m_afterFP = new FlushEventProcessor(false);
         m_ssn.addBeforeFlush(m_beforeFP);
         m_ssn.addAfterFlush(m_afterFP);
-        m_ssn.addBeforeActivate(new EventProcessor() {
+
+        m_ssn.addBeforeDelete(new EventProcessor() {
             protected void cleanUp(boolean isCommit) { }
             protected void flush() { }
             protected void write(Event ev) {

@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/09/25 $
+ * @version $Revision: #8 $ $Date: 2003/10/03 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/Session.java#7 $ by $Author: justin $, $DateTime: 2003/09/25 14:54:00 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/Session.java#8 $ by $Author: justin $, $DateTime: 2003/10/03 18:41:07 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -52,7 +52,7 @@ public class Session {
 
     private Set m_violations = new HashSet();
 
-    private final Set m_beforeActivate = new HashSet();
+    private final Set m_beforeDelete = new HashSet();
     private final Set m_afterActivate = new HashSet();
     private final Set m_beforeFlush = new HashSet();
     private final Set m_afterFlush = new HashSet();
@@ -225,7 +225,7 @@ public class Session {
             }
             Expander e = new Expander(this);
             e.expand(new CreateEvent(this, obj));
-            activate(e.finish());
+            activate(e);
         } finally {
             if (LOG.isDebugEnabled()) {
                 untrace("create");
@@ -245,7 +245,7 @@ public class Session {
 
             Expander e = new Expander(this);
             e.expand(new DeleteEvent(this, obj));
-            activate(e.finish());
+            activate(e);
             return true;
         } finally {
             if (LOG.isDebugEnabled()) {
@@ -288,7 +288,7 @@ public class Session {
                 }
             });
 
-            activate(e.finish());
+            activate(e);
         } finally {
             if (LOG.isDebugEnabled()) {
                 untrace("set");
@@ -325,7 +325,7 @@ public class Session {
                 }
             });
 
-            activate(e.finish());
+            activate(e);
         } finally {
             if (LOG.isDebugEnabled()) {
                 untrace("add", result[0]);
@@ -342,7 +342,7 @@ public class Session {
             }
             Expander e = new Expander(this);
             remove(obj, prop, value, e);
-            activate(e.finish());
+            activate(e);
         } finally {
             if (LOG.isDebugEnabled()) {
                 untrace("remove");
@@ -384,7 +384,7 @@ public class Session {
             while (c.next()) {
                 remove(obj, prop, c.get(), e);
             }
-            activate(e.finish());
+            activate(e);
         } finally {
             if (LOG.isDebugEnabled()) {
                 untrace("clear");
@@ -707,17 +707,36 @@ public class Session {
         }
     }
 
-    private void activate(List pending) {
-        process(m_beforeActivate, pending);
-
-        for (Iterator it = pending.iterator(); it.hasNext(); ) {
-            Event ev = (Event) it.next();
-            ev.activate();
+    private void activate(Expander e) {
+        List pending = e.finish();
+        if (e.didDelete()) {
+            process(m_beforeDelete, pending);
         }
 
         List activated = new ArrayList();
-        activated.addAll(pending);
-        pending.clear();
+        for (Iterator it = pending.iterator(); it.hasNext(); ) {
+            Event ev = (Event) it.next();
+            if (e.didDelete()) {
+                ObjectData od = getObjectData(ev.getObject());
+                if (od != null && od.isDeleted()) {
+                    continue;
+                }
+
+                if (ev instanceof PropertyEvent) {
+                    PropertyEvent pev = (PropertyEvent) ev;
+                    Object arg = pev.getArgument();
+                    if (arg != null) {
+                        ObjectData pod = getObjectData(arg);
+                        if (pod != null && pod.isDeleted()) {
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            ev.activate();
+            activated.add(ev);
+        }
 
         computeFlushability();
 
@@ -882,15 +901,16 @@ public class Session {
     }
 
     /**
-     * Before activate event processors have the following constraint. It is
+     * Before delete event processors are sent events associated with deletes
+     * and removes that cause deletes. They have some constraints. It is
      * illegal to add objects to roles that are being deleted by the set of
      * events being activated. In other words, don't put an object in a
      * position in the object graph that would imply that it should be deleted
      * as a consequence of any delete event being activated.
      */
-    public void addBeforeActivate(EventProcessor ep) {
+    public void addBeforeDelete(EventProcessor ep) {
         check(ep);
-        m_beforeActivate.add(ep);
+        m_beforeDelete.add(ep);
     }
 
     public void addAfterActivate(EventProcessor ep) {
