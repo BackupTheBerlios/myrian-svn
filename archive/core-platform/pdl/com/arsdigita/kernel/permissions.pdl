@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/permissions.pdl#11 $
-// $DateTime: 2003/05/14 10:53:33 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/permissions.pdl#12 $
+// $DateTime: 2003/05/14 17:03:14 $
 
 model com.arsdigita.kernel.permissions;
 
@@ -565,7 +565,10 @@ object type ParameterizedPrivilege {
     String[1..1] basePrivilege = parameterized_privileges.base_privilege VARCHAR(100);
     String[1..1] paramKey = parameterized_privileges.param_key VARCHAR(100);
     String[0..1] paramName = parameterized_privileges.param_name VARCHAR(100);
-    Privilege[1..1] basePriv =
+
+    // this are 0..1 to avoid persistence 1..1 checks
+    // actually set with the basePrivilege property above
+    Privilege[0..1] basePriv =
         join parameterized_privileges.base_privilege
           to acs_privileges.privilege;
 
@@ -632,9 +635,7 @@ query ObjectPermissionCollection {
     Boolean granteeIsUser;
     String granteeName;
     String granteeEmail;
-    String granteeGivenName;
-    String granteeFamilyName;
-    BigDecimal granteeNameID;
+    PersonName granteePersonName;
     do {
         select acs_permissions.privilege,
                CASE
@@ -713,8 +714,8 @@ query ObjectPermissionCollection {
         granteeIsUser = parties.user_p;
         granteeName = parties.name;
         granteeEmail = parties.primary_email;
-        granteeGivenName = parties.given_name;
-        granteeFamilyName = parties.family_name;
-        granteeNameID = parties.name_id;
+        granteePersonName.id = parties.name_id;
+        granteePersonName.givenName = parties.given_name;
+        granteePersonName.familyName = parties.family_name;
     }
 }

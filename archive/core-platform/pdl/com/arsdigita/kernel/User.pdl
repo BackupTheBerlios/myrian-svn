@@ -11,19 +11,17 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/User.pdl#10 $
-// $DateTime: 2003/05/12 18:19:45 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/User.pdl#11 $
+// $DateTime: 2003/05/14 17:03:14 $
 
 model com.arsdigita.kernel;
 
 object type User extends Party {
-    PersonName[1..1] name = join users.name_id to person_names.name_id;
+    component PersonName[1..1] name =
+        join users.name_id to person_names.name_id;
     unique String screenName = users.screen_name VARCHAR(100);
 
     reference key (users.user_id);
-
-    // name_id is set during insert, and should never change.
-    add name{}
 }
 
 data operation ClearUserFromGroups {
