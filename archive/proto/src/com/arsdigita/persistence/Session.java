@@ -55,7 +55,7 @@ import java.sql.SQLException;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #19 $ $Date: 2003/03/13 $
+ * @version $Revision: #20 $ $Date: 2003/03/25 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -114,26 +114,11 @@ public class Session {
     }
 
     private ConnectionSource m_cs = new ConnectionSource() {
-            private List m_conns = new ArrayList();
-
             public Connection acquire() {
-                try {
-                    Connection conn =
-                        ConnectionManager.getCurrentThreadConnection();
-                    if (conn == null) {
-                        conn = ConnectionManager.getConnection();
-                        ConnectionManager.setCurrentThreadConnection(conn);
-                        conn.setAutoCommit(false);
-                    }
-                    return conn;
-                } catch (SQLException e) {
-                    throw new Error(e.getMessage());
-                }
+                return Session.this.getConnection();
             }
 
-            public void release(Connection conn) {
-                
-            }
+            public void release(Connection conn) { }
         };
     private RDBMSQuerySource m_qs = new RDBMSQuerySource();
     private RDBMSEngine m_engine = new RDBMSEngine(m_cs);
@@ -256,7 +241,17 @@ public class Session {
      **/
 
     public Connection getConnection() {
-        throw new Error("not implemented");
+        try {
+            Connection conn = ConnectionManager.getCurrentThreadConnection();
+            if (conn == null) {
+                conn = ConnectionManager.getConnection();
+                ConnectionManager.setCurrentThreadConnection(conn);
+                conn.setAutoCommit(false);
+            }
+            return conn;
+        } catch (SQLException e) {
+            throw new Error(e.getMessage());
+        }
     }
 
 

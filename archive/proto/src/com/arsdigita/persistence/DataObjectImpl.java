@@ -15,12 +15,12 @@ import java.util.*;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2003/03/14 $
+ * @version $Revision: #12 $ $Date: 2003/03/25 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#11 $ by $Author: ashah $, $DateTime: 2003/03/14 15:57:20 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#12 $ by $Author: ashah $, $DateTime: 2003/03/25 12:56:22 $";
 
     private Session m_ssn;
     private OID m_oid;
@@ -114,6 +114,8 @@ class DataObjectImpl implements DataObject {
     }
 
     public void set(String property, Object value) {
+        // all entry points for empty strings need to be converted to null
+        if ("".equals(value)) { value = null; }
         try {
             Property prop = getObjectType().getProperty(property);
             if (prop.isKeyProperty()) {
@@ -261,8 +263,8 @@ class DataObjectImpl implements DataObject {
                                 public void onSet(SetEvent e) {
                                     String prop = e.getProperty().getName();
                                     observer.set
-                                        (DataObjectImpl.this, prop, get(prop),
-                                         e.getArgument());
+                                        (DataObjectImpl.this, prop,
+                                         e.getPreviousValue(),e.getArgument());
                                 }
 
                                 public void onAdd(AddEvent e) {
