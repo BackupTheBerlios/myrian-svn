@@ -6,27 +6,27 @@ import com.arsdigita.persistence.proto.metadata.ObjectType;
  * DataSet
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/02 $
+ * @version $Revision: #3 $ $Date: 2003/01/06 $
  **/
 
 public class DataSet {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DataSet.java#2 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DataSet.java#3 $ by $Author: rhs $, $DateTime: 2003/01/06 16:31:02 $";
 
     private Session m_ssn;
-    private Query m_query;
+    private Binding m_binding;
 
-    protected DataSet(Session ssn, Query query) {
+    protected DataSet(Session ssn, Binding binding) {
         m_ssn = ssn;
-        m_query = query;
+        m_binding = binding;
     }
 
     public Session getSession() {
         return m_ssn;
     }
 
-    public Query getQuery() {
-        return m_query;
+    public Binding getBinding() {
+        return m_binding;
     }
 
     public Cursor getCursor() {

@@ -1,6 +1,7 @@
 package com.arsdigita.persistence.proto;
 
-import com.arsdigita.tools.junit.framework.BaseTestCase;
+import junit.framework.TestCase;
+//import com.arsdigita.tools.junit.framework.BaseTestCase;
 
 import com.arsdigita.persistence.proto.metadata.*;
 import com.arsdigita.persistence.proto.pdl.PDL;
@@ -12,12 +13,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/01/02 $
+ * @version $Revision: #5 $ $Date: 2003/01/06 $
  **/
 
-public class ProtoTest extends BaseTestCase {
+public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#4 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#5 $ by $Author: rhs $, $DateTime: 2003/01/06 16:31:02 $";
 
     public ProtoTest(String name) {
         super(name);

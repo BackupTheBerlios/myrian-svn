@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/01/02 $
+ * @version $Revision: #7 $ $Date: 2003/01/06 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#6 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#7 $ by $Author: rhs $, $DateTime: 2003/01/06 16:31:02 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -155,17 +155,17 @@ public class Session {
 
 
     /**
-     * Returns a PersistentCollection that corresponds to the given Query.
+     * Returns a PersistentCollection that corresponds to the given Binding.
      *
      * @param query A query object that specifies which objects are to be
      *              included in the collection and which properties are to be
      *              preloaded.
      *
-     * @return A PersistentCollection that corresponds to the given Query.
+     * @return A PersistentCollection that corresponds to the given Binding.
      **/
 
-    public PersistentCollection retrieve(Query query) {
-        return POS.getPersistentCollection(this, new DataSet(this, query));
+    public PersistentCollection retrieve(Binding binding) {
+        return POS.getPersistentCollection(this, new DataSet(this, binding));
     }
 
 
@@ -248,19 +248,33 @@ public class Session {
      * @return The value of the property.
      **/
 
-    public Object get(OID oid, Property prop) {
+    public Object get(final OID oid, Property prop) {
         if (LOG.isDebugEnabled()) {
             trace("get", new Object[] {oid, prop.getName()});
         }
 
-        PropertyData pd = fetchPropertyData(oid, prop);
-        Object result = pd.get();
+        final Object[] result = {null};
+
+        prop.dispatch(new Property.Switch() {
+                public void onRole(Role role) {
+                    PropertyData pd = fetchPropertyData(oid, role);
+                    result[0] = pd.get();
+                }
+
+                public void onAlias(Alias alias) {
+                    result[0] = get(oid, alias.getTarget());
+                }
+
+                public void onLink(Link link) {
+                    throw new Error("Not implemented yet");
+                }
+            });
 
         if (LOG.isDebugEnabled()) {
-            untrace("get", result);
+            untrace("get", result[0]);
         }
 
-        return result;
+        return result[0];
     }
 
 /*    private OID getLink(OID oid, Property prop, Object value) {
@@ -561,7 +575,7 @@ public class Session {
         } else if (prop.isCollection()) {
             pd = new PropertyData
                 (od, prop, POS.getPersistentCollection
-                 (this, new DataSet (this, getRetrieveQuery(oid, prop))));
+                 (this, new DataSet(this, getRetrieveQuery(oid, prop))));
         } else if (od.isNew()){
             pd = new PropertyData(od, prop, null);
         } else {
@@ -581,6 +595,8 @@ public class Session {
     }
 
     private boolean isAttribute(Property prop) {
+        // This should really look at the mapping metadata to figure out what
+        // to load by default.
         return prop.getType().getModel().equals(Model.getInstance("global"));
     }
 
@@ -597,52 +613,62 @@ public class Session {
         return result;
     }
 
-    private Filter getOIDFilter(OID oid) {
-        Filter f = null;
-        for (Iterator it = oid.getObjectMap().getKeyProperties().iterator();
-             it.hasNext(); ) {
-            Property prop = (Property) it.next();
-            Filter eq = m_engine.getEquals(Path.getInstance(prop.getName()),
-                                           oid.get(prop.getName()));
-            if (f == null) {
-                f = eq;
-            } else {
-                f = m_engine.getAnd(eq, f);
-            }
-        }
-
-        return f;
-    }
-
-    private Query getRetrieveQuery(OID oid) {
+    private Binding getRetrieveQuery(OID oid) {
         ObjectType type = oid.getObjectType();
         Signature sig = getRetrieveSignature(type);
-        return new Query(sig, getOIDFilter(oid));
+        Query q = new Query(sig);
+        q.addSource(new Source(type));
+        Parameter start = new Parameter(type, Path.getInstance("__start__"));
+        q.addParameter(start);
+        q.setFilter(m_engine.getEquals(Path.getInstance("__start__"),
+                                        null));
+        Binding b = new Binding(q);
+        b.set(start, POS.getPersistentObject(this, oid));
+        return b;
     }
 
-    private Query getRetrieveQuery(OID oid, Property prop) {
+    private Binding getRetrieveQuery(OID oid, Property prop) {
         if (isAttribute(prop)) {
             ObjectType type = oid.getObjectType();
             Signature sig = new Signature(type);
             sig.addPath(prop.getName());
-            return new Query(sig, getOIDFilter(oid));
+            Query q = new Query(sig);
+            q.addSource(new Source(type));
+            Parameter start = new Parameter(type,
+                                            Path.getInstance("__start__"));
+            q.addParameter(start);
+            q.setFilter(m_engine.getEquals(Path.getInstance("__start__"),
+                                           null));
+            Binding b = new Binding(q);
+            b.set(start, POS.getPersistentObject(this, oid));
+            return b;
         } else {
-            ObjectType type = (ObjectType) prop.getType();
+            ObjectType type = prop.getType();
             Signature sig = getRetrieveSignature(type);
+            Query q = new Query(sig);
+            q.addSource(new Source(type));
+            Parameter start = new Parameter(prop.getContainer(),
+                                            Path.getInstance("__start__"));
+            q.addParameter(start);
+
             // should filter to associated object(s)
             // should deal with one way associations
-            Filter f = null;
-            Role rev = ((Role) prop).getReverse();
-            if (rev != null) {
-                if (rev.isCollection()) {
-                    f = m_engine.getContains(Path.getInstance(rev.getName()),
-                                             oid);
-                } else {
-                    f = m_engine.getEquals(Path.getInstance(rev.getName()),
-                                           oid);
-                }
+            Filter f;
+            if (prop.isCollection()) {
+                f = m_engine.getContains
+                    (Path.getInstance("__start__." + prop.getName()),
+                     null);
+            } else {
+                f = m_engine.getEquals
+                    (Path.getInstance("__start__." + prop.getName()),
+                     null);
             }
-            return new Query(sig, f);
+
+            q.setFilter(f);
+            Binding b = new Binding(q);
+            b.set(start, POS.getPersistentObject(this, oid));
+
+            return b;
         }
     }
 

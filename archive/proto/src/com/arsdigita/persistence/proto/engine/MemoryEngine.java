@@ -12,12 +12,12 @@ import java.util.*;
  * MemoryEngine
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/01/02 $
+ * @version $Revision: #4 $ $Date: 2003/01/06 $
  **/
 
 public class MemoryEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#3 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#4 $ by $Author: rhs $, $DateTime: 2003/01/06 16:31:02 $";
 
     private static final Logger LOG = Logger.getLogger(MemoryEngine.class);
 
@@ -47,11 +47,11 @@ public class MemoryEngine extends Engine {
         m_uncomitted.clear();
     }
 
-    protected RecordSet execute(Query query) {
+    protected RecordSet execute(Binding binding) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("execute: " + query);
+            LOG.debug("execute: " + binding);
         }
-        DumbRecordSet drs = new DumbRecordSet(query);
+        DumbRecordSet drs = new DumbRecordSet(binding);
         if (LOG.isDebugEnabled()) {
             LOG.debug("result: " + drs);
         }
@@ -76,7 +76,7 @@ public class MemoryEngine extends Engine {
             }
 
             public void onRemove(RemoveEvent e) {
-                m_unflushed.remove(e);
+                m_unflushed.add(e);
             }
         };
 
@@ -89,28 +89,28 @@ public class MemoryEngine extends Engine {
         m_unflushed.clear();
     }
 
-    protected Filter getAnd(Filter leftOperand, Filter rightOperand) {
-        return new DumbAndFilter(leftOperand, rightOperand);
+    protected Filter getAnd(Filter left, Filter right) {
+        return new DumbAndFilter(left, right);
     }
 
-    protected Filter getOr(Filter leftOperand, Filter rightOperand) {
-        return new DumbOrFilter(leftOperand, rightOperand);
+    protected Filter getOr(Filter left, Filter right) {
+        return new DumbOrFilter(left, right);
     }
 
     protected Filter getNot(Filter operand) {
         return new DumbNotFilter(operand);
     }
 
-    protected Filter getEquals(Path path, Object value) {
-        return new DumbEqualsFilter(path, value);
+    protected Filter getEquals(Path left, Path right) {
+        return new DumbEqualsFilter(left, right);
     }
 
-    protected Filter getIn(Path path, Query query) {
-        return new DumbInFilter(path, query);
+    protected Filter getIn(Path path, Binding binding) {
+        return new DumbInFilter(path, binding);
     }
 
-    protected Filter getContains(Path path, Object value) {
-        return new DumbContainsFilter(path, value);
+    protected Filter getContains(Path collection, Path element) {
+        return new DumbContainsFilter(collection, element);
     }
 
     private Object get(OID oid, Property prop) {
@@ -158,35 +158,48 @@ public class MemoryEngine extends Engine {
         }
     }
 
-    private Object get(OID oid, Path p) {
+    private Object get(Binding binding, OID oid, Path p) {
+        if (p == null) {
+            return new PersistentObjectSource()
+                .getPersistentObject(getSession(), oid);
+        }
+
         Path parent = p.getParent();
         if (parent == null) {
-            return get(oid, oid.getObjectType().getProperty(p.getName()));
+            Parameter param = binding.getQuery().getParameter(p);
+            if (param == null) {
+                return get(oid,
+                           oid.getObjectType().getProperty(p.getName()));
+            } else {
+                return binding.get(param);
+            }
         } else {
-            Object value = get(oid, p.getParent());
+            Object value = get(binding, oid, p.getParent());
             if (value == null) {
                 return null;
             } else if (value instanceof PersistentObject) {
                 OID poid = ((PersistentObject) value).getOID();
                 return get(poid,
                            poid.getObjectType().getProperty(p.getName()));
-                } else {
-                    throw new IllegalArgumentException
-                        ("Path references attribute of opaque type: " + p);
-                }
+            } else {
+                throw new IllegalArgumentException
+                    ("Path references attribute of opaque type: " + p);
+            }
         }
     }
 
     private class DumbRecordSet extends RecordSet {
 
+        private Binding m_binding;
         private Query m_query;
         private Set m_oids = new HashSet();
         private Iterator m_it = null;
         private OID m_oid = null;
 
-        public DumbRecordSet(Query query) {
-            super(query.getSignature());
-            m_query = query;
+        public DumbRecordSet(Binding binding) {
+            super(binding.getQuery().getSignature());
+            m_binding = binding;
+            m_query = m_binding.getQuery();
 
             EventList[] els = {DATA, m_uncomitted};
             for (int j = 0; j < els.length; j++) {
@@ -205,11 +218,11 @@ public class MemoryEngine extends Engine {
                 }
             }
 
-            DumbFilter df = (DumbFilter) query.getFilter();
+            DumbFilter df = (DumbFilter) m_query.getFilter();
             if (df != null) {
                 for (Iterator it = m_oids.iterator(); it.hasNext(); ) {
                     OID oid = (OID) it.next();
-                    if (!df.accept(oid)) {
+                    if (!df.accept(m_binding, oid)) {
                         it.remove();
                     }
                 }
@@ -234,7 +247,7 @@ public class MemoryEngine extends Engine {
         }
 
         public Object get(Path p) {
-            return MemoryEngine.this.get(m_oid, p);
+            return MemoryEngine.this.get(m_binding, m_oid, p);
         }
 
         public String toString() {
@@ -244,28 +257,28 @@ public class MemoryEngine extends Engine {
     }
 
     interface DumbFilter {
-        boolean accept(OID oid);
+        boolean accept(Binding b, OID oid);
     }
 
     class DumbAndFilter extends AndFilter implements DumbFilter {
-        public DumbAndFilter(Filter leftOperand, Filter rightOperand) {
-            super(leftOperand, rightOperand);
+        public DumbAndFilter(Filter left, Filter right) {
+            super(left, right);
         }
 
-        public boolean accept(OID oid) {
-            return ((DumbFilter) getLeftOperand()).accept(oid) &&
-                ((DumbFilter) getRightOperand()).accept(oid);
+        public boolean accept(Binding b, OID oid) {
+            return ((DumbFilter) getLeft()).accept(b, oid) &&
+                ((DumbFilter) getRight()).accept(b, oid);
         }
     }
 
     class DumbOrFilter extends OrFilter implements DumbFilter {
-        public DumbOrFilter(Filter leftOperand, Filter rightOperand) {
-            super(leftOperand, rightOperand);
+        public DumbOrFilter(Filter left, Filter right) {
+            super(left, right);
         }
 
-        public boolean accept(OID oid) {
-            return ((DumbFilter) getLeftOperand()).accept(oid) ||
-                ((DumbFilter) getRightOperand()).accept(oid);
+        public boolean accept(Binding b, OID oid) {
+            return ((DumbFilter) getLeft()).accept(b, oid) ||
+                ((DumbFilter) getRight()).accept(b, oid);
         }
     }
 
@@ -274,20 +287,20 @@ public class MemoryEngine extends Engine {
             super(operand);
         }
 
-        public boolean accept(OID oid) {
-            return !((DumbFilter) getOperand()).accept(oid);
+        public boolean accept(Binding b, OID oid) {
+            return !((DumbFilter) getOperand()).accept(b, oid);
         }
     }
 
 
     class DumbEqualsFilter extends EqualsFilter implements DumbFilter {
-        public DumbEqualsFilter(Path path, Object value) {
-            super(path, value);
+        public DumbEqualsFilter(Path left, Path right) {
+            super(left, right);
         }
 
-        public boolean accept(OID oid) {
-            Object left = get(oid, getPath());
-            Object right = getValue();
+        public boolean accept(Binding b, OID oid) {
+            Object left = get(b, oid, getLeft());
+            Object right = get(b, oid, getRight());
             if (left == right) {
                 return true;
             } else if (left == null) {
@@ -299,25 +312,27 @@ public class MemoryEngine extends Engine {
     }
 
     class DumbInFilter extends InFilter implements DumbFilter {
-        public DumbInFilter(Path path, Query query) {
-            super(path, query);
+        public DumbInFilter(Path path, Binding binding) {
+            super(path, binding);
         }
 
-        public boolean accept(OID oid) {
-            Object val = get(oid, getPath());
-            DumbRecordSet drs = new DumbRecordSet(getQuery());
+        public boolean accept(Binding b, OID oid) {
+            Object val = get(b, oid, getPath());
+            DumbRecordSet drs = new DumbRecordSet(getBinding());
             return drs.getOIDs().contains(val);
         }
     }
 
     class DumbContainsFilter extends ContainsFilter implements DumbFilter {
-        public DumbContainsFilter(Path path, Object value) {
-            super(path, value);
+        public DumbContainsFilter(Path collection, Path element) {
+            super(collection, element);
         }
 
-        public boolean accept(OID oid) {
-            Set vals = (Set) get(oid, getPath());
-            return vals.contains(getValue());
+        public boolean accept(Binding b, OID oid) {
+            Set vals = (Set) get(b, oid, getCollection());
+            Object element = get(b, oid, getElement());
+            boolean result = vals.contains(element);
+            return result;
         }
     }
 
