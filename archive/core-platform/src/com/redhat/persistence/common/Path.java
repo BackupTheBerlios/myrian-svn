@@ -22,16 +22,18 @@ import java.util.Map;
  * Path
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2004/02/19 $
+ * @version $Revision: #7 $ $Date: 2004/02/19 $
  **/
 
 public class Path {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#6 $ by $Author: bche $, $DateTime: 2004/02/19 14:31:02 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#7 $ by $Author: bche $, $DateTime: 2004/02/19 16:41:18 $";
 
     private static final int N_BUCKETS = 64;
     private static final int BITMASK = N_BUCKETS - 1;
     private static final Map[] BUCKETS = new Map[N_BUCKETS];
+    //special case the id path since it shows up so often
+    private static final Path ID_PATH = new Path(null, "id");
     static {
         for (int ii=0; ii<N_BUCKETS; ii++) {
             BUCKETS[ii] = new HashMap();
@@ -41,6 +43,11 @@ public class Path {
     public static final Path get(String path) {
         if (path == null) {
             return null;
+        }
+
+        //special case the id path since it shows up so often
+        if ("id".equals(path)) {
+            return ID_PATH;
         }
 
         Map paths = BUCKETS[path.hashCode() & BITMASK];
