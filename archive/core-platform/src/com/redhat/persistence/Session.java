@@ -47,12 +47,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2004/04/07 $
+ * @version $Revision: #15 $ $Date: 2004/07/30 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Session.java#14 $ by $Author: dennis $, $DateTime: 2004/04/07 16:07:11 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Session.java#15 $ by $Author: mbooth $, $DateTime: 2004/07/30 07:33:58 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -76,6 +76,7 @@ public class Session {
     private final Set m_afterActivate = new HashSet();
     private final Set m_beforeFlush = new HashSet();
     private final Set m_afterFlush = new HashSet();
+    private final Set m_flushStates = new HashSet();
 
     private Event m_beforeFlushMarker = null;
 
@@ -596,12 +597,20 @@ public class Session {
         for (Iterator it = processors.iterator(); it.hasNext(); ) {
             EventProcessor ep = (EventProcessor) it.next();
 
+            if( LOG.isDebugEnabled() ) {
+                trace( "Event processor: " + ep.getClass().getName(), events.toArray() );
+            }
+
             for (Iterator it2 = events.iterator(); it2.hasNext(); ) {
                 Event ev = (Event) it2.next();
                 ep.write(ev);
             }
 
             ep.flush();
+
+            if( LOG.isDebugEnabled() ) {
+                untrace( "Event processor: " + ep.getClass().getName() );
+            }
         }
     }
 
@@ -639,13 +648,25 @@ public class Session {
      * datastore are consistent with the contents of the in memory data cache.
      **/
     public void flush() {
+        Set flushState = new HashSet( m_events.getEvents() );
+
         try {
             if (LOG.isDebugEnabled()) {
                 trace("flush", new Object[] {});
             }
 
+            // m_flushStates is a stack of previous states in the current flush
+            // If the current state is in the stack, there is a loop
+
+            if( m_flushStates.contains( flushState ) ) {
+                throw new FlushException( null, flushState, "because a loop has been detected. This state has been previously visited: " );
+            }
+            m_flushStates.add( flushState );
+
             flushInternal();
         } finally {
+            m_flushStates.remove( flushState );
+
             if (LOG.isDebugEnabled()) {
                 untrace("flush");
             }
@@ -710,6 +731,11 @@ public class Session {
 
         process(m_afterFlush, written);
 
+        // If we still have events left and there aren't any errors then an
+        // after flush event created a new, unflushed event. Try flushing
+        // again
+        if( m_violations.size() == 0 && m_events.size() > 0 ) flush();
+
         if (LOG.isInfoEnabled()) {
             if (m_events.size() > 0) {
                 LOG.info("unflushed: " + m_events.size());
@@ -728,6 +754,7 @@ public class Session {
         m_odata.clear();
         m_events.clear();
         m_violations.clear();
+        m_flushStates.clear();
         m_beforeFlushMarker = null;
         if (LOG.isDebugEnabled()) { setLevel(0); }
         cleanUpEventProcessors(isCommit);
