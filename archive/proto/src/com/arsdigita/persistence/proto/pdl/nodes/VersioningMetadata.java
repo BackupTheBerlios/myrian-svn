@@ -15,6 +15,8 @@
 
 package com.arsdigita.persistence.proto.pdl.nodes;
 
+import com.arsdigita.persistence.metadata.MetadataRoot;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +27,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #1 $ $Date: 2003/02/18 $
+ * @version $Revision: #2 $ $Date: 2003/02/19 $
  */
 public class VersioningMetadata {
     private final static Logger LOG =
@@ -34,30 +36,39 @@ public class VersioningMetadata {
     private final Node.Switch m_switch;
     private final Set m_versionedTypes;
 
-    private final static VersioningMetadata ROOT = new VersioningMetadata();
+    private final static VersioningMetadata SINGLETON =
+        new VersioningMetadata();
 
     private VersioningMetadata() {
         m_versionedTypes = new HashSet();
         m_switch = new Node.Switch() {
                 public void onObjectType(ObjectTypeNd ot) {
                     if ( ot.getVersioned() != null ) {
-                        LOG.info("emitVersioned: " + ot.getName() +
-                                 " is versioned.", new Throwable());
-                        // FIXME: should probably add the corresponding instance
-                        // of ObjectType instead. -- vadimn@redhat.com,
-                        // 2003-02-18
-                        m_versionedTypes.add(ot);
+                        m_versionedTypes.add(ot.getQualifiedName());
                     }
                 }
             };
     }
 
     public static VersioningMetadata getVersioningMetadata() {
-        return ROOT;
+        return SINGLETON;
     }
 
     public Node.Switch nodeSwitch() {
         return m_switch;
+    }
+
+    /**
+     * Returns <code>true</code> if the object type named by
+     * <code>qualifiedName</code> is marked versioned in the PDL definition.
+     * Note that this a weaker test than checking of an object type is
+     * versioned. A type is versioned if is marked versioned or if one its
+     * ancestor types is marked versioned.
+     *
+     * @param qualifiedName the fully qualified name of an object type
+     **/
+    public boolean isMarkedVersioned(String qualifiedName) {
+        return m_versionedTypes.contains(qualifiedName);
     }
 }
 
