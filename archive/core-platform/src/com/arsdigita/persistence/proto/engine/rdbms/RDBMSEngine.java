@@ -13,18 +13,19 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/05/23 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#2 $ by $Author: rhs $, $DateTime: 2003/05/23 10:13:40 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
 
     private EventStream m_events = new EventStream(true);
     private HashMap m_outgoing = new HashMap();
+    private HashMap m_causes = new HashMap();
     private HashMap m_counts = new HashMap();
 
     private ArrayList m_operations = new ArrayList();
@@ -160,6 +161,7 @@ public class RDBMSEngine extends Engine {
     void clearEvents() {
         m_events.clear();
         m_outgoing.clear();
+        m_causes.clear();
         m_counts.clear();
     }
 
@@ -210,6 +212,10 @@ public class RDBMSEngine extends Engine {
         return (Collection) m_outgoing.get(ev);
     }
 
+    private Collection getCauses(Event ev) {
+        return (Collection) m_causes.get(ev);
+    }
+
     private int getCount(Event ev) {
         if (m_counts.containsKey(ev)) {
             return ((Integer) m_counts.get(ev)).intValue();
@@ -226,16 +232,20 @@ public class RDBMSEngine extends Engine {
         }
     }
 
-    private void addArrow(Event from, Event to) {
+    private void addArrow(Event from, Event to, String cause) {
         LinkedList outgoing = (LinkedList) m_outgoing.get(from);
+        LinkedList causes = (LinkedList) m_causes.get(from);
         if (outgoing == null) {
             outgoing = new LinkedList();
+            causes = new LinkedList();
             m_outgoing.put(from, outgoing);
+            m_causes.put(from, causes);
         }
 
         setCount(to, getCount(to) + 1);
 
         outgoing.add(to);
+        causes.add(cause);
     }
 
     private void clearArrows(Event ev) {
@@ -246,12 +256,13 @@ public class RDBMSEngine extends Engine {
             setCount(to, getCount(to) - 1);
         }
         m_outgoing.remove(ev);
+        m_causes.remove(ev);
     }
 
     private void addObjectDependency(Event ev, Object obj) {
         ObjectEvent oe = m_events.getLastEvent(obj);
         if (oe != null) {
-            addArrow(oe, ev);
+            addArrow(oe, ev, "object dependency");
         }
     }
 
@@ -268,11 +279,11 @@ public class RDBMSEngine extends Engine {
                 public void onValue(Value m) { }
 
                 public void onJoinTo(JoinTo m) {
-                    addArrow(to, from);
+                    addArrow(to, from, prop + ": join to link dependency");
                 }
 
                 public void onJoinFrom(JoinFrom m) {
-                    addArrow(from, to);
+                    addArrow(from, to, prop + ": join from link dependency");
                 }
 
                 public void onJoinThrough(JoinThrough m) {
@@ -281,9 +292,9 @@ public class RDBMSEngine extends Engine {
 
                 public void onStatic(Static m) {
                     if (prop.isComponent()) {
-                        addArrow(from, to);
+                        addArrow(from, to, prop + ": static composition");
                     } else if (!prop.isCollection()) {
-                        addArrow(to, from);
+                        addArrow(to, from, prop + ": static reference");
                     }
                 }
             });
@@ -299,7 +310,7 @@ public class RDBMSEngine extends Engine {
                         m_events.getReachablePropertyEvents(e.getObject());
                     for (Iterator it = pes.iterator(); it.hasNext(); ) {
                         PropertyEvent pe = (PropertyEvent) it.next();
-                        addArrow(pe, e);
+                        addArrow(pe, e, "deletion object dependency");
                         Object arg;
                         if (pe instanceof SetEvent) {
                             if (pe.getArgument() != null) {
@@ -324,7 +335,7 @@ public class RDBMSEngine extends Engine {
                     addObjectDependency(e, arg);
 
                     PropertyEvent pe = m_events.getLastEvent(obj, prop);
-                    if (pe != null) { addArrow(pe, e); }
+                    if (pe != null) { addArrow(pe, e, "WAW hazard"); }
 
                     ObjectEvent objev = m_events.getLastEvent(obj);
                     ObjectEvent argev = m_events.getLastEvent(arg);
@@ -358,8 +369,18 @@ public class RDBMSEngine extends Engine {
         } while (generated.size() > before);
 
         if (generated.size() < m_events.size()) {
-            throw new IllegalStateException
-                ("not all events flushed");
+            HashSet ungenerated = new HashSet();
+            ungenerated.addAll(m_events.getEvents());
+            ungenerated.removeAll(generated);
+            StringBuffer msg = new StringBuffer();
+            msg.append("unable to generate all events");
+            for (Iterator it = ungenerated.iterator(); it.hasNext(); ) {
+                Event ev = (Event) it.next();
+                msg.append("\n  " + ev + ": ");
+                msg.append("\n    " + getOutgoing(ev));
+                msg.append("\n    " + getCauses(ev));
+            }
+            throw new IllegalStateException(msg.toString());
         }
     }
 
