@@ -21,13 +21,13 @@ import org.apache.log4j.Logger;
 
 /**
  * @author Justin Ross &lt;<a href="mailto:jross@redhat.com">jross@redhat.com</a>&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Record.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Record.java#2 $
  */
 public abstract class Record {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/Record.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/Record.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2002/11/21 00:42:37 $";
+        "$DateTime: 2002/12/10 00:15:19 $";
 
     private static final Logger s_log = Logger.getLogger(Record.class);
 
@@ -46,10 +46,10 @@ public abstract class Record {
         if (m_log.isDebugEnabled()) {
             synchronized (this) {
                 if (m_undergoingAccess == false) {
-                    final Method getter = getter(field);
+                    final Method accessor = accessor(field);
 
                     m_undergoingAccess = true;
-                    final String value = prettyLiteral(value(getter));
+                    final String value = prettyLiteral(value(accessor));
                     m_undergoingAccess = false;
 
                     m_log.debug("Returning " + value + " for " + field);
@@ -60,10 +60,10 @@ public abstract class Record {
 
     protected final void mutated(String field) {
         if (m_log.isInfoEnabled()) {
-            final Method getter = getter(field);
+            final Method accessor = accessor(field);
 
             m_undergoingAccess = true;
-            final String value = prettyLiteral(value(getter));
+            final String value = prettyLiteral(value(accessor));
             m_undergoingAccess = false;
 
             m_log.info(field + " set to " + value);
@@ -80,14 +80,21 @@ public abstract class Record {
         }
     }
 
-    private Method getter(final String field) {
+    private Method accessor(final String field) {
         try {
-            final Method getter = m_class.getDeclaredMethod
+            Method method = m_class.getDeclaredMethod
                 ("get" + field, new Class[] {});
 
-            return getter;
+            return method;
         } catch (NoSuchMethodException nsme) {
-            throw new UncheckedWrapperException(nsme);
+            try {
+                Method method = m_class.getDeclaredMethod
+                    ("is" + field, new Class[] {});
+
+                return method;
+            } catch (NoSuchMethodException me) {
+                throw new UncheckedWrapperException(nsme);
+            }
         }
     }
 
@@ -105,7 +112,7 @@ public abstract class Record {
         final StringBuffer info = new StringBuffer();
 
         for (int i = 0; i < m_fields.length; i++) {
-            final Method method = getter(m_fields[i]);
+            final Method method = accessor(m_fields[i]);
             final String name = method.getName();
             final String value = prettyLiteral(value(method));
             final int len = name.length();
