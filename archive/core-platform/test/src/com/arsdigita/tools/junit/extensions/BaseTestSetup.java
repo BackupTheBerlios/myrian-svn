@@ -1,33 +1,33 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
- *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
- *
- * Software distributed under the License is distributed on an "AS
- * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * rights and limitations under the License.
- *
- */
+* Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+*
+* The contents of this file are subject to the CCM Public
+* License (the "License"); you may not use this file except in
+* compliance with the License. You may obtain a copy of
+* the License at http://www.redhat.com/licenses/ccmpl.html
+*
+* Software distributed under the License is distributed on an "AS
+* IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+* implied. See the License for the specific language governing
+* rights and limitations under the License.
+*
+*/
 
 package com.arsdigita.tools.junit.extensions;
 
-import java.sql.Connection;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Iterator;
-import java.io.FileNotFoundException;
-
 import com.arsdigita.db.ConnectionManager;
-import com.arsdigita.db.DbHelper;
-import com.arsdigita.initializer.Script;
 import com.arsdigita.installer.LoadSQLPlusScript;
-import com.arsdigita.installer.ParseException;
-import junit.extensions.*;
-import junit.framework.*;
+import com.arsdigita.util.DummyServletContext;
+import com.arsdigita.util.ResourceManager;
+import junit.extensions.TestDecorator;
+import junit.framework.Protectable;
+import junit.framework.Test;
+import junit.framework.TestResult;
+import junit.framework.TestSuite;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A Decorator to set up and tear down additional fixture state.
@@ -36,17 +36,17 @@ import junit.framework.*;
  */
 public class BaseTestSetup extends TestDecorator {
 
-    protected boolean performInitialization = true;
-    protected String scriptName;
-    protected String iniName;
-    protected TestSuite suite;
+    private boolean m_performInitialization = true;
+    private String m_scriptName;
+    private String m_iniName;
+    private TestSuite m_suite;
 
     private List m_setupSQLScripts = new LinkedList();
     private List m_teardownSQLScripts = new LinkedList();
 
     public BaseTestSetup(Test test, TestSuite suite) {
         super(test);
-        this.suite = suite;
+        m_suite = suite;
     }
 
     public BaseTestSetup(TestSuite suite) {
@@ -55,12 +55,12 @@ public class BaseTestSetup extends TestDecorator {
 
     public void run(final TestResult result) {
         Protectable p= new Protectable() {
-                public void protect() throws Exception {
-                    setUp();
-                    basicRun(result);
-                    tearDown();
-                }
-            };
+            public void protect() throws Exception {
+                setUp();
+                basicRun(result);
+                tearDown();
+            }
+        };
         result.runProtected(this, p);
     }
 
@@ -81,27 +81,27 @@ public class BaseTestSetup extends TestDecorator {
     }
 
     public void setInitScript(String scriptName) {
-        this.scriptName = scriptName;
+        m_scriptName = scriptName;
     }
 
     public String getInitScript() {
-        return scriptName;
+        return m_scriptName;
     }
 
     public void setInitScriptTarget(String iniName) {
-        this.iniName = iniName;
+        m_iniName = iniName;
     }
 
     public String getInitScriptTarget() {
-        return iniName;
+        return m_iniName;
     }
 
     public void setPerformInitialization(boolean performInitialization) {
-        this.performInitialization = performInitialization;
+        m_performInitialization = performInitialization;
     }
 
     public boolean getPerformInitialization() {
-        return performInitialization;
+        return m_performInitialization;
     }
 
     /**
@@ -110,9 +110,10 @@ public class BaseTestSetup extends TestDecorator {
      */
 
     protected void setUp() throws Exception {
-        if ( suite.testCount() > 0 ) {
-            if (performInitialization) {
-                Initializer.startup(suite, scriptName, iniName);
+        if ( m_suite.testCount() > 0 ) {
+            if (m_performInitialization) {
+                ResourceManager.getInstance().setServletContext(new DummyServletContext());
+                Initializer.startup(m_suite, m_scriptName, m_iniName);
                 setupSQL ();
             }
         }
@@ -123,9 +124,9 @@ public class BaseTestSetup extends TestDecorator {
      * fixture state.
      */
     protected void tearDown() throws Exception {
-        if ( suite.testCount() > 0 ) {
+        if ( m_suite.testCount() > 0 ) {
             teardownSQL ();
-            if (performInitialization) {
+            if (m_performInitialization) {
                 Initializer.shutdown();
             }
         }
@@ -145,8 +146,8 @@ public class BaseTestSetup extends TestDecorator {
     }
 
     private void runScripts(List scripts) throws Exception {
-	LoadSQLPlusScript loader = new LoadSQLPlusScript();
-	loader.setConnection(ConnectionManager.getConnection());
+        LoadSQLPlusScript loader = new LoadSQLPlusScript();
+        loader.setConnection(ConnectionManager.getConnection());
         for (Iterator iterator = scripts.iterator(); iterator.hasNext();) {
             String script = (String) iterator.next();
             loader.loadSQLPlusScript(script, false, true);
