@@ -14,12 +14,12 @@ import java.util.Iterator;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/01/09 $
+ * @version $Revision: #2 $ $Date: 2003/01/10 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#1 $ by $Author: rhs $, $DateTime: 2003/01/09 18:21:44 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#2 $ by $Author: rhs $, $DateTime: 2003/01/10 14:18:26 $";
 
     private AST m_ast = new AST();
     private ErrorReport m_errors = new ErrorReport();
@@ -138,6 +138,17 @@ public class PDL {
                 AST.FILES, File.OBJECT_TYPES, ObjectType.OBJECT_KEY,
                 ObjectKey.PROPERTIES
             }));
+
+        for (Iterator it = root.getObjectTypes().iterator(); it.hasNext(); ) {
+            com.arsdigita.persistence.proto.metadata.ObjectType ot =
+                (com.arsdigita.persistence.proto.metadata.ObjectType)
+                it.next();
+            if (ot.getSupertype() != null) {
+                ObjectMap om = root.getObjectMap(ot);
+                ObjectMap bm = root.getObjectMap(ot.getBasetype());
+                om.getKeyProperties().addAll(bm.getKeyProperties());
+            }
+        }
     }
 
     public static final void main(String[] args) throws Exception {
