@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #59 $ $Date: 2003/04/15 $
+ * @version $Revision: #60 $ $Date: 2003/04/17 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#59 $ by $Author: ashah $, $DateTime: 2003/04/15 10:07:23 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#60 $ by $Author: ashah $, $DateTime: 2003/04/17 02:41:34 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -78,10 +78,9 @@ public class Session {
         final Object[] result = {null};
 
         if (!getObjectType(obj).hasKey()) {
-            return getProperties(obj).get(prop);
-        }
-
-        prop.dispatch(new Property.Switch() {
+            result[0] = getProperties(obj).get(prop);
+        } else {
+            prop.dispatch(new Property.Switch() {
                 public void onRole(Role role) {
                     PropertyData pd = fetchPropertyData(obj, role);
                     result[0] = pd.get();
@@ -95,6 +94,7 @@ public class Session {
 		    result[0] = retrieve(getQuery(obj, link));
                 }
             });
+        }
 
         if (LOG.isDebugEnabled()) {
             untrace("get", result[0]);
@@ -478,7 +478,8 @@ public class Session {
         flush();
         if (!isFlushed()) {
             throw new IllegalStateException
-                ("unflushed events:" + m_events.getEvents());
+                ("unflushed events:" + m_events.getEvents() +
+                 "\nviolations: " + m_violations);
         }
     }
 
@@ -536,6 +537,12 @@ public class Session {
         if (LOG.isInfoEnabled()) {
             if (m_events.size() > 0) {
                 LOG.info("unflushed: " + m_events.size());
+            }
+        }
+
+        if (LOG.isDebugEnabled()) {
+            if (m_events.size() > 0) {
+                LOG.debug("violations: " + m_violations);
             }
         }
     }
