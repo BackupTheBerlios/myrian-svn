@@ -20,7 +20,7 @@ query Department$Gen class com.redhat.persistence.PropertyMap
     }
 }
 
-object type Employee class com.redhat.persistence.jdo.Employee 
+object type Employee class com.redhat.persistence.jdo.Employee
     adapter com.redhat.persistence.jdo.JDOAdapter {
 
     BigInteger[1..1] id = emps.id INTEGER;
@@ -100,7 +100,7 @@ association {
 }
 
 object type Item class com.redhat.persistence.jdo.Item
-                 adapter com.redhat.persistence.jdo.ReflectionAdapter {
+                 adapter com.redhat.persistence.jdo.JDOAdapter {
     Integer[1..1] id = items.id INTEGER;
 
     object key (id);

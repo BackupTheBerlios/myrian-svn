@@ -4,18 +4,35 @@ package com.redhat.persistence.jdo;
  * Item
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/29 $
+ * @version $Revision: #2 $ $Date: 2004/06/29 $
  **/
 
-public abstract class Item {
+public class Item {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdo/Item.java#1 $ by $Author: vadim $, $DateTime: 2004/06/29 15:38:35 $";
+    private int id;
+    private Product product;
 
-    public abstract int getId();
+    public Item() {}
 
-    public abstract Product getProduct();
+    public Item(int id) {
+        this.id = id;
+    }
 
-    public abstract void setProduct(Product product);
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
 
     public String toString() {
         return "<item #" + getId() + ">";

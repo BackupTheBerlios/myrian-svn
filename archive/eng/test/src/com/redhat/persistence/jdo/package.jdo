@@ -57,5 +57,9 @@
       <field name="content"/>
     </class>
 
+    <class name="Item" identity-type="datastore">
+      <field name="id"/>
+      <field name="product"/>
+    </class>
   </package>
 </jdo>
