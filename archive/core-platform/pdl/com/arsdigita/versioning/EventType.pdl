@@ -10,15 +10,14 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/versioning/Event.pdl#1 $ 
-// $DateTime: 2003/06/12 16:01:01 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/versioning/EventType.pdl#1 $ 
+// $DateTime: 2003/06/18 15:51:58 $
 
 model com.arsdigita.versioning;
 
-object type Event {
-  BigInteger[1..1] id = vcx_events.event_id INTEGER;
-
-  String[1..1]   name = vcx_events.name VARCHAR(40);
+object type EventType {
+  BigInteger[1..1] id = vcx_event_types.id INTEGER;
+  String[1..1]   name = vcx_event_types.name VARCHAR(40);
 
   object key (id);
 }

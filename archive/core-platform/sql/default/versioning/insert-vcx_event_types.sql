@@ -11,23 +11,23 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/versioning/insert-vcx_events.sql#1 $
--- $DateTime: 2003/06/12 17:39:20 $
+-- $Id: //core-platform/dev/sql/default/versioning/insert-vcx_event_types.sql#1 $
+-- $DateTime: 2003/06/18 15:51:58 $
 
 -- NOTE: this needs to be kept in sync with
 -- com.arsdigita.x.versioning.Event
 
-insert into vcx_events (event_id, name) 
+insert into vcx_event_types (id, name) 
 values (1, 'create');
 
-insert into vcx_events (event_id, name)
+insert into vcx_event_types (id, name)
 values (2, 'delete');
 
-insert into vcx_events (event_id, name)
+insert into vcx_event_types (id, name)
 values (3, 'add');
 
-insert into vcx_events (event_id, name)
+insert into vcx_event_types (id, name)
 values (4, 'remove');
 
-insert into vcx_events (event_id, name)
+insert into vcx_event_types (id, name)
 values (5, 'set');

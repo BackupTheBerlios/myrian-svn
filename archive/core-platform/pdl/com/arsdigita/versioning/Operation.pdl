@@ -10,15 +10,15 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/versioning/Operation.pdl#8 $ 
-// $DateTime: 2003/06/12 16:01:01 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/versioning/Operation.pdl#9 $ 
+// $DateTime: 2003/06/18 15:51:58 $
 
 model com.arsdigita.versioning;
 
 object type Operation {
   BigInteger[1..1]     id = vcx_operations.operation_id INTEGER;
 
-  Event[1..1]     event = join vcx_operations.event_id to vcx_events.event_id;
+  EventType[1..1] eventType = join vcx_operations.event_type_id to vcx_event_types.id;
   String[1..1]    attribute = vcx_operations.attribute VARCHAR(200);
   // indicates the subtype to which this data object should be specialized:
   // Generic, Clob, or Blob.

@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/oracle-se-create.sql#29 $
--- $DateTime: 2003/06/16 11:25:49 $
+-- $Id: //core-platform/dev/sql/oracle-se-create.sql#30 $
+-- $DateTime: 2003/06/18 15:51:58 $
 
 @@ oracle-se/function-currentDate.sql
 
@@ -168,7 +168,7 @@
 @@ default/versioning/table-vc_generic_operations.sql
 @@ default/versioning/comment-vc_generic_operations.sql
 
-@@ default/versioning/insert-vcx_events.sql
+@@ default/versioning/insert-vcx_event_types.sql
 @@ default/versioning/insert-vcx_java_classes.sql
 @@ default/versioning/sequence-vcx_txns_id_seq.sql
 @@ default/versioning/sequence-vcx_id_seq.sql
