@@ -22,7 +22,6 @@ package org.myrian.persistence;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-28
- * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 public interface EventProcessorManager {
     /**

@@ -85,7 +85,6 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003/02/06
- * @version $Revision: #1 $ $Date: 2004/10/01 $
  **/
 public final class SQLDebugger {
 

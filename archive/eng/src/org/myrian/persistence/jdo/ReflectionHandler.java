@@ -11,7 +11,6 @@ import org.xml.sax.helpers.*;
  * ReflectionHandler
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 class ReflectionHandler extends DefaultHandler {

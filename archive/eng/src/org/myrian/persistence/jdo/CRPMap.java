@@ -30,7 +30,6 @@ import javax.jdo.Query;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/10/01 $
  **/
 class CRPMap implements Map {
     private final static NullableObject NULL = new NullableObject() {

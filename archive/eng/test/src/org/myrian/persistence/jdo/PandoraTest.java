@@ -55,7 +55,6 @@ import org.apache.log4j.Logger;
  * PandoraTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/10/01 $
  **/
 
 public class PandoraTest extends WithTxnCase {

@@ -24,7 +24,6 @@ import java.util.Set;
  * UniqueKey
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class UniqueKey extends Constraint {

@@ -21,7 +21,6 @@ package org.myrian.persistence.engine.rdbms;
  * Join
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 abstract class Join {

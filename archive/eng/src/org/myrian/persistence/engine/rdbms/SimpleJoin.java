@@ -24,7 +24,6 @@ import org.myrian.persistence.metadata.Table;
  * SimpleJoin
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 class SimpleJoin extends Join {

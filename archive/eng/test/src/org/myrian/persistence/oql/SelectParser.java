@@ -35,7 +35,6 @@ import org.apache.log4j.Logger;
  * Use for counting subselects, inner, and outer joins.
  *
  * @author jorris@redhat.com
- * @version $Revision $1 $ $Date: 2004/10/01 $
  */
 public class SelectParser {
 

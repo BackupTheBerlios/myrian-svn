@@ -24,7 +24,6 @@ package org.myrian.util;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since  2003-05-21
- * @version $Revision: #1 $ $Date: 2004/10/01 $
  **/
 public class AssertionError extends Error {
 

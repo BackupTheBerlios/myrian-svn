@@ -23,7 +23,6 @@ import java.util.*;
  * Or
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class Or extends BinaryCondition {

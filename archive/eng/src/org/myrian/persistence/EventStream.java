@@ -36,7 +36,6 @@ import java.util.Map;
  * for filtering the stream down to the set of events that are of interest.
  *
  * @author <a href="mailto:ashah@redhat.com">Archit Shah</a>
- * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 class EventStream {

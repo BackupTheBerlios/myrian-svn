@@ -23,7 +23,6 @@ import org.myrian.persistence.common.Path;
  * StaticJoin
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 class StaticJoin extends Join {

@@ -25,7 +25,6 @@ import java.io.PrintWriter;
  * PropertyEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public abstract class PropertyEvent extends Event {

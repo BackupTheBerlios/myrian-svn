@@ -23,7 +23,6 @@ import java.io.PrintWriter;
  * ObjectEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public abstract class ObjectEvent extends Event {

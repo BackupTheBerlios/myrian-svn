@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
  * SessionSuite
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class SessionSuite extends TestSuite {

@@ -27,7 +27,6 @@ import java.util.Iterator;
  * ANSIWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/10/01 $
  **/
 
 

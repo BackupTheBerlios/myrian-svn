@@ -30,12 +30,11 @@ import org.myrian.persistence.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/10/01 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/pdl/PDLParser.jj#1 $ by $Author: vadim $, $DateTime: 2004/10/01 18:41:18 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/org/myrian/persistence/pdl/PDLParser.jj#2 $ by $Author: vadim $, $DateTime: 2004/10/04 13:37:25 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);

@@ -30,7 +30,6 @@ import java.sql.SQLException;
  * <code>oracle.sql.BLOB</code> and <code>oracle.sql.CLOB</code> classes.
  *
  * @since 2004-07-09
- * @version $Revision: #1 $
  * @author Vadim Nasardinov (vadimn@redhat.com)
  **/
 public final class OraLob {

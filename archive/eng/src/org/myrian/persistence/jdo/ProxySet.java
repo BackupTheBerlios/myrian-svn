@@ -28,7 +28,6 @@ import java.util.Set;
  *
  * @author  Vadim Nasardinov (vadimn@redhat.com)
  * @since   2004-07-14
- * @version $Id: //eng/persistence/dev/src/org/myrian/persistence/jdo/ProxySet.java#1 $
  **/
 class ProxySet implements Set, OQLCollection {
     private final OQLCollection m_coll;

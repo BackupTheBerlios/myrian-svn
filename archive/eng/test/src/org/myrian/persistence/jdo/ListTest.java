@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
  * ListTest
  *
  * @since 2004-07-13
- * @version $Revision: #1 $ $Date: 2004/10/01 $
  **/
 public class ListTest extends WithTxnCase {
     private final static Logger s_log = Logger.getLogger(ListTest.class);

@@ -25,7 +25,6 @@ import java.util.*;
  * Value
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class Value extends Mapping {

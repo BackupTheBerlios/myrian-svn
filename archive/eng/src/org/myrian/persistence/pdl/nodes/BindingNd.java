@@ -21,7 +21,6 @@ package org.myrian.persistence.pdl.nodes;
  * BindingNd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class BindingNd extends Node {

@@ -22,7 +22,6 @@ package org.myrian.persistence;
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
  * @since 2003-02-20
- * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 public abstract class EventProcessor {
     /**

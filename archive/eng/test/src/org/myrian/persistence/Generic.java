@@ -24,7 +24,6 @@ import org.myrian.persistence.metadata.ObjectType;
  * A generic class to persist and an appropriate adapter.
  *
  * @author <a href="mailto:ashah@redhat.com">Archit Shah</a>
- * @version $Revision: #1 $ $Date: 2004/10/01 $
  **/
 
 public class Generic {

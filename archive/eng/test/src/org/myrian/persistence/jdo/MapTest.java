@@ -32,7 +32,6 @@ import org.apache.log4j.Logger;
  * MapTest
  *
  * @since 2004-07-13
- * @version $Revision: #1 $ $Date: 2004/10/01 $
  **/
 public class MapTest extends WithTxnCase {
     private final static Logger s_log = Logger.getLogger(MapTest.class);

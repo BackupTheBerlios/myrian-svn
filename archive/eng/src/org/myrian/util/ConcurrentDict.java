@@ -49,7 +49,6 @@ import org.apache.log4j.Logger;
  *
  * @author  Vadim Nasardinov (vadimn@redhat.com)
  * @since   2004-02-20
- * @version $Revision: #1 $ $DateTime: 2004/10/01 18:41:18 $
  **/
 public final class ConcurrentDict {
     // We may want to make it possible to specify the bucket size at

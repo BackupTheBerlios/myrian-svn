@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
  * Tests lifecycle of JDO instances across transactions.
  *
  * @since 2004-08-04
- * @version $Id: //eng/persistence/dev/test/src/org/myrian/persistence/jdo/BiTxnTest.java#1 $
  **/
 public class BiTxnTest extends AbstractCase {
     private final static Logger s_log = Logger.getLogger(BiTxnTest.class);

@@ -23,7 +23,6 @@ import org.myrian.persistence.Condition;
  * CompoundJoin
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 abstract class CompoundJoin extends Join {

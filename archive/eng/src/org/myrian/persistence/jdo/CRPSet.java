@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
  * CRPSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/10/01 $
  **/
 
 class CRPSet extends CRPCollection implements Set {

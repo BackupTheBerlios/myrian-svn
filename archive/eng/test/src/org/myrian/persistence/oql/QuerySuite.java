@@ -40,7 +40,6 @@ import java.util.*;
  * QuerySuite
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/10/04 $
  **/
 
 public class QuerySuite extends TestSuite {

@@ -23,7 +23,6 @@ package org.myrian.persistence.metadata;
  * Link
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class Link extends Property {

@@ -23,7 +23,6 @@ import org.myrian.persistence.common.Path;
  * NoSuchPathException
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 public class NoSuchPathException extends ProtoException {

@@ -26,7 +26,6 @@ import org.myrian.persistence.metadata.ObjectType;
  * SimpleAdapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/10/04 $
  **/
 
 abstract class SimpleAdapter extends Adapter {
