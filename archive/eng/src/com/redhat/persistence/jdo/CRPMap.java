@@ -13,7 +13,7 @@ import javax.jdo.Query;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/07/12 $
+ * @version $Revision: #9 $ $Date: 2004/07/13 $
  **/
 class CRPMap implements Map {
     private Set entries;
@@ -43,14 +43,15 @@ class CRPMap implements Map {
         // XXX: locking
         final Map.Entry me = getEntry(key);
 
-        if (me == null ) {
-            // Note: we can pass in the "this" object because the oid of CRPMap
-            // is the same as the oid of the JDO instance that contains CRPMap
-            // as a field.
-            Map.Entry entry = new MapEntry(this, key);
+        if (me == null) {
+            PersistenceManagerImpl pmi = (PersistenceManagerImpl)
+                JDOHelper.getPersistenceManager(this);
+            StateManagerImpl smi = pmi.getStateManager(this);
+
+            Map.Entry entry = new MapEntry
+                (pmi.getSession().retrieve(smi.getPropertyMap()), key);
+
             entry.setValue(value);
-            // XXX: we shouldn't have to call makePersistent here
-            JDOHelper.getPersistenceManager(this).makePersistent(entry);
             entries.add(entry);
             return null;
         } else {

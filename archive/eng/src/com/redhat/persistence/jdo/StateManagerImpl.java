@@ -3,6 +3,7 @@ package com.redhat.persistence.jdo;
 import com.redhat.persistence.*;
 import com.redhat.persistence.metadata.*;
 import java.util.*;
+import javax.jdo.JDOUserException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.spi.JDOImplHelper;
 import javax.jdo.spi.PersistenceCapable;
@@ -120,9 +121,9 @@ class StateManagerImpl extends AbstractStateManager {
             if (prop.isKeyProperty()) {
                 return getPropertyMap().get(prop);
             } else if (prop.isCollection()) {
-                return new CRPSet(ssn(), pc, prop);
+                return new CRPSet(ssn(), ssn().retrieve(m_pmap), prop);
             } else {
-                return ssn().get(pc, prop);
+                return ssn().get(ssn().retrieve(m_pmap), prop);
             }
         }
     }
@@ -201,11 +202,122 @@ class StateManagerImpl extends AbstractStateManager {
         return sm;
     }
 
+    private void fill(Map values, StateManagerImpl smi, Class cls,
+                      PersistenceCapable pc) {
+        ObjectType type = m_pmap.getObjectType();
+        List props = C.getAllFields(cls);
+        List types = C.getAllTypes(cls);
+        for (int i = 0; i < props.size(); i++) {
+            String propName = smi.getPrefix() + ((String) props.get(i));
+            Object obj = smi.provideField(pc, i);
+            if (obj == null) { continue; }
+            Class klass = (Class) types.get(i);
+            if (C.isComponent(type, propName)) {
+                if (obj instanceof PersistenceCapable) {
+                    PersistenceCapable comp = (PersistenceCapable) obj;
+                    StateManagerImpl csmi = m_pmi.newSM
+                        (comp, m_pmap, propName + "$");
+                    fill(values, csmi, klass, comp);
+                } else {
+                    List l = C.componentProperties(type, propName);
+                    for (Iterator it = l.iterator(); it.hasNext(); ) {
+                        Property prop = (Property) it.next();
+                        values.put(prop, obj);
+                    }
+                }
+            } else {
+                Property prop = type.getProperty(propName);
+                if (!prop.isKeyProperty()) {
+                    values.put(prop, obj);
+                }
+            }
+        }
+    }
+
+    private void handleComponent(PersistenceCapable pc, String name,
+                                 Class klass) {
+        Map m = new HashMap();
+        StateManagerImpl csmi = m_pmi.newSM(pc, m_pmap, name + "$");
+        fill(m, csmi, klass, pc);
+        for (Iterator it = m.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry me = (Map.Entry) it.next();
+            Property prop = (Property) me.getKey();
+            Object value = me.getValue();
+            if (value == null) { continue; }
+            if (prop.isCollection()) {
+                throw new IllegalStateException
+                    ("collection properties on a component don't work");
+            }
+            if (value instanceof PersistenceCapable) {
+                m_pmi.makePersistent
+                    ((PersistenceCapable) value, prop.getType());
+            }
+            ssn().set(pc, prop, value);
+        }
+    }
+
     /**
      * Mark the field as modified by the user.
      */
     public void setObjectField(PersistenceCapable pc, int field,
                                Object currentValue, Object newValue) {
-        ssn().set(pc, prop(pc, field), newValue);
+        if (isComponent(pc, field)) {
+            String name = name(pc, field);
+
+            // XXX: what to do about currentValue
+            Class klass = (Class) C.getAllTypes(pc.getClass()).get(field);
+            if (klass.equals(List.class) || klass.equals(Map.class)) {
+                boolean isMap = klass.equals(Map.class);
+
+                List props = C.componentProperties
+                    (m_pmap.getObjectType(), name);
+
+                if (props.size() > 1) { throw new Error("not implemented"); }
+
+                Property prop = (Property) props.get(0);
+                ssn().clear(pc, prop);
+                if (newValue != null) {
+
+                    Object obj = getObjectField(pc, field);
+                    if (isMap) {
+                        ((Map) obj).putAll((Map) newValue);
+                    } else {
+                        ((List) obj).addAll((List) newValue);
+                    }
+                }
+            } else {
+                if (newValue != null) {
+                    if (newValue instanceof PersistenceCapable) {
+                        handleComponent
+                            ((PersistenceCapable) newValue, name, klass);
+                    } else {
+                        throw new IllegalStateException
+                            ("new value " + newValue + " of class " +
+                             newValue.getClass()
+                             + " is not persistence capable");
+                    }
+                }
+            }
+        } else {
+            Property prop = prop(pc, field);
+            if (prop.isCollection()) {
+                Collection c = (Collection) newValue;
+                ssn().clear(pc, prop);
+                if (c != null) {
+                    for (Iterator it = c.iterator(); it.hasNext(); ) {
+                        Object value = it.next();
+                        if (value instanceof PersistenceCapable) {
+                            m_pmi.makePersistent(value);
+                        }
+                        ssn().add(pc, prop, value);
+                    }
+                }
+            } else {
+                if (newValue instanceof PersistenceCapable) {
+                    m_pmi.makePersistent(newValue);
+                }
+                ssn().set(pc, prop, newValue);
+            }
+        }
     }
 }

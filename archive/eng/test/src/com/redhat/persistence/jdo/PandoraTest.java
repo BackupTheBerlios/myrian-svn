@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
  * PandoraTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/07/12 $
+ * @version $Revision: #7 $ $Date: 2004/07/13 $
  **/
 
 public class PandoraTest extends WithTxnCase {
@@ -226,11 +226,11 @@ public class PandoraTest extends WithTxnCase {
 
     public void testMagazine() {
         Magazine rag = new Magazine(0);
-        m_pm.makePersistent(rag);
         rag.setTitle("Wide Open");
-        Map index = rag.getIndex();
-        index.put("Samba", new Integer(3));
-        index.put("OProfile", new Integer(15));
+
+        rag.getIndex().put("Samba", new Integer(3));
+        m_pm.makePersistent(rag);
+        rag.getIndex().put("OProfile", new Integer(15));
 
         javax.jdo.Query qq = m_pm.newQuery
             ("com.redhat.persistence.OQL",
@@ -266,17 +266,15 @@ public class PandoraTest extends WithTxnCase {
         }
 
         final User rhs = new User(0);
-        m_pm.makePersistent(rhs);
-
         rhs.setName("Rafael H. Schloming");
         rhs.setEmail("rhs@mit.edu");
+        m_pm.makePersistent(rhs);
 
         List aux = rhs.getAuxiliaryEmails();
         YAdapter ad = new YAdapter(List.class);
         ad.addInterface(Iterator.class);
         ad.addInterface(ListIterator.class);
         aux = (List) ad.newAdapter(new ArrayList(), aux);
-        //System.out.println("aux: " + aux);
         aux.add("fdsa@asdf.com");
         aux.add("fdsa@asdf.com");
         aux.add("two@asdf.com");

@@ -4,8 +4,9 @@ import com.redhat.persistence.*;
 import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.oql.*;
 import com.redhat.persistence.oql.Expression;
-
 import java.util.*;
+import javax.jdo.JDOHelper;
+import javax.jdo.spi.PersistenceCapable;
 
 import org.apache.log4j.Logger;
 
@@ -13,7 +14,7 @@ import org.apache.log4j.Logger;
  * CRPSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/07/08 $
+ * @version $Revision: #5 $ $Date: 2004/07/13 $
  **/
 
 class CRPSet extends CRPCollection implements Set {
@@ -47,7 +48,19 @@ class CRPSet extends CRPCollection implements Set {
     }
 
     public boolean add(Object o) {
-        s_log.debug("CRPSet.add: " + o);
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("CRPSet.add: " + o);
+        }
+
+        PersistenceManagerImpl pmi =
+            (PersistenceManagerImpl) JDOHelper.getPersistenceManager(m_object);
+
+        if (C.isComponentProperty(m_property)) {
+            pmi.makePersistent((PersistenceCapable) o, m_property.getType());
+        } else {
+            pmi.makePersistent(o);
+        }
+
         if (contains(o)) {
             return false;
         } else {
