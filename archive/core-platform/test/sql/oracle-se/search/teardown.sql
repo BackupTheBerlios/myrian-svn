@@ -16,7 +16,6 @@
 
 -- Drop data model used for search tests.
 
-drop table searchable_notes;
 drop table search_test_book_chap_map;
 drop table search_test_chap_auth_map;
 drop table search_test_book;

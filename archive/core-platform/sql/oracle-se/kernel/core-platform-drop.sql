@@ -19,7 +19,7 @@
 --
 -- @author Oumi Mehrotra (oumi@arsdigita.com) 
 -- @creation-date May 16, 2001 20:16:43
--- @version $Id: //core-platform/dev/sql/oracle-se/kernel/core-platform-drop.sql#3 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/kernel/core-platform-drop.sql#4 $
 --
 
 @@ ../../../cms/content-section/sql/oracle-se/cms-drop.sql
@@ -34,7 +34,6 @@
 @@ ../../../services/messaging/sql/oracle-se/messaging-drop.sql
 @@ ../../../services/auditing/sql/oracle-se/auditing-drop.sql
 @@ ../../../services/categorization/sql/oracle-se/categorization-drop.sql
-@@ notes-drop.sql
 @@ permissions-drop.sql
 @@ acs-stylesheet-drop.sql
 @@ apm-drop.sql

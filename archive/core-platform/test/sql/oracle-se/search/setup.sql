@@ -12,26 +12,9 @@
 -- rights and limitations under the License.
 --
 
--- tests-create.sql
-
--- Data model for a searchable_note object, an object type that
--- is used to test searching.
-
 -- Author: Jeff Teeters (teeters@arsdigita.com)
 
--- $Id: //core-platform/dev/test/sql/oracle-se/search/setup.sql#4 $
-
-create table searchable_notes (
-    note_id integer 
-			constraint searchable_notes_id_fk references
-			acs_objects (object_id)
-			constraint searchable_notes_pk primary key,
-    creation_date date not null,
-    last_modified date not null,
-    title varchar(255) not null,
-    body varchar(4000)
-);
-
+-- $Id: //core-platform/dev/test/sql/oracle-se/search/setup.sql#5 $
 
 -- For testing getting attributes of related objects.
 
