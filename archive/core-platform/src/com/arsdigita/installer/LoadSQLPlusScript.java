@@ -14,7 +14,7 @@
  */
 
 /**
- * $Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#2 $
+ * $Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#3 $
  *
  *  This is the class with sole purpose to feed SQL*Plus script through
  *  JDBC interface.  SQL*Plus scripts are being parsed by SimpleOracleSQLParser,
@@ -30,7 +30,7 @@ import java.lang.reflect.*;
 
 public class LoadSQLPlusScript {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#3 $ by $Author: randyg $, $DateTime: 2002/07/19 15:52:15 $";
 
     private Connection s_con;
     private Statement s_stmt;
@@ -129,8 +129,21 @@ public class LoadSQLPlusScript {
                 ParseException, FileNotFoundException,
                 IllegalAccessException, NoSuchMethodException,
                 InvocationTargetException {
+        
+        // if there is a jdbcUrl, us that.  Otherwise, look to see
+        // if the existing connection is postgres
 
-        Class.forName("oracle.jdbc.driver.OracleDriver");
+        if ((jdbcUrl != null && jdbcUrl.indexOf("postgres") > -1) ||
+            (s_con != null && com.arsdigita.db.Initializer.getDatabase() ==
+                 com.arsdigita.db.Initializer.POSTGRES)) {
+            Class.forName("org.postgresql.Driver");
+        } else {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+        }
+
+        // Parse SQL script and feed JDBC with one statement at the time
+        System.err.println("Trying to open: '" + scriptFilename + "'");
+        SimpleSQLParser parser = new SimpleSQLParser(scriptFilename);
 
         if ( s_con == null ) {
             s_con = DriverManager.getConnection(jdbcUrl, 
@@ -138,11 +151,6 @@ public class LoadSQLPlusScript {
                                                 dbPassword);
         }
 
-        // Parse SQL script and feed JDBC with one statement at the time
-
-        System.err.println("Trying to open: '" + scriptFilename + "'");
-        SimpleOracleSQLParser parser =
-                new SimpleOracleSQLParser(scriptFilename);
         // iterate over parser.SQLStamentList();
 
         s_stmt = s_con.createStatement();
@@ -156,7 +164,7 @@ public class LoadSQLPlusScript {
 
 
     /**
-     *  This is a method which will be passed to Oracle SQL parser to
+     *  This is a method which will be passed to the database SQL parser to
      *  be executed for each parsed statement.
      *  It must accept single String argument.
      *  It must be public (because it will be called by other

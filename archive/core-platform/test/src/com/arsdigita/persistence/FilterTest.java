@@ -29,10 +29,10 @@ import org.apache.log4j.Category;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/07/19 $
  */
 public class FilterTest extends PersistenceTestCase {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/FilterTest.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/FilterTest.java#4 $ by $Author: randyg $, $DateTime: 2002/07/19 15:52:15 $";
 
     private static Category s_log = 
         Category.getInstance(FilterTest.class.getName());
@@ -47,10 +47,12 @@ public class FilterTest extends PersistenceTestCase {
         super.persistenceSetUp();
     }
 
+
     /**
       *  This tests creating a filter with Filter.simple
       */
-     public void testFilterSimpleFAILS() {
+     public void testFilterSimple() {
+         
          // this is tested all over because it is used when DataQuery 
          // creates a new filter.  But, let's try it again anyway
          DataQuery query = getDefaultQuery();
@@ -76,7 +78,8 @@ public class FilterTest extends PersistenceTestCase {
      /** 
       *  This tests the FilterImpl.equals and FilterFactory.equals methods
       */
-     public void testFilterEqualsFAILS() {
+     public void testFilterEquals() {
+         
          DataQuery query = getDefaultQuery();
          long fullSize = query.size();
          query.addFilter(FilterImpl.equals("priority", new Integer(6)));
@@ -102,7 +105,8 @@ public class FilterTest extends PersistenceTestCase {
      /** 
       *  This tests the FilterImpl.notEquals and FilterFactory.notEquals methods
       */
-     public void testFilterNotEqualsFAILS() {
+     public void testFilterNotEquals() {
+         
          DataQuery query = getDefaultQuery();
          long fullSize = query.size();
          query.addFilter(FilterImpl.notEquals("priority", new Integer(3)));
@@ -125,7 +129,8 @@ public class FilterTest extends PersistenceTestCase {
      /** 
       *  This tests the FilterImpl.lessThan and FilterFactory.lessThan methods
       */
-     public void testFilterLessThanFAILS() {
+     public void testFilterLessThan() {
+         
          DataQuery query = getDefaultQuery();
          long fullSize = query.size();
          query.addFilter(FilterImpl.lessThan("priority", new Integer(3), true));
@@ -182,7 +187,8 @@ public class FilterTest extends PersistenceTestCase {
       *  This tests the FilterImpl.greaterThan and FilterFactory.greaterThan 
       *  methods
       */
-     public void testFilterGreaterThanFAILS() {
+     public void testFilterGreaterThan() {
+         
          DataQuery query = getDefaultQuery();
          long fullSize = query.size();
          query.addFilter(FilterImpl.greaterThan("priority", new Integer(3), true));
@@ -252,7 +258,8 @@ public class FilterTest extends PersistenceTestCase {
       *  This tests the FilterImpl.startsWith and FilterFactory.startsWith 
       *  methods
       */
-     public void testFilterStartsWithFAILS() {
+     public void testFilterStartsWith() {
+         
          DataQuery query = getDefaultQuery();
          long fullSize = query.size();
          query.addFilter(FilterImpl.startsWith("description", "Read", true));
@@ -326,7 +333,8 @@ public class FilterTest extends PersistenceTestCase {
       *  This tests the FilterImpl.endsWith and FilterFactory.endsWith 
       *  methods
       */
-     public void testFilterEndsWithFAILS() {
+     public void testFilterEndsWith() {
+         
          DataQuery query = getDefaultQuery();
          long fullSize = query.size();
          query.addFilter(FilterImpl.endsWith("description", "14", true));
@@ -400,7 +408,8 @@ public class FilterTest extends PersistenceTestCase {
       *  This tests the FilterImpl.contains and FilterFactory.contains 
       *  methods
       */
-     public void testFilterContainsFAILS() {
+     public void testFilterContains() {
+         
          DataQuery query = getDefaultQuery();
          long fullSize = query.size();
          query.addFilter(FilterImpl.contains("description", "ead", true));
@@ -473,7 +482,8 @@ public class FilterTest extends PersistenceTestCase {
      /**
       *  This tests ORing filters together
       */ 
-     public void testCompoundFilterOrFAILS() {
+     public void testCompoundFilterOr() {
+         
          DataQuery query = getDefaultQuery();
          FilterFactory factory = query.getFilterFactory();
          CompoundFilter filter = factory.or()
@@ -518,7 +528,8 @@ public class FilterTest extends PersistenceTestCase {
      /**
       *  This tests ANDing filters together
       */
-     public void testCompoundFilterAndFAILS() {
+     public void testCompoundFilterAnd() {
+         
          // we just want to make sure that adding two filters together
          // gives the same results and creating them both at once
          DataQuery query = getDefaultQuery();
@@ -547,7 +558,8 @@ public class FilterTest extends PersistenceTestCase {
      /**
       *  This tests using filters with null values
       */
-     public void testFiltersWithNullFAILS() {
+     public void testFiltersWithNull() {
+         
          // I want to make sure that the system does not have a problem
          // when we use nulls
          DataOperation operation = getSession().retrieveDataOperation(
@@ -574,7 +586,8 @@ public class FilterTest extends PersistenceTestCase {
      /**
       *  This tests the setConditions and AddBindings methods in FilterImpl
       */
-     public void testFilterSetConditionsAndAddBindingsFAILS() {
+     public void testFilterSetConditionsAndAddBindings() {
+         
          DataQuery query = getDefaultQuery();
          query.addFilter(FilterImpl.equals("priority", new Integer(3)));
          long size = query.size();
@@ -592,10 +605,11 @@ public class FilterTest extends PersistenceTestCase {
 
 
      /**
-     *  We want to make sure that it is possible to set a fitler based on 
+     *  We want to make sure that it is possible to set a fitler basde on 
      *  a date by passing in a java.util.Date object
      */
-    public void testFilterOnDatesFAILS() {
+    public void testFilterOnDates() {
+         
         // uncomment this out when the problem is fixed
         //http://developer.arsdigita.com/acs5/sdm/one-ticket?ticket_id=149713
 
@@ -634,7 +648,8 @@ public class FilterTest extends PersistenceTestCase {
     /**
      *  This tests filters with number bind variables
      */ 
-    public void testFilterWithNumericBindVariablesFAILS() {
+    public void testFilterWithNumericBindVariables() {
+         
         DataQuery query = getDefaultQuery();
         query.addFilter("priority = :l12").set("l12", new Integer(3));
         assert("binding with an integer should not cause problems.", 
@@ -649,7 +664,7 @@ public class FilterTest extends PersistenceTestCase {
     /**
      * This tests subquery expansion in filters.
      **/
-    public void testSubQueryFAILS() {
+    public void testSubQuery() {
         DataQuery query = getDefaultQuery();
         Filter f = query.addFilter("exists (examples.SubQuery)");
         f.set("two", new Integer(2));
@@ -669,7 +684,8 @@ public class FilterTest extends PersistenceTestCase {
      *  This tests setting the Filter values to null without
      *  using the correct methods
      */
-    public void testNullValuesFAILS() {
+    public void testNullValues() {
+         
         // first, make some of the values null
         DataQuery query = getDefaultQuery();
         DataOperation operation = SessionManager.getSession()
@@ -710,7 +726,8 @@ public class FilterTest extends PersistenceTestCase {
 
     // This tests the method "compare" within the FilterFactory.
     // This test still needs a lot of work
-    public void testCompareFilterFAILS() {
+    public void testCompareFilter() {
+         
         DataQuery query = getDefaultQuery();
         DataOperation operation = SessionManager.getSession()
             .retrieveDataOperation("examples.DataOperationWithBindVariablesAndNull");
@@ -746,7 +763,7 @@ public class FilterTest extends PersistenceTestCase {
                                                  FilterFactory.EQUALS, 
                                                  "upper(:description)"));
         filter.set("description", "Read item 0");
-        System.out.println("query = " + query);
+
         assert("The EQUALS filter should have returned one row.  Instead " +
                "it returned " + query.size(), query.size() == 1);
 
@@ -835,7 +852,8 @@ public class FilterTest extends PersistenceTestCase {
      *  We want to alllow developers to filter based on items
      *  that are not selected from the DataQuery
      */
-    public void testFilterWithArbitraryVariablesFAILS() {
+    public void testFilterWithArbitraryVariables() {
+         
         DataQuery dq = getSession().retrieveQuery("examples.DataQueryWithMax");
         // This should be uncommented when people can filter by
         // variables not in their MAP statment

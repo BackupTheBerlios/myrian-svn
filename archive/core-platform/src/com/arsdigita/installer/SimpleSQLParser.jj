@@ -7,14 +7,14 @@ options {
 }
 
 
-PARSER_BEGIN(SimpleOracleSQLParser) 
+PARSER_BEGIN(SimpleSQLParser) 
 
 package com.arsdigita.installer;
 
 import java.io.*;
 import java.lang.reflect.*;
 
-public class SimpleOracleSQLParser {
+public class SimpleSQLParser {
 
     private File m_scriptAbsoluteDir;
 
@@ -23,19 +23,19 @@ public class SimpleOracleSQLParser {
           throws ParseException, IOException, NoSuchMethodException,
                  IllegalAccessException, InvocationTargetException
     {
-        SimpleOracleSQLParser parser = new SimpleOracleSQLParser(System.in);
+        SimpleSQLParser parser = new SimpleSQLParser(System.in);
         parser.useSQLStatement(parser, "printStatement");
     }
 
 
-    SimpleOracleSQLParser (String scriptFilename)
+    SimpleSQLParser (String scriptFilename)
               throws FileNotFoundException {
         this(new FileInputStream(scriptFilename));
         this.m_scriptAbsoluteDir =
               (new File(scriptFilename)).getParentFile().getAbsoluteFile();
     }
 
-    SimpleOracleSQLParser (File scriptFile)
+    SimpleSQLParser (File scriptFile)
             throws FileNotFoundException {
         this(new FileInputStream(scriptFile));
         this.m_scriptAbsoluteDir =
@@ -73,7 +73,7 @@ public class SimpleOracleSQLParser {
         
 }
 
-PARSER_END(SimpleOracleSQLParser) 
+PARSER_END(SimpleSQLParser) 
 
 SKIP:
 {
@@ -110,6 +110,8 @@ TOKEN:
   | < #DECLARE: "declare" >
   | < #END: "end" >
   | < SEMICOLON: ";" >
+  | < LANGUAGE: "language" >
+  | < LANGUAGE_PHRASE: <LANGUAGE> (<WHITESPACE>)* <STRING_LITERAL>>
   | < SQL_TOKEN: ( ~[" ", "\n", "\r", "\t", ";"] )+ >
 }
 
@@ -131,9 +133,18 @@ void useSQLStatement (Object obj, Method invokingMethod)
         {
             Token tok;
             StringBuffer sb = new StringBuffer(token.toString());
+            int database = com.arsdigita.db.Initializer.getDatabase();
             while (true) {
                 tok = getNextToken();
-                if (tok.kind == SLASH) {
+                if (tok.kind == SLASH && 
+                    database == com.arsdigita.db.Initializer.ORACLE) {
+                    break;
+                }
+                if (tok.kind == LANGUAGE_PHRASE &&
+                    database == com.arsdigita.db.Initializer.POSTGRES) {
+                    sb.append(" ").append(tok.image);
+                    // consume the next token which is a semi-colon
+                    tok = getNextToken();
                     break;
                 }
                 sb.append(" ").append(tok.image);
@@ -176,7 +187,7 @@ void useSQLStatement (Object obj, Method invokingMethod)
 
             System.err.println("Recursively including: '" + 
                     includedFile.toString() + "'");
-            SimpleOracleSQLParser parser = new SimpleOracleSQLParser(includedFile);
+            SimpleSQLParser parser = new SimpleSQLParser(includedFile);
             parser.useSQLStatement(obj, invokingMethod);
 
         }

@@ -14,7 +14,7 @@
  */
 
 /**
- * $Id: //core-platform/dev/src/com/arsdigita/installer/ExecuteSQLStatement.java#2 $
+ * $Id: //core-platform/dev/src/com/arsdigita/installer/ExecuteSQLStatement.java#3 $
  *
  *  Simple class which executes single SQL statement not returning
  *  rows.
@@ -27,7 +27,7 @@ import java.sql.*;
 
 public class ExecuteSQLStatement {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/ExecuteSQLStatement.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/ExecuteSQLStatement.java#3 $ by $Author: randyg $, $DateTime: 2002/07/19 15:52:15 $";
 
     static public void main (String args[]) {
 
@@ -60,7 +60,11 @@ public class ExecuteSQLStatement {
         throws ClassNotFoundException, SQLException
     {
 
-        Class.forName("oracle.jdbc.driver.OracleDriver");
+        if (jdbcUrl.indexOf("postgres") > -1) {
+            Class.forName("org.postgresql.Driver");
+        } else {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+        }
 
         Connection con = DriverManager.getConnection(jdbcUrl, dbUsername, dbPassword);
 
