@@ -28,12 +28,12 @@ import java.util.Map;
  * RDBMSRecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/10/28 $
+ * @version $Revision: #7 $ $Date: 2003/11/21 $
  **/
 
 class RDBMSRecordSet extends RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSRecordSet.java#6 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSRecordSet.java#7 $ by $Author: rhs $, $DateTime: 2003/11/21 10:51:18 $";
 
     final private RDBMSEngine m_engine;
     final private ResultCycle m_rc;
@@ -63,19 +63,18 @@ class RDBMSRecordSet extends RecordSet {
     }
 
     public Object get(Path p) {
+        StatementLifecycle cycle = m_rc.getLifecycle();
         try {
             ObjectType type = getSignature().getProperty(p).getType();
             Adapter ad = type.getRoot().getAdapter(type);
 
-            StatementLifecycle cycle = m_rc.getLifecycle();
             String column = getColumn(p);
             if (cycle != null) { cycle.beginGet(column); }
             Object result = ad.fetch(m_rc.getResultSet(), column);
             if (cycle != null) { cycle.endGet(result); }
             return result;
         } catch (SQLException e) {
-            //robust connection pooling
-            m_engine.checkBadConnection(e);
+            if (cycle != null) { cycle.endGet(e); }
             throw new Error
                 ("error fetching path (" + p + "): " + e.getMessage());
         }

@@ -15,7 +15,6 @@
 
 package com.redhat.persistence.engine.rdbms;
 
-import com.arsdigita.developersupport.StackTraces;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.apache.log4j.Logger;
@@ -24,18 +23,19 @@ import org.apache.log4j.Logger;
  * ResultCycle
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/11/20 $
+ * @version $Revision: #7 $ $Date: 2003/11/21 $
  **/
 
 class ResultCycle {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/ResultCycle.java#6 $ by $Author: ashah $, $DateTime: 2003/11/20 18:18:24 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/ResultCycle.java#7 $ by $Author: rhs $, $DateTime: 2003/11/21 10:51:18 $";
 
     private static final Logger LOG = Logger.getLogger(ResultCycle.class);
 
     final private RDBMSEngine m_engine;
     private ResultSet m_rs;
     final private StatementLifecycle m_cycle;
+    final private Throwable m_trace;
 
     ResultCycle(RDBMSEngine engine, ResultSet rs, StatementLifecycle cycle) {
         if (rs == null) {
@@ -44,21 +44,22 @@ class ResultCycle {
 
         m_engine = engine;
         m_rs = rs;
-        if (LOG.isDebugEnabled()) {
-            StackTraces.captureStackTrace(m_rs);
-        }
         m_cycle = cycle;
+        if (LOG.isDebugEnabled()) {
+            m_trace = new Throwable();
+        } else {
+            m_trace = null;
+        }
     }
 
     protected void finalize() {
         if (m_rs != null) {
             LOG.warn("ResultSet  was not closed.  " +
                      "Turn on debug logging for " + this.getClass() +
-                     " to see the stack trace for this ResultSet."
-                     );
+                     " to see the stack trace for this ResultSet.");
 
-            if (LOG.isDebugEnabled()) {
-                StackTraces.log("The ResultSet was created at: ", m_rs, LOG, "debug");
+            if (m_trace != null) {
+                LOG.debug("The ResultSet was created at: ", m_trace);
             }
 
             m_rs = null;
@@ -84,8 +85,7 @@ class ResultCycle {
             if (!result) { close(); }
             return result;
         } catch (SQLException e) {
-            // robust connection pooling
-            m_engine.checkBadConnection(e);
+            if (m_cycle != null) { m_cycle.endNext(e); }
             throw new Error(e.getMessage());
         }
     }
@@ -103,6 +103,7 @@ class ResultCycle {
             m_rs = null;
 	    m_engine.release();
         } catch (SQLException e) {
+            if (m_cycle != null) { m_cycle.endClose(e); }
             throw new Error(e.getMessage());
         }
     }

@@ -42,12 +42,12 @@ import java.util.Iterator;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2003/11/17 $
+ * @version $Revision: #12 $ $Date: 2003/11/21 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#11 $ by $Author: vadim $, $DateTime: 2003/11/17 17:03:49 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#12 $ by $Author: rhs $, $DateTime: 2003/11/21 10:51:18 $";
 
     private RDBMSEngine m_engine;
     private Operation m_op = null;
@@ -112,6 +112,7 @@ public abstract class SQLWriter {
                 }
                 if (cycle != null) { cycle.endSet(); }
             } catch (SQLException e) {
+                if (cycle != null) { cycle.endSet(e); }
                 throw new Error
                     ("SQL error binding [" + (index) + "] to " + obj + ": " +
                      e.getMessage());

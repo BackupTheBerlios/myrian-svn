@@ -15,7 +15,6 @@
 
 package com.arsdigita.persistence;
 
-import com.arsdigita.db.SQLExceptionHandler;
 import com.arsdigita.logging.SecureLogFilter;
 import com.arsdigita.tools.junit.framework.BaseTestCase;
 
@@ -68,7 +67,7 @@ import org.apache.log4j.varia.StringMatchFilter;
  */
 public class Log4jBasedTestCase extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/Log4jBasedTestCase.java#8 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/Log4jBasedTestCase.java#9 $";
 
     /**
      * The log object.  Should be modified

@@ -15,9 +15,6 @@
 
 package com.redhat.persistence.engine.rdbms;
 
-import com.arsdigita.db.ConnectionManager;
-import com.arsdigita.db.SQLExceptionHandler;
-import com.arsdigita.developersupport.DeveloperSupport;
 import com.redhat.persistence.Engine;
 import com.redhat.persistence.Event;
 import com.redhat.persistence.PropertyMap;
@@ -58,12 +55,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2003/11/17 $
+ * @version $Revision: #12 $ $Date: 2003/11/21 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#11 $ by $Author: vadim $, $DateTime: 2003/11/17 17:03:49 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#12 $ by $Author: rhs $, $DateTime: 2003/11/21 10:51:18 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -284,27 +281,29 @@ public class RDBMSEngine extends Engine {
         ResultSet rs = rc.getResultSet();
         StatementLifecycle cycle = rc.getLifecycle();
         try {
-            try {
-                long result;
-                if (rc.next()) {
+            long result;
+            if (rc.next()) {
+                try {
                     if (cycle != null) { cycle.beginGet("1"); }
                     result = rs.getLong(1);
                     if (cycle != null) { cycle.endGet(new Long(result)); }
-                } else {
-                    throw new IllegalStateException
-                        ("count returned no rows");
+                } catch (SQLException e) {
+                    if (cycle != null) { cycle.endGet(e); }
+                    throw new RDBMSException(e.getMessage()) {};
                 }
-                if (rc.next()) {
-                    throw new IllegalStateException
-                        ("count returned too many rows");
-                }
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("size = " + result);
-                }
-                return result;
-            } catch (SQLException e) {
-                throw new RDBMSException(e.getMessage()) {};
+            } else {
+                throw new IllegalStateException("count returned no rows");
             }
+
+            if (rc.next()) {
+                throw new IllegalStateException
+                    ("count returned too many rows");
+            }
+
+            if (LOG.isInfoEnabled()) {
+                LOG.info("size = " + result);
+            }
+            return result;
         } finally {
             rc.close();
         }
@@ -457,82 +456,61 @@ public class RDBMSEngine extends Engine {
 
             acquire();
 
-            /*
-             * PERFORMANCE HACK:
-             * If there is more than one DeveloperSupportListener,
-             * there is a listener other than then one created in com.arsdigita.dispatcher.Initializer.
-             * That means we are logging queries to webdevsupport.
-             */
-            boolean bLogQuery = DeveloperSupport.getListenerCount() > 1;
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Logging queries: " + bLogQuery);
+            StatementLifecycle cycle = null;
+            if (m_profiler != null) {
+                RDBMSStatement stmt = new RDBMSStatement(sql);
+                stmt.setQuery(op.getQuery());
+                for (Iterator it = op.getEvents().iterator(); it.hasNext(); ) {
+                    stmt.addEvent((Event) it.next());
+                }
+                cycle = m_profiler.getLifecycle(stmt);
             }
 
-            //see what kind of operation this isfor webdevsupport
-            String sOpType = "";
-            if (bLogQuery) {
-		if (op instanceof Select) {
-			sOpType = "executeQuery";
-		} else if (op instanceof Update) {
-			sOpType = "executeUpdate";
-		} else {
-			sOpType = "execute";
-		}
-            }
+            PreparedStatement ps;
 
             try {
-                StatementLifecycle cycle = null;
-                if (m_profiler != null) {
-                    RDBMSStatement stmt = new RDBMSStatement(sql);
-                    stmt.setQuery(op.getQuery());
-                    for (Iterator it = op.getEvents().iterator();
-                         it.hasNext(); ) {
-                        stmt.addEvent((Event) it.next());
-                    }
-                    cycle = m_profiler.getLifecycle(stmt);
-                }
-
                 if (cycle != null) { cycle.beginPrepare(); }
-                PreparedStatement ps = m_conn.prepareStatement(sql);
+                ps = m_conn.prepareStatement(sql);
                 if (cycle != null) { cycle.endPrepare(); }
+            } catch (SQLException e) {
+                if (cycle != null) { cycle.endPrepare(e); }
+                logQueryDetails(Priority.ERROR, sql, w, op, e);
+                throw new RDBMSException(e.getMessage()) {};
+            }
 
-                w.bind(ps, cycle);
+            w.bind(ps, cycle);
 
+            try {
                 if (cycle != null) { cycle.beginExecute(); }
                 long time = System.currentTimeMillis();
                 if (ps.execute()) {
                     time = System.currentTimeMillis() - time;
                     if (cycle != null) { cycle.endExecute(0); }
-                    if (bLogQuery) {
-                        DeveloperSupport.logQuery(m_conn.hashCode(), sOpType, sql, collToMap(w.getBindings()), time, null);
-                    }
                     return new ResultCycle(this, ps.getResultSet(), cycle);
                 } else {
-                    time = System.currentTimeMillis() - time;
-                    if (bLogQuery) {
-                        DeveloperSupport.logQuery(m_conn.hashCode(), sOpType, sql, collToMap(w.getBindings()), time, null);
-                    }
                     int updateCount = ps.getUpdateCount();
+                    time = System.currentTimeMillis() - time;
                     if (cycle != null) { cycle.endExecute(updateCount); }
 
                     if (LOG.isInfoEnabled()) {
                         LOG.info(updateCount + " rows affected");
                     }
 
-                    if (cycle != null) { cycle.beginClose(); }
-                    ps.close();
-                    if (cycle != null) { cycle.endClose(); }
+                    try {
+                        if (cycle != null) { cycle.beginClose(); }
+                        ps.close();
+                        if (cycle != null) { cycle.endClose(); }
+                    } catch (SQLException e) {
+                        if (cycle != null) { cycle.endClose(e); }
+                        logQueryDetails(Priority.ERROR, sql, w, op, e);
+                        throw new RDBMSException(e.getMessage()) {};
+                    }
 
                     return null;
                 }
             } catch (SQLException e) {
-                //robust connection pooling
-                checkBadConnection(e);
+                if (cycle != null) { cycle.endExecute(e); }
                 logQueryDetails(Priority.ERROR, sql, w, op, e);
-
-                if (bLogQuery) {
-                    DeveloperSupport.logQuery(m_conn.hashCode(), sOpType, sql, collToMap(w.getBindings()), 0, e);
-                }
                 throw new RDBMSException(e.getMessage()) {};
             }
         } finally {
@@ -553,27 +531,6 @@ public class RDBMSEngine extends Engine {
         LOG.log(priority, w.getBindings());
         LOG.log(priority, w.getTypeNames());
         LOG.log(priority, op.getEnvironment());
-    }
-
-    /**
-     * Tests if the SQLException was caused by a bad connection to the
-     * database. If it is, disconnects ConnectionManager and returns
-     * true.
-     *
-     * @param e the SQLException to check
-     * @return true if the SQLException was caused by a bad connection
-     *         to the database
-     */
-    boolean checkBadConnection(SQLException e) {
-        //      robust connection pooling
-        SQLException result = SQLExceptionHandler.wrap(e);
-        if (result instanceof com.arsdigita.db.DbNotAvailableException) {
-            LOG.warn("Bad Connection...calling ConnectionManager.badConnection()");
-            ConnectionManager.badConnection(m_conn);
-            return true;
-        } else {
-            return false;
-        }
     }
 
     public void execute(SQLBlock sql, Map parameters) {

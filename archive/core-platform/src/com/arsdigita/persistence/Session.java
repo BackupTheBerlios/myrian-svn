@@ -16,6 +16,7 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.db.DbHelper;
+import com.arsdigita.developersupport.DeveloperSupportProfiler;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.redhat.persistence.CreateEvent;
@@ -37,6 +38,7 @@ import com.redhat.persistence.metadata.Adapter;
 import com.redhat.persistence.metadata.Property;
 import com.redhat.persistence.metadata.Root;
 import com.redhat.persistence.profiler.rdbms.StatementProfiler;
+import com.redhat.persistence.profiler.rdbms.CompoundProfiler;
 import java.lang.ref.WeakReference;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -59,7 +61,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #31 $ $Date: 2003/11/06 $
+ * @version $Revision: #32 $ $Date: 2003/11/21 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -95,12 +97,16 @@ public class Session {
                 }
             };
 
+        CompoundProfiler profs = new CompoundProfiler();
+        profs.add(m_prof);
+        profs.add(new DeveloperSupportProfiler());
+
         switch (m_database) {
         case DbHelper.DB_ORACLE:
-            m_engine = new RDBMSEngine(src, new OracleWriter(), m_prof);
+            m_engine = new RDBMSEngine(src, new OracleWriter(), profs);
             break;
         case DbHelper.DB_POSTGRES:
-            m_engine = new RDBMSEngine(src, new PostgresWriter(), m_prof);
+            m_engine = new RDBMSEngine(src, new PostgresWriter(), profs);
             break;
         default:
             DbHelper.unsupportedDatabaseError("persistence");

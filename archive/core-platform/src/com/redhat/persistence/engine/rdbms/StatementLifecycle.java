@@ -15,33 +15,41 @@
 
 package com.redhat.persistence.engine.rdbms;
 
+import java.sql.*;
+
 /**
  * StatementLifecycle
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/08/15 $
+ * @version $Revision: #4 $ $Date: 2003/11/21 $
  **/
 
 public interface StatementLifecycle {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/StatementLifecycle.java#3 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/StatementLifecycle.java#4 $ by $Author: rhs $, $DateTime: 2003/11/21 10:51:18 $";
 
     void beginPrepare();
     void endPrepare();
+    void endPrepare(SQLException e);
 
     void beginSet(int pos, int type, Object obj);
     void endSet();
+    void endSet(SQLException e);
 
     void beginExecute();
     void endExecute(int updateCount);
+    void endExecute(SQLException e);
 
     void beginNext();
     void endNext(boolean more);
+    void endNext(SQLException e);
 
     void beginGet(String column);
     void endGet(Object result);
+    void endGet(SQLException e);
 
     void beginClose();
     void endClose();
+    void endClose(SQLException e);
 
 }

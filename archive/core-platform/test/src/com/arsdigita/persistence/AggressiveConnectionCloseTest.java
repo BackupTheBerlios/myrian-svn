@@ -15,7 +15,6 @@
 
 package com.arsdigita.persistence;
 
-import com.arsdigita.db.SQLExceptionHandler;
 import com.arsdigita.logging.SecureLogFilter;
 
 import java.io.*;
@@ -46,7 +45,7 @@ import org.apache.log4j.varia.StringMatchFilter;
  */
 public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/AggressiveConnectionCloseTest.java#12 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/AggressiveConnectionCloseTest.java#13 $";
 
     private Session ssn;
 

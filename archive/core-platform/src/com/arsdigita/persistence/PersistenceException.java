@@ -16,19 +16,18 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.util.UncheckedWrapperException;
-import com.arsdigita.db.DbException;
 
 /**
  * PersistenceException
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/10/23 $
+ * @version $Revision: #11 $ $Date: 2003/11/21 $
  */
 
 public class PersistenceException extends UncheckedWrapperException {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/PersistenceException.java#10 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/PersistenceException.java#11 $ by $Author: rhs $, $DateTime: 2003/11/21 10:51:18 $";
 
     /**
      * Constructor for a PersistenceException which does not wrap
@@ -94,21 +93,7 @@ public class PersistenceException extends UncheckedWrapperException {
      */
     public static final PersistenceException newInstance(String s,
                                                          Throwable rootCause) {
-        if (rootCause instanceof DbException) {
-            if (rootCause instanceof
-                com.arsdigita.db.UniqueConstraintException) {
-                return new UniqueConstraintException(s, (DbException)rootCause);
-            } else if (rootCause instanceof
-                       com.arsdigita.db.DbNotAvailableException) {
-                return new DbNotAvailableException(s, (DbException)rootCause);
-            }
-        } else if (rootCause instanceof
-                   com.redhat.persistence.DuplicateObjectException) {
-            return new UniqueConstraintException
-                (s, (com.redhat.persistence.DuplicateObjectException)
-                 rootCause);
-        } else if (rootCause instanceof
-                   com.redhat.persistence.FlushException) {
+        if (rootCause instanceof com.redhat.persistence.FlushException) {
             return new FlushException
                 (s, (com.redhat.persistence.FlushException) rootCause);
         }

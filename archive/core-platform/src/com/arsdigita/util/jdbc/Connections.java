@@ -16,7 +16,6 @@
 package com.arsdigita.util.jdbc;
 
 import com.arsdigita.db.DbHelper;
-import com.arsdigita.db.SQLExceptionHandler;
 import com.arsdigita.util.Assert;
 import com.arsdigita.util.Classes;
 import com.arsdigita.util.UncheckedWrapperException;
@@ -33,9 +32,9 @@ import org.apache.log4j.Logger;
  */
 public final class Connections {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/jdbc/Connections.java#3 $" +
-        "$Author: jorris $" +
-        "$DateTime: 2003/10/28 18:36:21 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/jdbc/Connections.java#4 $" +
+        "$Author: rhs $" +
+        "$DateTime: 2003/11/21 10:51:18 $";
 
     private static final Logger s_log = Logger.getLogger(Connections.class);
 
@@ -55,20 +54,10 @@ public final class Connections {
             switch (database) {
             case DbHelper.DB_POSTGRES:
                 Classes.loadClass("org.postgresql.Driver");
-
-                SQLExceptionHandler.setDbExceptionHandlerImplName
-                    ("com.arsdigita.db.postgres.PostgresDbExceptionHandlerImpl");
-
                 break;
             case DbHelper.DB_ORACLE:
                 Classes.loadClass("oracle.jdbc.driver.OracleDriver");
-
-                SQLExceptionHandler.setDbExceptionHandlerImplName
-                    ("com.arsdigita.db.oracle.OracleDbExceptionHandlerImpl");
-
                 break;
-            default:
-                throw new IllegalArgumentException("Unsupported database");
             }
 
             final Connection conn = DriverManager.getConnection(url);
@@ -86,12 +75,6 @@ public final class Connections {
 	    //}
 
             return conn;
-        } catch (ClassNotFoundException e) {
-            throw new UncheckedWrapperException(e);
-        } catch (InstantiationException e) {
-            throw new UncheckedWrapperException(e);
-        } catch (IllegalAccessException e) {
-            throw new UncheckedWrapperException(e);
         } catch (SQLException e) {
             throw new UncheckedWrapperException(e);
         }
