@@ -1,3 +1,19 @@
+--
+-- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+--
+-- The contents of this file are subject to the CCM Public
+-- License (the "License"); you may not use this file except in
+-- compliance with the License. You may obtain a copy of
+-- the License at http://www.redhat.com/licenses/ccmpl.html
+--
+-- Software distributed under the License is distributed on an "AS
+-- IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+-- implied. See the License for the specific language governing
+-- rights and limitations under the License.
+--
+-- $Id: //core-platform/dev/sql/oracle-se-create.sql#14 $
+-- $DateTime: 2003/01/07 14:51:38 $
+
 @@ oracle-se/function-currentDate.sql
 
 @@ ddl/oracle-se/create.sql
@@ -27,12 +43,16 @@
 @@ default/kernel/comment-email_addresses.sql
 @@ default/kernel/index-parties.sql
 @@ default/kernel/comment-parties.sql
+@@ default/kernel/index-party_email_map.sql
 @@ default/kernel/comment-party_email_map.sql
 @@ default/kernel/comment-person_names.sql
+@@ default/kernel/index-users.sql
 @@ default/kernel/comment-users.sql
 
 @@ default/kernel/index-roles.sql
 @@ default/kernel/comment-roles.sql
+
+@@ default/kernel/index-user_authentication.sql
 
 @@ default/kernel/table-group_subgroup_trans_index.sql
 @@ default/kernel/index-group_subgroup_trans_index.sql
@@ -76,12 +96,18 @@
 
 @@ default/kernel/index-site_nodes.sql
 @@ default/kernel/index-apm_packages.sql
+@@ default/kernel/index-apm_package_type_listener_map.sql
 @@ default/kernel/view-object_package_map.sql
 
 @@ default/kernel/index-acs_stylesheets.sql
 @@ default/kernel/index-acs_stylesheet_type_map.sql
 @@ default/kernel/index-acs_stylesheet_node_map.sql
 @@ default/kernel/function-package_id_for_object_id.sql
+
+@@ default/kernel/constraint-email_addresses.sql
+@@ default/kernel/constraint-group_subgroup_map.sql
+@@ default/kernel/constraint-site_nodes.sql
+@@ default/kernel/constraint-roles.sql
 
 @@ default/categorization/table-cat_categories.sql
 @@ default/categorization/comment-cat_categories.sql
@@ -97,8 +123,10 @@
 @@ default/categorization/table-cat_category_purpose_map.sql
 @@ default/categorization/index-cat_category_purpose_map.sql
 @@ default/categorization/table-cat_cat_subcat_trans_index.sql
+@@ default/categorization/index-cat_cat_subcat_trans_index.sql
 @@ default/categorization/trigger-cat_category_category_map.sql
 @@ default/categorization/insert-acs_privileges.sql
+@@ default/categorization/index-cat_root_cat_object_map.sql
 
 @@ oracle-se/auditing/table-acs_auditing.sql
 @@ default/auditing/index-acs_auditing.sql
@@ -179,6 +207,7 @@
 @@ default/formbuilder/table-bebop_meta_object.sql
 @@ default/formbuilder/comment-bebop_meta_object.sql
 @@ default/formbuilder/table-forms_widget_label.sql
+@@ default/formbuilder/index-forms_widget_label.sql
 @@ default/formbuilder/comment-forms_widget_label.sql
 @@ default/formbuilder/table-forms_lstnr_conf_email.sql
 @@ default/formbuilder/comment-forms_lstnr_conf_email.sql
@@ -193,12 +222,19 @@
 @@ default/formbuilder/table-forms_dataquery.sql
 @@ default/formbuilder/comment-forms_dataquery.sql
 @@ default/formbuilder/table-forms_dd_select.sql
+@@ default/formbuilder/index-forms_dd_select.sql
 @@ default/formbuilder/comment-forms_dd_select.sql
 @@ default/formbuilder/sequence-forms_unique_id_seq.sql
 @@ default/formbuilder/comment-forms_unique_id_seq.sql
 
 @@ default/persistence/table-persistence_dynamic_ot.sql
 @@ default/persistence/table-persistence_dynamic_assoc.sql
+
+@@ default/portal/index-portlets.sql
+
+@@ default/web/index-applications.sql
+@@ default/web/index-application_types.sql
+@@ default/web/index-application_type_privilege_map.sql
 
 @@ default/kernel/index-foreign_keys.sql
 

@@ -12,6 +12,7 @@
  * rights and limitations under the License.
  *
  */
+
 package com.arsdigita.tools.junit.results;
 
 import org.jdom.Document;

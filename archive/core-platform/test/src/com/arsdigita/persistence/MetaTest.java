@@ -26,12 +26,12 @@ import org.apache.log4j.*;
  * MetaTest
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #7 $ $Date: 2002/10/07 $
+ * @version $Revision: #8 $ $Date: 2003/01/07 $
  */
 
 public class MetaTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/MetaTest.java#7 $ by $Author: rhs $, $DateTime: 2002/10/07 19:00:30 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/MetaTest.java#8 $ by $Author: dennis $, $DateTime: 2003/01/07 14:51:38 $";
     private static final Logger s_log =
         Logger.getLogger(MetaTest.class.getName());
     static  {
@@ -79,9 +79,9 @@ public class MetaTest extends PersistenceTestCase {
         suite.addTest(new MetaTest("mdsql.Party"));
         suite.addTest(new MetaTest("mdsql.User"));
         suite.addTest(new MetaTest("mdsql.Group"));
-        suite.addTest(new MetaTest("examples.Article"));
-        //        suite.addTest(new MetaTest("examples.ArticleImageLink"));
-        suite.addTest(new MetaTest("examples.Image"));
+        suite.addTest(new MetaTest("linkTest.Article"));
+        //        suite.addTest(new MetaTest("linkTest.ArticleImageLink"));
+        suite.addTest(new MetaTest("linkTest.Image"));
         suite.addTest(new MetaTest("examples.Node"));
         suite.addTest(new MetaTest("examples.Order"));
         //        suite.addTest(new MetaTest("examples.LineItem"));

@@ -1,17 +1,17 @@
 /*
-* Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
-*
-* The contents of this file are subject to the CCM Public
-* License (the "License"); you may not use this file except in
-* compliance with the License. You may obtain a copy of
-* the License at http://www.redhat.com/licenses/ccmpl.html
-*
-* Software distributed under the License is distributed on an "AS
-* IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-* implied. See the License for the specific language governing
-* rights and limitations under the License.
-*
-*/
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.redhat.com/licenses/ccmpl.html
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
 
 package com.arsdigita.util;
 
@@ -32,7 +32,7 @@ import org.apache.cactus.ServletURL;
  */
 
 public class HttpServletDummyRequest implements HttpServletRequest {
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyRequest.java#10 $ by $Author: justin $, $DateTime: 2002/12/12 13:09:48 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyRequest.java#11 $ by $Author: dennis $, $DateTime: 2003/01/07 14:51:38 $";
 
     private HashMap parameters = new HashMap();
     private HashMap attributes = new HashMap();
@@ -52,7 +52,7 @@ public class HttpServletDummyRequest implements HttpServletRequest {
         this(true);
     }
     public HttpServletDummyRequest(boolean isDebug) {
-        this("localhost", "", "", "", null, isDebug);
+        this("localhost", "", "/someservlet", "/", null, isDebug);
     }
 
 

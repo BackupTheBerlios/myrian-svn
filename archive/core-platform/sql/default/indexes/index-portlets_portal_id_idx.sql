@@ -1,1 +1,0 @@
-create index PORTLETS_PORTAL_ID_idx on PORTLETS(PORTAL_ID);

@@ -42,11 +42,11 @@ import java.io.File;
  *  the framework will look here. test.testpath must be the fully qualified path name.
  *
  * @author Jon Orris
- * @version $Revision: #5 $ $Date: 2002/12/11 $
+ * @version $Revision: #6 $ $Date: 2003/01/07 $
  */
 
 public class PackageTestSuite extends TestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/tools/junit/framework/PackageTestSuite.java#5 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/tools/junit/framework/PackageTestSuite.java#6 $ by $Author: dennis $, $DateTime: 2003/01/07 14:51:38 $";
 
     public PackageTestSuite() {
         super();
@@ -180,8 +180,13 @@ public class PackageTestSuite extends TestSuite {
 
         File testFileDir = new File(testCasePath);
         String[] filenames = testFileDir.list();
-        if( filenames != null ) {
+        if( filenames != null && filenames.length > 0) {
             addTestCases(filenames, suite);
+        } else {
+            System.err.println("Warning: No tests found for test path: " + testCasePath);
+        }
+        if (suite.countTestCases() == 0) {
+            System.err.println("Warning: no tests added for test path: " + testCasePath);
         }
 
     }

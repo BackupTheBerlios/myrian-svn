@@ -27,23 +27,25 @@ import org.apache.log4j.Logger;
  * LinkAttributeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2003/01/07 $
  */
 
 public class StaticLinkAttributeTest extends LinkAttributeTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/StaticLinkAttributeTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/StaticLinkAttributeTest.java#4 $ by $Author: dennis $, $DateTime: 2003/01/07 14:51:38 $";
 
     public StaticLinkAttributeTest(String name) {
         super(name);
     }
 
     protected void persistenceSetUp() {
+        load("com/arsdigita/persistence/testpdl/static/Party.pdl");
         load("com/arsdigita/persistence/testpdl/static/LinkAttributes.pdl");
         super.persistenceSetUp();
     }
 
     String getModelName() {
-        return "linkAttributes";
+        return "examples";
     }
+
 }

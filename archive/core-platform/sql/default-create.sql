@@ -1,3 +1,19 @@
+--
+-- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+--
+-- The contents of this file are subject to the CCM Public
+-- License (the "License"); you may not use this file except in
+-- compliance with the License. You may obtain a copy of
+-- the License at http://www.redhat.com/licenses/ccmpl.html
+--
+-- Software distributed under the License is distributed on an "AS
+-- IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+-- implied. See the License for the specific language governing
+-- rights and limitations under the License.
+--
+-- $Id: //core-platform/dev/sql/default-create.sql#7 $
+-- $DateTime: 2003/01/07 14:51:38 $
+
 include default/function-currentDate.sql
 
 include default/globalization/table-g11n_charsets.sql
@@ -107,6 +123,16 @@ include default/kernel/index-acs_stylesheet_node_map.sql
 
 include default/kernel/function-package_id_for_object_id.sql
 
+include default/kernel/constraint-email_addresses.sql
+include default/kernel/constraint-group_subgroup_map.sql
+include default/kernel/constraint-site_nodes.sql
+include default/kernel/constraint-roles.sql
+
+include default/kernel/index-party_email_map.sql
+include default/kernel/index-users.sql
+include default/kernel/index-user_authentication.sql
+include default/kernel/index-apm_package_type_listener_map.sql
+
 include default/categorization/table-cat_categories.sql
 include default/categorization/comment-cat_categories.sql
 include default/categorization/table-cat_category_category_map.sql
@@ -122,6 +148,9 @@ include default/categorization/table-cat_category_purpose_map.sql
 include default/categorization/index-cat_category_purpose_map.sql
 include default/categorization/table-cat_cat_subcat_trans_index.sql
 include default/categorization/trigger-cat_category_category_map.sql
+
+include default/categorization/index-cat_cat_subcat_trans_index.sql
+include default/categorization/index-cat_root_cat_object_map.sql
 
 include default/auditing/table-acs_auditing.sql
 include default/auditing/index-acs_auditing.sql
@@ -148,20 +177,6 @@ include default/search/table-content_change_time.sql
 include default/search/table-search_indexing_jobs.sql
 include default/search/insert-dummy.sql
 include default/search/package-search_indexing.sql
-
-include default/places/table-places.sql
-include default/places/table-place_hierarchy.sql
-include default/places/index-place_hierarchy.sql
-include default/places/table-place_hierarchy_tc.sql
-include default/places/index-place_hierarchy_tc.sql
-include default/places/trigger-place_hierarchy.sql
-include default/places/table-pl_countries.sql
-include default/places/table-pl_regions.sql
-include default/places/table-pl_municipalities.sql
-include default/places/table-pl_postal_codes.sql
-include default/places/table-pl_us_states.sql
-include default/places/table-pl_us_counties.sql
-include default/places/index-pl_us_counties.sql
 
 include default/versioning/table-vc_objects.sql
 include default/versioning/comment-vc_objects.sql
@@ -235,13 +250,16 @@ include default/formbuilder/table-forms_dd_select.sql
 include default/formbuilder/comment-forms_dd_select.sql
 include default/formbuilder/sequence-forms_unique_id_seq.sql
 include default/formbuilder/comment-forms_unique_id_seq.sql
-
-include default/addresses/table-us_addresses.sql
+include default/formbuilder/index-forms_widget_label.sql
+include default/formbuilder/index-forms_dd_select.sql
 
 include default/persistence/table-persistence_dynamic_ot.sql
 include default/persistence/table-persistence_dynamic_assoc.sql
 
-include default/indexes/index-portlets_portal_id_idx.sql 
+include default/portal/index-portlets.sql
+include default/web/index-applications.sql
+include default/web/index-application_types.sql
+include default/web/index-application_type_privilege_map.sql
 
 include default/kernel/index-foreign_keys.sql 
 

@@ -13,7 +13,6 @@
  *
  */
 
-
 package com.arsdigita.persistence;
 
 class DefaultSessionFactory implements SessionFactory {

@@ -61,14 +61,15 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #16 $ $Date: 2002/11/26 $
+ * @version $Revision: #17 $ $Date: 2003/01/07 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#16 $ by $Author: vadim $, $DateTime: 2002/11/26 18:30:20 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#17 $ by $Author: dennis $, $DateTime: 2003/01/07 14:51:38 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
+    private static boolean s_quiet = false;
 
     // the abstract syntax tree root nod
     private AST m_ast = new AST();
@@ -181,6 +182,8 @@ public class PDL {
                                         Boolean.FALSE));
         CMD.addSwitch(new BooleanSwitch("-verbose", "sets logging to INFO",
                                         Boolean.FALSE));
+        CMD.addSwitch(new BooleanSwitch("-quiet", "sets logging to ERROR and does not complain if no PDL files are found",
+                                        Boolean.FALSE));
         CMD.addSwitch(new StringSwitch("-testddl", "no clue", null));
     }
 
@@ -203,6 +206,9 @@ public class PDL {
             Logger.getRootLogger().setLevel(Level.DEBUG);
         } else if (Boolean.TRUE.equals(options.get("-verbose"))) {
             Logger.getRootLogger().setLevel(Level.INFO);
+        } else if (Boolean.TRUE.equals(options.get("-quiet"))) {
+            Logger.getRootLogger().setLevel(Level.ERROR);
+            s_quiet = true;
         } else {
             Logger.getRootLogger().setLevel(Level.FATAL);
         }
@@ -219,6 +225,9 @@ public class PDL {
         files.addAll(Arrays.asList(args));
 
         if (files.size() < 1) {
+            if (s_quiet) {
+                return;
+            } 
             usage();
         }
 

@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.redhat.com/licenses/ccmpl.html
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
+
 package com.arsdigita.persistence.tests.data;
 
 import com.arsdigita.persistence.*;
@@ -23,12 +38,12 @@ import java.security.*;
  * value of the correct type for the specified property.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/11/06 $
+ * @version $Revision: #3 $ $Date: 2003/01/07 $
  **/
 
 public class DataSource {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/DataSource.java#2 $ by $Author: rhs $, $DateTime: 2002/11/06 16:38:23 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/DataSource.java#3 $ by $Author: dennis $, $DateTime: 2003/01/07 14:51:38 $";
 
     private static final Logger LOG = Logger.getLogger(DataSource.class);
 

@@ -24,12 +24,12 @@ import com.arsdigita.domain.DataObjectNotFoundException;
  * LinkAttributeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2002/08/15 $
+ * @version $Revision: #10 $ $Date: 2003/01/07 $
  **/
 
 public abstract class LinkAttributeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LinkAttributeTest.java#9 $ by $Author: jorris $, $DateTime: 2002/08/15 14:01:26 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LinkAttributeTest.java#10 $ by $Author: dennis $, $DateTime: 2003/01/07 14:51:38 $";
 
 
     private static Logger s_log =
@@ -86,7 +86,7 @@ public abstract class LinkAttributeTest extends PersistenceTestCase {
     public void testLinkAttributes() throws DataObjectNotFoundException {
         Session ssn = SessionManager.getSession();
         DataObject article = ssn.create(getModelName() + ".Article");
-	DataObject user = ssn.create( "examples.User");
+	DataObject user = ssn.create(getModelName() + ".User");
 	user.set("id", BigInteger.ZERO);
 	user.set("email", "foo@bar.com");
 	user.set("firstName", "foo");

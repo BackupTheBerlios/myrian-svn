@@ -12,6 +12,7 @@
  * rights and limitations under the License.
  *
  */
+
 package com.arsdigita.tools.junit.results;
 
 import org.jdom.Element;
@@ -20,7 +21,7 @@ import org.jdom.Element;
  *  ReportIndex
  *
  *  @author <a href="mailto:jorris@redhat.com">Jon Orris</a>
- *  @version $Revision: #2 $ $Date Nov 6, 2002 $
+ *  @version $Revision: #3 $ $Date Nov 6, 2002 $
  */
 public class ReportIndex extends Element {
     public ReportIndex(String previousChangelist, String currentChangelist) {

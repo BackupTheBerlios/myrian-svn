@@ -11,8 +11,9 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/oracle-se/kernel/drop-all.sql#3 $
--- $DateTime: 2002/10/16 14:12:35 $
+-- $Id: //core-platform/dev/sql/oracle-se/kernel/drop-all.sql#4 $
+-- $DateTime: 2003/01/07 14:51:38 $
+
 
 
 --
@@ -22,7 +23,7 @@
 --
 -- @author Bryan Quinn (bquinn@arsdigita.com) 
 -- @creation-date July 22, 2001 17:29:09
--- @cvs-id $Id: //core-platform/dev/sql/oracle-se/kernel/drop-all.sql#3 $
+-- @cvs-id $Id: //core-platform/dev/sql/oracle-se/kernel/drop-all.sql#4 $
 
 begin
    ctx_ddl.drop_section_group('autogroup');
