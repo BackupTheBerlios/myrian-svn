@@ -16,12 +16,11 @@
 package com.arsdigita.persistence.proto.pdl.nodes;
 
 import com.arsdigita.persistence.metadata.MetadataRoot;
+import com.arsdigita.persistence.metadata.ObjectType;
+import com.arsdigita.persistence.metadata.Property;
 import com.arsdigita.util.Assert;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -31,7 +30,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #10 $ $Date: 2003/05/06 $
+ * @version $Revision: #11 $ $Date: 2003/05/09 $
  */
 public class VersioningMetadata {
     private final static Logger s_log =
@@ -64,7 +63,7 @@ public class VersioningMetadata {
      **/
     private ChangeListener m_changeListener;
 
-    private final static VersioningMetadata SINGLETON =
+    private final static VersioningMetadata s_singleton =
         new VersioningMetadata();
 
     private VersioningMetadata() {
@@ -96,16 +95,14 @@ public class VersioningMetadata {
                     }
 
                     if ( prop.isUnversioned() ) {
-                        String propertyName = prop.getName().getName();
-                        Property property = new Property(containerName,
-                                                         propertyName);
+                        Property property = 
+                            getProperty(containerName, prop.getName().getName());
 
                         s_log.info("onProperty: " + property);
                         m_unversionedProps.add(property);
 
                         if ( m_changeListener != null ) {
-                            m_changeListener.onUnversionedProperty
-                                (containerName, propertyName);
+                            m_changeListener.onUnversionedProperty(property);
                         }
                     }
                 }
@@ -113,7 +110,7 @@ public class VersioningMetadata {
     }
 
     public static VersioningMetadata getVersioningMetadata() {
-        return SINGLETON;
+        return s_singleton;
     }
 
     public Node.Switch nodeSwitch() {
@@ -136,6 +133,14 @@ public class VersioningMetadata {
     }
 
 
+    private static Property getProperty(String containerName,
+                                        String propertyName) {
+
+        ObjectType objType = MetadataRoot.getMetadataRoot().
+            getObjectType(containerName);
+        return objType.getProperty(propertyName);
+    }
+
     /**
      * Returns <code>true</code> if the object type property whose name is
      * <code>qualifiedName</code> is marked <code>unversioned</code> in the PDL
@@ -147,7 +152,7 @@ public class VersioningMetadata {
      **/
     public boolean isMarkedUnversioned(String containerName, String propertyName) {
         return m_unversionedProps.contains
-            (new Property(containerName, propertyName));
+            (getProperty(containerName, propertyName));
     }
 
     /**
@@ -179,37 +184,7 @@ public class VersioningMetadata {
          * This method is called whenever we traverse a property node of the PDL
          * AST that is marked <code>unversioned</code>.
          **/
-        void onUnversionedProperty(String containerName, String propertyName);
-    }
-
-    private static class Property {
-        private final String m_container;
-        private final String m_property;
-
-        public Property(String container, String property) {
-            m_container = container;
-            m_property = property;
-        }
-
-        public boolean equals(Object obj) throws ClassCastException {
-            if ( obj == null ) return false;
-
-            Property that = (Property) obj;
-            return that.m_container.equals(this.m_container) 
-                && that.m_property.equals(this.m_property);
-        }
-
-        public int hashCode() {
-            return m_container.hashCode() + m_property.hashCode();
-        }
-
-        public String toString() {
-            StringBuffer sb = new StringBuffer
-                (m_container.length() + m_property.length() + 50);
-            sb.append("container=").append(m_container);
-            sb.append(", property=").append(m_property);
-            return sb.toString();
-        }
+        void onUnversionedProperty(Property property);
     }
 }
 
