@@ -1,0 +1,90 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/proto/pdl/com/arsdigita/kernel/UserAuthentication.pdl#6 $
+// $DateTime: 2003/08/04 15:56:00 $
+
+model com.arsdigita.kernel;
+
+object type UserAuthentication {
+    BigDecimal[1..1] id = user_authentication.auth_id INTEGER;
+    String[1..1] primaryEmail = parties.primary_email VARCHAR(100);
+    String[0..1] screenName = users.screen_name VARCHAR(100);
+    String[1..1] password = user_authentication.password VARCHAR(100);
+    String[0..1] salt = user_authentication.salt VARCHAR(100);
+    String[0..1] passwordQuestion = user_authentication.password_question VARCHAR(1000);
+    String[0..1] passwordAnswer = user_authentication.password_answer VARCHAR(1000);
+    User[1..1] user = join user_authentication.user_id to users.user_id;
+
+    object key(id);
+    Party[1..1] party =
+        join user_authentication.auth_id to parties.party_id;
+
+    // MDSQL also deletes from parties
+    delete {
+        do {
+            delete from user_authentication where auth_id = :id
+        }
+    }
+
+    // MDSQL also inserts into parties
+    insert {
+        do {
+            insert into user_authentication
+            (auth_id, password, salt,
+            password_question, password_answer, user_id)
+            values
+            (:id, :password, :salt,
+            :passwordQuestion, :passwordAnswer, :user.id)
+        }
+    }
+
+    // MDSQL also updates parties
+    update {
+        do {
+            update user_authentication
+            set password = :password,
+                salt = :salt,
+                password_answer = :passwordAnswer,
+                password_question = :passwordQuestion,
+	        user_id = :user.id
+            where auth_id = :id
+        }
+    }
+
+    add user {}
+    remove user {}
+}
+
+query UserAuthenticationForLogin {
+    BigDecimal id;
+    String primaryEmail;
+    String screenName;
+    String lowerScreenName;
+    do {
+        select user_authentication.auth_id,
+	           users.screen_name,
+	           lower(users.screen_name) as lower_screen_name,
+	           parties.primary_email
+          from user_authentication,
+	           parties,
+	           users
+         where user_authentication.user_id = parties.party_id
+	   and user_authentication.user_id = users.user_id
+    } map {
+        id = user_authentication.auth_id;
+        primaryEmail = parties.primary_email;
+	screenName = users.screen_name;
+	lowerScreenName = lower_screen_name;
+    }
+}

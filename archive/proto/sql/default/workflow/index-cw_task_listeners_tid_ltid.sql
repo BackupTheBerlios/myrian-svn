@@ -1,0 +1,1 @@
+create index cw_task_listeners_tid_ltid_idx on cw_task_listeners(task_id, listener_task_id);

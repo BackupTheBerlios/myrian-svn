@@ -1,0 +1,48 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/proto/pdl/com/arsdigita/categorization/query-getSubcategories.ora.pdl#3 $ 
+// $DateTime: 2003/08/04 15:56:00 $
+
+model com.arsdigita.categorization;
+
+
+// This query is modified from the original query in core.
+// the difference is the addition of abstract_p
+// Because we are using categorization for browsing it makes sense to
+// be able to categorize items under the "root" category.  In particular,
+// it makes sense to include the home page under the root category.
+query getSubCategories {
+    BigDecimal id;
+    String name;
+    BigDecimal nchild;
+    Boolean isAbstract;
+    
+    do {
+        select g.name,
+               g.category_id,
+               count(sd2.category_id) as sub_count, abstract_p
+        from cat_categories g,  
+             cat_category_category_map sd1,
+             cat_category_category_map sd2
+        where sd1.category_id = :objectID
+          and g.category_id = sd1.related_category_id
+          and sd2.category_id(+) = sd1.related_category_id
+        group by g.name, g.category_id, abstract_p
+    } map {
+        id = g.category_id;
+        name = g.name;
+        nchild = sub_count;
+        isAbstract = abstract_p;
+    }
+}

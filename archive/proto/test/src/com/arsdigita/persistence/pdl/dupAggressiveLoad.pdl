@@ -1,0 +1,10 @@
+model dupAggressiveLoad;
+
+object type Baz {
+    BigInteger id = baz.id;
+
+    object key(id);
+
+    aggressive load(id);
+    aggressive load(id);
+}

@@ -1,0 +1,58 @@
+//
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/proto/pdl/com/arsdigita/search/ContentChangeTime.pdl#3 $ 
+// $DateTime: 2003/08/04 15:56:00 $
+
+model com.arsdigita.search;
+
+// ContentChangeTime object is used to store when content last changes
+// Only needs to do insert.  Is never read by object.
+
+data operation InsertContentChangeTime {
+    do {
+        insert into content_change_time (
+            change_time
+        ) values (
+            :timeLastChange
+        )
+    }
+}
+
+query getContentChangeTimes {
+    Long       timeLastChange;
+    Long       timeEarliestChange;
+
+    do {
+        select max(change_time) as time_last_change,
+               min(change_time) as time_first_change
+        from content_change_time
+    } map {
+        timeLastChange = time_last_change;
+        timeEarliestChange = time_first_change;
+    }
+}
+
+// Following returns the earliest time since the last indexing started, or zero
+// Filter is applied:  query.setFilter ("change_time > TimeIndexingStarted")
+// to find earliest
+
+query getTimeEarliestNonSyncedChange {
+    Long timeEarliestChange;
+    do {
+        select nvl(min(change_time),0) as time_first_change
+        from content_change_time
+    } map {
+        timeEarliestChange = time_first_change;
+    }
+}
