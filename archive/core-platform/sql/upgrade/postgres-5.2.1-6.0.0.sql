@@ -11,19 +11,33 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.1-6.0.0.sql#4 $
--- $DateTime: 2003/07/21 01:44:28 $
-
-
-\i ../postgres/upgrade/5.2.0-5.3.0/alter-lucene.sql
+-- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.1-6.0.0.sql#5 $
+-- $DateTime: 2003/07/24 19:46:44 $
 
 begin;
 
-\i ../postgres/lucene/proc-update-dirty.sql
-
-drop trigger acs_permissions_cascade_del_tr on acs_objects;
-drop function acs_permissions_cascade_del_fn();
-\i ../default/upgrade/web-hosts.sql
+\i ../default/upgrade/5.2.1-6.0.0/drop-search-test.sql
+\i ../default/upgrade/5.2.1-6.0.0/sequence-vcx_id_seq.sql
+\i ../default/upgrade/5.2.1-6.0.0/sequence-vcx_txns_id_seq.sql
+\i ../default/upgrade/5.2.1-6.0.0/alter-categories.sql
+\i ../default/upgrade/5.2.1-6.0.0/table-web_hosts-auto.sql
+\i ../postgres/upgrade/5.2.1-6.0.0/update-web-hosts.sql
+\i ../postgres/upgrade/5.2.1-6.0.0/alter-lucene.sql
+\i ../postgres/upgrade/5.2.1-6.0.0/mime-types.sql
+\i ../postgres/upgrade/5.2.1-6.0.0/table-vcx_blob_operations-auto.sql
+\i ../postgres/upgrade/5.2.1-6.0.0/table-vcx_clob_operations-auto.sql
+\i ../postgres/upgrade/5.2.1-6.0.0/table-vcx_event_types-auto.sql
+\i ../postgres/upgrade/5.2.1-6.0.0/table-vcx_generic_operations-auto.sql
+\i ../postgres/upgrade/5.2.1-6.0.0/table-vcx_java_classes-auto.sql
+\i ../postgres/upgrade/5.2.1-6.0.0/table-vcx_obj_changes-auto.sql
+\i ../postgres/upgrade/5.2.1-6.0.0/table-vcx_operations-auto.sql
+\i ../postgres/upgrade/5.2.1-6.0.0/table-vcx_tags-auto.sql
+\i ../postgres/upgrade/5.2.1-6.0.0/table-vcx_txns-auto.sql
+\i ../postgres/upgrade/5.2.1-6.0.0/vcx_deferred.sql
+-- \i ../postgres/upgrade/5.2.1-6.0.0/update-constraints.sql
+\i ../postgres/upgrade/5.2.1-6.0.0/misc.sql
+\i ../default/upgrade/5.2.1-6.0.0/insert-vcx_event_types.sql
+\i ../default/upgrade/5.2.1-6.0.0/insert-vcx_java_classes.sql
 
 commit;
 

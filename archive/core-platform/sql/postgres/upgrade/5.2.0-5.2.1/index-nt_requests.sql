@@ -11,17 +11,9 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.0-5.2.1.sql#2 $
+-- $Id: //core-platform/dev/sql/postgres/upgrade/5.2.0-5.2.1/index-nt_requests.sql#1 $
 -- $DateTime: 2003/07/24 19:46:44 $
 
-
-begin;
-\i ../default/upgrade/5.2.0-5.2.1/alter-requests.sql
-\i ../postgres/upgrade/5.2.0-5.2.1/add-cat-deflt-ancestors-idx.sql
-\i ../postgres/upgrade/5.2.0-5.2.1/acs_objects-acs_permissions-cascade-workaround.sql
-\i ../postgres/upgrade/5.2.0-5.2.1/notification/index-nt_requests.sql
-
-commit;
-
---
-
+create index nt_requests_digest_id_idx on nt_requests(digest_id);
+create index nt_requests_message_id_idx on nt_requests(message_id);
+create index nt_requests_party_to_idx on nt_requests(party_to);
