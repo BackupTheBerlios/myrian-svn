@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #3 $ $Date: 2003/02/19 $
+ * @version $Revision: #4 $ $Date: 2003/02/21 $
  */
 public class VersioningMetadata {
     private final static Logger LOG =
@@ -114,7 +114,7 @@ public class VersioningMetadata {
     }
 
     /**
-     * @see #addChangeListener(ChangeListener)
+     * @see #addChangeListener(VersioningMetadata.ChangeListener)
      **/
     public interface ChangeListener {
         void onChange();

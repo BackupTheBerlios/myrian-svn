@@ -23,7 +23,7 @@ import java.util.List;
  *
  * @author Archit Shah (ashah@mit.edu)
  * @author Vadim Nasardinov (vadidmn@redhat.com)
- * @version $Date: 2003/02/19 $
+ * @version $Date: 2003/02/21 $
  * @since   2003-01-22
  **/
 public interface Graph {
@@ -103,12 +103,12 @@ public interface Graph {
     int outgoingEdgeCount(Object node);
 
     /**
-     * @see #outgoingEdgeCount(node)
+     * @see #outgoingEdgeCount(Object)
      **/
     int incomingEdgeCount(Object node);
 
     /**
-     * @see #getOutgoingEdges(node)
+     * @see #getOutgoingEdges(Object)
      **/
     List getIncomingEdges(Object node);
 
