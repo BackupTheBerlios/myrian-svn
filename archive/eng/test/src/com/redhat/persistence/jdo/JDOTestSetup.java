@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.util.Properties;
 import javax.jdo.JDOHelper;
-import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 
 import junit.extensions.TestSetup;
@@ -20,7 +19,6 @@ import junit.framework.Test;
 public class JDOTestSetup extends TestSetup {
     private static int s_id = 0;
     private static PersistenceManagerFactory s_pmf = null;
-    private static PersistenceManager m_pm = null;
 
     public JDOTestSetup(Test test) {
         super(test);

@@ -4,6 +4,7 @@ import com.redhat.persistence.*;
 import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.oql.Expression;
 import org.apache.commons.collections.map.IdentityMap;
+import java.sql.Connection;
 import java.util.*;
 import javax.jdo.*;
 import javax.jdo.spi.*;
@@ -33,6 +34,11 @@ public class PersistenceManagerImpl implements PersistenceManager {
     public PersistenceManagerImpl(Session ssn) {
         m_ssn = ssn;
         m_ssn.setAttribute(ATTR_NAME, this);
+    }
+
+    // XXX: revisit this kludge
+    Connection getConnection() {
+        return null;
     }
 
     StateManagerImpl getStateManager(PersistenceCapable pc) {

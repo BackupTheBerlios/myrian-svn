@@ -166,7 +166,7 @@ public class PersistenceManagerFactoryImpl
             public void release(Connection conn) {}
         };
 
-        Engine engine = null;
+        final RDBMSEngine engine;
         switch (DbHelper.getDatabaseFromURL(m_url)) {
         case DbHelper.DB_ORACLE:
             engine = new RDBMSEngine(src, new OracleWriter());
@@ -174,14 +174,17 @@ public class PersistenceManagerFactoryImpl
         case DbHelper.DB_POSTGRES:
             engine = new RDBMSEngine(src, new PostgresWriter());
             break;
-        }
-
-        if (engine == null) {
+        default:
             DbHelper.unsupportedDatabaseError("persistence");
+            throw new IllegalStateException("unreachable stmt to appease javac");
         }
 
         Session ssn = new Session(m_root, engine, new QuerySource());
-        return new PersistenceManagerImpl(ssn);
+        return new PersistenceManagerImpl(ssn) {
+                public Connection getConnection() {
+                    return engine.getConnection();
+                }
+            };
     }
 
     public String getConnectionDriverName() {
