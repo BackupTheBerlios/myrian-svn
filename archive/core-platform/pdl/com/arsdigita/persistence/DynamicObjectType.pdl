@@ -75,3 +75,16 @@ query getPostgresColumnNames {
         tableName = pg_class.relname;
     }
 }
+
+// pg_relcheck holds most constraints but pg_class holds the rest
+// in pg 7.3, there is a pg_constraint table that can be used.
+query getPostgresConstraintNames {
+    String name;
+    do {
+        select rcname as name from pg_relcheck 
+        union 
+        select relname as name from pg_class
+    } map {
+        name = name;
+    }
+}

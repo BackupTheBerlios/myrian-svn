@@ -17,7 +17,7 @@
 -- tests to run.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #8 $ $Date: 2002/07/29 $
+-- @version $Revision: #9 $ $Date: 2002/07/30 $
 --
 
 -- Right now this is duplicated from the individual files. This should
@@ -33,11 +33,11 @@ drop table t_user_group_map;
 drop table t_datatypes;
 drop table t_data_query;
 
---drop table t_sql_operation;
+drop table t_sql_operation;
 
---drop table t_article_image_map;
---drop table t_articles;
---drop table t_images;
+drop table t_article_image_map;
+drop table t_articles;
+drop table t_images;
 
 drop function DataOperationProcedure();
 drop function DataOperationFunction();

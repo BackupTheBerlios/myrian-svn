@@ -21,6 +21,8 @@ import java.sql.Types;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.Iterator;
 import org.apache.log4j.Category;
 
 
@@ -35,17 +37,19 @@ import org.apache.log4j.Category;
  * operations.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#4 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#5 $
  * @since 4.6.3 */
 
 final class PostgresDDLGenerator extends BaseDDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#4 $ by $Author: randyg $, $DateTime: 2002/07/18 15:00:29 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#5 $ by $Author: randyg $, $DateTime: 2002/07/30 10:05:06 $";
 
     private static Category s_log = 
         Category.getInstance(PostgresDDLGenerator.class);
 
     private static final int MAX_COLUMN_NAME_LEN = 26;
+
+    private static ArrayList constraints = new ArrayList();
 
     /**
      *  This method returns a boolean indicating whether the database contains
@@ -55,7 +59,7 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
     protected boolean tableExists(String proposedName) {
         DataQuery query = SessionManager.getSession().retrieveQuery
             ("com.arsdigita.persistence.getPostgresTableNames");
-        query.addEqualsFilter("tableName", proposedName.toUpperCase());
+        query.addEqualsFilter("tableName", proposedName.toLowerCase());
         return (query.size() > 0);
     }
 
@@ -69,9 +73,145 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
     protected boolean columnExists(String tableName, String proposedColumnName) {
         DataQuery query = SessionManager.getSession().retrieveQuery
             ("com.arsdigita.persistence.getPostgresColumnNames");
-        query.addEqualsFilter("tableName", tableName.toUpperCase());
-        query.addEqualsFilter("columnName", proposedColumnName.toUpperCase());
+        query.addEqualsFilter("tableName", tableName.toLowerCase());
+        query.addEqualsFilter("columnName", proposedColumnName.toLowerCase());
         return (query.size() > 0);
+    }
+
+
+    /**
+     * Takes an object type, a primary key property, and a collection of
+     * additional properties.  Returns either a collection of "create table" 
+     * or a collection of "alter table" statements to add the properties 
+     * to the object type's table.  If there is nothing to modify, this
+     * returns null.
+     *
+     * @param type the ObjectType
+     * @param keyColumn the key column of the object type,
+     * @param properties additional properties to add
+     * @param defaultValueMap mapping from property name to default value
+     * @return a DDL statement to create or alter the object type table
+     */
+    public Collection generateTable(ObjectType type,
+                                    Column keyColumn,
+                                    Collection properties,
+                                    Map defaultValueMap) {
+        StringBuffer ddl = new StringBuffer();
+        ArrayList statements = new ArrayList();
+        String tableName = Utilities.getColumn(type).getTableName();
+        boolean tableExists = tableExists(tableName);
+
+        if (!tableExists) {
+            // create table
+            return super.generateTable(type, keyColumn, 
+                                       properties, defaultValueMap);
+        } else {
+            // alter table
+            ArrayList list = new ArrayList();
+            if (properties == null) {
+                return list;
+            }
+                
+            Iterator props = properties.iterator();
+            
+            while (props.hasNext()) {
+                Property property = (Property)props.next();
+                
+                // collections are handled by mapping tables later
+                if (!property.isCollection()) {
+                    Object defaultValue = null;
+
+                    Column propCol;
+
+                    if (property.isAttribute()) {
+                        propCol = property.getColumn();
+                    } else {
+                        propCol = ((JoinElement)property.getJoinPath()
+                                   .getPath().get(0)).getFrom();
+                    }
+                    
+                    String columnType = 
+                        getJDBCTypeString(property, propCol);
+                    String columnName = 
+                        alterStringForSQL(propCol.getColumnName());
+                    
+                    StringBuffer sb = new StringBuffer();
+                    
+                    list.add("alter table " + tableName + " add " +
+                             columnName + " " + columnType);
+
+                    if (defaultValueMap != null) {
+                        Object value = defaultValueMap.get(property.getName());
+                        if (value != null) {
+                            list.add("alter table " + tableName + " alter " + 
+                                     columnName + " set " + 
+                                     getDefaultString(value));
+                        }
+                    }
+
+                    if (property.getMultiplicity() == Property.REQUIRED) {
+                        String constraintName =
+                            getConstraintName(tableName, columnName, "nn");
+                        list.add("alter table " + tableName + " add " +
+                                 "constraint " + constraintName + " " +
+                                 "check (" + columnName + " notnull)");
+                    } 
+                }
+            }
+            
+            if (list.size() == 0) {
+                return null;
+            }
+            
+            return list;
+        }
+    }
+
+
+    /**
+     *  This returns a unique constraint name that can be used when
+     *  added a constraint to a table.
+     *  @param tableName The name of the table to add the constraint
+     *  @param columnName The name of the column to add the constraint
+     *  @param suffix The suffix of the constraint name.  This is often
+     *  something like "nn" for "not null" or "fk" for foreign key.
+     */
+    private String getConstraintName(String tableName, String columnName, 
+                                     String suffix) {
+        boolean findNewName = true;
+        String constraintName = tableName + "_" + columnName;
+        if (constraintName.length() > 20) {
+            constraintName = constraintName.substring(0, 19);
+        }
+        constraintName = (constraintName + "_" + suffix).toLowerCase();
+        int count = 0;
+
+        synchronized(constraints) {
+            if (constraints.size() == 0) {
+                // populate the variable
+                DataQuery query = SessionManager.getSession().retrieveQuery
+                    ("com.arsdigita.persistence.getPostgresConstraintNames");
+                while (query.next()) {
+                    constraints.add(((String)query.get("name")).toLowerCase());
+                }
+                query.close();
+            }
+        }
+
+        while (findNewName) {
+            synchronized(constraints) {
+                if (!constraints.contains(constraintName)) {
+                    constraints.add(constraintName);
+                    findNewName = false;
+                } 
+            }
+            if (findNewName) {
+                constraintName = incrementName(constraintName, count)
+                    .toLowerCase();
+                count++;
+            }
+        }
+        return constraintName;
     }
 
 
@@ -94,8 +234,7 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
         case Types.BIT:
             return "char(1)";
         case Types.BLOB:
-            throw new Error("Not Yet Implemented");
-            //return "blob";
+            return "bytea";
         case Types.CHAR:
             return "char(" + size + ")";
         case Types.CLOB:
@@ -136,7 +275,27 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
      *  to the correct date/time.
      */
     protected String getDefaultDateSyntax(Date defaultDate) {
-        throw new Error("Not Yet Implemented");
+        long time = (new Date()).getTime() - defaultDate.getTime();
+
+        // we append the default now() and then we may append
+        // more on later if the time asked for is not this time
+        StringBuffer sb = new StringBuffer(" default now()");
+        
+        // if the difference in time between NOW and when the time
+        // was created is more than 1 minute then we add an offset to
+        // sysdate.  To do this, we convert milleseconds (the java
+        // way of keeping time) to days (the way that oracle wants
+        // the time to be expressed)
+        if (time > 6000 || time < -6000) {
+            float fullTime = Math.round(time*10/(60*60));
+            float offset = fullTime/10000;
+            if (offset > 0) {
+                sb.append(" - reltime('" + offset + " hours'::timespan)");
+            } else {
+                sb.append(" + reltime('" + offset*(-1) + " hours'::timespan)");
+            }
+        } 
+        return sb.toString();
     }
 
 

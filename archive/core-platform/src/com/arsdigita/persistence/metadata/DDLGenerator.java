@@ -30,12 +30,12 @@ import java.util.Map;
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
  * @author <a href="mailto:randyg@arsdigita.com">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGenerator.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGenerator.java#3 $
  * @since 4.6.3 */
 
 public interface DDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGenerator.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGenerator.java#3 $ by $Author: randyg $, $DateTime: 2002/07/30 10:05:06 $";
     /**
      * This takes an ObjectType name and model, and generates a unique
      * table name that can be used to store the object type.
@@ -68,10 +68,10 @@ public interface DDLGenerator {
      * @param defaultValueMap mapping from property name to default value
      * @return a DDL statement to create or alter the object type table
      */
-    String generateTable(ObjectType type,
-                         Column keyColumn,
-                         Collection properties,
-                         Map defaultValueMap);
+    Collection generateTable(ObjectType type,
+                             Column keyColumn,
+                             Collection properties,
+                             Map defaultValueMap);
 
     /**
      * Takes an object type, a primary key property, and a collection of
@@ -83,9 +83,9 @@ public interface DDLGenerator {
      * @param defaultValueMap mapping from property name to default value
      * @return a DDL statement to create or alter the object type table
      */
-    String generateTable(ObjectType type,
-                         Collection properties,
-                         Map defaultValueMap);
+    Collection generateTable(ObjectType type,
+                             Collection properties,
+                             Map defaultValueMap);
 
     /**
      * Takes an object type, a primary key property, and a collection of
@@ -97,9 +97,9 @@ public interface DDLGenerator {
      * @param properties additional properties to add
      * @return a DDL statement to create or alter the object type table
      */
-    String generateTable(ObjectType type,
-                         Column keyColumn,
-                         Collection properties);
+    Collection generateTable(ObjectType type,
+                             Column keyColumn,
+                             Collection properties);
 
     /**
      * Takes an object type and a collection of additional properties. 
@@ -110,8 +110,8 @@ public interface DDLGenerator {
      * @param properties additional properties to add
      * @return a DDL statement to create or alter the object type table
      */
-    String generateTable(ObjectType type,
-                         Collection properties);
+    Collection generateTable(ObjectType type,
+                             Collection properties);
 
     /**
      * Determines a unique name for a mapping table for a particular 

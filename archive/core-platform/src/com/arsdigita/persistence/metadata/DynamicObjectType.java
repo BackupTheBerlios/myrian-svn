@@ -51,12 +51,12 @@ import java.util.HashMap;
  *
  * @deprecated Use com.arsdigita.metadata.DynamicObjectType instead.
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $ 
+ * @version $Revision: #3 $ $Date: 2002/07/30 $ 
  */
 
 public class DynamicObjectType {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DynamicObjectType.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DynamicObjectType.java#3 $ by $Author: randyg $, $DateTime: 2002/07/30 10:05:06 $";
 
     // The DDL generator used
     private static DDLGenerator m_generator = DDLGeneratorFactory.getInstance();
@@ -727,10 +727,10 @@ public class DynamicObjectType {
     public ObjectType save() {
         // 1. Create the DDL that needs to be executed and prepare for 
         //    the object events
-        String ddlToAdd = m_generator.generateTable(m_objectType,
-                                                    m_keyColumn,
-                                                    m_newProperties,
-                                                    m_defaultValueMap);
+        Collection ddlToAdd = m_generator.generateTable(m_objectType,
+                                                        m_keyColumn,
+                                                        m_newProperties,
+                                                        m_defaultValueMap);
 
         // 2. Generate the PDL.
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -766,7 +766,11 @@ public class DynamicObjectType {
                                                          .createStatement();
 
             if (ddlToAdd != null) {
-                statement.executeUpdate(ddlToAdd);
+                Iterator iterator = ddlToAdd.iterator();
+                while (iterator.hasNext()) {
+                    String ddl = (String)iterator.next();
+                    statement.executeUpdate(ddl);
+                }
             }
             
             Iterator it = m_mappingTables.iterator();
@@ -779,9 +783,16 @@ public class DynamicObjectType {
             }
 
         } catch (SQLException e) {
+            StringBuffer ddl = new StringBuffer();
+            Iterator iterator = ddlToAdd.iterator();
+            while (iterator.hasNext()) {
+                ddl.append((String)iterator.next() + 
+                           com.arsdigita.persistence.Utilities.LINE_BREAK);
+            }
+
             throw PersistenceException.newInstance(e.getMessage() + 
                                            Utilities.LINE_BREAK +
-                                           "SQL for ADD: " + ddlToAdd, e);
+                                           "SQL for ADD: " + ddl.toString(), e);
         }
             
 
