@@ -1,0 +1,62 @@
+//
+// Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+//
+// The contents of this file are subject to the ArsDigita Public 
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.arsdigita.com/ADPL.txt
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+
+//
+// Represents US Addresses
+//
+// @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/addresses/USAddress.pdl#1 $ by $Author: randyg $, $DateTime: 2002/08/02 16:40:10 $
+//
+
+model com.arsdigita.addresses;
+
+import com.arsdigita.kernel.*;
+
+object type BaseUSAddress extends ACSObject {
+    String[1..1] line1 = us_addresses.line1;
+    String[0..1] line2 = us_addresses.line2;
+    String[0..1] line3 = us_addresses.line3;
+    String[0..1] line4 = us_addresses.line4;
+    String[1..1] city = us_addresses.city;
+    String[1..1] state = us_addresses.state;
+    String[1..1] zip = us_addresses.zip;
+    String[0..1] zipExt = us_addresses.zip_ext;
+
+    reference key (us_addresses.address_id);
+
+    update {}
+}
+
+object type USAddress extends BaseUSAddress {
+    retrieve { super; }
+
+    insert { super; }
+
+    update {
+        do {
+            update us_addresses
+            set line1 = :line1,
+                line2 = :line2,
+                line3 = :line3,
+                line4 = :line4,
+                city = :city,
+                state = :state,
+                zip = :zip,
+                zip_ext = :zipExt
+            where address_id = :id
+        }
+    }
+
+    delete { super; }
+}

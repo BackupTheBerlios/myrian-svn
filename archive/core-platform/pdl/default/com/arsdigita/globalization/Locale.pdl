@@ -1,0 +1,53 @@
+//
+// Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+//
+// The contents of this file are subject to the ArsDigita Public 
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.arsdigita.com/ADPL.txt
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+
+//
+// description
+//
+// @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/globalization/Locale.pdl#1 $ by $Author: randyg $, $DateTime: 2002/08/02 16:40:10 $
+//
+
+model com.arsdigita.globalization;
+
+object type Locale {
+    BigDecimal id = g11n_locales.locale_id;
+    String[1..1] language = g11n_locales.language;
+    String[0..1] country = g11n_locales.country;
+    String[0..1] variant = g11n_locales.variant;
+    Charset[0..1] defaultCharset =
+        join g11n_locales.default_charset_id to g11n_charsets.charset_id;
+    Charset[0..n] charsets =
+        join g11n_locales.locale_id to g11n_locale_charset_map.locale_id,
+        join g11n_locale_charset_map.charset_id to g11n_charsets.charset_id;
+
+    object key (id);
+
+    retrieve all {
+        do {
+            select g11n_locales.locale_id,
+                   g11n_locales.language,
+                   g11n_locales.country,
+                   g11n_locales.variant,
+                   g11n_locales.default_charset_id
+            from g11n_locales
+        } map {
+            id = g11n_locales.locale_id;
+            language = g11n_locales.language;
+            country = g11n_locales.country;
+            variant = g11n_locales.variant;
+            defaultCharset.id = g11n_locales.default_charset_id;
+        }
+    }
+}

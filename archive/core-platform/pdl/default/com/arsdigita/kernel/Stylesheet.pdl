@@ -1,0 +1,163 @@
+//
+// Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+//
+// The contents of this file are subject to the ArsDigita Public 
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.arsdigita.com/ADPL.txt
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+
+// Metadata for Stylesheets. 
+//
+// @author <a href="mailto:bquinn@arsdigita.com">Bryan Quinn</a>
+// @version "$Id: //core-platform/dev/pdl/default/com/arsdigita/kernel/Stylesheet.pdl#1 $" 
+
+model com.arsdigita.kernel;
+
+import com.arsdigita.globalization.*;
+
+object type Stylesheet extends ACSObject {
+    String outputType = acs_stylesheets.output_type VARCHAR(50);
+    String pathName = acs_stylesheets.pathname VARCHAR(300);
+    // XXX: This might eventually link to the content repository.
+    BigDecimal itemID = acs_stylesheets.item_id INTEGER;
+    // XXX: This is a hack to allow filtering based on locale ID
+    //      Proper fix is to wait on persistence to give access
+    //      to 0..1 and 1..1 associations in filters (see Rafi)
+    BigDecimal localeID = acs_stylesheets.locale_id INTEGER;
+
+    PackageType[0..n] packageType;
+    SiteNode[0..n] siteNode;
+    Locale[0..1] locale;
+
+    reference key (acs_stylesheets.stylesheet_id);
+
+    retrieve packageType {
+        do {
+            SELECT apt.pretty_name, apt.pretty_plural, apt.package_uri,
+            apt.package_key, apt.servlet_package, apt.dispatcher_class,
+            apt.package_type_id
+            FROM apm_package_types apt, acs_stylesheets ss,
+            acs_stylesheet_type_map asm
+            WHERE apt.package_type_id = asm.package_type_id
+            AND asm.stylesheet_id = ss.stylesheet_id
+            AND ss.stylesheet_id = :id
+        } map {
+            packageType.id = apt.package_type_id;
+            packageType.prettyName = apt.pretty_name;
+            packageType.packageKey = apt.package_key;
+            packageType.prettyPlural = apt.pretty_plural;
+            packageType.packageURI = apt.package_uri;
+            packageType.servletPackage = apt.servlet_package;
+            packageType.dispatcherClass = apt.dispatcher_class;
+        }
+    }
+
+    add packageType {
+        do {
+            INSERT INTO acs_stylesheet_type_map
+            (stylesheet_id, package_type_id)
+            VALUES
+            (:id, :packageType.id)
+        }
+    }
+
+    remove packageType {
+        do {
+            DELETE FROM acs_stylesheet_type_map
+            WHERE stylesheet_id = :id
+            AND package_type_id = :packageType.id
+        }
+    }
+
+    retrieve siteNode {
+        do {
+            SELECT sn.node_id, sn.parent_id,
+            sn.name, sn.directory_p, sn.pattern_p, 
+            o.object_type, o.display_name
+            FROM site_nodes sn, acs_stylesheet_node_map asm,
+            acs_stylesheets ss, acs_objects o
+            WHERE sn.node_id = asm.node_id
+            AND ss.stylesheet_id = asm.stylesheet_id
+            AND sn.node_id = o.object_id
+            AND ss.stylesheet_id = :id
+        } map {	
+            siteNode.id = sn.node_id;
+            siteNode.objectType = o.object_type;
+            siteNode.displayName = o.display_name;
+            siteNode.name = sn.name;
+            siteNode.isDirectory = sn.directory_p;
+            siteNode.isPattern = sn.pattern_p;
+        }
+    }
+
+    add siteNode {
+        do {
+            INSERT INTO acs_stylesheet_node_map
+            (stylesheet_id, node_id)
+            VALUES
+            (:id, :siteNode.id)
+        }
+    }
+
+    remove siteNode {
+        do {
+            DELETE FROM acs_stylesheet_node_map
+            WHERE stylesheet_id = :id
+            AND node_id = :siteNode.id
+        }
+    }
+
+    retrieve locale {
+        do {    
+            SELECT g11n_locales.locale_id,
+                   g11n_locales.language,
+                   g11n_locales.country,
+                   g11n_locales.variant
+            FROM g11n_locales, acs_stylesheets
+            WHERE acs_stylesheets.stylesheet_id = :id
+              AND g11n_locales.locale_id = acs_stylesheets.locale_id
+        } map { 
+            locale.id = g11n_locales.locale_id;
+            locale.language = g11n_locales.language;
+            locale.country = g11n_locales.country;
+            locale.variant = g11n_locales.variant;
+        }
+    }
+
+    add locale {
+        do { 
+            UPDATE acs_stylesheets 
+               SET locale_id = :locale.id
+               WHERE stylesheet_id = :id
+        }
+    }
+
+    remove locale {
+        do { 
+            UPDATE acs_stylesheets 
+               SET locale_id = null
+               WHERE stylesheet_id = :id
+        }
+    }
+}
+
+query allStyleSheets {
+    do {
+        SELECT ss.output_type, ss.pathname, ss.item_id, ss.locale_id
+        FROM acs_stylesheets
+    } map {
+        localeID = ss.locale_id;
+        outputType = ss.output_type;
+        pathName = ss.pathname;
+        itemID = ss.item_id;
+    }
+}
+
+
+
