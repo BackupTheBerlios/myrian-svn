@@ -11,10 +11,10 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/util/DBTestPage.pdl#5 $ 
-// $DateTime: 2002/10/16 14:12:35 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/web/monitoring/DBTest.pdl#1 $ 
+// $DateTime: 2002/10/23 13:31:30 $
 
-model com.arsdigita.util;
+model com.arsdigita.web.monitoring;
 
 query dbTest {
     String success;
