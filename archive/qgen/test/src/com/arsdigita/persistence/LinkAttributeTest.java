@@ -24,12 +24,12 @@ import com.arsdigita.domain.DataObjectNotFoundException;
  * LinkAttributeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/03/04 $
  **/
 
 public abstract class LinkAttributeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/arsdigita/persistence/LinkAttributeTest.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/arsdigita/persistence/LinkAttributeTest.java#2 $ by $Author: ashah $, $DateTime: 2004/03/04 12:51:40 $";
 
 
     private static Logger s_log =
@@ -82,6 +82,19 @@ public abstract class LinkAttributeTest extends PersistenceTestCase {
         assertEquals("image not deleted properly", null, ssn.retrieve(oid));
     }
 
+    /**
+     * Tests the handling of a path that isn't a property or a link attribute.
+     */
+    public void testLinkNamespace() {
+        Session ssn = SessionManager.getSession();
+        DataObject article = ssn.create(getModelName() + ".Article");
+        article.set("id", BigInteger.ZERO);
+        article.set("text", "text");
+        article.save();
+        DataAssociation images = (DataAssociation) article.get("images");
+        images.addInSubqueryFilter("id", "examples.DataQueryZeroOrOneRow");
+        images.size();
+    }
 
     public void testLinkAttributes() throws DataObjectNotFoundException {
         Session ssn = SessionManager.getSession();

@@ -36,12 +36,12 @@ import org.apache.log4j.Logger;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2004/03/03 $
+ * @version $Revision: #7 $ $Date: 2004/03/04 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Signature.java#6 $ by $Author: ashah $, $DateTime: 2004/03/03 18:10:03 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Signature.java#7 $ by $Author: ashah $, $DateTime: 2004/03/04 12:51:40 $";
 
     private static final Logger s_log = Logger.getLogger(Signature.class);
 
@@ -294,11 +294,15 @@ public class Signature {
 
     public boolean exists(Path p) {
         if (isSource(p)) {
-	    return true;
-	} else {
-	    return exists(p.getParent()) &&
-		getType(p.getParent()).getProperty(p.getName()) != null;
-	}
+            return true;
+        }
+
+        if (p == null) {
+            return false;
+        }
+
+        return exists(p.getParent()) &&
+            getType(p.getParent()).getProperty(p.getName()) != null;
     }
 
     public String toString() {
