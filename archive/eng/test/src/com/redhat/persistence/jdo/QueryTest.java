@@ -156,4 +156,15 @@ public class QueryTest extends AbstractCase {
         it = c.iterator();
         assertTrue(((Employee) it.next()).getSalary() != null);
     }
+
+    public void testCandidatesLimit() {
+        Collection c;
+        Query q;
+
+        q = pm().newQuery
+            (Extensions.OQL,
+             "limit(all(com.redhat.persistence.jdo.Employee), 1)");
+        c = (Collection) q.execute();
+        assertEquals(1, c.size());
+    }
 }

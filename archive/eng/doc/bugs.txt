@@ -1,5 +1,5 @@
 # Since:   2004-06-29
-# Version: $Id: //eng/persistence/dev/doc/bugs.txt#3 $
+# Version: $Id: //eng/persistence/dev/doc/bugs.txt#4 $
 
 * Opened
 .. PersistenceManager.makePersistent(Object) fails silently (rather
@@ -12,7 +12,8 @@
    specification might imply that an exception should be thrown. The
    other logical behaviors are to have the object get the persistent
    state associated with the identity or to have the object's in
-   memory state become the canonical version of the state for that identity.
+   memory state become the canonical version of the state for that
+   identity.
 
    Reported: 2004-06-23
    By: rhs
@@ -24,5 +25,14 @@
 
    Reported: 07/08/2004
    By: rhs
+
+.. When using limit in an OQL query and then using the javax.jdo.Query
+   API to do setFilter or setOrder, the limit part of the expression
+   is dropped silently. Instead, OQL should raise a catchable
+   exception that can be converted to a JDOUserException by the jdo
+   implementation or correctly handle non top-level range and limit
+
+   Reported: 08/13/2004
+   By: ashah
 
 * Closed

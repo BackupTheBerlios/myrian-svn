@@ -29,8 +29,8 @@ class JDOQuery implements ExtendedQuery, Serializable {
     private String m_params = "";
     private String m_vars = "";
     private String m_imports = "";
-    private String m_filter = "";
-    private String m_order = "";
+    private String m_filter = null;
+    private String m_order = null;
 
     public JDOQuery(PersistenceManagerImpl pmi) {
         m_pm = pmi;
@@ -190,6 +190,10 @@ class JDOQuery implements ExtendedQuery, Serializable {
                 m_expr = Expression.valueOf(m_baseExpr, params);
             }
 
+            if (m_varMap.size() == 0 && m_filter == null && m_order == null) {
+                return m_expr;
+            }
+
             m_expr = new Define(m_expr, "this");
 
             for (Iterator it = m_varMap.entrySet().iterator();
@@ -201,12 +205,16 @@ class JDOQuery implements ExtendedQuery, Serializable {
                 throw new Error("not implemented");
             }
 
-            Expression filter = p.filter(this, m_filter, params);
-            if (filter != null) {
-                m_expr = new Filter(m_expr, filter);
+            if (m_filter != null) {
+                Expression filter = p.filter(this, m_filter, params);
+                if (filter != null) {
+                    m_expr = new Filter(m_expr, filter);
+                }
             }
 
-            p.parseOrdering(this, m_order, params);
+            if (m_order != null) {
+                p.parseOrdering(this, m_order, params);
+            }
 
             m_expr = new Get(m_expr, "this");
             return m_expr;
