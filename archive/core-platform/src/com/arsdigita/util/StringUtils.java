@@ -18,11 +18,13 @@ package com.arsdigita.util;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashMap;
+import java.util.StringTokenizer;
 
 import org.apache.oro.text.perl.Perl5Util;
 import org.apache.oro.text.regex.MalformedPatternException;
@@ -157,9 +159,9 @@ public class StringUtils {
         }
     }
 
-    
+
     /**
-     * Converts plain text with simple inline markup 
+     * Converts plain text with simple inline markup
      * into HTML. The following constructs are recognised:
      *
      * <ul>
@@ -196,7 +198,7 @@ public class StringUtils {
     public final static String smartTextToHtml(String s) {
         ArrayList blocks = new ArrayList();
         s_re.split(blocks, "/\\r?\\n(\\r?\\n)+/", s);
-        
+
         StringBuffer html = new StringBuffer("");
         Iterator i = blocks.iterator();
         while (i.hasNext()) {
@@ -214,13 +216,13 @@ public class StringUtils {
         }
         return html.toString();
     }
-    
+
     private static String smartTextList(String match,
                                         String type,
                                         String s) {
         ArrayList blocks = new ArrayList();
         s_re.split(blocks, match, s);
-        
+
         StringBuffer list = new StringBuffer("<" + type + ">\n");
         Iterator i = blocks.iterator();
         while (i.hasNext()) {
@@ -238,7 +240,7 @@ public class StringUtils {
 
         return list.toString();
     }
-    
+
     private static Map s_entities = new HashMap();
     static {
         s_entities.put("fraction12", "&frac12;");
@@ -259,31 +261,31 @@ public class StringUtils {
         // escaping stuff, so we'd better make sure there aren't any
         // in the text.
         s = s_re.substitute("s/\u0001|\u0002|\u0003//g", s);
-    
+
         // We transform a few common symbols
         // We don't substitute them straight in because the
         // substituted text might interfere with stuff that
         // follows...
         s = s_re.substitute("s|\\b1/4\\b|\u0003fraction14\u0003|gx", s);
         s = s_re.substitute("s|\\b1/2\\b|\u0003fraction12\u0003|gx", s);
-        s = s_re.substitute("s|\\b3/4\\b|\u0003fraction34\u0003|gx", s);        
+        s = s_re.substitute("s|\\b3/4\\b|\u0003fraction34\u0003|gx", s);
         s = s_re.substitute("s|\\(C\\)|\u0003copyright\u0003|gx", s);
         s = s_re.substitute("s|\\(R\\)|\u0003registered\u0003|gx", s);
         s = s_re.substitute("s|\\(TM\\)|\u0003trademark\u0003|gx", s);
         if (s_log.isDebugEnabled()) {
             s_log.debug("After entities {" + s + "}");
         }
-    
+
         // We've got to protect the url of titled links before we go further,
         // however we can't actually generate the link yet because
         // that interferes with the monospace stuff below....
         s = s_re.substitute("s|@@|\u0001|gx", s);
-        s = smartTextReplace(new TitledLinkSubstitution(links), 
+        s = smartTextReplace(new TitledLinkSubstitution(links),
                              "@([^\\(@]+)\\(([^\\)]+)\\)", s);
-    
-        // We protect hyperlinks so that the '/' or '@' doesn't get 
+
+        // We protect hyperlinks so that the '/' or '@' doesn't get
         // mistaken for a block of italics / link
-        s = smartTextReplace(new UntitledLinkSubstitution(links), 
+        s = smartTextReplace(new UntitledLinkSubstitution(links),
                              "([a-z]+:\\/\\/[^\\s,\\(\\)><]*)", s);
         s = smartTextReplace(new UntitledLinkSubstitution(links),
                              "(mailto:[^\\s,\\(\\)><]*)", s);
@@ -299,13 +301,13 @@ public class StringUtils {
         //s = s_re.substitute("s|(?<!\\w)/([^/]+)/(?!\\w)|<em>$1</em>|gx", s);
         s = s_re.substitute("s|(\\W)/([^/]+)/(?!\\w)|$1<em>$2</em>|gx", s);
         s = s_re.substitute("s|\u0001|/|gx", s);
-        
+
         // Lets process bold text *bold*
         s = s_re.substitute("s|\\*\\*|\u0001|gx", s);
         //s = s_re.substitute("s|(?<!\\w)\\*([^\\*]+)\\*(?!\\w)|<strong>$1</strong>|gx", s);
         s = s_re.substitute("s|(\\W)\\*([^\\*]+)\\*(?!\\w)|$1<strong>$2</strong>|gx", s);
         s = s_re.substitute("s|\u0001|*|gx", s);
-        
+
         // Now we're onto the monospace stuff =monospace=
         s = s_re.substitute("s|==|\u0001|gx", s);
         //s = s_re.substitute("s|(?<!\\w)=([^=]+)=(?!\\w)|<code>$1</code>|gx", s);
@@ -324,7 +326,7 @@ public class StringUtils {
         if (s_log.isDebugEnabled()) {
             s_log.debug("After links pass two {" + s + "}");
         }
-        
+
         // Finally we can unobscure the hyperlinks
         s = smartTextReplace(new UnobscureSubstitution(links),
                              "\u0002([^\u0002]+)\u0002", s);
@@ -334,15 +336,15 @@ public class StringUtils {
         }
 
         // And those entities
-        s = smartTextReplace(new EntitySubstitution(), 
+        s = smartTextReplace(new EntitySubstitution(),
                               "\u0003([^\u0003]+)\u0003", s);
         if (s_log.isDebugEnabled()) {
             s_log.debug("After entities (complete) {" + s + "}");
         }
-        
+
         return s;
     }
-    
+
 
     private static String smartTextReplace(Substitution subst,
                                            String pattern,
@@ -390,7 +392,7 @@ public class StringUtils {
             s_log.debug("Encoded Link: " + dst);
         }
     }
-    
+
     private static class UntitledLinkSubstitution implements Substitution {
         private Map m_hash;
 
@@ -431,14 +433,14 @@ public class StringUtils {
                                        Pattern pattern) {
             String s = match.group(1);
             s_log.debug("Key: " + s);
-            
+
             Integer i = new Integer(s);
             appendBuffer.append((String)m_hash.get(i));
             s_log.debug("Link: " + m_hash.get(i));
         }
     }
-    
-    
+
+
     private static class EntitySubstitution implements Substitution {
         public void appendSubstitution(StringBuffer appendBuffer,
                                        MatchResult match,
@@ -448,12 +450,12 @@ public class StringUtils {
                                        Pattern pattern) {
             String s = match.group(1);
             s_log.debug("Key: " + s);
-            
+
             appendBuffer.append((String)s_entities.get(s));
             s_log.debug("Entity: " + s_entities.get(s));
         }
     }
-    
+
 
     /**
      * Convert a string of items separated by a separator
@@ -1221,5 +1223,49 @@ public class StringUtils {
         throwable.printStackTrace(pw);
         pw.close();
         return sw.toString();
+    }
+
+    /**
+     * Returns a list of lines where each line represents one level
+     * in the stack trace captured by <code>throwable</code>.
+     *
+     * <p>For a stack trace like this:</p>
+     *
+     * <pre>
+     * java.lang.Throwable
+     *         at Main.level3(Main.java:19)
+     *         at Main.level2(Main.java:15)
+     *         at Main.level1(Main.java:11)
+     *         at Main.main(Main.java:7)
+     * </pre>
+     *
+     * <p>the returned list looks like this: </p>
+     *
+     * <pre>
+     * ["java.lang.Throwable",
+     *  "Main.level3(Main.java:20)",
+     *  "Main.level2(Main.java:15)",
+     *  "Main.level1(Main.java:11)",
+     *  "Main.main(Main.java:7)"]
+     * </pre>
+     *
+     * @see #getStackTrace(Throwable)
+     * @throws NullPointerException if <code>throwable</code> is null
+     **/
+    public static List getStackList(Throwable throwable) {
+        StringTokenizer tkn = new StringTokenizer
+            (getStackTrace(throwable), System.getProperty("line.separator"));
+        List list = new LinkedList();
+        while ( tkn.hasMoreTokens() ) {
+            String token = tkn.nextToken().trim();
+            if ( "".equals(token) ) { continue; }
+            if ( token.startsWith("at ") ) {
+                list.add(token.substring(3));
+            } else {
+                list.add(token);
+            }
+        }
+
+        return list;
     }
 }
