@@ -1,7 +1,7 @@
 
 
 create or replace function lucene_update_dirty(timestamp, timestamp, integer, integer)
-returns boolean
+returns integer
 as '
 declare
   oldTimestamp alias for $1;
