@@ -38,11 +38,11 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #21 $ $Date: 2004/03/15 $
+ * @version $Revision: #22 $ $Date: 2004/03/30 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#21 $ by $Author: ashah $, $DateTime: 2004/03/15 13:47:44 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#22 $ by $Author: ashah $, $DateTime: 2004/03/30 16:23:13 $";
 
     private static Logger s_log =
         Logger.getLogger(DataQueryImplTest.class.getName());
@@ -896,7 +896,28 @@ public class DataQueryImplTest extends DataQueryTest {
         }
     }
 
-
+    public void testLongPaths() {
+        Session ssn = SessionManager.getSession();
+        DataQuery dq = ssn.retrieve("examples.DataQueryLongNames");
+        if (dq.next()) {
+            assertEquals("a", dq.get("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
+            assertEquals("b", dq.get("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"));
+            assertEquals("c", dq.get("cccccccccccccccccccccccccccccccc"));
+            assertEquals("d", dq.get("dddddddddddddddddddddddddddddddd"));
+            assertEquals("e", dq.get("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"));
+            assertEquals("f", dq.get("ffffffffffffffffffffffffffffffff"));
+            assertEquals("g", dq.get("gggggggggggggggggggggggggggggggg"));
+            assertEquals("h", dq.get("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"));
+            assertEquals("i", dq.get("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"));
+            assertEquals("j", dq.get("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj"));
+            assertEquals("k", dq.get("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"));
+            if (dq.next()) {
+                fail("query returned more than one row");
+            }
+        } else {
+            fail("query returned no rows");
+        }
+    }
 
     /**
      *  This test shows that if you select columns of the same

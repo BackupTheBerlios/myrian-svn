@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/test/pdl/com/arsdigita/persistence/static/DataQueryExtra.ora.pdl#4 $ 
-// $DateTime: 2003/09/04 16:38:12 $
+// $Id: //core-platform/dev/test/pdl/com/arsdigita/persistence/static/DataQueryExtra.ora.pdl#5 $ 
+// $DateTime: 2004/03/30 16:23:13 $
 
 model examples;
 
@@ -37,5 +37,46 @@ query SubQuery {
 query NamedFilter {
     do {
         trunc(action_time, 'yyyy') = to_date(:year || '0101', 'yyyymmdd')
+    }
+}
+
+query DataQueryLongNames {
+    String aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa;
+    String bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb;
+    String cccccccccccccccccccccccccccccccc;
+    String dddddddddddddddddddddddddddddddd;
+    String eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee;
+    String ffffffffffffffffffffffffffffffff;
+    String gggggggggggggggggggggggggggggggg;
+    String hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh;
+    String iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii;
+    String jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj;
+    String kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk;
+
+    do {
+        select 'a' as a,
+               'b' as b,
+               'c' as c,
+               'd' as d,
+               'e' as e,
+               'f' as f,
+               'g' as g,
+               'h' as h,
+               'i' as i,
+               'j' as j,
+               'k' as k
+        from dual
+    } map {
+        aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa = a;
+        bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb = b;
+        cccccccccccccccccccccccccccccccc = c;
+        dddddddddddddddddddddddddddddddd = d;
+        eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee = e;
+        ffffffffffffffffffffffffffffffff = f;
+        gggggggggggggggggggggggggggggggg = g;
+        hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh = h;
+        iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii = i;
+        jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj = j;
+        kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk = k;
     }
 }
