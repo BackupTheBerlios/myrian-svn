@@ -59,8 +59,8 @@ public class PersistenceManagerFactoryImpl
         // javax.jdo.option.TreeMap
         // javax.jdo.option.TreeSet
         // javax.jdo.option.Vector
-        // javax.jdo.option.Map
-        // javax.jdo.option.List
+        options.add("javax.jdo.option.Map");
+        options.add("javax.jdo.option.List");
         // javax.jdo.option.Array
         // javax.jdo.option.NullCollection
 
