@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/categorization/Category.pdl#24 $
-// $DateTime: 2003/09/30 13:37:15 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/categorization/Category.pdl#25 $
+// $DateTime: 2003/10/14 15:39:41 $
 
 model com.arsdigita.categorization;
 
@@ -41,7 +41,7 @@ object type Category extends ACSObject {
 
 
 association {
-    Category[0..1] rootCategory = join acs_objects.object_id
+    Category[0..n] rootCategory = join acs_objects.object_id
                                     to cat_root_cat_object_map.object_id,
                                   join cat_root_cat_object_map.category_id
                                     to cat_categories.category_id;
@@ -49,6 +49,8 @@ association {
                                       to cat_root_cat_object_map.category_id,
                                     join cat_root_cat_object_map.object_id
                                       to acs_objects.object_id;
+
+    String[0..1] useContext = cat_root_cat_object_map.use_context;
 }
 
 association {
@@ -94,8 +96,6 @@ association {
     }
 
 }
-
-
 
 // this returns all related categories (both ways)
 // To get the children, do 'get("related")' and then filter on
