@@ -37,12 +37,12 @@ import java.util.Set;
  * DDLWriter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/10/28 $
+ * @version $Revision: #4 $ $Date: 2003/11/11 $
  **/
 
 public class DDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/DDLWriter.java#3 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/DDLWriter.java#4 $ by $Author: rhs $, $DateTime: 2003/11/11 09:45:27 $";
 
     private File m_base;
     private boolean m_overwrite;
@@ -278,7 +278,7 @@ public class DDLWriter {
         if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
             return "\\i ";
         } else {
-            return "@@ ";
+            return "@ ";
         }
 
     }
