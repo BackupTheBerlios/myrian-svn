@@ -1,17 +1,19 @@
 package com.arsdigita.persistence.proto;
 
+import com.arsdigita.persistence.proto.common.*;
+
 /**
  * Condition
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/04/27 $
+ * @version $Revision: #3 $ $Date: 2003/04/30 $
  **/
 
 public abstract class Condition extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Condition.java#2 $ by $Author: rhs $, $DateTime: 2003/04/27 11:28:46 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Condition.java#3 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
 
-    public abstract class Switch {
+    public static abstract class Switch {
 
         public abstract void onAnd(And c);
         public abstract void onOr(Or c);
@@ -159,8 +161,16 @@ public abstract class Condition extends Expression {
         return new Equals(left, right);
     }
 
+    public static final Equals equals(Path left, Path right) {
+        return equals(Expression.variable(left), Expression.variable(right));
+    }
+
     public static final Contains contains(Expression left, Expression right) {
         return new Contains(left, right);
+    }
+
+    public static final Contains contains(Path left, Path right) {
+        return contains(Expression.variable(left), Expression.variable(right));
     }
 
     public static final In in(Expression left, Expression right) {

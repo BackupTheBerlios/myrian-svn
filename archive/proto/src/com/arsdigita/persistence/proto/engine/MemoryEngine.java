@@ -13,12 +13,12 @@ import java.util.*;
  * MemoryEngine
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #18 $ $Date: 2003/02/28 $
+ * @version $Revision: #19 $ $Date: 2003/04/30 $
  **/
 
 public class MemoryEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#18 $ by $Author: rhs $, $DateTime: 2003/02/28 19:58:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#19 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
 
     private static final Logger LOG = Logger.getLogger(MemoryEngine.class);
 
@@ -164,6 +164,34 @@ public class MemoryEngine extends Engine {
         }
     }
 
+    private Object get(final Query query, final Object obj, Expression e) {
+        final Object[] result = { null };
+
+        e.dispatch(new Expression.Switch() {
+            public void onQuery(Query q) {
+                throw new Error("not implemented");
+            }
+
+            public void onVariable(Expression.Variable v) {
+                result[0] = get(query, obj, v.getPath());
+            }
+
+            public void onValue(Expression.Value v) {
+                result[0] = v;
+            }
+
+            public void onPassthrough(Expression.Passthrough p) {
+                throw new Error("not implemented");
+            }
+
+            public void onCondition(Condition c) {
+                throw new Error("not implemented");
+            }
+        });
+
+        return result[0];
+    }
+
     private Object get(Query query, Object obj, Path p) {
         if (p == null) {
             return obj;
@@ -219,11 +247,11 @@ public class MemoryEngine extends Engine {
                 }
             }
 
-            Filter f = m_query.getFilter();
-            if (f != null) {
+            Expression filter = m_query.getFilter();
+            if (filter != null) {
                 for (Iterator it = m_objs.iterator(); it.hasNext(); ) {
                     Object obj = it.next();
-                    if (!accept(obj, m_query, f)) {
+                    if (!accept(obj, m_query, filter)) {
                         it.remove();
                     }
                 }
@@ -261,55 +289,70 @@ public class MemoryEngine extends Engine {
 
     }
 
-    boolean accept(final Object obj, final Query q, Filter filter) {
+    boolean accept(final Object obj, final Query q, Expression filter) {
         final boolean[] result = { false };
 
-        filter.dispatch(new Filter.Switch() {
+        filter.dispatch(new Expression.Switch() {
+            public void onQuery(Query q) {
+                throw new Error("not implemented");
+            }
 
-                public void onAnd(AndFilter f) {
-                    result[0] = accept(obj, q, f.getLeft()) &&
-                        accept(obj, q, f.getRight());
-                }
+            public void onVariable(Expression.Variable v) {
+                throw new Error("not implemented");
+            }
 
-                public void onOr(OrFilter f) {
-                    result[0] = accept(obj, q, f.getLeft()) ||
-                        accept(obj, q, f.getRight());
-                }
+            public void onValue(Expression.Value v) {
+                throw new Error("not implemented");
+            }
 
-                public void onNot(NotFilter f) {
-                    result[0] = !accept(obj, q, f.getOperand());
-                }
+            public void onPassthrough(Expression.Passthrough p) {
+                throw new UnsupportedOperationException
+                    ("unsupported filter type");
+            }
 
-                public void onEquals(EqualsFilter f) {
-                    Object left = get(q, obj, f.getLeft());
-                    Object right = get(q, obj, f.getRight());
-                    if (left == right) {
-                        result[0] = true;
-                    } else if (left == null) {
-                        result[0] = right == null;
-                    } else {
-                        result[0] = left.equals(right);
+            public void onCondition(Condition c) {
+                c.dispatch(new Condition.Switch() {
+                    public void onAnd(Condition.And f) {
+                        result[0] = accept(obj, q, f.getLeft()) &&
+                            accept(obj, q, f.getRight());
                     }
-                }
 
-                public void onIn(InFilter f) {
-                    Object val = get(q, obj, f.getPath());
-                    DumbRecordSet drs = new DumbRecordSet(f.getQuery());
-                    result[0] = drs.getObjects().contains(val);
-                }
+                    public void onOr(Condition.Or f) {
+                        result[0] = accept(obj, q, f.getLeft()) ||
+                            accept(obj, q, f.getRight());
+                    }
 
-                public void onContains(ContainsFilter f) {
-                    Set vals = (Set) get(q, obj, f.getCollection());
-                    Object element = get(q, obj, f.getElement());
-                    result[0] = vals.contains(element);
-                }
+                    public void onNot(Condition.Not f) {
+                        result[0] = !accept(obj, q, f.getExpression());
+                    }
 
-                public void onPassthrough(PassthroughFilter f) {
-                    throw new UnsupportedOperationException
-                        ("unsupported filter type");
-                }
+                    public void onEquals(Condition.Equals f) {
+                        Object left = get(q, obj, f.getLeft());
+                        Object right = get(q, obj, f.getRight());
+                        if (left == right) {
+                            result[0] = true;
+                        } else if (left == null) {
+                            result[0] = right == null;
+                        } else {
+                            result[0] = left.equals(right);
+                        }
+                    }
 
-            });
+                    public void onIn(Condition.In f) {
+                        Object val = get(q, obj, f.getLeft());
+                        DumbRecordSet drs = new DumbRecordSet
+                            ((Query) f.getRight());
+                        result[0] = drs.getObjects().contains(val);
+                    }
+
+                    public void onContains(Condition.Contains f) {
+                        Set vals = (Set) get(q, obj, f.getLeft());
+                        Object element = get(q, obj, f.getRight());
+                        result[0] = vals.contains(element);
+                    }
+                });
+            }
+        });
 
         return result[0];
     }

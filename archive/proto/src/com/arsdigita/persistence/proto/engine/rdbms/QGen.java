@@ -13,12 +13,12 @@ import java.io.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #24 $ $Date: 2003/04/07 $
+ * @version $Revision: #25 $ $Date: 2003/04/30 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#24 $ by $Author: rhs $, $DateTime: 2003/04/07 21:34:46 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#25 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -147,9 +147,9 @@ class QGen {
                 SQLBlock block = getBlock(src);
                 Path alias;
 		if (src.getPath() == null) {
-		    alias = Path.get("__static");
+		    alias = Path.get("static__");
 		} else {
-		    alias = Path.get(src.getPath() + "__static");
+		    alias = Path.get(src.getPath() + "static__");
 		}
                 j = new StaticJoin
 		    (new StaticOperation(block, env, false), alias);
@@ -197,14 +197,11 @@ class QGen {
         }
 
         for (Iterator it = m_query.getOrder().iterator(); it.hasNext(); ) {
-            Path path = (Path) it.next();
-            genPath(path);
-	    if (m_query.isDefaulted(path)) {
-		genPath(m_query.getDefault(path));
-	    }
+            Expression e = (Expression) it.next();
+            generate(e);
         }
 
-        Condition condition = filter(m_query.getFilter());
+        generate(m_query.getFilter());
 
         Join join = null;
         for (Iterator it = sig.getSources().iterator(); it.hasNext(); ) {
@@ -216,7 +213,8 @@ class QGen {
             }
         }
 
-        Select result = new Select(join, condition, env);
+        Select result = new Select(join, m_query.getFilter(), env);
+        result.setMappings(m_columns);
 
         int col = 0;
         for (Iterator it = sig.getPaths().iterator(); it.hasNext(); ) {
@@ -225,13 +223,8 @@ class QGen {
         }
 
         for (Iterator it = m_query.getOrder().iterator(); it.hasNext(); ) {
-            Path path = (Path) it.next();
-	    if (m_query.isDefaulted(path)) {
-		result.addOrder(getColumn(path), m_query.isAscending(path),
-				getColumn(m_query.getDefault(path)));
-	    } else {
-		result.addOrder(getColumn(path), m_query.isAscending(path));
-	    }
+            Expression e = (Expression) it.next();
+            result.addOrder(e, m_query.isAscending(e));
         }
 
         for (Iterator it = sig.getParameters().iterator(); it.hasNext(); ) {
@@ -318,9 +311,9 @@ class QGen {
         if (!getTables(parent).contains(table)) {
             Join join = getJoin(path);
             Join simple = new SimpleJoin(table, alias);
-            Path[] cols = getColumns(parent);
-            Condition cond = Condition.equals
-                (cols, getPaths(alias, constraint));
+            Path tmp = Path.add(alias, "__tmp__");
+            Condition cond = Condition.equals(parent, tmp);
+            setColumns(tmp, getPaths(alias, constraint));
             if (isOuter(path)) {
                 join = new LeftJoin(join, simple, cond);
             } else {
@@ -430,76 +423,81 @@ class QGen {
 	return true;
     }
 
-    private Condition filter(Filter filter) {
-        if (filter == null) {
-            return null;
+    private final Expression.Switch m_esw = new Expression.Switch() {
+        public void onQuery(Query q) {
+            throw new Error("not implemented");
         }
 
-        final Condition[] result = { null };
+        public void onCondition(Condition c) {
+            c.dispatch(m_csw);
+        }
 
-        filter.dispatch(new Filter.Switch() {
-                public void onAnd(AndFilter f) {
-                    result[0] = new AndCondition(filter(f.getLeft()),
-                                                 filter(f.getRight()));
-                }
+        public void onVariable(Expression.Variable v) {
+            genPath(v.getPath());
+        }
 
-                public void onOr(OrFilter f) {
-                    result[0] = new OrCondition(filter(f.getLeft()),
-                                                filter(f.getRight()));
-                }
+        public void onValue(Expression.Value v) {
+            // do nothing
+        }
 
-                public void onNot(NotFilter f) {
-                    result[0] = new NotCondition(filter(f.getOperand()));
-                }
+        public void onPassthrough(final Expression.Passthrough e) {
+            SQLParser p = new SQLParser
+                (new StringReader(e.getExpression()),
+                 new SQLParser.Mapper() {
+                     public Path map(Path path) {
+                         Root r = Root.getRoot();
+                         if (r.hasObjectType(path.getPath())) {
+                             return path;
+                         } else {
+                             genPath(path);
+                             return getColumn(path);
+                         }
+                     }
+                 });
 
-                public void onEquals(EqualsFilter f) {
-                    genPath(f.getLeft());
-                    genPath(f.getRight());
-                    result[0] = Condition.equals(getColumns(f.getLeft()),
-                                                 getColumns(f.getRight()));
-                }
+            try {
+                p.sql();
+            } catch (ParseException pe) {
+                throw new Error(pe.getMessage());
+            }
+        }
+    };
 
-                public void onIn(InFilter f) {
-                    genPath(f.getPath());
-                    QGen qgen = new QGen(f.getQuery());
-                    result[0] = new InCondition(getColumn(f.getPath()),
-                                                qgen.generate());
-                }
+    private final Condition.Switch m_csw = new Condition.Switch() {
+        public void onAnd(Condition.And e) {
+            generate(e.getLeft());
+            generate(e.getRight());
+        }
 
-                public void onContains(ContainsFilter f) {
-                    genPath(f.getCollection());
-                    genPath(f.getElement());
-                    result[0] = Condition.equals
-                        (getColumns(f.getCollection()),
-                         getColumns(f.getElement()));
-                }
+        public void onOr(Condition.Or e) {
+            generate(e.getLeft());
+            generate(e.getRight());
+        }
 
-                public void onPassthrough(final PassthroughFilter f) {
-                    SQLParser p = new SQLParser
-                        (new StringReader(f.getConditions()),
-                         new SQLParser.Mapper() {
-                                 public Path map(Path path) {
-                                     Root r = Root.getRoot();
-                                     if (r.hasObjectType(path.getPath())) {
-                                         return path;
-                                     } else {
-                                         genPath(path);
-                                         return getColumn(path);
-                                     }
-                                 }
-                             });
+        public void onNot(Condition.Not e) {
+            generate(e.getExpression());
+        }
 
-                    try {
-                        p.sql();
-                    } catch (ParseException e) {
-                        throw new Error(e.getMessage());
-                    }
+        public void onEquals(Condition.Equals e) {
+            generate(e.getLeft());
+            generate(e.getRight());
+        }
 
-                    result[0] = new StaticCondition(p.getSQL());
-                }
-            });
+        public void onIn(Condition.In e) {
+            generate(e.getLeft());
+            generate(e.getRight());
+        }
 
-        return result[0];
+        public void onContains(Condition.Contains e) {
+            generate(e.getLeft());
+            generate(e.getRight());
+        }
+    };
+
+    private void generate(Expression e) {
+        if (e != null) {
+            e.dispatch(m_esw);
+        }
     }
 
 }

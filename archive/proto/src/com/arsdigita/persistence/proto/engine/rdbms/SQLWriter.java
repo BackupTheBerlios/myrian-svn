@@ -1,22 +1,24 @@
 package com.arsdigita.persistence.proto.engine.rdbms;
 
 import com.arsdigita.persistence.proto.*;
+import com.arsdigita.persistence.proto.Condition;
 import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
 
 import java.util.*;
 import java.sql.*;
+import java.io.*;
 
 /**
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2003/04/15 $
+ * @version $Revision: #13 $ $Date: 2003/04/30 $
  **/
 
 abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#12 $ by $Author: ashah $, $DateTime: 2003/04/15 10:07:23 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#13 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
 
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();
@@ -102,7 +104,15 @@ abstract class SQLWriter {
         write(sql.getFirst(), null);
     }
 
+    public void write(SQL sql, boolean map) {
+        write(sql.getFirst(), null, map);
+    }
+
     public void write(SQLToken start, SQLToken end) {
+        write(start, end, false);
+    }
+
+    public void write(SQLToken start, SQLToken end, boolean map) {
         Root r = Root.getRoot();
 
         for (SQLToken t = start; t != end; t = t.getNext()) {
@@ -119,9 +129,11 @@ abstract class SQLWriter {
                     write(b.getSQL());
                     continue;
                 }
+            } else if (t.isPath() && map) {
+                write(Expression.variable(Path.get(t.getImage())));
+            } else {
+                write(t.getImage());
             }
-
-            write(t.getImage());
         }
     }
 
@@ -177,12 +189,179 @@ abstract class SQLWriter {
         join.write(this);
     }
 
-    public void write(Condition cond) {
-        cond.write(this);
+    private final Expression.Switch m_esw = new Expression.Switch() {
+        public void onQuery(Query q) { write(q); }
+        public void onCondition(Condition c) { write(c); }
+        public void onVariable(Expression.Variable v) { write(v); }
+        public void onValue(Expression.Value v) { write(v); }
+        public void onPassthrough(Expression.Passthrough p) { write(p); }
+    };
+
+    public void write(Expression expr) {
+        expr.dispatch(m_esw);
     }
 
-    public void write(StaticCondition cond) {
-        write(cond.getSQL());
+    private final Condition.Switch m_csw = new Condition.Switch() {
+        public void onAnd(Condition.And a) { write(a); }
+        public void onOr(Condition.Or o) { write(o); }
+        public void onNot(Condition.Not n) { write(n); }
+        public void onEquals(Condition.Equals e) { write(e); }
+        public void onIn(Condition.In i) { write(i); }
+        public void onContains(Condition.Contains c) { write(c); }
+    };
+
+    public void write(Condition cond) {
+        cond.dispatch(m_csw);
+    }
+
+    public void write(Query q) {
+        QGen qg = new QGen(q);
+        write((Operation) qg.generate());
+    }
+
+    public void write(Expression.Variable v) {
+        if (m_expanded.contains(v)) {
+            write(v.getPath());
+        } else {
+            Path[] cols = m_op.getMapping(v.getPath());
+            if (cols == null) { throw new Error("no mapping: " + v); }
+            if (cols.length != 1) {
+                throw new Error("expands to wrong multiplicity");
+            }
+            write(cols[0]);
+        }
+    }
+
+    public void write(Expression.Value v) {
+        m_sql.append("?");
+        m_bindings.add(v.getValue());
+        // TODO: do type lookup based on class of value
+        m_types.add(new Integer(java.sql.Types.INTEGER));
+    }
+
+    public void write(Expression.Passthrough e) {
+        SQLParser p = new SQLParser(new StringReader(e.getExpression()));
+        try {
+            p.sql();
+        } catch (ParseException pe) {
+            throw new Error(pe.getMessage());
+        }
+
+        write(p.getSQL(), true);
+    }
+
+    public void write(Condition.And cond) {
+        write(cond.getLeft());
+        write(" and ");
+        write(cond.getRight());
+    }
+
+    public void write(Condition.Or cond) {
+        write(cond.getLeft());
+        write(" or ");
+        write(cond.getRight());
+    }
+
+    public void write(Condition.Not cond) {
+        write("not ");
+        write(cond.getExpression());
+    }
+
+    public void write(Condition.In cond) {
+        write(cond.getLeft());
+        write(" in (");
+        write(cond.getRight());
+        write(")");
+    }
+
+    private HashSet m_expanded = new HashSet();
+
+    private boolean isExpandable(Expression expr) {
+        return !m_expanded.contains(expr)
+            && expr instanceof Expression.Variable
+            || expr instanceof Expression.Value;
+    }
+
+    private Path[] expand(Expression expr) {
+        final Path[][] result = { null };
+
+        expr.dispatch(new Expression.Switch() {
+            public void onVariable(Expression.Variable v) {
+                if (m_op.isParameter(v.getPath())) {
+                    result[0] = new Path[] { v.getPath() };
+                } else {
+                    result[0] = m_op.getMapping(v.getPath());
+                    if (result[0] == null) {
+                        throw new IllegalStateException
+                            ("no expansion for expr: " + v);
+                    }
+                }
+            }
+            public void onValue(Expression.Value v) {
+                throw new Error("not implemented");
+            }
+            public void onQuery(Query q) {
+                throw new Error("not implemented");
+            }
+            public void onPassthrough(Expression.Passthrough p) {
+                throw new Error("not implemented");
+            }
+            public void onCondition(Condition c) {
+                throw new Error("not implemented");
+            }
+        });
+
+        return result[0];
+    }
+
+    private Expression expand(Expression left, Expression right) {
+        if (!isExpandable(left)) {
+            throw new IllegalArgumentException("not expandable: " + left);
+        }
+        if (!isExpandable(right)) {
+            throw new IllegalArgumentException("not expandable: " + right);
+        }
+
+        Expression result = null;
+
+        Path[] leftCols = expand(left);
+        Path[] rightCols = expand(right);
+        if (leftCols.length != rightCols.length) {
+            throw new IllegalArgumentException(left + ", " + right);
+        }
+
+        for (int i = 0; i < leftCols.length; i++) {
+            Expression l = Expression.variable(leftCols[i]);
+            Expression r = Expression.variable(rightCols[i]);
+            m_expanded.add(l);
+            m_expanded.add(r);
+            Expression eq = Condition.equals(l, r);
+            if (result == null) {
+                result = eq;
+            } else {
+                result = Condition.and(result, eq);
+            }
+        }
+
+        return result;
+    }
+
+    private void writeEquals(Expression left, Expression right) {
+        if (isExpandable(left) && isExpandable(right)) {
+            write(expand(left, right));
+        } else {
+            write(left);
+            write(" = ");
+            write(right);
+        }
+    }
+
+    public void write(Condition.Equals cond) {
+        writeEquals(cond.getLeft(), cond.getRight());
+    }
+
+    public void write(Condition.Contains cond) {
+        writeEquals(cond.getLeft(), cond.getRight());
     }
 
     public abstract void write(Select select);
@@ -197,12 +376,6 @@ abstract class SQLWriter {
     public abstract void write(RightJoin join);
     public abstract void write(CrossJoin join);
 
-    public abstract void write(AndCondition cond);
-    public abstract void write(OrCondition cond);
-    public abstract void write(NotCondition cond);
-    public abstract void write(InCondition cond);
-    public abstract void write(EqualsCondition cond);
-
 }
 
 
@@ -213,7 +386,7 @@ class ANSIWriter extends SQLWriter {
 
         Collection sels = select.getSelections();
         Join join = select.getJoin();
-        Condition cond = select.getCondition();
+        Expression filter = select.getFilter();
 
         if (sels.size() == 0) {
             write("*");
@@ -232,9 +405,9 @@ class ANSIWriter extends SQLWriter {
         write("\nfrom ");
         write(join);
 
-        if (cond != null) {
+        if (filter != null) {
             write("\nwhere ");
-            write(cond);
+            write(filter);
         }
 
         Collection order = select.getOrder();
@@ -244,26 +417,10 @@ class ANSIWriter extends SQLWriter {
         }
 
         for (Iterator it = order.iterator(); it.hasNext(); ) {
-            Path p = (Path) it.next();
-	    if (select.isDefaulted(p)) {
-		write("case when(");
-		write(p);
-		write(" is null) then ");
-		write(select.getDefault(p));
-		write(" else ");
-		write(p);
-		write(" end");
-	    } else {
-		if (select.isParameter(p)) {
-		    write("coalesce(");
-		    write(p);
-		    write(")");
-		} else {
-		    write(p);
-		}
-	    }
+            Expression e = (Expression) it.next();
+            write(e);
 
-            if (!select.isAscending(p)) {
+            if (!select.isAscending(e)) {
                 write(" desc");
             }
 
@@ -349,13 +506,13 @@ class ANSIWriter extends SQLWriter {
         // XXX: this is a hack, for binding to work properly we need to call
         // the Operation version of write.
         write((Operation) join.getStaticOperation());
-        write(") as ");
+        write(") ");
         write(join.getAlias());
     }
 
     public void write(SimpleJoin join) {
         write(join.getTable().getName());
-        write(" as ");
+        write(" ");
         write(join.getAlias());
     }
 
@@ -387,37 +544,6 @@ class ANSIWriter extends SQLWriter {
 
     public void write(CrossJoin join) {
         writeCompound(join);
-    }
-
-
-    public void write(AndCondition cond) {
-        write(cond.getLeft());
-        write(" and ");
-        write(cond.getRight());
-    }
-
-    public void write(OrCondition cond) {
-        write(cond.getLeft());
-        write(" or ");
-        write(cond.getRight());
-    }
-
-    public void write(NotCondition cond) {
-        write("not ");
-        write(cond.getOperand());
-    }
-
-    public void write(InCondition cond) {
-        write(cond.getColumn());
-        write(" in (");
-        write(cond.getSelect());
-        write(")");
-    }
-
-    public void write(EqualsCondition cond) {
-        write(cond.getLeft());
-        write(" = ");
-        write(cond.getRight());
     }
 
 }

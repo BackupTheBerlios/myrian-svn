@@ -1,6 +1,7 @@
 package com.arsdigita.persistence.proto.engine.rdbms;
 
 import com.arsdigita.persistence.proto.common.*;
+import com.arsdigita.persistence.proto.*;
 
 import java.util.*;
 
@@ -8,39 +9,38 @@ import java.util.*;
  * Select
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2003/03/31 $
+ * @version $Revision: #12 $ $Date: 2003/04/30 $
  **/
 
 class Select extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#11 $ by $Author: rhs $, $DateTime: 2003/03/31 10:58:30 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#12 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
 
     private Join m_join;
-    private Condition m_condition;
+    private Expression m_filter;
     private ArrayList m_selections = new ArrayList();
     private HashMap m_aliases = new HashMap();
     private ArrayList m_order = new ArrayList();
     private HashSet m_ascending = new HashSet();
-    private HashMap m_defaults = new HashMap();
     private Integer m_offset = null;
     private Integer m_limit = null;
 
-    public Select(Join join, Condition condition) {
-        this(join, condition, new Environment());
+    public Select(Join join, Expression filter) {
+        this(join, filter, new Environment());
     }
 
-    public Select(Join join, Condition condition, Environment env) {
+    public Select(Join join, Expression filter, Environment env) {
         super(env);
         m_join = join;
-        m_condition = condition;
+        m_filter = filter;
     }
 
     public Join getJoin() {
         return m_join;
     }
 
-    public Condition getCondition() {
-        return m_condition;
+    public Expression getFilter() {
+        return m_filter;
     }
 
     public void addSelection(Path path, String alias) {
@@ -58,33 +58,20 @@ class Select extends Operation {
         return m_selections;
     }
 
-    public void addOrder(Path path, boolean isAscending) {
-        if (m_order.contains(path)) {
+    public void addOrder(Expression expr, boolean isAscending) {
+        if (m_order.contains(expr)) {
             throw new IllegalArgumentException
                 ("already ordered by this path");
         }
 
-        m_order.add(path);
+        m_order.add(expr);
         if (isAscending) {
-            m_ascending.add(path);
+            m_ascending.add(expr);
         }
     }
 
-    public void addOrder(Path path, boolean isAscending, Path defaultPath) {
-	addOrder(path, isAscending);
-	m_defaults.put(path, defaultPath);
-    }
-
-    public boolean isAscending(Path path) {
-        return m_ascending.contains(path);
-    }
-
-    public boolean isDefaulted(Path p) {
-	return m_defaults.containsKey(p);
-    }
-
-    public Path getDefault(Path p) {
-	return (Path) m_defaults.get(p);
+    public boolean isAscending(Expression expr) {
+        return m_ascending.contains(expr);
     }
 
     public Collection getOrder() {

@@ -9,12 +9,12 @@ import java.util.*;
  * DynamicQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/04/10 $
+ * @version $Revision: #5 $ $Date: 2003/04/30 $
  **/
 
 public class DynamicQuerySource extends QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DynamicQuerySource.java#4 $ by $Author: ashah $, $DateTime: 2003/04/10 17:19:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DynamicQuerySource.java#5 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
 
     private Signature getSignature(ObjectType type) {
         Signature result = new Signature(type);
@@ -35,7 +35,7 @@ public class DynamicQuerySource extends QuerySource {
         Collection keyProps = map.getKeyProperties();
 
         Query query = new Query(sig, null);
-        Filter f = null;
+        Expression f = null;
 
         for (Iterator it = keyProps.iterator(); it.hasNext(); ) {
             Property keyProp = (Property) it.next();
@@ -44,13 +44,13 @@ public class DynamicQuerySource extends QuerySource {
                 (keyProp.getType(), Path.add("__key__", keyProp.getName()));
             sig.addParameter(keyParam);
             query.set(keyParam, key);
-            Filter propFilt = new EqualsFilter
+            Expression propFilt = Condition.equals
                 (Path.get(keyProp.getName()), keyParam.getPath());
 
             if (f == null) {
                 f = propFilt;
             } else {
-                f = new AndFilter(f, propFilt);
+                f = Condition.and(f, propFilt);
             }
         }
 
@@ -60,10 +60,10 @@ public class DynamicQuerySource extends QuerySource {
     public Query getQuery(Object obj) {
         ObjectType type = Session.getObjectType(obj);
         Signature sig = getSignature(type);
-        Parameter start = new Parameter(type, Path.get("__start__"));
+        Parameter start = new Parameter(type, Path.get("start__"));
         sig.addParameter(start);
         Query q = new Query
-            (sig, new EqualsFilter(Path.get("__start__"), null));
+            (sig, Condition.equals(start.getPath(), null));
         q.set(start, obj);
         return q;
     }
@@ -73,15 +73,15 @@ public class DynamicQuerySource extends QuerySource {
             ObjectType type = prop.getType();
             Signature sig = getSignature(type);
             Parameter start = new Parameter(prop.getContainer(),
-                                            Path.get("__start__"));
+                                            Path.get("start__"));
             sig.addParameter(start);
 
-	    Filter f;
+	    Expression f;
 	    if (prop.isCollection()) {
-		f = new ContainsFilter
+		f = Condition.contains
 		    (Path.add(start.getPath(), prop.getName()), null);
 	    } else {
-		f = new EqualsFilter
+		f = Condition.equals
 		    (Path.add(start.getPath(), prop.getName()), null);
 	    }
             Query q = new Query(sig, f);
@@ -92,10 +92,10 @@ public class DynamicQuerySource extends QuerySource {
             Signature sig = new Signature(type);
             sig.addPath(prop.getName());
             sig.addDefaultProperties(Path.get(prop.getName()));
-            Parameter start = new Parameter(type, Path.get("__start__"));
+            Parameter start = new Parameter(type, Path.get("start__"));
             sig.addParameter(start);
             Query q = new Query
-                (sig, new EqualsFilter(start.getPath(), null));
+                (sig, Condition.equals(start.getPath(), null));
             q.set(start, obj);
             return q;
         }

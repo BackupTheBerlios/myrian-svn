@@ -12,12 +12,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #22 $ $Date: 2003/04/04 $
+ * @version $Revision: #23 $ $Date: 2003/04/30 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#22 $ by $Author: rhs $, $DateTime: 2003/04/04 09:30:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#23 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -89,11 +89,13 @@ class EventSwitch extends Event.Switch {
         for (Iterator it = paths.iterator(); it.hasNext(); ) {
             Path p = (Path) it.next();
             Object o = values.get(p);
-            Condition eq = new EqualsCondition(getPath(cols[index]), p);
+            Path col = getPath(cols[index]);
+            Condition eq = Condition.equals(col, p);
+            mut.setMapping(col, new Path[] {col});
             if (cond == null) {
                 cond = eq;
             } else {
-                cond = new AndCondition(eq, cond);
+                cond = Condition.and(eq, cond);
             }
             mut.set(p, o, cols[index].getType());
             index++;

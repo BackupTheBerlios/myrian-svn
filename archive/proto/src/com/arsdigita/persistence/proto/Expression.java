@@ -6,14 +6,14 @@ import com.arsdigita.persistence.proto.common.*;
  * Expression
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/04/27 $
+ * @version $Revision: #3 $ $Date: 2003/04/30 $
  **/
 
 public abstract class Expression {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Expression.java#2 $ by $Author: rhs $, $DateTime: 2003/04/27 11:28:46 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Expression.java#3 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
 
-    public abstract class Switch {
+    public static abstract class Switch {
 
         public abstract void onQuery(Query q);
         public abstract void onCondition(Condition c);
@@ -56,6 +56,10 @@ public abstract class Expression {
 
         public void dispatch(Switch sw) {
             sw.onValue(this);
+        }
+
+        public Object getValue() {
+            return m_value;
         }
 
         public String toString() {

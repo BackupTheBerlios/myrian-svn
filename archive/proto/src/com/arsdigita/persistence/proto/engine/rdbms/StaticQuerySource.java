@@ -10,12 +10,12 @@ import java.util.*;
  * StaticQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2003/04/10 $
+ * @version $Revision: #10 $ $Date: 2003/04/30 $
  **/
 
 class StaticQuerySource extends QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/StaticQuerySource.java#9 $ by $Author: ashah $, $DateTime: 2003/04/10 17:19:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/StaticQuerySource.java#10 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
 
     private synchronized Source getSource(ObjectType type, SQLBlock block,
                                           Path prefix) {
@@ -111,22 +111,22 @@ class StaticQuerySource extends QuerySource {
 
         Signature sig = getSignature(type, om.getRetrieveAll(), null, null);
         Query query = new Query(sig, null);
-        Filter f = null;
+        Expression f = null;
 
         for (Iterator it = keyProps.iterator(); it.hasNext(); ) {
             Property keyProp = (Property) it.next();
             Object key = keys.get(keyProp);
             Parameter keyParam = new Parameter
-                (keyProp.getType(), Path.add("__key__", keyProp.getName()));
+                (keyProp.getType(), Path.add("key__", keyProp.getName()));
             sig.addParameter(keyParam);
             query.set(keyParam, key);
-            Filter propFilt = new EqualsFilter
+            Expression propFilt = Condition.equals
                 (Path.get(keyProp.getName()), keyParam.getPath());
 
             if (f == null) {
                 f = propFilt;
             } else {
-                f = new AndFilter(f, propFilt);
+                f = Condition.and(f, propFilt);
             }
         }
 
@@ -142,10 +142,10 @@ class StaticQuerySource extends QuerySource {
             return getQuery(obj, key);
         }
         Signature sig = getSignature(type, om.getRetrieveAll(), null, null);
-        Parameter start = new Parameter(type, Path.get("__start__"));
+        Parameter start = new Parameter(type, Path.get("start__"));
         sig.addParameter(start);
         Query result = new Query
-            (sig, new EqualsFilter(null, start.getPath()));
+            (sig, Condition.equals(null, start.getPath()));
         result.set(start, obj);
         return result;
     }

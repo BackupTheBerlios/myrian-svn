@@ -14,12 +14,12 @@ import java.io.*;
  * SQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/04/09 $
+ * @version $Revision: #5 $ $Date: 2003/04/30 $
  */
 
 public class SQLParser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/common/SQLParser.jj#4 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/common/SQLParser.jj#5 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
 
     public static interface Mapper {
         Path map(Path path);
@@ -166,6 +166,14 @@ TOKEN [IGNORE_CASE]:
   | <PRIOR: "prior">
   | <LIMIT: "limit">
   | <OFFSET: "offset">
+  | <ASC: "asc">
+  | <DESC: "desc">
+  | <CASE: "case">
+  | <WHEN: "when">
+  | <THEN: "then">
+  | <ELSE: "else">
+  | <END: "end">
+  | <AS: "as">
 // allowed functions
   | <UPPER: "upper">
   | <LOWER: "lower">
@@ -251,9 +259,9 @@ void symbol() :
   | t = <LIKE>
   | t = <BETWEEN>
   | t = <IN>
-  | t = <NOT> 
+  | t = <NOT>
   | t = <AND>
-  | t = <OR> 
+  | t = <OR>
   | t = <ANY>
   | t = <SOME>
   | t = <EXISTS>
@@ -262,6 +270,14 @@ void symbol() :
   | t = <INTERSECT>
   | t = <LIMIT>
   | t = <OFFSET>
+  | t = <ASC>
+  | t = <DESC>
+  | t = <CASE>
+  | t = <WHEN>
+  | t = <THEN>
+  | t = <ELSE>
+  | t = <END>
+  | t = <AS>
   | t = <MINUS>
   | t = <PRIOR>
   | t = <UPPER>

@@ -8,23 +8,22 @@ import java.util.*;
  * Query
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2003/04/24 $
+ * @version $Revision: #15 $ $Date: 2003/04/30 $
  **/
 
 public class Query extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#14 $ by $Author: rhs $, $DateTime: 2003/04/24 08:07:11 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#15 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
 
     private Signature m_signature;
-    private Filter m_filter;
+    private Expression m_filter;
     private ArrayList m_order = new ArrayList();
     private HashSet m_ascending = new HashSet();
-    private HashMap m_defaults = new HashMap();
     private Integer m_offset = null;
     private Integer m_limit = null;
     private HashMap m_values = new HashMap();
 
-    public Query(Signature signature, Filter filter) {
+    public Query(Signature signature, Expression filter) {
         m_signature = signature;
         m_filter = filter;
     }
@@ -33,22 +32,21 @@ public class Query extends Expression {
         sw.onQuery(this);
     }
 
-    private static final Filter and(Filter left, Filter right) {
+    private static final Expression and(Expression left, Expression right) {
 	if (left == null) {
 	    return right;
 	}
 	if (right == null) {
 	    return left;
 	}
-	return new AndFilter(left, right);
+	return Condition.and(left, right);
     }
 
-    public Query(Query query, Filter filter) {
+    public Query(Query query, Expression filter) {
 	m_signature = new Signature(query.m_signature);
 	m_filter = and(query.m_filter, filter);
         m_order.addAll(query.m_order);
         m_ascending.addAll(query.m_ascending);
-	m_defaults.putAll(query.m_defaults);
 	m_offset = query.m_offset;
 	m_limit = query.m_limit;
 	m_values.putAll(query.m_values);
@@ -58,41 +56,28 @@ public class Query extends Expression {
         return m_signature;
     }
 
-    public Filter getFilter() {
+    public Expression getFilter() {
         return m_filter;
     }
 
-    public void addOrder(Path path, boolean isAscending) {
-        if (m_order.contains(path)) {
+    public void addOrder(Expression expr, boolean isAscending) {
+        if (m_order.contains(expr)) {
             throw new IllegalArgumentException
-                ("already ordered by path: " + path);
+                ("already ordered by expr: " + expr);
         }
 
-        m_order.add(path);
+        m_order.add(expr);
         if (isAscending) {
-            m_ascending.add(path);
+            m_ascending.add(expr);
         }
-    }
-
-    public void addOrder(Path path, boolean isAscending, Path defaultPath) {
-	addOrder(path, isAscending);
-	m_defaults.put(path, defaultPath);
     }
 
     public Collection getOrder() {
         return m_order;
     }
 
-    public boolean isAscending(Path p) {
-        return m_ascending.contains(p);
-    }
-
-    public boolean isDefaulted(Path p) {
-	return m_defaults.containsKey(p);
-    }
-
-    public Path getDefault(Path p) {
-	return (Path) m_defaults.get(p);
+    public boolean isAscending(Expression e) {
+        return m_ascending.contains(e);
     }
 
     public void clearOrder() {
@@ -134,16 +119,10 @@ public class Query extends Expression {
         StringBuffer buf = new StringBuffer();
         buf.append(m_signature + "\nfilter(" + m_filter + ")\norder(");
         for (Iterator it = m_order.iterator(); it.hasNext(); ) {
-            Path p = (Path) it.next();
-            buf.append(p);
+            Expression e = (Expression) it.next();
+            buf.append(e);
 
-	    if (isDefaulted(p)) {
-		buf.append(" (");
-		buf.append(getDefault(p));
-		buf.append(")");
-	    }
-
-            if (!isAscending(p)) {
+            if (!isAscending(e)) {
                 buf.append(" desc");
             }
 

@@ -6,12 +6,12 @@ import com.arsdigita.persistence.proto.metadata.ObjectType;
  * DataSet
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/03/28 $
+ * @version $Revision: #9 $ $Date: 2003/04/30 $
  **/
 
 public class DataSet {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DataSet.java#8 $ by $Author: rhs $, $DateTime: 2003/03/28 17:56:58 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DataSet.java#9 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
 
     private Session m_ssn;
     private Query m_query;
@@ -33,17 +33,17 @@ public class DataSet {
         return getCursor(null);
     }
 
-    public Cursor getCursor(Filter f) {
-	return new Cursor(m_ssn, new Query(m_query, f));
+    public Cursor getCursor(Expression filter) {
+	return new Cursor(m_ssn, new Query(m_query, filter));
     }
 
     public long size() {
         return size(null);
     }
 
-    public long size(Filter f) {
+    public long size(Expression filter) {
         // XXX: This is dumb, it needs to be replaced.
-        Cursor c = getCursor(f);
+        Cursor c = getCursor(filter);
         long result = 0;
         while (c.next()) { result++; }
         return result;
@@ -54,8 +54,8 @@ public class DataSet {
         return isEmpty(null);
     }
 
-    public boolean isEmpty(Filter f) {
-        return size(f) == 0;
+    public boolean isEmpty(Expression filter) {
+        return size(filter) == 0;
     }
 
 }

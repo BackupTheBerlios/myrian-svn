@@ -1,15 +1,17 @@
 package com.arsdigita.persistence.proto.engine.rdbms;
 
+import com.arsdigita.persistence.proto.*;
+
 /**
  * CompoundJoin
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/02/17 $
+ * @version $Revision: #4 $ $Date: 2003/04/30 $
  **/
 
 abstract class CompoundJoin extends Join {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/CompoundJoin.java#3 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/CompoundJoin.java#4 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
 
     public static class Type {}
 

@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #61 $ $Date: 2003/04/28 $
+ * @version $Revision: #62 $ $Date: 2003/04/30 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#61 $ by $Author: ashah $, $DateTime: 2003/04/28 16:45:07 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#62 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -136,14 +136,14 @@ public class Session {
 	    q.set(to, value);
 	}
 
-	return new Query
-	    (q, new AndFilter
-	     (new EqualsFilter
-	      (Path.add("link", link.getFrom().getName()),
-	       from.getPath()),
-	      new EqualsFilter
-	      (Path.add("link", link.getTo().getName()),
-	       to == null ? null : to.getPath())));
+        return new Query
+            (q, Condition.and
+             (Condition.equals
+              (Path.add("link", link.getFrom().getName()),
+               from.getPath()),
+              Condition.equals
+              (Path.add("link", link.getTo().getName()),
+               to == null ? null : to.getPath())));
     }
 
     Object get(Object start, Path path) {

@@ -1,5 +1,6 @@
 package com.arsdigita.persistence.proto.engine.rdbms;
 
+import com.arsdigita.persistence.proto.*;
 import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
 
@@ -11,18 +12,19 @@ import java.util.*;
  * Operation
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2003/03/14 $
+ * @version $Revision: #11 $ $Date: 2003/04/30 $
  **/
 
 abstract class Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Operation.java#10 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Operation.java#11 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
 
     private static final Logger LOG = Logger.getLogger(Operation.class);
 
     private Environment m_env;
     private HashMap m_types = new HashMap();
     private HashSet m_parameters = new HashSet();
+    private HashMap m_mappings = new HashMap();
 
     protected Operation(Environment env) {
         m_env = env;
@@ -60,6 +62,18 @@ abstract class Operation {
 
     Environment getEnvironment() {
         return m_env;
+    }
+
+    public Path[] getMapping(Path p) {
+        return (Path[]) m_mappings.get(p);
+    }
+
+    public void setMapping(Path p, Path[] cols) {
+        m_mappings.put(p, cols);
+    }
+
+    public void setMappings(Map map) {
+        m_mappings.putAll(map);
     }
 
     abstract void write(SQLWriter w);

@@ -12,9 +12,11 @@ import com.arsdigita.persistence.proto.CursorException;
 import com.arsdigita.persistence.proto.Query;
 import com.arsdigita.persistence.proto.Signature;
 import com.arsdigita.persistence.proto.Parameter;
-import com.arsdigita.persistence.proto.PassthroughFilter;
+import com.arsdigita.persistence.proto.Expression;
+import com.arsdigita.persistence.proto.metadata.Root;
 import com.arsdigita.util.Assert;
 import com.arsdigita.util.StringUtils;
+
 import java.io.StringReader;
 import java.util.*;
 import org.apache.log4j.Logger;
@@ -23,12 +25,12 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #20 $ $Date: 2003/04/30 $
+ * @version $Revision: #21 $ $Date: 2003/04/30 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#20 $ by $Author: ashah $, $DateTime: 2003/04/30 08:32:13 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#21 $ by $Author: rhs $, $DateTime: 2003/04/30 10:11:14 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 
@@ -217,73 +219,47 @@ class DataQueryImpl implements DataQuery {
     }
 
     public void addOrder(String order) {
-	addOrder(order, null);
-    }
-
-    private void addOrder(String order, String def) {
         if (m_cursor != null) {
             throw new PersistenceException
                 ("Cannot order an active data query. " +
                  "Data query must be rewound.");
         }
-
-        String[] orders = StringUtils.split(order, ',');
-        for (int i = 0; i < orders.length; i++) {
-            String[] parts = StringUtils.split(orders[i].trim(), ' ');
-            boolean isAscending;
-            if (parts.length == 1) {
-                isAscending = true;
-            } else if (parts.length == 2) {
-                isAscending = parts[1].trim().startsWith("asc");
-            } else {
-                throw new IllegalArgumentException("bad order: " + order);
-            }
-
-	    Path p = Path.get(parts[0]);
-
-            p = unalias(p);
-
-	    if (def == null) {
-		m_query.addOrder(p, isAscending);
-	    } else {
-		m_query.addOrder(p, isAscending, Path.get(def));
-	    }
-        }
+        order = unalias(order);
+        m_query.addOrder(Expression.passthrough(order), true);
     }
 
     private int m_order = 0;
 
     public void addOrderWithNull(String orderOne, Object orderTwo,
 				 boolean isAscending) {
-	Path p1, p2;
+        String suffix = null;
+        if (isAscending) {
+            suffix = "asc";
+        } else {
+            suffix = "desc";
+        }
 
-	if (orderOne == null) {
-	    p1 = Path.get("__order" + m_order++);
-	    m_bindings.put(p1.getPath(), null);
-	} else {
-	    p1 = Path.get(orderOne);
-	}
+        Object secondElement = orderTwo;
+        if (orderTwo instanceof String && orderTwo != null) {
+            Path path = Path.get((String) orderTwo);
+            if (!m_query.getSignature().exists(path)) {
+                String var = "order" + m_order++;
+                secondElement = ":" + var;
+                setParameter(var, orderTwo);
+                if (orderOne != null) {
+                    if (!Root.getRoot().getObjectType("global.String").equals
+                        (m_query.getSignature().getType
+                         (Path.get(orderOne)))) {
+                        // this means that there is going to be a type conflict
+                        // by the DB so we prevent it here
+                        throw new PersistenceException("type mismatch");
+                    }
+                }
+            }
+        }
 
-	if (orderTwo instanceof String && orderTwo != null) {
-	    p2 = Path.get((String) orderTwo);
-	    if (!m_query.getSignature().exists(p2)) {
-		p2 = Path.get("__order" + m_order++);
-		m_bindings.put(p2.getPath(), orderTwo);
-		if (orderOne != null) {
-		    if (m_query.getSignature().getType(p1) !=
-			m_pssn.getObjectType(orderTwo)) {
-			throw new PersistenceException
-			    ("type mismatch");
-		    }
-		}
-	    }
-	} else {
-	    p2 = Path.get("__order" + m_order++);
-	    m_bindings.put(p2.getPath(), orderTwo);
-	}
-
-	addOrder
-            (p1.getPath() + (isAscending ? " asc" : " desc"), p2.getPath());
+        addOrder("case when (" + orderOne + " is null) then " +
+                 secondElement + " else " + orderOne + " end " + suffix);
     }
 
     public void clearOrder() {
@@ -413,8 +389,8 @@ class DataQueryImpl implements DataQuery {
         if (conditions == null || conditions.equals("")) {
 	    q = new Query(m_query, null);
 	} else {
-            conditions = unaliasFilter(conditions);
-	    q = new Query(m_query, new PassthroughFilter(conditions));
+            conditions = unalias(conditions);
+	    q = new Query(m_query, Expression.passthrough(conditions));
 	}
 
 	Map filterBindings = m_filter.getBindings();
@@ -498,9 +474,9 @@ class DataQueryImpl implements DataQuery {
         return m_query.getSignature().hasPath(path);
     }
 
-    private String unaliasFilter(String filter) {
+    private String unalias(String expr) {
         SQLParser p = new SQLParser
-            (new StringReader(filter),
+            (new StringReader(expr),
              new SQLParser.Mapper() {
                  public Path map(Path path) {
                      return unalias(path);
