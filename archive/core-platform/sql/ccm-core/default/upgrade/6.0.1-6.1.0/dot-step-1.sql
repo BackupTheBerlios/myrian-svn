@@ -1,5 +1,5 @@
-alter table persistence_dynamic_ot rename to persistence_dynamic_ot_backup;
-alter table persistence_dynamic_assoc rename to persistence_dynamic_assoc_backup;
+alter table persistence_dynamic_ot rename to pdot_backup;
+alter table persistence_dynamic_assoc rename to pda_backup;
 
 create table persistence_dynamic_ot (
     pdl_id                 integer,
