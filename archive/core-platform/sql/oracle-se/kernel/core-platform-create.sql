@@ -19,11 +19,11 @@
 --
 -- @author Bryan Quinn (bquinn@arsdigita.com) 
 -- @creation-date May 16, 2001 20:16:43
--- @version $Id: //core-platform/dev/sql/oracle-se/kernel/core-platform-create.sql#1 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/kernel/core-platform-create.sql#2 $
 --
 
-@@ ../../../infrastructure/globalization/sql/oracle-se/g11n-create.sql
-@@ ../../../infrastructure/preferences/sql/oracle-se/preferences-create.sql
+@@ ../globalization/g11n-create.sql
+@@ ../preferences/preferences-create.sql
 @@ objects-create.sql
 @@ parties-create.sql
 @@ security-create.sql
@@ -32,15 +32,15 @@
 @@ apm-create.sql
 @@ acs-stylesheet-create.sql
 @@ notes-create.sql
-@@ ../../../services/categorization/sql/oracle-se/categorization-create.sql
-@@ ../../../services/auditing/sql/oracle-se/auditing-create.sql
-@@ ../../../services/messaging/sql/oracle-se/messaging-create.sql
-@@ ../../../services/notification/sql/oracle-se/notification-create.sql
-@@ ../../../services/search/sql/oracle-se/search-create.sql
-@@ ../../../services/places/sql/oracle-se/places-create.sql
-@@ ../../../services/versioning/sql/oracle-se/versioning-create.sql
-@@ ../../../services/workflow/sql/oracle-se/workflow-create.sql
-@@ ../../../services/formbuilder/sql/oracle-se/formbuilder-create.sql
-@@ ../../../services/addresses/sql/oracle-se/us-addresses-create.sql
-@@ ../../../cms/content-section/sql/oracle-se/cms-create.sql
-@@ ../../../infrastructure/persistence/sql/oracle-se/persistence-create.sql
+@@ ../categorization/categorization-create.sql
+@@ ../auditing/auditing-create.sql
+@@ ../messaging/messaging-create.sql
+@@ ../notification/notification-create.sql
+@@ ../search/search-create.sql
+@@ ../places/places-create.sql
+@@ ../versioning/versioning-create.sql
+@@ ../workflow/workflow-create.sql
+@@ ../formbuilder/formbuilder-create.sql
+@@ ../addresses/us-addresses-create.sql
+@@ ../../../../cms/sql/oracle-se/content-section/cms-create.sql
+@@ ../persistence/persistence-create.sql
