@@ -26,21 +26,42 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#3 $
  */
 public class BaseConfig {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#3 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/02 12:40:15 $";
+        "$DateTime: 2003/09/02 14:11:43 $";
 
     private static final Logger s_log = Logger.getLogger
         (BaseConfig.class);
 
-    private final FilePropertyStore m_store;
+    private final ParameterStore m_store;
 
-    protected BaseConfig(final String filename) {
-        m_store = new FilePropertyStore(filename);
+    protected BaseConfig(final ParameterStore store) {
+        m_store = store;
+    }
+
+    protected BaseConfig(final String resource) {
+        final Properties props = new Properties();
+
+        final InputStream in = getClass().getResourceAsStream(resource);
+
+        if (in == null) {
+            if (s_log.isInfoEnabled()) {
+                s_log.info(resource + " was not found; using an empty " +
+                           "property record");
+            }
+        } else {
+            try {
+                props.load(in);
+            } catch (IOException ioe) {
+                throw new UncheckedWrapperException(ioe);
+            }
+        }
+
+        m_store = new JavaPropertyStore(props);
     }
 
     protected final Object initialize(final Parameter param) {

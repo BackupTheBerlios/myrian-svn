@@ -25,37 +25,24 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/FilePropertyStore.java#6 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyStore.java#1 $
  */
-public class FilePropertyStore implements ParameterStore {
+public class JavaPropertyStore implements ParameterStore {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/FilePropertyStore.java#6 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyStore.java#1 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/02 01:33:12 $";
+        "$DateTime: 2003/09/02 14:11:43 $";
 
     private static final Logger s_log = Logger.getLogger
-        (FilePropertyStore.class);
+        (JavaPropertyStore.class);
 
     private final Properties m_props;
 
-    public FilePropertyStore(final String filename) {
-        m_props = new Properties();
 
-        final InputStream in = getClass().getResourceAsStream(filename);
+    public JavaPropertyStore(final Properties props) {
+        Assert.exists(props, Properties.class);
 
-        if (in == null) {
-            if (s_log.isInfoEnabled()) {
-                s_log.info(filename + " was not found; using an empty " +
-                           "property record");
-            }
-            //throw new IllegalStateException("no such resource: " + filename);
-        } else {
-            try {
-                m_props.load(in);
-            } catch (IOException ioe) {
-                throw new UncheckedWrapperException(ioe);
-            }
-        }
+        m_props = props;
     }
 
     public String read(final Parameter param) {
