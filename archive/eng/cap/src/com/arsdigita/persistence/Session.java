@@ -62,7 +62,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2004/09/01 $
+ * @version $Revision: #7 $ $Date: 2004/09/23 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -563,8 +563,12 @@ public class Session {
     }
 
     void invalidateDataObjects(boolean connectedOnly, boolean error) {
-        for (Iterator it = m_dataObjects.iterator(); it.hasNext(); ) {
-            WeakReference ref = (WeakReference) it.next();
+        int size = m_dataObjects.size();
+        // allow concurrent modification of m_dataObjects. objects added
+        // during invalidation do not need to be invalidated because they are
+        // directly visible to the user until the next transaction
+        for (int i = 0; i < size; i++) {
+            WeakReference ref = (WeakReference) m_dataObjects.get(i);
             DataObjectImpl obj = (DataObjectImpl) ref.get();
             if (obj != null) {
                 obj.invalidate(connectedOnly, error);
