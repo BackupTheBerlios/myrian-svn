@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,6 +41,7 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.apache.commons.collections.map.AbstractReferenceMap;
+import org.apache.commons.collections.map.ReferenceMap;
 import org.apache.commons.collections.map.ReferenceIdentityMap;
 
 /**
@@ -51,12 +51,12 @@ import org.apache.commons.collections.map.ReferenceIdentityMap;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2004/08/18 $
+ * @version $Revision: #15 $ $Date: 2004/08/26 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#14 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#15 $ by $Author: ashah $, $DateTime: 2004/08/26 15:14:44 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -70,8 +70,11 @@ public class Session {
     private final Engine m_engine;
     private final QuerySource m_qs;
 
-    private final Map m_odata = new HashMap();
-    private final Map m_keyless = new IdentityHashMap();
+    private final List m_modified = new ArrayList();
+    private final Map m_keyodata = new ReferenceMap
+        (AbstractReferenceMap.HARD, AbstractReferenceMap.WEAK);
+    private final Map m_objodata = new ReferenceIdentityMap
+        (AbstractReferenceMap.WEAK, AbstractReferenceMap.HARD, true);
     private final Map m_keys = new ReferenceIdentityMap
         (AbstractReferenceMap.WEAK, AbstractReferenceMap.HARD, true);
 
@@ -113,7 +116,7 @@ public class Session {
     public Object retrieve(PropertyMap keys) {
         Adapter ad = m_root.getAdapter(keys.getObjectType());
         Object key = ad.getSessionKey(keys);
-        ObjectData odata = (ObjectData) m_odata.get(key);
+        ObjectData odata = (ObjectData) m_keyodata.get(key);
 
         if (odata != null) {
             if (odata.isDeleted()) { return null; }
@@ -774,10 +777,12 @@ public class Session {
     }
 
     private void clear(boolean isCommit) {
-        m_odata.clear();
-        m_keyless.clear();
+        for (Iterator it = m_objodata.values().iterator(); it.hasNext(); ) {
+            ((ObjectData) it.next()).clear();
+        }
         m_events.clear();
         m_violations.clear();
+        m_modified.clear();
         m_beforeFlushMarker = null;
         if (LOG.isDebugEnabled()) { setLevel(0); }
         cleanUpEventProcessors(isCommit);
@@ -794,6 +799,7 @@ public class Session {
             flushAll();
             clear(true);
             m_engine.commit();
+            if (LOG.isInfoEnabled()) { LOG.info("commit"); }
             success = true;
         } finally {
             if (!success) { clear(false); }
@@ -809,6 +815,7 @@ public class Session {
         try {
             flushAll();
             clear(true);
+            if (LOG.isInfoEnabled()) { LOG.info("testCommit"); }
             success = true;
         } finally {
             if (!success) { clear(false); }
@@ -840,6 +847,7 @@ public class Session {
             m_engine.rollback();
         } finally {
             clear(false);
+            if (LOG.isInfoEnabled()) { LOG.info("rollback"); }
         }
     }
 
@@ -928,7 +936,7 @@ public class Session {
     }
 
     void use(Object key, Object obj) {
-        ObjectData odata = (ObjectData) m_odata.get(key);
+        ObjectData odata = (ObjectData) m_keyodata.get(key);
         if (odata != null) {
             odata.setObject(obj);
             setSessionKey(obj, key);
@@ -936,25 +944,25 @@ public class Session {
     }
 
     Object getObject(Object key) {
-        if (m_odata.containsKey(key)) {
-            return ((ObjectData) m_odata.get(key)).getObject();
+        if (m_keyodata.containsKey(key)) {
+            return ((ObjectData) m_keyodata.get(key)).getObject();
         } else {
             return null;
         }
     }
 
     ObjectData getObjectDataByKey(Object key) {
-        return (ObjectData) m_odata.get(key);
+        return (ObjectData) m_keyodata.get(key);
     }
 
     boolean hasObjectData(Object obj) {
-        return m_keyless.containsKey(obj)
-            || (hasSessionKey(obj) && m_odata.containsKey(getSessionKey(obj)));
+        return m_objodata.containsKey(obj)
+            || (hasSessionKey(obj) && m_keyodata.containsKey(getSessionKey(obj)));
     }
 
     ObjectData getObjectData(Object obj) {
-        if (m_keyless.containsKey(obj)) {
-            return (ObjectData) m_keyless.get(obj);
+        if (m_objodata.containsKey(obj)) {
+            return (ObjectData) m_objodata.get(obj);
         } else if (hasSessionKey(obj)) {
             return getObjectDataByKey(getSessionKey(obj));
         } else {
@@ -963,7 +971,11 @@ public class Session {
     }
 
     void addObjectData(ObjectData odata) {
-        m_keyless.put(odata.getObject(), odata);
+        m_objodata.put(odata.getObject(), odata);
+    }
+
+    void addModified(Object obj) {
+        m_modified.add(obj);
     }
 
     public boolean hasSessionKey(Object obj) {
@@ -975,9 +987,9 @@ public class Session {
             throw new IllegalArgumentException
                 ("object already assigned key: " + obj);
         }
-        ObjectData odata = (ObjectData) m_keyless.remove(obj);
+        ObjectData odata = (ObjectData) m_objodata.get(obj);
         if (odata != null) {
-            m_odata.put(key, odata);
+            m_keyodata.put(key, odata);
         }
         m_keys.put(obj, key);
     }
@@ -996,7 +1008,8 @@ public class Session {
             RecordSet rs = getDataSet(obj).getCursor().execute();
             // Cache non-existent objects
             if (!rs.next()) {
-                m_odata.put(getSessionKey(obj), null);
+                m_keyodata.put(getSessionKey(obj), null);
+                m_objodata.put(obj, null);
             } else {
                 do {
                     rs.load(this);
@@ -1153,15 +1166,24 @@ public class Session {
     }
 
     void dump(PrintWriter out) {
-        for (Iterator it = m_odata.entrySet().iterator(); it.hasNext(); ) {
+        out.println("keyodata");
+        for (Iterator it = m_keyodata.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry me = (Map.Entry) it.next();
+            if (me.getValue() != null) {
+                out.println(me.getKey());
+            }
+        }
 
-            Object key = me.getKey();
-            out.print(key);
-            out.println(":");
+        out.println("objodata");
+        for (Iterator it = m_objodata.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry me = (Map.Entry) it.next();
+            out.println(str(me.getKey()));
+        }
 
-            ObjectData od = (ObjectData) me.getValue();
-            od.dump(out);
+        out.println("keys");
+        for (Iterator it = m_keys.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry me = (Map.Entry) it.next();
+            out.println(str(me.getKey()));
         }
     }
 

@@ -24,12 +24,12 @@ import org.apache.log4j.Logger;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/08/06 $
+ * @version $Revision: #4 $ $Date: 2004/08/26 $
  **/
 
 class ObjectData implements Violation {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/ObjectData.java#3 $ by $Author: rhs $, $DateTime: 2004/08/06 08:43:09 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/ObjectData.java#4 $ by $Author: ashah $, $DateTime: 2004/08/26 15:14:44 $";
 
     private static final Logger LOG = Logger.getLogger(ObjectData.class);
 
@@ -51,6 +51,7 @@ class ObjectData implements Violation {
     public static final State AGILE = new State("agile");
     public static final State SENILE = new State("senile");
     public static final State DEAD = new State("dead");
+    public static final State UNKNOWN = new State("unknown");
 
     private boolean m_startedNew = false;
 
@@ -60,9 +61,9 @@ class ObjectData implements Violation {
 
     public ObjectData(Session ssn, Object object, State state) {
         m_ssn = ssn;
-        m_object = object;
         m_container = null;
         m_map = null;
+        setObject(object);
         setState(state);
 
         m_ssn.addObjectData(this);
@@ -96,8 +97,28 @@ class ObjectData implements Violation {
         m_map = map;
     }
 
+    void clear() {
+        Collection keys = m_map.getKeyProperties();
+        for (Iterator it = m_pdata.values().iterator(); it.hasNext(); ) {
+            PropertyData pdata = (PropertyData) it.next();
+            if (!keys.contains(pdata.getProperty())) {
+                it.remove();
+            }
+        }
+
+        if (m_pdata.size() != keys.size()) {
+            throw new IllegalStateException();
+        }
+
+        setState(UNKNOWN);
+        m_startedNew = false;
+    }
+
     public void addPropertyData(Property p, PropertyData pd) {
         m_pdata.put(p, pd);
+        if (getState().equals(UNKNOWN)) {
+            setState(NUBILE);
+        }
     }
 
     public PropertyData getPropertyData(Property prop) {
@@ -124,6 +145,8 @@ class ObjectData implements Violation {
 
     public boolean isDead() { return m_state.equals(DEAD); }
 
+    public boolean isLoaded() { return !m_state.equals(UNKNOWN); }
+
     public boolean isFlushed() {
         if (getSession().getEventStream().getLastEvent(getObject()) != null) {
             return false;
@@ -143,6 +166,10 @@ class ObjectData implements Violation {
         }
 
         m_state = state;
+
+        if (!m_state.equals(NUBILE) && !m_state.equals(UNKNOWN)) {
+            getSession().addModified(getObject());
+        }
     }
 
     public State getState() { return m_state; }

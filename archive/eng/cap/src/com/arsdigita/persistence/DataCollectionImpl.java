@@ -22,12 +22,12 @@ import com.redhat.persistence.common.Path;
  * DataCollectionImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/26 $
  **/
 
 class DataCollectionImpl extends DataQueryImpl implements DataCollection {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataCollectionImpl.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataCollectionImpl.java#2 $ by $Author: ashah $, $DateTime: 2004/08/26 15:14:44 $";
 
     DataCollectionImpl(Session ssn, DataSet ds) {
         super(ssn, ds);
@@ -40,7 +40,7 @@ class DataCollectionImpl extends DataQueryImpl implements DataCollection {
     public DataObject getDataObject() {
         Path p = Path.get(null);
         p = resolvePath(p);
-        return (DataObject) m_cursor.get(p);
+        return (DataObject) getSession().refresh(m_cursor.get(p));
     }
 
     /**

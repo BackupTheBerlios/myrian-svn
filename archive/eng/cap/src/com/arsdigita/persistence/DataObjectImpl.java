@@ -34,12 +34,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/08/03 $
+ * @version $Revision: #3 $ $Date: 2004/08/26 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataObjectImpl.java#2 $ by $Author: rhs $, $DateTime: 2004/08/03 09:01:35 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataObjectImpl.java#3 $ by $Author: ashah $, $DateTime: 2004/08/26 15:14:44 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -214,9 +214,11 @@ class DataObjectImpl implements DataObject {
                     }
                 }
 
-                Session ssn = SessionManager.getSession().getProtoSession();
-                Object me = ssn.retrieve(C.pmap(ssn.getRoot(), m_oid));
-                obj = ssn.get(me, convert(property));
+                com.arsdigita.persistence.Session ssn =
+                    SessionManager.getSession();
+                Object me = ssn.retrieve(m_oid);
+                obj = ssn.refresh
+                    (ssn.getProtoSession().get(me, convert(property)));
 
                 if (obj instanceof DataObjectImpl) {
                     DataObjectImpl dobj = (DataObjectImpl) obj;
@@ -230,13 +232,7 @@ class DataObjectImpl implements DataObject {
                 return obj;
             } else {
                 Object result = get(getSsn(), convert(property));
-                if (result instanceof DataObjectImpl) {
-                    DataObjectImpl dobj = (DataObjectImpl) result;
-                    if (dobj.isDisconnected()) {
-                        result = getSession().retrieve(dobj.getOID());
-                    }
-                }
-                return result;
+                return getSession().refresh(result);
             }
         } else {
             return null;

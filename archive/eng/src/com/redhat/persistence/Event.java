@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
  * Event
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/26 $
  **/
 
 public abstract class Event {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Event.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Event.java#2 $ by $Author: ashah $, $DateTime: 2004/08/26 15:14:44 $";
 
     private static final Logger LOG = Logger.getLogger(Event.class);
 
@@ -69,12 +69,7 @@ public abstract class Event {
     }
 
     public final Object getObject() {
-        ObjectData od = getObjectData();
-        if (od == null) {
-            return m_obj;
-        } else {
-            return getObjectData().getObject();
-        }
+        return m_obj;
     }
 
     public final ObjectMap getObjectMap() {

@@ -22,12 +22,12 @@ import java.util.Iterator;
  * CreateEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/08/06 $
+ * @version $Revision: #4 $ $Date: 2004/08/26 $
  **/
 
 public class CreateEvent extends ObjectEvent {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/CreateEvent.java#3 $ by $Author: rhs $, $DateTime: 2004/08/06 08:43:09 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/CreateEvent.java#4 $ by $Author: ashah $, $DateTime: 2004/08/26 15:14:44 $";
 
     CreateEvent(Session ssn, Object obj) {
         super(ssn, obj);
@@ -41,6 +41,7 @@ public class CreateEvent extends ObjectEvent {
         super.activate();
 
         ObjectData odata = getObjectData();
+        odata.setObject(getObject());
         odata.setState(ObjectData.INFANTILE);
 
         Session ssn = getSession();

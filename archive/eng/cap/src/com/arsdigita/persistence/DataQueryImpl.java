@@ -56,12 +56,12 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/26 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataQueryImpl.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataQueryImpl.java#2 $ by $Author: ashah $, $DateTime: 2004/08/26 15:14:44 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 
@@ -541,7 +541,7 @@ class DataQueryImpl implements DataQuery {
     public Object get(String propertyName) {
         Path path = resolvePath(unalias(Path.get(propertyName)));
 	try {
-	    return m_cursor.get(path);
+	    return getSession().refresh(m_cursor.get(path));
 	} catch (ProtoException e) {
 	    throw PersistenceException.newInstance(e);
 	}

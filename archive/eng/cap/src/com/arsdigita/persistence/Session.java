@@ -59,7 +59,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/06/17 $
+ * @version $Revision: #4 $ $Date: 2004/08/26 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -340,7 +340,13 @@ public class Session {
      **/
 
     public DataObject retrieve(OID oid) {
-        return (DataObject) m_ssn.retrieve(C.pmap(getRoot(), oid));
+        PropertyMap pmap = C.pmap(getRoot(), oid);
+        DataObject dobj = (DataObject) m_ssn.retrieve(pmap);
+        if (dobj != null && dobj.isDisconnected()) {
+            m_ssn.releaseObject(dobj);
+            dobj = (DataObject) m_ssn.retrieve(pmap);
+        }
+        return dobj;
     }
 
 
@@ -535,6 +541,17 @@ public class Session {
         } catch (ProtoException pe) {
             throw PersistenceException.newInstance(pe);
         }
+    }
+
+    Object refresh(Object value) {
+        if (value instanceof DataObjectImpl) {
+            DataObjectImpl dobj = (DataObjectImpl) value;
+            if (dobj.isDisconnected()) {
+                return retrieve(dobj.getOID());
+            }
+        }
+
+        return value;
     }
 
     private void addDataObject(DataObjectImpl obj) {
