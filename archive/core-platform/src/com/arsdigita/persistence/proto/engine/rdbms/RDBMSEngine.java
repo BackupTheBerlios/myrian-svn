@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/06/26 $
+ * @version $Revision: #6 $ $Date: 2003/06/27 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#5 $ by $Author: rhs $, $DateTime: 2003/06/26 18:40:22 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#6 $ by $Author: rhs $, $DateTime: 2003/06/27 17:35:31 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -226,6 +226,9 @@ public class RDBMSEngine extends Engine {
                 if (rs.next()) {
                     throw new IllegalStateException
                         ("count returned too many rows");
+                }
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("size = " + result);
                 }
                 return result;
             } catch (SQLException e) {

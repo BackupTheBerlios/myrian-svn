@@ -11,15 +11,15 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/test/sql/postgres/persistence/data-query-test.sql#5 $
--- $DateTime: 2002/10/16 14:12:35 $
+-- $Id: //core-platform/dev/test/sql/postgres/persistence/data-query-test.sql#6 $
+-- $DateTime: 2003/06/27 17:35:31 $
 
 
 --
 -- This file contains the data model for the data query test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #5 $ $Date: 2002/10/16 $
+-- @version $Revision: #6 $ $Date: 2003/06/27 $
 --
 
 create table t_data_query (
@@ -33,102 +33,102 @@ create table t_data_query (
 insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values  
-    (0, 'read', 'Read item 0', 1, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('0 days'::timespan));
+    (0, 'read', 'Read item 0', 1, '1976-12-24'::timestamp);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (1, 'read', 'Read item 1', 2, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('4 days'::timespan));
+    (1, 'read', 'Read item 1', 2, '1976-12-24'::timestamp + '4 days'::reltime);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (2, 'read', 'Read item 2', 3, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('8 days'::timespan));
+    (2, 'read', 'Read item 2', 3, '1976-12-24'::timestamp + '8 days'::reltime);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (3, 'read', 'Read item 3', 7, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('10 days'::timespan));
+    (3, 'read', 'Read item 3', 7, '1976-12-24'::timestamp + '10 days'::reltime);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (4, 'read', 'Read item 4', 3, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('11 days'::timespan));
+    (4, 'read', 'Read item 4', 3, '1976-12-24'::timestamp + '11 days'::reltime);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (5, 'write', 'Wrote item 5', 9, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('11.3 days'::timespan));
+    (5, 'write', 'Wrote item 5', 9, '1976-12-24'::timestamp + '11.3 days'::reltime);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (6, 'write', 'Wrote item 6', 3, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('11.79 days'::timespan));
+    (6, 'write', 'Wrote item 6', 3, '1976-12-24'::timestamp + '11.79 days'::reltime);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (7, 'write', 'Wrote item 7', 3, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('24.3 days'::timespan));
+    (7, 'write', 'Wrote item 7', 3, '1976-12-24'::timestamp + '24.3 days'::reltime);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (8, 'write', 'Wrote item 8', 3, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('28.119 days'::timespan));
+    (8, 'write', 'Wrote item 8', 3, '1976-12-24'::timestamp + '28.119 days'::reltime);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (9, 'write', 'Wrote item 9', 3, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('31 days'::timespan));
+    (9, 'write', 'Wrote item 9', 3, '1976-12-24'::timestamp + '31 days'::reltime);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (10, 'delete', 'Deleted item 10', 7, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('47 days'::timespan));
+    (10, 'delete', 'Deleted item 10', 7, '1976-12-24'::timestamp + '47 days'::reltime);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (11, 'delete', 'Deleted item 11', 3, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('92 days'::timespan));
+    (11, 'delete', 'Deleted item 11', 3, '1976-12-24'::timestamp + '92 days'::reltime);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (12, 'delete', 'Deleted item 12', 3, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('102 days'::timespan));
+    (12, 'delete', 'Deleted item 12', 3, '1976-12-24'::timestamp + '102 days'::reltime);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (13, 'delete', 'Deleted item 13', 9, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('228 days'::timespan));
+    (13, 'delete', 'Deleted item 13', 9, '1976-12-24'::timestamp + '228 days'::reltime);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (14, 'delete', 'Deleted item 14', 3, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('228 days'::timespan));
+    (14, 'delete', 'Deleted item 14', 3, '1976-12-24'::timestamp + '228 days'::reltime);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (15, 'create', 'Created item 15', 3, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('230 days'::timespan));
+    (15, 'create', 'Created item 15', 3, '1976-12-24'::timestamp + '230 days'::reltime);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (16, 'create', 'Created item 16', 3, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('241 days'::timespan));
+    (16, 'create', 'Created item 16', 3, '1976-12-24'::timestamp + '241 days'::reltime);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (17, 'create', 'Created item 17', 4, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('281 days'::timespan));
+    (17, 'create', 'Created item 17', 4, '1976-12-24'::timestamp + '281 days'::reltime);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (18, 'create', 'Created item 18', 3, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('384 days'::timespan));
+    (18, 'create', 'Created item 18', 3, '1976-12-24'::timestamp + '384 days'::reltime);
 
     insert into t_data_query
     (entry_id, action, description, priority, action_time)
     values
-    (19, 'create', 'Created item 19', 8, datetime('1976-12-24'::datetime, '00:00'::time) + reltime('12203 days'::timespan));
+    (19, 'create', 'Created item 19', 8, '1976-12-24'::timestamp + '12203 days'::reltime);
 
 
 create or replace function DataOperationProcWithReturn(integer) returns integer
