@@ -34,12 +34,12 @@ import org.apache.log4j.Logger;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2004/03/30 $
+ * @version $Revision: #11 $ $Date: 2004/03/30 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Signature.java#10 $ by $Author: vadim $, $DateTime: 2004/03/30 15:48:15 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Signature.java#11 $ by $Author: vadim $, $DateTime: 2004/03/30 16:06:52 $";
 
     private static final Logger s_log = Logger.getLogger(Signature.class);
 
@@ -90,7 +90,7 @@ public class Signature {
         // throw-away String object.
         int pathIdxWidth;
         if (pathIndex == 0) {
-            pathIdxWidth = 0;
+            pathIdxWidth = 1;
         } else {
             pathIdxWidth = 0;
             for (int i = pathIndex; i > 0; i /= 10) { pathIdxWidth++; }
