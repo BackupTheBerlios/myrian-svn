@@ -25,12 +25,12 @@ import java.util.*;
  * QuerySuite
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/03/08 $
+ * @version $Revision: #9 $ $Date: 2004/03/09 $
  **/
 
 public class QuerySuite extends TestSuite {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QuerySuite.java#8 $ by $Author: rhs $, $DateTime: 2004/03/08 23:10:10 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QuerySuite.java#9 $ by $Author: rhs $, $DateTime: 2004/03/09 12:39:57 $";
 
     public QuerySuite() {}
 
@@ -268,6 +268,7 @@ public class QuerySuite extends TestSuite {
         private QuerySuite m_suite;
         private String m_name = null;
         private List m_tests = null;
+        private List m_fetched = null;
         private String m_variant = null;
         private boolean m_ordered = false;
         private StringBuffer m_query = null;
@@ -286,6 +287,7 @@ public class QuerySuite extends TestSuite {
                                  Attributes attrs) {
             if (name.equals("test")) {
                 m_tests = new ArrayList();
+                m_fetched = new ArrayList();
                 m_name = attrs.getValue(uri, "name");
             } else if (name.equals("query")) {
                 m_query = new StringBuffer();
@@ -304,6 +306,8 @@ public class QuerySuite extends TestSuite {
                         m_innerCount = new Integer(value);
                     } else if (attr.equals("outers")) {
                         m_outerCount = new Integer(value);
+                    } else if (attr.equals("fetched")) {
+                        m_fetched.add(value);
                     } else {
                         throw new IllegalStateException
                             ("unrecognized attribute for query: " + attr);
@@ -352,20 +356,51 @@ public class QuerySuite extends TestSuite {
                 test.setOuterCount(m_outerCount);
                 m_outerCount = null;
                 m_tests.add(test);
+                if (m_fetched.size() < m_tests.size()) {
+                    m_fetched.add(null);
+                }
             } else if (name.equals("results")) {
                 // do nothing
             } else if (name.equals("test")) {
-                for (Iterator it = m_tests.iterator(); it.hasNext(); ) {
-                    QueryTest test = (QueryTest) it.next();
-                    test.setResults(m_results);
+                for (int i = 0; i < m_tests.size(); i++) {
+                    QueryTest test = (QueryTest) m_tests.get(i);
+                    String fetched = (String) m_fetched.get(i);
+                    test.setResults(filter(m_results, fetched));
                     test.setError(m_error);
                     m_suite.addTest(test);
                 }
+                m_tests = null;
+                m_fetched = null;
                 m_results = null;
                 m_error = null;
             }
         }
 
+    }
+
+    private static List filter(List rows, String fetched) {
+        if (fetched == null) { return rows; }
+
+        Set fetchSet = new HashSet();
+        String[] parts = StringUtils.split(fetched, ',');
+        for (int i = 0; i < parts.length; i++) {
+            fetchSet.add(parts[i]);
+        }
+
+        List result = new ArrayList(rows.size());
+        for (int i = 0; i < rows.size(); i++) {
+            Map row = (Map) rows.get(i);
+            Map filtered = new HashMap();
+            for (Iterator it = row.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry me = (Map.Entry) it.next();
+                if (fetchSet.contains(me.getKey())) {
+                    filtered.put(me.getKey(), me.getValue());
+                }
+            }
+            result.add(filtered);
+        }
+
+        return result;
     }
 
     public static void main(String[] args) throws Exception {

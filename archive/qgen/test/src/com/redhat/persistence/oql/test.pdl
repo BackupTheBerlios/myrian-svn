@@ -180,3 +180,24 @@ object type Group class com.redhat.persistence.PropertyMap
 
     object key(id);
 }
+
+object type Pair1 class com.redhat.persistence.PropertyMap
+                 adapter com.redhat.persistence.oql.IdentityAdapter {
+    BigInteger id = p1.id;
+    String name = p1.name;
+
+    object key(id);
+}
+
+object type Pair2 class com.redhat.persistence.PropertyMap
+                 adapter com.redhat.persistence.oql.IdentityAdapter {
+    BigInteger id = p2.id;
+    String name = p2.name;
+
+    object key(id);
+}
+
+association {
+    unique Pair1[0..1] p1 = join p2.p1_id to p1.id;
+    Pair2[0..1] p2 = join p1.id to p2.p1_id;
+}

@@ -156,4 +156,11 @@
     <subgroups id="6"/>
     <subgroups id="10"/>
   </test.Group>
+
+  <test.Pair1 id="1" name="One"/>
+  <test.Pair1 id="2" name="Two"/>
+  <test.Pair1 id="3" name="Three"/>
+  <test.Pair2 id="21" name="Twenty One" p1.id="1"/>
+  <test.Pair2 id="22" name="Twenty Two" p1.id="2"/>
+  <test.Pair2 id="23" name="Twenty Three" p1.id="3"/>
 </data>

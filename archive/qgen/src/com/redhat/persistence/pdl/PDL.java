@@ -29,12 +29,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/03/03 $
+ * @version $Revision: #5 $ $Date: 2004/03/09 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/pdl/PDL.java#4 $ by $Author: rhs $, $DateTime: 2004/03/03 18:47:37 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/pdl/PDL.java#5 $ by $Author: rhs $, $DateTime: 2004/03/09 12:39:57 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -979,9 +979,15 @@ public class PDL {
 
         if (magnitude == 1) {
             JoinNd jn = (JoinNd) joins.get(low);
-            if (lookup(jn.getTo()).isUniqueKey()) {
+            Column to = lookup(jn.getTo());
+            Column from = lookup(jn.getFrom());
+            if (to.isPrimaryKey()) {
                 joinForward = true;
-            } else if (lookup(jn.getFrom()).isUniqueKey()) {
+            } else if (from.isPrimaryKey()) {
+                joinForward = false;
+            } else if (to.isUniqueKey()) {
+                joinForward = true;
+            } else if (from.isUniqueKey()) {
                 joinForward = false;
             } else {
                 m_errors.fatal(jpn, "neither end unique");
