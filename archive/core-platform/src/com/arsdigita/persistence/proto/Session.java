@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/05/22 $
+ * @version $Revision: #4 $ $Date: 2003/05/23 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Session.java#3 $ by $Author: ashah $, $DateTime: 2003/05/22 14:50:15 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Session.java#4 $ by $Author: ashah $, $DateTime: 2003/05/23 12:14:49 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -554,12 +554,13 @@ public class Session {
         }
     }
 
-    private void clear() {
+    private void clear(boolean isCommit) {
         m_odata.clear();
         m_events.clear();
         m_violations.clear();
         m_beforeFlushMarker = null;
         if (LOG.isDebugEnabled()) { setLevel(0); }
+        cleanUpEventProcessors(isCommit);
     }
 
     /**
@@ -568,10 +569,15 @@ public class Session {
      **/
 
     public void commit() {
-        flushAll();
-        clear();
-        cleanUpEventProcessors(true);
-        m_engine.commit();
+        boolean success = false;
+        try {
+            flushAll();
+            clear(true);
+            m_engine.commit();
+            success = true;
+        } finally {
+            if (!success) { clear(false); }
+        }
     }
 
     /**
@@ -579,9 +585,14 @@ public class Session {
      * work associated with commit.
      */
     void testCommit() {
-        flushAll();
-        clear();
-        cleanUpEventProcessors(true);
+        boolean success = false;
+        try {
+            flushAll();
+            clear(true);
+            success = true;
+        } finally {
+            if (!success) { clear(false); }
+        }
     }
 
     private void cleanUpEventProcessors(boolean isCommit) {
@@ -605,9 +616,11 @@ public class Session {
      **/
 
     public void rollback() {
-        clear();
-        m_engine.rollback();
-        cleanUpEventProcessors(false);
+        try {
+            m_engine.rollback();
+        } finally {
+            clear(false);
+        }
     }
 
     Engine getEngine() {
