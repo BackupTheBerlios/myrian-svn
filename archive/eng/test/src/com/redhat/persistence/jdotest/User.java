@@ -4,7 +4,7 @@ package com.redhat.persistence.jdotest;
  * User
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/06/24 $
+ * @version $Revision: #3 $ $Date: 2004/06/25 $
  **/
 
 public class User extends Party {
@@ -24,14 +24,4 @@ public class User extends Party {
     public void setName(String name) {
         this.name = name;
     }
-
-    public String toString() {
-        String name = getName();
-        if (name == null) {
-            return getEmail();
-        } else {
-            return name;
-        }
-    }
-
 }

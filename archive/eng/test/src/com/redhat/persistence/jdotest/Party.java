@@ -6,7 +6,7 @@ import java.util.*;
  * Party
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/06/24 $
+ * @version $Revision: #3 $ $Date: 2004/06/25 $
  **/
 
 public class Party {
@@ -26,7 +26,7 @@ public class Party {
     public void setEmail(String email) {
         this.email = email;
     }
-    
+
     public List getAuxiliaryEmails() {
         return new LinkedList();
     }
@@ -37,4 +37,7 @@ public class Party {
         l.addAll(emails);
     }
 
+    public String toString() {
+        return "<party #" + id + ">";
+    }
 }

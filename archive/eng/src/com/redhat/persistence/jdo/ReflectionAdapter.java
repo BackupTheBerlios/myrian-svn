@@ -14,12 +14,12 @@ import java.util.*;
  * ReflectionAdapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/22 $
+ * @version $Revision: #2 $ $Date: 2004/06/25 $
  **/
 
 public class ReflectionAdapter extends Adapter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/ReflectionAdapter.java#1 $ by $Author: vadim $, $DateTime: 2004/06/22 13:25:03 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/ReflectionAdapter.java#2 $ by $Author: ashah $, $DateTime: 2004/06/25 14:54:45 $";
 
     private static final Class[] PERSISTENT = new Class[] { Persistent.class };
 
@@ -97,7 +97,9 @@ public class ReflectionAdapter extends Adapter {
                         m_props.getObjectType().getProperty(propName);
                     if (prop != null) {
                         if (name.startsWith("get")) {
-                            if (prop.isCollection()) {
+                            if (prop.isKeyProperty()) {
+                                return m_props.get(prop);
+                            } else if (prop.isCollection()) {
                                 Class rt = method.getReturnType();
                                 if (rt.equals(List.class)) {
                                     return new CRPList(m_ssn, ths, prop);
