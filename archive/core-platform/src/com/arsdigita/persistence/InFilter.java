@@ -15,6 +15,7 @@
 
 package com.arsdigita.persistence;
 
+import com.arsdigita.db.DbHelper;
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.metadata.MetadataException;
 import com.redhat.persistence.metadata.ObjectMap;
@@ -28,14 +29,14 @@ import org.apache.log4j.Logger;
  * InFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/02/26 $
+ * @version $Revision: #9 $ $Date: 2004/02/26 $
  **/
 
 class InFilter extends FilterImpl implements Filter {
 
     private static Logger s_log = Logger.getLogger(InFilter.class);
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/InFilter.java#8 $ by $Author: vadim $, $DateTime: 2004/02/26 12:36:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/InFilter.java#9 $ by $Author: vadim $, $DateTime: 2004/02/26 12:42:49 $";
 
     private Root m_root;
     private String m_prop;
@@ -88,14 +89,25 @@ class InFilter extends FilterImpl implements Filter {
                 (m_root, block, "no such path: " + subProp);
         }
 
+        final int currentDB = DbHelper.getDatabase();
         final StringBuffer sb = new StringBuffer();
-        sb.append("exisTs ( select RAW[subquery_id] from (select RAW[");
-        sb.append(subcol.getPath());
-        sb.append("] as RAW[subquery_id] from (");
-        sb.append(m_query);
-        sb.append(") RAW[insub1] ) RAW[insub2] where ");
-        sb.append("RAW[insub2.subquery_id] = ");
-        sb.append(m_prop).append(")");
+
+        if (currentDB == DbHelper.DB_POSTGRES) {
+            sb.append("exists ( select RAW[subquery_id] from (select RAW[");
+            sb.append(subcol.getPath());
+            sb.append("] as RAW[subquery_id] from (");
+            sb.append(m_query);
+            sb.append(") RAW[insub1] ) RAW[insub2] where ");
+            sb.append("RAW[insub2.subquery_id] = ");
+            sb.append(m_prop).append(")");
+        } else if (currentDB == DbHelper.DB_ORACLE) {
+            sb.append(m_prop).append(" in (select RAW[");
+            sb.append(subcol.getPath()).append("] from (");
+            sb.append(m_query).append(") RAW[insub])");
+        } else {
+            throw new IllegalStateException
+                ("Unknown database: " + DbHelper.getDatabaseName(currentDB));
+        }
         return sb.toString();
     }
 }
