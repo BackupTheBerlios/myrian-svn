@@ -37,12 +37,12 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/08/27 $
+ * @version $Revision: #4 $ $Date: 2003/10/01 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/DataQueryImpl.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/DataQueryImpl.java#4 $ by $Author: rhs $, $DateTime: 2003/10/01 14:17:42 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 
@@ -492,7 +492,7 @@ class DataQueryImpl implements DataQuery {
     private String unalias(String expr) {
         SQLParser p = new SQLParser
             (new StringReader(expr),
-             new SQLParser.Mapper() {
+             new SQLParser.IdentityMapper() {
                  public Path map(Path path) {
                      return unalias(path);
                  }

@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/09/25 $
+ * @version $Revision: #9 $ $Date: 2003/10/01 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/QGen.java#8 $ by $Author: justin $, $DateTime: 2003/09/25 14:54:00 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/QGen.java#9 $ by $Author: rhs $, $DateTime: 2003/10/01 14:17:42 $";
 
     private static final Logger LOG = Logger.getLogger(QGen.class);
 
@@ -646,7 +646,7 @@ class QGen {
         public void onPassthrough(final Expression.Passthrough e) {
             SQLParser p = new SQLParser
                 (new StringReader(e.getExpression()),
-                 new SQLParser.Mapper() {
+                 new SQLParser.IdentityMapper() {
                      public Path map(Path path) {
                          if (m_root.hasObjectType(path.getPath())) {
                              return path;

@@ -14,25 +14,27 @@ import java.io.*;
  * SQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/09/09 $
+ * @version $Revision: #4 $ $Date: 2003/10/01 $
  */
 
 public class SQLParser {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/common/SQLParser.jj#3 $ by $Author: rhs $, $DateTime: 2003/09/09 17:32:16 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/common/SQLParser.jj#4 $ by $Author: rhs $, $DateTime: 2003/10/01 14:17:42 $";
 
     public static interface Mapper {
         Path map(Path path);
     }
 
+    public static class IdentityMapper implements Mapper {
+        public Path map(Path path) {
+            return path;
+        }
+    }
+
     private SQL m_sql = new SQL();
     private StringBuffer m_image = new StringBuffer();
     private ArrayList m_assigns = new ArrayList();
-    private Mapper m_mapper = new Mapper() {
-            public Path map(Path path) {
-                return path;
-            }
-        };
+    private Mapper m_mapper = new IdentityMapper();
 
     public SQLParser(Reader r, Mapper mapper) {
         this(r);
@@ -79,12 +81,7 @@ public class SQLParser {
 
     private void append(Token t) {
         appendSpecial(t);
-        if (t.kind == RAW) {
-            // XXX: ignore escapes for now
-            m_image.append(t.image.substring(4, t.image.length() - 1));
-        } else {
-            m_image.append(t.image);
-        }
+        m_image.append(t.image);
     }
 
     private void token() {
@@ -286,8 +283,13 @@ void symbol() :
   | t = <AS>
   | t = <MINUS>
   | t = <PRIOR>
-  | t = <RAW> )
-    { append(t); }
+  | t = <RAW> {
+      appendSpecial(t);
+      token();
+      m_image.append(t.image);
+      token(SQLToken.RAW);
+  } )
+     { if (t.kind != RAW) { append(t); } }
 }
 
 void clauseStart() :
