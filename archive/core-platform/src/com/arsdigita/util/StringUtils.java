@@ -182,6 +182,92 @@ public class StringUtils {
         return returned_array;
     }
 
+  /**
+   * <p> Given a string, split it into substrings matching a regular
+   * expression that you supply. Parts of the original string which
+   * don't match the regular expression also appear as substrings. The
+   * upshot of this is that the final substrings can be concatenated
+   * to get the original string.  </p>
+   *
+   * <p> As an example, let's say the original string is: </p>
+   *
+   * <pre>
+   * s = "/packages/foo/xsl/::vhost::/foo_::locale::.xsl";
+   * </pre>
+   *
+   * <p> We call the function like this: </p>
+   *
+   * <pre>
+   * output = splitUp (s, "/::\\w+::/");
+   * </pre>
+   *
+   * <p> The result (<code>output</code>) will be the following list: </p>
+   *
+   * <pre>
+   * ("/packages/foo/xsl/", "::vhost::", "/foo_", "::locale::", ".xsl")
+   * </pre>
+   *
+   * <p> Notice the important property that concatenating all these
+   * strings together will restore the original string. </p>
+   *
+   * <p> Here is another useful example. To split up HTML into elements
+   * and content, do: </p>
+   *
+   * <pre>
+   * output = splitUp (html, "/<.*?>/");
+   * </pre>
+   *
+   * <p> You will end up with something like this: </p>
+   *
+   * <pre>
+   * ("The following text will be ", "<b>", "bold", "</b>", ".")
+   * </pre>
+   *
+   * @param s The original string to split.
+   * @param re The regular expression in the format required by
+   * {@link org.apache.oro.text.perl.Perl5Util#match}.
+   * @return List of substrings.
+   *
+   * @author Richard W.M. Jones
+   *
+   * <p> This is equivalent to the Perl "global match in array context",
+   * specifically: <code>@a = /(RE)|(.+)/g;</code> </p>
+   *
+   */
+  public static List splitUp (String s, String re)
+  {
+    Perl5Util p5 = new Perl5Util ();
+    ArrayList list = new ArrayList ();
+
+    while (s != null && s.length() > 0)
+      {
+	// Find the next match.
+	if (p5.match (re, s))
+	  {
+	    MatchResult result = p5.getMatch ();
+
+	    // String up to the start of the match.
+	    if (result.beginOffset (0) > 0)
+	      list.add (s.substring (0, result.beginOffset (0)));
+
+	    // Matching part.
+	    list.add (result.toString ());
+
+	    // Update s to be the remainder of the string.
+	    s = s.substring (result.endOffset (0));
+	  }
+	else
+	  {
+	    // Finished.
+	    list.add (s);
+
+	    s = null;
+	  }
+      }
+
+    return list;
+  }
+
     /**
      * Converts an array of Strings into a single String separated by
      * a given character.
