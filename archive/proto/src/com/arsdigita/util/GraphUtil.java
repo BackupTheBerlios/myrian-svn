@@ -30,7 +30,7 @@ import java.util.Stack;
  *
  * @author Archit Shah (ashah@mit.edu)
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/02/19 $
+ * @version $Date: 2003/03/07 $
  * @since 2003-01-22
  **/
 public class GraphUtil {
@@ -179,11 +179,11 @@ public class GraphUtil {
     private static void printTreeRecurse(Tree tree, GraphFormatter fmtr,
                                          PrintWriter writer) {
 
-        String root = fmtr.formatNode(tree.getRoot());
+        String root = fmtr.nodeName(tree.getRoot());
         for (Iterator ii=tree.getSubtrees().iterator(); ii.hasNext(); ) {
             Tree.EdgeTreePair pair = (Tree.EdgeTreePair) ii.next();
-            String edge = fmtr.formatEdge(pair.getEdge());
-            String child = fmtr.formatNode(pair.getTree().getRoot());
+            String edge = fmtr.edge(pair.getEdge());
+            String child = fmtr.nodeName(pair.getTree().getRoot());
             writer.print(INDENT + root + " -> " + child);
             if ( edge != null ) {
                 writer.print("[label=\"" + edge + "\"]");
@@ -214,11 +214,21 @@ public class GraphUtil {
             int nodeCount = graph.outgoingEdgeCount(node) +
                 graph.incomingEdgeCount(node);
 
-            if ( nodeCount==0 ) {
-                // this is a disconnected node
-                writer.println(INDENT + fmtr.formatNode(node) + ";");
-                continue;
+            String nodeName = fmtr.nodeName(node);
+            String nodeAttrs = fmtr.nodeAttributes(node);
+
+            if ( nodeCount==0 || nodeAttrs != null ) {
+                writer.print(INDENT + nodeName);
+                if ( nodeCount == 0 ) {
+                    writer.println(";");
+                    continue;
+                } else if ( nodeAttrs != null ) {
+                    writer.println(nodeAttrs + ";");
+                } else {
+                    throw new Error("can't get here");
+                }
             }
+
             if (graph.outgoingEdgeCount(node) == 0) {
                 // we'll print this node when we print the outgoing edges of
                 // some other node
@@ -228,11 +238,11 @@ public class GraphUtil {
             while (edges.hasNext()) {
                 Graph.Edge edge = (Graph.Edge) edges.next();
                 StringBuffer sb = new StringBuffer();
-                sb.append(INDENT).append(fmtr.formatNode(edge.getTail()));
-                sb.append(" -> ").append(fmtr.formatNode(edge.getHead()));
+                sb.append(INDENT).append(fmtr.nodeName(edge.getTail()));
+                sb.append(" -> ").append(fmtr.nodeName(edge.getHead()));
                 if ( edge.getLabel() != null ) {
                     sb.append("[label=\"");
-                    sb.append(fmtr.formatEdge(edge.getLabel()));
+                    sb.append(fmtr.edge(edge.getLabel()));
                     sb.append("\"]");
                 }
                 sb.append(";");
