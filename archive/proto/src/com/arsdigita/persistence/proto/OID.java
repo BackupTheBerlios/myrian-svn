@@ -51,10 +51,10 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/01/02 $ */
+ * @version $Revision: #2 $ $Date: 2003/01/10 $ */
 
 public class OID {
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/OID.java#1 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/OID.java#2 $ by $Author: rhs $, $DateTime: 2003/01/10 13:56:45 $";
 
     private ObjectType m_type;
     private Map m_values = new HashMap();
@@ -476,6 +476,11 @@ public class OID {
      * relying on this equals method (see DomainObject's equals method
      * for an example).  */
     public boolean equals(Object obj) {
+        if (!isInitialized()) {
+            throw new IllegalStateException
+                ("Trying to compare an uninitialized oid");
+        }
+
         if (obj instanceof OID) {
             OID oid = (OID)obj;
 
@@ -521,6 +526,10 @@ public class OID {
      * two equivalent objects must hash to the same value.
      */
     public int hashCode() {
+        if (!isInitialized()) {
+            throw new IllegalStateException
+                ("Trying to hash an uninitialized oid");
+        }
         // here we rely on the values collection's hashcode method
         // to base its hashcode on the hashcodes of the contained values.
         return (m_type.getBasetype().hashCode() + m_values.hashCode());
