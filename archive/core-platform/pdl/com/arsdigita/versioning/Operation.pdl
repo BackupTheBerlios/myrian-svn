@@ -10,13 +10,13 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/versioning/Operation.pdl#10 $ 
-// $DateTime: 2003/06/18 16:02:35 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/versioning/Operation.pdl#11 $ 
+// $DateTime: 2003/06/18 16:19:52 $
 
 model com.arsdigita.versioning;
 
 object type Operation {
-    BigInteger[1..1]     id = vcx_operations.operation_id INTEGER;
+    BigInteger[1..1]     id = vcx_operations.id INTEGER;
 
     EventType[1..1] eventType = join vcx_operations.event_type_id to vcx_event_types.id;
     String[1..1]    attribute = vcx_operations.attribute VARCHAR(200);
@@ -28,6 +28,6 @@ object type Operation {
     JavaClass[1..1] javaclass = join vcx_operations.class_id to vcx_java_classes.id;
 
     composite DataObjectChange[1..1] changeset = join vcx_operations.change_id 
-                                                   to vcx_obj_changes.change_id;
+                                                   to vcx_obj_changes.id;
     object key (id);
 }

@@ -10,18 +10,18 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/versioning/DataObjectChange.pdl#2 $ 
-// $DateTime: 2003/06/18 16:02:35 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/versioning/DataObjectChange.pdl#3 $ 
+// $DateTime: 2003/06/18 16:19:52 $
 
 model com.arsdigita.versioning;
 
 object type DataObjectChange {
-    BigInteger[1..1]  id = vcx_obj_changes.change_id INTEGER;
+    BigInteger[1..1]  id = vcx_obj_changes.id INTEGER;
 
     composite Txn[1..1] txn = join vcx_obj_changes.txn_id 
                               to vcx_txns.id;
 
-    Operation[0..n] operations = join vcx_obj_changes.change_id
+    Operation[0..n] operations = join vcx_obj_changes.id
                                  to vcx_operations.change_id;
 
     String[1..1] oid = vcx_obj_changes.obj_id VARCHAR(400);
