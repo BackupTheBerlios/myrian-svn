@@ -3,6 +3,6 @@
 
 extend lib/*.jar lib/*.zip
 extend `find build -name "*.jmake" | sed s/\\.jmake\$//g`
-extend src test/src
+extend `find build -name "*.jmake" | sed s/\\.jmake\$//g | sed s%^build/%%g`
 
 exec java $*
