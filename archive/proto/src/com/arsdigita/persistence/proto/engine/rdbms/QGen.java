@@ -13,12 +13,12 @@ import java.sql.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/02/17 $
+ * @version $Revision: #8 $ $Date: 2003/02/18 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#7 $ by $Author: rhs $, $DateTime: 2003/02/17 20:13:29 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#8 $ by $Author: rhs $, $DateTime: 2003/02/18 20:24:39 $";
 
     private Query m_query;
     private HashMap m_columns = new HashMap();
@@ -224,7 +224,8 @@ class QGen {
                         Column to = rm.getJoin(0).getTo();
                         addJoin(path, to);
                         setColumn(path, Path.get
-                                  (path.getParent() + "__" + to));
+                                  (path.getParent() + "__" +
+                                   getKey(to.getTable())));
                     } else if (rm.isJoinThrough()) {
                         addJoin(path, rm.getJoin(0).getTo());
                         setColumn
