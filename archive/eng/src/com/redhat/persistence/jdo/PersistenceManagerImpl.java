@@ -198,7 +198,7 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
     }
 
     public void deletePersistentAll(Collection pcs) {
-        deletePersistent(pcs.toArray());
+        deletePersistentAll(pcs.toArray());
     }
 
     public void deletePersistentAll(Object[] pcs) {
