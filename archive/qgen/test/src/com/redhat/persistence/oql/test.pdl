@@ -216,3 +216,9 @@ association {
     unique Pair1[0..1] p1 = join p2.p1_id to p1.id;
     Pair2[0..1] p2 = join p1.id to p2.p1_id;
 }
+
+query IdsLessThanThree {
+    do {
+        id < 3
+    }
+}

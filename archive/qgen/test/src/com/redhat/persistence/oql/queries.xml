@@ -1072,4 +1072,15 @@
     </query>
     <results></results>
   </test>
+
+  <test name="NamedFilter">
+    <query fetched="id">
+      query(filter(all(test.A), sql { test.IdsLessThanThree }), id = id)
+    </query>
+    <results>
+      <row id="0"/>
+      <row id="1"/>
+      <row id="2"/>
+    </results>
+  </test>
 </tests>
