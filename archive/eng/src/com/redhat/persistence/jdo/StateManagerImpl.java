@@ -3,8 +3,10 @@ package com.redhat.persistence.jdo;
 import com.redhat.persistence.*;
 import com.redhat.persistence.metadata.*;
 import java.util.*;
-import javax.jdo.*;
-import javax.jdo.spi.*;
+import javax.jdo.PersistenceManager;
+import javax.jdo.spi.JDOImplHelper;
+import javax.jdo.spi.PersistenceCapable;
+import javax.jdo.spi.StateManager;
 
 import org.apache.log4j.Logger;
 
@@ -90,9 +92,15 @@ class StateManagerImpl implements StateManager {
      */
     public Object getObjectField(PersistenceCapable pc, int field,
                                  Object currentValue) {
-        Object result = ssn().get(pc, prop(pc, field));
-        s_log.debug("getObjectField: " + (result == null ? "null" : result.getClass().getName()));
-        return result;
+
+        Class klass =
+            JDOImplHelper.getInstance().getFieldTypes(pc.getClass())[field];
+
+        if (klass.equals(Collection.class)) {
+            return new CRPSet(ssn(), pc, prop(pc, field));
+        } else {
+            return ssn().get(pc, prop(pc, field));
+        }
     }
 
     public boolean getBooleanField(PersistenceCapable pc, int field,
