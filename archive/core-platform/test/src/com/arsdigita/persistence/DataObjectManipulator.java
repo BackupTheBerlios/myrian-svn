@@ -14,6 +14,7 @@
  */
 
 package com.arsdigita.persistence;
+import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.metadata.*;
 import com.arsdigita.util.StringUtils;
 import com.arsdigita.util.CheckedWrapperException;
@@ -30,11 +31,11 @@ import org.apache.log4j.*;
  * DataObjectManipulator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #5 $ $Date: 2002/08/16 $
+ * @version $Revision: #6 $ $Date: 2002/10/07 $
  */
 public class DataObjectManipulator {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataObjectManipulator.java#5 $ by $Author: jorris $, $DateTime: 2002/08/16 18:36:44 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataObjectManipulator.java#6 $ by $Author: rhs $, $DateTime: 2002/10/07 19:00:30 $";
     private static final Logger s_log =
         Logger.getLogger(DataObjectManipulator.class.getName());
     static  {
@@ -289,7 +290,11 @@ public class DataObjectManipulator {
                 savedNullInRequiredField = ( p.isRequired() && valueIsNull );
             } catch (Exception t) {
                 if( p.isRequired() && valueIsNull ) {
-                    return;
+                    if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+                        throw new AbortMetaTestException();
+                    } else {
+                        return;
+                    }
                 }
                 if( p.isNullable() && valueIsNull ) {
                     String msg = "Failed to save DataObject: " +  data.getObjectType().getName();
@@ -303,7 +308,11 @@ public class DataObjectManipulator {
                     s_log.debug("Failed to set property " + p.getName());
                     s_log.debug("Checking error");
                     checkSetError(t, p, data, value);
-                    return;
+                    if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+                        throw new AbortMetaTestException();
+                    } else {
+                        return;
+                    }
                 }
             }
 
@@ -484,7 +493,7 @@ public class DataObjectManipulator {
                     m_variants.add(new Float(0));
                     m_variants.add(new Float(300.92199f));
                     m_variants.add(new Float(16.60f));
-                    m_variants.add(new Float("9.99E125"));
+                    m_variants.add(new Float("9.99E10"));
 
 
                 }
@@ -712,3 +721,5 @@ public class DataObjectManipulator {
     private Map m_manipulators = new HashMap();
     private Session m_session;
 }
+
+class AbortMetaTestException extends RuntimeException {}

@@ -25,7 +25,7 @@ object type Datatype {
     Double           double = t_datatypes.j_double FLOAT;
     Float            float = t_datatypes.j_float FLOAT;
     Integer          integer = t_datatypes.j_integer INTEGER;
-    Long             long = t_datatypes.j_long INTEGER;
+    Long             long = t_datatypes.j_long BIGINT;
     Short            short = t_datatypes.j_short INTEGER;
     String           string = t_datatypes.j_string VARCHAR(4000);
     // XXX: Should be byte[], but that isn't supported yet.

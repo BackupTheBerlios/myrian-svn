@@ -30,12 +30,12 @@ import java.sql.PreparedStatement;
  * Class for processing of Postgres DB Exceptions.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #5 $
+ * @version $Revision: #6 $
  * @since 4.6
  */
 public class PostgresDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresDbExceptionHandlerImpl.java#5 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresDbExceptionHandlerImpl.java#6 $";
 
     static {
         errors.put("Cannot insert a duplicate key into unique index",
@@ -47,9 +47,20 @@ public class PostgresDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
                    com.arsdigita.db.DbNotAvailableException.class);
         errors.put("Something unusual has occured to cause the driver to fail.",
                    com.arsdigita.db.DbNotAvailableException.class);
-        errors.put("No suitable driver", com.arsdigita.db.DbNotAvailableException.class);
+        errors.put("No suitable driver",
+                   com.arsdigita.db.DbNotAvailableException.class);
 
-        errors.put("The user property is missing", com.arsdigita.db.DbNotAvailableException.class);
+        errors.put("The user property is missing",
+                   com.arsdigita.db.DbNotAvailableException.class);
+
+        // These errors are here so that the PersistenceExceptionTest passes
+        // on both oracle and postgres. They can also theoretically occur in
+        // postgres mode if you forget to switch your jdbc URL from the oracle
+        // version.
+        errors.put("Invalid Oracle URL specified",
+                   com.arsdigita.db.DbNotAvailableException.class);
+        errors.put("ORA-12154",
+                   com.arsdigita.db.DbNotAvailableException.class);
 
     }
 

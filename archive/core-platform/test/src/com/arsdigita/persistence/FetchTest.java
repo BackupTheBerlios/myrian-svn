@@ -10,6 +10,8 @@ package com.arsdigita.persistence;
 
 import org.apache.log4j.Logger;
 
+import com.arsdigita.db.DbHelper;
+
 import java.util.Date;
 import java.math.BigDecimal;
 
@@ -68,8 +70,15 @@ public class FetchTest extends PersistenceTestCase {
         order = getSession().retrieve(oid);
         s_log.warn("Retrieved order");
         // When using postgres, a persistence exception will be thrown.
-        s_log.warn("About to retrieve seller for second time.");
-        String afterFailedSeller = (String) order.get("seller");
-        assertEquals("Sellers differ!", originalSeller, afterFailedSeller);
+        try {
+            s_log.warn("About to retrieve seller for second time.");
+            String afterFailedSeller = (String) order.get("seller");
+            assertEquals("Sellers differ!", originalSeller,
+                         afterFailedSeller);
+        } catch (PersistenceException e) {
+            if (DbHelper.getDatabase() != DbHelper.DB_POSTGRES) {
+                throw e;
+            }
+        }
     }
 }

@@ -226,7 +226,13 @@ object type LineItem {
 }
 
 query OrdersMaxPrices {
-
+    BigDecimal orderId;
+    String buyer;
+    String seller;
+    String shippingAddress;
+    Date shippingDate;
+    Boolean hasShipped;
+    BigDecimal maxPrice;
 
     do {
         select t_orders.order_id,
