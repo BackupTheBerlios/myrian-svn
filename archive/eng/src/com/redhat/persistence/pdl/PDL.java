@@ -28,12 +28,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/08/19 $
+ * @version $Revision: #7 $ $Date: 2004/08/20 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#6 $ by $Author: rhs $, $DateTime: 2004/08/19 15:03:09 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#7 $ by $Author: rhs $, $DateTime: 2004/08/20 15:04:48 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -947,7 +947,7 @@ public class PDL {
                 } else {
                     emitMapping(om, prop, (QualiasNd) mapping);
                 }
-                if (!m_root.hasObjectMap(prop.getType())) {
+                if (!prop.getType().isIndependent()) {
                     Mapping m = om.getMapping(prop);
                     if (m != null) {
                         NestedMapNd nm = getNestedMap(nd);
