@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/02/21 $
+ * @version $Revision: #6 $ $Date: 2004/02/22 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#5 $ by $Author: rhs $, $DateTime: 2004/02/21 13:11:19 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#6 $ by $Author: rhs $, $DateTime: 2004/02/22 23:33:33 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -60,7 +60,7 @@ public class Query {
             gen.pop();
         }
 
-        s_log.info("unoptimized frame: " + qframe);
+        s_log.info("unoptimized frame:\n" + qframe);
 
         boolean modified;
         do {
@@ -71,14 +71,14 @@ public class Query {
             }
         } while (modified);
 
-        s_log.info("hoisted frame: " + qframe);
+        s_log.info("hoisted frame:\n" + qframe);
 
         for (Iterator it = gen.getFrames().iterator(); it.hasNext(); ) {
             QFrame qf = (QFrame) it.next();
             qf.shrink();
         }
 
-        s_log.info("shrunk frame: " + qframe);
+        s_log.info("shrunk frame:\n" + qframe);
 
         StringBuffer sql = new StringBuffer();
         sql.append("select ");
