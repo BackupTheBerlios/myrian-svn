@@ -17,6 +17,7 @@ package com.arsdigita.util;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
+import com.arsdigita.dispatcher.DispatcherHelper;
 import java.util.Map;
 import java.util.Iterator;
 import java.util.Set;
@@ -33,8 +34,10 @@ import org.apache.log4j.Logger;
  * ID parameter.
  */
 public class URLRewriter {
-
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/URLRewriter.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = 
+        "$Id: //core-platform/dev/src/com/arsdigita/util/URLRewriter.java#5 $" +
+        "$Author: justin $" +
+        "$DateTime: 2002/08/27 15:44:44 $";
 
     private static final Logger s_log =
         Logger.getLogger(URLRewriter.class);
@@ -73,7 +76,7 @@ public class URLRewriter {
 
         Set rs = new HashSet();
         for (Iterator i = s_providers.iterator(); i.hasNext();) {
-            rs.addAll(((ParameterProvider)i.next()).getModels());
+            rs.addAll(((ParameterProvider) i.next()).getModels());
         }
         return rs;
     }
@@ -107,9 +110,21 @@ public class URLRewriter {
     public static String encodeRedirectURL(HttpServletRequest req,
                                            HttpServletResponse resp,
                                            String url) {
-        s_log.debug("encodeRedirectURL: before: "+url);
-        url = resp.encodeRedirectURL(encodeParams(req, url));
-        s_log.debug("encodeRedirectURL:  after: "+url);
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("encodeRedirectURL: before: " + url);
+        }
+
+        if (url.startsWith("/")) {
+            String prefix = DispatcherHelper.getDispatcherServletPath();
+            url = prefix + resp.encodeRedirectURL(encodeParams(req, url));
+        } else {
+            url = resp.encodeRedirectURL(encodeParams(req, url));
+        }
+
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("encodeRedirectURL:  after: " + url);
+        }
+
         return url;
     }
 
@@ -136,9 +151,21 @@ public class URLRewriter {
     public static String encodeURL(HttpServletRequest req,
                                    HttpServletResponse resp,
                                    String url) {
-        s_log.debug("encodeURL: before: "+url);
-        url = resp.encodeURL(encodeParams(req, url));
-        s_log.debug("encodeURL:  after: "+url);
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("encodeURL: before: " + url);
+        }
+
+        if (url.startsWith("/")) {
+            String prefix = DispatcherHelper.getDispatcherServletPath();
+            url = prefix + resp.encodeURL(encodeParams(req, url));
+        } else {
+            url = resp.encodeURL(encodeParams(req, url));
+        }
+
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("encodeURL:  after: " + url);
+        }
+
         return url;
     }
 
