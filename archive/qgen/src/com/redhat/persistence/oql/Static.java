@@ -13,12 +13,12 @@ import java.util.*;
  * Static
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2004/03/20 $
+ * @version $Revision: #13 $ $Date: 2004/03/21 $
  **/
 
 public class Static extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#12 $ by $Author: rhs $, $DateTime: 2004/03/20 20:50:09 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#13 $ by $Author: rhs $, $DateTime: 2004/03/21 00:40:57 $";
 
     private SQL m_sql;
     private String[] m_columns;
@@ -170,6 +170,7 @@ public class Static extends Expression {
                 QFrame frame = gen.frame(this, child.getType());
                 frame.addChild(child);
                 frame.setValues(child.getValues());
+                frame.setMappings(child.getMappings());
             }
         }
     }
@@ -236,6 +237,7 @@ public class Static extends Expression {
                 QFrame frame = gen.frame(this, child.getType());
                 frame.addChild(child);
                 frame.setValues(child.getValues());
+                frame.setMappings(child.getMappings());
             }
         }
 

@@ -1,5 +1,6 @@
 package com.redhat.persistence.oql;
 
+import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
 import java.util.*;
 
@@ -9,12 +10,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #22 $ $Date: 2004/03/20 $
+ * @version $Revision: #23 $ $Date: 2004/03/21 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#22 $ by $Author: rhs $, $DateTime: 2004/03/20 20:50:09 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#23 $ by $Author: rhs $, $DateTime: 2004/03/21 00:40:57 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -27,6 +28,7 @@ class QFrame {
 
     private boolean m_outer = false;
     private List m_values = null;
+    private Map m_mappings = null;
     private String m_table = null;
     private Expression m_tableExpr = null;
     private Map m_columns = null;
@@ -119,6 +121,39 @@ class QFrame {
         } else {
             return m_columns.containsKey(column);
         }
+    }
+
+    boolean hasMappings() {
+        return m_mappings != null;
+    }
+
+    boolean hasMapping(Path p) {
+        return hasMappings() && m_mappings.containsKey(p);
+    }
+
+    String getMapping(Path p) {
+        return (String) m_mappings.get(p);
+    }
+
+    void addMapping(Path p, String c) {
+        if (m_mappings == null) { m_mappings = new HashMap(); }
+        m_mappings.put(p, c);
+    }
+
+    void addMappings(Map mappings) {
+        if (mappings == null) { return; }
+        for (Iterator it = mappings.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry me = (Map.Entry) it.next();
+            addMapping((Path) me.getKey(), (String) me.getValue());
+        }
+    }
+
+    void setMappings(Map mappings) {
+        m_mappings = mappings;
+    }
+
+    Map getMappings() {
+        return m_mappings;
     }
 
     void setTable(String table) {

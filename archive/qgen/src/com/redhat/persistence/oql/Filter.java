@@ -7,12 +7,12 @@ import java.util.*;
  * Filter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2004/03/20 $
+ * @version $Revision: #14 $ $Date: 2004/03/21 $
  **/
 
 public class Filter extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Filter.java#13 $ by $Author: rhs $, $DateTime: 2004/03/20 20:50:09 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Filter.java#14 $ by $Author: rhs $, $DateTime: 2004/03/21 00:40:57 $";
 
     private Expression m_expr;
     private Expression m_condition;
@@ -28,6 +28,7 @@ public class Filter extends Expression {
         QFrame frame = gen.frame(this, expr.getType());
         frame.addChild(expr);
         frame.setValues(expr.getValues());
+        frame.setMappings(expr.getMappings());
         gen.addUses(this, gen.getUses(m_expr));
         gen.addBoolean(m_condition);
         gen.push(frame);

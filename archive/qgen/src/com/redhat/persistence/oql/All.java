@@ -8,12 +8,12 @@ import java.util.*;
  * All
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2004/03/20 $
+ * @version $Revision: #12 $ $Date: 2004/03/21 $
  **/
 
 public class All extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/All.java#11 $ by $Author: rhs $, $DateTime: 2004/03/20 20:50:09 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/All.java#12 $ by $Author: rhs $, $DateTime: 2004/03/21 00:40:57 $";
 
     private String m_type;
     private Map m_bindings;
@@ -59,6 +59,10 @@ public class All extends Expression {
             QFrame child = gen.getFrame(all);
             frame.addChild(child);
             frame.setValues(child.getValues());
+            for (Iterator it = block.getPaths().iterator(); it.hasNext(); ) {
+                Path p = (Path) it.next();
+                frame.addMapping(p, block.getMapping(p).getPath());
+            }
         }
     }
 

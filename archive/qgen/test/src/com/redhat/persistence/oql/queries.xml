@@ -43,7 +43,7 @@
     <query subselects="0" joins="1" outers="1">
       query(all(test.Tuple).cee, id = id, name = name)
     </query>
-    <query subselects="2" joins="1" outers="1">
+    <query subselects="1" joins="1" outers="1">
       query(all(test.StaticTuple).cee, id = id, name = name)
     </query>
     <results>

@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #20 $ $Date: 2004/03/18 $
+ * @version $Revision: #21 $ $Date: 2004/03/21 $
  **/
 
 public class Code {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#20 $ by $Author: rhs $, $DateTime: 2004/03/18 17:18:33 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#21 $ by $Author: rhs $, $DateTime: 2004/03/21 00:40:57 $";
 
     private static final Logger s_log = Logger.getLogger(Code.class);
 
@@ -258,6 +258,36 @@ public class Code {
         });
 
         return result[0];
+    }
+
+    static String[] columns(Property prop, QFrame frame) {
+        List result = new ArrayList();
+        if (columns(prop, frame, null, result)) {
+            return (String[]) result.toArray(new String[result.size()]);
+        } else {
+            return null;
+        }
+    }
+
+    private static boolean columns(Property prop, QFrame frame, Path prefix,
+                                   List result) {
+        prefix = Path.add(prefix, prop.getName());
+        Collection props = properties(prop.getType());
+        if (props.isEmpty()) {
+            if (frame.hasMapping(prefix)) {
+                result.add(frame.getMapping(prefix));
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        for (Iterator it = props.iterator(); it.hasNext(); ) {
+            Property p = (Property) it.next();
+            if (!columns(p, frame, prefix, result)) { return false; }
+        }
+
+        return true;
     }
 
     static void equals(String[] left, String[] right, StringBuffer buf) {
