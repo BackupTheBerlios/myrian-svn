@@ -14,5 +14,12 @@ public class JDOStateTest extends AbstractCase {
         assertTrue("transient", !state.isPersistent());
         state.makePersistent();
         assertTrue("persistent", state.isPersistent());
+
+        try {
+            state.makeNontransactional();
+            fail("Should have thrown a JDOUserException");
+        } catch (JDOUserException ex) {
+            ; // expected
+        }
     }
 }

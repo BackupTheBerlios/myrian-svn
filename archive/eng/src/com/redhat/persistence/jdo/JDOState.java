@@ -3,6 +3,7 @@ package com.redhat.persistence.jdo;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import javax.jdo.JDOUserException;
 
 final class JDOState {
     private final static String COL_SEP = "|";
@@ -231,20 +232,19 @@ final class JDOState {
             // XXX: see p. 49.  Deal with the case when the instance is an
             // implicit parameter, in which case no exception must be thrown
 
-            // XXX: this should be a JDOUserException
-            throw new IllegalStateException
+            throw new JDOUserException
                 ("Inapplicable state transition: " +
                  transition(action, m_state));
         }
 
         if (nextState == S_IMPOSSIBLE) {
-            throw new IllegalStateException
+            throw new JDOUserException
                 ("Implementation error. Impossible state transition: " +
                  transition(action, m_state));
         }
 
         if (nextState == S_ERROR) {
-            throw new IllegalStateException
+            throw new JDOUserException
                 ("Application error.  Illegal state transition: " +
                  transition(action, m_state));
         }
