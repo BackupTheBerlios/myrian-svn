@@ -1,7 +1,9 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.*;
+import com.arsdigita.persistence.proto.common.ParseException;
 import com.arsdigita.persistence.proto.common.Path;
+import com.arsdigita.persistence.proto.common.SQLParser;
 import com.arsdigita.persistence.proto.engine.rdbms.UnboundParameterException;
 import com.arsdigita.persistence.proto.PersistentCollection;
 import com.arsdigita.persistence.proto.DataSet;
@@ -11,23 +13,26 @@ import com.arsdigita.persistence.proto.Query;
 import com.arsdigita.persistence.proto.Signature;
 import com.arsdigita.persistence.proto.Parameter;
 import com.arsdigita.persistence.proto.PassthroughFilter;
-
+import com.arsdigita.util.Assert;
 import com.arsdigita.util.StringUtils;
-
+import java.io.StringReader;
 import java.util.*;
+import org.apache.log4j.Logger;
 
 /**
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #19 $ $Date: 2003/04/09 $
+ * @version $Revision: #20 $ $Date: 2003/04/30 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#19 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#20 $ by $Author: ashah $, $DateTime: 2003/04/30 08:32:13 $";
 
-    private static final FilterFactory FACTORY = new FilterFactoryImpl();
+    private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
+
+    private static final FilterFactory s_factory = new FilterFactoryImpl();
 
     private Session m_ssn;
     private com.arsdigita.persistence.proto.Session m_pssn;
@@ -40,6 +45,8 @@ class DataQueryImpl implements DataQuery {
     // This indicates the limits on the number of rows returned by the query
     private int m_lowerBound = 0;
     private int m_upperBound = Integer.MAX_VALUE;
+
+    private final List m_aliases = new ArrayList();
 
     DataQueryImpl(Session ssn, PersistentCollection pc) {
 	this(ssn, pc.getDataSet().getQuery());
@@ -65,7 +72,7 @@ class DataQueryImpl implements DataQuery {
     }
 
     public boolean hasProperty(String propertyName) {
-        throw new Error("not implemented");
+        return propertyExists(unalias(Path.get(propertyName)));
     }
 
     public void reset() {
@@ -200,7 +207,7 @@ class DataQueryImpl implements DataQuery {
     }
 
     public FilterFactory getFilterFactory() {
-        return FACTORY;
+        return s_factory;
     }
 
 
@@ -219,6 +226,7 @@ class DataQueryImpl implements DataQuery {
                 ("Cannot order an active data query. " +
                  "Data query must be rewound.");
         }
+
         String[] orders = StringUtils.split(order, ',');
         for (int i = 0; i < orders.length; i++) {
             String[] parts = StringUtils.split(orders[i].trim(), ' ');
@@ -228,11 +236,12 @@ class DataQueryImpl implements DataQuery {
             } else if (parts.length == 2) {
                 isAscending = parts[1].trim().startsWith("asc");
             } else {
-                throw new IllegalArgumentException
-                    ("bad order: " + order);
+                throw new IllegalArgumentException("bad order: " + order);
             }
 
 	    Path p = Path.get(parts[0]);
+
+            p = unalias(p);
 
 	    if (def == null) {
 		m_query.addOrder(p, isAscending);
@@ -273,15 +282,14 @@ class DataQueryImpl implements DataQuery {
 	    m_bindings.put(p2.getPath(), orderTwo);
 	}
 
-	addOrder(p1.getPath() + (isAscending ? " asc" : " desc"),
-		 p2.getPath());
+	addOrder
+            (p1.getPath() + (isAscending ? " asc" : " desc"), p2.getPath());
     }
-
 
     public void clearOrder() {
-        throw new Error("not implemented");
+        m_query.clearOrder();
+        m_order = 0;
     }
-
 
     private void setParameter(Query query, String parameterName,
 			      Object value) {
@@ -368,7 +376,7 @@ class DataQueryImpl implements DataQuery {
     }
 
     public void alias(String fromPrefix, String toPrefix) {
-        throw new Error("not implemented");
+        m_aliases.add(new Alias(fromPrefix, toPrefix));
     }
 
     public void close() {
@@ -385,8 +393,9 @@ class DataQueryImpl implements DataQuery {
 
 
     public Object get(String propertyName) {
+        Path path = unalias(Path.get(propertyName));
 	try {
-	    return m_cursor.get(propertyName);
+	    return m_cursor.get(path);
 	} catch (CursorException e) {
 	    throw new PersistenceException(e);
 	}
@@ -404,6 +413,7 @@ class DataQueryImpl implements DataQuery {
         if (conditions == null || conditions.equals("")) {
 	    q = new Query(m_query, null);
 	} else {
+            conditions = unaliasFilter(conditions);
 	    q = new Query(m_query, new PassthroughFilter(conditions));
 	}
 
@@ -412,12 +422,18 @@ class DataQueryImpl implements DataQuery {
 	     it.hasNext(); ) {
 	    Map.Entry me = (Map.Entry) it.next();
 	    String key = (String) me.getKey();
+            if (key.charAt(0) == ':') {
+                key = unalias(Path.get(key)).toString();
+            }
 	    setParameter(key, me.getValue());
 	}
 
 	for (Iterator it = m_bindings.entrySet().iterator(); it.hasNext(); ) {
 	    Map.Entry me = (Map.Entry) it.next();
 	    String key = (String) me.getKey();
+            if (key.charAt(0) == ':') {
+                key = unalias(Path.get(key)).toString();
+            }
 	    setParameter(q, key, me.getValue());
 	}
 
@@ -476,6 +492,117 @@ class DataQueryImpl implements DataQuery {
 	} catch (UnboundParameterException e) {
 	    throw new PersistenceException(e);
 	}
+    }
+
+    private final boolean propertyExists(Path path) {
+        return m_query.getSignature().hasPath(path);
+    }
+
+    private String unaliasFilter(String filter) {
+        SQLParser p = new SQLParser
+            (new StringReader(filter),
+             new SQLParser.Mapper() {
+                 public Path map(Path path) {
+                     return unalias(path);
+                 }
+             });
+
+        try {
+            p.sql();
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+
+        return p.getSQL().toString();
+    }
+
+    private Path unalias(Path path) {
+	if (s_log.isDebugEnabled()) {
+	    s_log.debug("External Path: " + path);
+	    s_log.debug("Aliases: " + m_aliases.toString());
+	}
+
+        Path result = path;
+
+        for (Iterator it = m_aliases.iterator(); it.hasNext(); ) {
+            Alias alias = (Alias) it.next();
+            if (alias.isMatch(path)) {
+		if (s_log.isDebugEnabled()) {
+		    s_log.debug("matched " + alias);
+		}
+                Path candidate = alias.unalias(path);
+                if (propertyExists(candidate)) {
+                    result = candidate;
+                    break;
+                }
+
+                if (s_log.isDebugEnabled()) {
+                    s_log.debug("Candidate " + candidate + " doesn't exist.");
+                }
+            } else {
+		if (s_log.isDebugEnabled()) {
+		    s_log.debug("didn't match " + alias);
+		}
+            }
+        }
+
+	if (s_log.isDebugEnabled()) {
+	    s_log.debug("Internal Path: " + result);
+	}
+
+        return result;
+    }
+
+    private static class Alias {
+
+        private Path m_from;
+        private Path m_to;
+
+        public Alias(String from, String to) {
+            Assert.assertNotEmpty(from, "from");
+            Assert.assertNotEmpty(to, "to");
+
+            m_from = Path.get(from);
+            m_to = Path.get(to);
+        }
+
+        private static final boolean isWildcard(Path path) {
+            return path.getParent() == null && path.getName().equals("*");
+        }
+
+        public boolean isMatch(Path path) {
+            if (isWildcard(m_from)) { return true; }
+            if (m_from.getParent() == null) { return m_from.equals(path); }
+            while (path.getParent() != null) {
+                path = path.getParent();
+            }
+            return m_from.getParent().equals(path);
+        }
+
+        public Path unalias(Path path) {
+            if (isWildcard(m_from) && isWildcard(m_to)) {
+                return path;
+            } else if (isWildcard(m_from) && !isWildcard(m_to)) {
+                if (m_to.getParent() != null) {
+                    return Path.add(m_to.getParent(), path);
+                } else {
+                    throw new IllegalStateException(this + " " + path);
+                }
+            } else if (!isWildcard(m_from) && isWildcard(m_to)) {
+                return path.getRelative(m_from);
+            } else {
+                try {
+                    return Path.add(m_to, path.getRelative(m_from));
+                } catch (RuntimeException e) {
+                    throw new PersistenceException(this + " " + path, e);
+                }
+            }
+        }
+
+        public String toString() {
+            return m_from + " --> " + m_to;
+        }
+
     }
 
 }
