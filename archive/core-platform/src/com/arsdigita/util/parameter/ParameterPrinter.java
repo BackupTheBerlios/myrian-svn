@@ -17,7 +17,9 @@ package com.arsdigita.util.parameter;
 
 import com.arsdigita.templating.XSLTemplate;
 import com.arsdigita.util.Classes;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -31,22 +33,52 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import org.apache.log4j.Logger;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#8 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#9 $
  */
 final class ParameterPrinter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#8 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#9 $" +
         "$Author: scott $" +
-        "$DateTime: 2003/11/12 21:42:24 $";
+        "$DateTime: 2003/11/13 17:42:03 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterPrinter.class);
 
     private static final ArrayList s_records = new ArrayList();
+
+    private static final Options OPTIONS = new Options();
+
+    static {
+        OPTIONS.addOption
+            (OptionBuilder
+             .hasArg(false)
+             .withLongOpt("usage")
+             .withDescription("Print this message")
+             .create());
+        OPTIONS.addOption
+            (OptionBuilder
+             .hasArg(false)
+             .withLongOpt("html")
+             .withDescription("Generate HTML")
+             .create());
+        OPTIONS.addOption
+            (OptionBuilder
+             .hasArg()
+             .withLongOpt("file")
+             .withArgName("FILE")
+             .withDescription("Use list of additional Config classes from FILE")
+             .create());
+    }
 
     private static void writeXML(final PrintWriter out) {
         out.write("<?xml version=\"1.0\"?>");
@@ -116,24 +148,56 @@ final class ParameterPrinter {
     }
 
     public static final void main(final String[] args) throws IOException {
-        register("com.arsdigita.runtime.RuntimeConfig");
-        register("com.arsdigita.web.WebConfig");
-        register("com.arsdigita.templating.TemplatingConfig");
-        register("com.arsdigita.kernel.KernelConfig");
-        register("com.arsdigita.kernel.security.SecurityConfig");
-        register("com.arsdigita.mail.MailConfig");
-        register("com.arsdigita.versioning.VersioningConfig");
-        register("com.arsdigita.search.SearchConfig");
-        register("com.arsdigita.search.lucene.LuceneConfig");
-        register("com.arsdigita.kernel.security.SecurityConfig");
-        register("com.arsdigita.bebop.BebopConfig");
-        register("com.arsdigita.dispatcher.DispatcherConfig");
-        register("com.arsdigita.workflow.simple.WorkflowConfig");
-        register("com.arsdigita.cms.ContentSectionConfig");
 
-        if (args.length == 0) {
-            System.out.println("Usage: ParameterPrinter [--html] output-file");
-        } else if (args[0].equals("--html") && args.length == 2) {
+        CommandLine line = null;;
+        try {
+            line = new PosixParser().parse(OPTIONS, args);
+        } catch (ParseException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+        }
+
+        String[] outFile = line.getArgs();
+        if (outFile.length != 1) {
+            System.out.println("Usage: ParameterPrinter [--html] [--file config-list-file] output-file");
+            System.exit(1);
+        }
+        if (line.hasOption("usage")) {
+            System.out.println("Usage: ParameterPrinter [--html] [--file config-list-file] output-file");
+            System.exit(0);
+        }
+
+        if (line.hasOption("file")) {
+            String file = line.getOptionValue("file");
+            try {
+                BufferedReader reader =  new BufferedReader(new FileReader(file));
+                String configClass;
+                while ((configClass = reader.readLine()) != null) {
+                    register(configClass);
+                }
+            } catch (IOException e) {
+                System.err.println(e.getMessage());
+                System.exit(1);
+            }
+        } else {
+            register("com.arsdigita.runtime.RuntimeConfig");
+            register("com.arsdigita.web.WebConfig");
+            register("com.arsdigita.templating.TemplatingConfig");
+            register("com.arsdigita.kernel.KernelConfig");
+            register("com.arsdigita.kernel.security.SecurityConfig");
+            register("com.arsdigita.mail.MailConfig");
+            register("com.arsdigita.versioning.VersioningConfig");
+            register("com.arsdigita.search.SearchConfig");
+            register("com.arsdigita.search.lucene.LuceneConfig");
+            register("com.arsdigita.kernel.security.SecurityConfig");
+            register("com.arsdigita.bebop.BebopConfig");
+            register("com.arsdigita.dispatcher.DispatcherConfig");
+            register("com.arsdigita.workflow.simple.WorkflowConfig");
+            register("com.arsdigita.cms.ContentSectionConfig");
+        }
+
+
+        if (line.hasOption("html")) {
             final StringWriter sout = new StringWriter();
             final PrintWriter out = new PrintWriter(sout);
 
@@ -145,16 +209,14 @@ final class ParameterPrinter {
 
             final Source source = new StreamSource
                 (new StringReader(sout.toString()));
-            final Result result = new StreamResult(new File(args[1]));
+            final Result result = new StreamResult(new File(outFile[0]));
 
             template.transform(source, result);
-        } else if (args.length == 1 && !args[0].startsWith("--")) {
+        } else {
             final PrintWriter out = new PrintWriter
-                (new FileWriter(args[0]));
+                (new FileWriter(outFile[0]));
 
             writeXML(out);
-        } else {
-            System.out.println("Usage: ParameterPrinter [--html] output-file");
         }
     }
 }
