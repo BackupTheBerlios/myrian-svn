@@ -10,12 +10,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #29 $ $Date: 2004/03/24 $
+ * @version $Revision: #30 $ $Date: 2004/03/24 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#29 $ by $Author: rhs $, $DateTime: 2004/03/24 16:36:49 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#30 $ by $Author: rhs $, $DateTime: 2004/03/24 17:03:10 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -273,12 +273,13 @@ class QFrame {
     }
 
     private List m_orders = new ArrayList();
+    private List m_where = new ArrayList();
 
     Code emit(boolean select, boolean range) {
-        List where = new ArrayList();
+        m_where.clear();
         Code join = null;
         if (!m_hoisted) {
-            join = render(where);
+            join = render(m_where);
             if (join != null && join.isEmpty()) { join = null; }
         }
 
@@ -309,13 +310,13 @@ class QFrame {
             result = result.add(join);
         }
 
-        for (int i = 0; i < where.size(); i++) {
+        for (int i = 0; i < m_where.size(); i++) {
             if (i == 0) {
                 result = result.add("\nwhere ");
             } else {
                 result = result.add(" and ");
             }
-            result = result.add((Code) where.get(i));
+            result = result.add((Code) m_where.get(i));
         }
 
         m_orders.clear();
@@ -430,9 +431,12 @@ class QFrame {
         return buf.toString();
     }
 
+    private Set m_emitted = new HashSet();
+
     private Code render(List where) {
         LinkedList joins = new LinkedList();
-        render(joins, where, this, this, new HashSet());
+        m_emitted.clear();
+        render(joins, where, this, this, m_emitted);
         Code code = null;
         for (Iterator it = joins.iterator(); it.hasNext(); ) {
             JFrame frame = (JFrame) it.next();
@@ -593,10 +597,9 @@ class QFrame {
     boolean isSelect() {
         if (m_hoisted) {
             return false;
-        } else if (render(new ArrayList()) == null) {
-            return false;
         } else {
-            return true;
+            m_where.clear();
+            return render(m_where) != null;
         }
     }
 
