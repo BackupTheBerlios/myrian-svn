@@ -24,13 +24,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#2 $
  */
 public abstract class AbstractParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/18 15:53:35 $";
+        "$DateTime: 2003/09/19 02:38:52 $";
 
     private final String m_name;
     private final Class m_type;
@@ -65,8 +65,8 @@ public abstract class AbstractParameter implements Parameter {
         return m_name;
     }
 
-    public final ParameterInfo getInfo() {
-        return null; // XXX nothing yet
+    public final Object getDefaultValue() {
+        return m_default;
     }
 
     //

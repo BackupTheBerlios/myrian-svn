@@ -31,13 +31,13 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterStore
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/ConfigRecord.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/ConfigRecord.java#2 $
  */
 public class ConfigRecord {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/ConfigRecord.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/ConfigRecord.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/16 13:41:28 $";
+        "$DateTime: 2003/09/19 02:38:52 $";
 
     private static final Logger s_log = Logger.getLogger
         (ConfigRecord.class);
@@ -45,11 +45,15 @@ public class ConfigRecord {
     private final String m_name;
     private final ArrayList m_params;
     private final HashMap m_values;
+    private final HashMap m_infos;
 
     protected ConfigRecord(final String name) {
         m_name = name;
         m_params = new ArrayList();
         m_values = new HashMap();
+        m_infos = new HashMap();
+
+        ConfigPrinter.register(this);
     }
 
     /**
@@ -86,6 +90,14 @@ public class ConfigRecord {
         }
 
         return set(param, value);
+    }
+
+    protected final void setInfo(final Parameter param,
+                                 final ParameterInfo info) {
+        Assert.exists(param, Parameter.class);
+        Assert.exists(info, ParameterInfo.class);
+
+        m_infos.put(param, info);
     }
 
     private Object set(final Parameter param, final ParameterValue value) {
@@ -152,5 +164,72 @@ public class ConfigRecord {
      */
     public String toString() {
         return super.toString() + ":" + m_name;
+    }
+
+    void writeXML(final PrintWriter out) {
+        Assert.exists(out, PrintWriter.class);
+
+        out.write("<record>");
+        field(out, "name", m_name);
+
+        final Iterator params = m_params.iterator();
+
+        while (params.hasNext()) {
+            final Parameter param = (Parameter) params.next();
+            final ParameterInfo info = (ParameterInfo) m_infos.get(param);
+
+            out.write("<parameter>");
+
+            field(out, "name", param.getName());
+
+            if (param.isRequired()) {
+                out.write("<required/>");
+            }
+
+            final Object defaalt = param.getDefaultValue();
+
+            if (defaalt != null) {
+                if (defaalt instanceof Object[]) {
+                    final Object[] elems = (Object[]) defaalt;
+                    final StringBuffer buffer = new StringBuffer();
+
+                    for (int i = 0; i < elems.length; i++) {
+                        buffer.append(elems[i].toString());
+                        buffer.append(", ");
+                    }
+
+                    final int len = buffer.length();
+
+                    if (len > 2) {
+                        field(out, "default", buffer.substring(0, len - 2));
+                    }
+                } else {
+                    field(out, "default", defaalt.toString());
+                }
+            }
+
+            field(out, "title", info.getTitle());
+            field(out, "purpose", info.getPurpose());
+            field(out, "example", info.getExample());
+            field(out, "format", info.getFormat());
+
+            out.write("</parameter>");
+        }
+
+        out.write("</record>");
+    }
+
+    private void field(final PrintWriter out,
+                       final String name,
+                       final String value) {
+        if (value != null) {
+            out.write("<");
+            out.write(name);
+            out.write("><![CDATA[");
+            out.write(value);
+            out.write("]]></");
+            out.write(name);
+            out.write(">");
+        }
     }
 }
