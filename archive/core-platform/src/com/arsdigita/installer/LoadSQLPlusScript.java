@@ -14,7 +14,7 @@
  */
 
 /**
- * $Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#4 $
+ * $Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#5 $
  *
  *  This is the class with sole purpose to feed SQL*Plus script through
  *  JDBC interface.  SQL*Plus scripts are being parsed by SimpleOracleSQLParser,
@@ -24,6 +24,7 @@
 
 package com.arsdigita.installer;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -32,7 +33,7 @@ import java.io.FileNotFoundException;
 
 public class LoadSQLPlusScript {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#4 $ by $Author: dennis $, $DateTime: 2002/08/08 11:07:31 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#5 $ by $Author: dennis $, $DateTime: 2002/08/08 16:17:42 $";
 
     private Connection s_con;
     private Statement s_stmt;
@@ -140,7 +141,10 @@ public class LoadSQLPlusScript {
 
         s_stmt = s_con.createStatement();
 
-        parser.useSQLStatement(this, "executeOneStatement");
+        try {
+            parser.useSQLStatement(this, "executeOneStatement");
+        } catch (InvocationTargetException e) {
+        }
 
         s_stmt.close();
         s_con.close();
