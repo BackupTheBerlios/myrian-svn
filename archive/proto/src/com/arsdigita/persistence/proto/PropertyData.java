@@ -8,12 +8,12 @@ import java.io.*;
  * PropertyData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #13 $ $Date: 2003/03/27 $
+ * @version $Revision: #14 $ $Date: 2003/05/12 $
  **/
 
 class PropertyData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyData.java#13 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyData.java#14 $ by $Author: ashah $, $DateTime: 2003/05/12 15:08:06 $";
 
     final private ObjectData m_odata;
     final private Property m_prop;
@@ -26,6 +26,10 @@ class PropertyData {
         m_value = value;
 
         m_odata.addPropertyData(m_prop, this);
+    }
+
+    ObjectData getObjectData() {
+        return m_odata;
     }
 
     public Session getSession() {

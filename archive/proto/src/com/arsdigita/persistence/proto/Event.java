@@ -11,12 +11,12 @@ import java.util.*;
  * Event
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/04/01 $
+ * @version $Revision: #13 $ $Date: 2003/05/12 $
  **/
 
 public abstract class Event {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Event.java#12 $ by $Author: ashah $, $DateTime: 2003/04/01 18:05:32 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Event.java#13 $ by $Author: ashah $, $DateTime: 2003/05/12 15:08:06 $";
 
     private static final Logger LOG = Logger.getLogger(Event.class);
 
@@ -47,15 +47,20 @@ public abstract class Event {
         m_obj = obj;
     }
 
-    public Session getSession() {
+    public final Session getSession() {
         return m_ssn;
     }
 
-    public Object getObject() {
-        return m_obj;
+    public final Object getObject() {
+        ObjectData od = getObjectData();
+        if (od == null) {
+            return m_obj;
+        } else {
+            return getObjectData().getObject();
+        }
     }
 
-    public ObjectMap getObjectMap() {
+    public final ObjectMap getObjectMap() {
         return m_ssn.getObjectMap(m_obj);
     }
 
@@ -68,6 +73,8 @@ public abstract class Event {
     final Iterator getDependentEvents() {
         return m_dependentEvents.iterator();
     }
+
+    abstract ObjectData getObjectData();
 
     abstract void prepare();
 
