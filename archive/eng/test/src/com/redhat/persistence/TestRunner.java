@@ -5,18 +5,19 @@ import junit.framework.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.regex.*;
 import org.apache.log4j.Logger;
 
 /**
  * TestRunner
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/08/03 $
+ * @version $Revision: #6 $ $Date: 2004/08/03 $
  **/
 
 public class TestRunner {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/TestRunner.java#5 $ by $Author: rhs $, $DateTime: 2004/08/03 14:02:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/TestRunner.java#6 $ by $Author: rhs $, $DateTime: 2004/08/03 15:28:49 $";
 
     private static final Logger s_log = Logger.getLogger(TestRunner.class);
 
@@ -29,14 +30,21 @@ public class TestRunner {
     private static final void run(String suite) throws Exception {
         final boolean halt = "true".equals
             (System.getProperty("junit.haltonfailure"));
-        final String filter = System.getProperty("junit.test");
-        final String exclude = System.getProperty("junit.exclude");
+        String include = System.getProperty("junit.test");
+        if (include == null) {
+            include = System.getProperty("junit.include");
+        }
+        String exclude = System.getProperty("junit.exclude");
+        final Pattern in = include == null ?
+            null : Pattern.compile(include, Pattern.DOTALL);
+        final Pattern ex = exclude == null ?
+            null : Pattern.compile(exclude, Pattern.DOTALL);
 
         final TestResult result = new TestResult() {
             protected void run(TestCase test) {
                 String name = "" + test;
-                if (exclude != null && name.matches(exclude)) { return; }
-                if (filter == null || name.matches(filter)) {
+                if (ex != null && ex.matcher(name).matches()) { return; }
+                if (in == null || in.matcher(name).matches()) {
                     super.run(test);
                 }
             }
