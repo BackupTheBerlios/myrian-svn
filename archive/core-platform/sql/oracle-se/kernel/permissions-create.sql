@@ -17,7 +17,7 @@
 --
 -- @author phong@arsdigita.com
 -- @creation-date 2001-05-21
--- @cvs-id $Id: //core-platform/dev/sql/oracle-se/kernel/permissions-create.sql#1 $
+-- @cvs-id $Id: //core-platform/dev/sql/oracle-se/kernel/permissions-create.sql#2 $
 --
 
 
@@ -214,16 +214,25 @@ create table object_grants (
 
 -- this table holds a count of "children" for each object, and is only
 -- used in order to maintain the *trans_context_index denormalizations
-create table context_child_counts (
-   object_id  integer not null
-              constraint ccc_object_id_fk
-              references acs_objects (object_id)
-              constraint ccc_object_id_pk
-              primary key,
-   n_children integer default 1 not null
-              constraint ccc_n_children_ck
-              check (n_children>=1)
-) organization index;
+
+-- This table has been removed because it causes contention when
+-- inserting two objects that share the same context. Both try to
+-- update this table and so the operations become serialized. This is
+-- temporarily replaced with a select from object_context_map, but
+-- since I believe we want to eventually remove object_context_map in
+-- favor of something that doesn't store the mapping for leaf nodes,
+-- I'm leaving this here.
+
+--create table context_child_counts (
+--   object_id  integer not null
+--              constraint ccc_object_id_fk
+--              references acs_objects (object_id)
+--              constraint ccc_object_id_pk
+--              primary key,
+--   n_children integer default 1 not null
+--              constraint ccc_n_children_ck
+--              check (n_children>=1)
+--) organization index;
 
 -- need another copy of object-context mappings in order to avoid mutation 
 -- errors in the triggers
@@ -277,6 +286,7 @@ as
     context_id  in object_context_map.context_id%TYPE
   )
   as
+    child_count integer;
   begin
 
     insert into object_context_map
@@ -284,15 +294,20 @@ as
     values
     (add_context.object_id, add_context.context_id);
 
-    update context_child_counts
-    set n_children = n_children + 1
-    where object_id = add_context.context_id;
+--  See comment near table definition.
+--    update context_child_counts
+--    set n_children = n_children + 1
+--    where object_id = add_context.context_id;
+    select count(*) into child_count
+    from object_context_map
+    where context_id = add_context.context_id;
 
-    if SQL%NOTFOUND then
-        insert into context_child_counts
-        (object_id, n_children)
-        values
-        (add_context.context_id, 1);
+--    if SQL%NOTFOUND then
+    if child_count = 1 then
+--        insert into context_child_counts
+--        (object_id, n_children)
+--        values
+--        (add_context.context_id, 1);
 
             insert into granted_context_non_leaf_map
             (object_id, implied_context_id, n_generations)
@@ -335,8 +350,11 @@ as
             from all_context_non_leaf_map
             UNION
             select add_context.object_id, add_context.object_id, 0
-            from context_child_counts
-            where object_id = add_context.object_id) descendants
+            from dual
+            where exists
+                (select 1 
+                 from object_context_map
+                 where context_id =  add_context.object_id)) descendants
       where ancestors.object_id = add_context.context_id
         and descendants.implied_context_id = add_context.object_id;
     
@@ -357,8 +375,11 @@ as
             from all_context_non_leaf_map
             UNION
             select add_context.object_id, add_context.object_id, 0
-            from context_child_counts
-            where object_id = add_context.object_id) descendants
+            from dual
+            where exists
+                (select 1 
+                 from object_context_map
+                 where context_id =  add_context.object_id)) descendants
       where ancestors.object_id = add_context.context_id
         and descendants.implied_context_id = add_context.object_id;
 
@@ -370,20 +391,25 @@ as
   )
   as
     v_delete_context integer;
+    child_count integer;
   begin
 
     delete from object_context_map 
     where object_id = remove_context.object_id;
 
-    delete from context_child_counts
-    where object_id = remove_context.context_id
-      and n_children=1;
+--  See comment near table definition.
+--    delete from context_child_counts
+--    where object_id = remove_context.context_id
+--      and n_children=1;
+    select count(*) into child_count
+    from object_context_map
+    where context_id = remove_context.context_id;
 
-    if SQL%NOTFOUND then
-        update context_child_counts
-        set n_children = n_children - 1
-        where object_id = remove_context.context_id;
-
+--    if SQL%NOTFOUND then
+--        update context_child_counts
+--        set n_children = n_children - 1
+--        where object_id = remove_context.context_id;
+    if child_count > 0 then
         v_delete_context := 0;
     else
         v_delete_context := 1;
@@ -444,8 +470,8 @@ as
         (add_grant.object_id, 1);
 
         select count(*) into v_has_children
-        from context_child_counts
-        where object_id = add_grant.object_id;
+        from object_context_map
+        where context_id = add_grant.object_id;
 
         if (v_has_children=1) then
 

@@ -17,14 +17,14 @@
 --
 -- @author phong@arsdigita.com
 -- @creation-date 2001-05-21
--- @cvs-id $Id: //core-platform/dev/sql/oracle-se/kernel/permissions-drop.sql#1 $
+-- @cvs-id $Id: //core-platform/dev/sql/oracle-se/kernel/permissions-drop.sql#2 $
 --
 
 drop table granted_context_non_leaf_map;
 drop table ungranted_context_non_leaf_map;
 drop table object_grants;
 
-drop table context_child_counts;
+--drop table context_child_counts;
 drop table object_context_map;
 drop table object_context;
 drop table acs_permissions;
