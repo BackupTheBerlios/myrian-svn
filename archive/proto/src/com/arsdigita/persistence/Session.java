@@ -40,7 +40,7 @@ import java.sql.Connection;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/02/13 $
+ * @version $Revision: #9 $ $Date: 2003/02/14 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -427,7 +427,8 @@ public class Session {
      **/
 
     public String getStackTrace() {
-        throw new Error("not implemented");        
+        // XXX
+        return "";
     }
 
 }
