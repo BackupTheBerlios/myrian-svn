@@ -104,7 +104,11 @@ class JDOHandler extends ReflectionHandler {
         for (int i = 0; i < candidates.size(); i++) {
             String candidate = (String) candidates.get(i);
             try {
-                // XXX: should we initialize here or not?
+                // We don't want to initialize the class we're loading
+                // here because we will be called from a static block
+                // of a class, and forcing initialization here can
+                // create a cyclic initialization dependency which in
+                // turn can break static code.
                 return Class.forName(candidate, false, m_loader);
             } catch (ClassNotFoundException e) {
                 // ignore

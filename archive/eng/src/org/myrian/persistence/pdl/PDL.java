@@ -406,7 +406,14 @@ public class PDL {
 
                 Class javaClass;
                 try {
-                    javaClass = Class.forName(jcn.getName());
+                    // We don't want to initialize the class we're
+                    // loading here because we may be called from a
+                    // static block of a class that jcn depends on and
+                    // that would create a cyclic initialization
+                    // dependency which can break static code.
+                    javaClass = Class.forName
+                        (jcn.getName(), false,
+                         Thread.currentThread().getContextClassLoader());
                 } catch (ClassNotFoundException e) {
                     m_errors.fatal(jcn,
                                    "Misspelled or non-existent class: " +
