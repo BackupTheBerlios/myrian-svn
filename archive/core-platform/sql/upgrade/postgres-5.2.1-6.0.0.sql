@@ -1,4 +1,3 @@
-//core-platform/dev/sql/upgrade/postgres-5.2.1-6.0.0.sql#10 - edit change 34778 (ktext)
 --
 -- Copyright (C) 2003, 2003 Red Hat Inc. All Rights Reserved.
 --
@@ -12,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.1-6.0.0.sql#12 $
--- $DateTime: 2003/08/15 16:27:41 $
+-- $Id: //core-platform/dev/sql/upgrade/postgres-5.2.1-6.0.0.sql#13 $
+-- $DateTime: 2003/08/15 21:35:15 $
 
 \echo Red Hat WAF 5.2.1 -> 6.0.0 Upgrade Script (PostgreSQL)
 
