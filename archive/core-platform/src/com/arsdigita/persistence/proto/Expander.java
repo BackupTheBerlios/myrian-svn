@@ -12,7 +12,7 @@ import java.util.*;
  */
 class Expander extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Expander.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Expander.java#2 $ by $Author: rhs $, $DateTime: 2003/05/23 10:09:08 $";
 
     final private Session m_ssn;
     final private Collection m_deleting = new HashSet();
@@ -129,7 +129,9 @@ class Expander extends Event.Switch {
         addEvent(e);
 
         if (role.isComponent()) {
-            if (old != null) { cascadeDelete(obj, old); }
+            if (old != null && !equals(old, value)) {
+                cascadeDelete(obj, old);
+            }
         }
     }
 
@@ -243,4 +245,13 @@ class Expander extends Event.Switch {
     private boolean isBeingDeleted(Object obj) {
         return m_deleting.contains(m_ssn.getSessionKey(obj));
     }
+
+    private boolean equals(Object o1, Object o2) {
+        if (o1 == null || o2 == null) {
+            return o1 == o2;
+        } else {
+            return m_ssn.getSessionKey(o1).equals(m_ssn.getSessionKey(o2));
+        }
+    }
+
 }
