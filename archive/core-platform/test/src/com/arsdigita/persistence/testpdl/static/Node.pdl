@@ -104,3 +104,26 @@ query nodesQuery {
     }
 }
 
+object type LazyNode extends Node {
+    retrieve {
+        do {
+            select *
+            from t_nodes
+            where node_id = :id
+        }
+        // We do nothing here in order to trigger lazy loading.
+    }
+
+    insert { super; }
+    update { super; }
+    delete { super; }
+}
+
+query lazyNodesQuery {
+    LazyNode[1..1] node;
+    do {
+        select * from t_nodes
+    } map {
+        node.id = t_nodes.node_id;
+    }
+}

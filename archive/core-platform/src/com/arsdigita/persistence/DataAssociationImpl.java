@@ -49,12 +49,12 @@ import org.apache.log4j.Category;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/05/30 $
+ * @version $Revision: #3 $ $Date: 2002/06/03 $
  */
 
 class DataAssociationImpl extends DataCollectionImpl implements DataAssociation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#2 $ by $Author: bche $, $DateTime: 2002/05/30 11:10:14 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#3 $ by $Author: rhs $, $DateTime: 2002/06/03 15:25:19 $";
 
     private final static Category s_cat = 
                     Category.getInstance(DataAssociationImpl.class.getName());
@@ -794,7 +794,7 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
      *  @param oid The OID to use to create the DataObject
      */
     private DataObject getObjectFromOID(OID oid) {
-        ObjectType objectType = oid.getDataObjectType();
+        ObjectType objectType = oid.getObjectType();
         GenericDataObject object =
             GenericDataObjectFactory.createObject(
                 objectType,

@@ -46,12 +46,12 @@ import java.util.ArrayList;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/05/31 $
+ * @version $Revision: #5 $ $Date: 2002/06/03 $
  */
 
 public class GenericDataObject implements DataObject {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#4 $ by $Author: rhs $, $DateTime: 2002/05/31 13:57:32 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#5 $ by $Author: rhs $, $DateTime: 2002/06/03 15:25:19 $";
 
     private ObjectType    m_type;
     private Session       m_session;
@@ -534,6 +534,12 @@ public class GenericDataObject implements DataObject {
                                   );
                     }
                 }
+            }
+
+            if (!m_data.hasProperty(propertyName)) {
+                throw new PersistenceException(
+                    "Unable to lazy load property: " + propertyName
+                    );
             }
 
             // If we get here, then either doRetrieve(Attribute) or 

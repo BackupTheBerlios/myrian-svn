@@ -31,13 +31,13 @@ import java.util.Map;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/06/03 $
  */
 
 class DataCollectionImpl extends DataQueryImpl
     implements DataCollection {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataCollectionImpl.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataCollectionImpl.java#2 $ by $Author: rhs $, $DateTime: 2002/06/03 15:25:19 $";
 
 
     /**
@@ -131,7 +131,7 @@ class DataCollectionImpl extends DataQueryImpl
 
     public boolean contains(OID oid) {
         ObjectType myBase = getObjectType().getBasetype();
-        ObjectType hisBase = oid.getDataObjectType().getBasetype();
+        ObjectType hisBase = oid.getObjectType().getBasetype();
         if (!myBase.equals(hisBase)) { return false; }
 
         for (Iterator it = myBase.getKeyProperties(); it.hasNext(); ) {

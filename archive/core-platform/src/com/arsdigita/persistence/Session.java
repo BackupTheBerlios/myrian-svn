@@ -42,12 +42,12 @@ import java.lang.ref.WeakReference;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $ 
+ * @version $Revision: #2 $ $Date: 2002/06/03 $ 
  * @see com.arsdigita.persistence.SessionManager
  */
 public class Session {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/Session.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/Session.java#2 $ by $Author: rhs $, $DateTime: 2002/06/03 15:25:19 $";
 
     private final static Category s_cat = 
                               Category.getInstance(Session.class.getName());
@@ -260,6 +260,33 @@ public class Session {
             throw new PersistenceException("No such type: " + typeName);
         }
         return create(type);
+    }
+
+
+    /**
+     * Creates a new DataObject with the type of the given oid and initializes
+     * the key properties to the values specified in the oid.
+     *
+     * @param oid The OID that specifies the type of and key properties for
+     *        the resulting DataObject.
+     **/
+
+    public DataObject create(OID oid) {
+        ObjectType type = oid.getObjectType();
+        DataObject result = create(type);
+
+        for (Iterator it = type.getKeyProperties(); it.hasNext(); ) {
+            Property prop = (Property) it.next();
+            String name = prop.getName();
+            Object value = oid.get(name);
+            if (value == null) {
+                throw new IllegalArgumentException(
+                    "Cannot create a DataObject with null key properties."
+                    );
+            }
+            result.set(name, value);
+        }
+        return result;
     }
 
     /**
