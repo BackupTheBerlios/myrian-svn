@@ -26,6 +26,7 @@ import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Property;
 import com.redhat.persistence.metadata.Role;
+import com.redhat.persistence.metadata.Root;
 import com.redhat.persistence.metadata.Static;
 import com.redhat.persistence.metadata.UniqueKey;
 import com.redhat.persistence.metadata.Value;
@@ -37,12 +38,12 @@ import java.util.Iterator;
  * PDLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2003/12/30 $
  **/
 
 public class PDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/pdl/PDLWriter.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/pdl/PDLWriter.java#2 $ by $Author: rhs $, $DateTime: 2003/12/30 22:29:20 $";
 
     private Writer m_out;
 
@@ -90,7 +91,11 @@ public class PDLWriter {
             write(prop);
 	}
 
-	ObjectMap om = type.getRoot().getObjectMap(type);
+	ObjectMap om = null;
+        Root root = type.getRoot();
+        if (root != null) {
+            om = root.getObjectMap(type);
+        }
 
 	if (type.getSupertype() == null && type.isKeyed()) {
 	    write("\n\n    object key (");
@@ -103,7 +108,7 @@ public class PDLWriter {
 		}
 	    }
 	    write(");");
-	} else if (om.getTable() != null) {
+	} else if (om != null && om.getTable() != null) {
 	    write("\n\n    reference key (");
 	    UniqueKey uk = om.getTable().getPrimaryKey();
 	    write(uk.getColumns());
@@ -138,7 +143,8 @@ public class PDLWriter {
         }
 
         ObjectType type = prop.getType();
-        if (type.getModel().getName().equals("global")) {
+        if (type.getModel() == null ||
+            type.getModel().getName().equals("global")) {
             write(type.getName());
         } else {
             write(type.getQualifiedName());
@@ -155,9 +161,16 @@ public class PDLWriter {
 	write(prop.getName());
         write(" = ");
 
-	ObjectMap om = prop.getRoot().getObjectMap(prop.getContainer());
+	ObjectMap om = null;
+        Root root = prop.getRoot();
+        if (root != null) {
+            om = root.getObjectMap(prop.getContainer());
+        }
 
-	Mapping m = om.getMapping(Path.get(prop.getName()));
+	Mapping m = null;
+        if (om != null) {
+            m = om.getMapping(Path.get(prop.getName()));
+        }
         if (m == null) {
             write("<no mapping for " + prop.getName() + " in " +
                   prop.getContainer().getName() + ">");
