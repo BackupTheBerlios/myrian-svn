@@ -8,12 +8,12 @@ import java.util.*;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/02/13 $
+ * @version $Revision: #6 $ $Date: 2003/02/14 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#5 $ by $Author: rhs $, $DateTime: 2003/02/13 17:16:57 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#6 $ by $Author: ashah $, $DateTime: 2003/02/14 01:21:43 $";
 
     private Session m_ssn;
     private OID m_oid;
@@ -72,7 +72,8 @@ class DataObjectImpl implements DataObject {
     }
 
     public boolean isNew() {
-        return m_ssn.isNew(this);
+        // handle calls to isNew before key is set
+        return !m_oid.isInitialized() || m_ssn.isNew(this);
     }
 
     public boolean isDeleted() {
@@ -121,6 +122,18 @@ class DataObjectImpl implements DataObject {
 
     public DataHandler setDataHandler(DataHandler handler) {
         throw new Error("not implemented");
+    }
+
+    public boolean equals(Object o) {
+        if (o instanceof DataObject) {
+            return m_oid.equals(((DataObject) o).getOID());
+        }
+
+        return false;
+    }
+
+    public int hashCode() {
+        return m_oid.hashCode();
     }
 
 }

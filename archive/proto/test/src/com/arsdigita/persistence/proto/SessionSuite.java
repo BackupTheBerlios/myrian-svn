@@ -13,37 +13,14 @@ import org.apache.log4j.Logger;
  * SessionSuite
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #4 $ $Date: 2003/02/13 $
+ * @version $Revision: #5 $ $Date: 2003/02/14 $
  **/
 
 public class SessionSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/SessionSuite.java#4 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/SessionSuite.java#5 $";
 
     private static final Logger s_log = Logger.getLogger(SessionSuite.class);
-
-    private static final class Generic {
-
-        private ObjectType m_type;
-        private Object m_id;
-
-        public Generic(ObjectType type, Object id) {
-            m_type = type;
-            m_id = id;
-        }
-
-        public ObjectType getObjectType() {
-            return m_type;
-        }
-
-        public Object getID() {
-            return m_id;
-        }
-
-        public String toString() {
-            return m_type + ": " + m_id;
-        }
-    }
 
     public SessionSuite() {}
 
@@ -218,25 +195,7 @@ public class SessionSuite extends PackageTestSuite {
         m_one = createKeyedType(m_model, "One");
         m_two = createKeyedType(m_model, "Two");
 
-        Adapter a = new Adapter() {
-            public Object getObject(ObjectType type, PropertyMap properties) {
-                return new Generic
-                    (type,
-                     (Integer) properties.get(type.getProperty("id")));
-            }
-
-            public PropertyMap getProperties(Object obj) {
-                PropertyMap result = new PropertyMap();
-                result.put(getObjectType(obj).getProperty("id"),
-                           ((Generic) obj).getID());
-                return result;
-            }
-
-            public ObjectType getObjectType(Object obj) {
-                return ((Generic) obj).getObjectType();
-            }
-        };
-
+        Adapter a = new Generic.Adapter();
         Adapter.addAdapter(Generic.class, m_root, a);
         Adapter.addAdapter(Generic.class, m_one, a);
         Adapter.addAdapter(Generic.class, m_two, a);

@@ -6,12 +6,12 @@ import java.io.*;
  * ObjectEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/02/12 $
+ * @version $Revision: #8 $ $Date: 2003/02/14 $
  **/
 
 public abstract class ObjectEvent extends Event {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectEvent.java#7 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectEvent.java#8 $ by $Author: ashah $, $DateTime: 2003/02/14 01:21:43 $";
 
     private ObjectData m_odata;
 

@@ -13,33 +13,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2003/02/13 $
+ * @version $Revision: #15 $ $Date: 2003/02/14 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#14 $ by $Author: rhs $, $DateTime: 2003/02/13 17:16:57 $";
-
-
-    private static class Generic {
-
-        private ObjectType m_type;
-        private BigInteger m_id;
-
-        public Generic(ObjectType type, BigInteger id) {
-            m_type = type;
-            m_id = id;
-        }
-
-        public ObjectType getType() {
-            return m_type;
-        }
-
-        public BigInteger getID() {
-            return m_id;
-        }
-
-    }
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#15 $ by $Author: ashah $, $DateTime: 2003/02/14 01:21:43 $";
 
 
     public ProtoTest(String name) {
@@ -53,30 +32,7 @@ public class ProtoTest extends TestCase {
         ObjectType ICLE = Root.getRoot().getObjectType("test.Icle");
         ObjectType COMPONENT = Root.getRoot().getObjectType("test.Component");
 
-        Adapter a = new Adapter() {
-            public Object getObject(ObjectType type,
-                                    PropertyMap properties) {
-                return new Generic
-                    (type,
-                     (BigInteger) properties.get(type.getProperty("id")));
-            }
-
-            public void setSession(Object obj, Session ssn) {
-                // do nothing
-            }
-
-            public PropertyMap getProperties(Object obj) {
-                PropertyMap result = new PropertyMap();
-                result.put(getObjectType(obj).getProperty("id"),
-                           ((Generic) obj).getID());
-                return result;
-            }
-
-            public ObjectType getObjectType(Object obj) {
-                return ((Generic) obj).getType();
-            }
-        };
-
+        Adapter a = new Generic.Adapter();
         Adapter.addAdapter(Generic.class, TEST, a);
         Adapter.addAdapter(Generic.class, ICLE, a);
         Adapter.addAdapter(Generic.class, COMPONENT, a);

@@ -8,12 +8,12 @@ import java.io.*;
  * PropertyData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/02/13 $
+ * @version $Revision: #7 $ $Date: 2003/02/14 $
  **/
 
 class PropertyData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyData.java#6 $ by $Author: ashah $, $DateTime: 2003/02/13 15:47:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyData.java#7 $ by $Author: ashah $, $DateTime: 2003/02/14 01:21:43 $";
 
     private ObjectData m_odata;
     private Property m_prop;
@@ -58,7 +58,6 @@ class PropertyData {
     }
 
     public void addEvent(PropertyEvent ev) {
-        ev.setPropertyData(this);
         m_events.add(ev);
     }
 
