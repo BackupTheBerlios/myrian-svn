@@ -21,28 +21,34 @@ import com.arsdigita.util.ConcurrentDict;
  * Path
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2004/03/25 $
+ * @version $Revision: #11 $ $Date: 2004/03/25 $
  **/
 
 public class Path {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#10 $ by $Author: vadim $, $DateTime: 2004/03/25 15:22:48 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#11 $ by $Author: vadim $, $DateTime: 2004/03/25 17:40:25 $";
 
     //special case the id path since it shows up so often
     private static final Path ID_PATH = new Path(null, "id");
+    private static final int NO_DOT = -1;
 
     private static final ConcurrentDict DICT =
         new ConcurrentDict(new Supplier());
 
-    private Path m_parent;  // initialized lazily from m_basename;
-    private final String m_basename;
-    private final String m_name;
+    private Path m_parent;  // initialized lazily from m_path
     private final String m_path;
+    private final int m_lastDot;
 
     private Path(String basename, String name) {
-        m_basename = basename;
-        m_name = name;
-        m_path = concat(m_basename, m_name);
+        if ( basename == null ) {
+            m_lastDot = NO_DOT;
+            m_path = name;
+        } else {
+            StringBuffer sb = new StringBuffer(basename.length()+name.length()+1);
+            sb.append(basename).append('.').append(name);
+            m_path = sb.toString();
+            m_lastDot = m_path.lastIndexOf('.');
+        }
     }
 
     public static final Path get(String path) {
@@ -83,13 +89,13 @@ public class Path {
     }
 
     public Path getParent() {
-        if (m_basename == null) {
+        if ( m_lastDot == NO_DOT ) {
             return null;
         }
 
         synchronized(this) {
             if (m_parent == null ) {
-                m_parent = Path.get(m_basename);
+                m_parent = Path.get(m_path.substring(0, m_lastDot));
             }
             return m_parent;
         }
@@ -125,7 +131,7 @@ public class Path {
     }
 
     public String getName() {
-        return m_name;
+        return m_path.substring(m_lastDot+1);
     }
 
     public String getPath() {
