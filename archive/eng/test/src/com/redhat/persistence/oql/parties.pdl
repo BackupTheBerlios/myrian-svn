@@ -1,7 +1,7 @@
 model parties;
 
 object type Party class com.redhat.persistence.PropertyMap
-                  adapter com.redhat.persistence.oql.IdentityAdapter {
+                  adapter com.redhat.persistence.pdl.adapters.IdentityAdapter {
     BigInteger id = oql_parties.party_id;
     // "user", "group", or "role"
     String type = oql_parties.type;

@@ -10,7 +10,7 @@ object type Department class com.redhat.persistence.jdo.Department
 }
 
 query Department$Gen class com.redhat.persistence.PropertyMap
-    adapter com.redhat.persistence.oql.IdentityAdapter {
+    adapter com.redhat.persistence.pdl.adapters.IdentityAdapter {
     BigInteger id;
 
     do {
@@ -30,7 +30,7 @@ object type Employee class com.redhat.persistence.jdo.Employee
 }
 
 query Employee$Gen class com.redhat.persistence.PropertyMap
-    adapter com.redhat.persistence.oql.IdentityAdapter {
+    adapter com.redhat.persistence.pdl.adapters.IdentityAdapter {
 
     BigInteger id;
     do {

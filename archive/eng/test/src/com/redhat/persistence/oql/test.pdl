@@ -11,12 +11,12 @@
 // or implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/test.pdl#1 $
-// $DateTime: 2004/06/07 13:49:55 $
+// $Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/test.pdl#2 $
+// $DateTime: 2004/07/12 16:14:01 $
 model test;
 
 object type A class com.redhat.persistence.PropertyMap
-              adapter com.redhat.persistence.oql.IdentityAdapter {
+              adapter com.redhat.persistence.pdl.adapters.IdentityAdapter {
     BigInteger id = a.a_id;
     String name = a.name;
     Link[0..1] first = qualias { filter(links, index == 0) };
@@ -28,7 +28,7 @@ object type A class com.redhat.persistence.PropertyMap
 }
 
 object type B class com.redhat.persistence.PropertyMap
-              adapter com.redhat.persistence.oql.IdentityAdapter {
+              adapter com.redhat.persistence.pdl.adapters.IdentityAdapter {
     BigInteger id = b.b_id;
     String name = b.name;
 
@@ -36,7 +36,7 @@ object type B class com.redhat.persistence.PropertyMap
 }
 
 object type C class com.redhat.persistence.PropertyMap
-              adapter com.redhat.persistence.oql.IdentityAdapter {
+              adapter com.redhat.persistence.pdl.adapters.IdentityAdapter {
     BigInteger id = c.c_id;
     String name = c.name;
 
@@ -44,7 +44,7 @@ object type C class com.redhat.persistence.PropertyMap
 }
 
 object type Link class com.redhat.persistence.PropertyMap
-                 adapter com.redhat.persistence.oql.IdentityAdapter {
+                 adapter com.redhat.persistence.pdl.adapters.IdentityAdapter {
     A a = join l.a_id to a.a_id;
     B b = join l.b_id to b.b_id;
     String name = l.name;
@@ -54,7 +54,7 @@ object type Link class com.redhat.persistence.PropertyMap
 }
 
 object type Tuple class com.redhat.persistence.PropertyMap
-                  adapter com.redhat.persistence.oql.IdentityAdapter {
+                  adapter com.redhat.persistence.pdl.adapters.IdentityAdapter {
     A a = join tup.a_id to a.a_id;
     B b = join tup.b_id to b.b_id;
     C c = join tup.c_id to c.c_id;
@@ -65,7 +65,7 @@ object type Tuple class com.redhat.persistence.PropertyMap
 }
 
 object type StaticTuple class com.redhat.persistence.PropertyMap
-                        adapter com.redhat.persistence.oql.IdentityAdapter {
+                        adapter com.redhat.persistence.pdl.adapters.IdentityAdapter {
     A a;
     B b;
     C c;
@@ -103,7 +103,7 @@ object type StaticTuple class com.redhat.persistence.PropertyMap
 }
 
 object type Node class com.redhat.persistence.PropertyMap
-                       adapter com.redhat.persistence.oql.IdentityAdapter {
+                       adapter com.redhat.persistence.pdl.adapters.IdentityAdapter {
     BigInteger id = st.st_id;
     String name = st.name;
     String description = st.description;
@@ -130,7 +130,7 @@ object type Node class com.redhat.persistence.PropertyMap
 }
 
 object type NodeType class com.redhat.persistence.PropertyMap
-                     adapter com.redhat.persistence.oql.IdentityAdapter {
+                     adapter com.redhat.persistence.pdl.adapters.IdentityAdapter {
     BigInteger id = nt.type_id;
     String name = nt.name;
     String description = nt.description;
@@ -139,7 +139,7 @@ object type NodeType class com.redhat.persistence.PropertyMap
 }
 
 object type StaticNode class com.redhat.persistence.PropertyMap
-                       adapter com.redhat.persistence.oql.IdentityAdapter {
+                       adapter com.redhat.persistence.pdl.adapters.IdentityAdapter {
     BigInteger id;
     String name;
     StaticNode parent;
@@ -183,7 +183,7 @@ object type StaticNode class com.redhat.persistence.PropertyMap
 }
 
 object type User class com.redhat.persistence.PropertyMap
-                 adapter com.redhat.persistence.oql.IdentityAdapter {
+                 adapter com.redhat.persistence.pdl.adapters.IdentityAdapter {
     BigInteger id = u.u_id;
     String name = u.name;
     String firstName = qualias { name };
@@ -196,7 +196,7 @@ object type User class com.redhat.persistence.PropertyMap
 }
 
 object type Group class com.redhat.persistence.PropertyMap
-                  adapter com.redhat.persistence.oql.IdentityAdapter {
+                  adapter com.redhat.persistence.pdl.adapters.IdentityAdapter {
     BigInteger id = g.g_id;
     String name = g.name;
 
@@ -215,7 +215,7 @@ object type Group class com.redhat.persistence.PropertyMap
 }
 
 object type Pair1 class com.redhat.persistence.PropertyMap
-                 adapter com.redhat.persistence.oql.IdentityAdapter {
+                 adapter com.redhat.persistence.pdl.adapters.IdentityAdapter {
     BigInteger id = p1.id;
     String name = p1.name;
 
@@ -223,7 +223,7 @@ object type Pair1 class com.redhat.persistence.PropertyMap
 }
 
 object type Pair2 class com.redhat.persistence.PropertyMap
-                 adapter com.redhat.persistence.oql.IdentityAdapter {
+                 adapter com.redhat.persistence.pdl.adapters.IdentityAdapter {
     BigInteger id = p2.id;
     String name = p2.name;
 

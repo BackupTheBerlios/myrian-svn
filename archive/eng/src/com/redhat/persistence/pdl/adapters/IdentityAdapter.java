@@ -12,7 +12,7 @@
  * governing rights and limitations under the License.
  *
  */
-package com.redhat.persistence.oql;
+package com.redhat.persistence.pdl.adapters;
 
 import com.redhat.persistence.*;
 import com.redhat.persistence.metadata.*;
@@ -21,12 +21,12 @@ import com.redhat.persistence.metadata.*;
  * IdentityAdapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/06/17 $
+ * @version $Revision: #1 $ $Date: 2004/07/12 $
  **/
 
 public class IdentityAdapter extends Adapter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/IdentityAdapter.java#2 $ by $Author: vadim $, $DateTime: 2004/06/17 13:28:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/adapters/IdentityAdapter.java#1 $ by $Author: bche $, $DateTime: 2004/07/12 16:14:01 $";
 
     public Object getObject(ObjectType basetype,
                             PropertyMap props,
