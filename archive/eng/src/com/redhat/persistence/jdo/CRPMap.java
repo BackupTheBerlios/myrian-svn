@@ -13,7 +13,7 @@ import javax.jdo.Query;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #16 $ $Date: 2004/07/14 $
+ * @version $Revision: #17 $ $Date: 2004/07/14 $
  **/
 class CRPMap implements Map {
     private Set entries;
@@ -89,10 +89,14 @@ class CRPMap implements Map {
 
         return new ProxySet((CRPSet) entries) {
                 public boolean add(Object elem) {
+                    // By design. The javadoc says entrySet() does not implement
+                    // add.
                     throw new UnsupportedOperationException();
                 }
 
                 public boolean addAll(Collection coll) {
+                    // By design. The javadoc says entrySet() does not implement
+                    // addAll.
                     throw new UnsupportedOperationException();
                 }
 
@@ -114,11 +118,14 @@ class CRPMap implements Map {
     }
 
     public Collection values() {
-        throw new UnsupportedOperationException();
+        Query query = getPMI().newQuery("oql", "$1.value");
+        return (Collection) query.execute(entries);
     }
 
     public boolean containsValue(Object value) {
-        throw new UnsupportedOperationException();
+        Query query = getPMI().newQuery("oql", "filter($1, value==$2)");
+        Collection coll = (Collection) query.execute(entries, value);
+        return coll.size() > 0;
     }
 
     public boolean containsKey(Object key) {
@@ -126,7 +133,7 @@ class CRPMap implements Map {
     }
 
     public boolean isEmpty() {
-        throw new UnsupportedOperationException();
+        return size() == 0;
     }
 
     public void clear() {
