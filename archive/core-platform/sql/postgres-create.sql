@@ -1,5 +1,7 @@
 begin;
 
+create view dual as select 1;
+
 \i default/globalization/table-g11n_charsets.sql
 \i default/globalization/index-g11n_charsets.sql
 \i default/globalization/table-g11n_locales.sql
