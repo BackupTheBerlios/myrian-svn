@@ -22,7 +22,8 @@ public class OQLQuery implements javax.jdo.Query {
         return m_pmi;
     }
 
-    private Expression makeExpr(Map parameters) {
+    private Expression makeExpr(Map params) {
+        Map parameters = new HashMap(params);
         for (Iterator it = parameters.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry me = (Map.Entry) it.next();
             if (me.getValue() instanceof CRPCollection) {
