@@ -27,7 +27,7 @@ association {
 // Pandora
 
 object type Party class com.redhat.persistence.jdotest.Party
-                  adapter com.redhat.persistence.jdo.ReflectionAdapter {
+                  adapter com.redhat.persistence.jdo.JDOAdapter {
     Integer[1..1] id = parties.party_id INTEGER;
     unique String[1..1] email = parties.primary_email VARCHAR(200);
 

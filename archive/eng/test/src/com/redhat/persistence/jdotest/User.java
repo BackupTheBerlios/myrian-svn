@@ -4,16 +4,26 @@ package com.redhat.persistence.jdotest;
  * User
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/22 $
+ * @version $Revision: #2 $ $Date: 2004/06/24 $
  **/
 
-public abstract class User extends Party {
+public class User extends Party {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdotest/User.java#1 $ by $Author: vadim $, $DateTime: 2004/06/22 13:25:03 $";
+    private String name;
 
-    public abstract String getName();
+    public User() {}
 
-    public abstract void setName(String name);
+    public User(int id) {
+        super(id);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String toString() {
         String name = getName();

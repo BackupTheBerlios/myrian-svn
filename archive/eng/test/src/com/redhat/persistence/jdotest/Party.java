@@ -6,18 +6,30 @@ import java.util.*;
  * Party
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/22 $
+ * @version $Revision: #2 $ $Date: 2004/06/24 $
  **/
 
-public abstract class Party {
+public class Party {
+    private int id;
+    private String email;
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdotest/Party.java#1 $ by $Author: vadim $, $DateTime: 2004/06/22 13:25:03 $";
+    public Party() {}
 
-    public abstract String getEmail();
+    public Party(int id) {
+        this.id = id;
+    }
 
-    public abstract void setEmail(String email);
+    public String getEmail() {
+        return email;
+    }
 
-    public abstract List getAuxiliaryEmails();
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    
+    public List getAuxiliaryEmails() {
+        return new LinkedList();
+    }
 
     public void setAuxiliaryEmails(List emails) {
         List l = getAuxiliaryEmails();

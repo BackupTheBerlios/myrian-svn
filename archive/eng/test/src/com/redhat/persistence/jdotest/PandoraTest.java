@@ -44,7 +44,7 @@ import org.apache.log4j.Logger;
  * PandoraTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/06/24 $
+ * @version $Revision: #6 $ $Date: 2004/06/24 $
  **/
 
 public class PandoraTest extends AbstractCase {
@@ -249,10 +249,12 @@ public class PandoraTest extends AbstractCase {
             products[i].setPicture(pictures[i]);
         }
 
-        User rhs = (User) Main.create
-            (m_ssn, User.class, new Object[] { new Integer(0) });
+        final User rhs = new User(0);
+        m_pm.makePersistent(rhs);
+
         rhs.setName("Rafael H. Schloming");
         rhs.setEmail("rhs@mit.edu");
+
         List aux = rhs.getAuxiliaryEmails();
         YAdapter ad = new YAdapter(List.class);
         ad.addInterface(Iterator.class);
