@@ -27,14 +27,14 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao
- * @version $Revision: #20 $ $Date: 2003/10/28 $
+ * @version $Revision: #21 $ $Date: 2003/11/10 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: jorris $ - $Date: 2003/10/28 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#20 $";
+    public static final String versionId = "$Author: rhs $ - $Date: 2003/11/10 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#21 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);
@@ -90,6 +90,8 @@ public class ConnectionManager {
     }
 
     public static final void badConnection(Connection conn) {
+        // XXX: do nothing right now since we have no pooling
+        if (true) { return; }
         ConnectionManager cm = getInstance();
         synchronized (cm) {
             if (cm.m_pool.containsConnection(conn)) {
