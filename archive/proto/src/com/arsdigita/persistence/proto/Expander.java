@@ -12,7 +12,7 @@ import java.util.*;
  */
 class Expander extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Expander.java#2 $ by $Author: ashah $, $DateTime: 2003/04/03 15:36:57 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Expander.java#3 $ by $Author: ashah $, $DateTime: 2003/04/04 12:58:37 $";
 
     final private Session m_ssn;
     final private Collection m_deleting = new HashSet();
@@ -58,8 +58,9 @@ class Expander extends Event.Switch {
             od = new ObjectData(m_ssn, obj, od.INFANTILE);
         } else if (!od.isDeleted()) {
             od.dump();
-            throw new IllegalArgumentException
-                ("Object already exists: " + obj);
+            ProtoException pe = new DuplicateObjectException(obj);
+            pe.setInternal(false);
+            throw pe;
         } else {
             od.setState(od.INFANTILE);
         }
@@ -72,8 +73,14 @@ class Expander extends Event.Switch {
         PropertyMap props = a.getProperties(obj);
         for (Iterator it = props.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry me = (Map.Entry) it.next();
-            Event ev = new SetEvent
-                (m_ssn, obj, (Property) me.getKey(), me.getValue());
+            Event ev;
+            try {
+                ev = new SetEvent
+                    (m_ssn, obj, (Property) me.getKey(), me.getValue());
+            } catch (TypeException te) {
+                te.setInternal(false);
+                throw te;
+            }
             expand(ev);
         }
     }

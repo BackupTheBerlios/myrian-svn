@@ -10,12 +10,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #15 $ $Date: 2003/04/02 $
+ * @version $Revision: #16 $ $Date: 2003/04/04 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#15 $ by $Author: ashah $, $DateTime: 2003/04/02 17:38:11 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#16 $ by $Author: ashah $, $DateTime: 2003/04/04 12:58:37 $";
 
     private final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -97,6 +97,10 @@ class DataObjectImpl implements DataObject {
 
     public Object get(String property) {
         Property prop = getObjectType().getProperty(property);
+        if (prop == null) {
+            throw new PersistenceException
+                ("no such property: " + property + " for " + this);
+        }
         if (prop.isCollection()) {
             return new DataAssociationImpl(getSession(), this, prop);
         }
@@ -191,6 +195,10 @@ class DataObjectImpl implements DataObject {
 
     public void save() {
         try {
+            if (m_ssn.isDeleted(this)) {
+                throw new PersistenceException("can't save a deleted object");
+            }
+
             m_ssn.flush();
             m_ssn.assertFlushed(this);
         } catch (ProtoException pe) {
