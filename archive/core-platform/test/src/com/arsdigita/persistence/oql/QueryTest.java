@@ -29,12 +29,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2002/08/14 $
+ * @version $Revision: #11 $ $Date: 2002/11/14 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#10 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#11 $ by $Author: jorris $, $DateTime: 2002/11/14 14:11:45 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);
@@ -98,11 +98,24 @@ public class QueryTest extends PersistenceTestCase {
     }
 
     private void doDiff(String expected, String actual) {
-        if (stripWhitespace(expected).equals(stripWhitespace(actual))) {
-            return;
-        } else {
-            fail(expected, actual);
+        StringTokenizer expectedTokens = new StringTokenizer(expected, "\n\r");
+        StringTokenizer actualTokens = new StringTokenizer(expected, "\n\r");
+
+        int lineNumber = 1;
+        while (expectedTokens.hasMoreTokens()) {
+            if (actualTokens.hasMoreTokens()) {
+                String expectedLine = stripWhitespace(expectedTokens.nextToken());
+                String actualLine = stripWhitespace(actualTokens.nextToken());
+                if(!expectedLine.equals(actualLine)) {
+                    fail(expected, actual, lineNumber);
+                }
+            } else {
+                fail(expected, actual, lineNumber);
+            }
+
         }
+
+
     }
 
     private static final String stripWhitespace(String str) {
@@ -129,8 +142,9 @@ public class QueryTest extends PersistenceTestCase {
         return result.toString().trim();
     }
 
-    private static final void fail(String expected, String actual) {
-        fail("Expected: \n" + expected + "\n\nActual:\n " + actual);
+    private static final void fail(String expected, String actual, int lineNumber) {
+
+        fail("Failed at line " + lineNumber + " Expected: \n" + expected + "\n\nActual:\n " + actual);
     }
 
     /**
