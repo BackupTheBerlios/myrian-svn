@@ -9,12 +9,12 @@ import java.util.*;
  * Cursor
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/01/06 $
+ * @version $Revision: #7 $ $Date: 2003/01/11 $
  **/
 
 public class Cursor {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Cursor.java#6 $ by $Author: rhs $, $DateTime: 2003/01/06 17:58:56 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Cursor.java#7 $ by $Author: rhs $, $DateTime: 2003/01/11 09:31:47 $";
 
     private DataSet m_dset;
     private Session m_ssn;
@@ -22,6 +22,7 @@ public class Cursor {
 
     private RecordSet m_rs = null;
     private OID m_current = null;
+    private long m_position = 0;
 
     protected Cursor(DataSet dset) {
         m_dset = dset;
@@ -70,11 +71,17 @@ public class Cursor {
         if (m_rs.next()) {
             m_current = m_rs.load(m_ssn);
 
+            m_position++;
             return true;
         } else {
 
+            m_position = 0;
             return false;
         }
+    }
+
+    public long getPosition() {
+        return m_position;
     }
 
 }

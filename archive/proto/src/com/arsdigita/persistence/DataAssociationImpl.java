@@ -6,13 +6,13 @@ import com.arsdigita.persistence.metadata.Property;
  * DataAssociationImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/01/10 $
+ * @version $Revision: #5 $ $Date: 2003/01/11 $
  **/
 
 class DataAssociationImpl extends DataAssociationCursorImpl
     implements DataAssociation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataAssociationImpl.java#4 $ by $Author: ashah $, $DateTime: 2003/01/10 18:48:23 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataAssociationImpl.java#5 $ by $Author: rhs $, $DateTime: 2003/01/11 09:31:47 $";
 
     private com.arsdigita.persistence.proto.Session m_pssn;
     private DataObject m_data;
@@ -53,12 +53,12 @@ class DataAssociationImpl extends DataAssociationCursorImpl
     }
 
     public void remove(DataObject obj) {
-        m_pssn.remove(m_data.getOID().getProtoOID(), m_pprop,
-                      DataObjectImpl.unwrap(obj));
+        remove(obj.getOID());
     }
 
     public void remove(OID oid) {
-        throw new Error("not implemented");
+        m_pssn.remove(m_data.getOID().getProtoOID(), m_pprop,
+                      m_pssn.retrieve(oid.getProtoOID()));
     }
 
     public boolean isModified() {

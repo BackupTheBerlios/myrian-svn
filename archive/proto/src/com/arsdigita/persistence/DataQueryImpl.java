@@ -12,26 +12,22 @@ import java.util.*;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/01/10 $
+ * @version $Revision: #7 $ $Date: 2003/01/11 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#6 $ by $Author: rhs $, $DateTime: 2003/01/10 17:10:28 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#7 $ by $Author: rhs $, $DateTime: 2003/01/11 09:31:47 $";
 
     private Session m_ssn;
     private com.arsdigita.persistence.proto.Session m_pssn;
-    private PersistentCollection m_pc = null;
-    private Query m_query;
-    private Cursor m_cursor = null;
+    PersistentCollection m_pc;
+    Cursor m_cursor = null;
 
-    DataQueryImpl(Session ssn,
-                  com.arsdigita.persistence.proto.metadata.ObjectType type) {
+    DataQueryImpl(Session ssn, PersistentCollection pc) {
         m_ssn = ssn;
         m_pssn = ssn.getProtoSession();
-        Signature sig = new Signature(type);
-        sig.addDefaultProperties();
-        m_query = new Query(sig, null);
+        m_pc = pc;
     }
 
     Session getSession() {
@@ -221,28 +217,23 @@ class DataQueryImpl implements DataQuery {
 
 
     public Object get(String propertyName) {
-        throw new Error("not implemented");
+        return m_cursor.get(propertyName);
     }
 
 
     public int getPosition() {
-        throw new Error("not implemented");
-    }
-
-    private Cursor getCursor() {
-        PersistentCollection pc = m_pssn.retrieve(m_query);
-        return pc.getDataSet().getCursor();
+        return (int) m_cursor.getPosition();
     }
 
     public boolean next() {
         if (m_cursor == null) {
-            m_cursor = getCursor();
+            m_cursor = m_pc.getDataSet().getCursor();
         }
         return m_cursor.next();
     }
 
     public long size() {
-        throw new Error("not implemented");
+        return m_pc.getDataSet().size();
     }
 
 }

@@ -17,6 +17,8 @@ package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
+import com.arsdigita.persistence.proto.Signature;
+import com.arsdigita.persistence.proto.Query;
 
 import java.sql.Connection;
 
@@ -31,7 +33,7 @@ import java.sql.Connection;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/01/10 $
+ * @version $Revision: #4 $ $Date: 2003/01/11 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -224,7 +226,10 @@ public class Session {
      **/
 
     public DataCollection retrieve(ObjectType type) {
-        return new DataCollectionImpl(this, type);
+        Signature sig = new Signature(C.type(type));
+        sig.addDefaultProperties();
+        return new DataCollectionImpl(this,
+                                      m_ssn.retrieve(new Query(sig, null)));
     }
 
 
