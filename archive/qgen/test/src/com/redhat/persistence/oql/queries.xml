@@ -128,6 +128,23 @@
   </test>
 
   <test>
+    <query>query(all(test.Node), id = id, name = name)</query>
+    <query>query(all(test.StaticNode), id = id, name = name)</query>
+    <results>
+      <row id="30" name="Thirty"/>
+      <row id="31" name="Thirty One"/>
+      <row id="32" name="Thirty Two"/>
+      <row id="33" name="Thirty Three"/>
+      <row id="34" name="Thirty Four"/>
+      <row id="35" name="Thirty Five"/>
+      <row id="36" name="Thirty Six"/>
+      <row id="37" name="Thirty Seven"/>
+      <row id="38" name="Thirty Eight"/>
+      <row id="39" name="Thirty Nine"/>
+    </results>
+  </test>
+
+  <test>
     <query>query(filter(all(test.Node), exists(parent)), id = id)</query>
     <query>query(filter(all(test.StaticNode), exists(parent)), id = id)</query>
     <query>query(filter(all(test.Node), not (parent == null)), id = id)</query>

@@ -11,12 +11,12 @@ import java.util.*;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2004/02/21 $
+ * @version $Revision: #12 $ $Date: 2004/02/21 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#11 $ by $Author: rhs $, $DateTime: 2004/02/21 16:37:34 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#12 $ by $Author: rhs $, $DateTime: 2004/02/21 16:50:28 $";
 
     private Expression m_expr;
     private String m_name;
@@ -82,9 +82,10 @@ public class Get extends Expression {
             String[] columns = Code.columns(prop, null);
             String table = Code.table(prop);
             if (table == null) {
+                QFrame stframe = ((QValue) expr.getValues().get(0)).getFrame();
                 List values = new ArrayList();
                 for (int i = 0; i < columns.length; i++) {
-                    values.add(new QValue(expr, columns[i]));
+                    values.add(new QValue(stframe, columns[i]));
                 }
                 frame.setValues(values);
             } else {
