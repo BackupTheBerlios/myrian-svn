@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package com.arsdigita.persistence;
+package com.redhat.persistence.engine.rdbms;
 
 import com.arsdigita.util.*;
 import com.arsdigita.util.jdbc.*;
@@ -31,12 +31,12 @@ import java.util.*;
  * PooledConnectionSourceTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/09/01 $
+ * @version $Revision: #1 $ $Date: 2004/09/30 $
  **/
 
 public class PooledConnectionSourceTest extends TestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PooledConnectionSourceTest.java#3 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/engine/rdbms/PooledConnectionSourceTest.java#1 $ by $Author: ashah $, $DateTime: 2004/09/30 17:47:51 $";
 
     private static final String JDBC_PREFIX = "jdbc:test:";
     private static final Map CONNECTIONS = new HashMap();

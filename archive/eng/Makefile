@@ -37,3 +37,7 @@ data-tests: all
 pdl-tests: all
 	$(TEST_CMD) com.redhat.persistence.pdl.PDLSuite \
 		com.arsdigita.persistence.pdl.PDLSuite $(TEST_RUNNER_ARGS)
+
+engine-tests: all
+	$(TEST_CMD) com.redhat.persistence.engine.rdbms.RDBMSSuite \
+		$(TEST_RUNNER_ARGS)

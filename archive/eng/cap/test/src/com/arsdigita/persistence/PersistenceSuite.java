@@ -23,10 +23,10 @@ import junit.framework.*;
  * PersistenceSuite
  *
  * @author Jon Orris
- * @version $Revision: #5 $ $Date: 2004/09/01 $
+ * @version $Revision: #6 $ $Date: 2004/09/30 $
  */
 public class PersistenceSuite extends TestSuite {
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PersistenceSuite.java#5 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PersistenceSuite.java#6 $ by $Author: ashah $, $DateTime: 2004/09/30 17:47:51 $";
 
     public static Test suite() {
         PersistenceSuite suite = new PersistenceSuite();
@@ -61,7 +61,6 @@ public class PersistenceSuite extends TestSuite {
         // Connection/transaction related tests
         suite.addTestSuite(AggressiveConnectionCloseTest.class);
         suite.addTestSuite(StatementClosingTest.class);
-        suite.addTestSuite(PooledConnectionSourceTest.class);
         suite.addTestSuite(TransactionContextTest.class);
 
         // Data manipulation tests
