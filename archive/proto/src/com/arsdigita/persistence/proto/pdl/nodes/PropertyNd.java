@@ -4,12 +4,12 @@ package com.arsdigita.persistence.proto.pdl.nodes;
  * Property
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/05/05 $
+ * @version $Revision: #6 $ $Date: 2003/05/05 $
  **/
 
 public class PropertyNd extends StatementNd {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/PropertyNd.java#5 $ by $Author: vadim $, $DateTime: 2003/05/05 18:24:29 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/PropertyNd.java#6 $ by $Author: vadim $, $DateTime: 2003/05/05 18:34:06 $";
 
     public static final Field TYPE =
         new Field(PropertyNd.class, "type", TypeNd.class, 1, 1);
@@ -25,26 +25,41 @@ public class PropertyNd extends StatementNd {
     private boolean m_isNullable = true;
     private boolean m_isUnversioned = false;
 
-    public void setUnique(boolean b) {
-        m_isUnique = b;
+    /**
+     * @post isUnique()
+     **/
+    public void setUnique() {
+        m_isUnique = true;
     }
 
-    public void setComponent(boolean b) {
-        m_isComponent = b;
+    /**
+     * @post isComponent()
+     **/
+    public void setComponent() {
+        m_isComponent = true;
     }
 
-    public void setComposite(boolean b) {
-        m_isComposite = b;
+    /**
+     * @post isComposite()
+     **/
+    public void setComposite() {
+        m_isComposite = true;
     }
 
-    public void setCollection(boolean b) {
-        m_isCollection = b;
+    /**
+     * @post isCollection()
+     **/
+    public void setCollection() {
+        m_isCollection = true;
     }
 
     public void setNullable(boolean b) {
         m_isNullable = b;
     }
 
+    /**
+     * @post isUnversioned()
+     **/
     public void setUnversioned() {
         m_isUnversioned = true;
     }
