@@ -7,12 +7,12 @@ import java.util.Iterator;
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/02/21 $
+ * @version $Revision: #9 $ $Date: 2004/02/21 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#8 $ by $Author: rhs $, $DateTime: 2004/02/21 13:11:19 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#9 $ by $Author: ashah $, $DateTime: 2004/02/21 17:35:23 $";
 
     private Object m_value;
 
@@ -66,23 +66,29 @@ public class Literal extends Expression {
             return sb.toString();
         }
 
-        String literal;
-        if (value instanceof String) {
-            literal = quote((String) value);
-        } else if (value instanceof com.redhat.persistence.PropertyMap) {
+        if (value instanceof com.redhat.persistence.PropertyMap) {
             java.util.Map.Entry me = (java.util.Map.Entry)
                 ((com.redhat.persistence.PropertyMap) value).
                 entrySet().iterator().next();
-            literal = me.getValue().toString();
+            value = me.getValue();
         } else if (value instanceof com.arsdigita.persistence.DataObject) {
             if (((com.arsdigita.persistence.DataObject) value).getOID()
                 .getNumberOfProperties() == 1) {
-                literal = ((com.arsdigita.persistence.DataObject) value).getOID().get("id").toString();
+                com.arsdigita.persistence.DataObject dobj =
+                    (com.arsdigita.persistence.DataObject) value;
+                value = dobj.getOID().get(((com.arsdigita.persistence.metadata.Property) dobj.getObjectType().getKeyProperties().next()).getName());
             } else {
-                literal = value.toString();
+                value = value.toString();
             }
+        }
+
+        String literal;
+        if (value instanceof String) {
+            literal = quote((String) value);
+        } else if (value ==  null) {
+            literal = "null";
         } else {
-            literal = "" + value;
+            literal = value.toString();
         }
 
         return literal;
