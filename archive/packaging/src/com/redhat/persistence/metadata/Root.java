@@ -25,12 +25,12 @@ import java.io.*;
  * Root
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/09/10 $
+ * @version $Revision: #6 $ $Date: 2003/09/17 $
  **/
 
 public class Root {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/metadata/Root.java#5 $ by $Author: rhs $, $DateTime: 2003/09/10 10:46:29 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/metadata/Root.java#6 $ by $Author: rhs $, $DateTime: 2003/09/17 15:39:02 $";
 
     private static final class Location {
 
@@ -163,7 +163,7 @@ public class Root {
             if (a != null) { return a; }
         }
 
-        throw new IllegalArgumentException("no adapter for: " + javaClass);
+        return null;
     }
 
     public Adapter getAdapter(ObjectType type) {
@@ -178,7 +178,7 @@ public class Root {
         Adapter a = (Adapter) m_adapters.get(null);
         if (a != null) { return a; }
 
-        throw new IllegalArgumentException("no adapter for: " + type);
+        return null;
     }
 
     public void dump(PrintStream out) {

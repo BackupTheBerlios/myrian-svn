@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * PackageLoader
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/09/09 $
+ * @version $Revision: #2 $ $Date: 2003/09/17 $
  **/
 
 public class PackageLoader {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/installer/PackageLoader.java#1 $ by $Author: rhs $, $DateTime: 2003/09/09 15:54:40 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/installer/PackageLoader.java#2 $ by $Author: rhs $, $DateTime: 2003/09/17 15:39:02 $";
 
     private static final Logger s_log =
         Logger.getLogger(PackageLoader.class);

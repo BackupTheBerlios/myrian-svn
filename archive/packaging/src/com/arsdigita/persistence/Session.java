@@ -58,7 +58,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/09/12 $
+ * @version $Revision: #6 $ $Date: 2003/09/17 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -121,7 +121,8 @@ public class Session {
         Root r = m_root.getRoot();
         synchronized (r) {
             Adapter ad = r.getAdapter(DataObjectImpl.class);
-            if (!(ad instanceof DataObjectAdapter)) {
+            if (ad == null ||
+                !(ad instanceof DataObjectAdapter)) {
                 ad = new DataObjectAdapter();
                 r.addAdapter(DataObjectImpl.class, ad);
                 r.addAdapter(PropertyMap.class, ad);
