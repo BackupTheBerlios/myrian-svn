@@ -3,6 +3,7 @@ package com.redhat.persistence.jdo;
 import com.redhat.persistence.*;
 import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.oql.Expression;
+import com.redhat.persistence.profiler.rdbms.StatementProfiler;
 import org.apache.commons.collections.map.IdentityMap;
 import java.sql.Connection;
 import java.util.*;
@@ -28,12 +29,14 @@ public class PersistenceManagerImpl implements PersistenceManager {
     private Session m_ssn;
     private Transaction m_txn = new TransactionImpl(this);
     private Object m_userObject = null;
+    private StatementProfiler m_prof = null;
 
     private Map m_smiMap = new IdentityMap();
 
-    public PersistenceManagerImpl(Session ssn) {
+    public PersistenceManagerImpl(Session ssn, StatementProfiler prof) {
         m_ssn = ssn;
         m_ssn.setAttribute(ATTR_NAME, this);
+        m_prof = prof;
     }
 
     // XXX: revisit this kludge
@@ -43,6 +46,10 @@ public class PersistenceManagerImpl implements PersistenceManager {
 
     StateManagerImpl getStateManager(Object pc) {
         return (StateManagerImpl) m_smiMap.get(pc);
+    }
+
+    private boolean hasStateManager(Object pc) {
+        return m_smiMap.containsKey(pc);
     }
 
     PersistenceCapable newPC(PropertyMap pmap) {
@@ -71,7 +78,7 @@ public class PersistenceManagerImpl implements PersistenceManager {
     }
 
     private PropertyMap pmap(PersistenceCapable pc, ObjectType type) {
-        if (m_smiMap.containsKey(pc)) {
+        if (hasStateManager(pc)) {
             return getStateManager(pc).getPropertyMap();
         }
 
@@ -223,6 +230,9 @@ public class PersistenceManagerImpl implements PersistenceManager {
      */
     public Object getObjectId(Object obj) {
         PersistenceCapable pc = (PersistenceCapable) obj;
+        if (!hasStateManager(obj)) {
+            throw new JDOUserException(obj + " has no state manager");
+        }
         return getStateManager(pc).getPropertyMap();
     }
 
@@ -590,5 +600,21 @@ public class PersistenceManagerImpl implements PersistenceManager {
      */
     public void setUserObject(Object o) {
         m_userObject = o;
+    }
+
+    public void startProfiling() {
+        if (m_prof == null) {
+            throw new JDOUserException
+                ("no profiler configured for this persistence manager");
+        }
+        m_prof.start();
+    }
+
+    public void stopProfiling() {
+        if (m_prof == null) {
+            throw new JDOUserException
+                ("no profiler configured for this persistence manager");
+        }
+        m_prof.stop();
     }
 }

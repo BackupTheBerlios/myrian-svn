@@ -9,6 +9,7 @@ import com.redhat.persistence.engine.rdbms.PooledConnectionSource;
 import com.redhat.persistence.engine.rdbms.OracleWriter;
 import com.redhat.persistence.engine.rdbms.PostgresWriter;
 import com.redhat.persistence.engine.rdbms.RDBMSEngine;
+import com.redhat.persistence.profiler.rdbms.StatementProfiler;
 import com.redhat.persistence.metadata.Root;
 import java.util.*;
 import java.io.*;
@@ -164,12 +165,13 @@ public class PersistenceManagerFactoryImpl
         // XXX: this currently ignores "user" and "pw"
 
         final RDBMSEngine engine;
+        StatementProfiler prof = new StatementProfiler();
         switch (DbHelper.getDatabaseFromURL(m_url)) {
         case DbHelper.DB_ORACLE:
-            engine = new RDBMSEngine(m_connSrc, new OracleWriter());
+            engine = new RDBMSEngine(m_connSrc, new OracleWriter(), prof);
             break;
         case DbHelper.DB_POSTGRES:
-            engine = new RDBMSEngine(m_connSrc, new PostgresWriter());
+            engine = new RDBMSEngine(m_connSrc, new PostgresWriter(), prof);
             break;
         default:
             DbHelper.unsupportedDatabaseError("persistence");
@@ -177,7 +179,7 @@ public class PersistenceManagerFactoryImpl
         }
 
         Session ssn = new Session(m_root, engine, new QuerySource());
-        return new PersistenceManagerImpl(ssn) {
+        return new PersistenceManagerImpl(ssn, prof) {
                 public Connection getConnection() {
                     return engine.getConnection();
                 }

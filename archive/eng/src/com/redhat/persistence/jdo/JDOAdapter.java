@@ -41,15 +41,8 @@ public class JDOAdapter extends Adapter {
 
     private static PersistenceManagerImpl getPMI(Session ssn) {
         PersistenceManagerImpl pmi = null;
-        synchronized(ssn) {
-            pmi = (PersistenceManagerImpl) ssn.getAttribute(pmi.ATTR_NAME);
-            if (pmi == null) {
-                pmi = new PersistenceManagerImpl(ssn);
-                ssn.setAttribute(pmi.ATTR_NAME, pmi);
-            } else {
-                s_log.debug("getPMI: hit");
-            }
-            return pmi;
+        synchronized (ssn) {
+            return (PersistenceManagerImpl) ssn.getAttribute(pmi.ATTR_NAME);
         }
     }
 }

@@ -47,12 +47,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/07/08 $
+ * @version $Revision: #6 $ $Date: 2004/07/29 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#5 $ by $Author: rhs $, $DateTime: 2004/07/08 11:34:59 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#6 $ by $Author: ashah $, $DateTime: 2004/07/29 09:56:41 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -730,7 +730,6 @@ public class Session {
         m_odata.clear();
         m_events.clear();
         m_violations.clear();
-        m_attrs.clear();
         m_beforeFlushMarker = null;
         if (LOG.isDebugEnabled()) { setLevel(0); }
         cleanUpEventProcessors(isCommit);
@@ -1039,9 +1038,8 @@ public class Session {
 
     /**
      * Sets an attribute inside of this <code>Session</code>.  The attribute
-     * exists as long as the session is open.  When the sessin is {@link
-     * #commit() committed} or {@link rollback() rolled back}, the attribute is
-     * discarded.
+     * exists as long as the session is open.  It is not affected by commit or
+     * rollback.
      *
      * @see #getAttribute(String)
      * @see #removeAttribute(String)
