@@ -106,7 +106,6 @@ public class  URLCache {
 
     /**
      * Utility method to return all URLs currently in the cache.
-     * @return
      */
     public Collection getURLS() {
         LinkedList list = new LinkedList(m_cache.keySet());

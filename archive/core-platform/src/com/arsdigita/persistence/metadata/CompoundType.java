@@ -25,12 +25,12 @@ import java.util.*;
  * property contained in a CompoundType has an associated DataType.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/05/12 $
+ * @version $Revision: #8 $ $Date: 2003/07/03 $
  */
 
 abstract public class CompoundType extends DataType {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/CompoundType.java#7 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/CompoundType.java#8 $ by $Author: vadim $, $DateTime: 2003/07/03 12:50:41 $";
 
 
     /**
@@ -39,8 +39,6 @@ abstract public class CompoundType extends DataType {
      * have.
      *
      * @param name The name of this compound type.
-     *
-     * @see CompoundType#addProperty(Property property)
      **/
 
     public CompoundType
