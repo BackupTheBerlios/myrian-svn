@@ -7,6 +7,7 @@ import com.redhat.persistence.jdo.PersistenceManagerImpl;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -14,7 +15,7 @@ import org.apache.log4j.Logger;
  * MapTest
  *
  * @since 2004-07-13
- * @version $Revision: #5 $ $Date: 2004/07/14 $
+ * @version $Revision: #6 $ $Date: 2004/07/28 $
  **/
 public class MapTest extends WithTxnCase {
     private final static Logger s_log = Logger.getLogger(MapTest.class);
@@ -70,6 +71,18 @@ public class MapTest extends WithTxnCase {
         assertTrue("entrySet has (TOPIC2, PAGE2)",
                    m_mag.getIndex().entrySet().contains(entry));
     }
+
+    public void testKeySet() {
+        Set keySet = m_mag.getIndex().keySet();
+        assertEquals("key set size", 2, keySet.size());
+        assertTrue("removed TOPIC1", keySet.remove(TOPIC1));
+        assertEquals("entry set size", 1, m_mag.getIndex().size());
+
+        Map.Entry entry = new Entry(TOPIC2, PAGE2);
+        assertTrue("entrySet has (TOPIC2, PAGE2)",
+                   m_mag.getIndex().entrySet().contains(entry));
+    }
+
 
     public void testValues() {
         assertTrue("values has PAGE1",

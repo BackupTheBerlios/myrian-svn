@@ -13,7 +13,7 @@ import javax.jdo.Query;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #22 $ $Date: 2004/07/28 $
+ * @version $Revision: #23 $ $Date: 2004/07/28 $
  **/
 class CRPMap implements Map {
     private final static NullableObject NULL = new NullableObject() {
@@ -84,7 +84,6 @@ class CRPMap implements Map {
     }
 
     NullableObject nullSavvyPut(Object key, Object value) {
-        // XXX: locking
         final Map.Entry me = getEntry(key);
 
         if (me == null) {
@@ -94,6 +93,17 @@ class CRPMap implements Map {
         } else {
             return new Nullable(me.setValue(value));
         }
+    }
+
+    NullableObject nullSavvyRemove(Object key) {
+        Map.Entry entry = getEntry(key);
+
+        if (entry == null) { return NULL; }
+
+        Object value = entry.getValue();
+        JDOHelper.getPersistenceManager(entry).deletePersistent(entry);
+        m_count--;
+        return new Nullable(value);
     }
 
     // =========================================================================
@@ -110,14 +120,7 @@ class CRPMap implements Map {
     }
 
     public Object remove(Object key) {
-        lock();
-        Map.Entry entry = getEntry(key);
-        if (entry == null) { return null; }
-
-        Object value = entry.getValue();
-        JDOHelper.getPersistenceManager(entry).deletePersistent(entry);
-        m_count--;
-        return value;
+        return nullSavvyRemove(key).getObject();
     }
 
     private Collection keys() {
@@ -131,7 +134,38 @@ class CRPMap implements Map {
             throw new UnsupportedOperationException();
         }
 
-        return new ProxySet((OQLCollection) keys());
+        return new ProxySet((OQLCollection) keys()) {
+                public boolean add(Object elem) {
+                    // By design. The javadoc says entrySet() does not implement
+                    // add.
+                    throw new UnsupportedOperationException();
+                }
+
+                public boolean addAll(Collection coll) {
+                    // By design. The javadoc says entrySet() does not implement
+                    // addAll.
+                    throw new UnsupportedOperationException();
+                }
+
+                public boolean remove(Object key) {
+                    return !nullSavvyRemove(key).isNull();
+                }
+
+                public boolean removeAll(Collection coll) {
+                    boolean modified = false;
+                    for (Iterator it=coll.iterator(); it.hasNext(); ) {
+                        modified |= !nullSavvyRemove(it.next()).isNull();
+                    }
+                    return modified;
+                }
+
+                // XXX: implement retainAll()
+                // public boolean retainAll(Collection coll) {}
+
+                public void clear() {
+                    CRPMap.this.clear();
+                }
+            };
     }
 
     public Set entrySet() {
