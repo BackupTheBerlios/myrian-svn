@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/test/pdl/com/arsdigita/x/versioning/eventproc.pdl#6 $ 
-// $DateTime: 2003/05/08 17:08:03 $
+// $Id: //core-platform/proto/test/pdl/com/arsdigita/x/versioning/eventproc.pdl#7 $ 
+// $DateTime: 2003/05/09 16:12:58 $
 
 model x.version.events.test01;
 
@@ -64,4 +64,16 @@ object type UVCT1 {
         String[0..1] name = te_uvct1.name VARCHAR;
 
         object key(id);
+}
+
+object type UVCT2 {
+        BigInteger[1..1] id = te_uvct2.id INTEGER;
+        String[0..1] name = te_uvct2.name VARCHAR;
+
+        object key(id);
+}
+
+association {
+    unversioned component UVCT2[0..n] uvct2s = join te_vt2.id to te_uvct2.composite_id;
+    VT2[0..1] vt2 = join te_uvct2.composite_id to te_vt2.id;
 }

@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/test/pdl/com/arsdigita/x/versioning/metadata.pdl#3 $
-// $DateTime: 2003/05/06 12:43:11 $
+// $Id: //core-platform/proto/test/pdl/com/arsdigita/x/versioning/metadata.pdl#4 $
+// $DateTime: 2003/05/09 16:12:58 $
 
 model x.version.test01;
 
@@ -25,7 +25,6 @@ versioned object type VT1 {
 
 object type VT2 extends VT1 {
     String[0..1] extraAttr    = t_vt2.extra_attr VARCHAR;
-    component C1[0..n] c1s = join t_vt2.id to t_c1.vt2_id;
     component UT3[0..n] ut3s = join t_vt2.id to t_ut3.vt2_id;
 
     reference key(t_vt2.id);
@@ -35,10 +34,14 @@ object type C1 {
     BigInteger[1..1] id = t_c1.id INTEGER;
 
     A1[1..1] a1s = join t_c1.a1_id to t_a1.id;
-    composite VT2[0..1] vt2 = join t_c1.vt2_id to t_vt2.id;
     component UT4[0..1] ut4 = join t_c1.ut4_id to t_ut4.id;
 
     object key(id);
+}
+
+association {
+    VT2[0..1] vt2 = join t_c1.vt2_id to t_vt2.id;
+    component C1[0..n] c1s = join t_vt2.id to t_c1.vt2_id;
 }
 
 object type A1 {

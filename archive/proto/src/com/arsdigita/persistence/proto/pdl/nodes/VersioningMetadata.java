@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #12 $ $Date: 2003/05/09 $
+ * @version $Revision: #13 $ $Date: 2003/05/09 $
  */
 public class VersioningMetadata {
     private final static Logger s_log =
@@ -84,31 +84,31 @@ public class VersioningMetadata {
                 }
 
                 public void onProperty(PropertyNd prop) {
+                    if ( !prop.isUnversioned() ) return;
+
                     Node parent = prop.getParent();
                     String containerName = null;
                     if ( parent instanceof ObjectTypeNd ) {
                         containerName = ((ObjectTypeNd) parent).getQualifiedName();
                     } else if ( parent instanceof AssociationNd) {
-                        s_log.error("not implemented");
+                        throw new Error("not implemented: " + prop);
                     } else {
                         throw new IllegalStateException("can'g get here.");
                     }
 
-                    if ( prop.isUnversioned() ) {
-                        Property property = 
-                            getProperty(containerName, prop.getName().getName());
+                    Property property = 
+                        getProperty(containerName, prop.getName().getName());
 
-                        if ( property.isKeyProperty() ) {
-                            throw new IllegalStateException
-                                ("Cannot mark a key property 'unversioned': " +
-                                 property);
-                        }
-                        s_log.info("onProperty: " + property);
-                        m_unversionedProps.add(property);
+                    if ( property.isKeyProperty() ) {
+                        throw new IllegalStateException
+                            ("Cannot mark a key property 'unversioned': " +
+                             property);
+                    }
+                    s_log.info("onProperty: " + property);
+                    m_unversionedProps.add(property);
 
-                        if ( m_changeListener != null ) {
-                            m_changeListener.onUnversionedProperty(property);
-                        }
+                    if ( m_changeListener != null ) {
+                        m_changeListener.onUnversionedProperty(property);
                     }
                 }
             };
