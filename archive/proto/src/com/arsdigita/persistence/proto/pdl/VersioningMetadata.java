@@ -18,6 +18,7 @@ package com.arsdigita.persistence.proto.pdl;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.metadata.Property;
+import com.arsdigita.persistence.proto.metadata.Role;
 import com.arsdigita.persistence.proto.pdl.nodes.AssociationNd;
 import com.arsdigita.persistence.proto.pdl.nodes.Node;
 import com.arsdigita.persistence.proto.pdl.nodes.ObjectTypeNd;
@@ -25,6 +26,7 @@ import com.arsdigita.persistence.proto.pdl.nodes.PropertyNd;
 import com.arsdigita.util.Assert;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -34,7 +36,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #2 $ $Date: 2003/05/09 $
+ * @version $Revision: #3 $ $Date: 2003/05/12 $
  */
 public class VersioningMetadata {
     private final static Logger s_log =
@@ -42,7 +44,6 @@ public class VersioningMetadata {
 
     private final Set m_versionedTypes;
     private final Set m_unversionedProps;
-    private Node.Switch m_switch;
     private ChangeListener m_changeListener;
 
     private final static VersioningMetadata s_singleton =
@@ -57,11 +58,8 @@ public class VersioningMetadata {
         return s_singleton;
     }
 
-    synchronized Node.Switch nodeSwitch(SymbolTable symTable) {
-        if ( m_switch == null ) {
-            m_switch = new NodeSwitch(symTable);
-        }
-        return m_switch;
+    Node.Switch nodeSwitch(Map properties) {
+        return new NodeSwitch(properties);
     }
 
     /**
@@ -135,10 +133,10 @@ public class VersioningMetadata {
     }
 
     private class NodeSwitch extends Node.Switch {
-        private SymbolTable m_symTable;
+        private Map m_properties;
 
-        public NodeSwitch(SymbolTable symTable) {
-            m_symTable = symTable;
+        public NodeSwitch(Map properties) {
+            m_properties = properties;
         }
 
         public void onObjectType(ObjectTypeNd ot) {
@@ -179,10 +177,8 @@ public class VersioningMetadata {
                 return ((ObjectTypeNd) parent).getQualifiedName();
             }
 
-            if ( !(parent instanceof AssociationNd) ) {
-                throw new IllegalStateException("can'g get here.");
-            } 
-
+            Assert.truth(parent instanceof AssociationNd,
+                         "parent instanceof AssociationNd");
             AssociationNd assoc = (AssociationNd) parent;
 
             PropertyNd other = null;
@@ -194,13 +190,13 @@ public class VersioningMetadata {
                 throw new IllegalStateException("can't get here");
             }
 
-            System.err.println("other.getType()=" + other);
-            if ( m_symTable.lookup(other.getType()) == null ) {
-                // FIXME: figure out why this lookup fails to find the resolved
-                // TypeNd.
-                throw new IllegalStateException("null");
+            Role role = (Role) m_properties.get(other);
+
+            if ( role == null ) {
+                throw new IllegalStateException
+                    ("Failed to look up property node=" + other);
             }
-            return m_symTable.lookup(other.getType());
+            return role.getType().getQualifiedName();
         }
     }
 }
