@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #4 $ $Date: 2003/10/31 $
+ * @version $Revision: #5 $ $Date: 2004/01/08 $
  */
 public class VersioningMetadata {
     private final static Logger s_log =
@@ -89,12 +89,12 @@ public class VersioningMetadata {
 
     /**
      * Returns <code>true</code> if the object type property whose name is
-     * <code>qualifiedName</code> is marked <code>unversioned</code> in the PDL
+     * <code>propertyName</code> is marked <code>unversioned</code> in the PDL
      * definition.
      *
      * <p>This method is provided for unit testing only.</p>
      *
-     * @param qualifiedName the fully qualified name of an object type property
+     * @param propertyName the fully qualified name of an object type property
      **/
     public boolean isMarkedUnversioned(String containerName, String propertyName) {
         return m_unversionedProps.contains
