@@ -1,7 +1,22 @@
 package com.redhat.persistence.jdo;
 
 public class SimpleTest extends AbstractCase {
-    public void test1() {
+    public void testModification() {
+        Employee e = new Employee("name", null);
+        e.setSalary(new Float(1.0f));
+        m_pm.makePersistent(e);
+        e.setSalary(new Float(e.getSalary().floatValue() + 2.0f));
+        Object eId = m_pm.getObjectId(e);
+        m_pm.currentTransaction().commit();
+
+        e = null;
+        m_pm.currentTransaction().begin();
+        e = (Employee) m_pm.getObjectById(eId, true);
+        assertTrue("set after makePersistent", e.getSalary().floatValue() > 2);
+        m_pm.currentTransaction().commit();
+    }
+
+    public void testRef() {
         String eName = "seb";
         String dName = "ASR";
 
