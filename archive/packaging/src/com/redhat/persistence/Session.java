@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/09/02 $
+ * @version $Revision: #6 $ $Date: 2003/09/04 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/Session.java#5 $ by $Author: justin $, $DateTime: 2003/09/02 00:57:18 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/Session.java#6 $ by $Author: justin $, $DateTime: 2003/09/04 10:21:44 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -272,7 +272,18 @@ public class Session {
                 }
 
                 public void onLink(Link link) {
-                    throw new UnsupportedOperationException("cannot set link");
+                    Object oldValue = get(obj, link);
+                    PropertyMap pmap = new PropertyMap(link.getLinkType());
+                    pmap.put(link.getFrom(), obj);
+
+                    if (oldValue != null) {
+                        pmap.put(link.getTo(), oldValue);
+                        e.expand(new DeleteEvent
+                                 (Session.this, getObject(pmap)));
+                    }
+
+                    pmap.put(link.getTo(), value);
+                    e.expand(new CreateEvent(Session.this, getObject(pmap)));
                 }
             });
 

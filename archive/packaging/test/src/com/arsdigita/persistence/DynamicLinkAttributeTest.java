@@ -27,24 +27,70 @@ import org.apache.log4j.Logger;
  * LinkAttributeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/09/04 $
  */
 
 public class DynamicLinkAttributeTest extends LinkAttributeTest {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/DynamicLinkAttributeTest.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/DynamicLinkAttributeTest.java#3 $ by $Author: justin $, $DateTime: 2003/09/04 10:21:44 $";
 
     public DynamicLinkAttributeTest(String name) {
         super(name);
     }
 
-    protected void persistenceSetUp() {
-        load("com/arsdigita/persistence/testpdl/mdsql/Party.pdl");
-        load("com/arsdigita/persistence/testpdl/mdsql/LinkAttributes.pdl");
-        super.persistenceSetUp();
-    }
-
     String getModelName() {
         return "mdsql";
+    }
+
+    public void testReferenceLinkAttribute() {
+        Session ssn = SessionManager.getSession();
+        DataObject user = ssn.create(getModelName() + ".User");
+        user.set("id", BigInteger.valueOf(0));
+        user.set("email", "foo@bar.com");
+        user.set("firstName", "foo");
+        user.set("lastNames", "bar");
+        user.save();
+
+        DataObject[] images = new DataObject[2];
+        for (int i = 0; i < images.length; i++) {
+            images[i] = ssn.create(getModelName() + ".Image");
+            images[i].set("id", BigInteger.valueOf(i));
+            byte[] bytes = "This is the image.".getBytes();
+            images[i].set("bytes", bytes);
+            images[i].save();
+        }
+
+        // set image
+        user.set("image", images[0]);
+        user.save();
+
+        // retrieve and then update caption
+        DataAssociationCursor dac =
+            ((DataAssociation) images[0].get("users")).cursor();
+        dac.next();
+        assertNull(dac.getLinkProperty("caption"));
+        assertEquals(user, dac.getDataObject());
+        DataObject link = dac.getLink();
+        link.set("caption", "caption");
+        link.save();
+
+        dac = ((DataAssociation) images[0].get("users")).cursor();
+        dac.next();
+        assertEquals("caption", dac.getLinkProperty("caption"));
+        assertEquals(1L, ((DataAssociation) images[0].get("users")).size());
+
+        // set new image as image
+        user.set("image", images[1]);
+        user.save();
+
+
+        // check that old image is no longer associated with user
+        assertEquals(0L, ((DataAssociation) images[0].get("users")).size());
+
+        // check that new image is associated with user and has no caption
+        dac = ((DataAssociation) images[1].get("users")).cursor();
+        dac.next();
+        assertNull(dac.getLinkProperty("caption"));
+        assertEquals(1L, ((DataAssociation) images[1].get("users")).size());
     }
 }
