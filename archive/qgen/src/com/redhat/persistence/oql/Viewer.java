@@ -17,12 +17,12 @@ import javax.swing.event.*;
  * Viewer
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/01/19 $
+ * @version $Revision: #3 $ $Date: 2004/01/20 $
  **/
 
 public class Viewer {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Viewer.java#2 $ by $Author: rhs $, $DateTime: 2004/01/19 14:43:24 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Viewer.java#3 $ by $Author: rhs $, $DateTime: 2004/01/20 12:41:29 $";
 
     public static final void main(String[] args) throws Exception {
         PDL pdl = new PDL();
@@ -34,6 +34,8 @@ public class Viewer {
         Root root = new Root();
         pdl.emit(root);
 
+        Propogator prop = new Propogator();
+
         JFrame frame = new JFrame("Viewer");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -41,10 +43,12 @@ public class Viewer {
             (new DefaultTreeModel(new DefaultMutableTreeNode
                                   (new UserNode(null))));
         PaneTableModel panes = new PaneTableModel();
+        JTable table = new JTable(panes);
+        table.setDefaultRenderer(Node.class, new NodeRenderer(prop));
 
         JSplitPane top = new JSplitPane
-            (JSplitPane.HORIZONTAL_SPLIT,
-             new JScrollPane(tree), new JScrollPane(new JTable(panes)));
+            (JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(tree),
+             new JScrollPane(table));
         top.setResizeWeight(0.0);
         JPanel bottom = new JPanel();
         bottom.setLayout(new BoxLayout(bottom, BoxLayout.X_AXIS));
@@ -63,8 +67,16 @@ public class Viewer {
 
         JButton parse = new JButton("Parse");
         parse.addActionListener
-            (new ParseListener(frame, root, text, tree, panes));
+            (new ParseListener(frame, root, text, tree, panes, prop));
         buttons.add(parse);
+
+        JButton step = new JButton("Step");
+        step.addActionListener(new StepListener(panes, prop));
+        buttons.add(step);
+
+        JButton run = new JButton("Run");
+        run.addActionListener(new PropogateListener(panes, prop));
+        buttons.add(run);
 
         JButton load = new JButton("Load...");
         load.addActionListener(new LoadListener(frame, root));
@@ -93,14 +105,17 @@ public class Viewer {
         private JTextArea m_text;
         private JTree m_tree;
         private PaneTableModel m_panes;
+        private Propogator m_prop;
 
         public ParseListener(JFrame frame, Root root, JTextArea text,
-                             JTree tree, PaneTableModel panes) {
+                             JTree tree, PaneTableModel panes,
+                             Propogator prop) {
             m_frame = frame;
             m_root = root;
             m_text = text;
             m_tree = tree;
             m_panes = panes;
+            m_prop = prop;
         }
 
         public void actionPerformed(ActionEvent evt) {
@@ -110,7 +125,8 @@ public class Viewer {
                 Expression expr = p.expression();
                 Pane pane = frame.graph(expr);
                 ((DefaultTreeModel) m_tree.getModel()).setRoot(tree(pane));
-                Node.propogate(Collections.singleton(frame.type));
+                m_prop.clear();
+                m_prop.add(frame.type);
             } catch (Throwable t) {
                 error(m_frame, t);
             }
@@ -234,17 +250,26 @@ public class Viewer {
             case 0:
                 return "" + pane.expression;
             case 1:
-                return "" + pane.type;
+                return pane.type;
             case 2:
-                return "" + pane.variables;
+                return pane.variables;
             case 3:
-                return "" + pane.injection;
+                return pane.injection;
             case 4:
-                return "" + pane.constrained;
+                return pane.constrained;
             case 5:
-                return "" + pane.keys;
+                return pane.keys;
             default:
                 throw new IllegalArgumentException();
+            }
+        }
+
+        public Class getColumnClass(int column) {
+            switch (column) {
+            case 0:
+                return String.class;
+            default:
+                return Node.class;
             }
         }
     }
@@ -254,6 +279,68 @@ public class Viewer {
         JOptionPane.showMessageDialog
             (frame, ("" + t.getMessage()).trim(), "Error",
              JOptionPane.ERROR_MESSAGE);
+    }
+
+    private static class StepListener implements ActionListener {
+        private PaneTableModel m_panes;
+        private Propogator m_prop;
+        public StepListener(PaneTableModel panes, Propogator p) {
+            m_panes = panes;
+            m_prop = p;
+        }
+        public void actionPerformed(ActionEvent evt) {
+            m_prop.step();
+            m_panes.fireTableDataChanged();
+        }
+    }
+
+    private static class PropogateListener implements ActionListener {
+        private PaneTableModel m_panes;
+        private Propogator m_prop;
+        public PropogateListener(PaneTableModel panes, Propogator prop) {
+            m_panes = panes;
+            m_prop = prop;
+        }
+        public void actionPerformed(ActionEvent evt) {
+            m_prop.propogate();
+            m_panes.fireTableDataChanged();
+        }
+    }
+
+    private static class NodeRenderer extends JLabel
+        implements TableCellRenderer {
+        private Propogator m_prop;
+        public NodeRenderer(Propogator prop) {
+            m_prop = prop;
+            setOpaque(true);
+        }
+        public Component getTableCellRendererComponent
+            (JTable table, Object value, boolean isSelected, boolean hasFocus,
+             int row, int column) {
+            Node node = (Node) value;
+            setText("" + node);
+
+            java.util.List nodes = m_prop.nodes();
+
+            Collection outputs = Collections.EMPTY_LIST;
+            Node head = null;
+            if (!nodes.isEmpty()) {
+                head = (Node) nodes.get(0);
+                outputs = head.getOutputs();
+            }
+
+            if (node == head && outputs.contains(node)) {
+                setBackground(Color.yellow);
+            } else if (node == head) {
+                setBackground(Color.red);
+            } else if (outputs.contains(node)) {
+                setBackground(Color.blue);
+            } else {
+                setBackground(Color.white);
+            }
+
+            return this;
+        }
     }
 
 }

@@ -8,12 +8,12 @@ import java.util.*;
  * Frame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/01/19 $
+ * @version $Revision: #4 $ $Date: 2004/01/20 $
  **/
 
 class Frame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Frame.java#3 $ by $Author: rhs $, $DateTime: 2004/01/19 14:43:24 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Frame.java#4 $ by $Author: rhs $, $DateTime: 2004/01/20 12:41:29 $";
 
     Frame parent;
     TypeNode type;
@@ -72,17 +72,18 @@ class Frame {
     }
 
     static Frame root(Root root) {
-        ObjectType type = new ObjectType(null, "root", null);
+        final ObjectType rt = new ObjectType(null, "root", null);
         for (Iterator it = root.getObjectTypes().iterator(); it.hasNext(); ) {
             ObjectType to = (ObjectType) it.next();
             if (to.isKeyed()) {
                 Expression.addKey(to, to.getKeyProperties());
-                addPath(type, Path.get(to.getQualifiedName()), to);
+                addPath(rt, Path.get(to.getQualifiedName()), to);
             }
         }
 
-        TypeNode tn = new TypeNode() { void updateType() {} };
-        tn.type = type;
+        TypeNode tn = new TypeNode() {
+            void updateType() { this.type = rt; }
+        };
         Frame frame = new Frame(null, tn);
         return frame;
     }

@@ -10,12 +10,12 @@ import java.util.*;
  * Main
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/01/16 $
+ * @version $Revision: #3 $ $Date: 2004/01/20 $
  **/
 
 public class Main {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Main.java#2 $ by $Author: rhs $, $DateTime: 2004/01/16 16:27:01 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Main.java#3 $ by $Author: rhs $, $DateTime: 2004/01/20 12:41:29 $";
 
     public static final void main(String[] args) throws Exception {
         PDL pdl = new PDL();
@@ -44,7 +44,9 @@ public class Main {
             frame.graph(e);
         }
 
-        Node.propogate(Collections.singleton(frame.type));
+        Propogator p = new Propogator();
+        p.add(frame.type);
+        p.propogate();
 
         Writer w = new OutputStreamWriter(System.out);
         frame.dump(new Indentor(w, "  "));
