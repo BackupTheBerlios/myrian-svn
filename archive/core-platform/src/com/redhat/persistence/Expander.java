@@ -27,11 +27,13 @@ import java.util.*;
  */
 class Expander extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Expander.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Expander.java#3 $ by $Author: ashah $, $DateTime: 2003/09/30 13:19:19 $";
 
     final private Session m_ssn;
     final private Collection m_deleting = new HashSet();
     final private List m_deletes = new LinkedList();
+    // m_deleted indicates if any deletes were added to m_pending
+    private boolean m_deleted = false;
     // m_pending == null indicates this expander is no longer usable
     private List m_pending = new ArrayList();
 
@@ -48,6 +50,9 @@ class Expander extends Event.Switch {
         ev.prepare();
         m_pending.add(ev);
         ev.log();
+        if (ev instanceof DeleteEvent) {
+            m_deleted = true;
+        }
     }
 
     private void addEvents(List l) {
@@ -83,6 +88,10 @@ class Expander extends Event.Switch {
         // mark expander as unusable
         m_pending = null;
         return result;
+    }
+
+    final boolean didDelete() {
+        return m_deleted;
     }
 
     public void onCreate(CreateEvent e) {
