@@ -32,12 +32,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/08/18 $
+ * @version $Revision: #8 $ $Date: 2004/08/18 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/RecordSet.java#7 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/RecordSet.java#8 $ by $Author: rhs $, $DateTime: 2004/08/18 17:29:45 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -85,7 +85,7 @@ public abstract class RecordSet {
             return get(path);
         } else if (map.isNested()) {
             Object key = path == null ?
-                key(Path.get("$container")) : key(path.getParent());
+                key(map.getContainer().getPath()) : key(path.getParent());
             if (key == null) {
                 return null;
             } else {
@@ -162,7 +162,7 @@ public abstract class RecordSet {
             }
             if (map.isNested() && map.isCompound()) {
                 Object container =
-                    load(ssn, values, Path.get("$container"), loaded);
+                    load(ssn, values, map.getContainer().getPath(), loaded);
                 Property prop = map.getContaining().getProperty();
                 if (!prop.isCollection()) {
                     if (LOG.isDebugEnabled()) {

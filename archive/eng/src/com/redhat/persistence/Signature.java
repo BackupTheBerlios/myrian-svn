@@ -36,12 +36,12 @@ import org.apache.log4j.Logger;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/08/18 $
+ * @version $Revision: #5 $ $Date: 2004/08/18 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Signature.java#4 $ by $Author: rhs $, $DateTime: 2004/08/18 14:57:34 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Signature.java#5 $ by $Author: rhs $, $DateTime: 2004/08/18 17:29:45 $";
 
     private static final Logger s_log = Logger.getLogger(Signature.class);
 
@@ -153,7 +153,7 @@ public class Signature {
         List mappings = om.getKeyMappings();
         // all props for unkeyed, immediate only for keyed
 
-        // prevent redundent fetches of $container paths
+        // prevent redundent fetches of container paths
         if (!isSource(path) && om.isNested() && om.isCompound()) {
             mappings = mappings.subList(1, mappings.size());
         }
