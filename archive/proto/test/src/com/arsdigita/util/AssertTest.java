@@ -18,61 +18,180 @@ package com.arsdigita.util;
 import junit.framework.TestCase;
 
 public class AssertTest extends TestCase {
-
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/util/AssertTest.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId =
+        "$Id: //core-platform/proto/test/src/com/arsdigita/util/AssertTest.java#2 $" +
+        "$Author: ashah $" +
+        "$DateTime: 2003/04/16 15:15:23 $";
 
     public AssertTest(String name) {
         super(name);
     }
 
     public void testAssert() {
+        Util.getConfig().setAssertEnabled(false);
+
+        junit.framework.Assert.assertTrue(!Assert.isEnabled());
+
+        Util.getConfig().setAssertEnabled(true);
+
+        junit.framework.Assert.assertTrue(Assert.isEnabled());
+
+        try {
+            com.arsdigita.util.Assert.truth(false, "Expected true");
+
+            junit.framework.Assert.fail();
+        } catch (Error e) {
+            // Empty
+        }
+
+        try {
+            com.arsdigita.util.Assert.falsity(true, "Expected false");
+
+            junit.framework.Assert.fail();
+        } catch (Error e) {
+            // Empty
+        }
+
+        try {
+            com.arsdigita.util.Assert.exists(null, Object.class);
+
+            junit.framework.Assert.fail();
+        } catch (Error e) {
+            // Empty
+        }
+
+        try {
+            com.arsdigita.util.Assert.locked(new Unlocked());
+
+            junit.framework.Assert.fail();
+        } catch (Error e) {
+            // Empty
+        }
+
+        try {
+            com.arsdigita.util.Assert.unlocked(new Locked());
+
+            junit.framework.Assert.fail();
+        } catch (Error e) {
+            // Empty
+        }
+
+        try {
+            com.arsdigita.util.Assert.equal(new Object(), new Object());
+
+            junit.framework.Assert.fail();
+        } catch (Error e) {
+            // Empty
+        }
+
+        try {
+            com.arsdigita.util.Assert.equal("whoa", "dude");
+
+            junit.framework.Assert.fail();
+        } catch (Error e) {
+            // Empty
+        }
+
+        try {
+            com.arsdigita.util.Assert.equal(null, new Object());
+
+            junit.framework.Assert.fail();
+        } catch (Error e) {
+            // Empty
+        }
+
+        try {
+            com.arsdigita.util.Assert.equal(new Object(), null);
+
+            junit.framework.Assert.fail();
+        } catch (Error e) {
+            // Empty
+        }
+
+        try {
+            final Object one = new Object();
+
+            com.arsdigita.util.Assert.unequal(one, one);
+
+            junit.framework.Assert.fail();
+        } catch (Error e) {
+            // Empty
+        }
+
+        try {
+            com.arsdigita.util.Assert.unequal(null, null);
+
+            junit.framework.Assert.fail();
+        } catch (Error e) {
+            // Empty
+        }
+
+        try {
+            com.arsdigita.util.Assert.unequal("dude", "dude");
+
+            junit.framework.Assert.fail();
+        } catch (Error e) {
+            // Empty
+        }
+
+        // Tests for the deprecated assert methods
 
         try {
             com.arsdigita.util.Assert.assertTrue(false);
-            junit.framework.Assert.assertTrue(false);
+            junit.framework.Assert.fail();
         } catch (IllegalStateException e) {
         }
 
         try {
             com.arsdigita.util.Assert.assertTrue(false, "Is false!");
-            junit.framework.Assert.assertTrue(false);
+            junit.framework.Assert.fail();
         } catch (IllegalStateException e) {
         }
 
         try {
             com.arsdigita.util.Assert.assertNotNull(null);
-            junit.framework.Assert.assertTrue(false);
+            junit.framework.Assert.fail();
         } catch (IllegalStateException e) {
         }
 
         try {
             com.arsdigita.util.Assert.assertNotNull(null, "Is null!");
-            junit.framework.Assert.assertTrue(false);
+            junit.framework.Assert.fail();
         } catch (IllegalStateException e) {
         }
 
         try {
             com.arsdigita.util.Assert.assertNotEmpty(null);
-            junit.framework.Assert.assertTrue(false);
+            junit.framework.Assert.fail();
         } catch (IllegalStateException e) {
         }
 
         try {
             com.arsdigita.util.Assert.assertNotEmpty("");
-            junit.framework.Assert.assertTrue(false);
+            junit.framework.Assert.fail();
         } catch (IllegalStateException e) {
         }
 
         try {
             com.arsdigita.util.Assert.assertNotEmpty(null, "NullString");
-            junit.framework.Assert.assertTrue(false);
+            junit.framework.Assert.fail();
         } catch (IllegalStateException e) {
         }
 
         try {
             com.arsdigita.util.Assert.assertNotEmpty("", "emptyString!");
-            junit.framework.Assert.assertTrue(false);
+            junit.framework.Assert.fail();
         } catch (IllegalStateException e) {
         }
+    }
+
+    private class Locked extends LockableImpl {
+        Locked() {
+            lock();
+        }
+    }
+
+    private class Unlocked extends LockableImpl {
+        // Empty
     }
 }
