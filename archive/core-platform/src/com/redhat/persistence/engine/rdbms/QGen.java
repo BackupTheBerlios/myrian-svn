@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/09/08 $
+ * @version $Revision: #8 $ $Date: 2003/09/09 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/QGen.java#7 $ by $Author: ashah $, $DateTime: 2003/09/08 16:54:02 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/QGen.java#8 $ by $Author: ashah $, $DateTime: 2003/09/09 14:13:22 $";
 
     private static final Logger LOG = Logger.getLogger(QGen.class);
 
@@ -652,8 +652,12 @@ class QGen {
                          } else if (isAllowedFunction(path)) {
                              return path;
                          } else {
-                             throw new RDBMSException
-                                 ("unknown value in expression: " + path) {};
+                             StringBuffer msg = new StringBuffer();
+                             msg.append("unknown value in expression: ");
+                             msg.append(path);
+                             msg.append("\nquery signature: ");
+                             msg.append(m_query.getSignature());
+                             throw new RDBMSException(msg.toString()) {};
                          }
                      }
                  });
