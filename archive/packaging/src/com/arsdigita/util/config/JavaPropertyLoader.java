@@ -22,21 +22,15 @@ import java.util.*;
 import org.apache.log4j.Logger;
 
 /**
- * Subject to change.
- *
- * An implementation of <code>ParameterLoader</code> that uses standard
- * Java properties to store and retrieve values.
- *
- * @see com.arsdigita.util.parameter.ParameterLoader
- * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyLoader.java#7 $
+ * @deprecated Use {@link com.arsdigita.util.JavaPropertyReader}
+ * instead
  */
-public class JavaPropertyLoader extends JavaPropertyReader 
+public class JavaPropertyLoader extends JavaPropertyReader
         implements ParameterLoader {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyLoader.java#7 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyLoader.java#8 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/17 18:08:50 $";
+        "$DateTime: 2003/10/17 19:02:11 $";
 
     private static final Logger s_log = Logger.getLogger
         (JavaPropertyLoader.class);
