@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/03/25 $
+ * @version $Revision: #10 $ $Date: 2004/03/29 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/QFrame.java#9 $ by $Author: rhs $, $DateTime: 2004/03/25 22:23:19 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/QFrame.java#10 $ by $Author: rhs $, $DateTime: 2004/03/29 00:04:00 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -763,6 +763,8 @@ class QFrame {
             modified |= innerizeAncestors(m_qvalues);
         }
 
+        modified |= mergeChildren(collapse);
+
         if (m_outer) {
             m_equals.clear();
             if (addEquals(m_equals)) {
@@ -798,6 +800,60 @@ class QFrame {
         }
 
         return modified;
+    }
+
+    private Map m_canon = new HashMap();
+
+    private boolean mergeChildren(Set collapse) {
+        boolean modified = false;
+
+        m_canon.clear();
+        List children = getChildren();
+        OUTER:
+        for (int i = 0; i < children.size(); i++) {
+            QFrame child = (QFrame) children.get(i);
+            m_equals.clear();
+            if (child.addEquals(m_equals)) {
+                m_from.clear();
+                m_to.clear();
+                m_generator.split(child, m_equals, m_from, m_to);
+                Object key = key(m_to);
+                if (key == null) { continue; }
+                for (int j = 0; j < m_from.size(); j++) {
+                    QValue qv = (QValue) m_from.get(j);
+                    String t = qv.getTable();
+                    if (t == null) { continue OUTER; }
+                    String c = qv.getColumn();
+                    if (c == null) { continue OUTER; }
+                    key = new CompoundKey(new CompoundKey(key, t), c);
+                }
+                EquiSet canon = (EquiSet) m_canon.get(key);
+                if (canon == null) {
+                    m_canon.put(key, child.m_equiset);
+                } else if (canon != child.m_equiset) {
+                    if (canon.addAll(child.m_equiset)) {
+                        collapse.add(canon);
+                    }
+                    child.m_equiset = canon;
+                    modified = true;
+                }
+            }
+        }
+
+        return modified;
+    }
+
+    private Object key(List qvalues) {
+        Object key = null;
+        for (int i = 0; i < qvalues.size(); i++) {
+            QValue qv = (QValue) qvalues.get(i);
+            if (key == null) {
+                key = m_equiset.partition(qv);
+            } else {
+                key = new CompoundKey(key, m_equiset.partition(qv));
+            }
+        }
+        return key;
     }
 
     private List m_econds = new ArrayList();
@@ -923,20 +979,29 @@ class QFrame {
         return true;
     }
 
+    private Map m_canonframes = new HashMap();
+
     void shrink() {
-        if (m_parent == null || m_equiset != m_parent.m_equiset) {
-            List framesets = m_equiset.getFrameSets();
-            QFrame[] frames = new QFrame[framesets.size()];
-            shrink(frames, framesets);
+        if (m_parent == null) {
+            m_canonframes.clear();
+            shrink(m_canonframes);
         }
     }
 
-    private void shrink(QFrame[] frames, List framesets) {
+    private void shrink(Map canon) {
         if (m_table != null) {
+            List framesets = m_equiset.getFrameSets();
+            QFrame[] frames = (QFrame[]) canon.get(m_equiset);
+            if (frames == null) {
+                frames = new QFrame[framesets.size()];
+                canon.put(m_equiset, frames);
+            }
+
             QFrame dup = null;
+
             for (int i = 0; i < framesets.size(); i++) {
-                List set = (List) framesets.get(i);
-                if (set.contains(this)) {
+                List partition = (List) framesets.get(i);
+                if (partition.contains(this)) {
                     dup = frames[i];
                     if (dup == null) {
                         dup = this;
@@ -944,6 +1009,7 @@ class QFrame {
                     }
                 }
             }
+
             if (dup != null && !dup.equals(this)) {
                 setDuplicate(dup);
             }
@@ -952,9 +1018,7 @@ class QFrame {
         List children = getChildren();
         for (int i = 0; i < children.size(); i++) {
             QFrame child = (QFrame) children.get(i);
-            if (child.m_equiset == m_equiset) {
-                child.shrink(frames, framesets);
-            }
+            child.shrink(canon);
         }
     }
 

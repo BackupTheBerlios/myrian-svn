@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * EquiSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/03/25 $
+ * @version $Revision: #7 $ $Date: 2004/03/29 $
  **/
 
 class EquiSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/EquiSet.java#6 $ by $Author: rhs $, $DateTime: 2004/03/25 22:23:19 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/EquiSet.java#7 $ by $Author: rhs $, $DateTime: 2004/03/29 00:04:00 $";
 
     private static final Logger s_log = Logger.getLogger(EquiSet.class);
 
@@ -55,6 +55,10 @@ class EquiSet {
         } else {
             return getPartition(idx);
         }
+    }
+
+    Integer partition(QValue a) {
+        return (Integer) m_nodes.get(a);
     }
 
     private List m_equals = new ArrayList();
