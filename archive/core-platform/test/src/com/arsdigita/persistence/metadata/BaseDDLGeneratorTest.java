@@ -33,23 +33,23 @@ import org.apache.log4j.Category;
 /**
   * 
  * <p> This class performs unit tests on 
- *  com.arsdigita.persistence.metadata.OracleDDLGenerator </p>
+ *  com.arsdigita.persistence.metadata.BaseDDLGenerator </p>
  *
  * @author <a href="mailto:jorris@arsdigita.com">jorris@arsdigita.com</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #1 $ $Date: 2002/07/25 $
  * 
  * @see com.arsdigita.persistence.metadatax.ObjectType
  */
 
 
-public class OracleDDLGeneratorTest extends PersistenceTestCase {  
+public class BaseDDLGeneratorTest extends PersistenceTestCase {  
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/OracleDDLGeneratorTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/BaseDDLGeneratorTest.java#1 $ by $Author: randyg $, $DateTime: 2002/07/25 17:33:29 $";
 
     private static Category s_log = 
-        Category.getInstance(OracleDDLGeneratorTest.class.getName());
+        Category.getInstance(BaseDDLGeneratorTest.class.getName());
 
-    public OracleDDLGeneratorTest(String name) {
+    public BaseDDLGeneratorTest(String name) {
         super(name);
     }
 

@@ -22,19 +22,19 @@ import junit.framework.Test;
  * MetadataSuite - Suite of tests for persistence.metadata
  *
  * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/07/25 $
  */
 public class MetadataxSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/MetadataxSuite.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/MetadataxSuite.java#4 $ by $Author: randyg $, $DateTime: 2002/07/25 17:33:29 $";
 
     public static Test suite() {
         MetadataxSuite suite = new MetadataxSuite();
         populateSuite(suite);
         BaseTestSetup wrapper = new BaseTestSetup(suite);
         wrapper.setInitScriptTarget ("com.arsdigita.persistence.Initializer");
-        wrapper.setSetupSQLScript(System.getProperty("test.sql.dir") + "/persistence/aggressive-test.sql");
-        wrapper.setTeardownSQLScript(System.getProperty("test.sql.dir") + "/persistence/aggressive-teardown.sql");
 
+        wrapper.setSetupSQLScript(System.getProperty("test.sql.dir") + "/../default/persistence/aggressive-test.sql");
+        wrapper.setTeardownSQLScript(System.getProperty("test.sql.dir") + "/../default/persistence/aggressive-teardown.sql");
         return wrapper;
     }
 
