@@ -2,6 +2,10 @@ ifndef BUILD
 BUILD=build
 endif
 
+ifndef DRIVERS
+DRIVERS := org.postgresql.Driver
+endif
+
 empty:=
 space:=$(empty) $(empty)
 
@@ -107,3 +111,6 @@ run-tests: $(JSTAMPS)
 
 jdo-tests: $(JSTAMPS)
 	bin/run com.redhat.persistence.TestRunner com.redhat.persistence.jdotest.SimpleTest
+
+pandora-tests: $(JSTAMPS)
+	bin/run -Djdbc.drivers=$(DRIVERS) com.redhat.persistence.jdotest.PandoraTest test

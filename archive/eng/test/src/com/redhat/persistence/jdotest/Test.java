@@ -1,5 +1,7 @@
 package com.redhat.persistence.jdotest;
 
+import com.arsdigita.runtime.RuntimeConfig;
+
 import com.redhat.persistence.*;
 import com.redhat.persistence.engine.rdbms.*;
 import com.redhat.persistence.pdl.*;
@@ -15,12 +17,12 @@ import java.util.*;
  * Test
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/06/22 $
+ * @version $Revision: #3 $ $Date: 2004/06/22 $
  **/
 
 abstract class Test {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdotest/Test.java#2 $ by $Author: vadim $, $DateTime: 2004/06/22 14:02:37 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdotest/Test.java#3 $ by $Author: vadim $, $DateTime: 2004/06/22 14:28:49 $";
 
     private Session m_ssn;
 
@@ -33,15 +35,15 @@ abstract class Test {
     }
 
     public static final void main(Class klass, String[] args) {
-        if (args.length < 2) {
+        if (args.length < 1) {
             System.err.println
                 ("usage: " + klass.getName() +
-                 " <jdbc> { load | unload | test } " +
+                 " { load | unload | test } " +
                  "[ method_1 . . . method_n ]");
             System.exit(1);
         }
 
-        String jdbc = args[0];
+        String jdbc = RuntimeConfig.getConfig().getJDBCURL();
 
         try {
             final Connection conn = DriverManager.getConnection(jdbc);
@@ -56,7 +58,7 @@ abstract class Test {
             Root root = new Root();
             pdl.emit(root);
 
-            String command = args[1];
+            String command = args[0];
             if (command.equals("load")) {
                 Schema.load(root, conn);
                 conn.commit();
@@ -74,11 +76,11 @@ abstract class Test {
                     Engine engine = new RDBMSEngine(src, new PostgresWriter());
                     Session ssn = new Session(root, engine, new QuerySource());
 
-                    if (args.length == 2) {
+                    if (args.length == 1) {
                         run(klass, ssn);
                     } else {
-                        String[] nargs = new String[args.length - 2];
-                        System.arraycopy(args, 2, nargs, 0, nargs.length);
+                        String[] nargs = new String[args.length - 1];
+                        System.arraycopy(args, 1, nargs, 0, nargs.length);
                         run(klass, ssn, nargs);
                     }
                 } finally {
