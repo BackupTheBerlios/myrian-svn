@@ -23,10 +23,10 @@ import junit.framework.Test;
  * PersistenceSuite
  *
  * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/13 $
  */
 public class PersistenceSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceSuite.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceSuite.java#2 $ by $Author: dennis $, $DateTime: 2002/05/13 16:12:59 $";
 
     public PersistenceSuite() {
         super();
@@ -45,8 +45,8 @@ public class PersistenceSuite extends PackageTestSuite {
         populateSuite(suite);
         BaseTestSetup wrapper = new BaseTestSetup(suite);
         wrapper.setInitScriptTarget ("com.arsdigita.persistence.Initializer");
-        wrapper.setSetupSQLScript(System.getProperty("test.sql.dir") + "/com/arsdigita/persistence/oracle-se/setup.sql");
-        wrapper.setTeardownSQLScript(System.getProperty("test.sql.dir") + "/com/arsdigita/persistence/oracle-se/teardown.sql");
+        wrapper.setSetupSQLScript(System.getProperty("test.sql.dir") + "/persistence/setup.sql");
+        wrapper.setTeardownSQLScript(System.getProperty("test.sql.dir") + "/persistence/teardown.sql");
         return wrapper;
     }
 
