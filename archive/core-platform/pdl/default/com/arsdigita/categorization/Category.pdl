@@ -38,6 +38,32 @@ object type Category extends ACSObject {
 
 
 association {
+    Category[0..1] rootCategory = join acs_objects.object_id
+                                    to cat_root_cat_object_map.object_id,
+                                  join cat_root_cat_object_map.category_id
+                                    to cat_categories.category_id;
+    ACSObject[0..n] categoryOwner = join cat_categories.category_id
+                                      to cat_root_cat_object_map.category_id,
+                                    join cat_root_cat_object_map.object_id
+                                      to acs_objects.object_id;
+
+    // Required because of bug in persistence.
+    // The where clause in the automatically generated event 
+    // does an and of object_id & category_id. However, the
+    // value supplied to the category_id bind value is the
+    // value of the new category, not the one being removed :(
+    //
+    // Comment out this event & the CategoryTest will fail
+    // with unqiue key violation
+    remove rootCategory {
+        do {
+            delete from cat_root_cat_object_map 
+                  where object_id = :id
+        }
+    }
+}
+
+association {
     Category[0..n] categories = join acs_objects.object_id 
                                   to cat_object_category_map.object_id,
                                 join cat_object_category_map.category_id
