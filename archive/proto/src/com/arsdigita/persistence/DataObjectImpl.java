@@ -14,16 +14,17 @@ import java.util.*;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2003/03/06 $
+ * @version $Revision: #10 $ $Date: 2003/03/12 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#9 $ by $Author: rhs $, $DateTime: 2003/03/06 14:09:52 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#10 $ by $Author: ashah $, $DateTime: 2003/03/12 14:58:16 $";
 
     private Session m_ssn;
     private OID m_oid;
     private Set m_observers = new HashSet();
+    private boolean m_isDisconnected = false;
 
     private static final class ObserverEntry {
 
@@ -125,7 +126,8 @@ class DataObjectImpl implements DataObject {
 
     public boolean isNew() {
         // handle calls to isNew before key is set
-        return !m_oid.isInitialized() || m_ssn.isNew(this);
+        return !m_oid.isInitialized() ||
+            (m_ssn.isNew(this) && !m_ssn.isPersisted(this));
     }
 
     public boolean isDeleted() {
@@ -133,11 +135,13 @@ class DataObjectImpl implements DataObject {
     }
 
     public boolean isDisconnected() {
-        throw new Error("not implemented");
+        // throw new Error("not implemented");
+        return m_isDisconnected;
     }
 
     public void disconnect() {
-        throw new Error("not implemented");
+        // throw new Error("not implemented");
+        m_isDisconnected = true;
     }
 
     public boolean isModified() {
@@ -157,11 +161,18 @@ class DataObjectImpl implements DataObject {
     }
 
     public void specialize(String subtypeName) {
-        throw new Error("not implemented");
+        ObjectType subtype =
+            MetadataRoot.getMetadataRoot().getObjectType(subtypeName);
+
+        if (subtype == null) {
+            throw new PersistenceException("No such type: " + subtypeName);
+        }
+
+        specialize(subtype);
     }
 
     public void specialize(ObjectType subtype) {
-        throw new Error("not implemented");
+        m_oid.specialize(subtype);
     }
 
     public void save() {

@@ -10,15 +10,15 @@ import java.sql.*;
  * RDBMSRecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/02/28 $
+ * @version $Revision: #4 $ $Date: 2003/03/12 $
  **/
 
 class RDBMSRecordSet extends RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSRecordSet.java#3 $ by $Author: rhs $, $DateTime: 2003/02/28 19:58:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSRecordSet.java#4 $ by $Author: ashah $, $DateTime: 2003/03/12 14:58:16 $";
 
     final private RDBMSEngine m_engine;
-    final private ResultSet m_rs;
+    private ResultSet m_rs;
     final private Map m_mappings;
 
     RDBMSRecordSet(Signature sig, RDBMSEngine engine, ResultSet rs,
@@ -49,8 +49,10 @@ class RDBMSRecordSet extends RecordSet {
     }
 
     public void close() {
+        if (m_rs == null) { return; }
         try {
             m_rs.close();
+            m_rs = null;
         } catch (SQLException e) {
             throw new Error(e.getMessage());
         }
