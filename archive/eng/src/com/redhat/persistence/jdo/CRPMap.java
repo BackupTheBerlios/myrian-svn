@@ -13,9 +13,14 @@ import javax.jdo.Query;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #19 $ $Date: 2004/07/20 $
+ * @version $Revision: #20 $ $Date: 2004/07/26 $
  **/
 class CRPMap implements Map {
+    private final static NullableObject NULL = new NullableObject() {
+            public boolean isNull() { return true; }
+            public Object getObject() { return null; }
+        };
+
     private Set entries;
     // XXX this is not a permanent solution
     private transient int m_count;
@@ -29,6 +34,12 @@ class CRPMap implements Map {
         Collection coll = (Collection) query.execute(entries, key);
         Iterator it = coll.iterator();
         return it.hasNext() ? (Map.Entry) it.next() : null;
+    }
+
+    NullableObject nullSavvyGet(Object key) {
+        final Map.Entry me = getEntry(key);
+
+        return me == null ? NULL : new Nullable(me.getValue());
     }
 
     private PersistenceManagerImpl getPMI() {
@@ -49,6 +60,37 @@ class CRPMap implements Map {
         entry.setValue(value);
         return entry;
     }
+
+    interface NullableObject {
+        boolean isNull();
+        Object getObject();
+    }
+
+    private static class Nullable implements NullableObject {
+        private final Object m_object;
+
+        Nullable(Object object) {
+            m_object = object;
+        }
+
+        public Object getObject() { return m_object; }
+
+        public boolean isNull() { return false; }
+    }
+
+    NullableObject nullSavvyPut(Object key, Object value) {
+        // XXX: locking
+        final Map.Entry me = getEntry(key);
+
+        if (me == null) {
+            entries.add(newMapEntry(key, value));
+            m_count++;
+            return NULL;
+        } else {
+            return new Nullable(me.setValue(value));
+        }
+    }
+
     // =========================================================================
     // Map interface
     // =========================================================================
@@ -59,16 +101,7 @@ class CRPMap implements Map {
     }
 
     public Object put(Object key, Object value) {
-        // XXX: locking
-        final Map.Entry me = getEntry(key);
-
-        if (me == null) {
-            entries.add(newMapEntry(key, value));
-            m_count++;
-            return null;
-        } else {
-            return me.setValue(value);
-        }
+        return nullSavvyPut(key, value).getObject();
     }
 
     public Object remove(Object key) {

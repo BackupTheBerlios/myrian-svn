@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #15 $ $Date: 2004/07/21 $
+ * @version $Revision: #16 $ $Date: 2004/07/26 $
  **/
 
 class CRPList implements List {
@@ -61,12 +61,17 @@ class CRPList implements List {
     }
 
     private Object m_remove(Integer index) {
-        // XXX: deal with with null values
-        Object oldValue = elements.remove(index);
-        if (oldValue == null) {
+        CRPMap.NullableObject value = ((CRPMap) elements).nullSavvyGet(index);
+        if (value.isNull()) {
             throw new IndexOutOfBoundsException(index.toString());
         }
-        return oldValue;
+
+        int idx = index.intValue();
+        for (; idx < size() - 1; idx++) {
+            elements.put(new Integer(idx), get(idx + 1));
+        }
+        elements.remove(new Integer(idx));
+        return value.getObject();
     }
 
     private class CRPListIterator implements ListIterator {
@@ -254,16 +259,28 @@ class CRPList implements List {
     }
 
     public Object set(int index, Object element) {
-        // XXX deal with nulls
-        final Integer idx = new Integer(index);
-        Object previous = elements.put(idx, element);
-        if (previous == null) {
-            elements.remove(idx);
-            throw new IndexOutOfBoundsException
-                (C.concat("index=", String.valueOf(index),
-                          "; element=", element));
+        if (index < 0) {
+            throw new IndexOutOfBoundsException(String.valueOf(index));
         }
-        return previous;
+
+        if ( elements instanceof CRPMap) {
+            final Integer idx = new Integer(index);
+            CRPMap.NullableObject previous =
+                ((CRPMap) elements).nullSavvyPut(idx, element);
+
+            if (previous.isNull()) {
+                elements.remove(idx);
+                throw new IndexOutOfBoundsException
+                    (C.concat("index=", String.valueOf(index),
+                              "; element=", element));
+            }
+            return previous.getObject();
+        } else {
+            if (index > elements.size()) {
+                throw new IndexOutOfBoundsException(String.valueOf(index));
+            }
+            return elements.put(new Integer(index), element);
+        }
     }
 
     public boolean add(Object element) {
@@ -300,7 +317,11 @@ class CRPList implements List {
     }
 
     public Object remove(int index) {
-        return m_remove(new Integer(index));
+        if ( elements instanceof CRPMap) {
+            return m_remove(new Integer(index));
+        } else {
+            return elements.remove(new Integer(index));
+        }
     }
 
     public boolean remove(Object element) {
