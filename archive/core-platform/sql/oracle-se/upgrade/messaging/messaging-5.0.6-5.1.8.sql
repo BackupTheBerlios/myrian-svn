@@ -1,4 +1,5 @@
 @@ message-remove-notnull-sender-constraint.sql
+@@ add-sent-date-index.sql
 
 create table message_threads (
     thread_id              integer
