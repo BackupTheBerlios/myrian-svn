@@ -13,12 +13,12 @@ import java.util.*;
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/03/11 $
+ * @version $Revision: #2 $ $Date: 2004/03/16 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Literal.java#1 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Literal.java#2 $ by $Author: richardl $, $DateTime: 2004/03/16 17:59:49 $";
 
     private Object m_value;
 
@@ -77,11 +77,11 @@ public class Literal extends Expression {
         } else {
             Adapter ad = root.getAdapter(value.getClass());
             PropertyMap pmap = ad.getProperties(value);
-            if (pmap.entrySet().isEmpty()) {
+            if (pmap.getObjectType().isCompound()) {
+                convert(pmap, result, root);
+            } else {
                 Code.Binding b = new Code.Binding(value, ad.defaultJDBCType());
                 result.add(new Code("?", Collections.singletonList(b)));
-            } else {
-                convert(pmap, result, root);
             }
         }
     }
