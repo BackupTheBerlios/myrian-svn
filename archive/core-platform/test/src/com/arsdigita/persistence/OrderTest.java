@@ -25,12 +25,12 @@ import java.sql.SQLException;
  * Test
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/05/12 $
+ * @version $Revision: #11 $ $Date: 2003/07/01 $
  */
 
 public abstract class OrderTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderTest.java#10 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderTest.java#11 $ by $Author: ashah $, $DateTime: 2003/07/01 11:28:55 $";
 
     public OrderTest(String name) {
         super(name);
@@ -153,35 +153,16 @@ public abstract class OrderTest extends PersistenceTestCase {
                  "did not execute");
         }
 
-        // We don't try this on postgres because the error caused by this will
-        // render the rest of the transaction useless and cause all subsequent
-        // tests performed in this method to fail.
-        if (!(com.arsdigita.db.DbHelper.getDatabase() ==
-              com.arsdigita.db.DbHelper.DB_POSTGRES &&
-              "dynamic".equals(m_testType))) {
+        if (!"dynamic".equals(m_testType)) {
             try {
                 DataObject orders = (DataObject)object.get("order");
-                object.set("order", null);
+                object.set("unsettableOrder", orders);
                 object.save();
-                if (!"dynamic".equals(m_testType)) {
-                    fail("trying to execute an event that is not defined should " +
-                         "throw an error.");
-                } else {
-                    object.set("order", orders);
-                    object.save();
-                }
-            } catch (UndefinedEventException e) {
-                // it should be here
-                // sometimes it should be here (for the static test)
-                assertTrue("We caught an UndefinedEventException in the dynamic test. " +
-                       "It should have been a PersistenceException",
-                       "static".equals(m_testType));
-            } /*catch (PersistenceException e) {
-                // sometimes it should be here (for the dynamic test)
-                assertTrue("We caught a PersistenceException in the static test.  " +
-                       "It should have been an UndefinedEventException",
-                       "dynamic".equals(m_testType));
-                       }*/
+                fail("trying to execute an event that is not defined should " +
+                     "throw an error.");
+            } catch (PersistenceException e) {
+                // continue
+            }
         }
 
 

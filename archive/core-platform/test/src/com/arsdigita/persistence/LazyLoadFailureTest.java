@@ -21,12 +21,12 @@ import java.math.*;
  * LazyLoadFailureTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2003/07/01 $
  **/
 
 public class LazyLoadFailureTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LazyLoadFailureTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LazyLoadFailureTest.java#4 $ by $Author: ashah $, $DateTime: 2003/07/01 11:28:55 $";
 
     public LazyLoadFailureTest(String name) {
         super(name);
@@ -53,7 +53,7 @@ public class LazyLoadFailureTest extends PersistenceTestCase {
         }
 
         try {
-            String name = (String) node.get("name");
+            String name = (String) node.get("lazyProperty");
             fail("Lazy load should have bombed out but didn't. It returned: ("
                  + name + ") instead.");
         } catch (PersistenceException e) {

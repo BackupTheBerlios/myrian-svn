@@ -1,6 +1,7 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.*;
+import com.arsdigita.persistence.proto.metadata.MetadataException;
 import com.arsdigita.persistence.proto.ProtoException;
 import com.arsdigita.persistence.proto.Session;
 
@@ -11,12 +12,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/06/20 $
+ * @version $Revision: #8 $ $Date: 2003/07/01 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#7 $ by $Author: ashah $, $DateTime: 2003/06/20 14:19:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#8 $ by $Author: ashah $, $DateTime: 2003/07/01 11:28:55 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -168,8 +169,8 @@ class DataObjectImpl implements DataObject {
                     }
                 }
 
-                obj = SessionManager.getSession().
-                    getProtoSession().get(this, convert(property));
+                obj = get(SessionManager.getSession().getProtoSession(),
+                          convert(property));
 
                 if (obj instanceof DataObjectImpl) {
                     DataObjectImpl dobj = (DataObjectImpl) obj;
@@ -182,7 +183,7 @@ class DataObjectImpl implements DataObject {
                 m_disconnect.put(prop, obj);
                 return obj;
             } else {
-                Object result = m_ssn.get(this, convert(property));
+                Object result = get(m_ssn, convert(property));
                 if (result instanceof DataObjectImpl) {
                     DataObjectImpl dobj = (DataObjectImpl) result;
                     if (dobj.isDisconnected()) {
@@ -215,7 +216,7 @@ class DataObjectImpl implements DataObject {
             if (!p.isCollection()
                 && !p.isKeyProperty()
                 && p.getType().isSimple()) {
-                m_disconnect.put(p, ssn.get(this, C.prop(p)));
+                m_disconnect.put(p, get(ssn, C.prop(p)));
             }
         }
 
@@ -460,6 +461,17 @@ class DataObjectImpl implements DataObject {
             } finally {
                 entry.clearFiring(event);
             }
+        }
+    }
+
+    private Object get(Session s,
+                       com.arsdigita.persistence.proto.metadata.Property p) {
+        try {
+            return s.get(this, p);
+        } catch (ProtoException pe) {
+            throw new PersistenceException(pe);
+        } catch (MetadataException pe) {
+            throw new PersistenceException(pe);
         }
     }
 

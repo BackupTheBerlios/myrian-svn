@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/test/pdl/com/arsdigita/persistence/static/Order.pdl#2 $ 
-// $DateTime: 2003/05/12 18:19:45 $
+// $Id: //core-platform/dev/test/pdl/com/arsdigita/persistence/static/Order.pdl#3 $ 
+// $DateTime: 2003/07/01 11:28:55 $
 
 model examples;
 
@@ -191,6 +191,8 @@ object type LineItem {
     Float[1..1] price;
     String[1..1] name;
     Boolean[0..1] inStock;
+    // no add/remove defined for this order
+    Order[0..1] unsettableOrder;
 
     object key (id);
 
@@ -231,6 +233,14 @@ object type LineItem {
     
     delete {
         do { delete from t_line_items where item_id = :id }
+    }
+
+    retrieve unsettableOrder {
+        do {
+            select null as id from dual
+        } map {
+            unsettableOrder.id = id;
+        }
     }
 }
 

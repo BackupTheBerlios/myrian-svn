@@ -10,12 +10,12 @@ import java.util.*;
  * StaticQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/06/02 $
+ * @version $Revision: #3 $ $Date: 2003/07/01 $
  **/
 
 class StaticQuerySource extends QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/StaticQuerySource.java#2 $ by $Author: rhs $, $DateTime: 2003/06/02 10:49:07 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/StaticQuerySource.java#3 $ by $Author: ashah $, $DateTime: 2003/07/01 11:28:55 $";
 
     private synchronized Source getSource(ObjectType type, SQLBlock block,
                                           Path prefix) {
@@ -164,6 +164,9 @@ class StaticQuerySource extends QuerySource {
             ObjectType type = prop.getType();
             Mapping m = om.getMapping(path);
             block = m.getRetrieve();
+            if (block == null) {
+                throw new MetadataException(prop, "no retrieve for " + prop);
+            }
             sig = getSignature(type, block, path, props.getObjectType());
         } else {
             ObjectType type = om.getObjectType();
@@ -184,6 +187,10 @@ class StaticQuerySource extends QuerySource {
             if (sig == null) {
                 Mapping m = om.getMapping(path);
                 block = m.getRetrieve();
+                if (block == null) {
+                    throw new MetadataException
+                        (prop, "no retrieve for " + prop);
+                }
                 sig = getSignature
                     (prop.getType(), block, path, props.getObjectType());
             }
