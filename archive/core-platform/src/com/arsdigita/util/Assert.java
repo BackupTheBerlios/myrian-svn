@@ -27,16 +27,16 @@ import org.apache.log4j.Logger;
  * Do not subclass it.  In a future revision of this software, this
  * class will be made final.
  *
- * @author David Lutterkort
+ * @author David Lutterkort &lt;dlutter@redhat.com&gt;
  * @author Uday Mathur
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#13 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#14 $
  */
 public class Assert {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#13 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#14 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/04/26 19:14:38 $";
+        "$DateTime: 2003/05/12 01:04:26 $";
 
     private static final Logger s_log = Logger.getLogger
         (Assert.class);
@@ -49,6 +49,19 @@ public class Assert {
         // Making this a little less costly will be good. XXX
 
         return Util.getConfig().isAssertEnabled();
+    }
+
+    /**
+     * Throws an error.
+     *
+     * @param message A <code>String</code> describing the failure
+     * condition
+     * @throws java.lang.Error
+     */
+    public static void fail(final String message) {
+        s_log.error(message);
+
+        throw new Error(message);
     }
 
     /**
@@ -181,6 +194,33 @@ public class Assert {
             if (!value1.equals(value2)) {
                 final String message = value1 + " does not equal " + value2;
 
+                s_log.error(message);
+
+                throw new Error(message);
+            }
+        }
+    }
+
+    /**
+     * Verifies that two values are equal (according to their equals
+     * method, unless <code>value1</code> is null, then according to
+     * <code>==</code>).
+     *
+     * @param value1 The first value to be compared
+     * @param value2 The second
+     * @throws java.lang.Error if the arguments are unequal
+     */
+    public static final void equal(final Object value1,
+                                   final Object value2,
+                                   final String message) {
+        if (value1 == null) {
+            if (value1 != value2) {
+                s_log.error(message);
+
+                throw new Error(message);
+            }
+        } else {
+            if (!value1.equals(value2)) {
                 s_log.error(message);
 
                 throw new Error(message);
@@ -425,18 +465,6 @@ public class Assert {
                         "Illegal access to a locked " +
                         l.getClass().getName());
         }
-    }
-
-    /**
-     * This is the equivalent of assertTrue(false, msg).
-     *
-     * @param msg A string describing the condition of failure.
-     * @throws java.lang.Error
-     * @deprecated because it's just as simple to throw an
-     * <code>Error</code> or <code>Exception</code>
-     */
-    public static void fail(String msg) {
-        assertTrue(false, msg);
     }
 
     /**
