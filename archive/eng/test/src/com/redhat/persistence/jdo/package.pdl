@@ -57,18 +57,18 @@ object type Party class com.redhat.persistence.jdo.Party
 }
 
 association {
-    Party[1..1] party =
+    Party[1..1] container =
         join auxiliary_emails.party_id to parties.party_id;
-    component AuxiliaryEmail[0..n] auxiliaryEmails$elements =
+    component AuxiliaryEmail[0..n] auxiliaryEmails$elements$entries =
         join parties.party_id to auxiliary_emails.party_id;
 }
 
-object type AuxiliaryEmail class com.redhat.persistence.jdo.ListElement
-                           adapter com.redhat.persistence.jdo.ReflectionAdapter {
-    Integer[1..1] index = auxiliary_emails.index;
-    String[0..1] email = auxiliary_emails.email VARCHAR(200);
+object type AuxiliaryEmail class com.redhat.persistence.jdo.MapEntry
+                           adapter com.redhat.persistence.jdo.JDOAdapter {
+    Integer[1..1] key = auxiliary_emails.index;
+    String[0..1] value = auxiliary_emails.email VARCHAR(200);
 
-    object key (party, index);
+    object key (container, key);
 }
 
 object type User extends Party class com.redhat.persistence.jdo.User {

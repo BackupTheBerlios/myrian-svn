@@ -11,6 +11,7 @@ public class JDOSuite extends TestSuite {
         suite.addTestSuite(PandoraTest.class);
         suite.addTestSuite(WithoutTxnTest.class);
         suite.addTestSuite(MapTest.class);
+        suite.addTestSuite(ListTest.class);
 
         return new JDOTestSetup(suite);
     }

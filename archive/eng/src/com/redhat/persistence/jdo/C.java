@@ -90,6 +90,7 @@ class C {
         }
         for (Iterator it = type.getProperties().iterator(); it.hasNext(); ) {
             Property p = (Property) it.next();
+            // XXX: is it really enough for p to merely start with name?
             if (p.getName().startsWith(name)) {
                 return true;
             }

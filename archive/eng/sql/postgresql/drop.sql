@@ -15,8 +15,5 @@ drop table parties;
 
 drop table emps;
 drop table depts;
-
-
-
-
-
+drop table mag_index;
+drop table magazines;

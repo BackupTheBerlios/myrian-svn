@@ -84,7 +84,9 @@ class StateManagerImpl extends AbstractStateManager {
         Property prop = type.getProperty(name);
 
         if (prop == null) {
-            throw new IllegalStateException("no " + name + " in " +  type);
+            throw new IllegalStateException
+                ("no " + name + " in " +  type + "; field=" + field +
+                 "; prefix=" + m_prefix);
         }
 
         return prop;
@@ -99,13 +101,17 @@ class StateManagerImpl extends AbstractStateManager {
      */
     public Object getObjectField(PersistenceCapable pc, int field,
                                  Object currentValue) {
+
+        final Class declaredClass =
+            (Class) C.getAllTypes(pc.getClass()).get(field);
+        final String name = name(pc, field);
+
         if (isComponent(pc, field)) {
-            String name = name(pc, field);
             if (m_components.containsKey(name)) {
                 return m_components.get(name);
             } else {
                 // XXX: what to do about currentValue
-                Class klass = (Class) C.getAllTypes(pc.getClass()).get(field);
+                Class klass = declaredClass;
                 if (klass.equals(List.class)) {
                     klass = CRPList.class;
                 } else if (klass.equals(Map.class)) {
@@ -121,7 +127,11 @@ class StateManagerImpl extends AbstractStateManager {
             if (prop.isKeyProperty()) {
                 return getPropertyMap().get(prop);
             } else if (prop.isCollection()) {
-                return new CRPSet(ssn(), ssn().retrieve(m_pmap), prop);
+                if (Map.class.equals(declaredClass)) {
+                    return m_pmi.newPC(m_pmap, CRPMap.class, name + "$");
+                } else {
+                    return new CRPSet(ssn(), ssn().retrieve(m_pmap), prop);
+                }
             } else {
                 return ssn().get(ssn().retrieve(m_pmap), prop);
             }
