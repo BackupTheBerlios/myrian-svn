@@ -3,30 +3,30 @@ LIBS:=lib
 
 -include abe.mk
 
-tests: all
-	bin/run com.redhat.persistence.TestRunner \
-		`find $(SOURCES) -name "*Suite.java" -printf "%P " | sed s@[.]java@@g | sed s@/@.@g`
+TEST_RUNNER:=bin/run
+ifdef INCLUDE
+TEST_RUNNER:=$(TEST_RUNNER) -Djunit.include=$(INCLUDE)
+endif
+ifdef EXCLUDE
+TEST_RUNNER:=$(TEST_RUNNER) -Djunit.exclude=$(EXCLUDE)
+endif
+TEST_RUNNER:=$(TEST_RUNNER) com.redhat.persistence.TestRunner
 
-run-tests: all
-	bin/run-tests
+tests: all
+	$(TEST_RUNNER) `find $(SOURCES) -name "*Suite.java" -printf "%P " | sed s@[.]java@@g | sed s@/@.@g`
 
 jdo-tests: all
-	bin/run com.redhat.persistence.TestRunner \
-		com.redhat.persistence.jdo.JDOSuite
+	$(TEST_RUNNER) com.redhat.persistence.jdo.JDOSuite
 
 persistence-tests: all
-	bin/run com.redhat.persistence.TestRunner \
-		com.arsdigita.persistence.PersistenceSuite
+	$(TEST_RUNNER) com.arsdigita.persistence.PersistenceSuite
 
 oql-tests: all
-	bin/run com.redhat.persistence.TestRunner \
-		com.redhat.persistence.oql.QuerySuite
+	$(TEST_RUNNER) com.redhat.persistence.oql.QuerySuite
 
 data-tests: all
-	bin/run com.redhat.persistence.TestRunner \
-		com.arsdigita.persistence.tests.data.DataSuite
+	$(TEST_RUNNER) com.arsdigita.persistence.tests.data.DataSuite
 
 pdl-tests: all
-	bin/run com.redhat.persistence.TestRunner \
-		com.redhat.persistence.pdl.PDLSuite \
+	$(TEST_RUNNER) com.redhat.persistence.pdl.PDLSuite \
 		com.arsdigita.persistence.pdl.PDLSuite
