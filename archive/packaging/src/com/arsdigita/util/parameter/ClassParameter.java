@@ -23,13 +23,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ClassParameter.java#3 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ClassParameter.java#4 $
  */
-public class ClassParameter extends StringParameter {
+public class ClassParameter extends AbstractParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ClassParameter.java#3 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ClassParameter.java#4 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/02 12:40:15 $";
+        "$DateTime: 2003/09/18 15:53:35 $";
 
     static {
         Converters.set(Class.class, new ClassConverter());
@@ -42,6 +42,6 @@ public class ClassParameter extends StringParameter {
     public ClassParameter(final String name,
                           final int multiplicity,
                           final Object defaalt) {
-        super(name, multiplicity, defaalt);
+        super(name, multiplicity, defaalt, Class.class);
     }
 }

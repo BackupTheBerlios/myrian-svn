@@ -20,26 +20,20 @@ import java.util.*;
 /**
  * Subject to change.
  *
- * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Revision: #4 $ $Date: 2003/09/18 $
+ * @version $Revision: #1 $ $Date: 2003/09/18 $
  */
-public interface Parameter {
+public interface ParameterInfo {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/Parameter.java#4 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterInfo.java#1 $" +
         "$Author: justin $" +
         "$DateTime: 2003/09/18 15:53:35 $";
 
-    public static final int OPTIONAL = 0;
-    public static final int REQUIRED = 1;
+    String getTitle();
 
-    boolean isRequired();
+    String getPurpose();
 
-    String getName();
+    String getExample();
 
-    ParameterInfo getInfo();
-
-    ParameterValue unmarshal(ParameterStore store);
-
-    void validate(ParameterValue value);
+    String getFormat();
 }
