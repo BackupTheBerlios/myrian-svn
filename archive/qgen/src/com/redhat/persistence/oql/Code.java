@@ -13,16 +13,17 @@ import org.apache.log4j.Logger;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2004/02/27 $
+ * @version $Revision: #15 $ $Date: 2004/02/28 $
  **/
 
 class Code {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#14 $ by $Author: rhs $, $DateTime: 2004/02/27 18:00:19 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#15 $ by $Author: rhs $, $DateTime: 2004/02/28 08:30:26 $";
 
     private static final Logger s_log = Logger.getLogger(Code.class);
 
     static final String TRUE = "1 = 1";
+    static final String FALSE = "1 = 0";
     static final String NULL = "null";
 
     static String join(Collection objs, String sep) {

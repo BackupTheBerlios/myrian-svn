@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * And
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/02/27 $
+ * @version $Revision: #8 $ $Date: 2004/02/28 $
  **/
 
 public class And extends BinaryCondition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/And.java#7 $ by $Author: rhs $, $DateTime: 2004/02/27 16:35:42 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/And.java#8 $ by $Author: rhs $, $DateTime: 2004/02/28 08:30:26 $";
 
     public And(Expression left, Expression right) {
         super(left, right);
@@ -29,6 +29,18 @@ public class And extends BinaryCondition {
         gen.addNonNulls(this, gen.getNonNull(m_right));
         if (gen.isSufficient(m_left) && gen.isSufficient(m_right)) {
             gen.addSufficient(this);
+        }
+    }
+
+    String emit(Generator gen) {
+        String left = m_left.emit(gen);
+        String right = m_right.emit(gen);
+        if (Code.TRUE.equals(left)) {
+            return right;
+        } else if (Code.TRUE.equals(right)) {
+            return left;
+        } else {
+            return left + " and " + right;
         }
     }
 

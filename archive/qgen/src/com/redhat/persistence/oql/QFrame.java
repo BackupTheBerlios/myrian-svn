@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/02/27 $
+ * @version $Revision: #8 $ $Date: 2004/02/28 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#7 $ by $Author: rhs $, $DateTime: 2004/02/27 18:11:29 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#8 $ by $Author: rhs $, $DateTime: 2004/02/28 08:30:26 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -167,9 +167,10 @@ class QFrame {
 
     String emit(boolean select) {
         List where = new ArrayList();
+        Set emitted = new HashSet();
         String join = null;
         if (!m_hoisted) {
-            join = render(where);
+            join = render(where, emitted);
         }
 
         StringBuffer buf = new StringBuffer();
@@ -198,7 +199,7 @@ class QFrame {
             buf.append(join);
         }
 
-        String sql = join(where, "\nand ");
+        String sql = join(where, "\nand ", emitted);
         if (!sql.equals("")) {
             buf.append("\nwhere ");
             buf.append(sql);
@@ -233,16 +234,17 @@ class QFrame {
         return buf.toString();
     }
 
-    private String join(List exprs, String sep) {
-        List emitted = new ArrayList();
+    private String join(List exprs, String sep, Set emitted) {
+        List conditions = new ArrayList();
         for (Iterator it = exprs.iterator(); it.hasNext(); ) {
             Expression e = (Expression) it.next();
             String sql = e.emit(m_generator);
-            if (!Code.TRUE.equals(sql)) {
+            if (!Code.TRUE.equals(sql) && !emitted.contains(sql)) {
+                conditions.add(sql);
                 emitted.add(sql);
             }
         }
-        return Code.join(emitted, sep);
+        return Code.join(conditions, sep);
     }
 
     private List getOrders() {
@@ -265,11 +267,11 @@ class QFrame {
         }
     }
 
-    String render(List conditions) {
-        return render(conditions, new HashSet());
+    private String render(List conditions, Set emitted) {
+        return render(conditions, new HashSet(), emitted);
     }
 
-    String render(List conditions, Set defined) {
+    private String render(List conditions, Set defined, Set emitted) {
         StringBuffer result = new StringBuffer();
 
         Set defs = new HashSet();
@@ -288,7 +290,7 @@ class QFrame {
         for (Iterator it = m_children.iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
             List conds = new ArrayList();
-            String join = child.render(conds, defs);
+            String join = child.render(conds, defs, emitted);
             /*if (join == null && !conds.isEmpty()) {
                 throw new IllegalStateException
                     ("Condition without joins: " + conds +
@@ -346,7 +348,7 @@ class QFrame {
                     conditions.addAll(conds);
                 } else {
                     result.append(" on ");
-                    result.append(join(conds, " and "));
+                    result.append(join(conds, " and ", emitted));
                 }
             }
             first = false;
@@ -416,7 +418,7 @@ class QFrame {
     boolean isSelect() {
         if (m_hoisted) {
             return false;
-        } else if (render(new ArrayList()) == null) {
+        } else if (render(new ArrayList(), new HashSet()) == null) {
             return false;
         } else {
             return true;
@@ -443,13 +445,7 @@ class QFrame {
         if (m_condition != null && !m_outer) {
             List nonnulls = m_generator.getNonNull(m_condition);
             Set frames = frames(nonnulls);
-            for (Iterator it = m_children.iterator(); it.hasNext(); ) {
-                QFrame child = (QFrame) it.next();
-                if (child.m_outer && child.containsAny(frames)) {
-                    child.m_outer = false;
-                    modified = true;
-                }
-            }
+            modified = innerize(frames);
         }
         if (m_outer) {
             List conditions = getConditions();
@@ -467,6 +463,21 @@ class QFrame {
                     m_outer = false;
                     modified = true;
                 }
+            }
+        }
+        return modified;
+    }
+
+    boolean innerize(Set frames) {
+        boolean modified = false;
+        if (m_outer && containsAny(frames)) {
+            m_outer = false;
+            modified = true;
+        }
+        for (Iterator it = m_children.iterator(); it.hasNext(); ) {
+            QFrame child = (QFrame) it.next();
+            if (child.innerize(frames)) {
+                modified = true;
             }
         }
         return modified;
@@ -534,7 +545,8 @@ class QFrame {
                     ("Multiple duplicate frames returned: " + dups);
             }
             if (dups.size() > 0) {
-                setAlias((QFrame) dups.iterator().next());
+                QFrame dup = (QFrame) dups.iterator().next();
+                setAlias(dup);
             }
             frames.add(this);
         }

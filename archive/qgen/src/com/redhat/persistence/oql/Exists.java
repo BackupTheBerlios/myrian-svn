@@ -6,12 +6,12 @@ import java.util.*;
  * Exists
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/02/27 $
+ * @version $Revision: #10 $ $Date: 2004/02/28 $
  **/
 
 public class Exists extends UnaryCondition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Exists.java#9 $ by $Author: rhs $, $DateTime: 2004/02/27 16:35:42 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Exists.java#10 $ by $Author: rhs $, $DateTime: 2004/02/28 08:30:26 $";
 
     public Exists(Expression query) {
         super(query);
@@ -27,16 +27,18 @@ public class Exists extends UnaryCondition {
         QFrame query = gen.getFrame(m_operand);
         if (!query.isSelect()) {
             List values = query.getValues();
-            StringBuffer buf = new StringBuffer();
+            List conds = new ArrayList();
             for (Iterator it = values.iterator(); it.hasNext(); ) {
                 QValue value = (QValue) it.next();
-                buf.append(value);
-                buf.append(" is not null");
-                if (it.hasNext()) {
-                    buf.append(" and ");
+                if (value.isNullable()) {
+                    conds.add(value + " is not null");
                 }
             }
-            return buf.toString();
+            if (conds.isEmpty()) {
+                return Code.TRUE;
+            } else {
+                return Code.join(conds, " and ");
+            }
         } else {
             return "exists (" + m_operand.emit(gen) + ")";
         }

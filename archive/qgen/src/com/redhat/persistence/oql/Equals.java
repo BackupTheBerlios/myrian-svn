@@ -6,12 +6,12 @@ import java.util.*;
  * Equals
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2004/02/27 $
+ * @version $Revision: #13 $ $Date: 2004/02/28 $
  **/
 
 public class Equals extends BinaryCondition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Equals.java#12 $ by $Author: rhs $, $DateTime: 2004/02/27 18:00:19 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Equals.java#13 $ by $Author: rhs $, $DateTime: 2004/02/28 08:30:26 $";
 
     public Equals(Expression left, Expression right) {
         super(left, right);
@@ -75,9 +75,6 @@ public class Equals extends BinaryCondition {
     }
 
     static String emit(Generator gen, Expression lexpr, Expression rexpr) {
-        List left = new ArrayList();
-        List right = new ArrayList();
-
         if (gen.hasFrame(lexpr) && gen.hasFrame(rexpr)) {
             QFrame lframe = gen.getFrame(lexpr);
             QFrame rframe = gen.getFrame(rexpr);
@@ -88,40 +85,52 @@ public class Equals extends BinaryCondition {
                     throw new IllegalStateException
                         ("signature missmatch: " + lvals + ", " + rvals);
                 }
+                List conds = new ArrayList();
                 for (int i = 0; i < lvals.size(); i++) {
-                    left.add("" + (QValue) lvals.get(i));
-                    right.add("" + (QValue) rvals.get(i));
+                    QValue l = (QValue) lvals.get(i);
+                    QValue r = (QValue) rvals.get(i);
+                    String lsql = l.toString();
+                    String rsql = r.toString();
+                    if (Code.NULL.equals(lsql)) {
+                        if (!r.isNullable()) {
+                            return Code.FALSE;
+                        }
+                    } else if (Code.NULL.equals(rsql)) {
+                        if (!l.isNullable()) {
+                            return Code.FALSE;
+                        }
+                    }
+
+                    if (!lsql.equals(rsql)) {
+                        conds.add(emit(lsql, rsql));
+                    }
                 }
-            } else {
-                // XXX: we can to do something smarter than this for
-                // multi column selects
-                left.add(lexpr.emit(gen));
-                right.add(rexpr.emit(gen));
-            }
-        } else {
-            left.add(lexpr.emit(gen));
-            right.add(rexpr.emit(gen));
-        }
-
-        List conds = new ArrayList();
-        for (int i = 0; i < left.size(); i++) {
-            String l = (String) left.get(i);
-            String r = (String) right.get(i);
-            if (Code.NULL.equals(l)) {
-                conds.add(r + " is " + l);
-            } else if (Code.NULL.equals(r)) {
-                conds.add(l + " is " + r);
-            } else if (l.equals(r)) {
-                // do nothing
-            } else {
-                conds.add(l + " = " + r);
+                if (conds.isEmpty()) {
+                    return Code.TRUE;
+                } else {
+                    return Code.join(conds, " and ");
+                }
             }
         }
 
-        if (conds.isEmpty()) {
+        // XXX: we can to do something smarter than this for
+        // multi column selects
+        String lsql = lexpr.emit(gen);
+        String rsql = rexpr.emit(gen);
+        if (lsql.equals(rsql)) {
             return Code.TRUE;
         } else {
-            return Code.join(conds, " and ");
+            return emit(lsql, rsql);
+        }
+    }
+
+    private static String emit(String left, String right) {
+        if (Code.NULL.equals(left)) {
+            return right + " is " + left;
+        } else if (Code.NULL.equals(right)) {
+            return left + " is " + right;
+        } else {
+            return left + " = " + right;
         }
     }
 

@@ -1,15 +1,17 @@
 package com.redhat.persistence.oql;
 
+import com.redhat.persistence.metadata.*;
+
 /**
  * QValue
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/02/21 $
+ * @version $Revision: #2 $ $Date: 2004/02/28 $
  **/
 
 class QValue {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QValue.java#1 $ by $Author: rhs $, $DateTime: 2004/02/21 13:11:19 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QValue.java#2 $ by $Author: rhs $, $DateTime: 2004/02/28 08:30:26 $";
 
     private QFrame m_frame;
     private String m_column;
@@ -29,6 +31,17 @@ class QValue {
 
     String getColumn() {
         return m_column;
+    }
+
+    boolean isNullable() {
+        QFrame frame = m_frame.getAlias();
+        if (frame.isOuter()) { return true; }
+        if (frame.getTable() == null) { return true; }
+        Root root = frame.getGenerator().getRoot();
+        Table t = root.getTable(frame.getTable());
+        if (t == null) { return true; }
+        Column col = t.getColumn(m_column);
+        return col.isNullable();
     }
 
     public String toString() {

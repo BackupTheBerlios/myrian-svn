@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/02/27 $
+ * @version $Revision: #7 $ $Date: 2004/02/28 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#6 $ by $Author: rhs $, $DateTime: 2004/02/27 16:35:42 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#7 $ by $Author: rhs $, $DateTime: 2004/02/28 08:30:26 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -266,14 +266,23 @@ class Generator {
     Set getDuplicates(QFrame frame) {
         List conds = frame.getRoot().getConditions();
 
+        // We have to key this map by QValue.toString() rather than a
+        // QValue, this is because there can be multiple QValues for a
+        // given frame referring to the same column. This also means
+        // that with each subsequent computation of the equisets map
+        // previous aliasing will be taken into account since the
+        // toString() will used the aliased name for the frame.
+
         Map equisets = new HashMap();
         for (Iterator it = conds.iterator(); it.hasNext(); ) {
             Expression e = (Expression) it.next();
             List eqs = getEqualities(e);
             for (Iterator iter = eqs.iterator(); iter.hasNext(); ) {
                 Equality eq = (Equality) iter.next();
-                Set lset = (Set) equisets.get(eq.getLeft());
-                Set rset = (Set) equisets.get(eq.getRight());
+                String l = eq.getLeft().toString();
+                String r = eq.getRight().toString();
+                Set lset = (Set) equisets.get(l);
+                Set rset = (Set) equisets.get(r);
                 if (lset == null && rset == null) {
                     lset = rset = new HashSet();
                 } else if (lset == null && rset != null) {
@@ -288,8 +297,8 @@ class Generator {
                 // really matter which one we add to.
                 lset.add(eq.getLeft());
                 rset.add(eq.getRight());
-                equisets.put(eq.getLeft(), lset);
-                equisets.put(eq.getRight(), rset);
+                equisets.put(l, lset);
+                equisets.put(r, rset);
             }
         }
 
@@ -319,7 +328,7 @@ class Generator {
             QValue me = eq.getValue(frame);
             if (me == null) { continue; }
             if (me.getTable() == null) { continue; }
-            Set equiset = (Set) equisets.get(me);
+            Set equiset = (Set) equisets.get(me.toString());
             for (Iterator iter = equiset.iterator(); iter.hasNext(); ) {
                 QValue other = (QValue) iter.next();
                 if (other.getFrame().equals(frame)) { continue; }
