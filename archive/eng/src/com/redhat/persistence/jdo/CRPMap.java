@@ -13,7 +13,7 @@ import javax.jdo.Query;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #21 $ $Date: 2004/07/28 $
+ * @version $Revision: #22 $ $Date: 2004/07/28 $
  **/
 class CRPMap implements Map {
     private final static NullableObject NULL = new NullableObject() {
@@ -126,9 +126,12 @@ class CRPMap implements Map {
     }
 
     public Set keySet() {
-        // XXX: this is a temporary hack.  We need to return a CRPSet or some
-        // such instead.
-        return new HashSet(keys());
+        // XXX: implement for the case when entries is a HashSet
+        if (!(entries instanceof CRPSet)) {
+            throw new UnsupportedOperationException();
+        }
+
+        return new ProxySet((OQLCollection) keys());
     }
 
     public Set entrySet() {

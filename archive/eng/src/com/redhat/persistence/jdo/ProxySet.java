@@ -11,70 +11,70 @@ import java.util.Set;
  *
  * @author  Vadim Nasardinov (vadimn@redhat.com)
  * @since   2004-07-14
- * @version $Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/ProxySet.java#2 $
+ * @version $Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/ProxySet.java#3 $
  **/
 class ProxySet implements Set, OQLCollection {
-    private final CRPSet m_set;
+    private final OQLCollection m_coll;
 
-    ProxySet(CRPSet proxied) {
+    ProxySet(OQLCollection proxied) {
         if (proxied == null) { throw new NullPointerException("proxied"); }
-        m_set = proxied;
+        m_coll = proxied;
     }
 
     public Expression expression() {
-        return m_set.expression();
+        return m_coll.expression();
     }
 
     public int size() {
-        return m_set.size();
+        return m_coll.size();
     }
 
     public void clear() {
-        m_set.clear();
+        m_coll.clear();
     }
 
     public boolean isEmpty() {
-        return m_set.isEmpty();
+        return m_coll.isEmpty();
     }
 
     public boolean add(Object element) {
-        return m_set.add(element);
+        return m_coll.add(element);
     }
 
     public boolean addAll(Collection coll) {
-        return m_set.addAll(coll);
+        return m_coll.addAll(coll);
     }
 
     public boolean contains(Object element) {
-        return m_set.contains(element);
+        return m_coll.contains(element);
     }
 
     public boolean containsAll(Collection coll) {
-        return m_set.containsAll(coll);
+        return m_coll.containsAll(coll);
     }
 
     public boolean remove(Object element) {
-        return m_set.remove(element);
+        return m_coll.remove(element);
     }
 
     public boolean removeAll(Collection coll) {
-        return m_set.removeAll(coll);
+        return m_coll.removeAll(coll);
     }
 
     public boolean retainAll(Collection coll) {
-        return m_set.retainAll(coll);
+        return m_coll.retainAll(coll);
     }
 
     public Iterator iterator() {
-        return m_set.iterator();
+        return m_coll.iterator();
     }
 
     public Object[] toArray() {
-        return m_set.toArray();
+        return m_coll.toArray();
     }
 
     public Object[] toArray(Object[] ary) {
-        return m_set.toArray(ary);
+        return m_coll.toArray(ary);
     }
 }
 
