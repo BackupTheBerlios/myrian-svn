@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/oracle-se-create.sql#2 $
--- $DateTime: 2004/01/15 10:03:14 $
+-- $Id: //core-platform/dev/sql/ccm-core/oracle-se-create.sql#3 $
+-- $DateTime: 2004/01/20 12:05:11 $
 
 @@ oracle-se/function-currentDate.sql
 
@@ -80,11 +80,12 @@
 @@ default/kernel/table-dnm_privilege_hierarchy.sql
 @@ default/kernel/comment-dnm_privilege_hierarchy.sql
 
-@@ oracle-se/kernel/package-dnm_privileges.sql
-@@ oracle-se/kernel/triggers-dnm_privileges.sql
 @@ default/kernel/table-dnm_permissions.sql
 @@ default/kernel/comment-dnm_permissions.sql
 @@ default/kernel/index-dnm_permissions.sql
+
+@@ oracle-se/kernel/package-dnm_privileges.sql
+@@ oracle-se/kernel/triggers-dnm_privileges.sql
 
 @@ default/kernel/comment-acs_permissions.sql
 
