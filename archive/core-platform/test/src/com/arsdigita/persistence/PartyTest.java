@@ -27,12 +27,12 @@ import org.apache.log4j.Category;
  * PartyTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/07/25 $
  */
 
 abstract public class PartyTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PartyTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PartyTest.java#3 $ by $Author: randyg $, $DateTime: 2002/07/25 16:27:18 $";
 
     private static Category s_log = 
         Category.getInstance(PartyTest.class.getName());
@@ -259,18 +259,23 @@ abstract public class PartyTest extends PersistenceTestCase {
 
 	OID oid = new OID(getModelName() + ".Group", new BigInteger("1"));
 
-	group = getSession().retrieve(oid);
-	try {
-	    group.delete();
-	    fail("group was successfully deleted when it should " +
-		 "have errored out with constraint failures");
-	} catch (PersistenceException e) {
-	    // Do nothing.
-	}
+    if (com.arsdigita.db.Initializer.getDatabase() !=
+        com.arsdigita.db.Initializer.POSTGRES) {
+        group = getSession().retrieve(oid);
+        try {
+            group.delete();
+            fail("group was successfully deleted when it should " +
+                 "have errored out with constraint failures");
+        } catch (PersistenceException e) {
+            // Do nothing.
+        }
+    }
 
 	group = getSession().retrieve(oid);
 	members = (DataAssociation) group.get("members");
 	DataAssociationCursor cursor = members.cursor();
+    cursor = members.cursor();
+
 	while (cursor.next()) {
 	    cursor.remove();
 	}

@@ -25,12 +25,12 @@ import java.sql.SQLException;
  * Test
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/07/22 $
+ * @version $Revision: #5 $ $Date: 2002/07/25 $
  */
 
 public abstract class OrderTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderTest.java#4 $ by $Author: randyg $, $DateTime: 2002/07/22 18:09:12 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderTest.java#5 $ by $Author: randyg $, $DateTime: 2002/07/25 16:27:18 $";
 
     public OrderTest(String name) {
         super(name);
@@ -153,24 +153,28 @@ public abstract class OrderTest extends PersistenceTestCase {
                  "did not execute");
         }
 
-        try {
-            GenericDataObject orders = (GenericDataObject)object.get("order");
-            object.set("order", null);
-            object.save();
-            fail("trying to execute an event that is not defined should " +
-                 "throw an error.");
-        } catch (UndefinedEventException e) {
-            // it should be here
-            // sometimes it should be here (for the static test)
-            assert("We caught an UndefinedEventException in the dynamic test. " +
-                   "It should have been a PersistenceException", 
-                   "static".equals(m_testType));
-        } catch (PersistenceException e) {
-            // sometimes it should be here (for the dynamic test)
-            assert("We caught a PersistenceException in the static test.  " +
-                   "It should have been an UndefinedEventException", 
-                   "dynamic".equals(m_testType));
-        } 
+        if (!(com.arsdigita.db.Initializer.getDatabase() ==
+              com.arsdigita.db.Initializer.POSTGRES &&
+              "dynamic".equals(m_testType))) {
+            try {
+                GenericDataObject orders = (GenericDataObject)object.get("order");
+                object.set("order", null);
+                object.save();
+                fail("trying to execute an event that is not defined should " +
+                     "throw an error.");
+            } catch (UndefinedEventException e) {
+                // it should be here
+                // sometimes it should be here (for the static test)
+                assert("We caught an UndefinedEventException in the dynamic test. " +
+                       "It should have been a PersistenceException", 
+                       "static".equals(m_testType));
+            } catch (PersistenceException e) {
+                // sometimes it should be here (for the dynamic test)
+                assert("We caught a PersistenceException in the static test.  " +
+                       "It should have been an UndefinedEventException", 
+                       "dynamic".equals(m_testType));
+            } 
+        }
 
 
         order = getSession().retrieve(new OID(getModelName() + ".Order", 1));
