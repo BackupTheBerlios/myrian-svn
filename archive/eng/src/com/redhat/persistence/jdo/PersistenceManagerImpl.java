@@ -12,7 +12,7 @@ import javax.jdo.spi.*;
 
 import org.apache.log4j.Logger;
 
-public class PersistenceManagerImpl implements PersistenceManager {
+public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
     private static final Logger s_log =
         Logger.getLogger(PersistenceManagerImpl.class);
 
@@ -29,14 +29,19 @@ public class PersistenceManagerImpl implements PersistenceManager {
     private Session m_ssn;
     private Transaction m_txn = new TransactionImpl(this);
     private Object m_userObject = null;
-    private StatementProfiler m_prof = null;
+    private final StatementProfiler m_prof;
+    private final ClassInfo m_classInfo;
 
     private Map m_smiMap = new IdentityMap();
 
-    public PersistenceManagerImpl(Session ssn, StatementProfiler prof) {
+    public PersistenceManagerImpl(Session ssn,
+                                  StatementProfiler prof,
+                                  ClassInfo classInfo) {
+
         m_ssn = ssn;
         m_ssn.setAttribute(ATTR_NAME, this);
         m_prof = prof;
+        m_classInfo = classInfo;
     }
 
     // XXX: revisit this kludge
@@ -104,7 +109,7 @@ public class PersistenceManagerImpl implements PersistenceManager {
                 BaseStateManager smTemp = new BaseStateManager();
                 pc.jdoReplaceStateManager(smTemp);
 
-                List props = C.getAllFields(cls);
+                List props = m_classInfo.getAllFields(cls);
                 for (int i = 0; i < props.size(); i++) {
                     String propName = (String) props.get(i);
                     // XXX: right now we ignore the possibility of a
@@ -341,7 +346,7 @@ public class PersistenceManagerImpl implements PersistenceManager {
 
             m_ssn.create(pc);
 
-            List props = C.getAllFields(cls);
+            List props = m_classInfo.getAllFields(cls);
             for (int i = 0; i < props.size(); i++) {
                 String propName = smi.getPrefix() + ((String) props.get(i));
                 if (C.isComponent(type, propName)
@@ -616,5 +621,27 @@ public class PersistenceManagerImpl implements PersistenceManager {
                 ("no profiler configured for this persistence manager");
         }
         m_prof.stop();
+    }
+
+    // Implementation of ClassInfo
+
+    public List getAllFields(Class pcClass) {
+        return m_classInfo.getAllFields(pcClass);
+    }
+
+    public List getAllTypes(Class pcClass) {
+        return m_classInfo.getAllTypes(pcClass);
+    }
+
+    public String numberToName(Class pcClass, int fieldNumber) {
+        return m_classInfo.numberToName(pcClass, fieldNumber);
+    }
+
+    public Class numberToType(Class pcClass, int fieldNumber) {
+        return m_classInfo.numberToType(pcClass, fieldNumber);
+    }
+
+    public int nameToNumber(Class pcClass, String fieldName) {
+        return m_classInfo.nameToNumber(pcClass, fieldName);
     }
 }

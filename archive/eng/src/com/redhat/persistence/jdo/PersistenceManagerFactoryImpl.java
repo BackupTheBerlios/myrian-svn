@@ -1,23 +1,31 @@
 package com.redhat.persistence.jdo;
 
 import com.arsdigita.db.DbHelper;
-import com.redhat.persistence.Engine;
 import com.redhat.persistence.QuerySource;
 import com.redhat.persistence.Session;
 import com.redhat.persistence.engine.rdbms.ConnectionSource;
-import com.redhat.persistence.engine.rdbms.PooledConnectionSource;
 import com.redhat.persistence.engine.rdbms.OracleWriter;
+import com.redhat.persistence.engine.rdbms.PooledConnectionSource;
 import com.redhat.persistence.engine.rdbms.PostgresWriter;
 import com.redhat.persistence.engine.rdbms.RDBMSEngine;
-import com.redhat.persistence.profiler.rdbms.StatementProfiler;
 import com.redhat.persistence.metadata.Root;
-import java.util.*;
+import com.redhat.persistence.profiler.rdbms.StatementProfiler;
 import java.io.*;
 import java.sql.*;
+import java.util.*;
+
 import javax.jdo.*;
+import javax.jdo.spi.JDOImplHelper;
+import javax.jdo.spi.RegisterClassEvent;
+import javax.jdo.spi.RegisterClassListener;
+
+import org.apache.log4j.Logger;
 
 public class PersistenceManagerFactoryImpl
     implements PersistenceManagerFactory, Serializable {
+
+    private final static Logger s_log =
+        Logger.getLogger(PersistenceManagerFactoryImpl.class);
 
     /* See pp. 70-71, Section 8.5 "PersistenceManagerFactory methods":
      *
@@ -28,6 +36,8 @@ public class PersistenceManagerFactoryImpl
      * exactly match the requested properties.
      */
     private final static Map s_instances = new HashMap();
+
+    private final Registrar m_registrar = new Registrar();
 
     private static Collection m_options;
     static {
@@ -135,6 +145,7 @@ public class PersistenceManagerFactoryImpl
                 ;
             }
         }
+        JDOImplHelper.getInstance().addRegisterClassListener(m_registrar);
     }
 
     public Root getMetadataRoot() {
@@ -179,7 +190,7 @@ public class PersistenceManagerFactoryImpl
         }
 
         Session ssn = new Session(m_root, engine, new QuerySource());
-        return new PersistenceManagerImpl(ssn, prof) {
+        return new PersistenceManagerImpl(ssn, prof, m_registrar) {
                 public Connection getConnection() {
                     return engine.getConnection();
                 }
@@ -368,5 +379,112 @@ public class PersistenceManagerFactoryImpl
 
     public void setRetainValues(boolean value) {
         throw new JDOUnsupportedOptionException("RetainValues");
+    }
+
+    // ========================================================================
+    // RegisterClassListener
+    // ========================================================================
+    private static class Registrar implements RegisterClassListener, ClassInfo {
+        private final Map m_classFields;
+        private final Map m_classTypes;
+
+        Registrar() {
+            m_classFields = new HashMap();
+            m_classTypes  = new HashMap();
+        }
+
+        public void registerClass(RegisterClassEvent event) {
+            final Class klass = event.getRegisteredClass();
+
+            if (m_classFields.containsKey(klass)
+                || m_classTypes.containsKey(klass)) {
+
+                throw new IllegalStateException
+                    ("Already registered " + toString(event));
+            }
+
+            // XXX: cacheFields should make use of event.getFieldNames
+            m_classFields.put(klass,
+                              Collections.unmodifiableList(cacheFields(klass)));
+            // XXX: cacheTypes should make use of event.getFieldTypes
+            m_classTypes.put(klass,
+                             Collections.unmodifiableList(cacheTypes(klass)));
+        }
+
+        private static List cacheFields(Class pcClass) {
+            List fields = new ArrayList();
+            JDOImplHelper helper = JDOImplHelper.getInstance();
+
+            for (Class klass=pcClass;
+                 klass != null;
+                 klass = helper.getPersistenceCapableSuperclass(klass)) {
+
+                String[] names = helper.getFieldNames(klass);
+                if (names.length == 0) { continue; }
+                List current = new ArrayList(Arrays.asList(names));
+                current.addAll(fields);
+                fields = current;
+            }
+            return fields;
+        }
+
+        private static List cacheTypes(Class pcClass) {
+            List types = new ArrayList();
+            JDOImplHelper helper = JDOImplHelper.getInstance();
+
+            for (Class klass=pcClass;
+                 klass != null;
+                 klass = helper.getPersistenceCapableSuperclass(klass)) {
+
+                Class[] names = helper.getFieldTypes(klass);
+                if (names.length == 0) { continue; }
+                List current = new ArrayList(names.length);
+                // Yes, I know about Arrays.asList(Object[]).  It returns a list
+                // that doesn't implement addAll.
+                for (int ii=0; ii<names.length; ii++) {
+                    current.add(names[ii]);
+                }
+                current.addAll(types);
+                types = current;
+            }
+            return types;
+        }
+
+        private static String toString(RegisterClassEvent event) {
+            return "registering " + event.getRegisteredClass().getName() +
+                superclass(event.getPersistenceCapableSuperclass()) +
+                ";\nfields=" + Arrays.asList(event.getFieldNames()) +
+                ";\ntypes="  + Arrays.asList(event.getFieldTypes());
+        }
+
+        private static String superclass(Class superclass) {
+            if (superclass == null) { return ""; }
+            return " (inherits from " + superclass.getName() + ")";
+        }
+
+        // Implementation of ClassInfo
+
+        public List getAllFields(Class pcClass) {
+            return (List) m_classFields.get(pcClass);
+        }
+
+        public List getAllTypes(Class pcClass) {
+            return (List) m_classTypes.get(pcClass);
+        }
+
+        public String numberToName(Class pcClass, int fieldNumber) {
+            return (String) getAllFields(pcClass).get(fieldNumber);
+        }
+
+        public Class numberToType(Class pcClass, int fieldNumber) {
+            return (Class) getAllTypes(pcClass).get(fieldNumber);
+        }
+        /**
+         * Returns the first occurrence of the specified field in the most derived
+         * class.
+         **/
+        public int nameToNumber(Class pcClass, String fieldName) {
+            return getAllFields(pcClass).lastIndexOf(fieldName);
+        }
     }
 }

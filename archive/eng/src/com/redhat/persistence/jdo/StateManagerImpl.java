@@ -77,7 +77,7 @@ class StateManagerImpl extends AbstractStateManager {
     }
 
     private String name(PersistenceCapable pc, int field) {
-        return m_prefix + C.numberToName(pc.getClass(), field);
+        return m_prefix + m_pmi.numberToName(pc.getClass(), field);
     }
 
     private Property prop(PersistenceCapable pc, int field) {
@@ -107,7 +107,7 @@ class StateManagerImpl extends AbstractStateManager {
                                  Object currentValue) {
 
         final Class declaredClass =
-            (Class) C.getAllTypes(pc.getClass()).get(field);
+            (Class) m_pmi.getAllTypes(pc.getClass()).get(field);
         final String name = name(pc, field);
 
         if (isComponent(pc, field)) {
@@ -228,8 +228,8 @@ class StateManagerImpl extends AbstractStateManager {
     private void fill(Map values, StateManagerImpl smi, Class cls,
                       PersistenceCapable pc) {
         ObjectType type = m_pmap.getObjectType();
-        List props = C.getAllFields(cls);
-        List types = C.getAllTypes(cls);
+        List props = m_pmi.getAllFields(cls);
+        List types = m_pmi.getAllTypes(cls);
         for (int i = 0; i < props.size(); i++) {
             String propName = smi.getPrefix() + ((String) props.get(i));
             Object obj = smi.provideField(pc, i);
@@ -288,7 +288,7 @@ class StateManagerImpl extends AbstractStateManager {
             String name = name(pc, field);
 
             // XXX: what to do about currentValue
-            Class klass = (Class) C.getAllTypes(pc.getClass()).get(field);
+            Class klass = (Class) m_pmi.getAllTypes(pc.getClass()).get(field);
             if (klass.equals(List.class) || klass.equals(Map.class)) {
                 boolean isMap = klass.equals(Map.class);
 
