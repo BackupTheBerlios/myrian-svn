@@ -14,14 +14,11 @@
 
 model com.arsdigita.kernel;
 
-import com.arsdigita.kernel.ACSObject;
-import com.arsdigita.kernel.PackageType;
-import com.arsdigita.kernel.PackageInstance;
 import com.arsdigita.kernel.permissions.Privilege;
 import com.arsdigita.workspace.portal.Portlet;
 
 // @author Justin Ross (justin@arsdigita.com)
-// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/kernel/Application.pdl#1 $
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/kernel/Application.pdl#2 $
 
 object type ApplicationType {
     BigDecimal id = application_types.application_type_id INTEGER;
