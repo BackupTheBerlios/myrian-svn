@@ -44,12 +44,12 @@ import java.util.ArrayList;
  *              through inheritance.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #17 $ $Date: 2002/10/31 $
+ * @version $Revision: #18 $ $Date: 2002/10/31 $
  */
 
 public class GenericDataObject implements DataObject {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#17 $ by $Author: rhs $, $DateTime: 2002/10/31 12:25:15 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#18 $ by $Author: rhs $, $DateTime: 2002/10/31 15:36:36 $";
 
     private ObjectType    m_type;
     private Session       m_session;
@@ -376,6 +376,8 @@ public class GenericDataObject implements DataObject {
                     GenericDataObject obj =
                         (GenericDataObject) m_data.get(prop.getName());
                     if (obj != null) {
+                        fireObserver(new RemoveEvent(this, prop.getName(),
+                                                     obj));
                         doRoleRemove(prop.getName(), obj.m_data);
                         obj.delete();
                     }
