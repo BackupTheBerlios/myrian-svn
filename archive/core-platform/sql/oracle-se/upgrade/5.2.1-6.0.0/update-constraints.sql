@@ -447,11 +447,6 @@ alter table acs_permissions add
     constraint acs_per_gra_id_obj_id__p_lrweb
       primary key(object_id, grantee_id, privilege);
 
-alter table acs_stylesheet_type_map drop constraint acs_sty_typ_map_pac_ty_p_afjeo;
-alter table acs_stylesheet_type_map add
-    constraint acs_sty_typ_map_pac_ty_p_afjeo
-      primary key(stylesheet_id, package_type_id);
-
 alter table apm_package_type_listener_map drop constraint apm_pac_typ_lis_map_li_p_6_z6o;
 alter table apm_package_type_listener_map add
     constraint apm_pac_typ_lis_map_li_p_6_z6o
@@ -477,10 +472,6 @@ alter table group_subgroup_map add
     constraint grou_sub_map_gro_id_su_p_8caa0
       primary key(subgroup_id, group_id);
 
-alter table object_container_map drop constraint obje_contai_map_obj_id_p_ymkb5;
-alter table object_container_map add
-    constraint obje_con_map_con_id_ob_p_ul6se
-      primary key(object_id, container_id);
 -- Normally, Oracle automatically creates an index for every primary key.  However,
 -- because of the 'ocm_container_object_idx' index, which indexes these same keys in
 -- reverse order, Oracle does not create the index.  So, we do it explicitly.

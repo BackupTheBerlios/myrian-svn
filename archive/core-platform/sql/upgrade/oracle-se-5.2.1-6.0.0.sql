@@ -5,7 +5,6 @@
 @@ ../default/upgrade/5.2.1-6.0.0/table-web_hosts-auto.sql
 @@ ../oracle-se/upgrade/5.2.1-6.0.0/update-web-hosts.sql
 @@ ../oracle-se/upgrade/5.2.1-6.0.0/alter-lucene.sql
-@@ ../oracle-se/upgrade/5.2.1-6.0.0/proc-update-dirty.sql
 @@ ../oracle-se/upgrade/5.2.1-6.0.0/mime-types.sql
 @@ ../oracle-se/upgrade/5.2.1-6.0.0/table-vcx_blob_operations-auto.sql
 @@ ../oracle-se/upgrade/5.2.1-6.0.0/table-vcx_clob_operations-auto.sql
@@ -17,8 +16,7 @@
 @@ ../oracle-se/upgrade/5.2.1-6.0.0/table-vcx_tags-auto.sql
 @@ ../oracle-se/upgrade/5.2.1-6.0.0/table-vcx_txns-auto.sql
 @@ ../oracle-se/upgrade/5.2.1-6.0.0/vcx_deferred.sql
-@@ ../oracle-se/upgrade/5.2.1-6.0.0/update-nullable.sql
-@@ ../oracle-se/upgrade/5.2.1-6.0.0/update-constraints.sql
-@@ ../oracle-se/upgrade/5.2.1-6.0.0/misc.sql
 @@ ../default/upgrade/5.2.1-6.0.0/insert-vcx_event_types.sql
 @@ ../default/upgrade/5.2.1-6.0.0/insert-vcx_java_classes.sql
+@@ ../oracle-se/upgrade/5.2.1-6.0.0/misc.sql
+@@ ../oracle-se/upgrade/5.2.1-6.0.0/update-constraints.sql
