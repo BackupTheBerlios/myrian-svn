@@ -36,7 +36,13 @@ class StateManagerImpl extends AbstractStateManager {
     }
 
     private final Session ssn() {
-        return m_pmi.getSession();
+        Session ssn = m_pmi.getSession();
+        if (m_pmi.isClosed()) {
+            throw new JDOUserException
+                ("the persistence manager for " + m_pmap
+                 + " has been closed");
+        }
+        return ssn;
     }
 
     PropertyMap getPropertyMap() {
@@ -68,8 +74,6 @@ class StateManagerImpl extends AbstractStateManager {
     private ObjectType type(PersistenceCapable pc) {
         if (pc == null) { throw new NullPointerException("pc"); }
         return m_pmap.getObjectType();
-
-        //        return ssn().getRoot().getObjectType(pc.getClass().getName());
     }
 
     private String name(PersistenceCapable pc, int field) {
