@@ -25,15 +25,21 @@ import com.arsdigita.kernel.security.UserContext;
  * Class RequestEnvironment
  * 
  * @author jorris@redhat.com
- * @version $Revision $1 $ $Date: 2004/01/29 $
+ * @version $Revision $1 $ $Date: 2004/02/12 $
  */
 public class RequestEnvironment {
     private HttpServletDummyRequest m_req;
     private HttpServletDummyResponse m_res;
 
     public RequestEnvironment() {
-        setupServletContext();
+        this(new HttpServletDummyRequest(),
+                new HttpServletDummyResponse());
+    }
+    public RequestEnvironment(HttpServletDummyRequest req,
+                              HttpServletDummyResponse res) {
+        setupServletContext(req, res);
         setKernelContext();
+
     }
 
     public HttpServletDummyRequest getRequest() {
@@ -44,9 +50,10 @@ public class RequestEnvironment {
         return m_res;
     }
 
-    private void setupServletContext() {
-        m_req = new HttpServletDummyRequest();
-        m_res = new HttpServletDummyResponse();
+    private void setupServletContext(HttpServletDummyRequest req,
+                              HttpServletDummyResponse res) {
+        m_req = req;
+        m_res = res;
 
         DispatcherHelper.setRequest(m_req);
 
