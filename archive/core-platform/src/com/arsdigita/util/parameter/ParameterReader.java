@@ -15,19 +15,36 @@
 
 package com.arsdigita.util.parameter;
 
-
-
 /**
  * Subject to change.
  *
+ * Reads an encoded string value for a parameter from storage.  Any
+ * errors encountered while reading are added to an error list.
+ * This class is counterpart to <code>ParameterWriter</code>.
+ *
+ * @see Parameter#write(ParameterWriter,ErrorList)
+ * @see ErrorList
+ * @see ParameterWriter
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterReader.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterReader.java#3 $
  */
 public interface ParameterReader {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterReader.java#2 $" +
-        "$Author: jorris $" +
-        "$DateTime: 2003/10/28 18:36:21 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterReader.java#3 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/11/10 12:17:07 $";
 
+    /**
+     * Reads an encoded <code>String</value> for <code>param</code>
+     * from storage.  If there are errors, they are added to
+     * <code>errors</code>.
+     *
+     * @param param The <code>Parameter</code> being read; it cannot
+     * be null
+     * @param errors The <code>ErrorList</code> that will collect any
+     * errors; it cannot be null
+     * @return The marshaled <code>String</code> value for
+     * <code>param</code>; it may be null
+     */
     String read(Parameter param, ErrorList errors);
 }

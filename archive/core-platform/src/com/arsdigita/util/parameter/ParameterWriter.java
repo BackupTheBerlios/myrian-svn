@@ -15,19 +15,31 @@
 
 package com.arsdigita.util.parameter;
 
-
-
 /**
  * Subject to change.
  *
+ * Writes encoded parameter values to storage.  Implementors define
+ * the exact nature of the storage.
+ *
+ * @see Parameter#write(ParameterWriter,Object)
+ * @see ParameterReader
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterWriter.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterWriter.java#3 $
  */
 public interface ParameterWriter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterWriter.java#2 $" +
-        "$Author: jorris $" +
-        "$DateTime: 2003/10/28 18:36:21 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterWriter.java#3 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/11/10 12:17:07 $";
 
+    /**
+     * Writes the marshaled <code>value</code> for parameter
+     * <code>param</code> to storage.
+     *
+     * @param param The <code>Parameter</code> that is being written;
+     * it cannot be null
+     * @param value The encoded <code>String</code> value to store for
+     * <code>param</code>; it may be null
+     */
     void write(Parameter param, String value);
 }
