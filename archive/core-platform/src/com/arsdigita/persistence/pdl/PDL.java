@@ -51,12 +51,12 @@ import org.apache.log4j.Priority;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/08/12 $
+ * @version $Revision: #8 $ $Date: 2002/08/13 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#7 $ by $Author: dennis $, $DateTime: 2002/08/12 12:23:01 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#8 $ by $Author: randyg $, $DateTime: 2002/08/13 10:23:36 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
 
@@ -192,6 +192,15 @@ public class PDL {
             setDebugDirectory(debugDir);
         }
 
+        String database = (String) OPTIONS.get("-database");
+        if (database != null) {
+            if ("postgres".equalsIgnoreCase(database)) {
+                Initializer.setDatabase(Initializer.POSTGRES);
+            } else {
+                Initializer.setDatabase(Initializer.ORACLE);
+            }
+        }
+
         List files = new ArrayList();
         Stack dirs = new Stack();
 
@@ -203,6 +212,15 @@ public class PDL {
             }
         }
 
+        // the level is used to determine whether or not the
+        // directory should be filtered based on the database
+        int level = 0;
+        String dbName = null;
+        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+            dbName = "postgres";
+        } else {
+            dbName = "oracle-se";
+        }
         while (dirs.size() > 0) {
             File dir = (File) dirs.pop();
             File[] listing = dir.listFiles(new FileFilter() {
@@ -213,7 +231,11 @@ public class PDL {
                 });
             for (int i = 0; i < listing.length; i++) {
                 if (listing[i].isDirectory()) {
-                    dirs.push(listing[i]);
+                    if (level > 0 || listing[i].getName().startsWith(dbName) ||
+                        listing[i].getName().equals("default")) {
+                        System.out.println("adding " + listing[i].getName());
+                        dirs.push(listing[i]);
+                    } 
                 } else {
                     try {
                         files.add(listing[i].getCanonicalPath());
@@ -222,6 +244,7 @@ public class PDL {
                     }
                 }
             }
+            level++;
         }
 
         files.addAll(args);
@@ -236,14 +259,6 @@ public class PDL {
             String base = (String) OPTIONS.get("-ddl");
             if (base != null) {
                 writer = new DDLWriter(base);
-            }
-            String database = (String) OPTIONS.get("-database");
-            if (database != null) {
-                if ("postgres".equalsIgnoreCase(database)) {
-                    Initializer.setDatabase(Initializer.POSTGRES);
-                } else {
-                    Initializer.setDatabase(Initializer.ORACLE);
-                }
             }
             
             compilePDL(files);
@@ -310,9 +325,25 @@ public class PDL {
         StringBuffer sb = new StringBuffer();
         PDL pdl = new PDL();
 
+        String dbName = null;
+        if (Initializer.getDatabase() == Initializer.POSTGRES) {
+            dbName = "postgres";
+        } else {
+            dbName = "oracle-se";
+        }
+        String filename;
         for (int i = 0; i < files.size(); i++) {
             try {
-                pdl.load((String)files.get(i));
+                // we only add files that are either in the default
+                // directory or in the db specific directory.
+                // it would be nice if there was a better way to do this
+                // but since we cannot assume that the string is the
+                // prefix we have to filter all of the files
+                filename = (String)files.get(i);
+                if (filename.indexOf("/default") > -1 ||
+                    filename.indexOf("/" + dbName + "/") > -1) {
+                    pdl.load(filename);
+                } 
             } catch (PDLException e) {
                 sb.append((String)files.get(i)).append(": ");
                 sb.append(e.getMessage()).append(Utilities.LINE_BREAK);
@@ -324,14 +355,11 @@ public class PDL {
             pdl.generateMetadata(MetadataRoot.getMetadataRoot());
             if (s_debugDirectory != null) {
                 try {
-                    // Future use -- Patrick
                     PDLOutputter.writePDL(MetadataRoot.getMetadataRoot(),
                                           new java.io.File(s_debugDirectory));
                 } catch (java.io.IOException e) {
                     s_log.error(
-                        "There was a problem generating debugging output",
-                        e
-                        );
+                        "There was a problem generating debugging output", e);
                 }
             }
         } else {
