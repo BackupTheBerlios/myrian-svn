@@ -55,10 +55,23 @@ class JDOQuery implements ExtendedQuery, Serializable {
     private String m_imports = "";
     private String m_filter = null;
     private String m_order = null;
+    private boolean m_ignoreCache = false;
 
     public JDOQuery(PersistenceManagerImpl pmi) {
         m_pm = pmi;
         reset();
+    }
+
+    JDOQuery(PersistenceManagerImpl pmi, JDOQuery template) {
+        // see documentation of PersistenceManager#newQuery(Object)
+        this(pmi);
+        m_imports = template.m_imports;
+        m_params = template.m_params;
+        m_vars = template.m_vars;
+        m_filter = template.m_filter;
+        m_order = template.m_order;
+        m_baseExpr = template.m_baseExpr;
+        m_ignoreCache = template.m_ignoreCache;
     }
 
     JDOQuery(PersistenceManagerImpl pmi, String expr) {
@@ -92,6 +105,9 @@ class JDOQuery implements ExtendedQuery, Serializable {
     }
 
     public void compile() {
+        if (m_pm.isClosed()) {
+            throw new JDOUserException("persistence manager was closed");
+        }
         reset();
         JDOQLParser p = getParser();
         p.parseImports(this, m_imports);
@@ -334,7 +350,6 @@ class JDOQuery implements ExtendedQuery, Serializable {
 
     private void setCandidates(OQLCollection pcs) {
         m_candidates = pcs;
-        m_baseExpr = null;
     }
 
     public void setCandidates(Collection pcs) {
@@ -368,7 +383,9 @@ class JDOQuery implements ExtendedQuery, Serializable {
         m_order = ordering;
     }
 
-    public boolean getIgnoreCache() { return false; }
+    public boolean getIgnoreCache() {
+        return m_ignoreCache;
+    }
 
     public void setIgnoreCache(boolean ignoreCache) {
         throw new Error("not implemented");

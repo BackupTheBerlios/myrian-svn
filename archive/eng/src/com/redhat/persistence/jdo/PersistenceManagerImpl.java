@@ -95,7 +95,6 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
                            PersistenceCapable container, String prefix) {
         StateManagerImpl smi = new StateManagerImpl
             (this, pmap, container, prefix);
-        // set pmap here for objects requiring id gen
         m_smiMap.put(pc, smi);
         pc.jdoReplaceStateManager(smi);
         return smi;
@@ -187,8 +186,7 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
 
         StateManagerImpl smi = getStateManager(pc);
         if (smi == null) {
-            throw new JDOFatalInternalException
-                ("implementation error: null smi for pc=" + pc);
+            throw new JDOUserException("can not delete transient instance");
         }
         smi.getState().deletePersistent();
         m_ssn.delete(pc);
@@ -550,6 +548,10 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
      * Create a new Query using elements from another Query.
      */
     public Query newQuery(Object compiled) {
+        if (compiled instanceof JDOQuery) {
+            return new JDOQuery(this, (JDOQuery) compiled);
+        }
+
         throw new Error("not implemented");
     }
 
@@ -559,6 +561,8 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
     public Query newQuery(String language, final Object query) {
         if (Extensions.OQL.equals(language)) {
             return new JDOQuery(this, (String) query);
+        } else if ("javax.jdo.query.JDOQL".equals(language)) {
+            return newQuery(query);
         }
 
         throw new JDOUserException
