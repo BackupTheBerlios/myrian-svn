@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
  * PandoraTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/07/13 $
+ * @version $Revision: #10 $ $Date: 2004/07/13 $
  **/
 
 public class PandoraTest extends WithTxnCase {
@@ -222,34 +222,6 @@ public class PandoraTest extends WithTxnCase {
                 "group@asdf.com"
             })
         });
-    }
-
-    public void testMagazine() {
-        final String topic1 = "Samba";
-        final String topic2 = "OProfile";
-
-        Magazine rag = new Magazine(0);
-        rag.setTitle("Wide Open");
-
-        rag.getIndex().put(topic1, new Integer(3));
-        m_pm.makePersistent(rag);
-        rag.getIndex().put(topic2, new Integer(15));
-
-        javax.jdo.Query qq = m_pm.newQuery
-            ("com.redhat.persistence.OQL",
-             "all(com.redhat.persistence.jdo.Magazine)");
-        Collection magazines = (Collection) qq.execute();
-        Iterator it = magazines.iterator();
-        assertTrue("has next", it.hasNext());
-        Magazine current = (Magazine) it.next();
-        assertEquals("wide open", rag, current);
-        Map idx = current.getIndex();
-        assertTrue("has topic1", idx.containsKey(topic1));
-        assertTrue("has topic2", idx.containsKey(topic2));
-        assertEquals("topic1 on page 3", new Integer(3), idx.get(topic1));
-        assertEquals("page 3", new Integer(3), idx.remove(topic1));
-        assertTrue("has topic1", !idx.containsKey(topic1));
-        assertTrue("has topic2", idx.keySet().contains(topic2));
     }
 
     public void testMain() {
