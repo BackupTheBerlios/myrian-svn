@@ -24,14 +24,14 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Revision: #8 $ $Date: 2002/10/04 $
+ * @version $Revision: #9 $ $Date: 2002/10/09 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: rhs $ - $Date: 2002/10/04 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#8 $";
+    public static final String versionId = "$Author: rhs $ - $Date: 2002/10/09 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#9 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);
@@ -81,6 +81,8 @@ public class ConnectionManager {
                 cm.disconnect();
             }
         }
+
+        setCurrentThreadConnection(null);
     }
 
     synchronized void disconnect() {
