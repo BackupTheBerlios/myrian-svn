@@ -124,14 +124,14 @@ public class DbHelper {
      */
     public static int getDatabaseFromURL(String url) {
         if (!url.startsWith("jdbc:")) {
-            throw new RuntimeException("JDBC URL " +
+            throw new IllegalArgumentException("JDBC URL " +
                                        url + " doesn't start with jdbc:");
         }
 
         int pos = url.indexOf(":", 5);
 
         if (pos == -1) {
-            throw new RuntimeException("JDBC URL " + url +
+            throw new IllegalArgumentException("JDBC URL " + url +
                                        " is not of the form jdbc:[dbname]:xyz");
         }
 
