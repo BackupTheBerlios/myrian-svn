@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public class URLRewriterTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/URLRewriterTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/URLRewriterTest.java#5 $ by $Author: jorris $, $DateTime: 2002/10/21 09:09:49 $";
 
     public URLRewriterTest(String s) {
         super(s);
@@ -40,11 +40,10 @@ public class URLRewriterTest extends TestCase {
     }
 
     public void testGetGlobalParams() {
-        HttpServletDummyRequest req = new HttpServletDummyRequest();
+        HttpServletDummyRequest req = new HttpServletDummyRequest("localhost","", "/foo", "/bar", null);
         HashSet set = new HashSet();
         set.add("param1");
         set.add("param2");
-        req.setURL("/foo/bar");
         req.setParameterValues("x", "xvalue");
         req.setParameterValues("y", "32");
         Set rs = URLRewriter.getGlobalParams(req);
@@ -57,9 +56,9 @@ public class URLRewriterTest extends TestCase {
     }
 
     public void testEncodeURL() {
-        HttpServletDummyRequest req = new HttpServletDummyRequest();
+        HttpServletDummyRequest req = new HttpServletDummyRequest("localhost","", "/foo", "/bar", null);
         HttpServletDummyResponse resp = new HttpServletDummyResponse();
-        req.setURL("/foo/bar");
+//        req.setURL("/foo/bar");
         req.setParameterValues("x", "xvalue");
         req.setParameterValues("y", "32");
         String encoded = URLRewriter.encodeURL(req, resp,

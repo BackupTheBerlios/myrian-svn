@@ -16,26 +16,37 @@
 package com.arsdigita.util;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
 import java.lang.UnsupportedOperationException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.IOException;
 
 public class HttpServletDummyResponse implements HttpServletResponse {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyResponse.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyResponse.java#5 $ by $Author: jorris $, $DateTime: 2002/10/21 09:09:49 $";
 
-    private PrintStream _out;
-    private boolean     _committed;
+    private PrintStream m_out;
+    private boolean     m_committed;
+    private TestServletContainer m_container;
 
     public HttpServletDummyResponse() {
-        _out = System.out;
-        _committed = false;
+        m_out = System.out;
+        m_committed = false;
     }
 
     public HttpServletDummyResponse(PrintStream out) {
-        _out=out;
-        _committed = false;
+        m_out=out;
+        m_committed = false;
     }
+
+    void setContainer(TestServletContainer container) {
+        m_container = container;
+    }
+
 
     public void addCookie(javax.servlet.http.Cookie cookie) {
         throw new UnsupportedOperationException("Method not implemented");
@@ -82,7 +93,7 @@ public class HttpServletDummyResponse implements HttpServletResponse {
     }
 
     public void sendRedirect(String location) throws java.io.IOException{
-        throw new UnsupportedOperationException("Method not implemented");
+        m_container.sendRedirect(location);
     }
 
     public void setDateHeader(String name, long date){
@@ -108,8 +119,8 @@ public class HttpServletDummyResponse implements HttpServletResponse {
 
     /* Methods from SevletResponse */
     public void flushBuffer() throws java.io.IOException{
-        _committed = true;
-        _out.flush();
+        m_committed = true;
+        m_out.flush();
     }
 
     public void resetBuffer() {
@@ -133,11 +144,11 @@ public class HttpServletDummyResponse implements HttpServletResponse {
     }
 
     public PrintWriter getWriter() throws java.io.IOException {
-        return new PrintWriter(_out);
+        return new PrintWriter(m_out);
     }
 
     public boolean isCommitted() {
-        return _committed;
+        return m_committed;
     }
 
     public void reset() {

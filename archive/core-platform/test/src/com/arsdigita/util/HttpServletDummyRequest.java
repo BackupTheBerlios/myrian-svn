@@ -1,68 +1,82 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
- *
- * The contents of this file are subject to the CCM Public
- * License (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/ccmpl.html
- *
- * Software distributed under the License is distributed on an "AS
- * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * rights and limitations under the License.
- *
- */
+* Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+*
+* The contents of this file are subject to the CCM Public
+* License (the "License"); you may not use this file except in
+* compliance with the License. You may obtain a copy of
+* the License at http://www.redhat.com/licenses/ccmpl.html
+*
+* Software distributed under the License is distributed on an "AS
+* IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+* implied. See the License for the specific language governing
+* rights and limitations under the License.
+*
+*/
 
 package com.arsdigita.util;
 
-import com.arsdigita.tools.junit.extensions.Initializer;
-import com.arsdigita.dispatcher.*;
-import com.arsdigita.kernel.security.UserContext;
-import com.arsdigita.kernel.security.SessionContext;
-import com.arsdigita.kernel.KernelRequestContext;
+import com.arsdigita.dispatcher.DispatcherHelper;
 
-import java.util.LinkedList;
-import javax.servlet.http.*;
-import javax.servlet.ServletContext;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
-import java.io.*;
-import javax.servlet.*;
+import org.apache.cactus.ServletURL;
 
 /**
-   Dummy request object for unit testing of form methods that include
-   requests in their signatures.
-*/
+ Dummy request object for unit testing of form methods that include
+ requests in their signatures.
+ */
 
 public class HttpServletDummyRequest implements HttpServletRequest {
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyRequest.java#7 $ by $Author: jorris $, $DateTime: 2002/10/17 15:09:52 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyRequest.java#8 $ by $Author: jorris $, $DateTime: 2002/10/21 09:09:49 $";
 
-    private HashMap parameters;
-    private HashMap attributes;
-    private String m_url = "/";
-    private String m_queryString;
+    private HashMap parameters = new HashMap();
+    private HashMap attributes = new HashMap();
     private HttpSession m_session;
     private boolean m_isSecure;
-   private String m_pathInfo;
-     private final static String REQUEST_CONTEXT_ATTR =
-         "com.arsdigita.dispatcher.RequestContext";
+    private final static String REQUEST_CONTEXT_ATTR =
+            "com.arsdigita.dispatcher.RequestContext";
 
+    public ServletURL getServletURL() {
+        return m_servletURL;
+    }
 
+    private ServletURL m_servletURL;
+    private TestServletContainer m_container;
 
     public HttpServletDummyRequest() {
         this(true);
     }
-
     public HttpServletDummyRequest(boolean isDebug) {
-        parameters=new HashMap();
-        attributes=new HashMap();
+        this("localhost", "", "", "", null, isDebug);
+    }
+
+
+    public HttpServletDummyRequest(String serverName,
+        String contextPath, String servletPath, String pathInfo,
+        String queryString) {
+        this(serverName, contextPath, servletPath, pathInfo, queryString, true);
+    }
+
+    public HttpServletDummyRequest(String serverName,
+        String contextPath, String servletPath, String pathInfo,
+        String queryString, boolean isDebug) {
+        m_servletURL = new ServletURL(serverName, contextPath, servletPath, pathInfo, queryString);
 
         initializeRequestContext(isDebug);
 
     }
 
+    void setContainer(TestServletContainer container) {
+        m_container = container;
+    }
     private void initializeRequestContext(boolean isDebug) {
         DummyRequestContext requestContext
-             = new DummyRequestContext(this, new DummyServletContext(), isDebug);
+                = new DummyRequestContext(this, new DummyServletContext(), isDebug);
 
         DispatcherHelper.setRequest(this);
 
@@ -91,8 +105,8 @@ public class HttpServletDummyRequest implements HttpServletRequest {
         LinkedList valuesList = (LinkedList)(parameters.get(name));
         if (valuesList != null) {
             /*
-              this annoying loop is because we
-              cannot directly cast Object[] to String[]
+            this annoying loop is because we
+            cannot directly cast Object[] to String[]
             */
             Object[] _objectArray=valuesList.toArray();
             String [] _stringArray=new String[_objectArray.length];
@@ -105,23 +119,10 @@ public class HttpServletDummyRequest implements HttpServletRequest {
         }
     }
 
-    /**
-     * sets the requestURI + query string
-     */
-    public void setURL(String s) {
-        int i = s.indexOf('?') ;
-        if (i >= 0) {
-            m_url = s.substring(0, i);
-            m_queryString = s.substring(i + 1);
-        } else {
-            m_url = s;
-        }
-    }
-
     /*
-      naming convention here may seem odd.
-      we keep it as setParameterValues rather than setParameterValue
-      since we are appending to the list of values rather than overwriting it
+    naming convention here may seem odd.
+    we keep it as setParameterValues rather than setParameterValue
+    since we are appending to the list of values rather than overwriting it
     */
     public void setParameterValues(String name, String value) {
         LinkedList valuesList = (LinkedList)parameters.get(name);
@@ -178,40 +179,34 @@ public class HttpServletDummyRequest implements HttpServletRequest {
     public java.util.Enumeration getHeaders(java.lang.String name) { return null; }
 
     public java.util.Enumeration getHeaderNames() {
-      return new Enumeration() {
-         public boolean hasMoreElements() {
-            return false;
-         }
+        return new Enumeration() {
+            public boolean hasMoreElements() {
+                return false;
+            }
 
-         public Object nextElement() {
-            return null;
-         }
-      };
+            public Object nextElement() {
+                return null;
+            }
+        };
     };
 
     public int getIntHeader(java.lang.String name) { return 0; }
 
     public java.lang.String getMethod() { return null; }
 
-   public java.lang.String getPathInfo() {
-      return m_pathInfo;
-   }
-   public void setPathInfo(String info) {
-      m_pathInfo = info;
-   }
-
+    public java.lang.String getPathInfo() {
+	        return m_servletURL.getPathInfo();
+    }
 
 
     public java.lang.String getPathTranslated() { return null; }
 
-    public java.lang.String getContextPath() { return ""; }
-
-    public void setQueryString(String s) {
-        m_queryString = s;
+    public java.lang.String getContextPath() { 
+        return m_servletURL.getContextPath();
     }
 
     public java.lang.String getQueryString() {
-        return m_queryString;
+           return m_servletURL.getQueryString();
     }
 
     public java.lang.String getRemoteUser() { return null; }
@@ -222,21 +217,20 @@ public class HttpServletDummyRequest implements HttpServletRequest {
 
     public java.lang.String getRequestedSessionId() { return null; }
 
-    public void setRequestURI(String s) {
-        m_url = s;
-    }
 
     public java.lang.String getRequestURI() {
-        return m_url;
+        return getServletPath() + getPathInfo();
     }
 
-    public java.lang.String getServletPath() { return null; }
+    public java.lang.String getServletPath() {
+        return m_servletURL.getServletPath();
+    }
 
     public HttpSession getSession(boolean create) {
         if (m_session == null && create) {
-             m_session = new HttpDummySession();
-         }
-         return m_session;
+            m_session = new HttpDummySession();
+        }
+        return m_session;
 
     }
 
@@ -246,8 +240,8 @@ public class HttpServletDummyRequest implements HttpServletRequest {
 
 
     public void setSession(HttpSession s) {
-         m_session = s;
-     }
+        m_session = s;
+    }
 
     public boolean isRequestedSessionIdValid() { return true; }
 
@@ -266,7 +260,7 @@ public class HttpServletDummyRequest implements HttpServletRequest {
     public java.lang.String getContentType() { return null; }
 
     public ServletInputStream getInputStream()
-        throws java.io.IOException { return null; }
+            throws java.io.IOException { return null; }
 
 
     public java.lang.String getProtocol() { return null; }
@@ -278,7 +272,7 @@ public class HttpServletDummyRequest implements HttpServletRequest {
     public int getServerPort() { return 0; }
 
     public java.io.BufferedReader getReader()
-        throws java.io.IOException { return null; }
+            throws java.io.IOException { return null; }
 
     public java.lang.String getRemoteAddr() { return null; }
 
@@ -304,7 +298,7 @@ public class HttpServletDummyRequest implements HttpServletRequest {
         m_isSecure = secure;
     }
     public RequestDispatcher getRequestDispatcher(java.lang.String path) {
-        return null;
+        return m_container.getDispatcher(path);
     }
 
     public java.lang.String getRealPath(java.lang.String path) { return null; }
@@ -317,7 +311,7 @@ public class HttpServletDummyRequest implements HttpServletRequest {
     }
 
     public void setCharacterEncoding(String env)
-        throws UnsupportedEncodingException {
+            throws UnsupportedEncodingException {
     }
 
 }
