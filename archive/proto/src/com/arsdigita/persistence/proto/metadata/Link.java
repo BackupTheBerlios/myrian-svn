@@ -6,20 +6,20 @@ import com.arsdigita.persistence.proto.common.*;
  * Link
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/03/27 $
+ * @version $Revision: #6 $ $Date: 2003/04/05 $
  **/
 
 public class Link extends Property {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Link.java#5 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Link.java#6 $ by $Author: rhs $, $DateTime: 2003/04/05 20:42:18 $";
 
-    private Property m_from;
-    private Property m_to;
+    private Role m_from;
+    private Role m_to;
     private boolean m_isCollection;
     private boolean m_isNullable;
 
-    public Link(String name, Property from, Property to,
-		boolean isCollection, boolean isNullable) {
+    public Link(String name, Role from, Role to, boolean isCollection,
+		boolean isNullable) {
         super(name);
         m_from = from;
 	m_to = to;
@@ -43,11 +43,11 @@ public class Link extends Property {
         return m_to.isComponent();
     }
 
-    public Property getFrom() {
+    public Role getFrom() {
 	return m_from;
     }
 
-    public Property getTo() {
+    public Role getTo() {
 	return m_to;
     }
 

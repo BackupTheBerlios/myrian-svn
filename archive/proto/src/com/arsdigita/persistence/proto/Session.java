@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #54 $ $Date: 2003/04/04 $
+ * @version $Revision: #55 $ $Date: 2003/04/05 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#54 $ by $Author: rhs $, $DateTime: 2003/04/04 09:30:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#55 $ by $Author: rhs $, $DateTime: 2003/04/05 20:42:18 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -379,17 +379,33 @@ public class Session {
         }
     }
 
-    public boolean isFlushed(Object obj, Property prop) {
-        if (!hasObjectData(obj)) {
-            return true;
-        }
+    public boolean isFlushed(final Object obj, Property prop) {
+	if (!hasObjectData(obj)) {
+	    return true;
+	}
 
-        PropertyData pd = getObjectData(obj).getPropertyData(prop);
-        if (pd == null) {
-            return true;
-        }
+	final boolean[] result = { true };
 
-        return pd.isFlushed();
+	prop.dispatch(new Property.Switch() {
+		public void onRole(Role r) {
+		    PropertyData pd = getObjectData(obj).getPropertyData(r);
+		    if (pd == null) {
+			result[0] = true;
+		    } else {
+			result[0] = pd.isFlushed();
+		    }
+		}
+
+		public void onAlias(Alias a) {
+		    result[0] = isFlushed(obj, a.getTarget());
+		}
+
+		public void onLink(Link l) {
+		    result[0] = isFlushed(obj, l.getFrom().getReverse());
+		}
+	    });
+
+	return result[0];
     }
 
     public boolean isPersisted(Object obj) {

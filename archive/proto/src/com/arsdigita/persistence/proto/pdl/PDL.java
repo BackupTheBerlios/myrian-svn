@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #36 $ $Date: 2003/04/05 $
+ * @version $Revision: #37 $ $Date: 2003/04/05 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#36 $ by $Author: rhs $, $DateTime: 2003/04/05 09:09:04 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#37 $ by $Author: rhs $, $DateTime: 2003/04/05 20:42:18 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -154,7 +154,16 @@ public class PDL {
 			ObjectType ot = m_symbols.getEmitted(linkName(assn));
 
 			ot.addProperty(rone);
+			Role revOne = new Role("~" + rone.getName(), ot,
+					       rtwo.isComponent(), true, true);
+			rone.getType().addProperty(revOne);
+			rone.setReverse(revOne);
+
 			ot.addProperty(rtwo);
+			Role revTwo = new Role("~" + rtwo.getName(), ot,
+					       rone.isComponent(), true, true);
+			rtwo.getType().addProperty(revTwo);
+			rtwo.setReverse(revTwo);
 
 			for (Iterator it = props.iterator(); it.hasNext(); ) {
 			    PropertyNd prop = (PropertyNd) it.next();
@@ -468,21 +477,32 @@ public class PDL {
 		    ObjectType ot = m_symbols.getEmitted(linkName(assn));
 		    ObjectMap om = m_root.getObjectMap(ot);
 		    Collection keys = om.getKeyProperties();
-		    Property pone = ot.getProperty(one.getName().getName());
-		    Property ptwo = ot.getProperty(two.getName().getName());
+		    Role pone = (Role) ot.getProperty(one.getName().getName());
+		    Role ptwo = (Role) ot.getProperty(two.getName().getName());
 		    keys.add(ptwo);
 		    keys.add(pone);
 
 		    if (one.getMapping() != null) {
-			emitMapping(pone, (JoinPathNd) one.getMapping(), 1);
+			emitMapping(pone, (JoinPathNd) one.getMapping(), 1, 2);
+			emitMapping(pone.getReverse(),
+				    (JoinPathNd) two.getMapping(), 0, 1);
 		    } else {
 			om.addMapping(new Static(Path.get(pone.getName())));
+			m_root.getObjectMap(pone.getType()).addMapping
+			    (new Static
+			     (Path.get(pone.getReverse().getName())));
 		    }
 
+
 		    if (two.getMapping() != null) {
-			emitMapping(ptwo, (JoinPathNd) two.getMapping(), 1);
+			emitMapping(ptwo, (JoinPathNd) two.getMapping(), 1, 2);
+			emitMapping(ptwo.getReverse(),
+				    (JoinPathNd) one.getMapping(), 0, 1);
 		    } else {
 			om.addMapping(new Static(Path.get(ptwo.getName())));
+			m_root.getObjectMap(ptwo.getType()).addMapping
+			    (new Static
+			     (Path.get(ptwo.getReverse().getName())));
 		    }
 
 		    String[] paths = new String[] { pone.getName(),
@@ -662,15 +682,16 @@ public class PDL {
     }
 
     private void emitMapping(Property prop, JoinPathNd jpn) {
-	emitMapping(prop, jpn, 0);
+	emitMapping(prop, jpn, 0, jpn.getJoins().size());
     }
 
-    private void emitMapping(Property prop, JoinPathNd jpn, int start) {
+    private void emitMapping(Property prop, JoinPathNd jpn, int start,
+			     int stop) {
         ObjectMap om = m_root.getObjectMap(prop.getContainer());
         Path path = Path.get(prop.getName());
         List joins = jpn.getJoins();
         Mapping m;
-        if (joins.size() - start == 1) {
+        if (stop - start == 1) {
             JoinNd jn = (JoinNd) joins.get(start);
             if (lookup(jn.getTo()).isUniqueKey()) {
                 ForeignKey fk = fk(jn, true);
@@ -683,7 +704,7 @@ public class PDL {
                 m_errors.fatal(jpn, "neither end unique");
                 return;
             }
-        } else if (joins.size() - start == 2) {
+        } else if (stop - start == 2) {
             JoinNd first = (JoinNd) joins.get(start);
             JoinNd second = (JoinNd) joins.get(start + 1);
             ForeignKey from = fk(first, false);
