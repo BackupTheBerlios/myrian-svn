@@ -57,12 +57,12 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/02/24 $
+ * @version $Revision: #4 $ $Date: 2004/02/27 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataQueryImpl.java#3 $ by $Author: ashah $, $DateTime: 2004/02/24 21:22:56 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataQueryImpl.java#4 $ by $Author: ashah $, $DateTime: 2004/02/27 11:25:47 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 
@@ -158,7 +158,17 @@ class DataQueryImpl implements DataQuery {
 
         m_filter = getFilterFactory().and();
 
-        m_expr = new Define(m_originalExpr, "this");
+        // XXX: hack for data queries with bindings that have calls to addPath
+        // addJoin needs to join against the static-ified version of the All.
+        // this if is equivalent to testing if m_originalExpr instanceof All
+        if (this.getClass().equals(DataQueryImpl.class)) {
+            m_expr = new Define
+                (new Static(getTypeInternal().getQualifiedName(), m_bindings),
+                 "this");
+        } else {
+            m_expr = new Define(m_originalExpr, "this");
+        }
+
         m_signature = new Signature();
         m_signature.addSignature(m_originalSig, Path.get("this"));
         m_joins.put(null, "this");
@@ -561,15 +571,6 @@ class DataQueryImpl implements DataQuery {
         }
 
         Expression expr = m_expr;
-
-        if (m_bindings.size() > 0) {
-            if (m_joins.size() > 1) {
-                throw new Error("not implemented yet");
-            }
-            expr = new Define
-                (new Static(getTypeInternal().getQualifiedName(), m_bindings),
-                 "this");
-        }
 
         if (conditions != null) {
             expr = new com.redhat.persistence.oql.Filter
