@@ -136,7 +136,7 @@ public class StatementProfiler implements RDBMSProfiler {
                 elem("event", "<![CDATA[" + event.toString() + "]]>");
             }
 
-            m_out.write("<phases>");
+            m_out.write("<lifecycle>");
 
             begin("prepare");
         }
@@ -195,7 +195,7 @@ public class StatementProfiler implements RDBMSProfiler {
         public void endClose() {
             end("close");
 
-            m_out.write("</phases>");
+            m_out.write("</lifecycle>");
 
             elem("millis", Long.toString(m_elapsed));
 
