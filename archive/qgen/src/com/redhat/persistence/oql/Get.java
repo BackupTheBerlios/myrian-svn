@@ -7,16 +7,20 @@ import com.redhat.persistence.metadata.Static;
 import java.io.*;
 import java.util.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #15 $ $Date: 2004/02/27 $
+ * @version $Revision: #16 $ $Date: 2004/03/01 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#15 $ by $Author: rhs $, $DateTime: 2004/02/27 16:35:42 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#16 $ by $Author: rhs $, $DateTime: 2004/03/01 11:43:59 $";
+
+    private static final Logger s_log = Logger.getLogger(Get.class);
 
     private Expression m_expr;
     private String m_name;
@@ -175,25 +179,127 @@ public class Get extends Expression {
         private String emitStatic() {
             Mapping m = Code.getMapping(m_property);
             List values = m_expr.getValues();
-            final String[] key = new String[values.size()];
-            for (int i = 0; i < key.length; i++) {
-                key[i] = "" + values.get(i);
+            String[] from = new String[values.size()];
+            for (int i = 0; i < from.length; i++) {
+                from[i] = "" + values.get(i);
             }
 
-            StringBuffer buf = new StringBuffer();
-            buf.append("exists(select 1 from (");
-            Code.bind
-                (m.getRetrieve().getSQL(),
-                 Code.map
-                 (Code.paths(m_property.getContainer(), null), key), buf);
-            buf.append(") sg where ");
             Path[] paths = Code.paths
                 (m_property.getType(), Path.get(m_property.getName()));
-            Code.equals
-                (Code.concat("sg.", Code.columns(paths, m.getRetrieve())),
-                 Code.columns(m_property.getType(), m_frame.alias()), buf);
-            buf.append(")");
-            return buf.toString();
+            String[] cols = Code.columns(paths, m.getRetrieve());
+            Map bindings = Code.map
+                (Code.paths(m_property.getContainer(), null), from);
+            String[] to =
+                Code.columns(m_property.getType(), m_frame.alias());
+
+            StringBuffer in = new StringBuffer();
+            in.append("(");
+            for (int i = 0; i < to.length; i++) {
+                in.append(to[i]);
+                if (i < to.length - 1) {
+                    in.append(", ");
+                }
+            }
+            in.append(") in (");
+            in(m.getRetrieve().getSQL(), cols, bindings, in);
+            in.append(")");
+
+            /*StringBuffer buf = new StringBuffer();
+            buf.append("exists(select 1 from (");
+            Code.bind(m.getRetrieve().getSQL(), bindings, buf);
+            buf.append(") sg where ");
+            Code.equals(Code.concat("sg.", cols), to, buf);
+            buf.append(")");*/
+            return in.toString();
+        }
+
+        static boolean is(SQLToken t, String image) {
+            return t.getImage().trim().equalsIgnoreCase(image);
+        }
+
+        static void in(SQL sql, String[] columns, Map values,
+                       StringBuffer buf) {
+            SQLToken t;
+            boolean select = false;
+            int depth = 0;
+            Map selections = new HashMap();
+            StringBuffer selection = new StringBuffer();
+            String prefix = null;
+            for (t = sql.getFirst(); t != null; t = t.getNext()) {
+                if (depth == 0 && is(t, "select")) {
+                    select = true;
+                } else if (depth == 0 && select &&
+                           (is(t, ",") || is(t, "from"))) {
+                    String sel = selection.toString();
+                    String match = null;
+                    for (int i = 0; i < columns.length; i++) {
+                        if (sel.trim().endsWith(columns[i])) {
+                            if (match == null) {
+                                match = columns[i];
+                            } else if (columns[i].length() > match.length()) {
+                                match = columns[i];
+                            }
+                            selections.put(match, sel);
+                        }
+                    }
+                    if (match == null) {
+                        String trimmed = sel.trim();
+                        if (trimmed.equals("*")) {
+                            // do nothing
+                        } else if (trimmed.endsWith("*")) {
+                            if (prefix != null) {
+                                throw new IllegalStateException
+                                    ("multiple prefixes: " + sql);
+                            }
+                            prefix =
+                                trimmed.substring(0, trimmed.indexOf('.'));
+                        }
+                    }
+                    if (is(t, "from")) {
+                        break;
+                    }
+                    selection = new StringBuffer();
+                } else {
+                    if (is(t, "(")) {
+                        depth++;
+                    } else if (is(t, ")")) {
+                        depth--;
+                    }
+                    selection.append(t.getImage());
+                }
+            }
+
+            buf.append("select ");
+            for (int i = 0; i < columns.length; i++) {
+                String sel = (String) selections.get(columns[i]);
+                if (sel == null) {
+                    if (prefix != null) {
+                        buf.append(prefix);
+                        buf.append(".");
+                    }
+                    buf.append(columns[i]);
+                } else {
+                    buf.append(sel);
+                }
+                if (i < columns.length - 1) {
+                    buf.append(", ");
+                }
+            }
+            buf.append(" ");
+
+            for (; t != null; t = t.getNext()) {
+                if (t.isBind()) {
+                    Path key = Path.get(t.getImage().substring(1));
+                    String value = (String) values.get(key);
+                    if (value == null) {
+                        throw new IllegalStateException
+                            ("no value for: " + key + " in " + values);
+                    }
+                    buf.append(value);
+                } else {
+                    buf.append(t.getImage());
+                }
+            }
         }
 
         private void conditions() {

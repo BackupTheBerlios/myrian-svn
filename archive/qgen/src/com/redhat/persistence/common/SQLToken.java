@@ -19,12 +19,12 @@ package com.redhat.persistence.common;
  * SQLToken
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/03/01 $
  **/
 
 public class SQLToken {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/common/SQLToken.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/common/SQLToken.java#2 $ by $Author: rhs $, $DateTime: 2004/03/01 11:43:59 $";
 
     public static class Type {
 
@@ -43,6 +43,7 @@ public class SQLToken {
     public static final Type BIND = new Type("BIND");
     public static final Type PATH = new Type("PATH");
     public static final Type RAW = new Type("RAW");
+    public static final Type SPACE = new Type("SPACE");
 
     SQLToken m_previous = null;
     SQLToken m_next = null;
@@ -80,6 +81,10 @@ public class SQLToken {
 
     public boolean isRaw() {
         return m_type == RAW;
+    }
+
+    public boolean isSpace() {
+        return m_type == SPACE;
     }
 
 }

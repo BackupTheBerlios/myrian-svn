@@ -29,7 +29,6 @@ import com.redhat.persistence.oql.Query;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import org.apache.log4j.Logger;
 
@@ -37,16 +36,16 @@ import org.apache.log4j.Logger;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/02/26 $
+ * @version $Revision: #5 $ $Date: 2004/03/01 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Signature.java#4 $ by $Author: ashah $, $DateTime: 2004/02/26 12:50:00 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Signature.java#5 $ by $Author: rhs $, $DateTime: 2004/03/01 11:43:59 $";
 
     private static final Logger s_log = Logger.getLogger(Signature.class);
 
-    private HashSet m_paths = new HashSet();
+    private ArrayList m_paths = new ArrayList();
     private ArrayList m_sources = new ArrayList();
     private HashMap m_sourceMap = new HashMap();
 
@@ -75,6 +74,9 @@ public class Signature {
         // XXX: this is not legit we could get name conflicts
         str = str.replace('.', '_');
         str = str.replace('@', '_');
+        if (str.length() > 28) {
+            str = str.substring(0, 28);
+        }
         return str;
     }
 
@@ -90,14 +92,14 @@ public class Signature {
         for (Iterator it = m_paths.iterator(); it.hasNext(); ) {
             Path path = (Path) it.next();
             if (path == null) { continue; }
-            q.fetch(clean(path.getPath()), expression(path));
+            q.fetch(getColumn(path), expression(path));
         }
 
         return q;
     }
 
     public String getColumn(Path p) {
-        return clean(p.getPath());
+        return clean(p.getPath()) + m_paths.indexOf(p);
     }
 
     public ObjectType getObjectType() {
