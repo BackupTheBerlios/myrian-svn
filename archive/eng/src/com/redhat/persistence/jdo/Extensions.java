@@ -136,11 +136,9 @@ public class Extensions {
                     ("no object type for klass: " + klass);
             }
             ObjectMap om = root.getObjectMap(ot);
-            if (om == null) {
-                throw new IllegalStateException
-                    ("no object map for type: " + ot.getQualifiedName());
+            if (om != null) {
+                tables.addAll(om.getRequiredTables());
             }
-            tables.addAll(om.getRequiredTables());
         }
         return new ArrayList(tables);
     }
