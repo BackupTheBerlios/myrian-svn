@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #39 $ $Date: 2003/04/18 $
+ * @version $Revision: #40 $ $Date: 2003/04/24 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#39 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#40 $ by $Author: ashah $, $DateTime: 2003/04/24 16:58:05 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -140,8 +140,21 @@ public class PDL {
                 }
 
                 public void onProperty(PropertyNd prop) {
-                    define(m_symbols.getEmitted
-                           ((ObjectTypeNd) prop.getParent()), prop);
+                    ObjectType type =
+                        m_symbols.getEmitted((ObjectTypeNd) prop.getParent());
+
+                    Role role = define(type, prop);
+
+                    /* if the property is a composite, the other end is a
+                     * needs to be set up for cascading deletes to work
+                     */
+                    if (prop.isComposite()) {
+                        String rev = "~" + prop.getName().getName() +
+                            type.getQualifiedName().replace('.', '$');
+                        Role reverse = new Role(rev, type, true, true, true);
+                        role.getType().addProperty(reverse);
+                        role.setReverse(reverse);
+                    }
                 }
 
                 public void onAssociation(AssociationNd assn) {
@@ -542,6 +555,24 @@ public class PDL {
                     } else {
                         emitMapping(prop, (JoinPathNd) mapping);
                     }
+
+                    // auto generate reverse way for one-way composites
+                    if (pn.isComposite()
+                        && pn.getParent() instanceof ObjectTypeNd) {
+                        if (!(prop instanceof Role)) {
+                            m_errors.fatal(pn, "composite non role");
+                        } else if (mapping == null) {
+                            m_errors.fatal
+                                (pn, "one-way composite must have metadata");
+                        } else {
+                            Role rev = ((Role) prop).getReverse();
+                            if (mapping instanceof JoinPathNd) {
+                                emitMapping(rev, (JoinPathNd) mapping, true);
+                            } else {
+                                m_errors.fatal(pn, "must have a join path");
+                            }
+                        }
+                    }
                 }
             });
 
@@ -690,7 +721,15 @@ public class PDL {
     }
 
     private void emitMapping(Property prop, JoinPathNd jpn) {
-	emitMapping(prop, jpn, 0, jpn.getJoins().size());
+	emitMapping(prop, jpn, false);
+    }
+
+    private void emitMapping(Property prop, JoinPathNd jpn, boolean reverse) {
+        if (reverse) {
+            emitMapping(prop, jpn, jpn.getJoins().size(), 0);
+        } else {
+            emitMapping(prop, jpn, 0, jpn.getJoins().size());
+        }
     }
 
     private void emitMapping(Property prop, JoinPathNd jpn, int start,
@@ -703,24 +742,36 @@ public class PDL {
         Path path = Path.get(prop.getName());
         List joins = jpn.getJoins();
         Mapping m;
-        if (stop - start == 1) {
-            JoinNd jn = (JoinNd) joins.get(start);
+
+        int magnitude = Math.abs(stop - start);
+        boolean forward = stop > start;
+        int low = forward ? start : stop;
+        boolean joinForward;
+
+        if (magnitude == 1) {
+            JoinNd jn = (JoinNd) joins.get(low);
             if (lookup(jn.getTo()).isUniqueKey()) {
-                ForeignKey fk = fk(jn, true);
-                m = new JoinTo(path, fk);
-		setNullable(fk, prop.isNullable());
+                joinForward = true;
             } else if (lookup(jn.getFrom()).isUniqueKey()) {
-                ForeignKey fk = fk(jn, false);
-                m = new JoinFrom(path, fk);
+                joinForward = false;
             } else {
                 m_errors.fatal(jpn, "neither end unique");
                 return;
             }
-        } else if (stop - start == 2) {
-            JoinNd first = (JoinNd) joins.get(start);
-            JoinNd second = (JoinNd) joins.get(start + 1);
-            ForeignKey from = fk(first, false);
-            ForeignKey to = fk(second, true);
+
+            ForeignKey fk = fk(jn, joinForward);
+
+            if (forward == joinForward) {
+                m = new JoinTo(path, fk);
+		setNullable(fk, prop.isNullable());
+            } else {
+                m = new JoinFrom(path, fk);
+            }
+        } else if (magnitude == 2) {
+            JoinNd first = (JoinNd) joins.get(low);
+            JoinNd second = (JoinNd) joins.get(low + 1);
+            ForeignKey from = fk(first, !forward);
+            ForeignKey to = fk(second, forward);
 
 	    // XXX: The not null checks here seem to be solely for the
 	    // sake of the SelfReference.pdl test. We may want to
@@ -731,7 +782,11 @@ public class PDL {
 		return;
 	    }
 
-            m = new JoinThrough(path, from, to);
+            if (forward) {
+                m = new JoinThrough(path, from, to);
+            } else {
+                m = new JoinThrough(path, to, from);
+            }
 	    setNullable(from, false);
 	    setNullable(to, false);
         } else {
