@@ -13,11 +13,15 @@
  *
  */
 
-package com.arsdigita.persistence.proto.pdl.nodes;
+package com.arsdigita.persistence.proto.pdl;
 
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.metadata.Property;
+import com.arsdigita.persistence.proto.pdl.nodes.AssociationNd;
+import com.arsdigita.persistence.proto.pdl.nodes.Node;
+import com.arsdigita.persistence.proto.pdl.nodes.ObjectTypeNd;
+import com.arsdigita.persistence.proto.pdl.nodes.PropertyNd;
 import com.arsdigita.util.Assert;
 
 import java.util.HashSet;
@@ -30,7 +34,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #13 $ $Date: 2003/05/09 $
+ * @version $Revision: #1 $ $Date: 2003/05/09 $
  */
 public class VersioningMetadata {
     private final static Logger s_log =
