@@ -31,12 +31,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2003/05/12 $
+ * @version $Revision: #15 $ $Date: 2003/06/16 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#14 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#15 $ by $Author: rhs $, $DateTime: 2003/06/16 12:43:36 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);
@@ -56,32 +56,31 @@ public class QueryTest extends PersistenceTestCase {
             sig.addDefaultProperties();
         } else {
             for (int i = 0; i < properties.length; i++) {
-                sig.addPath(Path.get(properties[i]));
+                Path path = Path.get(properties[i]);
+                sig.addPath(path);
+                sig.addDefaultProperties(path);
             }
         }
 
-        OracleWriter w = new OracleWriter();
-        w.write(query);
-        compare(name + ".op", w.getSQL());
+        // Test oracle specific syntax.
+        OracleWriter ow = new OracleWriter();
+        ow.write(query);
+        String oraResult = compare("oracle-se/" + name + ".op", ow.getSQL());
+
+        // Test pg syntax.
+        PostgresWriter pw = new PostgresWriter();
+        pw.write(query);
+        String pgResult = compare("postgres/" + name + ".op", pw.getSQL());
+
+        if (oraResult != null || pgResult != null) {
+            fail(oraResult + "\n\n" + pgResult);
+        }
     }
 
-    private void compare(String expectedResource, String actual) {
+    private String compare(String expectedResource, String actual) {
         String op = "com/arsdigita/persistence/oql/" + expectedResource;
         InputStream is = getClass().getClassLoader().getResourceAsStream(op);
 
-        if (is == null) {
-            // this means it is a db specific file
-            String database = null;
-            if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
-                database = "postgres";
-            } else {
-                database = "oracle-se";
-            }
-            op = "com/arsdigita/persistence/oql/" + database + "/" +
-                expectedResource;
-
-            is = getClass().getClassLoader().getResourceAsStream(op);
-        }
         assertTrue("No such resource: " + op + "\n\nActual:\n" + actual,
                    is != null);
 
@@ -98,10 +97,14 @@ public class QueryTest extends PersistenceTestCase {
             fail(e.getMessage());
         }
 
-        doDiff(expected.toString(), actual);
+        String result = diff(expected.toString(), actual);
+        if (result != null) {
+            result = expectedResource + ": " + result;
+        }
+        return result;
     }
 
-    private void doDiff(String expected, String actual) {
+    private String diff(String expected, String actual) {
         StringTokenizer expectedTokens = new StringTokenizer(expected, "\n\r");
         StringTokenizer actualTokens = new StringTokenizer(actual, "\n\r");
 
@@ -112,15 +115,16 @@ public class QueryTest extends PersistenceTestCase {
             if (actualTokens.hasMoreTokens()) {
                 String actualLine = stripWhitespace(actualTokens.nextToken());
                 if(!expectedLine.equals(actualLine)) {
-                    fail(expectedLine, actualLine, lineNumber, actual);
+                    return failure(expectedLine, actualLine, lineNumber,
+                                   actual);
                 }
             } else {
-                fail(expectedLine, null, lineNumber, actual);
+                return failure(expectedLine, null, lineNumber, actual);
             }
 
         }
 
-
+        return null;
     }
 
     private static final String stripWhitespace(String str) {
@@ -147,11 +151,11 @@ public class QueryTest extends PersistenceTestCase {
         return result.toString().trim();
     }
 
-    private static final void fail(String expected, String actual,
-				   int lineNumber, String output) {
-        fail("Diff failed at line " + lineNumber +
-	     "\nExpected line:\n" + expected + "\n\nActual line:\n" + actual +
-	     "\n\nTest output:\n" + output);
+    private static final String failure(String expected, String actual,
+                                        int lineNumber, String output) {
+        return "Diff failed at line " + lineNumber +
+            "\nExpected line:\n" + expected + "\n\nActual line:\n" + actual +
+            "\n\nTest output:\n" + output;
     }
 
     /**
@@ -251,7 +255,10 @@ public class QueryTest extends PersistenceTestCase {
         Root root = Root.getRoot();
         Table table = root.getTable(tableName);
         assertTrue("No such table: " + tableName, table != null);
-        compare(table.getName() + ".sql", table.getSQL(false));
+        String result = compare(table.getName() + ".sql", table.getSQL(false));
+        if (result != null) {
+            fail(result);
+        }
     }
 
     public void testTest() {

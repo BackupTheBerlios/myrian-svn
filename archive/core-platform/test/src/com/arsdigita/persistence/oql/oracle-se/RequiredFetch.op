@@ -1,12 +1,7 @@
-        do {
- select required__refs.ref_attribute as required__refs__ref_attribute,
-        required__refs.ref_id as required__refs__ref_id,
-        sub.sub_id as sub_id
-   from refs required__refs,
-        sub sub
-  where sub.required_id = required__refs.ref_id
-        } map {
-            id = sub.sub_id;
-            required.refAttribute = required__refs.required__refs__ref_attribute;
-            required.id = required__refs.required__refs__ref_id;
-        }
+select s1.sup_id as column0,
+       required__r.ref_id as column1,
+       required__r.ref_attribute as column2
+from sub s,
+     sup s1,
+     refs required__r
+where s1.sup_id = s.sub_id and required__r.ref_id = s.required_id

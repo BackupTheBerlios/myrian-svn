@@ -1,12 +1,7 @@
-        do {
- select optional__refs.ref_attribute as optional__refs__ref_attribute,
-        optional__refs.ref_id as optional__refs__ref_id,
-        sub.sub_id as sub_id
-   from refs optional__refs,
-        sub sub
-  where sub.optional_id = optional__refs.ref_id(+)
-        } map {
-            id = sub.sub_id;
-            optional.refAttribute = optional__refs.optional__refs__ref_attribute;
-            optional.id = optional__refs.optional__refs__ref_id;
-        }
+select s1.sup_id as column0,
+       optional__r.ref_id as column1,
+       optional__r.ref_attribute as column2
+from sub s,
+     sup s1,
+     refs optional__r
+where s1.sup_id = s.sub_id and optional__r.ref_id(+) = s.optional_id

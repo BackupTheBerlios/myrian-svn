@@ -1,30 +1,18 @@
-         do {
- select acs_objects.default_domain_class as cs_objcts__dflt_dmn_clss,
-        acs_objects.display_name as acs_objects__display_name,
-        acs_objects.object_id as object_id,
-        acs_objects.object_type as acs_objects__object_type,
-        portrait__acs_objects.object_id as prtrt__acs_objcts__objct_id,
-        portrait__acs_objects.object_type as prtrt__acs_objcts__objct_typ,
-        portrait__t_docs_resources.description as prtrt__t_dcs_rsrcs__dscrptn,
-        t_up_profiles.bio as t_up_profiles__bio,
-        t_up_profiles.skills as t_up_profiles__skills,
-        t_up_profiles.user_id as user__t_up_profiles__user_id
-   from acs_objects acs_objects,
-        acs_objects portrait__acs_objects,
-        t_docs_resources portrait__t_docs_resources,
-        t_up_profiles t_up_profiles
-  where portrait__t_docs_resources.resource_id = portrait__acs_objects.object_id(+)
-    and t_up_profiles.portrait_id = portrait__t_docs_resources.resource_id(+)
-    and t_up_profiles.profile_id = acs_objects.object_id
-        } map {
-            displayName = acs_objects.acs_objects__display_name;
-            objectType = acs_objects.acs_objects__object_type;
-            skills = t_up_profiles.t_up_profiles__skills;
-            bio = t_up_profiles.t_up_profiles__bio;
-            defaultDomainClass = acs_objects.cs_objcts__dflt_dmn_clss;
-            id = acs_objects.object_id;
-            user.id = t_up_profiles.user__t_up_profiles__user_id;
-            portrait.objectType = portrait__acs_objects.prtrt__acs_objcts__objct_typ;
-            portrait.description = portrait__t_docs_resources.prtrt__t_dcs_rsrcs__dscrptn;
-            portrait.id = portrait__acs_objects.prtrt__acs_objcts__objct_id;
-        }
+select ao.object_id as column0,
+       ao.default_domain_class as column1,
+       thumbnail__ao.object_id as column2,
+       portrait__ao.object_type as column3,
+       portrait__ao.object_id as column4,
+       tup.bio as column5,
+       user__ao.object_id as column6,
+       tup.skills as column7,
+       ao.object_type as column8,
+       ao.display_name as column9,
+       portrait__tdr.description as column10
+from t_up_profiles tup,
+     acs_objects ao,
+     acs_objects thumbnail__ao,
+     acs_objects portrait__ao,
+     acs_objects user__ao,
+     t_docs_resources portrait__tdr
+where ao.object_id = tup.profile_id and thumbnail__ao.object_id(+) = tup.thumbnail_id and portrait__ao.object_id(+) = tup.portrait_id and user__ao.object_id = tup.user_id and portrait__tdr.resource_id(+) = tup.portrait_id

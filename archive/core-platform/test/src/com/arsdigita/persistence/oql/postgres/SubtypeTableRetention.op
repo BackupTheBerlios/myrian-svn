@@ -1,10 +1,4 @@
-        do {
- select sup.sup_attribute as sup__sup_attribute,
-        sup.sup_id as sup_id
-   from sup sup
-        join sub sub on (sup.sup_id = sub.sub_id)
-        } map {
-            supAttribute = sup.sup__sup_attribute;
-            id = sup.sup_id;
-        }
-
+select s1.sup_id as column0,
+       s1.sup_attribute as column1
+from sub s
+     join sup s1 on s1.sup_id = s.sub_id
