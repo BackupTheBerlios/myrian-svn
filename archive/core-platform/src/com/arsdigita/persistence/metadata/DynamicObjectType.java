@@ -51,12 +51,12 @@ import java.util.HashMap;
  *
  * @deprecated Use com.arsdigita.metadata.DynamicObjectType instead.
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/14 $
+ * @version $Revision: #7 $ $Date: 2002/10/14 $
  */
 
 public class DynamicObjectType {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DynamicObjectType.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DynamicObjectType.java#7 $ by $Author: rhs $, $DateTime: 2002/10/14 16:12:17 $";
 
     // The DDL generator used
     private static DDLGenerator m_generator = DDLGeneratorFactory.getInstance();
@@ -656,10 +656,10 @@ public class DynamicObjectType {
                 m_generator.generateColumnName(m_objectType, name);
 
             // we need this both for the column type, and the FK constraint
-            Column refkey = Utilities.getColumn(type);
+            Column refkey = type.getColumn();
 
             Column foreignKey =
-                new Column(Utilities.getColumn(m_objectType).getTable(),
+                new Column(m_objectType.getColumn().getTable(),
                            columnName,
                            refkey.getType());
 
@@ -672,8 +672,8 @@ public class DynamicObjectType {
                                     m_generator.generateMappingTableName(m_objectType, name)
                                     );
 
-            Column baseKey = Utilities.getColumn(m_objectType);
-            Column foreignKey = Utilities.getColumn(type);
+            Column baseKey = m_objectType.getColumn();
+            Column foreignKey = type.getColumn();
 
             String columnName1 =
                 m_generator.generateColumnName(type, baseKey.getColumnName());

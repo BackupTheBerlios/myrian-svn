@@ -46,7 +46,7 @@ import java.util.HashMap;
  *
  * @deprecated Use com.arsdigita.metadata.DynamicAssociation instead.
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #5 $ $Date: 2002/08/14 $
+ * @version $Revision: #6 $ $Date: 2002/10/14 $
  */
 
 public class DynamicAssociation {
@@ -233,8 +233,8 @@ public class DynamicAssociation {
                                            generator.generateMappingTableName(type1, m_prop2.getName())
                                            );
 
-            Column type1Key = Utilities.getColumn(type1);
-            Column type2Key = Utilities.getColumn(type2);
+            Column type1Key = type1.getColumn();
+            Column type2Key = type2.getColumn();
 
             if ((type1Key == null) || (type2Key == null)) {
                 throw new PersistenceException("One of the object types does " +

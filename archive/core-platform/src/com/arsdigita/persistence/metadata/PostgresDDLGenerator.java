@@ -37,12 +37,12 @@ import org.apache.log4j.Logger;
  * operations.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#7 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#8 $
  * @since 4.6.3 */
 
 final class PostgresDDLGenerator extends BaseDDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#8 $ by $Author: rhs $, $DateTime: 2002/10/14 16:12:17 $";
 
     private static final Logger s_log =
         Logger.getLogger(PostgresDDLGenerator.class);
@@ -98,7 +98,7 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
                                     Map defaultValueMap) {
         StringBuffer ddl = new StringBuffer();
         ArrayList statements = new ArrayList();
-        String tableName = Utilities.getColumn(type).getTableName();
+        String tableName = type.getColumn().getTableName();
         boolean tableExists = tableExists(tableName);
 
         if (!tableExists) {

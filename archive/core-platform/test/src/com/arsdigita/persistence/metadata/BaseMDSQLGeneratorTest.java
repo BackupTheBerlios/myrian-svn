@@ -27,13 +27,13 @@ import org.apache.log4j.Logger;
  * This class performs unit tests on com.arsdigita.persistence.metadata.BaseMDSQLGenerator </p>
  *
  * author <a href="mailto:jorriarsdigita.com">jorriarsdigita.com</a>
- * version $Revision: #5 $ $Date: 2002/08/30 $
+ * version $Revision: #6 $ $Date: 2002/10/14 $
  *
  */
 
 public class BaseMDSQLGeneratorTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/BaseMDSQLGeneratorTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/BaseMDSQLGeneratorTest.java#6 $ by $Author: rhs $, $DateTime: 2002/10/14 16:12:17 $";
 
     private static Logger s_log =
         Logger.getLogger(BaseMDSQLGeneratorTest.class.getName());
@@ -379,7 +379,7 @@ public class BaseMDSQLGeneratorTest extends PersistenceTestCase {
         Property prop = new Property(refName, refType);
         JoinPath jp = new JoinPath();
 
-        Column end = Utilities.getColumn(refType);
+        Column end = refType.getColumn();
 
         Column start = getColumn(getTable(tableName), columnName,
                                  end.getType());

@@ -31,7 +31,7 @@ import java.util.Iterator;
  **/
 public class Utilities  {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Utilities.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Utilities.java#4 $ by $Author: rhs $, $DateTime: 2002/10/14 16:12:17 $";
 
     public final static String LINE_BREAK =
         System.getProperty("line.separator", "\n\r");
@@ -153,25 +153,6 @@ public class Utilities  {
         return prop;
     }
 
-    /**
-     * Returns the Column that stores the key for this object, either the
-     * reference key or the object key.
-     */
-    public static Column getColumn(ObjectType type) {
-        Column retval = type.getReferenceKey();
-
-        if (retval == null) {
-            Property prop = getKeyProperty(type);
-
-            if (prop == null) {
-                return null;
-            }
-
-            retval = prop.getColumn();
-        }
-
-        return retval;
-    }
 
     /**
      * "join" a List of Strings into a single string, with each string

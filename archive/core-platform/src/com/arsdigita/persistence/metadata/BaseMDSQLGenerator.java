@@ -47,12 +47,12 @@ import org.apache.log4j.Logger;
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#14 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#15 $
  * @since 4.6.3
  */
 abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#14 $ by $Author: jparsons $, $DateTime: 2002/10/14 12:51:42 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#15 $ by $Author: rhs $, $DateTime: 2002/10/14 16:12:17 $";
 
     private static final Logger s_log =
         Logger.getLogger(BaseMDSQLGenerator.class);
@@ -676,7 +676,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
         Property refkey = Utilities.getKeyProperty(type);
         Property typekey = Utilities.getKeyProperty((ObjectType)prop.getType());
-        Column refColumn = Utilities.getColumn(type);
+        Column refColumn = type.getColumn();
 
         if ((typekey == null) || (refkey == null) || (refColumn == null)) {
             return null;
@@ -759,7 +759,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
             sb.append(valueBuffer);
             sb.append(")\n");
         } else {
-            Column typeCol = Utilities.getColumn((ObjectType)prop.getType());
+            Column typeCol = ((ObjectType)prop.getType()).getColumn();
 
             sb.append("update ")
                 .append(je1.getTo().getTableName())
@@ -875,7 +875,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
             return null;
         }
 
-        Column refkey = Utilities.getColumn(type);
+        Column refkey = type.getColumn();
 
         if ((refkey == null) || (Utilities.getKeyProperty(type) == null)) {
             return null;
@@ -965,7 +965,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
         Property refkey = Utilities.getKeyProperty(type);
         Property typekey = Utilities.getKeyProperty((ObjectType)prop.getType());
-        Column refColumn = Utilities.getColumn(type);
+        Column refColumn = type.getColumn();
 
         if ((typekey == null) || (refkey == null) || (refColumn == null)) {
             return null;
@@ -1002,7 +1002,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
                 .append(".")
                 .append(typekey.getName());
         } else {
-            Column typeCol = Utilities.getColumn((ObjectType)prop.getType());
+            Column typeCol = ((ObjectType)prop.getType()).getColumn();
 
             sb.append("update ")
                 .append(je1.getTo().getTableName())
@@ -1049,7 +1049,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
         JoinElement je1 = (JoinElement)path.get(0);
         Property refkey = Utilities.getKeyProperty(type);
-        Column refColumn = Utilities.getColumn(type);
+        Column refColumn = type.getColumn();
 
         if ((refkey == null) || (refColumn == null)) {
             return null;
@@ -1351,7 +1351,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
         Map columns = new HashMap();
         List pathCols = new ArrayList();
 
-        Column refkey = Utilities.getColumn(type);
+        Column refkey = type.getColumn();
 
 
         if ((refkey == null) || (Utilities.getKeyProperty(type) == null)) {
@@ -1489,7 +1489,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
         Map columns = new HashMap();
         List pathCols = new ArrayList();
 
-        Column refkey = Utilities.getColumn(type);
+        Column refkey = type.getColumn();
 
         if (refkey == null) {
             return null;

@@ -38,12 +38,12 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.metadata.DynamicObjectType}.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#5 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#6 $
  * @since 4.6.3 */
 
 abstract class BaseDDLGenerator implements DDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#5 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#6 $ by $Author: rhs $, $DateTime: 2002/10/14 16:12:17 $";
 
     private static final Logger s_log =
         Logger.getLogger(BaseDDLGenerator.class);
@@ -193,7 +193,7 @@ abstract class BaseDDLGenerator implements DDLGenerator {
     public String generateColumnName(ObjectType objectType, String proposedName) {
         proposedName = alterStringForSQL(proposedName.toLowerCase());
 
-        Column key = Utilities.getColumn(objectType);
+        Column key = objectType.getColumn();
         if (key == null) {
             throw new PersistenceException(objectType.getName() + " does not "+
                                            "support MDSQL.");
@@ -472,13 +472,13 @@ abstract class BaseDDLGenerator implements DDLGenerator {
                                     Map defaultValueMap) {
         StringBuffer ddl = new StringBuffer();
         List statements = new ArrayList();
-        String tableName = Utilities.getColumn(type).getTableName();
+        String tableName = type.getColumn().getTableName();
 
         if (keyColumn != null) {
             ddl.append(keyColumn.getColumnName());
 
             if (type.getSupertype() != null) {
-                Column superKey = Utilities.getColumn(type.getSupertype());
+                Column superKey = type.getSupertype().getColumn();
 
                 ddl.append(" ")
                     .append(getTypeDeclaration(superKey.getType(),
