@@ -17,7 +17,7 @@
 //
 // @author <a href="mailto:scott@arsdigita.com">Scott Seago</a>
 // @author <a href="mailto:tzumainn@arsdigita.com">Tzu-Mainn Chen</a>
-// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/notes/Note.pdl#1 $ by $Author: randyg $, $DateTime: 2002/08/02 16:40:10 $
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/notes/Note.pdl#2 $ by $Author: randyg $, $DateTime: 2002/08/05 16:43:41 $
 //
 
 model com.arsdigita.notes;
@@ -25,109 +25,25 @@ model com.arsdigita.notes;
 import com.arsdigita.kernel.*;
 
 object type Note extends ACSObject {
-    String title;
-    String body;
-    NoteTheme[0..1] theme;
+    String title = notes.title VARCHAR(255);
+    String body = notes.body VARCHAR(4000);
+    NoteTheme[0..1] theme = join notes.theme_id to note_themes.theme_id;
 
-    retrieve {
-        do {
-            select n.note_id,
-                   n.title,
-                   n.body,
-                   o.object_type
-            from notes n,
-                 acs_objects o
-            where note_id=:id
-            and o.object_id = n.note_id
-        } map {
-            id = n.note_id;
-            title = n.title;
-            body = n.body;
-            objectType = acs_objects.object_type;
-        }
-    }
-
-    retrieve all {
-        do {
-            select n.note_id,
-                   n.title,
-                   n.body,
-                   o.object_type 
-            from notes n,
-                 acs_objects o
-            where o.object_id = n.note_id
-        } map {
-            id = n.note_id;
-            title = n.title;
-            body = n.body;
-            objectType = acs_objects.object_type;
-        }
-    }
-
-    insert {
-        super;
-        do {
-            insert into notes
-            (note_id, title, body)
-            values
-            (:id, :title, :body)
-        }
-    }
-
-    update {
-        super;
-        do {
-            update notes
-            set title = :title,
-                body = :body
-            where note_id = :id
-        }
-    }
-
-    delete {
-        do {
-            delete from notes
-            where note_id = :id
-        }
-        super;
-    }
-
-    add theme {
-        do {
-            update notes
-            set theme_id = :theme.id
-            where note_id = :id
-        }
-    }
-
-    remove theme {
-        do {
-            update notes
-            set theme_id = null
-            where note_id = :id
-        }
-    }
-
-    retrieve theme {
-        do {
-            select t.theme_id,
-                   t.name,
-                   o.object_type
-            from notes n,
-                 note_themes t,
-                 acs_objects o
-            where n.theme_id = t.theme_id
-            and t.theme_id = o.object_id
-            and n.note_id = :id
-        } map {
-            theme.id = t.theme_id;
-            theme.name = t.name;
-            theme.objectType = o.object_type;
-        }
-    }
+    reference key (notes.note_id);
 }
 
 query NotesRetrieveAll {
+    BigDecimal id;
+    String title;
+    String body;
+    BigDecimal categoryID;
+    String categoryName;
+    Date creationDate;
+    Date lastModified;
+    BigDecimal creationUser;
+    BigDecimal modifiedBy;
+    BigDecimal noteNum;
+
     do {
         select n.note_id,
                m.category_id,
@@ -166,105 +82,10 @@ query NotesRetrieveAll {
 }
 
 object type NoteTheme extends ACSObject {
-    String name;
-    Stylesheet[0..n] style;
-
-    retrieve {
-        do {
-            select c.theme_id,
-                   c.name,
-                   o.object_type 
-            from note_themes c,
-                 acs_objects o
-            where theme_id=:id
-            and o.object_id = c.theme_id
-        } map {
-            id = c.theme_id;
-            name = c.name;
-            objectType = o.object_type;
-        }
-    }
-
-    retrieve all {
-        do {
-            select c.theme_id,
-                   c.name,
-                   o.object_type  
-            from note_themes c,
-                 acs_objects o
-            where o.object_id = c.theme_id
-        } map {
-            id = c.theme_id;
-            name = c.name;
-            objectType = o.object_type;
-        }
-    }
-
-    insert {
-        super;
-        do {
-            insert into note_themes
-            (theme_id, name)
-            values
-            (:id, :name)
-        }
-    }
-
-    update {
-        super;
-        do {
-            update note_themes
-            set name = :name
-            where themes_id = :id
-        }
-    }
-
-    delete {
-        do {
-            delete from note_themes
-            where theme_id = :id
-        }
-        super;
-    }
-
-    add style {
-        do {
-            insert into theme_stylesheet_map
-            (theme_id, stylesheet_id)
-            values
-            (:id, :style.id)
-        }
-    }
-
-    remove style {
-        do {
-            delete from theme_stylesheet_map
-            where theme_id = :id
-            and stylesheet_id = :style.id
-        }
-    }
-
-    retrieve style {
-        do {
-            select ss.stylesheet_id,
-                   ss.locale_id,
-                   ss.output_type, 
-                   ss.pathname,
-                   ss.item_id,
-                   o.object_type
-            from acs_stylesheets ss,
-                 theme_stylesheet_map tsm, 
-                 acs_objects o
-            where ss.stylesheet_id = tsm.stylesheet_id
-            and ss.stylesheet_id = o.object_id
-            and tsm.theme_id = :id
-        } map {
-            style.id = ss.stylesheet_id;
-            style.pathName = ss.pathname;
-            style.objectType = o.object_type;
-            style.localeID = ss.locale_id;
-            style.outputType = ss.output_type;
-            style.itemID = ss.item_id;
-        }
-    }
+    String name = note_themes.name VARCHAR(200);
+    Stylesheet[0..n] style = join note_themes.theme_id
+                               to theme_stylesheet_map.theme_id,
+                             join theme_stylesheet_map.stylesheet_id
+                               to acs_stylesheets.stylesheet_id;
+    reference key (note_themes.theme_id);
 }

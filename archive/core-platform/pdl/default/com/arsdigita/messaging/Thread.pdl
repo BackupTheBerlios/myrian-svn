@@ -19,8 +19,8 @@ import com.arsdigita.kernel.Party;
 
 object type Thread extends ACSObject {
 
-    Date[1..1] lastUpdate = message_threads.last_update;
-    BigDecimal[1..1] numReplies = message_threads.num_replies;
+    Date[1..1] lastUpdate = message_threads.last_update TIMESTAMP;
+    BigDecimal[1..1] numReplies = message_threads.num_replies INTEGER;
 
     ThreadedMessage[1..1] root =
         join message_threads.root_id to messages.message_id;

@@ -45,37 +45,11 @@ association {
     UserTask[0..n] tasks = join groups.group_id
                              to cw_task_group_assignees.group_id,
                            join cw_task_group_assignees.task_id
-                             to cw_tasks.task_id;
-    Group[0..n] assignedGroups = join cw_tasks.task_id 
-                             to cw_task_group_assignees.task_id,
-                           join cw_task_group_assignees.group_id 
-                             to groups.group_id;
-
-    add assignedGroups {
-        do {
-           insert into cw_task_group_assignees (
-               task_id                         ,
-               group_id                        )
-           values                              (
-               :id                             ,
-               :assignedGroups.id  )
-        }
-    }
-
-    remove assignedGroups {
-        do {
-           delete from cw_task_group_assignees
-           where  task_id    = :id 
-           and    group_id   = :assignedGroups.id
-        }
-    }
-
-    clear  assignedGroups {
-        do {
-           delete from cw_task_group_assignees 
-           where  task_id  = :id
-        }
-    }
+                             to cw_user_tasks.task_id;
+    Group[0..n] assignedGroups = join cw_user_tasks.task_id 
+                                   to cw_task_group_assignees.task_id,
+                                 join cw_task_group_assignees.group_id 
+                                    to groups.group_id;
 }
 
 

@@ -12,7 +12,7 @@
 // rights and limitations under the License.
 //
 
-// $Id: //core-platform/dev/pdl/default/com/arsdigita/notification/Digest.pdl#1 $
+// $Id: //core-platform/dev/pdl/default/com/arsdigita/notification/Digest.pdl#2 $
 
 model com.arsdigita.notification;
 
@@ -20,39 +20,13 @@ import com.arsdigita.kernel.*;
 
 object type Digest extends ACSObject {
 
-    BigDecimal partyFrom = nt_digests.party_from;
-    String     subject = nt_digests.subject;
-    String     header = nt_digests.header;
-    String     separator = nt_digests.separator;
-    String     signature = nt_digests.signature;
-    Integer    frequency = nt_digests.frequency;
-    Date       nextRun = nt_digests.next_run;
+    BigDecimal partyFrom = nt_digests.party_from INTEGER;
+    String[1..1]     subject = nt_digests.subject VARCHAR(250);
+    String[1..1]     header = nt_digests.header VARCHAR(4000);
+    String[1..1]     separator = nt_digests.separator VARCHAR(100);
+    String[1..1]     signature = nt_digests.signature VARCHAR(4000);
+    Integer[1..1]    frequency = nt_digests.frequency INTEGER;
+    Date[1..1]       nextRun = nt_digests.next_run TIMESTAMP;
 
     reference key (nt_digests.digest_id);
-
-    insert {
-
-        super;
-
-        do {
-            insert into nt_digests
-            (digest_id,
-            subject,
-            party_from,
-            header,
-            separator,
-            signature,
-            frequency,
-            next_run)
-            values
-            (:id,
-            :subject,
-            :partyFrom,
-            :header,
-            :separator,
-            :signature,
-            :frequency,
-            sysdate)
-        }
-    }
 }

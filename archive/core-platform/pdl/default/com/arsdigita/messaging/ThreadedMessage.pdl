@@ -14,8 +14,8 @@ model com.arsdigita.messaging;
 
 object type ThreadedMessage extends Message {
 
-    BigDecimal root = messages.root_id;
-    String     sortKey = messages.sort_key;
+    BigDecimal[0..1] root = messages.root_id INTEGER;
+    String[0..1] sortKey = messages.sort_key VARCHAR(300);
 
     insert {
 
@@ -38,6 +38,9 @@ object type ThreadedMessage extends Message {
 // selected, and therefore should execute reasonably fast.
 
 query maxSortKey {
+    BigDecimal root;
+    String sortKey;
+    BigDecimal sortSize;
     do {
          select   root_id,
                   sort_key,
@@ -57,6 +60,10 @@ query maxSortKey {
 // children. 
 
 query getMessageTree {
+    BigDecimal root;
+    String sortKey;
+    BigDecimal sortSize;
+    BigDecimal object;
     do {
         select   message_id,
                  object_id,

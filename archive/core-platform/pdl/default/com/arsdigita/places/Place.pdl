@@ -16,7 +16,7 @@
 // Abstract Place type
 //
 // @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
-// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/places/Place.pdl#2 $ by $Author: randyg $, $DateTime: 2002/08/05 14:32:26 $
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/places/Place.pdl#3 $ by $Author: randyg $, $DateTime: 2002/08/05 16:43:41 $
 //
 
 model com.arsdigita.places;
@@ -27,8 +27,8 @@ object type Place extends ACSObject {
     String[1..1] name = places.place_name VARCHAR(200);
     // Right now, it is not possible to pass both scale and precision
     // in to NUMBER
-    Double[0..1] latitude = places.latitude NUMBER(9);
-    Double[0..1] longitude = places.longitude NUMBER(9);
+    Double[0..1] latitude = places.latitude NUMERIC(9);
+    Double[0..1] longitude = places.longitude NUMERIC(9);
     //Double[0..1] latitude = places.latitude NUMBER(9,6);
     //Double[0..1] longitude = places.longitude NUMBER(9,6);
 

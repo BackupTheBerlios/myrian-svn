@@ -28,66 +28,13 @@ import com.arsdigita.kernel.*;
 
 object type MessagePart {
 
-    BigDecimal id;
-    BigDecimal messageID;
-    String     type;
-    String     name;
-    String     description;
-    String     disposition;
-    Blob       content;
+    BigDecimal id = message_parts.part_id INTEGER;
+    BigDecimal messageID = message_parts.message_id INTEGER;
+    String     type = message_parts.type VARCHAR(50);
+    String     name = message_parts.name VARCHAR(100);
+    String     description = message_parts.description VARCHAR(500);
+    String     disposition = message_parts.disposition VARCHAR(50);
+    Blob       content = message_parts.content BLOB;
 
     object key (id);
-
-    insert {
-        do {
-            insert into message_parts
-                (part_id,
-                 type,
-                 name,
-                 description,
-                 disposition,
-                 content)
-            values
-                (:id,
-                 :type,
-                 :name,
-                 :description,
-                 :disposition,
-                 :content)
-        }
-    }
-
-    retrieve {
-        do {
-
-            select type,
-                   name,
-                   description,
-                   disposition,
-                   content
-            from   message_parts
-            where  part_id = :id
-
-        } map {
-
-            type        = type;
-            name        = name;
-            description = description;
-            disposition = disposition;
-            content     = content;
-
-        }
-    }
-
-    update {
-        do {
-            update message_parts
-                set   type        = :type,
-                      name        = :name,
-                      description = :description,
-                      disposition = :disposition,
-                      content     = :content
-                where part_id     = :part_id;
-        }
-    }
 }

@@ -12,7 +12,7 @@
 // rights and limitations under the License.
 //
 
-// $Id: //core-platform/dev/pdl/default/com/arsdigita/notification/Notification.pdl#1 $
+// $Id: //core-platform/dev/pdl/default/com/arsdigita/notification/Notification.pdl#2 $
 
 model com.arsdigita.notification;
 
@@ -20,16 +20,19 @@ import com.arsdigita.kernel.*;
 
 object type QueueItem {
 
-   BigDecimal requestID;
-   BigDecimal messageID;
-   BigDecimal partyTo;
-   String     partyToAddr;
-   BigDecimal retryCount;
-   Boolean    success;
-   String     header;
-   String     signature;
+   BigDecimal requestID = nt_requests.request_id INTEGER;
+   BigDecimal messageID = nt_requests.message_id INTEGER;
+   BigDecimal partyTo = nt_queue.party_to INTEGER;
+   String     partyToAddr = parties.primary_email VARCHAR(100);
+   BigDecimal retryCount = nt_queue.retry_count INTEGER;
+   Boolean    success = nt_queue.success_p CHAR(1);
+   String     header = nt_requests.header VARCHAR(4000);
+   String     signature = nt_requests.signature VARCHAR(4000);
 
    object key (requestID, partyTo);
+
+    join nt_queue.party_to to parties.party_id,
+    join nt_queue.request_id to nt_requests.request_id;
 
    retrieve {
        do {
@@ -89,126 +92,26 @@ object type QueueItem {
 
 object type Notification extends ACSObject {
 
-    BigDecimal partyTo;
-    BigDecimal digestID;
-    BigDecimal messageID;
-    String     header;
-    String     signature;
-    Boolean    expandGroup;
-    Date       requestDate;
-    Date       fulfillDate;
-    String     status;
-    Integer    maxRetries;
-    Boolean    expunge;
-    Boolean    expungeMessage;
+    BigDecimal partyTo = nt_requests.party_to INTEGER;
+    BigDecimal digestID = nt_requests.digest_id INTEGER;
+    BigDecimal messageID = nt_requests.message_id INTEGER;
+    String     header = nt_requests.header VARCHAR(4000);
+    String     signature = nt_requests.signature VARCHAR(4000);
+    Boolean    expandGroup = nt_requests.expand_group CHAR(1);
+    Date       requestDate = nt_requests.request_date TIMESTAMP;
+    Date       fulfillDate = nt_requests.fulfill_date TIMESTAMP;
+    String     status = nt_requests.status VARCHAR(20);
+    Integer    maxRetries = nt_requests.max_retries INTEGER;
+    Boolean    expunge = nt_requests.expunge_p CHAR(1);
+    Boolean    expungeMessage = nt_requests.expunge_msg_p CHAR(1);
 
-    retrieve {
-
-	super;
-
-	do {
-	    select digest_id,
-                   party_to,
-   		   message_id,
-                   header,
-                   signature,
-		   expand_group,
-		   request_date,
-		   fulfill_date,
-		   status,
-  		   max_retries,
-                   expunge_p,
-                   expunge_msg_p
-	    from   nt_requests
-	    where  request_id = :id
-
-	 } map {
-
-	     partyTo        = party_to;
-	     digestID       = digest_id;
-	     messageID      = message_id;
-             header         = header;
-             signature      = signature;
-	     expandGroup    = expand_group;
-	     requestDate    = request_date;
-	     fulfillDate    = fulfill_date;
-	     status         = status;
-	     maxRetries     = max_retries;
-	     expunge        = expunge_p;
-             expungeMessage = expunge_msg_p;
-
-	 }
-    }
-
-    insert {
-
-	super;
-
-	do {
-	    insert into nt_requests
-		(request_id,
-                 party_to,
-                 digest_id,
-                 message_id,
-                 header,
-                 signature,
-                 expand_group,
-		 request_date,
-		 fulfill_date,
-		 status,
-		 max_retries,
-		 expunge_p,
-                 expunge_msg_p)
-             values
-		(:id,
-		 :partyTo,
-		 :digestID,
-		 :messageID,
-                 :header,
-                 :signature,
-		 :expandGroup,
-		 :requestDate,
-		 :fulfillDate,
-		 :status,
-		 :maxRetries,
-		 :expunge,
-                 :expungeMessage)
-	 }
-    }
-
-    update {
-	
-	super;
-
-	do {
-	    update nt_requests
-		set   party_to      = :partyTo,
-		      digest_id     = :digestID,
-		      message_id    = :messageID,
-                      header        = :header,
-                      signature     = :signature,
- 		      expand_group  = :expandGroup,
-		      request_date  = :requestDate,
-		      fulfill_date  = :fulfillDate,
-		      status        = :status,
-		      max_retries   = :maxRetries,
-		      expunge_p     = :expunge,
-                      expunge_msg_p = :expungeMessage
-		where request_id    = :id
-	 }
-    }
-
-    delete {
-
-	do {
-	    delete from nt_requests where request_id = :id
-        }
-
-	super;
-    }
+    reference key (nt_requests.request_id);
 }
 
+
 query GetPendingNotifications {
+    BigDecimal partyTo;
+    BigDecimal requestID;
     do {
         select request_id, 
                party_to
@@ -221,6 +124,10 @@ query GetPendingNotifications {
 }
 
 query GetSimpleQueuedNotifications {
+    BigDecimal requestID;
+    BigDecimal messageID;
+    BigDecimal partyTo;
+
     do {
         select q.request_id, 
                q.party_to, 
@@ -243,6 +150,11 @@ query GetSimpleQueuedNotifications {
 }
 
 query GetDigestQueuedNotifications {
+    BigDecimal requestID;
+    BigDecimal messageID;
+    BigDecimal partyTo;
+    BigDecimal digestID;
+
     do {
         select r.digest_id, 
                q.party_to, 
@@ -268,6 +180,7 @@ query GetDigestQueuedNotifications {
 }
 
 query GetCompleteNotifications {
+    BigDecimal requestID;
     do {
         select request_id
         from   nt_requests
