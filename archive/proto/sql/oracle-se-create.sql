@@ -141,6 +141,8 @@
 @@ default/versioning/comment-vc_generic_operations.sql
 @@ default/versioning/function-last_attr_value.sql
 
+@@ default/x/versioning/insert-vcx_events.sql
+
 @@ default/workflow/sequence-cw_sequences.sql
 @@ default/workflow/table-cw_tasks.sql
 @@ default/workflow/index-cw_tasks.sql

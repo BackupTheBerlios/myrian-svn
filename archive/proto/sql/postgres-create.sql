@@ -140,6 +140,8 @@ begin;
 \i default/versioning/comment-vc_generic_operations.sql
 \i postgres/versioning/function-last_attr_value.sql
 
+\i default/x/versioning/insert-vcx_events.sql
+
 \i postgres/workflow/sequence-cw_sequences.sql
 \i default/workflow/table-cw_tasks.sql
 \i default/workflow/index-cw_tasks.sql
