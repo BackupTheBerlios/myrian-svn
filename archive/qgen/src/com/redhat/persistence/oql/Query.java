@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #16 $ $Date: 2004/03/19 $
+ * @version $Revision: #17 $ $Date: 2004/03/19 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#16 $ by $Author: rhs $, $DateTime: 2004/03/19 19:22:26 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#17 $ by $Author: rhs $, $DateTime: 2004/03/19 21:45:43 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -86,11 +86,19 @@ public class Query {
             qf.mergeOuter();
         }
 
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("outers merged:\n" + qframe);
+        }
+
         for (int i = 0; i < frames.size(); i++) {
             QFrame qf = (QFrame) frames.get(i);
             if (qf.getParent() == null) {
                 qf.equifill();
             }
+        }
+
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("eq/nn filled:\n" + qframe);
         }
 
         do {
