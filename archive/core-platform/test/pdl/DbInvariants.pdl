@@ -11,14 +11,17 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/test/pdl/DbInvariants.pdl#5 $ 
-// $DateTime: 2002/10/16 14:12:35 $
+// $Id: //core-platform/dev/test/pdl/DbInvariants.pdl#6 $ 
+// $DateTime: 2003/02/12 17:25:45 $
 
 model dbinvariants;
 
-query ForeignKeyIndices returns 0..1 {
+query ForeignKeyIndices {
+    String tableName;
+    String columnName;
+
     do {
-        SELECT distinct 1
+        SELECT distinct acc1.table_name, acc1.column_name
         FROM user_cons_columns acc1, user_constraints ac1
         WHERE ac1.constraint_name = acc1.constraint_name
         AND ac1.constraint_type = 'R'
@@ -31,5 +34,8 @@ query ForeignKeyIndices returns 0..1 {
             SELECT table_name, column_name, column_position
             FROM user_ind_columns
             )
+    } map {
+        tableName = acc1.table_name;
+        columnName = acc1.column_name;
     }
 }
