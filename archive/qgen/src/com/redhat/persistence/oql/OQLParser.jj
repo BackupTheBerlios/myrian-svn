@@ -15,7 +15,7 @@ import java.io.*;
  * OQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/01/26 $
+ * @version $Revision: #5 $ $Date: 2004/01/26 $
  */
 
 class OQLParser {
@@ -33,6 +33,7 @@ class OQLParser {
         EXPRESSIONS.put("offset", Offset.class);
         EXPRESSIONS.put("limit", Limit.class);
         EXPRESSIONS.put("exists", Exists.class);
+        EXPRESSIONS.put("size", Size.class);
     }
 
     static Expression construct(Token t, List expressions) {
@@ -58,13 +59,6 @@ class OQLParser {
         } catch (InvocationTargetException e) {
             throw new IllegalStateException(e.getMessage());
         }
-    }
-
-    public static final void main(String[] args) throws Exception {
-        boolean a = true, b = true, c = true, d = true, e = false, f = true;
-        if (a && b && c && d || e && f) { System.out.println("true"); }
-        OQLParser p = new OQLParser(new InputStreamReader(System.in));
-        System.out.println(p.expression());
     }
 
 }
