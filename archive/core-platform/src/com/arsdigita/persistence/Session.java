@@ -59,7 +59,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #17 $ $Date: 2003/06/20 $
+ * @version $Revision: #18 $ $Date: 2003/06/25 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -615,7 +615,11 @@ public class Session {
      **/
 
     public DataCollection retrieve(String typeName) {
-        return retrieve(m_root.getObjectType(typeName));
+        ObjectType ot = m_root.getObjectType(typeName);
+        if (ot == null) {
+            throw new PersistenceException("no such type: " + typeName);
+        }
+        return retrieve(ot);
     }
 
 
@@ -663,7 +667,12 @@ public class Session {
      **/
 
     public DataQuery retrieveQuery(String name) {
-        Query q = m_qs.getQuery(Root.getRoot().getObjectType(name));
+        com.arsdigita.persistence.proto.metadata.ObjectType ot
+            = Root.getRoot().getObjectType(name);
+        if (ot == null) {
+            throw new PersistenceException("no such query: " + name);
+        }
+        Query q = m_qs.getQuery(ot);
         return new DataQueryImpl(this, m_ssn.retrieve(q));
     }
 
@@ -699,8 +708,12 @@ public class Session {
      **/
 
     public DataOperation retrieveDataOperation(String name) {
-        return new DataOperation
-            (this, Root.getRoot().getDataOperation(Path.get(name)).getSQL());
+        com.arsdigita.persistence.proto.metadata.DataOperation op
+            = Root.getRoot().getDataOperation(Path.get(name));
+        if (op == null) {
+            throw new PersistenceException("no such data operation: " + name);
+        }
+        return new DataOperation(this, op.getSQL());
     }
 
 
