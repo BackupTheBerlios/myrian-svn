@@ -1,9 +1,13 @@
+ifndef BUILD
 BUILD=build
+endif
 
 empty:=
 space:=$(empty) $(empty)
 
+ifndef JAVACC
 JAVACC=sh javacc-3.2/bin/javacc
+endif
 
 SOURCES:=src test/src cap/src cap/test/src
 
