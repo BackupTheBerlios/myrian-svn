@@ -77,6 +77,7 @@
 @@ default/kernel/index-acs_stylesheets.sql
 @@ default/kernel/index-acs_stylesheet_type_map.sql
 @@ default/kernel/index-acs_stylesheet_node_map.sql
+@@ default/kernel/function-package_id_for_object_id.sql
 
 @@ default/categorization/table-cat_categories.sql
 @@ default/categorization/comment-cat_categories.sql

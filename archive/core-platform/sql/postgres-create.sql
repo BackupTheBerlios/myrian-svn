@@ -58,6 +58,7 @@ create view dual as select 1;
 \i default/kernel/view-ungranted_trans_context_index.sql
 \i default/kernel/view-ungranted_trans_context_map.sql
 \i default/kernel/view-object_context_trans_map.sql
+\i postgres/kernel/function-package_id_for_object_id.sql
 
 -- XXX
 --\i default/kernel/view-object_package_map.sql

@@ -105,6 +105,7 @@ include default/kernel/index-acs_stylesheet_node_map.sql
 include default/kernel/table-note_themes.sql
 include default/kernel/table-notes.sql
 include default/kernel/table-theme_stylesheet_map.sql
+include default/kernel/function-package_id_for_object_id.sql
 
 include default/categorization/table-cat_categories.sql
 include default/categorization/comment-cat_categories.sql
