@@ -24,6 +24,7 @@ import com.arsdigita.persistence.proto.pdl.nodes.Node;
 import com.arsdigita.persistence.proto.pdl.nodes.ObjectTypeNd;
 import com.arsdigita.persistence.proto.pdl.nodes.PropertyNd;
 import com.arsdigita.util.Assert;
+import com.arsdigita.util.AssertionError;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -36,7 +37,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #2 $ $Date: 2003/05/19 $
+ * @version $Revision: #3 $ $Date: 2003/05/21 $
  */
 public class VersioningMetadata {
     private final static Logger s_log =
@@ -189,7 +190,7 @@ public class VersioningMetadata {
                     }
                     m_nodeVisitor.onVersionedProperty(property);
                 } else {
-                    throw new IllegalStateException("es impossible");
+                    throw new AssertionError("es impossible");
                 }
             }
         }
@@ -210,7 +211,7 @@ public class VersioningMetadata {
             } else if ( prop.equals(assoc.getRoleTwo()) ) {
                 other = assoc.getRoleOne();
             } else {
-                throw new IllegalStateException("can't get here");
+                throw new AssertionError("can't get here");
             }
 
             Role role = (Role) m_properties.get(other);
