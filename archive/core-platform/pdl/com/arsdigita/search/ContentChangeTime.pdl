@@ -11,47 +11,36 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/search/ContentChangeTime.pdl#5 $ 
-// $DateTime: 2002/10/16 14:12:35 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/search/ContentChangeTime.pdl#6 $ 
+// $DateTime: 2003/06/05 18:35:25 $
 
 model com.arsdigita.search;
-
-import com.arsdigita.kernel.*;
 
 // ContentChangeTime object is used to store when content last changes
 // Only needs to do insert.  Is never read by object.
 
-object type ContentChangeTime {
-    BigDecimal id;
+data operation InsertContentChangeTime {
+    do {
+        insert into content_change_time (
+            change_time
+        ) values (
+            :timeLastChange
+        )
+    }
+}
+
+query getContentChangeTimes {
     Long       timeLastChange;
     Long       timeEarliestChange;
 
-    object key (id);
-
-    retrieve {
-        do {
-            select max(change_time) as time_last_change,
-                   min(change_time) as time_first_change
-            from content_change_time
-        } map {
-            timeLastChange = time_last_change;
-            timeEarliestChange = time_first_change;
-        }
+    do {
+        select max(change_time) as time_last_change,
+               min(change_time) as time_first_change
+        from content_change_time
+    } map {
+        timeLastChange = time_last_change;
+        timeEarliestChange = time_first_change;
     }
-
-    insert {
-        do {
-            insert into content_change_time (
-                change_time
-            ) values (
-                :timeLastChange
-            )
-        }
-    }
-
-    update {}
-
-    delete {}
 }
 
 // Following returns the earliest time since the last indexing started, or zero
@@ -59,8 +48,8 @@ object type ContentChangeTime {
 // to find earliest
 
 query getTimeEarliestNonSyncedChange {
-    BigDecimal timeEarliestChange;
-   do {
+    Long timeEarliestChange;
+    do {
         select nvl(min(change_time),0) as time_first_change
         from content_change_time
     } map {

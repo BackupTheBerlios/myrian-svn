@@ -11,12 +11,10 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/search/IndexingTime.pdl#7 $ 
-// $DateTime: 2002/10/16 14:12:35 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/search/IndexingTime.pdl#8 $ 
+// $DateTime: 2003/06/05 18:35:25 $
 
 model com.arsdigita.search;
-
-import com.arsdigita.kernel.*;
 
 // IndexingTime object is used to retrieve times related to
 // the most recent indexing operation (which is run as an
@@ -24,58 +22,43 @@ import com.arsdigita.kernel.*;
 // for the procedures that generate the information read
 // by this file.
 
-object type IndexingTime {
-    BigDecimal id;
+query getJobInfo {
     Long       jobNum;
     String     jobStatus;
+
+    do {
+        select search_indexing.job_number() as job_num,
+               search_indexing.get_status() as job_status
+        from dual
+    } map {
+        jobNum = job_num;
+        jobStatus = job_status;
+    }
+}
+
+query getIndexingInfo {
     Date       timeQueued_date;
     Date       timeStarted_date;
     Date       timeFinished_date;
     Date       timeFailed_date;
     Date       oracleSysdate;        // Current Oracle sysdate
 
-  object key (id);
-
-  retrieve {
-      do {
-	 select
-            search_indexing.job_number() as job_num,
-            'dummy' as job_status
-         from dual
-      } map {
-         jobNum = job_num;
-         jobStatus = job_status;
-      }
-
-      do {
-	 select
-            time_queued,
-            time_started,
-    	    time_finished,
-    	    time_failed,
-	    sysdate as time_sysdate
-	 from
-            search_indexing_jobs
-         where
-            job_num = :jobNum
-      } map {
-	timeQueued_date = time_queued;
-	timeStarted_date = time_started;
-	timeFinished_date = time_finished;
-	timeFailed_date = time_failed;
-	oracleSysdate = time_sysdate;
-      }
-  }
-	 
-  insert {
-  }
-
-  update {
-  }
-
-  delete {
-   }
+    do {
+        select
+          time_queued,
+          time_started,
+    	  time_finished,
+    	  time_failed,
+	  sysdate as time_sysdate
+        from
+          search_indexing_jobs
+        where
+          job_num = :jobNum
+    } map {
+        timeQueued_date = time_queued;
+        timeStarted_date = time_started;
+        timeFinished_date = time_finished;
+        timeFailed_date = time_failed;
+        oracleSysdate = time_sysdate;
+    }
 }
-
-
-
