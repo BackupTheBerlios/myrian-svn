@@ -332,20 +332,10 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
         }
 
         Class cls = pc.getClass();
-        StateManagerImpl smi = getStateManager(pc);
-        if (smi == null) {
+        if (!hasStateManager(pc)) {
             PropertyMap pmap = pmap(pc, type);
-            smi = newSM(pc, pmap);
-        }
+            StateManagerImpl smi = newSM(pc, pmap);
 
-        PropertyMap pmap = smi.getPropertyMap();
-        if (pmap.isNull()) {
-            throw new IllegalStateException("pmap is null: " + pmap);
-        }
-
-        Object current = m_ssn.retrieve(pmap);
-
-        if (current == null) {
             Map values = new HashMap();
 
             m_ssn.create(pc);
