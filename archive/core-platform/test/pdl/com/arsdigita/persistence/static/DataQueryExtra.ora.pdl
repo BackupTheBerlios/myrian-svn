@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/test/pdl/com/arsdigita/persistence/static/DataQueryExtra.ora.pdl#3 $ 
-// $DateTime: 2003/08/15 13:46:34 $
+// $Id: //core-platform/dev/test/pdl/com/arsdigita/persistence/static/DataQueryExtra.ora.pdl#4 $ 
+// $DateTime: 2003/09/04 16:38:12 $
 
 model examples;
 
@@ -31,5 +31,11 @@ query SubQuery {
         select 1
         from dual
         where 2 = :two
+    }
+}
+
+query NamedFilter {
+    do {
+        trunc(action_time, 'yyyy') = to_date(:year || '0101', 'yyyymmdd')
     }
 }

@@ -39,11 +39,11 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #17 $ $Date: 2003/09/02 $
+ * @version $Revision: #18 $ $Date: 2003/09/04 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#17 $ by $Author: ashah $, $DateTime: 2003/09/02 11:56:35 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#18 $ by $Author: ashah $, $DateTime: 2003/09/04 16:38:12 $";
 
     private static Logger s_log =
         Logger.getLogger(DataQueryImplTest.class.getName());
@@ -868,6 +868,15 @@ public class DataQueryImplTest extends DataQueryTest {
         fail("The mapping failed, properties should differ at some point");
     }
 
+    public void testNamedFilter() {
+        DataQuery dq = getDefaultQuery();
+        Filter f = dq.addFilter("examples.NamedFilter");
+        f.set("year", "1976");
+        while (dq.next()) {
+            assertTrue("read".equals(dq.get("action")));
+        }
+        assertEquals(2L, dq.size());
+    }
 
     /**
      *  this tests the getPropertyValues method for DataQuery
