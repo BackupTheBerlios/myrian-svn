@@ -30,12 +30,12 @@ import java.io.InputStream;
  * PersistenceTestCase
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/01 $
+ * @version $Revision: #6 $ $Date: 2002/08/01 $
  */
 
 public class PersistenceTestCase extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#5 $ by $Author: randyg $, $DateTime: 2002/08/01 11:13:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#6 $ by $Author: randyg $, $DateTime: 2002/08/01 11:16:42 $";
 
     // Prevent loading the same PDL file twice
     private static Set s_loadedPDLResources = new HashSet();
@@ -85,7 +85,7 @@ public class PersistenceTestCase extends TestCase {
             m.loadResource(resource);
             m.generateMetadata(MetadataRoot.getMetadataRoot());
 
-            String outputPDLDir = "/home/randyg/pdl";
+            String outputPDLDir = null;
             if (outputPDL) {
                 try {
                     PDLOutputter.writePDL(MetadataRoot.getMetadataRoot(),

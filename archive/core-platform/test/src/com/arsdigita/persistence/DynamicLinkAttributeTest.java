@@ -27,12 +27,12 @@ import org.apache.log4j.Category;
  * LinkAttributeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/07/31 $
+ * @version $Revision: #2 $ $Date: 2002/08/01 $
  */
 
 public class DynamicLinkAttributeTest extends LinkAttributeTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DynamicLinkAttributeTest.java#1 $ by $Author: randyg $, $DateTime: 2002/07/31 10:54:52 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DynamicLinkAttributeTest.java#2 $ by $Author: randyg $, $DateTime: 2002/08/01 11:16:42 $";
 
     public DynamicLinkAttributeTest(String name) {
         super(name);
