@@ -46,12 +46,12 @@ import java.util.ArrayList;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/06/03 $
+ * @version $Revision: #6 $ $Date: 2002/06/14 $
  */
 
 public class GenericDataObject implements DataObject {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#5 $ by $Author: rhs $, $DateTime: 2002/06/03 15:25:19 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#6 $ by $Author: rhs $, $DateTime: 2002/06/14 12:22:31 $";
 
     private ObjectType    m_type;
     private Session       m_session;
@@ -76,19 +76,26 @@ public class GenericDataObject implements DataObject {
     private static final class ObserverEntry {
 
         private DataObserver m_observer;
-        private int m_index;
+        private Set m_firing = new HashSet();
 
-        ObserverEntry(DataObserver observer, int index) {
+        ObserverEntry(DataObserver observer) {
             m_observer = observer;
-            m_index = index;
         }
 
         public DataObserver getObserver() {
             return m_observer;
         }
 
-        public int getIndex() {
-            return m_index;
+        public boolean isFiring(DataEvent event) {
+            return m_firing.contains(event.getClass());
+        }
+
+        public void setFiring(DataEvent event) {
+            m_firing.add(event.getClass());
+        }
+
+        public void clearFiring(DataEvent event) {
+            m_firing.remove(event.getClass());
         }
 
         public int hashCode() {
@@ -104,7 +111,7 @@ public class GenericDataObject implements DataObject {
         }
 
         public String toString() {
-            return "Observer " + m_index + ": " + m_observer;
+            return "Observer: " + m_observer;
         }
 
     }
@@ -131,7 +138,7 @@ public class GenericDataObject implements DataObject {
         if (observer == null) {
             throw new IllegalArgumentException("Can't add a null observer.");
         }
-        ObserverEntry entry = new ObserverEntry(observer, m_observers.size());
+        ObserverEntry entry = new ObserverEntry(observer);
         if (!m_observers.contains(entry)) {
             if (m_firing != null) {
                 throw new IllegalStateException(
@@ -146,29 +153,15 @@ public class GenericDataObject implements DataObject {
         }
     }
 
-    private static final int BEFORE_SAVE = 0;
-    private static final int AFTER_SAVE = 1;
-    private static final int BEFORE_DELETE = 2;
-    private static final int AFTER_DELETE = 3;
-    private static final int NUM_METHODS = 4;
-
-    private int[] m_count = new int[NUM_METHODS];
-    private BitSet[] m_fired = new BitSet[NUM_METHODS];
     private ObserverEntry m_firing = null;
 
-    private void fireObserver(int method, boolean errorOnSave) {
-        if (m_count[method] == 0) {
-            m_fired[method] = new BitSet(m_observers.size());
-        }
-
-        m_count[method]++;
+    void fireObserver(DataEvent event, boolean errorOnSave) {
         ObserverEntry old = m_firing;
         try {
             for (Iterator it = m_observers.iterator(); it.hasNext(); ) {
                 ObserverEntry entry = (ObserverEntry) it.next();
                 DataObserver observer = entry.getObserver();
-                int index = entry.getIndex();
-                if (m_fired[method].get(index)) {
+                if (entry.isFiring(event)) {
                     if (errorOnSave) {
                         throw new PersistenceException(
                             "Loop detected while firing a DataObserver. " +
@@ -180,56 +173,38 @@ public class GenericDataObject implements DataObject {
                             );
                     }
                 } else {
-                    m_fired[method].set(index);
-                    m_firing = entry;
-                    callObserverMethod(observer, method);
+                    try {
+                        entry.setFiring(event);
+                        m_firing = entry;
+                        event.invoke(observer);
+                    } finally {
+                        entry.clearFiring(event);
+                    }
                 }
             }
         } finally {
-            m_count[method]--;
             m_firing = old;
-        }
-
-        if (m_count[method] == 0) {
-            m_fired[method] = null;
         }
     }
 
-    private void callObserverMethod(DataObserver observer, int method) {
-        switch (method) {
-        case BEFORE_SAVE:
-            observer.beforeSave(this);
-            break;
-        case AFTER_SAVE:
-            observer.afterSave(this);
-            break;
-        case BEFORE_DELETE:
-            observer.beforeDelete(this);
-            break;
-        case AFTER_DELETE:
-            observer.afterDelete(this);
-            break;
-        default:
-            throw new IllegalStateException(
-                "No such observer method: " + method
-                );
-        }
+    void fireObserver(DataEvent event) {
+        fireObserver(event, true);
     }
 
     private void fireBeforeSave() {
-        fireObserver(BEFORE_SAVE, true);
+        fireObserver(new BeforeSaveEvent(this));
     }
 
     private void fireAfterSave() {
-        fireObserver(AFTER_SAVE, false);
+        fireObserver(new AfterSaveEvent(this), false);
     }
 
     private void fireBeforeDelete() {
-        fireObserver(BEFORE_DELETE, true);
+        fireObserver(new BeforeDeleteEvent(this));
     }
 
     private void fireAfterDelete() {
-        fireObserver(AFTER_DELETE, true);
+        fireObserver(new AfterDeleteEvent(this));
     }
 
     void setNew(boolean isNew) {
@@ -523,15 +498,12 @@ public class GenericDataObject implements DataObject {
                         // TO DO: talk to Rafi about how he really wants
                         // to handle this.
 
-                        throw new PersistenceException(
-                                  "Unable to retrieve attribute " + 
-                                  propertyName +
-                                  " of object type " + m_type.getName() +
-                                  " because there is no retrieve attribute " +
-                                  " event handler defined for it and " +
-                                  " the retrieve object event returned no " +
-                                  " data."
-                                  );
+                        throw new ObjectDeletedException(
+                            "Unable to retrieve attribute " + 
+                            propertyName +
+                            " of object type " + m_type.getName() +
+                            " because the object has been deleted."
+                            );
                     }
                 }
             }
@@ -562,14 +534,19 @@ public class GenericDataObject implements DataObject {
         // if value is an object or scalar then it adds to data container
         Property prop = checkProperty(propertyName);
 
-        // make sure that the property is loaded so it can be nulled correctly
-        // this is a bit of a hack, but the correct solution is much harder
-        // and not very well supported.
-        if (value == null && (prop.isRole() && !prop.isCollection())) {
-            get(propertyName);
+        if (prop.isCollection()) {
+            throw new PersistenceException(
+                "Cannot set a multi valued property."
+                );
         }
 
+        // make sure that the property is loaded so it can be nulled correctly
+        // also necessary for observer firing.
+        Object previous = get(propertyName);
+
         m_data.set(propertyName, value);
+
+        fireObserver(new SetEvent(this, propertyName, previous, value));
     }
 
 

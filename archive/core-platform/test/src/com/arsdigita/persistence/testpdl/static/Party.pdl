@@ -79,10 +79,12 @@ object type User extends Party {
 
     retrieve attributes {
         do {
-            select bio
+            select *
             from t_users
             where user_id = :id
         } map {
+            firstName = t_users.first_name;
+            lastNames = t_users.last_names;
             bio = t_users.bio;
         }
     }

@@ -30,11 +30,11 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/06/14 $
  */
 public class GenericDataObjectTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/GenericDataObjectTest.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/GenericDataObjectTest.java#2 $ by $Author: rhs $, $DateTime: 2002/06/14 12:22:31 $";
 
     public GenericDataObjectTest(String name) {
         super(name);
@@ -158,13 +158,18 @@ public class GenericDataObjectTest extends PersistenceTestCase {
         party.specialize("examples.User");
 
 
-        party = getSession().create("examples.Party");
-        party.set("id", BigInteger.ZERO);
-        party.set("email", "jorris@arsdigita.com");
-        party.save();
-        
-        ObjectType userType = getSession().create("examples.User").getObjectType();
-        party.specialize( userType );
+        DataObject user = getSession().create(new OID("examples.User",
+                                                      BigInteger.ZERO));
+        user.set("email", "jorris@arsdigita.com");
+        user.set("firstName", "NA");
+        user.set("lastNames", "NA");
+        user.save();
+
+        party = getSession().retrieve(new OID("examples.Party",
+                                              BigInteger.ZERO));
+        party.specialize(user.getObjectType());
+        assertEquals("NA", party.get("firstName"));
+        assertEquals("NA", party.get("lastNames"));
         party.set("firstName", "Jon");
         party.set("lastNames", "Orris");
         party.save();

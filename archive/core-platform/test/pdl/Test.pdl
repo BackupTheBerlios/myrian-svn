@@ -1,0 +1,39 @@
+model test;
+
+object type Test {
+    BigInteger[1..1] id = tests.test_id INTEGER;
+    String[0..1] name = tests.name VARCHAR(200);
+    Test[0..1] optionalSelf = join tests.optional_self_id to tests.test_id;
+    Test[0..n] collectionSelf = join tests.test_id to collection_self.test_id,
+                            join collection_self.element_id to tests.test_id;
+    Icle[0..1] optional = join tests.optional_id to icles.icle_id;
+    Icle[1..1] required = join tests.required_id to icles.icle_id;
+    Icle[0..n] collection = join tests.test_id to collection.test_id,
+                            join collection.element_id to icles.icle_id;
+
+    object key (id);
+}
+
+association {
+    Test[0..1] parent = join tests.parent_id to tests.test_id;
+    Test[0..n] children = join tests.test_id to tests.parent_id;
+}
+
+object type Icle {
+    BigInteger[1..1] id = icles.icle_id INTEGER;
+    String[0..1] name = icles.name VARCHAR(200);
+
+    object key (id);
+}
+
+object type Component {
+    BigInteger[1..1] id = components.component_id INTEGER;
+    String[0..1] name = components.name VARCHAR(200);
+
+    object key (id);
+}
+
+association {
+    Test[1..1] test = join components.test_id to tests.test_id;
+    Component[0..n] components = join tests.test_id to components.component_id;
+}

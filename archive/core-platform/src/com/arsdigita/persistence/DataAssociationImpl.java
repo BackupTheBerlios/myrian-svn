@@ -49,12 +49,12 @@ import org.apache.log4j.Category;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/06/03 $
+ * @version $Revision: #4 $ $Date: 2002/06/14 $
  */
 
 class DataAssociationImpl extends DataCollectionImpl implements DataAssociation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#3 $ by $Author: rhs $, $DateTime: 2002/06/03 15:25:19 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#4 $ by $Author: rhs $, $DateTime: 2002/06/14 12:22:31 $";
 
     private final static Category s_cat = 
                     Category.getInstance(DataAssociationImpl.class.getName());
@@ -161,6 +161,8 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
     public void clear() {
         m_toAdd.clear();
         m_cleared = true;
+
+        m_parent.fireObserver(new ClearEvent(m_parent, m_role));
     }
 
 
@@ -211,6 +213,8 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
             s_cat.warn("Adding null object to association " + this, new Throwable());
         }
 
+        m_parent.fireObserver(new AddEvent(m_parent, m_role, object));
+
         DataObject link = null;
         if (m_linkType != null) {
             Property prop = m_parent.getObjectType().getProperty(m_role);
@@ -250,6 +254,9 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
      *  @param object The DataObject to be removed
      */
     public void remove(DataObject object) {
+
+        m_parent.fireObserver(new RemoveEvent(m_parent, m_role, object));
+
         if (m_linkType != null) {
             DataObject link = GenericDataObjectFactory.createObject(
                 m_linkType,
@@ -308,7 +315,7 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
         } else {
             for (Iterator it = m_fetched.iterator(); it.hasNext(); ) {
                 GenericDataObject toSave = (GenericDataObject) it.next();
-                if (!toSave.isDeleted()) {
+                if (!toSave.isDeleted() && toSave.isModified()) {
                     toSave.save();
                 }
             }
