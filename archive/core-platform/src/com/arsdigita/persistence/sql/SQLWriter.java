@@ -6,12 +6,12 @@ import java.util.*;
  * SQLWriter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/30 $
+ * @version $Revision: #2 $ $Date: 2002/05/30 $
  **/
 
 public final class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/SQLWriter.java#1 $ by $Author: rhs $, $DateTime: 2002/05/30 15:15:09 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/SQLWriter.java#2 $ by $Author: rhs $, $DateTime: 2002/05/30 18:13:18 $";
 
     private StringBuffer m_buffer = new StringBuffer(1024);
     private Stack m_indents = new Stack();
@@ -91,7 +91,8 @@ public final class SQLWriter {
             char last = m_buffer.charAt(m_buffer.length() - 1);
             if (Character.isJavaIdentifierPart(last) ||
                 last == ')' ||
-                last == '\'') {
+                last == '\'' ||
+                last == '?') {
                 print(' ');
             }
         }
