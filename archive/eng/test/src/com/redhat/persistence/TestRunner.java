@@ -12,22 +12,36 @@ import org.apache.log4j.Logger;
  * TestRunner
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/08/03 $
+ * @version $Revision: #7 $ $Date: 2004/08/12 $
  **/
 
 public class TestRunner {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/TestRunner.java#6 $ by $Author: rhs $, $DateTime: 2004/08/03 15:28:49 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/TestRunner.java#7 $ by $Author: ashah $, $DateTime: 2004/08/12 15:46:57 $";
 
     private static final Logger s_log = Logger.getLogger(TestRunner.class);
 
     public static final void main(String[] args) throws Exception {
+        List results = new ArrayList();
         for (int i = 0; i < args.length; i++) {
-            run(args[i]);
+            results.add(run(args[i]));
+        }
+
+        System.out.println("");
+
+        for (int i = 0; i < results.size(); i++) {
+            TestResult result = (TestResult) results.get(i);
+            System.out.println
+                ("Test " + args[i] + ": " +
+                 (result.wasSuccessful() ? "PASSED" : "FAILED"));
+            System.out.println
+                ("Tests run: " + result.runCount()
+                 + ", failures: " + result.failureCount()
+                 + ", errors: " + result.errorCount());
         }
     }
 
-    private static final void run(String suite) throws Exception {
+    private static final TestResult run(String suite) throws Exception {
         final boolean halt = "true".equals
             (System.getProperty("junit.haltonfailure"));
         String include = System.getProperty("junit.test");
@@ -55,6 +69,8 @@ public class TestRunner {
                 if (s_log.isDebugEnabled()) {
                     s_log.debug("stack", t);
                 }
+
+                print(test, t, false);
                 if (halt) { result.stop(); }
             }
             public void addFailure(Test test, AssertionFailedError t) {
@@ -62,6 +78,8 @@ public class TestRunner {
                 if (s_log.isDebugEnabled()) {
                     s_log.debug("stack", t);
                 }
+
+                print(test, t, true);
                 if (halt) { result.stop(); }
             }
             public void startTest(Test test) {
@@ -76,26 +94,16 @@ public class TestRunner {
         Method method = klass.getMethod("suite", new Class[0]);
         Test test = (Test) method.invoke(null, null);
         test.run(result);
-        System.out.println
-            ("Test " + suite + ": " +
-             (result.wasSuccessful() ? "PASSED" : "FAILED"));
-        System.out.println
-            ("Tests run: " + result.runCount()
-             + ", failures: " + result.failureCount()
-             + ", errors: " + result.errorCount());
-        print(result.failures());
-        print(result.errors());
+
+        return result;
     }
 
-    private static final void print(Enumeration e) {
-        while (e.hasMoreElements()) {
-            TestFailure failure = (TestFailure) e.nextElement();
-            System.out.println("Testcase: " + failure.failedTest());
-            System.out.println(failure.isFailure() ? "FAILED " : "ERROR ");
-            if (!"false".equals(System.getProperty("junit.verbose"))) {
-                System.out.println(failure.toString());
-                System.out.println(failure.trace());
-            }
+    private static final void print(Test test, Throwable t, boolean failed) {
+        System.out.println
+            ("Testcase " + (failed ? "FAILED" : "ERROR ") + ": " + test);
+
+        if (!"false".equals(System.getProperty("junit.verbose"))) {
+            t.printStackTrace(System.out);
         }
     }
 
