@@ -25,9 +25,9 @@ import com.arsdigita.persistence.proto.Query;
 import com.arsdigita.persistence.proto.PropertyMap;
 import com.arsdigita.persistence.proto.EventProcessor;
 import com.arsdigita.persistence.proto.Event;
-import com.arsdigita.persistence.proto.PropertyEvent;
-import com.arsdigita.persistence.proto.ObjectEvent;
 import com.arsdigita.persistence.proto.CreateEvent;
+import com.arsdigita.persistence.proto.DeleteEvent;
+import com.arsdigita.persistence.proto.ObjectEvent;
 import com.arsdigita.persistence.proto.metadata.Root;
 import com.arsdigita.persistence.proto.metadata.Property;
 import com.arsdigita.persistence.proto.engine.MemoryEngine;
@@ -35,14 +35,11 @@ import com.arsdigita.persistence.proto.engine.rdbms.RDBMSEngine;
 import com.arsdigita.persistence.proto.engine.rdbms.RDBMSQuerySource;
 import com.arsdigita.persistence.proto.engine.rdbms.ConnectionSource;
 
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import org.apache.log4j.Logger;
 
 /**
  * <p>All persistence operations take place within the context of a session.
@@ -55,10 +52,12 @@ import java.sql.SQLException;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #21 $ $Date: 2003/03/27 $
+ * @version $Revision: #22 $ $Date: 2003/03/28 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
+
+    private static final Logger s_log = Logger.getLogger(Session.class);
 
     // This is just a temporary way to get an adapter registered.
     static {
@@ -128,47 +127,97 @@ public class Session {
     private TransactionContext m_ctx = new TransactionContext(m_ssn);
     private MetadataRoot m_root = MetadataRoot.getMetadataRoot();
 
-    private static final void fireEvent(Event e) {
-        fireEvent(e, true);
+    private static final void fireEvent(DataEvent e) {
+        e.m_object.fireObserver(e);
     }
 
-    private static final void fireEvent(Event e, boolean before) {
-        Object o = e.getObject();
-        if (o instanceof DataObjectImpl) {
-            DataObjectImpl doi = (DataObjectImpl) o;
-            doi.fireObserver(e, before, !(before && e instanceof CreateEvent));
-        }
+    {
+        m_ssn.addAfterActivate(new EventProcessor() {
+            public void write(Event ev) {
+                if (!(ev.getObject() instanceof DataObjectImpl)) { return; }
+                ev.dispatch(new Event.Switch() {
+                    public void onCreate(CreateEvent e) { }
+
+                    public void onDelete(DeleteEvent e) { }
+
+                    public void onSet(
+                        com.arsdigita.persistence.proto.SetEvent e) {
+                        fireEvent(new SetEvent((DataObjectImpl) e.getObject(),
+                                               e.getProperty().getName(),
+                                               e.getPreviousValue(),
+                                               e.getArgument()));
+                    }
+
+                    public void onAdd(
+                        com.arsdigita.persistence.proto.AddEvent e) {
+                        fireEvent(new AddEvent((DataObjectImpl) e.getObject(),
+                                               e.getProperty().getName(),
+                                               (DataObjectImpl) e.getArgument()));
+                    }
+
+                    public void onRemove(
+                        com.arsdigita.persistence.proto.RemoveEvent e) {
+                        fireEvent(new RemoveEvent((DataObjectImpl) e.getObject(),
+                                                  e.getProperty().getName(),
+                                                  (DataObjectImpl) e.getArgument()));
+                    }
+                });
+            }
+
+            public void flush() { }
+        });
+
+        m_ssn.addBeforeFlush(new FlushEventProcessor(true));
+
+        m_ssn.addAfterFlush(new FlushEventProcessor(false));
     }
 
-        {
-            m_ssn.addAfterActivate(new EventProcessor() {
-                    public void write(Event e) {
-                        if (e instanceof PropertyEvent) {
-                            fireEvent(e);
-                        }
-                    }
+    private static class FlushEventProcessor extends EventProcessor {
+        final private boolean m_before;
+        private List m_events = new ArrayList();
 
-                    public void flush() { }
-                });
-            m_ssn.addBeforeFlush(new EventProcessor() {
-                    public void write(Event e) {
-                        if (e instanceof ObjectEvent) {
-                            fireEvent(e, true);
-                        }
-                    }
+        FlushEventProcessor(boolean before) { m_before = before; }
 
-                    public void flush() { }
-                });
-            m_ssn.addAfterFlush(new EventProcessor() {
-                    public void write(Event e) {
-                        if (e instanceof ObjectEvent) {
-                            fireEvent(e, false);
-                        }
-                    }
-
-                    public void flush() { }
-                });
+        public void write(Event e) {
+            if (e.getObject() instanceof DataObjectImpl) {
+                m_events.add(e);
+            }
         }
+
+        public void flush() {
+            Set objs = new HashSet();
+            List events = new LinkedList();
+            for (int i = m_events.size() - 1; i >= 0; i--) {
+                Event e = (Event) m_events.get(i);
+                DataObjectImpl obj = (DataObjectImpl) e.getObject();
+
+                if (!objs.contains(obj)) {
+                    events.add(0, e);
+                    objs.add(obj);
+                }
+            }
+
+            for (Iterator it = events.iterator(); it.hasNext(); ) {
+                Event e = (Event) it.next();
+                DataObjectImpl obj = (DataObjectImpl) e.getObject();
+                if (e instanceof DeleteEvent) {
+                    if (m_before) {
+                        fireEvent(new BeforeDeleteEvent(obj));
+                    } else {
+                        fireEvent(new AfterDeleteEvent(obj));
+                    }
+                } else {
+                    if (m_before) {
+                        fireEvent(new BeforeSaveEvent(obj));
+                    } else {
+                        fireEvent(new AfterSaveEvent(obj));
+                    }
+                }
+            }
+
+            m_events.clear();
+        }
+    }
 
     com.arsdigita.persistence.proto.Session getProtoSession() {
         return m_ssn;

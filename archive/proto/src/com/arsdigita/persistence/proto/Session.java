@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #49 $ $Date: 2003/03/27 $
+ * @version $Revision: #50 $ $Date: 2003/03/28 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#49 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#50 $ by $Author: ashah $, $DateTime: 2003/03/28 12:30:01 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -37,7 +37,6 @@ public class Session {
     private Set m_visiting = new HashSet();
 
     private EventStream m_events = new EventStream();
-    private LinkedList m_pending = new LinkedList();
     private boolean m_eventsChanged = false;
 
     private Set m_violations = new HashSet();
@@ -46,7 +45,7 @@ public class Session {
     private final Set m_beforeFlush = new HashSet();
     private final Set m_afterFlush = new HashSet();
 
-    private boolean m_flushing = false;
+    private Event m_beforeFlushMarker = null;
 
     public Session(Engine engine, QuerySource source) {
         m_engine = engine;
@@ -56,41 +55,42 @@ public class Session {
     EventStream getEventStream() { return m_events; }
 
     private void cleanUp() {
-        if (m_pending.size() > 0) {
-            LOG.warn("pending events being dumped");
-        }
-        // m_pending.clear();
         if (m_visiting.size() > 0) {
-            LOG.warn("pending events being dumped");
+            LOG.warn("m_visiting not empty");
         }
-        // m_visiting.clear();
-
-        // reset logging stack
-        if (LOG.isDebugEnabled()) { setLevel(0); }
+        m_visiting.clear();
     }
 
-    private RuntimeException handleException(ProtoException pe) {
-        if (pe.isInternal()) {
-            return new UncheckedWrapperException
-                ("internal persistence exception", pe);
-        } else {
-            pe.setInternal(true);
-            return pe;
+    private RuntimeException handleException(RuntimeException re) {
+        if (re instanceof ProtoException) {
+            ProtoException pe = (ProtoException) re;
+            if (pe.isInternal()) {
+                if (LOG.isDebugEnabled()) { setLevel(0); }
+                return new UncheckedWrapperException
+                    ("internal persistence exception", pe);
+            } else {
+                pe.setInternal(true);
+            }
         }
+
+        return re;
     }
 
     public void create(Object obj) {
+        LinkedList pending = new LinkedList();
+        int l = LOG.isDebugEnabled() ? getLevel() : 0;
         try {
-            createInternal(obj);
-            processPending();
-        } catch (ProtoException pe) {
-            throw handleException(pe);
+            createInternal(obj, pending);
+            activate(pending);
+        } catch (RuntimeException re) {
+            if (LOG.isDebugEnabled()) { setLevel(l); }
+            throw handleException(re);
         } finally {
             cleanUp();
         }
     }
 
-    private void createInternal(Object obj) {
+    private void createInternal(Object obj, List pending) {
         if (LOG.isDebugEnabled()) {
             trace("create", new Object[] {obj});
         }
@@ -108,12 +108,12 @@ public class Session {
 
         getAdapter(obj).setSession(obj, this);
 
-        addEvent(new CreateEvent(this, obj));
+        addEvent(new CreateEvent(this, obj), pending);
 
         PropertyMap props = getAdapter(obj).getProperties(obj);
         for (Iterator it = props.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry me = (Map.Entry) it.next();
-            setInternal(obj, (Property) me.getKey(), me.getValue());
+            setInternal(obj, (Property) me.getKey(), me.getValue(), pending);
         }
 
         if (LOG.isDebugEnabled()) {
@@ -122,18 +122,21 @@ public class Session {
     }
 
     public boolean delete(Object obj) {
+        List pending = new LinkedList();
+        int l = LOG.isDebugEnabled() ? getLevel() : 0;
         try {
-            boolean result = deleteInternal(obj);
-            processPending();
+            boolean result = deleteInternal(obj, pending);
+            activate(pending);
             return result;
-        } catch (ProtoException pe) {
-            throw handleException(pe);
+        } catch (RuntimeException re) {
+            if (LOG.isDebugEnabled()) { setLevel(l); }
+            throw handleException(re);
         } finally {
             cleanUp();
         }
     }
 
-    private boolean deleteInternal(Object obj) {
+    private boolean deleteInternal(Object obj, List pending) {
         if (LOG.isDebugEnabled()) {
             trace("delete", new Object[] {obj});
         }
@@ -155,7 +158,7 @@ public class Session {
                  it.hasNext(); ) {
                 Role role = (Role) it.next();
                 if (role.isCollection()) {
-                    clearInternal(obj, role);
+                    clearInternal(obj, role, pending);
                 }
             }
 
@@ -164,13 +167,13 @@ public class Session {
                 Role role = (Role) it.next();
 
                 if (!role.isCollection() && get(obj, role) != null) {
-                    setInternal(obj, role, null);
+                    setInternal(obj, role, null, pending);
                 }
             }
 
             m_visiting.remove(od);
 
-            addEvent(new DeleteEvent(this, obj));
+            addEvent(new DeleteEvent(this, obj), pending);
             result = true;
         }
 
@@ -206,7 +209,8 @@ public class Session {
      * Cascades delete from container to the containee. The containee
      * will not be deleted in all cases.
      **/
-    private void cascadeDelete(Object container, Object containee) {
+    private void cascadeDelete(Object container, Object containee,
+                               List pending) {
         ObjectData containerOD = fetchObjectData(container);
         boolean me = false;
 
@@ -215,7 +219,7 @@ public class Session {
             m_visiting.add(containerOD);
         }
 
-        deleteInternal(containee);
+        deleteInternal(containee, pending);
 
         if (me) { m_visiting.remove(containerOD); }
     }
@@ -228,15 +232,18 @@ public class Session {
      * @param event the event causing this update
      * @param target the old target of a role that has been updated
      **/
-    private void reverseUpdateOld(PropertyEvent event, Object target) {
+    private void reverseUpdateOld(PropertyEvent event, Object target,
+                                  List pending) {
         Object source = event.getObject();
         Role role = (Role) event.getProperty();
         Role rev = role.getReverse();
 
         if (rev.isCollection()) {
-            addEvent(new RemoveEvent(this, target, rev, source, event));
+            addEvent(new RemoveEvent(this, target, rev, source, event),
+                     pending);
         } else {
-            addEvent(new SetEvent(this, target, rev, null, event));
+            addEvent(new SetEvent(this, target, rev, null, event),
+                     pending);
         }
     }
 
@@ -246,40 +253,45 @@ public class Session {
      * needs to be set to the new source. In addition, the new target's old
      * source needs to be updated so its role target is null.
      **/
-    private void reverseUpdateNew(PropertyEvent event) {
+    private void reverseUpdateNew(PropertyEvent event, List pending) {
         Object source = event.getObject();
         Role role = (Role) event.getProperty();
         Object target = event.getArgument();
         Role rev = role.getReverse();
         if (rev.isCollection()) {
-            addEvent(new AddEvent(this, target, rev, source, event));
+            addEvent(new AddEvent(this, target, rev, source, event), pending);
         } else {
             Object old = get(target, rev);
             if (old != null) {
                 if (role.isCollection()) {
-                    addEvent(new RemoveEvent(this, old, role, target, event));
+                    addEvent(new RemoveEvent(this, old, role, target, event),
+                             pending);
                 } else {
-                    addEvent(new SetEvent(this, old, role, null, event));
+                    addEvent(new SetEvent(this, old, role, null, event),
+                             pending);
                 }
             }
 
-            addEvent(new SetEvent(this, target, rev, source, event));
+            addEvent(new SetEvent(this, target, rev, source, event), pending);
         }
     }
 
     public void set(final Object obj, Property prop, final Object value) {
+        List pending = new LinkedList();
+        int l = LOG.isDebugEnabled() ? getLevel() : 0;
         try {
-            setInternal(obj, prop, value);
-            processPending();
-        } catch (ProtoException pe) {
-            throw handleException(pe);
+            setInternal(obj, prop, value, pending);
+            activate(pending);
+        } catch (RuntimeException re) {
+            if (LOG.isDebugEnabled()) { setLevel(l); }
+            throw handleException(re);
         } finally {
             cleanUp();
         }
     }
 
     private void setInternal(final Object obj, Property prop,
-                             final Object value) {
+                             final Object value, final List pending) {
         if (LOG.isDebugEnabled()) {
             trace("set", new Object[] {obj, prop.getName(), value});
         }
@@ -301,19 +313,19 @@ public class Session {
                     }
 
                     if (role.isReversable()) {
-                        if (old != null) { reverseUpdateOld(ev, old); }
-                        if (value != null) { reverseUpdateNew(ev); }
+                        if (old != null) { reverseUpdateOld(ev, old, pending);}
+                        if (value != null) { reverseUpdateNew(ev, pending); }
                     }
 
-                    addEvent(ev);
+                    addEvent(ev, pending);
 
                     if (role.isComponent()) {
-                        if (old != null) { cascadeDelete(obj, old); }
+                        if (old != null) { cascadeDelete(obj, old, pending); }
                     }
                 }
 
                 public void onAlias(Alias alias) {
-                    setInternal(obj, alias.getTarget(), value);
+                    setInternal(obj, alias.getTarget(), value, pending);
                 }
 
                 public void onLink(Link link) {
@@ -417,19 +429,22 @@ public class Session {
 
 
     public Object add(final Object obj, Property prop, final Object value) {
+        List pending = new LinkedList();
+        int l = LOG.isDebugEnabled() ? getLevel() : 0;
         try {
-            Object result = addInternal(obj, prop, value);
-            processPending();
+            Object result = addInternal(obj, prop, value, pending);
+            activate(pending);
             return result;
-        } catch (ProtoException pe) {
-            throw handleException(pe);
+        } catch (RuntimeException re) {
+            if (LOG.isDebugEnabled()) { setLevel(l); }
+            throw handleException(re);
         } finally {
             cleanUp();
         }
     }
 
     private Object addInternal(final Object obj, Property prop,
-                               final Object value) {
+                               final Object value, final List pending) {
         if (LOG.isDebugEnabled()) {
             trace("add", new Object[] {obj, prop.getName(), value});
         }
@@ -446,12 +461,12 @@ public class Session {
                         throw te;
                     }
 
-                    if (role.isReversable()) { reverseUpdateNew(ev); }
-                    addEvent(ev);
+                    if (role.isReversable()) { reverseUpdateNew(ev, pending); }
+                    addEvent(ev, pending);
                 }
 
                 public void onAlias(Alias alias) {
-                    addInternal(obj, alias.getTarget(), value);
+                    addInternal(obj, alias.getTarget(), value, pending);
                 }
 
                 public void onLink(Link link) {
@@ -459,7 +474,7 @@ public class Session {
 		    pmap.put(link.getFrom(), obj);
 		    pmap.put(link.getTo(), value);
 		    result[0] = getObject(pmap);
-		    createInternal(result[0]);
+		    createInternal(result[0], pending);
                 }
             });
 
@@ -471,11 +486,14 @@ public class Session {
     }
 
     public void remove(final Object obj, Property prop, final Object value) {
+        List pending = new LinkedList();
+        int l = LOG.isDebugEnabled() ? getLevel() : 0;
         try {
-            removeInternal(obj, prop, value);
-            processPending();
-        } catch (ProtoException pe) {
-            throw handleException(pe);
+            removeInternal(obj, prop, value, pending);
+            activate(pending);
+        } catch (RuntimeException re) {
+            if (LOG.isDebugEnabled()) { setLevel(l); }
+            throw handleException(re);
         } finally {
             cleanUp();
         }
@@ -483,7 +501,7 @@ public class Session {
 
 
     private void removeInternal(final Object obj, Property prop,
-                                final Object value) {
+                                final Object value, final List pending) {
         if (LOG.isDebugEnabled()) {
             trace("remove", new Object[] {obj, prop.getName(), value});
         }
@@ -498,26 +516,26 @@ public class Session {
                         throw te;
                     }
 
-                    addEvent(ev);
+                    addEvent(ev, pending);
 
                     if (role.isReversable()) {
-                        reverseUpdateOld(ev, value);
+                        reverseUpdateOld(ev, value, pending);
                     }
 
                     if (role.isComponent()) {
-                        cascadeDelete(obj, value);
+                        cascadeDelete(obj, value, pending);
                     }
                 }
 
                 public void onAlias(Alias alias) {
-                    removeInternal(obj, alias.getTarget(), value);
+                    removeInternal(obj, alias.getTarget(), value, pending);
                 }
 
                 public void onLink(Link link) {
 		    Query q = getQuery(obj, link, value);
 		    Cursor c = retrieve(q).getDataSet().getCursor();
 		    while (c.next()) {
-			deleteInternal(c.get());
+			deleteInternal(c.get(), pending);
 		    }
                 }
             });
@@ -529,17 +547,20 @@ public class Session {
 
 
     public void clear(Object obj, Property prop) {
+        List pending = new LinkedList();
+        int l = LOG.isDebugEnabled() ? getLevel() : 0;
         try {
-            clearInternal(obj, prop);
-            processPending();
-        } catch (ProtoException pe) {
-            throw handleException(pe);
+            clearInternal(obj, prop, pending);
+            activate(pending);
+        } catch (RuntimeException re) {
+            if (LOG.isDebugEnabled()) { setLevel(l); }
+            throw handleException(re);
         } finally {
             cleanUp();
         }
     }
 
-    private void clearInternal(Object obj, Property prop) {
+    private void clearInternal(Object obj, Property prop, List pending) {
        if (LOG.isDebugEnabled()) {
             trace("clear", new Object[] {obj, prop.getName()});
         }
@@ -548,7 +569,7 @@ public class Session {
             (PersistentCollection) get(obj, prop);
         Cursor c = pc.getDataSet().getCursor();
         while (c.next()) {
-            removeInternal(obj, prop, c.get());
+            removeInternal(obj, prop, c.get(), pending);
         }
 
         if (LOG.isDebugEnabled()) {
@@ -605,6 +626,16 @@ public class Session {
         return od.isFlushed();
     }
 
+    public void assertFlushed(Object obj) {
+        if (!isFlushed(obj)) {
+            if (LOG.isInfoEnabled()) {
+                LOG.info("nulled not null property datas: " + m_violations);
+            }
+            throw new ProtoException("all events not flushed for: " + obj,
+                                     false);
+        }
+    }
+
     public boolean isFlushed(Object obj, Property prop) {
         if (!hasObjectData(obj)) {
             return true;
@@ -624,28 +655,16 @@ public class Session {
 
     private static final Integer s_zero = new Integer(0);
 
-    private void process(Collection processors, List events) {
-        HashMap marker = new HashMap();
+    private void process(Collection processors, Collection events) {
         for (Iterator it = processors.iterator(); it.hasNext(); ) {
             EventProcessor ep = (EventProcessor) it.next();
-            marker.put(ep, s_zero);
-        }
 
-        for (Iterator it = processors.iterator(); it.hasNext(); ) {
-            EventProcessor ep = (EventProcessor) it.next();
-            int start = ((Integer) marker.get(ep)).intValue();
-            int max = events.size();
-            write(ep, events, start, max);
-            marker.put(ep, new Integer(events.size()));
+            for (Iterator it2 = events.iterator(); it2.hasNext(); ) {
+                Event ev = (Event) it2.next();
+                ep.write(ev);
+            }
+
             ep.flush();
-        }
-    }
-
-    private void write(EventProcessor ep, List events,
-                       int start, int stop) {
-        for (int i = start; i < stop; i++) {
-            Event ev = (Event) events.get(i);
-            ep.write(ev);
         }
     }
 
@@ -683,14 +702,12 @@ public class Session {
      * datastore are consistent with the contents of the in memory data cache.
      **/
     public void flush() {
-        if (m_flushing) { return; }
+        int l = LOG.isDebugEnabled() ? getLevel() : 0;
         try {
-            m_flushing = true;
             flushInternal();
-        } catch (ProtoException pe) {
-            throw handleException(pe);
-        } finally {
-            m_flushing = false;
+        } catch (RuntimeException re) {
+            if (LOG.isDebugEnabled()) { setLevel(l); }
+            throw handleException(re);
         }
     }
 
@@ -706,17 +723,42 @@ public class Session {
             trace("flush", new Object[] {});
         }
 
-        process(m_beforeFlush, m_events.getEvents());
+        boolean flushed = m_beforeFlushMarker != null;
+        List events = m_events.getEvents();
+        for (int i = 0; i < events.size(); i++) {
+            Event ev = (Event) events.get(i);
+            if (flushed) {
+                if (m_beforeFlushMarker.equals(ev)) { flushed = false; }
+                continue;
+            }
 
-        computeFlushability();
+            m_beforeFlushMarker = ev;
+
+            for (Iterator eps = m_beforeFlush.iterator(); eps.hasNext(); ) {
+                EventProcessor ep = (EventProcessor) eps.next();
+                ep.write(ev);
+            }
+        }
+
+        for (Iterator it = m_beforeFlush.iterator(); it.hasNext(); ) {
+            EventProcessor ep = (EventProcessor) it.next();
+            ep.flush();
+        }
+
         List written = new LinkedList();
 
+        Event prev = null;
         for (Iterator it = m_events.iterator(); it.hasNext(); ) {
             Event ev = (Event) it.next();
             if (ev.m_flushable) {
                 m_engine.write(ev);
                 written.add(ev);
                 it.remove();
+                if (ev.equals(m_beforeFlushMarker)) {
+                    m_beforeFlushMarker = prev;
+                }
+            } else {
+                prev = ev;
             }
         }
 
@@ -727,6 +769,8 @@ public class Session {
             m_eventsChanged = true;
             ev.sync();
         }
+
+        computeFlushability();
 
         process(m_afterFlush, written);
 
@@ -752,10 +796,11 @@ public class Session {
 
         m_odata.clear();
         m_events.clear();
-        m_pending.clear();
         m_visiting.clear();
         m_violations.clear();
         m_engine.commit();
+        m_beforeFlushMarker = null;
+        if (LOG.isDebugEnabled()) { setLevel(0); }
     }
 
     /**
@@ -767,10 +812,11 @@ public class Session {
         // should properly roll back java state
         m_odata.clear();
         m_events.clear();
-        m_pending.clear();
         m_visiting.clear();
         m_violations.clear();
         m_engine.rollback();
+        m_beforeFlushMarker = null;
+        if (LOG.isDebugEnabled()) { setLevel(0); }
     }
 
     Engine getEngine() {
@@ -799,22 +845,23 @@ public class Session {
         }
     }
 
-    void addEvent(Event ev) {
+    private void addEvent(Event ev, List pending) {
         ev.inject();
-        m_pending.add(ev);
+        pending.add(ev);
     }
 
-    private void processPending() {
-        for (Iterator it = m_pending.iterator(); it.hasNext(); ) {
+    private void activate(List pending) {
+        for (Iterator it = pending.iterator(); it.hasNext(); ) {
             Event ev = (Event) it.next();
             m_eventsChanged = true;
             ev.activate();
         }
 
         List activated = new ArrayList();
-        activated.addAll(m_pending);
-        m_pending.clear();
+        activated.addAll(pending);
+        pending.clear();
 
+        computeFlushability();
         // XXX: m_visiting. size() should be 0. but we can't check right now
         // because exceptions don't clear m_visiting on the way out of
         // every top level method
@@ -978,6 +1025,7 @@ public class Session {
     }
 
     static final void setLevel(int level) {
+        if (level < 0) { level = 0; }
         LEVEL.set(new Integer(level));
     }
 

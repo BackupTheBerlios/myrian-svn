@@ -1,26 +1,23 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.*;
-import com.arsdigita.persistence.proto.AddEvent;
-import com.arsdigita.persistence.proto.CreateEvent;
-import com.arsdigita.persistence.proto.DeleteEvent;
-import com.arsdigita.persistence.proto.Event;
 import com.arsdigita.persistence.proto.ProtoException;
-import com.arsdigita.persistence.proto.RemoveEvent;
 import com.arsdigita.persistence.proto.Session;
-import com.arsdigita.persistence.proto.SetEvent;
 import java.util.*;
+import org.apache.log4j.Logger;
 
 /**
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2003/03/25 $
+ * @version $Revision: #13 $ $Date: 2003/03/28 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#12 $ by $Author: ashah $, $DateTime: 2003/03/25 12:56:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#13 $ by $Author: ashah $, $DateTime: 2003/03/28 12:30:01 $";
+
+    private final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
     private Session m_ssn;
     private OID m_oid;
@@ -40,15 +37,15 @@ class DataObjectImpl implements DataObject {
             return m_observer;
         }
 
-        public boolean isFiring(Event event) {
+        public boolean isFiring(DataEvent event) {
             return m_firing.contains(event.getClass());
         }
 
-        public void setFiring(Event event) {
+        public void setFiring(DataEvent event) {
             m_firing.add(event.getClass());
         }
 
-        public void clearFiring(Event event) {
+        public void clearFiring(DataEvent event) {
             m_firing.remove(event.getClass());
         }
 
@@ -189,12 +186,9 @@ class DataObjectImpl implements DataObject {
     public void save() {
         try {
             m_ssn.flush();
+            m_ssn.assertFlushed(this);
         } catch (ProtoException pe) {
             throw new PersistenceException(pe);
-        }
-
-        if (!m_ssn.isFlushed(this)) {
-            throw new PersistenceException("all events not flushed");
         }
     }
 
@@ -218,69 +212,32 @@ class DataObjectImpl implements DataObject {
 
     private ObserverEntry m_firing = null;
 
-    void fireObserver(Event event, final boolean before,
-                      boolean swallowReentrence) {
+    void fireObserver(DataEvent event) {
         ObserverEntry old = m_firing;
         try {
             for (Iterator it = m_observers.iterator(); it.hasNext(); ) {
                 ObserverEntry entry = (ObserverEntry) it.next();
                 final DataObserver observer = entry.getObserver();
                 if (entry.isFiring(event)) {
-                    if (!swallowReentrence) {
+//                     if (event instanceof BeforeSaveEvent
+//                         || event instanceof BeforeDeleteEvent
+//                         || event instanceof AfterDeleteEvent) {
+                    if (false) {
                         throw new PersistenceException
                             ("Loop detected while firing a DataObserver. " +
                              "This probably resulted from calling the save " +
                              "method of a data object from within a " +
                              "beforeSave observer registered on that " +
                              "same data object, or the analogous situation " +
-                             "with delete and beforeDelete/afterDelete.");
+                             "with delete and beforeDelete/afterDelete. " +
+                             entry  + " " + event);
                     }
                 } else {
                     try {
                         entry.setFiring(event);
                         m_firing = entry;
-                        event.dispatch(new Event.Switch() {
-                                public void onCreate(CreateEvent e) {
-                                    if (before) {
-                                        observer.beforeSave
-                                            (DataObjectImpl.this);
-                                    } else {
-                                        observer.afterSave
-                                            (DataObjectImpl.this);
-                                    }
-                                }
-
-                                public void onDelete(DeleteEvent e) {
-                                    if (before) {
-                                        observer.beforeDelete
-                                            (DataObjectImpl.this);
-                                    } else {
-                                        observer.afterDelete
-                                            (DataObjectImpl.this);
-                                    }
-                                }
-
-                                public void onSet(SetEvent e) {
-                                    String prop = e.getProperty().getName();
-                                    observer.set
-                                        (DataObjectImpl.this, prop,
-                                         e.getPreviousValue(),e.getArgument());
-                                }
-
-                                public void onAdd(AddEvent e) {
-                                    observer.add
-                                        (DataObjectImpl.this,
-                                         e.getProperty().getName(),
-                                         (DataObject) e.getArgument());
-                                }
-
-                                public void onRemove(RemoveEvent e) {
-                                    observer.remove
-                                        (DataObjectImpl.this,
-                                         e.getProperty().getName(),
-                                         (DataObject) e.getArgument());
-                                }
-                            });
+                        s_log.debug(event);
+                        event.invoke(observer);
                     } finally {
                         entry.clearFiring(event);
                     }
