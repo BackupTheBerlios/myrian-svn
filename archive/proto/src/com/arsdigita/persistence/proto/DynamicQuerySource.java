@@ -9,12 +9,12 @@ import java.util.*;
  * DynamicQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/04/07 $
+ * @version $Revision: #4 $ $Date: 2003/04/10 $
  **/
 
 public class DynamicQuerySource extends QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DynamicQuerySource.java#3 $ by $Author: rhs $, $DateTime: 2003/04/07 14:17:43 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DynamicQuerySource.java#4 $ by $Author: ashah $, $DateTime: 2003/04/10 17:19:22 $";
 
     private Signature getSignature(ObjectType type) {
         Signature result = new Signature(type);
@@ -28,22 +28,33 @@ public class DynamicQuerySource extends QuerySource {
         return new Query(sig, null);
     }
 
-    public Query getQuery(ObjectType type, Object key) {
+    public Query getQuery(PropertyMap keys) {
+        ObjectType type = keys.getObjectType();
         Signature sig = getSignature(type);
         ObjectMap map = Root.getRoot().getObjectMap(type);
-        Collection keys = map.getKeyProperties();
-        if (keys.size() != 1) {
-            throw new IllegalArgumentException("type has more than one key");
+        Collection keyProps = map.getKeyProperties();
+
+        Query query = new Query(sig, null);
+        Filter f = null;
+
+        for (Iterator it = keyProps.iterator(); it.hasNext(); ) {
+            Property keyProp = (Property) it.next();
+            Object key = keys.get(keyProp);
+            Parameter keyParam = new Parameter
+                (keyProp.getType(), Path.add("__key__", keyProp.getName()));
+            sig.addParameter(keyParam);
+            query.set(keyParam, key);
+            Filter propFilt = new EqualsFilter
+                (Path.get(keyProp.getName()), keyParam.getPath());
+
+            if (f == null) {
+                f = propFilt;
+            } else {
+                f = new AndFilter(f, propFilt);
+            }
         }
-        Property keyProp = (Property) keys.iterator().next();
-        Parameter keyParam = new Parameter
-            (keyProp.getType(), Path.get("__key__"));
-        sig.addParameter(keyParam);
-        Filter f =
-            new EqualsFilter(Path.get(keyProp.getName()), keyParam.getPath());
-        Query result = new Query(sig, f);
-        result.set(keyParam, key);
-        return result;
+
+        return new Query(query, f);
     }
 
     public Query getQuery(Object obj) {

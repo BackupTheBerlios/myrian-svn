@@ -4,17 +4,17 @@ package com.arsdigita.persistence.proto;
  * AndFilter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/01/13 $
+ * @version $Revision: #5 $ $Date: 2003/04/10 $
  **/
 
 public class AndFilter extends Filter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/AndFilter.java#4 $ by $Author: rhs $, $DateTime: 2003/01/13 16:40:35 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/AndFilter.java#5 $ by $Author: ashah $, $DateTime: 2003/04/10 17:19:22 $";
 
     private Filter m_left;
     private Filter m_right;
 
-    protected AndFilter(Filter left, Filter right) {
+    public AndFilter(Filter left, Filter right) {
         m_left = left;
         m_right = right;
     }

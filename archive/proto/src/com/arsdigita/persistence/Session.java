@@ -55,7 +55,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #25 $ $Date: 2003/04/08 $
+ * @version $Revision: #26 $ $Date: 2003/04/10 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -448,14 +448,7 @@ public class Session {
      **/
 
     public DataObject retrieve(OID oid) {
-        Map props = oid.getProperties();
-        if (props.size() == 1) {
-            return (DataObject) m_ssn.retrieve
-                (C.type(oid.getObjectType()),
-                 props.values().iterator().next());
-        } else {
-            throw new Error("not implemented");
-        }
+        return (DataObject) m_ssn.retrieve(C.pmap(oid));
     }
 
 

@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #57 $ $Date: 2003/04/07 $
+ * @version $Revision: #58 $ $Date: 2003/04/10 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#57 $ by $Author: rhs $, $DateTime: 2003/04/07 19:59:54 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#58 $ by $Author: ashah $, $DateTime: 2003/04/10 17:19:22 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -50,8 +50,8 @@ public class Session {
 
     EventStream getEventStream() { return m_events; }
 
-    public Object retrieve(ObjectType obj, Object id) {
-        PersistentCollection pc = retrieve(m_qs.getQuery(obj, id));
+    public Object retrieve(PropertyMap keys) {
+        PersistentCollection pc = retrieve(m_qs.getQuery(keys));
         Cursor c = pc.getDataSet().getCursor();
         if (c.next()) {
             Object result = c.get();

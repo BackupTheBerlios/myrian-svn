@@ -7,16 +7,16 @@ import com.arsdigita.persistence.proto.metadata.*;
  * QuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/02/26 $
+ * @version $Revision: #3 $ $Date: 2003/04/10 $
  **/
 
 public abstract class QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/QuerySource.java#2 $ by $Author: rhs $, $DateTime: 2003/02/26 20:44:08 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/QuerySource.java#3 $ by $Author: ashah $, $DateTime: 2003/04/10 17:19:22 $";
 
     public abstract Query getQuery(ObjectType type);
 
-    public abstract Query getQuery(ObjectType type, Object key);
+    public abstract Query getQuery(PropertyMap keys);
 
     // These should probably be changed to take type signatures.
     public abstract Query getQuery(Object obj);

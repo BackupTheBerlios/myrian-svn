@@ -10,12 +10,12 @@ import java.util.*;
  * StaticQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/04/09 $
+ * @version $Revision: #9 $ $Date: 2003/04/10 $
  **/
 
 class StaticQuerySource extends QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/StaticQuerySource.java#8 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/StaticQuerySource.java#9 $ by $Author: ashah $, $DateTime: 2003/04/10 17:19:22 $";
 
     private synchronized Source getSource(ObjectType type, SQLBlock block,
                                           Path prefix) {
@@ -100,29 +100,37 @@ class StaticQuerySource extends QuerySource {
         return new Query(sig, null);
     }
 
-    public Query getQuery(ObjectType type, Object key) {
+    public Query getQuery(PropertyMap keys) {
+        ObjectType type = keys.getObjectType();
         ObjectMap om = Root.getRoot().getObjectMap(type);
-        Collection keys = om.getKeyProperties();
-        if (keys.size() != 1) {
-            throw new IllegalArgumentException("type has more than one key");
-        }
-        Property keyProp = (Property) keys.iterator().next();
+        Collection keyProps = om.getKeyProperties();
 
         if (om.getRetrieveAll() == null) {
-            PropertyMap props = new PropertyMap(type);
-            props.put(keyProp, key);
-            return getQuery(om, props, keyProp);
+            return getQuery(om, keys, (Property) keyProps.iterator().next());
         }
 
         Signature sig = getSignature(type, om.getRetrieveAll(), null, null);
-        Parameter keyParam = new Parameter
-            (keyProp.getType(), Path.get("__key__"));
-        sig.addParameter(keyParam);
-        Filter f = new EqualsFilter
-            (Path.get(keyProp.getName()), keyParam.getPath());
-        Query result = new Query(sig, f);
-        result.set(keyParam, key);
-        return result;
+        Query query = new Query(sig, null);
+        Filter f = null;
+
+        for (Iterator it = keyProps.iterator(); it.hasNext(); ) {
+            Property keyProp = (Property) it.next();
+            Object key = keys.get(keyProp);
+            Parameter keyParam = new Parameter
+                (keyProp.getType(), Path.add("__key__", keyProp.getName()));
+            sig.addParameter(keyParam);
+            query.set(keyParam, key);
+            Filter propFilt = new EqualsFilter
+                (Path.get(keyProp.getName()), keyParam.getPath());
+
+            if (f == null) {
+                f = propFilt;
+            } else {
+                f = new AndFilter(f, propFilt);
+            }
+        }
+
+        return new Query(query, f);
     }
 
     public Query getQuery(Object obj) {
