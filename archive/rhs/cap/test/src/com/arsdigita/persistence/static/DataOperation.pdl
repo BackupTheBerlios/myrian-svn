@@ -1,0 +1,132 @@
+//
+// Copyright (C) 2001-2004 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of the
+// License at http://www.redhat.com/licenses/ccmpl.html.
+//
+// Software distributed under the License is distributed on an
+// "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+// or implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/static/DataOperation.pdl#1 $
+// $DateTime: 2004/05/03 13:36:20 $
+model examples;
+
+data operation DataOperationWithBindVariables {
+    do {
+        update t_data_query
+        set priority = :priority
+        where priority > :currentPriority
+        and lower(substr(description, 0, 5)) = :description
+    }
+}
+
+data operation DataOperationWithBindVariablesAndNull {
+    do {
+        update t_data_query
+        set description = :description
+        where priority = :priority
+    }
+}
+
+data operation DataOperationToDeleteTestDynamicObjectTypes {
+    do {
+        delete from acs_objects
+        where object_id in (
+            select pdl_id
+            from persistence_dynamic_ot
+            where lower(dynamic_object_type) = lower(:dynamicType))
+    }
+}
+
+data operation DataOperationToDeleteTestDynamicAssociations {
+    do {
+        delete from acs_objects
+        where object_id in (
+            select pdl_id
+            from persistence_dynamic_assoc
+            where lower(model_name) = lower(:modelName)
+              and lower(object_type_one) = lower(:objectType1)
+              and lower(property_one) = lower(:property1)
+              and lower(object_type_two) = lower(:objectType2)
+              and lower(property_two) = lower(:property2))
+    }
+}
+
+
+//data operation DataOperationFunction {
+//    do call {
+//        :newValue = DataOperationFunction
+//    } map {
+//        newValue : VARCHAR(4000);
+//    }
+//}
+//
+//data operation DataOperationProcWithOut {
+//    do call {
+//        DataOperationProcWithOut(:newID)
+//    } map {
+//        newID : VARCHAR(4000);
+//    }
+//}
+//
+//data operation DataOperationProcWithInOut {
+//    do call {
+//        DataOperationProcWithInOut(:oldID, :newID)
+//    } map {
+//        oldID : VARCHAR(40);
+//        newID : VARCHAR(40);
+//    }
+//}
+//
+//data operation DataOperationProcWithInOutInt {
+//    do call {
+//        DataOperationProcWithInOutInt(:oldID, :newID)
+//    } map {
+//        oldID : INTEGER;
+//        newID : INTEGER;
+//    }
+//}
+//
+//data operation DataOperationProcWithDates {
+//    do call {
+//        DataOperationProcWithDates(:idToUpdate, :oldDate, :newDate)
+//    } map {
+//        idToUpdate : INTEGER;
+//        oldDate : DATE;
+//        newDate : DATE;
+//    }
+//}
+//
+//data operation DataOperationProcWithTime {
+//    do call {
+//        DataOperationProcWithTime(:idToUpdate, :oldDate, :newDate)
+//    } map {
+//        idToUpdate : INTEGER;
+//        oldDate : TIMESTAMP;
+//        newDate : TIMESTAMP;
+//    }
+//}
+        
+
+
+query PLSQLQueryWithArbitraryArgs {
+    Integer arg1;
+    Integer arg2;
+    Integer arg3;
+    Integer arg4;
+    Integer arg5;
+
+    do {
+        select a, b, c, d, e from PLSQLTestTable
+    } map {
+        arg1 = PLSQLTestTable.a;
+        arg2 = PLSQLTestTable.b;
+        arg3 = PLSQLTestTable.c;
+        arg4 = PLSQLTestTable.d;
+        arg5 = PLSQLTestTable.e;
+    }
+}

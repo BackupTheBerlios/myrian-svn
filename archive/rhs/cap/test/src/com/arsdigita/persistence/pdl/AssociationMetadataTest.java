@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * AssociationMetadataTest
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #1 $ $Date: 2004/05/03 $
+ * @version $Revision: #2 $ $Date: 2004/05/03 $
  **/
 
 public class AssociationMetadataTest extends TestCase {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/pdl/AssociationMetadataTest.java#1 $ by $Author: rhs $, $DateTime: 2004/05/03 11:48:01 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/pdl/AssociationMetadataTest.java#2 $ by $Author: rhs $, $DateTime: 2004/05/03 13:36:20 $";
 
     private static Logger s_log =
         Logger.getLogger(AssociationMetadataTest.class);
@@ -46,14 +46,14 @@ public class AssociationMetadataTest extends TestCase {
     private ObjectType m_ot2;
     private ObjectType m_ot3;
 
-    private static final String FILE =
-        "test/pdl/com/arsdigita/persistence/Association.pdl";
+    private static final String PDL =
+        "com/arsdigita/persistence/Association.pdl";
 
     protected void setUp() throws Exception {
         super.setUp();
         m_root = new Root();
         PDL pdl = new PDL();
-        pdl.load(new FileReader(FILE), FILE);
+        pdl.loadResource(PDL);
         pdl.emit(m_root);
         m_ot1 = m_root.getObjectType("Association.Obj1");
         m_ot2 = m_root.getObjectType("Association.Obj2");
