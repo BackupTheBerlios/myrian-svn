@@ -15,12 +15,12 @@ import org.apache.log4j.Logger;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/06/24 $
+ * @version $Revision: #3 $ $Date: 2003/06/25 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#2 $ by $Author: rhs $, $DateTime: 2003/06/24 22:57:54 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#3 $ by $Author: rhs $, $DateTime: 2003/06/25 17:10:18 $";
 
     private static final Logger LOG = Logger.getLogger(QGen.class);
 
@@ -424,7 +424,8 @@ class QGen {
 
         SimpleJoin simple = null;
 
-        if (m_anal.isDuplicate(path)) {
+        if (m_anal.isDuplicate(path) &&
+            !constraint.equals(table.getPrimaryKey())) {
             Path canon = m_anal.getCanonical(path);
             genPathRecursive(canon);
             alias = getAlias(canon, table);

@@ -31,12 +31,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #16 $ $Date: 2003/06/24 $
+ * @version $Revision: #17 $ $Date: 2003/06/25 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#16 $ by $Author: rhs $, $DateTime: 2003/06/24 22:57:54 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#17 $ by $Author: rhs $, $DateTime: 2003/06/25 17:10:18 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);
@@ -258,20 +258,36 @@ public class QueryTest extends PersistenceTestCase {
 
 
     /**
-     * Tests the contains filter.
+     * Test an individual condition filter.
      **/
 
-    private void doContainsTest(String from, String assn, String to) {
+    private static final String[] CONDITIONS = { "Contains", "Equals" };
+
+    private static final int CONTAINS = 0;
+    private static final int EQUALS = 1;
+
+    private Condition condition(int cond, Path p1, Path p2) {
+        switch (cond) {
+        case CONTAINS:
+            return Condition.contains(p1, p2);
+        case EQUALS:
+            return Condition.equals(p1, p2);
+        default:
+            throw new IllegalStateException("unknown condition: " + cond);
+        }
+    }
+
+    private void doConditionTest(String from, String assn, String to,
+                                 int cond) {
         Root root = Root.getRoot();
         ObjectType FROM = root.getObjectType(from);
         ObjectType TO = root.getObjectType(to);
         Signature sig = new Signature(TO);
         Parameter start = new Parameter(FROM, Path.get("start"));
         sig.addParameter(start);
-        Query q = new Query(sig, Condition.contains
-                            (Path.add(start.getPath(),
-                                      assn), null));
-        doTest("Contains-" + assn, q);
+        Query q = new Query(sig, condition(cond, Path.add(start.getPath(),
+                                                          assn), null));
+        doTest(CONDITIONS[cond] + "-" + assn, q);
     }
 
     /**
@@ -279,15 +295,27 @@ public class QueryTest extends PersistenceTestCase {
      **/
 
     public void testContainsJoinThrough() {
-        doContainsTest("test.Test", "collection", "test.Icle");
+        doConditionTest("test.Test", "collection", "test.Icle", CONTAINS);
     }
 
     /**
      * Tests contains filter for join froms.
      **/
 
-    public void testContainsFilterJoinFrom() {
-        doContainsTest("test.Test", "components", "test.Component");
+    public void testContainsJoinFrom() {
+        doConditionTest("test.Test", "components", "test.Component", CONTAINS);
+    }
+
+    public void testContainsJoinFromSelf() {
+        doConditionTest("test.Test", "children", "test.Test", CONTAINS);
+    }
+
+    public void testEqualsJoinTo() {
+        doConditionTest("test.Test", "optional", "test.Icle", EQUALS);
+    }
+
+    public void testEqualsJoinToSelf() {
+        doConditionTest("test.Test", "optionalSelf", "test.Test", EQUALS);
     }
 
 
