@@ -11,8 +11,8 @@
 -- or implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/test/sql/postgres/domain/setup.sql#6 $
--- $DateTime: 2004/04/07 16:07:11 $
+-- $Id: //core-platform/dev/test/sql/postgres/domain/setup.sql#7 $
+-- $DateTime: 2004/07/12 12:26:18 $
 
 
 @@ ../../default/domain/setup.sql
@@ -28,3 +28,6 @@ create or replace function package_abstractness(integer)
 	select count(*) into total from t_class  where package_id = v_id;
 	return abs_count / total;
   end' language 'plpgsql';
+
+@@ ../com/arsdigita/domain/create.sql
+@@ ../com/arsdigita/domain/deferred.sql
