@@ -2,6 +2,7 @@ package com.redhat.persistence.jdo;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOUserException;
+import javax.jdo.spi.JDOImplHelper;
 
 /**
  * This tests PersistenceManagerImpl and StateManagerImpl.
@@ -45,4 +46,18 @@ public class ManagerTest extends WithTxnCase {
             ; // expected
         }
     }
+
+    // public void testNewObjectIdInstance() {
+    //     final String strid = m_pm.getObjectId(m_group).toString();
+    //     assertNotNull("strid", strid);
+    // 
+    //     Object id = JDOImplHelper.getInstance().
+    //         newObjectIdInstance(Group.class, strid);
+    // 
+    //     assertNotNull("id", id);
+    // 
+    //     Group group = (Group) m_pm.getObjectById(id, false);
+    // 
+    //     assertEquals("groups", m_group, group);
+    // }
 }
