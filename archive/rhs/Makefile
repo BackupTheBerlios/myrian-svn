@@ -15,6 +15,20 @@ CLASSPATH:=$(CLASSPATH):$(SOURCEPATH)
 
 JSTAMPS:=$(SOURCES:%=$(BUILD)/%.jstamp)
 
+PKGS:=com.arsdigita.db com.arsdigita.persistence
+PKGS:=$(PKGS) com.arsdigita.persistence.metadata com.arsdigita.persistence.pdl
+PKGS:=$(PKGS) com.arsdigita.util.cmd com.redhat.persistence
+PKGS:=$(PKGS) com.redhat.persistence.common com.redhat.persistence.engine
+PKGS:=$(PKGS) com.redhat.persistence.engine.rdbms com.redhat.persistence.metadata
+PKGS:=$(PKGS) com.redhat.persistence.oql com.redhat.persistence.pdl
+PKGS:=$(PKGS) com.redhat.persistence.pdl.adapters com.redhat.persistence.pdl.nodes
+PKGS:=$(PKGS) com.redhat.persistence.profiler com.redhat.persistence.profiler.rdbms
+JD:=javadoc
+JD_SOURCEPATH:=-sourcepath src:cap/src
+JD_INCLUDES:=-version -author
+JD_FLAGS:=$(JD_SOURCEPATH) $(JD_INCLUDES)
+DOC_DEST:=$(BUILD)/doc
+
 all: $(JSTAMPS)
 
 -include $(SOURCES:%=$(BUILD)/%.jmake)
@@ -57,3 +71,7 @@ $(BUILD)/%.jmake: %
 	@echo "" >> $@
 	@echo "" >> $@
 	@find $< -type d -printf "%p:\n" >> $@
+
+doc:
+	@mkdir -p $(DOC_DEST)
+	$(JD) $(JD_FLAGS) $(PKGS) -d $(DOC_DEST)
