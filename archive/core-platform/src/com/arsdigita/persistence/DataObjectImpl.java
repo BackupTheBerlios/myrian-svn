@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/06/02 $
+ * @version $Revision: #6 $ $Date: 2003/06/16 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#5 $ by $Author: ashah $, $DateTime: 2003/06/02 17:28:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#6 $ by $Author: ashah $, $DateTime: 2003/06/16 17:03:22 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -24,10 +24,11 @@ class DataObjectImpl implements DataObject {
     private OID m_oid;
     private Set m_observers = new HashSet();
     private Map m_disconnect = null;
-    private boolean m_shouldDisconnect = false;
+    private boolean m_manualDisconnect = false;
     private Throwable m_invalidStack = null;
     private boolean m_valid = true;
-    private boolean m_crossTransactions = false;
+    // originating transaction has terminated
+    private boolean m_transactionDone = false;
 
     private final class ObserverEntry {
 
@@ -157,9 +158,7 @@ class DataObjectImpl implements DataObject {
             return m_oid.get(property);
         } else if (m_oid.isInitialized()) {
             if (isDisconnected()) {
-                if (m_disconnect == null) {
-                    doDisconnect();
-                }
+                doDisconnect();
 
                 Object obj = m_disconnect.get(prop);
 
@@ -192,10 +191,12 @@ class DataObjectImpl implements DataObject {
     }
 
     private void doDisconnect() {
+        if (m_disconnect != null) { return; }
         m_disconnect = new HashMap();
-        if (!m_shouldDisconnect) {
-            if (s_log.isInfoEnabled()) {
-                s_log.info("autodisconnect: " + getOID(), new Throwable());
+        if (isDeleted()) { return; }
+        if (!m_manualDisconnect) {
+            if (s_log.isDebugEnabled()) {
+                s_log.debug("autodisconnect: " + getOID(), new Throwable());
             }
         }
 
@@ -249,7 +250,7 @@ class DataObjectImpl implements DataObject {
     }
 
     public boolean isDisconnected() {
-        return m_crossTransactions || !isValid();
+        return m_manualDisconnect || m_transactionDone || !isValid();
     }
 
     void invalidate(boolean connectedOnly, boolean error) {
@@ -258,11 +259,11 @@ class DataObjectImpl implements DataObject {
             if (s_log.isDebugEnabled()) {
                 m_invalidStack = new Throwable();
             }
-        } else if (connectedOnly && m_shouldDisconnect) {
-                doDisconnect();
+        } else if (connectedOnly && m_manualDisconnect) {
+            doDisconnect();
         }
 
-        m_crossTransactions = true;
+        m_transactionDone = true;
     }
 
     public void disconnect() {
@@ -271,7 +272,8 @@ class DataObjectImpl implements DataObject {
                 ("can't disconnect uninitialized: " + this);
         }
 
-        m_shouldDisconnect = true;
+        m_manualDisconnect = true;
+        m_ssn.releaseObject(this);
     }
 
     public boolean isModified() {
@@ -307,7 +309,7 @@ class DataObjectImpl implements DataObject {
         }
 
         if (!isDisconnected()
-            && !m_crossTransactions
+            && !m_transactionDone
             && m_ssn != null
             && m_ssn != SessionManager.getSession().getProtoSession()) {
             throw new PersistenceException

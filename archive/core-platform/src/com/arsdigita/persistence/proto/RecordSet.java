@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/06/02 $
+ * @version $Revision: #3 $ $Date: 2003/06/16 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/RecordSet.java#2 $ by $Author: rhs $, $DateTime: 2003/06/02 10:49:07 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/RecordSet.java#3 $ by $Author: ashah $, $DateTime: 2003/06/16 17:03:22 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -104,10 +104,6 @@ public abstract class RecordSet {
 
 			if (obj == null) {
 			    obj = m_adapter.getObject(type, pmap);
-			    if (type.isKeyed()) {
-				m_adapter.setSession(obj, ssn);
-			    }
-
                             if (previous != obj) {
                                 ssn.use(obj);
                             }

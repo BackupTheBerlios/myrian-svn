@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/06/09 $
+ * @version $Revision: #6 $ $Date: 2003/06/16 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Session.java#5 $ by $Author: ashah $, $DateTime: 2003/06/09 13:09:56 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Session.java#6 $ by $Author: ashah $, $DateTime: 2003/06/16 17:03:22 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -663,7 +663,28 @@ public class Session {
         return ad.getSessionKey(obj);
     }
 
+    /**
+     * Forces this session to release references to the specified object from
+     * its internal caches. Events that point to this object continue to do
+     * so.
+     *
+     * @param obj the object to release. It should not be nul
+     **/
+    public void releaseObject(Object obj) {
+        ObjectData od = getObjectData(obj);
+        if (od.getObject() == obj) {
+            Adapter ad = getAdapter(obj);
+            ObjectType type = ad.getObjectType(obj);
+            Object newObj = ad.getObject(type, ad.getProperties(obj));
+            use(newObj);
+        }
+    }
+
     void use(Object obj) {
+        Adapter ad = getAdapter(obj);
+        ObjectType type = ad.getObjectType(obj);
+        if (type.isKeyed()) { ad.setSession(obj, this); }
+
         ObjectData odata = getObjectData(obj);
         if (odata != null) {
             odata.setObject(obj);
