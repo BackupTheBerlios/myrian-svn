@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/09/08 $
+ * @version $Revision: #7 $ $Date: 2003/09/08 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/QGen.java#6 $ by $Author: ashah $, $DateTime: 2003/09/08 14:24:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/QGen.java#7 $ by $Author: ashah $, $DateTime: 2003/09/08 16:54:02 $";
 
     private static final Logger LOG = Logger.getLogger(QGen.class);
 
@@ -168,11 +168,10 @@ class QGen {
         }
 
         String candidate = buf.toString();
-        if (RESERVED.contains(candidate)) {
-            return candidate + "_";
-        } else {
-            return candidate;
+        while (RESERVED.contains(candidate)) {
+            candidate = candidate + "_";
         }
+        return candidate;
     }
 
     private String abbreviate(String name) {
