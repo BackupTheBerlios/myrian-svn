@@ -52,12 +52,12 @@ import org.apache.log4j.Logger;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/01/29 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/QGen.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/QGen.java#2 $ by $Author: ashah $, $DateTime: 2004/01/29 12:35:08 $";
 
     private static final Logger LOG = Logger.getLogger(QGen.class);
 
@@ -66,10 +66,12 @@ class QGen {
         String[] functions = {
             /* sql standard functions supported by both oracle and postgres.
              * there is an added caveat that the function uses normal function
-             * syntax and not keywords as arguments (e.g. trim)
+             * syntax and not keywords as arguments (e.g. trim(leading 'a'
+             * from str), substring('teststr' from 3 for 2))
              */
             "current_date", "current_timestamp",
             "upper", "lower",
+            "trim", // only trim(str) syntax is allowed
             // postgres supported oracle-isms
             "substr", "length", "nvl"
         };

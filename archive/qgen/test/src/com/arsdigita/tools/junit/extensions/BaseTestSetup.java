@@ -134,12 +134,28 @@ public class BaseTestSetup extends TestDecorator {
 
         for (Iterator iterator = scripts.iterator(); iterator.hasNext(); ) {
             final String script = (String) iterator.next();
-
-            loader.loadSQLPlusScript(script);
+            loader.loadSQLPlusScript(resolveScript(script));
         }
 
         conn.commit();
         conn.close();
+    }
+
+    private String resolveScript(final String script) {
+        String sqldir = System.getProperty("test.sql.dir");
+        File filename = new File(sqldir + script);
+        if (filename.exists() && filename.isFile()) {
+            return filename.toString();
+        }
+        filename = new File(sqldir + File.separator + DbHelper.getDatabaseDirectory() + script);
+        if (filename.exists() && filename.isFile()) {
+            return filename.toString();
+        }
+        filename = new File(sqldir + File.separator + "default" + script);
+        if (filename.exists() && filename.isFile()) {
+            return filename.toString();
+        }
+        return null;
     }
 
     public void addRequiredInitializer(final String initName) {

@@ -18,21 +18,15 @@ package com.arsdigita.persistence;
 import com.arsdigita.persistence.metadata.ObjectType;
 
 /**
- * Title:       DataObject interface
- * Description: This interface defines the public methods of Data Objects.
- *              This interface is primarily how client code interacts with any
- *              GenericDataObject. The GenericDataObject class is primary
- *              used for use by the persistent engine and anyone wanting to
- *              extend the functionality of GenericDataObjects through
- *              inheritance.
+ * Defines the public methods of Data Objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/01/29 $
  */
 
 public interface DataObject {
 
-    String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataObject.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataObject.java#2 $ by $Author: ashah $, $DateTime: 2004/01/29 12:35:08 $";
 
     /**
      * Returns the type of this persistent object.

@@ -61,7 +61,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/01/29 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -248,9 +248,10 @@ public class Session {
      * Creates and returns a DataObject of the given type. All fields of
      * this object are initially set to null, and it is not persisted until
      * {@link DataObject#save()}
-     * is called.<P>
-     * Because of the initial null values, this method should only be
-     * used for creating new objects.  GenericDataObjectFactory.createObject
+     * is called.
+     *
+     * <p>Because of the initial null values, this method should only be
+     * used for creating new objects.  The method {@link #retrieve(OID)}
      * is suitable for creating objects that will then be populated with
      * information from the database (e.g. objects that are being retrieved
      * rather than created as new).

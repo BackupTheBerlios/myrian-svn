@@ -38,11 +38,11 @@ import java.util.Set;
  * </p>
  *
  * @author David Lutterkort
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/01/29 $
  */
 public class SequentialMap extends AbstractMap implements Map {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/util/SequentialMap.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/util/SequentialMap.java#2 $ by $Author: ashah $, $DateTime: 2004/01/29 12:35:08 $";
 
     private ArrayList m_entries = null;
     private Set m_entrySet = null;
@@ -85,7 +85,7 @@ public class SequentialMap extends AbstractMap implements Map {
         int index = -1;
 
         for (int i = 0; i < size(); i++) {
-            Entry p = (Entry) m_entries.get(i);
+            Map.Entry p = (Map.Entry) m_entries.get(i);
 
             if (key == null) {
                 if (p.getKey() == null) {
@@ -122,7 +122,7 @@ public class SequentialMap extends AbstractMap implements Map {
         boolean contains = false;
 
         for (int i = 0; i < size(); i++) {
-            Entry p = (Entry) m_entries.get(i);
+            Map.Entry p = (Map.Entry) m_entries.get(i);
 
             if (value == null) {
                 if (p.getValue() == null) {
@@ -180,7 +180,7 @@ public class SequentialMap extends AbstractMap implements Map {
     public Object get(Object key) {
         int i = indexOf(key);
 
-        return (i == -1) ? null : ((Entry) m_entries.get(i)).getValue();
+        return (i == -1) ? null : ((Map.Entry) m_entries.get(i)).getValue();
     }
 
     /**
@@ -199,7 +199,7 @@ public class SequentialMap extends AbstractMap implements Map {
      * @return Object The element at the specified index.
      */
     public Object get(int index) {
-        return ((Entry) m_entries.get(index)).getValue();
+        return ((Map.Entry) m_entries.get(index)).getValue();
     }
 
     /**
@@ -218,7 +218,7 @@ public class SequentialMap extends AbstractMap implements Map {
      * @return Object The key of the element at the specified index.
      */
     public Object getKey(int index) {
-        return ((Entry) m_entries.get(index)).getKey();
+        return ((Map.Entry) m_entries.get(index)).getKey();
     }
 
     /**

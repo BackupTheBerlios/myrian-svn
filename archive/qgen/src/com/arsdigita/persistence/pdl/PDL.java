@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -59,12 +60,12 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/01/29 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/pdl/PDL.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/pdl/PDL.java#2 $ by $Author: ashah $, $DateTime: 2004/01/29 12:35:08 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;
@@ -205,13 +206,12 @@ public class PDL {
 
         final PDLFilter filter =
             new NameFilter(DbHelper.getDatabaseSuffix(), "pdl");
-        final HashSet output = new HashSet();
+        // accumulate the values returned by the filter
+        final Collection[] output = new Collection[] { new HashSet() };
         PDLFilter tracker = new PDLFilter() {
-            public boolean accept(String name) {
-                boolean result = filter.accept(name);
-                if (result) {
-                    output.add(name);
-                }
+            public Collection accept(Collection names) {
+                Collection result = filter.accept(names);
+                output[0].addAll(result);
                 return result;
             }
         };
@@ -220,11 +220,17 @@ public class PDL {
         parse(compiler, (File[]) options.get("-library-path"), filter);
         parse(compiler, (File[]) options.get("-path"), tracker);
         parse(compiler, args, tracker);
-        if (output.size() < 1) {
+        if (output[0].size() < 1) {
             if (s_quiet) {
                 return;
             }
             usage();
+        }
+
+        HashSet pdlFiles = new HashSet();
+        for (Iterator it = output[0].iterator(); it.hasNext(); ) {
+            File pdlFile = new File((String) it.next());
+            pdlFiles.add(pdlFile);
         }
 
         File debugDir = (File) options.get("-generate-events");
@@ -253,12 +259,15 @@ public class PDL {
             }
 
             List tables = new ArrayList(root.getRoot().getTables());
+
             for (Iterator it = tables.iterator(); it.hasNext(); ) {
                 Table table = (Table) it.next();
-                if (!output.contains(root.getRoot().getFilename(table))) {
+                File tableFile = new File(root.getRoot().getFilename(table));
+                if (!pdlFiles.contains(tableFile)) {
                     it.remove();
                 }
             }
+
             try {
                 writer.write(tables);
             } catch (IOException ioe) {
@@ -278,6 +287,7 @@ public class PDL {
 
     private static void parse(PDLCompiler compiler, File[] path,
                               PDLFilter filter) {
+        ArrayList filenames = new ArrayList();
         for (int i = 0; i < path.length; i++) {
             File f = path[i];
             if (!f.exists()) { continue; }
@@ -287,19 +297,18 @@ public class PDL {
                        && (f.getName().endsWith(".jar")
                            || f.getName().endsWith(".zip"))) {
                 try {
-                    ZipInputStream zis = new ZipInputStream
-                        (new FileInputStream(f));
-                    try {
-                        new ZipSource(zis, filter).parse(compiler);
-                    } finally {
-                        zis.close();
-                    }
+                    new ZipSource(new ZipFile(f), filter).parse(compiler);
                 } catch (IOException e) {
                     throw new UncheckedWrapperException(e);
                 }
-            } else if (filter.accept(f.getPath())) {
-                new FileSource(f).parse(compiler);
+            } else {
+                filenames.add(f.getPath());
             }
+        }
+
+        Collection accepted = filter.accept(filenames);
+        for (Iterator it = accepted.iterator(); it.hasNext(); ) {
+            new FileSource((String) it.next()).parse(compiler);
         }
     }
 
@@ -400,6 +409,11 @@ public class PDL {
 
         while (dirs.size() > 0) {
             File dir = (File) dirs.pop();
+            if ("upgrade".equalsIgnoreCase(dir.getName())) {
+                s_log.debug("Skipping upgrade directory");
+                continue;
+            }
+
             File[] listing = dir.listFiles(new FileFilter() {
                     public boolean accept(File file) {
                         if (file.isDirectory()) {

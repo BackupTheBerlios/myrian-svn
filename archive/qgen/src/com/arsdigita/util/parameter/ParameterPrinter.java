@@ -43,13 +43,13 @@ import org.apache.commons.cli.ParseException;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-qgen/src/com/arsdigita/util/parameter/ParameterPrinter.java#1 $
+ * @version $Id: //core-platform/test-qgen/src/com/arsdigita/util/parameter/ParameterPrinter.java#2 $
  */
 final class ParameterPrinter {
     public final static String versionId =
-        "$Id: //core-platform/test-qgen/src/com/arsdigita/util/parameter/ParameterPrinter.java#1 $" +
-        "$Author: dennis $" +
-        "$DateTime: 2003/12/10 16:59:20 $";
+        "$Id: //core-platform/test-qgen/src/com/arsdigita/util/parameter/ParameterPrinter.java#2 $" +
+        "$Author: ashah $" +
+        "$DateTime: 2004/01/29 12:35:08 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterPrinter.class);
@@ -149,7 +149,7 @@ final class ParameterPrinter {
 
     public static final void main(final String[] args) throws IOException {
 
-        CommandLine line = null;;
+        CommandLine line = null;
         try {
             line = new PosixParser().parse(OPTIONS, args);
         } catch (ParseException e) {

@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/test-qgen/sql/ccm-core/postgres-create.sql#1 $
--- $DateTime: 2003/12/10 16:59:20 $
+-- $Id: //core-platform/test-qgen/sql/ccm-core/postgres-create.sql#2 $
+-- $DateTime: 2004/01/29 12:35:08 $
 
 begin;
 
@@ -58,39 +58,61 @@ begin;
 \i default/kernel/index-group_member_map_group_id_idx.sql
 \i default/kernel/index-group_subgroup_map_grp_id_idx.sql
 
+\i default/kernel/table-acs_privilege_hierarchy.sql
+\i default/kernel/index-acs_privilege_hierarchy.sql
+\i default/kernel/table-dnm_privileges.sql
+\i default/kernel/comment-dnm_privileges.sql
+\i default/kernel/table-dnm_privilege_col_map.sql
+\i default/kernel/comment-dnm_privilege_col_map.sql
+\i default/kernel/table-dnm_privilege_hierarchy_map.sql
+\i default/kernel/table-dnm_privilege_hierarchy.sql
+\i default/kernel/comment-dnm_privilege_hierarchy.sql
+
+\i postgres/kernel/package-dnm_privileges.sql
+\i postgres/kernel/triggers-dnm_privileges.sql
+\i default/kernel/table-dnm_permissions.sql
+\i default/kernel/comment-dnm_permissions.sql
+\i default/kernel/index-dnm_permissions.sql
 
 \i default/kernel/insert-privileges.sql
 
 \i default/kernel/insert-object_zero.sql
 
-\i default/kernel/table-granted_context_non_leaf_map.sql
-\i default/kernel/index-granted_context_non_leaf_map.sql
-\i default/kernel/table-ungranted_context_non_leaf_map.sql
-\i default/kernel/index-ungranted_context_non_leaf_map.sql
-\i default/kernel/table-object_grants.sql
-\i default/kernel/table-context_child_counts.sql
-\i default/kernel/table-object_context_map.sql
-\i default/kernel/index-object_context_map.sql
-\i default/kernel/view-all_context_non_leaf_map.sql
+\i default/kernel/table-dnm_object_1_granted_context.sql
+\i default/kernel/table-dnm_object_grants.sql
+\i default/kernel/table-dnm_granted_context.sql
+\i postgres/kernel/table-dnm_ungranted_context.sql
 
-\i postgres/kernel/package-permission_denormalization.sql
-\i postgres/kernel/trigger-acs_permissions.sql
+\i default/kernel/index-dnm_object_1_granted_context.sql
+\i default/kernel/index-dnm_granted_context.sql
+\i postgres/kernel/index-dnm_granted_context.sql
+\i postgres/kernel/index-dnm_ungranted_context.sql
+
+\i postgres/kernel/package-dnm_context.sql
+\i default/kernel/insert-dnm_context.sql
+\i postgres/kernel/triggers-dnm_context.sql
+
+\i default/kernel/table-dnm_group_membership.sql
+\i default/kernel/index-dnm_group_membership.sql
+\i default/kernel/table-dnm_party_grants.sql
+
+\i postgres/kernel/package-dnm_parties.sql
+\i default/kernel/insert-dnm_group_membership.sql
+\i postgres/kernel/triggers-dnm_parties.sql
+
+\i postgres/kernel/stats-dnm_tables.sql
+
 \i default/kernel/index-acs_permissions.sql
 
 \i default/kernel/insert-users.sql
 \i default/kernel/insert-groups.sql
 \i default/kernel/insert-permissions.sql
-\i default/kernel/view-granted_trans_context_index.sql
-\i default/kernel/view-granted_trans_context_map.sql
-\i default/kernel/view-ungranted_trans_context_index.sql
-\i default/kernel/view-ungranted_trans_context_map.sql
-\i default/kernel/view-object_context_trans_map.sql
+
 \i postgres/kernel/function-package_id_for_object_id.sql
 \i default/kernel/constraint-email_addresses.sql
 \i default/kernel/constraint-group_subgroup_map.sql
 \i default/kernel/constraint-site_nodes.sql
 \i default/kernel/constraint-roles.sql
-
 
 -- XXX
 --\i default/kernel/view-object_package_map.sql

@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/01/29 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/RecordSet.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/RecordSet.java#2 $ by $Author: ashah $, $DateTime: 2004/01/29 12:35:08 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -139,14 +139,21 @@ public abstract class RecordSet {
 		 "\nsignature: " + m_signature);
 	}
 
+        HashMap cursorValues = new HashMap();
+
 	for (Iterator it = values.entrySet().iterator(); it.hasNext(); ) {
 	    Map.Entry me = (Map.Entry) it.next();
 	    Path p = (Path) me.getKey();
-	    if (m_signature.isSource(p)) { continue; }
+            Object value = me.getValue();
+
+	    if (m_signature.isSource(p)) {
+                cursorValues.put(p, value);
+                continue;
+            }
+
 	    Property prop = m_signature.getProperty(p);
-	    if (prop.getContainer().isKeyed() && !prop.isCollection()) {
+            if (prop.getContainer().isKeyed() && !prop.isCollection()) {
 		Object container = values.get(p.getParent());
-		Object value = me.getValue();
 		if (container == null) {
 		    if (value == null) {
 			continue;
@@ -156,10 +163,12 @@ public abstract class RecordSet {
 		    }
 		}
 		ssn.load(container, prop, value);
-	    }
+	    } else {
+                cursorValues.put(p, value);
+            }
 	}
 
-	return values;
+	return cursorValues;
     }
 
 }

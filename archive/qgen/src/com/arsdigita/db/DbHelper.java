@@ -260,4 +260,47 @@ public class DbHelper {
 
         return result;
     }
+
+    /**
+     * Truncate a string to a specified length, respecting character
+     * boundaries.
+     *
+     * @param s The string to be truncated.
+     * @param maxLength The maximum length of the string, in units that
+     * are database-dependent (for PG, characters; for Oracle, bytes).
+     *
+     * @see #varcharLength(String)
+     */
+    public static String truncateString(String s, int maxLength) {
+        String result = null;
+
+        switch (getDatabase()) {
+        case DB_POSTGRES:
+            result = s.substring(0, maxLength-1);
+            break;
+        case DB_ORACLE:
+            byte sBytes[] = s.getBytes();
+            byte sTruncateBytes[] = new byte[maxLength];
+
+            // Truncate based on bytes, and construct a new string
+            System.arraycopy(sBytes, 0, sTruncateBytes, 0, maxLength);
+            String truncateString = new String(sTruncateBytes);
+
+            // New string might have partially truncated a multi-byte
+            // character, so we drop the last character. Note that this is
+            // conservative, and in some cases the last character is a
+            // legitimate multi-byte character and is dropped
+            // anyway. However, implementing a completely correct solution
+            // would require the use of BreakIterator.following and
+            // therefore be an O(N) solution (I think).
+            result = truncateString.substring(0,truncateString.length()-1);
+            break;
+        default:
+            DbHelper.unsupportedDatabaseError("varcharLength");
+        }
+
+        return result;
+
+    }
+
 }

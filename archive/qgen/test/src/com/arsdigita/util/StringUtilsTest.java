@@ -18,6 +18,7 @@ package com.arsdigita.util;
 import junit.framework.TestCase;
 
 import java.util.HashMap;
+
 import org.apache.log4j.Logger;
 
 public class StringUtilsTest extends TestCase {

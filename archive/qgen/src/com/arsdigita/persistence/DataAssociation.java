@@ -23,19 +23,19 @@ import com.arsdigita.persistence.metadata.ObjectType;
  * <p>
  *
  * It is important to note that when the deprecated methods in this class
- * are removed, <font color="red"><b>this class will no long extend
+ * are removed, <font color="red"><b>this class will no longer extend
  * DataCollection</b></font>.  If you want something that extends
  * DataCollection, use DataAssociationCursor instead.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/12/10 $ */
+ * @version $Revision: #2 $ $Date: 2004/01/29 $ */
 
 public interface DataAssociation extends DataCollection {
     // when this no longer extends DataCollection, make sure it
     // still has get/set Query and get/set Source
 
-    String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataAssociation.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataAssociation.java#2 $ by $Author: ashah $, $DateTime: 2004/01/29 12:35:08 $";
 
     /**
      * Adds <i>object</i> to the persistent association.
@@ -131,10 +131,8 @@ public interface DataAssociation extends DataCollection {
     boolean isModified();
 
 
-    /**
-     *
+    /*
      *  Deprecated methods from DataQuery
-     *
      */
 
 

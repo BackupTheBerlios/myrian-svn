@@ -39,7 +39,7 @@ import com.arsdigita.util.Assert;
  * @author Archit Shah (ashah@mit.edut)
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-01-22
- * @version $Date: 2003/12/10 $
+ * @version $Date: 2004/01/29 $
  **/
 public class GraphSet implements Graph {
     private final static String LINE_SEP = System.getProperty("line.separator");
@@ -55,7 +55,7 @@ public class GraphSet implements Graph {
             Object node = nodes.next();
             newGraph.addNode(node);
             for (Iterator edges=getOutgoingEdges(node).iterator(); edges.hasNext(); ) {
-                Edge edge = (Edge) edges.next();
+                Graph.Edge edge = (Graph.Edge) edges.next();
                 newGraph.addEdge(edge.getTail(), edge.getHead(), edge.getLabel());
             }
         }

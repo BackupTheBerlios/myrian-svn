@@ -11,16 +11,17 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/test-qgen/pdl/com/arsdigita/web/Host.pdl#1 $
-// $DateTime: 2003/12/10 16:59:20 $
+// $Id: //core-platform/test-qgen/pdl/com/arsdigita/web/Host.pdl#2 $
+// $DateTime: 2004/01/29 12:35:08 $
 
 model com.arsdigita.web;
 
 
 object type Host {
   BigDecimal id = web_hosts.host_id INTEGER;
-  unique String serverName = web_hosts.server_name VARCHAR(200);
+  String serverName = web_hosts.server_name VARCHAR(200);
   Integer serverPort = web_hosts.server_port INTEGER;
 
   object key (id);
+  unique (serverName, serverPort);
 }

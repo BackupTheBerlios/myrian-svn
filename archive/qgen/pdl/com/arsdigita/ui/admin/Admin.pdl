@@ -11,22 +11,29 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/test-qgen/pdl/com/arsdigita/ui/admin/Admin.pdl#1 $ 
-// $DateTime: 2003/12/10 16:59:20 $
+// $Id: //core-platform/test-qgen/pdl/com/arsdigita/ui/admin/Admin.pdl#2 $ 
+// $DateTime: 2004/01/29 12:35:08 $
 
 model com.arsdigita.ui.admin;
+
+import com.arsdigita.web.Application;
+
+object type Admin extends Application {
+    reference key (admin_app.application_id);
+}
+
 
 query AllNoParentGroups {
     BigDecimal groupID;
     do {
-        select group_id
-          from groups
+        select g.group_id
+          from groups g
          where not exists (
-	                   select 1
-                           from group_subgroup_map
-			   where group_id = subgroup_id)
+	           select 1
+                 from group_subgroup_map m
+			    where g.group_id = m.subgroup_id)
     } map {
-        groupID = group_id;
+        groupID = g.group_id;
     }
 }
 

@@ -11,7 +11,9 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/test-qgen/sql/ccm-core/default/categorization/insert-acs_privileges.sql#1 $
--- $DateTime: 2003/12/10 16:59:20 $
+-- $Id: //core-platform/test-qgen/sql/ccm-core/default/categorization/insert-acs_privileges.sql#2 $
+-- $DateTime: 2004/01/29 12:35:08 $
 
 insert into acs_privileges (privilege) values ('map_to_category');
+insert into acs_privilege_hierarchy (child_privilege, privilege)
+  values ('map_to_category', 'admin');

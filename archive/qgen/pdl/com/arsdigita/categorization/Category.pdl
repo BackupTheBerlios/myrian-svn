@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
+// Copyright (C) 2001-2004 Red Hat Inc. All Rights Reserved.
 //
 // The contents of this file are subject to the CCM Public
 // License (the "License"); you may not use this file except in
@@ -11,22 +11,12 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/test-qgen/pdl/com/arsdigita/categorization/Category.pdl#1 $
-// $DateTime: 2003/12/10 16:59:20 $
+// $Id: //core-platform/test-qgen/pdl/com/arsdigita/categorization/Category.pdl#2 $
+// $DateTime: 2004/01/29 12:35:08 $
 
 model com.arsdigita.categorization;
 
 import com.arsdigita.kernel.*;
-
-// NOTE:
-// out of fear of joining with acs_objects to get the objectType property,
-// all events that retrieve categories or sorted categories cheat and
-// return a hard-coded value for objectType.  In the case of events that
-// retrieve objects of type Category, this hardcoded objectType value will
-// be wrong for objects whose type is a subtype of Category.  However,
-// no one is relying on the java method Category.getSpecificObjectType()
-// to return the "right" subtype of Category.  We will introduce a better
-// solution in the future.
 
 object type Category extends ACSObject {
     String[0..1] description = cat_categories.description VARCHAR(4000);
@@ -39,18 +29,18 @@ object type Category extends ACSObject {
     reference key (cat_categories.category_id);
 }
 
+object type UseContext {
+    BigDecimal[1..1] id = cat_root_cat_object_map.id;
 
-association {
-    Category[0..n] rootCategory = join acs_objects.object_id
-                                    to cat_root_cat_object_map.object_id,
-                                  join cat_root_cat_object_map.category_id
-                                    to cat_categories.category_id;
-    ACSObject[0..n] categoryOwner = join cat_categories.category_id
-                                      to cat_root_cat_object_map.category_id,
-                                    join cat_root_cat_object_map.object_id
+    Category[1..1] rootCategory =join cat_root_cat_object_map.category_id
+                                   to cat_categories.category_id;
+    ACSObject[1..1] categoryOwner = join cat_root_cat_object_map.object_id
                                       to acs_objects.object_id;
 
     String[0..1] useContext = cat_root_cat_object_map.use_context;
+
+    unique (categoryOwner, useContext);
+    object key (id);
 }
 
 association {

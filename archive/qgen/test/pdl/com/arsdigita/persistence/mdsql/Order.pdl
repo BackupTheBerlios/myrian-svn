@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/test-qgen/test/pdl/com/arsdigita/persistence/mdsql/Order.pdl#1 $ 
-// $DateTime: 2003/12/10 16:59:20 $
+// $Id: //core-platform/test-qgen/test/pdl/com/arsdigita/persistence/mdsql/Order.pdl#2 $ 
+// $DateTime: 2004/01/29 12:35:08 $
 
 model mdsql;
 
@@ -21,7 +21,6 @@ object type Order {
     String[1..1] buyer = t_orders.buyer VARCHAR(100);
     String seller = t_orders.seller VARCHAR(100);
     String shippingAddress = t_orders.shipping_address VARCHAR(200);
-    component LineItem[0..n] items = join t_orders.order_id to t_line_items.order_id;
     Date shippingDate = t_orders.shipping_date TIMESTAMP;
     Boolean hasShipped = t_orders.shipped_p CHAR;
 
@@ -48,13 +47,16 @@ object type LineItem {
     BigDecimal id = t_line_items.item_id DECIMAL;
     Float[1..1] price = t_line_items.price FLOAT;
     String[1..1] name = t_line_items.name VARCHAR(100);
-    Order[1..1] order = join t_line_items.order_id to t_orders.order_id;
     Boolean[0..1] inStock = t_line_items.in_stock_p CHAR;
 
     object key (id);
 
 }
 
+association {
+    Order[1..1] order = join t_line_items.order_id to t_orders.order_id;
+    component LineItem[0..n] items = join t_orders.order_id to t_line_items.order_id;
+}
 
 object type OtherItem {
     BigDecimal id = t_other_items.other_id DECIMAL;

@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/test-qgen/pdl/com/arsdigita/search/intermedia/SearchContent.pdl#1 $ 
-// $DateTime: 2003/12/10 16:59:20 $
+// $Id: //core-platform/test-qgen/pdl/com/arsdigita/search/intermedia/SearchContent.pdl#2 $ 
+// $DateTime: 2004/01/29 12:35:08 $
 
 model com.arsdigita.search.intermedia;
 
@@ -26,7 +26,7 @@ object type SearchContent {
   BigDecimal id = search_content.object_id INTEGER;
   String     object_type = search_content.object_type VARCHAR(100);
   String     link_text = search_content.link_text VARCHAR(1000);
-  String     url_stub = search_content.url_stub VARCHAR(100);
+  String     url_stub = search_content.url_stub VARCHAR(1000);
   String     summary = search_content.summary VARCHAR(4000);
   String[0..1] xml_content = search_content.xml_content CLOB;
   Blob[0..1] raw_content = search_content.raw_content BLOB;

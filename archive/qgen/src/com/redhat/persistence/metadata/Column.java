@@ -30,12 +30,12 @@ import java.util.Set;
  * the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/01/29 $
  */
 
 public class Column extends Element {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/metadata/Column.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/metadata/Column.java#2 $ by $Author: ashah $, $DateTime: 2004/01/29 12:35:08 $";
 
     /**
      * The name of this Column.
@@ -64,7 +64,6 @@ public class Column extends Element {
     /**
      * Constructs a new Column with the given table and columnName.
      *
-     * @param table The name of the table this Column belongs to.
      * @param columnName The name of this Column.
      *
      * @pre (table != null && columnName != null)
@@ -127,7 +126,7 @@ public class Column extends Element {
      * Constructs a new Column with the given table, columnName, JDBC
      * integer type code, and size.
      *
-     * @param columnName The name of this Column.
+     * @param name The name of this Column.
      * @param type The JDBC integer type code for this Column.
      * @param size The size of this Column.
      * @param scale The scale of this Column.

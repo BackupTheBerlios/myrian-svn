@@ -1,0 +1,37 @@
+//
+// Copyright (C) 2004 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/test-qgen/pdl/com/arsdigita/search/lucene/IndexId.pdl#1 $ 
+// $DateTime: 2004/01/29 12:35:08 $
+
+model com.arsdigita.search.lucene;
+
+import com.arsdigita.web.*;
+
+// Ideally, lucene_ids should extend web_hosts.  What prevents us from
+// doing so is the fact that an IndexId object is created *after* its
+// corresponding Host object has been initialized and saved.  Therefore,
+// if IndexId were to extend Host, we would run into a
+// DuplicateObjectException, because creating an IndexId would involve
+// (re)creating an instance of its base type Host first.  Therefore,
+// IndexId does not extend Host. (Which would also please Barbara Liskov
+// to no end.)
+
+object type IndexId {
+    BigDecimal[1..1] id           = lucene_ids.id INTEGER;
+
+    unique Host[1..1] host        = join lucene_ids.host_id to web_hosts.host_id;
+    unique Integer[1..1] indexID  = lucene_ids.index_id INTEGER;
+
+    object key(id);
+}
