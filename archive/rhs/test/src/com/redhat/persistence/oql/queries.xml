@@ -1224,10 +1224,10 @@
   </test>
 
   <test name="parties">
-    <query>
+    <query joins="0" subselects="0">
         query(all(parties.Party), id = id, class = discriminator1)
     </query>
-    <query>
+    <query joins="3" outers="3" subselects="0">
         query(all(parties.Party), id = id, class = discriminator2)
     </query>
     <results>
