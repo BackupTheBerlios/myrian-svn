@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/UserAuthentication.pdl#8 $ 
-// $DateTime: 2002/12/13 16:26:51 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/UserAuthentication.pdl#9 $ 
+// $DateTime: 2003/01/23 12:15:45 $
 
 model com.arsdigita.kernel;
 
@@ -74,7 +74,7 @@ query UserAuthenticationForLogin {
     do {
         select user_authentication.auth_id,
 	           users.screen_name,
-	           lower(users.screen_name) lower_screen_name,
+	           lower(users.screen_name) as lower_screen_name,
 	           parties.primary_email
           from user_authentication, 
 	           parties,

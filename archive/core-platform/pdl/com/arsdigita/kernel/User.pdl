@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/User.pdl#8 $
-// $DateTime: 2002/12/10 19:36:26 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/User.pdl#9 $
+// $DateTime: 2003/01/23 12:15:45 $
 
 model com.arsdigita.kernel;
 
@@ -42,8 +42,8 @@ query UserPrimaryEmail {
     do {
 	select users.user_id,
 	       users.screen_name,
-	       lower(users.screen_name) lower_screen_name,
-	       lower(parties.primary_email) lower_primary_email,
+	       lower(users.screen_name) as lower_screen_name,
+	       lower(parties.primary_email) as lower_primary_email,
 	       parties.primary_email
 	  from users, 
 	       parties
