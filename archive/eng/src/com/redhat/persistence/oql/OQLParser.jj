@@ -11,6 +11,11 @@
  * or by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
  * 3001 King Ranch Road, Ukiah, CA 95482.
  */
+options {
+    STATIC = false;
+    DEBUG_PARSER = false;
+}
+
 PARSER_BEGIN(OQLParser)
 
 package com.redhat.persistence.oql;
@@ -24,7 +29,7 @@ import java.io.*;
  * OQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2004/08/30 $
+ * @version $Revision: #9 $ $Date: 2004/08/30 $
  */
 
 class OQLParser {

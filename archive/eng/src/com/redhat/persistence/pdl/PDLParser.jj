@@ -11,6 +11,11 @@
  * or by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
  * 3001 King Ranch Road, Ukiah, CA 95482.
  */
+options {
+    STATIC = false;
+    DEBUG_PARSER = false;
+}
+
 PARSER_BEGIN(PDLParser)
 
 package com.redhat.persistence.pdl;
@@ -21,12 +26,12 @@ import com.redhat.persistence.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/08/30 $
+ * @version $Revision: #5 $ $Date: 2004/08/30 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLParser.jj#4 $ by $Author: dennis $, $DateTime: 2004/08/30 14:24:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLParser.jj#5 $ by $Author: dennis $, $DateTime: 2004/08/30 15:48:38 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);

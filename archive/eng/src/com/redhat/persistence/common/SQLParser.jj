@@ -11,6 +11,12 @@
  * or by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
  * 3001 King Ranch Road, Ukiah, CA 95482.
  */
+options {
+    STATIC = false;
+    DEBUG_PARSER = false;
+    DEBUG_TOKEN_MANAGER = false;
+}
+
 PARSER_BEGIN(SQLParser)
 
 package com.redhat.persistence.common;
@@ -22,12 +28,12 @@ import java.io.*;
  * SQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/08/30 $
+ * @version $Revision: #3 $ $Date: 2004/08/30 $
  */
 
 public class SQLParser {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/common/SQLParser.jj#2 $ by $Author: dennis $, $DateTime: 2004/08/30 14:24:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/common/SQLParser.jj#3 $ by $Author: dennis $, $DateTime: 2004/08/30 15:48:38 $";
 
     public static interface Mapper {
         Path map(Path path);
