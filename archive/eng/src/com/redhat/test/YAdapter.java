@@ -169,13 +169,17 @@ public final class YAdapter {
 
             if (canonicalThrowable != null ^ testedThrowable != null) {
                 if (canonicalThrowable == null) {
-                    throw new AssertionFailedError
+                    AssertionFailedError e = new AssertionFailedError
                         ("unequal: obj1: " + canonicalResult
                          + " exc2: " + testedThrowable);
+                    e.initCause(testedThrowable);
+                    throw e;
                 } else {
-                    throw new AssertionFailedError
+                    AssertionFailedError e = new AssertionFailedError
                         ("unequal: exc1: " + canonicalThrowable
-                         + " obj2: " + testedThrowable);
+                         + " obj2: " + testedResult);
+                    e.initCause(canonicalThrowable);
+                    throw e;
                 }
             } else if (canonicalThrowable != null && testedThrowable != null) {
                 if (canonicalThrowable.getClass().equals
