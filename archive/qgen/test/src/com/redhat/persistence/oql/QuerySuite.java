@@ -24,12 +24,12 @@ import java.util.*;
  * QuerySuite
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/02/24 $
+ * @version $Revision: #6 $ $Date: 2004/02/24 $
  **/
 
 public class QuerySuite extends TestSuite {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QuerySuite.java#5 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QuerySuite.java#6 $ by $Author: jorris $, $DateTime: 2004/02/24 17:37:51 $";
 
     public QuerySuite() {}
 
@@ -269,6 +269,8 @@ public class QuerySuite extends TestSuite {
         private String m_variant = null;
         private boolean m_ordered = false;
         private StringBuffer m_query = null;
+        private Integer m_subselectCount = null;
+        private Integer m_joinCount = null;
         private List m_results = null;
         private ExpectedError m_error = null;
 
@@ -286,6 +288,14 @@ public class QuerySuite extends TestSuite {
                 m_query = new StringBuffer();
                 m_ordered = "true".equalsIgnoreCase
                     (attrs.getValue(uri, "ordered"));
+                String subSelects = attrs.getValue("subselects");
+                if (subSelects != null) {
+                    m_subselectCount = new Integer(subSelects);
+                }
+                String joinCount = attrs.getValue("joins");
+                if (joinCount != null) {
+                    m_joinCount = new Integer(joinCount);
+                }
             } else if (name.equals("results")) {
                 m_results = new ArrayList();
             } else if (name.equals("row")) {
@@ -319,6 +329,8 @@ public class QuerySuite extends TestSuite {
                 }
                 QueryTest test =
                     new QueryTest(m_suite, tname, query, m_ordered, m_error);
+                test.setSubselectCount(m_subselectCount);
+                test.setJoinCount(m_joinCount);
                 m_tests.add(test);
             } else if (name.equals("results")) {
                 // do nothing

@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
  * QueryTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/02/24 $
+ * @version $Revision: #6 $ $Date: 2004/02/24 $
  **/
 
 public class QueryTest extends TestCase {
@@ -23,7 +23,7 @@ public class QueryTest extends TestCase {
     // being an instance of TestCase. Later versions of ant don't
     // suffer from this problem.
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QueryTest.java#5 $ by $Author: rhs $, $DateTime: 2004/02/24 10:13:24 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QueryTest.java#6 $ by $Author: jorris $, $DateTime: 2004/02/24 17:37:51 $";
 
     private static final Logger s_log = Logger.getLogger(QueryTest.class);
 
@@ -33,6 +33,8 @@ public class QueryTest extends TestCase {
     private String m_query;
     private List m_results = null;
     private final ExpectedError m_expectedError;
+    private Integer m_subselectCount = null;
+    private Integer m_joinCount = null;
     //private static final String NL = System.getProperty("line.separator");
 
     public QueryTest(QuerySuite suite, 
@@ -99,6 +101,18 @@ public class QueryTest extends TestCase {
                         ("sql:\n\n" + sql + "\n\nmissing: " + missing +
                          "\n\nextra: " + extra + "\n\n", expected, actual);
                 }
+                SelectParser parser = new SelectParser(sql);
+                if (m_subselectCount != null) {
+                    assertEquals("Too many subselects in sql: " + sql,
+                            m_subselectCount.intValue(), parser.getSubselectCount());
+                }
+
+                if (m_joinCount != null) {
+                    assertEquals("Too many joins in sql: " + sql,
+                            m_joinCount.intValue(), parser.getJoinCount());
+                }
+
+
             } catch (SQLException e) {
                 fail("sql:\n\n" + sql + "\n\n" + e.getMessage());
             } finally {
@@ -135,6 +149,14 @@ public class QueryTest extends TestCase {
             return true;
         }
         return !m_expectedError.isExpected(t);
+    }
+
+    public void setSubselectCount(Integer subselectCount) {
+        m_subselectCount = subselectCount;
+    }
+
+    public void setJoinCount(Integer joinCount) {
+        m_joinCount = joinCount;
     }
 
 }
