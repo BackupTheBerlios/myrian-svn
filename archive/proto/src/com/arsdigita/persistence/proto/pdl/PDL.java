@@ -16,12 +16,12 @@ import java.util.*;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2003/02/13 $
+ * @version $Revision: #14 $ $Date: 2003/02/13 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#13 $ by $Author: rhs $, $DateTime: 2003/02/13 17:16:57 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#14 $ by $Author: rhs $, $DateTime: 2003/02/13 17:37:37 $";
 
     private AST m_ast = new AST();
     private ErrorReport m_errors = new ErrorReport();
@@ -161,7 +161,9 @@ public class PDL {
                 "global.String",
                 "global.Float",
                 "global.Date",
-                "global.Boolean"
+                "global.Boolean",
+                "global.Blob",
+                "global.Byte"
             };
             Class[] classes = new Class[] {
                 Integer.class,
@@ -170,7 +172,9 @@ public class PDL {
                 String.class,
                 Float.class,
                 java.util.Date.class,
-                Boolean.class
+                Boolean.class,
+                byte[].class,
+                Byte.class
             };
 
             for (int i = 0; i < types.length; i++) {
