@@ -28,12 +28,12 @@ import java.util.Stack;
  * This Actor validates a Query object.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/30 $
+ * @version $Revision: #3 $ $Date: 2003/02/05 $
  **/
 
 class Validator extends Actor {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Validator.java#2 $ by $Author: rhs $, $DateTime: 2003/01/30 17:57:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Validator.java#3 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
 
     private int m_nonOuter = 0;
     private Set m_connected = new HashSet();
@@ -60,7 +60,7 @@ class Validator extends Actor {
 
             for (Iterator it = table.getConditions().iterator();
                  it.hasNext(); ) {
-                Condition cond = (Condition) it.next();
+                OldCondition cond = (OldCondition) it.next();
                 Table toAdd;
                 if (cond.getHead().getTable().equals(table)) {
                     toAdd = cond.getTail().getTable();

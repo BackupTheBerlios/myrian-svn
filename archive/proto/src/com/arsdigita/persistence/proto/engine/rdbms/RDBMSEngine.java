@@ -15,49 +15,20 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/01/31 $
+ * @version $Revision: #6 $ $Date: 2003/02/05 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#5 $ by $Author: rhs $, $DateTime: 2003/01/31 12:48:23 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#6 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
-
-    private static final Set getTables(ObjectMap om) {
-        final HashSet result = new HashSet();
-        for (Iterator it = om.getObjectType().getProperties().iterator();
-             it.hasNext(); ) {
-            Property prop = (Property) it.next();
-            Mapping m = om.getMapping(Path.get(prop.getName()));
-            // XXX: no metadata
-            if (m == null) {
-                return null;
-            }
-            m.dispatch(new Mapping.Switch() {
-                    public void onValue(ValueMapping vm) {
-                        result.add(vm.getColumn().getTable());
-                    }
-
-                    public void onReference(ReferenceMapping rm) {
-                        if (rm.isJoinTo()) {
-                            result.add(rm.getJoin(0).getFrom().getTable());
-                        }
-                    }
-                });
-        }
-        return result;
-    }
 
     private Event.Switch m_switch = new Event.Switch() {
 
             private void onObjectEvent(ObjectEvent e) {
                 OID oid = e.getOID();
-                Set tables = getTables(oid.getObjectMap());
-                // XXX: no metadata
-                if (tables == null) {
-                    return;
-                }
+                Collection tables = oid.getObjectMap().getTables();
                 for (Iterator it = tables.iterator(); it.hasNext(); ) {
                     Table table = (Table) it.next();
                     if (e instanceof CreateEvent) {
@@ -184,9 +155,12 @@ public class RDBMSEngine extends Engine {
             Path p = (Path) it.next();
             q.fetch(p.getPath());
         }
+
         if (LOG.isDebugEnabled() &&
             q.getChildren().size() + q.getSelections().size() > 0) {
             LOG.debug(q.toSQL());
+            QGen qg = new QGen(sig);
+            LOG.debug(qg.generate());
         }
         return null;
     }

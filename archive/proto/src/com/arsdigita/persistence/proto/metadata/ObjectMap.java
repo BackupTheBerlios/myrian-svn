@@ -8,12 +8,12 @@ import java.util.*;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/01/30 $
+ * @version $Revision: #8 $ $Date: 2003/02/05 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#7 $ by $Author: rhs $, $DateTime: 2003/01/30 17:57:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#8 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -153,6 +153,51 @@ public class ObjectMap extends Element {
         }
         joins.addAll(m_joins);
         return joins;
+    }
+
+    public Table getTable() {
+        Join sup = getSuperJoin();
+        if (sup == null) {
+            Property key = (Property) getKeyProperties().iterator().next();
+            Mapping m = getMapping(Path.get(key.getName()));
+            if (m == null) { return null; }
+            if (m.isValue()) {
+                return ((ValueMapping) m).getColumn().getTable();
+            } else {
+                return ((ReferenceMapping) m).getJoin(0).getFrom().getTable();
+            }
+        } else {
+            return sup.getFrom().getTable();
+        }
+    }
+
+    public Collection getTables() {
+        final ArrayList result = new ArrayList();
+        for (Iterator it = getObjectType().getProperties().iterator();
+             it.hasNext(); ) {
+            Property prop = (Property) it.next();
+            Mapping m = getMapping(Path.get(prop.getName()));
+            // XXX: no metadata
+            if (m == null) { continue; }
+            m.dispatch(new Mapping.Switch() {
+                    public void onValue(ValueMapping vm) {
+                        Table t = vm.getColumn().getTable();
+                        if (!result.contains(t)) {
+                            result.add(t);
+                        }
+                    }
+
+                    public void onReference(ReferenceMapping rm) {
+                        if (rm.isJoinTo()) {
+                            Table t = rm.getJoin(0).getFrom().getTable();
+                            if (!result.contains(t)) {
+                                result.add(t);
+                            }
+                        }
+                    }
+                });
+        }
+        return result;
     }
 
     public int getRank(Table table) {

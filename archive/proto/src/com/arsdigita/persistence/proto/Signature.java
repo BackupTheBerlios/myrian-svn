@@ -8,15 +8,15 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/02/05 $
+ * @version $Revision: #11 $ $Date: 2003/02/05 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#10 $ by $Author: ashah $, $DateTime: 2003/02/05 17:39:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#11 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
 
     private ObjectType m_type;
-    private HashMap m_paths = new HashMap();
+    private ArrayList m_paths = new ArrayList();
 
     private ArrayList m_sources = new ArrayList();
     private HashMap m_sourceMap = new HashMap();
@@ -26,6 +26,7 @@ public class Signature {
 
     public Signature(ObjectType type) {
         m_type = type;
+        addSource(new Source(m_type));
         addKeyProperties();
     }
 
@@ -34,17 +35,26 @@ public class Signature {
     }
 
     public void addPath(String path) {
-        if (!m_paths.containsKey(path)) {
-            m_paths.put(path, Path.get(path));
+        addPath(Path.get(path));
+    }
+
+    public void addPath(Path path) {
+        if (!m_paths.contains(path)) {
+            m_paths.add(path);
         }
     }
 
     Path getPath(String path) {
-        return (Path) m_paths.get(path);
+        Path p = Path.get(path);
+        if (m_paths.contains(p)) {
+            return p;
+        } else {
+            return null;
+        }
     }
 
     public Collection getPaths() {
-        return m_paths.values();
+        return m_paths;
     }
 
     public void addSource(Source s) {
@@ -156,7 +166,7 @@ public class Signature {
         StringBuffer buf = new StringBuffer();
         buf.append(m_type.getQualifiedName() + "(");
 
-        for (Iterator it = m_paths.values().iterator(); it.hasNext(); ) {
+        for (Iterator it = m_paths.iterator(); it.hasNext(); ) {
             buf.append(it.next());
             if (it.hasNext()) {
                 buf.append(", ");

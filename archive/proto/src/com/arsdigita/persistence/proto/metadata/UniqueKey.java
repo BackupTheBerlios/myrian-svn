@@ -21,12 +21,12 @@ import java.util.*;
  * UniqueKey
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/12/31 $
+ * @version $Revision: #2 $ $Date: 2003/02/05 $
  **/
 
 public class UniqueKey extends Constraint {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/UniqueKey.java#1 $ by $Author: rhs $, $DateTime: 2002/12/31 15:39:17 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/UniqueKey.java#2 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
 
     private Set m_foreignKeys = new HashSet();
 
@@ -37,9 +37,8 @@ public class UniqueKey extends Constraint {
     private static final Table checkDuplicates(Table table,
                                                Column[] columns) {
         if (table.getUniqueKey(columns) != null) {
-            throw new IllegalArgumentException(
-                                               "Table already has a unique key: " + table.getName()
-                                               );
+            throw new IllegalArgumentException
+                ("Table already has a unique key: " + table.getName());
         }
         return table;
     }

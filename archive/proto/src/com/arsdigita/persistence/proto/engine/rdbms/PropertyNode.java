@@ -17,18 +17,19 @@ package com.arsdigita.persistence.proto.engine.rdbms;
 
 import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
+import com.arsdigita.persistence.proto.metadata.Join;
 import java.util.*;
 
 /**
  * PropertyNode
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/30 $
+ * @version $Revision: #3 $ $Date: 2003/02/05 $
  **/
 
 class PropertyNode extends Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/PropertyNode.java#2 $ by $Author: rhs $, $DateTime: 2003/01/30 17:57:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/PropertyNode.java#3 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
 
     private Property m_property;
 
@@ -90,7 +91,7 @@ class PropertyNode extends Node {
         table = defineTable(first.getTo().getTableName());
         Column to = table.defineColumn(first.getTo());
 
-        new Condition(this, from, to);
+        new OldCondition(this, from, to);
 
         for (int i = 1; i < path.size(); i++) {
             Join je = (Join) path.get(i);
@@ -98,7 +99,7 @@ class PropertyNode extends Node {
             from = table.defineColumn(je.getFrom());
             table = defineTable(je.getTo().getTableName());
             to = table.defineColumn(je.getTo());
-            new Condition(this, from, to);
+            new OldCondition(this, from, to);
         }
 
         super.buildQuery();

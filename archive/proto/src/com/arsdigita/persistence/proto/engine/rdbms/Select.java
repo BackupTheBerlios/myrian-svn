@@ -1,25 +1,59 @@
 package com.arsdigita.persistence.proto.engine.rdbms;
 
+import com.arsdigita.persistence.proto.common.*;
+
+import java.util.*;
+
 /**
  * Select
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/01/30 $
+ * @version $Revision: #2 $ $Date: 2003/02/05 $
  **/
 
 class Select extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#1 $ by $Author: rhs $, $DateTime: 2003/01/30 17:57:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#2 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
 
-    private String m_sql;
+    private ArrayList m_selections = new ArrayList();
+    private Join m_join;
 
-    public Select(String sql) {
+    public Select(Join join) {
         super(null, null);
-        m_sql = sql;
+        m_join = join;
+    }
+
+    public void addSelection(Path path) {
+        if (!m_selections.contains(path)) {
+            m_selections.add(path);
+        }
+    }
+
+    public Collection getSelections() {
+        return m_selections;
     }
 
     public String toString() {
-        return m_sql;
+        StringBuffer result = new StringBuffer();
+
+        result.append("select ");
+
+        if (m_selections.size() == 0) {
+            result.append("*");
+        } else {
+            for (Iterator it = m_selections.iterator(); it.hasNext(); ) {
+                Path path = (Path) it.next();
+                result.append(path);
+                if (it.hasNext()) {
+                    result.append(",\n       ");
+                }
+            }
+        }
+
+        result.append("\nfrom ");
+        result.append(m_join);
+
+        return result.toString();
     }
 
 }

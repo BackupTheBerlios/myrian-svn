@@ -24,12 +24,12 @@ import org.apache.log4j.Logger;
  * Table
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/01/28 $
+ * @version $Revision: #2 $ $Date: 2003/02/05 $
  **/
 
 class Table {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Table.java#1 $ by $Author: rhs $, $DateTime: 2003/01/28 19:17:39 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Table.java#2 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
 
     private static final Logger s_log = Logger.getLogger(Table.class);
 
@@ -49,7 +49,7 @@ class Table {
 
     public void remove() {
         for (Iterator it = getConditions().iterator(); it.hasNext(); ) {
-            Condition cond = (Condition) it.next();
+            OldCondition cond = (OldCondition) it.next();
             cond.remove();
         }
 
@@ -98,7 +98,7 @@ class Table {
         return m_columns.values();
     }
 
-    void addCondition(Condition condition) {
+    void addCondition(OldCondition condition) {
         if (condition.getHead().getTable().equals(this)) {
             m_entering.add(condition);
         } else {
@@ -106,7 +106,7 @@ class Table {
         }
     }
 
-    void removeCondition(Condition condition) {
+    void removeCondition(OldCondition condition) {
         if (condition.getHead().getTable().equals(this)) {
             m_entering.remove(condition);
         } else {
@@ -188,7 +188,7 @@ class Table {
 
         Table other = null;
         for (Iterator it = getConditions().iterator(); it.hasNext(); ) {
-            Condition cond = (Condition) it.next();
+            OldCondition cond = (OldCondition) it.next();
             Table candidate;
             if (cond.getHead().getTable().equals(this)) {
                 candidate = cond.getTail().getTable();

@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #18 $ $Date: 2003/02/05 $
+ * @version $Revision: #19 $ $Date: 2003/02/05 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#18 $ by $Author: ashah $, $DateTime: 2003/02/05 17:39:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#19 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -670,7 +670,6 @@ public class Session {
     private Signature getRetrieveSignature(ObjectType type) {
         Signature result = new Signature(type);
         result.addDefaultProperties();
-        result.addSource(new Source(type));
         return result;
     }
 

@@ -14,12 +14,12 @@ import java.util.*;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2003/01/30 $
+ * @version $Revision: #10 $ $Date: 2003/02/05 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#9 $ by $Author: rhs $, $DateTime: 2003/01/30 17:57:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#10 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
 
     private AST m_ast = new AST();
     private ErrorReport m_errors = new ErrorReport();
@@ -112,14 +112,7 @@ public class PDL {
                 FileNd.ASSOCIATIONS
             }));
 
-        StringBuffer buf = new StringBuffer();
-        for (Iterator it = m_errors.getMessages().iterator(); it.hasNext(); ) {
-            buf.append(it.next() + "\n");
-        }
-
-        if (buf.length() > 0) {
-            throw new Error(buf.toString());
-        }
+        m_errors.check();
 
         for (Iterator it = m_symbols.getObjectTypes().iterator();
              it.hasNext(); ) {
@@ -128,7 +121,16 @@ public class PDL {
         }
 
         emitDDL(root);
+
+        m_errors.check();
+
         emitMapping(root);
+
+        m_errors.check();
+
+        emitConstraints(root);
+
+        m_errors.check();
     }
 
     private void emitDDL(Root root) {
@@ -161,6 +163,71 @@ public class PDL {
                 root.addTable(table);
             }
         }
+    }
+
+    private void unique(ObjectMap map, Node nd, Collection ids,
+                        boolean primary) {
+        final ArrayList cols = new ArrayList();
+        for (Iterator it = ids.iterator(); it.hasNext(); ) {
+            IdentifierNd id = (IdentifierNd) it.next();
+            Mapping m = map.getMapping(Path.get(id.getName()));
+            // XXX: no metadata
+            if (m == null) {
+                return;
+            }
+            m.dispatch(new Mapping.Switch() {
+                    public void onValue(ValueMapping vm) {
+                        cols.add(vm.getColumn());
+                    }
+
+                    public void onReference(ReferenceMapping rm) {
+                        if (!rm.isJoinTo()) {
+                            throw new Error("can't do this");
+                        }
+
+                        cols.add(rm.getJoin(0).getFrom());
+                    }
+                });
+        }
+
+        unique(nd, (Column[]) cols.toArray(new Column[0]), primary);
+    }
+
+    private void unique(Node nd, Column[] cols, boolean primary) {
+        Table table = cols[0].getTable();
+        if (table.getUniqueKey(cols) != null) {
+            m_errors.warn(nd, "duplicate key");
+            return;
+        }
+        UniqueKey key = new UniqueKey(table, null, cols);
+        if (primary) {
+            table.setPrimaryKey(key);
+        }
+    }
+
+    private void emitConstraints(final Root root) {
+        m_ast.traverse(new Node.Switch() {
+                private ObjectMap getMap(Node nd) {
+                    return root.getObjectMap
+                        (m_symbols.getEmitted((ObjectTypeNd) nd.getParent()));
+                }
+
+                public void onObjectKey(ObjectKeyNd nd) {
+                    unique(getMap(nd), nd, nd.getProperties(), true);
+                }
+
+                public void onUniqueKey(UniqueKeyNd nd) {
+                    unique(getMap(nd), nd, nd.getProperties(), false);
+                }
+
+                public void onReferenceKey(ReferenceKeyNd nd) {
+                    unique(nd, new Column[] { lookup(root, nd.getCol()) },
+                           true);
+                }
+            }, new Node.IncludeFilter(new Node.Field[] {
+                AST.FILES, FileNd.OBJECT_TYPES, ObjectTypeNd.OBJECT_KEY,
+                ObjectTypeNd.UNIQUE_KEYS, ObjectTypeNd.REFERENCE_KEY
+            }));
     }
 
     private void emitMapping(final Root root) {

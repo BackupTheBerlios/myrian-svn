@@ -28,12 +28,12 @@ import org.apache.log4j.Logger;
  * specified in a PDL file to generate sql queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/30 $
+ * @version $Revision: #3 $ $Date: 2003/02/05 $
  **/
 
 public class Query extends Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Query.java#2 $ by $Author: rhs $, $DateTime: 2003/01/30 17:57:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Query.java#3 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -76,11 +76,11 @@ public class Query extends Node {
         m_selections.remove(selection);
     }
 
-    void addCondition(Condition condition) {
+    void addCondition(OldCondition condition) {
         m_conditions.add(condition);
     }
 
-    void removeCondition(Condition condition) {
+    void removeCondition(OldCondition condition) {
         m_conditions.remove(condition);
     }
 
@@ -368,7 +368,7 @@ public class Query extends Node {
             Table table = (Table) tables.pop();
             for (Iterator it = table.getLeaving().iterator();
                  it.hasNext(); ) {
-                Condition condition = (Condition) it.next();
+                OldCondition condition = (OldCondition) it.next();
                 result.append("\n        ");
                 if (condition.isOuter()) {
                     result.append("left ");
@@ -393,7 +393,7 @@ public class Query extends Node {
 
         final List conditions = new ArrayList();
         for (Iterator it = m_conditions.iterator(); it.hasNext(); ) {
-            Condition condition = (Condition) it.next();
+            OldCondition condition = (OldCondition) it.next();
             conditions.add(condition.getTail().getQualifiedName() + " = " +
                            condition.getHead().getQualifiedName() +
                            (condition.isOuter() ? "(+)" : ""));
@@ -524,7 +524,7 @@ public class Query extends Node {
         toDot(env, result);
 
         for (Iterator it = m_conditions.iterator(); it.hasNext(); ) {
-            Condition cond = (Condition) it.next();
+            OldCondition cond = (OldCondition) it.next();
             result.append(
                           "    " + env.get(cond.getTail().getTable()) + ":" +
                           env.get(cond.getTail()) +

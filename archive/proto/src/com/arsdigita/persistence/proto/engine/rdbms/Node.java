@@ -18,6 +18,7 @@ package com.arsdigita.persistence.proto.engine.rdbms;
 import com.arsdigita.util.*;
 import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
+import com.arsdigita.persistence.proto.metadata.Join;
 import java.util.*;
 
 import org.apache.log4j.Logger;
@@ -26,12 +27,12 @@ import org.apache.log4j.Logger;
  * Node
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/30 $
+ * @version $Revision: #3 $ $Date: 2003/02/05 $
  **/
 
 abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Node.java#2 $ by $Author: rhs $, $DateTime: 2003/01/30 17:57:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Node.java#3 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
 
     private static final Logger s_log = Logger.getLogger(Node.class);
 
@@ -113,11 +114,11 @@ abstract class Node {
         m_tables.remove(table.getName());
     }
 
-    void addCondition(Condition condition) {
+    void addCondition(OldCondition condition) {
         m_conditions.add(condition);
     }
 
-    void removeCondition(Condition condition) {
+    void removeCondition(OldCondition condition) {
         m_conditions.remove(condition);
     }
 
@@ -298,7 +299,7 @@ abstract class Node {
 
                 if (connected.contains(from.getTable()) &&
                     !connected.contains(to.getTable())) {
-                    new Condition(this, from, to);
+                    new OldCondition(this, from, to);
                     connected.add(to.getTable());
                 }
             }
@@ -311,7 +312,7 @@ abstract class Node {
 
                 if (connected.contains(from.getTable()) &&
                     !connected.contains(to.getTable())) {
-                    new Condition(this, from, to);
+                    new OldCondition(this, from, to);
                     connected.add(to.getTable());
                 }
             }
@@ -332,7 +333,7 @@ abstract class Node {
             msg.append("\nConstraints used: ");
 
             for (Iterator it = m_conditions.iterator(); it.hasNext(); ) {
-                Condition cond = (Condition) it.next();
+                OldCondition cond = (OldCondition) it.next();
                 msg.append(
                            cond.getTail().getFullName() + " = " +
                            cond.getHead().getFullName()
