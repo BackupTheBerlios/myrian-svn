@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2004/09/13 $
+ * @version $Revision: #12 $ $Date: 2004/09/14 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#11 $ by $Author: rhs $, $DateTime: 2004/09/13 16:23:12 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#12 $ by $Author: rhs $, $DateTime: 2004/09/14 17:42:52 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -364,12 +364,18 @@ public class PDL {
                         ObjectMap container =
                             getMap(nm.getParent().getParent());
                         if (container != null) {
-                            om = new ObjectMap
-                                (container.getObjectType()
-                                 .getProperty(getPath(nm.getParent()))
-                                 .getType());
-                            emit(nm, om);
-                            modified[0] = true;
+                            ObjectType type = container
+                                .getObjectType()
+                                .getProperty(getPath(nm.getParent()))
+                                .getType();
+                            if (type.isIndependent()) {
+                                m_errors.fatal
+                                    (nm, "can't nest a non nested type");
+                            } else {
+                                om = new ObjectMap(type);
+                                emit(nm, om);
+                                modified[0] = true;
+                            }
                         }
                     }
                 }

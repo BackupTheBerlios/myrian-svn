@@ -11,12 +11,12 @@ import junit.framework.TestCase;
  * ErrorTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/09/14 $
+ * @version $Revision: #2 $ $Date: 2004/09/14 $
  **/
 
 public class ErrorTest extends TestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/pdl/ErrorTest.java#1 $ by $Author: rhs $, $DateTime: 2004/09/14 17:22:30 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/pdl/ErrorTest.java#2 $ by $Author: rhs $, $DateTime: 2004/09/14 17:42:52 $";
 
     private Map m_files = new LinkedHashMap();
 
@@ -46,11 +46,10 @@ public class ErrorTest extends TestCase {
         Root root = new Root();
         try {
             pdl.emit(root);
+            fail("expected error: " + error);
         } catch (PDLException e) {
-            assertEquals(error, e.getMessage());
+            assertEquals(error.trim(), e.getMessage().trim());
         }
-
-        fail("expected error: " + error);
     }
 
     public void testNestedMapWithNonNestedType() {
@@ -63,7 +62,8 @@ public class ErrorTest extends TestCase {
         line("    String a;");
         line("    String b;");
         line("}");
-        errorEquals("can't nest non nested type");
+        errorEquals
+            ("file: line 4, column 13 [error]: can't nest a non nested type");
     }
 
 }

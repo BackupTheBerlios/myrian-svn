@@ -30,12 +30,12 @@ import com.redhat.persistence.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2004/09/13 $
+ * @version $Revision: #8 $ $Date: 2004/09/14 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLParser.jj#7 $ by $Author: rhs $, $DateTime: 2004/09/13 16:23:12 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLParser.jj#8 $ by $Author: rhs $, $DateTime: 2004/09/14 17:42:52 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -419,14 +419,15 @@ NestedMapNd nested_map() :
 {
     NestedMapNd nm = new NestedMapNd();
     Node n;
+    Token t;
 }
 {
-    <LBRACE>
+    t = <LBRACE>
         ((  n = nested_mapping() { nm.add(NestedMapNd.MAPPINGS, n); }
           | n = object_key() { nm.add(NestedMapNd.OBJECT_KEY, n); } )
          <SEMI>)+
     <RBRACE>
-        { return nm; }
+        { ln(nm, t); return nm; }
 }
 
 NestedMappingNd nested_mapping() :
