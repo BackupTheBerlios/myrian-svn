@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/02/24 $
+ * @version $Revision: #5 $ $Date: 2004/02/24 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#4 $ by $Author: rhs $, $DateTime: 2004/02/24 10:13:24 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#5 $ by $Author: rhs $, $DateTime: 2004/02/24 19:43:59 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -199,25 +199,10 @@ class Generator {
             Expression e = (Expression) it.next();
             addConstraining(e, frame, values, frames);
         }
-        if (!frame.isConstrained(values)) {
+        if (values.isEmpty() || !frame.isConstrained(values)) {
             return null;
         }
-        Set roots = new HashSet();
-        for (Iterator it = frames.iterator(); it.hasNext(); ) {
-            QFrame f = (QFrame) it.next();
-            roots.add(f.getRoot());
-        }
-
-        // if there is more than one root we need to pick the most
-        // nested frame
-        for(QFrame c = frame.getContainer(); c != null; c = c.getContainer()) {
-            QFrame root = c.getRoot();
-            if (roots.contains(root)) {
-                return root;
-            }
-        }
-
-        return null;
+        return frame.getContainer();
     }
 
     private void addConstraining(Expression e, QFrame frame, List values,

@@ -686,7 +686,29 @@
   </test>
 
   <test>
-    <query>query(filter(all(test.A).first, exists(a)), a = a.id, b = b.id, index = index)</query>
+    <query>query(all(test.A).first, a = a.id, b = b.id, index = index)</query>
+    <results>
+      <row a="null" b="null" index="null"/>
+      <row a="null" b="null" index="null"/>
+      <row a="null" b="null" index="null"/>
+      <row a="null" b="null" index="null"/>
+      <row a="null" b="null" index="null"/>
+      <row a="null" b="null" index="null"/>
+      <row a="0" b="10" index="0"/>
+      <row a="1" b="11" index="0"/>
+      <row a="2" b="10" index="0"/>
+      <row a="3" b="11" index="0"/>
+    </results>
+  </test>
+
+  <test>
+    <query>query(filter(all(test.A).first, exists(a)),
+                 a = a.id, b = b.id, index = index)</query>
+    <query>query(filter(all(test.A).first, exists(a) and exists(b)),
+                 a = a.id, b = b.id, index = index)</query>
+    <query>query(filter(all(test.A).first,
+                        exists(a) and exists(b) and exists(index)),
+                 a = a.id, b = b.id, index = index)</query>
     <results>
       <row a="0" b="10" index="0"/>
       <row a="1" b="11" index="0"/>

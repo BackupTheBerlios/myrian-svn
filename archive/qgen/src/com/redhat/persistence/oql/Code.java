@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2004/02/23 $
+ * @version $Revision: #13 $ $Date: 2004/02/24 $
  **/
 
 class Code {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#12 $ by $Author: ashah $, $DateTime: 2004/02/23 11:51:21 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#13 $ by $Author: rhs $, $DateTime: 2004/02/24 19:43:59 $";
 
     private static final Logger s_log = Logger.getLogger(Code.class);
 
@@ -139,8 +139,21 @@ class Code {
         if (om.getRetrieveAll() != null) {
             return "(" + om.getRetrieveAll().getSQL() + ")";
         } else {
-            return om.getTable().getName();
+            return table(om).getName();
         }
+    }
+
+    static Table table(ObjectMap map) {
+        Table table = null;
+        for (ObjectMap om = map; om != null; om = om.getSuperMap()) {
+            table = om.getTable();
+            if (table != null) { break; }
+        }
+        if (table == null) {
+            throw new IllegalStateException
+                ("type does not have table: " + map.getObjectType());
+        }
+        return table;
     }
 
     static void bind(SQL sql, Map values, StringBuffer buf) {
@@ -210,7 +223,7 @@ class Code {
                 return concat(alias + ".", columns);
             }
         } else {
-            return names(om.getTable().getPrimaryKey().getColumns(), alias);
+            return names(table(om).getPrimaryKey().getColumns(), alias);
         }
     }
 

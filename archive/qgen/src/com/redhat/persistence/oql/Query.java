@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/02/24 $
+ * @version $Revision: #8 $ $Date: 2004/02/24 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#7 $ by $Author: rhs $, $DateTime: 2004/02/24 10:13:24 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#8 $ by $Author: rhs $, $DateTime: 2004/02/24 19:43:59 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -91,6 +91,11 @@ public class Query {
         }
 
         s_log.info("shrunk frame:\n" + qframe);
+
+        List where = new ArrayList();
+        String join = qframe.render(where);
+        s_log.info("join: " + join);
+        s_log.info("where: " + where);
 
         StringBuffer sql = new StringBuffer();
         sql.append("select ");

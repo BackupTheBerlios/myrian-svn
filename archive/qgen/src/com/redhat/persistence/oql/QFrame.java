@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/02/24 $
+ * @version $Revision: #4 $ $Date: 2004/02/24 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#3 $ by $Author: rhs $, $DateTime: 2004/02/24 10:13:24 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#4 $ by $Author: rhs $, $DateTime: 2004/02/24 19:43:59 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -166,15 +166,15 @@ class QFrame {
     }
 
     String emit(boolean select) {
-        List inner = new ArrayList();
-        MultiMap outer = new MultiMap();
         List where = new ArrayList();
-
-        flatten(inner, outer, where);
+        String join = null;
+        if (!m_hoisted) {
+            join = render(where);
+        }
 
         StringBuffer buf = new StringBuffer();
         if (select) {
-            if (!inner.isEmpty()) {
+            if (join != null) {
                 buf.append("(select ");
             } else if (m_values.size() > 1) {
                 buf.append("(");
@@ -190,29 +190,12 @@ class QFrame {
             }
         }
 
-        if (select && !inner.isEmpty()) {
+        if (select && join != null) {
             buf.append("\nfrom ");
         }
 
-        for (Iterator it = inner.iterator(); it.hasNext(); ) {
-            QFrame qf = (QFrame) it.next();
-            buf.append(qf.join());
-            if (it.hasNext()) {
-                if (outer.isEmpty()) {
-                    buf.append(", ");
-                } else {
-                    buf.append("\ncross join ");
-                }
-            }
-        }
-
-        for (Iterator it = outer.keys().iterator(); it.hasNext(); ) {
-            QFrame qf = (QFrame) it.next();
-            List on = outer.get(qf);
-            buf.append("\nleft join ");
-            buf.append(qf.join());
-            buf.append(" on ");
-            buf.append(join(on, " and "));
+        if (join != null) {
+            buf.append(join);
         }
 
         if (!where.isEmpty()) {
@@ -242,22 +225,11 @@ class QFrame {
             buf.append(m_limit.emit(m_generator));
         }
 
-        if (select && (!inner.isEmpty() || m_values.size() > 1)) {
+        if (select && (join != null || m_values.size() > 1)) {
             buf.append(")");
         }
 
         return buf.toString();
-    }
-
-    private String join() {
-        if (m_table != null && m_alias == null) {
-            return m_table + " " + alias();
-        } else if (m_tableExpr != null) {
-            return m_tableExpr.emit(m_generator) + " " + alias();
-        } else {
-            throw new IllegalStateException
-                ("not a source frame: " + this);
-        }
     }
 
     private String join(List exprs, String sep) {
@@ -270,28 +242,6 @@ class QFrame {
             }
         }
         return buf.toString();
-    }
-
-    private void fill(List joins, List conditions, List orders) {
-        for (Iterator it = m_children.iterator(); it.hasNext(); ) {
-            QFrame child = (QFrame) it.next();
-            child.fill(joins, conditions, orders);
-        }
-        if (m_table != null && m_alias == null) {
-            joins.add(m_table + " " + alias());
-        } else if (m_tableExpr != null) {
-            joins.add(m_tableExpr.emit(m_generator) + " " + alias());
-        }
-        if (m_condition != null) {
-            conditions.add(m_condition);
-        }
-        if (m_order != null) {
-            String order = m_order.emit(m_generator);
-            if (!m_asc) {
-                order = order + " desc";
-            }
-            orders.add(0, order);
-        }
     }
 
     private List getOrders() {
@@ -314,102 +264,109 @@ class QFrame {
         }
     }
 
-    private void addInner(List inner) {
-        if (m_table != null || m_tableExpr != null) {
-            QFrame frame = getAlias();
-            if (!inner.contains(frame)) {
-                inner.add(frame);
-            }
+    String render(List conditions) {
+        return render(conditions, new HashSet());
+    }
+
+    String render(List conditions, Set defined) {
+        StringBuffer result = new StringBuffer();
+
+        Set defs = new HashSet();
+
+        boolean first = true;
+        if (m_table != null && m_alias == null) {
+            first = false;
+            result.append(m_table + " " + alias());
+            defs.add(this);
+        } else if (m_tableExpr != null) {
+            first = false;
+            result.append(m_tableExpr.emit(m_generator) + " " + alias());
+            defs.add(this);
         }
+
         for (Iterator it = m_children.iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
-            if (child.isOuter()) { continue; }
-            child.addInner(inner);
+            List conds = new ArrayList();
+            String join = child.render(conds, defs);
+            if (join == null && !conds.isEmpty()) {
+                throw new IllegalStateException
+                    ("Condition without joins: " + conds +
+                     "\nchild: " + child +
+                     "\nthis: " + this);
+            }
+            if (join == null) { continue; }
+            for (Iterator iter = conds.iterator(); iter.hasNext(); ) {
+                Expression e = (Expression) iter.next();
+                Set used = frames(e);
+                used.removeAll(defs);
+                if (!used.isEmpty()) {
+                    conditions.add(e);
+                    iter.remove();
+                }
+            }
+            if (!first) {
+                result.append("\n");
+                if (child.m_outer) {
+                    if (conds.isEmpty()) {
+                        throw new IllegalStateException
+                            ("Outer join on nothing: " + join +
+                             "\nchild: " + child +
+                             "\nthis: " + this);
+                    }
+                    result.append("left ");
+                } else if (conds.isEmpty()) {
+                    result.append("cross ");
+                }
+                result.append("join ");
+            }
+            result.append(join);
+            if (!conds.isEmpty()) {
+                if (first) {
+                    conditions.addAll(conds);
+                } else {
+                    result.append(" on ");
+                    result.append(join(conds, " and "));
+                }
+            }
+            first = false;
+        }
+
+        if (m_condition != null) {
+            conditions.add(m_condition);
+        }
+
+        defined.addAll(defs);
+
+        if (first) {
+            return null;
+        } else {
+            return result.toString();
         }
     }
 
-    void flatten(List inner, MultiMap outer, List where) {
-        if (m_hoisted) { return; }
-        addInner(inner);
-
-        List remaining = new ArrayList();
-        addConditions(where, remaining);
-
-        while (true) {
-            QFrame frame = null;
-            List on = new ArrayList();
-
-            for (Iterator it = remaining.iterator(); it.hasNext(); ) {
-                Expression e = (Expression) it.next();
-                List uses = m_generator.getUses(e);
-                if (uses.isEmpty()) { continue; }
-                Set frames = new HashSet();
-                for (Iterator iter = uses.iterator(); iter.hasNext(); ) {
-                    QValue value = (QValue) iter.next();
-                    QFrame qf = value.getFrame().getAlias();
-                    frames.add(qf);
-                }
-                frames.removeAll(inner);
-                if (frames.isEmpty()) {
-                    where.add(e);
-                    it.remove();
-                    continue;
-                }
-                frames.removeAll(outer.keys());
-                if (frames.size() != 1) {
-                    // condition requires more than one table (or no
-                    // tables), so it can't be next
-
-                    // XXX: in order to be fully correct here we might
-                    // need to consider the possibility of factoring
-                    // conditions, for example if we know that a
-                    // condition imposes an equality constraint we may
-                    // render that equality constraint as part of the
-                    // join and later eliminate the portion that is
-                    // part of the actual condition.
-                    continue;
-                }
-                QFrame qf = (QFrame) frames.iterator().next();
-                if (frame == null) {
-                    frame = qf;
-                } else if (!frame.equals(qf)) {
-                    continue;
-                }
-                on.add(e);
-                it.remove();
-            }
-
-            if (frame == null) { break; }
-            outer.addAll(frame, on);
+    Set frames(Expression e) {
+        List uses = m_generator.getUses(e);
+        Set result = new HashSet();
+        for (Iterator it = uses.iterator(); it.hasNext(); ) {
+            QValue value = (QValue) it.next();
+            result.add(value.getFrame().getAlias());
         }
-
-        if (remaining.size() > 0) {
-            throw new IllegalStateException
-                ("unable to form outer joins on: " + remaining +
-                 "\nframe: " + this +
-                 "\ninner: " + inner +
-                 "\nouter: " + outer +
-                 "\nwhere: " + where);
-        }
+        return result;
     }
 
     List getConditions() {
         List result = new ArrayList();
-        addConditions(result, result);
+        addConditions(result);
         return result;
     }
 
-    private void addConditions(List inner, List outer) {
+    private void addConditions(List result) {
         for (Iterator it = m_children.iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
-            child.addConditions(inner, outer);
+            child.addConditions(result);
         }
         if (m_condition != null) {
-            if (isOuter()) {
-                outer.add(m_condition);
-            } else {
-                inner.add(m_condition);
-            }
+            result.add(m_condition);
         }
     }
 
@@ -433,15 +390,17 @@ class QFrame {
     }
 
     boolean isSelect() {
-        List inner = new ArrayList();
-        MultiMap outer = new MultiMap();
-        List where = new ArrayList();
-        flatten(inner, outer, where);
-        return !inner.isEmpty();
+        if (m_hoisted) {
+            return false;
+        } else if (render(new ArrayList()) == null) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     boolean hoist() {
-        // Rather than this m_select business we could construct
+        // XXX: Rather than this m_select business we could construct
         // another QFrame, copy children, condition, etc to it and
         // remove our own children.
         QFrame frame = m_generator.getConstraining(this);
