@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/09/12 $
+ * @version $Revision: #8 $ $Date: 2003/10/23 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/pdl/PDL.java#7 $ by $Author: rhs $, $DateTime: 2003/09/12 09:13:53 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/pdl/PDL.java#8 $ by $Author: justin $, $DateTime: 2003/10/23 11:58:56 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -1088,7 +1088,7 @@ public class PDL {
                     Collection blocks = getSQLBlocks(ot, type, name);
                     if (blocks != null && blocks.size() > 0) {
                         m_errors.warn
-                            (ev, "redundent events specified," +
+                            (ev, "redundant events specified," +
                              " ignoring this event");
                         return;
                     }

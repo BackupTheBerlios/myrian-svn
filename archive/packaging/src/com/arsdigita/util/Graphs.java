@@ -30,7 +30,7 @@ import java.util.Stack;
  *
  * @author Archit Shah (ashah@mit.edu)
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/09/25 $
+ * @version $Date: 2003/10/23 $
  * @since 2003-01-22
  **/
 public class Graphs {
@@ -52,7 +52,7 @@ public class Graphs {
     /**
      * Finds a path in <code>graph</code> from begin to end
      * 
-     * @see #findPath(Graph, Object, EdgeSelector, NodeSelector)
+     * @see #findPath(Graph, Object, Graphs.EdgeSelector, Graphs.NodeSelector)
      * @returns list of edges representing the found path
      * @throws NullPointerException if any of the three arguments is <code>null</code>.
      **/
@@ -294,7 +294,7 @@ public class Graphs {
     }
 
     /**
-     * @see #findPath(Graph, Object, EdgeSelector, NodeSelector)
+     * @see #findPath(Graph, Object, Graphs.EdgeSelector, Graphs.NodeSelector)
      **/
     public interface EdgeSelector {
         /**
@@ -309,7 +309,7 @@ public class Graphs {
     }
 
     /**
-     * @see #findPath(Graph, Object, EdgeSelector, NodeSelector)
+     * @see #findPath(Graph, Object, Graphs.EdgeSelector, Graphs.NodeSelector)
      **/
     public interface NodeSelector {
         boolean test(Object node);

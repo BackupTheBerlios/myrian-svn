@@ -18,13 +18,13 @@ package com.arsdigita.tools.junit.extensions;
 import junit.extensions.TestDecorator;
 import junit.framework.Test;
 import junit.framework.TestResult;
-import com.arsdigita.kernel.KernelExcursion;
-import com.arsdigita.kernel.Kernel;
+import com.arsdigita.kernel.*;
+import com.arsdigita.util.Assert;
 
 /**
  *
  * @author Jon Orris (jorris@redhat.com)
- * @version $Revision: #1 $ $DateTime: 2003/09/25 14:54:00 $
+ * @version $Revision: #2 $ $DateTime: 2003/10/23 11:58:56 $
  */
 public class PermissionDecorator extends TestDecorator {
     public PermissionDecorator(Test test) {
@@ -34,13 +34,29 @@ public class PermissionDecorator extends TestDecorator {
     public void run(TestResult testResult) {
         final TestResult finalResult = testResult;
         KernelExcursion ex = new KernelExcursion() {
+
             protected void excurse() {
-                setParty(Kernel.getSystemParty());
+                setParty(getAdminUser());
                 PermissionDecorator.super.run(finalResult);
             }
         };
 
         ex.run();
+    }
+
+    public static User getAdminUser() {
+        UserCollection uc = User.retrieveAll();
+
+        try {
+            uc.filter(KernelHelper.getSystemAdministratorEmailAddress());
+            uc.next();
+            User sysadmin = uc.getUser();
+            Assert.exists(sysadmin, User.class);
+
+            return sysadmin;
+        } finally {
+            uc.close();
+        }
     }
 
 }

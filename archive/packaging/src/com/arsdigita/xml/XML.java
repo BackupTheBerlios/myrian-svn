@@ -23,10 +23,12 @@ import com.arsdigita.xml.formatters.DateTimeFormatter;
 
 import java.io.IOException;
 import java.io.InputStream;
-
-import java.util.Map;
-import java.util.HashMap;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -50,6 +52,8 @@ public class XML {
     static {
         s_formatters.put(Date.class, new DateTimeFormatter());
     }
+
+    private XML() {}
 
     /**
      * Registers a formatter for serializing objects of a
@@ -183,4 +187,56 @@ public class XML {
         }
     }
 
+    /**
+     * This visitor is called by {@link #traverse(Element, int, XML.Action)}.
+     **/
+    public interface Action {
+        void apply(Element elem, int level);
+    }
+
+    /**
+     * Prints the skeleton structure of the element to the supplied print
+     * writer.
+     **/
+    public static void toSkeleton(final Element element,
+                                  final PrintWriter writer) {
+
+        XML.traverse(element, 0, new Action() {
+                public void apply(Element elem, int level) {
+                    final String padding = "  ";
+                    for (int ii=0; ii<level; ii++) {
+                        writer.print(padding);
+                    }
+                    writer.print(elem.getName());
+                    Iterator attrs = elem.getAttributes().keySet().iterator();
+                    while (attrs.hasNext()) {
+                        writer.print(" @");
+                        writer.print((String) attrs.next());
+                    }
+                    writer.println("");
+                }
+            });
+    }
+
+    /**
+     * This is a wrapper for {@link #toSkeleton(Element, PrintWriter)}.
+     **/
+    public static String toSkeleton(Element element) {
+        StringWriter writer = new StringWriter();
+        PrintWriter pw = new PrintWriter(writer);
+        XML.toSkeleton(element, pw);
+        pw.close();
+        return writer.toString();
+    }
+
+    /**
+     * Pre-order, depth-first traversal.
+     **/
+    public static void traverse(Element elem, int level, Action action) {
+        action.apply(elem, level);
+        final Iterator children=elem.getChildren().iterator();
+        while (children.hasNext()) {
+            XML.traverse((Element) children.next(), level+1, action);
+        }
+    }
 }

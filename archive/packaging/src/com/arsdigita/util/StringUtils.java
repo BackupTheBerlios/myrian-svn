@@ -528,7 +528,7 @@ public class StringUtils {
    *
    * @param s The original string to split.
    * @param re The regular expression in the format required by
-   * {@link org.apache.oro.text.perl.Perl5Util#umatch}.
+   * {@link org.apache.oro.text.perl.Perl5Util#match(String, String)}.
    * @return List of substrings.
    *
    * @author Richard W.M. Jones
@@ -776,12 +776,12 @@ public class StringUtils {
     /**
      * <p>Add a possible newline for proper wrapping.</p>
      *
-     * <p>Checks the given String to see if it ends with whitspace.
-     * If so, it assumes this whitespace is intentional formatting and
-     * returns a reference to the original string.  If not, a new
-     * <code>String</code> object is created containing the original
-     * plus a platform-dependent newline character obtained from
-     * {@link System#getProperties()}.</p>
+     * <p>Checks the given String to see if it ends with whitspace.  If so, it
+     * assumes this whitespace is intentional formatting and returns a reference
+     * to the original string.  If not, a new <code>String</code> object is
+     * created containing the original plus a platform-dependent newline
+     * character obtained from {@link System#getProperty(String)
+     * System.getProperty("line.separator")}.</p>
      */
     public static String addNewline(String s) {
         int n = s.length()-1;

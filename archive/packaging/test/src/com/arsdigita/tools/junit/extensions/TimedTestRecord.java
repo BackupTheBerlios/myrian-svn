@@ -15,6 +15,7 @@
 
 package com.arsdigita.tools.junit.extensions;
 import com.arsdigita.util.UncheckedWrapperException;
+import com.arsdigita.kernel.KernelExcursion;
 
 import com.clarkware.junitperf.TimedTest;
 
@@ -58,8 +59,20 @@ public class TimedTestRecord extends TestDecorator {
         }
     }
 
-    public void run(TestResult result) {
+    public void run(final TestResult result) {
 
+        new KernelExcursion() {
+            protected void excurse() {
+                setParty(PermissionDecorator.getAdminUser());
+
+                runTimingTest(result);
+
+            }
+        }.run();
+
+    }
+
+    private void runTimingTest(TestResult result) {
         try {
             /* get the previous recorded time, new timeout value */
             TestCaseDescriptor tdesc = pTime.getDescriptor ( fTest );
@@ -67,7 +80,7 @@ public class TimedTestRecord extends TestDecorator {
 
             /*
              * we need to record the time ourselves as well,
-             * unfortunately TimedTest does not give us access to the 
+             * unfortunately TimedTest does not give us access to the
              * beginning time
              */
             TimedTest timedTest = new TimedTest ( fTest, timeout );
@@ -76,14 +89,14 @@ public class TimedTestRecord extends TestDecorator {
             long elapsed = System.currentTimeMillis() - beginTime;
 
             /* update the records only if an error did not occur */
-            if  ( result.wasSuccessful () ) { 
+            if  ( result.wasSuccessful () ) {
                 if ( elapsed < tdesc.getFastest() ) {
                     tdesc.setFastest ( elapsed );
                     pTime.update ( tdesc );
                 }
             } else {
             }
-            
+
         } catch ( Exception e ) {
             /* an unexpected exception */
             result.addError ( fTest, new Error ( e.toString() ) );
