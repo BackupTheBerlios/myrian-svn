@@ -38,11 +38,11 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #19 $ $Date: 2003/10/23 $
+ * @version $Revision: #20 $ $Date: 2004/01/22 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#19 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#20 $ by $Author: ashah $, $DateTime: 2004/01/22 17:43:25 $";
 
     private static Logger s_log =
         Logger.getLogger(DataQueryImplTest.class.getName());
@@ -802,6 +802,57 @@ public class DataQueryImplTest extends DataQueryTest {
                  Utilities.LINE_BREAK + e.getMessage() +
                  operation.toString());
             throw e;
+        }
+    }
+
+    public void testAddPathSquared() {
+        Session ssn = getSession();
+        OrderAssociation oa = new OrderAssociation(ssn, "mdsql");
+        DataQuery dq = ssn.retrieve("mdsql.LineItem");
+        dq.addPath("order.items.id");
+        dq.addOrder("id");
+        dq.addOrder("order.items.id");
+        dq.addEqualsFilter("order.id", new BigDecimal(1));
+
+        // for each item go through all the other items
+        for (int i = 0; i < oa.NUM_ITEMS; i++) {
+            for (int j = 0; j < oa.NUM_ITEMS; j++) {
+                assertTrue(dq.next());
+                assertEquals(new BigDecimal(i), dq.get("id"));
+                assertEquals(new BigDecimal(j), dq.get("order.items.id"));
+            }
+        }
+
+        assertFalse(dq.next());
+    }
+
+    public void testCursorGetUnflushed() {
+        Session ssn = getSession();
+        DataObject user = ssn.create("mdsql.User");
+        user.set("id", new BigInteger("1"));
+        user.set("email", "user@example.com");
+        user.set("firstName", "Abe");
+        user.set("lastNames", "Honest");
+        DataObject color = ssn.create("mdsql.Color");
+        color.set("id", new BigInteger("1"));
+        color.set("name", "red");
+        user.set("favorateColor", color);
+        user.save();
+
+        // null is not flushable, so value in session and db differ
+        color.set("name", null);
+
+        DataQuery dq = ssn.retrieve("mdsql.User");
+        dq.addPath("favorateColor.name");
+        dq.addEqualsFilter("id", user.get("id"));
+
+        try {
+            dq.next();
+            assertNull("value from cursor does not match value in session",
+                       dq.get("favorateColor.name"));
+        } finally {
+            dq.close();
+            color.set("name", "red");
         }
     }
 

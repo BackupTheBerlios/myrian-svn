@@ -25,13 +25,20 @@ import java.util.*;
  */
 final class OrderAssociation {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderAssociation.java#5 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderAssociation.java#6 $ by $Author: ashah $, $DateTime: 2004/01/22 17:43:25 $";
     public static final int NUM_ITEMS = 10;
 
+    private final String m_model;
+
     OrderAssociation(Session session) {
+        this(session, "examples");
+    }
+
+    OrderAssociation(Session session, String model) {
+        m_model = model + ".";
         BigDecimal id = new BigDecimal(1);
 
-        DataObject order = session.create("examples.Order");
+        DataObject order = session.create(m_model + "Order");
         order.set("id", id);
         order.set("buyer", "Michael Bryzek");
         order.set("shippingAddress",
@@ -42,11 +49,11 @@ final class OrderAssociation {
         order.save();
 
         m_order = (DataObject) session.retrieve
-            (new OID("examples.Order", id));
+            (new OID(m_model + "Order", id));
 
         DataAssociation items = (DataAssociation) m_order.get("items");
         for (int i = 0; i < NUM_ITEMS; i++) {
-            DataObject li = session.create("examples.LineItem");
+            DataObject li = session.create(m_model + "LineItem");
             li.set("id", new BigDecimal(i));
             li.set("name", "Item " + i);
             li.set("price", new Float(2.99 + i));
