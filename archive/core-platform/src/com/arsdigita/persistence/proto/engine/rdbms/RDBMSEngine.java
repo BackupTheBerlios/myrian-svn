@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/05/23 $
+ * @version $Revision: #3 $ $Date: 2003/06/02 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#2 $ by $Author: rhs $, $DateTime: 2003/05/23 10:13:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#3 $ by $Author: rhs $, $DateTime: 2003/06/02 10:49:07 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -492,6 +492,15 @@ public class RDBMSEngine extends Engine {
     }
 
     static final Path[] getKeyPaths(ObjectType type, Path prefix) {
+        return getPaths(type, prefix, false);
+    }
+
+    static final Path[] getImmediatePaths(ObjectType type, Path prefix) {
+        return getPaths(type, prefix, true);
+    }
+
+    private static final Path[] getPaths(ObjectType type, Path prefix,
+                                 boolean immediate) {
         LinkedList result = new LinkedList();
         LinkedList stack = new LinkedList();
         stack.add(prefix);
@@ -500,17 +509,22 @@ public class RDBMSEngine extends Engine {
             Path p = (Path) stack.removeLast();
 
             ObjectType ot = type.getType(Path.relative(prefix, p));
-            Collection keys = ot.getKeyProperties();
-            if (keys.size() == 0) {
+            Collection props;
+            if (immediate) {
+                props = ot.getImmediateProperties();
+            } else {
+                props = ot.getKeyProperties();
+            }
+            if (props.size() == 0) {
                 result.add(p);
                 continue;
             }
 
-            ArrayList revKeys = new ArrayList(keys.size());
-            revKeys.addAll(keys);
-            Collections.reverse(revKeys);
+            ArrayList revProps = new ArrayList(props.size());
+            revProps.addAll(props);
+            Collections.reverse(revProps);
 
-            for (Iterator it = revKeys.iterator(); it.hasNext(); ) {
+            for (Iterator it = revProps.iterator(); it.hasNext(); ) {
                 Property key = (Property) it.next();
                 stack.add(Path.add(p, key.getName()));
             }

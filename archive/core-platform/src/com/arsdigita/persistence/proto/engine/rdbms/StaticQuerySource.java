@@ -10,12 +10,12 @@ import java.util.*;
  * StaticQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/02 $
  **/
 
 class StaticQuerySource extends QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/StaticQuerySource.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/StaticQuerySource.java#2 $ by $Author: rhs $, $DateTime: 2003/06/02 10:49:07 $";
 
     private synchronized Source getSource(ObjectType type, SQLBlock block,
                                           Path prefix) {
@@ -52,24 +52,25 @@ class StaticQuerySource extends QuerySource {
         }
 
 	ArrayList unfetched = null;
-	for (Iterator it = sig.getObjectType()
-		 .getImmediateProperties().iterator(); it.hasNext(); ) {
-	    Property prop = (Property) it.next();
-	    Path p = Path.get(prop.getName());
-	    if (!requireKey && sig.getObjectType().isKey(p)) {
-		continue;
-	    }
-	    Path[] paths = RDBMSEngine.getKeyPaths
-		(prop.getType(), Path.add(prefix, p));
-	    for (int i = 0; i < paths.length; i++) {
-		if (block.getMapping(paths[i]) == null) {
-		    if (unfetched == null) {
-			unfetched = new ArrayList();
-		    }
-		    unfetched.add(p);
-		}
-	    }
-	}
+
+        for (Iterator it = block.getPaths().iterator(); it.hasNext(); ) {
+            Path fetched = (Path) it.next();
+            Path parent = Path.relative(prefix, fetched.getParent());
+            if ((!requireKey || !type.isKeyed()) && parent == null) {
+                continue;
+            }
+            ObjectType ot = sig.getType(parent);
+            Path[] paths = RDBMSEngine.getKeyPaths
+                (ot, Path.add(prefix, parent));
+            for (int i = 0; i < paths.length; i++) {
+                if (!block.hasMapping(paths[i])) {
+                    if (unfetched == null) {
+                        unfetched = new ArrayList();
+                    }
+                    unfetched.add(paths[i]);
+                }
+            }
+        }
 
 	if (unfetched != null) {
 	    throw new MetadataException
@@ -190,10 +191,10 @@ class StaticQuerySource extends QuerySource {
 
         Query result = new Query(sig, null);
 
-        for (Iterator it = props.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry me = (Map.Entry) it.next();
-            Property key = (Property) me.getKey();
-            Object value = me.getValue();
+        for (Iterator it = props.getObjectType().getKeyProperties().iterator();
+             it.hasNext(); ) {
+            Property key = (Property) it.next();
+            Object value = props.get(key);
             Parameter p = sig.getParameter(Path.get(":" + key.getName()));
             result.set(p, value);
 	    p = sig.getParameter(Path.get(key.getName()));

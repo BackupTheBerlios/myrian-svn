@@ -4,12 +4,12 @@ package com.arsdigita.persistence.proto.pdl.nodes;
  * Property
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/05/19 $
+ * @version $Revision: #3 $ $Date: 2003/06/02 $
  **/
 
 public class PropertyNd extends StatementNd {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/nodes/PropertyNd.java#2 $ by $Author: vadim $, $DateTime: 2003/05/19 15:20:26 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/nodes/PropertyNd.java#3 $ by $Author: rhs $, $DateTime: 2003/06/02 10:49:07 $";
 
     public static final Field TYPE =
         new Field(PropertyNd.class, "type", TypeNd.class, 1, 1);
@@ -18,6 +18,7 @@ public class PropertyNd extends StatementNd {
     public static final Field MAPPING =
         new Field(PropertyNd.class, "mapping", Node.class, 1, 1);
 
+    private boolean m_isImmediate = false;
     private boolean m_isUnique = false;
     private boolean m_isComponent = false;
     private boolean m_isComposite = false;
@@ -26,6 +27,17 @@ public class PropertyNd extends StatementNd {
 
     private boolean m_isUnversioned = false;
     private boolean m_isVersioned = false;
+
+    /**
+     * @post isImmediate()
+     **/
+    public void setImmediate() {
+        m_isImmediate = true;
+    }
+
+    public boolean isImmediate() {
+        return m_isImmediate;
+    }
 
     /**
      * @post isUnique()

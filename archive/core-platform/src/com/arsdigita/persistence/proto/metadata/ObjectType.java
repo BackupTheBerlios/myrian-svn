@@ -7,18 +7,19 @@ import java.util.*;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/02 $
  **/
 
 public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#2 $ by $Author: rhs $, $DateTime: 2003/06/02 10:49:07 $";
 
     private Model m_model;
     private String m_name;
     private Class m_class;
     private ObjectType m_super;
     private Mist m_properties = new Mist(this);
+    private ArrayList m_immediates = new ArrayList();
 
     public ObjectType(Model model, String name, ObjectType supertype) {
         m_model = model;
@@ -145,10 +146,13 @@ public class ObjectType extends Element {
         return map.getKeyProperties().contains(prop);
     }
 
+    public boolean isImmediate(Property prop) {
+        return getImmediateProperties().contains(prop);
+    }
+
     public boolean isImmediate(Path path) {
         Property prop = getProperty(path);
-        Collection keys = prop.getContainer().getKeyProperties();
-        return keys.size() == 0 || keys.contains(prop);
+        return prop.getContainer().isImmediate(prop);
     }
 
     public Collection getKeyProperties() {
@@ -160,10 +164,28 @@ public class ObjectType extends Element {
 
     public Collection getImmediateProperties() {
 	if (isKeyed()) {
-	    return getKeyProperties();
+            ArrayList result = new ArrayList();
+	    result.addAll(getKeyProperties());
+            result.addAll(getBasetype().m_immediates);
+            return result;
 	} else {
 	    return getProperties();
 	}
+    }
+
+    public void addImmediateProperty(Property prop) {
+        if (prop.getContainer() != this) {
+            throw new IllegalArgumentException
+                ("property doesn't belong to this type: " + prop);
+        }
+        if (m_super != null) {
+            throw new IllegalArgumentException
+                ("derived object types cannot have immediate properties");
+        }
+
+        if (!m_immediates.contains(prop)) {
+            m_immediates.add(prop);
+        }
     }
 
     public boolean isKeyed() {

@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/02 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/RecordSet.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/RecordSet.java#2 $ by $Author: rhs $, $DateTime: 2003/06/02 10:49:07 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -75,7 +75,7 @@ public abstract class RecordSet {
 			Path kp = Path.add(p, prop.getName());
 			if (values.containsKey(kp)) {
 			    pmap.put(prop, values.get(kp));
-			} else {
+			} else if (m_signature.isFetched(kp)) {
 			    continue OUTER;
 			}
 		    }

@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/05/20 $
+ * @version $Revision: #5 $ $Date: 2003/06/02 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#4 $ by $Author: ashah $, $DateTime: 2003/05/20 14:37:22 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#5 $ by $Author: rhs $, $DateTime: 2003/06/02 10:49:07 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -135,6 +135,9 @@ public class PDL {
                                  prop.isCollection(),
                                  prop.isNullable());
                     type.addProperty(result);
+                    if (prop.isImmediate()) {
+                        type.addImmediateProperty(result);
+                    }
                     m_properties.put(prop, result);
                     return result;
                 }
