@@ -1,0 +1,21 @@
+// @author Jim Parsons (jparsons@redhat.com)
+
+model com.arsdigita.portal;
+
+import com.arsdigita.kernel.ResourceType;
+import com.arsdigita.kernel.Resource;
+
+
+object type PortletType extends ResourceType {
+    String profile = application_types.profile VARCHAR(20);
+}
+
+object type Portlet extends Resource {
+    Integer cellNumber = applications.cell_number INTEGER;
+    Integer sortKey = applications.sort_key INTEGER;
+
+    reference key (portlets.portlet_id);
+
+}
+
+
