@@ -133,3 +133,5 @@ create table forms_dd_select (
 comment on table forms_dd_select is '
   Select widget populated using canned database queries.
 ';
+
+create sequence forms_unique_id_seq;

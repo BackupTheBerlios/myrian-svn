@@ -12,8 +12,12 @@
 -- rights and limitations under the License.
 --
 --
--- $Id: //core-platform/dev/sql/upgrade/oracle-se-5.1.2-5.2.0.sql#1 $
+-- $Id: //core-platform/dev/sql/upgrade/oracle-se-5.1.2-5.2.0.sql#2 $
 
+@@ ../oracle-se/upgrade/5.1.2-5.2.0/function-last_attr_value.sql
+@@ ../oracle-se/upgrade/5.1.2-5.2.0/function-package_id_for_object_id.sql
+@@ ../oracle-se/upgrade/5.1.2-5.2.0/package-search_indexing.sql
+@@ ../oracle-se/upgrade/5.1.2-5.2.0/package-parties_denormalization.sql
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/create-function-current-date.sql
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/drop-category-map-id.sql
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/table-cat_cat_subcat_trans_index.sql
