@@ -28,15 +28,17 @@ import org.w3c.dom.Attr;
  * <code>org.jdom.Element</code> using <code>org.w3c.dom.Element</code>.
  *
  * @author Patrick McNeill (pmcneill@arsdigita.com)
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/06/10 $
  * @since ACS 4.5a
  */
 public class Element {
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = 
+        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#2 $" +
+        "$Author: justin $" +
+        "$DateTime: 2002/06/10 16:20:30 $";
 
-    private static Category s_log =
-        Category.getInstance(Element.class.getName());
-    /* Used to log errors when creating new Elements */
+    private static Category s_log = Category.getInstance
+        (Element.class.getName());
 
     protected org.w3c.dom.Element m_element;
     /* DOM element that is being wrapped */
@@ -255,9 +257,11 @@ public class Element {
         StringBuffer result = new StringBuffer();
 
         org.w3c.dom.NodeList nl = m_element.getChildNodes();
+
         for (int i = 0; i < nl.getLength(); i++) { 
             org.w3c.dom.Node n = nl.item(i);
-            if ( n.getNodeType() == org.w3c.dom.Node.TEXT_NODE ) {
+
+            if (n.getNodeType() == org.w3c.dom.Node.TEXT_NODE) {
                 result.append(((org.w3c.dom.Text) n).getData());
             }
         }
@@ -266,6 +270,8 @@ public class Element {
     }
 
     public Element setCDATASection(String cdata) {
+        s_log.debug("Setting CDATA section to '" + cdata + "'.");
+
         if (cdata == null) {
             cdata = "";
         }
@@ -276,6 +282,26 @@ public class Element {
         m_element.appendChild(cdataSection);
 
         return this;
+    }
+
+    public String getCDATASection() {
+        StringBuffer result = new StringBuffer();
+
+        org.w3c.dom.NodeList nl = m_element.getChildNodes();
+
+        for (int i = 0; i < nl.getLength(); i++) { 
+            org.w3c.dom.Node n = nl.item(i);
+
+            if (n.getNodeType() == org.w3c.dom.Node.CDATA_SECTION_NODE) {
+                result.append(((org.w3c.dom.CDATASection) n).getData());
+            }
+        }
+
+        String str = result.toString();
+
+        s_log.debug("Fetched this from CDATA section: " + str);
+
+        return str;
     }
 
     /**
