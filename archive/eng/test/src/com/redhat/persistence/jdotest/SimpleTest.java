@@ -5,7 +5,7 @@ public class SimpleTest extends AbstractCase {
         String eName = "seb";
         String dName = "ASR";
 
-        Employee e = new Employee(id(), eName, new Department(id(), dName));
+        Employee e = new Employee(eName, new Department(dName));
         m_pm.makePersistent(e);
         Object eId = m_pm.getObjectId(e);
         assertNotNull("null object identifier", eId);
@@ -25,7 +25,7 @@ public class SimpleTest extends AbstractCase {
 
     public void testNullRef() {
         String eName = "nullRefEmp";
-        Employee e = new Employee(id(), eName, null);
+        Employee e = new Employee(eName, null);
         m_pm.makePersistent(e);
         Object eId = m_pm.getObjectId(e);
         assertNotNull("null object identifier", eId);

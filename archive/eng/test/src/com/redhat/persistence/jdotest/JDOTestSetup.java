@@ -49,6 +49,7 @@ public class JDOTestSetup extends TestSetup {
         Connection conn = Connections.acquire
             (s_pmf.getConnectionURL());
         Schema.load(root, conn);
+        conn.createStatement().execute("create sequence jdotest_seq");
         conn.commit();
     }
 
@@ -59,6 +60,7 @@ public class JDOTestSetup extends TestSetup {
         Connection conn = Connections.acquire
             (s_pmf.getConnectionURL());
         Schema.unload(root, conn);
+        conn.createStatement().execute("drop sequence jdotest_seq");
         conn.commit();
     }
 }

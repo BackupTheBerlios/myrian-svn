@@ -16,6 +16,14 @@ public class PersistenceManagerImpl implements PersistenceManager {
 
     static final String ATTR_NAME = PersistenceManagerImpl.class.getName();
 
+    /**
+     * For new objects, a dataquery matching the name of the type with this
+     * constant appended will be used to retrieve a new id value. If the data
+     * query is not found, it is assumed the id properties are set and stored
+     * in the PC instance.
+     */
+    public static final String ID_GEN = "$Gen";
+
     private Session m_ssn;
     private Transaction m_txn = new TransactionImpl(this);
     private Object m_userObject = null;
@@ -57,23 +65,40 @@ public class PersistenceManagerImpl implements PersistenceManager {
         PropertyMap pmap = new PropertyMap(type);
         Class cls = pc.getClass();
 
-        try {
-            BaseStateManager smTemp = new BaseStateManager();
-            pc.jdoReplaceStateManager(smTemp);
+        Root root = m_ssn.getRoot();
+        ObjectType gen = root.getObjectType(type.getQualifiedName() + ID_GEN);
 
-            List props = C.getAllFields(cls);
-            for (int i = 0; i < props.size(); i++) {
-                String propName = (String) props.get(i);
-                Property prop = type.getProperty(propName);
-                if (prop.isKeyProperty()) {
-                    pmap.put(prop, smTemp.provideField(pc, i));
+        if (gen != null) {
+            DataSet ds = m_ssn.getDataSet(gen);
+            Cursor c = ds.getCursor();
+            if (c.next()) {
+                for (Iterator it = type.getKeyProperties().iterator();
+                     it.hasNext(); ) {
+                    Property prop = (Property) it.next();
+                    Object value = c.get(prop.getName());
+                    pmap.put(prop, value);
                 }
             }
+            c.close();
+        } else {
+            try {
+                BaseStateManager smTemp = new BaseStateManager();
+                pc.jdoReplaceStateManager(smTemp);
 
-            return pmap;
-        } finally {
-            pc.jdoReplaceStateManager(null);
+                List props = C.getAllFields(cls);
+                for (int i = 0; i < props.size(); i++) {
+                    String propName = (String) props.get(i);
+                    Property prop = type.getProperty(propName);
+                    if (prop.isKeyProperty()) {
+                        pmap.put(prop, smTemp.provideField(pc, i));
+                    }
+                }
+            } finally {
+                pc.jdoReplaceStateManager(null);
+            }
         }
+
+        return pmap;
     }
 
     // XXX: temporary hack to make PandoraTest compile.  Will revert to
@@ -291,7 +316,9 @@ public class PersistenceManagerImpl implements PersistenceManager {
                         Collection c = (Collection) value;
                         for (Iterator vals = c.iterator(); vals.hasNext(); ) {
                             Object val = vals.next();
-                            makePersistent(val);
+                            if (val instanceof PersistenceCapable) {
+                                makePersistent(val);
+                            }
                             m_ssn.add(obj, prop, val);
                         }
                     } else {

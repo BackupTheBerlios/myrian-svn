@@ -45,3 +45,4 @@
    object creation
  * deal with subtle key ordering issues that can happen when multiple
    places in PDL try to define the same primary key in opposite orders
+ * move IdentityAdapter to somewhere more generic than test/src/.../oql
