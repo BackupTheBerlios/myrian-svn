@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/versioning/index-vc_transactions.sql#3 $
--- $DateTime: 2003/02/13 14:09:25 $
+-- $Id: //core-platform/dev/sql/default/versioning/index-vc_transactions.sql#4 $
+-- $DateTime: 2003/08/15 13:46:34 $
 
 create index vc_transactions_master_id_idx on vc_transactions(master_id);
 create index vc_transactions_tstamp_idx on vc_transactions(timestamp);

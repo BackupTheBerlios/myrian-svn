@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -27,12 +27,12 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *              inheritance.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/07/09 $
+ * @version $Revision: #9 $ $Date: 2003/08/15 $
  */
 
 public interface DataObject {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObject.java#8 $ by $Author: ashah $, $DateTime: 2003/07/09 12:47:27 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObject.java#9 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     /**
      * Returns the type of this persistent object.

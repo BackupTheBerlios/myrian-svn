@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -24,14 +24,14 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao
- * @version $Revision: #15 $ $Date: 2002/12/11 $
+ * @version $Revision: #16 $ $Date: 2003/08/15 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: dennis $ - $Date: 2002/12/11 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#15 $";
+    public static final String versionId = "$Author: dennis $ - $Date: 2003/08/15 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#16 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);

@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/kernel/view-ungranted_trans_context_map.sql#3 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/kernel/view-ungranted_trans_context_map.sql#4 $
+-- $DateTime: 2003/08/15 13:46:34 $
 
 create view ungranted_trans_context_map
 as select o.object_id, map.implied_context_id, n_generations+1 as n_generations

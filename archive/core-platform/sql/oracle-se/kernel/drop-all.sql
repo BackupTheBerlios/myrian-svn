@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/oracle-se/kernel/drop-all.sql#4 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/oracle-se/kernel/drop-all.sql#5 $
+-- $DateTime: 2003/08/15 13:46:34 $
 
 
 
@@ -23,7 +23,7 @@
 --
 -- @author Bryan Quinn (bquinn@arsdigita.com) 
 -- @creation-date July 22, 2001 17:29:09
--- @cvs-id $Id: //core-platform/dev/sql/oracle-se/kernel/drop-all.sql#4 $
+-- @cvs-id $Id: //core-platform/dev/sql/oracle-se/kernel/drop-all.sql#5 $
 
 begin
    ctx_ddl.drop_section_group('autogroup');

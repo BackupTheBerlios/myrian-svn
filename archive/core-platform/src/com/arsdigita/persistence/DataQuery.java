@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -53,12 +53,12 @@ import java.util.Map;
  * </pre>
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/08/14 $
+ * @version $Revision: #10 $ $Date: 2003/08/15 $
  */
 
 public interface DataQuery {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQuery.java#9 $ by $Author: rhs $, $DateTime: 2003/08/14 12:29:10 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQuery.java#10 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     /**
      * Returns the type of this data query.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -28,8 +28,8 @@ import junit.framework.TestSuite;
  *
  *
  * @author Michael Bryzek
- * @date $Date: 2002/12/11 $
- * @version $Revision: #5 $
+ * @date $Date: 2003/08/15 $
+ * @version $Revision: #6 $
  *
  * @see com.arsdigita.persistence.Initializer
  **/
@@ -37,7 +37,7 @@ import junit.framework.TestSuite;
 public class InitializerTest extends TestCase
 {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/InitializerTest.java#5 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/InitializerTest.java#6 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     /**
      * Constructor (needed for JTest)

@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,7 +11,7 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/globalization/index-g11n_charsets.sql#2 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/globalization/index-g11n_charsets.sql#3 $
+-- $DateTime: 2003/08/15 13:46:34 $
 
 create unique index g11n_charsets_charset_idx on g11n_charsets (charset);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * Should be subclassed with database-specific initialization.
  *
  * @author David Eison
- * @version $Revision: #7 $
+ * @version $Revision: #8 $
  * @since 4.6
  */
 public abstract class DbExceptionHandlerBaseImpl implements DbExceptionHandler {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DbExceptionHandlerBaseImpl.java#7 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DbExceptionHandlerBaseImpl.java#8 $";
 
     private static final Logger s_cat = Logger.getLogger(DbExceptionHandlerBaseImpl.class.getName());
 

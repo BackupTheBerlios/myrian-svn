@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -34,12 +34,12 @@ import org.apache.log4j.Logger;
  *
  * @see Initializer
  * @author Archit Shah 
- * @version $Revision: #10 $ $Date: 2003/07/08 $
+ * @version $Revision: #11 $ $Date: 2003/08/15 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#10 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#11 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     private static String s_url = null;           // the jdbc URL
     private static String s_username = null;      // the database username

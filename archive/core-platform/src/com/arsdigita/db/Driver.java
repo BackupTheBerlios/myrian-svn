@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -25,12 +25,12 @@ import java.util.Properties;
  * a "real" implementation of java.sql.Driver
  *
  * @author Mark Thomas
- * @version $Revision: #5 $ $Date: 2002/12/11 $
+ * @version $Revision: #6 $ $Date: 2003/08/15 $
  * @since 4.5
  */
 class Driver implements java.sql.Driver {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Driver.java#5 $ $Author: dennis $ $Date: 2002/12/11 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Driver.java#6 $ $Author: dennis $ $Date: 2003/08/15 $";
 
     // The Driver object we wrap
     private java.sql.Driver driver;

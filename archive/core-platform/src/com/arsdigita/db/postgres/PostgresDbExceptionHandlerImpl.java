@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -23,12 +23,12 @@ import com.arsdigita.db.DbExceptionHandlerBaseImpl;
  * Class for processing of Postgres DB Exceptions.
  *
  * @author David Eison
- * @version $Revision: #10 $
+ * @version $Revision: #11 $
  * @since 4.6
  */
 public class PostgresDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresDbExceptionHandlerImpl.java#10 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresDbExceptionHandlerImpl.java#11 $";
 
     static {
         errors.put("Cannot insert a duplicate key into unique index",

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -26,12 +26,12 @@ import org.apache.log4j.*;
  * MetaTest
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #9 $ $Date: 2003/05/12 $
+ * @version $Revision: #10 $ $Date: 2003/08/15 $
  */
 
 public class MetaTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/MetaTest.java#9 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/MetaTest.java#10 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
     private static final Logger s_log =
         Logger.getLogger(MetaTest.class.getName());
     static  {

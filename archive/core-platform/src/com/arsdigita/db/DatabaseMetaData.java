@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -23,12 +23,12 @@ import java.sql.SQLException;
  * that wraps a "real" implementation of java.sql.DatabaseMetaData
  *
  * @author Mark Thomas
- * @version $Revision: #5 $ $Date: 2002/12/11 $
+ * @version $Revision: #6 $ $Date: 2003/08/15 $
  * @since 4.5
  */
 public class DatabaseMetaData implements java.sql.DatabaseMetaData {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DatabaseMetaData.java#5 $ $Author: dennis $ $Date: 2002/12/11 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DatabaseMetaData.java#6 $ $Author: dennis $ $Date: 2003/08/15 $";
 
     // the object we wrap
     private java.sql.DatabaseMetaData m_metaData;

@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,15 +11,15 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/test/sql/postgres/persistence/data-query-test.sql#6 $
--- $DateTime: 2003/06/27 17:35:31 $
+-- $Id: //core-platform/dev/test/sql/postgres/persistence/data-query-test.sql#7 $
+-- $DateTime: 2003/08/15 13:46:34 $
 
 
 --
 -- This file contains the data model for the data query test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #6 $ $Date: 2003/06/27 $
+-- @version $Revision: #7 $ $Date: 2003/08/15 $
 --
 
 create table t_data_query (
@@ -141,4 +141,3 @@ begin
    return v_priority;
 end;
 ' LANGUAGE 'plpgsql';
-

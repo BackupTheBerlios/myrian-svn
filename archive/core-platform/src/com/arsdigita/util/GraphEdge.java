@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -21,7 +21,7 @@ package com.arsdigita.util;
  * @author Archit Shah (ashah@mit.edut)
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-01-22
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/08/15 $
  **/
 public final class GraphEdge implements Graph.Edge {
     private Object m_tail;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
 
 public class Sequences {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Sequences.java#5 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Sequences.java#6 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     private static final Logger s_log =
         Logger.getLogger(Sequences.class);

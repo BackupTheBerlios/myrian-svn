@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -24,12 +24,12 @@ import java.util.Set;
  *  Dummy ServletContext object for unit testing of form methods that
  *  include requests in their signatures.
  *
- * @version $Revision: #6 $ $Date: 2003/05/01 $
+ * @version $Revision: #7 $ $Date: 2003/08/15 $
  */
 
 public class DummyServletContext implements ServletContext {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/DummyServletContext.java#6 $ by $Author: jorris $, $DateTime: 2003/05/01 09:02:57 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/DummyServletContext.java#7 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     private HashMap m_attributes = new HashMap();
     private HashMap m_dispachers = new HashMap();

@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.redhat.com/licenses/ccmpl.html
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
+
 package com.redhat.persistence.engine.rdbms;
 
 import com.redhat.persistence.*;
@@ -13,12 +28,12 @@ import java.io.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/07/19 $
+ * @version $Revision: #5 $ $Date: 2003/08/15 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#4 $ by $Author: rhs $, $DateTime: 2003/07/19 20:26:22 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#5 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();

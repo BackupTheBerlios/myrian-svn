@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -31,7 +31,7 @@ import java.util.Iterator;
  **/
 public class Utilities  {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Utilities.java#6 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Utilities.java#7 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     public final static String LINE_BREAK =
         System.getProperty("line.separator", "\n\r");

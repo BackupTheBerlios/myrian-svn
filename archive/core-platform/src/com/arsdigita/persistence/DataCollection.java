@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -57,7 +57,7 @@ import java.sql.*;
  *   </pre>
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2003/08/15 $
  *
  * @see com.arsdigita.persistence.SessionManager
  * @see com.arsdigita.persistence.Session
@@ -67,7 +67,7 @@ import java.sql.*;
 
 public interface DataCollection extends DataQuery {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataCollection.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataCollection.java#4 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     /**
      * Returns a data object for the current position in the collection.

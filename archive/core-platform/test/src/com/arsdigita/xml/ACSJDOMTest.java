@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -24,7 +24,7 @@ import javax.xml.transform.stream.*;
 
 public class ACSJDOMTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/xml/ACSJDOMTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/xml/ACSJDOMTest.java#4 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     public static final String BEBOP_XML_NS =
         "http://www.arsdigita.com/bebop/1.0";

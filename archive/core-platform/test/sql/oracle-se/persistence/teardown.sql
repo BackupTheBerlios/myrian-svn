@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/test/sql/oracle-se/persistence/teardown.sql#12 $
--- $DateTime: 2003/02/19 22:26:51 $
+-- $Id: //core-platform/dev/test/sql/oracle-se/persistence/teardown.sql#13 $
+-- $DateTime: 2003/08/15 13:46:34 $
 
 
 --
@@ -20,7 +20,7 @@
 -- tests to run.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #12 $ $Date: 2003/02/19 $
+-- @version $Revision: #13 $ $Date: 2003/08/15 $
 --
 
 -- Right now this is duplicated from the individual files. This should
@@ -42,5 +42,3 @@ drop procedure DataOperationProcWithDates;
 drop procedure DataOperationProcedureWithArgs;
 drop procedure PLSQLWithArbitraryArgs;
 drop procedure DataOperationProcedureOneArg;
-
-

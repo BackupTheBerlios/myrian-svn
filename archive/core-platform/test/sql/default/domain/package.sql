@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/test/sql/default/domain/package.sql#4 $
--- $DateTime: 2002/12/11 13:49:53 $
+-- $Id: //core-platform/dev/test/sql/default/domain/package.sql#5 $
+-- $DateTime: 2003/08/15 13:46:34 $
 
 
 --
@@ -20,7 +20,7 @@
 -- test cases.
 --
 -- @author Jon Orris
--- @version $Revision: #4 $ $Date: 2002/12/11 $
+-- @version $Revision: #5 $ $Date: 2003/08/15 $
 --
 
 create table t_package (

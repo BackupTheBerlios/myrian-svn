@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2003, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/upgrade/oracle-se-5.2.1-6.0.0.sql#9 $
--- $DateTime: 2003/08/12 19:06:12 $
+-- $Id: //core-platform/dev/sql/upgrade/oracle-se-5.2.1-6.0.0.sql#10 $
+-- $DateTime: 2003/08/15 13:46:34 $
 
 PROMPT Red Hat WAF 5.2.1 -> 6.0.0 Upgrade Script (Oracle)
 

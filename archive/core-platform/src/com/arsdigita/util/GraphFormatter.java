@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -19,7 +19,7 @@ package com.arsdigita.util;
  * Implementations of this interface can be used for pretty-printing graphs.
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/07/31 $
+ * @version $Date: 2003/08/15 $
  * @since 2003-01-23
  **/
 public interface GraphFormatter {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -23,12 +23,12 @@ import com.redhat.persistence.common.*;
  * link.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/07/08 $
+ * @version $Revision: #12 $ $Date: 2003/08/15 $
  **/
 
 public class Association extends ModelElement {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Association.java#11 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Association.java#12 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     private Property m_roleOne;
     private Property m_roleTwo;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -33,11 +33,11 @@ import org.apache.log4j.Logger;
  * </p>
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Revision: #6 $ $Date: 2003/07/22 $
+ * @version $Revision: #7 $ $Date: 2003/08/15 $
  */
 public abstract class HierarchyDenormalization {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/HierarchyDenormalization.java#6 $ by $Author: ashah $, $DateTime: 2003/07/22 13:40:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/HierarchyDenormalization.java#7 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     private final static Logger s_log =
         Logger.getLogger(HierarchyDenormalization.class);

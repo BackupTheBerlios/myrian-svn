@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -24,12 +24,12 @@ import com.arsdigita.dispatcher.RequestContext;
  *  Dummy RequestContext object for unit testing of form methods that
  *  include requests in their signatures.
  *
- * @version $Revision: #2 $ $Date: 2002/12/11 $
+ * @version $Revision: #3 $ $Date: 2003/08/15 $
  */
 
 public class DummyRequestContext implements RequestContext {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/DummyRequestContext.java#2 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/DummyRequestContext.java#3 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     private ServletContext m_servletContext;
     private HttpServletRequest m_request;

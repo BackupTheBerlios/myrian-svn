@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -24,12 +24,12 @@ import java.util.*;
  * ObjectTree
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/07 $
+ * @version $Revision: #3 $ $Date: 2003/08/15 $
  **/
 
 public class ObjectTree {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/ObjectTree.java#2 $ by $Author: dennis $, $DateTime: 2003/01/07 14:51:38 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/ObjectTree.java#3 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     private ObjectType m_type;
     private ObjectTree m_parent;

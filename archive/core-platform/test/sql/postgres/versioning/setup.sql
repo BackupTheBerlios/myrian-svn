@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,15 +11,15 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/test/sql/postgres/versioning/setup.sql#2 $
--- $DateTime: 2002/10/16 14:12:35 $
+-- $Id: //core-platform/dev/test/sql/postgres/versioning/setup.sql#3 $
+-- $DateTime: 2003/08/15 13:46:34 $
 
 
 --
 -- This file contains the data model for the versioning tests
 --
 -- @author <a href="mailto:jbank@mit.edu">jbank@arsdigita.com</a>
--- @version $Revision: #2 $ $Date: 2002/10/16 $
+-- @version $Revision: #3 $ $Date: 2003/08/15 $
 --
 
 create table t_versioned_datatypes (

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -20,12 +20,12 @@ package com.arsdigita.persistence;
  * This manipulates SQL in a way that is specific to Postgres.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/05/12 $
+ * @version $Revision: #5 $ $Date: 2003/08/15 $
  */
 
 class PostgresSQLUtilities implements SQLUtilities  {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/PostgresSQLUtilities.java#4 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/PostgresSQLUtilities.java#5 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     /**
      *  This method takes a comparator (e.g. =, <=, >=, !=, <>)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -39,13 +39,13 @@ import org.apache.log4j.Logger;
  * that wraps a "real" implementation of java.sql.CallableStatement
  *
  * @author Mark Thomas
- * @version $Revision: #7 $ $Date: 2002/12/11 $
+ * @version $Revision: #8 $ $Date: 2003/08/15 $
  * @since 4.5
  */
 public class PreparedStatement extends com.arsdigita.db.Statement
     implements java.sql.PreparedStatement {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/PreparedStatement.java#7 $ $Author: dennis $ $Date: 2002/12/11 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/PreparedStatement.java#8 $ $Author: dennis $ $Date: 2003/08/15 $";
 
     private static final Logger s_cat =
         Logger.getLogger(PreparedStatement.class);

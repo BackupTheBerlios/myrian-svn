@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -24,12 +24,12 @@ import java.util.*;
  * Associations.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/07/08 $
+ * @version $Revision: #7 $ $Date: 2003/08/15 $
  */
 
 public class Model extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Model.java#6 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Model.java#7 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     static Model wrap(Root root,
 		      com.redhat.persistence.metadata.Model model) {

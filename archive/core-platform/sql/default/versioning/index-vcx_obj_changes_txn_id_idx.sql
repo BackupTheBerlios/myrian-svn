@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2003, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/versioning/index-vcx_obj_changes_txn_id_idx.sql#1 $
--- $DateTime: 2003/08/13 14:00:34 $
+-- $Id: //core-platform/dev/sql/default/versioning/index-vcx_obj_changes_txn_id_idx.sql#2 $
+-- $DateTime: 2003/08/15 13:46:34 $
 
 -- index foreign keys
 create index vcx_obj_changes_txn_id_idx on vcx_obj_changes(txn_id);

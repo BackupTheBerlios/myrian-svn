@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -39,7 +39,7 @@ import com.arsdigita.util.Assert;
  * @author Archit Shah (ashah@mit.edut)
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-01-22
- * @version $Date: 2003/07/31 $
+ * @version $Date: 2003/08/15 $
  **/
 public class GraphSet implements Graph {
     private final static String LINE_SEP = System.getProperty("line.separator");

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -24,10 +24,10 @@ import junit.framework.TestCase;
  * PersistenceSuite
  *
  * @author Jon Orris
- * @version $Revision: #7 $ $Date: 2003/02/19 $
+ * @version $Revision: #8 $ $Date: 2003/08/15 $
  */
 public class PersistenceSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceSuite.java#7 $ by $Author: jorris $, $DateTime: 2003/02/19 22:26:51 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceSuite.java#8 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     public PersistenceSuite() {
         super();

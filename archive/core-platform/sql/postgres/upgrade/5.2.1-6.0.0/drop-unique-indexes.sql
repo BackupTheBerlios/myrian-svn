@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2003, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres/upgrade/5.2.1-6.0.0/drop-unique-indexes.sql#1 $
--- $DateTime: 2003/08/14 19:42:42 $
+-- $Id: //core-platform/dev/sql/postgres/upgrade/5.2.1-6.0.0/drop-unique-indexes.sql#2 $
+-- $DateTime: 2003/08/15 13:46:34 $
 
 drop index apm_listen_liste_class_u_cr5q1;
 drop index apm_pac_typ_pre_plural_u_kqgl6;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -33,7 +33,7 @@ public class Initializer
 
     private Configuration m_conf = new Configuration();
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#14 $ by $Author: dennis $, $DateTime: 2002/12/11 12:02:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#15 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     public static final String JDBC_URL = "jdbcUrl";
     public static final String DB_USERNAME = "dbUsername";

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -29,7 +29,7 @@ import java.util.Enumeration;
 
 public class ServletUtils {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/ServletUtils.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/ServletUtils.java#4 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     private ServletUtils() { }
 

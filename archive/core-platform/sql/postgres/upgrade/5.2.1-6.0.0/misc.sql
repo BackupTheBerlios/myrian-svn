@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres/upgrade/5.2.1-6.0.0/misc.sql#4 $
--- $DateTime: 2003/08/15 00:21:06 $
+-- $Id: //core-platform/dev/sql/postgres/upgrade/5.2.1-6.0.0/misc.sql#5 $
+-- $DateTime: 2003/08/15 13:46:34 $
 
 drop function last_attr_value(varchar,integer);
 

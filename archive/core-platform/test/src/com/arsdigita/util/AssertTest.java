@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -19,9 +19,9 @@ import junit.framework.TestCase;
 
 public class AssertTest extends TestCase {
     public static final String versionId =
-        "$Id: //core-platform/dev/test/src/com/arsdigita/util/AssertTest.java#5 $" +
-        "$Author: vadim $" +
-        "$DateTime: 2003/05/21 16:45:33 $";
+        "$Id: //core-platform/dev/test/src/com/arsdigita/util/AssertTest.java#6 $" +
+        "$Author: dennis $" +
+        "$DateTime: 2003/08/15 13:46:34 $";
 
     public AssertTest(String name) {
         super(name);

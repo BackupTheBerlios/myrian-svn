@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/default/formbuilder/comment-bebop_process_listeners.sql#2 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/default/formbuilder/comment-bebop_process_listeners.sql#3 $
+-- $DateTime: 2003/08/15 13:46:34 $
 
 comment on table bebop_process_listeners is '
   This table contains the persistent data for process listeners

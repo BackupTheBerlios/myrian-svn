@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2003 ArsDigita Corporation. All Rights Reserved.
  *
  * The contents of this file are subject to the ArsDigita Public 
  * License (the "License"); you may not use this file except in

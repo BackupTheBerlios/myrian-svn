@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/oracle-se/templating/acs-templating-drop.sql#3 $
--- $DateTime: 2002/10/16 14:12:35 $
+-- $Id: //core-platform/dev/sql/oracle-se/templating/acs-templating-drop.sql#4 $
+-- $DateTime: 2003/08/15 13:46:34 $
 
 
 -- Uninstall file for the data model created by 'acs-templating-create.sql'
@@ -20,7 +20,7 @@
 --
 -- brech (Mon Aug 28 11:04:55 2000)
 --
--- $Id: //core-platform/dev/sql/oracle-se/templating/acs-templating-drop.sql#3 $
+-- $Id: //core-platform/dev/sql/oracle-se/templating/acs-templating-drop.sql#4 $
 --
 
 @@ demo-drop

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -28,14 +28,14 @@ import org.w3c.dom.Attr;
  * <code>org.jdom.Element</code> using <code>org.w3c.dom.Element</code>.
  *
  * @author Patrick McNeill 
- * @version $Revision: #10 $ $Date: 2003/06/02 $
+ * @version $Revision: #11 $ $Date: 2003/08/15 $
  * @since ACS 4.5a
  */
 public class Element {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#10 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/06/02 15:00:59 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#11 $" +
+        "$Author: dennis $" +
+        "$DateTime: 2003/08/15 13:46:34 $";
 
     private static final Logger s_log = Logger.getLogger
         (Element.class.getName());

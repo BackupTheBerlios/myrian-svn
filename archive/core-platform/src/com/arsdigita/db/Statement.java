@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -54,12 +54,12 @@ import java.io.StringWriter;
  * </ul>
  *
  * @author Mark Thomas
- * @version $Revision: #10 $ $Date: 2003/05/23 $
+ * @version $Revision: #11 $ $Date: 2003/08/15 $
  * @since 4.5
  */
 public class Statement implements java.sql.Statement, ResultSetEventListener {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Statement.java#10 $ $Author: vadim $ $Date: 2003/05/23 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Statement.java#11 $ $Author: dennis $ $Date: 2003/08/15 $";
 
     private static final java.util.Set dbgStatements = new java.util.HashSet();
 

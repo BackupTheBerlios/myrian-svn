@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -30,12 +30,12 @@ import java.sql.SQLException;
  * (normally this is called via the DB Initializer).
  *
  * @author David Eison
- * @version $Revision: #9 $
+ * @version $Revision: #10 $
  * @since 4.6
  */
 public class SQLExceptionHandler {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/SQLExceptionHandler.java#9 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/SQLExceptionHandler.java#10 $";
 
     private static String s_exceptionHandlerName = "com.arsdigita.db.oracle.OracleDbExceptionHandlerImpl";
 

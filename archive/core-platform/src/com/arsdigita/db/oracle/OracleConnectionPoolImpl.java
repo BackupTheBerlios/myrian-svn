@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
  * Connection pooling class using Oracle implementation.
  *
  * @author David Dao
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#10 $ $DateTime: 2002/12/11 13:49:53 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#11 $ $DateTime: 2003/08/15 13:46:34 $
  * @since
  *
  */
@@ -36,8 +36,8 @@ import org.apache.log4j.Logger;
 public class OracleConnectionPoolImpl extends BaseConnectionPool {
 
     public static final String versionId = "$Author: dennis $ " +
-        "- $Date: 2002/12/11 $ " + 
-        "$Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#10 $";
+        "- $Date: 2003/08/15 $ " + 
+        "$Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#11 $";
 
     private static final Logger cat = Logger.getLogger(OracleConnectionPoolImpl.class.getName());
 

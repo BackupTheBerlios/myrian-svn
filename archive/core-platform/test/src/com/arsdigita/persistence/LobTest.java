@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -33,12 +33,12 @@ import org.apache.log4j.Logger;
  * LobTest - for testing Blob and Clob datatype.
  *
  * @author Jeff Teeters 
- * @version $Revision: #12 $ $Date: 2003/07/01 $
+ * @version $Revision: #13 $ $Date: 2003/08/15 $
  */
 
 public class LobTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LobTest.java#12 $ by $Author: ashah $, $DateTime: 2003/07/01 14:52:01 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LobTest.java#13 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     private Logger s_cat =
         Logger.getLogger(LobTest.class);

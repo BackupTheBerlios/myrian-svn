@@ -25,4 +25,3 @@ sqlplus
 
 But this should only be done when the server is not running, otherwise
 there could be conflicts with automatic rebuilds.
-

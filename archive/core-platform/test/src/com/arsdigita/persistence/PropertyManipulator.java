@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -40,11 +40,11 @@ import org.apache.log4j.*;
  * for common cases as Attribute Properties, Key Properties, etc.
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #5 $ $Date: 2003/07/01 $
+ * @version $Revision: #6 $ $Date: 2003/08/15 $
  */
 public class PropertyManipulator {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PropertyManipulator.java#5 $ by $Author: ashah $, $DateTime: 2003/07/01 13:40:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PropertyManipulator.java#6 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
     private static final Logger s_log =
         Logger.getLogger(PropertyManipulator.class.getName());
     static  {

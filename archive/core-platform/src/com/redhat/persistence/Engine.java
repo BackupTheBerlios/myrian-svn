@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -19,12 +19,12 @@ package com.redhat.persistence;
  * Engine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/07/08 $
+ * @version $Revision: #2 $ $Date: 2003/08/15 $
  **/
 
 public abstract class Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Engine.java#1 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Engine.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     protected abstract void write(Event ev);
     protected abstract void flush();

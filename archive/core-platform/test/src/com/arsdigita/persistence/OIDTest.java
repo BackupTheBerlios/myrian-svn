@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -28,15 +28,15 @@ import org.apache.log4j.Logger;
  *
  *
  * @author Michael Bryzek
- * @date $Date: 2003/06/30 $
- * @version $Revision: #8 $
+ * @date $Date: 2003/08/15 $
+ * @version $Revision: #9 $
  *
  * @see com.arsdigita.persistence.OID
  **/
 
 public class OIDTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OIDTest.java#8 $ by $Author: ashah $, $DateTime: 2003/06/30 17:31:41 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OIDTest.java#9 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     private static Logger s_log =
         Logger.getLogger(OIDTest.class.getName());

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -21,13 +21,13 @@ import org.apache.log4j.Logger;
 
 /**
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Record.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Record.java#4 $
  */
 public abstract class Record {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/Record.java#3 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/03/28 11:40:45 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/Record.java#4 $" +
+        "$Author: dennis $" +
+        "$DateTime: 2003/08/15 13:46:34 $";
 
     private static final Logger s_log = Logger.getLogger(Record.class);
 

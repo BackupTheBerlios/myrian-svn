@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -78,12 +78,12 @@ import java.util.Map;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/05/12 $
+ * @version $Revision: #6 $ $Date: 2003/08/15 $
  */
 
 public interface Filter {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/Filter.java#5 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/Filter.java#6 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     // this string is used as the namespace for the bind variables
     String FILTER = "__FILTERPARAMS__";

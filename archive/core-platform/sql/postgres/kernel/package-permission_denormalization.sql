@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres/kernel/package-permission_denormalization.sql#6 $
--- $DateTime: 2003/05/09 15:13:15 $
+-- $Id: //core-platform/dev/sql/postgres/kernel/package-permission_denormalization.sql#7 $
+-- $DateTime: 2003/08/15 13:46:34 $
 
 
   create or replace function permissions_add_context (

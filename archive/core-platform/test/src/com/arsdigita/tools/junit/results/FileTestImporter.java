@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -21,7 +21,7 @@ import java.util.Map;
  *  FileTestImporter
  *
  *  @author <a href="mailto:jorris@redhat.com">Jon Orris</a>
- *  @version $Revision: #2 $ $Date Nov 6, 2002 $
+ *  @version $Revision: #3 $ $Date Nov 6, 2002 $
  */
 public class FileTestImporter implements BaselineTestImporter {
 

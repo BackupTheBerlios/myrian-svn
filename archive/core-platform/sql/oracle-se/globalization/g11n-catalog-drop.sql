@@ -1,5 +1,5 @@
 --
--- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+-- Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
 --
 -- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
@@ -11,15 +11,15 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/oracle-se/globalization/g11n-catalog-drop.sql#3 $
--- $DateTime: 2002/10/16 14:12:35 $
+-- $Id: //core-platform/dev/sql/oracle-se/globalization/g11n-catalog-drop.sql#4 $
+-- $DateTime: 2003/08/15 13:46:34 $
 
 
 --
 -- Drop message catalog.
 --
 -- @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
--- @version $Id: //core-platform/dev/sql/oracle-se/globalization/g11n-catalog-drop.sql#3 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/globalization/g11n-catalog-drop.sql#4 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $
 --
 
 drop table g11n_catalogs;

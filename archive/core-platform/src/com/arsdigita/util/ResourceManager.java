@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -42,7 +42,7 @@ public class ResourceManager {
     private File m_webappRoot;
     private ServletContext m_servletContext;
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/ResourceManager.java#7 $ by $Author: jorris $, $DateTime: 2003/03/11 16:57:51 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/ResourceManager.java#8 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
 
     /**
      * Empty constructor, which we make private to enforce the singleton
