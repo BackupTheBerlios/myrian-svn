@@ -26,12 +26,12 @@ import java.util.*;
  * the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/07/09 $
+ * @version $Revision: #3 $ $Date: 2003/07/29 $
  */
 
 public class Column extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Column.java#2 $ by $Author: ashah $, $DateTime: 2003/07/09 12:34:39 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Column.java#3 $ by $Author: rhs $, $DateTime: 2003/07/29 16:51:07 $";
 
     /**
      * The name of this Column.
@@ -436,6 +436,11 @@ public class Column extends Element {
 
         if (!m_isNullable) {
             result.append(" not null");
+        }
+
+        if (DbHelper.getDatabase() == DbHelper.DB_ORACLE
+            && m_type == Types.BIT) {
+            result.append(" check(" + m_name + " in ('0', '1'))");
         }
 
         for (Iterator it = m_constraints.iterator(); it.hasNext(); ) {
