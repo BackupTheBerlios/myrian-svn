@@ -2,11 +2,14 @@
 
 model com.arsdigita.portal;
 
+import com.arsdigita.kernel.ApplicationType;
 import com.arsdigita.kernel.ResourceType;
 import com.arsdigita.kernel.Resource;
 
 
 object type PortletType extends ResourceType {
+    ApplicationType[0..1] providerApplicationType =
+        join application_types.provider_id to application_types.application_type_id;
     String profile = application_types.profile VARCHAR(20);
 }
 
