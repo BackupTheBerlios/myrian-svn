@@ -30,12 +30,12 @@ import java.util.List;
  * Script
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/09/09 $
+ * @version $Revision: #6 $ $Date: 2002/09/20 $
  */
 
 public class Script {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Script.java#5 $ by $Author: jorris $, $DateTime: 2002/09/09 17:12:20 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Script.java#6 $ by $Author: dan $, $DateTime: 2002/09/20 11:50:07 $";
 
     private static final Logger s_log =
         Logger.getLogger(Script.class);
@@ -161,10 +161,20 @@ public class Script {
                                               "Startup has already been called."
                                               );
         HashSet initializersRun = new HashSet();
+        boolean loggerIsInitialized = false;
         try {
             for (int i = 0; i < m_initializers.size(); i++) {
                 Initializer ini = (Initializer) m_initializers.get(i);
+                if (loggerIsInitialized) {
+                    s_log.info("Running initializer " + ini.getClass().getName() +
+                               " (" + i + " of " + m_initializers.size() + " complete)");
+                }
+
                 final String name = ini.getClass().getName();
+                if (com.arsdigita.logging.Initializer.class.getName().equals(name)) {
+                    loggerIsInitialized = true;
+                }
+
                 ini.startup();
                 initializersRun.add(name);
                 if (name.equals(iniName))
@@ -172,7 +182,6 @@ public class Script {
             }
 
         } catch(Exception e) {
-            final boolean loggerIsInitialized = initializersRun.contains("com.arsdigita.logging.Initializer");
             logInitializationFailure(loggerIsInitialized, e);
             throw new InitializationException("Initialization Script startup error!", e);
         }
