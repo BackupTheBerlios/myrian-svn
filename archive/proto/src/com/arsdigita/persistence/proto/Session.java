@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #37 $ $Date: 2003/02/27 $
+ * @version $Revision: #38 $ $Date: 2003/02/28 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#37 $ by $Author: ashah $, $DateTime: 2003/02/27 21:02:33 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#38 $ by $Author: ashah $, $DateTime: 2003/02/28 13:50:14 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -208,7 +208,7 @@ public class Session {
             addEvent(new AddEvent(this, target, rev, source, event));
         } else {
             Object old = get(target, rev);
-            if (old != null && !old.equals(source)) {
+            if (old != null) {
                 if (role.isCollection()) {
                     addEvent(new RemoveEvent(this, old, role, target, event));
                 } else {
@@ -240,12 +240,13 @@ public class Session {
 
                     PropertyEvent ev =
                         new SetEvent(Session.this, obj, role, value);
-                    addEvent(ev);
 
                     if (role.isReversable()) {
                         if (old != null) { reverseUpdateOld(ev, old); }
                         if (value != null) { reverseUpdateNew(ev); }
                     }
+
+                    addEvent(ev);
 
                     if (role.isComponent()) {
                         if (old != null) { cascadeDelete(obj, old); }
@@ -328,9 +329,9 @@ public class Session {
                 public void onRole(Role role) {
                     PropertyEvent ev =
                         new AddEvent(Session.this, obj, role, value);
-                    addEvent(ev);
 
                     if (role.isReversable()) { reverseUpdateNew(ev); }
+                    addEvent(ev);
                 }
 
                 public void onAlias(Alias alias) {
@@ -508,10 +509,13 @@ public class Session {
             ep.flush();
         }
 
-        if (LOG.isDebugEnabled()) {
+        if (LOG.isInfoEnabled()) {
             if (m_events.size() > 0) {
-                LOG.error("unflushed: " + m_events.size());
+                LOG.info("unflushed: " + m_events.size());
             }
+        }
+
+        if (LOG.isDebugEnabled()) {
             untrace("flush");
         }
     }
