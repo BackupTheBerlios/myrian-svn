@@ -43,3 +43,12 @@
 - are a == b == c and a > b > c valid in jdoql
 
 - handling non-short-circuiting boolean operators (& and |) in jdoql
+
+- Performance
+  - C.getAllTypes and C.getAllFields should be rewritten such that
+    they their (unmodifiable) lists once and only once, as opposed to
+    recomputing them on every call.
+
+  - make ReflectionAdapter use cglib's Factory interface for efficient
+    object creation
+  
