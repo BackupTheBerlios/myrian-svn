@@ -8,12 +8,12 @@ import java.util.*;
  * Variable
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/02/06 $
+ * @version $Revision: #6 $ $Date: 2004/02/09 $
  **/
 
 public class Variable extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Variable.java#5 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Variable.java#6 $ by $Author: rhs $, $DateTime: 2004/02/09 11:51:40 $";
 
     private String m_name;
 
@@ -86,6 +86,9 @@ public class Variable extends Expression {
             code.table(prop);
             code.append(" ");
             code.append(alias);
+            if (prop.isNullable() && !prop.isCollection()) {
+                code.append(" right");
+            }
             code.append(" join (select 1) " + code.var("d") + " on ");
             code.condition(prop, alias, parent.getColumns());
         } else {

@@ -7,12 +7,12 @@ import java.util.*;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/02/06 $
+ * @version $Revision: #8 $ $Date: 2004/02/09 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#7 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#8 $ by $Author: rhs $, $DateTime: 2004/02/09 11:51:40 $";
 
     private Expression m_expr;
     private String m_name;
@@ -76,15 +76,17 @@ public class Get extends Expression {
             return;
         }
 
+        m_expr.emit(code);
+
         String[] columns = expr.getColumns(prop);
         if (columns == null) {
+            if (prop.isNullable() && !prop.isCollection()) {
+                code.append(" left");
+            }
+            code.append(" join ");
             code.table(prop);
             code.append(" ");
             code.append(alias);
-            code.append(" join ");
-        }
-        m_expr.emit(code);
-        if (columns == null) {
             code.append(" on ");
             code.condition(prop, alias, expr.getColumns());
         }

@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/02/06 $
+ * @version $Revision: #4 $ $Date: 2004/02/09 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#3 $ by $Author: rhs $, $DateTime: 2004/02/06 17:43:00 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#4 $ by $Author: rhs $, $DateTime: 2004/02/09 11:51:40 $";
 
     private Object m_value;
 
@@ -22,13 +22,18 @@ public class Literal extends Expression {
     }
 
     Code.Frame frame(Code code) {
-        Code.Frame frame = code.frame(code.getType(m_value));
+        Code.Frame frame;
+        if (m_value == null) {
+            frame = code.frame(null);
+        } else {
+            frame = code.frame(code.getType(m_value));
+        }
         // XXX: should have option to use bind variables here
         String literal;
         if (m_value instanceof String) {
             literal = quote((String) m_value);
         } else {
-            literal = m_value.toString();
+            literal = "" + m_value;
         }
         frame.setColumns(new String[] { literal });
         code.addVirtual(this);

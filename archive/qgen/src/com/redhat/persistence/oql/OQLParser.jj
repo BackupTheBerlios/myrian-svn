@@ -16,7 +16,7 @@ import java.io.*;
  * OQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2004/02/06 $
+ * @version $Revision: #11 $ $Date: 2004/02/09 $
  */
 
 class OQLParser {
@@ -128,6 +128,7 @@ TOKEN:
   | <DECIMAL: ( "+" | "-" )? (<DIGIT>)* ( "." (<DIGIT>)+ )?
               ( "E" | "e" ) ( "+" | "-" ) (<DIGIT>)+>
   | <BOOLEAN: ( "true" | "false" )>
+  | <NULL: "null">
   | <ID: (<CH>) (<CH>|<DIGIT>)* ( "[]" )?>
         { matchedToken.image = OQLParser.unescape(image.toString()); }
 }
@@ -295,6 +296,8 @@ Expression generic() :
       { return new Literal(new BigDecimal(t.image)); }
   | t = <BOOLEAN>
       { return new Literal(Boolean.valueOf(t.image)); }
+  | t = <NULL>
+      { return new Literal(null); }
   | e = all()
       { return e; }
 }

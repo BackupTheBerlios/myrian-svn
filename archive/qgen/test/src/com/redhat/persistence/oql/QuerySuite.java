@@ -24,12 +24,12 @@ import java.util.*;
  * QuerySuite
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/02/04 $
+ * @version $Revision: #2 $ $Date: 2004/02/09 $
  **/
 
 public class QuerySuite extends TestSuite {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QuerySuite.java#1 $ by $Author: rhs $, $DateTime: 2004/02/04 11:20:32 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QuerySuite.java#2 $ by $Author: rhs $, $DateTime: 2004/02/09 11:51:40 $";
 
     public QuerySuite() {}
 
@@ -263,7 +263,9 @@ public class QuerySuite extends TestSuite {
             } else if (name.equals("row")) {
                 Map row = new HashMap();
                 for (int i = 0; i < attrs.getLength(); i++) {
-                    row.put(attrs.getLocalName(i), attrs.getValue(i));
+                    String value = attrs.getValue(i);
+                    if (value.equals("null")) { value = null; }
+                    row.put(attrs.getLocalName(i), value);
                 }
                 m_results.add(row);
             }

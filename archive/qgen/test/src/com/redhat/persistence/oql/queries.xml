@@ -97,6 +97,7 @@
     <query>query(all(test.Node).parent, id = id)</query>
     <query>query(all(test.StaticNode).parent, id = id)</query>
     <results>
+      <row id="null"/>
       <row id="30"/>
       <row id="30"/>
       <row id="30"/>
@@ -112,6 +113,8 @@
   <test>
     <query>query(filter(all(test.Node), exists(parent)), id = id)</query>
     <query>query(filter(all(test.StaticNode), exists(parent)), id = id)</query>
+    <query>query(filter(all(test.Node), not (parent == null)), id = id)</query>
+    <query>query(filter(all(test.StaticNode), not (parent == null)), id = id)</query>
     <results>
       <row id="31"/>
       <row id="32"/>
