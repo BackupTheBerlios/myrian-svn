@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #17 $ $Date: 2003/10/28 $
+ * @version $Revision: #18 $ $Date: 2003/11/24 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#17 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#18 $ by $Author: ashah $, $DateTime: 2003/11/24 15:35:00 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -168,7 +168,9 @@ class DataObjectImpl implements DataObject {
     }
 
     public com.arsdigita.persistence.Session getSession() {
-        if (isDisconnected()) { return null; }
+        if (isDisconnected()) {
+            return SessionManager.getSession();
+        }
         return com.arsdigita.persistence.Session.getSessionFromProto(getSsn());
     }
 
