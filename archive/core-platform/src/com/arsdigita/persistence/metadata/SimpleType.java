@@ -15,12 +15,6 @@
 
 package com.arsdigita.persistence.metadata;
 
-import java.io.PrintStream;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.Collection;
 
 /**
  * The SimpleType class is the base class for all the primative DataTypes
@@ -28,12 +22,12 @@ import java.util.Collection;
  * the atoms from which compound types are built.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/05/12 $
+ * @version $Revision: #5 $ $Date: 2003/07/07 $
  */
 
 public class SimpleType extends DataType {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/SimpleType.java#4 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/SimpleType.java#5 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
 
     static final SimpleType
 	wrap(com.arsdigita.persistence.proto.metadata.ObjectType obj) {

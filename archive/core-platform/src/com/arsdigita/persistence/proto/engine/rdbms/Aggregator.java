@@ -6,18 +6,17 @@ import com.arsdigita.persistence.proto.metadata.*;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
 
 /**
  * Aggregator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/06/09 $
+ * @version $Revision: #2 $ $Date: 2003/07/07 $
  **/
 
 class Aggregator extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/Aggregator.java#1 $ by $Author: rhs $, $DateTime: 2003/06/09 19:03:29 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/Aggregator.java#2 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
 
     private ArrayList m_nodes = new ArrayList();
     private HashMap m_events = new HashMap();

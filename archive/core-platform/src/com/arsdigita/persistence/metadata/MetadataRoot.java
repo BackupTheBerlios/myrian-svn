@@ -23,19 +23,18 @@ import java.sql.*;
 import java.math.*;
 
 import org.apache.log4j.Logger;
-import com.arsdigita.db.DbHelper;
 
 /**
  * The MetadataRoot is a singleton class that serves as an entry point for the
  * metadata system.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #15 $ $Date: 2003/05/12 $
+ * @version $Revision: #16 $ $Date: 2003/07/07 $
  **/
 
 public class MetadataRoot extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#15 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#16 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
 
     private static final Logger s_cat = Logger.getLogger(MetadataRoot.class.getName());
 

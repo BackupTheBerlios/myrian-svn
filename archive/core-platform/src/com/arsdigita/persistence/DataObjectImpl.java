@@ -1,7 +1,6 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.*;
-import com.arsdigita.persistence.proto.metadata.MetadataException;
 import com.arsdigita.persistence.proto.ProtoException;
 import com.arsdigita.persistence.proto.Session;
 
@@ -12,12 +11,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2003/07/02 $
+ * @version $Revision: #11 $ $Date: 2003/07/07 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#10 $ by $Author: ashah $, $DateTime: 2003/07/02 17:18:32 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#11 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 

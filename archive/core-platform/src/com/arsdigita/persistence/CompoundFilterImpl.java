@@ -17,9 +17,7 @@ package com.arsdigita.persistence;
 
 import java.util.Map;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
-import com.arsdigita.util.Assert;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -27,12 +25,12 @@ import org.apache.log4j.Logger;
  * CompoundFilters are used to AND or OR multiple filters together.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/05/12 $
+ * @version $Revision: #8 $ $Date: 2003/07/07 $
  */
 
 class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/CompoundFilterImpl.java#7 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/CompoundFilterImpl.java#8 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
 
     private static final Logger m_log =
         Logger.getLogger(CompoundFilterImpl.class);

@@ -16,7 +16,6 @@
 package com.arsdigita.persistence.pdl;
 
 
-import com.arsdigita.util.StringUtils;
 import com.arsdigita.util.ResourceManager;
 import com.arsdigita.util.UncheckedWrapperException;
 import com.arsdigita.util.Assert;
@@ -37,7 +36,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,12 +60,12 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #20 $ $Date: 2003/06/13 $
+ * @version $Revision: #21 $ $Date: 2003/07/07 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#20 $ by $Author: vadim $, $DateTime: 2003/06/13 16:09:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#21 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;

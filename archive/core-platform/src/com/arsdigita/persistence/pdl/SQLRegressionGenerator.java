@@ -18,7 +18,6 @@ package com.arsdigita.persistence.pdl;
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
-import com.arsdigita.persistence.metadata.Property;
 import com.arsdigita.persistence.proto.metadata.Column;
 import com.arsdigita.persistence.proto.metadata.Root;
 import com.arsdigita.persistence.proto.metadata.ObjectMap;
@@ -32,7 +31,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;

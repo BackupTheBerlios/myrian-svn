@@ -6,16 +6,13 @@ import com.arsdigita.persistence.proto.common.Path;
 import com.arsdigita.persistence.proto.common.SQLParser;
 import com.arsdigita.persistence.proto.ProtoException;
 import com.arsdigita.persistence.proto.PersistentCollection;
-import com.arsdigita.persistence.proto.DataSet;
 import com.arsdigita.persistence.proto.Cursor;
-import com.arsdigita.persistence.proto.CursorException;
 import com.arsdigita.persistence.proto.Query;
 import com.arsdigita.persistence.proto.Signature;
 import com.arsdigita.persistence.proto.Parameter;
 import com.arsdigita.persistence.proto.Expression;
 import com.arsdigita.persistence.proto.metadata.Root;
 import com.arsdigita.util.Assert;
-import com.arsdigita.util.StringUtils;
 
 import java.io.StringReader;
 import java.util.*;
@@ -25,12 +22,12 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #27 $ $Date: 2003/07/02 $
+ * @version $Revision: #28 $ $Date: 2003/07/07 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#27 $ by $Author: ashah $, $DateTime: 2003/07/02 17:18:32 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#28 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 

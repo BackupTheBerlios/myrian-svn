@@ -15,7 +15,6 @@
 
 package com.arsdigita.persistence.metadata;
 
-import com.arsdigita.persistence.proto.metadata.Root;
 import com.arsdigita.persistence.proto.metadata.Role;
 import com.arsdigita.persistence.proto.metadata.Link;
 
@@ -31,7 +30,7 @@ import java.util.*;
  * REQUIRED, and COLLECTION.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/05/12 $
+ * @version $Revision: #10 $ $Date: 2003/07/07 $
  **/
 
 public class Property extends Element {
@@ -68,7 +67,7 @@ public class Property extends Element {
         "[0..n]"
     };
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#9 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#10 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
 
 
     static Property

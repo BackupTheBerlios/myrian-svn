@@ -2,18 +2,17 @@ package com.arsdigita.persistence.proto;
 
 import com.arsdigita.persistence.proto.metadata.Property;
 import java.io.*;
-import java.util.Iterator;
 
 /**
  * SetEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/07/07 $
  **/
 
 public class SetEvent extends PropertyEvent {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/SetEvent.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/SetEvent.java#2 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
 
     private Object m_oldValue;
 

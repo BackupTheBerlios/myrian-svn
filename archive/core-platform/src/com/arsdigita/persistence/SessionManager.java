@@ -16,7 +16,6 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.MetadataRoot;
-import com.arsdigita.persistence.proto.EventProcessor;
 import com.arsdigita.persistence.proto.EventProcessorManager;
 
 import java.util.HashSet;
@@ -35,12 +34,12 @@ import org.apache.log4j.Logger;
  *
  * @see Initializer
  * @author Archit Shah 
- * @version $Revision: #8 $ $Date: 2003/05/12 $
+ * @version $Revision: #9 $ $Date: 2003/07/07 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#8 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#9 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
 
     private static String s_url = null;           // the jdbc URL
     private static String s_username = null;      // the database username

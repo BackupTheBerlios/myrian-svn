@@ -5,18 +5,17 @@ import com.arsdigita.db.DbHelper;
 import java.sql.*;
 import java.io.*;
 
-import org.apache.log4j.Logger;
 
 /**
  * BlobAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/05/29 $
+ * @version $Revision: #3 $ $Date: 2003/07/07 $
  **/
 
 public class BlobAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/adapters/BlobAd.java#2 $ by $Author: bche $, $DateTime: 2003/05/29 18:28:35 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/adapters/BlobAd.java#3 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
 
     public BlobAd() {
 	super(Root.getRoot().getObjectType("global.Blob"), Types.BLOB);

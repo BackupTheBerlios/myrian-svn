@@ -2,7 +2,6 @@ package com.arsdigita.persistence.proto;
 
 import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
-import com.arsdigita.util.Assert;
 
 import java.util.*;
 import java.io.*;
@@ -16,12 +15,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/07/02 $
+ * @version $Revision: #11 $ $Date: 2003/07/07 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Session.java#10 $ by $Author: ashah $, $DateTime: 2003/07/02 12:35:46 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Session.java#11 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 

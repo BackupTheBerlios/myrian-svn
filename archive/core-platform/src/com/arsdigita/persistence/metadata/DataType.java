@@ -15,7 +15,6 @@
 
 package com.arsdigita.persistence.metadata;
 
-import com.arsdigita.persistence.proto.metadata.Root;
 
 /**
  * The DataType class represents the type of a persistently stored datum.
@@ -28,12 +27,12 @@ import com.arsdigita.persistence.proto.metadata.Root;
  * @see CompoundType
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/05/12 $
+ * @version $Revision: #5 $ $Date: 2003/07/07 $
  */
 
 abstract public class DataType extends ModelElement {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DataType.java#4 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DataType.java#5 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
 
     private com.arsdigita.persistence.proto.metadata.ObjectType m_type;
 

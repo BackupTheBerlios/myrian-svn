@@ -14,18 +14,17 @@
 
 package com.arsdigita.persistence.proto;
 
-import com.arsdigita.persistence.proto.metadata.Property;
 
 /**
  * Engine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/06/26 $
+ * @version $Revision: #4 $ $Date: 2003/07/07 $
  **/
 
 public abstract class Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Engine.java#3 $ by $Author: rhs $, $DateTime: 2003/06/26 18:40:22 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Engine.java#4 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
 
     protected abstract void write(Event ev);
     protected abstract void flush();

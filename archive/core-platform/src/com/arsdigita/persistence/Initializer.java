@@ -18,10 +18,7 @@ package com.arsdigita.persistence;
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.initializer.Configuration;
 import com.arsdigita.initializer.InitializationException;
-import com.arsdigita.util.ResourceManager;
-import com.arsdigita.persistence.metadata.CompoundType;
 import com.arsdigita.persistence.metadata.MetadataRoot;
-import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.pdl.PDL;
 import com.arsdigita.persistence.pdl.PDLException;
 import java.io.File;
@@ -35,7 +32,7 @@ import org.apache.log4j.Level;
  * the SessionManager of them.
  *
  * @author Archit Shah 
- * @version $Revision: #15 $ $Date: 2003/05/12 $
+ * @version $Revision: #16 $ $Date: 2003/07/07 $
  **/
 
 public class Initializer

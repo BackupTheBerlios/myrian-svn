@@ -21,19 +21,16 @@ import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.proto.common.Path;
 import com.arsdigita.persistence.proto.Adapter;
-import com.arsdigita.persistence.proto.Signature;
 import com.arsdigita.persistence.proto.Query;
 import com.arsdigita.persistence.proto.PropertyMap;
 import com.arsdigita.persistence.proto.EventProcessor;
 import com.arsdigita.persistence.proto.Event;
 import com.arsdigita.persistence.proto.CreateEvent;
 import com.arsdigita.persistence.proto.DeleteEvent;
-import com.arsdigita.persistence.proto.ObjectEvent;
 import com.arsdigita.persistence.proto.ProtoException;
 import com.arsdigita.persistence.proto.PropertyEvent;
 import com.arsdigita.persistence.proto.metadata.Root;
 import com.arsdigita.persistence.proto.metadata.Property;
-import com.arsdigita.persistence.proto.engine.MemoryEngine;
 import com.arsdigita.persistence.proto.engine.rdbms.RDBMSEngine;
 import com.arsdigita.persistence.proto.engine.rdbms.RDBMSQuerySource;
 import com.arsdigita.persistence.proto.engine.rdbms.ConnectionSource;
@@ -60,7 +57,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #20 $ $Date: 2003/07/03 $
+ * @version $Revision: #21 $ $Date: 2003/07/07 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {

@@ -15,7 +15,6 @@
 
 package com.arsdigita.persistence.metadata;
 
-import com.arsdigita.persistence.proto.metadata.Root;
 
 import java.util.*;
 
@@ -25,12 +24,12 @@ import java.util.*;
  * property contained in a CompoundType has an associated DataType.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/07/03 $
+ * @version $Revision: #9 $ $Date: 2003/07/07 $
  */
 
 abstract public class CompoundType extends DataType {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/CompoundType.java#8 $ by $Author: vadim $, $DateTime: 2003/07/03 12:50:41 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/CompoundType.java#9 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
 
 
     /**

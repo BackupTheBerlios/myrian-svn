@@ -16,8 +16,6 @@
 package com.arsdigita.util.url;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Priority;
 
 /**
  * Helper class for fetching remote URLs. Provides a pool of worker threads

@@ -1,7 +1,6 @@
 package com.arsdigita.persistence.proto.pdl;
 
 import com.arsdigita.persistence.proto.Adapter;
-import com.arsdigita.persistence.proto.PropertyMap;
 import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.pdl.nodes.*;
 import com.arsdigita.persistence.proto.metadata.*;
@@ -17,12 +16,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2003/07/03 $
+ * @version $Revision: #13 $ $Date: 2003/07/07 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#12 $ by $Author: rhs $, $DateTime: 2003/07/03 16:36:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#13 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
