@@ -24,13 +24,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#5 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#6 $
  */
 public class StringParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#5 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#6 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/02 12:40:15 $";
+        "$DateTime: 2003/09/15 15:51:43 $";
 
     private final String m_name;
     private final Class m_type;
@@ -80,16 +80,16 @@ public class StringParameter implements Parameter {
     }
 
     public final ParameterValue unmarshal(final ParameterStore store) {
-        final ParameterValue value = new ParameterValue();
+        final ArrayList errors = new ArrayList();
         final String literal = store.read(this);
 
         if (literal == null) {
-            value.setValue(m_default);
+            return new ParameterValue(m_default, errors);
         } else {
-            value.setValue(unmarshal(literal, value.getErrors()));
-        }
+            final Object value = unmarshal(literal, errors);
 
-        return value;
+            return new ParameterValue(value, errors);
+        }
     }
 
     protected Object unmarshal(final String value, final List errors) {

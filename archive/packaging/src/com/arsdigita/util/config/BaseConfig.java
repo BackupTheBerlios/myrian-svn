@@ -31,18 +31,20 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterStore
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#9 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#10 $
  */
 public class BaseConfig {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#9 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#10 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/12 19:03:44 $";
+        "$DateTime: 2003/09/15 15:51:43 $";
 
     private static final Logger s_log = Logger.getLogger
         (BaseConfig.class);
 
     private final ParameterStore m_store;
+    private final ArrayList m_params;
+    private final HashMap m_values;
 
     /**
      * Constructs a configuration record that uses <code>store</code>
@@ -53,6 +55,8 @@ public class BaseConfig {
      */
     protected BaseConfig(final ParameterStore store) {
         m_store = store;
+        m_params = new ArrayList();
+        m_values = new HashMap();
     }
 
     /**
@@ -66,6 +70,9 @@ public class BaseConfig {
      */
     protected BaseConfig(final String resource, final boolean required) {
         Assert.exists(resource, String.class);
+
+        m_params = new ArrayList();
+        m_values = new HashMap();
 
         final Properties props = new Properties();
 
@@ -141,6 +148,13 @@ public class BaseConfig {
                  value.getErrors().toString());
         }
 
+        return set(param, value);
+    }
+
+    private Object set(final Parameter param, final ParameterValue value) {
+        Assert.exists(param, Parameter.class);
+        Assert.exists(value, ParameterValue.class);
+
         if (s_log.isDebugEnabled()) {
             s_log.debug("Validating parameter value " + value);
         }
@@ -153,7 +167,41 @@ public class BaseConfig {
                  value.getErrors().toString());
         }
 
-        return value.getValue();
+        final Object result = value.getValue();
+
+        synchronized (m_values) {
+            m_values.put(param, result);
+        }
+
+        return result;
+    }
+
+    /**
+     * Gets the value of <code>param</code>.
+     *
+     * @param param The named <code>Parameter</code> whose value you
+     * wish to retrieve; it cannot be null
+     */
+    protected final Object get(final Parameter param) {
+        Assert.exists(param, Parameter.class);
+
+        synchronized (m_values) {
+            return m_values.get(param);
+        }
+    }
+
+    /**
+     * Sets the value of <code>param</code> to <code>value</code>.
+     *
+     * @param param The named <code>Parameter</code> whose value you
+     * wish to set; it cannot be null
+     * @param value The new value of <code>param</code>; it can be
+     * null
+     */
+    protected final void set(final Parameter param, final Object value) {
+        Assert.exists(param, Parameter.class);
+
+        set(param, new ParameterValue(value, new ArrayList()));
     }
 
     /**

@@ -24,29 +24,24 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#3 $
  */
 public final class ParameterValue {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#3 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/28 00:48:42 $";
+        "$DateTime: 2003/09/15 15:51:43 $";
 
     private Object m_value;
-    private final ArrayList m_errors = new ArrayList();
-    private boolean m_assigned = false;
+    private final List m_errors;
+
+    public ParameterValue(final Object value, final List errors) {
+        m_value = value;
+        m_errors = errors;
+    }
 
     public final Object getValue() {
         return m_value;
-    }
-
-    public final void setValue(final Object value) {
-        m_assigned = true;
-        m_value = value;
-    }
-
-    public final boolean isAssigned() {
-        return m_assigned;
     }
 
     public final List getErrors() {
