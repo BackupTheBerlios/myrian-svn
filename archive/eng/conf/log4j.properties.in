@@ -24,3 +24,4 @@ log4j.appender.console = org.apache.log4j.ConsoleAppender
 # For debugging all queries run by persistence
 #log4j.logger.com.redhat.persistence.engine.rdbms.RDBMSEngine = INFO
 log4j.logger.com.redhat.persistence.jdo.PersistenceManagerImpl = INFO
+log4j.logger.Neo = WARN
