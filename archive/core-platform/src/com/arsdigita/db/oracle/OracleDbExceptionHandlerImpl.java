@@ -30,12 +30,12 @@ import java.sql.PreparedStatement;
  * Class for processing of Oracle DB Exceptions.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #5 $
+ * @version $Revision: #6 $
  * @since 4.6
  */
 public class OracleDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleDbExceptionHandlerImpl.java#5 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleDbExceptionHandlerImpl.java#6 $";
 
     static {
         // lots of stuff can keep us away from the DB...
@@ -61,9 +61,13 @@ public class OracleDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
         // not connected to Oracle
         errors.put("ORA-03114",
                    com.arsdigita.db.DbNotAvailableException.class);
+        // TNS:packet writer failure
+        errors.put("ORA-12571",
+                   com.arsdigita.db.DbNotAvailableException.class);
 
         // this one is pretty specific, thankfully.
-        errors.put("ORA-00001", com.arsdigita.db.UniqueConstraintException.class);
+        errors.put("ORA-00001",
+                   com.arsdigita.db.UniqueConstraintException.class);
     }
 
 }
