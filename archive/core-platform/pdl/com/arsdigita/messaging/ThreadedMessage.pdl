@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/messaging/ThreadedMessage.pdl#6 $ 
-// $DateTime: 2003/07/03 12:34:51 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/messaging/ThreadedMessage.pdl#7 $ 
+// $DateTime: 2003/08/15 02:23:59 $
 
 model com.arsdigita.messaging;
 
@@ -41,18 +41,21 @@ object type ThreadedMessage extends Message {
 
 query maxSortKey {
     BigDecimal root;
+    BigDecimal inReplyTo;
     String sortKey;
     BigDecimal sortSize;
     do {
          select   root_id,
                   sort_key,
+		  in_reply_to,
                   length(sort_key) as sort_size
          from     messages 
          order by sort_key desc
     } map {
-         root     = root_id;
-         sortKey  = sort_key;
-         sortSize = sort_size;
+         root      = root_id;
+	 inReplyTo = in_reply_to;
+         sortKey   = sort_key;
+         sortSize  = sort_size;
     }
 }
 
