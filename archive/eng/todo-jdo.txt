@@ -18,6 +18,12 @@
     - can use reflection, but that may not be appropriate depending on
       what the spec says regarding the protected-ness of the field
 
+- The current implementation of C#javaGet(PersistenceCapable,Property)
+  relies on reflective method access and a bean-style naming
+  convention.  Rewrite this method to use
+  StateManager#getXXXField(PersistenceCapable,int,XXX) or some such
+  instead.
+
 - First-class Objects vs Second-class Objects
   - how do Collection implementation fit in
   - are PersitenceCapable SCOs using embedded-* the same as components
