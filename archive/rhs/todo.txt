@@ -24,3 +24,4 @@
    aggregate operations on collection properties and also providing
    construct for creating derived types, e.g.
    group(all(User), firstName == "Bob")
+ * add hypersonic SQL support
