@@ -30,36 +30,23 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/09/10 $
+ * @version $Revision: #7 $ $Date: 2003/09/12 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/pdl/PDL.java#6 $ by $Author: rhs $, $DateTime: 2003/09/10 10:46:29 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/pdl/PDL.java#7 $ by $Author: rhs $, $DateTime: 2003/09/12 09:13:53 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
-    private ErrorReport m_errors = new ErrorReport();
-    private SymbolTable m_symbols;
-    private HashSet m_links = new HashSet();
-    private HashSet m_fks = new HashSet();
-    private HashMap m_propertyCollisions = new HashMap();
-    private HashMap m_emitted = new HashMap();
-    private HashMap m_nodes = new HashMap();
+    private boolean m_autoLoad;
 
-    public PDL() {}
-
-    void emit(Node node, Object emitted) {
-        m_nodes.put(emitted, node);
-        m_emitted.put(node, emitted);
+    public PDL() {
+        this(true);
     }
 
-    Node getNode(Object emitted) {
-        return (Node) m_nodes.get(emitted);
-    }
-
-    Object getEmitted(Node node) {
-        return m_emitted.get(node);
+    private PDL(boolean autoLoad) {
+        m_autoLoad = autoLoad;
     }
 
     public void load(Reader r, String filename) {
@@ -80,6 +67,12 @@ public class PDL {
         load(new InputStreamReader(is), s);
     }
 
+    private void emitGlobal(Root root) {
+        PDL glob = new PDL(false);
+        glob.loadResource("com/redhat/persistence/pdl/global.pdl");
+        glob.emit(root);
+    }
+
     private String linkName(AssociationNd assn) {
 	Model m = Model.getInstance(assn.getFile().getModel().getName());
 	return m.getQualifiedName() + "." +
@@ -95,10 +88,37 @@ public class PDL {
     }
 
     private Root m_root;
+    private ErrorReport m_errors;
+    private SymbolTable m_symbols;
+    private HashSet m_links;
+    private HashSet m_fks;
+    private HashMap m_propertyCollisions;
+    private HashMap m_emitted;
+    private HashMap m_nodes;
+
+    void emit(Node node, Object emitted) {
+        m_nodes.put(emitted, node);
+        m_emitted.put(node, emitted);
+    }
+
+    Node getNode(Object emitted) {
+        return (Node) m_nodes.get(emitted);
+    }
+
+    Object getEmitted(Node node) {
+        return m_emitted.get(node);
+    }
 
     public void emit(Root root) {
 	m_root = root;
+        m_errors = new ErrorReport();
         m_symbols = new SymbolTable(m_errors, m_root);
+        m_links = new HashSet();
+        m_fks = new HashSet();
+        m_propertyCollisions = new HashMap();
+        m_emitted = new HashMap();
+        m_nodes = new HashMap();
+
         m_ast.traverse(new Node.Switch() {
             public void onNode(Node nd) {
                 for (Iterator it = nd.getFields().iterator(); it.hasNext(); ) {
@@ -112,13 +132,13 @@ public class PDL {
 
         m_errors.check();
 
+        if (m_autoLoad && root.getObjectType("global.String") == null) {
+            emitGlobal(root);
+        }
+
         for (Iterator it = m_root.getObjectTypes().iterator();
 	     it.hasNext(); ) {
             m_symbols.addEmitted((ObjectType) it.next());
-        }
-
-        if (root.getObjectType("global.String") == null) {
-            loadResource("com/redhat/persistence/pdl/global.pdl");
         }
 
         m_ast.traverse(new Node.Switch() {
