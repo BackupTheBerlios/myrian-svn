@@ -26,12 +26,12 @@ import java.util.List;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/02/09 $
+ * @version $Revision: #5 $ $Date: 2004/03/11 $
  **/
 
 public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/ObjectType.java#4 $ by $Author: jorris $, $DateTime: 2004/02/09 15:27:20 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/ObjectType.java#5 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:56 $";
 
     private final Model m_model;
     private final String m_name;
@@ -45,7 +45,11 @@ public class ObjectType extends Element {
         m_model = model;
         m_name = name;
         m_super = supertype;
-        m_qualifiedName = m_model.getQualifiedName() + "." + m_name;
+        if (m_model == null) {
+            m_qualifiedName = m_name;
+        } else {
+            m_qualifiedName = m_model.getQualifiedName() + "." + m_name;
+        }
     }
 
     public Root getRoot() {
