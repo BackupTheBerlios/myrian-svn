@@ -42,6 +42,8 @@ public class IO {
         while ((ret = src.read(buf)) != -1) {
             dst.write(buf, 0, ret);
         }
+        
+        dst.flush();
     }
     
     
