@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Field;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -30,10 +31,12 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2002-08-23
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Debug.java#4 $ $Date: 2003/03/21 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Debug.java#5 $ $Date: 2003/06/25 $
  **/
 public class Debug {
     private static final Logger s_log = Logger.getLogger(Debug.class);
+
+    private Debug() {}
 
     /**
      * Useful if you want to examine the string <code>text</code> in an
@@ -163,5 +166,51 @@ public class Debug {
         } catch (IllegalAccessException ex) {
             throw new Error("This can't normally happen.");
         }
+    }
+
+    /**
+     * Manipulates the logging level for the specified logger.
+     *
+     * <p>Possible use case: Suppose you want to log db queries generated as a
+     * result of executing the method <code>foo()</code>.  One way to do this is
+     * to set the level for the
+     * <code>"com.arsdigita.db.PreparedStatement"</code> logger to
+     * <code>"info"</code> in <code>enterprise.init</code>.  However, this will
+     * result in <em>all</em> queries being logged, producing a flood of
+     * debugging information that you have to wade through to find queries that
+     * are of interest to you.</p>
+     *
+     * <p>An alternative is to do something like this: </p>
+     *
+     * <pre>
+     *  String old = Debug.setLevel("com.arsdigita.db.PreparedStatement", "info");
+     *  foo();
+     *  Debug.setLevel("com.arsdigita.db.PreparedStatement", old);
+     *  // or
+     *  Debug.setLevel("com.arsdigita.db.PreparedStatement", "off");
+     * </pre>
+     * 
+     * <p>Note, however, that although this method allows you to eliminate <em>a
+     * lot</em> of unnecessary clutter, it fails to eliminate all of it. In the
+     * presence of multiple threads of execution, methods other than
+     * <code>foo()</code> may execute within the same time slice.  These other
+     * methods executing concurrently may produce additional logging in the
+     * <code>PreparedStatement</code> class.  </p>
+     * 
+     * @see Level
+     * @see Logger
+     *
+     * @param loggerName the name of the logger, usually the name of a class
+     * @param level the logger level; one of <code>"debug"</code>,
+     * <code>"info"</code>, <code>"warn"</code>, <code>"error"</code>,
+     * <code>"fatal"</code>, or <code>"off"</code>. If an invalid level name is
+     * passed, the level will default to <code>"debug"</code>.
+     * @return the previous level prior to this call
+     **/
+    public static String setLevel(String loggerName, String level) {
+        Logger logger = Logger.getLogger(loggerName);
+        Level old = logger.getLevel();
+        logger.setLevel(Level.toLevel(level));
+        return old == null ? null : old.toString();
     }
 }
