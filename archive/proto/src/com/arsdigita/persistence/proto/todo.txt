@@ -38,6 +38,8 @@ Functionality:
      Simple addition to anonymous mapper in QGen.java, may require
      some fanciness for legacy bind variable support.
 
+     Status: Done
+
  * Disconnected data (1)
 
      On disconnect store HashMap of object data in wrapper layer. Also
