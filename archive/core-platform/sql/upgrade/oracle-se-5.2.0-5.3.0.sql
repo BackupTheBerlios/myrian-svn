@@ -11,8 +11,9 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/upgrade/oracle-se-5.2.0-5.3.0.sql#1 $
--- $DateTime: 2003/06/05 16:29:48 $
+-- $Id: //core-platform/dev/sql/upgrade/oracle-se-5.2.0-5.3.0.sql#2 $
+-- $DateTime: 2003/06/27 15:28:05 $
 
 @@ ../oracle-se/upgrade/5.2.0-5.3.0/add-category-url.sql
 @@ ../default/upgrade/5.2.0-5.3.0/alter-categories.sql
+@@ ../oracle-se/upgrade/5.2.0-5.3.0/alter-lucene.sql

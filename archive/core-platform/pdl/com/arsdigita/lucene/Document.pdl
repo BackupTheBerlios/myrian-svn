@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/lucene/Document.pdl#5 $ 
-// $DateTime: 2003/06/26 12:13:42 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/lucene/Document.pdl#6 $ 
+// $DateTime: 2003/06/27 15:28:05 $
 
 model com.arsdigita.lucene;
 
@@ -21,7 +21,7 @@ object type Document {
     String[1..1] type              = lucene_docs.type VARCHAR(200);
     String[0..1] typeSpecificInfo  = lucene_docs.type_info VARCHAR;
     Date[1..1] timestamp           = lucene_docs.timestamp TIMESTAMP;
-    Integer[1..1] isDirty          = lucene_docs.is_dirty INTEGER;
+    Integer[1..1] dirty            = lucene_docs.dirty INTEGER;
     Boolean[1..1] isDeleted        = lucene_docs.is_deleted BIT;
     String[0..1] language          = lucene_docs.language CHAR(2);
     String[0..1] country           = lucene_docs.country CHAR(2);
@@ -38,7 +38,7 @@ object type Document {
 
 
     // To avoid race conditions between indexers, we
-    // never 'set' the isDirty flag - we just toggle
+    // never 'set' the dirty flag - we just toggle
     // our bit.
     update {
       do {
@@ -56,7 +56,7 @@ object type Document {
            creation_party = :creationParty,
            last_modified_date = :lastModifiedDate,
            last_modified_party = :lastModifiedParty,
-           is_dirty = lucene_update_dirty(timestamp, :timestamp, is_dirty, :isDirty)
+           dirty = lucene_update_dirty(timestamp, :timestamp, dirty, :dirty)
         where document_id = :id
       }
     }
@@ -68,7 +68,7 @@ query dirtyDocuments {
   do {
     select document_id 
       from lucene_docs
-     where bitand(is_dirty, :isDirty) > 0
+     where bitand(dirty, :dirty) > 0
   } map {
     id = document_id;
   }
