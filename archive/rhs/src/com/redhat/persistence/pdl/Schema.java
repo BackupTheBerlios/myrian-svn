@@ -1,6 +1,7 @@
 package com.redhat.persistence.pdl;
 
 import com.redhat.persistence.metadata.*;
+import com.arsdigita.db.DbHelper;
 
 import java.sql.*;
 import java.util.*;
@@ -9,12 +10,12 @@ import java.util.*;
  * Schema
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/05/04 $
+ * @version $Revision: #2 $ $Date: 2004/05/05 $
  **/
 
 public class Schema {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/pdl/Schema.java#1 $ by $Author: rhs $, $DateTime: 2004/05/04 14:28:06 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/pdl/Schema.java#2 $ by $Author: rhs $, $DateTime: 2004/05/05 16:04:40 $";
 
     private Schema() {}
 
@@ -31,6 +32,8 @@ public class Schema {
 
     public static void load(List tables, Connection conn)
         throws SQLException {
+        // XXX: should eliminate use of global variable here
+        DbHelper.setDatabase(DbHelper.getDatabase(conn));
         Statement stmt = conn.createStatement();
         try {
             List constraints = new ArrayList();
