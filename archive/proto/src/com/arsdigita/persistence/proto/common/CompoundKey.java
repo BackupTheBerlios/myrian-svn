@@ -4,12 +4,12 @@ package com.arsdigita.persistence.proto.common;
  * CompoundKey
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/02/14 $
+ * @version $Revision: #4 $ $Date: 2003/02/17 $
  **/
 
 public final class CompoundKey {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/common/CompoundKey.java#3 $ by $Author: ashah $, $DateTime: 2003/02/14 22:58:33 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/common/CompoundKey.java#4 $ by $Author: rhs $, $DateTime: 2003/02/17 20:13:29 $";
 
     private Object m_one;
     private Object m_two;
@@ -42,6 +42,7 @@ public final class CompoundKey {
     }
 
     public String toString() {
-        return m_one + "." + m_two;
+        return "key(" + m_one + ", " + m_two + ")";
     }
+
 }

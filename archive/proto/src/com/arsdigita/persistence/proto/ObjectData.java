@@ -8,12 +8,12 @@ import java.io.*;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/02/14 $
+ * @version $Revision: #10 $ $Date: 2003/02/17 $
  **/
 
 class ObjectData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#9 $ by $Author: ashah $, $DateTime: 2003/02/14 01:21:43 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#10 $ by $Author: rhs $, $DateTime: 2003/02/17 20:13:29 $";
 
     private Session m_ssn;
     private Object m_object;
@@ -153,8 +153,7 @@ class ObjectData {
     }
 
     void dump(PrintWriter out) {
-        out.print(getObject());
-        out.println(":");
+        out.println("    object = " + getObject());
         for (Iterator it = m_pdata.values().iterator(); it.hasNext(); ) {
             PropertyData pdata = (PropertyData) it.next();
             pdata.dump(out);

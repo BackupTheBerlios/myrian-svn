@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #30 $ $Date: 2003/02/17 $
+ * @version $Revision: #31 $ $Date: 2003/02/17 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#30 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#31 $ by $Author: rhs $, $DateTime: 2003/02/17 20:13:29 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -661,9 +661,17 @@ public class Session {
             pd = new PropertyData(od, prop, null);
         } else {
             RecordSet rs = m_engine.execute(getRetrieveQuery(obj, prop));
+            boolean found = false;
             while (rs.next()) {
+                found = true;
                 rs.load(this);
             }
+
+            if (!found) {
+                throw new IllegalStateException
+                    ("Query failed to return any results");
+            }
+
             pd = od.getPropertyData(prop);
             if (pd == null) {
                 throw new IllegalStateException
@@ -739,14 +747,22 @@ public class Session {
     }
 
     void dump() {
-        PrintWriter pw = new PrintWriter(System.out);
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
         dump(pw);
         pw.flush();
+        LOG.debug(sw.toString());
     }
 
     void dump(PrintWriter out) {
-        for (Iterator it = m_odata.values().iterator(); it.hasNext(); ) {
-            ObjectData od = (ObjectData) it.next();
+        for (Iterator it = m_odata.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry me = (Map.Entry) it.next();
+
+            Object key = me.getKey();
+            out.print(key);
+            out.println(":");
+
+            ObjectData od = (ObjectData) me.getValue();
             od.dump(out);
         }
     }

@@ -10,12 +10,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/02/17 $
+ * @version $Revision: #6 $ $Date: 2003/02/17 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#5 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#6 $ by $Author: rhs $, $DateTime: 2003/02/17 20:13:29 $";
 
     private static final Path KEY = Path.get("__key__");
     private static final Path KEY_FROM = Path.get("__key_from__");
@@ -35,17 +35,6 @@ class EventSwitch extends Event.Switch {
         return Path.get(column.toString());
     }
 
-    private Object getKeyValue(Object obj) {
-        if (obj == null) { return null; }
-        Adapter ad = Adapter.getAdapter(obj.getClass());
-        ObjectType type = ad.getObjectType(obj);
-        Collection keys = type.getKeyProperties();
-        if (keys.size() != 1) {
-            throw new Error("not implemented");
-        }
-        return ad.getProperties(obj).get((Property) keys.iterator().next());
-    }
-
     private DML findOperation(Object obj, Table table) {
         DML op = m_engine.getOperation(obj, table);
         if (op != null) { return op; }
@@ -53,9 +42,14 @@ class EventSwitch extends Event.Switch {
         Column key = getKey(table);
         DML result =
             new Update(table, new EqualsCondition(getPath(key), KEY));
-        result.set(KEY, getKeyValue(obj), key.getType());
+        result.set(KEY, RDBMSEngine.getKeyValue(obj), key.getType());
         m_engine.addOperation(obj, result);
         return result;
+    }
+
+    private DML findOperation(Object from, Object to, Table map) {
+        DML op = m_engine.getOperation(from, to, map);
+        return op;
     }
 
     private void onObjectEvent(ObjectEvent e) {
@@ -69,7 +63,7 @@ class EventSwitch extends Event.Switch {
                 Column key = getKey(table);
                 DML del =
                     new Delete(table, new EqualsCondition(getPath(key), KEY));
-                del.set(KEY, getKeyValue(obj), key.getType());
+                del.set(KEY, RDBMSEngine.getKeyValue(obj), key.getType());
                 m_engine.addOperation(obj, del);
             } else {
                 throw new IllegalArgumentException
@@ -96,6 +90,7 @@ class EventSwitch extends Event.Switch {
         if (m == null) {
             return;
         }
+
         m.dispatch(new Mapping.Switch() {
                 public void onValue(ValueMapping vm) {
                     Column col = vm.getColumn();
@@ -107,41 +102,55 @@ class EventSwitch extends Event.Switch {
                     if (rm.isJoinFrom()) {
                         Column col = rm.getJoin(0).getTo();
                         DML op = findOperation(arg, col.getTable());
-                        op.set(col, getKeyValue(obj));
+                        op.set(col, RDBMSEngine.getKeyValue(obj));
                     } else if (rm.isJoinThrough()) {
                         Column from = rm.getJoin(0).getTo();
                         Column to = rm.getJoin(1).getFrom();
-                        DML op;
+                        Table table = from.getTable();
+
+                        DML op = m_engine.getOperation(obj, arg, table);
+                        // This should eliminate duplicates, but we could be
+                        // smarter by canceling out inserts and updates which
+                        // we don't do right now.
+                        if (op != null) { return; }
+                        op = m_engine.getOperation(arg, obj, table);
+                        if (op != null) { return; }
+
                         if (e instanceof AddEvent ||
-                            e instanceof SetEvent) {
-                            op = new Insert(from.getTable());
-                            op.set(from, getKeyValue(obj));
-                            op.set(to, getKeyValue(arg));
-                        } else if (e instanceof RemoveEvent) {
+                            e instanceof SetEvent &&
+                            arg != null) {
+                            op = new Insert(table);
+                            op.set(from, RDBMSEngine.getKeyValue(obj));
+                            op.set(to, RDBMSEngine.getKeyValue(arg));
+                        } else if (e instanceof RemoveEvent ||
+                                   e instanceof SetEvent &&
+                                   arg == null) {
                             op = new Delete
-                                (from.getTable(), new AndCondition
+                                (table, new AndCondition
                                     (new EqualsCondition(getPath(from),
                                                          KEY_FROM),
                                      new EqualsCondition(getPath(to),
                                                          KEY_TO)));
-                            op.set(KEY_FROM, getKeyValue(obj), from.getType());
-                            op.set(KEY_TO, getKeyValue(arg), to.getType());
+                            op.set(KEY_FROM, RDBMSEngine.getKeyValue(obj),
+                                   from.getType());
+                            op.set(KEY_TO, RDBMSEngine.getKeyValue(arg),
+                                   to.getType());
                         } else {
                             throw new IllegalArgumentException
                                 ("not a set, add, or remove");
-                                }
-                        m_engine.addOperation(op);
+                        }
+                        m_engine.addOperation(obj, arg, op);
                     } else if (rm.isJoinTo()) {
                         Column col = rm.getJoin(0).getFrom();
                         DML op = findOperation(obj, col.getTable());
-                        op.set(col, getKeyValue(arg));
+                        op.set(col, RDBMSEngine.getKeyValue(arg));
                     } else {
                         throw new IllegalArgumentException
                             ("not a join from, to, or through");
                             }
                 }
             });
-            }
+    }
 
     public void onSet(final SetEvent e) {
         onPropertyEvent(e);

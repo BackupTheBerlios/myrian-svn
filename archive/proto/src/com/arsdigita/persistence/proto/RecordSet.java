@@ -6,16 +6,20 @@ import com.arsdigita.persistence.proto.metadata.Property;
 
 import java.util.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2003/02/14 $
+ * @version $Revision: #10 $ $Date: 2003/02/17 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#9 $ by $Author: ashah $, $DateTime: 2003/02/14 16:45:39 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#10 $ by $Author: rhs $, $DateTime: 2003/02/17 20:13:29 $";
+
+    private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
     private Signature m_signature;
     private Adapter m_adapter;
@@ -68,20 +72,20 @@ public abstract class RecordSet {
         // Instantiate all the objects
         for (Iterator it = pmaps.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry me = (Map.Entry) it.next();
+            Path p = (Path) me.getKey();
             PropertyMap props = (PropertyMap) me.getValue();
             if (props == null) {
-                objs.put(props, null);
+                objs.put(p, null);
             } else {
-                Path p = (Path) me.getKey();
                 ObjectType ot;
                 if (p == null) {
-                    ot = type.getBasetype();
+                    ot = type;
                 } else {
                     ot = m_signature.getProperty(p).getType();
                 }
                 Object obj = ssn.getObject(m_adapter.getSessionKey(ot, props));
                 if (obj == null) {
-                    obj = m_adapter.getObject(type, props);
+                    obj = m_adapter.getObject(ot, props);
                     m_adapter.setSession(obj, ssn);
                 }
                 objs.put(p, obj);
@@ -103,7 +107,11 @@ public abstract class RecordSet {
                 }
             } else {
                 Property prop = m_signature.getProperty(p);
-                ssn.load(obj, prop, get(p));
+                if (objs.containsKey(p)) {
+                    ssn.load(obj, prop, objs.get(p));
+                } else {
+                    ssn.load(obj, prop, get(p));
+                }
             }
         }
 

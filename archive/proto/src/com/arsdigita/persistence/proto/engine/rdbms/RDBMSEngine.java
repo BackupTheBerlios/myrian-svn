@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2003/02/17 $
+ * @version $Revision: #15 $ $Date: 2003/02/17 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#14 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#15 $ by $Author: rhs $, $DateTime: 2003/02/17 20:13:29 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -57,12 +57,20 @@ public class RDBMSEngine extends Engine {
         m_operations.add(dml);
     }
 
-    void addOperation(DML dml) {
+    void addOperation(Object from, Object to, DML dml) {
+        Object key =
+            new CompoundKey(new CompoundKey(from, to), dml.getTable());
+        m_operationMap.put(key, dml);
         m_operations.add(dml);
     }
 
     DML getOperation(Object obj, Table table) {
         Object key = new CompoundKey(obj, table);
+        return (DML) m_operationMap.get(key);
+    }
+
+    DML getOperation(Object from, Object to, Table table) {
+        Object key = new CompoundKey(new CompoundKey(from, to), table);
         return (DML) m_operationMap.get(key);
     }
 
@@ -92,6 +100,9 @@ public class RDBMSEngine extends Engine {
     }
 
     public RecordSet execute(Query query) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Executing " + query);
+        }
         QGen qg = new QGen(query);
         Select sel = qg.generate();
         return new RDBMSRecordSet(query.getSignature(), this, execute(sel),
@@ -156,6 +167,17 @@ public class RDBMSEngine extends Engine {
         } catch (SQLException e) {
             throw new Error(e.getMessage());
         }
+    }
+
+    static final Object getKeyValue(Object obj) {
+        if (obj == null) { return null; }
+        Adapter ad = Adapter.getAdapter(obj.getClass());
+        ObjectType type = ad.getObjectType(obj);
+        Collection keys = type.getKeyProperties();
+        if (keys.size() != 1) {
+            throw new Error("not implemented");
+        }
+        return ad.getProperties(obj).get((Property) keys.iterator().next());
     }
 
 }

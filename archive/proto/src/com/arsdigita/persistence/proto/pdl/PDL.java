@@ -20,12 +20,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #17 $ $Date: 2003/02/17 $
+ * @version $Revision: #18 $ $Date: 2003/02/17 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#17 $ by $Author: vadim $, $DateTime: 2003/02/17 19:25:30 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#18 $ by $Author: rhs $, $DateTime: 2003/02/17 20:13:29 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -62,6 +62,10 @@ public class PDL {
             if (type == null) { throw new IllegalArgumentException(); }
             m_type = type;
             m_binder = binder;
+        }
+
+        public Object fetch(ResultSet rs, String column) throws SQLException {
+            return m_binder.fetch(rs, column);
         }
 
         public void bind(PreparedStatement ps, int index, Object obj,
@@ -205,6 +209,15 @@ public class PDL {
                             throws SQLException {
                             ps.setInt(index, ((Integer) obj).intValue());
                         }
+                        public Object fetch(ResultSet rs, String column)
+                            throws SQLException {
+                            int i = rs.getInt(column);
+                            if (rs.wasNull()) {
+                                return null;
+                            } else {
+                                return new Integer(i);
+                            }
+                        }
                     },
                 new Binder() {
                         public void bind(PreparedStatement ps, int index,
@@ -213,12 +226,25 @@ public class PDL {
                             ps.setBigDecimal
                                 (index, new BigDecimal((BigInteger) obj));
                         }
+                        public Object fetch(ResultSet rs, String column)
+                            throws SQLException {
+                            BigDecimal bd = rs.getBigDecimal(column);
+                            if (bd == null) {
+                                return null;
+                            } else {
+                                return bd.toBigInteger();
+                            }
+                        }
                     },
                 new Binder() {
                         public void bind(PreparedStatement ps, int index,
                                          Object obj, int type)
                             throws SQLException {
                             ps.setBigDecimal(index, (BigDecimal) obj);
+                        }
+                        public Object fetch(ResultSet rs, String column)
+                            throws SQLException {
+                            return rs.getBigDecimal(column);
                         }
                     },
                 new Binder() {
@@ -227,12 +253,25 @@ public class PDL {
                             throws SQLException {
                             ps.setString(index, (String) obj);
                         }
+                        public Object fetch(ResultSet rs, String column)
+                            throws SQLException {
+                            return rs.getString(column);
+                        }
                     },
                 new Binder() {
                         public void bind(PreparedStatement ps, int index,
                                          Object obj, int type)
                             throws SQLException {
                             ps.setFloat(index, ((Float) obj).floatValue());
+                        }
+                        public Object fetch(ResultSet rs, String column)
+                            throws SQLException {
+                            float f = rs.getFloat(column);
+                            if (rs.wasNull()) {
+                                return null;
+                            } else {
+                                return new Float(f);
+                            }
                         }
                     },
                 new Binder() {
@@ -243,6 +282,15 @@ public class PDL {
                                 (((java.util.Date) obj).getTime());
                             ps.setTimestamp(index, tstamp);
                         }
+                        public Object fetch(ResultSet rs, String column)
+                            throws SQLException {
+                            Timestamp tstamp = rs.getTimestamp(column);
+                            if (tstamp == null) {
+                                return null;
+                            } else {
+                                return new java.util.Date(tstamp.getTime());
+                            }
+                        }
                     },
                 new Binder() {
                         public void bind(PreparedStatement ps, int index,
@@ -250,6 +298,17 @@ public class PDL {
                             throws SQLException {
                             ps.setBoolean
                                 (index, ((Boolean) obj).booleanValue());
+                        }
+                        public Object fetch(ResultSet rs, String column)
+                            throws SQLException {
+                            boolean bool = rs.getBoolean(column);
+                            if (rs.wasNull()) {
+                                return null;
+                            } else if (bool) {
+                                return Boolean.TRUE;
+                            } else {
+                                return Boolean.FALSE;
+                            }
                         }
                     },
                 null,
@@ -285,6 +344,7 @@ public class PDL {
     private static interface Binder {
         void bind(PreparedStatement ps, int index, Object obj, int type)
             throws SQLException;
+        Object fetch(ResultSet rs, String column) throws SQLException;
     }
 
     private void emitDDL(Root root) {

@@ -13,12 +13,12 @@ import java.sql.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/02/17 $
+ * @version $Revision: #7 $ $Date: 2003/02/17 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#6 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#7 $ by $Author: rhs $, $DateTime: 2003/02/17 20:13:29 $";
 
     private Query m_query;
     private HashMap m_columns = new HashMap();
@@ -115,7 +115,14 @@ class QGen {
 
         for (Iterator it = sig.getParameters().iterator(); it.hasNext(); ) {
             Parameter param = (Parameter) it.next();
-            result.set(param.getPath(), m_query.get(param), Types.INTEGER);
+            if (param.getObjectType().hasKey()) {
+                result.set(param.getPath(),
+                           RDBMSEngine.getKeyValue(m_query.get(param)),
+                           Types.INTEGER);
+            } else {
+                result.set(param.getPath(), m_query.get(param),
+                           Types.INTEGER);
+            }
         }
 
         return result;
@@ -148,6 +155,19 @@ class QGen {
         setJoin(getSource(path), join);
     }
 
+    private boolean isOuter(Path path) {
+        if (path == null) {
+            return false;
+        }
+
+        Property prop = m_query.getSignature().getProperty(path);
+        if (prop.isNullable()) {
+            return true;
+        } else {
+            return isOuter(path.getParent());
+        }
+    }
+
     private void addJoin(Path path, Column to) {
         Path parentColumn = getColumn(path.getParent());
         Table table = to.getTable();
@@ -155,9 +175,13 @@ class QGen {
             Join join = getJoin(path);
             Join simple = new SimpleJoin
                 (table, Path.get(path.getParent() + "__" + table.getName()));
-            join = new InnerJoin
-                (join, simple, new EqualsCondition
-                    (parentColumn, Path.get(path.getParent() + "__" + to)));
+            Condition cond = new EqualsCondition
+                (parentColumn, Path.get(path.getParent() + "__" + to));
+            if (isOuter(path)) {
+                join = new LeftJoin(join, simple, cond);
+            } else {
+                join = new InnerJoin(join, simple, cond);
+            }
             setJoin(path, join);
             addTable(path.getParent(), table);
         }

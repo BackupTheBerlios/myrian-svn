@@ -16,12 +16,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #16 $ $Date: 2003/02/17 $
+ * @version $Revision: #17 $ $Date: 2003/02/17 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#16 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#17 $ by $Author: rhs $, $DateTime: 2003/02/17 20:13:29 $";
 
 
     public ProtoTest(String name) {
@@ -53,7 +53,10 @@ public class ProtoTest extends TestCase {
             new ConnectionSource() {
                     public Connection acquire() {
                         try {
-                            return ConnectionManager.getConnection();
+                            Connection conn =
+                                ConnectionManager.getConnection();
+                            conn.setAutoCommit(false);
+                            return conn;
                         } catch (SQLException e) {
                             throw new Error(e.getMessage());
                         }
@@ -71,7 +74,7 @@ public class ProtoTest extends TestCase {
         ssn.create(obj);
         ssn.set(obj, REQUIRED, req);
         Object obj2 = ssn.retrieve(obj.getType(), obj.getID());
-        assertTrue("obj: " + obj + ", obj2: " + obj2, obj == obj2);
+//        assertTrue("obj: " + obj + ", obj2: " + obj2, obj == obj2);
 
         ssn.set(obj, str, "foo");
         assertEquals("foo", ssn.get(obj, str));
@@ -80,6 +83,7 @@ public class ProtoTest extends TestCase {
         assertEquals(null, ssn.retrieve(obj.getType(), obj.getID()));
 
         ssn.create(obj);
+        ssn.set(obj, REQUIRED, req);
 
         PersistentCollection pc =
             (PersistentCollection) ssn.get(obj, col);
@@ -123,6 +127,8 @@ public class ProtoTest extends TestCase {
         System.out.println("---------------------------------");
         System.out.println();
         ssn.dump();
+
+        ssn.rollback();
     }
 
     private static void assertCollection(Object[] expected,
