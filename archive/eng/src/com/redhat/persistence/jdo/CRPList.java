@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.Query;
@@ -16,7 +17,7 @@ import org.apache.log4j.Logger;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2004/07/21 $
+ * @version $Revision: #15 $ $Date: 2004/07/21 $
  **/
 
 class CRPList implements List {
@@ -70,21 +71,44 @@ class CRPList implements List {
 
     private class CRPListIterator implements ListIterator {
         private int m_index;
+        private boolean m_forward;
         private Iterator m_elements;
 
         CRPListIterator(int from) {
             m_index = from;
+            m_forward = true;
+            resetIterator();
+        }
 
-            Query query = getPMI().newQuery
-                ("oql",
-                 C.concat("sort(filter($1.",
-                          m_fieldName,
-                          ", key >= $1), key)"));
+        private void resetIterator() {
+            final String oql;
+            if (m_forward) {
+                oql = C.concat
+                    ("sort(filter($1.", m_fieldName,
+                     ", key >= $2), key)");
+            } else {
+                oql = C.concat
+                    ("rsort(filter($1.", m_fieldName,
+                     ", $2 >= key), key)");
+            }
+
+            Query query = getPMI().newQuery("oql", oql);
 
             Collection coll =
                 (Collection) query.execute(elements, new Integer(m_index));
             m_elements = coll.iterator();
         }
+
+        private void possiblyReverse(boolean forward) {
+            if (m_forward != forward) {
+                m_forward = forward;
+                resetIterator();
+            }
+        }
+
+        // ====================================================================
+        // ListIterator implementation
+        // ====================================================================
 
         public int nextIndex() {
             return m_index;
@@ -107,13 +131,22 @@ class CRPList implements List {
         }
 
         public Object next() {
+            possiblyReverse(true);
             MapEntry entry = (MapEntry) m_elements.next();
             m_index++;
             return entry.getValue();
         }
 
         public Object previous() {
-            throw new UnsupportedOperationException();
+            if (!hasPrevious()) {
+                throw new NoSuchElementException
+                    ("previousIndex: " + previousIndex());
+            }
+
+            possiblyReverse(false);
+            MapEntry entry = (MapEntry) m_elements.next();
+            m_index--;
+            return entry.getValue();
         }
 
         public void add(Object element) {
@@ -226,7 +259,9 @@ class CRPList implements List {
         Object previous = elements.put(idx, element);
         if (previous == null) {
             elements.remove(idx);
-            throw new IndexOutOfBoundsException(String.valueOf(index));
+            throw new IndexOutOfBoundsException
+                (C.concat("index=", String.valueOf(index),
+                          "; element=", element));
         }
         return previous;
     }
