@@ -47,6 +47,8 @@ import java.util.List;
  */
 public class BaseTestSetup extends TestDecorator {
 
+    private static final TestConfig CONFIG = new TestConfig();
+
     private boolean m_performInitialization = true;
     private String m_scriptName;
     private String m_iniName;
@@ -115,22 +117,23 @@ public class BaseTestSetup extends TestDecorator {
         return m_performInitialization;
     }
 
-    private void openSession() {
-        TestConfig conf = new TestConfig();
-        String pdl = conf.getPDL();
-        String jdbc = conf.getURL();
-        String user = conf.getUser();
-        String password = conf.getPassword();
-        int database = conf.getDatabase();
-        DbHelper.setDatabase(database);
+    private Connection getConnection() {
+        String jdbc = CONFIG.getURL();
+        String user = CONFIG.getUser();
+        String password = CONFIG.getPassword();
+        int database = CONFIG.getDatabase();
 
         try {
             switch (database) {
             case DbHelper.DB_POSTGRES:
-                Class.forName("org.postgresql.Driver");
+                Classes.loadClass("org.postgresql.Driver");
+                SQLExceptionHandler.setDbExceptionHandlerImplName
+                    ("com.arsdigita.db.oracle.OracleDbExceptionHandlerImpl");
                 break;
             case DbHelper.DB_ORACLE:
-                Class.forName("oracle.jdbc.driver.OracleDriver");
+                Classes.loadClass("oracle.jdbc.driver.OracleDriver");
+                SQLExceptionHandler.setDbExceptionHandlerImplName
+                    ("com.arsdigita.db.postgres.PostgresDbExceptionHandlerImpl");
                 break;
             default:
                 throw new IllegalArgumentException("unsupported database");
@@ -139,14 +142,27 @@ public class BaseTestSetup extends TestDecorator {
             Connection conn =
                 DriverManager.getConnection(jdbc, user, password);
             conn.setAutoCommit(false);
-            ConnectionSource source = new DedicatedConnectionSource(conn);
-            MetadataRoot root = PDL.loadDirectory(new File(pdl));
-            SessionManager.open("default", root, source, database);
+            return conn;
         } catch (ClassNotFoundException e) {
+            throw new UncheckedWrapperException(e);
+        } catch (InstantiationException e) {
+            throw new UncheckedWrapperException(e);
+        } catch (IllegalAccessException e) {
             throw new UncheckedWrapperException(e);
         } catch (SQLException e) {
             throw new UncheckedWrapperException(e);
         }
+    }
+
+    private void openSession() {
+        String pdl = CONFIG.getPDL();
+        int database = CONFIG.getDatabase();
+        DbHelper.setDatabase(database);
+
+        Connection conn = getConnection();
+        ConnectionSource source = new DedicatedConnectionSource(conn);
+        MetadataRoot root = PDL.loadDirectory(new File(pdl));
+        SessionManager.open("default", root, source, database);
     }
 
     /**
@@ -156,12 +172,12 @@ public class BaseTestSetup extends TestDecorator {
 
     protected void setUp() throws Exception {
         if ( m_suite.testCount() > 0 ) {
+            openSession();
             if (m_performInitialization) {
                 ResourceManager.getInstance().setServletContext(new DummyServletContext());
-                openSession();
                 Initializer.startup(m_suite, m_scriptName, m_iniName);
-                setupSQL ();
             }
+            setupSQL();
         }
     }
 
@@ -193,10 +209,17 @@ public class BaseTestSetup extends TestDecorator {
 
     private void runScripts(List scripts) throws Exception {
         LoadSQLPlusScript loader = new LoadSQLPlusScript();
-        loader.setConnection(ConnectionManager.getConnection());
+        Connection conn = getConnection();
+        loader.setConnection(conn);
         for (Iterator iterator = scripts.iterator(); iterator.hasNext();) {
             String script = (String) iterator.next();
             loader.loadSQLPlusScript(script);
+        }
+        try {
+            conn.commit();
+            conn.close();
+        } catch (SQLException e) {
+            throw new UncheckedWrapperException(e);
         }
     }
 

@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/09/09 $
+ * @version $Revision: #5 $ $Date: 2003/09/09 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/pdl/PDL.java#4 $ by $Author: justin $, $DateTime: 2003/09/09 13:02:17 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/pdl/PDL.java#5 $ by $Author: rhs $, $DateTime: 2003/09/09 17:32:16 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -415,66 +415,6 @@ public class PDL {
         m_ast.traverse(nodeSwitch);
     }
 
-    private class UniqueTraversal extends Node.Traversal {
-
-        private HashMap m_cols = new HashMap();
-        private Node m_nd;
-        private ArrayList m_ids = new ArrayList();
-        private String m_id = null;
-        private boolean m_primary;
-
-        public UniqueTraversal(Node nd, Collection ids,
-                               boolean primary) {
-            m_nd = nd;
-            m_primary = primary;
-            for (Iterator it = ids.iterator(); it.hasNext(); ) {
-                m_ids.add(((IdentifierNd) it.next()).getName());
-            }
-        }
-
-        public boolean accept(Node child) {
-            Node.Field f = child.getField();
-            if (f == ObjectTypeNd.PROPERTIES) {
-                PropertyNd p = (PropertyNd) child;
-                m_id = p.getName().getName();
-                return m_ids.contains(m_id);
-            } else if (f == PropertyNd.MAPPING) {
-                return true;
-            } else if (f == JoinPathNd.JOINS) {
-                return child.getIndex() == 0;
-            } else if (f == JoinNd.FROM) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        public void onColumn(ColumnNd colnd) {
-            m_cols.put(m_id, colnd);
-        }
-
-        public void emit() {
-            if (m_cols.size() == 0) {
-                m_errors.warn(m_nd, "no metadata");
-                return;
-            }
-
-            Column[] cols = new Column[m_ids.size()];
-            int index = 0;
-            for (Iterator it = m_ids.iterator(); it.hasNext(); ) {
-                String id = (String) it.next();
-                ColumnNd colnd = (ColumnNd) m_cols.get(id);
-                if (colnd == null) {
-                    m_errors.warn(m_nd, "no metadata for " + id);
-                    return;
-                }
-                cols[index++] = lookup(colnd);
-            }
-            unique(m_nd, cols, m_primary);
-        }
-
-    }
-
     private HashMap m_primaryKeys = new HashMap();
 
     private void unique(Node nd, Column[] cols, boolean primary) {
@@ -504,9 +444,64 @@ public class PDL {
     }
 
     private void unique(Node nd, Collection ids, boolean primary) {
-        UniqueTraversal ut = new UniqueTraversal(nd, ids, primary);
-        nd.getParent().traverse(ut);
-        ut.emit();
+        final ArrayList columns = new ArrayList();
+        final Node.Traversal propertyToColumn = new Node.Traversal() {
+            public boolean accept(Node child) {
+                Node.Field f = child.getField();
+                if (f == PropertyNd.MAPPING) {
+                    return true;
+                } else if (f == JoinPathNd.JOINS) {
+                    return child.getIndex() == 0;
+                } else if (f == JoinNd.FROM) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            public void onColumn(ColumnNd colnd) {
+                columns.add(lookup(colnd));
+            }
+        };
+
+        if (nd instanceof ObjectKeyNd || nd instanceof UniqueKeyNd) {
+            ObjectTypeNd otn = (ObjectTypeNd) nd.getParent();
+            ObjectType ot = m_symbols.getEmitted(otn);
+            for (Iterator it = ids.iterator(); it.hasNext(); ) {
+                String id = ((IdentifierNd) it.next()).getName();
+                Property prop = (Property) ot.getProperty(id);
+                if (prop == null) {
+                    m_errors.warn(nd, "no such property " + id);
+                    return;
+                }
+                PropertyNd propNd = (PropertyNd) getNode(prop);
+                int start = columns.size();
+                propNd.traverse(propertyToColumn);
+                int end = columns.size();
+                if (start == end) {
+                    m_errors.warn(nd, "no metadata for " + id);
+                    return;
+                }
+            }
+        } else if (nd instanceof PropertyNd) {
+            nd.traverse(propertyToColumn);
+            if (columns.size() == 0) {
+                m_errors.warn(nd, "no metadata for " +
+                              ((PropertyNd) nd).getName().getName());
+                return;
+            }
+        } else {
+            throw new IllegalArgumentException("node type: " + nd.getClass());
+        }
+
+        if (columns.size() == 0) {
+            throw new IllegalStateException("did not error out earlier");
+        }
+        Column[] cols = new Column[columns.size()];
+        for (int i = 0; i < cols.length; i++) {
+            cols[i] = (Column) columns.get(i);
+        }
+        unique(nd, cols, primary);
     }
 
     private void emitDDL() {

@@ -1,0 +1,49 @@
+//
+// Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/test-packaging/test/pdl/com/arsdigita/persistence/mdsql/Link.pdl#1 $ 
+// $DateTime: 2003/09/09 17:32:16 $
+
+model mdsql.linkTest;
+
+object type Article {
+    BigInteger id = t_articles.article_id INTEGER;
+    String text = t_articles.text CLOB;
+    object key (id);
+}
+
+object type ArticleImageLink {
+    String caption = t_article_image_link.caption VARCHAR(4000);
+    object key (article, image);
+}
+
+association {
+    component ArticleImageLink[0..n] images =
+        join t_articles.article_id to t_article_image_link.article_id;
+    Article[1..1] article =
+        join t_article_image_link.article_id to t_articles.article_id;
+}
+
+association {
+    ArticleImageLink[0..n] links =
+        join t_images.image_id to t_article_image_link.image_id;
+    Image[1..1] image =
+        join t_article_image_link.image_id to t_images.image_id;
+}
+
+object type Image {
+    BigInteger id = t_images.image_id INTEGER;
+    Blob bytes = t_images.bytes BLOB;
+
+    object key (id);
+}
