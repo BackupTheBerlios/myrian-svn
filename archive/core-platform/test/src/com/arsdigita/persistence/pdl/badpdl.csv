@@ -7,6 +7,8 @@ duplicateObjectName,TestObject
 bogusType,BogusType
 duplicateAttributeName0,testAttribute
 duplicateAttributeName1,testAttribute
+duplicateAttributeName2,testAttribute
+duplicateAttributeName3,testAttribute
 bogusMultiplicity0,testAttribute
 bogusMultiplicity1,testAttribute
 bogusMultiplicity2,testAttribute

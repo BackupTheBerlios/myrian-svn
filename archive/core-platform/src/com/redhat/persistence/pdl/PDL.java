@@ -16,24 +16,37 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/07/09 $
+ * @version $Revision: #4 $ $Date: 2003/07/09 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#3 $ by $Author: ashah $, $DateTime: 2003/07/09 12:34:39 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#4 $ by $Author: rhs $, $DateTime: 2003/07/09 14:42:13 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
     private ErrorReport m_errors = new ErrorReport();
     private SymbolTable m_symbols;
-    private HashMap m_properties = new HashMap();
     private HashSet m_links = new HashSet();
     private HashSet m_fks = new HashSet();
-    private HashMap m_fkNds = new HashMap();
-    private HashMap m_events = new HashMap();
+    private HashMap m_propertyCollisions = new HashMap();
+    private HashMap m_emitted = new HashMap();
+    private HashMap m_nodes = new HashMap();
 
     public PDL() {}
+
+    void emit(Node node, Object emitted) {
+        m_nodes.put(emitted, node);
+        m_emitted.put(node, emitted);
+    }
+
+    Node getNode(Object emitted) {
+        return (Node) m_nodes.get(emitted);
+    }
+
+    Object getEmitted(Node node) {
+        return m_emitted.get(node);
+    }
 
     public void load(Reader r, String filename) {
         try {
@@ -136,10 +149,22 @@ public class PDL {
         m_ast.traverse(new Node.Switch() {
                 private Role define(ObjectType type, PropertyNd prop) {
                     String name = prop.getName().getName();
-                    if (type.hasProperty(name)) {
-                        m_errors.fatal(prop, "duplicate property: " + name);
+
+                    // Check for collisions
+                    Property prev = (Property) m_propertyCollisions.get
+                        (type.getQualifiedName() + ":" + name);
+                    if (prev == null) {
+                        prev = type.getProperty(name);
+                    }
+                    if (prev != null) {
+                        m_errors.fatal
+                            (prop, "duplicate property: " + name +
+                             ", previous definition: " +
+                             getNode(prev).getLocation());
                         return null;
                     }
+
+                    // Check for bad multiplicity
                     Integer upper = prop.getUpper();
                     Integer lower = prop.getLower();
                     if (upper != null && upper.intValue() <= 0
@@ -150,6 +175,7 @@ public class PDL {
                         return null;
                     }
 
+                    // Create the property
                     Role result =
                         new Role(prop.getName().getName(),
                                  m_symbols.getEmitted(prop.getType()),
@@ -162,7 +188,18 @@ public class PDL {
                     if (prop.isImmediate()) {
                         type.addImmediateProperty(result);
                     }
-                    m_properties.put(prop, result);
+
+                    // Track what node defined this property and vice versa
+                    emit(prop, result);
+
+                    // Track for collision detection
+                    ObjectType ot = type;
+                    while (ot != null) {
+                        m_propertyCollisions.put
+                            (ot.getQualifiedName() + ":" + name, result);
+                        ot = ot.getSupertype();
+                    }
+
                     return result;
                 }
 
@@ -353,8 +390,9 @@ public class PDL {
     }
 
     public void emitVersioned() {
+        HashMap properties = new HashMap();
         Node.Switch nodeSwitch = VersioningMetadata.getVersioningMetadata().
-            nodeSwitch(m_properties);
+            nodeSwitch(m_emitted);
         m_ast.traverse(nodeSwitch);
     }
 
@@ -631,7 +669,7 @@ public class PDL {
 
         m_ast.traverse(new Node.Switch() {
                 public void onProperty(PropertyNd pn) {
-                    Role prop = (Role) m_properties.get(pn);
+                    Role prop = (Role) getEmitted(pn);
                     if (prop == null) { return; }
 
                     ObjectMap om = m_root.getObjectMap(prop.getContainer());
@@ -698,7 +736,8 @@ public class PDL {
 			}
 			if (table == null) {
 			    throw new IllegalStateException
-				("unable to find supertable");
+				("unable to find supertable for " +
+                                 om.getObjectType());
 			}
 			fk(cols, table.getPrimaryKey());
 		    }
@@ -805,7 +844,7 @@ public class PDL {
             if (uk.equals(fk.getUniqueKey())) {
                 return fk;
             } else {
-                Node prev = (Node) m_fkNds.get(fk);
+                Node prev = getNode(fk);
                 m_errors.fatal
                     (fromnd,
                      "foreign key incompatible with previous definition: " +
@@ -815,8 +854,7 @@ public class PDL {
         }
 
         fk = fk(new Column[] {from}, uk);
-        m_fkNds.put(fk, fromnd);
-
+        emit(fromnd, fk);
 	return fk;
     }
 
@@ -1126,14 +1164,14 @@ public class PDL {
     private boolean checkDuplicates(ObjectMap om, Object prev, Object obj,
                                     EventNd nd) {
         if (prev != null) {
-            Node prevNd = (Node) m_events.get(prev);
+            Node prevNd = (Node) getNode(prev);
             m_errors.fatal
                 (nd, "duplicate " + nd.getType() + " event for object type " +
                  om.getObjectType().getQualifiedName() +
                  ", previous definition: " + prevNd.getLocation());
             return false;
         } else {
-            m_events.put(obj, nd);
+            emit(nd, obj);
             return true;
         }
     }
