@@ -10,12 +10,12 @@ import java.util.*;
  * Engine
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2002/11/27 $
  **/
 
 public class Engine implements PersistenceEngine {
 
-    public final static String versionId = "$Id: //users/rhs/persistence-proto/engine/Engine.java#1 $ by $Author: rhs $, $DateTime: 2002/11/27 17:41:53 $";
+    public final static String versionId = "$Id: //users/rhs/persistence-proto/engine/Engine.java#2 $ by $Author: rhs $, $DateTime: 2002/11/27 18:23:04 $";
 
     private static class EventList extends ArrayList {
         public Event getEvent(int index) {
@@ -45,8 +45,8 @@ public class Engine implements PersistenceEngine {
         m_uncomitted.clear();
     }
 
-    public Cursor execute(Query query) {
-        return new DumbCursor(query);
+    public RecordSet execute(Query query) {
+        return new DumbRecordSet(query);
     }
 
     public synchronized void write(Event event) {
@@ -109,15 +109,15 @@ public class Engine implements PersistenceEngine {
         return ES;
     }
 
-    private class DumbCursor extends Cursor {
+    private class DumbRecordSet extends RecordSet {
 
         private Query m_query;
         private Set m_oids = new HashSet();
         private Iterator m_it = null;
         private OID m_oid = null;
 
-        public DumbCursor(Query query) {
-            super(m_ssn, query.getSignature());
+        public DumbRecordSet(Query query) {
+            super(query.getSignature());
             m_query = query;
 
             EventList[] els = {DATA, m_uncomitted};
@@ -138,7 +138,7 @@ public class Engine implements PersistenceEngine {
             }
         }
 
-        protected boolean fetchRow() {
+        public boolean next() {
             if (m_it == null) {
                 m_it = m_oids.iterator();
             }
@@ -151,7 +151,7 @@ public class Engine implements PersistenceEngine {
             }
         }
 
-        private Object fetch(OID oid, Property prop) {
+        private Object get(OID oid, Property prop) {
             EventList[] els = {m_uncomitted, DATA};
             for (int j = 0; j < els.length; j++) {
                 for (int i = els[j].size() - 1; i >= 0; i--) {
@@ -169,19 +169,19 @@ public class Engine implements PersistenceEngine {
             return null;
         }
 
-        protected Object fetchPath(Path p) {
+        public Object get(Path p) {
             Path parent = p.getParent();
             if (parent == null) {
-                return fetch(m_oid,
-                             m_oid.getObjectType().getProperty(p.getName()));
+                return get(m_oid,
+                           m_oid.getObjectType().getProperty(p.getName()));
             } else {
-                Object value = fetchPath(p.getParent());
+                Object value = get(p.getParent());
                 if (value == null) {
                     return null;
                 } else if (value instanceof PersistentObject) {
                     OID oid = ((PersistentObject) value).getOID();
-                    return fetch(oid,
-                                 oid.getObjectType().getProperty(p.getName()));
+                    return get(oid,
+                               oid.getObjectType().getProperty(p.getName()));
                 } else {
                     throw new IllegalArgumentException
                         ("Path references attribute of opaque type: " + p);

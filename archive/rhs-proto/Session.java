@@ -9,12 +9,12 @@ import java.io.*;
  * Session
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/11/27 $
+ * @version $Revision: #3 $ $Date: 2002/11/27 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //users/rhs/persistence-proto/Session.java#2 $ by $Author: rhs $, $DateTime: 2002/11/27 17:41:53 $";
+    public final static String versionId = "$Id: //users/rhs/persistence-proto/Session.java#3 $ by $Author: rhs $, $DateTime: 2002/11/27 18:23:04 $";
 
     private static final PersistentObjectSource POS =
         new PersistentObjectSource();
@@ -33,14 +33,13 @@ public class Session {
 
     private ObjectData getObjectData(OID oid) {
         if (!hasObjectData(oid)) {
-            Cursor c = ENGINE.execute(getRetrieveQuery(oid));
+            RecordSet rs = ENGINE.execute(getRetrieveQuery(oid));
             // Cache non existent objects
-            if (!c.next()) {
+            if (!rs.next()) {
                 m_odata.put(oid, null);
             }
-            while (c.next()) {
-                // XXX: This is a bit odd, but Cursor loads data into the
-                // session automagically. Maybe that should change.
+            while (rs.next()) {
+                rs.load(this);
             }
         }
 
@@ -66,10 +65,9 @@ public class Session {
         } else if (od.isNew()){
             pd = new PropertyData(od, prop, null);
         } else {
-            // should fetch property from db
-            Cursor c = ENGINE.execute(getRetrieveQuery(oid, prop));
-            while (c.next()) {
-                // XXX: See above XXX
+            RecordSet rs = ENGINE.execute(getRetrieveQuery(oid, prop));
+            while (rs.next()) {
+                rs.load(this);
             }
             pd = od.getPropertyData(prop);
         }
