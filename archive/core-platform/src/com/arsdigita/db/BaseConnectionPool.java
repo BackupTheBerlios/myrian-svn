@@ -24,19 +24,20 @@ import org.apache.log4j.Logger;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Collections;
+import java.util.Iterator;
 
 /**
  * Base connection pooling class
  *
  * @author Bob Donald (<a href="mailto:bdonald@arsdigita.com"></a>)
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#4 $ $DateTime: 2002/08/14 23:39:40 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#5 $ $DateTime: 2002/10/02 13:49:31 $
  * @since
  *
  */
 
 abstract public class BaseConnectionPool implements DatabaseConnectionPool {
 
-    private static final String versionId = "$Author: dennis $ - $Date: 2002/08/14 $ $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#4 $";
+    private static final String versionId = "$Author: rhs $ - $Date: 2002/10/02 $ $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#5 $";
 
     private static final Logger cat = Logger.getLogger(BaseConnectionPool.class.getName());
 
@@ -67,6 +68,28 @@ abstract public class BaseConnectionPool implements DatabaseConnectionPool {
 
     public String getPassword() {
         return m_password;
+    }
+
+    public synchronized void closeConnections() {
+        for (Iterator it = m_availConnections.iterator(); it.hasNext(); ) {
+            java.sql.Connection conn = (java.sql.Connection) it.next();
+            try {
+                conn.close();
+            } catch (java.sql.SQLException e) {
+                cat.error(e);
+            }
+        }
+        for (Iterator it = m_usedConnections.iterator(); it.hasNext(); ) {
+            java.sql.Connection conn = (java.sql.Connection) it.next();
+            try {
+                conn.close();
+            } catch (java.sql.SQLException e) {
+                cat.error(e);
+            }
+        }
+        m_availConnections.clear();
+        m_usedConnections.clear();
+        m_loaded = false;
     }
 
     public void freeConnections() {
@@ -143,4 +166,5 @@ abstract public class BaseConnectionPool implements DatabaseConnectionPool {
      */
     abstract protected java.sql.Connection getNewConnection()
         throws java.sql.SQLException;
+
 }

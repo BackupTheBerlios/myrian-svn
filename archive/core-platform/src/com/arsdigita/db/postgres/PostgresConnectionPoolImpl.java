@@ -26,14 +26,14 @@ import org.apache.log4j.Logger;
  * Connection pooling class for PosgreSQL databases.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresConnectionPoolImpl.java#5 $ $DateTime: 2002/08/14 23:39:40 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresConnectionPoolImpl.java#6 $ $DateTime: 2002/10/02 13:49:31 $
  * @since 4.5
  *
  */
 
 public class PostgresConnectionPoolImpl extends BaseConnectionPool {
 
-    public static final String versionId = "$Author: dennis $ - $Date: 2002/08/14 $ $Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresConnectionPoolImpl.java#5 $";
+    public static final String versionId = "$Author: rhs $ - $Date: 2002/10/02 $ $Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresConnectionPoolImpl.java#6 $";
 
     private static final Logger s_log = Logger.getLogger(PostgresConnectionPoolImpl.class.getName());
 
@@ -75,4 +75,5 @@ public class PostgresConnectionPoolImpl extends BaseConnectionPool {
         throws java.sql.SQLException {
         // ignore
     }
+
 }

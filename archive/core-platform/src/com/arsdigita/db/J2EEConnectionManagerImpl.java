@@ -25,14 +25,14 @@ import org.apache.log4j.Logger;
  *
  *
  * @author David Dao (<a href="mailto:david@arsdigita.com"></a>)
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/10/02 $
  * @since 4.5
  *
  */
 
 public class J2EEConnectionManagerImpl implements DatabaseConnectionPool {
 
-    public static final String versionId = "$Author: dennis $ - $Date: 2002/08/14 $ $Id: //core-platform/dev/src/com/arsdigita/db/J2EEConnectionManagerImpl.java#4 $";
+    public static final String versionId = "$Author: rhs $ - $Date: 2002/10/02 $ $Id: //core-platform/dev/src/com/arsdigita/db/J2EEConnectionManagerImpl.java#5 $";
 
     private static final Logger cat = Logger.getLogger(J2EEConnectionManagerImpl.class.getName());
 
@@ -53,6 +53,10 @@ public class J2EEConnectionManagerImpl implements DatabaseConnectionPool {
 
     public String getPassword() {
         return "";
+    }
+
+    public void closeConnections() {
+        return;
     }
 
     public void freeConnections() {

@@ -29,16 +29,14 @@ import org.apache.log4j.Logger;
  * Connection pooling class using Oracle implementation.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#5 $ $DateTime: 2002/08/14 23:39:40 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#6 $ $DateTime: 2002/10/02 13:49:31 $
  * @since
  *
  */
 
 public class OracleConnectionPoolImpl extends BaseConnectionPool {
 
-    private static final String versionId = "$Author: dennis $ - $Date: 2002/08/14 $ $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#5 $";
-
-    private static OracleDataSource ods = null;
+    private static final String versionId = "$Author: rhs $ - $Date: 2002/10/02 $ $Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleConnectionPoolImpl.java#6 $";
 
     private static final Logger cat = Logger.getLogger(OracleConnectionPoolImpl.class.getName());
 
@@ -51,15 +49,17 @@ public class OracleConnectionPoolImpl extends BaseConnectionPool {
         }
     }
 
+    private OracleDataSource m_ods = null;
+
     public void setConnectionInfo(String url, String username,
                                   String password) throws SQLException {
         try {
             super.setConnectionInfo(url, username, password);
             cat.info("Using: " + url + ", " + username + ", " + password);
-            ods = new OracleDataSource();
-            ods.setURL(m_url);
-            ods.setUser(m_user);
-            ods.setPassword(m_password);
+            m_ods = new OracleDataSource();
+            m_ods.setURL(m_url);
+            m_ods.setUser(m_user);
+            m_ods.setPassword(m_password);
         } catch (SQLException e) {
             cat.error("Error setting connection info", e);
             SQLExceptionHandler.throwSQLException(e);
@@ -70,7 +70,7 @@ public class OracleConnectionPoolImpl extends BaseConnectionPool {
     protected java.sql.Connection getNewConnection()
         throws java.sql.SQLException {
         try {
-            java.sql.Connection con = ods.getConnection();
+            java.sql.Connection con = m_ods.getConnection();
             if (s_useFixFor901) {
                 java.sql.PreparedStatement stmt = con.prepareStatement( "alter session set \"_push_join_union_view\" = false");
                 stmt.execute();

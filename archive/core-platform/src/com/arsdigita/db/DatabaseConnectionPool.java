@@ -19,14 +19,14 @@ package com.arsdigita.db;
  *
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/10/02 $
  * @since 4.5
  *
  */
 
 public interface DatabaseConnectionPool {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DatabaseConnectionPool.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/DatabaseConnectionPool.java#4 $ by $Author: rhs $, $DateTime: 2002/10/02 13:49:31 $";
 
     public java.sql.Connection getConnection() throws java.sql.SQLException;
 
@@ -51,6 +51,12 @@ public interface DatabaseConnectionPool {
      * Returns the password for the connections in the pool.
      */
     public String getPassword();
+
+    /**
+     * Closes and frees all the connections in the pool.
+     **/
+
+    public void closeConnections();
 
     /**
      * Frees the connections in the pool.

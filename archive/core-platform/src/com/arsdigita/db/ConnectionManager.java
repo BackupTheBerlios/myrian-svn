@@ -24,14 +24,14 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Revision: #5 $ $Date: 2002/09/23 $
+ * @version $Revision: #6 $ $Date: 2002/10/02 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: rhs $ - $Date: 2002/09/23 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#5 $";
+    public static final String versionId = "$Author: rhs $ - $Date: 2002/10/02 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#6 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);
@@ -78,7 +78,7 @@ public class ConnectionManager {
     synchronized void disconnect() {
         if (m_pool != null) {
             CURRENT_THREAD_CONNECTION = new ThreadLocal();
-            m_pool.freeConnections();
+            m_pool.closeConnections();
             m_pool = null;
         }
     }
@@ -86,20 +86,9 @@ public class ConnectionManager {
     synchronized void connect() throws java.sql.SQLException {
         // check to see if pool is already intialized
         // for this url, username, and password.
-
         if (m_pool != null) {
-            if ( m_pool.getUrl().equals(m_url) &&
-                 m_pool.getUserName().equals(m_username) &&
-                 m_pool.getPassword().equals(m_password) ) {
-                // pool already intialized.
-                return;
-            } else {
-                m_pool.freeConnections();
-            }
+            return;
         }
-
-        // reset the pool
-        m_pool = null;
 
         try {
             m_pool = (DatabaseConnectionPool) m_poolImpl.newInstance();
@@ -278,6 +267,13 @@ public class ConnectionManager {
     }
 
 
+    static void closeConnections() {
+        if (MANAGER != null &&
+            MANAGER.m_pool != null) {
+            MANAGER.m_pool.closeConnections();
+        }
+    }
+
     /**
      * Frees all of the connections in the pool.
      */
@@ -286,7 +282,6 @@ public class ConnectionManager {
             MANAGER.disconnect();
         }
     }
-
 
     /**
      * Code for ensuring that there is only one connection per thread.
