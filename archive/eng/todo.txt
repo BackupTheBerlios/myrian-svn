@@ -1,0 +1,48 @@
+ * gcj support
+ * discriminator support
+ * collection modification flags
+ * cursor closing
+ * successive logging seems to cause PropertyCondition's Code object
+   to mutate, could be from repeated calls to emit methods in the
+   toString()
+ * need two way order -> line item for ordering to work correctly
+ * seperate various behavior control bits from one way, two way,
+   composite, component, etc
+ * sql generation interface
+ * removed hardcoded jdbc url from tests
+ * find better way to initialize session than in static block in
+   PersistenceTestCase
+ * remove DbHelper.java
+    - remove sql producing methods from Column and Table and replace
+      them with pluggable renderers
+    - remove sql producing code from DDLWriter and replace it with a
+      pluggable renderer
+    - remove usage from BlobAd and StringAd, figure out how to make
+      adapters db dependent
+    - either make InFilter a plugin point or choose one behavior
+    - remove cap.Session's use of DbHelper to choose an SQLWriter
+    - figure out how PDL.java can set up the appropriate environment
+      for the target database in the absence of a connection object
+    - figure out out to do db specific tests
+ * remove TestPDLGenerator.java
+ * make sql setup and teardown work on oracle
+ * remove dead sql scripts
+ * import -> resource search
+ * allow adapters to fault properties before object has been resurrected
+ * make session aware of both object identity and datastore identity
+   and all the various permutations and mappings in between the two
+   kinds of identity
+ * support aggregation via implicitly generating group by for
+   aggregate operations on collection properties and also providing
+   construct for creating derived types, e.g.
+   group(all(User), firstName == "Bob")
+ * add hypersonic SQL support
+ * remove distinction between oql expressions and relational metadata
+ * simplify session construction interface
+   - move ConnectionSource impls into crp
+   - eliminate QuerySource
+ * make ReflectionAdapter use cglib's Factory interface for efficient
+   object creation
+ * deal with subtle key ordering issues that can happen when multiple
+   places in PDL try to define the same primary key in opposite orders
+ * remove oracle build dependency
