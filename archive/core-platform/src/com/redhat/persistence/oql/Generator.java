@@ -9,17 +9,16 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/03/23 $
+ * @version $Revision: #3 $ $Date: 2004/03/23 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Generator.java#2 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Generator.java#3 $ by $Author: richardl $, $DateTime: 2004/03/23 18:01:04 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
-    private Root m_root;
-    private List m_frames = new ArrayList();
+    private List m_framepool = new ArrayList();
     private Map m_queries = new HashMap();
     private LinkedList m_stack = new LinkedList();
     private Set m_boolean = new HashSet();
@@ -30,8 +29,24 @@ class Generator {
     private MultiMap m_nonnull = new MultiMap();
     private Map m_substitutions = new HashMap();
 
-    Generator(Root root) {
+    private Root m_root;
+    private List m_frames;
+
+    Generator() {}
+
+    void init(Root root) {
         m_root = root;
+        m_frames = m_framepool.subList(0, 0);
+
+        m_queries.clear();
+        m_stack.clear();
+        m_boolean.clear();
+        m_equalities.clear();
+        m_sufficient.clear();
+        m_uses.clear();
+        m_null.clear();
+        m_nonnull.clear();
+        m_substitutions.clear();
     }
 
     Root getRoot() {
@@ -43,9 +58,14 @@ class Generator {
     }
 
     QFrame frame(Expression expr, ObjectType type) {
-        QFrame result = new QFrame(this, expr, type, peek());
+        int size = m_frames.size();
+        if (size == m_framepool.size()) {
+            m_framepool.add(new QFrame(this));
+        }
+        m_frames = m_framepool.subList(0, size + 1);
+        QFrame result = (QFrame) m_frames.get(size);
+        result.init(expr, type, peek());
         m_queries.put(expr, result);
-        m_frames.add(result);
         return result;
     }
 
@@ -235,15 +255,20 @@ class Generator {
         }
     }
 
+    private Set m_ccolumns = new HashSet();
+    private Set m_cframes = new HashSet();
+    private List m_cconds = new ArrayList();
+
     QFrame getConstraining(QFrame frame) {
-        List conds = frame.getConditions();
-        Set columns = new HashSet();
-        Set frames = new HashSet();
-        for (Iterator it = conds.iterator(); it.hasNext(); ) {
+        m_cconds.clear();
+        m_ccolumns.clear();
+        m_cframes.clear();
+        frame.addConditions(m_cconds);
+        for (Iterator it = m_cconds.iterator(); it.hasNext(); ) {
             Expression e = (Expression) it.next();
-            addConstraining(e, frame, columns, frames);
+            addConstraining(e, frame, m_ccolumns, m_cframes);
         }
-        if (columns.isEmpty() || !frame.isConstrained(columns)) {
+        if (m_ccolumns.isEmpty() || !frame.isConstrained(m_ccolumns)) {
             return null;
         }
         return frame.getContainer();
