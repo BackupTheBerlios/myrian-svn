@@ -23,12 +23,12 @@ import java.security.*;
  * value of the correct type for the specified property.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/10/31 $
+ * @version $Revision: #2 $ $Date: 2002/11/06 $
  **/
 
 public class DataSource {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/DataSource.java#1 $ by $Author: rhs $, $DateTime: 2002/10/31 12:25:15 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/DataSource.java#2 $ by $Author: rhs $, $DateTime: 2002/11/06 16:38:23 $";
 
     private static final Logger LOG = Logger.getLogger(DataSource.class);
 
@@ -136,7 +136,7 @@ public class DataSource {
         } else if (type.equals(MetadataRoot.CHARACTER)) {
             return new Character(makeString(hash, 1).charAt(0));
         } else if (type.equals(MetadataRoot.DATE)) {
-            return new Date();
+            return new Date(1000*Long.parseLong(makeNumber(hash, 32, 0)));
         } else if (type.equals(MetadataRoot.DOUBLE)) {
             return Double.valueOf(makeNumber(hash, 64, 0));
         } else if (type.equals(MetadataRoot.FLOAT)) {
@@ -144,7 +144,7 @@ public class DataSource {
         } else if (type.equals(MetadataRoot.INTEGER)) {
             return Integer.valueOf(makeNumber(hash, 32, 0));
         } else if (type.equals(MetadataRoot.LONG)) {
-            return Long.valueOf(makeNumber(hash, 32, 0));
+            return Long.valueOf(makeNumber(hash, 64, 0));
         } else if (type.equals(MetadataRoot.SHORT)) {
             return Short.valueOf(makeNumber(hash, 16, 0));
         } else if (type.equals(MetadataRoot.STRING)) {

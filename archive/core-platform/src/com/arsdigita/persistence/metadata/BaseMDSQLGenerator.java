@@ -42,12 +42,12 @@ import org.apache.log4j.Logger;
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#18 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#19 $
  * @since 4.6.3
  */
 abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#18 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#19 $ by $Author: rhs $, $DateTime: 2002/11/06 16:38:23 $";
 
     private static final Logger s_log =
         Logger.getLogger(BaseMDSQLGenerator.class);
@@ -502,41 +502,35 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
         if (path.size() == 1) {
             Column from = ((JoinElement)path.get(0)).getFrom();
-            Column refkey = type.getColumn();
-            Property typekey = Utilities.getKeyProperty((ObjectType)prop.getType());
+            Property typekey =
+                Utilities.getKeyProperty((ObjectType)prop.getType());
 
             if ((typekey == null) ||
-                (refkey == null) ||
                 (Utilities.getKeyProperty(type) == null)) {
                 s_log.warn("generateSinglePropertyAdd: " +
                            type.getName() + "." + prop.getName() +
                            "\ntypekey: " + typekey +
                            "\ntype: " + prop.getType().getName() +
-                           "\nrefkey: " + refkey +
                            "\nUtilities.getKeyProperty(type): " +
                            Utilities.getKeyProperty(type));
                 return null;
             }
 
-            if (!refkey.getTableName().equals(from.getTableName())) {
-                s_log.warn("generateSinglePropertyAdd: JoinPath for " +
-                           prop.getName() + " in " + type.getQualifiedName() +
-                           " does not start in the primary table.");
-                return null;
-            }
+            Table table = from.getTable();
+            Column pkey = table.getPrimaryKey().getColumns()[0];
 
             sb.append("update ")
-                .append(from.getTableName())
+                .append(table.getName())
                 .append("\nset ")
-                .append(from.getColumnName())
+                .append(from.getName())
                 .append(" = :")
                 .append(prop.getName())
                 .append(".")
                 .append(typekey.getName())
                 .append("\nwhere ")
-                .append(refkey.getTableName())
+                .append(table.getName())
                 .append(".")
-                .append(refkey.getColumnName())
+                .append(pkey.getName())
                 .append(" = :")
                 .append(Utilities.getKeyProperty(type).getName());
         } else {
@@ -817,22 +811,17 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
         if (path.size() == 1) {
             Column from = ((JoinElement)path.get(0)).getFrom();
-
-            if (!refkey.getTableName().equals(from.getTableName())) {
-                s_log.warn("generateSinglePropertyRemove: JoinPath for " +
-                           prop.getName() +
-                           " does not start in the primary table.");
-                return null;
-            }
+            Table table = from.getTable();
+            Column pkey = table.getPrimaryKey().getColumns()[0];
 
             sb.append("update ")
-                .append(from.getTableName())
+                .append(table.getName())
                 .append("\nset ")
-                .append(from.getColumnName())
+                .append(from.getName())
                 .append(" = null\nwhere ")
-                .append(refkey.getTableName())
+                .append(table.getName())
                 .append(".")
-                .append(refkey.getColumnName())
+                .append(pkey.getName())
                 .append(" = :")
                 .append(Utilities.getKeyProperty(type).getName());
         } else {
