@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/Resource.pdl#3 $ 
-// $DateTime: 2002/10/16 15:11:40 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/Resource.pdl#4 $ 
+// $DateTime: 2002/10/16 16:57:53 $
 
 model com.arsdigita.kernel;
 
@@ -55,6 +55,5 @@ object type Resource extends ACSObject {
 
     reference key (applications.application_id);
 
+    aggressive load (parentResource.id);
 }
-
-
