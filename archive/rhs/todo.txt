@@ -38,3 +38,8 @@
    group(all(User), firstName == "Bob")
  * add hypersonic SQL support
  * remove distinction between oql expressions and relational metadata
+ * simplify session construction interface
+   - move ConnectionSource impls into crp
+   - eliminate QuerySource
+ * make ReflectionAdapter use cglib's Factory interface for efficient
+   object creation
