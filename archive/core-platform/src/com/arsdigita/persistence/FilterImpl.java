@@ -26,12 +26,12 @@ import org.apache.log4j.Logger;
  * be combined and manipulated to create complex queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/07/07 $
+ * @version $Revision: #12 $ $Date: 2003/08/14 $
  */
 
 abstract class FilterImpl implements Filter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterImpl.java#11 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterImpl.java#12 $ by $Author: rhs $, $DateTime: 2003/08/14 12:27:40 $";
 
     private static final Logger m_log =
         Logger.getLogger(Filter.class.getName());
@@ -47,6 +47,9 @@ abstract class FilterImpl implements Filter {
      * Returns a name that is safe to use for binding the passed in property
      * name.
      **/
+
+    private static final int MASK = ~(1 << 31);
+    private static int s_counter = 0;
 
     private static final String bindName(String propertyName) {
         StringBuffer result = new StringBuffer(propertyName.length());
@@ -68,6 +71,9 @@ abstract class FilterImpl implements Filter {
                 break;
             }
         }
+
+        // the bitwise and drops the sign bit
+        result.append(s_counter++ & MASK);
 
         return result.toString();
     }
@@ -122,14 +128,15 @@ abstract class FilterImpl implements Filter {
      *  @param value The value for the specified attribute
      */
     protected static Filter equals(String attribute, Object value) {
+        String bind = bindName(attribute);
         String conditions;
         if (value == null) {
             conditions = m_util.createNullString("=", attribute);
         } else {
-            conditions = attribute + " = :" + bindName(attribute);
+            conditions = attribute + " = :" + bind;
         }
 
-        return (new SimpleFilter(conditions)).set(bindName(attribute), value);
+        return (new SimpleFilter(conditions)).set(bind, value);
     }
 
 
@@ -146,14 +153,15 @@ abstract class FilterImpl implements Filter {
      *  @param value The value for the specified attribute
      */
     protected static Filter notEquals(String attribute, Object value) {
+        String bind = bindName(attribute);
         String conditions;
         if (value == null) {
             conditions = m_util.createNullString("!=", attribute);
         } else {
-            conditions = attribute + " != :" + bindName(attribute);
+            conditions = attribute + " != :" + bind;
         }
 
-        return (new SimpleFilter(conditions)).set(bindName(attribute), value);
+        return (new SimpleFilter(conditions)).set(bind, value);
     }
 
 
@@ -251,9 +259,9 @@ abstract class FilterImpl implements Filter {
         if (value == null) {
             return filterForNullValue(attribute, trueForAllIfValueIsNull);
         } else {
-            Filter filter = simple(attribute + " " + comparator + " :" +
-                                   bindName(attribute));
-            filter.set(bindName(attribute), value);
+            String bind = bindName(attribute);
+            Filter filter = simple(attribute + " " + comparator + " :" + bind);
+            filter.set(bind, value);
             return filter;
         }
 
@@ -279,9 +287,9 @@ abstract class FilterImpl implements Filter {
         if (value == null) {
             return filterForNullValue(attribute, trueForAllIfValueIsNull);
         } else {
-            Filter filter = simple(attribute + " like :" +
-                                   bindName(attribute) + " || '%'");
-            filter.set(bindName(attribute), value);
+            String bind = bindName(attribute);
+            Filter filter = simple(attribute + " like :" + bind + " || '%'");
+            filter.set(bind, value);
             return filter;
         }
     }
@@ -306,9 +314,9 @@ abstract class FilterImpl implements Filter {
         if (value == null) {
             return filterForNullValue(attribute, trueForAllIfValueIsNull);
         } else {
-            Filter filter = simple(attribute + " like '%' || :" +
-                                   bindName(attribute));
-            filter.set(bindName(attribute), value);
+            String bind = bindName(attribute);
+            Filter filter = simple(attribute + " like '%' || :" + bind);
+            filter.set(bind, value);
             return filter;
         }
     }
@@ -333,9 +341,10 @@ abstract class FilterImpl implements Filter {
         if (value == null) {
             return filterForNullValue(attribute, trueForAllIfValueIsNull);
         } else {
-            Filter filter = simple(attribute + " like '%' || :" +
-                                   bindName(attribute) + " || '%'");
-            filter.set(bindName(attribute), value);
+            String bind = bindName(attribute);
+            Filter filter = simple(attribute + " like '%' || :" + bind +
+                                   " || '%'");
+            filter.set(bind, value);
             return filter;
         }
     }

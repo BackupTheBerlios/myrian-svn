@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
  * CompoundFilters are used to AND or OR multiple filters together.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/07/07 $
+ * @version $Revision: #9 $ $Date: 2003/08/14 $
  */
 
 class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/CompoundFilterImpl.java#8 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/CompoundFilterImpl.java#9 $ by $Author: rhs $, $DateTime: 2003/08/14 12:27:40 $";
 
     private static final Logger m_log =
         Logger.getLogger(CompoundFilterImpl.class);
@@ -116,12 +116,11 @@ class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
             if (getBindings().size() < numberBindings) {
                 // there was name overlapping so log a warning
 		if (m_log.isEnabledFor(Level.WARN)) {
-		    m_log.warn(
-			       "When the filter was added, there was a naming" +
-			       " conflict with the variables." + Utilities.LINE_BREAK +
-			       "Filter 1: " + filter.toString() + Utilities.LINE_BREAK +
-			       "Filter 2: " + toString()
-			       );
+		    m_log.warn
+                        ("When the filter was added, there was a naming" +
+                         " conflict with the variables." + Utilities.LINE_BREAK +
+                         "Filter 1: " + filter.toString() + Utilities.LINE_BREAK +
+                         "Filter 2: " + toString());
 		}
             }
         }
