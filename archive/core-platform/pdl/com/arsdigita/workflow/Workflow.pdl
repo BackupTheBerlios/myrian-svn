@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/workflow/Workflow.pdl#10 $ 
-// $DateTime: 2003/05/21 12:25:09 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/workflow/Workflow.pdl#11 $
+// $DateTime: 2003/06/02 10:50:25 $
 
 model com.arsdigita.workflow.simple;
 
@@ -23,45 +23,10 @@ object type Workflow extends Task {
     BigDecimal[0..1] processDefinitionID = cw_processes.process_def_id INTEGER;
     String[0..1]     processState = cw_processes.process_state VARCHAR(16);
     composite ACSObject[0..1]  object = join cw_processes.object_id to acs_objects.object_id;
-    component Task[0..n] wfTasks = join cw_processes.process_id 
+    component Task[0..n] wfTasks = join cw_processes.process_id
                                      to cw_tasks.parent_task_id;
 
     reference key (cw_processes.process_id);
-
-    retrieve wfTasks {
-        do {
-            select cw_tasks.task_id          ,
-                   cw_tasks.label            ,
-                   cw_tasks.description      ,
-                   cw_tasks.is_active        ,
-                   cw_tasks.parent_task_id   ,
-                   cw_tasks.task_state       ,
-                   acs_objects.default_domain_class    ,
-                   acs_objects.object_type   ,
-                   acs_objects.object_id
-            from   cw_tasks                      ,
-                   acs_objects
-            where  cw_tasks.parent_task_id = :id
-            and    acs_objects.object_id = cw_tasks.task_id
-        } map {
-	    wfTasks.id		     	     = acs_objects.object_id;
-            wfTasks.label                    = cw_tasks.label;
-            wfTasks.description              = cw_tasks.description;
-            wfTasks.isActive                 = cw_tasks.is_active;
-            wfTasks.parentTaskID             = cw_tasks.parent_task_id;
-            wfTasks.taskState 		     = cw_tasks.task_state;
-	    wfTasks.objectType           = acs_objects.object_type;
-	    wfTasks.defaultDomainClass       = acs_objects.default_domain_class;
-        }
-   }
-
-    remove wfTasks {
-        do {
-            delete
-            from   cw_tasks
-            where  cw_tasks.parent_task_id = :id
-        }
-   }
 }
 
 
@@ -73,11 +38,11 @@ query getProcesses {
     String processObjectType;
 
     do {
-        select cw_processes.process_id 
+        select cw_processes.process_id
         ,      acs_objects.object_type
         ,      cw_processes.object_id as object_id
         ,      cw_processes.process_def_id
-        from cw_processes , acs_objects 
+        from cw_processes , acs_objects
         where cw_processes.object_id = acs_objects.object_id
     } map {
         id = cw_processes.process_id;

@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/workflow/Task.pdl#11 $
-// $DateTime: 2003/05/12 18:19:45 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/workflow/Task.pdl#12 $
+// $DateTime: 2003/06/02 10:50:25 $
 
 model com.arsdigita.workflow.simple;
 
@@ -28,10 +28,6 @@ object type Task extends ACSObject {
     component TaskComment[0..n] comments =
               join cw_tasks.task_id to cw_task_comments.task_id;
 
-    Task[0..n] dependsOn = join cw_tasks.task_id
-                              to cw_task_dependencies.task_id,
-                            join cw_task_dependencies.dependent_task_id
-                              to cw_tasks.task_id;
     reference key (cw_tasks.task_id);
 
 
@@ -52,6 +48,16 @@ object type Task extends ACSObject {
         }
         super;
     }
+}
+
+association {
+    Task[0..n] dependsOn = join cw_tasks.task_id
+                              to cw_task_dependencies.task_id,
+                            join cw_task_dependencies.dependent_task_id
+                              to cw_tasks.task_id;
+    Task[0..n] dependents =
+        join cw_tasks.task_id to cw_task_dependencies.dependent_task_id,
+        join cw_task_dependencies.task_id to cw_tasks.task_id;
 }
 
 association {
