@@ -15,12 +15,12 @@ import java.util.*;
  * ScriptParser.java
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/02/23 $
+ * @version $Revision: #5 $ $Date: 2004/02/26 $
  */
 
 public class ScriptParser {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/ScriptParser.jj#4 $ by $Author: justin $, $DateTime: 2004/02/23 17:14:17 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/ScriptParser.jj#5 $ by $Author: justin $, $DateTime: 2004/02/26 12:55:35 $";
 
 }
 
@@ -101,21 +101,32 @@ Initializer initializerClass() throws InitializationException :
             Constructor cons = cls.getConstructor(new Class[0]);
             return (Initializer) cons.newInstance(new Object[0]);
         } catch (ClassNotFoundException e) {
-            throw new InitializationException("Couldn't find " + className);
+            // The initializer no longer exists, so we use the generic
+            // one.
+
+            return (Initializer) Classes.newInstance
+                (GenericInitializer.class,
+                 new Class[] {String.class},
+                 new Object[] {className.toString()});
         } catch (NoSuchMethodException e) {
-            throw new InitializationException(
-                className +
-                " must implement com.arsdigita.initializer.Initializer"
-                );
+            // We ran into something named foo.Initializer, but it
+            // doesn't implement c.a.initializer.Initializer anymore.
+            // So we sub in a generic initializer implementing the old
+            // interface.
+
+            return (Initializer) Classes.newInstance
+                (GenericInitializer.class,
+                 new Class[] {String.class},
+                 new Object[] {className.toString()});
         } catch (InstantiationException e) {
             throw new InitializationException(
                 "Error instantiating " + className + ": " + e.getMessage()
                 );
         } catch (ClassCastException e) {
-            throw new InitializationException(
-                className +
-                " must implement com.arsdigita.initializer.Initializer"
-                );
+            return (Initializer) Classes.newInstance
+                (GenericInitializer.class,
+                 new Class[] {String.class},
+                 new Object[] {className.toString()});
         } catch (IllegalAccessException e) {
             throw new InitializationException(className + " must be public.");
         } catch (InvocationTargetException e) {
@@ -124,10 +135,6 @@ Initializer initializerClass() throws InitializationException :
                 e.getTargetException().getMessage()
                 );
         }
-//         return (Initializer) Classes.newInstance
-//             (GenericInitializer.class,
-//              new Class[] {String.class},
-//              new Object[] {className.toString()});
     }
 }
 
