@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
  * @author Randy Graebner &lt;randyg@alum.mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/11/26 $
+ * @version $Revision: #4 $ $Date: 2004/01/22 $
  **/
 
 public final class Files {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Files.java#3 $ by $Author: dennis $, $DateTime: 2003/11/26 18:09:02 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Files.java#4 $ by $Author: dennis $, $DateTime: 2004/01/22 17:43:00 $";
 
     private static final Logger s_log = 
         Logger.getLogger(Files.class);
@@ -69,6 +69,9 @@ public final class Files {
                 throw new IOException("couldn't make directory: " + to);
             }
             File[] files = from.listFiles();
+            if (files == null) {
+                throw new IOException("could not read directory: " + from);
+            }
             for (int i = 0; i < files.length; i++) {
                 copy(files[i], to, mode);
             }
@@ -77,6 +80,12 @@ public final class Files {
                 if ( mode == IGNORE_EXISTING ) { return; }
                 if ( mode == UPDATE &&
                      to.lastModified() > from.lastModified() ) { return; }
+            }
+            if (!from.canRead()) {
+                throw new IOException("can not read file: " + from);
+            }
+            if (!to.canWrite()) {
+                throw new IOException("can not write file: " + to);
             }
             InputStream is = new FileInputStream(from);
             OutputStream os = new FileOutputStream(to);
