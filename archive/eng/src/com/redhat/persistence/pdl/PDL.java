@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #17 $ $Date: 2004/10/01 $
+ * @version $Revision: #18 $ $Date: 2004/10/01 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#17 $ by $Author: rhs $, $DateTime: 2004/10/01 15:07:31 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#18 $ by $Author: vadim $, $DateTime: 2004/10/01 15:45:16 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -58,7 +58,7 @@ public class PDL {
             FileNd file = p.file(filename);
             m_ast.add(AST.FILES, file);
         } catch (ParseException e) {
-            throw new WrappedError(filename, e);
+            throw new Error(filename, e);
         }
     }
 

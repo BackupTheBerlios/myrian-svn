@@ -17,8 +17,6 @@
  */
 package com.redhat.persistence.engine.rdbms;
 
-import com.arsdigita.util.WrappedError;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.apache.log4j.Logger;
@@ -27,12 +25,12 @@ import org.apache.log4j.Logger;
  * ResultCycle
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/09/07 $
+ * @version $Revision: #4 $ $Date: 2004/10/01 $
  **/
 
 class ResultCycle {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/ResultCycle.java#3 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/ResultCycle.java#4 $ by $Author: vadim $, $DateTime: 2004/10/01 15:45:16 $";
 
     private static final Logger LOG = Logger.getLogger(ResultCycle.class);
 
@@ -90,7 +88,7 @@ class ResultCycle {
             return result;
         } catch (SQLException e) {
             if (m_cycle != null) { m_cycle.endNext(e); }
-            throw new WrappedError(e);
+            throw new Error(e);
         }
     }
 
@@ -108,7 +106,7 @@ class ResultCycle {
             m_engine.release();
         } catch (SQLException e) {
             if (m_cycle != null) { m_cycle.endClose(e); }
-            throw new WrappedError(e);
+            throw new Error(e);
         }
     }
 

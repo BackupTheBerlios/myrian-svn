@@ -39,7 +39,6 @@ import com.redhat.persistence.oql.Expression;
 import com.redhat.persistence.oql.Query;
 import com.redhat.persistence.oql.Variable;
 import com.redhat.persistence.oql.Size;
-import com.arsdigita.util.WrappedError;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -62,12 +61,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/10/01 $
+ * @version $Revision: #10 $ $Date: 2004/10/01 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#9 $ by $Author: vadim $, $DateTime: 2004/10/01 15:29:46 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#10 $ by $Author: vadim $, $DateTime: 2004/10/01 15:45:16 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -252,7 +251,7 @@ public class RDBMSEngine extends Engine {
         try {
             m_conn.commit();
         } catch (SQLException e) {
-            throw new WrappedError(e);
+            throw new Error(e);
         } finally {
             releaseAll();
         }
@@ -263,7 +262,7 @@ public class RDBMSEngine extends Engine {
         try {
             m_conn.rollback();
         } catch (SQLException e) {
-            throw new WrappedError(e);
+            throw new Error(e);
         } finally {
             releaseAll();
             clear();
@@ -433,7 +432,7 @@ public class RDBMSEngine extends Engine {
                     }
                 } catch (SQLException se) {
                     LOG.error(se.getMessage(), se);
-                    throw new WrappedError(se);
+                    throw new Error(se);
                 } finally {
                     rs.close();
                 }
