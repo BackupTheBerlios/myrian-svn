@@ -29,13 +29,13 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterLoader
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyLoader.java#5 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyLoader.java#6 $
  */
 public class JavaPropertyLoader implements ParameterLoader {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyLoader.java#5 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/17 14:27:50 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyLoader.java#6 $" +
+        "$Author: rhs $" +
+        "$DateTime: 2003/10/17 15:34:34 $";
 
     private static final Logger s_log = Logger.getLogger
         (JavaPropertyLoader.class);
@@ -74,9 +74,7 @@ public class JavaPropertyLoader implements ParameterLoader {
         if (m_props.containsKey(key)) {
             final ParameterValue value = new ParameterValue();
 
-            value.setString(read(param, value.getErrors()));
-
-            param.unmarshal(value.getString(), value.getErrors());
+            value.setObject(param.read(this, value.getErrors()));
 
             return value;
         } else {

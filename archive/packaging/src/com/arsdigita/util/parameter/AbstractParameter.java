@@ -24,13 +24,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#8 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#9 $
  */
 public abstract class AbstractParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#8 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/17 14:28:55 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#9 $" +
+        "$Author: rhs $" +
+        "$DateTime: 2003/10/17 15:34:34 $";
 
     private final String m_name;
     private final Class m_type;
@@ -96,11 +96,12 @@ public abstract class AbstractParameter implements Parameter {
         }
     }
 
-    public Object unmarshal(final String value, final ErrorList errors) {
+    protected Object unmarshal(final String value, final List errors) {
         try {
             return Converters.convert(m_type, value);
         } catch (ConversionException ce) {
-            errors.add(ce.getMessage());
+            errors.add("'" + value + "' is not a valid '" +
+                       m_type.getName() + "' (" + ce.getMessage() + ")");
 
             return null;
         }

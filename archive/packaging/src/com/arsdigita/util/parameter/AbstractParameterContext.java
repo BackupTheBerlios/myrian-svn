@@ -24,13 +24,13 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameterContext.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameterContext.java#3 $
  */
 public abstract class AbstractParameterContext implements ParameterContext {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameterContext.java#2 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/17 14:30:44 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameterContext.java#3 $" +
+        "$Author: rhs $" +
+        "$DateTime: 2003/10/17 15:34:34 $";
 
     private static final Logger s_log = Logger.getLogger
         (AbstractParameterContext.class);
@@ -77,7 +77,12 @@ public abstract class AbstractParameterContext implements ParameterContext {
      * @param param The named <code>Parameter</code> whose value you
      * wish to retrieve; it cannot be null
      */
+
     public Object get(final Parameter param) {
+        return get(param, param.getDefaultValue());
+    }
+
+    public Object get(final Parameter param, final Object dephault) {
         if (Assert.isEnabled()) {
             Assert.exists(param, Parameter.class);
             Assert.truth(m_param.contains(param),
@@ -89,7 +94,7 @@ public abstract class AbstractParameterContext implements ParameterContext {
         final Object value = m_map.get(param);
 
         if (value == null) {
-            return param.getDefaultValue();
+            return dephault;
         } else {
             return value;
         }
