@@ -9,12 +9,12 @@ import java.util.*;
  * for filtering the stream down to the set of events that are of interest.
  *
  * @author <a href="mailto:ashah@redhat.com">Archit Shah</a>
- * @version $Revision: #2 $ $Date: 2003/03/10 $
+ * @version $Revision: #3 $ $Date: 2003/03/10 $
  **/
 
 public class EventStream {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/EventStream.java#2 $ by $Author: rhs $, $DateTime: 2003/03/10 15:35:44 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/EventStream.java#3 $ by $Author: ashah $, $DateTime: 2003/03/10 17:28:24 $";
 
     // all events
     private final LinkedList m_events = new LinkedList();
@@ -27,7 +27,7 @@ public class EventStream {
 
     public int size() { return m_events.size(); }
 
-    public Collection getEvents() { return m_events; }
+    public List getEvents() { return m_events; }
 
     public Iterator iterator() { return m_events.iterator(); }
 

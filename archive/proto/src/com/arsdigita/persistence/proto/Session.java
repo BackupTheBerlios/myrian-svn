@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #41 $ $Date: 2003/03/07 $
+ * @version $Revision: #42 $ $Date: 2003/03/10 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#41 $ by $Author: ashah $, $DateTime: 2003/03/07 13:27:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#42 $ by $Author: ashah $, $DateTime: 2003/03/10 17:28:24 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -45,12 +45,25 @@ public class Session {
     private final Set m_beforeFlush = new HashSet();
     private final Set m_afterFlush = new HashSet();
 
+    private boolean m_flushing = false;
+
     public Session(Engine engine, QuerySource source) {
         m_engine = engine;
         m_qs = source;
     }
 
     EventStream getEventStream() { return m_events; }
+
+    private void cleanUp() {
+        if (m_pending.size() > 0) {
+            LOG.warn("pending events being dumped");
+        }
+        // m_pending.clear();
+        if (m_visiting.size() > 0) {
+            LOG.warn("pending events being dumped");
+        }
+        // m_visiting.clear();
+    }
 
     public void create(Object obj) {
         if (LOG.isDebugEnabled()) {
@@ -70,13 +83,17 @@ public class Session {
 
         getAdapter(obj).setSession(obj, this);
 
-        addEvent(new CreateEvent(this, obj));
-        processPending();
+        try {
+            addEvent(new CreateEvent(this, obj));
+            processPending();
 
-        PropertyMap props = getAdapter(obj).getProperties(obj);
-        for (Iterator it = props.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry me = (Map.Entry) it.next();
-            set(obj, (Property) me.getKey(), me.getValue());
+            PropertyMap props = getAdapter(obj).getProperties(obj);
+            for (Iterator it = props.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry me = (Map.Entry) it.next();
+                set(obj, (Property) me.getKey(), me.getValue());
+            }
+        } finally {
+            cleanUp();
         }
 
         if (LOG.isDebugEnabled()) {
@@ -85,9 +102,13 @@ public class Session {
     }
 
     public boolean delete(Object obj) {
-        boolean result = deleteInternal(obj);
-        processPending();
-        return result;
+        try {
+            boolean result = deleteInternal(obj);
+            processPending();
+            return result;
+        } finally {
+            cleanUp();
+        }
     }
 
     private boolean deleteInternal(Object obj) {
@@ -226,8 +247,12 @@ public class Session {
     }
 
     public void set(final Object obj, Property prop, final Object value) {
-        setInternal(obj, prop, value);
-        processPending();
+        try {
+            setInternal(obj, prop, value);
+            processPending();
+        } finally {
+            cleanUp();
+        }
     }
 
     private void setInternal(final Object obj, Property prop,
@@ -319,9 +344,13 @@ public class Session {
 
 
     public Object add(final Object obj, Property prop, final Object value) {
-        Object result = addInternal(obj, prop, value);
-        processPending();
-        return result;
+        try {
+            Object result = addInternal(obj, prop, value);
+            processPending();
+            return result;
+        } finally {
+            cleanUp();
+        }
     }
 
     private Object addInternal(final Object obj, Property prop,
@@ -357,8 +386,12 @@ public class Session {
     }
 
     public void remove(final Object obj, Property prop, final Object value) {
-        removeInternal(obj, prop, value);
-        processPending();
+        try {
+            removeInternal(obj, prop, value);
+            processPending();
+        } finally {
+            cleanUp();
+        }
     }
 
 
@@ -399,8 +432,12 @@ public class Session {
 
 
     public void clear(Object obj, Property prop) {
-        clearInternal(obj, prop);
-        processPending();
+        try {
+            clearInternal(obj, prop);
+            processPending();
+        } finally {
+            cleanUp();
+        }
     }
 
     private void clearInternal(Object obj, Property prop) {
@@ -453,7 +490,7 @@ public class Session {
             getObjectData(obj).getPropertyData(prop).isModified();
     }
 
-    private void process(Collection processors, Collection events) {
+    private void process(Collection processors, List events) {
         for (Iterator it = processors.iterator(); it.hasNext(); ) {
             EventProcessor ep = (EventProcessor) it.next();
             write(ep, events);
@@ -461,9 +498,10 @@ public class Session {
         }
     }
 
-    private void write(EventProcessor ep, Collection events) {
-        for (Iterator it = events.iterator(); it.hasNext(); ) {
-            Event ev = (Event) it.next();
+    private void write(EventProcessor ep, List events) {
+        int max = events.size();
+        for (int i = 0; i < max; i++) {
+            Event ev = (Event) events.get(i);
             ep.write(ev);
         }
     }
@@ -502,6 +540,16 @@ public class Session {
      * datastore are consistent with the contents of the in memory data cache.
      **/
     public void flush() {
+        if (m_flushing) { return; }
+        try {
+            m_flushing = true;
+            flushInternal();
+        } finally {
+            m_flushing = false;
+        }
+    }
+
+    private void flushInternal() {
         if (LOG.isDebugEnabled()) {
             trace("flush", new Object[] {});
         }
@@ -549,12 +597,16 @@ public class Session {
 
     public void commit() {
         flush();
-        m_engine.commit();
+        if (m_events.size() > 0) {
+            throw new IllegalStateException();
+        }
+
         m_odata.clear();
         m_events.clear();
         m_pending.clear();
         m_visiting.clear();
         m_violations.clear();
+        m_engine.commit();
     }
 
     /**
@@ -564,12 +616,12 @@ public class Session {
 
     public void rollback() {
         // should properly roll back java state
-        m_engine.rollback();
         m_odata.clear();
         m_events.clear();
         m_pending.clear();
         m_visiting.clear();
         m_violations.clear();
+        m_engine.rollback();
     }
 
     Engine getEngine() {
