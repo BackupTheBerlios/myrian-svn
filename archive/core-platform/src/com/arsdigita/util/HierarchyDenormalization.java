@@ -33,11 +33,11 @@ import org.apache.log4j.Logger;
  * </p>
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Revision: #5 $ $Date: 2003/07/07 $
+ * @version $Revision: #6 $ $Date: 2003/07/22 $
  */
 public abstract class HierarchyDenormalization {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/HierarchyDenormalization.java#5 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/HierarchyDenormalization.java#6 $ by $Author: ashah $, $DateTime: 2003/07/22 13:40:18 $";
 
     private final static Logger s_log =
         Logger.getLogger(HierarchyDenormalization.class);
@@ -97,6 +97,13 @@ public abstract class HierarchyDenormalization {
                     s_log.debug("After save: oid:" + dobj.getOID() +
                                 " new value is:" + m_newAttributeValue +
                                 " old value is:" + m_oldAttributeValue);
+                }
+
+                if ((m_oldAttributeValue == null
+                     && m_newAttributeValue == null)
+                    || (m_oldAttributeValue != null
+                        && m_oldAttributeValue.equals(m_newAttributeValue))) {
+                    return;
                 }
 
                 if (m_oldAttributeValue == null) {
