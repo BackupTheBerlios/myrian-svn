@@ -38,7 +38,6 @@ import com.redhat.persistence.oql.Variable;
 import com.redhat.persistence.oql.Size;
 import com.arsdigita.util.UncheckedWrapperException;
 import com.arsdigita.util.WrappedError;
-import com.arsdigita.webdevsupport.WebDevSupport;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -61,12 +60,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #19 $ $Date: 2004/04/05 $
+ * @version $Revision: #20 $ $Date: 2004/04/05 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#19 $ by $Author: rhs $, $DateTime: 2004/04/05 15:45:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#20 $ by $Author: rhs $, $DateTime: 2004/04/05 15:47:24 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
