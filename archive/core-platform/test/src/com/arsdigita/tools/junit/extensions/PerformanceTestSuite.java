@@ -28,19 +28,23 @@ public class PerformanceTestSuite extends PerformanceSuite {
         super();
     }
 
+/*
+    EXAMPLE:
+
     public static Test suite () {
-        
+
         PerformanceTestSuite suite = new PerformanceTestSuite ();
-        
+
         Test CategoryTest = new CategoryTest ( "testEquals" );
         suite.addTest ( CategoryTest );
         Test CategoryTest2 = new CategoryTest ( "testSetGetProperties" );
         suite.addTest ( CategoryTest2 );
         Test CategoryTest3 = new CategoryTest ( "testDeleteCategory" );
         suite.addTest ( CategoryTest3 );
-                                                                                                                 
+
         BaseTestSetup wrapper = new BaseTestSetup(suite);
         wrapper.setInitScriptTarget ("com.arsdigita.kernel.security.Initializer");
         return wrapper;
     }
+    */
 }
