@@ -14,28 +14,25 @@
  */
 
 package com.arsdigita.persistence;
-import com.arsdigita.tools.junit.extensions.BaseTestSetup;
-import junit.framework.*;
-import com.arsdigita.persistence.metadata.*;
-import java.math.*;
-import java.util.*;
-import java.io.*;
-import org.apache.log4j.*;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /**
  * MetaTest
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #4 $ $Date: 2003/10/01 $
+ * @version $Revision: #5 $ $Date: 2003/10/01 $
  */
 
 public class MetaTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/MetaTest.java#4 $ by $Author: rhs $, $DateTime: 2003/10/01 15:48:49 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/MetaTest.java#5 $ by $Author: jorris $, $DateTime: 2003/10/01 17:13:24 $";
     private static final Logger s_log =
         Logger.getLogger(MetaTest.class.getName());
     static  {
-        s_log.setPriority(Priority.DEBUG);
+        s_log.setLevel(Level.DEBUG);
     }
 
     String m_objectTypeName;
@@ -59,11 +56,7 @@ public class MetaTest extends PersistenceTestCase {
 
     public void testGenericCRUD()  throws Exception {
         try {
-            Session ssn = getSession();
-            if (ssn == null) {
-                throw new IllegalStateException("null session");
-            }
-            ObjectTypeValidator validator = new ObjectTypeValidator(ssn);
+            ObjectTypeValidator validator = new ObjectTypeValidator();
             validator.performCRUDTest(m_objectTypeName);
         } catch (AbortMetaTestException e) {
             // This happens on postgres when the validator encounters a valid
