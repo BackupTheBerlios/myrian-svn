@@ -4,6 +4,13 @@
   <property name="build.src.dir" value="${build.dir}/src" />
   <property name="javacc32.jar" value="javacc-3.2/bin/lib/javacc.jar" />
 
+  <property name="persistence.jdo.dir" value="build/classes/com/redhat/persistence/jdo"/>
+  <path id="jdori.classpath">
+    <pathelement location="${env.CCM_DEV_HOME}/persistence/lib/jdo.jar"/>
+    <pathelement location="${env.CCM_DEV_HOME}/persistence/jdori/jdori.jar"/>
+    <pathelement location="${env.CCM_DEV_HOME}/persistence/jdori/jdori-enhancer.jar"/>
+  </path>
+
   <target name="_javacc">
     <mkdir dir="${build.src.dir}/${jjdir}"/>
     <java classname="javacc" fork="true">
@@ -38,8 +45,28 @@
       </fileset>
       <mapper to="*" from="${src.dir}/*" type="glob"/>
     </copy>
+    <mkdir dir="build/sql"/>
+    <mkdir dir="build/pdl"/>
+    <mkdir dir="pdl"/>
   </target>
   <target name="clean-build-hook"/>
   <target name="clean-tests-hook"/>
-  <target name="deploy-hook"/>
+
+  <target name="deploy-hook">
+    <pathconvert property="jdori.classpath.string" pathsep=":" refid="jdori.classpath"/>
+    <pathconvert property="persistence.run.classpath.string" pathsep=":" refid="persistence.run.classpath"/>
+    <apply executable="java" parallel="true">
+      <arg value="-cp"/>
+      <arg value="${jdori.classpath.string}"/>
+      <arg value="com.sun.jdori.enhancer.Main"/>
+      <arg value="-d"/>
+      <arg value="${build.classes.dir}"/>
+      <arg value="-s"/>
+      <arg value="${persistence.run.classpath.string}"/>
+      <fileset dir="${persistence.jdo.dir}">
+        <include name="**/*.class"/>
+        <include name="**/*.jdo"/>
+      </fileset>
+    </apply>
+  </target>
 </project>
