@@ -1,7 +1,4 @@
 create table cat_object_category_map (
-  object_category_map_id  integer
-                          constraint cat_obj_cat_map_id_pk
-                          primary key,
   category_id             integer
                           constraint cat_obj_cat_map_cat_id_fk
                           references cat_categories on delete cascade,
