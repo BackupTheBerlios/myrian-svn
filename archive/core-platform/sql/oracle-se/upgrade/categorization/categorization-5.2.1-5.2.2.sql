@@ -76,3 +76,6 @@ drop procedure updateCategorizationTEMP;
 drop procedure updateCategorizationHelpTEMP;
 
 alter table cat_categories modify (default_ancestors not null);
+
+
+insert into acs_privileges (privilege) values ('map_to_category');

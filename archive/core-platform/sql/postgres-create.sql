@@ -82,6 +82,7 @@ begin;
 \i default/categorization/index-cat_category_purpose_map.sql
 \i default/categorization/table-cat_cat_subcat_trans_index.sql
 \i postgres/categorization/trigger-cat_category_category_map.sql
+\i default/categorization/insert-acs_privileges.sql
 
 \i default/auditing/table-acs_auditing.sql
 \i default/auditing/index-acs_auditing.sql

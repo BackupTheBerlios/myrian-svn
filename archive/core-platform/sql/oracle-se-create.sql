@@ -98,6 +98,7 @@
 @@ default/categorization/index-cat_category_purpose_map.sql
 @@ default/categorization/table-cat_cat_subcat_trans_index.sql
 @@ default/categorization/trigger-cat_category_category_map.sql
+@@ default/categorization/insert-acs_privileges.sql
 
 @@ oracle-se/auditing/table-acs_auditing.sql
 @@ default/auditing/index-acs_auditing.sql
