@@ -38,11 +38,11 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/08/06 $
+ * @version $Revision: #6 $ $Date: 2003/08/06 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataQueryImplTest.java#5 $ by $Author: bche $, $DateTime: 2003/08/06 14:16:04 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataQueryImplTest.java#6 $ by $Author: bche $, $DateTime: 2003/08/06 17:35:46 $";
 
     private static Logger s_log =
         Logger.getLogger(DataQueryImplTest.class.getName());
@@ -612,7 +612,7 @@ public class DataQueryImplTest extends DataQueryTest {
                 ps.close();
             }
         } finally {
-            conn.close();
+            ConnectionManager.returnConnection(conn);            
         }
     }
 

@@ -23,7 +23,7 @@ import java.sql.SQLException;
 
 public class ConnectionManagerTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/db/ConnectionManagerTest.java#4 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/db/ConnectionManagerTest.java#5 $ by $Author: bche $, $DateTime: 2003/08/06 17:35:46 $";
 
     private String ORACLE_DATE_QUERY = "select sysdate from dual";
     private String POSTGRES_DATE_QUERY = "select 'now'::timestamp";
@@ -79,7 +79,7 @@ public class ConnectionManagerTest extends TestCase {
                 stmt.close();
             }
         } finally {
-            conn.close();
+            ConnectionManager.returnConnection(conn);            
         }
     }
 }

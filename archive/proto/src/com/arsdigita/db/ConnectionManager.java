@@ -26,14 +26,14 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao
- * @version $Revision: #5 $ $Date: 2003/08/06 $
+ * @version $Revision: #6 $ $Date: 2003/08/06 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: bche $ - $Date: 2003/08/06 $ $Id: //core-platform/proto/src/com/arsdigita/db/ConnectionManager.java#5 $";
+    public static final String versionId = "$Author: bche $ - $Date: 2003/08/06 $ $Id: //core-platform/proto/src/com/arsdigita/db/ConnectionManager.java#6 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);
@@ -139,7 +139,7 @@ public class ConnectionManager {
             // possibly overload the listener.
             java.sql.Connection conn = pool.getConnection();
             if (conn != null) {
-                conn.close();
+                returnConnection(conn);                
             }
         } catch (SQLException e) {
             SQLException wrapped = SQLExceptionHandler.wrap(e);
@@ -327,18 +327,40 @@ public class ConnectionManager {
      **/
 
 
+    /**
+     * Gets a connection.  Note that any code retrieving a connection needs to
+     * return the connection to the pool by calling returnConnection()
+     */
     public static java.sql.Connection getConnection()
         throws java.sql.SQLException {
         return MANAGER.gimmeConnection();
     }
 
-
+    
     static void closeConnections() {
         if (MANAGER != null &&
             MANAGER.m_pool != null) {
             MANAGER.m_pool.closeConnections();
         }
     }
+    
+    /**
+     * Returns a connection to the connection pool.  Anytime code calls getConnection(),
+     * it needs to call this method when it is done with the connection
+     * 
+     * @param conn the connection to return
+     * @throws java.sql.SQLException
+     */
+	public static void returnConnection(Connection conn)
+		throws java.sql.SQLException {
+		if (conn != null) {
+			if (MANAGER != null && MANAGER.m_pool != null) {
+				MANAGER.m_pool.returnToPool(conn);
+			} else {
+				conn.close();
+			}
+		}
+	}
 
     /**
      * Frees all of the connections in the pool.

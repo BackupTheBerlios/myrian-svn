@@ -25,14 +25,14 @@ import org.apache.log4j.Logger;
  *
  *
  * @author David Dao
- * @version $Revision: #4 $ $Date: 2003/08/04 $
+ * @version $Revision: #5 $ $Date: 2003/08/06 $
  * @since 4.5
  *
  */
 
 public class J2EEConnectionManagerImpl implements DatabaseConnectionPool {
 
-    public static final String versionId = "$Author: dennis $ - $Date: 2003/08/04 $ $Id: //core-platform/proto/src/com/arsdigita/db/J2EEConnectionManagerImpl.java#4 $";
+    public static final String versionId = "$Author: bche $ - $Date: 2003/08/06 $ $Id: //core-platform/proto/src/com/arsdigita/db/J2EEConnectionManagerImpl.java#5 $";
 
     private static final Logger cat = Logger.getLogger(J2EEConnectionManagerImpl.class.getName());
 
@@ -78,6 +78,10 @@ public class J2EEConnectionManagerImpl implements DatabaseConnectionPool {
         } catch (NamingException e) {
             throw new java.sql.SQLException("Caught NamingException: " + e.toString());
         }
+    }
+    
+    public void returnToPool(java.sql.Connection conn) {
+         cat.warn("Ignoring return to pool as this is not a pooled driver");                   
     }
 
     public void setConnectionPoolSize(int num) throws java.sql.SQLException {

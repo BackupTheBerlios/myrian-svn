@@ -33,7 +33,7 @@ import java.sql.PreparedStatement;
 
 public class OracleSequenceImpl extends SequenceImpl {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/oracle/OracleSequenceImpl.java#4 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/oracle/OracleSequenceImpl.java#5 $ by $Author: bche $, $DateTime: 2003/08/06 17:35:46 $";
 
     private String m_sequenceName;
 
@@ -53,7 +53,7 @@ public class OracleSequenceImpl extends SequenceImpl {
             BigDecimal result = this.getCurrentValue(conn);
             return result;
         } finally {
-            conn.close();
+            ConnectionManager.returnConnection(conn);
         }
     }
 
@@ -63,7 +63,7 @@ public class OracleSequenceImpl extends SequenceImpl {
             BigDecimal result = this.getNextValue(conn);
             return result;
         } finally {
-            conn.close();
+            ConnectionManager.returnConnection(conn);
         }
     }
 

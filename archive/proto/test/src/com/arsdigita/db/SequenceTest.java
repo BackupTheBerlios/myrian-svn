@@ -21,7 +21,7 @@ import junit.framework.*;
 
 public class SequenceTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/db/SequenceTest.java#3 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/db/SequenceTest.java#4 $ by $Author: bche $, $DateTime: 2003/08/06 17:35:46 $";
 
     public static String sequenceName = "acs_object_id_seq";
 
@@ -65,7 +65,7 @@ public class SequenceTest extends TestCase {
 
         assertTrue(! seqValue1.equals(seqValue2));
 
-        conn.close();
+        ConnectionManager.returnConnection(conn);
     }
 
 }
