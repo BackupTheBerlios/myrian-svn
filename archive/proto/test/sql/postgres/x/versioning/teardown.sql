@@ -10,7 +10,7 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/proto/test/sql/postgres/x/versioning/teardown.sql#5 $
+-- $Id: //core-platform/proto/test/sql/postgres/x/versioning/teardown.sql#6 $
 -- 
 
 --
@@ -18,11 +18,12 @@
 --
 -- Author: Vadim Nasardinov (vadimn@redhat.com)
 -- Since:  2003-02-24
--- Version: $Id: //core-platform/proto/test/sql/postgres/x/versioning/teardown.sql#5 $
---          $DateTime: 2003/05/01 16:45:52 $
+-- Version: $Id: //core-platform/proto/test/sql/postgres/x/versioning/teardown.sql#6 $
+--          $DateTime: 2003/05/08 17:08:03 $
 
 drop table te_vt1;
 drop table te_c1;
+drop table te_uvct1;
 drop table te_vt2;
 
 drop table te_vt3;
