@@ -15,12 +15,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/02/05 $
+ * @version $Revision: #8 $ $Date: 2003/02/06 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#7 $ by $Author: rhs $, $DateTime: 2003/02/05 21:09:04 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#8 $ by $Author: rhs $, $DateTime: 2003/02/06 12:29:10 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -141,7 +141,14 @@ public class RDBMSEngine extends Engine {
     }
 
     private void addOperation(OID oid, DML dml) {
-        m_operationMap.put(oid + ":" + dml.getTable().getName(), dml);
+        String key = oid + ":" + dml.getTable().getName();
+        if (dml instanceof Delete) {
+            DML prev = (DML) m_operationMap.get(key);
+            if (prev != null) {
+                m_operations.remove(prev);
+            }
+        }
+        m_operationMap.put(key, dml);
         m_operations.add(dml);
     }
 
@@ -191,6 +198,7 @@ public class RDBMSEngine extends Engine {
         if (LOG.isDebugEnabled()) {
             LOG.debug(m_operations);
         }
+        m_operationMap.clear();
         m_operations.clear();
     }
 

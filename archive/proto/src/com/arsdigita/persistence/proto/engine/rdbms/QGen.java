@@ -13,12 +13,12 @@ import java.util.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/02/05 $
+ * @version $Revision: #2 $ $Date: 2003/02/06 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#1 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#2 $ by $Author: rhs $, $DateTime: 2003/02/06 12:29:10 $";
 
     private Signature m_signature;
     private HashMap m_columns = new HashMap();
@@ -81,8 +81,8 @@ class QGen {
                 return null;
             }
             Join j = new SimpleJoin
-                (start, Path.get(src.getPath() + ":" + start.getName()));
-            setColumn(src.getPath(), Path.get(src.getPath() + ":" +
+                (start, Path.get(src.getPath() + "__" + start.getName()));
+            setColumn(src.getPath(), Path.get(src.getPath() + "__" +
                                               getKey(start)));
             setJoin(src, j);
             addTable(src.getPath(), start);
@@ -106,7 +106,7 @@ class QGen {
             }
         }
 
-        Select result = new Select(join);
+        Select result = new Select(join, null);
 
         for (Iterator it = m_signature.getPaths().iterator();
              it.hasNext(); ) {
@@ -140,10 +140,10 @@ class QGen {
         if (!getTables(path.getParent()).contains(table)) {
             Join join = getJoin(path);
             Join simple = new SimpleJoin
-                (table, Path.get(path.getParent() + ":" + table.getName()));
+                (table, Path.get(path.getParent() + "__" + table.getName()));
             join = new InnerJoin
                 (join, simple, new EqualsCondition
-                    (parentColumn, Path.get(path.getParent() + ":" + to)));
+                    (parentColumn, Path.get(path.getParent() + "__" + to)));
             setJoin(path, join);
             addTable(path.getParent(), table);
         }
@@ -167,7 +167,7 @@ class QGen {
         m.dispatch(new Mapping.Switch() {
                 public void onValue(ValueMapping vm) {
                     addJoin(path, getKey(vm.getColumn().getTable()));
-                    setColumn(path, Path.get(path.getParent() + ":" +
+                    setColumn(path, Path.get(path.getParent() + "__" +
                                              vm.getColumn()));
                 }
 
@@ -175,16 +175,17 @@ class QGen {
                     if (rm.isJoinTo()) {
                         Column to = rm.getJoin(0).getFrom();
                         addJoin(path, getKey(to.getTable()));
-                        setColumn(path, Path.get(path.getParent() + ":" + to));
+                        setColumn(path, Path.get(path.getParent() + "__" +
+                                                 to));
                     } else if (rm.isJoinFrom()) {
                         Column to = rm.getJoin(0).getTo();
                         addJoin(path, to);
-                        setColumn(path, Path.get(path + ":" + to));
+                        setColumn(path, Path.get(path + "__" + to));
                     } else if (rm.isJoinThrough()) {
                         addJoin(path, rm.getJoin(0).getTo());
                         setColumn
                             (path, Path.get
-                             (path + ":" + rm.getJoin(1).getFrom()));
+                             (path + "__" + rm.getJoin(1).getFrom()));
                     } else {
                         throw new Error("huh?");
                     }
