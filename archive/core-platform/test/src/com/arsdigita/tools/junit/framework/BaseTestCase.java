@@ -43,7 +43,7 @@ public abstract class BaseTestCase extends TestCase {
     }
 
     protected void baseSetUp() {
-        s_log.info (this.getClass().getName() + " started");
+        s_log.warn (this.getClass().getName() + "." + getName() +  " started");
 
         Session sess = SessionManager.getSession();
         sess.getTransactionContext().beginTxn();
