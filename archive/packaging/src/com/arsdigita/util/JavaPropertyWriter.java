@@ -28,13 +28,13 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterWriter
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/JavaPropertyWriter.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/JavaPropertyWriter.java#2 $
  */
 public class JavaPropertyWriter implements ParameterWriter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/JavaPropertyWriter.java#1 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/17 19:02:11 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/JavaPropertyWriter.java#2 $" +
+        "$Author: rhs $" +
+        "$DateTime: 2003/10/21 22:52:15 $";
 
     private static final Logger s_log = Logger.getLogger
         (JavaPropertyWriter.class);
@@ -95,7 +95,15 @@ public class JavaPropertyWriter implements ParameterWriter {
             Assert.exists(param, Parameter.class);
         }
 
-        m_props.setProperty(param.getName(), value);
+        // XXX: Properties objects blow up when you try to put null
+        // values in them. This null check fixes it for now, but it
+        // doesn't let us explicitly write out a null value if that's
+        // what we actually want to store. I.e. our property store
+        // doesn't know the difference between a parameter being
+        // unspecified and a parameter being explicitly set to null.
+        if (value != null) {
+            m_props.setProperty(param.getName(), value);
+        }
     }
 
     /**
