@@ -260,4 +260,43 @@ public class DbHelper {
 
         return result;
     }
+
+    /**
+     * Truncate a string to a specified byte length, respecting
+     * character boundaries.
+     *
+     * @see #varcharLength(String)
+     */
+    public static String truncateString(String s, int maxLengthInBytes) {
+        String result = null;
+
+        switch (getDatabase()) {
+        case DB_POSTGRES:
+            result = s;
+            break;
+        case DB_ORACLE:
+            byte sBytes[] = s.getBytes();
+            byte sTruncateBytes[] = new byte[maxLengthInBytes];
+
+            // Truncate based on bytes, and construct a new string
+            System.arraycopy(sBytes, 0, sTruncateBytes, 0, maxLengthInBytes);
+            String truncateString = new String(sTruncateBytes);
+
+            // New string might have partially truncated a multi-byte
+            // character, so we drop the last character. Note that this is
+            // conservative, and in some cases the last character is a
+            // legitimate multi-byte character and is dropped
+            // anyway. However, implementing a completely correct solution
+            // would require the use of BreakIterator.following and
+            // therefore be an O(N) solution (I think).
+            result = truncateString.substring(0,truncateString.length()-1);
+            break;
+        default:
+            DbHelper.unsupportedDatabaseError("varcharLength");
+        }
+
+        return result;
+
+    }
+
 }
