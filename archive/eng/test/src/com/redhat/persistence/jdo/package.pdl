@@ -77,6 +77,27 @@ query Employee$Gen class com.redhat.persistence.PropertyMap
     }
 }
 
+object type BigEmployee class com.redhat.persistence.jdo.BigEmployee
+    adapter com.redhat.persistence.jdo.JDOAdapter {
+
+    BigInteger[1..1] id = bigemps.id INTEGER;
+    String[0..1] name = bigemps.name VARCHAR(200);
+    Float[0..1] salary = bigemps.salary FLOAT;
+    Department[0..1] dept = join bigemps.dept_id to depts.id;
+    Address[0..1] address {
+        m_street = bigemps.street;
+        m_apt = bigemps.apt;
+        m_city = bigemps.city;
+        m_state = bigemps.state;
+        m_zip = bigemps.zip;
+    };
+
+    object key (id);
+
+    aggressive load(address);
+
+}
+
 object type Rolodex class com.redhat.persistence.jdo.Rolodex
     adapter com.redhat.persistence.jdo.JDOAdapter {
     BigInteger id = rolodexes.id;
@@ -87,6 +108,17 @@ object type Rolodex class com.redhat.persistence.jdo.Rolodex
     };
 
     object key (id);
+}
+
+query BigEmployee$Gen class com.redhat.persistence.PropertyMap
+    adapter com.redhat.persistence.pdl.adapters.IdentityAdapter {
+
+    BigInteger id;
+    do {
+        select nextval('jdotest_seq') as id
+    } map {
+        id = id;
+    }
 }
 
 nested object type Contact class com.redhat.persistence.jdo.Contact

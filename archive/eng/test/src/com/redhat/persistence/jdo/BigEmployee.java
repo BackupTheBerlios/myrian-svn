@@ -17,26 +17,41 @@
  */
 package com.redhat.persistence.jdo;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.math.BigInteger;
 
-public class JDOSuite extends TestSuite {
-    public static Test suite() {
-        JDOSuite suite = new JDOSuite();
+public class BigEmployee {
+    private String name = null;
+    private Float salary = new Float(1);
+    private Department dept = null;
+    private Address address = new Address();
 
-        suite.addTestSuite(SimpleTest.class);
-        suite.addTestSuite(PandoraTest.class);
-        suite.addTestSuite(WithoutTxnTest.class);
-        suite.addTestSuite(MapTest.class);
-        suite.addTestSuite(ListTest.class);
-        suite.addTestSuite(ManagerTest.class);
-        suite.addTestSuite(BiTxnTest.class);
-        suite.addTestSuite(NestedObjectTest.class);
-        suite.addTestSuite(JDOStateTest.class);
-        suite.addTestSuite(MemoryTest.class);
+    private transient byte[] fat = new byte[10000000];
 
-        suite.addTest(QueryTest.suite());
+    public BigEmployee() { }
 
-        return new JDOTestSetup(suite);
+    public BigEmployee(String name, Department dept) {
+        this.name = name;
+        this.dept = dept;
     }
+
+    public void setSalary(Float salary) {
+        this.salary = salary;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Float getSalary() {
+        return salary;
+    }
+
+    public Department getDept() {
+        return dept;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
 }

@@ -17,9 +17,12 @@
  */
 package com.redhat.persistence;
 
+import com.redhat.persistence.metadata.Adapter;
 import com.redhat.persistence.metadata.ObjectMap;
+import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Property;
 import java.io.PrintWriter;
+import java.lang.ref.WeakReference;
 import java.util.*;
 import org.apache.log4j.Logger;
 
@@ -27,19 +30,24 @@ import org.apache.log4j.Logger;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2004/09/07 $
+ * @version $Revision: #7 $ $Date: 2004/09/10 $
  **/
 
 class ObjectData implements Violation {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/ObjectData.java#6 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/ObjectData.java#7 $ by $Author: ashah $, $DateTime: 2004/09/10 14:49:17 $";
 
     private static final Logger LOG = Logger.getLogger(ObjectData.class);
 
     private final Session m_ssn;
-    private Object m_object;
-    private Object m_container;
+    private WeakReference m_object;
+    private ObjectData m_container;
     private ObjectMap m_map;
+    private Object m_key = null;
+
+    void setKey(Object key) {
+        m_key = key;
+    }
 
     static class State {
         private String m_name;
@@ -77,19 +85,46 @@ class ObjectData implements Violation {
     }
 
     public Object getObject() {
-        return m_object;
+        Object obj = m_object.get();
+        if (obj == null) {
+            ObjectType type = getObjectMap().getObjectType();
+            PropertyMap pmap = new PropertyMap(type);
+            Collection keys = getObjectMap().getKeyProperties();
+            for (Iterator it = m_pdata.values().iterator(); it.hasNext(); ) {
+                PropertyData pdata = (PropertyData) it.next();
+                if (keys.contains(pdata.getProperty())) {
+                    pmap.put(pdata.getProperty(), pdata.getValue());
+                }
+            }
+
+            Session ssn = getSession();
+            Adapter ad = ssn.getRoot().getAdapter(type);
+            obj = ad.getObject(type, pmap, ssn);
+            setObject(obj);
+            ssn.setSessionKey(obj, m_key);
+        }
+
+        return obj;
     }
 
     void setObject(Object object) {
-        m_object = object;
+        m_object = new WeakReference(object);
     }
 
     public Object getContainer() {
-        return m_container;
+        return m_container.getObject();
     }
 
     void setContainer(Object container) {
-        m_container = container;
+        if (container == null) {
+            throw new NullPointerException("container");
+        }
+
+        m_container = getSession().getObjectData(container);
+
+        if (m_container == null) {
+            throw new IllegalStateException("no objectdata for container");
+        }
     }
 
     public ObjectMap getObjectMap() {
@@ -101,6 +136,7 @@ class ObjectData implements Violation {
     }
 
     void clear() {
+        if (m_map == null) { return; }
         Collection keys = m_map.getKeyProperties();
         for (Iterator it = m_pdata.values().iterator(); it.hasNext(); ) {
             PropertyData pdata = (PropertyData) it.next();

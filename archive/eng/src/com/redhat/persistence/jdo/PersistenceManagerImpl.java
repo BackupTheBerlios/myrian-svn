@@ -52,7 +52,7 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
     private final ClassInfo m_classInfo;
 
     private Map m_smiMap = new ReferenceIdentityMap
-        (AbstractReferenceMap.WEAK, AbstractReferenceMap.HARD, true);
+        (AbstractReferenceMap.WEAK, AbstractReferenceMap.WEAK, true);
 
     public PersistenceManagerImpl(PersistenceManagerFactoryImpl pmf,
                                   Session ssn, StatementProfiler prof,

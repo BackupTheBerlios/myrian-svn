@@ -54,12 +54,12 @@ import org.apache.commons.collections.map.ReferenceIdentityMap;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #17 $ $Date: 2004/09/07 $
+ * @version $Revision: #18 $ $Date: 2004/09/10 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#17 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#18 $ by $Author: ashah $, $DateTime: 2004/09/10 14:49:17 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -993,6 +993,7 @@ public class Session {
         ObjectData odata = (ObjectData) m_objodata.get(obj);
         if (odata != null) {
             m_keyodata.put(key, odata);
+            odata.setKey(key);
         }
         m_keys.put(obj, key);
     }

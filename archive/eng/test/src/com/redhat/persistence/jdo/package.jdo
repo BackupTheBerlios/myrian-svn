@@ -6,6 +6,7 @@
     <class name="Department" identity-type="datastore"/>
     <class name="Employee" identity-type="datastore"/>
     <class name="Address" identity-type="datastore"/>
+    <class name="BigEmployee" identity-type="datastore"/>
 
     <class name="Rolodex" identity-type="datastore"/>
     <class name="Contact" identity-type="datastore"/>
