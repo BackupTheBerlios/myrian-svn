@@ -1,0 +1,2 @@
+create index acs_stylesheet_node_node_idx on acs_stylesheet_node_map(node_id);
+create index acs_stylesheet_node_sheet_idx on acs_stylesheet_node_map(stylesheet_id);

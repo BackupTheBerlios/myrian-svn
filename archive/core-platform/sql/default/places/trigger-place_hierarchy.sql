@@ -1,0 +1,6 @@
+-- maintain the above denormalization
+-- create or replace trigger place_hierarchy_tc_i_tr
+-- after insert on place_hierarchy
+-- for each row
+-- begin
+-- end;
