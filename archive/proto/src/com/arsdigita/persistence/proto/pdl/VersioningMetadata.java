@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #3 $ $Date: 2003/05/12 $
+ * @version $Revision: #4 $ $Date: 2003/05/12 $
  */
 public class VersioningMetadata {
     private final static Logger s_log =
@@ -127,6 +127,12 @@ public class VersioningMetadata {
 
         /**
          * This method is called whenever we traverse a property node of the PDL
+         * AST that is marked <code>versioned</code>.
+         **/
+        void onVersionedProperty(Property property);
+
+        /**
+         * This method is called whenever we traverse a property node of the PDL
          * AST that is marked <code>unversioned</code>.
          **/
         void onUnversionedProperty(Property property);
@@ -152,7 +158,7 @@ public class VersioningMetadata {
         }
 
         public void onProperty(PropertyNd prop) {
-            if ( !prop.isUnversioned() ) return;
+            if ( !prop.isUnversioned() && !prop.isVersioned() ) return;
 
             String containerName = getContainerName(prop);
             Property property = 
@@ -167,7 +173,18 @@ public class VersioningMetadata {
             m_unversionedProps.add(property);
 
             if ( m_changeListener != null ) {
-                m_changeListener.onUnversionedProperty(property);
+                if ( prop.isUnversioned() ) {
+                    m_changeListener.onUnversionedProperty(property);
+                } else if ( prop.isVersioned() ) {
+                    if ( property.getType().isSimple() ) {
+                        throw new IllegalStateException
+                            ("Simple properties are versioned by default. " +
+                             "They cannot be marked 'versioned'. " + property);
+                    }
+                    m_changeListener.onVersionedProperty(property);
+                } else {
+                    throw new IllegalStateException("es impossible");
+                }
             }
         }
 
