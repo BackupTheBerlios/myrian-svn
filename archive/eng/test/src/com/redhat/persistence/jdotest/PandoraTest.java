@@ -1,30 +1,54 @@
 package com.redhat.persistence.jdotest;
 
-import com.redhat.persistence.*;
+import com.arsdigita.runtime.RuntimeConfig;
+import com.redhat.persistence.Cursor;
+import com.redhat.persistence.Engine;
+import com.redhat.persistence.PropertyMap;
+import com.redhat.persistence.QuerySource;
+import com.redhat.persistence.Session;
+import com.redhat.persistence.engine.rdbms.ConnectionSource;
+import com.redhat.persistence.engine.rdbms.PostgresWriter;
+import com.redhat.persistence.engine.rdbms.RDBMSEngine;
 import com.redhat.persistence.jdo.Main;
-import com.redhat.persistence.metadata.*;
+import com.redhat.persistence.metadata.ObjectType;
+import com.redhat.persistence.metadata.Property;
+import com.redhat.persistence.metadata.Root;
 import com.redhat.persistence.oql.*;
 import com.redhat.persistence.oql.Expression;
-import com.redhat.test.*;
-import com.redhat.util.*;
+import com.redhat.persistence.pdl.PDL;
+import com.redhat.persistence.pdl.Schema;
+import com.redhat.test.YAdapter;
+import com.redhat.util.Reflection;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * PandoraTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/22 $
+ * @version $Revision: #2 $ $Date: 2004/06/23 $
  **/
 
-public class PandoraTest extends Test {
+public class PandoraTest {
+    private Session m_ssn;
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdotest/PandoraTest.java#1 $ by $Author: vadim $, $DateTime: 2004/06/22 13:25:03 $";
-
-    public static final void main(String[] args) {
-        main(PandoraTest.class, args);
+    private PandoraTest(Session ssn) {
+        m_ssn = ssn;
     }
 
     private byte[] getImageBytes(String resource) {
@@ -72,8 +96,7 @@ public class PandoraTest extends Test {
     }
 
     private void testClass(Class klass, Object[] values) {
-        Session ssn = getSession();
-        ObjectType type = ssn.getRoot().getObjectType(klass.getName());
+        ObjectType type = m_ssn.getRoot().getObjectType(klass.getName());
         PropertyMap props = new PropertyMap(type);
         for (int i = 0; i < values.length; i+=2) {
             String name = (String) values[i];
@@ -92,7 +115,7 @@ public class PandoraTest extends Test {
             key[i] = props.get((Property) keys.get(i));
         }
 
-        Object obj = Main.create(ssn, klass, key);
+        Object obj = Main.create(m_ssn, klass, key);
 
         for (Iterator it = type.getProperties().iterator(); it.hasNext(); ) {
             Property p = (Property) it.next();
@@ -115,7 +138,7 @@ public class PandoraTest extends Test {
             }
         }
 
-        ssn.flush();
+        m_ssn.flush();
 
         Expression expr = new All(klass.getName());
         for (int i = 0; i < keys.size(); i++) {
@@ -124,7 +147,7 @@ public class PandoraTest extends Test {
                 (expr, new Equals(new Variable(p.getName()),
                                   new Literal(props.get(p))));
         }
-        Cursor c = Main.cursor(ssn, klass, expr);
+        Cursor c = Main.cursor(m_ssn, klass, expr);
 
         if (c.next()) {
             obj = c.get();
@@ -196,12 +219,10 @@ public class PandoraTest extends Test {
     }
 
     public void testMain() {
-        Session ssn = getSession();
-
         Picture[] pictures = new Picture[10];
         for (int i = 0; i < pictures.length; i++) {
             pictures[i] = (Picture) Main.create
-                (ssn, Picture.class, new Object[] { new Integer(i) });
+                (m_ssn, Picture.class, new Object[] { new Integer(i) });
             pictures[i].setCaption("Caption " + i);
             pictures[i].setContent(new byte[32]);
         }
@@ -209,14 +230,14 @@ public class PandoraTest extends Test {
         Product[] products = new Product[10];
         for (int i = 0; i < products.length; i++) {
             products[i] = (Product) Main.create
-                (ssn, Product.class, new Object[] { new Integer(i) });
+                (m_ssn, Product.class, new Object[] { new Integer(i) });
             products[i].setName("Product " + i);
             products[i].setPrice((float)3.14);
             products[i].setPicture(pictures[i]);
         }
 
         User rhs = (User) Main.create
-            (ssn, User.class, new Object[] { new Integer(0) });
+            (m_ssn, User.class, new Object[] { new Integer(0) });
         rhs.setName("Rafael H. Schloming");
         rhs.setEmail("rhs@mit.edu");
         List aux = rhs.getAuxiliaryEmails();
@@ -279,35 +300,177 @@ public class PandoraTest extends Test {
 
         for (int i = 0; i < 10; i++) {
             Order o = (Order) Main.create
-                (ssn, Order.class, new Object[] { new Integer(i) });
+                (m_ssn, Order.class, new Object[] { new Integer(i) });
             o.setParty(rhs);
             Collection items = o.getItems();
             for (int j = 0; j < 10; j++) {
                 Item item = (Item) Main.create
-                    (ssn, Item.class, new Object[] { new Integer(j + 10*i) });
+                    (m_ssn, Item.class, new Object[] { new Integer(j + 10*i) });
                 item.setProduct(products[i]);
                 items.add(item);
             }
         }
 
-        Cursor c = Main.all(ssn, Order.class);
+        Cursor c = Main.all(m_ssn, Order.class);
         while (c.next()) {
-            Main.lock(ssn, c.get());
+            Main.lock(m_ssn, c.get());
         }
 
-        ssn.flushAll();
+        m_ssn.flushAll();
 
         Class[] klasses =
             new Class[] { Product.class, Picture.class, Order.class,
                           User.class };
         for (int i = 0; i < klasses.length; i++) {
-            c = Main.all(ssn, klasses[i]);
+            c = Main.all(m_ssn, klasses[i]);
             while (c.next()) {
-                ssn.delete(c.get());
+                m_ssn.delete(c.get());
             }
         }
 
-        ssn.flushAll();
+        m_ssn.flushAll();
     }
 
+    public static final void main(String[] args) {
+        final Class klass = PandoraTest.class;
+
+        if (args.length < 1) {
+            System.err.println
+                ("usage: " + klass +
+                 " { load | unload | test } " +
+                 "[ method_1 . . . method_n ]");
+            System.exit(1);
+        }
+
+        String jdbc = RuntimeConfig.getConfig().getJDBCURL();
+
+        try {
+            final Connection conn = DriverManager.getConnection(jdbc);
+            conn.setAutoCommit(false);
+            PDL pdl = new PDL();
+            String name = klass.getName().replace('.', '/') + ".pdl";
+            InputStream is = klass.getClassLoader().getResourceAsStream(name);
+            if (is != null) {
+                pdl.load(new InputStreamReader(is), name);
+            }
+
+            Root root = new Root();
+            pdl.emit(root);
+
+            String command = args[0];
+            if (command.equals("load")) {
+                Schema.load(root, conn);
+                conn.commit();
+            } else if (command.equals("unload")) {
+                Schema.unload(root, conn);
+                conn.commit();
+            } else if (command.equals("test")) {
+                Schema.load(root, conn);
+                try {
+                    ConnectionSource src = new ConnectionSource() {
+                        public Connection acquire() { return conn; }
+                        public void release(Connection conn) {}
+                    };
+
+                    Engine engine = new RDBMSEngine(src, new PostgresWriter());
+                    Session ssn = new Session(root, engine, new QuerySource());
+
+                    if (args.length == 1) {
+                        run(ssn);
+                    } else {
+                        String[] nargs = new String[args.length - 1];
+                        System.arraycopy(args, 1, nargs, 0, nargs.length);
+                        run(ssn, nargs);
+                    }
+                } finally {
+                    conn.rollback();
+                }
+            } else {
+                System.err.println("unrecognized command: " + command);
+            }
+        } catch (SQLException e) {
+            RuntimeException rex = new IllegalStateException();
+            rex.initCause(e);
+            throw rex;
+        }
+    }
+
+    private static boolean isTest(Method m) {
+        return ((m.getModifiers() & Modifier.STATIC) == 0
+                && m.getName().startsWith("test"));
+    }
+
+    private static void run(Session ssn) {
+
+        Method[] methods = PandoraTest.class.getMethods();
+        for (int i = 0; i < methods.length; i++) {
+            Method m = methods[i];
+            if (isTest(m)) {
+                run(m, ssn);
+            }
+        }
+    }
+
+    private static void run(Session ssn, String[] tests) {
+        for (int i = 0; i < tests.length; i++) {
+            try {
+                Method m = PandoraTest.class.getMethod(tests[i], null);
+                if (!isTest(m)) {
+                    System.err.println("not a test: " + tests[i]);
+                    continue;
+                }
+                run(m, ssn);
+            } catch (NoSuchMethodException e) {
+                System.err.println("no such method: " + tests[i]);
+            }
+        }
+    }
+
+    private static void run(Method m, Session ssn) {
+        try {
+            PandoraTest t = new PandoraTest(ssn);
+            System.out.print(m.getName() + ": ");
+            Object result = m.invoke(t, null);
+            String msg;
+            if (result == null) {
+                msg = "PASS";
+            } else {
+                msg = "PASS ==> " + result;
+            }
+            System.out.println(msg);
+        } catch (InvocationTargetException e) {
+            System.out.println
+                ("FAILED ==> " + e.getTargetException().getMessage());
+            e.getTargetException().printStackTrace(System.out);
+        } catch (IllegalAccessException e) {
+            System.out.println("ERROR ==> " + e.getMessage());
+        }
+    }
+
+    protected void fail(String message) {
+        throw new Error(message);
+    }
+
+    protected void assertTrue(boolean b, String message) {
+        if (!b) { fail(message); }
+    }
+
+    protected void assertEquals(Object o1, Object o2, String message) {
+        if (o1 == null) { assertTrue(o2 == null, message); }
+        if (o2 == null) { assertTrue(o1 == null, message); }
+        if (o1.getClass().isArray() && o2.getClass().isArray()) {
+            int l1 = Array.getLength(o1);
+            int l2 = Array.getLength(o2);
+            assertEquals(l1, l2, message);
+            for (int i = 0; i < l1; i++) {
+                assertEquals(Array.get(o1, i), Array.get(o2, i), message);
+            }
+        } else {
+            assertTrue(o1.equals(o2) && o2.equals(o1), message);
+        }
+    }
+
+    protected void assertEquals(int n1, int n2, String message) {
+        assertTrue(n1 == n2, message);
+    }
 }
