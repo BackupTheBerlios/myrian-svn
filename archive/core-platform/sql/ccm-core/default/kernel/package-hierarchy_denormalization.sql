@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/default/kernel/package-hierarchy_denormalization.sql#1 $
--- $DateTime: 2003/10/23 15:28:18 $
+-- $Id: //core-platform/dev/sql/ccm-core/default/kernel/package-hierarchy_denormalization.sql#2 $
+-- $DateTime: 2004/01/26 18:26:10 $
 
 create or replace procedure hierarchy_add_item (v_item_id in INTEGER, 
                                                 v_table in VARCHAR, 
@@ -40,11 +40,17 @@ create or replace procedure hierarchy_add_subitem (v_item_id in INTEGER,
     sql_stmt VARCHAR(4000);
     v_select_item_id integer;
     v_select_subitem_id integer;
-    v_select_n_paths integer;
+    v_select_ancestor_n_paths integer;
+    v_select_descendant_n_paths integer;
   begin
       sql_stmt := 'select ancestors.' || v_itemColumn || ' as item_id, 
                    descendants.' || v_subitemColumn || ' as subitem_id,
-                  (ancestors.n_paths * descendants.n_paths) as n_paths
+                  (case when ancestors.n_paths = 0
+                        then 1
+                        else ancestors.n_paths end) as ancestor_n_paths,
+                  (case when descendants.n_paths = 0
+                        then 1
+                        else descendants.n_paths end) as descendant_n_paths
           from ' || v_table || ' ancestors,
                ' || v_table || ' descendants
           where ancestors.' || v_subitemColumn || ' = ' || v_item_id || '
@@ -52,15 +58,11 @@ create or replace procedure hierarchy_add_subitem (v_item_id in INTEGER,
 
       OPEN newEntry FOR sql_stmt;
       LOOP
-        FETCH newEntry INTO v_select_item_id, v_select_subitem_id, v_select_n_paths;
+        FETCH newEntry INTO v_select_item_id, v_select_subitem_id, v_select_ancestor_n_paths, v_select_descendant_n_paths;
         EXIT WHEN newEntry%NOTFOUND;
 
-          if ((v_item_id = v_select_item_id) or
-              (v_subitem_id = v_select_subitem_id)) then
-            v_path_increment := 1;
-          else 
-            v_path_increment := v_select_n_paths;
-          end if;
+          v_path_increment :=
+              v_select_ancestor_n_paths * v_select_descendant_n_paths;
 
           execute immediate 'update ' || v_table ||  '
           set n_paths = n_paths + ' || v_path_increment || '
@@ -95,11 +97,17 @@ create or replace procedure hierarchy_remove_subitem (v_item_id in INTEGER,
     sql_stmt VARCHAR(4000);
     v_select_item_id integer;
     v_select_subitem_id integer;
-    v_select_n_paths integer;
+    v_select_ancestor_n_paths integer;
+    v_select_descendant_n_paths integer;
   begin
       sql_stmt := 'select ancestors.' || v_itemColumn || ' as item_id, 
                    descendants.' || v_subitemColumn || ' as subitem_id,
-                  (ancestors.n_paths * descendants.n_paths) as n_paths
+                  (case when ancestors.n_paths = 0
+                        then 1
+                        else ancestors.n_paths end) as ancestor_n_paths,
+                  (case when descendants.n_paths = 0
+                        then 1
+                        else descendants.n_paths end) as descendant_n_paths
           from ' || v_table || ' ancestors,
                ' || v_table || ' descendants
           where ancestors.' || v_subitemColumn || ' = ' || v_item_id || '
@@ -107,15 +115,11 @@ create or replace procedure hierarchy_remove_subitem (v_item_id in INTEGER,
 
       OPEN newEntry FOR sql_stmt;
       LOOP
-        FETCH newEntry INTO v_select_item_id, v_select_subitem_id, v_select_n_paths;
+        FETCH newEntry INTO v_select_item_id, v_select_subitem_id, v_select_ancestor_n_paths, v_select_descendant_n_paths;
         EXIT WHEN newEntry%NOTFOUND;
 
-        if ((v_select_item_id = v_item_id) or
-            (v_select_subitem_id = v_subitem_id)) then
-            v_path_decrement := 1;
-        else
-            v_path_decrement := v_select_n_paths;
-        end if;
+        v_path_decrement :=
+            v_select_ancestor_n_paths * v_select_descendant_n_paths;
 
         -- delete this entry if n_path would become 0 if we were
         -- to decrement n_paths

@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/postgres/kernel/package-hierarchy_denormalization.sql#1 $
--- $DateTime: 2003/10/23 15:28:18 $
+-- $Id: //core-platform/dev/sql/ccm-core/postgres/kernel/package-hierarchy_denormalization.sql#2 $
+-- $DateTime: 2004/01/26 18:26:10 $
 
 create or replace function hierarchy_add_item (
     integer, varchar, varchar, varchar
@@ -54,7 +54,12 @@ create or replace function hierarchy_add_subitem (
                   as item_id, 
                   descendants.'' || quote_ident(v_subitemColumn) || '' 
                   as subitem_id,
-                 (ancestors.n_paths * descendants.n_paths) as n_paths
+                  (case when ancestors.n_paths = 0
+                        then 1
+                        else ancestors.n_paths end) as ancestor_n_paths,
+                  (case when descendants.n_paths = 0
+                        then 1
+                        else descendants.n_paths end) as descendant_n_paths
           from '' || quote_ident(v_hierarchy_index) || '' ancestors,
                '' || quote_ident(v_hierarchy_index) || '' descendants
           where ancestors.'' || quote_ident(v_subitemColumn) || '' = '' || 
@@ -62,12 +67,8 @@ create or replace function hierarchy_add_subitem (
             and descendants.'' || quote_ident(v_itemColumn) || '' = '' || 
                 quote_literal(v_subitem_id) || ''''
       loop
-          if ((v_item_id = new_entry.item_id) or
-              (v_subitem_id = new_entry.subitem_id)) then
-            v_path_increment := 1;
-          else 
-            v_path_increment := new_entry.n_paths;
-          end if;
+          v_path_increment :=
+              new_entry.ancestor_n_paths * new_entry.descendant_n_paths;
 
           -- This does both an update and an insert because the postegres
           -- execute statement in 7.2.1 is not smart enough to recognize
@@ -126,7 +127,12 @@ create or replace function hierarchy_remove_subitem (
                   as item_id, 
                   descendants.'' || quote_ident(v_subitemColumn) || '' 
                   as subitem_id,
-                 (ancestors.n_paths * descendants.n_paths) as n_paths
+                  (case when ancestors.n_paths = 0
+                        then 1
+                        else ancestors.n_paths end) as ancestor_n_paths,
+                  (case when descendants.n_paths = 0
+                        then 1
+                        else descendants.n_paths end) as descendant_n_paths
           from '' || quote_ident(v_hierarchy_index) || '' ancestors,
                '' || quote_ident(v_hierarchy_index) || '' descendants
           where ancestors.'' || quote_ident(v_subitemColumn) || '' = '' || 
@@ -134,12 +140,8 @@ create or replace function hierarchy_remove_subitem (
             and descendants.'' || quote_ident(v_itemColumn) || '' = '' || 
                 quote_literal(v_subitem_id) || ''''
       loop
-        if ((remove_entry.item_id = v_item_id) or
-            (remove_entry.subitem_id = v_subitem_id)) then
-            v_path_decrement := 1;
-        else
-            v_path_decrement := remove_entry.n_paths;
-        end if;
+          v_path_decrement :=
+              remove_entry.ancestor_n_paths * remove_entry.descendant_n_paths;
 
           -- This does both an update and an insert because the postegres
           -- execute statement in 7.2.1 is not smart enough to recognize
