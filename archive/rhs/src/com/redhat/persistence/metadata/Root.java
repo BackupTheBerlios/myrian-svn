@@ -19,6 +19,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 
@@ -26,12 +27,12 @@ import java.util.Map;
  * Root
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/05/02 $
+ * @version $Revision: #4 $ $Date: 2004/05/04 $
  **/
 
 public class Root {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/Root.java#3 $ by $Author: rhs $, $DateTime: 2004/05/02 13:12:27 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/src/com/redhat/persistence/metadata/Root.java#4 $ by $Author: rhs $, $DateTime: 2004/05/04 14:28:06 $";
 
     private static final class Location {
 
@@ -137,7 +138,7 @@ public class Root {
         m_tables.add(table);
     }
 
-    public Collection getTables() {
+    public List getTables() {
         return m_tables;
     }
 

@@ -39,12 +39,12 @@ import java.util.*;
  * QuerySuite
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/05/02 $
+ * @version $Revision: #2 $ $Date: 2004/05/04 $
  **/
 
 public class QuerySuite extends TestSuite {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/test/src/com/redhat/persistence/oql/QuerySuite.java#1 $ by $Author: rhs $, $DateTime: 2004/05/02 13:12:27 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/test/src/com/redhat/persistence/oql/QuerySuite.java#2 $ by $Author: rhs $, $DateTime: 2004/05/04 14:28:06 $";
 
     public QuerySuite() {}
 
@@ -75,42 +75,16 @@ public class QuerySuite extends TestSuite {
         PDL pdl = new PDL();
         pdl.loadResource("com/redhat/persistence/oql/test.pdl");
         pdl.emit(m_root);
-
-        m_constraints = new ArrayList();
-        Collection tables = m_root.getTables();
-        for (Iterator it = tables.iterator(); it.hasNext(); ) {
-            Table table = (Table) it.next();
-            for (Iterator iter = table.getConstraints().iterator();
-                 iter.hasNext(); ) {
-                Constraint con = (Constraint) iter.next();
-                if (con.isDeferred()) { m_constraints.add(con); }
-            }
-        }
     }
-
-    private Collection m_constraints = null;
 
     private void setup() throws SQLException {
         if (m_root == null) { init(); }
-        Statement stmt = m_conn.createStatement();
 
-        Collection tables = m_root.getTables();
-        for (Iterator it = tables.iterator(); it.hasNext(); ) {
-            Table table = (Table) it.next();
-            String sql = table.getSQL();
-            try {
-                stmt.execute(sql);
-            } catch (SQLException e) {
-                throw new IllegalStateException(e.getMessage() + "\n\n" + sql);
-            }
+        try {
+            Schema.load(m_root, m_conn);
+        } catch (SQLException e) {
+            throw new IllegalStateException(e.getMessage());
         }
-
-        for (Iterator it = m_constraints.iterator(); it.hasNext(); ) {
-            Constraint con = (Constraint) it.next();
-            stmt.execute("alter table " + con.getTable().getName() +
-                         " add " + con.getSQL());
-        }
-        stmt.close();
 
         ConnectionSource src = new ConnectionSource() {
             public Connection acquire() { return m_conn; }
@@ -128,36 +102,19 @@ public class QuerySuite extends TestSuite {
 
     private void teardown() throws SQLException {
         if (m_root == null) { init(); }
-        Statement stmt = m_conn.createStatement();
         try {
-            for (Iterator it = m_constraints.iterator(); it.hasNext(); ) {
-                Constraint con = (Constraint) it.next();
-                try {
-                    stmt.execute("alter table " + con.getTable().getName() +
-                                 " drop constraint " + con.getName());
-                } catch (SQLException e) {
-                    System.err.println(e.getMessage());
-                }
-            }
-
-            Collection tables = m_root.getTables();
-            for (Iterator it = tables.iterator(); it.hasNext(); ) {
-                Table table = (Table) it.next();
-                try {
-                    stmt.execute("drop table " + table.getName());
-                } catch (SQLException e) {
-                    System.err.println(e.getMessage());
-                }
+            try {
+                Schema.unload(m_root, m_conn);
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
             }
         } finally {
-            stmt.close();
             if (commit) {
                 m_conn.commit();
             } else {
                 m_conn.rollback();
             }
             m_conn.close();
-            m_constraints = null;
             m_conn = null;
             m_root = null;
         }
