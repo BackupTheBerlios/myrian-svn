@@ -134,16 +134,19 @@ public class PersistenceTestCase extends TestCase {
     }
 
     static {
-        MetadataRoot root = MetadataRoot.getMetadataRoot();
-        SessionManager.configure
-            ("default", root, new PooledConnectionSource
-             (org.myrian.persistence.TestConfig.getJDBCURL(),
-              10, 30000));
-        PDLCompiler pdl = new PDLCompiler();
-        PDLSource testpdl = new ManifestSource
-            ("cap-test-pdl.mf", new NameFilter("pg", "pdl"));
-        testpdl.parse(pdl);
-        pdl.emit(root);
+        try {
+            String url = org.myrian.persistence.TestConfig.getJDBCURL();
+            MetadataRoot root = MetadataRoot.getMetadataRoot();
+            SessionManager.configure
+                ("default", root, new PooledConnectionSource(url, 10, 30000));
+            PDLCompiler pdl = new PDLCompiler();
+            PDLSource testpdl = new ManifestSource
+                ("cap-test-pdl.mf", new NameFilter("pg", "pdl"));
+            testpdl.parse(pdl);
+            pdl.emit(root);
+        } catch (IllegalStateException e) {
+            LOG.fatal("couldn't configure session", e);
+        }
     }
 
     protected void persistenceSetUp() {
