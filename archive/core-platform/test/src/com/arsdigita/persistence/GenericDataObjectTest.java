@@ -30,11 +30,11 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2002/12/11 $
+ * @version $Revision: #9 $ $Date: 2003/07/02 $
  */
 public class GenericDataObjectTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/GenericDataObjectTest.java#8 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/GenericDataObjectTest.java#9 $ by $Author: ashah $, $DateTime: 2003/07/02 12:35:46 $";
 
     public GenericDataObjectTest(String name) {
         super(name);
@@ -194,13 +194,18 @@ public class GenericDataObjectTest extends PersistenceTestCase {
         order.set("shippingDate",
                   new java.sql.Date(System.currentTimeMillis()));
         order.set("hasShipped", Boolean.FALSE);
-        order.set("text", "This is some text!");
         order.save();
         OID oid = order.getOID();
 
         order = getSession().retrieve(oid);
-        assertTrue("The retrieve method for [examples.OrderExtWithFailingRetrieve] " +
-               "does not work so it should return null", order == null);
+        try {
+            order.get("text");
+            fail("The retrieve method for " +
+                 " [examples.OrderExtWithFailingRetrieve]" +
+                 "does not work so it should fail");
+        } catch (PersistenceException pe) {
+            // continue
+        }
 
 
     }

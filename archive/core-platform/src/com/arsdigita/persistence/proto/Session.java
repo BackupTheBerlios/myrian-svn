@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/06/24 $
+ * @version $Revision: #10 $ $Date: 2003/07/02 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Session.java#9 $ by $Author: ashah $, $DateTime: 2003/06/24 17:28:06 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Session.java#10 $ by $Author: ashah $, $DateTime: 2003/07/02 12:35:46 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -805,8 +805,9 @@ public class Session {
 		    load(obj, prop, values.get(null));
 		}
             } else if (values == null) {
-                throw new IllegalStateException
-                    ("Query failed to return any results");
+                throw new MetadataException
+                    (prop, "Query for: " + prop.getContainer() + "." + prop
+                     + " failed to return rows" );
 	    }
 
             pd = od.getPropertyData(prop);

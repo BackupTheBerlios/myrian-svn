@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/test/pdl/com/arsdigita/persistence/static/Order.pdl#3 $ 
-// $DateTime: 2003/07/01 11:28:55 $
+// $Id: //core-platform/dev/test/pdl/com/arsdigita/persistence/static/Order.pdl#4 $ 
+// $DateTime: 2003/07/02 12:35:46 $
 
 model examples;
 
@@ -411,7 +411,7 @@ association {
 
 
 object type OrderExtWithFailingRetrieve extends Order {
-    String[1..1]   text;
+    String[0..1]   text;
 
     // this is supposed to fail per SDM ticket 147567
     retrieve {
@@ -430,27 +430,13 @@ object type OrderExtWithFailingRetrieve extends Order {
 
     insert {
         super;
-
-        do {
-            insert into t_orders_ext
-            (order_id, text)
-            values
-            (:id, :text)
-        }
     }
 
     update {
         super;
-
-        do {
-            update t_orders_ext
-            set text = :text
-            where order_id = :id
-        }
     }
 
     delete {
-        do { delete from t_orders_ext where order_id = :id }
         super;
     }
 
