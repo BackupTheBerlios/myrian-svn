@@ -32,6 +32,10 @@ ifndef BUILD
 BUILD:=build
 endif
 
+ifndef JAVAC_OPTS
+JAVAC_OPTS:=-g
+endif
+
 ifndef JAVADOC
 JAVADOC:=javadoc
 endif
@@ -111,7 +115,7 @@ $(@M_TIMESTAMP): $(@M_SOURCES) $(@M_JDO_FILES) $(@M_DEPS)
 	@mkdir -p $(@M_CLASSES)
 	$(if $(REBUILD),@echo compiling $(words $(REBUILD)) \
 		files from @M/src to $(@M_CLASSES))
-	$(if $(REBUILD),@javac -classpath $(@M_CLASSPATH) \
+	$(if $(REBUILD),@javac $(JAVAC_OPTS) -classpath $(@M_CLASSPATH) \
 		-sourcepath $(BUILD)/@M/src \
 		-d $(@M_CLASSES) $(REBUILD))
 	$(if $(REBUILD),@echo enhancing $(words $(CLASSES)) \
