@@ -20,6 +20,8 @@ import com.arsdigita.persistence.DataOperation;
 import com.arsdigita.persistence.SessionManager;
 import com.arsdigita.domain.DomainObject;
 
+import org.apache.log4j.Logger;
+
 /**
  * <p>
  * A class to allow a column with denormalization to be maintained.
@@ -29,11 +31,14 @@ import com.arsdigita.domain.DomainObject;
  * </p>
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Revision: #2 $ $Date: 2002/10/14 $
+ * @version $Revision: #3 $ $Date: 2002/11/19 $
  */
 public abstract class HierarchyDenormalization {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/HierarchyDenormalization.java#2 $ by $Author: richardl $, $DateTime: 2002/10/14 17:27:59 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/HierarchyDenormalization.java#3 $ by $Author: dan $, $DateTime: 2002/11/19 04:25:12 $";
+
+    private final static Logger s_log = 
+        Logger.getLogger(HierarchyDenormalization.class);
 
     private String m_attributeName;
     private String m_id;
@@ -68,6 +73,11 @@ public abstract class HierarchyDenormalization {
         m_isModified = m_domainObject.isPropertyModified(m_attributeName);
         boolean wasNew = m_domainObject.isNew();
 
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Before save: isModified:" + m_isModified + 
+                        " wasNew:" + wasNew);
+        } 
+
         // if the url has been modified, we need the old url
         // if it is modified and new then this is the first url so
         // the "old" url is the "new" url
@@ -86,6 +96,9 @@ public abstract class HierarchyDenormalization {
                 }
                 collection.close();
             }
+            if (s_log.isDebugEnabled()) {
+                s_log.debug("Old value is " + m_oldAttributeValue);
+            } 
         }
     }
 
@@ -96,6 +109,10 @@ public abstract class HierarchyDenormalization {
      */
     public void afterSave() {
         if (m_isModified) {
+            if (s_log.isDebugEnabled()) {
+                s_log.debug("After save: oid:" + m_domainObject.getOID() + 
+                            " new value is:"+ getAttributeValue());
+            } 
             DataOperation operation =
                 SessionManager.getSession().retrieveDataOperation
                 (m_operationName);
