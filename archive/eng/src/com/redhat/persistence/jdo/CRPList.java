@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2004/07/21 $
+ * @version $Revision: #14 $ $Date: 2004/07/21 $
  **/
 
 class CRPList implements List {
@@ -77,24 +77,21 @@ class CRPList implements List {
 
             Query query = getPMI().newQuery
                 ("oql",
-                 C.concat("sort(filter(elements.",
+                 C.concat("sort(filter($1.",
                           m_fieldName,
-                          ", sql {key >= :key}), key)"));
-                          // ", sql {key >= :key}), value)"));
+                          ", key >= $1), key)"));
 
-            Map map = new HashMap();
-            map.put("elements", elements);
-            map.put("key", new Integer(m_index));
-            Collection coll = (Collection) query.executeWithMap(map);
+            Collection coll =
+                (Collection) query.execute(elements, new Integer(m_index));
             m_elements = coll.iterator();
         }
 
         public int nextIndex() {
-            throw new UnsupportedOperationException();
+            return m_index;
         }
 
         public int previousIndex() {
-            throw new UnsupportedOperationException();
+            return m_index - 1;
         }
 
         public void remove() {
@@ -106,11 +103,13 @@ class CRPList implements List {
         }
 
         public boolean hasPrevious() {
-            throw new UnsupportedOperationException();
+            return m_index > 0;
         }
 
         public Object next() {
-            throw new UnsupportedOperationException();
+            MapEntry entry = (MapEntry) m_elements.next();
+            m_index++;
+            return entry.getValue();
         }
 
         public Object previous() {
