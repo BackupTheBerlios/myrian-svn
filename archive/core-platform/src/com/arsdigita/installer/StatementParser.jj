@@ -75,6 +75,7 @@ SKIP:
   | <(<WHITESPACE>)? "show" <WHITESPACE> "errors" (<WHITESPACE>)?
      (<SEMICOLON>)?>
   | <"\\echo" (~["\n", "\r"])* ("\n"|"\r"|"\r\n")>
+  | <"PROMPT" (~["\n", "\r"])* ("\n"|"\r"|"\r\n")>
 }
 
 TOKEN:
