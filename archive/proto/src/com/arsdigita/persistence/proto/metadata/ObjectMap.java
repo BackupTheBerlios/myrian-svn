@@ -8,12 +8,12 @@ import java.util.*;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2003/03/05 $
+ * @version $Revision: #14 $ $Date: 2003/03/14 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#13 $ by $Author: rhs $, $DateTime: 2003/03/05 18:41:57 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#14 $ by $Author: rhs $, $DateTime: 2003/03/14 16:11:37 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -22,10 +22,10 @@ public class ObjectMap extends Element {
     private Table m_table;
 
     private SQLBlock m_retrieveAll;
-    private ArrayList m_retrieves = new ArrayList();
-    private ArrayList m_inserts = new ArrayList();
-    private ArrayList m_updates = new ArrayList();
-    private ArrayList m_deletes = new ArrayList();
+    private ArrayList m_retrieves = null;
+    private ArrayList m_inserts = null;
+    private ArrayList m_updates = null;
+    private ArrayList m_deletes = null;
 
     public ObjectMap(ObjectType type) {
         m_type = type;
@@ -175,13 +175,27 @@ public class ObjectMap extends Element {
         return m_retrieves;
     }
 
+    public void setDeclaredRetrieves(Collection retrieves) {
+        if (retrieves == null) {
+            m_retrieves = null;
+        } else {
+            m_retrieves = new ArrayList();
+            m_retrieves.addAll(retrieves);
+        }
+    }
+
     public Collection getRetrieves() {
         if (getSuperMap() == null) {
-            return m_retrieves;
-        } else {
             ArrayList result = new ArrayList();
-            result.addAll(getSuperMap().getRetrieves());
-            result.addAll(m_retrieves);
+            if (m_retrieves != null) {
+                m_retrieves.addAll(result);
+            }
+            return result;
+        } else {
+            Collection result = getSuperMap().getRetrieves();
+            if (m_retrieves != null) {
+                result.addAll(m_retrieves);
+            }
             return result;
         }
     }
@@ -190,14 +204,12 @@ public class ObjectMap extends Element {
         return m_inserts;
     }
 
-    public Collection getInserts() {
-        if (getSuperMap() == null) {
-            return m_inserts;
+    public void setDeclaredInserts(Collection inserts) {
+        if (inserts == null) {
+            m_inserts = null;
         } else {
-            ArrayList result = new ArrayList();
-            result.addAll(getSuperMap().getInserts());
-            result.addAll(m_inserts);
-            return result;
+            m_inserts = new ArrayList();
+            m_inserts.addAll(inserts);
         }
     }
 
@@ -205,13 +217,27 @@ public class ObjectMap extends Element {
         return m_updates;
     }
 
+    public void setDeclaredUpdates(Collection updates) {
+        if (updates == null) {
+            m_updates = null;
+        } else {
+            m_updates = new ArrayList();
+            m_updates.addAll(updates);
+        }
+    }
+
     public Collection getUpdates() {
         if (getSuperMap() == null) {
-            return m_updates;
-        } else {
             ArrayList result = new ArrayList();
-            result.addAll(getSuperMap().getUpdates());
-            result.addAll(m_updates);
+            if (m_updates != null) {
+                result.addAll(m_updates);
+            }
+            return result;
+        } else {
+            Collection result = getSuperMap().getUpdates();
+            if (m_updates != null) {
+                result.addAll(m_updates);
+            }
             return result;
         }
     }
@@ -220,19 +246,13 @@ public class ObjectMap extends Element {
         return m_deletes;
     }
 
-    public Collection getDeletes() {
-        if (getSuperMap() == null) {
-            return m_deletes;
+    public void setDeclaredDeletes(Collection deletes) {
+        if (deletes == null) {
+            m_deletes = null;
         } else {
-            ArrayList result = new ArrayList();
-            result.addAll(m_deletes);
-            result.addAll(getSuperMap().getDeletes());
-            return result;
+            m_deletes = new ArrayList();
+            m_deletes.addAll(deletes);
         }
-    }
-
-    public void addDelete(SQLBlock delete) {
-        m_deletes.add(delete);
     }
 
     Object getElementKey() {

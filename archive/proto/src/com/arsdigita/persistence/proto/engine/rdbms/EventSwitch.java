@@ -12,12 +12,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #16 $ $Date: 2003/03/14 $
+ * @version $Revision: #17 $ $Date: 2003/03/14 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#16 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#17 $ by $Author: rhs $, $DateTime: 2003/03/14 16:11:37 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -152,9 +152,9 @@ class EventSwitch extends Event.Switch {
         Collection tables = om.getTables();
 
         while (om != null) {
-            if ((ins && om.getDeclaredInserts().size() > 0) ||
-                (up && om.getDeclaredUpdates().size() > 0) ||
-                (del && om.getDeclaredDeletes().size() > 0)) {
+            if ((ins && om.getDeclaredInserts() != null) ||
+                (up && om.getDeclaredUpdates() != null) ||
+                (del && om.getDeclaredDeletes() != null)) {
                 tables.removeAll(om.getDeclaredTables());
             }
 
@@ -202,13 +202,13 @@ class EventSwitch extends Event.Switch {
         for (Iterator it = oms.iterator(); it.hasNext(); ) {
             ObjectMap om = (ObjectMap) it.next();
             if (e instanceof CreateEvent) {
-                if (om.getDeclaredInserts().size() > 0) {
+                if (om.getDeclaredInserts() != null) {
                     addOperations(obj, om.getDeclaredInserts());
                 } else {
                     addDML(obj, om.getDeclaredTables(), true);
                 }
             } else if (e instanceof DeleteEvent) {
-                if (om.getDeclaredDeletes().size() > 0) {
+                if (om.getDeclaredDeletes() != null) {
                     addOperations(obj, om.getDeclaredDeletes());
                 } else {
                     addDML(obj, om.getDeclaredTables(), false);
@@ -234,8 +234,8 @@ class EventSwitch extends Event.Switch {
 
         final ObjectMap om = e.getObjectMap();
         Mapping m = om.getMapping(Path.get(e.getProperty().getName()));
-        if ((e instanceof AddEvent && m.getAdds().size() > 0) ||
-            (e instanceof RemoveEvent && m.getRemoves().size() > 0)) {
+        if ((e instanceof AddEvent && m.getAdds() != null) ||
+            (e instanceof RemoveEvent && m.getRemoves() != null)) {
             return;
         }
 
@@ -335,7 +335,9 @@ class EventSwitch extends Event.Switch {
 
         Property prop = e.getProperty();
         Mapping m = e.getObjectMap().getMapping(Path.get(prop.getName()));
-        addOperations(e.getObject(), prop, e.getArgument(), m.getAdds());
+        if (m.getAdds() != null) {
+            addOperations(e.getObject(), prop, e.getArgument(), m.getAdds());
+        }
     }
 
     public void onRemove(final RemoveEvent e) {
@@ -343,7 +345,10 @@ class EventSwitch extends Event.Switch {
 
         Property prop = e.getProperty();
         Mapping m = e.getObjectMap().getMapping(Path.get(prop.getName()));
-        addOperations(e.getObject(), prop, e.getArgument(), m.getRemoves());
+        if (m.getRemoves() != null) {
+            addOperations(e.getObject(), prop, e.getArgument(),
+                          m.getRemoves());
+        }
     }
 
     private void addOperations(Object obj, Collection blocks) {

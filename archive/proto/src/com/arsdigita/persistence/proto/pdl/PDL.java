@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #29 $ $Date: 2003/03/14 $
+ * @version $Revision: #30 $ $Date: 2003/03/14 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#29 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#30 $ by $Author: rhs $, $DateTime: 2003/03/14 16:11:37 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -790,7 +790,7 @@ public class PDL {
             } else if (ev.getName().getName().equals(one)) {
                 if (!ev.isSingle()) {
                     Collection blocks = getSQLBlocks(oneType, ev, two);
-                    if (blocks.size() > 0) {
+                    if (blocks != null && blocks.size() > 0) {
                         m_errors.warn
                             (ev, "both ends of a two way specified, " +
                              "ignoring this event");
@@ -801,7 +801,7 @@ public class PDL {
             } else if (ev.getName().getName().equals(two)) {
                 if (!ev.isSingle()) {
                     Collection blocks = getSQLBlocks(twoType, ev, one);
-                    if (blocks.size() > 0) {
+                    if (blocks != null && blocks.size() > 0) {
                         m_errors.warn
                             (ev, "both ends of a two way specified, " +
                              "ignoring this event");
@@ -858,6 +858,39 @@ public class PDL {
         return blocks;
     }
 
+    private void setSQLBlocks(ObjectType ot, EventNd ev, String role,
+                              Collection blocks) {
+        setSQLBlocks(ot.getRoot().getObjectMap(ot), ev, role, blocks);
+    }
+
+    private void setSQLBlocks(ObjectMap om, EventNd ev, String role,
+                              Collection blocks) {
+        if (ev.getType().equals(EventNd.INSERT)) {
+            om.setDeclaredInserts(blocks);
+        } else if (ev.getType().equals(EventNd.UPDATE)) {
+            om.setDeclaredUpdates(blocks);
+        } else if (ev.getType().equals(EventNd.DELETE)) {
+            om.setDeclaredDeletes(blocks);
+        } else if (ev.getType().equals(EventNd.RETRIEVE)) {
+            if (role == null) {
+                om.setDeclaredRetrieves(blocks);
+            } else {
+                throw new Error("single block event");
+            }
+        } else if (ev.getType().equals(EventNd.ADD)) {
+            getMapping(om, role).setAdds(blocks);
+        } else if (ev.getType().equals(EventNd.REMOVE)) {
+            getMapping(om, role).setRemoves(blocks);
+        } else if (ev.getType().equals(EventNd.CLEAR)) {
+            // do nothing
+        } else if (ev.getType().equals(EventNd.RETRIEVE_ATTRIBUTES)) {
+            // do nothing
+        } else {
+            m_errors.fatal(ev, "bad event type: " + ev.getType());
+            // do nothing
+        }
+    }
+
     private void addEvent(ObjectMap om, EventNd ev, String role) {
         if (ev.getType().equals(EventNd.RETRIEVE) &&
             role != null) {
@@ -869,12 +902,14 @@ public class PDL {
             return;
         }
 
-        Collection blocks = getSQLBlocks(om, ev, role);
+        ArrayList blocks = new ArrayList();
 
         for (Iterator it = ev.getSQL().iterator(); it.hasNext(); ) {
             SQLBlockNd nd = (SQLBlockNd) it.next();
             blocks.add(getBlock(nd));
         }
+
+        setSQLBlocks(om, ev, role, blocks);
     }
 
     private SQLBlock getBlock(EventNd ev) {
