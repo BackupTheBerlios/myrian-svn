@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres/kernel/trigger-acs_permissions.sql#3 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/postgres/kernel/trigger-acs_permissions.sql#4 $
+-- $DateTime: 2003/01/09 14:36:00 $
 
 
 create or replace function object_context_in_fn () returns opaque as '
@@ -57,7 +57,7 @@ begin
        perform permissions_remove_context(old.object_id, 
                                           old.context_id);
   end if;
-  return null;
+  return old;
 end;' language 'plpgsql';
 
 create trigger object_context_del_tr
