@@ -47,12 +47,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #16 $ $Date: 2004/07/30 $
+ * @version $Revision: #17 $ $Date: 2004/08/02 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Session.java#16 $ by $Author: mbooth $, $DateTime: 2004/07/30 13:15:43 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Session.java#17 $ by $Author: mbooth $, $DateTime: 2004/08/02 13:16:10 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -76,8 +76,6 @@ public class Session {
     private final Set m_afterActivate = new HashSet();
     private final Set m_beforeFlush = new HashSet();
     private final Set m_afterFlush = new HashSet();
-
-    private final Set m_flushStates = new HashSet();
 
     private Event m_beforeFlushMarker = null;
 
@@ -649,25 +647,13 @@ public class Session {
      * datastore are consistent with the contents of the in memory data cache.
      **/
     public void flush() {
-        FlushState flushState = new FlushState();
-
         try {
             if (LOG.isDebugEnabled()) {
                 trace("flush", new Object[] {});
             }
 
-            // m_flushStates is a stack of previous states in the current flush
-            // If the current state is in the stack, there is a loop
-
-            if( m_flushStates.contains( flushState ) ) {
-                throw new LoopException();
-            }
-            m_flushStates.add( flushState );
-
             flushInternal();
         } finally {
-            m_flushStates.remove( flushState );
-
             if (LOG.isDebugEnabled()) {
                 untrace("flush");
             }
@@ -755,7 +741,6 @@ public class Session {
         m_odata.clear();
         m_events.clear();
         m_violations.clear();
-        m_flushStates.clear();
         m_beforeFlushMarker = null;
         if (LOG.isDebugEnabled()) { setLevel(0); }
         cleanUpEventProcessors(isCommit);
@@ -1152,34 +1137,6 @@ public class Session {
                 buf.append(msg);
             }
             LOG.debug(buf.toString());
-        }
-    }
-
-    private class FlushState {
-        Object[] m_stateVars;
-        
-        FlushState() {
-            m_stateVars = new Object[] {
-                new HashSet( m_events.getEvents() ),
-                ((HashSet) m_beforeFlush).clone(),
-                ((HashSet) m_afterFlush).clone(),
-                m_beforeFlushMarker
-            };
-        };
-
-        public boolean equals( Object o ) {
-            if( null == o || !( o instanceof FlushState ) ) return false;
-            FlushState state = (FlushState) o;
-
-            for( int i = 0; i < m_stateVars.length; i++ ) {
-                if( null == m_stateVars[i] ) {
-                    if( null != state.m_stateVars[i] ) return false;
-                } else if( !m_stateVars[i].equals( state.m_stateVars[i] ) ) {
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }
