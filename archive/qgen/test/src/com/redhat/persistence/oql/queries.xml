@@ -130,6 +130,8 @@
   <test>
     <query>query(all(test.Node), id = id, name = name)</query>
     <query>query(all(test.StaticNode), id = id, name = name)</query>
+    <query>query(sql { test.Node }, id = id, name = name)</query>
+    <query>query(sql { test.StaticNode }, id = id, name = name)</query>
     <results>
       <row id="30" name="Thirty"/>
       <row id="31" name="Thirty One"/>

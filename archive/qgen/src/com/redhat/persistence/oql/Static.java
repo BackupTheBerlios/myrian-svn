@@ -13,12 +13,12 @@ import java.util.*;
  * Static
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/02/24 $
+ * @version $Revision: #9 $ $Date: 2004/02/25 $
  **/
 
 public class Static extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#8 $ by $Author: rhs $, $DateTime: 2004/02/24 10:13:24 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#9 $ by $Author: rhs $, $DateTime: 2004/02/25 09:07:03 $";
 
     private SQL m_sql;
     private String m_type;
@@ -65,6 +65,8 @@ public class Static extends Expression {
         m_map = map;
         m_bindings = bindings;
 
+        int size = size(m_sql);
+
         for(SQLToken t = m_sql.getFirst(); t != null; t = t.getNext()) {
             if (isExpression(t)) {
                 String image = t.getImage();
@@ -72,7 +74,7 @@ public class Static extends Expression {
                 if (t.isBind()) {
                     e = bind(image);
                 } else if (t.isPath()) {
-                    All all = new All(image, m_bindings);
+                    All all = new All(image, m_bindings, size != 1);
                     if (isAllowedFunction(image) || !m_map) {
                         e = new Choice(all, image);
                     } else {
@@ -132,6 +134,20 @@ public class Static extends Expression {
         }
     }
 
+    private static int size(SQL sql) {
+        int size = 0;
+        for (SQLToken t = sql.getFirst(); t != null; t = t.getNext()) {
+            String image = t.getImage();
+            for (int i = 0; i < image.length(); i++) {
+                if (!Character.isWhitespace(image.charAt(i))) {
+                    size++;
+                    break;
+                }
+            }
+        }
+        return size;
+    }
+
     void frame(Generator gen) {
         for (Iterator it = m_expressions.iterator(); it.hasNext(); ) {
             Expression e = (Expression) it.next();
@@ -142,8 +158,7 @@ public class Static extends Expression {
             QFrame frame = gen.frame(this, gen.getType(m_type));
             frame.setValues(m_columns);
             frame.setTable(this);
-        } else if (m_expressions.size() == 1
-                   && m_sql.getFirst().equals(m_sql.getLast())) {
+        } else if (m_expressions.size() == 1 && size(m_sql) == 1) {
             Expression e = (Expression) m_expressions.get(0);
             if (gen.hasFrame(e)) {
                 QFrame child = gen.getFrame(e);
