@@ -14,12 +14,12 @@ import org.xml.sax.*;
  * JDOHandler
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/09/20 $
+ * @version $Revision: #3 $ $Date: 2004/09/23 $
  **/
 
 class JDOHandler extends ReflectionHandler {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/JDOHandler.java#2 $ by $Author: rhs $, $DateTime: 2004/09/20 13:26:16 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/JDOHandler.java#3 $ by $Author: rhs $, $DateTime: 2004/09/23 15:48:34 $";
 
     private ClassLoader m_loader;
     private String m_resource;
@@ -46,11 +46,8 @@ class JDOHandler extends ReflectionHandler {
     private Integer m_jdbcSize = null;
 
     private Map m_fields = new LinkedHashMap();
-    private Map m_lines = new HashMap();
-    private List m_nested = new ArrayList();
 
     private StringBuffer m_emitted = new StringBuffer();
-    private int m_newlines = 1;
 
     JDOHandler(ClassLoader loader, String resource) {
         m_loader = loader;
@@ -109,12 +106,6 @@ class JDOHandler extends ReflectionHandler {
     private JDOHandler emit(String pdl) {
         m_emitted.append(pdl);
         return this;
-    }
-
-    private void advance(int line) {
-        for ( ; m_newlines < line; m_newlines++) {
-            emit("\n");
-        }
     }
 
     public String getPDL() {
@@ -201,8 +192,6 @@ class JDOHandler extends ReflectionHandler {
         } catch (NoSuchFieldException e) {
             throw fatal(e);
         }
-
-        m_lines.put(m_field, new Integer(m_locator.getLineNumber()));
 
         m_type = m_field.getType();
     }
@@ -303,7 +292,7 @@ class JDOHandler extends ReflectionHandler {
     }
 
     String column(Class klass) {
-        return column(table(klass), "id");
+        return column(table(klass), "_jdo_id");
     }
 
     String column(Class klass, String field) {
@@ -329,10 +318,10 @@ class JDOHandler extends ReflectionHandler {
     String mapping(String from, String field, String to, boolean collection,
                    boolean embedded) {
         if (collection && embedded) {
-            return inverse(column(from + "_" + field, "id"));
+            return inverse(column(from + "_" + field, "_jdo_id"));
         } else if (collection && !embedded) {
             String map = from + "_" + field;
-            return mapping(column(map, "id"), column(map, field));
+            return mapping(column(map, "_jdo_id"), column(map, field));
         } else if (!collection && embedded) {
             return value(column(from, field));
         } else if (!collection && !embedded) {
@@ -351,16 +340,11 @@ class JDOHandler extends ReflectionHandler {
         if (m_key == null) {
             type = pdlType(m_type);
         } else {
-            type = classname(m_class.getName()) + "$" + m_field.getName();
-            m_nested.add
-                ("nested object type " + type +
-                 " class " + MapEntry.class.getName() +
-                 " adapter " + JDOAdapter.class.getName() +
-                 " { " + pdlType(m_key) + "[1..1] key; " +
-                 pdlType(m_value) + " value; }");
+            type = MapEntry.class.getName() +
+                "<" + pdlType(m_key) + ", " + pdlType(m_value) + ">";
         }
         StringBuffer pdl = new StringBuffer();
-        pdl.append(" ");
+        pdl.append("    ");
         if (m_key != null) { pdl.append("component "); }
         pdl.append(type);
         if (m_required || m_collection) {
@@ -373,41 +357,41 @@ class JDOHandler extends ReflectionHandler {
         if (m_key != null) { pdl.append("$entries"); }
         if (!m_embeddedClass) {
             if (m_embedded && !m_collection && isPC(m_type)) {
-                pdl.append(" { ");
+                pdl.append(" {\n");
                 // XXX: superclass fields?
                 Field[] fields = m_type.getDeclaredFields();
                 for (int i = 0; i < fields.length; i++) {
                     if (!isPersistent(fields[i])) { continue; }
-                    pdl.append(" ");
+                    pdl.append("        ");
                     pdl.append(fields[i].getName());
                     pdl.append(" = ");
                     pdl.append(mapping(table(m_class),
                                        field + "_" + fields[i].getName(),
                                        table(fields[i].getType()),
                                        false, !isPC(fields[i].getType())));
-                    pdl.append("; ");
+                    pdl.append(";\n");
                 }
-                pdl.append(" }");
+                pdl.append("\n    }");
             } else {
                 pdl.append(" = ");
                 pdl.append(mapping(table(m_class), field, table(m_type),
                                    m_collection, m_embedded || !isPC(m_type)));
                 if (m_key != null) {
-                    pdl.append(" { ");
-                    pdl.append("key = ");
+                    pdl.append(" {\n");
+                    pdl.append("        key = ");
                     pdl.append(mapping(table(m_class) + "_" + field, "key",
                                        table(m_key), false, !isPC(m_key)));
-                    pdl.append("; ");
-                    pdl.append(" value = ");
+                    pdl.append(";\n");
+                    pdl.append("        value = ");
                     pdl.append(mapping(table(m_class) + "_" + field, "value",
                                        table(m_value), false, !isPC(m_key)));
-                    pdl.append("; ");
-                    pdl.append(" object key (key); ");
-                    pdl.append("}");
+                    pdl.append(";\n");
+                    pdl.append("        object key (key);\n");
+                    pdl.append("    }");
                 }
             }
         }
-        pdl.append("; ");
+        pdl.append(";");
         m_fields.put(m_field, pdl.toString());
         m_field = null;
         m_type = null;
@@ -431,7 +415,7 @@ class JDOHandler extends ReflectionHandler {
                 }
                 if (isPersistent(field)) {
                     StringBuffer pdl = new StringBuffer();
-                    pdl.append(" " + pdlType(field.getType()) + " " +
+                    pdl.append("    " + pdlType(field.getType()) + " " +
                                field.getName());
                     if (!m_embeddedClass) {
                         pdl.append(" = ");
@@ -439,12 +423,12 @@ class JDOHandler extends ReflectionHandler {
                                            table(field.getType()), false,
                                            !isPC(field.getType())));
                     }
-                    pdl.append("; ");
+                    pdl.append(";");
                     m_fields.put(field, pdl.toString());
                 }
             }
 
-            advance(m_line);
+            emit("\n");
 
             if (m_embeddedClass) { emit("nested "); }
             String name = classname(m_class.getName());
@@ -454,23 +438,20 @@ class JDOHandler extends ReflectionHandler {
             }
             emit(" class ").emit(m_class.getName());
             emit(" adapter ").emit(JDOAdapter.class.getName());
-            emit(" { ");
+            emit(" {\n");
             if (!m_embeddedClass && m_keys.isEmpty() && m_super == null) {
-                emit(" Integer id = " + value(column(m_class)) + "; ");
+                emit("    Integer _jdo_id = " + value(column(m_class)) +
+                     ";\n");
             }
 
             for (Iterator it = m_fields.keySet().iterator(); it.hasNext(); ) {
                 Object field = it.next();
                 String pdl = (String) m_fields.get(field);
-                Integer line = (Integer) m_lines.get(field);
-                if (line != null) {
-                    advance(line.intValue());
-                }
-                emit(pdl);
+                emit(pdl + "\n");
             }
 
             if (!m_keys.isEmpty()) {
-                emit(" object key (");
+                emit("\n    object key (");
                 for (int i = 0; i < m_keys.size(); i++) {
                     Field key = (Field) m_keys.get(i);
                     emit(key.getName());
@@ -478,41 +459,35 @@ class JDOHandler extends ReflectionHandler {
                         emit(", ");
                     }
                 }
-                emit("); ");
+                emit(");\n");
             } else if (!m_embeddedClass && m_super == null) {
-                emit(" object key (id);");
+                emit("\n    object key (_jdo_id);\n");
             } else if (m_super != null) {
-                emit(" reference key (" + column(m_class) + ");");
+                emit("\n    reference key (" + column(m_class) + ");\n");
             }
-            emit(" } ");
+            emit("\n}");
 
             if (!m_embeddedClass && m_keys.isEmpty() && m_super == null) {
-                emit("query " + name + "$Gen class " +
+                emit("\nquery " + name + "$Gen class " +
                      PropertyMap.class.getName() + " adapter " +
-                     IdentityAdapter.class.getName() + " { ");
-                emit("Integer id;");
-                emit(" do { ");
-                emit("select nextval('jdotest_seq') as id");
-                emit(" } map { ");
-                emit("id = id;");
-                emit(" }");
-                emit("} ");
-            }
-
-            for (int i = 0; i < m_nested.size(); i++) {
-                emit((String) m_nested.get(i)).emit(" ");
+                     IdentityAdapter.class.getName() + " {\n");
+                emit("    Integer _jdo_id;\n");
+                emit("    do {\n");
+                emit("        select nextval('jdotest_seq') as id\n");
+                emit("    } map {\n");
+                emit("        _jdo_id = id;\n");
+                emit("    }\n");
+                emit("}\n");
             }
         }
 
         m_fields.clear();
-        m_nested.clear();
         m_class = null;
         m_super = null;
         m_embeddedClass = false;
         m_generate = true;
         m_keys.clear();
         m_line = -1;
-        m_lines.clear();
     }
 
     private static final Map J2P_SUBS = new HashMap();
