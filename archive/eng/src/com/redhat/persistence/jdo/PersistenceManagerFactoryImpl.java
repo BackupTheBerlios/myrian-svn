@@ -28,11 +28,8 @@ public class PersistenceManagerFactoryImpl
     private final static Map s_instances = new HashMap();
 
     private static Collection m_options;
-    private static Collection m_unsupportedProperties;
     static {
-
         Set options = new HashSet();
-        Set unsupported = new HashSet();
         options.add("javax.jdo.query.JDOQL");
         // javax.jdo.option.TransientTransactional
         // javax.jdo.option.NontransactionalRead
@@ -114,13 +111,18 @@ public class PersistenceManagerFactoryImpl
             } else if ("javax.jdo.option.ConnectionFactory2Name".equals(k)) {
                 setConnectionFactory2Name(v);
             } else if ("javax.jdo.option.ConnectionUserName".equals(k)) {
-                setConnectionUserName(v);
+                _setConnectionUserName(v);
             } else if ("javax.jdo.option.ConnectionPassword".equals(k)) {
-                setConnectionPassword(v);
+                _setConnectionPassword(v);
             } else if ("javax.jdo.option.ConnectionURL".equals(k)) {
-                setConnectionURL(v);
+                _setConnectionURL(v);
             } else if ("javax.jdo.option.ConnectionDriverName".equals(k)) {
-                setConnectionDriverName(v);
+                _setConnectionDriverName(v);
+            } else {
+                // See 11.1 Interface PersistenceManagerFactory, p. 80:
+                // Any property not recognized by the implementation must be
+                // silently ignored.
+                ;
             }
         }
     }
@@ -186,7 +188,19 @@ public class PersistenceManagerFactoryImpl
         return m_driver;
     }
 
+    /*
+     * See pp. 70-71 and p. 84: The returned PersistenceManagerFactory is not
+     * configurable (the setXXX methods will throw an exception).
+     */
+    private void unmodifiable() {
+        throw new UnsupportedOperationException("unmodifiable");
+    }
+
     public void setConnectionDriverName(String value) {
+        unmodifiable();
+    }
+
+    private void _setConnectionDriverName(String value) {
         try {
             Class.forName(value);
         } catch (ClassNotFoundException cnfe) {
@@ -200,6 +214,10 @@ public class PersistenceManagerFactoryImpl
     }
 
     public void setConnectionURL(String value) {
+        throw new UnsupportedOperationException("unmodifiable");
+    }
+
+    private void _setConnectionURL(String value) {
         m_url = value;
     }
 
@@ -207,11 +225,21 @@ public class PersistenceManagerFactoryImpl
         return m_user;
     }
 
+
     public void setConnectionUserName(String value) {
+        unmodifiable();
+
+    }
+
+    private void _setConnectionUserName(String value) {
         m_user = value;
     }
 
     public void setConnectionPassword(String value) {
+        unmodifiable();
+    }
+
+    private void _setConnectionPassword(String value) {
         m_pass = value;
     }
 
@@ -259,7 +287,12 @@ public class PersistenceManagerFactoryImpl
         return m_minPool;
     }
 
+
     public void setMinPool(int value) {
+        unmodifiable();
+    }
+
+    private void _setMinPool(int value) {
         m_minPool = value;
     }
 
@@ -268,6 +301,10 @@ public class PersistenceManagerFactoryImpl
     }
 
     public void setMaxPool(int value) {
+        unmodifiable();
+    }
+
+    private void _setMaxPool(int value) {
         m_maxPool = value;
     }
 
@@ -275,7 +312,12 @@ public class PersistenceManagerFactoryImpl
         return m_mswait;
     }
 
+
     public void setMsWait(int value) {
+        unmodifiable();
+    }
+
+    private void _setMsWait(int value) {
         m_mswait = value;
     }
 
