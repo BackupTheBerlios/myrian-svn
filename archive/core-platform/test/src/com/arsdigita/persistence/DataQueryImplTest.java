@@ -38,11 +38,11 @@ import org.apache.log4j.Category;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/07/25 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#4 $ by $Author: randyg $, $DateTime: 2002/07/25 16:42:22 $";
 
     private static Category s_log = 
         Category.getInstance(DataQueryImplTest.class.getName());
@@ -366,14 +366,13 @@ public class DataQueryImplTest extends DataQueryTest {
          // we want a new query
          query = getSession().retrieveQuery("examples.DataQueryWithBindVariables");
          query.setParameter("priority", "3");
-         query.setParameter("description", "wrote");
          
          try {
              assert(query.size() == 1);
          } catch (PersistenceException e) {
-             // this is the correct behavior
+             // this is the correct behavior because it is missing a parameter
          }
- 
+         query.setParameter("description", "wrote");
         
          // Test the ability to get out the parameter values
          assert("The retrieved value for 'description' was not correct",
@@ -884,6 +883,7 @@ public class DataQueryImplTest extends DataQueryTest {
         operation.setParameter("description", null);
         try {
             operation.execute();
+            operation.close();
         } catch (Exception e) {
             fail("An exception should not have been thrown. " +
                  Utilities.LINE_BREAK + e.getMessage() + 
