@@ -644,4 +644,13 @@
       <row id="9" name="00s"/>
     </results>
   </test>
+  <test>
+    <query>query(filter(all(test.User), name == "Snurble").groups, id = id, name = name)</query>
+    <results/>
+  </test>
+  <test>
+    <exception type="java.lang.IllegalArgumentException" msg="no such expression: afilter"/>
+    <query>query(afilter(all(test.User), name == "Snurble").groups, id = id, name = name)</query>
+    <results/>
+  </test>
 </tests>

@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
  * QueryTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/02/09 $
+ * @version $Revision: #4 $ $Date: 2004/02/11 $
  **/
 
 public class QueryTest extends TestCase {
@@ -23,7 +23,7 @@ public class QueryTest extends TestCase {
     // being an instance of TestCase. Later versions of ant don't
     // suffer from this problem.
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QueryTest.java#3 $ by $Author: rhs $, $DateTime: 2004/02/09 14:57:03 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QueryTest.java#4 $ by $Author: jorris $, $DateTime: 2004/02/11 12:32:30 $";
 
     private static final Logger s_log = Logger.getLogger(QueryTest.class);
 
@@ -32,13 +32,19 @@ public class QueryTest extends TestCase {
     private boolean m_ordered;
     private String m_query;
     private List m_results = null;
+    private final ExpectedError m_expectedError;
+    //private static final String NL = System.getProperty("line.separator");
 
-    public QueryTest(QuerySuite suite, String name, String query,
-                     boolean ordered) {
+    public QueryTest(QuerySuite suite, 
+                     String name, 
+                     String query,
+                     boolean ordered,
+                     ExpectedError expectedError) {
         m_suite = suite;
         m_name = name;
         m_query = query;
         m_ordered = ordered;
+        m_expectedError = expectedError;
     }
 
     void setResults(List results) {
@@ -98,10 +104,15 @@ public class QueryTest extends TestCase {
             } finally {
                 stmt.close();
             }
+
         } catch (AssertionFailedError e) {
-            result.addFailure(this, e);
+            if (isUnexpected(e)) {
+                result.addFailure(this, e);
+            }
         } catch (Throwable t) {
-            result.addError(this, t);
+            if (isUnexpected(t)) {
+                result.addError(this, t);
+            }
         } finally {
             result.endTest(this);
         }
@@ -117,6 +128,13 @@ public class QueryTest extends TestCase {
 
     public String toString() {
         return m_query;
+    }
+
+    boolean isUnexpected(final Throwable t) {
+        if (m_expectedError == null) {
+            return true;
+        }
+        return !m_expectedError.isExpected(t);
     }
 
 }

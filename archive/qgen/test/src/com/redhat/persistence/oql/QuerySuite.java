@@ -24,12 +24,12 @@ import java.util.*;
  * QuerySuite
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/02/09 $
+ * @version $Revision: #3 $ $Date: 2004/02/11 $
  **/
 
 public class QuerySuite extends TestSuite {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QuerySuite.java#2 $ by $Author: rhs $, $DateTime: 2004/02/09 11:51:40 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QuerySuite.java#3 $ by $Author: jorris $, $DateTime: 2004/02/11 12:32:30 $";
 
     public QuerySuite() {}
 
@@ -243,6 +243,7 @@ public class QuerySuite extends TestSuite {
         private boolean m_ordered = false;
         private StringBuffer m_query = null;
         private List m_results = null;
+        private ExpectedError m_error = null;
 
         public TestLoader(QuerySuite suite) {
             m_suite = suite;
@@ -268,6 +269,10 @@ public class QuerySuite extends TestSuite {
                     row.put(attrs.getLocalName(i), value);
                 }
                 m_results.add(row);
+            } else if (name.equals("exception")) {
+                String type = attrs.getValue("type");
+                String msg = attrs.getValue("msg");
+                m_error = new ExpectedError(type, msg);
             }
         }
 
@@ -286,7 +291,7 @@ public class QuerySuite extends TestSuite {
                     tname = m_name + "[" + tname + "]";
                 }
                 QueryTest test =
-                    new QueryTest(m_suite, tname, query, m_ordered);
+                    new QueryTest(m_suite, tname, query, m_ordered, m_error);
                 m_tests.add(test);
             } else if (name.equals("results")) {
                 // do nothing
