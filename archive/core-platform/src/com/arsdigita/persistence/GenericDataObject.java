@@ -44,12 +44,12 @@ import java.util.ArrayList;
  *              through inheritance.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #15 $ $Date: 2002/10/16 $
+ * @version $Revision: #16 $ $Date: 2002/10/16 $
  */
 
 public class GenericDataObject implements DataObject {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#15 $ by $Author: richardl $, $DateTime: 2002/10/16 14:39:19 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#16 $ by $Author: richardl $, $DateTime: 2002/10/16 18:18:50 $";
 
     private ObjectType    m_type;
     private Session       m_session;
@@ -1078,7 +1078,7 @@ public class GenericDataObject implements DataObject {
      * Disconnects this DataObject from the current transaction. This allows
      * the data object to be used in multiple transactions.
      *
-     * @see isDisconnected()
+     * @see #isDisconnected()
      **/
 
     public void disconnect() {

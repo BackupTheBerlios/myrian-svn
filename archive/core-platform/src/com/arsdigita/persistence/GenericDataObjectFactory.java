@@ -25,12 +25,12 @@ import java.lang.reflect.Constructor;
  *              data passed in.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/10/16 $
+ * @version $Revision: #6 $ $Date: 2002/10/16 $
  */
 
 public class GenericDataObjectFactory {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObjectFactory.java#5 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObjectFactory.java#6 $ by $Author: richardl $, $DateTime: 2002/10/16 18:18:50 $";
 
 
     /**
@@ -39,7 +39,6 @@ public class GenericDataObjectFactory {
      * Object can then be cast to the more specific class associated
      * with the object type.
      *
-     * @see com.arsdigita.persistence.metadata.ObjectType#getClassName()
      */
     public static GenericDataObject createObject(ObjectType type,
                                                  Session session,

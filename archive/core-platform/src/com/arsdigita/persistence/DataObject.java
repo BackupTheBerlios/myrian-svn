@@ -27,12 +27,12 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *              inheritance.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/10/16 $
+ * @version $Revision: #5 $ $Date: 2002/10/16 $
  */
 
 public interface DataObject {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObject.java#4 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObject.java#5 $ by $Author: richardl $, $DateTime: 2002/10/16 18:18:50 $";
 
     /**
      * Returns the type of this persistent object.
@@ -110,7 +110,7 @@ public interface DataObject {
      * Disconnects this DataObject from the current transaction. This allows
      * the data object to be used in multiple transactions.
      *
-     * @see isDisconnected()
+     * @see #isDisconnected()
      **/
 
     void disconnect();
