@@ -20,7 +20,7 @@ model com.arsdigita.ui.sitemap;
 query getRootNode {
     BigDecimal id;
     String name;
-    String nchild;
+    BigDecimal nchild;
     do {
         select 'Root' as node_name, 
                s1.node_id,
@@ -41,7 +41,7 @@ query getRootNode {
 query getSubNodes {
     BigDecimal id;
     String name;
-    String nchild;
+    BigDecimal nchild;
     do {
         select s1.name,
                s1.node_id,
