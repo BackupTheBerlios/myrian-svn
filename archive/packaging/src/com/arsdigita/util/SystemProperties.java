@@ -28,13 +28,13 @@ import org.apache.log4j.Logger;
  *
  * @see java.lang.System
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/SystemProperties.java#3 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/SystemProperties.java#4 $
  */
 public final class SystemProperties {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/SystemProperties.java#3 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/SystemProperties.java#4 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/23 11:43:44 $";
+        "$DateTime: 2003/09/23 12:32:59 $";
 
     private static final Logger s_log = Logger.getLogger
         (SystemProperties.class);
@@ -62,7 +62,7 @@ public final class SystemProperties {
         final ParameterValue value = s_loader.load(param);
 
         if (value == null) {
-            return null;
+            return param.getDefaultValue();
         } else {
             if (!value.getErrors().isEmpty()) {
                 throw new ConfigError

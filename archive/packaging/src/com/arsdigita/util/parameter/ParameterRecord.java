@@ -31,13 +31,13 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterLoader
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#3 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#4 $
  */
 public abstract class ParameterRecord {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#3 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#4 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/23 11:43:44 $";
+        "$DateTime: 2003/09/23 12:32:59 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterRecord.class);
@@ -166,16 +166,16 @@ public abstract class ParameterRecord {
         final ParameterValue value = loader.load(param);
 
         if (value == null) {
-            throw new IllegalArgumentException("XXX");
-        }
+            return set(param, new ParameterValue(param.getDefaultValue()));
+        } else {
+            if (!value.getErrors().isEmpty()) {
+                throw new IllegalArgumentException
+                    ("Parameter " + param.getName() + ": " +
+                     value.getErrors().toString());
+            }
 
-        if (!value.getErrors().isEmpty()) {
-            throw new IllegalArgumentException
-                ("Parameter " + param.getName() + ": " +
-                 value.getErrors().toString());
+            return set(param, value);
         }
-
-        return set(param, value);
     }
 
     private Object set(final Parameter param, final ParameterValue value) {
