@@ -33,22 +33,14 @@ import org.apache.log4j.Logger;
  * </p>
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Revision: #7 $ $Date: 2003/08/15 $
+ * @version $Revision: #8 $ $Date: 2003/12/09 $
  */
 public abstract class HierarchyDenormalization {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/HierarchyDenormalization.java#7 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/HierarchyDenormalization.java#8 $ by $Author: ashah $, $DateTime: 2003/12/09 15:56:40 $";
 
     private final static Logger s_log =
         Logger.getLogger(HierarchyDenormalization.class);
-
-    private String m_attributeName;
-    private String m_id;
-    private String m_operationName;
-    private boolean m_isModified = false;
-    private String m_oldAttributeValue;
-    private String m_newAttributeValue;
-
 
     public HierarchyDenormalization(String operationName,
                                     ObservableDomainObject object,
@@ -60,13 +52,23 @@ public abstract class HierarchyDenormalization {
     public HierarchyDenormalization(String operationName,
                                     ObservableDomainObject object,
                                     String attributeName, String id) {
-        m_id = id;
-        m_operationName = operationName;
-        m_attributeName = attributeName;
-        object.addObserver(new Observer());
+        object.addObserver(new Observer(operationName, attributeName, id));
     }
 
     private class Observer implements DomainObjectObserver {
+
+        private final String m_attributeName;
+        private final String m_id;
+        private final String m_operationName;
+        private boolean m_isModified = false;
+        private String m_oldAttributeValue;
+        private String m_newAttributeValue;
+
+        Observer(String operationName, String attributeName, String id) {
+            m_id = id;
+            m_operationName = operationName;
+            m_attributeName = attributeName;
+        }
 
         public void set(DomainObject dobj, String name,
                         Object old_value, Object new_value) {
@@ -128,6 +130,21 @@ public abstract class HierarchyDenormalization {
 
         public void beforeDelete(DomainObject dobj) { }
         public void afterDelete(DomainObject dobj) { }
+
+        public boolean equals(Object other) {
+            if (other instanceof Observer) {
+                Observer o = (Observer) other;
+                return m_operationName.equals(o.m_operationName)
+                    && m_id.equals(o.m_id)
+                    && m_attributeName.equals(o.m_attributeName);
+            }
+
+            return false;
+        }
+
+        public int hashCode() {
+            return m_operationName.hashCode();
+        }
     }
 
     /**
