@@ -11,15 +11,17 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/lucene/Document.pdl#2 $ 
-// $DateTime: 2002/10/16 14:12:35 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/lucene/Document.pdl#3 $ 
+// $DateTime: 2002/12/21 01:24:31 $
 
 model com.arsdigita.lucene;
 
 object type Document {
     BigDecimal[1..1] id            = lucene_docs.document_id INTEGER;
     String[1..1] type              = lucene_docs.type VARCHAR(200);
+    String[0..1] typeSpecificInfo  = lucene_docs.type_info VARCHAR;
     Date[1..1] timestamp           = lucene_docs.timestamp TIMESTAMP;
+    Boolean[1..1] isDirty          = lucene_docs.is_dirty BIT;
     Boolean[1..1] isDeleted        = lucene_docs.is_deleted BIT;
     String[0..1] language          = lucene_docs.language CHAR(2);
     String[0..1] country           = lucene_docs.country CHAR(2);
