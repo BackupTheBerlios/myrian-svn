@@ -24,16 +24,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 /**
  * RDBMSRecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/02/24 $
+ * @version $Revision: #3 $ $Date: 2004/03/02 $
  **/
 
 class RDBMSRecordSet extends RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/RDBMSRecordSet.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/RDBMSRecordSet.java#3 $ by $Author: rhs $, $DateTime: 2004/03/02 09:17:03 $";
+
+    private static final Logger s_log = Logger.getLogger(RecordSet.class);
 
     final private RDBMSEngine m_engine;
     final private ResultCycle m_rc;
@@ -69,6 +73,9 @@ class RDBMSRecordSet extends RecordSet {
             if (cycle != null) { cycle.beginGet(column); }
             Object result = ad.fetch(m_rc.getResultSet(), column);
             if (cycle != null) { cycle.endGet(result); }
+            if (s_log.isDebugEnabled()) {
+                s_log.debug(p + "(" + column + ") -> " + result);
+            }
             return result;
         } catch (SQLException e) {
             if (cycle != null) { cycle.endGet(e); }
