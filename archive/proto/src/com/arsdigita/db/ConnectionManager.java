@@ -26,14 +26,14 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao
- * @version $Revision: #7 $ $Date: 2003/08/07 $
+ * @version $Revision: #8 $ $Date: 2003/08/08 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: bche $ - $Date: 2003/08/07 $ $Id: //core-platform/proto/src/com/arsdigita/db/ConnectionManager.java#7 $";
+    public static final String versionId = "$Author: bche $ - $Date: 2003/08/08 $ $Id: //core-platform/proto/src/com/arsdigita/db/ConnectionManager.java#8 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);
@@ -88,7 +88,7 @@ public class ConnectionManager {
         m_interval = interval;
     }
 
-    static final void badConnection(Connection conn) {
+    public static final void badConnection(Connection conn) {
         ConnectionManager cm = getInstance();
         synchronized (cm) {
             if (cm.m_pool.containsConnection(conn)) {

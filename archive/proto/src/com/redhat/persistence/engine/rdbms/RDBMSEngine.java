@@ -1,5 +1,7 @@
 package com.redhat.persistence.engine.rdbms;
 
+import com.arsdigita.db.ConnectionManager;
+import com.arsdigita.db.SQLExceptionHandler;
 import com.arsdigita.developersupport.DeveloperSupport;
 import com.arsdigita.webdevsupport.WebDevSupport;
 import com.redhat.persistence.*;
@@ -15,12 +17,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/08/07 $
+ * @version $Revision: #4 $ $Date: 2003/08/08 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#3 $ by $Author: bche $, $DateTime: 2003/08/07 17:11:17 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#4 $ by $Author: bche $, $DateTime: 2003/08/08 11:00:21 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -475,7 +477,9 @@ public class RDBMSEngine extends Engine {
 
                     return null;
                 }
-            } catch (SQLException e) {
+            } catch (SQLException e) {   
+                //robust connection pooling             
+                checkBadConnection(e);
                 LOG.error(sql, e);
                 if (bLogQuery) {
                     DeveloperSupport.logQuery(m_conn.hashCode(), sOpType, sql, collToMap(w.getBindings()), 0, e);
@@ -484,6 +488,24 @@ public class RDBMSEngine extends Engine {
             }
         } finally {
             w.clear();
+        }
+    }
+    
+    /**
+     * Tests if the SQLException was caused by a bad connection to the database.
+     * If it is, disconnects ConnectionManager and returns true.  
+     * @param e the SQLException to check
+     * @return true if the SQLException was caused by a bad connection to the database
+     */
+    boolean checkBadConnection(SQLException e) {
+        //      robust connection pooling
+        SQLException result = SQLExceptionHandler.wrap(e);
+        if (result instanceof com.arsdigita.db.DbNotAvailableException) {
+            LOG.warn("Bad Connection...calling ConnectionManager.badConnection()");
+            ConnectionManager.badConnection(m_conn);            
+            return true;
+        } else {
+            return false;
         }
     }
 

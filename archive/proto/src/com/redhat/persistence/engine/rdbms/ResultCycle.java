@@ -8,12 +8,12 @@ import org.apache.log4j.Logger;
  * ResultCycle
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/04 $
+ * @version $Revision: #3 $ $Date: 2003/08/08 $
  **/
 
 class ResultCycle {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/engine/rdbms/ResultCycle.java#2 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/redhat/persistence/engine/rdbms/ResultCycle.java#3 $ by $Author: bche $, $DateTime: 2003/08/08 11:00:21 $";
 
     private static final Logger LOG = Logger.getLogger(ResultCycle.class);
 
@@ -50,6 +50,8 @@ class ResultCycle {
             if (!result) { close(); }
             return result;
         } catch (SQLException e) {
+            // robust connection pooling
+            m_engine.checkBadConnection(e);
             throw new Error(e.getMessage());
         }
     }
