@@ -33,9 +33,9 @@ import org.apache.log4j.Logger;
  */
 public final class Connections {
     public static final String versionId =
-        "$Id: //eng/persistence/dev/test/src/com/arsdigita/util/jdbc/Connections.java#1 $" +
-        "$Author: rhs $" +
-        "$DateTime: 2004/06/07 13:49:55 $";
+        "$Id: //eng/persistence/dev/src/com/arsdigita/util/jdbc/Connections.java#1 $" +
+        "$Author: vadim $" +
+        "$DateTime: 2004/07/28 14:15:02 $";
 
     private static final Logger s_log = Logger.getLogger(Connections.class);
 

@@ -28,9 +28,9 @@ import java.util.Arrays;
  */
 public final class Classes {
     public static final String versionId =
-        "$Id: //eng/persistence/dev/test/src/com/arsdigita/util/Classes.java#1 $" +
-        "$Author: rhs $" +
-        "$DateTime: 2004/06/07 13:49:55 $";
+        "$Id: //eng/persistence/dev/src/com/arsdigita/util/Classes.java#1 $" +
+        "$Author: vadim $" +
+        "$DateTime: 2004/07/28 14:15:02 $";
 
     private static final Logger s_log = Logger.getLogger(Classes.class);
 
