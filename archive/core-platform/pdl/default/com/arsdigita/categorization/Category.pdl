@@ -369,3 +369,24 @@ data operation swapObjectWithNextObject {
 }
 
 
+// Fetches all ancestors of a category, including itself.
+//
+// @param categoryID the specified category
+//
+query getAllCategoryAncestors {
+    Category category;
+    do {
+        select c.category_id, c.name, c.description, c.enabled_p
+        from cat_categories c, 
+             cat_cat_subcat_trans_index trans
+        where trans.subcategory_id = :categoryID
+          and trans.category_id = c.category_id
+  } map {
+      category.id          = c.category_id;
+      category.name        = c.name;
+      category.description = c.description;
+      category.isEnabled   = c.enabled_p;
+  }
+}
+
+
