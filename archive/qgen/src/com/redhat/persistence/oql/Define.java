@@ -7,12 +7,12 @@ import java.util.*;
  * Define
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2004/02/21 $
+ * @version $Revision: #11 $ $Date: 2004/02/24 $
  **/
 
 public class Define extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Define.java#10 $ by $Author: rhs $, $DateTime: 2004/02/21 18:22:56 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Define.java#11 $ by $Author: rhs $, $DateTime: 2004/02/24 10:13:24 $";
 
     private Expression m_expr;
     private String m_name;
@@ -28,6 +28,7 @@ public class Define extends Expression {
         QFrame frame = gen.frame(this, define(m_name, expr.getType()));
         frame.addChild(expr);
         frame.setValues(expr.getValues());
+        gen.addUses(this, gen.getUses(m_expr));
     }
 
     String emit(Generator gen) {

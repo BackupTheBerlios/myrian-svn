@@ -13,12 +13,12 @@ import java.util.*;
  * Static
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/02/23 $
+ * @version $Revision: #8 $ $Date: 2004/02/24 $
  **/
 
 public class Static extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#7 $ by $Author: ashah $, $DateTime: 2004/02/23 12:02:35 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#8 $ by $Author: rhs $, $DateTime: 2004/02/24 10:13:24 $";
 
     private SQL m_sql;
     private String m_type;
@@ -136,6 +136,7 @@ public class Static extends Expression {
         for (Iterator it = m_expressions.iterator(); it.hasNext(); ) {
             Expression e = (Expression) it.next();
             e.frame(gen);
+            gen.addUses(this, gen.getUses(e));
         }
         if (m_type != null) {
             QFrame frame = gen.frame(this, gen.getType(m_type));
@@ -199,12 +200,14 @@ public class Static extends Expression {
                 m_all.frame(gen);
                 if (gen.hasFrame(m_all)) {
                     child = gen.getFrame(m_all);
+                    gen.addUses(this, gen.getUses(m_all));
                 }
             } else if (m_expression != null) {
                 m_expression.frame(gen);
                 if (gen.hasFrame(m_expression)) {
                     child = gen.getFrame(m_expression);
                 }
+                gen.addUses(this, gen.getUses(m_expression));
             }
 
             if (child != null) {

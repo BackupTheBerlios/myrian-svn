@@ -11,12 +11,12 @@ import java.util.*;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2004/02/21 $
+ * @version $Revision: #14 $ $Date: 2004/02/24 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#13 $ by $Author: rhs $, $DateTime: 2004/02/21 18:22:56 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#14 $ by $Author: rhs $, $DateTime: 2004/02/24 10:13:24 $";
 
     private Expression m_expr;
     private String m_name;
@@ -31,6 +31,14 @@ public class Get extends Expression {
         QFrame expr = gen.getFrame(m_expr);
         QFrame frame = frame(gen, expr, m_name, this);
         frame.addChild(0, expr);
+        Property prop = expr.getType().getProperty(m_name);
+        if (!prop.isCollection()) {
+            List children = frame.getChildren();
+            for (int i = 1; i < children.size(); i++) {
+                QFrame child = (QFrame) children.get(i);
+                child.setOuter(true);
+            }
+        }
     }
 
     String emit(Generator gen) {
@@ -69,6 +77,7 @@ public class Get extends Expression {
                     QFrame qualias = gen.getFrame(e);
                     frame.addChild(qualias);
                     frame.setValues(qualias.getValues());
+                    gen.addUses(result, frame.getValues());
                     return frame;
                 } finally {
                     gen.pop();
@@ -89,12 +98,16 @@ public class Get extends Expression {
                 }
                 frame.setValues(values);
             } else {
-                frame.setValues(columns);
-                frame.setTable(table);
+                TableAll tall = new TableAll
+                    (table, columns, prop.getType().getQualifiedName());
+                tall.frame(gen);
+                QFrame tbl = gen.getFrame(tall);
                 PropertyCondition cond =
-                    new PropertyCondition(expr, prop, frame);
+                    new PropertyCondition(expr, prop, tbl);
                 cond.frame(gen);
-                frame.setCondition(cond);
+                tbl.setCondition(cond);
+                frame.addChild(tbl);
+                frame.setValues(tbl.getValues());
             }
         } else {
             int lower = 0;
@@ -109,6 +122,8 @@ public class Get extends Expression {
             int upper = lower + Code.span(prop.getType());
             frame.setValues(values.subList(lower, upper));
         }
+
+        gen.addUses(result, frame.getValues());
 
         return frame;
     }
@@ -128,7 +143,12 @@ public class Get extends Expression {
         }
 
         void frame(Generator gen) {
-            if (m_conditions == null) { return; }
+            gen.addUses(this, m_expr.getValues());
+            if (m_conditions == null) {
+                gen.addUses(this, m_frame.getValues());
+                return;
+            }
+            gen.addUses(this, m_conditions);
 
             List values = m_expr.getValues();
             for (int i = 0; i < values.size(); i++) {
@@ -248,6 +268,34 @@ public class Get extends Expression {
 
         String summary() {
             return "this";
+        }
+
+    }
+
+    private static class TableAll extends Expression {
+
+        private String m_table;
+        private String[] m_columns;
+        private String m_type;
+
+        TableAll(String table, String[] columns, String type) {
+            m_table = table;
+            m_columns = columns;
+            m_type = type;
+        }
+
+        void frame(Generator gen) {
+            QFrame frame = gen.frame(this, gen.getType(m_type));
+            frame.setValues(m_columns);
+            frame.setTable(m_table);
+        }
+
+        String emit(Generator gen) {
+            return gen.getFrame(this).emit();
+        }
+
+        String summary() {
+            return "tall: " + m_table;
         }
 
     }

@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * BinaryCondition
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/02/21 $
+ * @version $Revision: #7 $ $Date: 2004/02/24 $
  **/
 
 public abstract class BinaryCondition extends Condition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/BinaryCondition.java#6 $ by $Author: rhs $, $DateTime: 2004/02/21 18:22:56 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/BinaryCondition.java#7 $ by $Author: rhs $, $DateTime: 2004/02/24 10:13:24 $";
 
     Expression m_left;
     Expression m_right;
@@ -22,6 +22,8 @@ public abstract class BinaryCondition extends Condition {
     void frame(Generator gen) {
         m_left.frame(gen);
         m_right.frame(gen);
+        gen.addUses(this, gen.getUses(m_left));
+        gen.addUses(this, gen.getUses(m_right));
     }
 
     String emit(Generator gen) {

@@ -330,6 +330,49 @@
   </test>
 
   <test>
+    <query>query(all(test.User).groups, id = id, name = name)</query>
+    <results>
+      <row id="2" name="R&amp;B"/>
+      <row id="9" name="00s"/>
+
+      <row id="0" name="Pop"/>
+      <row id="8" name="90s"/>
+      <row id="9" name="00s"/>
+
+      <row id="0" name="Pop"/>
+      <row id="8" name="90s"/>
+      <row id="9" name="00s"/>
+
+      <row id="0" name="Pop"/>
+      <row id="7" name="80s"/>
+
+      <row id="4" name="New Age"/>
+      <row id="7" name="80s"/>
+
+      <row id="3" name="Country"/>
+      <row id="8" name="90s"/>
+      <row id="9" name="00s"/>
+
+      <row id="0" name="Pop"/>
+      <row id="7" name="80s"/>
+      <row id="8" name="90s"/>
+
+      <row id="0" name="Pop"/>
+      <row id="5" name="Film"/>
+      <row id="6" name="Television"/>
+      <row id="9" name="00s"/>
+
+      <row id="1" name="Rock"/>
+      <row id="8" name="90s"/>
+
+      <row id="0" name="Pop"/>
+      <row id="5" name="Film"/>
+      <row id="8" name="90s"/>
+      <row id="9" name="00s"/>
+    </results>
+  </test>
+
+  <test>
     <query>query(all(test.A), id = id, name = name)</query>
     <results>
       <row id="0" name="Zero"/>
@@ -643,7 +686,7 @@
   </test>
 
   <test>
-    <query>query(all(test.A).first, a = a.id, b = b.id, index = index)</query>
+    <query>query(filter(all(test.A).first, exists(a)), a = a.id, b = b.id, index = index)</query>
     <results>
       <row a="0" b="10" index="0"/>
       <row a="1" b="11" index="0"/>

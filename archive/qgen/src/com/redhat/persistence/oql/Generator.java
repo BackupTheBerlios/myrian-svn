@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/02/23 $
+ * @version $Revision: #4 $ $Date: 2004/02/24 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#3 $ by $Author: ashah $, $DateTime: 2004/02/23 11:51:21 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#4 $ by $Author: rhs $, $DateTime: 2004/02/24 10:13:24 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -23,6 +23,7 @@ class Generator {
     private Map m_queries = new HashMap();
     private LinkedList m_stack = new LinkedList();
     private MultiMap m_equalities = new MultiMap();
+    private MultiMap m_uses = new MultiMap();
     private Map m_substitutions = new HashMap();
 
     Generator(Root root) {
@@ -121,6 +122,18 @@ class Generator {
 
     void addEqualities(Expression expr, List equalities) {
         m_equalities.addAll(expr, equalities);
+    }
+
+    List getUses(Expression expr) {
+        return m_uses.get(expr);
+    }
+
+    void addUse(Expression expr, QValue v) {
+        m_uses.add(expr, v);
+    }
+
+    void addUses(Expression expr, List values) {
+        m_uses.addAll(expr, values);
     }
 
     void setSubstitute(Expression expr, Expression substitute) {
@@ -256,8 +269,10 @@ class Generator {
             if (me == null) { continue; }
             QValue other = eq.getOther(me);
             if (me.getTable() == null) { continue; }
-            if (me.getTable().equals(other.getTable()) &&
-                me.getColumn().equals(other.getColumn())) {
+            if (me.getTable().equals(other.getTable())
+                && me.getColumn().equals(other.getColumn())
+                && !me.getFrame().isOuter()
+                && !other.getFrame().isOuter()) {
                 values.add(other.getFrame(), me);
             }
         }

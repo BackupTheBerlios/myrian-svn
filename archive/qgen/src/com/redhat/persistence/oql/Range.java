@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * Range
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/02/21 $
+ * @version $Revision: #7 $ $Date: 2004/02/24 $
  **/
 
 public abstract class Range extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Range.java#6 $ by $Author: rhs $, $DateTime: 2004/02/21 18:22:56 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Range.java#7 $ by $Author: rhs $, $DateTime: 2004/02/24 10:13:24 $";
 
     Expression m_query;
     Expression m_operand;
@@ -26,6 +26,8 @@ public abstract class Range extends Expression {
         frame.addChild(query);
         frame.setValues(query.getValues());
         m_operand.frame(gen);
+        gen.addUses(this, gen.getUses(m_query));
+        gen.addUses(this, gen.getUses(m_operand));
     }
 
     String emit(Generator gen) {

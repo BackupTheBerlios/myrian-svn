@@ -24,12 +24,12 @@ import java.util.*;
  * QuerySuite
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/02/11 $
+ * @version $Revision: #4 $ $Date: 2004/02/24 $
  **/
 
 public class QuerySuite extends TestSuite {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QuerySuite.java#3 $ by $Author: jorris $, $DateTime: 2004/02/11 12:32:30 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QuerySuite.java#4 $ by $Author: rhs $, $DateTime: 2004/02/24 10:13:24 $";
 
     public QuerySuite() {}
 
@@ -52,9 +52,7 @@ public class QuerySuite extends TestSuite {
         return m_conn;
     }
 
-    private Collection m_constraints = null;
-
-    private void setup() throws SQLException {
+    private void init() {
         m_root = new Root();
         m_conn = Connections.acquire(RuntimeConfig.getConfig().getJDBCURL());
 
@@ -62,18 +60,32 @@ public class QuerySuite extends TestSuite {
         pdl.loadResource("com/redhat/persistence/oql/test.pdl");
         pdl.emit(m_root);
 
-        Collection tables = m_root.getTables();
         m_constraints = new ArrayList();
-
-        Statement stmt = m_conn.createStatement();
+        Collection tables = m_root.getTables();
         for (Iterator it = tables.iterator(); it.hasNext(); ) {
             Table table = (Table) it.next();
-            String sql = table.getSQL();
-            stmt.execute(sql);
             for (Iterator iter = table.getConstraints().iterator();
                  iter.hasNext(); ) {
                 Constraint con = (Constraint) iter.next();
                 if (con.isDeferred()) { m_constraints.add(con); }
+            }
+        }
+    }
+
+    private Collection m_constraints = null;
+
+    private void setup() throws SQLException {
+        if (m_root == null) { init(); }
+        Statement stmt = m_conn.createStatement();
+
+        Collection tables = m_root.getTables();
+        for (Iterator it = tables.iterator(); it.hasNext(); ) {
+            Table table = (Table) it.next();
+            String sql = table.getSQL();
+            try {
+                stmt.execute(sql);
+            } catch (SQLException e) {
+                throw new IllegalStateException(e.getMessage() + "\n\n" + sql);
             }
         }
 
@@ -96,23 +108,38 @@ public class QuerySuite extends TestSuite {
         ssn.flush();
     }
 
+    private boolean commit = false;
+
     private void teardown() throws SQLException {
+        if (m_root == null) { init(); }
         Statement stmt = m_conn.createStatement();
         try {
             for (Iterator it = m_constraints.iterator(); it.hasNext(); ) {
                 Constraint con = (Constraint) it.next();
-                stmt.execute("alter table " + con.getTable().getName() +
-                             " drop constraint " + con.getName());
+                try {
+                    stmt.execute("alter table " + con.getTable().getName() +
+                                 " drop constraint " + con.getName());
+                } catch (SQLException e) {
+                    System.err.println(e.getMessage());
+                }
             }
 
             Collection tables = m_root.getTables();
             for (Iterator it = tables.iterator(); it.hasNext(); ) {
                 Table table = (Table) it.next();
-                stmt.execute("drop table " + table.getName());
+                try {
+                    stmt.execute("drop table " + table.getName());
+                } catch (SQLException e) {
+                    System.err.println(e.getMessage());
+                }
             }
         } finally {
             stmt.close();
-            m_conn.rollback();
+            if (commit) {
+                m_conn.commit();
+            } else {
+                m_conn.rollback();
+            }
             m_conn.close();
             m_constraints = null;
             m_conn = null;
@@ -308,7 +335,22 @@ public class QuerySuite extends TestSuite {
     }
 
     public static void main(String[] args) throws Exception {
-        junit.textui.TestRunner.run(suite());
+        QuerySuite suite = new QuerySuite();
+        suite.commit = true;
+        String cmd = "setup";
+        if (args.length > 0) {
+            cmd = args[0];
+        }
+        if (cmd.equals("setup")) {
+            suite.setup();
+        } else if (cmd.equals("teardown")) {
+            suite.teardown();
+        } else {
+            System.err.println("unknown command: " + cmd);
+            return;
+        }
+        Connection conn = suite.getConnection();
+        if (conn != null) { conn.commit(); }
     }
 
 }

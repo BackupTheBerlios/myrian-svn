@@ -6,12 +6,12 @@ import java.util.*;
  * MultiMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/02/21 $
+ * @version $Revision: #3 $ $Date: 2004/02/24 $
  **/
 
 class MultiMap {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/MultiMap.java#2 $ by $Author: rhs $, $DateTime: 2004/02/21 23:13:07 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/MultiMap.java#3 $ by $Author: rhs $, $DateTime: 2004/02/24 10:13:24 $";
 
     private List m_keys = new ArrayList();
     private Map m_lists = new HashMap();
@@ -32,6 +32,14 @@ class MultiMap {
         }
     }
 
+    boolean contains(Object key) {
+        return m_lists.containsKey(key);
+    }
+
+    boolean isEmpty() {
+        return m_lists.isEmpty();
+    }
+
     void add(Object key, Object value) {
         List values = (List) m_lists.get(key);
         if (values == null) {
@@ -46,6 +54,20 @@ class MultiMap {
         for (Iterator it = values.iterator(); it.hasNext(); ) {
             add(key, it.next());
         }
+    }
+
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("{");
+        for (Iterator it = keys().iterator(); it.hasNext(); ) {
+            Object key = it.next();
+            buf.append(key + "=" + get(key));
+            if (it.hasNext()) {
+                buf.append(", ");
+            }
+        }
+        buf.append("}");
+        return buf.toString();
     }
 
 }

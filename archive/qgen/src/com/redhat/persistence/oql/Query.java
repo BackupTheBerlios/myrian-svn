@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/02/22 $
+ * @version $Revision: #7 $ $Date: 2004/02/24 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#6 $ by $Author: rhs $, $DateTime: 2004/02/22 23:33:33 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#7 $ by $Author: rhs $, $DateTime: 2004/02/24 10:13:24 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -58,6 +58,18 @@ public class Query {
             }
         } finally {
             gen.pop();
+        }
+
+        for (Iterator it = gen.getFrames().iterator(); it.hasNext(); ) {
+            QFrame qf = (QFrame) it.next();
+            s_log.info("frame: " + qf);
+            s_log.info("expr: " + qf.getExpression());
+            s_log.info("uses: " + gen.getUses(qf.getExpression()));
+            Expression cond = qf.getCondition();
+            if (cond != null) {
+                s_log.info("cond: " + cond);
+                s_log.info("uses: " + gen.getUses(cond));
+            }
         }
 
         s_log.info("unoptimized frame:\n" + qframe);

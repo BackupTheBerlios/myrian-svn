@@ -33,7 +33,7 @@ object type Link class com.redhat.persistence.PropertyMap
     A a = join l.a_id to a.a_id;
     B b = join l.b_id to b.b_id;
     String name = l.name;
-    Integer index = l.index;
+    Integer index = l.idx;
 
     object key(a, b);
 }
