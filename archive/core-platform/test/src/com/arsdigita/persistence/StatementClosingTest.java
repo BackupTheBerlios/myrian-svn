@@ -47,7 +47,7 @@ import org.apache.log4j.varia.StringMatchFilter;
  */
 public class StatementClosingTest extends Log4jBasedTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/StatementClosingTest.java#9 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/StatementClosingTest.java#10 $";
 
     private Session ssn;
 
@@ -55,14 +55,6 @@ public class StatementClosingTest extends Log4jBasedTestCase {
 
     public StatementClosingTest(String name) {
         super(name);
-    }
-
-    // the idea here is to pick an incredibly dirt-simple PDL file that
-    // has an insert statement
-    protected void persistenceSetUp() {
-        load("com/arsdigita/persistence/testpdl/mdsql/Datatype.pdl");
-        load("com/arsdigita/persistence/testpdl/static/Order.pdl");
-        super.persistenceSetUp();
     }
 
     /**
@@ -73,6 +65,7 @@ public class StatementClosingTest extends Log4jBasedTestCase {
 
         ssn = getSession();
         originalCloseValue = ssn.getTransactionContext().getAggressiveClose();
+        runFinalization(false);
     }
 
     /**
@@ -99,6 +92,8 @@ public class StatementClosingTest extends Log4jBasedTestCase {
         DataObject dt = ssn.create("examples.Datatype");
         dt.set("id", BigInteger.ZERO);
         dt.save();
+
+        runFinalization();
 
         assertLogDoesNotContain(closeString);
 
@@ -145,6 +140,19 @@ public class StatementClosingTest extends Log4jBasedTestCase {
         items = null;
         cursor = null;
 
+        runFinalization();
+
+        assertLogDoesNotContain(daString);
+        assertLogContains(closeString);
+    }
+
+    private void runFinalization() {
+        runFinalization(true);
+    }
+
+    private void runFinalization(boolean logging) {
+        if (!logging) { Logger.getRoot().removeAppender(log); }
+
         // do everything we can to encourage garbage collection
         System.gc();
         try {
@@ -152,7 +160,6 @@ public class StatementClosingTest extends Log4jBasedTestCase {
         } catch  (InterruptedException e) {}
         System.runFinalization();
 
-        assertLogDoesNotContain(daString);
-        assertLogContains(closeString);
+        if (!logging) { Logger.getRoot().addAppender(log); }
     }
 }
