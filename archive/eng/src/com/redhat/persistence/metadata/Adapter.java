@@ -24,15 +24,17 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * Adapter
+ * Adapter.
+ *
+ * Subclasses must provide a public no-args constructor.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/06/17 $
+ * @version $Revision: #4 $ $Date: 2004/06/18 $
  **/
 
 public abstract class Adapter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Adapter.java#3 $ by $Author: vadim $, $DateTime: 2004/06/17 16:10:26 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Adapter.java#4 $ by $Author: vadim $, $DateTime: 2004/06/18 16:55:13 $";
 
     private Root m_root;
 
@@ -105,6 +107,10 @@ public abstract class Adapter {
 
     public abstract PropertyMap getProperties(Object obj);
 
+    /**
+     * @pre obj != null
+     * @throws NullPointerException if <code>obj</code> is null.
+     **/
     public abstract ObjectType getObjectType(Object obj);
 
 }
