@@ -35,19 +35,20 @@ import org.apache.log4j.Logger;
  *
  * @see Initializer
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #3 $ $Date: 2003/02/28 $
+ * @version $Revision: #4 $ $Date: 2003/03/25 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/SessionManager.java#3 $ by $Author: vadim $, $DateTime: 2003/02/28 16:01:18 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/SessionManager.java#4 $ by $Author: vadim $, $DateTime: 2003/03/25 17:26:50 $";
 
     private static String s_url = null;           // the jdbc URL
     private static String s_username = null;      // the database username
     private static String s_password = null;      // the database password
     private static ThreadLocal s_session;  // the session
     private static SQLUtilities s_sqlUtil;
-    private static Set s_procManagers = new HashSet();
+    private static Set s_beforeFlushProcManagers = new HashSet();
+    private static Set s_afterFlushProcManagers  = new HashSet();
 
     private static final Logger s_cat =
         Logger.getLogger(SessionManager.class.getName());
@@ -97,10 +98,19 @@ public class SessionManager {
      *  processor's <code>write(Event)</code> method. </li>
      * </ul>
      **/
-    public static synchronized void addEventProcessorManager
+    public static synchronized void addBeforeFlushProcManager
         (EventProcessorManager manager) {
 
-        s_procManagers.add(manager);
+        s_beforeFlushProcManagers.add(manager);
+    }
+
+    /**
+     * @see #addBeforeFlushProcManager(EventProcessorManager)
+     **/
+    public static synchronized void addAfterFlushProcManager
+        (EventProcessorManager manager) {
+
+        s_afterFlushProcManagers.add(manager);
     }
 
      /**
@@ -152,10 +162,15 @@ public class SessionManager {
                                                         sb.toString());
                     }
                     Session s = new Session();
-                    for (Iterator ii=s_procManagers.iterator(); ii.hasNext(); ) {
+                    for (Iterator ii=s_beforeFlushProcManagers.iterator(); ii.hasNext(); ) {
                         EventProcessorManager mngr = 
                             (EventProcessorManager) ii.next();
-                        s.getProtoSession().addEventProcessor(mngr.getEventProcessor());
+                        s.getProtoSession().addBeforeFlush(mngr.getEventProcessor());
+                    }
+                    for (Iterator ii=s_afterFlushProcManagers.iterator(); ii.hasNext(); ) {
+                        EventProcessorManager mngr = 
+                            (EventProcessorManager) ii.next();
+                        s.getProtoSession().addAfterFlush(mngr.getEventProcessor());
                     }
                     return s;
                 }

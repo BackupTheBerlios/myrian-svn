@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #47 $ $Date: 2003/03/24 $
+ * @version $Revision: #48 $ $Date: 2003/03/25 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#47 $ by $Author: ashah $, $DateTime: 2003/03/24 12:07:20 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#48 $ by $Author: vadim $, $DateTime: 2003/03/25 17:26:50 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -887,16 +887,6 @@ public class Session {
     public void addAfterFlush(EventProcessor ep) {
         check(ep);
         m_afterFlush.add(ep);
-    }
-
-    // FIXME: Once the old Session class and proto.Session are merged, this
-    // method should be made package-private. It is (and should be) only used by
-    // SessionManager. -- vadimn@redhat.com, 2003-02-28
-    /**
-     * <span style="color:FireBrick">FIXME</span> this shouldn't be public.
-     **/
-    public void addEventProcessor(EventProcessor ep) {
-        addAfterFlush(ep);
     }
 
     void dump() {
