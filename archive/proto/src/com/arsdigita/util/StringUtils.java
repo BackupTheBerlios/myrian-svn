@@ -46,6 +46,7 @@ public class StringUtils {
         // can't instantiate me!
     }
 
+    public static final String NEW_LINE = System.getProperty("line.separator");
     /**
      * Tests if a string is empty.
      * @param s A string to test
@@ -207,6 +208,31 @@ public class StringUtils {
         return result.toString();
     }
     /**
+     * Converts an array of Strings into a single String separated by
+     * a given string.
+     * Example Input: {"cat", "house", "dog"}, ", "
+     * Output -  "cat, house, dog"
+     *
+     * @param strings The string array too join.
+     * @param joinStr The string to join the array members together.
+     *
+     * @pre strings != null
+     *
+     * @return Joined String
+     **/
+    public static String join(String[] strings, String joinStr) {
+        StringBuffer result = new StringBuffer();
+        final int lastIdx = strings.length - 1;
+        for (int idx = 0; idx < strings.length; idx++) {
+            result.append(strings[idx]);
+            if (idx < lastIdx) {
+                result.append(joinStr);
+            }
+        }
+
+        return result.toString();
+    }
+    /**
      * Extract a parameter value from a packed list of parameter values.
      * Example: input: key="age", sep=',', plist="cost=23,age=27,name=Thom"
      * output = "27".  This is a simple implementation that is meant
@@ -318,19 +344,19 @@ public class StringUtils {
                 if (entries == null) {
                     to.append("[null iterator]");
                 } else {
-                    String newLine = System.getProperty("line.separator");
                     to.append("{");
-                    String comma = newLine;
+                    String comma = NEW_LINE;
 
                     while (entries.hasNext()) {
                         to.append(comma);
-                        comma = "," + newLine;
+                        comma = "," + NEW_LINE;
                         Map.Entry e = (Map.Entry)entries.next();
+
                         to  .append(toString(e.getKey()))
                             .append(" => ")
                             .append(toString(e.getValue()));
                     }
-                    to.append(newLine).append("}");
+                    to.append(NEW_LINE).append("}");
                 }
             }
         }
@@ -377,7 +403,7 @@ public class StringUtils {
         } else if (Character.isWhitespace(s.charAt(n))) {
             return s;
         } else {
-            return s.concat(System.getProperty("line.separator"));
+            return s.concat(NEW_LINE);
         }
     }
 
@@ -478,7 +504,7 @@ public class StringUtils {
      */
 
     public final static String repeat(String pattern, int repeatCount) {
-        StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer(repeatCount * pattern.length());
         for (int i = 0; i < repeatCount; i++) {
             sb.append(pattern);
         }
