@@ -25,13 +25,13 @@ import javax.mail.internet.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/csv/CSV.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/csv/CSV.java#3 $
  */
 public final class CSV {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/csv/CSV.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/csv/CSV.java#3 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/23 01:57:55 $";
+        "$DateTime: 2003/09/23 11:43:44 $";
 
     public static final Object[][] load(final Reader reader,
                                         final Parameter[] params) {
@@ -46,7 +46,7 @@ public final class CSV {
             row = new Object[params.length];
 
             for (int i = 0; i < params.length; i++) {
-                value = params[i].unmarshal(loader);
+                value = loader.load(params[i]);
 
                 if (!value.getErrors().isEmpty()) {
                     throw new IllegalArgumentException

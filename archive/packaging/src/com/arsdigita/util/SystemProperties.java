@@ -28,13 +28,13 @@ import org.apache.log4j.Logger;
  *
  * @see java.lang.System
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/SystemProperties.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/SystemProperties.java#3 $
  */
 public final class SystemProperties {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/SystemProperties.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/SystemProperties.java#3 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/23 01:57:55 $";
+        "$DateTime: 2003/09/23 11:43:44 $";
 
     private static final Logger s_log = Logger.getLogger
         (SystemProperties.class);
@@ -59,20 +59,26 @@ public final class SystemProperties {
 
         Assert.exists(param, Parameter.class);
 
-        final ParameterValue value = param.unmarshal(s_loader);
+        final ParameterValue value = s_loader.load(param);
 
-        if (!value.getErrors().isEmpty()) {
-            throw new ConfigError
-                ("Parameter " + param.getName() + ": " + value.getErrors());
+        if (value == null) {
+            return null;
+        } else {
+            if (!value.getErrors().isEmpty()) {
+                throw new ConfigError
+                    ("Parameter " + param.getName() + ": " +
+                     value.getErrors());
+            }
+
+            param.validate(value);
+
+            if (!value.getErrors().isEmpty()) {
+                throw new ConfigError
+                    ("Parameter " + param.getName() + ": " +
+                     value.getErrors());
+            }
+
+            return value.getObject();
         }
-
-        param.validate(value);
-
-        if (!value.getErrors().isEmpty()) {
-            throw new ConfigError
-                ("Parameter " + param.getName() + ": " + value.getErrors());
-        }
-
-        return value.getObject();
     }
 }

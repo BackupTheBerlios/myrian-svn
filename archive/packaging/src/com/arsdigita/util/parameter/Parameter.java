@@ -22,13 +22,13 @@ import java.util.*;
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Revision: #6 $ $Date: 2003/09/23 $
+ * @version $Revision: #7 $ $Date: 2003/09/23 $
  */
 public interface Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/Parameter.java#6 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/Parameter.java#7 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/23 01:57:55 $";
+        "$DateTime: 2003/09/23 11:43:44 $";
 
     public static final int OPTIONAL = 0;
     public static final int REQUIRED = 1;
@@ -43,7 +43,7 @@ public interface Parameter {
 
     void setInfo(ParameterInfo info);
 
-    ParameterValue unmarshal(ParameterLoader store);
+    void unmarshal(ParameterValue value);
 
     void validate(ParameterValue value);
 }

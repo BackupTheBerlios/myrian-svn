@@ -31,13 +31,13 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterLoader
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#3 $
  */
 public abstract class ParameterRecord {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#3 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/23 10:49:54 $";
+        "$DateTime: 2003/09/23 11:43:44 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterRecord.class);
@@ -163,7 +163,7 @@ public abstract class ParameterRecord {
                          param + " has not been registered");
         }
 
-        final ParameterValue value = param.unmarshal(loader);
+        final ParameterValue value = loader.load(param);
 
         if (value == null) {
             throw new IllegalArgumentException("XXX");

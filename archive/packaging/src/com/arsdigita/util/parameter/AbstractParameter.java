@@ -24,13 +24,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#3 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#4 $
  */
 public abstract class AbstractParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#3 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#4 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/23 01:57:55 $";
+        "$DateTime: 2003/09/23 11:43:44 $";
 
     private final String m_name;
     private final Class m_type;
@@ -83,19 +83,19 @@ public abstract class AbstractParameter implements Parameter {
     // Lifecycle events
     //
 
-    public final ParameterValue unmarshal(final ParameterLoader loader) {
-        final ParameterValue value = loader.load(this);
+    public final void unmarshal(final ParameterValue value) {
+        Assert.exists(value, ParameterValue.class);
 
-        if (value == null) {
-            return new ParameterValue(m_default);
+        final String string = value.getString();
+
+        if (string == null) {
+            value.setObject(getDefaultValue());
         } else {
-            final String string = value.getString();
             final List errors = value.getErrors();
+
             final Object result = unmarshal(string, errors);
 
             value.setObject(result);
-
-            return value;
         }
     }
 
