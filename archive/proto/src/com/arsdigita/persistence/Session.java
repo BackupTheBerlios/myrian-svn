@@ -45,7 +45,7 @@ import java.sql.SQLException;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/02/18 $
+ * @version $Revision: #12 $ $Date: 2003/02/18 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -89,7 +89,10 @@ public class Session {
     }
 
     private com.arsdigita.persistence.proto.Session m_ssn =
-        new com.arsdigita.persistence.proto.Session(new RDBMSEngine(
+        new com.arsdigita.persistence.proto.Session(new MemoryEngine());
+    // Use the instantiation below to run with the relational engine. Right
+    // now this will only work on postgres.
+/*        new com.arsdigita.persistence.proto.Session(new RDBMSEngine(
             new ConnectionSource() {
                     public Connection acquire() {
                         try {
@@ -104,7 +107,7 @@ public class Session {
                     public void release(Connection conn) {
                         // Do nothing
                     }
-                }));
+                    }));*/
     private TransactionContext m_ctx = new TransactionContext(m_ssn);
     private MetadataRoot m_root = MetadataRoot.getMetadataRoot();
 
