@@ -6,16 +6,24 @@ import java.util.*;
 import javax.jdo.*;
 import javax.jdo.spi.*;
 
+import org.apache.log4j.Logger;
+
 class StateManagerImpl implements StateManager {
+    private final static Logger s_log =
+        Logger.getLogger(StateManagerImpl.class);
 
     private PersistenceManagerImpl m_pmi = null;
 
     // XXX temporary storage for replaceField/replacingField
     private Object m_tmpValue = null;
 
-    StateManagerImpl() { }
+    StateManagerImpl() {
+        s_log.debug("StateManagerImpl(): m_pmi=null", new Throwable());
+    }
 
     StateManagerImpl(PersistenceManagerImpl pmi) {
+        if (pmi == null) { throw new NullPointerException("pmi"); }
+
         m_pmi = pmi;
     }
 
