@@ -44,10 +44,10 @@ import org.apache.log4j.Logger;
  * PandoraTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/06/29 $
+ * @version $Revision: #3 $ $Date: 2004/07/06 $
  **/
 
-public class PandoraTest extends AbstractCase {
+public class PandoraTest extends WithTxnCase {
     private final static Logger s_log = Logger.getLogger(PandoraTest.class);
 
     private Session m_ssn;

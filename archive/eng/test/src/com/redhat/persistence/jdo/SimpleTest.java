@@ -1,6 +1,6 @@
 package com.redhat.persistence.jdo;
 
-public class SimpleTest extends AbstractCase {
+public class SimpleTest extends WithTxnCase {
     public void testModification() {
         Employee e = new Employee("name", null);
         e.setSalary(new Float(1.0f));

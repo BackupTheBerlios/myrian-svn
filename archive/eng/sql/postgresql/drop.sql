@@ -1,6 +1,8 @@
 -- Since: 2004-06-25
 -- Temporary hack to clean up the schema
 
+drop sequence jdotest_seq;
+
 drop table items;
 drop table orders;
 drop table products;

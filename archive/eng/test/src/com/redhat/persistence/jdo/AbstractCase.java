@@ -36,12 +36,5 @@ public abstract class AbstractCase extends TestCase {
 
         s_pmf = JDOHelper.getPersistenceManagerFactory(p);
         m_pm = s_pmf.getPersistenceManager();
-        m_pm.currentTransaction().begin();
-    }
-
-    protected void tearDown() {
-        if (m_pm.currentTransaction().isActive()) {
-            m_pm.currentTransaction().rollback();
-        }
     }
 }
