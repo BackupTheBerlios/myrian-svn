@@ -29,13 +29,13 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $ */
+ * @version $Revision: #3 $ $Date: 2003/09/09 $ */
 
 public interface DataAssociation extends DataCollection {
     // when this no longer extends DataCollection, make sure it
     // still has get/set Query and get/set Source
 
-    String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/DataAssociation.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/DataAssociation.java#3 $ by $Author: justin $, $DateTime: 2003/09/09 13:02:17 $";
 
     /**
      * Adds <i>object</i> to the persistent association.
@@ -214,9 +214,6 @@ public interface DataAssociation extends DataCollection {
      * set.
      * <p>
      * If the query has not yet been executed, it executes the query.
-     * <p>
-     * This is similar to {@link com.arsdigita.db.ResultSet#isLast()}
-     * <p>
      *
      * @deprecated use {@link #cursor()}.isLast()
      *

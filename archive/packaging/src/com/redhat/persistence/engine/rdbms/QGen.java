@@ -30,14 +30,35 @@ import org.apache.log4j.Logger;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/08/29 $
+ * @version $Revision: #6 $ $Date: 2003/09/09 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/QGen.java#5 $ by $Author: rhs $, $DateTime: 2003/08/29 10:31:35 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/QGen.java#6 $ by $Author: justin $, $DateTime: 2003/09/09 13:02:17 $";
 
     private static final Logger LOG = Logger.getLogger(QGen.class);
+
+    private static final Collection s_functions = new HashSet();
+    static {
+        String[] functions = {
+            /* sql standard functions supported by both oracle and postgres.
+             * there is an added caveat that the function uses normal function
+             * syntax and not keywords as arguments (e.g. trim)
+             */
+            "current_date", "current_timestamp",
+            "upper", "lower",
+            // postgres supported oracle-isms
+            "substr", "length", "nvl"
+        };
+        for (int i = 0; i < functions.length; i++) {
+            s_functions.add(Path.get(functions[i]));
+        }
+    }
+
+    private static final boolean isAllowedFunction(Path p) {
+        return s_functions.contains(p);
+    }
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -117,10 +138,19 @@ class QGen {
     private static final HashSet RESERVED = new HashSet();
 
     static {
-        // TODO: expand this list
-        RESERVED.add("as");
-        RESERVED.add("in");
-        RESERVED.add("to");
+        String[] keywords = {
+            // postgres keywords (non-reserved and reserved) from 7.3 docs
+            "abort", "abs", "absolute", "access", "action", "ada", "add", "admin", "after", "aggregate", "", "alias", "all", "allocate", "alter", "analyse", "analyze", "and", "any", "are", "array", "as", "asc", "asensitive", "assertion", "assignment", "asymmetric", "at", "atomic", "authorization", "avg", "backward", "before", "begin", "between", "bigint", "binary", "bit", "bitvar", "bit_length", "blob", "boolean", "both", "breadth", "by", "c", "cache", "call", "called", "cardinality", "cascade", "cascaded", "case", "cast", "catalog", "catalog_name", "chain", "char", "character", "characteristics", "character_length", "character_set_catalog", "character_set_name", "character_set_schema", "char_length", "check", "checked", "checkpoint", "class", "class_origin", "clob", "close", "cluster", "coalesce", "cobol", "collate", "collation", "collation_catalog", "collation_name", "collation_schema", "column", "column_name", "command_function", "command_function_code", "comment", "commit", "committed", "completion", "condition_number", "connect", "connection", "connection_name", "constraint", "constraints", "constraint_catalog", "constraint_name", "constraint_schema", "constructor", "contains", "continue", "conversion", "convert", "copy", "corresponding", "count", "create", "createdb", "createuser", "cross", "cube", "current", "current_date", "current_path", "current_role", "current_time", "current_timestamp", "current_user", "cursor", "cursor_name", "cycle", "data", "database", "date", "datetime_interval_code", "datetime_interval_precision", "day", "deallocate", "dec", "decimal", "declare", "default", "deferrable", "deferred", "defined", "definer", "delete", "delimiter", "delimiters", "depth", "deref", "desc", "describe", "descriptor", "destroy", "destructor", "deterministic", "diagnostics", "dictionary", "disconnect", "dispatch", "distinct", "do", "domain", "double", "drop", "dynamic", "dynamic_function", "dynamic_function_code", "each", "else", "encoding", "encrypted", "end", "end-exec", "equals", "escape", "every", "except", "exception", "exclusive", "exec", "execute", "existing", "exists", "explain", "external", "extract", "false", "fetch", "final", "first", "float", "for", "force", "foreign", "fortran", "forward", "found", "free", "freeze", "from", "full", "function", "g", "general", "generated", "get", "global", "go", "goto", "grant", "granted", "group", "grouping", "handler", "having", "hierarchy", "hold", "host", "hour", "identity", "ignore", "ilike", "immediate", "immutable", "implementation", "implicit", "in", "increment", "index", "indicator", "infix", "inherits", "initialize", "initially", "inner", "inout", "input", "insensitive", "insert", "instance", "instantiable", "instead", "int", "integer", "intersect", "interval", "into", "invoker", "is", "isnull", "isolation", "iterate", "join", "k", "key", "key_member", "key_type", "lancompiler", "language", "large", "last", "lateral", "leading", "left", "length", "less", "level", "like", "limit", "listen", "load", "local", "localtime", "localtimestamp", "location", "locator", "lock", "lower", "m", "map", "match", "max", "maxvalue", "message_length", "message_octet_length", "message_text", "method", "min", "minute", "minvalue", "mod", "mode", "modifies", "modify", "module", "month", "more", "move", "mumps", "name", "names", "national", "natural", "nchar", "nclob", "new", "next", "no", "nocreatedb", "nocreateuser", "none", "not", "nothing", "notify", "notnull", "null", "nullable", "nullif", "number", "numeric", "object", "octet_length", "of", "off", "offset", "oids", "old", "on", "only", "open", "operation", "operator", "option", "options", "or", "order", "ordinality", "out", "outer", "output", "overlaps", "overlay", "overriding", "owner", "pad", "parameter", "parameters", "parameter_mode", "parameter_name", "parameter_ordinal_position", "parameter_specific_catalog", "parameter_specific_name", "parameter_specific_schema", "partial", "pascal", "password", "path", "pendant", "placing", "pli", "position", "postfix", "precision", "prefix", "preorder", "prepare", "preserve", "primary", "prior", "privileges", "procedural", "procedure", "public", "read", "reads", "real", "recheck", "recursive", "ref", "references", "referencing", "reindex", "relative", "rename", "repeatable", "replace", "reset", "restrict", "result", "return", "returned_length", "returned_octet_length", "returned_sqlstate", "returns", "revoke", "right", "role", "rollback", "rollup", "routine", "routine_catalog", "routine_name", "routine_schema", "row", "rows", "row_count", "rule", "savepoint", "scale", "schema", "schema_name", "scope", "scroll", "search", "second", "section", "security", "select", "self", "sensitive", "sequence", "serializable", "server_name", "session", "session_user", "set", "setof", "sets", "share", "show", "similar", "simple", "size", "smallint", "some", "source", "space", "specific", "specifictype", "specific_name", "sql", "sqlcode", "sqlerror", "sqlexception", "sqlstate", "sqlwarning", "stable", "start", "state", "statement", "static", "statistics", "stdin", "stdout", "storage", "strict", "structure", "style", "subclass_origin", "sublist", "substring", "sum", "symmetric", "sysid", "system", "system_user", "table", "table_name", "temp", "template", "temporary", "terminate", "than", "then", "time", "timestamp", "timezone_hour", "timezone_minute", "to", "toast", "trailing", "transaction", "transactions_committed", "transactions_rolled_back", "transaction_active", "transform", "transforms", "translate", "translation", "treat", "trigger", "trigger_catalog", "trigger_name", "trigger_schema", "trim", "true", "truncate", "trusted", "type", "uncommitted", "under", "unencrypted", "union", "unique", "unknown", "unlisten", "unnamed", "unnest", "until", "update", "upper", "usage", "user", "user_defined_type_catalog", "user_defined_type_name", "user_defined_type_schema", "using", "vacuum", "valid", "validator", "value", "values", "varchar", "variable", "varying", "verbose", "version", "view", "volatile", "when", "whenever", "where", "with", "without", "work", "write", "year", "zone",
+
+            // oracle keywords from 8.1.7 docs
+            "access", "add", "all", "alter", "and", "any", "as", "asc", "audit", "between", "by", "char", "check", "cluster", "column", "comment", "compress", "connect", "create", "current", "date", "decimal", "default", "delete", "desc", "distinct", "drop", "else", "exclusive", "exists", "file", "float", "for", "from", "grant", "group", "having", "identified", "immediate", "in", "increment", "index", "initial", "insert", "integer", "intersect", "into", "is", "level", "like", "lock", "long", "maxextents", "minus", "mlslabel", "mode", "modify", "noaudit", "nocompress", "not", "nowait", "null", "number", "of", "offline", "on", "online", "option", "or", "order", "pctfree", "prior", "privileges", "public", "raw", "rename", "resource", "revoke", "row", "rowid", "rownum", "rows", "select", "session", "set", "share", "size", "smallint", "start", "successful", "synonym", "sysdate", "table", "then", "to", "trigger", "uid", "union", "unique", "update", "user", "validate", "values", "varchar", "varchar2", "view", "whenever", "where", "with"
+        };
+
+        for (int i = 0; i < keywords.length; i++) {
+            RESERVED.add(keywords[i].toLowerCase());
+        }
+
+        // used internally
         RESERVED.add("c_");
     }
 
@@ -128,7 +158,7 @@ class QGen {
         StringBuffer buf = new StringBuffer(name.length());
         int index = 0;
         while (true) {
-            buf.append(name.charAt(index));
+            buf.append(Character.toLowerCase(name.charAt(index)));
             index = name.indexOf('_', index);
             if (index < 0 || index >= name.length()) {
                 break;
@@ -142,11 +172,10 @@ class QGen {
         }
 
         String candidate = buf.toString();
-        if (RESERVED.contains(candidate)) {
-            return candidate + "_";
-        } else {
-            return candidate;
+        while (RESERVED.contains(candidate)) {
+            candidate = candidate + "_";
         }
+        return candidate;
     }
 
     private String abbreviate(String name) {
@@ -620,9 +649,14 @@ class QGen {
                      public Path map(Path path) {
                          if (m_root.hasObjectType(path.getPath())) {
                              return path;
-                         } else {
+                         } else if (m_query.getSignature().exists(path)) {
                              genPath(path);
                              return getColumn(path);
+                         } else if (isAllowedFunction(path)) {
+                             return path;
+                         } else {
+                             throw new RDBMSException
+                                 ("unknown value in expression: " + path) {};
                          }
                      }
                  });

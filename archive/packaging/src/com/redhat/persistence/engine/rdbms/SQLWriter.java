@@ -28,12 +28,12 @@ import java.io.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/08/27 $
+ * @version $Revision: #4 $ $Date: 2003/09/09 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#4 $ by $Author: justin $, $DateTime: 2003/09/09 13:02:17 $";
 
     private RDBMSEngine m_engine;
     private Operation m_op = null;
@@ -187,7 +187,12 @@ public abstract class SQLWriter {
                     continue;
                 }
             } else if (t.isPath() && map) {
-                write(Expression.variable(Path.get(t.getImage())));
+                Path p = Path.get(t.getImage());
+                if (m_op.getMapping(p) != null) {
+                    write(Expression.variable(p));
+                } else {
+                    write(t.getImage());
+                }
             } else {
                 write(t.getImage());
             }
