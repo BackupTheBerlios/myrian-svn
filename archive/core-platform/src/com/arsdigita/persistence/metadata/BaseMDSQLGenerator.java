@@ -47,20 +47,20 @@ import org.apache.log4j.Category;
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#8 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#9 $
  * @since 4.6.3
  */
 abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#8 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#9 $ by $Author: randyg $, $DateTime: 2002/08/06 18:07:28 $";
 
     private static final Category s_log =
         Category.getInstance(BaseMDSQLGenerator.class);
 
 
-    //**********************************************************//
+    //////////////////////////////////////////////////////////////
     // Methods for the MDSQLGenerator interface                 //
-    //**********************************************************//
+    //////////////////////////////////////////////////////////////
 
     /**
      * Generates an Event of a particular Event type for a certain
@@ -183,9 +183,9 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
     }
 
 
-    //**********************************************************//
+    //////////////////////////////////////////////////////////////
     // Query generation methods                                 //
-    //**********************************************************//
+    //////////////////////////////////////////////////////////////
 
     /**
      * Generates the SQL for a retrieve event for a particular object type.
@@ -215,7 +215,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
      */
     protected Event generatePropertyRetrieve(ObjectType type,
                                              Property prop,
-					     ObjectType link) {
+                                             ObjectType link) {
         Operation op = generateRetrieveOperation(type, prop, link);
 
         if (op == null) {
@@ -270,7 +270,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
      */
     protected Operation generateRetrieveOperation(ObjectType type,
                                                   Property prop,
-						  ObjectType link) {
+                                                  ObjectType link) {
         if (type.getReferenceKey() == null) {
             boolean found = false;
             for (Iterator it = type.getKeyProperties(); it.hasNext(); ) {
@@ -313,9 +313,9 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
     }
 
 
-    //**********************************************************//
+    //////////////////////////////////////////////////////////////
     // DML generation methods                                   //
-    //**********************************************************//
+    //////////////////////////////////////////////////////////////
 
     /**
      * Generates an Insert event for a particular object type.
@@ -534,13 +534,13 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
             if ((typekey == null) ||
                 (refkey == null) ||
                 (Utilities.getKeyProperty(type) == null)) {
-	    s_log.warn("generateSinglePropertyAdd: " +
+            s_log.warn("generateSinglePropertyAdd: " +
                            type.getName() + "." + prop.getName() +
-		                   "\ntypekey: " + typekey +
+                                   "\ntypekey: " + typekey +
                            "\ntype: " + prop.getType().getName() +
-		       "\nrefkey: " + refkey +
-		                   "\nUtilities.getKeyProperty(type): " +
-		    Utilities.getKeyProperty(type));
+                       "\nrefkey: " + refkey +
+                                   "\nUtilities.getKeyProperty(type): " +
+                    Utilities.getKeyProperty(type));
                 return null;
             }
 
@@ -621,7 +621,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
      */
     protected Event generateCollectionPropertyAdd(ObjectType type,
                                                   Property prop,
-						  ObjectType link) {
+                                                  ObjectType link) {
         StringBuffer sb = new StringBuffer();
         List path = prop.getJoinPath().getPath();
 
@@ -658,66 +658,67 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
                            prop.getName() + " is not continuous");
                 return null;
             }
-	    
-	    List attrs = new ArrayList();
-	    if (link != null) {
-		String map = je1.getTo().getTableName();
-		
-		Iterator props = link.getDeclaredProperties();
-		while (props.hasNext()) {
-		    Property attr = (Property)props.next();
-		    if (link.isKeyProperty(attr))
-			continue;
-		    Column column = attr.getColumn();
-		    
-		    if (column != null) {
-			if (column.getTableName().equals(map)) {
-			    attrs.add(attr);
-			} else {
-			    s_log.warn("Link attribute " + attr.getName() 
-				       + "  (" + column.getTableName() 
-				       + "." + column.getColumnName()  
-				       + ") is not in mapping table " + map);
-			}
-		    } else {
-			s_log.warn("No table/column definition for link attribute " + attr.getName());
-		    }
-		}
-	    }
+            
+            Map columnValueMap = new HashMap();
+            if (link != null) {
+                String map = je1.getTo().getTableName();
+                
+                Iterator props = link.getDeclaredProperties();
+                while (props.hasNext()) {
+                    Property attr = (Property)props.next();
+                    if (link.isKeyProperty(attr)) {
+                        continue;
+                    }
+                    Column column = attr.getColumn();
+                    
+                    if (column != null) {
+                        if (column.getTableName().equals(map)) {
+                            // if the column is in the table, add it
+                            // to the list to be added.  This is used for
+                            // simple types such as Integer and String
+                            columnValueMap.put(column.getColumnName(), 
+                                               attr.getName());
+                        } else {
+                            s_log.warn("Link attribute " + attr.getName() 
+                                       + "  (" + column.getTableName() 
+                                       + "." + column.getColumnName()  
+                                       + ") is not in mapping table " + map);
+                        }
+                    } else {
+                        addColumnValue(columnValueMap, attr, map);
+                    }
+                }
+            }
+
+            Iterator columnValues = columnValueMap.entrySet().iterator();
+            StringBuffer valueBuffer = new StringBuffer();
+            StringBuffer columnBuffer = new StringBuffer();
+            while (columnValues.hasNext()) {
+                Map.Entry me = (Map.Entry)columnValues.next();
+                columnBuffer.append(", ").append((String)me.getKey());
+                valueBuffer.append(", :").append((String)me.getValue());
+            }
 
             // assume the mapping tables is je1.to/je2.from
             sb.append("insert into ")
-		.append(je1.getTo().getTableName())
-		.append(" (\n")
-		.append(je1.getTo().getColumnName())
-		.append(", ")
-		.append(je2.getFrom().getColumnName());
-	    
-	    for (int i = 0 ; i < attrs.size() ; i++) {
-		Property attr = (Property)attrs.get(i);
-		Column column = attr.getColumn();
-		
-		sb.append(", ")
-		    .append(column.getColumnName());
-	    }
+                .append(je1.getTo().getTableName())
+                .append(" (\n")
+                .append(je1.getTo().getColumnName())
+                .append(", ")
+                .append(je2.getFrom().getColumnName());
+            
+            sb.append(columnBuffer);
 
+            sb.append(")\nvalues (\n:")
+                .append(refkey.getName())
+                .append(", :")
+                .append(prop.getName())
+                .append(".")
+                .append(typekey.getName());
 
-	    sb.append(")\nvalues (\n:")
-		.append(refkey.getName())
-		.append(", :")
-		.append(prop.getName())
-		.append(".")
-		.append(typekey.getName());
-
-	    for (int i = 0 ; i < attrs.size() ; i++) {
-		Property attr = (Property)attrs.get(i);
-		Column column = attr.getColumn();
-		
-		sb.append(", :")
-		    .append(attr.getName());
-	    }
-	    sb.append(")\n");
-	} else {
+            sb.append(valueBuffer);
+            sb.append(")\n");
+        } else {
             Column typeCol = Utilities.getColumn((ObjectType)prop.getType());
 
             sb.append("update ")
@@ -741,6 +742,76 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
         event.addOperation(op);
 
         return event;
+    }
+
+
+    /**
+     * This takes a property and, if it is properly formatted,
+     * adds it column and value representation to the passed in map.
+     * @param columnValueMap The map to add the column (key) and value (value).
+     * @param attr The attribute to check.  This should have 
+     *             !attr.isAttribute() and should have a defined join path.
+     *             attr.getType() should be an ObjectType
+     * @param currentTable The table being updated/used.  If the column for
+     *        the key property of the attribute is not a column for the 
+     *        current table then the attribute is skipped.
+     *        If this is null then the check is skipped
+     * @return This returns the value of currentTable if it was passed
+     *         in or the value of the table used if currentTable == null.
+     *         This returns null if the column could not be added to the map
+     */
+    private String addColumnValue(Map columnValueMap, Property attr,
+                                  String currentTable) {
+        String returnValue = null;
+        // If we have something that is not an attribute
+        // (e.g. a User) then we end up here and only
+        // continue if the join path is property defined.
+        if (!attr.isAttribute() && attr.getJoinPath() != null) {
+            String keyUsed = null;
+            Iterator i = ((ObjectType)attr.getType())
+                .getKeyProperties();
+            if (i.hasNext()) {
+                Property keyProperty = (Property)i.next();
+                keyUsed = keyProperty.getName();
+                Iterator joinPath = attr.getJoinPath()
+                    .getJoinElements();
+                // we want the second of the first 
+                // element of the path
+                Column from = ((JoinElement)joinPath.next()).getFrom();
+                if (currentTable == null ||
+                    from.getTableName().equals(currentTable)) {
+                    returnValue = from.getTableName();
+                    columnValueMap.put
+                        (from.getColumnName(), 
+                         attr.getName() + "." + 
+                         keyProperty.getName());
+                } else {
+                    s_log.warn("Link attribute " + 
+                               keyProperty.getName() 
+                               + "  (" + from.getTableName() 
+                               + "." + from.getColumnName()  
+                               + ") is not in mapping table " + currentTable);
+                }
+            }
+            if (i.hasNext()) {
+                // if there is a second key then the code
+                // may not work so we warn.
+                s_log.warn
+                    ("There are multiple keys for " +
+                     "object type " + 
+                     ((ObjectType)attr.getType()).getName() +
+                     ".  We are using key " + keyUsed + "." +
+                     " This may or may not be appropriate. " +
+                     "Please check to make sure that the " +
+                     "generated SQL is correct.");
+            }
+        } else {
+            // if there is not join path then there is
+            // no metadata
+            s_log.warn("No table/column definition for " +
+                       "link attribute " + attr.getName());
+        }
+        return returnValue;
     }
 
 
@@ -845,7 +916,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
      */
     protected Event generateCollectionPropertyRemove(ObjectType type,
                                                      Property prop,
-						     ObjectType link) {
+                                                     ObjectType link) {
         StringBuffer sb = new StringBuffer();
         List path = prop.getJoinPath().getPath();
 
@@ -1072,26 +1143,44 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
             // attribute
                 
             if (!property.isAttribute()) {
-                // this is not yet supported so we continue
-                continue;
-            }
+                Map map = new HashMap();
+                String tableName = addColumnValue(map, property, null);
+                Iterator columnValues = map.entrySet().iterator();
+                int columnCount = 0;
+                while (columnValues.hasNext()) {
+                    columnCount++;
+                    Map.Entry me = (Map.Entry)columnValues.next();
 
-            Column col = property.getColumn();
-            if (col == null) {
-                // if the link attribute does not have a column we
-                // cannot generate the DML
-                return null;
-            }
-            
-            columns = (HashMap)columnMap.get(col.getTableName());
-            if (columns == null) {
-                columns = new HashMap();
-                columnMap.put(col.getTableName(), columns);
-            }
+                    columns = (HashMap)columnMap.get(tableName);
+                    if (columns == null) {
+                        columns = new HashMap();
+                        columnMap.put(tableName, columns);
+                    }
+                    columns.put((String)me.getKey(), ":" + 
+                                (String)me.getValue());
+                }
 
-            columns.put(col.getColumnName(), ":" + property.getName());
-            if (pq != null) {
-                pq.enqueue(col.getTableName(), 0);
+                if (columnCount > 0 && pq != null) {
+                    pq.enqueue(tableName, 0);
+                }
+            } else {
+                Column col = property.getColumn();
+                if (col == null) {
+                    // if the link attribute does not have a column we
+                    // cannot generate the DML
+                    return null;
+                }
+                
+                columns = (HashMap)columnMap.get(col.getTableName());
+                if (columns == null) {
+                    columns = new HashMap();
+                    columnMap.put(col.getTableName(), columns);
+                }
+                
+                columns.put(col.getColumnName(), ":" + property.getName());
+                if (pq != null) {
+                    pq.enqueue(col.getTableName(), 0);
+                }
             }
         }
 
@@ -1178,9 +1267,9 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
         return ev;
     }
 
-    //**********************************************************//
+    //////////////////////////////////////////////////////////////
     // Utility methods                                          //
-    //**********************************************************//
+    //////////////////////////////////////////////////////////////
 
     /**
      * Add all of the Operations from an ObjectType's super object type to

@@ -13,12 +13,12 @@ import org.apache.log4j.Category;
  * specified in a PDL file to generate sql queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2002/08/02 $
+ * @version $Revision: #12 $ $Date: 2002/08/06 $
  **/
 
 public class Query extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#11 $ by $Author: randyg $, $DateTime: 2002/08/02 09:15:46 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#12 $ by $Author: randyg $, $DateTime: 2002/08/06 18:07:28 $";
 
     private static final Category s_log = Category.getInstance(Query.class);
 
@@ -52,29 +52,18 @@ public class Query extends Node {
             for (Iterator it = link.getProperties(); it.hasNext(); ) {
                 Property property = (Property) it.next();
                 if (!link.isKeyProperty(property)) {
-                    
-                    if (property.isAttribute()) {
-                        if (property.getColumn() == null) {
-                            throw new NoMetadataException
-                                (property.getFilename() + ": " + 
-                                 property.getLineNumber() +
-                                 ": No metadata found for property " + 
-                                 property.getName() +
-                                 " while generating SQL for query: " + 
-                                 getQuery());
-                        }
-                        
-                        Node parent = getChildNode(parentProperty);
-                        parent.addLinkSelection(parent, property);
-                    } else {
+                    if (property.isAttribute() && 
+                        property.getColumn() == null) {
                         throw new NoMetadataException
                             (property.getFilename() + ": " + 
                              property.getLineNumber() +
                              ": No metadata found for property " + 
-                             property.getName() + " while generating SQL " +
-                             "for query: " + getQuery() + "; " +
-                             "Object link attributes are not supported");
+                             property.getName() +
+                             " while generating SQL for query: " + 
+                             getQuery());
                     }
+                    Node parent = getChildNode(parentProperty);
+                    parent.addLinkSelection(parent, property);
                 }
             }
         }

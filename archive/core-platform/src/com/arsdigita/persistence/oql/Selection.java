@@ -7,12 +7,12 @@ import com.arsdigita.persistence.metadata.*;
  * Selection
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/06 $
+ * @version $Revision: #7 $ $Date: 2002/08/06 $
  **/
 
 class Selection {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Selection.java#6 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Selection.java#7 $ by $Author: randyg $, $DateTime: 2002/08/06 18:07:28 $";
 
     private Node m_node;
     private Property m_property;
@@ -31,6 +31,10 @@ class Selection {
 
     public Property getProperty() {
         return m_property;
+    }
+
+    protected void setProperty(Property property) {
+        m_property = property;
     }
 
     public Column getColumn() {
@@ -56,12 +60,12 @@ class Selection {
 
 
     public String getName() {
-        return m_node.getName() + "." + m_property.getName();
+        return m_node.getName() + "." + getProperty().getName();
     }
 
     public String getAlias() {
         if (m_node == getQuery() &&
-            m_node.getObjectType().isKeyProperty(m_property)) {
+            m_node.getObjectType().isKeyProperty(getProperty())) {
             return m_column.getName();
         } else {
             String alias = m_node.getAlias();
