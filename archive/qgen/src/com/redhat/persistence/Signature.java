@@ -36,12 +36,12 @@ import org.apache.log4j.Logger;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2004/03/04 $
+ * @version $Revision: #8 $ $Date: 2004/03/09 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Signature.java#7 $ by $Author: ashah $, $DateTime: 2004/03/04 12:51:40 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Signature.java#8 $ by $Author: ashah $, $DateTime: 2004/03/09 01:19:00 $";
 
     private static final Logger s_log = Logger.getLogger(Signature.class);
 
@@ -131,6 +131,19 @@ public class Signature {
                 Property prop = (Property) it.next();
 		addPathImmediates(Path.add(path, prop.getName()));
             }
+        }
+    }
+
+    private void makePathLoadable(Path prefix, Collection paths) {
+        for (Iterator it = paths.iterator(); it.hasNext(); ) {
+            Path p = (Path) it.next();
+            Path path;
+            if (prefix == null) {
+                path = p;
+            } else {
+                path = Path.add(prefix, p);
+            }
+            makePathLoadable(path);
         }
     }
 
@@ -247,8 +260,7 @@ public class Signature {
             // assume that path.getParent() is keyed
             ObjectMap container = root.getObjectMap(prop.getContainer());
             if (container != null) {
-                addPathImmediates
-                    (path.getParent(), container.getDeclaredFetchedPaths());
+                makePathLoadable(path.getParent(), container.getDeclaredFetchedPaths());
             }
         }
     }
@@ -257,7 +269,7 @@ public class Signature {
         Root root = type.getRoot();
         if (root == null) { return; }
         ObjectMap om = root.getObjectMap(type);
-        addPathImmediates(path, om.getFetchedPaths());
+        makePathLoadable(path, om.getFetchedPaths());
     }
 
     private void addDefaultProperties() {
