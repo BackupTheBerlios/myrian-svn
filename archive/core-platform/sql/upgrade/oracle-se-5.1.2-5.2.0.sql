@@ -12,16 +12,16 @@
 -- rights and limitations under the License.
 --
 --
--- $Id: //core-platform/dev/sql/upgrade/oracle-se-5.1.2-5.2.0.sql#2 $
+-- $Id: //core-platform/dev/sql/upgrade/oracle-se-5.1.2-5.2.0.sql#3 $
 
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/function-last_attr_value.sql
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/function-package_id_for_object_id.sql
+@@ ../oracle-se/upgrade/5.1.2-5.2.0/package-hierarchy_denormalization.sql
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/package-search_indexing.sql
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/package-parties_denormalization.sql
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/create-function-current-date.sql
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/drop-category-map-id.sql
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/table-cat_cat_subcat_trans_index.sql
-@@ ../oracle-se/upgrade/5.1.2-5.2.0/package-hierarchy_denormalization.sql
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/trigger-cat_category_category_map.sql
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/categorization.sql
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/add-applications.sql
@@ -36,3 +36,5 @@
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/drop-us-addresses.sql
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/drop-notes.sql
 @@ ../oracle-se/upgrade/5.1.2-5.2.0/drop-table-secret-tokens.sql
+@@ ../oracle-se/upgrade/5.1.2-5.2.0/misc.sql
+@@ ../oracle-se/upgrade/5.1.2-5.2.0/update-constraints.sql

@@ -24,21 +24,6 @@ alter table cat_categories add (
     default_ancestors varchar(4000)
 );
 
-create or replace procedure updateCategorizationTEMP
-as 
-   cursor categories is select category_id from cat_categories;
-   v_category_id integer;
-begin
-   open categories;
-   loop
-      FETCH categories INTO v_category_id;
-      EXIT WHEN categories%NOTFOUND;
-      updateCategorizationHelpTEMP(v_category_id);
-   end loop;
-end;
-/
-show errors
-
 create or replace procedure updateCategorizationHelpTEMP(v_category_id INTEGER)
 as 
    cursor parents is 
@@ -58,6 +43,21 @@ begin
       EXIT WHEN parents%NOTFOUND;
 
       update cat_categories set default_ancestors = parent_id || '/' || default_ancestors where category_id = v_category_id;
+   end loop;
+end;
+/
+show errors
+
+create or replace procedure updateCategorizationTEMP
+as 
+   cursor categories is select category_id from cat_categories;
+   v_category_id integer;
+begin
+   open categories;
+   loop
+      FETCH categories INTO v_category_id;
+      EXIT WHEN categories%NOTFOUND;
+      updateCategorizationHelpTEMP(v_category_id);
    end loop;
 end;
 /
