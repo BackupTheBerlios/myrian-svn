@@ -12,12 +12,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #19 $ $Date: 2003/03/31 $
+ * @version $Revision: #20 $ $Date: 2003/04/01 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#19 $ by $Author: rhs $, $DateTime: 2003/03/31 14:34:45 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#20 $ by $Author: rhs $, $DateTime: 2003/04/01 10:11:56 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -204,6 +204,7 @@ class EventSwitch extends Event.Switch {
 		throw new IllegalStateException
 		    ("updates exist for object being created");
 	    }
+	    m_engine.markUpdate(obj);
 	}
 
         for (Iterator it = oms.iterator(); it.hasNext(); ) {
