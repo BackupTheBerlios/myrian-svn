@@ -35,8 +35,8 @@ import org.apache.log4j.Level;
  * Initializer gets the information required to create Sessions and informs
  * the SessionManager of them.
  *
- * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #4 $ $Date: 2003/03/28 $
+ * @author Archit Shah 
+ * @version $Revision: #5 $ $Date: 2003/04/09 $
  **/
 
 public class Initializer
@@ -105,9 +105,6 @@ public class Initializer
      * initialization parameter.
      **/
     public void startup() {
-	if (s_log.isEnabledFor(Level.WARN)) {
-	    s_log.warn("Persistence initializer is starting");
-	}
 
         int database = DbHelper.getDatabase();
 
@@ -121,8 +118,8 @@ public class Initializer
         }
 
         ObjectType.setOptimizeDefault(
-                                      m_conf.getParameter(OPTIMIZE_BY_DEFAULT).equals(Boolean.TRUE)
-                                      );
+            m_conf.getParameter(OPTIMIZE_BY_DEFAULT).equals(Boolean.TRUE)
+        );
 
         CompoundType.setFirstRowsDefault
             (Boolean.TRUE.equals
@@ -170,7 +167,7 @@ public class Initializer
         PDL.loadPDLFiles(new File(pdlDir));
 
         // Finally the files out of the database
-	TransactionContext txn = null;
+        TransactionContext txn = null;
         try {
             Session session = SessionManager.getSession();
             txn = session.getTransactionContext();
@@ -189,12 +186,12 @@ public class Initializer
                 if (root.getObjectType(currentFile) != null) {
                     // this means that there is a type in the database
                     // that has already been defined so we write an error
-		    if (s_log.isEnabledFor(Level.WARN)) {
-			s_log.warn
-			    ("The Object Type [" + currentFile + "] has already " +
-			     "been defined in the static files.  Ignoring " + 
-			     "object type definition from the database");
-		    }
+                    if (s_log.isEnabledFor(Level.WARN)) {
+                        s_log.warn
+                            ("The Object Type [" + currentFile + "] has already " +
+                             "been defined in the static files.  Ignoring " +
+                             "object type definition from the database");
+                    }
                     continue;
                 }
 
@@ -258,10 +255,10 @@ public class Initializer
             throw new InitializationException("No such SessionFactory implementation: " + factoryClassName, cne);
         } catch(InstantiationException ie) {
             throw new InitializationException("Could not instantiate SessionFactory " + factoryClassName +
-                    " reason: " + ie.getMessage(), ie);
+                                              " reason: " + ie.getMessage(), ie);
         } catch(IllegalAccessException ia) {
             throw new InitializationException("Could not instantiate SessionFactory " + factoryClassName +
-                    " due to private constructor! ", ia);
+                                              " due to private constructor! ", ia);
         }
         return factory;
         }*/

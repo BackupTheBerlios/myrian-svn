@@ -20,12 +20,12 @@ package com.arsdigita.persistence.pdl.ast;
  * Defines a FlexField column in the database associated with a particular
  * object type.
  *
- * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @author Patrick McNeill
+ * @version $Revision: #2 $ $Date: 2003/04/09 $
  */
 public class FlexFieldDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/ast/FlexFieldDef.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/ast/FlexFieldDef.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     // the Column to specify as a flexfield
     private ColumnDef m_column;

@@ -25,13 +25,13 @@ import java.sql.SQLException;
  * because it's doing the same thing, but subclassed from
  * PersistenceException instead of SQLException.
  *
- * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #1 $
+ * @author David Eison
+ * @version $Revision: #2 $
  * @since 4.6
  */
 public class DbNotAvailableException extends PersistenceException {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DbNotAvailableException.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DbNotAvailableException.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     /**
      * No public constructor.

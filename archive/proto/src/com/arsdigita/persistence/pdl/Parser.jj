@@ -22,13 +22,13 @@ import java.util.*;
  * Parser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #2 $ $Date: 2003/02/17 $
+ * @author Patrick McNeill
+ * @version $Revision: #3 $ $Date: 2003/04/09 $
  */
 
 public class Parser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/Parser.jj#2 $ by $Author: vadim $, $DateTime: 2003/02/17 19:25:30 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/Parser.jj#3 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     private List m_path;
     private String m_filename;

@@ -22,13 +22,13 @@ import com.arsdigita.db.DbHelper;
  * A factory class that instantiates a MDSQLGenerator implementation and then
  * returns it to calling classes.
  *
- * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/MDSQLGeneratorFactory.java#1 $
+ * @author Patrick McNeill
+ * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/MDSQLGeneratorFactory.java#2 $
  * @since 4.6.3
  */
 public class MDSQLGeneratorFactory {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/MDSQLGeneratorFactory.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/MDSQLGeneratorFactory.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     private static final Logger s_log =
         Logger.getLogger(MDSQLGeneratorFactory.class);

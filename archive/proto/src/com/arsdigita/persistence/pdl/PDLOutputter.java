@@ -30,8 +30,8 @@ import java.io.PrintStream;
  * model.  The output will go to the a given directory, with each PDL
  * file being named after the fully qualified model name.
  *
- * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/PDLOutputter.java#1 $
+ * @author Patrick McNeill
+ * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/PDLOutputter.java#2 $
  */
 public class PDLOutputter {
     /**

@@ -15,7 +15,14 @@
 
 package com.arsdigita.persistence.metadata;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import com.arsdigita.util.UncheckedWrapperException;
@@ -24,21 +31,21 @@ import com.arsdigita.util.UncheckedWrapperException;
  * Constraint
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/04/09 $
  **/
 
 abstract class Constraint {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/Constraint.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/Constraint.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     private Table m_table;
     private String m_name;
     private Column[] m_columns;
 
     // sourceBytes is used for generating the constraint name
-    private static final char[] sourceBytes = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_'};
+    private static final char[] sourceBytes = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_'};
 
-    
+
     Constraint(Table table, String name, Column[] columns) {
         m_table = table;
         m_name = name;
@@ -75,11 +82,13 @@ abstract class Constraint {
 
         buf.append(m_table.getName());
 
-        for (int i = 0; i < m_columns.length; i++) {
+        List cols = getSortedColumns();
+        for (Iterator it = cols.iterator(); it.hasNext(); ) {
+            Column col = (Column) it.next();
             buf.append("_");
-            buf.append(m_columns[i].getName());
+            buf.append(col.getName());
         }
-        
+
         String name = buf.toString();
         buf = new StringBuffer(abbreviate(name, 22));
 
@@ -131,7 +140,7 @@ abstract class Constraint {
                 // here we just remove the character before the "_"
                 result.append(name.substring(previousIndex, currentIndex-1));
                 charsRemoved++;
-                allMinSizeOrLess = allMinSizeOrLess && 
+                allMinSizeOrLess = allMinSizeOrLess &&
                     (currentIndex - previousIndex <= minSize);
             } else {
                 // this means the string is too short so we just leave it
@@ -191,17 +200,27 @@ abstract class Constraint {
         return getColumnList(false);
     }
 
-    String getColumnList(boolean sort) {
+    List getSortedColumns() {
         List cols = new ArrayList(Arrays.asList(m_columns));
 
+        Collections.sort(cols, new Comparator() {
+                public int compare(Object o1, Object o2) {
+                    Column c1 = (Column) o1;
+                    Column c2 = (Column) o2;
+                    return c1.getName().compareTo(c2.getName());
+                }
+            });
+
+        return cols;
+    }
+
+    String getColumnList(boolean sort) {
+        List cols;
+
         if (sort) {
-            Collections.sort(cols, new Comparator() {
-                    public int compare(Object o1, Object o2) {
-                        Column c1 = (Column) o1;
-                        Column c2 = (Column) o2;
-                        return c1.getName().compareTo(c2.getName());
-                    }
-                });
+            cols = getSortedColumns();
+        } else {
+            cols = new ArrayList(Arrays.asList(m_columns));
         }
 
         StringBuffer result = new StringBuffer("(");

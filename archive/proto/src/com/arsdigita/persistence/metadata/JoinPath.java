@@ -26,8 +26,8 @@ import java.io.PrintStream;
  * the fly. A path is composed of 1 or more JoinElements, specifying the
  * particular columns to join, and in what order.
  *
- * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/JoinPath.java#1 $
+ * @author Patrick McNeill
+ * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/JoinPath.java#2 $
  * @since 4.6
  *
  * @invariant getPath() != null
@@ -35,7 +35,7 @@ import java.io.PrintStream;
 
 public class JoinPath extends Element {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/JoinPath.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/JoinPath.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     private List m_path;
     // a List of JoinElements

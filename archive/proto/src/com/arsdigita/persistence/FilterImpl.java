@@ -27,33 +27,21 @@ import org.apache.log4j.Logger;
  * be combined and manipulated to create complex queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/04/04 $
+ * @version $Revision: #6 $ $Date: 2003/04/09 $
  */
 
-class FilterImpl implements Filter {
+abstract class FilterImpl implements Filter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/FilterImpl.java#5 $ by $Author: rhs $, $DateTime: 2003/04/04 09:30:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/FilterImpl.java#6 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     private static final Logger m_log =
         Logger.getLogger(Filter.class.getName());
 
-    private String m_conditions;
     private Map m_bindings = new HashMap();
     private static SQLUtilities m_util =
         SessionManager.getSQLUtilities();
 
-    /**
-     *  Creates a new filter with no conditions.  This is only meant
-     *  to be called by this class an any class that extends it.  It is
-     *  NOT meant to be used as a constructor outside of these classes
-     *  @param isAnd indicates if this is an AND filter or an OR filter
-     */
-    protected FilterImpl(String conditions) {
-        // note that it is possible for conditions to be null
-        // if we actually want a NO-OP filter or if we want to
-        // set the conditons later with setConditions()
-        m_conditions = conditions;
-    }
+    protected FilterImpl() {}
 
 
     /**
@@ -99,7 +87,7 @@ class FilterImpl implements Filter {
                                             "be null or the empty string");
         }
 
-        return new FilterImpl(conditions);
+        return new SimpleFilter(conditions);
     }
 
 
@@ -112,7 +100,7 @@ class FilterImpl implements Filter {
         // we do not want to return null so we return something
         // that is either always true or always false
         if (trueForAllIfValueIsNull) {
-            return new FilterImpl(null);
+            return new SimpleFilter(null);
         } else {
             // We are setting it to both null and not null because we know
             // that it is not possible to have both.
@@ -142,7 +130,7 @@ class FilterImpl implements Filter {
             conditions = attribute + " = :" + bindName(attribute);
         }
 
-        return (new FilterImpl(conditions)).set(bindName(attribute), value);
+        return (new SimpleFilter(conditions)).set(bindName(attribute), value);
     }
 
 
@@ -166,7 +154,7 @@ class FilterImpl implements Filter {
             conditions = attribute + " != :" + bindName(attribute);
         }
 
-        return (new FilterImpl(conditions)).set(bindName(attribute), value);
+        return (new SimpleFilter(conditions)).set(bindName(attribute), value);
     }
 
 
@@ -363,12 +351,11 @@ class FilterImpl implements Filter {
     protected static Filter in(String propertyName, String queryName) {
         if (propertyName == null || propertyName.equals("") ||
             queryName == null || queryName.equals("")) {
-            throw new IllegalArgumentException(
-                                               "The propertyName and queryName must be non empty."
-                                               );
+            throw new IllegalArgumentException
+		("The propertyName and queryName must be non empty.");
         }
 
-        return new FilterImpl(propertyName + " in (" + queryName + ")");
+        return new InFilter(propertyName, null, queryName);
     }
 
     /**
@@ -379,20 +366,17 @@ class FilterImpl implements Filter {
      * in a PDL file somewhere.
      **/
 
-    protected static Filter in( String property,
-                                String subQueryProperty,
-                                String queryName ) {
-        if( property == null || property.equals( "" ) ||
-            subQueryProperty == null || subQueryProperty.equals( "" ) ||
-            queryName == null || queryName.equals( "" ) ) {
+    protected static Filter in(String property, String subQueryProperty,
+			       String queryName) {
+        if (property == null || property.equals("") ||
+            subQueryProperty == null || subQueryProperty.equals("") ||
+            queryName == null || queryName.equals("") ) {
             throw new IllegalArgumentException
-                ( "The property, subQueryProperty and queryName must be " +
-                  "non empty." );
+                ("The property, subQueryProperty and queryName must be " +
+                 "non empty.");
         }
 
-        return new FilterImpl
-            ( property + " in ( select " + subQueryProperty +
-              " from ( " + queryName + " ) )" );
+        return new InFilter(property, subQueryProperty, queryName);
     }
 
     /**
@@ -404,12 +388,17 @@ class FilterImpl implements Filter {
     protected static Filter notIn(String propertyName, String queryName) {
         if (propertyName == null || propertyName.equals("") ||
             queryName == null || queryName.equals("")) {
-            throw new IllegalArgumentException(
-                                               "The propertyName and querName must be non empty."
-                                               );
+            throw new IllegalArgumentException
+		("The propertyName and queryName must be non empty.");
         }
 
-        return new FilterImpl(propertyName + " not in (" + queryName + ")");
+	final InFilter in = new InFilter(propertyName, null, queryName);
+
+        return new FilterImpl() {
+		public String getConditions() {
+		    return "not " + in.getConditions();
+		}
+	    };
     }
 
 
@@ -469,35 +458,6 @@ class FilterImpl implements Filter {
      */
     protected void addBindings(Map bindings) {
         m_bindings.putAll(bindings);
-    }
-
-
-    /**
-     *  This sets the condition to the passed in string.  <b>This should
-     *  ONLY be used by classes extending FilterImpl
-     *  @param conditions The new conditions for this Filter
-     */
-    protected void setConditions(String conditions) {
-        m_conditions = conditions;
-    }
-
-
-    /**
-     *  This returns the string representation of this Filter before
-     *  any bindings are applied
-     */
-    public String getConditions() {
-        return m_conditions;
-    }
-
-
-    /**
-     * This prints out a string representation of the filter
-     */
-    public String toString() {
-        return "Filter:" + Utilities.LINE_BREAK +
-            " Conditions: " + getConditions() +
-            Utilities.LINE_BREAK + "  Values: " + getBindings();
     }
 
 }

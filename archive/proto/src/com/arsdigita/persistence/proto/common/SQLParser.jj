@@ -14,12 +14,12 @@ import java.io.*;
  * SQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/04/04 $
+ * @version $Revision: #4 $ $Date: 2003/04/09 $
  */
 
 public class SQLParser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/common/SQLParser.jj#3 $ by $Author: rhs $, $DateTime: 2003/04/04 09:30:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/common/SQLParser.jj#4 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     public static interface Mapper {
         Path map(Path path);
@@ -113,6 +113,7 @@ TOKEN:
   | <INTEGER_LITERAL: ( "+" | "-" )? (<DIGIT>)+>
   | <NUMBER_LITERAL: ( "+" | "-" )? (<DIGIT>)* ( "." (<DIGIT>)+ )?
                      ( "E" | "e" ) ( "+" | "-" ) (<DIGIT>)+>
+  | <QUOTED_ID: "\"" ( ~["\""] | "\"\"" )* "\"">
 }
 
 TOKEN:
@@ -264,7 +265,8 @@ void symbol() :
   | t = <MINUS>
   | t = <PRIOR>
   | t = <UPPER>
-  | t = <LOWER> )
+  | t = <LOWER>
+  | t = <QUOTED_ID> )
     { append(t); }
 }
 

@@ -15,6 +15,13 @@
 
 package com.arsdigita.persistence;
 
+import com.arsdigita.util.*;
+
+import java.sql.*;
+import java.util.*;
+
+import org.apache.log4j.Logger;
+
 /**
  * Title:       TransactionContext class
  *              This class is intentionally NOT threadsafe;
@@ -22,17 +29,23 @@ package com.arsdigita.persistence;
  * Description: The TransactionContext class encapsulates a database transaction.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/04/08 $
+ * @version $Revision: #6 $ $Date: 2003/04/09 $
  */
 
 public class TransactionContext {
 
-    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/TransactionContext.java#5 $ by $Author: ashah $, $DateTime: 2003/04/08 10:31:44 $";
+    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/TransactionContext.java#6 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
+
+    private static final Logger s_cat =
+	Logger.getLogger(TransactionContext.class);
 
     private static boolean s_aggressive = false;
 
     private Session m_ossn;
     private com.arsdigita.persistence.proto.Session m_ssn;
+    private Map m_attrs = new HashMap();
+    private ArrayList m_listeners = new ArrayList();
+    private boolean m_inTxn = false;
 
     TransactionContext(com.arsdigita.persistence.Session ssn) {
 	m_ossn = ssn;
@@ -54,6 +67,7 @@ public class TransactionContext {
 
     public void beginTxn() {
         // Do nothing. This is implicit now.
+	m_inTxn = true;
     }
 
     /**
@@ -65,10 +79,14 @@ public class TransactionContext {
 
     public void commitTxn() {
 	try {
+	    fireBeforeCommitEvent();
             m_ssn.commit();
 	} finally {
+	    m_inTxn = false;
             m_ossn.freeConnection();
             m_ossn.invalidateDataObjects(true);
+            fireCommitEvent();
+	    clearAttributes();
 	}
     }
 
@@ -82,10 +100,14 @@ public class TransactionContext {
 
     public void abortTxn() {
 	try {
+	    fireBeforeAbortEvent();
 	    m_ssn.rollback();
 	} finally {
+	    m_inTxn = false;
 	    m_ossn.freeConnection();
             m_ossn.invalidateDataObjects(false);
+            fireAbortEvent();
+	    clearAttributes();
 	}
     }
 
@@ -93,7 +115,7 @@ public class TransactionContext {
      * Register a one time transaction event listener
      */
     public void addTransactionListener(TransactionListener listener) {
-        //throw new Error("not implemented");
+        m_listeners.add(listener);
     }
 
     /**
@@ -103,7 +125,96 @@ public class TransactionContext {
      * invoked to prevent infinite recursion.
      */
     public void removeTransactionListener(TransactionListener listener) {
-        throw new Error("not implemented");
+        m_listeners.remove(listener);
+    }
+
+    /*
+     * NB, this method is delibrately private, since we don't
+     * want it being fired at any other time than immediately
+     * before the transaction
+     */
+    private void fireBeforeCommitEvent() {
+        Assert.assertTrue
+	    (inTxn(), "The beforeCommit event was fired outside of " +
+	     "the transaction");
+
+        Object listeners[] = m_listeners.toArray();
+
+        for (int i = 0 ; i < listeners.length ; i++) {
+	    if (s_cat.isDebugEnabled()) {
+		s_cat.debug("Firing transaction beforeCommit event");
+	    }
+            TransactionListener listener = (TransactionListener)listeners[i];
+            listener.beforeCommit(this);
+        }
+    }
+
+    /*
+     * NB, this method is delibrately private, since we don't
+     * want it being fired at any other time than immediately
+     * after the transaction
+     */
+    private void fireCommitEvent() {
+        Assert.assertTrue
+	    (!inTxn(), "transaction commit event fired during transaction");
+
+        Object listeners[] = m_listeners.toArray();
+        m_listeners.clear();
+
+        for (int i = 0 ; i < listeners.length ; i++) {
+	    if (s_cat.isDebugEnabled()) {
+		s_cat.debug("Firing transaction commit event");
+	    }
+            TransactionListener listener = (TransactionListener)listeners[i];
+            listener.afterCommit(this);
+        }
+
+        Assert.assertTrue
+	    (!inTxn(), "transaction commit listener didn't close transaction");
+    }
+
+    /*
+     * NB, this method is delibrately private, since we don't
+     * want it being fired at any other time than immediately
+     * before the transaction
+     */
+    private void fireBeforeAbortEvent() {
+        Assert.assertTrue
+	    (inTxn(), "The beforeAbort event was fired outside of " +
+	     "the transaction");
+
+        Object listeners[] = m_listeners.toArray();
+        for (int i = 0 ; i < listeners.length ; i++) {
+	    if (s_cat.isDebugEnabled()) {
+		s_cat.debug("Firing transaction beforeAbort event");
+	    }
+            TransactionListener listener = (TransactionListener)listeners[i];
+            listener.beforeAbort(this);
+        }
+    }
+
+    /*
+     * NB, this method is delibrately private, since we don't
+     * want it being fired at any other time than immediately
+     * after the transaction
+     */
+    private void fireAbortEvent() {
+        Assert.assertTrue
+	    (!inTxn(), "transaction abort event fired during transaction");
+
+        Object listeners[] = m_listeners.toArray();
+        m_listeners.clear();
+
+        for (int i = 0 ; i < listeners.length ; i++) {
+	    if (s_cat.isDebugEnabled()) {
+		s_cat.debug("Firing transaction abort event");
+	    }
+            TransactionListener listener = (TransactionListener)listeners[i];
+            listener.afterAbort(this);
+        }
+
+        Assert.assertTrue
+	    (!inTxn(), "transaction abort listener didn't close transaction");
     }
 
     /**
@@ -113,7 +224,7 @@ public class TransactionContext {
      **/
 
     public boolean inTxn() {
-        return true;
+        return m_inTxn;
     }
 
     /**
@@ -125,7 +236,12 @@ public class TransactionContext {
      **/
 
     public int getTransactionIsolation() {
-        throw new Error("not implemented");
+        try {
+            Connection conn = m_ossn.getConnection();
+	    return conn.getTransactionIsolation();
+        } catch (SQLException e) {
+            throw PersistenceException.newInstance(e);
+        }
     }
 
     /**
@@ -137,7 +253,58 @@ public class TransactionContext {
      * @param level The desired isolation level.
      **/
     public void setTransactionIsolation(int level) {
-        throw new Error("not implemented");
+        try {
+            Connection conn = m_ossn.getConnection();
+	    conn.setTransactionIsolation(level);
+        } catch (SQLException e) {
+            throw PersistenceException.newInstance(e);
+        }
+    }
+
+    /**
+     * Set an attribute inside of this <code>TransactionContext</code>.
+     * The attribute will exist as long as the transaction is opened.
+     * When the transaction is closed or aborted, the attribute will
+     * be discarded. This method is analogous to
+     * {@link #ServletRequest.setAttribute(String, Object)}
+     *
+     * @param name the name of the attribute
+     * @param value the value of the attribute
+     * @post getAttribute(name) == value
+     */
+    public void setAttribute(String name, Object value) {
+        m_attrs.put(name, value);
+    }
+
+    /**
+     * Get an attribute inside of this <code>TransactionContext</code>.
+     * The attribute will exist as long as the transaction is opened.
+     * When the transaction is closed or aborted, the attribute will
+     * be discarded. This method is analogous to
+     * {@link #ServletRequest.getAttribute(String)}
+     *
+     * @param name the name of the attribute
+     * @return the value of the attribute, or null if no attribute with
+     *   this value has been stored
+     */
+    public Object getAttribute(String name) {
+        return m_attrs.get(name);
+    }
+
+    /**
+     * Remove an attribute from this <code>TransactionContext</code>.
+     * be discarded. This method is analogous to
+     * {@link #ServletRequest.removeAttribute(String)}
+     *
+     * @param name the name of the attribute to remove
+     * @post getAttribute(name) == null
+     */
+    public void removeAttribute(String name) {
+        m_attrs.remove(name);
+    }
+
+    void clearAttributes() {
+        m_attrs.clear();
     }
 
     static boolean getAggressiveClose() {

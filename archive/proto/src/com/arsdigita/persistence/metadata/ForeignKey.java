@@ -19,12 +19,12 @@ package com.arsdigita.persistence.metadata;
  * ForeignKey
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/04/09 $
  **/
 
 public class ForeignKey extends Constraint {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/ForeignKey.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/ForeignKey.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     private UniqueKey m_key;
     private boolean m_cascade;
@@ -43,10 +43,9 @@ public class ForeignKey extends Constraint {
         Column[] fk = getColumns();
         Column[] uk = m_key.getColumns();
         if (fk.length != uk.length) {
-            throw new IllegalArgumentException(
-                                               "Foreign columns don't match unique key: fk = " + getSQL()
-                                               + " uk = " + key.getSQL()
-                                               );
+            throw new IllegalArgumentException
+                ("Foreign columns don't match unique key: fk = " + getSQL()
+                 + " uk = " + key.getSQL());
         }
 
         for (int i = 0; i < fk.length; i++) {
@@ -56,9 +55,10 @@ public class ForeignKey extends Constraint {
             } else {
                 if (fk[i].getType() != uk[i].getType() &&
                     fk[i].getSize() != uk[i].getSize()) {
-                    throw new IllegalArgumentException(
-                                                       "Foreign columns don't match unique key."
-                                                       );
+                    throw new IllegalArgumentException
+                        (fk[i].getLocation() +
+                         ": Foreign columns don't match unique key: fk = " +
+                         getSQL() + " uk = " + key.getSQL());
                 }
             }
         }

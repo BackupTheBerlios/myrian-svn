@@ -7,13 +7,13 @@ import com.arsdigita.persistence.proto.ProtoException;
  * DataAssociationImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/03/14 $
+ * @version $Revision: #9 $ $Date: 2003/04/09 $
  **/
 
 class DataAssociationImpl extends DataAssociationCursorImpl
     implements DataAssociation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataAssociationImpl.java#8 $ by $Author: ashah $, $DateTime: 2003/03/14 15:57:20 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataAssociationImpl.java#9 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     private com.arsdigita.persistence.proto.Session m_pssn;
     private DataObject m_data;

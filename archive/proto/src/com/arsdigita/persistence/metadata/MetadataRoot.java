@@ -28,12 +28,12 @@ import com.arsdigita.db.DbHelper;
  * metadata system.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/04/09 $
  **/
 
 public class MetadataRoot extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/MetadataRoot.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/MetadataRoot.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     private static final Logger s_cat = Logger.getLogger(MetadataRoot.class.getName());
 
@@ -152,7 +152,7 @@ public class MetadataRoot extends Element {
                     }
                     return 1;
                 }
-                
+
                 public Object fetch(ResultSet rs, String column)
                     throws SQLException {
                     String str = rs.getString(column);
@@ -242,7 +242,7 @@ public class MetadataRoot extends Element {
                 }
             });
 
-    public static final SimpleType LONG = 
+    public static final SimpleType LONG =
         init(new SimpleType("Long", java.lang.Long.class, Types.BIGINT) {
                 public int bindValue(PreparedStatement ps, int index, Object value,
                                      int jdbcType) throws SQLException {
@@ -268,7 +268,7 @@ public class MetadataRoot extends Element {
                     ps.setShort(index, ((Short) value).shortValue());
                     return 1;
                 }
-                
+
                 public Object fetch(ResultSet rs, String column)
                     throws SQLException {
                     short s = rs.getShort(column);
@@ -279,13 +279,13 @@ public class MetadataRoot extends Element {
                     }
                 }
             });
-    
+
     public static final SimpleType STRING = init
         (new SimpleType("String", java.lang.String.class, Types.VARCHAR) {
                 public boolean needsRefresh(Object value, int jdbcType) {
                     return (value != null && jdbcType == Types.CLOB);
                 }
-                
+
                 public void doRefresh(ResultSet rs, String column, Object value)
                     throws SQLException {
                     if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
@@ -307,7 +307,7 @@ public class MetadataRoot extends Element {
                         }
                     }
                 }
-                
+
                 public String getLiteral(Object value, int jdbcType) {
                     switch (jdbcType) {
                     case Types.CLOB:
@@ -359,7 +359,7 @@ public class MetadataRoot extends Element {
                 }
             });
 
-    public static final SimpleType BLOB = 
+    public static final SimpleType BLOB =
         init(new SimpleType("Blob", java.sql.Blob.class, Types.BLOB) {
                 public boolean needsRefresh(Object value, int jdbcType) {
                     if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
@@ -441,7 +441,7 @@ public class MetadataRoot extends Element {
                 }
             });
 
-    public static final SimpleType CLOB = 
+    public static final SimpleType CLOB =
         init(new SimpleType("Clob", java.sql.Clob.class, Types.CLOB) {
                 public int bindValue(PreparedStatement ps, int index, Object value,
                                      int jdbcType) throws SQLException {
@@ -476,7 +476,7 @@ public class MetadataRoot extends Element {
             });
 
     // This is for backword compatibility with data queries.
-    public static final SimpleType OBJECT = 
+    public static final SimpleType OBJECT =
         init(new SimpleType("<Object>", java.lang.Object.class, Types.VARCHAR) {
                 public int bindValue(PreparedStatement ps, int index, Object value,
                                      int jdbcType) throws SQLException {
@@ -533,7 +533,9 @@ public class MetadataRoot extends Element {
     }
 
 
-
+    public static final void clear() {
+        s_root = newInstance();
+    }
     /**
      * Returns the MetadataRoot instance for this JVM.
      *

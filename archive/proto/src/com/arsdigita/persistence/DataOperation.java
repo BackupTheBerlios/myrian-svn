@@ -26,13 +26,13 @@ import org.apache.log4j.Logger;
  * Used to allow the user to control execution of a named DML event (a
  * data operation, in PDL).
  *
- * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
+ * @author Patrick McNeill
  * @since 4.5
- * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#5 $
+ * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#6 $
  */
 public class DataOperation {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#5 $ by $Author: rhs $, $DateTime: 2003/04/04 09:30:02 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataOperation.java#6 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     private static final Logger s_cat =
         Logger.getLogger(DataOperation.class);

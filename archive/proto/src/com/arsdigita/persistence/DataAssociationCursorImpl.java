@@ -7,13 +7,13 @@ import com.arsdigita.persistence.proto.PersistentCollection;
  * DataAssociationCursorImpl
  *
  * @author Archit Shah &lt;ashah@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/03/27 $
+ * @version $Revision: #7 $ $Date: 2003/04/09 $
  **/
 
 class DataAssociationCursorImpl extends DataCollectionImpl
     implements DataAssociationCursor {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#6 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#7 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     private DataAssociationImpl m_assn;
 
@@ -33,8 +33,18 @@ class DataAssociationCursorImpl extends DataCollectionImpl
         return (DataObject) get("link");
     }
 
-    public Object getLinkProperty(String prop) {
-        return get("link." + prop);
+
+    /**
+     *  This returns the Link Property specified by the passed in parameter.
+     *  For instance, if there is a sortKey specifying how to sort
+     *  the association, calling getLinkProperty("sortKey") would return
+     *  the sortKey for the given Association.
+     *
+     *  @param name The name of the Link Property to return
+     *  @return The Link Property specified by the parameter
+     */
+    public Object getLinkProperty(String name) {
+        return get("link." + name);
     }
 
     public void remove() {

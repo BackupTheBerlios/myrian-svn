@@ -13,12 +13,12 @@ import java.util.*;
  * Parser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/04/09 $
  */
 
 class Parser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/sql/Parser.jj#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/sql/Parser.jj#2 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     private String m_filename;
 
@@ -265,7 +265,7 @@ Element unstructuredElementNoComma() :
 
 Element unstructuredElement() :
 {
-    Element el;
+    Element el = null;
     Token t;
 }
 {

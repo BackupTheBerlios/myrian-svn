@@ -63,12 +63,12 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/04/02 $
+ * @version $Revision: #6 $ $Date: 2003/04/09 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/PDL.java#5 $ by $Author: rhs $, $DateTime: 2003/04/02 12:28:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/PDL.java#6 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;
@@ -171,7 +171,7 @@ public class PDL {
         load(new InputStreamReader(is), s);
     }
 
-    private static final CommandLine CMD =
+    protected static final CommandLine CMD =
         new CommandLine(PDL.class.getName(), null);
 
     static {
@@ -220,6 +220,7 @@ public class PDL {
      * error.
      **/
     public static final void main(String[] args) throws PDLException {
+
         Map options = new HashMap();
         args = CMD.parse(options, args);
 
@@ -249,7 +250,7 @@ public class PDL {
         if (files.size() < 1) {
             if (s_quiet) {
                 return;
-            } 
+            }
             usage();
         }
 

@@ -27,25 +27,23 @@ import org.apache.log4j.Logger;
  * CompoundFilters are used to AND or OR multiple filters together.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/02/28 $
+ * @version $Revision: #4 $ $Date: 2003/04/09 $
  */
 
 class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/CompoundFilterImpl.java#3 $ by $Author: rhs $, $DateTime: 2003/02/28 17:44:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/CompoundFilterImpl.java#4 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     private static final Logger m_log =
         Logger.getLogger(CompoundFilterImpl.class);
 
     private String m_combineWith;
-    private Collection m_filters = new ArrayList();
+    private ArrayList m_filters = new ArrayList();
 
     /**
      *  This creates a new compound filter with the specified join type.
      */
     private CompoundFilterImpl(boolean isAnd) {
-        super(null);
-
         if (isAnd) {
             m_combineWith = "and";
         } else {
@@ -139,45 +137,66 @@ class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
         return m_filters.remove(filter);
     }
 
-    /**
-     *  This returns the string representation of this Filter before
-     *  any bindings are applied
-     */
     public String getConditions() {
-        String conditions = null;
-        for (Iterator iter = m_filters.iterator(); iter.hasNext();) {
-            Filter f = (Filter) iter.next();
-            conditions = combineConditions(conditions, f.getConditions());
-        }
-        return conditions;
-    }
+	if (m_filters.size() == 0) {
+	    return null;
+	}
 
-    /**
-     * Unsupported.
-     **/
-    protected void setConditions() {
-        Assert.fail("CompoundFilterImpl.setConditions() is unsupported");
-    }
+	StringBuffer result = new StringBuffer();
 
-    private String combineConditions(String currentConditions,
-                                     String newConditions) {
-        // do nothing if the conditions passed in are null or the empty string
-        if (newConditions == null || newConditions.equals("")) {
-            return currentConditions;
-        }
-        if (currentConditions == null) {
-            return newConditions;
-        }
-        return
-            "(" + currentConditions + ") " + m_combineWith +
-            " (" + newConditions + ")";
+	result.append("(");
+
+	boolean first = true;
+
+	for (Iterator it = m_filters.iterator(); it.hasNext(); ) {
+	    Filter f = (Filter) it.next();
+	    String sql = f.getConditions();
+	    if (sql == null || sql.equals("")) {
+		continue;
+	    }
+
+	    if (first) {
+		first = false;
+	    } else {
+		result.append(" " + m_combineWith + " ");
+	    }
+
+	    result.append(sql);
+	}
+
+	if (first) {
+	    return null;
+	}
+
+	result.append(")");
+
+	return result.toString();
     }
 
     /**
      *  This outputs a string representation of the CompoundFilter
      */
     public String toString() {
-        return super.toString() + Utilities.LINE_BREAK + " Compound Type: " +
-            m_combineWith.toUpperCase();
+	StringBuffer result = new StringBuffer();
+
+	result.append("(");
+
+	boolean first = true;
+
+	for (Iterator it = m_filters.iterator(); it.hasNext(); ) {
+	    Filter f = (Filter) it.next();
+	    if (first) {
+		first = false;
+	    } else {
+		result.append(" " + m_combineWith + " ");
+	    }
+
+	    result.append(f.toString());
+	}
+
+	result.append(")");
+
+        return result.toString();
     }
+
 }

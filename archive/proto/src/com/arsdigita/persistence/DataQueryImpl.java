@@ -20,12 +20,12 @@ import java.util.*;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #18 $ $Date: 2003/04/04 $
+ * @version $Revision: #19 $ $Date: 2003/04/09 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#18 $ by $Author: rhs $, $DateTime: 2003/04/04 20:45:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#19 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     private static final FilterFactory FACTORY = new FilterFactoryImpl();
 

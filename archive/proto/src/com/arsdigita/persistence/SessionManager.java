@@ -34,13 +34,13 @@ import org.apache.log4j.Logger;
  * to provide the JDBC information and the MetadataRoot to the SessionManager.
  *
  * @see Initializer
- * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #4 $ $Date: 2003/03/25 $
+ * @author Archit Shah 
+ * @version $Revision: #5 $ $Date: 2003/04/09 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/SessionManager.java#4 $ by $Author: vadim $, $DateTime: 2003/03/25 17:26:50 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/SessionManager.java#5 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     private static String s_url = null;           // the jdbc URL
     private static String s_username = null;      // the database username

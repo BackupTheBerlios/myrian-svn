@@ -54,8 +54,8 @@ import com.arsdigita.persistence.metadata.ObjectType;
  * change the underlying data query. The constructed object is not a
  * cursor, it just wraps the data query that was passed in.
  *
- * @author <a href="mailto:lutter@arsdigita.com">David Lutterkort</a>
- * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryDataCollectionAdapter.java#2 $
+ * @author David Lutterkort
+ * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryDataCollectionAdapter.java#3 $
  */
 public class DataQueryDataCollectionAdapter extends DataQueryDecorator
     implements DataCollection {

@@ -22,13 +22,13 @@ import com.arsdigita.persistence.metadata.JoinElement;
  * Defines a mapping between two particular columns, used by JoinPathDef
  * to support MDSQL.
  *
- * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @author Patrick McNeill
+ * @version $Revision: #2 $ $Date: 2003/04/09 $
  */
 
 public class JoinElementDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/ast/JoinElementDef.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/ast/JoinElementDef.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 09:48:41 $";
 
     private ColumnDef m_from;
     // the "start" column
