@@ -10,101 +10,48 @@ import org.apache.log4j.Logger;
  * EquiSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/03/11 $
+ * @version $Revision: #2 $ $Date: 2004/03/23 $
  **/
 
 class EquiSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/EquiSet.java#1 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/EquiSet.java#2 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
 
     private static final Logger s_log = Logger.getLogger(EquiSet.class);
 
     private Generator m_generator;
-    private List m_sets = new ArrayList();
+
+    private Map m_nodes = new HashMap();
+    private Set m_sets = new HashSet();
+
+    private EquiSet m_equiframes = null;
+
+    private Set m_frames = new HashSet();
     private List m_framesets = null;
 
     EquiSet(Generator generator) {
         m_generator = generator;
     }
 
-    List getSets() {
+    Set getSets() {
         return m_sets;
     }
 
     Set get(QValue a) {
-        int index = indexOf(a);
-        if (index < 0) {
-            return null;
-        } else {
-            return (Set) m_sets.get(index);
-        }
-    }
-
-    int indexOf(QValue a) {
-        for (int i = 0; i < m_sets.size(); i++) {
-            Set set = (Set) m_sets.get(i);
-            if (set.contains(a)) { return i; }
-        }
-        return -1;
+        return (Set) m_nodes.get(a);
     }
 
     boolean equate(QValue a, QValue b) {
-        int aindex = -1;
-        int bindex = -1;
-        Set aset = null;
-        Set bset = null;
-
-        for (int i = 0; i < m_sets.size(); i++) {
-            Set set = (Set) m_sets.get(i);
-            if (set.contains(a)) {
-                if (aset != null) {
-                    throw new IllegalStateException
-                        ("not a partition: " + set + ", " + aset);
-                }
-                aindex = i;
-                aset = set;
-            }
-            if (set.contains(b)) {
-                if (bset != null) {
-                    throw new IllegalStateException
-                        ("not a partition: " + set + ", " + bset);
-                }
-                bindex = i;
-                bset = set;
-            }
-        }
-
-        if (aset != null && bset != null) {
-            if (aindex == bindex) {
-                return false;
-            } else {
-                aset.addAll(bset);
-                m_sets.remove(bindex);
-            }
-        } else if (aset != null) {
-            aset.add(b);
-        } else if (bset != null) {
-            bset.add(a);
-        } else {
-            aset = new HashSet();
-            aset.add(a);
-            aset.add(b);
-            m_sets.add(aset);
-        }
-
-        return true;
+        m_frames.add(a.getFrame());
+        m_frames.add(b.getFrame());
+        Set s = new HashSet();
+        s.add(a);
+        s.add(b);
+        return add(s);
     }
 
     void collapse() {
-        Set frames = new HashSet();
-        for (int i = 0; i < m_sets.size(); i++) {
-            Set set = (Set) m_sets.get(i);
-            for (Iterator it = set.iterator(); it.hasNext(); ) {
-                QValue v = (QValue) it.next();
-                frames.add(v.getFrame());
-            }
-        }
-        while (collapse(frames)) {};
+        while (collapse(m_frames)) {};
     }
 
     boolean collapse(Collection frames) {
@@ -112,30 +59,10 @@ class EquiSet {
         MultiMap columns = new MultiMap();
         for (Iterator it = frames.iterator(); it.hasNext(); ) {
             QFrame frame = (QFrame) it.next();
-            Table t = m_generator.getRoot().getTable(frame.getTable());
-            if (t == null) { continue; }
-            MIDDLE: for (Iterator iter = t.getConstraints().iterator();
-                         iter.hasNext(); ) {
-                Constraint c = (Constraint) iter.next();
-                if (!(c instanceof UniqueKey)) { continue; }
-                UniqueKey uk = (UniqueKey) c;
-                Column[] cols = uk.getColumns();
-                Object key = uk;
-                for (int i = 0; i < cols.length; i++) {
-                    if (!frame.hasValue(cols[i].getName())) {
-                        continue MIDDLE;
-                    }
-                    QValue v = frame.getValue(cols[i].getName());
-                    Integer vindex = new Integer(indexOf(v));
-                    if (vindex.intValue() < 0) {
-                        continue MIDDLE;
-                    }
-                    if (key == null) {
-                        key = vindex;
-                    } else {
-                        key = new CompoundKey(vindex, key);
-                    }
-                }
+            List keys = keys(frame);
+            if (keys == null) { continue; }
+            for (int i = 0; i < keys.size(); i++) {
+                Object key = keys.get(i);
                 result.add(key, frame);
                 columns.addAll(key, frame.getColumns());
             }
@@ -147,18 +74,14 @@ class EquiSet {
             Object key = (Object) it.next();
             Set set = result.get(key);
             Set cols = columns.get(key);
-            QFrame from = null;
-            for (Iterator iter = set.iterator(); iter.hasNext(); ) {
-                QFrame to = (QFrame) iter.next();
-                if (from != null) {
-                    for (Iterator ii = cols.iterator(); ii.hasNext(); ) {
-                        String col = (String) ii.next();
-                        QValue v1 = from.getValue(col);
-                        QValue v2 = to.getValue(col);
-                        modified |= equate(v1, v2);
-                    }
+            for (Iterator iter = cols.iterator(); iter.hasNext(); ) {
+                String col = (String) iter.next();
+                Set eq = new HashSet();
+                for (Iterator ii = set.iterator(); ii.hasNext(); ) {
+                    QFrame frame = (QFrame) ii.next();
+                    eq.add(frame.getValue(col));
                 }
-                from = to;
+                modified |= add(eq);
             }
         }
 
@@ -172,8 +95,130 @@ class EquiSet {
         return modified;
     }
 
+    List keys(QFrame frame) {
+        Table t = m_generator.getRoot().getTable(frame.getTable());
+        if (t == null) { return null; }
+        List result = null;
+        OUTER: for (Iterator it = t.getConstraints().iterator();
+                    it.hasNext(); ) {
+            Constraint c = (Constraint) it.next();
+            if (!(c instanceof UniqueKey)) { continue; }
+            UniqueKey uk = (UniqueKey) c;
+            Column[] cols = uk.getColumns();
+            Object key = uk;
+            for (int i = 0; i < cols.length; i++) {
+                if (!frame.hasValue(cols[i].getName())) {
+                    continue OUTER;
+                }
+                QValue v = frame.getValue(cols[i].getName());
+                Set set = get(v);
+                if (set == null) {
+                    continue OUTER;
+                }
+                if (key == null) {
+                    key = new Pointer(set);
+                } else {
+                    key = new CompoundKey(new Pointer(set), key);
+                }
+            }
+            if (result == null) { result = new ArrayList(); }
+            result.add(key);
+        }
+        return result;
+    }
+
     List getFrameSets() {
         return m_framesets;
+    }
+
+    boolean add(Set set) {
+        Set to = null;
+        Set from = new HashSet();
+
+        for (Iterator it = set.iterator(); it.hasNext(); ) {
+            Object o = it.next();
+            Set s = (Set) m_nodes.get(o);
+            if (s == null) {
+                from.add(new Pointer(set));
+            } else if (to == null) {
+                to = s;
+            } else if (to == s) {
+                // do nothing
+            } else if (s.size() > to.size()) {
+                from.add(new Pointer(to));
+                to = s;
+            } else {
+                from.add(new Pointer(s));
+            }
+        }
+
+        if (to == null && !from.isEmpty()) {
+            to = new HashSet();
+        }
+
+        boolean modified = false;
+        for (Iterator it = from.iterator(); it.hasNext(); ) {
+            Pointer p = (Pointer) it.next();
+            m_sets.remove(p);
+            for (Iterator iter = p.set.iterator(); iter.hasNext(); ) {
+                Object o = iter.next();
+                modified |= to.add(o);
+                m_nodes.put(o, to);
+            }
+        }
+        if (to != null) {
+            m_sets.add(new Pointer(to));
+        }
+
+        return modified;
+    }
+
+    boolean addAll(EquiSet equiset) {
+        boolean modified = false;
+        for (Iterator it = equiset.m_sets.iterator(); it.hasNext(); ) {
+            Pointer p = (Pointer) it.next();
+            modified |= add(p.set);
+        }
+        m_frames.addAll(equiset.m_frames);
+        return modified;
+    }
+
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("{");
+        for (Iterator iter = m_sets.iterator(); iter.hasNext(); ) {
+            Pointer p = (Pointer) iter.next();
+            for (Iterator it = p.set.iterator(); it.hasNext(); ) {
+                buf.append(it.next());
+                if (it.hasNext()) {
+                    buf.append(", ");
+                }
+            }
+            if (iter.hasNext()) {
+                buf.append(" | ");
+            }
+        }
+        buf.append("}");
+        return buf.toString();
+    }
+
+    private static class Pointer {
+
+        Set set;
+
+        Pointer(Set set) {
+            this.set = set;
+        }
+
+        public int hashCode() {
+            return System.identityHashCode(set);
+        }
+
+        public boolean equals(Object o) {
+            Pointer p = (Pointer) o;
+            return set == p.set;
+        }
+
     }
 
 }

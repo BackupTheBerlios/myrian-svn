@@ -4,12 +4,12 @@ package com.redhat.persistence.oql;
  * BinaryCondition
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/03/11 $
+ * @version $Revision: #2 $ $Date: 2004/03/23 $
  **/
 
 public abstract class BinaryCondition extends Condition {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/BinaryCondition.java#1 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/BinaryCondition.java#2 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
 
     Expression m_left;
     Expression m_right;
@@ -26,10 +26,21 @@ public abstract class BinaryCondition extends Condition {
         gen.addUses(this, gen.getUses(m_right));
     }
 
+    private Code paren(Code sql, Expression e) {
+        if (e instanceof BinaryCondition || e instanceof Static) {
+            sql = new Code("(").add(sql).add(")");
+        }
+        return sql;
+    }
+
+    Code emit(Code left, String op, Code right) {
+        return paren(left, m_left).add(" ").add(op).add(" ")
+            .add(paren(right, m_right));
+    }
+
     Code emit(Generator gen) {
         String op = getOperator();
-        return m_left.emit(gen).add(" ").add(op).add(" ")
-            .add(m_right.emit(gen));
+        return emit(m_left.emit(gen), op, m_right.emit(gen));
     }
 
     private String str(Expression e) {

@@ -15,9 +15,14 @@
 
 package com.arsdigita.persistence;
 
-import java.util.Map;
+import com.redhat.persistence.oql.And;
+import com.redhat.persistence.oql.Expression;
+import com.redhat.persistence.oql.Or;
+import com.redhat.persistence.oql.Static;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -25,29 +30,24 @@ import org.apache.log4j.Logger;
  * CompoundFilters are used to AND or OR multiple filters together.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/11/21 $
+ * @version $Revision: #12 $ $Date: 2004/03/23 $
  */
 
 class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/CompoundFilterImpl.java#11 $ by $Author: ashah $, $DateTime: 2003/11/21 11:59:09 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/CompoundFilterImpl.java#12 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
 
     private static final Logger m_log =
         Logger.getLogger(CompoundFilterImpl.class);
 
-    private String m_combineWith;
+    private boolean m_isAnd;
     private ArrayList m_filters = new ArrayList();
 
     /**
      *  This creates a new compound filter with the specified join type.
      */
     private CompoundFilterImpl(boolean isAnd) {
-        if (isAnd) {
-            m_combineWith = "and";
-        } else {
-            m_combineWith = "or";
-        }
-
+        m_isAnd = isAnd;
     }
 
 
@@ -111,18 +111,7 @@ class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
 
         Map bindings = filter.getBindings();
         if (bindings != null) {
-            int numberBindings = getBindings().size() + bindings.size();
             addBindings(bindings);
-            if (getBindings().size() < numberBindings) {
-                // there was name overlapping so log a warning
-		if (m_log.isEnabledFor(Level.WARN)) {
-		    m_log.warn
-                        ("When the filter was added, there was a naming" +
-                         " conflict with the variables." + Utilities.LINE_BREAK +
-                         "Filter 1: " + filter.toString() + Utilities.LINE_BREAK +
-                         "Filter 2: " + toString());
-		}
-            }
         }
 
         m_filters.add(filter);
@@ -132,6 +121,51 @@ class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
 
     public boolean removeFilter(Filter filter) {
         return m_filters.remove(filter);
+    }
+
+    protected Expression makeExpression(DataQueryImpl query, Map bindings) {
+        if (m_filters.size() == 0) {
+            return null;
+        }
+
+        Expression expr = null;
+
+        for (Iterator it = m_filters.iterator(); it.hasNext(); ) {
+            Filter filter = (Filter) it.next();
+            Expression fExpr = null;
+            if (filter instanceof FilterImpl) {
+                Map map;
+                if (bindings.size() > 0) {
+                    map = new HashMap();
+                    map.putAll(bindings);
+                    map.putAll(getBindings());
+                } else {
+                    map = getBindings();
+                }
+                fExpr = ((FilterImpl) filter).makeExpression(query, map);
+            } else {
+                String conditions = filter.getConditions();
+                if (conditions != null) {
+                    fExpr = new Static(conditions, filter.getBindings());
+                }
+            }
+
+            if (expr == null) {
+                expr = fExpr;
+            } else if (fExpr != null) {
+                if (m_isAnd) {
+                    expr = new And(expr, fExpr);
+                } else {
+                    expr = new Or(expr, fExpr);
+                }
+            }
+        }
+
+        return expr;
+    }
+
+    private final String combineWith() {
+        return m_isAnd ? "and" : "or";
     }
 
     public String getConditions() {
@@ -153,7 +187,7 @@ class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
 	    if (first) {
 		first = false;
 	    } else {
-		result.append(" " + m_combineWith + " ");
+		result.append(" " + combineWith() + " ");
 	    }
 
             result.append("(");
@@ -183,7 +217,7 @@ class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
 	    if (first) {
 		first = false;
 	    } else {
-		result.append(" " + m_combineWith + " ");
+		result.append(" " + combineWith() + " ");
 	    }
 
 	    result.append(f.toString());

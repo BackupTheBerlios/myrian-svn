@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/03/11 $
+ * @version $Revision: #2 $ $Date: 2004/03/23 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Get.java#1 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Get.java#2 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
 
     private static final Logger s_log = Logger.getLogger(Get.class);
 
@@ -90,10 +90,31 @@ public class Get extends Expression {
             }
         }
 
+        if (expr.hasMappings()) {
+            Path path = Path.get(prop.getName());
+            for (Iterator it = expr.getMappings().entrySet().iterator();
+                 it.hasNext(); ) {
+                Map.Entry me = (Map.Entry) it.next();
+                Path key = (Path) me.getKey();
+                String value = (String) me.getValue();
+                if (path.isAncestor(key)) {
+                    frame.addMapping(Path.relative(path, key), value);
+                }
+            }
+        }
+
         Collection props = Code.properties(prop.getContainer());
         if (!props.contains(prop)) {
-            String[] columns = Code.columns(prop, null);
-            String table = Code.table(prop);
+            String[] columns = null;
+            String table = null;
+            if (expr.hasMappings()) {
+                columns = Code.columns(prop, expr);
+            }
+            if (columns == null) {
+                columns = Code.columns(prop, (String) null);
+                table = Code.table(prop);
+            }
+
             if (table == null) {
                 QFrame stframe = ((QValue) expr.getValues().get(0)).getFrame();
                 List values = new ArrayList();

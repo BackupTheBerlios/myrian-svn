@@ -28,12 +28,12 @@ import java.util.Iterator;
  * Adapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/10/28 $
+ * @version $Revision: #3 $ $Date: 2004/03/23 $
  **/
 
 public abstract class Adapter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Adapter.java#2 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Adapter.java#3 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
 
     private Root m_root;
 
@@ -70,31 +70,37 @@ public abstract class Adapter {
     // having things that throw unsupported operation exception.
 
     public Object fetch(ResultSet rs, String column) throws SQLException {
-        throw new UnsupportedOperationException("not a bindable type");
+        throw new UnsupportedOperationException
+            ("not a bindable adapter: " + getClass().getName());
     }
 
     public void bind(PreparedStatement ps, int index, Object obj, int type)
         throws SQLException {
-        throw new UnsupportedOperationException("not a bindable type");
+        throw new UnsupportedOperationException
+            ("not a bindable adapter: " + getClass().getName());
     }
 
     public int defaultJDBCType() {
-        throw new UnsupportedOperationException("not a bindable type");
+        throw new UnsupportedOperationException
+            ("not a bindable adapter: " + getClass().getName());
     }
 
     public boolean isMutation(Object value, int jdbcType) {
-        throw new UnsupportedOperationException("not a bindable type");
+        throw new UnsupportedOperationException
+            ("not a bindable adapter: " + getClass().getName());
     }
 
     public void mutate(ResultSet rs, String column, Object obj, int type)
         throws SQLException {
-        throw new UnsupportedOperationException("not a bindable type");
+        throw new UnsupportedOperationException
+            ("not a bindable adapter: " + getClass().getName());
     }
 
     public void setSession(Object obj, Session ssn) { return; }
 
     public Object getObject(ObjectType basetype, PropertyMap props) {
-        throw new UnsupportedOperationException("not a compound type");
+        throw new UnsupportedOperationException
+            ("not a compound adapter: " + getClass().getName());
     }
 
     public abstract PropertyMap getProperties(Object obj);

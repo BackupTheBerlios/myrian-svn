@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/03/11 $
+ * @version $Revision: #2 $ $Date: 2004/03/23 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Query.java#1 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Query.java#2 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -66,11 +66,13 @@ public class Query {
             s_log.debug("unoptimized frame:\n" + qframe);
         }
 
+        List frames = gen.getFrames();
+
         boolean modified;
         do {
             modified = false;
-            for (Iterator it = gen.getFrames().iterator(); it.hasNext(); ) {
-                QFrame qf = (QFrame) it.next();
+            for (int i = 0; i < frames.size(); i++) {
+                QFrame qf = (QFrame) frames.get(i);
                 modified |= qf.hoist();
             }
         } while (modified);
@@ -79,21 +81,39 @@ public class Query {
             s_log.debug("hoisted frame:\n" + qframe);
         }
 
-        for (Iterator it = gen.getFrames().iterator(); it.hasNext(); ) {
-            QFrame qf = (QFrame) it.next();
+        for (int i = 0; i < frames.size(); i++) {
+            QFrame qf = (QFrame) frames.get(i);
+            qf.mergeOuter();
+        }
+
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("outers merged:\n" + qframe);
+        }
+
+        for (int i = 0; i < frames.size(); i++) {
+            QFrame qf = (QFrame) frames.get(i);
             if (qf.getParent() == null) {
-                EquiSet eq = new EquiSet(gen);
-                gen.equateAll(eq, qf);
-                eq.collapse();
-                qf.setEquiSet(eq);
+                qf.equifill();
             }
+        }
+
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("eq/nn filled:\n" + qframe);
         }
 
         do {
             modified = false;
-            for (Iterator it = gen.getFrames().iterator(); it.hasNext(); ) {
-                QFrame qf = (QFrame) it.next();
-                modified |= qf.innerize();
+            Set collapse = new HashSet();
+            for (int i = 0; i < frames.size(); i++) {
+                QFrame qf = (QFrame) frames.get(i);
+                long st = System.currentTimeMillis();
+                modified |= qf.innerize(collapse);
+            }
+            if (modified) {
+                for (Iterator it = collapse.iterator(); it.hasNext(); ) {
+                    EquiSet eq = (EquiSet) it.next();
+                    eq.collapse();
+                }
             }
         } while (modified);
 
@@ -128,7 +148,7 @@ public class Query {
         }
 
         if (m_names.isEmpty()) {
-            sql = sql.add("1");
+            sql = sql.add("1 as dummy");
         }
 
         sql = sql.add("\nfrom ").add(qframe.emit(false, !oracle));

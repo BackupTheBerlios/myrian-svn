@@ -29,10 +29,10 @@ import org.apache.log4j.Logger;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2003/11/21 $
+ * @version $Revision: #15 $ $Date: 2004/03/23 $
  */
 public class FilterTest extends PersistenceTestCase {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/FilterTest.java#14 $ by $Author: ashah $, $DateTime: 2003/11/21 11:59:09 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/FilterTest.java#15 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
 
     private static Logger s_log =
         Logger.getLogger(FilterTest.class.getName());
@@ -391,6 +391,20 @@ public class FilterTest extends PersistenceTestCase {
         assertEquals("must have 10 rows in query", 10, q.size());
     }
 
+    public void testCompoundFilterOrSameBind() {
+        DataQuery q = getDefaultQuery();
+        FilterFactory ff = q.getFilterFactory();
+        CompoundFilter or = ff.or();
+        Filter f1 = ff.simple("action = :action");
+        Filter f2 = ff.simple("action = :action");
+        f1.set("action", "create");
+        f2.set("action", "delete");
+        or.addFilter(f1);
+        or.addFilter(f2);
+        q.addFilter(or);
+        assertEquals("must have 10 rows in query", 10, q.size());
+    }
+
     /**
      *  This tests ANDing filters together
      */
@@ -712,37 +726,6 @@ public class FilterTest extends PersistenceTestCase {
         */
     }
 
-    /**
-     *  We want to alllow developers to filter based on items
-     *  that are not selected from the DataQuery
-     */
-    public void testFilterWithArbitraryVariables() {
-
-        DataQuery dq = getSession().retrieveQuery("examples.DataQueryWithMax");
-        // This should be uncommented when people can filter by
-        // variables not in their MAP statment
-        /*
-          assertTrue("The query should return at least one line", dq.next());
-          BigDecimal maxPriority = (BigDecimal) dq.get("priority");
-          //        s_log.info("XXXX the priroity is " + maxPriority);
-          assertTrue("The query should only return one line", !dq.next());
-
-          dq = getSession().retrieveQuery("examples.DataQueryWithMax");
-          dq.addEqualsFilter("action", "write");
-          assertTrue("The query should return at least one line", dq.next());
-          //        s_log.info("YYYYY...The item from the filter = " +
-          (BigDecimal) dq.get("priority"));
-          assertTrue("The query should only return one line", !dq.next());
-
-          dq = getSession().retrieveQuery("examples.DataQueryWithMax");
-          dq.addEqualsFilter("action", "read");
-          assertTrue("The query should return at least one line", dq.next());
-          //        s_log.info("YYYYY...The item from the filter = " +
-          (BigDecimal) dq.get("priority"));
-          assertTrue("The query should only return one line", !dq.next());
-        */
-    }
-
     public void testFilterWithNVL() {
         DataQuery dq = getDefaultQuery();
         dq.addFilter("nvl('zero', 'zero') = nvl('one', 'one')");
@@ -755,6 +738,11 @@ public class FilterTest extends PersistenceTestCase {
         dq.addFilter("1 = 0");
         // this should end up parsing as (((1=1) or (1=0)) and (1=0))
         // which is false
+        assertEquals("filter should return no rows", 0, dq.size());
+
+        dq = getDefaultQuery();
+        dq.addFilter("1 = 0");
+        dq.addFilter("1 = 1 or 1 = 0");
         assertEquals("filter should return no rows", 0, dq.size());
     }
 

@@ -13,12 +13,12 @@ import java.util.*;
  * Static
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/03/11 $
+ * @version $Revision: #2 $ $Date: 2004/03/23 $
  **/
 
 public class Static extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Static.java#1 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Static.java#2 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
 
     private SQL m_sql;
     private String[] m_columns;
@@ -150,8 +150,10 @@ public class Static extends Expression {
     protected boolean hasType() { return false; }
 
     void frame(Generator gen) {
+        boolean bool = gen.isBoolean(this) && m_expressions.size() == 1;
         for (Iterator it = m_expressions.iterator(); it.hasNext(); ) {
             Expression e = (Expression) it.next();
+            if (bool) { gen.addBoolean(e); }
             e.frame(gen);
             gen.addUses(this, gen.getUses(e));
         }
@@ -160,13 +162,15 @@ public class Static extends Expression {
             QFrame frame = gen.frame(this, type);
             frame.setValues(m_columns);
             frame.setTable(this);
-        } else if (m_expressions.size() == 1 && size(m_sql) == 1) {
+        } else if (!gen.isBoolean(this) && m_expressions.size() == 1
+                   && size(m_sql) == 1) {
             Expression e = (Expression) m_expressions.get(0);
             if (gen.hasFrame(e)) {
                 QFrame child = gen.getFrame(e);
                 QFrame frame = gen.frame(this, child.getType());
                 frame.addChild(child);
                 frame.setValues(child.getValues());
+                frame.setMappings(child.getMappings());
             }
         }
     }
@@ -214,12 +218,14 @@ public class Static extends Expression {
         void frame(Generator gen) {
             QFrame child = null;
             if (gen.hasType(m_all.getType())) {
+                if (gen.isBoolean(this)) { gen.addBoolean(m_all); }
                 m_all.frame(gen);
                 if (gen.hasFrame(m_all)) {
                     child = gen.getFrame(m_all);
                     gen.addUses(this, gen.getUses(m_all));
                 }
             } else if (m_expression != null) {
+                if (gen.isBoolean(this)) { gen.addBoolean(m_expression); }
                 m_expression.frame(gen);
                 if (gen.hasFrame(m_expression)) {
                     child = gen.getFrame(m_expression);
@@ -231,6 +237,7 @@ public class Static extends Expression {
                 QFrame frame = gen.frame(this, child.getType());
                 frame.addChild(child);
                 frame.setValues(child.getValues());
+                frame.setMappings(child.getMappings());
             }
         }
 

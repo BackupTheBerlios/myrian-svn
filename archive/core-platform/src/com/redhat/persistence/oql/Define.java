@@ -1,5 +1,6 @@
 package com.redhat.persistence.oql;
 
+import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
 import java.util.*;
 
@@ -7,12 +8,12 @@ import java.util.*;
  * Define
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/03/11 $
+ * @version $Revision: #2 $ $Date: 2004/03/23 $
  **/
 
 public class Define extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Define.java#1 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Define.java#2 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
 
     private Expression m_expr;
     private String m_name;
@@ -28,6 +29,15 @@ public class Define extends Expression {
         QFrame frame = gen.frame(this, define(m_name, expr.getType()));
         frame.addChild(expr);
         frame.setValues(expr.getValues());
+        if (expr.hasMappings()) {
+            for (Iterator it = expr.getMappings().entrySet().iterator();
+                 it.hasNext(); ) {
+                Map.Entry me = (Map.Entry) it.next();
+                Path key = (Path) me.getKey();
+                String value = (String) me.getValue();
+                frame.addMapping(Path.add(m_name, key), value);
+            }
+        }
         gen.addUses(this, gen.getUses(m_expr));
     }
 

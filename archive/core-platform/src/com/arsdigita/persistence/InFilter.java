@@ -29,50 +29,43 @@ import org.apache.log4j.Logger;
  * InFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/02/26 $
+ * @version $Revision: #10 $ $Date: 2004/03/23 $
  **/
 
-class InFilter extends FilterImpl implements Filter {
+class InFilter extends SimpleFilter implements Filter {
 
     private static Logger s_log = Logger.getLogger(InFilter.class);
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/InFilter.java#9 $ by $Author: vadim $, $DateTime: 2004/02/26 12:42:49 $";
-
-    private Root m_root;
-    private String m_prop;
-    private String m_subProp;
-    private String m_query;
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/InFilter.java#10 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
 
     InFilter(Root root, String property, String subqueryProperty,
              String query) {
-        m_root = root;
-        m_prop = property;
-        m_subProp = subqueryProperty;
-        m_query = query;
+        super(makeConditions(root, property, subqueryProperty, query));
         if (s_log.isDebugEnabled()) {
             s_log.debug("InFilter: " + property + " - " + subqueryProperty +
                         " - " + query);
         }
     }
 
-    private SQLBlock getBlock(String query) {
-        ObjectType ot = m_root.getObjectType(query);
-        ObjectMap map = m_root.getObjectMap(ot);
+    private static SQLBlock getBlock(Root root, String query) {
+        ObjectType ot = root.getObjectType(query);
+        ObjectMap map = root.getObjectMap(ot);
         if (map == null) {
             throw new PersistenceException("no such query: " + query);
         }
         return map.getRetrieveAll();
     }
 
-    public String getConditions() {
-        SQLBlock block = getBlock(m_query);
+    private static String makeConditions(Root root, String prop,
+                                         String subProperty, String query) {
+        SQLBlock block = getBlock(root, query);
         Path subProp;
-        if (m_subProp == null) {
+        if (subProperty == null) {
             Iterator paths = block.getPaths().iterator();
             if (paths.hasNext()) {
                 subProp = (Path) paths.next();
             } else {
-                return m_prop + " in (" + m_query + ")";
+                return prop + " in (" + query + ")";
             }
 
             if (paths.hasNext()) {
@@ -80,13 +73,13 @@ class InFilter extends FilterImpl implements Filter {
                     ("subquery has more than one mapping");
             }
         } else {
-            subProp = Path.get(m_subProp);
+            subProp = Path.get(subProperty);
         }
 
         Path subcol = block.getMapping(subProp);
         if (subcol == null) {
             throw new MetadataException
-                (m_root, block, "no such path: " + subProp);
+                (root, block, "no such path: " + subProp);
         }
 
         final int currentDB = DbHelper.getDatabase();
@@ -96,14 +89,14 @@ class InFilter extends FilterImpl implements Filter {
             sb.append("exists ( select RAW[subquery_id] from (select RAW[");
             sb.append(subcol.getPath());
             sb.append("] as RAW[subquery_id] from (");
-            sb.append(m_query);
+            sb.append(query);
             sb.append(") RAW[insub1] ) RAW[insub2] where ");
             sb.append("RAW[insub2.subquery_id] = ");
-            sb.append(m_prop).append(")");
+            sb.append(prop).append(")");
         } else if (currentDB == DbHelper.DB_ORACLE) {
-            sb.append(m_prop).append(" in (select RAW[");
+            sb.append(prop).append(" in (select RAW[");
             sb.append(subcol.getPath()).append("] from (");
-            sb.append(m_query).append(") RAW[insub])");
+            sb.append(query).append(") RAW[insub])");
         } else {
             throw new IllegalStateException
                 ("Unknown database: " + DbHelper.getDatabaseName(currentDB));

@@ -23,8 +23,6 @@ import com.redhat.persistence.metadata.Property;
 import com.redhat.persistence.metadata.Root;
 import com.redhat.persistence.metadata.SQLBlock;
 import com.redhat.persistence.oql.Expression;
-import com.redhat.persistence.oql.Get;
-import com.redhat.persistence.oql.Variable;
 import com.redhat.persistence.oql.Query;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,12 +34,12 @@ import org.apache.log4j.Logger;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2004/03/11 $
+ * @version $Revision: #8 $ $Date: 2004/03/23 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Signature.java#7 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Signature.java#8 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
 
     private static final Logger s_log = Logger.getLogger(Signature.class);
 
@@ -59,15 +57,6 @@ public class Signature {
 
     public Signature(ObjectType type) {
         addSource(type, null);
-    }
-
-    // XXX: should be public static in oql
-    private static Expression expression(Path path) {
-        if (path.getParent() == null) {
-            return new Variable(path.getName());
-        } else {
-            return new Get(expression(path.getParent()), path.getName());
-        }
     }
 
     private String clean(String str) {
@@ -92,7 +81,7 @@ public class Signature {
         for (Iterator it = m_paths.iterator(); it.hasNext(); ) {
             Path path = (Path) it.next();
             if (path == null) { continue; }
-            q.fetch(getColumn(path), expression(path));
+            q.fetch(getColumn(path), Expression.valueOf(path));
         }
 
         return q;

@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/03/11 $
+ * @version $Revision: #2 $ $Date: 2004/03/23 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Generator.java#1 $ by $Author: vadim $, $DateTime: 2004/03/11 18:13:02 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Generator.java#2 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -22,6 +22,7 @@ class Generator {
     private List m_frames = new ArrayList();
     private Map m_queries = new HashMap();
     private LinkedList m_stack = new LinkedList();
+    private Set m_boolean = new HashSet();
     private MultiMap m_equalities = new MultiMap();
     private Set m_sufficient = new HashSet();
     private MultiMap m_uses = new MultiMap();
@@ -113,6 +114,14 @@ class Generator {
                 ("unable to resolve type: " + name);
         }
         return result;
+    }
+
+    void addBoolean(Expression expr) {
+        m_boolean.add(expr);
+    }
+
+    boolean isBoolean(Expression expr) {
+        return m_boolean.contains(expr);
     }
 
     Set getEqualities(Expression expr) {
@@ -263,109 +272,6 @@ class Generator {
         }
     }
 
-    void equateAll(EquiSet equiset, QFrame frame) {
-        for (Iterator it = frame.getConditions().iterator(); it.hasNext(); ) {
-            Expression e = (Expression) it.next();
-            Set eqs = getEqualities(e);
-            for (Iterator iter = eqs.iterator(); iter.hasNext(); ) {
-                Equality eq = (Equality) iter.next();
-                equiset.equate(eq.getLeft(), eq.getRight());
-            }
-        }
-    }
-
-    boolean isNullable(QFrame frame, List equalities, Set nonnulls) {
-        List cols = new ArrayList();
-        List ocols = new ArrayList();
-        QFrame fframe = null;
-        QFrame oframe = null;
-        for (Iterator it = equalities.iterator(); it.hasNext(); ) {
-            Equality eq = (Equality) it.next();
-            QValue from;
-            QValue other;
-            if (frame.contains(eq.getLeft()) &&
-                !frame.contains(eq.getRight())) {
-                from = eq.getLeft();
-                other = eq.getRight();
-            } else if (frame.contains(eq.getRight()) &&
-                       !frame.contains(eq.getLeft())) {
-                from = eq.getRight();
-                other = eq.getLeft();
-            } else {
-                return true;
-            }
-            if (oframe == null) {
-                fframe = from.getFrame();
-                oframe = other.getFrame();
-            } else if (!oframe.equals(other.getFrame()) ||
-                       !fframe.equals(from.getFrame())) {
-                return true;
-            }
-            if (other.isNullable() && !nonnulls.contains(other)) {
-                return true;
-            }
-            cols.add(from.getColumn());
-            ocols.add(other.getColumn());
-        }
-
-        if (oframe == null) { return true; }
-        if (oframe.isOuter()) { return true; }
-        if (oframe.getTable() == null || fframe.getTable() == null) {
-            return true;
-        }
-
-        String table = fframe.getTable();
-        String otable = oframe.getTable();
-        if (table.equals(otable) && cols.equals(ocols)
-            && isConstrained(table, cols)) {
-            // XXX: technically we should make sure none of the columns
-            // are nullable
-            return false;
-        }
-
-        Table t = m_root.getTable(table);
-        if (t == null) { return true; }
-        Table ot = m_root.getTable(otable);
-        if (ot == null) { return true; }
-        ForeignKey from = ot.getForeignKey(columns(ot, ocols));
-        if (from == null) { return true; }
-        UniqueKey to = t.getUniqueKey(columns(t, cols));
-        if (to == null) { return true; }
-        if (isNullable(to)) { return true; }
-        if (isConnected(from, to)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private boolean isConnected(ForeignKey from, UniqueKey to) {
-        UniqueKey uk = from.getUniqueKey();
-        if (uk.equals(to)) { return true; }
-        ForeignKey fk = uk.getTable().getForeignKey(uk.getColumns());
-        if (fk == null) { return false; }
-        else { return isConnected(fk, to); }
-    }
-
-    private boolean isNullable(Constraint c) {
-        return isNullable(c.getColumns());
-    }
-
-    private boolean isNullable(Column[] cols) {
-        for (int i = 0; i < cols.length; i++) {
-            if (cols[i].isNullable()) { return true; }
-        }
-        return false;
-    }
-
-    private Column[] columns(Table t, List cols) {
-        Column[] result = new Column[cols.size()];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = t.getColumn((String) cols.get(i));
-        }
-        return result;
-    }
-
     boolean isConstrained(String table, Collection columns) {
         Table t = m_root.getTable(table);
         if (t == null) { return false; }
@@ -384,6 +290,36 @@ class Generator {
             }
         }
         return false;
+    }
+
+    void equate(EquiSet equiset, Expression e) {
+        Set eqs = getEqualities(e);
+        for (Iterator it = eqs.iterator(); it.hasNext(); ) {
+            Equality eq = (Equality) it.next();
+            equiset.equate(eq.getLeft(), eq.getRight());
+        }
+    }
+
+    void split(QFrame frame, List equalities, List from, List to) {
+        for (int i = 0; i < equalities.size(); i++) {
+            Equality eq = (Equality) equalities.get(i);
+            QValue left = eq.getLeft();
+            QValue right = eq.getRight();
+            if (frame.contains(left) && frame.contains(right)) {
+                // it's inernal, we don't care about it
+                continue;
+            }
+            if (frame.contains(left)) {
+                from.add(left);
+                to.add(right);
+            } else if (frame.contains(right)) {
+                from.add(right);
+                to.add(left);
+            } else {
+                // not sure what this case means
+                continue;
+            }
+        }
     }
 
 }

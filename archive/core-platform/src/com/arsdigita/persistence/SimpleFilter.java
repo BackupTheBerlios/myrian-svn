@@ -15,16 +15,21 @@
 
 package com.arsdigita.persistence;
 
+import java.util.HashMap;
+import java.util.Map;
+import com.redhat.persistence.oql.Expression;
+import com.redhat.persistence.oql.Static;
+
 /**
  * SimpleFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/08/15 $
+ * @version $Revision: #4 $ $Date: 2004/03/23 $
  **/
 
 class SimpleFilter extends FilterImpl {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SimpleFilter.java#3 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SimpleFilter.java#4 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
 
     String m_conditions;
 
@@ -32,6 +37,31 @@ class SimpleFilter extends FilterImpl {
         // note that it is possible for conditions to be null
         // if we actually want a NO-OP filter
         m_conditions = conditions;
+    }
+
+    protected Expression makeExpression(DataQueryImpl query, Map bindings) {
+        String conditions = getConditions();
+        if (conditions == null) {
+            return null;
+        }
+
+        conditions = query.unalias(conditions);
+        conditions = query.mapAndAddPaths(conditions);
+        try {
+            Map map;
+            if (bindings.size() > 0) {
+                map = new HashMap();
+                map.putAll(bindings);
+                map.putAll(getBindings());
+            } else {
+                map = getBindings();
+            }
+
+            return new Static(conditions, map);
+        } catch (RuntimeException re) {
+            System.err.println("original conditions: " + getConditions());
+            throw re;
+        }
     }
 
     /**
