@@ -18,6 +18,7 @@ JJTREE=sh javacc-3.2/bin/jjtree
 endif
 
 SOURCES:=src test/src cap/src cap/test/src
+#SOURCES:=src test/src cap/src cap/test/src tck/datastore/tests tck/application-identity/tests
 CONF   := conf
 
 SOURCEPATH:=$(subst $(space),:,$(SOURCES:%=$(BUILD)/%))
