@@ -13,32 +13,16 @@ package com.arsdigita.installer;
 
 import java.io.*;
 import java.lang.reflect.*;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Logger;
 
 public class SimpleSQLParser {
 
-    private static final Logger s_log =
-        Logger.getLogger(SimpleSQLParser.class);
-
     private File m_scriptAbsoluteDir;
-    private File m_scriptRelativeDir;
-
-    // m_scriptAbsoluteDir is used for including files relative to the current
-    // working directory.  e.g.) @ create.sql
-    //
-    // m_scriptRelativeDir is used for including files relative to the current
-    // file.  e.g.) @@ create.sql
 
 
     public static void main(String args[])
           throws ParseException, IOException, NoSuchMethodException,
                  IllegalAccessException, InvocationTargetException
     {
-        ConsoleAppender log = new ConsoleAppender();
-        BasicConfigurator.configure(log);
-
         SimpleSQLParser parser = new SimpleSQLParser(System.in);
         parser.useSQLStatement(parser, "printStatement");
     }
@@ -47,25 +31,15 @@ public class SimpleSQLParser {
     SimpleSQLParser (String scriptFilename)
               throws FileNotFoundException {
         this(new FileInputStream(scriptFilename));
-        this.m_scriptRelativeDir =
+        this.m_scriptAbsoluteDir =
               (new File(scriptFilename)).getParentFile().getAbsoluteFile();
-        this.m_scriptAbsoluteDir = this.m_scriptRelativeDir;
     }
 
     SimpleSQLParser (File scriptFile)
             throws FileNotFoundException {
         this(new FileInputStream(scriptFile));
-        this.m_scriptRelativeDir =
+        this.m_scriptAbsoluteDir =
               scriptFile.getParentFile().getAbsoluteFile();
-        this.m_scriptAbsoluteDir = this.m_scriptRelativeDir;
-    }
-
-    SimpleSQLParser (File scriptFile, File absoluteDir)
-            throws FileNotFoundException {
-        this(new FileInputStream(scriptFile));
-        this.m_scriptRelativeDir =
-              scriptFile.getParentFile().getAbsoluteFile();
-        this.m_scriptAbsoluteDir = absoluteDir;
     }
 
 
@@ -92,7 +66,8 @@ public class SimpleSQLParser {
         
 
     public void printStatement(String stmt) {
-        s_log.info (stmt);
+        System.out.println(stmt);
+        System.out.println();
     }
 
         
@@ -115,9 +90,7 @@ SKIP:
 TOKEN:
 {
     < #WHITESPACE: ( [" ", "\n", "\r", "\t"] )+ >
-  | < SINGLE_AT: "@" >
   | < DOUBLE_AT: "@@" >
-  | < INCLUDE_FILE: ( <SINGLE_AT> | <DOUBLE_AT> ) <WHITESPACE> >
   | < STRING_LITERAL: "'" (~["'"])* ( "''" (~["'"])* )* "'" >
   | < DOUBLE_QUOTED_STRING_LITERAL: "\"" (~["\""])* ( "\"\"" (~["\""])* )* "\"" >
   | < PLSQL_BLOCK:  ( <CREATE> <WHITESPACE>
@@ -152,9 +125,7 @@ void useSQLStatement (Object obj, Method invokingMethod)
 {
     String s;
     Token includedFileToken;
-    Token includedFileTypeToken;
     String includedFilename;
-    String includedFiletype;
 }
 {
         {
@@ -184,60 +155,40 @@ void useSQLStatement (Object obj, Method invokingMethod)
             Object[] args = { s };
             invokingMethod.invoke(obj, args);
         }
-  | includedFileTypeToken = <INCLUDE_FILE> includedFileToken = <SQL_TOKEN>
+  | <DOUBLE_AT> includedFileToken = <SQL_TOKEN>
         {
+            System.err.println();
             includedFilename = includedFileToken.image;
-            includedFiletype = includedFileTypeToken.image;
-
-            s_log.info ("includedFiletype: " + includedFiletype);
-
             File includedFile = new File(includedFilename);
             if (includedFile.isAbsolute()) {
-                s_log.info ("Absolute path found: '" +
+                System.err.println("Absolute path found: '" +
                         includedFilename + "'");
             } else {
 
                 String absoluteFilename;
-                File basedir;
 
-                s_log.info("Relative path found: '" +
+                System.err.println("Relative path found: '" +
                         includedFilename + "'");
                 //  Well make it absolute then.
                 //  If we don't have information on where we are,
                 //  assume that script is located in user current dir.
-                if ( includedFiletype == "@" ) {
-                    if (m_scriptRelativeDir == null) {
-                        if (m_scriptAbsoluteDir == null) {
-                            basedir = new File (System.getProperty("user.dir"));
-                        } else {
-                            basedir = m_scriptAbsoluteDir;
-                        }
-                    } else {
-                        basedir = m_scriptRelativeDir;
-                    }
+                if (m_scriptAbsoluteDir == null) {
+                    absoluteFilename =
+                        System.getProperty("user.dir") +
+                        File.separator + includedFilename;
                 } else {
-                    if (m_scriptAbsoluteDir == null) {
-                        basedir = new File (System.getProperty("user.dir"));
-                    } else {
-                        basedir = m_scriptAbsoluteDir;
-                    }
-                }    
-                s_log.info ("basedir: " + basedir);
-                s_log.info ("includedFilename: " + includedFilename);
+                    absoluteFilename =
+                        m_scriptAbsoluteDir.toString() +
+                        File.separator + includedFilename;
+                }
 
-                includedFile = new File(basedir.toString() + File.separator + includedFilename);
+                includedFile = new File(absoluteFilename);
 
             } 
 
-            s_log.info("Recursively including: '" + includedFile.toString() + "'");
-
-            SimpleSQLParser parser;
-            if ( m_scriptAbsoluteDir == null ) {
-                parser = new SimpleSQLParser(includedFile);
-            } else { 
-                parser = new SimpleSQLParser(includedFile, m_scriptAbsoluteDir);
-            }
-            
+            System.err.println("Recursively including: '" + 
+                    includedFile.toString() + "'");
+            SimpleSQLParser parser = new SimpleSQLParser(includedFile);
             parser.useSQLStatement(obj, invokingMethod);
 
         }
