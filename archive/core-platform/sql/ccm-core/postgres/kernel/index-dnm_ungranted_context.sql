@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/postgres/kernel/index-dnm_ungranted_context.sql#2 $
--- $DateTime: 2004/01/20 14:16:30 $
+-- $Id: //core-platform/dev/sql/ccm-core/postgres/kernel/index-dnm_ungranted_context.sql#3 $
+-- $DateTime: 2004/01/29 06:03:55 $
 -- autor: Aram Kananov <aram@kananov.com>
 
 create index dnm_ungranted_context_gctx_idx on dnm_ungranted_context(granted_context_id);
