@@ -30,13 +30,13 @@ import org.apache.log4j.Logger;
  * @author David Lutterkort &lt;dlutter@redhat.com&gt;
  * @author Uday Mathur
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/Assert.java#5 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/Assert.java#6 $
  */
 public class Assert {
     public static final String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/Assert.java#5 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/Assert.java#6 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/04 00:03:52 $";
+        "$DateTime: 2003/10/06 12:21:50 $";
 
     private static final Logger s_log = Logger.getLogger
         (Assert.class);
@@ -50,7 +50,8 @@ public class Assert {
 	    (Assert.class.getName() + ".enabled");
 
         if (enabled == null) {
-            s_enabled = false;
+            //s_enabled = false;
+            s_enabled = true;
         } else {
             s_enabled = enabled.equals("true");
         }

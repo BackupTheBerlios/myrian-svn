@@ -31,25 +31,27 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterLoader
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#9 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#10 $
  */
 public abstract class ParameterRecord {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#9 $" +
-        "$Author: dan $" +
-        "$DateTime: 2003/10/06 09:53:27 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#10 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/10/06 12:21:50 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterRecord.class);
 
     private final String m_name;
-    private final ArrayList m_params;
+    private final ArrayList m_registered;
+    private final HashSet m_loaded;
     private final Map m_values;
     private final Properties m_info;
 
     protected ParameterRecord(final String name) {
         m_name = name;
-        m_params = new ArrayList();
+        m_registered = new ArrayList();
+        m_loaded = new HashSet();
         m_values = Collections.synchronizedMap(new HashMap());
         m_info = new Properties();
 
@@ -57,22 +59,22 @@ public abstract class ParameterRecord {
     }
 
     public final Parameter[] getParameters() {
-        Parameter[] result = new Parameter[m_params.size()];
-        return (Parameter[]) m_params.toArray(result);
+        Parameter[] result = new Parameter[m_registered.size()];
+        return (Parameter[]) m_registered.toArray(result);
     }
 
     protected final void register(final Parameter param) {
         if (s_log.isDebugEnabled()) {
-            s_log.debug("Registering " + param.getName() + 
+            s_log.debug("Registering " + param.getName() +
                         " (" + param + ") on " + this);
         }
 
         if (Assert.isEnabled()) {
-            Assert.truth(!m_params.contains(param),
+            Assert.truth(!m_registered.contains(param),
                          param + " is already registered");
         }
 
-        m_params.add(param);
+        m_registered.add(param);
     }
 
     public final void load(final ParameterLoader loader) {
@@ -82,7 +84,7 @@ public abstract class ParameterRecord {
 
         Assert.exists(loader, ParameterLoader.class);
 
-        final Iterator params = m_params.iterator();
+        final Iterator params = m_registered.iterator();
 
         while (params.hasNext()) {
             load((Parameter) params.next(), loader);
@@ -107,7 +109,7 @@ public abstract class ParameterRecord {
             throw new UncheckedWrapperException(ioe);
         }
 
-        final Iterator params = m_params.iterator();
+        final Iterator params = m_registered.iterator();
 
         while (params.hasNext()) {
             final Parameter param = (Parameter) params.next();
@@ -123,6 +125,13 @@ public abstract class ParameterRecord {
      * wish to retrieve; it cannot be null
      */
     protected final Object get(final Parameter param) {
+        if (Assert.isEnabled()) {
+            Assert.truth(m_registered.contains(param),
+                         param + " has not been registered");
+            Assert.truth(m_loaded.contains(param),
+                         param + " has not been loaded");
+        }
+
         final ParameterValue value = getValue(param);
 
         if (value == null) {
@@ -141,14 +150,12 @@ public abstract class ParameterRecord {
     // Does not param.check.
     protected final ParameterValue getValue(final Parameter param) {
         if (s_log.isDebugEnabled()) {
-            s_log.debug("Getting value of " + param.getName() + 
+            s_log.debug("Getting value of " + param.getName() +
                         " (" + param + ")");
         }
 
         if (Assert.isEnabled()) {
             Assert.exists(param, Parameter.class);
-            Assert.truth(m_params.contains(param),
-                         param + " has not been registered");
         }
 
         return (ParameterValue) m_values.get(param);
@@ -179,13 +186,13 @@ public abstract class ParameterRecord {
     protected final void setValue(final Parameter param,
                                   final ParameterValue value) {
         if (s_log.isDebugEnabled()) {
-            s_log.debug("Setting " + param.getName() + 
+            s_log.debug("Setting " + param.getName() +
                         " (" + param + ") to " + value);
         }
 
         if (Assert.isEnabled()) {
             Assert.exists(param, Parameter.class);
-            Assert.truth(m_params.contains(param),
+            Assert.truth(m_registered.contains(param),
                          param + " has not been registered");
         }
 
@@ -207,15 +214,17 @@ public abstract class ParameterRecord {
 
     private void load(final Parameter param, final ParameterLoader loader) {
         if (s_log.isDebugEnabled()) {
-            s_log.debug("Loading " + param.getName() + 
+            s_log.debug("Loading " + param.getName() +
                         " (" + param + ") from " + loader);
         }
 
         if (Assert.isEnabled()) {
             Assert.exists(param, Parameter.class);
             Assert.exists(loader, ParameterLoader.class);
-            Assert.truth(m_params.contains(param),
+            Assert.truth(m_registered.contains(param),
                          param + " has not been registered");
+
+            m_loaded.add(param);
         }
 
         final ParameterValue value = loader.load(param);
@@ -257,7 +266,7 @@ public abstract class ParameterRecord {
         out.write("<record>");
         field(out, "name", m_name);
 
-        final Iterator params = m_params.iterator();
+        final Iterator params = m_registered.iterator();
 
         while (params.hasNext()) {
             final Parameter param = (Parameter) params.next();
