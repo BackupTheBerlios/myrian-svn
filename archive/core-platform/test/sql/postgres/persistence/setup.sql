@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/test/sql/postgres/persistence/setup.sql#15 $
--- $DateTime: 2002/10/16 14:12:35 $
+-- $Id: //core-platform/dev/test/sql/postgres/persistence/setup.sql#16 $
+-- $DateTime: 2002/10/31 12:25:15 $
 
 
 --
@@ -20,7 +20,7 @@
 -- tests to run.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #15 $ $Date: 2002/10/16 $
+-- @version $Revision: #16 $ $Date: 2002/10/31 $
 --
 
 @@ create.sql
@@ -28,3 +28,4 @@
 @@ data-query-test.sql
 @@ sql-operation-test.sql
 @@ data-operation-test.sql
+@@ deferred.sql

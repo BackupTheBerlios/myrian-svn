@@ -44,12 +44,12 @@ import java.util.ArrayList;
  *              through inheritance.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #16 $ $Date: 2002/10/16 $
+ * @version $Revision: #17 $ $Date: 2002/10/31 $
  */
 
 public class GenericDataObject implements DataObject {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#16 $ by $Author: richardl $, $DateTime: 2002/10/16 18:18:50 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#17 $ by $Author: rhs $, $DateTime: 2002/10/31 12:25:15 $";
 
     private ObjectType    m_type;
     private Session       m_session;
@@ -553,6 +553,13 @@ public class GenericDataObject implements DataObject {
             throw new PersistenceException(
                                            "Cannot set a multi valued property."
                                            );
+        }
+
+        if (!isNew() && m_type.isKeyProperty(prop)) {
+            throw new PersistenceException(
+                "Cannot change a key property once an object has " +
+                "been saved."
+                );
         }
 
         // make sure that the property is loaded so it can be nulled correctly
