@@ -28,14 +28,14 @@ import org.w3c.dom.Attr;
  * <code>org.jdom.Element</code> using <code>org.w3c.dom.Element</code>.
  *
  * @author Patrick McNeill 
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/10/20 $
  * @since ACS 4.5a
  */
 public class Element {
     public static final String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/xml/Element.java#2 $" +
-        "$Author: rhs $" +
-        "$DateTime: 2003/08/19 22:28:24 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/xml/Element.java#3 $" +
+        "$Author: dan $" +
+        "$DateTime: 2003/10/20 13:05:05 $";
 
     private static final Logger s_log = Logger.getLogger
         (Element.class.getName());
@@ -191,6 +191,14 @@ public class Element {
      */
     public Element addAttribute( String name, String value ) {
         m_element.setAttribute( name, value );
+
+        return this;
+    }
+
+    public Element addAttribute(String name, 
+                                String value,
+                                String ns) {
+        m_element.setAttributeNS(ns, name, value);
 
         return this;
     }
