@@ -462,6 +462,9 @@ object type Category extends ACSObject {
 //}
 
 query getCategories {
+    BigDecimal id;
+    String name;
+    String description;
     do {
         select category_id, name, description
         from cat_categories
@@ -492,6 +495,9 @@ query topLevelCategories {
 }
 
 query immediateChildren {
+    BigDecimal id;
+    String name;
+    String description;
     do {
         select c.category_id, c.description, c.name
         from cat_categories c, cat_category_category_map ccm
@@ -611,6 +617,11 @@ data operation swapObjectWithNextObject {
 
 query relatedCategoriesQuery {
     Category relatedCategory;
+    BigDecimal parentID;
+    String relationType;
+    Boolean isDefault;
+    BigDecimal sortKey;
+    
     do {
         select m.category_category_map_id,
                c.category_id as related_id, c.name, c.enabled_p,

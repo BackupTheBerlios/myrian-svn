@@ -60,6 +60,12 @@ object type ObjectCategoryMapping  {
 
       
 query objectCategoryMappingQuery {
+    BigDecimal categoryID;
+    BigDecimal sortKey;
+    BigDecimal objectID;
+    BigDecimal objectCategoryMapID;
+    Boolean isDefault;
+
     do {
         select category_id, object_id, object_category_map_id,
                default_p, sort_key

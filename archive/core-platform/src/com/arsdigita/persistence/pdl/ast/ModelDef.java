@@ -30,12 +30,12 @@ import java.util.Collection;
  * Defines the Model of a particular object type.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/07/26 $
  */
 
 public class ModelDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ModelDef.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ModelDef.java#4 $ by $Author: randyg $, $DateTime: 2002/07/26 15:26:35 $";
 
     // the model name
     private String m_name;
@@ -154,6 +154,17 @@ public class ModelDef extends Element {
         for (Iterator it = m_assns.iterator(); it.hasNext(); ) {
             AssociationDef ad = (AssociationDef) it.next();
             ad.validateMappings();
+        }
+
+        // we want to validate all mappings within the QueryDef to make
+        // sure that we know the jdbc type of every object being
+        // returned by a query.
+        for (Iterator it = m_queries.values().iterator(); it.hasNext(); ) {
+            NamedSQLDef qd = (NamedSQLDef) it.next();
+
+            if (qd instanceof QueryDef) {
+                ((QueryDef)qd).validateMappings();
+            } 
         }
     }
 

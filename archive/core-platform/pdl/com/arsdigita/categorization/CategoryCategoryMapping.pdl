@@ -63,6 +63,13 @@ object type CategoryCategoryMapping {
 
 
 query categoryCategoryMappingQuery {
+    BigDecimal categoryID;
+    BigDecimal objectID;
+    BigDecimal sortKey;
+    Boolean isDefault;
+    BigDecimal categoryCategoryMapID;
+    String relationType;
+
     do {
         select related_category_id, category_id, category_category_map_id,
                default_p, sort_key, relation_type
@@ -88,6 +95,10 @@ query categoryClearDefaultParent {
 
 
 query getRootCategory {
+    BigDecimal id;
+    String name;
+    Integer nchild;
+
     do {
         select g.name, 
                g.category_id,
@@ -106,6 +117,10 @@ query getRootCategory {
 
 
 query getSubCategories {
+    BigDecimal id;
+    String name;
+    Integer nchild;
+    
     do {
         select g.name,
                g.category_id,

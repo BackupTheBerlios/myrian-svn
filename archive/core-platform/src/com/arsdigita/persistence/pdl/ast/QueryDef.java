@@ -24,23 +24,31 @@ import com.arsdigita.persistence.metadata.Mapping;
 import com.arsdigita.persistence.PersistenceException;
 import com.arsdigita.persistence.Utilities;
 
+import org.apache.log4j.Category;
+
 import java.util.Iterator;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 
 /**
  * Defines a data query that is not associated with an object type or 
  * association.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/07/26 $
  */
 public class QueryDef extends NamedSQLDef {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/QueryDef.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/QueryDef.java#4 $ by $Author: randyg $, $DateTime: 2002/07/26 15:26:35 $";
 
     // this determines if it is a "zero or one row ", "one row" query 
     // or a multi-row query
     private int m_lowerBound = 0;
     private int m_upperBound = Integer.MAX_VALUE;
+    private static int count = 0;
+    private static final Category s_log =
+        Category.getInstance(QueryDef.class.getName());
 
     /**
      * Create a new QueryDef named "name"
@@ -112,6 +120,48 @@ public class QueryDef extends NamedSQLDef {
 
         return result;
     }
+
+
+    /**
+     *  This ensures that all values being returned have a specified
+     *  jdbc type.  This is important to avoid ClassCastExceptions
+     *  when retrieving these properties
+     */
+    protected void validateMappings() {
+        StringBuffer warning = new StringBuffer();
+
+        for (Iterator it = m_sql.getMapStatements().iterator(); it.hasNext();) {
+            String path = ((MapStatement)it.next()).getPrettyPath();
+            if (getPropertyDef(path) == null) {
+                // Check to see if the property is part of an object type
+                if (!(path.indexOf(".") > -1 && 
+                    getPropertyDef(path.substring
+                                   (0, path.lastIndexOf("."))) != null)) { 
+                    warning.append("Property: " + path + Utilities.LINE_BREAK);
+                }
+            } 
+        }
+
+        if (warning.length() > 0) {
+            count++;
+            StringWriter str = new StringWriter();
+            PrintWriter msg = new PrintWriter(str);
+            msg.println("Warning: The following properties are not declared " +
+                        " in the definition of the query and therefore do " +
+                        " not have an associated JDBC Type.  Please define " +
+                        " the property at the top of the query.  For " +
+                        " backwards compatibility we are going to use the " +
+                        " default JDBC type as defined by the database " +
+                        " (which could lead to errors)." + 
+                        Utilities.LINE_BREAK +
+                        count + "Model: " + getModelDef().getName() + "." + getName() +
+                        Utilities.LINE_BREAK +
+                        "Query: " + getName());
+            msg.println(warning.toString());
+            s_log.warn(str.toString());
+        }
+    }
+
 
     /**
      * Returns a string representation of this object.
