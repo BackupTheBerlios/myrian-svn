@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/permissions.pdl#7 $ 
-// $DateTime: 2002/10/16 14:59:54 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/permissions.pdl#8 $ 
+// $DateTime: 2003/03/19 18:20:48 $
 
 model com.arsdigita.kernel.permissions;
 
@@ -206,24 +206,28 @@ query PermissionFilterQuery {
     do {
         select oc.object_id 
         from object_context oc
-        where (context_id in
-                   (select c.object_id 
+        where (exists
+                   (select 1
                       from granted_context_non_leaf_map c, 
                            acs_permissions p 
-                     where c.implied_context_id=p.object_id 
+                     where c.implied_context_id = p.object_id 
+		       and context_id = c.object_id
                        and (p.grantee_id in :partyList or 
-                            p.grantee_id in (select group_id 
-                                             from group_member_trans_map
-                                             where member_id in :partyList)) 
+                            exists (select 1
+                                    from group_member_trans_map
+                                    where member_id in :partyList
+				    and p.grantee_id = group_id)) 
                         and p.privilege in :privilegeList
                    )
-               or oc.object_id in 
-                   (select p.object_id
+               or exists
+                   (select 1
                       from acs_permissions p
-                     where (p.grantee_id in :partyList or 
-                            p.grantee_id in (select group_id
-                                             from group_member_trans_map
-                                             where member_id in :partyList))
+		      where p.object_id = oc.object_id
+                      and (p.grantee_id in :partyList or 
+                            exists (select 1
+                                    from group_member_trans_map
+                                    where member_id in :partyList
+				    and p.grantee_id = group_id))
                         and p.privilege in :privilegeList
                    )
               )
@@ -237,22 +241,26 @@ query GroupPermissionFilterQuery {
     do {
         select oc.object_id 
         from object_context oc
-        where (context_id in
-                   (select c.object_id 
+        where (exists
+                   (select 1
                       from granted_context_non_leaf_map c, 
                            acs_permissions p 
-                     where c.implied_context_id=p.object_id 
-                       and p.grantee_id in (select group_id 
-                                            from group_subgroup_trans_map
-                                            where subgroup_id in :partyList) 
+                     where c.implied_context_id = p.object_id 
+		       and context_id = c.object_id
+                       and exists (select 1
+                                   from group_subgroup_trans_map
+                                   where subgroup_id in :partyList
+				   and p.grantee_id = group_id) 
                         and p.privilege in :privilegeList
                    )
-               or oc.object_id in 
-                   (select p.object_id
+               or exists
+                   (select 1
                       from acs_permissions p
-                     where p.grantee_id in (select group_id
-                                            from group_subgroup_trans_map
-                                            where subgroup_id in :partyList)
+		      where oc.object_id = p.object_id
+                      and exists (select 1
+                                   from group_subgroup_trans_map
+                                   where subgroup_id in :partyList
+				   and p.grantee_id = group_id)
                         and p.privilege in :privilegeList
                    )
               )
@@ -298,28 +306,32 @@ query CheckPermissionForUser {
     do {
         select 1 as permission_p
         from object_context
-        where object_id=:objectID
-          and (context_id in (
-                   select c.object_id 
+        where object_id = :objectID
+          and (exists (
+                   select 1
                      from granted_context_non_leaf_map c, 
                           acs_permissions p 
-                    where c.implied_context_id=p.object_id 
+                    where c.implied_context_id = p.object_id 
+		      and context_id = c.object_id
                       and (  p.grantee_id in :partyList or 
-                             p.grantee_id in
-                                (select group_id 
+                             exists 
+                                (select 1
                                    from group_member_trans_map
-                                  where member_id in :partyList)
+                                  where member_id in :partyList
+				  and p.grantee_id = group_id)
                           )
                       and p.privilege in :privilegeList
                   )
-               or :objectID in (
-                    select p.object_id
+               or exists (
+                    select 1
                       from acs_permissions p
-                     where (  p.grantee_id in :partyList or 
-                              p.grantee_id in
-                                  (select group_id
+		      where :objectID = p.object_id
+                      and (  p.grantee_id in :partyList or 
+                              exists
+                                  (select 1
                                      from group_member_trans_map
-                                    where member_id in :partyList)
+                                    where member_id in :partyList
+				    and p.grantee_id = group_id)
                            )
                        and p.privilege in :privilegeList
                   )
@@ -334,25 +346,29 @@ query CheckPermissionForGroup {
     do {
         select 1 as permission_p
         from object_context
-        where object_id=:objectID
-          and (context_id in (
-                   select c.object_id 
+        where object_id = :objectID
+          and (exists (
+                   select 1
                      from granted_context_non_leaf_map c, 
                           acs_permissions p 
-                    where c.implied_context_id=p.object_id 
-                      and p.grantee_id in
-                                (select group_id 
+                    where c.implied_context_id = p.object_id 
+		      and context_id = c.object_id
+                      and exists 
+                                (select 1
                                    from group_subgroup_trans_map
-                                  where subgroup_id in :partyList)
+                                  where subgroup_id in :partyList
+				   and p.grantee_id = group_id)
                       and p.privilege in :privilegeList
                   )
-               or :objectID in (
-                    select p.object_id
+               or exists (
+                    select 1
                       from acs_permissions p
-                     where p.grantee_id in
-                                  (select group_id
+                     where p.object_id = :objectID
+		     and exists
+                                  (select 1
                                      from group_subgroup_trans_map
-                                    where subgroup_id in :partyList)
+                                    where subgroup_id in :partyList
+				     and p.grantee_id = group_id)
                        and p.privilege in :privilegeList
                   )
               )
@@ -370,10 +386,11 @@ query CheckUninheritedPermissionForUser {
             from  acs_permissions
             where acs_permissions.object_id = :objectID
               and (acs_permissions.grantee_id in :partyList
-                   or acs_permissions.grantee_id in (
-                          select group_id
+                   or exists  (
+                          select 1
                           from group_member_trans_map
                           where member_id in :partyList
+			  and acs_permissions.grantee_id = group_id
                    ))
               and (acs_permissions.privilege in :privilegeList)
         )
@@ -390,10 +407,11 @@ query CheckUninheritedPermissionForGroup {
             select 1
             from  acs_permissions
             where acs_permissions.object_id = :objectID
-              and (acs_permissions.grantee_id in (
-                          select group_id
+              and (exists (
+                          select 1
                           from group_subgroup_trans_map
                           where subgroup_id in :partyList
+			  and acs_permissions.grantee_id = group_id
                    ))
               and (acs_permissions.privilege in :privilegeList)
         )
@@ -431,10 +449,11 @@ query PrivilegesForUser {
           select acs_permissions.privilege
             from acs_permissions
            where (acs_permissions.grantee_id = :partyID
-                  or acs_permissions.grantee_id in (
-                          select group_id
+                  or exists (
+                          select 1
                           from group_member_trans_map
                           where member_id = :partyID
+			  and acs_permissions.grantee_id = group_id
                   ))
              and acs_permissions.object_id = :objectID
           UNION
@@ -446,10 +465,11 @@ query PrivilegesForUser {
              and oc.context_id = map.object_id
              and map.implied_context_id = acs_permissions.object_id
              and (acs_permissions.grantee_id = :partyID
-                   or acs_permissions.grantee_id in (
-                          select group_id
+                   or exists (
+                          select 1
                           from group_member_trans_map
                           where member_id = :partyID
+			  and acs_permissions.grantee_id = group_id
                   ))
     } map {
         privilege = acs_permissions.privilege;
@@ -461,10 +481,11 @@ query PrivilegesForGroup {
     do {
           select acs_permissions.privilege
             from acs_permissions
-           where acs_permissions.grantee_id in (
-                          select group_id
+           where exists (
+                          select 1
                           from group_subgroup_trans_map
                           where subgroup_id = :partyID
+			  and acs_permissions.grantee_id = group_id
                  )
              and acs_permissions.object_id = :objectID
           UNION
@@ -475,10 +496,11 @@ query PrivilegesForGroup {
            where oc.object_id = :objectID
              and oc.context_id = map.object_id
              and map.implied_context_id = acs_permissions.object_id
-             and acs_permissions.grantee_id in (
-                          select group_id
+             and exists (
+                          select 1
                           from group_subgroup_trans_map
                           where subgroup_id = :partyID
+			  and acs_permissions.grantee_id = group_id
                  )
     } map {
         privilege = acs_permissions.privilege;
@@ -636,10 +658,11 @@ query ObjectPermissionCollection {
                      0 as name_id
               from groups, parties
               where groups.group_id = parties.party_id) parties
-        where acs_permissions.object_id in (
-                  select implied_context_id 
+        where exists (
+                  select 1
                   from granted_trans_context_map c 
-                  where object_id =:objectID)
+                  where object_id = :objectID
+		  and acs_permissions.object_id = implied_context_id)
           and acs_permissions.grantee_id = parties.party_id
         UNION ALL
         select acs_permissions.privilege,
@@ -667,10 +690,11 @@ query ObjectPermissionCollection {
               from users, parties, person_names
               where users.user_id = parties.party_id
                 and users.name_id = person_names.name_id) parties
-        where acs_permissions.object_id in (
-                  select implied_context_id 
+        where exists (
+                  select 1
                   from granted_trans_context_map 
-                  where object_id = :objectID)
+                  where object_id = :objectID
+		  and acs_permissions.object_id = implied_context_id)
           and acs_permissions.grantee_id = parties.party_id
     } map {
         privilege = acs_permissions.privilege;
