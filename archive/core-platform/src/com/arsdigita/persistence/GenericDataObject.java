@@ -46,12 +46,12 @@ import java.util.ArrayList;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/05/30 $
+ * @version $Revision: #4 $ $Date: 2002/05/31 $
  */
 
 public class GenericDataObject implements DataObject {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#3 $ by $Author: rhs $, $DateTime: 2002/05/30 17:55:49 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#4 $ by $Author: rhs $, $DateTime: 2002/05/31 13:57:32 $";
 
     private ObjectType    m_type;
     private Session       m_session;
@@ -103,6 +103,10 @@ public class GenericDataObject implements DataObject {
             }
         }
 
+        public String toString() {
+            return "Observer " + m_index + ": " + m_observer;
+        }
+
     }
 
     private static final DataHandler s_defaultHandler = new DataHandler() {};
@@ -129,9 +133,13 @@ public class GenericDataObject implements DataObject {
         }
         ObserverEntry entry = new ObserverEntry(observer, m_observers.size());
         if (!m_observers.contains(entry)) {
-            if (m_firing) {
+            if (m_firing != null) {
                 throw new IllegalStateException(
-                    "Can't add an observer from within an observer."
+                    "Can't add a new observer from within another " +
+                    "observer.\n" +
+                    "Trying to add: " + observer + "\n" +
+                    "Currently firing: " + m_firing + "\n" +
+                    "Current observers: " + m_observers
                     );
             }
             m_observers.add(entry);
@@ -146,7 +154,7 @@ public class GenericDataObject implements DataObject {
 
     private int[] m_count = new int[NUM_METHODS];
     private BitSet[] m_fired = new BitSet[NUM_METHODS];
-    private boolean m_firing = false;
+    private ObserverEntry m_firing = null;
 
     private void fireObserver(int method, boolean errorOnSave) {
         if (m_count[method] == 0) {
@@ -154,9 +162,7 @@ public class GenericDataObject implements DataObject {
         }
 
         m_count[method]++;
-        boolean old = m_firing;
-        m_firing = true;
-
+        ObserverEntry old = m_firing;
         try {
             for (Iterator it = m_observers.iterator(); it.hasNext(); ) {
                 ObserverEntry entry = (ObserverEntry) it.next();
@@ -175,6 +181,7 @@ public class GenericDataObject implements DataObject {
                     }
                 } else {
                     m_fired[method].set(index);
+                    m_firing = entry;
                     callObserverMethod(observer, method);
                 }
             }
