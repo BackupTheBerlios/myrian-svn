@@ -28,12 +28,12 @@ import com.arsdigita.db.DbHelper;
  * metadata system.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2002/09/03 $
+ * @version $Revision: #13 $ $Date: 2002/09/24 $
  **/
 
 public class MetadataRoot extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#12 $ by $Author: randyg $, $DateTime: 2002/09/03 09:35:24 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#13 $ by $Author: rhs $, $DateTime: 2002/09/24 17:06:24 $";
 
     private static final Logger s_cat = Logger.getLogger(MetadataRoot.class.getName());
 
@@ -362,28 +362,28 @@ public class MetadataRoot extends Element {
     public static final SimpleType BLOB = 
         init(new SimpleType("Blob", java.sql.Blob.class, Types.BLOB) {
                 public boolean needsRefresh(Object value, int jdbcType) {
-                    return (value != null && jdbcType == Types.BLOB);
+                    if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+                        return false;
+                    } else {
+                        return (value != null && jdbcType == Types.BLOB);
+                    }
                 }
 
                 public void doRefresh(ResultSet rs, String column, Object value)
                     throws SQLException {
-                    if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
-                        // do nothing
-                    } else {
-                        oracle.sql.BLOB blob =
-                            (oracle.sql.BLOB) rs.getBlob(column);
-                        OutputStream out = blob.getBinaryOutputStream();
-                        try {
-                            out.write((byte[]) value);
-                            out.flush();
-                            out.close();
-                        } catch (IOException e) {
-                            // This used to be a persistence exception, but using
-                            // persistence exception here breaks ant verify-pdl
-                            // because the classpath isn't set up to include
-                            // com.arsdigita.util.*
-                            throw new Error("Unable to write LOB: " + e);
-                        }
+                    oracle.sql.BLOB blob =
+                        (oracle.sql.BLOB) rs.getBlob(column);
+                    OutputStream out = blob.getBinaryOutputStream();
+                    try {
+                        out.write((byte[]) value);
+                        out.flush();
+                        out.close();
+                    } catch (IOException e) {
+                        // This used to be a persistence exception, but using
+                        // persistence exception here breaks ant verify-pdl
+                        // because the classpath isn't set up to include
+                        // com.arsdigita.util.*
+                        throw new Error("Unable to write LOB: " + e);
                     }
                 }
 
