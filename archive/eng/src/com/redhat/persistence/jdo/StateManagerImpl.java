@@ -29,21 +29,86 @@ class StateManagerImpl implements StateManager {
         return m_pmi.getSession();
     }
 
+
+    /*
+     * XXX: This mapping needs to be computed at startup and cached.
+     **/
+    private static List getAllFields(Class pcClass) {
+        List fields = new ArrayList();
+        JDOImplHelper helper = JDOImplHelper.getInstance();
+
+        for (Class klass=pcClass;
+             klass != null;
+             klass = helper.getPersistenceCapableSuperclass(klass)) {
+
+            String[] names = helper.getFieldNames(klass);
+            if (names.length == 0) { continue; }
+            List current = new ArrayList(names.length);
+            // Yes, I know about Arrays.asList(Object[]).  It returns a list
+            // that doesn't implement addAll.
+            for (int ii=0; ii<names.length; ii++) {
+                current.add(names[ii]);
+            }
+            current.addAll(fields);
+            fields = current;
+        }
+        return fields;
+    }
+
+    /*
+     * XXX: This mapping needs to be computed at startup and cached.
+     * XXX: This is very similar to getAllFields.
+     **/
+    private static List getAllTypes(Class pcClass) {
+        List types = new ArrayList();
+        JDOImplHelper helper = JDOImplHelper.getInstance();
+
+        for (Class klass=pcClass;
+             klass != null;
+             klass = helper.getPersistenceCapableSuperclass(klass)) {
+
+            Class[] names = helper.getFieldTypes(klass);
+            if (names.length == 0) { continue; }
+            List current = new ArrayList(names.length);
+            // Yes, I know about Arrays.asList(Object[]).  It returns a list
+            // that doesn't implement addAll.
+            for (int ii=0; ii<names.length; ii++) {
+                current.add(names[ii]);
+            }
+            current.addAll(types);
+            types = current;
+        }
+        return types;
+    }
+
+    private static String numberToName(Class pcClass, int field) {
+        return (String) getAllFields(pcClass).get(field);
+    }
+
+    /**
+     * Returns the first occurrence of the specified field in the most derived
+     * class.
+     **/
+    private static int nameToNumber(Class pcClass, String fieldName) {
+        return getAllFields(pcClass).lastIndexOf(fieldName);
+    }
+
     void cacheKeyProperties(PersistenceCapable pc, PropertyMap pmap) {
-        List props = Arrays.asList
-            (JDOImplHelper.getInstance().getFieldNames(pc.getClass()));
+        List props = getAllFields(pc.getClass());
 
         for (Iterator it = pmap.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry me = (Map.Entry) it.next();
             Property prop = (Property) me.getKey();
             int index = props.indexOf(prop.getName());
             Object value = me.getValue();
-
-            try {
-                m_tmpValue = value;
-                pc.jdoReplaceField(index);
-            } finally {
-                m_tmpValue = null;
+            // XXX: should null values be allowed?
+            if (value != null) {
+                try {
+                    m_tmpValue = value;
+                    pc.jdoReplaceField(index);
+                } finally {
+                    m_tmpValue = null;
+                }
             }
         }
     }
@@ -75,8 +140,7 @@ class StateManagerImpl implements StateManager {
     private Property prop(PersistenceCapable pc, int field) {
         ObjectType type = type(pc);
 
-        String name =
-            JDOImplHelper.getInstance().getFieldNames(pc.getClass())[field];
+        String name = numberToName(pc.getClass(), field);
 
         Property prop = type.getProperty(name);
 
@@ -93,8 +157,7 @@ class StateManagerImpl implements StateManager {
     public Object getObjectField(PersistenceCapable pc, int field,
                                  Object currentValue) {
 
-        Class klass =
-            JDOImplHelper.getInstance().getFieldTypes(pc.getClass())[field];
+        Class klass = (Class) getAllTypes(pc.getClass()).get(field);
 
         if (klass.equals(Collection.class)) {
             return new CRPSet(ssn(), pc, prop(pc, field));
