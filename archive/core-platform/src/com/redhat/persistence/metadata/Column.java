@@ -26,12 +26,12 @@ import java.util.*;
  * the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/07/29 $
+ * @version $Revision: #4 $ $Date: 2003/07/31 $
  */
 
 public class Column extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Column.java#3 $ by $Author: rhs $, $DateTime: 2003/07/29 16:51:07 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Column.java#4 $ by $Author: rhs $, $DateTime: 2003/07/31 12:51:28 $";
 
     /**
      * The name of this Column.
@@ -440,13 +440,16 @@ public class Column extends Element {
 
         if (DbHelper.getDatabase() == DbHelper.DB_ORACLE
             && m_type == Types.BIT) {
-            result.append(" check(" + m_name + " in ('0', '1'))");
+            String name = Constraint.generateName
+                (getTable(), Collections.singletonList(this), "_c");
+            result.append("\n        constraint " + name);
+            result.append("\n          check(" + m_name + " in ('0', '1'))");
         }
 
         for (Iterator it = m_constraints.iterator(); it.hasNext(); ) {
             Constraint con = (Constraint) it.next();
-            if (con.getColumns().length == 1 && (!defer ||
-                                                 !con.isDeferred())) {
+            if (con.getColumns().length == 1
+                && (!defer || !con.isDeferred())) {
                 result.append("\n");
                 result.append(con.getColumnSQL());
             }

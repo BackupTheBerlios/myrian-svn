@@ -31,12 +31,12 @@ import com.arsdigita.util.UncheckedWrapperException;
  * Constraint
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/07/14 $
+ * @version $Revision: #3 $ $Date: 2003/07/31 $
  **/
 
 public abstract class Constraint {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Constraint.java#2 $ by $Author: dennis $, $DateTime: 2003/07/14 17:14:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Constraint.java#3 $ by $Author: rhs $, $DateTime: 2003/07/31 12:51:28 $";
 
     private Table m_table;
     private String m_name;
@@ -77,12 +77,16 @@ public abstract class Constraint {
         }
     }
 
+
     private String generateName() {
+        return generateName(m_table, getSortedColumns(), getSuffix());
+    }
+
+    static String generateName(Table table, List cols, String suffix) {
         StringBuffer buf = new StringBuffer();
 
-        buf.append(m_table.getName());
+        buf.append(table.getName());
 
-        List cols = getSortedColumns();
         for (Iterator it = cols.iterator(); it.hasNext(); ) {
             Column col = (Column) it.next();
             buf.append("_");
@@ -92,10 +96,10 @@ public abstract class Constraint {
         String name = buf.toString();
         buf = new StringBuffer(abbreviate(name, 22));
 
-        buf.append(getSuffix());
+        buf.append(suffix);
         try {
             MessageDigest digest = MessageDigest.getInstance("MD5");
-            byte[] bytes = digest.digest((name + getSuffix()).getBytes());
+            byte[] bytes = digest.digest((name + suffix).getBytes());
             char[] hash = new char[5];
             for (int i = 0; i < 5; i++) {
                 int intValue = (new Byte(bytes[i])).intValue();
@@ -112,7 +116,6 @@ public abstract class Constraint {
         String result = buf.toString();
         return result;
     }
-
 
     /**
      *  The length is the desired length for the abbreviated name
