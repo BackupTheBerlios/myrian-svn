@@ -16,7 +16,7 @@
 package com.redhat.persistence;
 
 import com.redhat.persistence.metadata.ObjectType;
-import com.redhat.persistence.metadata.Property;
+import com.redhat.persistence.metadata.Role;
 import java.io.*;
 import java.util.*;
 
@@ -24,12 +24,12 @@ import java.util.*;
  * CreateEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/21 $
  **/
 
 public class CreateEvent extends ObjectEvent {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/CreateEvent.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/CreateEvent.java#3 $ by $Author: ashah $, $DateTime: 2003/10/21 11:38:25 $";
 
     CreateEvent(Session ssn, Object obj) {
         super(ssn, obj);
@@ -47,11 +47,11 @@ public class CreateEvent extends ObjectEvent {
         // set up new dependencies
         ObjectType type = getSession().getObjectType(getObject());
 
-        for (Iterator it = type.getProperties().iterator(); it.hasNext(); ) {
-            Property prop = (Property) it.next();
-            if (!prop.isNullable()) {
+        for (Iterator it = type.getRoles().iterator(); it.hasNext(); ) {
+            Role role = (Role) it.next();
+            if (!role.isNullable()) {
                 PropertyData pd =
-                    getSession().fetchPropertyData(getObject(), prop);
+                    getSession().fetchPropertyData(getObject(), role);
                 pd.addNotNullDependent(this);
             }
         }
