@@ -22,8 +22,8 @@ import java.util.List;
  * href="http://mathworld.wolfram.com/Graph.html">graphs</a> of objects.
  *
  * @author Archit Shah (ashah@mit.edu)
- * @author Vadim Nasardinov (vadidmn@redhat.com)
- * @version $Date: 2003/02/21 $
+ * @author Vadim Nasardinov (vadimn@redhat.com)
+ * @version $Date: 2003/04/30 $
  * @since   2003-01-22
  **/
 public interface Graph {
