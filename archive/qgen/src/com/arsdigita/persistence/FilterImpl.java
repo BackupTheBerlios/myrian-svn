@@ -16,6 +16,8 @@
 package com.arsdigita.persistence;
 
 import com.redhat.persistence.metadata.Root;
+import com.redhat.persistence.oql.Expression;
+import com.redhat.persistence.oql.Static;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -27,12 +29,12 @@ import org.apache.log4j.Logger;
  * be combined and manipulated to create complex queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/03/22 $
+ * @version $Revision: #3 $ $Date: 2004/03/22 $
  */
 
 abstract class FilterImpl implements Filter {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/FilterImpl.java#2 $ by $Author: richardl $, $DateTime: 2004/03/22 13:05:27 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/FilterImpl.java#3 $ by $Author: ashah $, $DateTime: 2004/03/22 16:48:51 $";
 
     private static final Logger m_log =
         Logger.getLogger(Filter.class.getName());
@@ -41,16 +43,26 @@ abstract class FilterImpl implements Filter {
 
     protected FilterImpl() {}
 
+    /**
+     * For subclasses of FilterImpl, this method is not used in generating the
+     * actual filter. It seems reasonable for subclasses of FilterImpl to
+     * implement this method anyways, if only for toString or other debugging
+     * purposes.
+     */
+    public abstract String getConditions();
+
+    /**
+     * For instances of FilterImpl, DataQueryImpl and CompoundFilterImpl use
+     * this method to generate oql filter conditions.
+     */
+    protected abstract Expression makeExpression(DataQueryImpl query,
+                                                 Map bindings);
 
     /**
      * Returns a name that is safe to use for binding the passed in property
      * name.
      **/
-
-    private static final int MASK = ~(1 << 31);
-    private static int s_counter = 0;
-
-    private static final String bindName(String propertyName) {
+    static final String bindName(String propertyName) {
         StringBuffer result = new StringBuffer(propertyName.length());
         for (int i = 0; i < propertyName.length(); i++) {
             char c = propertyName.charAt(i);
@@ -70,9 +82,6 @@ abstract class FilterImpl implements Filter {
                 break;
             }
         }
-
-        // the bitwise and drops the sign bit
-        result.append(s_counter++ & MASK);
 
         return result.toString();
     }
@@ -134,15 +143,7 @@ abstract class FilterImpl implements Filter {
      *  @param value The value for the specified attribute
      */
     protected static Filter equals(String attribute, Object value) {
-        String bind = bindName(attribute);
-        String conditions;
-        if (value == null) {
-            conditions = createNullString("=", attribute);
-        } else {
-            conditions = attribute + " = :" + bind;
-        }
-
-        return (new SimpleFilter(conditions)).set(bind, value);
+        return EqualsFilter.eq(attribute, value);
     }
 
 
@@ -159,15 +160,7 @@ abstract class FilterImpl implements Filter {
      *  @param value The value for the specified attribute
      */
     protected static Filter notEquals(String attribute, Object value) {
-        String bind = bindName(attribute);
-        String conditions;
-        if (value == null) {
-            conditions = createNullString("!=", attribute);
-        } else {
-            conditions = attribute + " != :" + bind;
-        }
-
-        return (new SimpleFilter(conditions)).set(bind, value);
+        return EqualsFilter.notEq(attribute, value);
     }
 
 
@@ -409,12 +402,7 @@ abstract class FilterImpl implements Filter {
         }
 
 	final InFilter in = new InFilter(root, propertyName, null, queryName);
-
-        return new FilterImpl() {
-		public String getConditions() {
-		    return "not " + in.getConditions();
-		}
-	    };
+        return new SimpleFilter("not " + in.getConditions());
     }
 
 

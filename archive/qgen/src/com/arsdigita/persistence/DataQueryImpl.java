@@ -33,8 +33,7 @@ import com.redhat.persistence.oql.Define;
 import com.redhat.persistence.oql.Equals;
 import com.redhat.persistence.oql.Exists;
 import com.redhat.persistence.oql.Expression;
-import com.redhat.persistence.oql.Get;
-import com.redhat.persistence.oql.Join;
+import com.redhat.persistence.oql.LeftJoin;
 import com.redhat.persistence.oql.Limit;
 import com.redhat.persistence.oql.Literal;
 import com.redhat.persistence.oql.Offset;
@@ -57,12 +56,12 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/03/16 $
+ * @version $Revision: #7 $ $Date: 2004/03/22 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataQueryImpl.java#6 $ by $Author: bche $, $DateTime: 2004/03/16 17:15:26 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataQueryImpl.java#7 $ by $Author: ashah $, $DateTime: 2004/03/22 16:48:51 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 
@@ -77,7 +76,7 @@ class DataQueryImpl implements DataQuery {
     private Expression m_expr;
 
     Cursor m_cursor = null;
-    private CompoundFilter m_filter;
+    private CompoundFilterImpl m_filter;
 
     private ArrayList m_orders = new ArrayList();
 
@@ -143,8 +142,10 @@ class DataQueryImpl implements DataQuery {
 
     public void reset() {
 	close();
-        clearOrder();
 	m_cursor = null;
+
+        clearOrder();
+        clearFilter();
 	m_lowerBound = 0;
 	m_upperBound = Integer.MAX_VALUE;
         m_offset = null;
@@ -152,8 +153,6 @@ class DataQueryImpl implements DataQuery {
         m_signature = new Signature(m_originalSig);
         m_joins.clear();
         m_bindings.clear();
-
-        m_filter = getFilterFactory().and();
 
         // XXX: hack for data queries with bindings that have calls to addPath
         // addJoin needs to join against the static-ified version of the All.
@@ -261,15 +260,6 @@ class DataQueryImpl implements DataQuery {
         return path;
     }
 
-    // XXX: should be abstracted to oql
-    private static Expression expression(Path path) {
-        if (path.getParent() == null) {
-            return new Variable(path.getName());
-        } else {
-            return new Get(expression(path.getParent()), path.getName());
-        }
-    }
-
     private void addJoin(Path path) {
         List elts = new ArrayList();
         for (Path p = path; p != null; p = p.getParent()) {
@@ -298,13 +288,13 @@ class DataQueryImpl implements DataQuery {
 
                 Expression prevColl;
                 if (prev == null) {
-                    prevColl = new Define(expression(Path.add("this", coll)),
-                                          "target");
+                    prevColl = new Define
+                        (Expression.valueOf(Path.add("this", coll)), "target");
                 } else {
                     Path p = Path.add
                         ((String) m_joins.get(prev),
                          Path.relative(prev, coll));
-                    prevColl = new Define(expression(p), "target");
+                    prevColl = new Define(Expression.valueOf(p), "target");
                 }
 
                 Expression cond = new Exists
@@ -313,7 +303,7 @@ class DataQueryImpl implements DataQuery {
                       new Equals
                       (new Variable(alias), new Variable("target"))));
 
-                m_expr = new Join
+                m_expr = new LeftJoin
                     (m_expr,
                      new Define(new All(type.getQualifiedName()), alias),
                      cond);
@@ -330,11 +320,11 @@ class DataQueryImpl implements DataQuery {
                 Path assoc = Path.add(coll.getParent(), assocName);
 
                 addJoin(assoc);
-
+                Path pathThroughLink = Path.add(resolvePath(coll), assocName);
                 m_expr = new com.redhat.persistence.oql.Filter
                     (m_expr, new Equals
-                     (expression(Path.add(resolvePath(coll), assocName)),
-                      expression(resolvePath(assoc))));
+                     (Expression.valueOf(pathThroughLink),
+                      Expression.valueOf(resolvePath(assoc))));
             }
         }
     }
@@ -399,11 +389,9 @@ class DataQueryImpl implements DataQuery {
         return addFilter(getFilterFactory().equals(attribute, value));
     }
 
-
     public Filter addNotEqualsFilter(String attribute, Object value) {
         return addFilter(getFilterFactory().notEquals(attribute, value));
     }
-
 
     public void clearFilter() {
         if (m_cursor != null) {
@@ -411,7 +399,7 @@ class DataQueryImpl implements DataQuery {
                 ("Cannot clear the filter on an active data query. " +
                  "Data query must be rewound.");
         }
-        m_filter = getFilterFactory().and();
+        m_filter = (CompoundFilterImpl) getFilterFactory().and();
     }
 
     public FilterFactory getFilterFactory() {
@@ -566,7 +554,11 @@ class DataQueryImpl implements DataQuery {
 
     private SQLParser.Mapper m_mapper = new AddPathMapper();
 
-    private String mapAndAddPaths(String s) {
+    Path mapAndAddPath(Path p) {
+        return m_mapper.map(p);
+    }
+
+    String mapAndAddPaths(String s) {
         StringReader reader = new StringReader(s);
         SQLParser p = new SQLParser(reader, m_mapper);
 
@@ -582,11 +574,6 @@ class DataQueryImpl implements DataQuery {
     private Expression makeExpr() {
         final ObjectType type = getTypeInternal();
 
-        String conditions = m_filter.getConditions();
-        if (conditions != null) {
-            conditions = mapAndAddPaths(conditions);
-        }
-
         String[] orders = new String[m_orders.size()];
 
         for (int i = m_orders.size() - 1; i >= 0; i--) {
@@ -594,12 +581,14 @@ class DataQueryImpl implements DataQuery {
             orders[i] = mapAndAddPaths(order);
         }
 
+        Expression filter = m_filter.makeExpression(this, m_bindings);
+
         // can't start finalizing expr until all paths have been added
         Expression expr = m_expr;
 
-        if (conditions != null) {
+        if (filter != null) {
             expr = new com.redhat.persistence.oql.Filter
-                (expr, new Static(conditions, m_filter.getBindings()));
+                (expr, filter);
         }
 
         for (int i = orders.length - 1; i >= 0; i--) {
@@ -686,7 +675,7 @@ class DataQueryImpl implements DataQuery {
 
     private SQLParser.Mapper m_unaliaser = new UnaliasMapper();
 
-    private String unalias(String expr) {
+    String unalias(String expr) {
         if (expr == null) { return null; }
         StringReader reader = new StringReader(expr);
         SQLParser p = new SQLParser(reader, m_unaliaser);
@@ -700,7 +689,7 @@ class DataQueryImpl implements DataQuery {
         return p.getSQL().toString();
     }
 
-    private Path unalias(Path path) {
+    Path unalias(Path path) {
 	if (s_log.isDebugEnabled()) {
 	    s_log.debug("External Path: " + path);
 	    s_log.debug("Aliases: " + m_aliases.toString());
