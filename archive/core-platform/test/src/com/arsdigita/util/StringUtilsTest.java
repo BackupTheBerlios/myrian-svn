@@ -18,11 +18,98 @@ package com.arsdigita.util;
 import junit.framework.TestCase;
 
 import java.util.HashMap;
+import org.apache.log4j.Logger;
 
 public class StringUtilsTest extends TestCase {
 
+    private static final Logger s_log = Logger.getLogger(StringUtilsTest.class);
+
     public StringUtilsTest(String name) {
         super(name);
+    }
+
+    public void testSmartText() {
+        String src = "foo *bar* wibble /eek/\n" +
+            "and mailto:dan@berrange.com eek!\n" +
+            "\n" +
+            "the second =paragraph= contains\n" +
+            "a link to http://www.google.com\n" +
+            "and the fractions 1/2 3/4 1/4 and\n" +
+            "the symbols for copyright (C),\n" +
+            "trademark (TM) and rights (R)\n" + 
+            "\n" +
+            "* a bullet list\n" +
+            "* more *bullets* in\n" +
+            " this list element\n" +
+            "* a final element\n" +
+            "\n" +
+            "-------\n" +
+            "\n" +
+            "+ now an enumerated list item\n" +
+            "+ and one /more/\n" +
+            "+ this one is split over two lines\n" +
+            "for testing purposes\n"+
+            "\n" +
+            "___\n" +
+            "\n" +
+            "and now the end is near, lets test\n" +
+            "@google(http://www.google.com) a few\n" +
+            "titled links, including a mailto\n" +
+            "@Dan B(mailto:dan@@berrange.com)";
+        String expected = "<div>\n" + 
+            "foo <strong>bar</strong> wibble <em>eek</em>\n" + 
+            "and <a href=\"mailto:dan@berrange.com\">mailto:dan@berrange.com</a> eek!\n" + 
+            "</div>\n" + 
+            "\n" +
+            "<div>\n" + 
+            "the second <code>paragraph</code> contains\n" + 
+            "a link to <a href=\"http://www.google.com\">http://www.google.com</a>\n" + 
+            "and the fractions &frac12; &frac34; &frac14; and\n" + 
+            "the symbols for copyright &copy;,\n" + 
+            "trademark <sup>TM</sup> and rights &reg;\n" + 
+            "</div>\n" + 
+            "\n" +
+            "<ul>\n" + 
+            "<li>\n" + 
+            "a bullet list\n" + 
+            "</li>\n" + 
+            "<li>\n" + 
+            "more <strong>bullets</strong> in\n" + 
+            " this list element\n" + 
+            "</li>\n" + 
+            "<li>\n" + 
+            "a final element</li>\n" + 
+            "</ul>\n" + 
+            "\n" +
+            "<hr/>\n" + 
+            "\n" +
+            "<ol>\n" + 
+            "<li>\n" + 
+            "now an enumerated list item\n" + 
+            "</li>\n" + 
+            "<li>\n" + 
+            "and one <em>more</em>\n" + 
+            "</li>\n" + 
+            "<li>\n" + 
+            "this one is split over two lines\n" + 
+            "for testing purposes</li>\n" + 
+            "</ol>\n" + 
+            "\n" +
+            "<hr/>\n" + 
+            "\n" +
+            "<div>\n" + 
+            "and now the end is near, lets test\n" + 
+            "<a href=\"http://www.google.com\">google</a> a few\n" + 
+            "titled links, including a mailto\n" + 
+            "<a href=\"mailto:dan@berrange.com\">Dan B</a>\n" + 
+            "</div>\n";
+        String actual = StringUtils.smartTextToHtml(src);
+        
+        s_log.error("Input: {" + src + "}\n");
+        s_log.error("Expected: {" + expected + "}\n");
+        s_log.error("Actual: {" + actual + "}\n");
+        
+        assertTrue(expected.equals(actual));
     }
 
     public void testEmptyString() {
@@ -263,11 +350,11 @@ public class StringUtilsTest extends TestCase {
                                ", jj=" + jj + ", pairs[jj]=" + pairs[jj]);
             String expected = pairs[jj];
             String actual = StringUtils.replace(pairs[ii], ";", "\\;");
-            Assert.assertEquals(expected, actual);
+            assertEquals(expected, actual);
 
             expected = pairs[ii];
             actual = StringUtils.replace(pairs[jj], "\\;", ";");
-            Assert.assertEquals(expected, actual);
+            assertEquals(expected, actual);
         }
     }
 }

@@ -43,7 +43,7 @@ import org.apache.oro.text.perl.Perl5Util;
  * }
  * </pre>
  *
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/HtmlToText.java#6 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/HtmlToText.java#7 $
  */
 
 public class HtmlToText {
@@ -650,9 +650,10 @@ public class HtmlToText {
         if (formatType == null || MessageType.TEXT_HTML.equals(formatType)) {
             return text;
         } else if (formatType.equals(MessageType.TEXT_PREFORMATTED)) {
-            return "<pre>"+text+"</pre>";
-        } else {
-            /*format is plain*/
+            return "<pre>" + StringUtils.quoteHtml(text) + "</pre>";
+        } else if (formatType.equals(MessageType.TEXT_SMART)) {
+            return StringUtils.smartTextToHtml(text);
+        } else { /*format is plain*/
             return StringUtils.textToHtml(text);
         }
     }
