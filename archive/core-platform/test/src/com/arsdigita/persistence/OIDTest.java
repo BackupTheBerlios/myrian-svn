@@ -29,15 +29,15 @@ import org.apache.log4j.Logger;
  * <p> Copyright 2001 ArsDigita Corporation</p>
  *
  * @author <a href="mbryzek@arsdigita.com">Michael Bryzek</a>
- * @date $Date: 2002/08/14 $
- * @version $Revision: #4 $
+ * @date $Date: 2002/08/30 $
+ * @version $Revision: #5 $
  *
  * @see com.arsdigita.persistence.OID
  **/
 
 public class OIDTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OIDTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OIDTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
 
     private static Logger s_log =
         Logger.getLogger(OIDTest.class.getName());
@@ -117,7 +117,7 @@ public class OIDTest extends TestCase {
         multiKey.set("partyTo", new BigDecimal(8));
         parsed = OID.valueOf(multiKey.toString());
 
-        assert("Parsing of OID with multiple big decimal keys failed",
+        assertTrue("Parsing of OID with multiple big decimal keys failed",
                multiKey.equals(parsed));
 
         // now we test with multiple keys of multiple types
@@ -126,7 +126,7 @@ public class OIDTest extends TestCase {
         multiKeyMulti.set("partyId", new BigDecimal(4));
         multiKeyMulti.set("privilege", "my privilege");
         parsed = OID.valueOf(multiKeyMulti.toString());
-        assert("Parsing of OID with multiple keys failed",
+        assertTrue("Parsing of OID with multiple keys failed",
                multiKeyMulti.equals(parsed));
     }
 
@@ -193,7 +193,7 @@ public class OIDTest extends TestCase {
         assertEquals("Hash equality failed!", oid.hashCode(), oid2.hashCode());
 
         oid2 = new OID(TYPE, 100);
-        assert("equals() returned true", !oid.equals(oid2));
+        assertTrue("equals() returned true", !oid.equals(oid2));
         assertTrue("Hash inequality failed!", oid.hashCode() != oid2.hashCode());
     }
 

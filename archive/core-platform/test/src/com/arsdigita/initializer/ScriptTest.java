@@ -23,12 +23,12 @@ import java.util.*;
  * ScriptTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/08/30 $
  */
 
 public class ScriptTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/initializer/ScriptTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/initializer/ScriptTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
 
     public ScriptTest(String name) {
         super(name);
@@ -79,17 +79,17 @@ public class ScriptTest extends TestCase {
                                   "init com.arsdigita.initializer.FooInitializer {}"
                                   );
 
-            assert("FooInitializer should start out as not started",
+            assertTrue("FooInitializer should start out as not started",
                    !FooInitializer.isStarted());
 
             s.startup();
 
-            assert("FooInitializer wasn't started",
+            assertTrue("FooInitializer wasn't started",
                    FooInitializer.isStarted());
 
             s.shutdown();
 
-            assert("FooInitializer wasn't shutdown",
+            assertTrue("FooInitializer wasn't shutdown",
                    !FooInitializer.isStarted());
         } catch (InitializationException e) {
             fail(e.getMessage());

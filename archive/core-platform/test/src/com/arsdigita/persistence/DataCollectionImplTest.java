@@ -28,11 +28,11 @@ import org.apache.log4j.Logger;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/08/30 $
  */
 public class DataCollectionImplTest extends DataCollectionTest
 {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataCollectionImplTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataCollectionImplTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
     private static Logger s_log =
         Logger.getLogger(DataCollectionImplTest.class.getName());
     private ObjectType m_nodeType;
@@ -92,12 +92,12 @@ public class DataCollectionImplTest extends DataCollectionTest
         DataCollection collection = getDefaultCollection();
         final String ORDER_FIELD = "id";
         collection.setOrder(ORDER_FIELD);
-        assert( "Should be several items in this query set!", collection.next() );
+        assertTrue( "Should be several items in this query set!", collection.next() );
         BigDecimal priorValue = (BigDecimal) collection.get(ORDER_FIELD);
 
         while ( collection.next() ) {
             final BigDecimal currentValue = (BigDecimal) collection.get(ORDER_FIELD);
-            assert("Query was retrieved out of order.",
+            assertTrue("Query was retrieved out of order.",
                    priorValue.compareTo( currentValue ) < 0 );
 
             priorValue = currentValue;
@@ -107,12 +107,12 @@ public class DataCollectionImplTest extends DataCollectionTest
 
         collection = getDefaultCollection();
         collection.setOrder("id desc");
-        assert( "Should be several items in this query set!", collection.next() );
+        assertTrue( "Should be several items in this query set!", collection.next() );
         priorValue = (BigDecimal) collection.get(ORDER_FIELD);
 
         while ( collection.next() ) {
             final BigDecimal currentValue = (BigDecimal) collection.get(ORDER_FIELD);
-            assert("Query was retrieved out of order.",
+            assertTrue("Query was retrieved out of order.",
                    priorValue.compareTo( currentValue ) > 0 );
 
             priorValue = currentValue;
@@ -123,7 +123,7 @@ public class DataCollectionImplTest extends DataCollectionTest
 
         collection = getOrderCollection();
         collection.setOrder("buyer desc, seller asc");
-        assert("Should be several items in this query set!",
+        assertTrue("Should be several items in this query set!",
                collection.next() );
 
         String priorBuyer = (String) collection.get("buyer");
@@ -133,10 +133,10 @@ public class DataCollectionImplTest extends DataCollectionTest
             final String currentBuyer =
                 (String) collection.get("buyer");
             final String currentSeller = (String) collection.get("seller");
-            assert("Buyer order wrong!",
+            assertTrue("Buyer order wrong!",
                    priorBuyer.compareTo( currentBuyer ) >= 0 );
             if( priorBuyer.equals(currentBuyer) ) {
-                assert("Seller order wrong! " + priorSeller + " " + currentSeller,
+                assertTrue("Seller order wrong! " + priorSeller + " " + currentSeller,
                        priorSeller.compareTo( currentSeller) <= 0);
 
             }

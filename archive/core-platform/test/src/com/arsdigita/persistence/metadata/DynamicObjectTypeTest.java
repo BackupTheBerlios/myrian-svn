@@ -34,12 +34,12 @@ import org.apache.log4j.Logger;
  * class works as advertised.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/14 $
+ * @version $Revision: #6 $ $Date: 2002/08/30 $
  */
 
 public class DynamicObjectTypeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/DynamicObjectTypeTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/DynamicObjectTypeTest.java#6 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
     private static Logger s_log =
         Logger.getLogger(DynamicObjectTypeTest.class.getName());
 
@@ -141,7 +141,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
         // make sure that the supertype is valid
         String actualSuperType = objectType.getSupertype().getQualifiedName();
 
-        assert("The supertype should have been '" + superTypeString + "'" +
+        assertTrue("The supertype should have been '" + superTypeString + "'" +
                " but actually was '" + actualSuperType + "'",
                superTypeString.equals(actualSuperType));
 
@@ -160,7 +160,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
 
         actualSuperType = objectType.getSupertype().getQualifiedName();
 
-        assert("The supertype should have been '" + superTypeString + "'" +
+        assertTrue("The supertype should have been '" + superTypeString + "'" +
                " but actually was '" + actualSuperType + "'",
                superTypeString.equals(actualSuperType));
 
@@ -181,7 +181,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
 
         actualSuperType = objectType.getSupertype().getQualifiedName();
 
-        assert("The supertype should have been '" + superTypeString + "'" +
+        assertTrue("The supertype should have been '" + superTypeString + "'" +
                " but actually was '" + actualSuperType + "'",
                superTypeString.equals(actualSuperType));
 
@@ -218,10 +218,10 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
         m_objectTypes.add(dotObject);
         m_tables.add(prop.getColumn().getTableName());
 
-        assert("The model name should be [com.arsdigita.kernel] not [" +
+        assertTrue("The model name should be [com.arsdigita.kernel] not [" +
                dotObject.getModel().getName() + "]",
                "com.arsdigita.kernel".equals(dotObject.getModel().getName()));
-        assert(dotObject.getModel().equals(dotModel));
+        assertTrue(dotObject.getModel().equals(dotModel));
 
         // make sure an invalid name throws an exception
         try {
@@ -256,7 +256,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
         Property prop2 = dot.addRequiredAttribute("myOptionalProp2",
                                                   m_root.FLOAT, 400,
                                                   new Float(4));
-        assert("the size for the new string attribute should be 400, not " +
+        assertTrue("the size for the new string attribute should be 400, not " +
                prop2.getColumn().getSize(), prop2.getColumn().getSize() == 400);
 
         validateProperties(dot.getObjectType().getDeclaredProperties(),
@@ -265,11 +265,11 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
 
         // make sure that the column names are different but the table names
         // are the same
-        assert("the tables names are different when they should both be " +
+        assertTrue("the tables names are different when they should both be " +
                "the same", prop.getColumn().getTableName().equals
                (prop2.getColumn().getTableName()));
 
-        assert("the column names are the same when they should be different ",
+        assertTrue("the column names are the same when they should be different ",
                !prop.getColumn().getColumnName().equals
                (prop2.getColumn().getColumnName()));
 
@@ -293,7 +293,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
             // this should be here so let it fall through
         }
 
-        assert("An optional attribute should be required",
+        assertTrue("An optional attribute should be required",
                prop.getMultiplicity() == Property.REQUIRED);
     }
 
@@ -309,7 +309,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
 
         Property prop2 = dot.addOptionalAttribute("myOptionalProp2",
                                                   m_root.STRING, 400);
-        assert("the size for the new string attribute should be 400, not " +
+        assertTrue("the size for the new string attribute should be 400, not " +
                prop2.getColumn().getSize(), prop2.getColumn().getSize() == 400);
 
         validateProperties(dot.getObjectType().getDeclaredProperties(),
@@ -317,11 +317,11 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
 
         // make sure that the column names are different but the table names
         // are the same
-        assert("the tables names are different when they should both be " +
+        assertTrue("the tables names are different when they should both be " +
                "the same", prop.getColumn().getTableName().equals
                (prop2.getColumn().getTableName()));
 
-        assert("the column names are the same when they should be different ",
+        assertTrue("the column names are the same when they should be different ",
                !prop.getColumn().getColumnName().equals
                (prop2.getColumn().getColumnName()));
 
@@ -343,7 +343,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
             // this should be here so let it fall through
         }
 
-        assert("An optional attribute should be nullable",
+        assertTrue("An optional attribute should be nullable",
                prop.getMultiplicity() == Property.NULLABLE);
     }
 
@@ -407,8 +407,8 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
         DataObject associated2 = (DataObject)testObj.get("myOptionalRR");
         DataObject associated3 = (DataObject)testObj.get("myRequiredRR");
 
-        assert("Optional attribute differs", associated.equals(associated2));
-        assert("Required attribute differs", defaultObj.equals(associated3));
+        assertTrue("Optional attribute differs", associated.equals(associated2));
+        assertTrue("Required attribute differs", defaultObj.equals(associated3));
 
         assoc = (DataAssociation)testObj.get("myCollectionRR");
         DataAssociationCursor cursor = assoc.cursor();
@@ -449,10 +449,10 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
         testObj = getSession().retrieve(testOID);
 
         String value = (String)testObj.get("testAttribute");
-        assert("Optional value not saved", value.equals("Test Attribute"));
+        assertTrue("Optional value not saved", value.equals("Test Attribute"));
 
         value = (String)testObj.get("testRequired");
-        assert("Required value not saved", value.equals("Test Required"));
+        assertTrue("Required value not saved", value.equals("Test Required"));
 
         testObj.delete();
     }
@@ -498,7 +498,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
         testObj = getSession().retrieve(new OID(type2, new BigDecimal(-53)));
 
         String value = (String)testObj.get("testAttr1");
-        assert("Child Value not saved correctly",
+        assertTrue("Child Value not saved correctly",
                value.equals("Test Attribute"));
 
         testObj.delete();
@@ -513,7 +513,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
         testObj = getSession().retrieve(new OID(type3, new BigDecimal(-54)));
 
         value = (String)testObj.get("testAttr1");
-        assert("Grand child value not saved correctly",
+        assertTrue("Grand child value not saved correctly",
                value.equals("Test Attribute"));
 
         testObj.delete();
@@ -572,13 +572,13 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
         DataObject associated2 = (DataObject)testObj.get("testAssoc1");
         String value = (String)associated2.get("testAttr1");
 
-        assert("Associated value not retrieved correctly",
+        assertTrue("Associated value not retrieved correctly",
                value.equals("Test Attr"));
 
         associated2 = (DataObject)testObj.get("testAssoc2");
         value = (String)associated2.get("testAttr1");
 
-        assert("Associated subtype value not retrieved correctly",
+        assertTrue("Associated subtype value not retrieved correctly",
                value.equals("Test Attr"));
 
         testObj.delete();
@@ -623,7 +623,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
             count++;
             String name = ((Property)properties.next()).getName();
             list2.add(name);
-            assert("The ObjectType contained the property [" + name + "] " +
+            assertTrue("The ObjectType contained the property [" + name + "] " +
                    "but it should not have", list.contains(name));
         }
 

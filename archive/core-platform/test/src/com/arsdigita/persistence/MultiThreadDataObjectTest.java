@@ -26,12 +26,12 @@ import org.apache.log4j.Logger;
  * MultiThreadDataObjectTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/14 $
+ * @version $Revision: #7 $ $Date: 2002/08/30 $
  **/
 
 public class MultiThreadDataObjectTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/MultiThreadDataObjectTest.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/MultiThreadDataObjectTest.java#7 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
 
     private static final Logger s_log = Logger.getLogger(
                                                          MultiThreadDataObjectTest.class.getName()
@@ -131,7 +131,7 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
         node.save();
 
         // let's see if it is there
-        assert("The insert should have added a node but it did not.",
+        assertTrue("The insert should have added a node but it did not.",
                query.size() == size + 1);
 
         // abort the transaction and open a new transaction

@@ -35,11 +35,11 @@ import java.math.BigDecimal;
  * facilitates this future refactoring.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/08/30 $
  */
 public abstract class DataQueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
 
     public DataQueryTest(String name) {
         super(name);
@@ -108,14 +108,14 @@ public abstract class DataQueryTest extends PersistenceTestCase {
         DataQuery dq = getDefaultQuery();
 
         // first is unsupported for foward-only resultsets.
-        assert("first() Failed! There should be rows in this query!",
+        assertTrue("first() Failed! There should be rows in this query!",
                dq.first());
 
-        assert("Should be on the first row!", dq.isFirst() );
+        assertTrue("Should be on the first row!", dq.isFirst() );
 
-        assert("last() Failed! There should be rows in this query!",
+        assertTrue("last() Failed! There should be rows in this query!",
                dq.last());
-        assert("Should be on the last row!", dq.isLast() );
+        assertTrue("Should be on the last row!", dq.isLast() );
         try {
             dq.next();
             dq.get("id");
@@ -126,9 +126,9 @@ public abstract class DataQueryTest extends PersistenceTestCase {
         }
 
         // Back to the beginning
-        assert("first() Failed! There should be rows in this query!",
+        assertTrue("first() Failed! There should be rows in this query!",
                dq.first());
-        assert("Should be on the first row!", dq.isFirst() );
+        assertTrue("Should be on the first row!", dq.isFirst() );
 
         BigDecimal firstValue = (BigDecimal) dq.get("id");
         dq.next();
@@ -137,12 +137,12 @@ public abstract class DataQueryTest extends PersistenceTestCase {
         dq.next();
 
         dq.previous();
-        assert( "previous() did not work first time!",
+        assertTrue( "previous() did not work first time!",
                 secondValue.equals(dq.get("id")) );
         dq.previous();
-        assert( "previous() did not work second time!",
+        assertTrue( "previous() did not work second time!",
                 firstValue.equals(dq.get("id")) );
-        assert("Should be on the first row!", dq.isFirst() );
+        assertTrue("Should be on the first row!", dq.isFirst() );
 
     }
 
@@ -168,16 +168,16 @@ public abstract class DataQueryTest extends PersistenceTestCase {
     public void testIsEmpty() {
         DataQuery dq = getDefaultQuery();
         dq.setFilter("1 = 2");
-        assert("isEmpty failed.", dq.isEmpty());
+        assertTrue("isEmpty failed.", dq.isEmpty());
         dq.next();
-        assert("isEmpty failed.", dq.isEmpty());
+        assertTrue("isEmpty failed.", dq.isEmpty());
         dq.close();
 
         dq = getDefaultQuery();
-        assert("isEmpty failed.", !dq.isEmpty());
+        assertTrue("isEmpty failed.", !dq.isEmpty());
 
         while (dq.next()) {
-            assert("isEmpty failed.", !dq.isEmpty());
+            assertTrue("isEmpty failed.", !dq.isEmpty());
         }
     }
 

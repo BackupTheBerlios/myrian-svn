@@ -27,13 +27,13 @@ import org.apache.log4j.Logger;
  * This class performs unit tests on com.arsdigita.persistence.metadata.OracleMDSQLGenerator </p>
  *
  * author <a href="mailto:jorriarsdigita.com">jorriarsdigita.com</a>
- * version $Revision: #6 $ $Date: 2002/08/14 $
+ * version $Revision: #7 $ $Date: 2002/08/30 $
  *
  */
 
 public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/OracleMDSQLGeneratorTest.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/OracleMDSQLGeneratorTest.java#7 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
 
     private static Logger s_log =
         Logger.getLogger(OracleMDSQLGeneratorTest.class.getName());
@@ -204,15 +204,15 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
         OracleMDSQLGenerator gen = (OracleMDSQLGenerator) MDSQLGeneratorFactory.getInstance();
         Event retrieve = gen.generateRetrieve(type);
 
-        assert("No retrieve event created", retrieve != null);
+        assertTrue("No retrieve event created", retrieve != null);
 
         Iterator it = retrieve.getOperations();
 
-        assert("No operations created", it.hasNext());
+        assertTrue("No operations created", it.hasNext());
 
         Operation op = (Operation)it.next();
 
-        assert("Too many operations created", !it.hasNext());
+        assertTrue("Too many operations created", !it.hasNext());
 
         it = op.getMappings();
         String aggCol = null;
@@ -227,13 +227,13 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
             }
         }
 
-        assert("Aggressively loaded attribute not found", aggCol != null);
+        assertTrue("Aggressively loaded attribute not found", aggCol != null);
     }
 
     private void assertAttributeValue(DataObject obj,
                                       String attrName,
                                       Object expected) {
-        assert("Object is null", obj != null);
+        assertTrue("Object is null", obj != null);
 
         StringTokenizer tokens = new StringTokenizer(attrName, ".");
         Object value = obj;
@@ -242,7 +242,7 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
             value = ((DataObject)value).get(tokens.nextToken());
         }
 
-        assert(attrName + " was {" + value + "}, not {" + expected + "}",
+        assertTrue(attrName + " was {" + value + "}, not {" + expected + "}",
                value.equals(expected));
     }
 
@@ -297,7 +297,7 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
         assertAttributeValue(user2, "referer.name", "David Eison");
         assertAttributeValue(user3, "referer.name", "Patrick McNeill");
         assertAttributeValue(user3, "referer.referer.name", "David Eison");
-        assert("referer.name not null in user 1", user1.get("referer") == null);
+        assertTrue("referer.name not null in user 1", user1.get("referer") == null);
     }
 
     /**

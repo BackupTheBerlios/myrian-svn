@@ -21,12 +21,12 @@ import junit.framework.TestCase;
  * Test
  *
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/08/30 $
  */
 
 public class SessionManagerTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/SessionManagerTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/SessionManagerTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
 
     public SessionManagerTest(String name) {
         super(name);
@@ -53,7 +53,7 @@ public class SessionManagerTest extends TestCase {
     public void testSessionPushPop() {
         Session s = SessionManager.getSession();
         // make sure that the stack trace does not return anything
-        assert("The stack string should be blank", s.getStackTrace() == "" ||
+        assertTrue("The stack string should be blank", s.getStackTrace() == "" ||
                s.getStackTrace() == null);
 
         String var1 = "This is my first message";
@@ -62,10 +62,10 @@ public class SessionManagerTest extends TestCase {
         s.pushMessage(var1);
         s.pushMessage(var2);
         String trace = s.getStackTrace();
-        assert("The stack trace should contain both var1 and var2",
+        assertTrue("The stack trace should contain both var1 and var2",
                trace.indexOf(var1) > -1 && trace.indexOf(var2) > -1);
 
-        assert("var 2 should show up before var1 in the trace",
+        assertTrue("var 2 should show up before var1 in the trace",
                trace.indexOf(var1) > trace.indexOf(var2));
 
     }

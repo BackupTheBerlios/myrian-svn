@@ -22,12 +22,12 @@ import java.util.Map;
  * DataContainerTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/08/30 $
  */
 
 public class DataContainerTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataContainerTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataContainerTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
 
     public DataContainerTest(String name) {
         super(name);
@@ -71,9 +71,9 @@ public class DataContainerTest extends TestCase {
 
     public void testHasProperty() {
         for (int i = 0; i < props.length; i++) {
-            assert("hasProperty failed on new container",
+            assertTrue("hasProperty failed on new container",
                    newData.hasProperty(props[i]));
-            assert("hasProperty failed on old container",
+            assertTrue("hasProperty failed on old container",
                    newData.hasProperty(props[i]));
         }
     }
@@ -145,8 +145,8 @@ public class DataContainerTest extends TestCase {
     public void testNullRoleReferenceInInitProperty() throws Exception {
         oldData.initProperty("testRole", null);
 
-        assert(!oldData.isPropertyModified("testRole"));
-        assert(!oldData.isModified());
+        assertTrue(!oldData.isPropertyModified("testRole"));
+        assertTrue(!oldData.isModified());
 
         // this needs some more work to make sure that you can modify
         // the association and that isModified and isPropertyModified still

@@ -30,11 +30,11 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/15 $
+ * @version $Revision: #6 $ $Date: 2002/08/30 $
  */
 public class GenericDataObjectTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/GenericDataObjectTest.java#5 $ by $Author: jorris $, $DateTime: 2002/08/15 14:01:26 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/GenericDataObjectTest.java#6 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
 
     public GenericDataObjectTest(String name) {
         super(name);
@@ -85,7 +85,7 @@ public class GenericDataObjectTest extends PersistenceTestCase {
 
         // make sure it is not there
         query = getSession().retrieveQuery("examples.nodesQuery");
-        assert("The deleting of a node did not actually delete.",
+        assertTrue("The deleting of a node did not actually delete.",
                query.size() == initialSize);
         // should this be allowed?
         node.delete();
@@ -123,7 +123,7 @@ public class GenericDataObjectTest extends PersistenceTestCase {
 
         DataObject parent2 = (DataObject)node2.get("parent");
 
-        assert("Parents not equal", parent.equals(parent2));
+        assertTrue("Parents not equal", parent.equals(parent2));
 
         DataObject node3 = getSession().retrieve(
                                                  new OID("examples.Node", new BigDecimal(7)));
@@ -134,7 +134,7 @@ public class GenericDataObjectTest extends PersistenceTestCase {
 
         parent2 = (DataObject)node3.get("parent");
 
-        assert("Parent not set to null", parent2 == null);
+        assertTrue("Parent not set to null", parent2 == null);
 
     }
 
@@ -202,7 +202,7 @@ public class GenericDataObjectTest extends PersistenceTestCase {
         OID oid = order.getOID();
 
         order = getSession().retrieve(oid);
-        assert("The retrieve method for [examples.OrderExtWithFailingRetrieve] " +
+        assertTrue("The retrieve method for [examples.OrderExtWithFailingRetrieve] " +
                "does not work so it should return null", order == null);
 
 

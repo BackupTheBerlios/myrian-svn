@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * PartyTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/14 $
+ * @version $Revision: #7 $ $Date: 2002/08/30 $
  */
 
 abstract public class PartyTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PartyTest.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PartyTest.java#7 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
 
     private static Logger s_log =
         Logger.getLogger(PartyTest.class.getName());
@@ -145,12 +145,12 @@ abstract public class PartyTest extends PersistenceTestCase {
         DataAssociation members =
             (DataAssociation) group.get("members");
         members.add(user);
-        assert("Members was just modified!", members.isModified() );
+        assertTrue("Members was just modified!", members.isModified() );
         group.save();
 
         group = getSession().retrieve(new OID(getModelName() + ".Group", BigInteger.ONE));
         members = (DataAssociation) group.get("members");
-        assert("Members was not modified!", members.isModified() == false );
+        assertTrue("Members was not modified!", members.isModified() == false );
 
         if (!members.next())
             fail("Data association should contain at least one row.");
@@ -204,7 +204,7 @@ abstract public class PartyTest extends PersistenceTestCase {
         group.save();
         while(members.next())
             {
-                assert("User2 should have been removed!", userId2.equals(members.get("id")) == false );
+                assertTrue("User2 should have been removed!", userId2.equals(members.get("id")) == false );
             }
 
     }

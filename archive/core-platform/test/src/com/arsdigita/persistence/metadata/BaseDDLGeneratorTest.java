@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
  *  com.arsdigita.persistence.metadata.BaseDDLGenerator </p>
  *
  * @author <a href="mailto:jorris@arsdigita.com">jorris@arsdigita.com</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/08/30 $
  *
  * @see com.arsdigita.persistence.metadatax.ObjectType
  */
@@ -44,7 +44,7 @@ import org.apache.log4j.Logger;
 
 public class BaseDDLGeneratorTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/BaseDDLGeneratorTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/BaseDDLGeneratorTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
 
     private static Logger s_log =
         Logger.getLogger(BaseDDLGeneratorTest.class.getName());
@@ -130,7 +130,7 @@ public class BaseDDLGeneratorTest extends PersistenceTestCase {
         for (int i = 0; i < 200; i++) {
             String tableName = m_generator.generateTableName("com.arsdigita.foo",
                                                              "myObjectName");
-            assert("generateTable produced duplicated table names: " + tableName,
+            assertTrue("generateTable produced duplicated table names: " + tableName,
                    !list.contains(tableName.toLowerCase()));
             list.add(tableName.toLowerCase());
         }
@@ -139,13 +139,13 @@ public class BaseDDLGeneratorTest extends PersistenceTestCase {
         // for length
         String tableName = m_generator.generateTableName
             ("my.long.project.namespace.foo", "myReallyReallyLongObjectName");
-        assert("the table name passed back is too long",
+        assertTrue("the table name passed back is too long",
                tableName.length() <= 26);
 
         // using a table we know that is in the system, let's see if
         // we get back a unique name
         tableName = m_generator.generateTableName("acs", "objects");
-        assert("the table generated is not correct",
+        assertTrue("the table generated is not correct",
                !"acs_objects".equals(tableName));
 
     }
@@ -178,12 +178,12 @@ public class BaseDDLGeneratorTest extends PersistenceTestCase {
       String createTableString = m_generator.generateCreateTable(objectType);
       String dropTableString = m_generator.generateDropTable(objectType);
 
-      assert("The create table should start with 'create table'.  Instead, " +
+      assertTrue("The create table should start with 'create table'.  Instead, " +
       "it was " + Utilities.LINE_BREAK + createTableString,
       createTableString.indexOf("create table") < 2 ||
       createTableString.indexOf("create table") > 0);
 
-      assert("The drop table string is not correct.  It should have been " +
+      assertTrue("The drop table string is not correct.  It should have been " +
       Utilities.LINE_BREAK + "drop table " +
       objectType.getReferenceKey().getTableName() +
       Utilities.LINE_BREAK + "but actuall was " +
@@ -220,7 +220,7 @@ public class BaseDDLGeneratorTest extends PersistenceTestCase {
       int tableNameIndex = prefix.indexOf("myTable");
       int addIndex = prefix.indexOf("add");
       int parenIndex = prefix.indexOf("(");
-      assert("One of the required items was not included or was in the " +
+      assertTrue("One of the required items was not included or was in the " +
       "wrong order.  The system returned [" + prefix + "] but should " +
       "have returned something like [alter table myTable add (]",
       alterIndex > -1 && alterIndex < tableIndex &&
@@ -241,7 +241,7 @@ public class BaseDDLGeneratorTest extends PersistenceTestCase {
       int tableNameIndex = prefix.indexOf("myTable");
       int dropIndex = prefix.indexOf("drop");
       int parenIndex = prefix.indexOf("(");
-      assert("One of the required items was not included or was in the " +
+      assertTrue("One of the required items was not included or was in the " +
       "wrong order.  The system returned [" + prefix + "] but should " +
       "have returned something like [alter table myTable drop (]",
       alterIndex > -1 && alterIndex < tableIndex &&
@@ -261,7 +261,7 @@ public class BaseDDLGeneratorTest extends PersistenceTestCase {
       int tableIndex = prefix.indexOf("table");
       int tableNameIndex = prefix.indexOf("myTable");
       int parenIndex = prefix.indexOf("(");
-      assert("One of the required items was not included or was in the " +
+      assertTrue("One of the required items was not included or was in the " +
       "wrong order.  The system returned [" + prefix + "] but should " +
       "have returned something like [create table myTable (]",
       createIndex > -1 && createIndex < tableIndex &&
@@ -290,7 +290,7 @@ public class BaseDDLGeneratorTest extends PersistenceTestCase {
         for (int i = 0; i < 200; i++) {
             String columnName = m_generator.generateColumnName(objectType,
                                                                "myObjectName");
-            assert("generateColumn produced a duplicate column name: " +
+            assertTrue("generateColumn produced a duplicate column name: " +
                    columnName, !columns.contains(columnName.toLowerCase()));
             Property property = new Property("prop" + i,
                                              MetadataRoot.BIGDECIMAL,
@@ -306,7 +306,7 @@ public class BaseDDLGeneratorTest extends PersistenceTestCase {
         // for length
         String columnName = m_generator.generateColumnName
             (objectType, "myReallyReallyLongObjectName");
-        assert("the column name passed back is too long",
+        assertTrue("the column name passed back is too long",
                columnName.length() <= 26);
     }
 
@@ -332,9 +332,9 @@ public class BaseDDLGeneratorTest extends PersistenceTestCase {
 
         testObj = getSession().retrieve(new OID(type, "bob@bob.bob"));
 
-        assert("Primary key not set",
+        assertTrue("Primary key not set",
                ((String)testObj.get("emailAddress")).equals("bob@bob.bob"));
-        assert("Test attribute not saved",
+        assertTrue("Test attribute not saved",
                ((String)testObj.get("testAttr1")).equals("hello bob"));
 
         testObj.delete();
@@ -367,7 +367,7 @@ public class BaseDDLGeneratorTest extends PersistenceTestCase {
 
       // at the very least, the words "not null" should appear and
       // they should not be the first items in the list
-      assert("The column returned that is supposed to be added was not " +
+      assertTrue("The column returned that is supposed to be added was not " +
       "correct.  It returned [" + toAdd + "]",
       toAdd.indexOf("not null") > 0 && toAdd.length() > 9);
       }
@@ -393,7 +393,7 @@ public class BaseDDLGeneratorTest extends PersistenceTestCase {
       String toRemove = m_generator.generateColumnToRemove(prop);
       assertNotNull("the string to remove a column should not be null",
       toRemove);
-      assert("The column to remove is not correct",
+      assertTrue("The column to remove is not correct",
       toRemove.equals(prop.getColumn().getColumnName()));
       }
     */
@@ -441,7 +441,7 @@ public class BaseDDLGeneratorTest extends PersistenceTestCase {
       }
 
       // make sure the value for the item that we have is correct
-      assert("The default value should be what is retreived",
+      assertTrue("The default value should be what is retreived",
       defaultValue.equals((String)dataObject.get("requiredAttribute2")));
       m_tables.add(objectType.getReferenceKey().getTableName());
       m_objectTypes.add(objectType);
@@ -453,7 +453,7 @@ public class BaseDDLGeneratorTest extends PersistenceTestCase {
       date);
       String col = m_generator.generateColumnToAdd(prop, date);
       s_log.info("COL = " + col);
-      assert("when adding a date, the default should be subtracted from the " +
+      assertTrue("when adding a date, the default should be subtracted from the " +
       "default.  Instead, we have [" + col + "]",
       col.indexOf("-") > 0 && col.indexOf("4.") > 0 &&
       col.indexOf("default") > 0);
@@ -464,7 +464,7 @@ public class BaseDDLGeneratorTest extends PersistenceTestCase {
       MetadataRoot.DATE, 400,
       date);
       col = m_generator.generateColumnToAdd(prop2, date);
-      assert("when adding a date, the default should be added to the " +
+      assertTrue("when adding a date, the default should be added to the " +
       "default.  Instead, we have [" + col + "]",
       col.indexOf("+") > 0 && col.indexOf("3.") > 0 &&
       col.indexOf("default") > 0);

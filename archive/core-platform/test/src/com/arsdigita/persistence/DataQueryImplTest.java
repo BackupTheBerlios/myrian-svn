@@ -38,11 +38,11 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/14 $
+ * @version $Revision: #7 $ $Date: 2002/08/30 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#7 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
 
     private static Logger s_log =
         Logger.getLogger(DataQueryImplTest.class.getName());
@@ -75,12 +75,12 @@ public class DataQueryImplTest extends DataQueryTest {
         final String PRIORITY = "priority";
 
         dq.setOrder(ORDER_FIELD);
-        assert( "Should be several items in this query set!", dq.next() );
+        assertTrue( "Should be several items in this query set!", dq.next() );
         BigDecimal priorValue = (BigDecimal) dq.get(ORDER_FIELD);
 
         while ( dq.next() ) {
             final BigDecimal currentValue = (BigDecimal) dq.get(ORDER_FIELD);
-            assert("Query was retrieved out of order.",
+            assertTrue("Query was retrieved out of order.",
                    priorValue.compareTo( currentValue ) < 0 );
 
             priorValue = currentValue;
@@ -90,12 +90,12 @@ public class DataQueryImplTest extends DataQueryTest {
 
         DataQuery descQuery = getDefaultQuery();
         descQuery.setOrder("id desc");
-        assert( "Should be several items in this query set!", descQuery.next() );
+        assertTrue( "Should be several items in this query set!", descQuery.next() );
         priorValue = (BigDecimal) descQuery.get(ORDER_FIELD);
 
         while ( descQuery.next() ) {
             final BigDecimal currentValue = (BigDecimal) descQuery.get(ORDER_FIELD);
-            assert("Query was retrieved out of order.",
+            assertTrue("Query was retrieved out of order.",
                    priorValue.compareTo( currentValue ) > 0 );
 
             priorValue = currentValue;
@@ -105,7 +105,7 @@ public class DataQueryImplTest extends DataQueryTest {
 
         DataQuery multipleColumnOrder = getDefaultQuery();
         multipleColumnOrder.setOrder("action desc, priority asc");
-        assert("Should be several items in this query set!",
+        assertTrue("Should be several items in this query set!",
                multipleColumnOrder.next() );
 
         BigDecimal priorPriority = (BigDecimal) multipleColumnOrder.get("priority");
@@ -115,10 +115,10 @@ public class DataQueryImplTest extends DataQueryTest {
             final BigDecimal currentPriority =
                 (BigDecimal) multipleColumnOrder.get("priority");
             final String currentAction = (String) multipleColumnOrder.get("action");
-            assert("Action order wrong!",
+            assertTrue("Action order wrong!",
                    priorAction.compareTo( currentAction ) >= 0 );
             if ( priorAction.equals(currentAction) ) {
-                assert("Priority order wrong! " + priorPriority.toString() +
+                assertTrue("Priority order wrong! " + priorPriority.toString() +
                        " vs " + currentPriority.toString(),
                        priorPriority.compareTo(currentPriority) <= 0 );
 
@@ -142,12 +142,12 @@ public class DataQueryImplTest extends DataQueryTest {
         final String PRIORITY = "priority";
 
         dq.addOrder(ORDER_FIELD);
-        assert( "Should be several items in this query set!", dq.next() );
+        assertTrue( "Should be several items in this query set!", dq.next() );
         BigDecimal priorValue = (BigDecimal) dq.get(ORDER_FIELD);
 
         while ( dq.next() ) {
             final BigDecimal currentValue = (BigDecimal) dq.get(ORDER_FIELD);
-            assert("Query was retrieved out of order.",
+            assertTrue("Query was retrieved out of order.",
                    priorValue.compareTo( currentValue ) < 0 );
 
             priorValue = currentValue;
@@ -157,12 +157,12 @@ public class DataQueryImplTest extends DataQueryTest {
 
         DataQuery descQuery = getDefaultQuery();
         descQuery.addOrder("id desc");
-        assert( "Should be several items in this query set!", descQuery.next() );
+        assertTrue( "Should be several items in this query set!", descQuery.next() );
         priorValue = (BigDecimal) descQuery.get(ORDER_FIELD);
 
         while ( descQuery.next() ) {
             final BigDecimal currentValue = (BigDecimal) descQuery.get(ORDER_FIELD);
-            assert("Query was retrieved out of order.",
+            assertTrue("Query was retrieved out of order.",
                    priorValue.compareTo( currentValue ) > 0 );
 
             priorValue = currentValue;
@@ -172,7 +172,7 @@ public class DataQueryImplTest extends DataQueryTest {
 
         DataQuery multipleColumnOrder = getDefaultQuery();
         multipleColumnOrder.addOrder("action desc, priority asc");
-        assert("Should be several items in this query set!",
+        assertTrue("Should be several items in this query set!",
                multipleColumnOrder.next() );
 
         BigDecimal priorPriority = (BigDecimal) multipleColumnOrder.get("priority");
@@ -182,10 +182,10 @@ public class DataQueryImplTest extends DataQueryTest {
             final BigDecimal currentPriority =
                 (BigDecimal) multipleColumnOrder.get("priority");
             final String currentAction = (String) multipleColumnOrder.get("action");
-            assert("Action order wrong!",
+            assertTrue("Action order wrong!",
                    priorAction.compareTo( currentAction ) >= 0 );
             if ( priorAction.equals(currentAction) ) {
-                assert("Priority order wrong! " + priorPriority.toString() +
+                assertTrue("Priority order wrong! " + priorPriority.toString() +
                        " vs " + currentPriority.toString(),
                        priorPriority.compareTo(currentPriority) <= 0 );
 
@@ -205,9 +205,9 @@ public class DataQueryImplTest extends DataQueryTest {
         multiOrder.addOrder(PRIORITY + " asc");
 
         // the two should be identical
-        assert(singleOrder.size() == multiOrder.size());
+        assertTrue(singleOrder.size() == multiOrder.size());
         while (multiOrder.next() && singleOrder.next()) {
-            assert("The MultiOrder ID did not match the single Order ID",
+            assertTrue("The MultiOrder ID did not match the single Order ID",
                    multiOrder.get("id").equals(singleOrder.get("id")));
         }
         multiOrder.close();
@@ -240,14 +240,14 @@ public class DataQueryImplTest extends DataQueryTest {
         // let's add a single filter that we know does not do anything
         query = getDefaultQuery();
         Filter f = query.addFilter("1=1");
-        assert("Adding a filter of 1=1 should not change the size",
+        assertTrue("Adding a filter of 1=1 should not change the size",
                size == query.size());
 
         // let's add a single filter that should restrict the results
         query = getDefaultQuery();
         Filter filter = query.addFilter("priority < :priority");
         filter.set("priority", new Integer(3));
-        assert("Filtering should lead to less results", query.size() < size);
+        assertTrue("Filtering should lead to less results", query.size() < size);
 
         // let's add another filter.  This should return the same results
         // as a new filter with the same conditions
@@ -263,21 +263,21 @@ public class DataQueryImplTest extends DataQueryTest {
         filter.set("lowerPriority", new Integer(3));
         filter.set("upperPriority", "7");
 
-        assert("The two queries should be the same size.",
+        assertTrue("The two queries should be the same size.",
                query.size() == query2.size());
 
         query = getDefaultQuery();
         filter = query.setFilter("id = :id");
         filter.set("id", new Integer(10));
 
-        assert("Filtered query should have at least one row.", query.next());
+        assertTrue("Filtered query should have at least one row.", query.next());
 
-        assert("Filtered query should have exactly one row.", !query.next());
+        assertTrue("Filtered query should have exactly one row.", !query.next());
 
         query = getDefaultQuery();
         filter = query.addFilter("priority < :lowerPriority");
         filter.set("lowerPriority", "-3");
-        assert("The query should not return any results", query.size() == 0);
+        assertTrue("The query should not return any results", query.size() == 0);
 
         // test adding a filter by passing in another filter
         query = getDefaultQuery();
@@ -294,7 +294,7 @@ public class DataQueryImplTest extends DataQueryTest {
         filter.set("lowerPriority", "6");
         filter = query.addFilter("action = :action");
         filter.set("action", "write");
-        assert("seperate string filters and passing in filters should " +
+        assertTrue("seperate string filters and passing in filters should " +
                "be the same.", withAddingFilter == query.size());
     }
 
@@ -368,20 +368,20 @@ public class DataQueryImplTest extends DataQueryTest {
         query.setParameter("priority", "3");
 
         try {
-            assert(query.size() == 1);
+            assertTrue(query.size() == 1);
         } catch (PersistenceException e) {
             // this is the correct behavior because it is missing a parameter
         }
         query.setParameter("description", "wrote");
 
         // Test the ability to get out the parameter values
-        assert("The retrieved value for 'description' was not correct",
+        assertTrue("The retrieved value for 'description' was not correct",
                "wrote".equals(query.getParameter("description").toString()));
-        assert("The retrieved value for 'priority' was not correct",
+        assertTrue("The retrieved value for 'priority' was not correct",
                "3".equals(query.getParameter("priority").toString()));
 
         // try to get a parameter that does not exist
-        assert("Trying to get a non-existent parameter actually returned " +
+        assertTrue("Trying to get a non-existent parameter actually returned " +
                "something besides null",
                null == query.getParameter("this does not exist"));
 
@@ -399,7 +399,7 @@ public class DataQueryImplTest extends DataQueryTest {
 
         // let's bind
         query.setParameter("actionTime", date);
-        assert("Binding with actionTime should return more than zero but less " +
+        assertTrue("Binding with actionTime should return more than zero but less " +
                "than the full size.  Instead, it returned " + query.size(),
                query.size() > 0 && query.size() < size);
 
@@ -426,13 +426,13 @@ public class DataQueryImplTest extends DataQueryTest {
         // first make sure that not setting the keyword does not
         // set the variable
         DataQuery query = getDefaultQuery();
-        assert("by default, DataQueries should be set to be wrapped in views",
+        assertTrue("by default, DataQueries should be set to be wrapped in views",
                !query.isNoView());
 
         // next test to make sure that the keyword actually set the
         // variable
         query = getSession().retrieveQuery("examples.DataQueryNoView");
-        assert("by default, a DataQuery with 'no view' set should say so.",
+        assertTrue("by default, a DataQuery with 'no view' set should say so.",
                query.isNoView());
 
         boolean hasParen = false;
@@ -455,7 +455,7 @@ public class DataQueryImplTest extends DataQueryTest {
                 hasParen = true;
             }
         }
-        assert("The query should not have a '(' between the word 'from' and " +
+        assertTrue("The query should not have a '(' between the word 'from' and " +
                "the next word", !hasParen);
 
         // The rest of the method tests the following situations
@@ -470,7 +470,7 @@ public class DataQueryImplTest extends DataQueryTest {
         query = getSession().retrieveQuery("examples.DataQueryNoView");
         DataQuery query2 = getSession().retrieveQuery("examples.DataQueryNoView");
         query2.setNoView(false);
-        assert("after setting noView to false, it should return false",
+        assertTrue("after setting noView to false, it should return false",
                !query2.isNoView());
 
         compareQueries("The view should not matter with no where clause",
@@ -482,7 +482,7 @@ public class DataQueryImplTest extends DataQueryTest {
 
         query2 = getSession().retrieveQuery("examples.DataQueryNoView");
         query2.setNoView(false);
-        assert("after setting noView to false, it should return false",
+        assertTrue("after setting noView to false, it should return false",
                !query2.isNoView());
         filter = query2.addFilter("action = :action");
         filter.set("action", "write");
@@ -495,9 +495,9 @@ public class DataQueryImplTest extends DataQueryTest {
         query2 = getSession().retrieveQuery("examples.DataQueryUnion");
         query.setNoView(true);
         query2.setNoView(false);
-        assert("after setting noView to true, it should return true",
+        assertTrue("after setting noView to true, it should return true",
                query.isNoView());
-        assert("after setting noView to false, it should return false",
+        assertTrue("after setting noView to false, it should return false",
                !query2.isNoView());
 
         query.setParameter("action", "write");
@@ -524,7 +524,7 @@ public class DataQueryImplTest extends DataQueryTest {
         filter = query2.addFilter("action = :actionFilter");
         filter.set("actionFilter", "read");
 
-        assert("after setting noView to true, it should return true",
+        assertTrue("after setting noView to true, it should return true",
                query.isNoView());
 
         compareQueries("The view should return different results",
@@ -628,7 +628,7 @@ public class DataQueryImplTest extends DataQueryTest {
             i++;
             assertNotNull("Should have a value for id", dq.get("id"));
         }
-        assert("Default data query returned no rows", i != 0);
+        assertTrue("Default data query returned no rows", i != 0);
         int j = 0;
         try {
             Object value = dq.get("id");
@@ -640,13 +640,13 @@ public class DataQueryImplTest extends DataQueryTest {
 
         while (j < 2*i) {
             j++;
-            assert("Next should continue returning false after initial false",
+            assertTrue("Next should continue returning false after initial false",
                    !dq.next());
         }
         dq.close();
-        assert("Next should return false after close", !dq.next());
+        assertTrue("Next should return false after close", !dq.next());
         dq.reset();
-        assert("Next should return true after reset", dq.next());
+        assertTrue("Next should return true after reset", dq.next());
         dq.close();
     }
 
@@ -654,7 +654,7 @@ public class DataQueryImplTest extends DataQueryTest {
         DataQuery query = getSession().retrieveQuery
             ("examples.DataQueryZeroOrOneRow");
         query.next();
-        assert("we should have only gotten back one row",
+        assertTrue("we should have only gotten back one row",
                !query.next());
 
         query = getDefaultQuery();
@@ -672,7 +672,7 @@ public class DataQueryImplTest extends DataQueryTest {
         query.addEqualsFilter("id", new Integer(-1));
 
         // this should not return any rows
-        assert("When it does not return any rows it should return false",
+        assertTrue("When it does not return any rows it should return false",
                !query.next());
     }
 
@@ -753,7 +753,7 @@ public class DataQueryImplTest extends DataQueryTest {
 
         // beginIndex = 1 does not do anything
         query.setRange(new Integer(1));
-        assert("adding the range starting with 1 should not change the " +
+        assertTrue("adding the range starting with 1 should not change the " +
                "number or rows returned.  Instead of getting " + fullSize +
                "rows, we got " + query.size() + " rows.",
                query.size() == fullSize);
@@ -766,14 +766,14 @@ public class DataQueryImplTest extends DataQueryTest {
         // beginIndex > 1 gives us less rows and the first row is
         query = getDefaultQuery();
         query.setRange(new Integer(4));
-        assert("adding the range starting with 4 should give us 3 less " +
+        assertTrue("adding the range starting with 4 should give us 3 less " +
                "rows returned.  Instead of getting " + (fullSize - 3) +
                " rows, we got " + query.size() + " rows.",
                query.size() == fullSize - 3);
 
         // not the same as the first row with beginIndex = 1
         query.next();
-        assert("changing the beginIndex should change the first row",
+        assertTrue("changing the beginIndex should change the first row",
                !(id.equals((BigDecimal)query.get("id")) &&
                  action.equals((String)query.get("action")) &&
                  description.equals((String)query.get("description"))));
@@ -782,7 +782,7 @@ public class DataQueryImplTest extends DataQueryTest {
         // beginIndex > [size of query with no index] then 0 rows returned
         query = getDefaultQuery();
         query.setRange(new Integer(10000));
-        assert("setting a beginIndex > [number of rows in table] should " +
+        assertTrue("setting a beginIndex > [number of rows in table] should " +
                "return zero rows.", query.size() == 0);
 
         // endIndex <= beginIndex...make sure an exception is thrown
@@ -808,7 +808,7 @@ public class DataQueryImplTest extends DataQueryTest {
         //    we should get back [size of query with no index]
         query = getDefaultQuery();
         query.setRange(new Integer(1), new Integer(100000));
-        assert("not placing reasonable restrictions should return the " +
+        assertTrue("not placing reasonable restrictions should return the " +
                "max number of rows", query.size() == fullSize);
         query.close();
 
@@ -816,7 +816,7 @@ public class DataQueryImplTest extends DataQueryTest {
         //    we should get back endIndex - rows
         query = getDefaultQuery();
         query.setRange(new Integer(1), new Integer(5));
-        assert("Asking for 4 rows should give us 4, not " + query.size(),
+        assertTrue("Asking for 4 rows should give us 4, not " + query.size(),
                query.size() == 4);
         query.close();
 
@@ -827,7 +827,7 @@ public class DataQueryImplTest extends DataQueryTest {
         long newSize = query.size();
         query = getDefaultQuery();
         query.setRange(new Integer(4));
-        assert("setting beginIndex to a reasonalble number but endIndex " +
+        assertTrue("setting beginIndex to a reasonalble number but endIndex " +
                "really high should give us the same as " +
                "query.setRange([reasonable number])",
                query.size() == newSize);
@@ -838,7 +838,7 @@ public class DataQueryImplTest extends DataQueryTest {
         query = getDefaultQuery();
         query.setRange(new Integer(4), new Integer(6));
         query.next();
-        assert("we should have gotten back 2 rows that does not include " +
+        assertTrue("we should have gotten back 2 rows that does not include " +
                "the first row",
                query.size() == 2 &&
                !(id.equals((BigDecimal)query.get("id")) &&
@@ -858,7 +858,7 @@ public class DataQueryImplTest extends DataQueryTest {
         BigDecimal priority = (BigDecimal)query.get("priority");
         String description = (String)query.get("description");
         query.close();
-        assert("If the description is null already, the test will not " +
+        assertTrue("If the description is null already, the test will not " +
                "pass.  So, if you get this you need to rewrite the test.",
                description != null);
 
@@ -874,7 +874,7 @@ public class DataQueryImplTest extends DataQueryTest {
         query.next();
         description = (String)query.get("description");
         query.close();
-        assert("We just updated the description to null so it should " +
+        assertTrue("We just updated the description to null so it should " +
                "still be null", description == null);
 
         // test to make sure that PL/SQL with null still executes
@@ -907,7 +907,7 @@ public class DataQueryImplTest extends DataQueryTest {
 
         System.out.println("id = " + object.get("id"));
         System.out.println("objectID = " + object.get("objectID"));
-        assert("The ID is not what it should be.  It should be " + id +
+        assertTrue("The ID is not what it should be.  It should be " + id +
                " but it is actually " + object.get("id"),
                id == (BigDecimal)object.get("id"));
     }
@@ -924,17 +924,17 @@ public class DataQueryImplTest extends DataQueryTest {
         String action = (String)query.get("action");
 
         Map values = query.getPropertyValues();
-        assert("The ID is not the same", id.equals(values.get("id")));
-        assert("The DESCRIPTION is not the same",
+        assertTrue("The ID is not the same", id.equals(values.get("id")));
+        assertTrue("The DESCRIPTION is not the same",
                description.equals(values.get("description")));
-        assert("The ACTION is not the same",
+        assertTrue("The ACTION is not the same",
                action.equals(values.get("action")));
 
         // now make sure that the items from the next map are not
         // the same
         query.next();
         Map values2 = query.getPropertyValues();
-        assert("the two maps where the same when they should not have been",
+        assertTrue("the two maps where the same when they should not have been",
                !values2.equals(values));
         query.close();
     }
@@ -978,7 +978,7 @@ public class DataQueryImplTest extends DataQueryTest {
         } else {
             sameSize = query1size != query2size;
         }
-        assert("COUNT: " + errorText + " The queries are: " +
+        assertTrue("COUNT: " + errorText + " The queries are: " +
                Utilities.LINE_BREAK + " Query1 = " + query1.toString() +
                Utilities.LINE_BREAK +" count = " + query1.size() +
                Utilities.LINE_BREAK + " Query2 = " + query2.toString() +
@@ -992,7 +992,7 @@ public class DataQueryImplTest extends DataQueryTest {
 
         while (query2.next()) {
             if (shouldBeIdential) {
-                assert("COMPARE: " + errorText + "The queries are: " +
+                assertTrue("COMPARE: " + errorText + "The queries are: " +
                        Utilities.LINE_BREAK + " Query1 = " + query1.toString() +
                        Utilities.LINE_BREAK +" count = " + query1size +
                        Utilities.LINE_BREAK + " Query2 = " + query2.toString() +

@@ -29,11 +29,11 @@ import com.arsdigita.db.DbHelper;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/08/14 $
+ * @version $Revision: #8 $ $Date: 2002/08/30 $
  */
 public class DataOperationTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataOperationTest.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataOperationTest.java#8 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
 
     public DataOperationTest(String name) {
         super(name);
@@ -117,7 +117,7 @@ public class DataOperationTest extends PersistenceTestCase {
         query.setParameter("description", "wrote");
 
         try {
-            assert(query.size() == 0);
+            assertTrue(query.size() == 0);
         } catch (PersistenceException e) {
             // this is the correct behavior
         }
@@ -131,7 +131,7 @@ public class DataOperationTest extends PersistenceTestCase {
         query.setParameter("priority", new BigDecimal(29999));
 
         try {
-            assert(query.size() > 0);
+            assertTrue(query.size() > 0);
         } catch (PersistenceException e) {
             // this is the correct behavior
         }
@@ -146,15 +146,15 @@ public class DataOperationTest extends PersistenceTestCase {
         operation.setParameter("currentPriority", "29999");
 
         // Test the ability to get out the parameter values
-        assert("The retrieved value for 'description' was not correct",
+        assertTrue("The retrieved value for 'description' was not correct",
                "wrote".equals(operation.getParameter("description").toString()));
-        assert("The retrieved value for 'priority' was not correct",
+        assertTrue("The retrieved value for 'priority' was not correct",
                "9".equals(operation.getParameter("priority").toString()));
-        assert("The retrieved value for 'priority' was not correct",
+        assertTrue("The retrieved value for 'priority' was not correct",
                "29999".equals(operation.getParameter("currentPriority").toString()));
 
         // try to get a parameter that does not exist
-        assert("Trying to get a non-existent parameter actually returned " +
+        assertTrue("Trying to get a non-existent parameter actually returned " +
                "something besides null",
                null == operation.getParameter("this does not exist"));
     }
@@ -171,7 +171,7 @@ public class DataOperationTest extends PersistenceTestCase {
         DataQuery query = getSession().retrieveQuery("examples.DataQuery");
         long size = query.size();
         operation.execute();
-        assert("The query should be larger after the PL/SQL than before",
+        assertTrue("The query should be larger after the PL/SQL than before",
                size < query.size());
 
         operation = getSession().retrieveDataOperation
@@ -200,12 +200,12 @@ public class DataOperationTest extends PersistenceTestCase {
             return_value = (String)operation.get("newValue");
         }
 
-        assert("DataOperationFunction did not correctly change the items " +
+        assertTrue("DataOperationFunction did not correctly change the items " +
                "returned by the query.  Expected " + (size + 1) +
                " but got " + query.size(), size + 1 == query.size());
         size = query.size();
         int nextID = Integer.parseInt(return_value);
-        assert("DataOperationFunction did not return the correct value. " +
+        assertTrue("DataOperationFunction did not return the correct value. " +
                "We expected " + (newID + 1) + " but got " + nextID,
                newID + 1 == nextID);
         newID = nextID;
@@ -223,11 +223,11 @@ public class DataOperationTest extends PersistenceTestCase {
             operation.execute();
             return_value = (String)operation.get("newID");
         }
-        assert("DataOperationProcWithOut did not correctly change the items " +
+        assertTrue("DataOperationProcWithOut did not correctly change the items " +
                "returned by the query", size + 1 == query.size());
         size = query.size();
         nextID = Integer.parseInt(return_value);
-        assert("DataOperationProcWithOut did not return the correct value. " +
+        assertTrue("DataOperationProcWithOut did not return the correct value. " +
                "We expected " + (newID + 1) + " but got " + nextID,
                newID + 1 == nextID);
         newID = nextID;
@@ -247,14 +247,14 @@ public class DataOperationTest extends PersistenceTestCase {
             operation.execute();
             return_value = (String)operation.get("newID");
         }
-        assert("DataOperationProcWithInOut did not correctly change the " +
+        assertTrue("DataOperationProcWithInOut did not correctly change the " +
                "items returned by the query.  We expected " + stringValue +
                " but got " + return_value, stringValue.equals(return_value));
-        assert("DataOperationProcWithInOut did not add a row",
+        assertTrue("DataOperationProcWithInOut did not add a row",
                size + 1 == query.size());
         size = query.size();
         nextID = Integer.parseInt(return_value);
-        assert("DataOperationProcWithInOut did not return the correct value. " +
+        assertTrue("DataOperationProcWithInOut did not return the correct value. " +
                "We expected " + (newID + 8) + " but got " + nextID,
                newID + 8 == nextID);
         newID = nextID;
@@ -275,14 +275,14 @@ public class DataOperationTest extends PersistenceTestCase {
             operation.execute();
             return_integer = (Integer)operation.get("newID");
         }
-        assert("DataOperationProcWithInOutInt did not correctly change the " +
+        assertTrue("DataOperationProcWithInOutInt did not correctly change the " +
                "items returned by the query (with Integer)",
                integerValue.toString().equals(return_integer.toString()));
-        assert("DataOperationProcWithInOutInt and Integer did not add a row",
+        assertTrue("DataOperationProcWithInOutInt and Integer did not add a row",
                size + 1 == query.size());
         size = query.size();
         nextID = return_integer.intValue();
-        assert("DataOperationProcWithInOutInt did not return the correct value. " +
+        assertTrue("DataOperationProcWithInOutInt did not return the correct value. " +
                "We expected " + (newID + 8) + " but got " + nextID,
                newID + 8 == nextID);
         newID = nextID;
@@ -304,7 +304,7 @@ public class DataOperationTest extends PersistenceTestCase {
             operation.setParameter("oldDate", date);
             operation.execute();
         }
-        assert("DataOperationProcWithDates and Integer added or removed a row",
+        assertTrue("DataOperationProcWithDates and Integer added or removed a row",
                size == query.size());
 
 
@@ -313,7 +313,7 @@ public class DataOperationTest extends PersistenceTestCase {
         query.addEqualsFilter("id", return_integer);
         query.next();
         long newTime = date.getTime() - ((Date)query.get("actionTime")).getTime();
-        assert("The time retrieved is not near the time set",
+        assertTrue("The time retrieved is not near the time set",
                newTime > -1000 && newTime < 1000);
         query.close();
     }
@@ -350,7 +350,7 @@ public class DataOperationTest extends PersistenceTestCase {
         try {
             query = getSession().retrieveQuery
                 ("examples.PLSQLQueryWithArbitraryArgs");
-            assert("the table already has items in it", query.size() == 0);
+            assertTrue("the table already has items in it", query.size() == 0);
 
             DataOperation operation = getSession().
                 retrieveDataOperation("examples.PLSQLWithArbitraryArgsQuery");
@@ -369,15 +369,15 @@ public class DataOperationTest extends PersistenceTestCase {
             Object arg4 = query.get("arg4");
             Object arg5 = query.get("arg5");
 
-            assert("The first argument should have been 1.  Instead, it is [" +
+            assertTrue("The first argument should have been 1.  Instead, it is [" +
                    arg1 + "]", "1".equals(arg1.toString()));
-            assert("The second argument should have been 1.  Instead, it is [" +
+            assertTrue("The second argument should have been 1.  Instead, it is [" +
                    arg2 + "]", "2".equals(arg2.toString()));
-            assert("The third argument should have been null.  Instead, it is [" +
+            assertTrue("The third argument should have been null.  Instead, it is [" +
                    arg3 + "]", arg3 == null);
-            assert("The fourth argument should have been null.  Instead, it is [" +
+            assertTrue("The fourth argument should have been null.  Instead, it is [" +
                    arg5 + "]", arg4 == null);
-            assert("The fifth argument should have been 5.  Instead, it is [" +
+            assertTrue("The fifth argument should have been 5.  Instead, it is [" +
                    arg5 + "]", "5".equals(arg5.toString()));
 
 

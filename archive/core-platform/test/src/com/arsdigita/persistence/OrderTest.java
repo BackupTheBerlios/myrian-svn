@@ -25,12 +25,12 @@ import java.sql.SQLException;
  * Test
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/08/14 $
+ * @version $Revision: #8 $ $Date: 2002/08/30 $
  */
 
 public abstract class OrderTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderTest.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderTest.java#8 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
 
     public OrderTest(String name) {
         super(name);
@@ -65,7 +65,7 @@ public abstract class OrderTest extends PersistenceTestCase {
         assertEquals("ShippingAddress was not retrieved correctly.",
                      "102 R Inman St.\nCambridge MA, 02139",
                      order.get("shippingAddress"));
-        assert("Shipping date was not retrieved correctly.",
+        assertTrue("Shipping date was not retrieved correctly.",
                order.get("shippingDate") instanceof java.util.Date);
         assertEquals("hasShipped was not retrieved correctly.",
                      Boolean.FALSE, order.get("hasShipped"));
@@ -142,7 +142,7 @@ public abstract class OrderTest extends PersistenceTestCase {
         DataObject object = null;
         while (items.next()) {
             retrieved.add(items.get("name"));
-            assert("inStock is " + items.get("inStock").getClass() +
+            assertTrue("inStock is " + items.get("inStock").getClass() +
                    ", should be a Boolean",
                    items.get("inStock") instanceof Boolean);
             object = items.getDataObject();
@@ -165,12 +165,12 @@ public abstract class OrderTest extends PersistenceTestCase {
             } catch (UndefinedEventException e) {
                 // it should be here
                 // sometimes it should be here (for the static test)
-                assert("We caught an UndefinedEventException in the dynamic test. " +
+                assertTrue("We caught an UndefinedEventException in the dynamic test. " +
                        "It should have been a PersistenceException",
                        "static".equals(m_testType));
             } catch (PersistenceException e) {
                 // sometimes it should be here (for the dynamic test)
-                assert("We caught a PersistenceException in the static test.  " +
+                assertTrue("We caught a PersistenceException in the static test.  " +
                        "It should have been an UndefinedEventException",
                        "dynamic".equals(m_testType));
             }
@@ -182,7 +182,7 @@ public abstract class OrderTest extends PersistenceTestCase {
         retrieved = new HashSet();
         while (items.next()) {
             retrieved.add(items.get("name"));
-            assert("inStock is not a boolean",
+            assertTrue("inStock is not a boolean",
                    items.get("inStock") instanceof Boolean);
         }
         assertEquals("Retrieved items don't match added items.",
@@ -205,7 +205,7 @@ public abstract class OrderTest extends PersistenceTestCase {
 
         DataQuery ordersMaxPrices =
             getSession().retrieveQuery(getModelName() + ".OrdersMaxPrices");
-        assert(ordersMaxPrices.next());
+        assertTrue(ordersMaxPrices.next());
 
         assertTrue("Order was not retrieved correctly.",
                    1 == ((Number)ordersMaxPrices.get("orderId")).intValue());
@@ -224,7 +224,7 @@ public abstract class OrderTest extends PersistenceTestCase {
                                                                              4, BigDecimal.ROUND_HALF_UP
                                                                              )
                      );
-        assert(!ordersMaxPrices.next());
+        assertTrue(!ordersMaxPrices.next());
 
         DataCollection allItems = getSession().retrieve(getModelName() + ".LineItem");
         while (allItems.next()) {
@@ -287,7 +287,7 @@ public abstract class OrderTest extends PersistenceTestCase {
         assertEquals("ShippingAddress was not retrieved correctly.",
                      "2036 Shattuck Ave",
                      orderExt.get("shippingAddress"));
-        assert("Shipping date was not retrieved correctly.",
+        assertTrue("Shipping date was not retrieved correctly.",
                orderExt.get("shippingDate") instanceof java.util.Date);
         assertEquals("hasShipped was not retrieved correctly.",
                      Boolean.FALSE, orderExt.get("hasShipped"));

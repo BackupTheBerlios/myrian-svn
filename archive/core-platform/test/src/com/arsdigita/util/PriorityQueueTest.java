@@ -38,7 +38,7 @@ public class PriorityQueueTest extends TestCase {
         pq.enqueue("Test 3", 3);
         pq.enqueue("Test 1", 1);
 
-        assert("isEmpty is returned true on an nonempty queue", !pq.isEmpty());
+        assertTrue("isEmpty is returned true on an nonempty queue", !pq.isEmpty());
 
         String peek1 = (String)pq.peek();
         String s1 = (String)pq.dequeue();
@@ -46,8 +46,8 @@ public class PriorityQueueTest extends TestCase {
         String s2 = (String)pq.dequeue();
         String s3 = (String)pq.dequeue();
 
-        assert("size was incorrect (should be 3)", pq.size() != 3);
-        assert("isEmpty is returned false on an empty queue", pq.isEmpty());
+        assertTrue("size was incorrect (should be 3)", pq.size() != 3);
+        assertTrue("isEmpty is returned false on an empty queue", pq.isEmpty());
 
         try {
             pq.dequeue();
@@ -56,11 +56,11 @@ public class PriorityQueueTest extends TestCase {
         } catch (NoSuchElementException e) {
         }
 
-        assert("Peek #1 incorrect", peek1.equals("Test 1"));
-        assert("Peek #2 incorrect", peek2.equals("Test 2"));
-        assert("Dequeue #1 incorrect", s1.equals("Test 1"));
-        assert("Dequeue #2 incorrect", s2.equals("Test 2"));
-        assert("Dequeue #3 incorrect", s3.equals("Test 3"));
+        assertTrue("Peek #1 incorrect", peek1.equals("Test 1"));
+        assertTrue("Peek #2 incorrect", peek2.equals("Test 2"));
+        assertTrue("Dequeue #1 incorrect", s1.equals("Test 1"));
+        assertTrue("Dequeue #2 incorrect", s2.equals("Test 2"));
+        assertTrue("Dequeue #3 incorrect", s3.equals("Test 3"));
     }
 
     public void testPriorityQueueDescending() {
@@ -90,10 +90,10 @@ public class PriorityQueueTest extends TestCase {
         } catch (NoSuchElementException e) {
         }
 
-        assert("Peek #1 incorrect", peek1.equals("Test 1"));
-        assert("Peek #2 incorrect", peek2.equals("Test 2"));
-        assert("Dequeue #1 incorrect", s1.equals("Test 1"));
-        assert("Dequeue #2 incorrect", s2.equals("Test 2"));
-        assert("Dequeue #3 incorrect", s3.equals("Test 3"));
+        assertTrue("Peek #1 incorrect", peek1.equals("Test 1"));
+        assertTrue("Peek #2 incorrect", peek2.equals("Test 2"));
+        assertTrue("Dequeue #1 incorrect", s1.equals("Test 1"));
+        assertTrue("Dequeue #2 incorrect", s2.equals("Test 2"));
+        assertTrue("Dequeue #3 incorrect", s3.equals("Test 3"));
     }
 }

@@ -29,15 +29,15 @@ import org.apache.log4j.Logger;
  *     DataAssociationImpl implements com.arsdigita.persistence.DataAssociation </p>
  *
  * @author <a href="mbryzek@arsdigita.com">Michael Bryzek</a>
- * @date $Date: 2002/08/14 $
- * @version $Revision: #4 $
+ * @date $Date: 2002/08/30 $
+ * @version $Revision: #5 $
  *
  * @see com.arsdigita.persistence.DataAssociationImpl
  **/
 
 public class DataAssociationImplTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataAssociationImplTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataAssociationImplTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
     private static Logger log =
         Logger.getLogger(DataAssociationImplTest.class.getName());
 
@@ -214,14 +214,14 @@ public class DataAssociationImplTest extends PersistenceTestCase {
         DataAssociationCursor firstCursor = m_orderAssoc.getLineItems().cursor();
         firstCursor.next();
         firstCursor.next();
-        assert("m_orderAssoc.getLineItems() is still at first element after calling next",
+        assertTrue("m_orderAssoc.getLineItems() is still at first element after calling next",
                ! (firstCursor.isFirst() || firstCursor.isBeforeFirst()));
         DataAssociation items = (DataAssociation) m_orderAssoc.getOrder().get("items");
         DataAssociationCursor secondCursor = items.cursor();
         assertEquals("Consecutive calls to get returned data associations " +
                      "of different sizes",
                      firstCursor.size(), secondCursor.size());
-        assert("Items is at position: " + secondCursor.getPosition() +
+        assertTrue("Items is at position: " + secondCursor.getPosition() +
                ". It should be before the first position",
                secondCursor.isBeforeFirst());
 
@@ -286,14 +286,14 @@ public class DataAssociationImplTest extends PersistenceTestCase {
         order.save();
         DataObject orderObject = (DataObject)other.get("order");
         assertNotNull(orderObject);
-        assert("The retrieved object should be the first order",
+        assertTrue("The retrieved object should be the first order",
                order.equals(orderObject));
         items.remove(other);
         order.save();
         DataAssociation items2 = (DataAssociation) order2.get("relatedOtherItems");
         items2.add(other);
         order2.save();
-        assert("the order changed but the value held by 'order' did not",
+        assertTrue("the order changed but the value held by 'order' did not",
                !orderObject.equals(other.get("order")));
     }
 

@@ -29,10 +29,10 @@ import org.apache.log4j.Logger;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/14 $
+ * @version $Revision: #7 $ $Date: 2002/08/30 $
  */
 public class FilterTest extends PersistenceTestCase {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/FilterTest.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/FilterTest.java#7 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
 
     private static Logger s_log =
         Logger.getLogger(FilterTest.class.getName());
@@ -60,7 +60,7 @@ public class FilterTest extends PersistenceTestCase {
         Filter filter = query.addFilter(
                                         FilterImpl.simple("priority < :lowerPriority"));
         filter.set("lowerPriority", "6");
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " In Filter.simple()", fullSize > query.size());
 
         // do the same test for FilterFactory
@@ -69,7 +69,7 @@ public class FilterTest extends PersistenceTestCase {
         filter = query.addFilter(
                                  factory.simple("priority < :lowerPriority"));
         filter.set("lowerPriority", "6");
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " In FilterSimple()", fullSize > query.size());
 
     }
@@ -83,20 +83,20 @@ public class FilterTest extends PersistenceTestCase {
         DataQuery query = getDefaultQuery();
         long fullSize = query.size();
         query.addFilter(FilterImpl.equals("priority", new Integer(6)));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in FilterEquals ", + fullSize > query.size());
 
         query = getDefaultQuery();
         FilterFactory factory = new FilterFactoryImpl();
         query.addFilter(factory.equals("priority", new Integer(6)));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in FilterEquals ", + fullSize > query.size());
 
 
         // test the convenience method
         query = getDefaultQuery();
         query.addEqualsFilter("priority", new Integer(6));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in addEqualsFilter ", + fullSize > query.size());
 
     }
@@ -110,18 +110,18 @@ public class FilterTest extends PersistenceTestCase {
         DataQuery query = getDefaultQuery();
         long fullSize = query.size();
         query.addFilter(FilterImpl.notEquals("priority", new Integer(3)));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in FilterNotEquals ", + fullSize > query.size());
 
         query = getDefaultQuery();
         FilterFactory factory = new FilterFactoryImpl();
         query.addFilter(factory.notEquals("priority", new Integer(3)));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in FilterNotEquals ", + fullSize > query.size());
 
         query = getDefaultQuery();
         query.addNotEqualsFilter("priority", new Integer(3));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in addNotEqualsFilter ", + fullSize > query.size());
     }
 
@@ -134,25 +134,25 @@ public class FilterTest extends PersistenceTestCase {
         DataQuery query = getDefaultQuery();
         long fullSize = query.size();
         query.addFilter(FilterImpl.lessThan("priority", new Integer(3), true));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in FilterLessThan no matter if the last param is true or " +
                " false...in true", fullSize > query.size());
 
         query = getDefaultQuery();
         query.addFilter(FilterImpl.lessThan("priority", new Integer(3), false));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in FilterLessThan no matter if the last param is true or " +
                " false...in false", fullSize > query.size());
 
         query = getDefaultQuery();
         Filter f = FilterImpl.lessThan("priority", null, true);
         query.addFilter(FilterImpl.lessThan("priority", null, true));
-        assert("when the allIfNull is true, it should return all results",
+        assertTrue("when the allIfNull is true, it should return all results",
                fullSize == query.size());
 
         query = getDefaultQuery();
         query.addFilter(FilterImpl.lessThan("priority", null, false));
-        assert("when the allIfNull is false, it should return all results",
+        assertTrue("when the allIfNull is false, it should return all results",
                0 == query.size());
 
 
@@ -160,24 +160,24 @@ public class FilterTest extends PersistenceTestCase {
         FilterFactory factory = new FilterFactoryImpl();
         query = getDefaultQuery();
         query.addFilter(factory.lessThan("priority", new Integer(3), true));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in FilterLessThan no matter if the last param is true or " +
                " false...in true and Factory", fullSize > query.size());
 
         query = getDefaultQuery();
         query.addFilter(factory.lessThan("priority", new Integer(3), false));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in FilterLessThan no matter if the last param is true or " +
                " false...in false and Factory", fullSize > query.size());
 
         query = getDefaultQuery();
         query.addFilter(factory.lessThan("priority", null, true));
-        assert("when the allIfNull is true, it should return all results. " +
+        assertTrue("when the allIfNull is true, it should return all results. " +
                "In Factory", fullSize == query.size());
 
         query = getDefaultQuery();
         query.addFilter(factory.lessThan("priority", null, false));
-        assert("when the allIfNull is false, it should return all results. " +
+        assertTrue("when the allIfNull is false, it should return all results. " +
                "In Factory", 0 == query.size());
 
     }
@@ -192,24 +192,24 @@ public class FilterTest extends PersistenceTestCase {
         DataQuery query = getDefaultQuery();
         long fullSize = query.size();
         query.addFilter(FilterImpl.greaterThan("priority", new Integer(3), true));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in FiltergreaterThan no matter if the last param is true or " +
                " false...in true", fullSize > query.size());
 
         query = getDefaultQuery();
         query.addFilter(FilterImpl.greaterThan("priority", new Integer(3), false));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in FiltergreaterThan no matter if the last param is true or " +
                " false...in false", fullSize > query.size());
 
         query = getDefaultQuery();
         query.addFilter(FilterImpl.greaterThan("priority", null, true));
-        assert("when the allIfNull is true, it should return all results",
+        assertTrue("when the allIfNull is true, it should return all results",
                fullSize == query.size());
 
         query = getDefaultQuery();
         query.addFilter(FilterImpl.greaterThan("priority", null, false));
-        assert("when the allIfNull is false, it should return all results",
+        assertTrue("when the allIfNull is false, it should return all results",
                0 == query.size());
 
 
@@ -217,24 +217,24 @@ public class FilterTest extends PersistenceTestCase {
         FilterFactory factory = new FilterFactoryImpl();
         query = getDefaultQuery();
         query.addFilter(factory.greaterThan("priority", new Integer(3), true));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in FiltergreaterThan no matter if the last param is true or " +
                " false...in true and Factory", fullSize > query.size());
 
         query = getDefaultQuery();
         query.addFilter(factory.greaterThan("priority", new Integer(3), false));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in FiltergreaterThan no matter if the last param is true or " +
                " false...in false and Factory", fullSize > query.size());
 
         query = getDefaultQuery();
         query.addFilter(factory.greaterThan("priority", null, true));
-        assert("when the allIfNull is true, it should return all results. " +
+        assertTrue("when the allIfNull is true, it should return all results. " +
                "In Factory", fullSize == query.size());
 
         query = getDefaultQuery();
         query.addFilter(factory.greaterThan("priority", null, false));
-        assert("when the allIfNull is false, it should return all results. " +
+        assertTrue("when the allIfNull is false, it should return all results. " +
                "In Factory", 0 == query.size());
 
         // let's make sure that lessThan, greaterThan, and equals are
@@ -249,7 +249,7 @@ public class FilterTest extends PersistenceTestCase {
 
         query = getDefaultQuery();
         query.addFilter(factory.equals("priority", new Integer(3)));
-        assert("adding equals, less than, and greater than should be all " +
+        assertTrue("adding equals, less than, and greater than should be all " +
                "results.", size + query.size() == fullSize);
     }
 
@@ -263,28 +263,28 @@ public class FilterTest extends PersistenceTestCase {
         DataQuery query = getDefaultQuery();
         long fullSize = query.size();
         query.addFilter(FilterImpl.startsWith("description", "Read", true));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in Filter.startsWith no matter if the last param is true or " +
                " false...in true", fullSize > query.size());
-        assert("adding a filter should restrict the results, not eliminate " +
+        assertTrue("adding a filter should restrict the results, not eliminate " +
                "them.", query.size() > 0);
 
         query = getDefaultQuery();
         query.addFilter(FilterImpl.startsWith("description", "Read", false));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in Filter.startsWith no matter if the last param is true or " +
                " false...in false", fullSize > query.size());
-        assert("adding a filter should restrict the results, not eliminate " +
+        assertTrue("adding a filter should restrict the results, not eliminate " +
                "them.", query.size() > 0);
 
         query = getDefaultQuery();
         query.addFilter(FilterImpl.startsWith("description", null, true));
-        assert("when the allIfNull is true, it should return all results",
+        assertTrue("when the allIfNull is true, it should return all results",
                fullSize == query.size());
 
         query = getDefaultQuery();
         query.addFilter(FilterImpl.startsWith("description", null, false));
-        assert("when the allIfNull is false, it should return all results",
+        assertTrue("when the allIfNull is false, it should return all results",
                0 == query.size());
 
 
@@ -292,39 +292,39 @@ public class FilterTest extends PersistenceTestCase {
         FilterFactory factory = new FilterFactoryImpl();
         query = getDefaultQuery();
         query.addFilter(factory.startsWith("description", "Read", true));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in FilterstartsWith no matter if the last param is true or " +
                " false...in true and Factory", fullSize > query.size());
-        assert("adding a filter should restrict the results, not eliminate " +
+        assertTrue("adding a filter should restrict the results, not eliminate " +
                "them.", query.size() > 0);
 
         query = getDefaultQuery();
         query.addFilter(factory.startsWith("description", "Read", false));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in FilterstartsWith no matter if the last param is true or " +
                " false...in false and Factory", fullSize > query.size());
-        assert("adding a filter should restrict the results, not eliminate " +
+        assertTrue("adding a filter should restrict the results, not eliminate " +
                "them.", query.size() > 0);
 
         query = getDefaultQuery();
         query.addFilter(factory.startsWith("description", null, true));
-        assert("when the allIfNull is true, it should return all results. " +
+        assertTrue("when the allIfNull is true, it should return all results. " +
                "In Factory", fullSize == query.size());
 
         query = getDefaultQuery();
         query.addFilter(factory.startsWith("description", null, false));
-        assert("when the allIfNull is false, it should return all results. " +
+        assertTrue("when the allIfNull is false, it should return all results. " +
                "In Factory", 0 == query.size());
 
         // let's make sure that it does negative stuff as well
         query = getDefaultQuery();
         query.addFilter(FilterImpl.startsWith("description", "item", false));
-        assert("when looking for an item that does not exist, it should " +
+        assertTrue("when looking for an item that does not exist, it should " +
                "return no rows", query.size() == 0);
 
         query = getDefaultQuery();
         query.addFilter(factory.startsWith("description", "item", false));
-        assert("when looking for an item that does not exist, it should " +
+        assertTrue("when looking for an item that does not exist, it should " +
                "return no rows", query.size() == 0);
     }
 
@@ -338,28 +338,28 @@ public class FilterTest extends PersistenceTestCase {
         DataQuery query = getDefaultQuery();
         long fullSize = query.size();
         query.addFilter(FilterImpl.endsWith("description", "14", true));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in Filter.endsWith no matter if the last param is true or " +
                " false...in true", fullSize > query.size());
-        assert("adding a filter should restrict the results, not eliminate " +
+        assertTrue("adding a filter should restrict the results, not eliminate " +
                "them.", query.size() > 0);
 
         query = getDefaultQuery();
         query.addFilter(FilterImpl.endsWith("description", "14", false));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in Filter.endsWith no matter if the last param is true or " +
                " false...in false", fullSize > query.size());
-        assert("adding a filter should restrict the results, not eliminate " +
+        assertTrue("adding a filter should restrict the results, not eliminate " +
                "them.", query.size() > 0);
 
         query = getDefaultQuery();
         query.addFilter(FilterImpl.endsWith("description", null, true));
-        assert("when the allIfNull is true, it should return all results",
+        assertTrue("when the allIfNull is true, it should return all results",
                fullSize == query.size());
 
         query = getDefaultQuery();
         query.addFilter(FilterImpl.endsWith("description", null, false));
-        assert("when the allIfNull is false, it should return all results",
+        assertTrue("when the allIfNull is false, it should return all results",
                0 == query.size());
 
 
@@ -367,39 +367,39 @@ public class FilterTest extends PersistenceTestCase {
         FilterFactory factory = new FilterFactoryImpl();
         query = getDefaultQuery();
         query.addFilter(factory.endsWith("description", "14", true));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in FilterendsWith no matter if the last param is true or " +
                " false...in true and Factory", fullSize > query.size());
-        assert("adding a filter should restrict the results, not eliminate " +
+        assertTrue("adding a filter should restrict the results, not eliminate " +
                "them", query.size() > 0);
 
         query = getDefaultQuery();
         query.addFilter(factory.endsWith("description", "14", false));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in FilterendsWith no matter if the last param is true or " +
                " false...in false and Factory", fullSize > query.size());
-        assert("adding a filter should restrict the results, not eliminate " +
+        assertTrue("adding a filter should restrict the results, not eliminate " +
                "them.", query.size() > 0);
 
         query = getDefaultQuery();
         query.addFilter(factory.endsWith("description", null, true));
-        assert("when the allIfNull is true, it should return all results. " +
+        assertTrue("when the allIfNull is true, it should return all results. " +
                "In Factory", fullSize == query.size());
 
         query = getDefaultQuery();
         query.addFilter(factory.endsWith("description", null, false));
-        assert("when the allIfNull is false, it should return all results. " +
+        assertTrue("when the allIfNull is false, it should return all results. " +
                "In Factory", 0 == query.size());
 
         // let's make sure that it does negative stuff as well
         query = getDefaultQuery();
         query.addFilter(FilterImpl.endsWith("description", "item", false));
-        assert("when looking for an item that does not exist, it should " +
+        assertTrue("when looking for an item that does not exist, it should " +
                "return no rows", query.size() == 0);
 
         query = getDefaultQuery();
         query.addFilter(factory.endsWith("description", "item", false));
-        assert("when looking for an item that does not exist, it should " +
+        assertTrue("when looking for an item that does not exist, it should " +
                "return no rows", query.size() == 0);
     }
 
@@ -413,28 +413,28 @@ public class FilterTest extends PersistenceTestCase {
         DataQuery query = getDefaultQuery();
         long fullSize = query.size();
         query.addFilter(FilterImpl.contains("description", "ead", true));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in Filter.contains no matter if the last param is true or " +
                " false...in true", fullSize > query.size());
-        assert("adding a filter should restrict the results, not eliminate " +
+        assertTrue("adding a filter should restrict the results, not eliminate " +
                "them.", query.size() > 0);
 
         query = getDefaultQuery();
         query.addFilter(FilterImpl.contains("description", "ead", false));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in Filter.contains no matter if the last param is true or " +
                " false...in false", fullSize > query.size());
-        assert("adding a filter should restrict the results, not eliminate " +
+        assertTrue("adding a filter should restrict the results, not eliminate " +
                "them.", query.size() > 0);
 
         query = getDefaultQuery();
         query.addFilter(FilterImpl.contains("description", null, true));
-        assert("when the allIfNull is true, it should return all results",
+        assertTrue("when the allIfNull is true, it should return all results",
                fullSize == query.size());
 
         query = getDefaultQuery();
         query.addFilter(FilterImpl.contains("description", null, false));
-        assert("when the allIfNull is false, it should return all results",
+        assertTrue("when the allIfNull is false, it should return all results",
                0 == query.size());
 
 
@@ -442,39 +442,39 @@ public class FilterTest extends PersistenceTestCase {
         FilterFactory factory = new FilterFactoryImpl();
         query = getDefaultQuery();
         query.addFilter(factory.contains("description", "ead", true));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in Filtercontains no matter if the last param is true or " +
                " false...in true and Factory", fullSize > query.size());
-        assert("adding a filter should restrict the results, not eliminate " +
+        assertTrue("adding a filter should restrict the results, not eliminate " +
                "them.", query.size() > 0);
 
         query = getDefaultQuery();
         query.addFilter(factory.contains("description", "ead", false));
-        assert("adding a filter should lower the number of returned results." +
+        assertTrue("adding a filter should lower the number of returned results." +
                " in Filtercontains no matter if the last param is true or " +
                " false...in false and Factory", fullSize > query.size());
-        assert("adding a filter should restrict the results, not eliminate " +
+        assertTrue("adding a filter should restrict the results, not eliminate " +
                "them.", query.size() > 0);
 
         query = getDefaultQuery();
         query.addFilter(factory.contains("description", null, true));
-        assert("when the allIfNull is true, it should return all results. " +
+        assertTrue("when the allIfNull is true, it should return all results. " +
                "In Factory", fullSize == query.size());
 
         query = getDefaultQuery();
         query.addFilter(factory.contains("description", null, false));
-        assert("when the allIfNull is false, it should return all results. " +
+        assertTrue("when the allIfNull is false, it should return all results. " +
                "In Factory", 0 == query.size());
 
         // let's make sure that it does negative stuff as well
         query = getDefaultQuery();
         query.addFilter(FilterImpl.endsWith("description", "abcd", false));
-        assert("when looking for an item that does not exist, it should " +
+        assertTrue("when looking for an item that does not exist, it should " +
                "return no rows", query.size() == 0);
 
         query = getDefaultQuery();
         query.addFilter(factory.endsWith("description", "abcd", false));
-        assert("when looking for an item that does not exist, it should " +
+        assertTrue("when looking for an item that does not exist, it should " +
                "return no rows", query.size() == 0);
     }
 
@@ -492,7 +492,7 @@ public class FilterTest extends PersistenceTestCase {
         filter.set("upperPriority", "-3");
         filter.set("lowerPriority", "-3");
         query.addFilter(filter);
-        assert("The query with an OR should return results",
+        assertTrue("The query with an OR should return results",
                query.size() > 0);
 
         // now test the or with ANDs in the conditions
@@ -520,7 +520,7 @@ public class FilterTest extends PersistenceTestCase {
         query.addFilter(filter);
         long upperSize = query.size();
 
-        assert("The (x and y) or (w and z) did not return the correct value",
+        assertTrue("The (x and y) or (w and z) did not return the correct value",
                lowerSize + upperSize == bothSize);
     }
 
@@ -541,7 +541,7 @@ public class FilterTest extends PersistenceTestCase {
         filter.set("lowerPriority", "3");
         query.addFilter(filter);
         long selectedItemCount = query.size();
-        assert("The query with an AND should return results",
+        assertTrue("The query with an AND should return results",
                selectedItemCount > 0);
 
         query = getDefaultQuery();
@@ -549,7 +549,7 @@ public class FilterTest extends PersistenceTestCase {
                                  ":lowerPriority");
         filter.set("upperPriority", "3");
         filter.set("lowerPriority", "3");
-        assert("two filters at once should be the same as two ANDed filters",
+        assertTrue("two filters at once should be the same as two ANDed filters",
                selectedItemCount == query.size());
 
     }
@@ -571,12 +571,12 @@ public class FilterTest extends PersistenceTestCase {
         DataQuery query = getDefaultQuery();
         long totalItems = query.size();
         query.addFilter(FilterImpl.equals("description", null));
-        assert("when only selected a small portion of items, the number " +
+        assertTrue("when only selected a small portion of items, the number " +
                "should be less than the total.", query.size() < totalItems);
 
         query = getDefaultQuery();
         query.addFilter(FilterImpl.notEquals("description", null));
-        assert("when only selected a small portion of items, the number " +
+        assertTrue("when only selected a small portion of items, the number " +
                "should be less than the total.", query.size() < totalItems);
 
 
@@ -598,7 +598,7 @@ public class FilterTest extends PersistenceTestCase {
         f.addBindings(map);
         query.addFilter(f);
 
-        assert("adding a filter on description should narrow the results in " +
+        assertTrue("adding a filter on description should narrow the results in " +
                "test setConditions ", size > query.size());
 
     }
@@ -624,14 +624,14 @@ public class FilterTest extends PersistenceTestCase {
         date.setTime(time/3);
 
         query.addFilter(query.getFilterFactory().lessThan("actionTime", date, true));
-        assert("The size after filtering should be less than the size before " +
+        assertTrue("The size after filtering should be less than the size before " +
                "filtering.  Before: " + size + "; After: " + query.size(),
                query.size() < size && query.size() > 0);
 
         // let's try out a null value
         query = getDefaultQuery();
         query.addFilter(query.getFilterFactory().lessThan("actionTime", null, true));
-        assert("When a < null and true is passed in, the sizes should be the " +
+        assertTrue("When a < null and true is passed in, the sizes should be the " +
                "same.  Rather, they were " + size + " and " + query.size(),
                size == query.size());
 
@@ -639,7 +639,7 @@ public class FilterTest extends PersistenceTestCase {
         query = getDefaultQuery();
         query.addFilter(query.getFilterFactory().lessThan("actionTime",
                                                           null, false));
-        assert("When a < null and false is passed in, the sizes should be  " +
+        assertTrue("When a < null and false is passed in, the sizes should be  " +
                "different.  Before: " + size + "; After: " + query.size(),
                size > query.size());
     }
@@ -652,11 +652,11 @@ public class FilterTest extends PersistenceTestCase {
 
         DataQuery query = getDefaultQuery();
         query.addFilter("priority = :l12").set("l12", new Integer(3));
-        assert("binding with an integer should not cause problems.",
+        assertTrue("binding with an integer should not cause problems.",
                query.size() > 0);
         query = getDefaultQuery();
         query.addFilter("priority = :1").set("1", new Integer(3));
-        assert("binding with an integer should not cause problems.",
+        assertTrue("binding with an integer should not cause problems.",
                query.size() > 0);
     }
 
@@ -708,17 +708,17 @@ public class FilterTest extends PersistenceTestCase {
         query.clearFilter();
         Filter f = query.addFilter("description = :description");
         f.set("description", null);
-        assert("The query should have returned " + actualSize + " but " +
+        assertTrue("The query should have returned " + actualSize + " but " +
         "instead returned " + query.size(), query.size() == actualSize);
 
         query.clearFilter();
         f = query.addFilter("description is null");
-        assert(query.size() == actualSize);
+        assertTrue(query.size() == actualSize);
 
         query = SessionManager.getSession()
         .retrieveQuery("examples.DataQueryWithMoreBinds");
         query.setParameter("description", null);
-        assert("Setting the parameter to null should give you the same " +
+        assertTrue("Setting the parameter to null should give you the same " +
         "as having null hard coded", query.size() == actualSize);
         */
     }
@@ -746,7 +746,7 @@ public class FilterTest extends PersistenceTestCase {
                                                         FilterFactory.EQUALS,
                                                         ":description"));
         filter.set("description", null);
-        assert("The EQUALS filter with null should have returned " +
+        assertTrue("The EQUALS filter with null should have returned " +
                numberNull + " but it actually returned " + query.size(),
                numberNull == query.size());
 
@@ -755,7 +755,7 @@ public class FilterTest extends PersistenceTestCase {
                                                  FilterFactory.EQUALS,
                                                  ":description"));
         filter.set("description", "Read item 0");
-        assert("The EQUALS filter should have returned zero rows.  Instead " +
+        assertTrue("The EQUALS filter should have returned zero rows.  Instead " +
                "it returned " + query.size(), query.size() == 0);
 
         query = getDefaultQuery();
@@ -764,7 +764,7 @@ public class FilterTest extends PersistenceTestCase {
                                                  "upper(:description)"));
         filter.set("description", "Read item 0");
 
-        assert("The EQUALS filter should have returned one row.  Instead " +
+        assertTrue("The EQUALS filter should have returned one row.  Instead " +
                "it returned " + query.size(), query.size() == 1);
 
 
@@ -773,7 +773,7 @@ public class FilterTest extends PersistenceTestCase {
                                                  FilterFactory.EQUALS,
                                                  ":description"));
         filter.set("description", "READ ITEM 0");
-        assert("The EQUALS filter should have returned one row.  Instead " +
+        assertTrue("The EQUALS filter should have returned one row.  Instead " +
                "it returned " + query.size(), query.size() == 1);
 
 
@@ -790,7 +790,7 @@ public class FilterTest extends PersistenceTestCase {
                                                  FilterFactory.NOT_EQUALS,
                                                  ":description"));
         filter.set("description", null);
-        assert("The NOT_EQUALS filter with null should have returned " +
+        assertTrue("The NOT_EQUALS filter with null should have returned " +
                numberNotNull + " but it actually returned " + query.size(),
                numberNotNull == query.size());
 
@@ -799,7 +799,7 @@ public class FilterTest extends PersistenceTestCase {
                                                  FilterFactory.NOT_EQUALS,
                                                  ":description"));
         filter.set("description", "Read item 0");
-        assert("The NOT_EQUALS filter should have returned " + totalRows +
+        assertTrue("The NOT_EQUALS filter should have returned " + totalRows +
                ".  " + "Instead it returned " +
                query.size(), query.size() == totalRows);
 
@@ -808,7 +808,7 @@ public class FilterTest extends PersistenceTestCase {
                                                  FilterFactory.NOT_EQUALS,
                                                  "upper(:description)"));
         filter.set("description", "Read item 0");
-        assert("The NOT_EQUALS filter should have returned " + (totalRows - 1) +
+        assertTrue("The NOT_EQUALS filter should have returned " + (totalRows - 1) +
                ".  Instead it returned " + query.size(),
                query.size() == totalRows - 1);
 
@@ -818,7 +818,7 @@ public class FilterTest extends PersistenceTestCase {
                                                  FilterFactory.NOT_EQUALS,
                                                  ":description"));
         filter.set("description", "READ ITEM 0");
-        assert("The NOT_EQUALS filter should have returned " + (totalRows - 1) +
+        assertTrue("The NOT_EQUALS filter should have returned " + (totalRows - 1) +
                ".  Instead it returned " + query.size(),
                query.size() == totalRows - 1);
         /*
@@ -858,24 +858,24 @@ public class FilterTest extends PersistenceTestCase {
         // This should be uncommented when people can filter by
         // variables not in their MAP statment
         /*
-          assert("The query should return at least one line", dq.next());
+          assertTrue("The query should return at least one line", dq.next());
           BigDecimal maxPriority = (BigDecimal) dq.get("priority");
           //        s_log.info("XXXX the priroity is " + maxPriority);
-          assert("The query should only return one line", !dq.next());
+          assertTrue("The query should only return one line", !dq.next());
 
           dq = getSession().retrieveQuery("examples.DataQueryWithMax");
           dq.addEqualsFilter("action", "write");
-          assert("The query should return at least one line", dq.next());
+          assertTrue("The query should return at least one line", dq.next());
           //        s_log.info("YYYYY...The item from the filter = " +
           (BigDecimal) dq.get("priority"));
-          assert("The query should only return one line", !dq.next());
+          assertTrue("The query should only return one line", !dq.next());
 
           dq = getSession().retrieveQuery("examples.DataQueryWithMax");
           dq.addEqualsFilter("action", "read");
-          assert("The query should return at least one line", dq.next());
+          assertTrue("The query should return at least one line", dq.next());
           //        s_log.info("YYYYY...The item from the filter = " +
           (BigDecimal) dq.get("priority"));
-          assert("The query should only return one line", !dq.next());
+          assertTrue("The query should only return one line", !dq.next());
         */
     }
 

@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 
 /**
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/08/30 $
  */
 
 public class DynamicAssociationTest extends PersistenceTestCase {
@@ -122,9 +122,9 @@ public class DynamicAssociationTest extends PersistenceTestCase {
         ObjectType user =
             m_root.getObjectType("com.arsdigita.kernel.User");
 
-        assert("Property not found in User",
+        assertTrue("Property not found in User",
                user.getProperty("owned") != null);
-        assert("Property not found in ACSObject",
+        assertTrue("Property not found in ACSObject",
                object.getProperty("owner") != null);
 
         DynamicAssociation dass2 = new DynamicAssociation(
@@ -135,7 +135,7 @@ public class DynamicAssociationTest extends PersistenceTestCase {
                                                           "owner");
 
         Association assoc2 = dass2.save();
-        assert("Saved associations are different", assoc.equals(assoc2));
+        assertTrue("Saved associations are different", assoc.equals(assoc2));
 
         try {
             dass2 = new DynamicAssociation(
@@ -185,7 +185,7 @@ public class DynamicAssociationTest extends PersistenceTestCase {
             owned = (DataAssociation)userObj.get("owned");
             DataAssociationCursor cursor = owned.cursor();
 
-            assert("Incorrect number of objects associated",
+            assertTrue("Incorrect number of objects associated",
                    cursor.size() == 2);
 
             boolean found1 = false;
@@ -206,7 +206,7 @@ public class DynamicAssociationTest extends PersistenceTestCase {
             }
             userObj.save();
 
-            assert("Association was missing an object", found1 && found2);
+            assertTrue("Association was missing an object", found1 && found2);
 
             testObj1.delete();
             testObj2.delete();

@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
  * NodeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/08/30 $
  */
 
 public abstract class NodeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/NodeTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/NodeTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
 
     private static Logger s_log =
         Logger.getLogger(NodeTest.class.getName());
@@ -144,7 +144,7 @@ public abstract class NodeTest extends PersistenceTestCase {
         assertEquals("Update failed.",
                      "other child",
                      child.get("name"));
-        assert(child.get("parent") != null);
+        assertTrue(child.get("parent") != null);
     }
 
     public void testParentAssociation() {
@@ -297,13 +297,13 @@ public abstract class NodeTest extends PersistenceTestCase {
     public void testIsNew() {
         DataObject child = getSession().create(getModelName() + ".Node");
 
-        assert("isNew() failed.", child.isNew());
+        assertTrue("isNew() failed.", child.isNew());
 
         child.set("id", new BigDecimal(1));
         child.set("name", "child");
         child.get("parent");
 
-        assert("isNew() failed.", child.isNew());
+        assertTrue("isNew() failed.", child.isNew());
     }
 
     private DataObject createNode(BigDecimal id, String name) {
