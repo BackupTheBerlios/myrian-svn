@@ -79,12 +79,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/03 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/pdl/PDL.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/pdl/PDL.java#2 $ by $Author: rhs $, $DateTime: 2004/02/03 18:30:38 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -438,11 +438,15 @@ public class PDL {
 			Adapter ad = (Adapter) adapterClass.newInstance();
 			m_root.addAdapter(javaClass, ad);
 		    } catch (IllegalAccessException e) {
-			m_errors.fatal(acn, e.getMessage());
+			m_errors.fatal
+                            (acn, "illegal access: " + e.getMessage());
 		    } catch (ClassNotFoundException e) {
-			m_errors.fatal(acn, e.getMessage());
+			m_errors.fatal
+                            (acn, "class not found: " + e.getMessage());
 		    } catch (InstantiationException e) {
-			m_errors.fatal(acn, e.getMessage());
+			m_errors.fatal
+                            (acn, "instantiation exception: " +
+                             e.getMessage());
 		    }
 		}
 	    });
