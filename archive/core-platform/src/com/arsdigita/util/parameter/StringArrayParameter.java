@@ -25,10 +25,18 @@ import com.arsdigita.util.StringUtils;
 public class StringArrayParameter extends StringParameter {
 
     public StringArrayParameter(final String name,
-                         final int multiplicity,
-                         final Object defaalt) {
+                                final int multiplicity,
+                                final Object defaalt) {
         super(name, multiplicity, defaalt);
 
+    }
+
+    protected String marshal(final Object value) {
+        if (value == null) {
+            return null;
+        } else {
+            return StringUtils.join((String[])value, ',');
+        }
     }
 
     protected Object unmarshal(final String literal,
