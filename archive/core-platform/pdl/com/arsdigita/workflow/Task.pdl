@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/workflow/Task.pdl#8 $ 
-// $DateTime: 2002/10/16 14:12:35 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/workflow/Task.pdl#9 $
+// $DateTime: 2002/11/11 19:11:24 $
 
 model com.arsdigita.workflow.simple;
 
@@ -25,14 +25,18 @@ object type Task extends ACSObject {
     String[1..1]     isActive = cw_tasks.is_active CHAR(1);
     BigDecimal[0..1] parentTaskID = cw_tasks.parent_task_id INTEGER;
     String[1..1]     taskState = cw_tasks.task_state VARCHAR(16);
-    component TaskComment[0..n] comments = 
+    component TaskComment[0..n] comments =
               join cw_tasks.task_id to cw_task_comments.task_id;
-	
+
+    Task[0..n] dependsOn = join cw_tasks.task_id
+                              to cw_task_dependencies.task_id,
+                            join cw_task_dependencies.dependent_task_id
+                              to cw_tasks.task_id;
     reference key (cw_tasks.task_id);
 
 
 
-   // delete all of dependency list , delete other dependency 
+   // delete all of dependency list , delete other dependency
    // list that has this task def.  The delete may fail
    // if there other foreign key references on task
    // TODO: delete dependencies too.
@@ -40,8 +44,8 @@ object type Task extends ACSObject {
         do {
             delete from cw_task_comments
             where task_id = :id
-        }	
-        
+        }
+
         do {
             delete from cw_tasks
             where  task_id = :id
@@ -51,12 +55,12 @@ object type Task extends ACSObject {
 }
 
 association {
-    Task[1..1] task = join cw_tasks.task_id 
+    Task[1..1] task = join cw_tasks.task_id
                         to cw_task_listeners.listener_task_id,
                       join cw_task_listeners.task_id
                         to cw_tasks.task_id;
-    Task[0..n] taskFinishedListeners = join cw_tasks.task_id 
-                                         to cw_task_listeners.task_id, 
+    Task[0..n] taskFinishedListeners = join cw_tasks.task_id
+                                         to cw_task_listeners.task_id,
                                        join cw_task_listeners.listener_task_id
                                          to cw_tasks.task_id;
 
@@ -67,7 +71,7 @@ association {
     retrieve taskFinishedListeners {
         do {
 	    select cw_task_listeners.listener_task_id ,
-                   acs_objects.object_type 
+                   acs_objects.object_type
             from   cw_task_listeners ,
                    acs_objects
             where  cw_task_listeners.task_id = :id
@@ -93,10 +97,10 @@ association {
     remove taskFinishedListeners {
         do {
             delete from cw_task_listeners
-            where  task_id = :id 
+            where  task_id = :id
             and    listener_task_id = :taskFinishedListeners.id
         }
-    }	
+    }
 
     clear  taskFinishedListeners {
 	do {
@@ -104,71 +108,8 @@ association {
             where  task_id = :id
       	}
     }
-}   
-
-association {
-    Task[1..1] targetTask = join cw_tasks.task_id 
-                              to cw_task_dependencies.task_id,
-                            join cw_task_dependencies.dependent_task_id
-                              to cw_tasks.task_id;
-
-    Task[0..n] dependsOn = join cw_tasks.task_id 
-                              to cw_task_dependencies.dependent_task_id,
-                            join cw_task_dependencies.task_id
-                              to cw_tasks.task_id;
-
-    retrieve dependsOn {
-        do {
-           select cw_tasks.label,
-                  cw_tasks.description,
-                  cw_tasks.is_active,
-                  cw_tasks.parent_task_id,
-                  acs_objects.object_id,
-                  acs_objects.object_type
-           from  cw_task_dependencies ,
-                 cw_tasks  ,
-                 acs_objects
-           where cw_task_dependencies.task_id = :id 
-           and   cw_tasks.task_id  = 
-	         cw_task_dependencies.dependent_task_id               
-           and   acs_objects.object_id = cw_tasks.task_id
-        } map {
-           dependsOn.description                 = cw_tasks.description;
-           dependsOn.isActive                    = cw_tasks.is_active;
-           dependsOn.parentTaskID                = cw_tasks.parent_task_id;
-           dependsOn.label                       = cw_tasks.label;
-           dependsOn.objectType                  = cw_tasks.object_type;
-           dependsOn.id                          = acs_objects.object_id;
-        }
-    }
-
-    add dependsOn {
-        do {
-            insert into cw_task_dependencies (
-                task_id ,
-                dependent_task_id
-            ) values (
-                :id ,
-                :dependsOn.id
-            )
-       }            
-    }
-
-    remove dependsOn {
-        do {
-            delete from cw_task_dependencies 
-            where task_id = :id
-            and   dependent_task_id = :dependsOn.id
-        }
-    }
-
-    clear dependsOn {
-        do {
-            delete from cw_task_dependencies 
-            where task_def_id = :id
-        }
-    }
 }
+
 
 query getTasks {
     BigDecimal taskId;
@@ -184,8 +125,8 @@ query getTasks {
                acs_objects.object_type
         from   cw_tasks,
                acs_objects
-        where 
-               acs_objects.object_id = 
+        where
+               acs_objects.object_id =
                         cw_tasks.task_id
     } map {
         taskId = cw_tasks.task_id;
