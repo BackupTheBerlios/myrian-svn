@@ -17,15 +17,29 @@
 -- tests to run.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #7 $ $Date: 2002/07/30 $
+-- @version $Revision: #3 $ $Date: 2002/07/30 $
 --
 
-@@ order-test.sql
-@@ ../../default/persistence/setup.sql
-@@ party-test.sql
-@@ datatype-test.sql
-@@ data-query-test.sql
-@@ sql-operation-test.sql
-@@ data-operation-test.sql
-@@ link-test.sql
+create table t_orders (
+    order_id    integer primary key,
+    buyer       varchar(100) not null,
+    seller      varchar(100),
+    shipping_address varchar(200),
+    shipping_date timestamp,
+    shipped_p char(1)
+);
 
+create table t_line_items (
+    item_id    integer primary key,
+    order_id   integer not null references t_orders(order_id),
+    price      numeric not null,
+    name       varchar(100) not null,
+    in_stock_p char(1)
+);
+
+create table t_other_items (
+    other_id    integer primary key,
+    price      numeric not null,
+    name       varchar(100) not null,
+    in_stock_p char(1)
+);

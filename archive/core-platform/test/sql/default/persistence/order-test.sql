@@ -17,37 +17,16 @@
 -- cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #1 $ $Date: 2002/07/22 $
+-- @version $Revision: #2 $ $Date: 2002/07/30 $
 --
 
-create table t_orders (
-    order_id    integer primary key,
-    buyer       varchar(100) not null,
-    seller      varchar(100),
-    shipping_address varchar(200),
-    shipping_date date,
-    shipped_p char(1)
-);
 
-create table t_line_items (
-    item_id    integer primary key,
-    order_id   integer not null references t_orders(order_id),
-    price      numeric not null,
-    name       varchar(100) not null,
-    in_stock_p char(1)
-);
 
 create table t_orders_ext (
     order_id     integer primary key references t_orders,
     text         varchar(100)
 );
 
-create table t_other_items (
-    other_id    integer primary key,
-    price      numeric not null,
-    name       varchar(100) not null,
-    in_stock_p char(1)
-);
 
 create table t_order_other_item_map (
       order_id   integer references t_orders,
