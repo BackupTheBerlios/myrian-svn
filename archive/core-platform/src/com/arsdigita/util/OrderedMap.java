@@ -28,19 +28,19 @@ import org.apache.log4j.Logger;
  */
 public class OrderedMap extends TreeMap {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/OrderedMap.java#5 $" +
-        "$Author: vadim $" +
-        "$DateTime: 2002/11/01 09:30:48 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/OrderedMap.java#6 $" +
+        "$Author: justin $" +
+        "$DateTime: 2002/11/14 16:34:00 $";
 
     private static final Logger s_log = Logger.getLogger
         (OrderedMap.class.getName());
 
-    private OrderedComparator m_comparator;
+    private OrderingComparator m_comparator;
 
     public OrderedMap() {
-        super(new OrderedComparator());
+        super(new OrderingComparator());
 
-        m_comparator = (OrderedComparator) comparator();
+        m_comparator = (OrderingComparator) comparator();
     }
 
     /**
@@ -58,7 +58,7 @@ public class OrderedMap extends TreeMap {
     }
 }
 
-class OrderedComparator implements Comparator {
+class OrderingComparator implements Comparator {
     private HashMap m_sortKeyMap = new HashMap();
     private long m_currSortKey = 0;
 
@@ -72,7 +72,7 @@ class OrderedComparator implements Comparator {
         return (int) (sk1.longValue() - sk2.longValue());
     }
 
-    public void keep(Object key) {
+    void keep(Object key) {
         m_sortKeyMap.put(key, new Long(m_currSortKey++));
     }
 }
