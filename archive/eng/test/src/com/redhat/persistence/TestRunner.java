@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * TestRunner
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/07/12 $
+ * @version $Revision: #3 $ $Date: 2004/07/15 $
  **/
 
 public class TestRunner {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/TestRunner.java#2 $ by $Author: ashah $, $DateTime: 2004/07/12 11:23:58 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/TestRunner.java#3 $ by $Author: ashah $, $DateTime: 2004/07/15 13:40:03 $";
 
     private static final Logger s_log = Logger.getLogger(TestRunner.class);
 
@@ -74,8 +74,10 @@ public class TestRunner {
             TestFailure failure = (TestFailure) e.nextElement();
             System.out.println("Testcase: " + failure.failedTest());
             System.out.println(failure.isFailure() ? "FAILED " : "ERROR ");
-            System.out.println(failure.toString());
-            System.out.println(failure.trace());
+            if (!"false".equals(System.getProperty("junit.verbose"))) {
+                System.out.println(failure.toString());
+                System.out.println(failure.trace());
+            }
         }
     }
 
