@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2004/09/20 $
+ * @version $Revision: #11 $ $Date: 2004/09/23 $
  **/
 
 class ObjectData implements Violation {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/ObjectData.java#10 $ by $Author: ashah $, $DateTime: 2004/09/20 18:11:08 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/ObjectData.java#11 $ by $Author: ashah $, $DateTime: 2004/09/23 14:12:24 $";
 
     private static final Logger LOG = Logger.getLogger(ObjectData.class);
 
@@ -138,6 +138,22 @@ class ObjectData implements Violation {
         m_map = map;
     }
 
+    public PropertyMap getProperties() {
+        PropertyMap result = new PropertyMap(getObjectMap().getObjectType());
+        List keys = getObjectMap().getKeyProperties();
+        for (int i = 0; i < keys.size(); i++) {
+            Property p = (Property) keys.get(i);
+            PropertyData pd = getPropertyData(p);
+            // for new objects not synced to store getValue returns null
+            if (isLoaded() && isInfantile()) {
+                result.put(p, pd.get());
+            } else {
+                result.put(p, pd.getValue());
+            }
+        }
+        return result;
+    }
+
     void clear() {
         if (m_map == null) { return; }
         Collection keys = m_map.getKeyProperties();
@@ -157,10 +173,8 @@ class ObjectData implements Violation {
     }
 
     public void addPropertyData(Property p, PropertyData pd) {
+        check();
         m_pdata.put(p, pd);
-        if (getState().equals(UNKNOWN)) {
-            setState(NUBILE);
-        }
     }
 
     public PropertyData getPropertyData(Property prop) {
@@ -171,25 +185,33 @@ class ObjectData implements Violation {
         return m_pdata.containsKey(prop);
     }
 
-    public boolean isNew() { return m_startedNew; }
+    public boolean isNew() { check(); return m_startedNew; }
 
-    public boolean isDeleted() { return isDead() || isSenile(); }
+    public boolean isDeleted() { check(); return isDead() || isSenile(); }
 
-    public boolean isModified() { return !isNubile(); }
+    public boolean isModified() { check(); return !isNubile(); }
 
-    public boolean isInfantile() { return m_state.equals(INFANTILE); }
+    public boolean isInfantile() { check(); return m_state.equals(INFANTILE); }
 
-    public boolean isNubile() { return m_state.equals(NUBILE); }
+    public boolean isNubile() { check(); return m_state.equals(NUBILE); }
 
-    public boolean isAgile() { return m_state.equals(AGILE); }
+    public boolean isAgile() { check(); return m_state.equals(AGILE); }
 
-    public boolean isSenile() { return m_state.equals(SENILE); }
+    public boolean isSenile() { check(); return m_state.equals(SENILE); }
 
-    public boolean isDead() { return m_state.equals(DEAD); }
+    public boolean isDead() { check(); return m_state.equals(DEAD); }
+
+    private void check() {
+        if (!isLoaded()) {
+            throw new IllegalStateException
+                ("unloaded object data with key " + getKey());
+        }
+    }
 
     public boolean isLoaded() { return !m_state.equals(UNKNOWN); }
 
     public boolean isFlushed() {
+        check();
         if (getSession().getEventStream().getLastEvent(getObject()) != null) {
             return false;
         }

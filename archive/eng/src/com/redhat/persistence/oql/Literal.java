@@ -29,12 +29,12 @@ import java.util.*;
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/09/07 $
+ * @version $Revision: #7 $ $Date: 2004/09/23 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Literal.java#6 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Literal.java#7 $ by $Author: ashah $, $DateTime: 2004/09/23 14:12:24 $";
 
     private Object m_value;
 
@@ -155,7 +155,15 @@ public class Literal extends Expression {
                     bindcount =
                         convert(container, result, gen, key, bindcount);
                 }
-                bindcount = convert(map, value, result, gen, key, bindcount);
+
+                PropertyMap pmap = gen.getSession().getProperties(value);
+                for (Iterator it = pmap.entrySet().iterator();
+                     it.hasNext(); ) {
+                    Map.Entry me = (Map.Entry) it.next();
+                    Property prop = (Property) me.getKey();
+                    Object obj = me.getValue();
+                    bindcount = convert(obj, result, gen, key, bindcount);
+                }
             } else {
                 Adapter ad = gen.getRoot().getAdapter(value.getClass());
                 Object k = key == null ? null :
@@ -170,24 +178,11 @@ public class Literal extends Expression {
         return bindcount;
     }
 
-    private static int convert(ObjectMap map, Object value, List result,
-                               Generator gen, Object key, int bindcount) {
-        Session ssn = gen.getSession();
-        Collection props = map.getKeyProperties();
-        for (Iterator it = props.iterator(); it.hasNext(); ) {
-            Property prop = (Property) it.next();
-            Object obj = ssn.get(value, prop);
-            bindcount = convert(obj, result, gen, key, bindcount);
-        }
-
-        return bindcount;
-    }
-
     public String toString() {
         if (m_value instanceof String) {
             return "\"" + m_value + "\"";
         } else {
-            return "" + m_value;
+            return "" + Session.str(m_value);
         }
     }
 

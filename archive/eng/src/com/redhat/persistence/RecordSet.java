@@ -36,12 +36,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2004/09/07 $
+ * @version $Revision: #12 $ $Date: 2004/09/23 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/RecordSet.java#11 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/RecordSet.java#12 $ by $Author: ashah $, $DateTime: 2004/09/23 14:12:24 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -153,6 +153,8 @@ public abstract class RecordSet {
             odata = new ObjectData(ssn, obj, ObjectData.NUBILE);
             ssn.setSessionKey(obj, key);
             odata.setObjectMap(getObjectMap(path));
+        } else if (!odata.isLoaded()) {
+            odata.setState(ObjectData.NUBILE);
         }
         return odata.getObject();
     }
@@ -181,7 +183,9 @@ public abstract class RecordSet {
                     ssn.load(container, prop, value);
                 }
                 ObjectData odata = ssn.getObjectData(value);
-                odata.setContainer(container);
+                if (odata != null) {
+                    odata.setContainer(container);
+                }
             }
             values.put(path, value);
         } else {
