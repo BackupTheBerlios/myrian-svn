@@ -24,13 +24,13 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameterContext.java#4 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameterContext.java#5 $
  */
 public abstract class AbstractParameterContext implements ParameterContext {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameterContext.java#4 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameterContext.java#5 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/20 22:11:50 $";
+        "$DateTime: 2003/10/21 21:30:18 $";
 
     private static final Logger s_log = Logger.getLogger
         (AbstractParameterContext.class);
@@ -77,7 +77,6 @@ public abstract class AbstractParameterContext implements ParameterContext {
      * @param param The named <code>Parameter</code> whose value you
      * wish to retrieve; it cannot be null
      */
-
     public Object get(final Parameter param) {
         return get(param, param.getDefaultValue());
     }
@@ -118,12 +117,22 @@ public abstract class AbstractParameterContext implements ParameterContext {
         m_map.put(param, value);
     }
 
-    public final ErrorList load(ParameterReader reader) {
+    public final ErrorList load(final ParameterReader reader) {
         final ErrorList errors = new ErrorList();
 
-        m_map.putAll((Map) m_param.read(reader, errors));
+        load(reader, errors);
 
         return errors;
+    }
+
+    public final void load(final ParameterReader reader,
+                           final ErrorList errors) {
+        if (Assert.isEnabled()) {
+            Assert.exists(reader, ParameterReader.class);
+            Assert.exists(errors, ErrorList.class);
+        }
+
+        m_map.putAll((Map) m_param.read(reader, errors));
     }
 
     public final ErrorList validate() {
@@ -132,6 +141,12 @@ public abstract class AbstractParameterContext implements ParameterContext {
         m_param.validate(m_map, errors);
 
         return errors;
+    }
+
+    public final void validate(final ErrorList errors) {
+        Assert.exists(errors, ErrorList.class);
+
+        m_param.validate(m_map, errors);
     }
 
     public final void save(ParameterWriter writer) {

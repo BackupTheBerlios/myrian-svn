@@ -21,21 +21,21 @@ import java.util.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterContext.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterContext.java#2 $
  */
 public interface ParameterContext {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterContext.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterContext.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/17 11:35:44 $";
+        "$DateTime: 2003/10/21 21:30:18 $";
 
-    Object get(Parameter param);
+    Object get(Parameter param, Object dephalt);
 
     void set(Parameter param, Object value);
 
-    ErrorList load(ParameterReader reader);
+    void load(ParameterReader reader, ErrorList errors);
 
     void save(ParameterWriter writer);
 
-    ErrorList validate();
+    void validate(ErrorList errors);
 }
