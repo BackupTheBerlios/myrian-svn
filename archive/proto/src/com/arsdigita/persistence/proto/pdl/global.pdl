@@ -1,15 +1,53 @@
 model global;
 
-object type BigDecimal {}
-object type BigInteger {}
-object type Long {}
-object type Integer {}
-object type Boolean {}
-object type String {}
-object type Date {}
-object type Blob {}
-object type Float {}
-object type Byte {}
-object type Character {}
-object type Short {}
-object type Double {}
+object type Boolean
+    class java.lang.Boolean
+    adapter com.arsdigita.persistence.proto.pdl.adapters.BooleanAd {}
+
+object type Byte
+    class java.lang.Byte
+    adapter com.arsdigita.persistence.proto.pdl.adapters.ByteAd {}
+
+object type Character
+    class java.lang.Character
+    adapter com.arsdigita.persistence.proto.pdl.adapters.CharacterAd {}
+
+object type String
+    class java.lang.String
+    adapter com.arsdigita.persistence.proto.pdl.adapters.StringAd {}
+
+object type Short
+    class java.lang.Short
+    adapter com.arsdigita.persistence.proto.pdl.adapters.ShortAd {}
+
+object type Integer
+    class java.lang.Integer
+    adapter com.arsdigita.persistence.proto.pdl.adapters.IntegerAd {}
+
+object type Long
+    class java.lang.Long
+    adapter com.arsdigita.persistence.proto.pdl.adapters.LongAd {}
+
+object type Float
+    class java.lang.Float
+    adapter com.arsdigita.persistence.proto.pdl.adapters.FloatAd {}
+
+object type Double
+    class java.lang.Double
+    adapter com.arsdigita.persistence.proto.pdl.adapters.DoubleAd {}
+
+object type BigInteger
+    class java.math.BigInteger
+    adapter com.arsdigita.persistence.proto.pdl.adapters.BigIntegerAd {}
+
+object type BigDecimal
+    class java.math.BigDecimal
+    adapter com.arsdigita.persistence.proto.pdl.adapters.BigDecimalAd {}
+
+object type Date
+    class java.util.Date
+    adapter com.arsdigita.persistence.proto.pdl.adapters.DateAd {}
+
+object type Blob
+    class \[B
+    adapter com.arsdigita.persistence.proto.pdl.adapters.BlobAd {}

@@ -4,12 +4,12 @@ package com.arsdigita.persistence.proto.pdl.nodes;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/03/15 $
+ * @version $Revision: #7 $ $Date: 2003/03/18 $
  **/
 
 public class ObjectTypeNd extends Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/ObjectTypeNd.java#6 $ by $Author: rhs $, $DateTime: 2003/03/15 02:35:11 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/ObjectTypeNd.java#7 $ by $Author: rhs $, $DateTime: 2003/03/18 15:44:06 $";
 
     public static final Field VERSIONED =
         new Field(ObjectTypeNd.class, "versioned", VersionedNd.class, 0, 1);
@@ -17,6 +17,8 @@ public class ObjectTypeNd extends Node {
         new Field(ObjectTypeNd.class, "name", IdentifierNd.class, 1, 1);
     public static final Field EXTENDS =
         new Field(ObjectTypeNd.class, "extends", TypeNd.class, 0, 1);
+    public static final Field CLASS =
+        new Field(ObjectTypeNd.class, "class", JavaClassNd.class, 0, 1);
     public static final Field ADAPTER =
         new Field(ObjectTypeNd.class, "adapter", JavaClassNd.class, 0, 1);
     public static final Field PROPERTIES =
@@ -74,6 +76,14 @@ public class ObjectTypeNd extends Node {
 
     public void setReturns(boolean value) {
         m_returns = value;
+    }
+
+    public JavaClassNd getJavaClass() {
+	return (JavaClassNd) get(CLASS);
+    }
+
+    public JavaClassNd getAdapterClass() {
+	return (JavaClassNd) get(ADAPTER);
     }
 
 }

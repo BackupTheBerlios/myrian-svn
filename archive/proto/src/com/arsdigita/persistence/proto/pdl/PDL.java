@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #31 $ $Date: 2003/03/15 $
+ * @version $Revision: #32 $ $Date: 2003/03/18 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#31 $ by $Author: rhs $, $DateTime: 2003/03/15 02:35:11 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#32 $ by $Author: rhs $, $DateTime: 2003/03/18 15:44:06 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -48,33 +48,6 @@ public class PDL {
             throw new Error("No such resource: " + s);
         }
         load(new InputStreamReader(is), s);
-    }
-
-    private static class SimpleAdapter extends Adapter {
-
-        private ObjectType m_type;
-        private Binder m_binder;
-
-        SimpleAdapter(ObjectType type, Binder binder) {
-            if (type == null) { throw new IllegalArgumentException(); }
-            m_type = type;
-            m_binder = binder;
-        }
-
-        public Object fetch(ResultSet rs, String column) throws SQLException {
-            return m_binder.fetch(rs, column);
-        }
-
-        public void bind(PreparedStatement ps, int index, Object obj,
-                         int type) throws SQLException {
-            m_binder.bind(ps, index, obj, type);
-        }
-
-        public PropertyMap getProperties(Object obj) {
-            return new PropertyMap(m_type);
-        }
-
-        public ObjectType getObjectType(Object obj) { return m_type; }
     }
 
     public void emit(final Root root) {
@@ -180,277 +153,39 @@ public class PDL {
 
         m_errors.check();
 
-        if (loadingGlobal) {
-            String[] types = new String[] {
-                "global.Integer",
-                "global.BigInteger",
-                "global.BigDecimal",
-                "global.String",
-                "global.Float",
-                "global.Date",
-                "global.Boolean",
-                "global.Blob",
-                "global.Byte",
-                "global.Character",
-                "global.Double",
-                "global.Short",
-                "global.Long",
-                "global.Float"
-            };
-            Class[] classes = new Class[] {
-                Integer.class,
-                java.math.BigInteger.class,
-                java.math.BigDecimal.class,
-                String.class,
-                Float.class,
-                java.util.Date.class,
-                Boolean.class,
-                byte[].class,
-                Byte.class,
-                Character.class,
-                Double.class,
-                Short.class,
-                Long.class,
-                Float.class
-            };
-            Binder[] binders = new Binder[] {
-                new Binder() {
-                        public void bind(PreparedStatement ps, int index,
-                                         Object obj, int type)
-                            throws SQLException {
-                            ps.setInt(index, ((Integer) obj).intValue());
-                        }
-                        public Object fetch(ResultSet rs, String column)
-                            throws SQLException {
-                            int i = rs.getInt(column);
-                            if (rs.wasNull()) {
-                                return null;
-                            } else {
-                                return new Integer(i);
-                            }
-                        }
-                    },
-                new Binder() {
-                        public void bind(PreparedStatement ps, int index,
-                                         Object obj, int type)
-                            throws SQLException {
-                            ps.setBigDecimal
-                                (index, new BigDecimal((BigInteger) obj));
-                        }
-                        public Object fetch(ResultSet rs, String column)
-                            throws SQLException {
-                            BigDecimal bd = rs.getBigDecimal(column);
-                            if (bd == null) {
-                                return null;
-                            } else {
-                                return bd.toBigInteger();
-                            }
-                        }
-                    },
-                new Binder() {
-                        public void bind(PreparedStatement ps, int index,
-                                         Object obj, int type)
-                            throws SQLException {
-                            ps.setBigDecimal(index, (BigDecimal) obj);
-                        }
-                        public Object fetch(ResultSet rs, String column)
-                            throws SQLException {
-                            return rs.getBigDecimal(column);
-                        }
-                    },
-                new Binder() {
-                        public void bind(PreparedStatement ps, int index,
-                                         Object obj, int type)
-                            throws SQLException {
-                            ps.setString(index, (String) obj);
-                        }
-                        public Object fetch(ResultSet rs, String column)
-                            throws SQLException {
-                            return rs.getString(column);
-                        }
-                    },
-                new Binder() {
-                        public void bind(PreparedStatement ps, int index,
-                                         Object obj, int type)
-                            throws SQLException {
-                            ps.setFloat(index, ((Float) obj).floatValue());
-                        }
-                        public Object fetch(ResultSet rs, String column)
-                            throws SQLException {
-                            float f = rs.getFloat(column);
-                            if (rs.wasNull()) {
-                                return null;
-                            } else {
-                                return new Float(f);
-                            }
-                        }
-                    },
-                new Binder() {
-                        public void bind(PreparedStatement ps, int index,
-                                         Object obj, int type)
-                            throws SQLException {
-                            Timestamp tstamp = new Timestamp
-                                (((java.util.Date) obj).getTime());
-                            ps.setTimestamp(index, tstamp);
-                        }
-                        public Object fetch(ResultSet rs, String column)
-                            throws SQLException {
-                            Timestamp tstamp = rs.getTimestamp(column);
-                            if (tstamp == null) {
-                                return null;
-                            } else {
-                                return new java.util.Date(tstamp.getTime());
-                            }
-                        }
-                    },
-                new Binder() {
-                        public void bind(PreparedStatement ps, int index,
-                                         Object obj, int type)
-                            throws SQLException {
-                            ps.setBoolean
-                                (index, ((Boolean) obj).booleanValue());
-                        }
-                        public Object fetch(ResultSet rs, String column)
-                            throws SQLException {
-                            boolean bool = rs.getBoolean(column);
-                            if (rs.wasNull()) {
-                                return null;
-                            } else if (bool) {
-                                return Boolean.TRUE;
-                            } else {
-                                return Boolean.FALSE;
-                            }
-                        }
-                    },
-                new Binder() {
-                        public void bind(PreparedStatement ps, int index,
-                                         Object obj, int type)
-                            throws SQLException {
-                            byte[] bytes = (byte[]) obj;
-                            ps.setBytes(index, bytes);
-                        }
+	m_ast.traverse(new Node.Switch() {
+		public void onObjectType(ObjectTypeNd nd) {
+		    ObjectType ot = m_symbols.getEmitted(nd);
+		    JavaClassNd jcn = nd.getJavaClass();
+		    JavaClassNd acn = nd.getAdapterClass();
 
-                        public Object fetch(ResultSet rs, String column)
-                            throws SQLException {
-                            return rs.getBytes(column);
-                        }
-                    },
-                new Binder() {
-                        public void bind(PreparedStatement ps, int index,
-                                         Object obj, int type)
-                            throws SQLException {
-                            ps.setByte(index, ((Byte) obj).byteValue());
-                        }
+		    if (jcn == null || acn == null) {
+			return;
+		    }
 
-                        public Object fetch(ResultSet rs, String column)
-                            throws SQLException {
-                            byte b = rs.getByte(column);
-                            if (rs.wasNull()) {
-                                return null;
-                            } else {
-                                return new Byte(b);
-                            }
-                        }
-                    },
-                new Binder() {
-                        public void bind(PreparedStatement ps, int index,
-                                         Object obj, int type)
-                            throws SQLException {
-                            Character charObj = (Character)obj;
-                            if (charObj == null ||
-                                "".equals(charObj.toString())) {
-                                ps.setString(index, null);
-                            } else {
-                                ps.setString(index, charObj.toString());
-                            }
-                        }
+		    Class javaClass;
+		    try {
+			javaClass = Class.forName(jcn.getName());
+		    } catch (ClassNotFoundException e) {
+			m_errors.fatal(jcn, e.getMessage());
+			return;
+		    }
 
-                        public Object fetch(ResultSet rs, String column)
-                            throws SQLException {
-                            String str = rs.getString(column);
-                            if (str != null && str.length() > 0) {
-                                return new Character(str.charAt(0));
-                            } else {
-                                return null;
-                            }
-                        }
-                    },
-                new Binder() {
-                        public void bind(PreparedStatement ps, int index,
-                                         Object obj, int type)
-                            throws SQLException {
-                            ps.setDouble(index, ((Double) obj).doubleValue());
-                        }
+		    try{
+			Class adapterClass = Class.forName(acn.getName());
+			Adapter ad = (Adapter) adapterClass.newInstance();
+			Adapter.addAdapter(javaClass, ot, ad);
+		    } catch (IllegalAccessException e) {
+			m_errors.fatal(acn, e.getMessage());
+		    } catch (ClassNotFoundException e) {
+			m_errors.fatal(acn, e.getMessage());
+		    } catch (InstantiationException e) {
+			m_errors.fatal(acn, e.getMessage());
+		    }
+		}
+	    });
 
-                        public Object fetch(ResultSet rs, String column)
-                            throws SQLException {
-                            double d = rs.getDouble(column);
-                            if (rs.wasNull()) {
-                                return null;
-                            } else {
-                                return new Double(d);
-                            }
-                        }
-                    },
-                new Binder() {
-                        public void bind(PreparedStatement ps, int index,
-                                         Object obj, int type)
-                            throws SQLException {
-                            ps.setShort(index, ((Short) obj).shortValue());
-                        }
-
-                        public Object fetch(ResultSet rs, String column)
-                            throws SQLException {
-                            short s = rs.getShort(column);
-                            if (rs.wasNull()) {
-                                return null;
-                            } else {
-                                return new Short(s);
-                            }
-                        }
-                    },
-                new Binder() {
-                        public void bind(PreparedStatement ps, int index,
-                                         Object obj, int type)
-                            throws SQLException {
-                            ps.setLong(index, ((Long) obj).longValue());
-                        }
-
-                        public Object fetch(ResultSet rs, String column)
-                            throws SQLException {
-                            long l = rs.getLong(column);
-                            if (rs.wasNull()) {
-                                return null;
-                            } else {
-                                return new Long(l);
-                            }
-                        }
-                    },
-                new Binder() {
-                        public void bind(PreparedStatement ps, int index,
-                                         Object obj, int type)
-                            throws SQLException {
-                            ps.setFloat(index, ((Float) obj).floatValue());
-                        }
-
-                        public Object fetch(ResultSet rs, String column)
-                            throws SQLException {
-                            float f = rs.getFloat(column);
-                            if (rs.wasNull()) {
-                                return null;
-                            } else {
-                                return new Float(f);
-                            }
-                        }
-                    }
-            };
-
-            for (int i = 0; i < types.length; i++) {
-                ObjectType type = root.getObjectType(types[i]);
-                Adapter.addAdapter(classes[i], type,
-                                   new SimpleAdapter(type, binders[i]));
-            }
-        }
+	m_errors.check();
     }
 
     public void emitVersioned() {

@@ -13,12 +13,12 @@ import com.arsdigita.persistence.proto.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/03/15 $
+ * @version $Revision: #5 $ $Date: 2003/03/18 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDLParser.jj#4 $ by $Author: rhs $, $DateTime: 2003/03/15 02:35:11 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDLParser.jj#5 $ by $Author: rhs $, $DateTime: 2003/03/18 15:44:06 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -28,6 +28,26 @@ class PDLParser {
     private static final void ln(Node node, Node from) {
         node.setLine(from.getLine());
         node.setColumn(from.getColumn());
+    }
+
+    private static final String unescape(String str) {
+        StringBuffer result = new StringBuffer(str.length());
+
+        boolean escaped = false;
+
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (escaped) {
+                result.append(c);
+                escaped = false;
+            } else if (c == '\\') {
+                escaped = true;
+            } else {
+                result.append(c);
+            }
+        }
+
+        return result.toString();
     }
 
 }
@@ -96,6 +116,7 @@ TOKEN:
   | <TRUE: "true">
   | <FALSE: "false">
   | <AGGRESSIVE: "aggressive" <WS> "load">
+  | <CLASS: "class">
   | <ADAPTER: "adapter">
   | <#WS: ([" ", "\t", "\n", "\r", "\f"])+>
 }
@@ -192,6 +213,7 @@ ObjectTypeNd object_type() :
         n = id() { ot.add(ObjectTypeNd.NAME, n); }
     [ ( <EXTENDS> n = type() { ot.add(ObjectTypeNd.EXTENDS, n); }
        |
+        <CLASS> n = javaClass() { ot.add(ObjectTypeNd.CLASS, n); }
         <ADAPTER> n = javaClass() { ot.add(ObjectTypeNd.ADAPTER, n); }
        |
         <RETURNS> <INT> <DOT> <DOT> ( id() | <INT> )
@@ -564,7 +586,7 @@ IdentifierNd id() :
 }
 {
     t = <ID> {
-        i = new IdentifierNd(t.image);
+        i = new IdentifierNd(unescape(t.image));
         ln(i, t);
         return i;
     }
