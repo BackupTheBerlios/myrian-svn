@@ -85,8 +85,6 @@ Cleanup:
  * Public way to access new session for calling flush()
  * Adapters
  * Rename everything
- * better solution for bind variable and object property name
-   collisions (FilterImpl.java:85)
 
 Testing:
   Make metatest not abort.
@@ -107,6 +105,9 @@ Disable all cascading deletes.
 
 
 -= D O N E =-
+
+ * better solution for bind variable and object property name
+   collisions (FilterImpl.java:85)
 
  * Eliminate old metadata & PDL parser
 
