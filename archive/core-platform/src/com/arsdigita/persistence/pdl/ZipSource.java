@@ -3,31 +3,37 @@ package com.arsdigita.persistence.pdl;
 import com.arsdigita.util.UncheckedWrapperException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 /**
  * An implementation of {@link PDLSource} that loads the contents of a
- * zip or jar file. This class doesn't take a filter at the moment
- * because PDL loading needs a manifest to decide whether or not to
- * load foo.pdl, because foo.<db>.pdl may be present.
+ * zip or jar file.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/01/16 $
+ * @version $Revision: #5 $ $Date: 2004/01/19 $
  **/
 
 class ZipSource implements PDLSource {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ZipSource.java#4 $ by $Author: ashah $, $DateTime: 2004/01/16 13:01:04 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ZipSource.java#5 $ by $Author: dennis $, $DateTime: 2004/01/19 17:53:10 $";
 
-    private final ZipInputStream m_zis;
+    private final ZipFile m_file;
+    private final PDLFilter m_filter;
 
     /**
      * @param zis the ZipInputStream to load
      **/
 
-    public ZipSource(ZipInputStream zis) {
-        m_zis = zis;
+    public ZipSource(ZipFile file, PDLFilter filter) {
+        m_file = file;
+        m_filter = filter;
     }
 
     /**
@@ -38,26 +44,35 @@ class ZipSource implements PDLSource {
      **/
 
     public void parse(PDLCompiler compiler) {
-        while (true) {
+        Enumeration entries = m_file.entries();
+        HashSet entrynames = new HashSet();
+        while (entries.hasMoreElements()) {
+            entrynames.add(((ZipEntry)entries.nextElement()).getName());
+        }
+        Collection accepted = m_filter.accept(entrynames);
+
+        Iterator iter = accepted.iterator();
+        while (iter.hasNext()) {
             try {
-                final ZipEntry entry = m_zis.getNextEntry();
-                if (entry == null) { break; }
-                String name = entry.getName();
+                String entryname = (String)iter.next();
+                ZipEntry entry = new ZipEntry (entryname);
                 if (entry.isDirectory()) { continue; }
-                compiler.parse(new InputStreamReader(m_zis) {
-                    public void close() {
-                        // We need to override close here to do
-                        // nothing since compiler.parse appears to
-                        // close the input stream from underneath us,
-                        // and that passes through to close the
-                        // underlying zip input stream which is a
-                        // problem when we try to read the next entry.
-                    }
-                }, name);
+                String name = entry.getName();
+                compiler.parse(new InputStreamReader(m_file.getInputStream(entry)) {
+                        public void close() {
+                            // We need to override close here to do
+                            // nothing since compiler.parse appears to
+                            // close the input stream from underneath us,
+                            // and that passes through to close the
+                            // underlying zip input stream which is a
+                            // problem when we try to read the next entry.
+                        }
+                    }, name);
             } catch (IOException e) {
+                throw new UncheckedWrapperException(e);
+            } catch (IllegalStateException e) {
                 throw new UncheckedWrapperException(e);
             }
         }
     }
-
 }

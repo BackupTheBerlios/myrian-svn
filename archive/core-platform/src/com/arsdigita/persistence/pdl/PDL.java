@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -59,12 +60,12 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #27 $ $Date: 2004/01/16 $
+ * @version $Revision: #28 $ $Date: 2004/01/19 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#27 $ by $Author: ashah $, $DateTime: 2004/01/16 18:19:19 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#28 $ by $Author: dennis $, $DateTime: 2004/01/19 17:53:10 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;
@@ -295,8 +296,11 @@ public class PDL {
             } else if (f.isFile()
                        && (f.getName().endsWith(".jar")
                            || f.getName().endsWith(".zip"))) {
-                throw new IllegalArgumentException
-                    ("zip and jar pdl loading is not implemented yet");
+                try {
+                    new ZipSource(new ZipFile(f), filter).parse(compiler);
+                } catch (IOException e) {
+                    throw new UncheckedWrapperException(e);
+                }
             } else {
                 filenames.add(f.getPath());
             }
