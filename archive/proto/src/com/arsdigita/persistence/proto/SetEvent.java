@@ -8,12 +8,12 @@ import java.util.Iterator;
  * SetEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/03/25 $
+ * @version $Revision: #10 $ $Date: 2003/03/27 $
  **/
 
 public class SetEvent extends PropertyEvent {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/SetEvent.java#9 $ by $Author: ashah $, $DateTime: 2003/03/25 12:56:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/SetEvent.java#10 $ by $Author: vadim $, $DateTime: 2003/03/27 16:59:32 $";
 
     private Object m_oldValue;
 
@@ -31,14 +31,14 @@ public class SetEvent extends PropertyEvent {
     }
 
     void activate() {
-        super.activate();
-
         PropertyEvent pe = getSession().getEventStream().getLastEvent(this);
         if (pe != null) {
             m_oldValue = pe.getArgument();
         } else {
             m_oldValue = getSession().get(getObject(), getProperty());
         }
+
+        super.activate();
 
         // PD dependencies
         if (getArgument() != null) {
