@@ -22,12 +22,12 @@ import java.util.Iterator;
  * CreateEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/07/28 $
+ * @version $Revision: #3 $ $Date: 2004/08/06 $
  **/
 
 public class CreateEvent extends ObjectEvent {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/CreateEvent.java#2 $ by $Author: rhs $, $DateTime: 2004/07/28 15:48:38 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/CreateEvent.java#3 $ by $Author: rhs $, $DateTime: 2004/08/06 08:43:09 $";
 
     CreateEvent(Session ssn, Object obj) {
         super(ssn, obj);
@@ -40,18 +40,25 @@ public class CreateEvent extends ObjectEvent {
     void activate() {
         super.activate();
 
-        getObjectData().setState(ObjectData.INFANTILE);
+        ObjectData odata = getObjectData();
+        odata.setState(ObjectData.INFANTILE);
+
+        Session ssn = getSession();
 
         // set up new dependencies
-        ObjectType type = getSession().getObjectType(getObject());
+        ObjectType type = ssn.getObjectType(getObject());
 
         for (Iterator it = type.getRoles().iterator(); it.hasNext(); ) {
             Role role = (Role) it.next();
             if (!role.isNullable()) {
-                PropertyData pd =
-                    getSession().fetchPropertyData(getObject(), role);
+                PropertyData pd = ssn.fetchPropertyData(getObject(), role);
                 pd.addNotNullDependent(this);
             }
+        }
+
+        // nested object violations
+        if (!ssn.hasSessionKey(getObject())) {
+            ssn.addViolation(odata);
         }
     }
 

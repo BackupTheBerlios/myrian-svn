@@ -24,16 +24,16 @@ import java.util.Iterator;
  * to flush.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/06 $
  **/
 
 public class FlushException extends ProtoException {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/FlushException.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/FlushException.java#2 $ by $Author: rhs $, $DateTime: 2004/08/06 08:43:09 $";
 
     private final Object m_obj;
 
-    private static String msg(Object obj, Collection pds) {
+    private static String msg(Object obj, Collection violations) {
         StringBuffer sb = new StringBuffer();
         if (obj == null) {
             sb.append("Unable to send all events to database");
@@ -41,20 +41,19 @@ public class FlushException extends ProtoException {
             sb.append("Unable to send all events to database for object ");
             sb.append(obj);
         }
-        sb.append(" because these required properties are null:");
+        sb.append(":");
 
-        for (Iterator it = pds.iterator(); it.hasNext(); ) {
-            PropertyData pd = (PropertyData) it.next();
-            sb.append("\n ");
-            sb.append(pd.getObjectData().getObject() + "."
-                      + pd.getProperty().getName());
+        for (Iterator it = violations.iterator(); it.hasNext(); ) {
+            Violation v = (Violation) it.next();
+            sb.append("\n  ");
+            sb.append(v.getViolationMessage());
         }
 
         return sb.toString();
     }
 
-    FlushException(Object obj, Collection pds) {
-	super(msg(obj, pds), false);
+    FlushException(Object obj, Collection violations) {
+	super(msg(obj, violations), false);
         m_obj = obj;
 
         if (Session.LOG.isInfoEnabled()) {
@@ -62,8 +61,8 @@ public class FlushException extends ProtoException {
         }
     }
 
-    FlushException(Collection pds) {
-        this(null, pds);
+    FlushException(Collection violations) {
+        this(null, violations);
     }
 
     public Object getObject() { return m_obj; }

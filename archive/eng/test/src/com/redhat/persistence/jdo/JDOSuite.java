@@ -14,6 +14,7 @@ public class JDOSuite extends TestSuite {
         suite.addTestSuite(ListTest.class);
         suite.addTestSuite(ManagerTest.class);
         suite.addTestSuite(BiTxnTest.class);
+        suite.addTestSuite(NestedObjectTest.class);
 
         suite.addTest(QueryTest.suite());
 

@@ -25,12 +25,12 @@ import java.util.List;
  * PropertyData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/06 $
  **/
 
-class PropertyData {
+class PropertyData implements Violation {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/PropertyData.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/PropertyData.java#2 $ by $Author: rhs $, $DateTime: 2004/08/06 08:43:09 $";
 
     final private ObjectData m_odata;
     final private Property m_prop;
@@ -100,7 +100,12 @@ class PropertyData {
         m_dependentEvents.add(ev);
     }
 
-    Iterator getDependentEvents() { return m_dependentEvents.iterator(); }
+    public Collection getDependentEvents() { return m_dependentEvents; }
+
+    public String getViolationMessage() {
+        return getObjectData().getObject() + "." +
+            getProperty().getName() + " is null";
+    }
 
     void transferNotNullDependentEvents(Event ev) {
         for (Iterator it = m_dependentEvents.iterator(); it.hasNext(); ) {

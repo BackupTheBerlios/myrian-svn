@@ -48,12 +48,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2004/08/05 $
+ * @version $Revision: #12 $ $Date: 2004/08/06 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#11 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#12 $ by $Author: rhs $, $DateTime: 2004/08/06 08:43:09 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -658,11 +658,9 @@ public class Session {
         // the source of unflushability is not null properties that
         // have not been set
         List queue = new LinkedList();
-        for (Iterator pds = m_violations.iterator(); pds.hasNext(); ) {
-            PropertyData pd = (PropertyData) pds.next();
-            for (Iterator evs = pd.getDependentEvents(); evs.hasNext(); ) {
-                queue.add(evs.next());
-            }
+        for (Iterator it = m_violations.iterator(); it.hasNext(); ) {
+            Violation v = (Violation) it.next();
+            queue.addAll(v.getDependentEvents());
         }
 
         // recursively mark reachable events as unflushable
@@ -1058,9 +1056,9 @@ public class Session {
         return pd;
     }
 
-    void addViolation(PropertyData pd) { m_violations.add(pd); }
+    void addViolation(Violation v) { m_violations.add(v); }
 
-    void removeViolation(PropertyData pd) { m_violations.remove(pd); }
+    void removeViolation(Violation v) { m_violations.remove(v); }
 
     private void check(EventProcessor ep) {
         if (ep == null) {

@@ -28,12 +28,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/08/05 $
+ * @version $Revision: #4 $ $Date: 2004/08/06 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#3 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#4 $ by $Author: rhs $, $DateTime: 2004/08/06 08:43:09 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -460,7 +460,9 @@ public class PDL {
                 // XXX: copied code
                 if (!m_root.hasObjectMap(prop.getType())) {
                     Mapping m = om.getMapping(prop);
-                    m.setMap(new ObjectMap(prop.getType()));
+                    if (m != null) {
+                        m.setMap(new ObjectMap(prop.getType()));
+                    }
                 }
             }
         });
@@ -904,7 +906,9 @@ public class PDL {
                     }
                     if (!m_root.hasObjectMap(prop.getType())) {
                         Mapping m = om.getMapping(prop);
-                        m.setMap(new ObjectMap(prop.getType()));
+                        if (m != null) {
+                            m.setMap(new ObjectMap(prop.getType()));
+                        }
                     }
 
                     // auto generate reverse way for one-way composites
@@ -1054,9 +1058,8 @@ public class PDL {
         ForeignKey fk = from.getTable().getForeignKey(new Column[] {from});
         UniqueKey uk = to.getTable().getUniqueKey(new Column[] {to});
         if (uk == null) {
-            uk = new UniqueKey(to.getTable(), null, new Column[] {to});
-            //m_errors.fatal(tond, "not a unique key: " + to);
-            //return null;
+            m_errors.fatal(tond, "not a unique key: " + to);
+            return null;
         }
 
         if (fk != null) {
@@ -1118,10 +1121,6 @@ public class PDL {
 
     private void emitMapping(ObjectMap om, Property prop, JoinPathNd jpn,
                              int start, int stop) {
-	if (!prop.getType().isKeyed()) {
-	    m_errors.fatal(jpn, "cannot associate to a non keyed type");
-	}
-
         Path path = Path.get(prop.getName());
         List joins = jpn.getJoins();
         Mapping m;

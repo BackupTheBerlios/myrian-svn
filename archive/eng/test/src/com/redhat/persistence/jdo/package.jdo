@@ -7,6 +7,9 @@
     <class name="Employee" identity-type="datastore"/>
     <class name="Address" identity-type="datastore"/>
 
+    <class name="Rolodex" identity-type="datastore"/>
+    <class name="Contact" identity-type="datastore"/>
+
     <!-- Pandora -->
 
     <class name="Party" identity-type="datastore">

@@ -22,12 +22,12 @@ import java.io.PrintWriter;
  * PropertyEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/08/05 $
+ * @version $Revision: #3 $ $Date: 2004/08/06 $
  **/
 
 public abstract class PropertyEvent extends Event {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/PropertyEvent.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/PropertyEvent.java#3 $ by $Author: rhs $, $DateTime: 2004/08/06 08:43:09 $";
 
     final private Property m_prop;
     final private Object m_arg;
@@ -96,13 +96,14 @@ public abstract class PropertyEvent extends Event {
     }
 
     void activate() {
+        Session ssn = getSession();
+
         // WAW
-        PropertyEvent prev = getSession().getEventStream().
-            getLastEvent(this);
+        PropertyEvent prev = ssn.getEventStream().getLastEvent(this);
         if (prev != null) { prev.addDependent(this); }
 
         // connect event to session data
-        getSession().getEventStream().add(this);
+        ssn.getEventStream().add(this);
 
         // update object data state
         if (getObjectData().isNubile()) {
@@ -112,19 +113,25 @@ public abstract class PropertyEvent extends Event {
         // object existence
         ObjectData od = getObjectData();
         if (od.isInfantile()) {
-            CreateEvent ce = (CreateEvent)
-                getSession().getEventStream().getLastEvent(getObject());
+            CreateEvent ce =
+                (CreateEvent) ssn.getEventStream().getLastEvent(getObject());
             ce.addDependent(this);
         }
 
         // arg existence
-        ObjectData arg = getArgumentObjectData();
-        if (arg != null) {
-            if (arg.isInfantile()) {
-                CreateEvent ce = (CreateEvent) getSession().getEventStream()
-                    .getLastEvent(getArgument());
+        ObjectData aodata = getArgumentObjectData();
+        Object arg = getArgument();
+        if (aodata != null) {
+            if (aodata.isInfantile()) {
+                CreateEvent ce =
+                    (CreateEvent) ssn.getEventStream().getLastEvent(arg);
                 ce.addDependent(this);
             }
+        }
+
+        // nested object violations
+        if (ssn.hasSessionKey(arg)) {
+            ssn.removeViolation(aodata);
         }
     }
 

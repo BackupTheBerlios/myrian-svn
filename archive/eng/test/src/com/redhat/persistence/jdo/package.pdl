@@ -64,6 +64,32 @@ association {
     Employee[0..n] emps = join depts.id to emps.dept_id;
 }
 
+object type Rolodex class com.redhat.persistence.jdo.Rolodex
+    adapter com.redhat.persistence.jdo.JDOAdapter {
+    BigInteger id = rolodexes.id;
+    Contact[0..n] m_contacts = join rolodexes.id to contacts.rolodex_id;
+    m_contacts.m_name = contacts.name;
+    m_contacts.m_number = contacts.number;
+
+    object key (id);
+}
+
+nested object type Contact class com.redhat.persistence.jdo.Contact
+    adapter com.redhat.persistence.jdo.JDOAdapter {
+    String[0..1] m_name;
+    String[0..1] m_number;
+}
+
+query Rolodex$Gen class com.redhat.persistence.PropertyMap
+    adapter com.redhat.persistence.pdl.adapters.IdentityAdapter {
+    BigInteger id;
+    do {
+        select nextval('jdotest_seq') as id
+    } map {
+        id = id;
+    }
+}
+
 
 // Pandora
 

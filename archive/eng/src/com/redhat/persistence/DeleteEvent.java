@@ -22,12 +22,12 @@ import java.util.Iterator;
  * DeleteEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/06 $
  **/
 
 public class DeleteEvent extends ObjectEvent {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/DeleteEvent.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/DeleteEvent.java#2 $ by $Author: rhs $, $DateTime: 2004/08/06 08:43:09 $";
 
     DeleteEvent(Session ssn, Object obj) {
         super(ssn, obj);
@@ -39,11 +39,13 @@ public class DeleteEvent extends ObjectEvent {
 
     void activate() {
         super.activate();
-        ObjectType type = getSession().getObjectType(getObject());
+        Session ssn = getSession();
+        ObjectType type = ssn.getObjectType(getObject());
+        ObjectData odata = getObjectData();
 
         for (Iterator it = type.getProperties().iterator(); it.hasNext(); ) {
             Property prop = (Property) it.next();
-            PropertyData pd = getObjectData().getPropertyData(prop);
+            PropertyData pd = odata.getPropertyData(prop);
             if  (pd == null) { continue; }
 
             if (!prop.isNullable()) {
@@ -51,19 +53,22 @@ public class DeleteEvent extends ObjectEvent {
             }
 
             if (prop.isCollection()) {
-                for (Iterator evs = getSession().getEventStream().
+                for (Iterator evs = ssn.getEventStream().
                          getCurrentEvents(getObject(), prop).iterator();
                      evs.hasNext(); ) {
                     ((PropertyEvent) evs.next()).addDependent(this);
                 }
             } else {
-                Event ev = getSession().getEventStream().getLastEvent
+                Event ev = ssn.getEventStream().getLastEvent
                     (getObject(), prop);
                 if (ev != null) { ev.addDependent(this); }
             }
         }
 
-        getObjectData().setState(ObjectData.SENILE);
+        odata.setState(ObjectData.SENILE);
+
+        // clean up nested object violations
+        ssn.removeViolation(odata);
     }
 
     void sync() {
