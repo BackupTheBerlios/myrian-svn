@@ -14,12 +14,12 @@ import java.util.*;
  * PooledConnectionSourceTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/11/21 $
+ * @version $Revision: #2 $ $Date: 2003/11/25 $
  **/
 
 public class PooledConnectionSourceTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PooledConnectionSourceTest.java#1 $ by $Author: rhs $, $DateTime: 2003/11/21 10:51:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PooledConnectionSourceTest.java#2 $ by $Author: rhs $, $DateTime: 2003/11/25 16:19:46 $";
 
     private static final String JDBC_PREFIX = "jdbc:test:";
     private static final Map CONNECTIONS = new HashMap();
@@ -248,6 +248,7 @@ public class PooledConnectionSourceTest extends TestCase {
                 return null;
             } else {
                 Connection result = new MockConnection() {
+
                     public DatabaseMetaData getMetaData() throws SQLException {
                         if (url.indexOf(":fail:") >= 0) {
                             throw new SQLException("mock fatal error");
@@ -260,6 +261,16 @@ public class PooledConnectionSourceTest extends TestCase {
                                 return new MockSingleRowResultSet();
                             }
                         };
+                    }
+
+                    private boolean m_closed = false;
+
+                    public boolean isClosed() {
+                        return m_closed;
+                    }
+
+                    public void close() {
+                        m_closed = true;
                     }
                 };
                 List conns = getConnections(url);

@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
  * PooledConnectionSource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/11/21 $
+ * @version $Revision: #2 $ $Date: 2003/11/25 $
  **/
 
 public class PooledConnectionSource implements ConnectionSource {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/PooledConnectionSource.java#1 $ by $Author: rhs $, $DateTime: 2003/11/21 10:51:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/PooledConnectionSource.java#2 $ by $Author: rhs $, $DateTime: 2003/11/25 16:19:46 $";
 
     private static final Logger s_log =
         Logger.getLogger(PooledConnectionSource.class);
@@ -67,19 +67,27 @@ public class PooledConnectionSource implements ConnectionSource {
             throw new IllegalArgumentException
                 ("connection did come from ths source: " + conn);
         }
-        m_available.add(conn);
+
+        boolean remove;
+        try {
+            remove = conn.isClosed();
+        } catch (SQLException e) {
+            s_log.warn("error calling Connection.isClosed()", e);
+            remove = true;
+        }
+
+        if (remove) {
+            remove(conn);
+        } else {
+            m_available.add(conn);
+        }
+
         notify();
     }
 
-    private synchronized void close(Connection conn) {
+    private synchronized void remove(Connection conn) {
         m_connections.remove(conn);
         m_available.remove(conn);
-        try {
-            conn.close();
-        } catch (SQLException e) {
-            s_log.warn("error while closing bad connection", e);
-        }
-        notify();
     }
 
     synchronized void testAvailable() {
@@ -121,12 +129,16 @@ public class PooledConnectionSource implements ConnectionSource {
                 for (Iterator it = untested.iterator(); it.hasNext(); ) {
                     Connection conn = (Connection) it.next();
                     SQLException e = test(conn);
-                    if (e == null) {
-                        release(conn);
-                    } else {
+                    if (e != null) {
                         s_log.warn("connection failed test", e);
-                        close(conn);
+                        try {
+                            conn.close();
+                        } catch (SQLException ex) {
+                            s_log.warn
+                                ("error while closing bad connection", ex);
+                        }
                     }
+                    release(conn);
                 }
             }
         }
