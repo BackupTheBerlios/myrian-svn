@@ -24,12 +24,12 @@ import java.util.*;
  * Associations.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/04/18 $
+ * @version $Revision: #4 $ $Date: 2003/04/21 $
  */
 
 public class Model extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/Model.java#3 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/Model.java#4 $ by $Author: vadim $, $DateTime: 2003/04/21 09:38:49 $";
 
     static Model wrap(Root root,
 		      com.arsdigita.persistence.proto.metadata.Model model) {
@@ -51,6 +51,7 @@ public class Model extends Element {
 		  com.arsdigita.persistence.proto.metadata.Model model) {
         super(root, model);
 	m_root = root;
+        m_model = model;
     }
 
 
