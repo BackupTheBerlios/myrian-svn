@@ -21,7 +21,7 @@ object type Role {
     String[1..1]     name = roles.name;
 
     // The group for which this role is defined
-    Group[1..1]      sourceGroup = join roles.group_id to group.group_id;
+    Group[1..1]      sourceGroup = join roles.group_id to groups.group_id;
 
     // The group which stores members in this role
     Group[1..1]      implicitGroup = join roles.implicit_group_id
