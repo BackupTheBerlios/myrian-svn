@@ -103,11 +103,12 @@ class StateManagerImpl extends AbstractStateManager {
             if (m_components.containsKey(name)) {
                 return m_components.get(name);
             } else {
-                // XXX: should we do something else if currentValue is
-                // not null?
+                // XXX: what to do about currentValue
                 Class klass = (Class) C.getAllTypes(pc.getClass()).get(field);
                 if (klass.equals(List.class)) {
                     klass = CRPList.class;
+                } else if (klass.equals(Map.class)) {
+                    klass = CRPMap.class;
                 }
                 Object obj = m_pmi.newPC(m_pmap, klass, name + "$");
                 m_components.put(name, obj);

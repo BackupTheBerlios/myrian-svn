@@ -25,6 +25,10 @@ abstract class AbstractStateManager implements StateManager {
     public abstract Object getObjectField(PersistenceCapable pc,
                                           int field, Object currentValue);
 
+    public final Object getObjectField(PersistenceCapable pc, int field) {
+        return getObjectField(pc, field, null);
+    }
+
     public final boolean getBooleanField(PersistenceCapable pc, int field,
                                          boolean currentValue) {
         return ((Boolean) getObjectField(pc, field, null)).booleanValue();
@@ -96,11 +100,6 @@ abstract class AbstractStateManager implements StateManager {
         try {
             m_tmpValue = null;
             pc.jdoProvideField(field);
-            Class klass = C.numberToType(pc.getClass(), field);
-            if (klass.equals(java.util.List.class)) {
-                // XXX: ignoring initial elements
-                m_tmpValue = new CRPList();
-            }
             return m_tmpValue;
         } finally {
             m_tmpValue = null;

@@ -75,6 +75,15 @@ class C {
         return getAllFields(pcClass).lastIndexOf(fieldName);
     }
 
+    public static String componentPropertyField(Property prop) {
+        return prop.getName().substring(0, prop.getName().indexOf('$'));
+    }
+
+    public static boolean isComponentProperty(Property prop) {
+        // at least one character before '$'
+        return prop.getName().indexOf('$') > 0;
+    }
+
     public static boolean isComponent(ObjectType type, String name) {
         if (type.hasProperty(name)) {
             return false;
@@ -86,6 +95,21 @@ class C {
             }
         }
         return false;
+    }
+
+    public static List componentProperties(ObjectType type, String name) {
+        if (type.hasProperty(name)) {
+            throw new IllegalArgumentException
+                (name + " is a property of " + type.getQualifiedName());
+        }
+        List l = new ArrayList();
+        for (Iterator it = type.getProperties().iterator(); it.hasNext(); ) {
+            Property p = (Property) it.next();
+            if (p.getName().startsWith(name)) {
+                l.add(p);
+            }
+        }
+        return l;
     }
 
     public static Cursor cursor(Session ssn, ObjectType type, Expression expr) {

@@ -331,7 +331,9 @@ public class PersistenceManagerImpl implements PersistenceManager {
                 Property prop = (Property) me.getKey();
                 Object value = me.getValue();
 
-                if (value != null) {
+                if (value == null) { continue; }
+
+                if (!C.isComponentProperty(prop)) {
                     if (value instanceof Collection) {
                         Collection c = (Collection) value;
                         for (Iterator vals = c.iterator(); vals.hasNext(); ) {
@@ -347,6 +349,23 @@ public class PersistenceManagerImpl implements PersistenceManager {
                         }
                         m_ssn.set(obj, prop, value);
                     }
+                } else {
+                    int index = C.nameToNumber
+                        (cls, C.componentPropertyField(prop));
+
+                    if (value instanceof Map) {
+                        Map m = (Map) smi.getObjectField(pc, index);
+                        m.putAll((Map) value);
+                    } else if (value instanceof List) {
+                        List l = (List) smi.getObjectField(pc, index);
+                        l.addAll((List) value);
+                    } else {
+                        // non persistence capable, non collection components
+                        throw new IllegalStateException
+                            (value.getClass() + " for "
+                             + prop + " of " + type.getQualifiedName()
+                             + " is not a collection and is a component prop");
+                    }
                 }
             }
         }
@@ -361,20 +380,20 @@ public class PersistenceManagerImpl implements PersistenceManager {
         for (int i = 0; i < props.size(); i++) {
             String propName = smi.getPrefix() + ((String) props.get(i));
             Object obj = smi.provideField(pc, i);
+            if (obj == null) { continue; }
+            Class klass = (Class) types.get(i);
             if (C.isComponent(type, propName)) {
-                if (!(obj instanceof PersistenceCapable)) {
-                    throw new ClassCastException
-                        ("Expected PersistenceCapable, got: " +
-                         (obj==null ? "null" : obj.getClass().getName()));
+                if (obj instanceof PersistenceCapable) {
+                    PersistenceCapable comp = (PersistenceCapable) obj;
+                    StateManagerImpl csmi = newSM(comp, pmap, propName + "$");
+                    fill(values, csmi, klass, comp);
+                } else {
+                    List l = C.componentProperties(type, propName);
+                    for (Iterator it = l.iterator(); it.hasNext(); ) {
+                        Property prop = (Property) it.next();
+                        values.put(prop, obj);
+                    }
                 }
-                PersistenceCapable comp = (PersistenceCapable) obj;
-                if (comp == null) { continue; }
-                StateManagerImpl csmi = newSM(comp, pmap, propName + "$");
-                Class klass = (Class) types.get(i);
-                if (klass.equals(List.class)) {
-                    klass = CRPList.class;
-                }
-                fill(values, csmi, klass, comp);
             } else {
                 Property prop = type.getProperty(propName);
                 if (!prop.isKeyProperty()) {
