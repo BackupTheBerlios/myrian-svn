@@ -80,3 +80,19 @@ object type Normalized extends Base {
 
     reference key (t_norms.id);
 }
+
+object type ReferenceTo extends Base {
+    Target[0..1] target = join t_refs.target_id to t_targets.id;
+    reference key (t_refs.id);
+}
+
+object type ReferenceFrom extends Base {
+    Target[0..1] target = join t_targets.reffrom_id to t_reffroms.id;
+    reference key (t_reffroms.id);
+}
+
+object type ReferenceMappingTable extends Base {
+    Target[0..1] target = join t_rmaps.id to t_rmaps_map.rmap_id,
+                          join t_rmaps_map.target_id to t_targets.id;
+    reference key (t_rmaps.id);
+}
