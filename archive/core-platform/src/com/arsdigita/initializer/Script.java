@@ -31,12 +31,12 @@ import java.util.List;
  * Script
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2003/08/15 $
+ * @version $Revision: #15 $ $Date: 2003/08/26 $
  */
 
 public class Script {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Script.java#14 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Script.java#15 $ by $Author: dan $, $DateTime: 2003/08/26 13:47:14 $";
 
     private static final Logger s_log =
         Logger.getLogger(Script.class);
@@ -115,9 +115,15 @@ public class Script {
         } catch (ParseException e) {
             // FIXME: what's the purpose of the errTok variable? I'm commenting
             // it out. -- 2002-11-26
-
+            logInitializationFailure(null, false, e);
             // Token errTok = e.currentToken.next;
             throw new InitializationException(e.getMessage());
+        } catch (InitializationException e) {
+            logInitializationFailure(null, false, e);
+            throw e;
+        } catch (RuntimeException e) {
+            logInitializationFailure(null, false, e);
+            throw e;
         }
     }
 
