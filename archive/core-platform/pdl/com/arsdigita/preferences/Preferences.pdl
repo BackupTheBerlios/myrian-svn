@@ -1,0 +1,202 @@
+//
+// Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+//
+// The contents of this file are subject to the ArsDigita Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.arsdigita.com/ADPL.txt
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+
+model com.arsdigita.preferences;
+
+object type Preferences {
+    BigDecimal id = preferences.preference_id;
+    BigDecimal[0..1] parentID = preferences.parent_id;
+    String name = preferences.name;
+    String[0..1] description = preferences.description;
+    BigDecimal isNode = preferences.is_node;
+    String preferenceType = preferences.preference_type;
+    composite PreferenceParameter[0..n] keyValuePairs;
+    composite Preferences[0..n] preferenceNodes;
+
+    object key (id);
+
+    insert {
+        do {
+           insert into preferences (
+                preference_id, parent_id, name, is_node,
+                description, preference_type
+            ) values (
+                :id, :parentID, :name, 1,
+                :description, :preferenceType
+            )
+        }
+    }    
+
+    update {
+        do {
+            update preferences
+            set parent_id = :parentID,
+                name = :name,
+                description = :description,
+                preference_type = :preferenceType
+            where preference_id = :id
+        }
+    }
+
+    // select all key-value pairs of this hierarchy
+    retrieve keyValuePairs {
+        do {
+            select preference_id,
+                   name,
+                   parent_id,
+                   description,
+                   preference_type,
+                   value_type,
+                   value_string
+            from preferences
+            where preferences.parent_id = :id
+            and preferences.is_node = 0
+        } map {
+            keyValuePairs.id = preferences.preference_id;
+            keyValuePairs.name = preferences.name;
+            keyValuePairs.parentID = preferences.parent_id;
+            keyValuePairs.description = preferences.description;
+            keyValuePairs.preferenceType = preferences.preference_type;
+            keyValuePairs.valueType = preferences.value_type;
+            keyValuePairs.valueString = preferences.value_string;
+        }
+    }
+
+    // parameter must exist before added
+    add keyValuePairs {
+        do {
+            update preferences
+            set parent_id = :id
+            where preference_id = :keyValuePairs.id
+            and is_node = 0
+        }
+    }
+
+    // remove key-value pair, ie. remove parent_id reference
+    clear keyValuePairs {
+        do {
+            delete from preferences
+            where parent_id = :id
+            and is_node = 0;
+        }
+    }
+
+    // remove all key-value pairs of this node
+    remove keyValuePairs {
+        do {
+            delete from preferences
+            where parent_id = :id
+            and preference_id = :keyValuePairs.id
+            and is_node = 0
+        }
+    }
+
+    // PDL for nested nodes ----
+    retrieve preferenceNodes {
+        do {
+            select preference_id,
+                   name,
+                   description,
+                   preference_type
+            from preferences
+            where preferences.parent_id = :id
+            and preferences.is_node = 1
+        } map {
+            preferenceNodes.id = preferences.preference_id;
+            preferenceNodes.name = preferences.name;
+            preferenceNodes.description = preferences.description;
+            preferenceNodes.preferenceType = preferences.preference_type;
+        }
+    }
+
+    add preferenceNodes {
+        do {
+            update preferences
+            set parent_id = :id
+            where preference_id = preferencesNodes.id
+        }
+    }
+
+    // delete child preferences
+    remove preferenceNodes {
+        do {
+            delete from preferences
+            where parent_id = :id
+            and preference_id = :preferenceNodes.id
+        }
+    }
+
+    // same as remove event
+    clear preferenceNodes {
+        do {
+            delete from preferences
+            where parent_id = :id
+            and preference_id = :preferenceNodes.id
+        }
+    }
+}
+
+query getTree {
+    do {
+        select preference_id,
+               parent_id,
+               name,
+               description,
+               is_node
+        from preferences
+        start with preference_id = :startNodeID
+        connect by prior preference_id = parent_id
+    } map {
+        id = preference_id;
+        parentID = parent_id;
+        name = name;
+        description = description;
+        isNode = is_node;
+    }
+}
+
+// returns reversed path; this is C in /A/B/C, then is should return C/B/A ,
+// deal with it in Java.
+query getAbsPath {
+    do {
+        select preference_id,
+               parent_id,
+               name
+        from preferences
+        start with preference_id = :startNodeID
+        connect by preference_id = prior parent_id
+    } map {
+        id = preference_id;
+        parentID = parent_id;
+        name = name;
+    }
+}
+
+// get root
+query getRoot {
+    do {
+        select preference_id,
+               name,
+               description,
+               preference_type
+        from preferences
+        where is_node = 1
+        and parent_id is null
+    } map {
+        id = preference_id;
+        name = name;
+        description = description;
+        preferenceType = preference_type;
+    }
+}

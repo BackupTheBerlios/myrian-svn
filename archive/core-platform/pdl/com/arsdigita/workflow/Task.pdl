@@ -1,0 +1,264 @@
+//
+// Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+//
+// The contents of this file are subject to the ArsDigita Public 
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.arsdigita.com/ADPL.txt
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+
+model com.arsdigita.workflow.simple;
+
+import com.arsdigita.kernel.*;
+
+object type Task extends ACSObject {
+
+    String[1..1]     label;
+    String[1..1]     description;
+    String[1..1]     isActive;
+    BigDecimal[0..1] parentTaskID;
+    String[1..1]     taskState;
+    String           taskObjectType;
+    composite TaskComment[0..n] comments;
+	
+    retrieve {
+	super;
+
+	do {
+	    select cw_tasks.task_id ,
+		   cw_tasks.label,
+                   cw_tasks.description,
+                   cw_tasks.is_active,
+                   cw_tasks.parent_task_id,
+                   cw_tasks.task_state  ,
+                   acs_objects.object_type
+            from   cw_tasks ,
+                   acs_objects 
+            where  cw_tasks.task_id = :id
+            and    acs_objects.object_id = cw_tasks.task_id
+	} map {
+            label                    = cw_tasks.label;
+            description              = cw_tasks.description;
+            isActive                 = cw_tasks.is_active;
+            parentTaskID             = cw_tasks.parent_task_id;
+            taskState 		     = cw_tasks.task_state;
+	    taskObjectType           = acs_objects.object_type;
+
+        }	
+    }
+
+    insert  {
+	super;
+	do {
+	    insert into cw_tasks (
+	        task_id,    
+	        label,
+	        description,
+	        is_active,
+	        parent_task_id,
+                task_state		
+	    ) values  (
+                :id,
+                :label,
+                :description,
+                :isActive,
+                :parentTaskID,
+                :taskState
+            )
+        }
+    }
+
+    update {
+	super;
+
+        do {
+	   update cw_tasks
+           set label = :label,
+	       description = :description,
+	       is_active = :isActive,
+	       parent_task_id = :parentTaskID,
+               task_state  = :taskState
+           where task_id   = :id
+        }
+    }
+
+   // delete all of dependency list , delete other dependency 
+   // list that has this task def.  The delete may fail
+   // if there other foreign key references on task
+   // TODO: delete dependencies too.
+    delete {
+	do {
+	    delete from cw_task_comments
+            where task_id = :id
+        }	
+
+	do {
+            delete from cw_tasks
+            where  task_id = :id
+        }
+	super;
+    }
+
+    retrieve comments {
+        do {
+            select comment_id   ,
+                   task_id      ,
+                   task_comment ,
+                   party_id     ,
+                   comment_date 
+            from   cw_task_comments
+            where  task_id = :id
+       }  map {
+            comments.id   = cw_task_comments.comment_id;
+            comments.taskID      = cw_task_comments.task_id;
+            comments.taskComment = cw_task_comments.task_comment;
+            comments.partyID     = cw_task_comments.party_id;
+            comments.commentDate = cw_task_comments.comment_date; 
+       }
+    }   
+
+    add comments {
+    }
+
+    remove comments {
+	do {
+            delete from cw_task_comments 
+            where comment_id = :comments.id
+        }
+    }
+
+    clear comments {
+	do {
+	    delete from cw_task_comments
+            where task_id = :id
+	}
+    }
+}
+
+association {
+    Task[1..1] task;
+    Task[0..n] taskFinishedListeners;
+
+    retrieve taskFinishedListeners {
+	do {
+	    select cw_task_listeners.listener_task_id ,
+                   acs_objects.object_type 
+            from   cw_task_listeners ,
+                   acs_objects
+            where  cw_task_listeners.task_id = :id
+            and    acs_objects.object_id = cw_task_listeners.listener_task_id
+        } map {
+            taskFinishedListeners.id               = cw_task_listeners.listener_task_id;
+            taskFinishedListeners.objectType       = acs_objects.object_type;
+        }
+    }
+
+    add taskFinishedListeners {
+	do {
+            insert into cw_task_listeners (
+                task_id ,
+                listener_task_id
+            ) values (
+	        :id  ,
+                :taskFinishedListeners.id
+	    )
+        }
+    }
+
+    remove taskFinishedListeners {
+        do {
+            delete from cw_task_listeners
+            where  task_id = :id 
+            and    listener_task_id = :taskFinishedListeners.id
+        }
+    }	
+
+    clear  taskFinishedListeners {
+	do {
+	    delete from cw_task_listeners
+            where  task_id = :id
+      	}
+    }
+}   
+
+association {
+    Task[1..1] targetTask;
+    Task[0..n] dependsOn;
+
+    retrieve dependsOn {
+        do {
+           select cw_tasks.label,
+                  cw_tasks.description,
+                  cw_tasks.is_active,
+                  cw_tasks.parent_task_id,
+                  acs_objects.object_id,
+                  acs_objects.object_type
+           from  cw_task_dependencies ,
+                 cw_tasks  ,
+                 acs_objects
+           where cw_task_dependencies.task_id = :id 
+           and   cw_tasks.task_id  = 
+	         cw_task_dependencies.dependent_task_id               
+           and   acs_objects.object_id = cw_tasks.task_id
+        } map {
+           dependsOn.description                 = cw_tasks.description;
+           dependsOn.isActive                    = cw_tasks.is_active;
+           dependsOn.parentTaskID                = cw_tasks.parent_task_id;
+           dependsOn.label                       = cw_tasks.label;
+           dependsOn.objectType                  = cw_tasks.object_type;
+           dependsOn.id                          = acs_objects.object_id;
+        }
+    }
+
+    add dependsOn {
+        do {
+            insert into cw_task_dependencies (
+                task_id ,
+                dependent_task_id
+            ) values (
+                :id ,
+                :dependsOn.id
+            )
+       }            
+    }
+
+    remove dependsOn {
+        do {
+            delete from cw_task_dependencies 
+            where task_id = :id
+            and   dependent_task_id = :dependsOn.id
+        }
+    }
+
+    clear dependsOn {
+        do {
+            delete from cw_task_dependencies 
+            where task_def_id = :id
+        }
+    }
+}
+
+query getTasks {
+    do {
+        select cw_tasks.task_id,
+               cw_tasks.parent_task_id,
+               cw_tasks.label,
+               cw_tasks.description,
+               acs_objects.object_type
+        from   cw_tasks,
+               acs_objects
+        where 
+               acs_objects.object_id = 
+                        cw_tasks.task_id
+    } map {
+        taskId = cw_tasks.task_id;
+        taskParentId = cw_tasks.parent_task_id;
+        taskLabel = cw_tasks.label;
+        taskDescription = cw_tasks.description;
+    }
+}

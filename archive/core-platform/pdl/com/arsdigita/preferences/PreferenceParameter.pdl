@@ -1,0 +1,53 @@
+//
+// Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+//
+// The contents of this file are subject to the ArsDigita Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.arsdigita.com/ADPL.txt
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+
+model com.arsdigita.preferences;
+
+object type PreferenceParameter {
+
+    BigDecimal id = preferences.preference_id;
+    BigDecimal parentID = preferences.parent_id;
+    String name = preferences.name;
+    String[0..1] description = preferences.description;
+    String preferenceType = preferences.preference_type;
+    String valueType = preferences.value_type;
+    String[0..1] valueString = preferences.value_string;
+
+    object key (id);
+
+    insert {
+        do {
+           insert into preferences (
+                preference_id, parent_id, name, is_node,
+                description, preference_type, value_type, value_string
+            ) values (
+                :id, :parentID, :name, 0,
+                :description, :preferenceType, :valueType, :valueString
+            )
+        }
+    }    
+
+    update {
+        do {
+            update preferences
+            set parent_id = :parentID,
+                name = :name,
+                description = :description,
+                preference_type = :preferenceType,
+                value_type = :valueType,
+                value_string = :valueString
+            where preference_id = :id
+        }
+    }
+}

@@ -1,0 +1,30 @@
+--
+-- Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+--
+-- The contents of this file are subject to the ArsDigita Public 
+-- License (the "License"); you may not use this file except in
+-- compliance with the License. You may obtain a copy of
+-- the License at http://www.arsdigita.com/ADPL.txt
+--
+-- Software distributed under the License is distributed on an "AS
+-- IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+-- implied. See the License for the specific language governing
+-- rights and limitations under the License.
+--
+
+-- Upgrades the data model from version 4.6.7 to 4.6.9
+--
+-- Copyright (C) 2001 Arsdigita Corporation
+--
+-- @author ron@arsdigita.com
+--
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/notification/notification-4.6.8-4.6.9.sql#1 $
+
+-- Add support for notification header and signature fields 
+
+alter table nt_requests add (
+    header    varchar2(250),
+    signature varchar2(250)
+);
+
+

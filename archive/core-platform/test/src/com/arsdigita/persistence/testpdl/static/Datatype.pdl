@@ -1,0 +1,146 @@
+//
+// Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+//
+// The contents of this file are subject to the ArsDigita Public 
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.arsdigita.com/ADPL.txt
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+
+model examples;
+
+object type Datatype {
+    BigInteger[1..1] id;
+    BigInteger       bigInteger;
+    BigDecimal       bigDecimal;
+    Boolean          boolean;
+    Byte             byte;
+    Character        character;
+    Date             date;
+    Double           double;
+    Float            float;
+    Integer          integer;
+    Long             long;
+    Short            short;
+    String           string;
+    // XXX: Should be byte[], but that isn't supported yet.
+    Blob             blob;
+    String           clob;
+
+    object key(id);
+
+    retrieve {
+        do {
+            select *
+            from t_datatypes
+            where id = :id
+        } map {
+            id = t_datatypes.id;
+            bigInteger = t_datatypes.j_big_integer;
+            bigDecimal = t_datatypes.j_big_decimal;
+            boolean = t_datatypes.j_boolean;
+            byte = t_datatypes.j_byte;
+            character = t_datatypes.j_character;
+            date = t_datatypes.j_date;
+            double = t_datatypes.j_double;
+            float = t_datatypes.j_float;
+            integer = t_datatypes.j_integer;
+            long = t_datatypes.j_long;
+            short = t_datatypes.j_short;
+            string = t_datatypes.j_string;
+            blob = t_datatypes.j_blob;
+            clob = t_datatypes.j_clob;
+        }
+    }
+
+    insert {
+        do {
+            insert into t_datatypes
+            (id, j_big_integer, j_big_decimal, j_boolean, j_byte, j_character,
+             j_date, j_double, j_float, j_integer, j_long, j_short, j_string,
+             j_blob, j_clob)
+            values
+            (:id, :bigInteger, :bigDecimal, :boolean, :byte, :character,
+             :date, :double, :float, :integer, :long, :short, :string, :blob,
+             :clob)
+        } map {
+            blob: BLOB;
+            clob: CLOB;
+        }
+    }
+
+    update {
+        do {
+            update t_datatypes
+            set j_big_integer = :bigInteger,
+                j_big_decimal = :bigDecimal,
+                j_boolean = :boolean,
+                j_byte = :byte,
+                j_character = :character,
+                j_date = :date,
+                j_double = :double,
+                j_float = :float,
+                j_integer = :integer,
+                j_long = :long,
+                j_short = :short,
+                j_string = :string,
+                j_blob = :blob,
+                j_clob = :clob
+            where id = :id
+        } map {
+            blob: BLOB;
+            clob: CLOB;
+        }
+    }
+
+    delete {
+        do {
+            delete from t_datatypes where id = :id
+        }
+    }
+}
+
+query TypedQuery {
+    BigInteger[1..1] id;
+    BigInteger       bigInteger;
+    BigDecimal       bigDecimal;
+    Boolean          boolean;
+    Byte             byte;
+    Character        character;
+    Date             date;
+    Double           double;
+    Float            float;
+    Integer          integer;
+    Long             long;
+    Short            short;
+    String           string;
+    // XXX: Should be byte[], but that isn't supported yet.
+    Blob             blob;
+    String           clob;
+
+    do {
+        select *
+	from t_datatypes
+    } map {
+	id = t_datatypes.id;
+	bigInteger = t_datatypes.j_big_integer;
+	bigDecimal = t_datatypes.j_big_decimal;
+	boolean = t_datatypes.j_boolean;
+	byte = t_datatypes.j_byte;
+	character = t_datatypes.j_character;
+	date = t_datatypes.j_date;
+	double = t_datatypes.j_double;
+	float = t_datatypes.j_float;
+	integer = t_datatypes.j_integer;
+	long = t_datatypes.j_long;
+	short = t_datatypes.j_short;
+	string = t_datatypes.j_string;
+	blob = t_datatypes.j_blob;
+	clob = t_datatypes.j_clob;
+    }
+}

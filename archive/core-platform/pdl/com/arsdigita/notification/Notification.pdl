@@ -1,0 +1,330 @@
+//
+// Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+//
+// The contents of this file are subject to the ArsDigita Public 
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.arsdigita.com/ADPL.txt
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+
+// $Id: //core-platform/dev/pdl/com/arsdigita/notification/Notification.pdl#1 $
+
+model com.arsdigita.notification;
+
+import com.arsdigita.kernel.*;
+
+object type QueueItem {
+
+   BigDecimal requestID;
+   BigDecimal messageID;
+   BigDecimal partyTo;
+   String     partyToAddr;
+   BigDecimal retryCount;
+   Boolean    success;
+   String     header;
+   String     signature;
+
+   object key (requestID, partyTo);
+
+   retrieve {
+       do {
+           select r.message_id, 
+                  r.header,
+                  r.signature,
+                  q.retry_count,
+                  q.success_p,
+                  p.primary_email
+           from   nt_queue q, 
+                  nt_requests r,
+                  parties p
+           where  q.request_id = :requestID
+             and  q.party_to   = :partyTo
+             and  r.request_id = q.request_id
+             and  p.party_id   = :partyTo
+       } map {
+           messageID   = r.message_id;
+           header      = r.header;
+           signature   = r.signature;
+           retryCount  = q.retry_count;
+           success     = q.success_p;
+           partyToAddr = p.primary_email;
+       }
+   }
+
+   insert {
+       do {
+           insert into nt_queue 
+                (request_id, 
+                 party_to,
+                 retry_count,
+                 success_p)
+           values (:requestID,
+                   :partyTo,
+                   0,
+                   '0')
+        }  
+   }
+
+   update {
+       do {
+           update nt_queue
+           set    retry_count = :retryCount,
+                  success_p   = :success
+           where  request_id  = :requestID and party_to = :partyTo
+       }
+   }
+
+   delete {
+       do {
+           delete from nt_queue
+           where  request_id = :requestID and party_to = :partyTo
+       }
+   }
+}
+
+object type Notification extends ACSObject {
+
+    BigDecimal partyTo;
+    BigDecimal digestID;
+    BigDecimal messageID;
+    String     header;
+    String     signature;
+    Boolean    expandGroup;
+    Date       requestDate;
+    Date       fulfillDate;
+    String     status;
+    Integer    maxRetries;
+    Boolean    expunge;
+    Boolean    expungeMessage;
+
+    retrieve {
+
+	super;
+
+	do {
+	    select digest_id,
+                   party_to,
+   		   message_id,
+                   header,
+                   signature,
+		   expand_group,
+		   request_date,
+		   fulfill_date,
+		   status,
+  		   max_retries,
+                   expunge_p,
+                   expunge_msg_p
+	    from   nt_requests
+	    where  request_id = :id
+
+	 } map {
+
+	     partyTo        = party_to;
+	     digestID       = digest_id;
+	     messageID      = message_id;
+             header         = header;
+             signature      = signature;
+	     expandGroup    = expand_group;
+	     requestDate    = request_date;
+	     fulfillDate    = fulfill_date;
+	     status         = status;
+	     maxRetries     = max_retries;
+	     expunge        = expunge_p;
+             expungeMessage = expunge_msg_p;
+
+	 }
+    }
+
+    insert {
+
+	super;
+
+	do {
+	    insert into nt_requests
+		(request_id,
+                 party_to,
+                 digest_id,
+                 message_id,
+                 header,
+                 signature,
+                 expand_group,
+		 request_date,
+		 fulfill_date,
+		 status,
+		 max_retries,
+		 expunge_p,
+                 expunge_msg_p)
+             values
+		(:id,
+		 :partyTo,
+		 :digestID,
+		 :messageID,
+                 :header,
+                 :signature,
+		 :expandGroup,
+		 :requestDate,
+		 :fulfillDate,
+		 :status,
+		 :maxRetries,
+		 :expunge,
+                 :expungeMessage)
+	 }
+    }
+
+    update {
+	
+	super;
+
+	do {
+	    update nt_requests
+		set   party_to      = :partyTo,
+		      digest_id     = :digestID,
+		      message_id    = :messageID,
+                      header        = :header,
+                      signature     = :signature,
+ 		      expand_group  = :expandGroup,
+		      request_date  = :requestDate,
+		      fulfill_date  = :fulfillDate,
+		      status        = :status,
+		      max_retries   = :maxRetries,
+		      expunge_p     = :expunge,
+                      expunge_msg_p = :expungeMessage
+		where request_id    = :id
+	 }
+    }
+
+    delete {
+
+	do {
+	    delete from nt_requests where request_id = :id
+        }
+
+	super;
+    }
+}
+
+query GetPendingNotifications {
+    do {
+        select request_id, 
+               party_to
+        from   nt_requests
+        where  status = 'pending'
+    } map {
+        requestID = request_id;
+        partyTo   = party_to;
+    }
+}
+
+query GetSimpleQueuedNotifications {
+    do {
+        select q.request_id, 
+               q.party_to, 
+               p.primary_email,
+               r.message_id
+        from   nt_queue q, 
+               nt_requests r, 
+               parties p
+        where  q.request_id = r.request_id
+          and  r.status='queued'
+          and  p.party_id = q.party_to      
+          and  r.digest_id is null
+          and  q.success_p = '0'
+          and  q.retry_count <= r.max_retries
+    } map {
+        requestID    = q.request_id;
+        messageID    = r.message_id;
+        partyTo      = q.party_to;
+    }
+}
+
+query GetDigestQueuedNotifications {
+    do {
+        select r.digest_id, 
+               q.party_to, 
+               r.message_id, 
+               r.request_id 
+        from   nt_requests r, 
+               nt_queue q, 
+               nt_digests d
+        where  r.status = 'queued'
+          and  r.request_id = q.request_id
+          and  r.digest_id is not null
+          and  q.success_p = '0' 
+          and  q.retry_count <= r.max_retries
+          and  d.next_run < sysdate
+          and  d.digest_id = r.digest_id
+	order by r.request_date
+    } map {
+        requestID = r.request_id;
+        messageID = r.message_id;
+        partyTo   = q.party_to;
+        digestID  = r.digest_id;
+    }
+}
+
+query GetCompleteNotifications {
+    do {
+        select request_id
+        from   nt_requests
+        where  status = 'sent'
+          and  expunge_p = '1'
+    } map {
+        requestID = request_id;
+    }
+}
+
+data operation DeleteNotificationQueued {
+    do {
+        delete from nt_queue 
+        where  request_id in 
+                   (select request_id
+                    from   nt_requests 
+                    where  status in ('sent', 'failed', 'failed_partial'))
+    }
+}
+
+data operation UpdateNotificationSuccessful {
+    do {
+        update nt_requests
+        set    status = 'sent'
+        where  status = 'queued' 
+	  and  not exists 
+	           (select 1 
+       	            from   nt_queue
+	            where  nt_queue.request_id = nt_requests.request_id
+	            and success_p = '0')
+   }
+}
+
+data operation UpdateNotificationFailure {
+    do {
+        update nt_requests
+        set    status = 'failed'
+        where  status = 'queued'
+          and  not exists 	
+                   (select 1
+                    from   nt_queue
+                    where  nt_queue.request_id = nt_requests.request_id
+                    and    (success_p = '1' or retry_count < nt_requests.max_retries))
+
+    }
+}
+
+data operation UpdateNotificationPartialFailure {
+    do {
+        update nt_requests
+        set    status = 'failed_partial'
+        where  status = 'queued'
+          and  not exists
+                   (select 1
+                    from   nt_queue	
+                    where  nt_queue.request_id = nt_requests.request_id
+		    and    success_p = '0' 
+		    and    retry_count < nt_requests.max_retries)
+    }
+}

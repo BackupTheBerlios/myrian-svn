@@ -1,0 +1,467 @@
+//
+// Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+//
+// The contents of this file are subject to the ArsDigita Public 
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.arsdigita.com/ADPL.txt
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+
+model com.arsdigita.kernel;
+
+//
+// GROUP
+//
+
+object type Group extends Party {
+    String      name = groups.name VARCHAR(200);
+    Role[0..n]  roles;
+
+    reference key (groups.group_id);
+
+    retrieve roles {
+        do {
+            select role_id, name, description
+	      from roles
+	     where group_id = :id
+        } map {
+            roles.roleId       = role_id;
+            roles.name         = name;
+            roles.description  = description;
+        }
+    }
+
+    add roles { }
+
+    clear roles {
+        do {
+            delete from roles where group_id = :id
+        }
+    }
+
+    delete {
+        do {
+            delete from group_subgroup_map
+            where subgroup_id = :id
+        }
+        do {
+            delete from groups
+            where group_id = :id
+        }
+        super;
+    }
+}
+
+
+//
+// MEMBERSHIP ASSOCIATION
+//
+
+association {
+    Group[0..n] groups;
+    User[0..n] members;
+
+    retrieve members {
+        do {
+	        select users.user_id, users.screen_name,
+	               parties.uri, 
+                   acs_objects.object_type, acs_objects.display_name
+	          from group_member_map, users, parties, acs_objects
+	         where group_member_map.group_id = :id
+	           and users.user_id = group_member_map.member_id
+	           and parties.party_id = users.user_id
+               and acs_objects.object_id = parties.party_id
+        } map {
+            members.id = users.user_id;
+            members.screenName = users.screen_name;
+            members.uri = parties.uri;
+            members.objectType = acs_objects.object_type;
+            members.displayName = acs_objects.display_name;
+        }
+    }
+
+    add members {
+        do {
+            insert into group_member_map
+            (id, group_id, member_id)
+            select
+            acs_object_id_seq.nextval, :id, :members.id
+            from dual
+            where not exists (select 1 from group_member_map
+                              where group_id = :id
+                              and   member_id = :members.id)
+        }
+    }
+
+    remove members {
+        do {
+            delete from group_member_map 
+            where group_id = :id 
+            and member_id=:members.id
+        }
+    }
+    
+    clear members {
+        do {delete from group_member_map where group_id = :id}
+    }
+
+    retrieve groups {
+        do {
+            select groups.name, groups.group_id, 
+	               parties.uri, 
+                   acs_objects.object_type, acs_objects.display_name
+	          from group_member_map, 
+	               groups, 
+	               parties, 
+	               acs_objects
+	         where group_member_map.member_id = :id
+	           and groups.group_id = group_member_map.group_id
+	           and parties.party_id = groups.group_id
+               and acs_objects.object_id = parties.party_id
+        } map {
+            groups.id = groups.group_id;
+            groups.name = groups.name;
+            groups.uri = parties.uri;
+            groups.objectType = acs_objects.object_type;
+            groups.displayName = acs_objects.display_name;
+        }
+    }
+
+    add groups {
+        do {
+            insert into group_member_map
+            (id, group_id, member_id)
+            values
+            (acs_object_id_seq.nextval, :groups.id, :id)
+        }
+    }
+
+    remove groups {	
+        do {
+            delete from group_member_map 
+            where group_id = :groups.id 
+            and member_id=:id
+        }
+    }
+
+    clear groups {
+        do {
+            delete from group_member_map where member_id = :id
+        }
+    }
+
+}
+
+//
+// SUBGROUP ASSOCIATION
+//
+
+association {
+    Group[0..n] supergroups;
+    Group[0..n] subgroups;
+
+    retrieve subgroups {
+        do {
+	        select groups.group_id, groups.name,
+	               parties.uri, 
+                   acs_objects.object_type, acs_objects.display_name
+	          from group_subgroup_map, 
+	               groups, 
+	               parties, 
+	               acs_objects
+	         where group_subgroup_map.group_id = :id
+	           and groups.group_id = group_subgroup_map.subgroup_id
+	           and parties.party_id = groups.group_id
+               and acs_objects.object_id = parties.party_id
+        } map {
+            subgroups.id = groups.group_id;
+            subgroups.name = groups.name;
+            subgroups.uri = parties.uri;
+            subgroups.objectType = acs_objects.object_type;
+            subgroups.displayName = acs_objects.display_name;
+        }
+    }
+
+    add subgroups {
+        do {
+            insert into group_subgroup_map
+            (id, group_id, subgroup_id)
+            select
+            acs_object_id_seq.nextval, :id, :subgroups.id
+            from dual
+            where not exists (select 1 from group_subgroup_map
+                              where group_id = :id
+                              and subgroup_id = :members.id)
+        }
+    }
+
+    remove subgroups {
+        do {
+            delete from group_subgroup_map 
+            where group_id = :id 
+            and subgroup_id=:subgroups.id
+        }
+    }
+
+    clear subgroups {
+        do {delete from group_subgroup_map where group_id = :id}
+    }
+
+    retrieve supergroups {
+        do {
+	        select groups.name, groups.group_id, 
+	               parties.uri, 
+                   acs_objects.object_type, acs_objects.display_name
+	          from group_subgroup_map, 
+	               groups, 
+	               parties, 
+	               acs_objects
+	         where group_subgroup_map.subgroup_id = :id
+	           and groups.group_id = group_subgroup_map.group_id
+	           and parties.party_id = groups.group_id
+               and acs_objects.object_id = parties.party_id
+        } map {
+            supergroups.id = groups.group_id;
+            supergroups.name = groups.name;
+            supergroups.uri = parties.uri;
+            supergroups.objectType = acs_objects.object_type;
+            supergroups.displayName = acs_objects.display_name;
+        }
+    }
+
+    add supergroups {
+        do {
+            insert into group_subgroup_map
+            (id, group_id, subgroup_id)
+            values
+            (acs_object_id_seq.nextval, :supergroups.id, :id)
+        }
+    }
+
+    remove supergroups {	
+        do {
+            delete from group_subgroup_map 
+            where group_id = :supergroups.id 
+            and subgroup_id=:id
+        }
+    }
+
+    clear supergroups {
+        do {
+            delete from group_subgroup_map where subgroup_id = :id
+        }
+    }
+}
+
+//
+// ALL MEMBERS ASSOCIATION
+//
+// This is a read only association used to implement the 
+// Group.getAllMembers() and User.getAllGroups() methods.
+//
+association {
+    Group[0..n] allGroups;
+    User[0..n] allMembers;
+
+    retrieve allMembers {
+        do {
+	        select users.user_id, users.screen_name,
+	               parties.uri, 
+                   acs_objects.object_type, acs_objects.display_name
+	          from group_member_trans_map, 
+	               users, 
+	               parties, 
+	               acs_objects
+	         where group_member_trans_map.group_id = :id
+	           and users.user_id = group_member_trans_map.member_id
+	           and parties.party_id = users.user_id
+               and acs_objects.object_id = parties.party_id
+        } map {
+            allMembers.id = users.user_id;
+            allMembers.screenName = users.screen_name;
+            allMembers.uri = parties.uri;
+            allMembers.objectType = acs_objects.object_type;
+            allMembers.displayName = acs_objects.display_name;
+        }
+    }
+
+    retrieve allGroups {
+        do {
+            select groups.name, groups.group_id, 
+	               parties.uri, 
+                   acs_objects.object_type, acs_objects.display_name
+	          from group_member_trans_map, 
+	               groups, 
+	               parties, 
+	               acs_objects
+            where group_member_trans_map.member_id = :id
+              and groups.group_id = group_member_trans_map.group_id
+              and parties.party_id = groups.group_id
+              and acs_objects.object_id = parties.party_id
+        } map {
+            allGroups.id = groups.group_id;
+            allGroups.name = groups.name;
+            allGroups.uri = parties.uri;
+            allGroups.objectType = acs_objects.object_type;
+            allGroups.displayName = acs_objects.display_name;
+        }
+    }
+
+}
+
+//
+// ALL SUBGROUPS ASSOCIATION
+//
+// This is a read only association used to implement the 
+// Group.getAllSubgroups() and Group.getAllSupergroups() methods.
+//
+association {
+    Group[0..n] allSupergroups;
+    Group[0..n] allSubgroups;
+
+    retrieve allSubgroups {
+        do {
+            select groups.group_id, groups.name,
+	               parties.uri, 
+                   acs_objects.object_type, acs_objects.display_name
+	          from group_subgroup_trans_map, 
+	               groups, 
+	               parties, 
+	               acs_objects
+	         where group_subgroup_trans_map.group_id = :id
+	           and groups.group_id = group_subgroup_trans_map.subgroup_id
+	           and parties.party_id = groups.group_id
+               and acs_objects.object_id = parties.party_id
+               and group_subgroup_trans_map.subgroup_id != :id
+        } map {
+            allSubgroups.id = groups.group_id;
+            allSubgroups.name = groups.name;
+            allSubgroups.uri = parties.uri;
+            allSubgroups.objectType = acs_objects.object_type;
+            allSubgroups.displayName = acs_objects.display_name;
+        }
+    }
+
+    retrieve allSupergroups {
+        do {
+            select groups.name, groups.group_id, 
+                   parties.uri, 
+                   acs_objects.object_type, acs_objects.display_name
+	          from group_subgroup_trans_map, 
+	               groups, 
+	               parties, 
+	               acs_objects
+	         where group_subgroup_trans_map.subgroup_id = :id
+	           and groups.group_id = group_subgroup_trans_map.group_id
+	           and parties.party_id = groups.group_id
+               and acs_objects.object_id = parties.party_id
+               and group_subgroup_trans_map.group_id != :id
+        } map {
+            allSupergroups.id = groups.group_id;
+            allSupergroups.name = groups.name;
+            allSupergroups.uri = parties.uri;
+            allSupergroups.objectType = acs_objects.object_type;
+            allSupergroups.displayName = acs_objects.display_name;
+        }
+    }
+
+}
+
+// Queries and operations to support Group API -- these are subject to change.
+
+query ContainedParties {
+    do {
+        select member_id as party_id
+        from group_member_map
+        where group_id = :groupID
+        UNION ALL
+        select subgroup_id as party_id
+        from group_subgroup_map
+        where group_id = :groupID
+    }
+}
+
+query AllContainedParties {
+    do {
+        select member_id as party_id
+        from group_member_trans_map
+        where group_id = :groupID
+        UNION ALL
+        select subgroup_id as party_id
+        from group_subgroup_trans_map
+        where group_id = :groupID and subgroup_id != :groupID
+    }
+}
+
+query RetrieveGroups {
+    do {
+        select group_id,
+               name, 
+               lower(name) as search_name
+        from groups
+    } map {
+       groupID = group_id;
+       name = name;
+       searchName = search_name;
+    }
+} 
+
+data operation ClearMembers {
+    do {
+        delete from group_member_map
+        where group_id = :groupID
+    }
+}
+data operation ClearSubgroups {
+    do {
+        delete from group_subgroup_map
+        where group_id = :groupID
+    }
+}
+data operation ClearSupergroups {
+    do {
+        delete from group_subgroup_map
+        where subgroup_id = :groupID
+    }
+}
+query GroupDirectMembers {
+    do {
+        select member_id
+        from group_member_map
+        where group_id = :groupID
+    } map {
+        memberID = group_member_map.member_id;
+    }
+}
+query GroupDirectSubgroups {
+    do {
+        select subgroup_id
+        from group_subgroup_map
+        where group_id = :groupID
+    } map {
+        subgroupID = group_subgroup_map.subgroup_id;
+    }
+}
+query GroupMembers {
+    do {
+        select member_id
+        from group_member_trans_map
+        where group_id = :groupID
+    } map {
+        memberID = group_member_map.member_id;
+    }
+}
+query GroupSubgroups {
+    do {
+        select subgroup_id
+        from group_subgroup_trans_map
+        where group_id = :groupID and subgroup_id!=:groupID
+    } map {
+        subgroupID = group_subgroup_trans_map.subgroup_id;
+    }
+}

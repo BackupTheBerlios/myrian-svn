@@ -1,0 +1,187 @@
+//
+// Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+//
+// The contents of this file are subject to the ArsDigita Public 
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.arsdigita.com/ADPL.txt
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+
+model com.arsdigita.categorization;
+
+import com.arsdigita.kernel.*;
+
+object type CategoryCategoryMapping {
+    BigDecimal[1..1] id;
+    BigDecimal[1..1] parentCategoryID;
+    BigDecimal[1..1] objectID;
+    Integer[1..1] sortKey;
+    Boolean[1..1] isDefault;
+    String[1..1] relationType;
+
+    BigDecimal[1..1] categoryID1;
+    BigDecimal[1..1] categoryID2;
+
+    object key (id);
+
+    retrieve {
+        do {
+            select category_category_map_id, 
+                   category_id,
+                   related_category_id,
+                   default_p,
+                   sort_key,
+                   relation_type
+              from cat_category_category_map
+            where category_category_map_id = :id
+         } map {
+            id = cat_category_category_map.category_category_map_id;
+            parentCategoryID = cat_category_category_map.category_id;
+            objectID = cat_category_category_map.related_category_id;
+            isDefault = cat_category_category_map.default_p;
+            sortKey = cat_category_category_map.sort_key;
+            relationType = cat_category_category_map.relation_type;
+         }
+    }
+
+    retrieve all {
+        do {
+            select category_category_map_id, 
+                   category_id,
+                   related_category_id,
+                   default_p,
+                   sort_key,
+                   relation_type
+              from cat_category_category_map
+         } map {
+            id = cat_category_category_map.category_category_map_id;
+            parentCategoryID = cat_category_category_map.category_id;
+            objectID = cat_category_category_map.related_category_id;
+            isDefault = cat_category_category_map.default_p;
+            sortKey = cat_category_category_map.sort_key;
+            relationType = cat_category_category_map.relation_type;
+         }
+    }
+
+    insert {
+        do {
+            insert into cat_category_category_map (
+                category_category_map_id,
+                category_id,
+                related_category_id,
+                default_p,
+                sort_key,
+                relation_type
+            ) values (
+                :id,
+                :parentCategoryID,
+                :objectID,
+                :isDefault,
+                (select CASE WHEN :sortKey is null 
+                             THEN (select CASE WHEN max(sort_key) is null
+                                               THEN 0 
+                                               ELSE max(sort_key) 
+                                          END + 1 
+                                     from cat_category_category_map) 
+                             ELSE :sortKey
+                             END
+                   from dual),
+                :relationType
+            )
+        }
+    } 
+
+
+    update {
+        do {
+            update cat_category_category_map
+            set category_id = :parentCategoryID,
+                related_category_id = :objectID,
+                default_p = :isDefault,
+                sort_key = :sortKey,
+                relation_type = :relationType
+          where category_category_map_id = :id
+        }
+    }
+    
+
+    delete {
+        do {
+            delete from cat_category_category_map
+            where category_category_map_id = :id
+        }
+    }
+
+}
+
+
+query categoryCategoryMappingQuery {
+    do {
+        select related_category_id, category_id, category_category_map_id,
+               default_p, sort_key, relation_type
+        from cat_category_category_map
+    } map {
+        categoryID = cat_category_category_map.category_id;
+        sortKey = cat_category_category_map.sort_key;
+        isDefault = cat_category_category_map.default_p;
+        objectID = cat_category_category_map.related_category_id;
+        categoryCategoryMapID = cat_category_category_map.category_category_map_id;
+        relationType = cat_category_category_map.relation_type;
+    }
+}
+
+
+query categoryClearDefaultParent {
+    do {
+        update cat_category_category_map
+        set default_p = 'f'
+        where category_category_map_id = :id
+    }
+}
+
+
+query getRootCategory {
+    do {
+        select g.name, 
+               g.category_id,
+               count(sd.category_id) as sub_count
+        from cat_categories g,
+             cat_category_category_map sd
+        where g.category_id = :objectID
+          and sd.category_id(+) = g.category_id
+        group by g.name, g.category_id
+    } map {
+        id = g.category_id;
+        name = g.name;
+        nchild = sub_count;
+    }
+}
+
+
+query getSubCategories {
+    do {
+        select g.name,
+               g.category_id,
+               count(sd2.category_id) as sub_count
+        from cat_categories g,  
+             cat_category_category_map sd1,
+             cat_category_category_map sd2
+        where sd1.category_id = :objectID
+          and g.category_id = sd1.related_category_id
+          and sd2.category_id(+) = sd1.related_category_id
+        group by g.name, g.category_id
+    } map {
+        id = g.category_id;
+        name = g.name;
+        nchild = sub_count;
+    }
+}
+
+
+
+

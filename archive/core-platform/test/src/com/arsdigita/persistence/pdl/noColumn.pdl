@@ -1,0 +1,8 @@
+model newfoobar;
+object type FooBar  {
+    String name = foo_bar.name VARCHAR(4000);
+    Boolean isEnabled = foo_bar.enabled_p CHAR(1);
+	String duplicate;
+
+	object key(name);
+}

@@ -1,0 +1,12 @@
+model incrementalLoad;
+
+object type SubType extends BaseType {
+    String qux;
+}
+
+object type Pointer {
+    BigDecimal id;
+    ReferencedType pointer;
+
+    object key(id);
+}

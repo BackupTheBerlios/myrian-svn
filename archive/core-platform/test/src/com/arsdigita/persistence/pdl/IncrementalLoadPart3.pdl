@@ -1,0 +1,14 @@
+model incrementalLoadOtherModel;
+
+import incrementalLoad.*;
+
+object type SubType extends BaseType {
+    String qux;
+}
+
+object type Pointer {
+    BigInteger id;
+    ReferencedType ptr;
+
+    object key(id);
+}

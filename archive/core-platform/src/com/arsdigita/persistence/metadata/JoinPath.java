@@ -1,0 +1,131 @@
+/*
+ * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ *
+ * The contents of this file are subject to the ArsDigita Public 
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.arsdigita.com/ADPL.txt
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
+
+package com.arsdigita.persistence.metadata;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
+import java.io.PrintStream;
+
+/**
+ * JoinPath defines a complete path from one ObjectType or table to another,
+ * allowing metadata-driven SQL to create queries across multiple tables on
+ * the fly. A path is composed of 1 or more JoinElements, specifying the
+ * particular columns to join, and in what order.
+ *
+ * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#1 $
+ * @since 4.6
+ *
+ * @invariant getPath() != null 
+ **/
+
+public class JoinPath extends Element {
+
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+
+    private List m_path;
+    // a List of JoinElements
+
+    /**
+     * Create a JoinPath, with the path to be created later.
+     **/
+    public JoinPath() {
+        this(new ArrayList());
+    }
+
+    /**
+     * Create a JoinPath with the given path, a List of JoinElements.
+     *
+     * @param path a list of JoinElements
+     *
+     * @pre path != null
+     **/
+    public JoinPath(List path) {
+        m_path = path;
+    }
+
+    /**
+     * Adds a new JoinElement to the end of the path
+     *
+     * @param element the JoinElement to append to the path
+     * @pre element != null
+     **/
+    public void addJoinElement(JoinElement element) {
+        m_path.add(element);
+    }
+
+    /**
+     * Adds a new JoinElement to the end of the path, created from two
+     * columns.
+     *
+     * @param from the column to start the join
+     * @param to the column where the join ends
+     * @pre from != null && to != null
+     **/
+    public void addJoinElement(Column from, Column to) {
+        m_path.add(new JoinElement(from, to));
+    }
+
+    /**
+     * Returns an Iterator containing all the JoinElements that are part of
+     * this JoinPath.
+     *
+     * @return An Iterator of JoinElements.
+     *
+     * @see JoinElement
+     **/
+
+    public Iterator getJoinElements() {
+        return m_path.iterator();
+    }
+
+    /**
+     * Specify the entire join path
+     *
+     * @param path a List of JoinElements
+     * @pre path != null
+     **/
+    protected void setPath(List path) {
+        m_path = path;
+    }
+
+    /**
+     * Returns the current path
+     *
+     * @return the current path
+     **/
+    public List getPath() {
+        return m_path;
+    }
+
+    /**
+     * Outputs a serialized representation of this JoinPath.
+     *
+     * @param out The PrintStream to use for output.
+     **/
+
+    void outputPDL(PrintStream out) {
+        for (Iterator it = getJoinElements(); it.hasNext(); ) {
+            JoinElement je = (JoinElement) it.next();
+            je.outputPDL(out);
+            if (it.hasNext()) {
+                out.print(", ");
+            }
+        }
+    }
+
+}

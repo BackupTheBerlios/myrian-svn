@@ -1,0 +1,30 @@
+model refetchTest;
+
+object type RefetchTest {
+    BigInteger[1..1] id = t_nodes.node_id INTEGER;
+    String[0..1] name = t_nodes.name VARCHAR(200);
+    RefetchTest[0..1] parent = join t_nodes.parent_id to t_nodes.node_id;
+
+    object key (id);
+
+    retrieve all {
+        do {
+            select node_id
+            from t_nodes
+        } map {
+            id = node_id;
+        }
+    }
+
+    retrieve {
+        do {
+            select *
+            from t_nodes
+            where node_id = :id
+        } map {
+            id = node_id;
+            name = name;
+            parent.id = parent_id;
+        }
+    }
+}

@@ -1,0 +1,73 @@
+// Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+//
+// The contents of this file are subject to the ArsDigita Public 
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.arsdigita.com/ADPL.txt
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+
+model com.arsdigita.messaging;
+
+object type ThreadedMessage extends Message {
+
+    BigDecimal root = messages.root_id;
+    String     sortKey = messages.sort_key;
+
+    insert {
+
+        super;
+
+        do {
+            update messages
+                set   root_id    = :root,
+                      sort_key   = :sortKey
+                where message_id = :id
+        }
+    }
+
+}
+
+// Used for sort key generation when we need to lookup the current
+// maximum.  The only way to use this right now is to execute the
+// query and select the first element.  This should always be used in
+// conjunction with a filter that limits the number of sort_keys
+// selected, and therefore should execute reasonably fast.
+
+query maxSortKey {
+    do {
+         select   root_id,
+                  sort_key,
+                  length(sort_key) as sort_size
+         from     messages 
+         order by sort_key desc
+    } map {
+         root     = root_id;
+         sortKey  = sort_key;
+         sortSize = sort_size;
+    }
+}
+
+// Use this query to retrieve all related messages in a threaded
+// discussion.   The modification of the sort_key column is required
+// to get level 0 message to sort correctly with respect to their
+// children. 
+
+query getMessageTree {
+    do {
+        select   message_id,
+                 object_id,
+                 nvl(root_id,message_id) as root_id,
+                 nvl(sort_key,'---') as sort_key
+        from     messages
+        order by root_id, sort_key
+    } map {
+        id      = message_id;
+        object  = object_id;
+        root    = root_id;
+        sortKey = sort_key;
+    }
+}

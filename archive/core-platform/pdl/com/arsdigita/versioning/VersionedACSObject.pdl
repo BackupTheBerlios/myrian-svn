@@ -1,0 +1,240 @@
+//
+// Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+//
+// The contents of this file are subject to the ArsDigita Public 
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.arsdigita.com/ADPL.txt
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+
+model com.arsdigita.versioning;
+
+import com.arsdigita.kernel.*;
+
+object type VersionedACSObject extends ACSObject {
+
+  Boolean[1..1]             isDeleted = vc_objects.is_deleted;
+  VersionedACSObject[0..1]  master;
+
+  reference key (vc_objects.object_id);
+
+  // WARNING: The retrieve event does NOT call super,
+  // in the interests of extra speed. This will cause all
+  // kinds of interesting bugs if ACSObject is ever modified.
+  retrieve {   
+    do {
+      select
+        o.object_type, o.display_name, o.default_domain_class,
+        v.is_deleted, v.master_id
+      from
+        acs_objects o, vc_objects v
+      where
+        o.object_id = :id
+      and
+        v.object_id = :id
+    } map {
+      objectType           = o.object_type;
+      displayName          = o.display_name;
+      defaultDomainClass   = o.default_domain_class;
+      isDeleted            = v.is_deleted;
+      master.id            = v.master_id;
+    }
+  }
+
+  //retrieve {
+  //  super;
+  //      
+  //  do {
+  //    select
+  //      v.is_deleted, v.master_id
+  //    from
+  //      vc_objects v
+  //    where
+  //      v.object_id = :id
+  //  } map {
+  //    isDeleted            = v.is_deleted;
+  //    master.id            = v.master_id;
+  //  }
+  //}
+
+  retrieve all {
+    do {
+      select
+        o.object_type, o.display_name, o.default_domain_class,
+        v.is_deleted, v.master_id
+      from
+        acs_objects o, vc_objects v
+      where
+        o.object_id = v.object_id
+    } map {
+      objectType           = o.object_type;
+      displayName          = o.display_name;
+      defaultDomainClass   = o.default_domain_class;
+      isDeleted            = v.is_deleted;
+      master.id            = v.master_id;
+    }
+  }    
+
+  insert {
+    super;
+    
+    do {
+      insert into vc_objects (object_id, is_deleted, master_id) 
+      values (:id, :isDeleted, :master.id)
+    }
+  }
+
+  update {
+    super;
+
+    do {
+      update vc_objects set 
+        is_deleted = :isDeleted,
+        master_id  = :master.id
+      where object_id = :id
+    }
+  }
+
+  delete {
+    do {
+      delete from vc_objects where object_id = :id
+    }
+
+    super;
+  }
+
+  retrieve master {
+    do {
+      select
+        o.object_id, o.object_type, o.display_name, o.default_domain_class,
+        v2.is_deleted, v2.master_id
+      from
+        acs_objects o, vc_objects v, vc_objects v2
+      where
+        o.object_id = v.master_id
+      and
+        v.object_id = :id
+      and
+        v2.object_id = v.master_id
+    } map {
+      master.id                   = o.object_id;
+      master.objectType           = o.object_type;
+      master.displayName          = o.display_name;
+      master.defaultDomainClass   = o.default_domain_class;
+      master.isDeleted            = v2.is_deleted;
+      master.master.id            = v2.master_id;
+    }
+  }
+
+  add master {}
+  remove master {}
+}
+
+query rollbackOperations {
+  Operation           operation;
+  VersionedACSObject  acsObject;
+  BigDecimal          transID;
+  BigDecimal          objectID;
+  
+  do {
+    select 
+      o.operation_id, o.transaction_id, o.action, o.attribute, o.classname,
+      t.object_id,
+      a.object_type, a.display_name, a.default_domain_class,
+      v.master_id, v.is_deleted
+    from
+      vc_operations o, vc_transactions t, acs_objects a, vc_objects v
+    where
+      (t.master_id = :masterID or (t.master_id is null and t.object_id = :masterID))
+    and
+      t.object_id = a.object_id
+    and
+      t.object_id = v.object_id
+    and
+      t.transaction_id = o.transaction_id
+    order by
+      t.timestamp desc, t.transaction_id desc
+  } map {
+    operation.id                 = o.operation_id;
+    operation.action             = o.action;
+    operation.attribute          = o.attribute;
+    operation.classname          = o.classname;    
+    operation.transaction.id     = o.transaction_id;
+    acsObject.id                 = t.object_id;
+    acsObject.defaultDomainClass = a.default_domain_class;
+    acsObject.objectType         = a.object_type;
+    acsObject.displayName        = a.display_name;
+    acsObject.master.id          = v.master_id;
+    acsObject.isDeleted          = v.is_deleted;
+    transID                      = o.transaction_id;
+    objectID                     = t.object_id;
+  }
+}
+    
+data operation reparentTransactions {
+  do {
+    update vc_transactions set master_id = :master
+    where object_id = :id
+  }
+}
+
+query childObjects {
+  do {
+    select object_id from vc_objects
+    where master_id = :masterID
+  } map {
+   childID = object_id;
+  }
+}
+
+query objectHistoryQuery {
+
+  BigDecimal    transID;
+  Transaction   trans;
+  BigDecimal    version;
+  Date          timestamp;
+  String        userEmail;
+  String        comment;
+
+  do {
+    select * from (select  
+      qq.transaction_id, qq.timestamp, qq.primary_email, qq.tag,
+      qq.is_last, rownum as order_n
+    from (select
+      q.transaction_id, q.timestamp, q.primary_email, q.tag,
+      q.is_last
+    from (
+      select
+        t.transaction_id, t.timestamp, p.primary_email, t.tag, 
+        '0' as is_last
+      from
+        vc_transactions t, parties p
+      where
+        master_id = :masterID
+      and
+        p.party_id(+) = t.modifying_user
+      and
+        t.tag is not null
+    union
+      select
+        :dummyID as transaction_id, to_date('') as timestamp, 
+        null as primary_email, null as tag, '1' as is_last
+      from
+        dual
+      where
+        :showCurrent = '1'
+    ) q order by is_last, timestamp) qq)
+  } map {
+    transID    = transaction_id;
+    trans.id   = transaction_id;
+    version    = order_n;
+    timestamp  = timestamp;
+    userEmail  = primary_email;
+    comment    = tag;
+  }
+}

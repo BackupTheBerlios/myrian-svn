@@ -1,0 +1,138 @@
+//
+// Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+//
+// The contents of this file are subject to the ArsDigita Public 
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.arsdigita.com/ADPL.txt
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+
+model com.arsdigita.workflow.simple;
+
+import com.arsdigita.kernel.*;
+
+//TODO: instead of getting the ObjectID and Type, create an association;
+object type Workflow extends Task {
+    BigDecimal    processID;
+    BigDecimal    processDefinitionID;
+    String        processState;
+    BigDecimal    ACSObjectID;
+    String        ACSObjectType;
+    composite Task[0..n] wfTasks;
+    retrieve {
+        super;
+     
+        do {
+            select cw_processes.process_def_id ,
+                   cw_processes.process_state  ,
+                   cw_processes.process_id     ,
+                   cw_processes.object_id      ,
+                   acs_objects.object_type
+            from   cw_processes   ,
+                   acs_objects    
+            where  cw_processes.process_id = :id
+            and    acs_objects.object_id(+) = cw_processes.object_id
+        } map {
+            processID = cw_processes.process_id;
+            processDefinitionID = cw_processes.process_def_id;
+            processState = cw_processes.process_state;
+            ACSObjectID  = cw_processes.object_id;
+            ACSObjectType = acs_objects.object_type;
+        }
+
+    }
+
+    insert  {
+        super;
+        do {
+           insert into cw_processes (
+               process_id     ,
+               process_def_id ,
+               process_state  ,
+               object_id     
+           ) values (
+               :id            , 
+               :processDefinitionID  ,
+               :processState  ,
+               :ACSObjectID 
+           ) 
+        }
+    }
+
+    update {
+        super;
+    
+        do {
+           update cw_processes 
+           set    process_def_id = :processDefinitionID ,
+                  process_state  = :processState,
+		  object_id      = :ACSObjectID
+           where  process_id = :id
+        }
+    }
+
+    delete {
+        do {
+            delete from cw_processes
+            where  process_id = :id
+        }
+        super;
+    }
+
+
+    retrieve wfTasks {
+        do {
+            select cw_tasks.task_id          ,
+                   cw_tasks.label            ,
+                   cw_tasks.description      ,
+                   cw_tasks.is_active        ,
+                   cw_tasks.parent_task_id   ,
+                   cw_tasks.task_state       ,
+                   acs_objects.default_domain_class    ,
+                   acs_objects.object_type   ,
+                   acs_objects.object_id
+            from   cw_tasks                      ,
+                   acs_objects
+            where  cw_tasks.parent_task_id = :id
+            and    acs_objects.object_id = cw_tasks.task_id
+        } map {
+	    wfTasks.id		     	     = acs_objects.object_id;
+            wfTasks.label                    = cw_tasks.label;
+            wfTasks.description              = cw_tasks.description;
+            wfTasks.isActive                 = cw_tasks.is_active;
+            wfTasks.parentTaskID             = cw_tasks.parent_task_id;
+            wfTasks.taskState 		     = cw_tasks.task_state;
+	    wfTasks.taskObjectType           = acs_objects.object_type;
+	    wfTasks.defaultDomainClass       = acs_objects.default_domain_class;
+        }
+   }
+    remove wfTasks {
+        do {
+            delete
+            from   cw_tasks
+            where  cw_tasks.parent_task_id = :id
+        }
+   }
+}
+
+
+query getProcesses {
+    do {
+        select cw_processes.process_id 
+        ,      acs_objects.object_type
+        ,      cw_processes.object_id as object_id
+        ,      cw_processes.process_def_id
+        from cw_processes , acs_objects 
+        where cw_processes.object_id = acs_objects.object_id
+    } map {
+        processID = cw_processes.process_id;
+        processDefID = cw_processes.process_def_id;
+        processObjectType = acs_objects.object_type;
+        processObjectID = cw_processes.object_id;
+    }
+}

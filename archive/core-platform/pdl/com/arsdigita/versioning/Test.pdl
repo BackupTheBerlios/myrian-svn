@@ -1,0 +1,344 @@
+//
+// Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+//
+// The contents of this file are subject to the ArsDigita Public 
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.arsdigita.com/ADPL.txt
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+
+model versiontest;
+
+import com.arsdigita.kernel.*;
+import com.arsdigita.versioning.*;
+
+object type Datatype extends VersionedACSObject {
+  BigInteger       bigInteger;
+  BigDecimal       bigDecimal;        
+  Boolean          boolean;
+  Byte             byte;
+  Character        character;
+  Date             date;
+  Double           double;
+  Float            float;
+  Integer          integer;
+  Long             long;
+  Short            short;
+  String           string;
+  Blob             blob;
+  String           clob;  // Really a CLOB
+  Datatype[0..1]   related;
+  Datatype[0..n]   mappedObjects;
+
+  composite Datatype [0..1] child;
+
+  // Composite relation goes both ways
+  composite Datatype[0..n] composites; 
+  Datatype[0..1]   parent;
+  
+  retrieve {
+    super;
+
+    do {
+      select 
+        t.*, 
+        o.object_type, o.object_id, o.default_domain_class
+      from 
+        t_versioned_datatypes t, acs_objects o
+      where 
+        o.object_id = :id 
+      and 
+        t.id = :id
+    } map {
+      bigInteger          = t.j_big_integer;
+      bigDecimal          = t.j_big_decimal;
+      boolean             = t.j_boolean;
+      byte                = t.j_byte;
+      character           = t.j_character;
+      date                = t.j_date;
+      double              = t.j_double;
+      float               = t.j_float;
+      integer             = t.j_integer;
+      long                = t.j_long;
+      short               = t.j_short;
+      string              = t.j_string;
+      blob                = t.j_blob;
+      clob                = t.j_clob;
+      id                  = o.object_id;
+      objectType          = o.object_type;
+      defaultDomainClass  = o.default_domain_class;
+      related.id          = t.related_id;
+      parent.id           = t.parent_id;  
+    }
+  }
+  
+  insert {
+    super;
+    
+    do {
+      insert into t_versioned_datatypes
+      (id, j_big_integer, j_big_decimal, j_boolean, j_byte, j_character,
+       j_date, j_double, j_float, j_integer, j_long, j_short, j_string,
+       j_blob, j_clob, parent_id, child_id)
+      values
+      (:id, :bigInteger, :bigDecimal, :boolean, :byte, :character,
+       :date, :double, :float, :integer, :long, :short, :string, :blob,
+       :clob, :parent.id, :child.id)
+    } map {
+      blob: BLOB;
+      clob: CLOB;
+    }
+  }
+
+  update {
+    super;
+
+    do {
+      update t_versioned_datatypes set
+        j_big_integer = :bigInteger,
+        j_big_decimal = :bigDecimal,
+        j_boolean = :boolean,
+        j_byte = :byte,
+        j_character = :character,
+        j_date = :date,
+        j_double = :double,
+        j_float = :float,
+        j_integer = :integer,
+        j_long = :long,
+        j_short = :short,
+        j_string = :string,
+        j_blob = :blob,
+        j_clob = :clob,
+        related_id = :related.id,
+        parent_id = :parent.id,
+        child_id = :child.id
+      where 
+        id = :id
+    } map {
+      blob: BLOB;
+      clob: CLOB;
+    }
+  }
+
+  delete {
+    do {
+      delete from t_versioned_datatypes where id = :id
+    }
+    super;
+  }
+  
+  add related {}
+  
+  remove related {}
+
+  retrieve related {   
+    do {
+      select 
+        t.*, 
+        o.object_type, o.object_id, o.default_domain_class
+      from 
+        t_versioned_datatypes t, acs_objects o,
+      t_versioned_datatypes tp
+      where 
+        o.object_id = tp.related_id 
+      and
+        t.id = tp.related_id
+      and 
+        tp.id = :id
+    } map {
+      related.bigInteger          = t.j_big_integer;
+      related.bigDecimal          = t.j_big_decimal;
+      related.boolean             = t.j_boolean;
+      related.byte                = t.j_byte;
+      related.character           = t.j_character;
+      related.date                = t.j_date;
+      related.double              = t.j_double;
+      related.float               = t.j_float;
+      related.integer             = t.j_integer;
+      related.long                = t.j_long;
+      related.short               = t.j_short;
+      related.string              = t.j_string;
+      related.blob                = t.j_blob;
+      related.clob                = t.j_clob;
+      related.id                  = o.object_id;
+      related.objectType          = o.object_type;
+      related.defaultDomainClass  = o.default_domain_class;
+      related.related.id          = t.related_id;
+      related.parent.id           = t.parent_id;
+    }
+  }
+  
+  retrieve mappedObjects {
+    do {
+      select t.*, o.object_type, o.object_id, o.default_domain_class
+    from 
+      t_versioned_datatypes t, acs_objects o, t_versioned_map m
+    where 
+      o.object_id = t.id
+    and 
+      m.child_id = t.id
+    and 
+      m.id = :id
+    } map {
+      mappedObjects.bigInteger          = t.j_big_integer;
+      mappedObjects.bigDecimal          = t.j_big_decimal;
+      mappedObjects.boolean             = t.j_boolean;
+      mappedObjects.byte                = t.j_byte;
+      mappedObjects.character           = t.j_character;
+      mappedObjects.date                = t.j_date;
+      mappedObjects.double              = t.j_double;
+      mappedObjects.float               = t.j_float;
+      mappedObjects.integer             = t.j_integer;
+      mappedObjects.long                = t.j_long;
+      mappedObjects.short               = t.j_short;
+      mappedObjects.string              = t.j_string;
+      mappedObjects.blob                = t.j_blob;
+      mappedObjects.clob                = t.j_clob;
+      mappedObjects.id                  = o.object_id;
+      mappedObjects.objectType          = o.object_type;
+      mappedObjects.defaultDomainClass  = o.default_domain_class;
+      mappedObjects.related.id          = t.related_id;
+      mappedObjects.parent.id           = t.parent_id;
+    }
+  }
+    
+  add mappedObjects {
+    do {
+      insert into t_versioned_map 
+        (id, child_id) 
+      values 
+        (:id, :mappedObjects.id)
+    }
+  }
+
+  remove mappedObjects {
+    do {
+      delete from t_versioned_map
+      where id = :id and child_id = :mappedObjects.id
+    }
+  }
+
+  add parent {}
+  
+  remove parent {}
+
+  retrieve parent {   
+    do {
+      select 
+        t.*, 
+        o.object_type, o.object_id, o.default_domain_class
+      from 
+        t_versioned_datatypes t, acs_objects o,
+      t_versioned_datatypes tp
+      where 
+        o.object_id = tp.parent_id 
+      and
+        t.id = tp.parent_id
+      and 
+        tp.id = :id
+    } map {
+      parent.bigInteger          = t.j_big_integer;
+      parent.bigDecimal          = t.j_big_decimal;
+      parent.boolean             = t.j_boolean;
+      parent.byte                = t.j_byte;
+      parent.character           = t.j_character;
+      parent.date                = t.j_date;
+      parent.double              = t.j_double;
+      parent.float               = t.j_float;
+      parent.integer             = t.j_integer;
+      parent.long                = t.j_long;
+      parent.short               = t.j_short;
+      parent.string              = t.j_string;
+      parent.blob                = t.j_blob;
+      parent.clob                = t.j_clob;
+      parent.id                  = o.object_id;
+      parent.objectType          = o.object_type;
+      parent.defaultDomainClass  = o.default_domain_class;
+      parent.related.id          = t.related_id;
+      parent.parent.id           = t.parent_id;
+    }
+  }
+
+  add child {}
+  
+  remove child {}
+
+  retrieve child {   
+    do {
+      select 
+        t.*, 
+        o.object_type, o.object_id, o.default_domain_class
+      from 
+        t_versioned_datatypes t, acs_objects o,
+      t_versioned_datatypes tp
+      where 
+        o.object_id = tp.child_id 
+      and
+        t.id = tp.child_id
+      and 
+        tp.id = :id
+    } map {
+      child.bigInteger          = t.j_big_integer;
+      child.bigDecimal          = t.j_big_decimal;
+      child.boolean             = t.j_boolean;
+      child.byte                = t.j_byte;
+      child.character           = t.j_character;
+      child.date                = t.j_date;
+      child.double              = t.j_double;
+      child.float               = t.j_float;
+      child.integer             = t.j_integer;
+      child.long                = t.j_long;
+      child.short               = t.j_short;
+      child.string              = t.j_string;
+      child.blob                = t.j_blob;
+      child.clob                = t.j_clob;
+      child.id                  = o.object_id;
+      child.objectType          = o.object_type;
+      child.defaultDomainClass  = o.default_domain_class;
+      child.related.id          = t.related_id;
+      child.parent.id           = t.parent_id;
+    }
+  }
+
+  retrieve composites {
+    do {
+      select t.*, o.object_type, o.object_id, o.default_domain_class
+    from 
+      t_versioned_datatypes t, acs_objects o
+    where 
+      o.object_id = t.id
+    and 
+      t.parent_id = :id
+    } map {
+      composites.bigInteger          = t.j_big_integer;
+      composites.bigDecimal          = t.j_big_decimal;
+      composites.boolean             = t.j_boolean;
+      composites.byte                = t.j_byte;
+      composites.character           = t.j_character;
+      composites.date                = t.j_date;
+      composites.double              = t.j_double;
+      composites.float               = t.j_float;
+      composites.integer             = t.j_integer;
+      composites.long                = t.j_long;
+      composites.short               = t.j_short;
+      composites.string              = t.j_string;
+      composites.blob                = t.j_blob;
+      composites.clob                = t.j_clob;
+      composites.id                  = o.object_id;
+      composites.objectType          = o.object_type;
+      composites.defaultDomainClass  = o.default_domain_class;
+      composites.related.id          = t.related_id;
+      composites.parent.id           = t.parent_id;
+    }
+  }
+    
+  add composites {}
+  
+  remove composites {}
+
+}

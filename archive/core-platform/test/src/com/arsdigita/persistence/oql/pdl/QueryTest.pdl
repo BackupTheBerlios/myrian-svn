@@ -1,0 +1,17 @@
+model test;
+
+object type Object {
+    BigInteger[1..1] id = objects.id INTEGER;
+    String [1..1] type = objects.type VARCHAR(200);
+
+    object key (id);
+}
+
+object type QueryTest extends Object {
+    String[1..1] name = query_tests.name VARCHAR(200);
+    QueryTest[0..1] parent = join query_tests.parent_id to it.ic, join it.ic to query_tests.id;
+
+    reference key (query_tests.id);
+
+    aggressive load (parent.id, parent.name, parent.type);
+}

@@ -1,0 +1,223 @@
+//
+// Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+//
+// The contents of this file are subject to the ArsDigita Public 
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.arsdigita.com/ADPL.txt
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+
+model com.arsdigita.workflow.simple;
+
+import com.arsdigita.kernel.*;
+
+object type UserTask extends Task {
+
+    String     isLocked;
+    BigDecimal lockingUserId;
+    Date        startDate;
+    Date        dueDate;
+    BigDecimal   durationMinutes;
+    BigDecimal   notificationSenderID;
+
+    retrieve {
+        super;
+
+        do {
+            select is_locked       ,
+                   locking_user_id ,
+                   start_date      ,
+                   due_date,
+		   duration_minutes,
+                   notification_sender_id
+            from   cw_user_tasks
+            where  task_id = :id
+        } map {
+            isLocked        = cw_user_tasks.is_locked;
+            lockingUserId   = cw_user_tasks.locking_user_id;
+            startDate       = cw_user_tasks.start_date;
+            dueDate         = cw_user_tasks.due_date;
+            durationMinutes = cw_user_tasks.duration_minutes;
+            notificationSenderID = cw_user_tasks.notification_sender_id;
+        }
+    } 
+
+    insert  {
+        super;
+
+        do {
+           insert into cw_user_tasks (
+               task_id         ,
+               is_locked       ,
+               locking_user_id ,
+               start_date      ,
+               due_date        ,
+	       duration_minutes	,
+               notification_sender_id
+           )   values  (
+               :id              ,
+               :isLocked        ,
+               :lockingUserId   ,
+               :startDate       ,
+               :dueDate         ,
+	       :durationMinutes ,
+               :notificationSenderID
+          )
+        }
+    }
+
+    update {
+        super;
+
+        do {
+           update cw_user_tasks
+           set    is_locked   = :isLocked ,
+                  locking_user_id = :lockingUserId,
+                  start_date      = :startDate,
+                  due_date        = :dueDate,
+	  	  duration_minutes= :durationMinutes,
+                  notification_sender_id = :notificationSenderID
+           where  task_id         = :id
+        }
+    }
+
+    delete {
+       do {
+           delete from cw_user_tasks
+           where task_id = :id
+       } 
+       super;
+    }
+
+}
+
+
+association {
+
+    UserTask[0..n] tasks;
+    User[0..n]  assignedUsers;
+
+    retrieve assignedUsers {
+        do {
+            select users.user_id             ,
+                   acs_objects.object_type   ,
+                   users.screen_name         ,
+                   parties.uri               
+            from   cw_task_user_assignees    ,
+                   acs_objects               ,
+                   users                     ,
+                   parties                   
+            where  cw_task_user_assignees.task_id   = :id
+            and    users.user_id                    = cw_task_user_assignees.user_id
+            and    acs_objects.object_id            = users.user_id
+            and    parties.party_id                 = acs_objects.object_id
+        } map {
+            assignedUsers.id            = users.user_id;
+            assignedUsers.screenName    = users.screen_name;
+            assignedUsers.uri           = parties.uri;
+            assignedUsers.objectType    = acs_objects.object_type;   
+        }
+    }
+
+
+    add assignedUsers {
+        do {
+           insert into cw_task_user_assignees  (
+                task_id                        ,
+                user_id                        )
+           values                              (
+               :id                             ,
+               :assignedUsers.id    
+           )
+        }
+    }
+
+    remove assignedUsers {
+        do {
+           delete from cw_task_user_assignees 
+           where  task_id = :id
+           and    user_id = :assignedUsers.id
+        }
+    }
+
+    clear assignedUsers {
+        do {
+           delete from cw_task_user_assignees
+           where task_id = :id
+        }
+    }
+
+}
+
+// Group task association
+association {
+
+    Group[0..n] assignedGroups;
+    UserTask[0..n] tasks;
+
+    retrieve assignedGroups {
+        do {
+            select groups.group_id            ,
+                   acs_objects.object_type    ,
+                   groups.name                ,
+                   parties.uri               
+            from   cw_task_group_assignees    ,
+                   acs_objects                ,
+                   groups                     ,
+                   parties                   
+            where  cw_task_group_assignees.task_id   = :id
+            and    groups.group_id                    = cw_task_group_assignees.group_id
+            and    acs_objects.object_id              = groups.group_id
+            and    parties.party_id                   = acs_objects.object_id
+        } map {
+            assignedGroups.id                 = groups.group_id;
+            assignedGroups.name               = groups.name;
+            assignedGroups.uri                = parties.uri;
+            assignedGroups.objectType         = acs_object.object_type;   
+        }
+    }
+
+    add assignedGroups {
+        do {
+           insert into cw_task_group_assignees (
+               task_id                         ,
+               group_id                        )
+           values                              (
+               :id                             ,
+               :assignedGroups.id  )
+        }
+    }
+
+    remove assignedGroups {
+        do {
+           delete from cw_task_group_assignees
+           where  task_id    = :id 
+           and    group_id   = :assignedGroups.id
+        }
+    }
+
+    clear  assignedGroups {
+        do {
+           delete from cw_task_group_assignees 
+           where  task_id  = :id
+        }
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+

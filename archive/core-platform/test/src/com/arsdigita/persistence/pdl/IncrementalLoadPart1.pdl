@@ -1,0 +1,15 @@
+model incrementalLoad;
+
+object type BaseType {
+    BigInteger  id;
+    String      foo;
+
+    object key(id);
+}
+
+object type ReferencedType {
+    BigInteger id;
+    String    bar;
+
+    object key(id);
+}

@@ -1,0 +1,47 @@
+model mutipleStatementsInPropertyAdd;
+
+object type Foo {
+    BigInteger[1..1] id;
+    Bar[0..n] bars;
+
+    object key(id);
+
+    retrieve bars {
+        do {
+            select *
+            from blah
+        }
+    }
+
+    add bars {
+        do {
+            insert into blah1
+            (1, 2, 3)
+            values
+            (4, 5, 6)
+        }
+
+        do {
+            insert into blah2
+            (1, 2, 3)
+            values
+            (4, 5, 6)
+        }
+    }
+
+    remove bars {
+        do {
+            delete from blah1
+        }
+
+        do {
+            delete from blah2
+        }
+    }
+}
+
+object type Bar {
+    BigInteger[1..1] id;
+
+    object key(id);
+}

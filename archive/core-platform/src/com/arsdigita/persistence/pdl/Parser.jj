@@ -1,0 +1,622 @@
+/**
+ * Note: if you're reading this file and notice the new syntax, don't use it
+ * yet!  I'm just checking this in since I'm going on vacation for a week.
+ * The new syntax is not fully supported in the backend yet, nor is it 
+ * necessarily stabilized.
+ */
+options {
+    STATIC = false;
+    DEBUG_PARSER = false;
+}
+
+PARSER_BEGIN(Parser)
+
+package com.arsdigita.persistence.pdl;
+
+import com.arsdigita.persistence.pdl.ast.*;
+import com.arsdigita.persistence.metadata.*;
+import java.util.*;
+
+/**
+ * Parser
+ *
+ * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
+ * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
+ * @version $Revision: #1 $ $Date: 2002/05/12 $
+ */
+
+public class Parser {
+
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/Parser.jj#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+
+    private List m_path;
+    private String m_filename;
+
+}
+
+PARSER_END(Parser)
+
+<DEFAULT,BEGIN> SKIP:
+{
+    " "
+  | "\t"
+  | "\n"
+  | "\r"
+  | "\f"
+}
+
+TOKEN:
+{
+    <SEMI: ";">
+  | <EQ: "=">
+  | <DOT: ".">
+  | <COMMA: ",">
+  | <STAR: "*">
+  | <LBRACE: "{">
+  | <RBRACE: "}">
+  | <LBRACKET: "[">
+  | <RBRACKET: "]">
+  | <LPAREN: "(">
+  | <RPAREN: ")">
+  | <COLON: ":">
+}
+
+TOKEN:
+{
+    <OBJECTTYPE: "object" <WS> "type">
+  | <RETRIEVE: "retrieve">
+  | <INSERT: "insert">
+  | <UPDATE: "update">
+  | <DELETE: "delete">
+  | <ADD: "add">
+  | <REMOVE: "remove">
+  | <CLEAR: "clear">
+  | <ATTRIBUTES: "attributes">
+  | <MODEL: "model">
+  | <IMPORT: "import">
+  | <FOREIGNKEY: "foreign" <WS> "key">
+  | <OBJECTKEY: "object" <WS> "key">
+  | <ALL: "all">
+  | <ASSOCIATION: "association">
+  | <COMPOSITE: "composite">
+  | <EXTENDS: "extends">
+  | <QUERY: "query">
+  | <RETURNS: "returns">
+  | <DML: "data" <WS> "operation">
+  | <CALL: "do" <WS> "call"> : BEGIN
+  | <DO: "do"> : BEGIN
+  | <MAP: "map">
+  | <SUPER: "super">
+  | <FLEXFIELDS: "flexfields">
+  | <JOIN: "join">
+  | <TO: "to">
+  | <REFERENCEKEY: "reference" <WS> "key">
+  | <OPTIONS: "options">
+  | <TRUE: "true">
+  | <FALSE: "false">
+  | <AGGRESSIVE: "aggressive" <WS> "load">
+  | <#WS: ([" ", "\t", "\n", "\r", "\f"])+>
+}
+
+<BEGIN> MORE:
+{
+  <"{"> { image.deleteCharAt(image.length() - 1); } : INSQL
+}
+
+<INSQL> TOKEN:
+{
+    <SQL: "}">
+    {
+        image.deleteCharAt(image.length() - 1);
+        matchedToken.image = image.toString();
+    } : DEFAULT
+}
+
+<INSQL> MORE:
+{
+    <~[]>
+}
+
+TOKEN:
+{
+    <ID: <CH>(<CH>|<DIGIT>)*>
+  | <#CH: ["a" - "z", "A" - "Z", "_", "$"]>
+  | <INT: (<DIGIT>)+>
+  | <#DIGIT: ["0" - "9"]>
+}
+
+SPECIAL_TOKEN:
+{
+    <COMMENT: "//" (~["\n", "\r"])* ("\n"|"\r"|"\r\n")>
+}
+
+void file(AST ast, String filename) :
+{
+    ModelDef m;
+    ObjectDef od;
+    AssociationDef ad;
+    NamedSQLDef named;
+    String s;
+    m_path = new ArrayList();
+    m_filename = filename;
+}
+{
+    m = model(ast) <SEMI>
+    ( s = imp() <SEMI> { m_path.add(s); } )*
+    ( od = object() { m.add(od); }
+      | ad = association() { m.add(ad); }
+      | named = query() { m.add(named); } )*
+    <EOF>
+}
+
+ModelDef model(AST ast) :
+{
+    StringBuffer name = new StringBuffer();
+    Token t;
+}
+{
+    <MODEL> t = <ID> { name.append(t.image); }
+    ( <DOT> t = <ID> { name.append("." + t.image); } )*
+    {
+        m_path.add(name.toString() + ".*");
+        return ast.getModelDef(name.toString(), true);
+    }
+}
+
+String imp() :
+{
+    // can't use path() since we need lookahead
+    List path = new ArrayList();
+    Token t;
+}
+{
+    <IMPORT>
+    t = <ID> { path.add(t.image); }
+    ( LOOKAHEAD(2) <DOT> t = <ID> { path.add(t.image); } )*
+    ( <DOT> <STAR> { path.add("*"); } )?
+
+    {
+        return Utilities.join(path, ".");
+    }
+}
+
+Identifier identifier() :
+{
+    StringBuffer model = new StringBuffer();
+    String type;
+    Token t, first;
+    boolean firstScope = true;
+}
+{
+    t = <ID> { type = t.image; first = t; }
+    ( <DOT> t = <ID>
+      {
+          if (!firstScope) {
+              model.append('.');
+          } else {
+              firstScope = false;
+          }
+
+          model.append(type);
+          type = t.image;
+      }
+        )*
+    {
+        Identifier result;
+        if (model.length() > 0) {
+            List path = new ArrayList();
+
+            path.add(model.toString() + ".*");
+
+            result = new Identifier(type, path);
+        } else {
+            result = new Identifier(type, m_path);
+        }
+        result.setFilename(m_filename);
+        result.setLineInfo(first);
+        return result;
+    }
+}
+
+ObjectDef object() :
+{
+    Token name;
+    Identifier superType = null;
+    ObjectDef od;
+    EventDef ed;
+    PropertyDef pd;
+    ObjectKeyDef key;
+    List path;
+    JoinPathDef jp;
+    ColumnDef refKey = null;
+    FlexFieldDef flex;
+    OptionBlock options;
+    String[] aggressive;
+}
+{
+    <OBJECTTYPE> name = <ID> [ <EXTENDS> superType = identifier() ]
+     {
+         od = new ObjectDef(name.image, superType);
+         od.setFilename(m_filename);
+         od.setLineInfo(name);
+     }
+    <LBRACE>
+        ( pd = property() <SEMI> { od.add(pd); } )*
+        [ key = objectKey() <SEMI> { od.add(key); } ]
+        [ options = optionBlock() { od.add(options); } ]
+        [ <REFERENCEKEY> <LPAREN> refKey = column() <RPAREN> <SEMI> 
+            { od.add(refKey); } ]
+        [ <AGGRESSIVE> <LPAREN>
+            aggressive = path() { od.add(aggressive); }
+            ( <COMMA> aggressive = path() { od.add(aggressive); } )*
+          <RPAREN> <SEMI> ]
+        ( path = joinPath() <SEMI> {
+            // the model always goes first in the m_path, so pull that out
+            String model = (String)m_path.get(0);
+            od.add(new JoinPathDef(path));
+        } )*
+        [ <FLEXFIELDS> <LBRACE>
+            ( flex = flexFields() { od.add(flex); } )+ <RBRACE> ]
+        ( ed = event() { od.add(ed); } ) *
+    <RBRACE>
+    { return od; }
+}
+
+FlexFieldDef flexFields() :
+{
+    ColumnDef column;
+    DataTypeDef type;
+}
+{
+    column = column() <SEMI>
+    {
+        return new FlexFieldDef(column);
+    }
+}
+
+DataTypeDef dbType() :
+{
+    Token type;
+    Token size = null;
+}
+{
+    type = <ID> (<LPAREN> size = <INT> <RPAREN>)?
+    {
+        DataTypeDef result;
+        if ( size == null ) {
+            result = new DataTypeDef(type.image);
+        } else {
+            result = new DataTypeDef(type.image,
+                                     new Integer(size.image).intValue());
+        }
+
+        result.setFilename(m_filename);
+        result.setLineInfo(type);
+
+        return result;
+    }
+}
+
+ObjectKeyDef objectKey() :
+{
+    Token t, lineTok;
+    ObjectKeyDef result = new ObjectKeyDef();
+}
+{
+    lineTok = <OBJECTKEY> <LPAREN> t = <ID> { result.add(t.image); }
+    ( <COMMA> t = <ID> { result.add(t.image); } )* <RPAREN>
+    {
+        result.setFilename(m_filename);
+        result.setLineInfo(lineTok);
+        return result;
+    }
+}
+
+AssociationDef association() :
+{
+    PropertyDef one;
+    PropertyDef two;
+    AssociationDef ad;
+    PropertyDef pd;
+    EventDef ed;
+    Token lineTok;
+    OptionBlock options;
+}
+{
+    lineTok = <ASSOCIATION> <LBRACE>
+        one = property() <SEMI>
+        two = property() <SEMI>
+        { ad = new AssociationDef(one, two); }
+        ( pd = property() <SEMI> { ad.add(pd); } )*
+        [ options = optionBlock() { ad.add(options); } ]
+        ( ed = event() { ad.add(ed); } )*
+    <RBRACE>
+    {
+        ad.setFilename(m_filename);
+        ad.setLineInfo(lineTok);
+        return ad;
+    }
+}
+
+PropertyDef property() :
+{
+    Identifier type;
+    Token name;
+    MultiplicityDef m = null;
+    ColumnDef column = null;
+    List jp = null;
+    boolean isComposite = false;
+    PropertyDef result;
+}
+{
+    [ <COMPOSITE> { isComposite = true; } ] type = identifier()
+        [ m = multiplicity() ] name = <ID>
+        ( <EQ> ( column = column() | jp = joinPath() ) )?
+    {
+        result = new PropertyDef(name.image, type, m, isComposite);
+        if (column != null) {
+            result.setColumn(column);
+        } else if (jp != null) {
+            result.setJoinPath(new JoinPathDef(jp));
+        }
+        result.setFilename(m_filename);
+        result.setLineInfo(name);
+        return result;
+    }
+}
+
+List joinPath() :
+{
+    List path = new ArrayList();
+    ColumnDef from;
+    ColumnDef to;
+}
+{
+    <JOIN> from = column() <TO> to = column()
+        { path.add(new JoinElementDef(from, to)); }
+    ( <COMMA> <JOIN> from = column() <TO> to = column()
+        { path.add(new JoinElementDef(from, to)); } )*
+    {
+        return path;
+    }
+}
+
+MultiplicityDef multiplicity() :
+{
+    String lower, upper;
+    Token tok, lineTok;
+}
+{
+    lineTok = <LBRACKET>
+         tok = <INT> { lower = tok.image; }
+    <DOT> <DOT>
+         ( <ID> { upper = "n"; } | tok = <INT> { upper = tok.image; } )
+    <RBRACKET>
+    {
+        MultiplicityDef result = new MultiplicityDef(lower, upper);
+        result.setFilename(m_filename);
+        result.setLineInfo(lineTok);
+        return result;
+    }
+}
+
+NamedSQLDef query() :
+{
+    Token type;
+    Token name;
+    Token tok;
+    Token queryMultiplicity = null;
+    NamedSQLDef qd;
+    PropertyDef pd;
+    SQLBlockDef b;
+    OptionBlock options;
+    String lower = null;
+    String upper = null;
+}
+{
+    ( type = <QUERY> | type = <DML> )
+    name = <ID>
+    [ <RETURNS> tok = <INT> {lower = tok.image;}
+      <DOT> <DOT>
+      ( <ID> { upper = "n"; } | tok = <INT> { upper = tok.image; } )]
+    {
+        if ( type.image.equals("query") ) {
+            qd = new QueryDef(name.image);
+            if (lower != null) {
+                ((QueryDef)qd).setReturnsLowerBound(Integer.parseInt(lower));
+            }
+            if (upper != null) {
+                if (upper.equals("n")) {
+                    ((QueryDef)qd).setReturnsUpperBound(Integer.MAX_VALUE);
+                } else {
+                    ((QueryDef)qd).setReturnsUpperBound(Integer.parseInt(upper));
+                }
+            }
+        } else {
+            qd = new DMLDef(name.image);
+        } 
+    }
+    <LBRACE>
+         ( pd = property() <SEMI> { qd.add(pd); } )*
+         [ options = optionBlock() { qd.add(options); } ]
+         b = block() { qd.add(b); }
+    <RBRACE>
+    {
+        qd.setFilename(m_filename);
+        qd.setLineInfo(name);
+        return qd;
+    }
+}
+
+void foreignKey() :
+{}
+{
+    <FOREIGNKEY> <LPAREN> column() <RPAREN>
+}
+
+ColumnDef column() :
+{
+    Token name;
+    Token table = null;
+    DataTypeDef dbType = null;
+}
+{
+    table = <ID> <DOT> name = <ID> [dbType = dbType()]
+    {
+        if (dbType == null) {
+            return new ColumnDef(table.image, name.image);
+        } else {
+            return new ColumnDef(table.image, name.image, dbType);
+        }
+    }
+}
+
+EventDef event() :
+{
+    EventDef ed;
+    SQLBlockDef b;
+    String type;
+    String name = null;
+    Token t, lineTok = null;
+}
+{
+    (
+        ( t = <INSERT> { type = t.image; }
+        | t = <UPDATE> { type = t.image; }
+        | t = <DELETE> { type = t.image; } )
+    |   ( ( t = <ADD> { type = t.image; }
+          | t = <REMOVE> { type = t.image; }
+          | t = <CLEAR> { type = t.image; }
+          ) [ t = <ID> { name = t.image; } ] )
+    |   ( t = <RETRIEVE> { type = t.image; lineTok = t;}
+          [ t = <ALL> { type = t.image; }
+          | t = <ATTRIBUTES> { type = t.image; }
+          | t = <ID> { name = t.image; } ] )
+    )
+    { ed = new EventDef(type, name); }
+    <LBRACE>
+        ( b = block() { ed.add(b); } | <SUPER> <SEMI> { ed.addSuper(); } )*
+    <RBRACE>
+    {
+        ed.setFilename(m_filename);
+        if (lineTok == null)
+            ed.setLineInfo(t);
+        else
+            ed.setLineInfo(lineTok);
+        return ed;
+    }
+}
+
+SQLBlockDef block() :
+{
+    SQLBlockDef b;
+    String text = null;
+    MapStatement m;
+    boolean call = false;
+    Token t, lineTok = null;
+}
+{
+    (lineTok = <CALL> { call = true; } | lineTok = <DO>) t = <SQL> { b = new SQLBlockDef(t.image); }
+    [ <MAP> <LBRACE> ( m = mapStatement() { b.add(m); } <SEMI> )+ <RBRACE> ]
+    {
+        b.setFilename(m_filename);
+        b.setLineInfo(lineTok);
+        b.setCallableStatement(call);
+        return b;
+    }
+}
+
+MapStatement mapStatement() :
+{
+    MapStatement result;
+}
+{
+    (   LOOKAHEAD(binding()) result = binding()
+      | result = mapping() )
+    { return result; }
+}
+
+BindingDef binding() :
+{
+    String[] path;
+    DataTypeDef type;
+    Token t;
+}
+{
+    path = path() t = <COLON> type = dbType()
+    {
+        BindingDef result = new BindingDef(path, type);
+        result.setFilename(m_filename);
+        result.setLineInfo(t);
+        return result;
+    }
+}
+
+String[] path() :
+{
+    List path = new ArrayList();
+    Token t;
+}
+{
+    t = <ID> { path.add(t.image); } ( <DOT> t = <ID> { path.add(t.image); } )*
+    { return (String[]) path.toArray(new String[0]); }
+}
+
+MappingDef mapping() :
+{
+    Token t, lineTok;
+    String[] path;
+    String table = null;
+    String col = null;
+}
+{
+    path = path()
+    <EQ> t = <ID> { col = t.image; lineTok = t; }
+    [ <DOT> t = <ID> { table = col; col = t.image; } ]
+    {
+        MappingDef result = new MappingDef(path, table, col);
+        result.setFilename(m_filename);
+        result.setLineInfo(lineTok);
+        return result;
+    }
+}
+
+OptionBlock optionBlock() :
+{
+    Token t;
+    OptionBlock result = new OptionBlock();
+    Option o;
+}
+{
+    t = <OPTIONS> <LBRACE>
+        ( o = option() { result.add(o); } <SEMI> )+
+    <RBRACE>
+    {
+        result.setFilename(m_filename);
+        result.setLineInfo(t);
+        return result;
+    }
+}
+
+Option option() :
+{
+    Token t;
+    Object value;
+}
+{
+    t = <ID> <EQ> value = optionValue()
+    {
+        Option result = new Option(t.image, value);
+        result.setFilename(m_filename);
+        result.setLineInfo(t);
+        return result;
+    }
+}
+
+Object optionValue() :
+{
+}
+{
+    <TRUE> { return Boolean.TRUE; }
+  | <FALSE> { return Boolean.FALSE; }
+}
