@@ -481,6 +481,10 @@ alter table object_container_map drop constraint obje_contai_map_obj_id_p_ymkb5;
 alter table object_container_map add
     constraint obje_con_map_con_id_ob_p_ul6se
       primary key(object_id, container_id);
+-- Normally, Oracle automatically creates an index for every primary key.  However,
+-- because of the 'ocm_container_object_idx' index, which indexes these same keys in
+-- reverse order, Oracle does not create the index.  So, we do it explicitly.
+create index obje_con_map_con_id_ob_p_ul6se on object_container_map (object_id, container_id);
 
 alter table parameterized_privileges drop constraint para_pri_bas_pri_par_k_p_a1rpb;
 alter table parameterized_privileges add
