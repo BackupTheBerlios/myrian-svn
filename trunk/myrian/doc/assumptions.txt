@@ -1,0 +1,24 @@
+# Since: 2004-06-29
+
+* The fully-qualifed class name and object type name of a JDO instance
+  have to match.  We rely on this when we write code like this:
+
+    ObjectType type = root.getObjectType(pc.getClass().getName());
+
+* In a similar vein, field names of a JDO instance must match the
+  corresponding object type's property names.  We rely on this when we
+  write code like this:
+
+    List props = C.getAllFields(cls);
+    for (int i = 0; i < props.size(); i++) {
+        String propName = (String) props.get(i);
+        Property prop = type.getProperty(propName);
+        if (prop.isKeyProperty()) {
+            pmap.put(prop, smTemp.provideField(pc, i));
+        }
+    }
+
+* Each JDO instance gets own StateManagerImpl.  We rely on this in
+  AbstractStateManager#provideField(PersistenceCapable pc, int field).
+  If this were not so, the provideField method would have to be
+  synchronized.

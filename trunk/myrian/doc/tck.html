@@ -1,0 +1,235 @@
+<html>
+<head>
+  <title>TCK</title>
+</head>
+<body>
+<h1>TCK</h1>
+
+<h2>Obtaining the TCK</h2>
+
+<p>The JDO TCK checked in into <code>//eng/persistence/dev/tck/</code> at p4
+change 44314 were obtained from the JPOX CVS repository on 2004-08-19 like so:
+</p>
+
+<blockquote><pre>
+$ cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jpox login
+$ cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/jpox co .
+$ cd "JPOX/TCK/JDO 1.0"
+</pre></blockquote>
+
+<p>There is also an apparently older version of the TCK downloaded from the <a
+href="http://www.jcp.org/en/jsr/detail?id=12">JSR 12</a> home page.  See <a
+href="http://jcp.org/aboutJava/communityprocess/final/jsr012/index2.html">this
+page</a>. Even older stuff is available from <a
+href="http://jcp.org/aboutJava/communityprocess/first/jsr012/index.html">this
+page</a>.  Following links from these pages, you should be able to download the
+following files:
+</p>
+
+<blockquote><pre>
+$ vdir
+-rw-------    1 vadim    vadim        4330 Aug 20 12:00 ErrataRI.html
+-rw-------    1 vadim    vadim        1295 Aug 20 11:58 ErrataTCK.html
+-rw-------    1 vadim    vadim     1290925 Aug 20 11:59 jdo-1_0_1-ri.zip
+-rw-------    1 vadim    vadim     4942084 Aug 20 12:00 jdori-1_0-fcs-src-04_Mar_2002.zip
+-rw-------    1 vadim    vadim     3516913 Aug 20 11:58 jdotck-1_0-fcs-src-04_Mar_2002.zip
+</pre></blockquote>
+
+<p>The TCK contained in <code>jdotck-1_0-fcs-src-04_Mar_2002.zip</code> is
+apparently older than the one in the <a
+href="http://cvs.sourceforge.net/viewcvs.py/jpox/JPOX/TCK/JDO%201.0/">JPOX CVS
+repository</a>.  Specifically,
+</p>
+
+<blockquote><pre>
+$ unzip jdotck-1_0-fcs-src-04_Mar_2002.zip
+$ find tests -name \*.java -exec basename {} \; | sort > /tmp/tck-sun.txt
+$ wc -l /tmp/tck-sun.txt
+    391 /tmp/tck-sun.txt
+$ cd /var/vadim/p4checkout/eng/persistence/dev/tck/
+$ find application-identity datastore -name \*.java -exec basename {} \; | sort > /tmp/tck-jpox.txt
+$ wc -l /tmp/tck-jpox.txt
+    782 /tmp/tck-jpox.txt
+$ diff /tmp/tck-sun.txt /tmp/tck-jpox.txt | grep -cE '^>'
+391
+$ diff /tmp/tck-sun.txt /tmp/tck-jpox.txt | grep -cE '^<'
+0
+</pre></blockquote>
+
+<p>In other words, all of the <code>.java</code> files present in the old
+version of TCK are available in the "JPOX" version.
+</p>
+
+<p>Based on the <code>ChangeLog</code> file produced by running <a
+href="http://www.red-bean.com/cvs2cl/cvs2cl.pl"><code>cvs2cl.pl</code></a> on
+the JPOX CVS repository, it appears that JPOX folks checked in the TCK on
+2003-11-28 at 19:38 (commited by "ebengtso"). The initial check-in contained
+compiled enhanced classes that were later removed.  See, for example, <a
+href="http://cvs.sourceforge.net/viewcvs.py/jpox/JPOX/TCK/JDO%201.0/datastore/enhanced/com/sun/jdotck/models/fieldtypes/Attic/"><code>jpox/JPOX/TCK/JDO%201.0/datastore/enhanced/com/sun/jdotck/models/fieldtypes/Attic/</code></a>.
+
+</p>
+
+
+<h2><code>jdori-enhancer.jar</code></h2>
+
+<p>The TCK imports classes from both and <code>jdori-enhancer.jar</code>.
+</p>
+
+<p>Some of the tests appear to be using an older version of the JDORI API and
+fail to compile against the newest version of <code>jdori-enhancer.jar</code>:
+</p>
+
+<blockquote><pre>
+tck/datastore/tests/com/sun/jdotck/enhancement/FieldAccessModified.java:109:
+cannot resolve symbol
+symbol  : constructor AnnotationTest (com.sun.jdori.enhancer.meta.EnhancerMetaData)
+location: class com.sun.jdori.enhancer.test.AnnotationTest
+            final AnnotationTest test = new AnnotationTest(metaData);
+                                        ^
+tck/datastore/tests/com/sun/jdotck/enhancement/FieldAccessModified.java:110:
+cannot resolve symbol
+symbol  : method test (java.io.PrintWriter,boolean,java.util.List)
+location: class com.sun.jdori.enhancer.test.AnnotationTest
+            final int res = test.test(out, verbose, fullyQualifiedClassNames);
+                                ^
+tck/datastore/tests/com/sun/jdotck/enhancement/ImplementsPersistenceCapable.java:108:
+cannot resolve symbol
+symbol  : constructor AugmentationTest (com.sun.jdori.enhancer.meta.EnhancerMetaData)
+location: class com.sun.jdori.enhancer.test.AugmentationTest
+        AugmentationTest test = new AugmentationTest(metaData);
+                                ^
+tck/datastore/tests/com/sun/jdotck/enhancement/ImplementsPersistenceCapable.java:110:
+test(java.io.PrintWriter,boolean,java.util.List)
+has protected access in com.sun.jdori.enhancer.test.AugmentationTest
+        incrementErrorCount (test.test(out, verbose, fullyQualifiedClassNames));
+                                 ^
+4 errors
+</pre></blockquote>
+
+<p><a href="http://service-spi.web.cern.ch/service-spi/external/JDORI/1.0/share/doc/javadoc/jdori/com/sun/jdori/enhancer/test/AnnotationTest.html">This page</a> indicates that <code>AnnotateTest</code> used
+to provide the signatures that the above versions of <code>FieldAccessModified</code>
+and <code>ImplementsPersistenceCapable</code> were written against.
+</p.
+
+<p>These classes compile successfully against <code>jdori.jar</code> obtained
+from <code>jdotck-1_0-fcs-src-04_Mar_2002.zip</code>, which is an older version.
+</p>
+
+<h2>Running the TCK</h2>
+
+<p>See</p>
+
+<ul>
+  <li><a href="http://www.jpox.org/docs/1_1/developer/jdotcktests.html">Running
+   the JDOTCK</a> (instructions for JPOX).</li>
+  <li><a href="http://speedo.objectweb.org/doc/Jdotck_Speedo.htm">Testing Speedo
+    with the JDO TCK</a></li>
+
+  <li><a href="http://java.sun.com/developer/technicalArticles/JCPtools2/">The
+    Java Compatibility Test Tools: JavaTest Harness</a>
+   </li>
+
+  <li><p> contains the following documents:</p>
+
+  <pre>README.html  <strong>(pretty useful)</strong>
+build.xml
+doc/Assertions/Assertions_002-Chapter_2.htm
+doc/Assertions/Assertions_000-Intro.htm
+doc/Assertions/Assertions_005-Chapter_5.htm
+doc/Assertions/Assertions_006-Chapter_6.htm
+doc/Assertions/Assertions_007-Chapter_7.htm
+doc/Assertions/Assertions_008-Chapter_8.htm
+doc/Assertions/Assertions_010-Chapter_10.htm
+doc/Assertions/Assertions_011-Chapter_11.htm
+doc/Assertions/Assertions_012-Chapter_12.htm
+doc/Assertions/Assertions_013-Chapter_13.htm
+doc/Assertions/Assertions_014-Chapter_14.htm
+doc/Assertions/Assertions_015-Chapter_15.htm
+doc/Assertions/Assertions_018-Chapter_18.htm
+doc/Assertions/Assertions_020-Chapter_20.htm
+doc/inheritance.pdf
+doc/company.pdf
+doc/javatest/editLinks.html
+doc/javatest/javatest.pdf
+javatest.jar
+COPYRIGHT-javatest.html
+README-javatest.html
+ReleaseNotes-javatest.html</pre>
+  </li>
+
+</ul>
+
+<ol>
+  <li><code>$ cd /var/vadim/p4checkout/eng/persistence/dev/tck/datastore</code>
+  </li>
+
+  <li><pre>$ mkdir iut_jars
+$ cp /from/unpacked/jdotck-1_0-fcs-src-04_Mar_2002.zip/javatest.jar iut_jars
+$ cp ../../lib/jdo.jar iut_jars/
+</pre>
+
+   <p>IUT stands for <em>Implementation Under Test</em>.</p>
+  </li>
+
+  <li><pre>$ mkdir jdori_jars
+$ cp /from/unpacked/jdotck-1_0-fcs-src-04_Mar_2002.zip/jdori.jar jdori_jars
+$ cp /from/unpacked/jdotck-1_0-fcs-src-04_Mar_2002.zip/btree.jar jdori_jars
+</pre>
+  </li>
+
+  <li><code>$ cp /var/vadim/distro/java/jdo/tmp/testsuite.jtt .</code>
+
+  </li>
+  <li><pre>$ ant usedatastoreidentity
+$ ant build
+</pre>
+  </li>
+
+  <li><p>To enhance test classes with the RI, execute</p>
+
+<pre>$ ant jdorienhance</pre>
+
+  <p>This currently dies with the following exception</p>
+
+<pre>NestedException: org.xml.sax.SAXParseException: Relative URI "jdo.dtd"; can not be resolved without a base URI.
+        at com.sun.jdori.enhancer.filter.Enhancer.enhanceClassFile(Unknown Source)
+        at com.sun.jdori.enhancer.ClassFileEnhancerTimer.enhanceClassFile(Unknown Source)
+</pre>
+
+  </li>
+
+  <li><pre>$ java -jar iut_jars/javatest.jar &
+</pre>
+
+  <p>Configure the testsuite. Configuration settings get saved in
+  <code>datastore/work/jtData/default.jti</code></p>
+</li>
+
+  <li><pre>$ ant runagent</pre>
+
+    <p>This basically runs something like this:</p>
+
+<pre>$ java -Djava.security.manager -Djava.security.policy=jdotck.policy \
+-DPMFProperties=iut.properties -DPMF2Properties=jdori2.properties -classpath \
+enhanced:classes:foo_jars/commons-collections-3.1.jar:foo_jars/commons-primitives-1.0.jar:foo_jars/javatest.jar:foo_jars/jdo.jar:foo_jars/jta1_0_1.jar:foo_jars/log4j.jar:foo_jars/postgresql.jar:foo_jars/rhp-jdo.jar \
+com.sun.javatest.agent.<strong>AgentMain</strong> -activeHost localhost</pre>
+
+    <p>You can also use the GUI, like so</p>
+
+<pre>$ java -classpath \
+enhanced:classes:iut_jars/rhp-jdo.jar:iut_jars/javatest.jar:iut_jars/jdo.jar:iut_jars/jta1_0_1.jar:jdori_jars/btree.jar:jdori_jars/jdori.jar \
+com.sun.javatest.agent.<strong>AgentFrame</strong></pre>
+
+   <p>Note that you can pass the <strong><code>-trace</code></strong> to get a
+    detailed view of what the agent's doing. (This produces about 2M worth of
+    output in my setup.)
+   </p>
+
+  </li>
+
+  <li>Start the tests from the harness.</li>
+</ol>
+
+</body>
+
+</html>

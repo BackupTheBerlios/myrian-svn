@@ -1,0 +1,458 @@
+-*- outline-layout: (-1 : *) -*-
+
+# Author:  Vadim Nasardinov (vadimn@redhat.com)
+# Since:   2004-08-16
+
+* Quotes from the JDO Spec
+  p. 24
+
+  3.2.2 Application server usage
+
+  For application server usage, the JDO architecture uses the J2EE Connector
+  architecture, which defines a standard set of system-level contracts between the
+  application server and EIS connectors. These system-level contracts are
+  implemented in a resource adapter from the EIS side.
+
+  The JDO persistence manager is a caching manager as defined by the J2EE
+  Connector architecture, that might use either its own (native) resource adapter
+  or a third party resource adapter. If the JDO PersistenceManager has its own
+  resource adapter, then implementations of the system-level contracts specified
+  in the J2EE Connector architecture must be provided by the JDO vendor. These
+  contracts include ManagedConnectionFactory, XAResource, and LocalTransaction
+  interfaces.
+
+
+  -----------------------------------------------------------------------------
+
+  p. 70
+
+  8.5 PersistenceManagerFactory methods
+
+  The following are standard key values for the Properties:
+
+    javax.jdo.PersistenceManagerFactoryClass
+    javax.jdo.option.Optimistic
+    javax.jdo.option.RetainValues
+    javax.jdo.option.RestoreValues
+    javax.jdo.option.IgnoreCache
+    javax.jdo.option.NontransactionalRead
+    javax.jdo.option.NontransactionalWrite
+    javax.jdo.option.Multithreaded
+    javax.jdo.option.ConnectionDriverName
+    javax.jdo.option.ConnectionUserName
+    javax.jdo.option.ConnectionPassword
+    javax.jdo.option.ConnectionURL
+    javax.jdo.option.ConnectionFactoryName
+    javax.jdo.option.ConnectionFactory2Name
+
+  -----------------------------------------------------------------------------
+
+  p. 79
+
+  11.1 Interface PersistenceManagerFactory
+
+  The following properties are for use when a connection factory is used, and
+  override the connection properties specified in ConnectionURL,
+  ConnectionUserName, or ConnectionPassword.
+
+    * ConnectionFactory: the connection factory from which datastore connections
+      are obtained
+
+    * ConnectionFactoryName: the name of the connection factory from which
+      datastore connections are obtained. This name is looked up with JNDI to
+      locate the connection factory.
+
+  If multiple connection properties are set, then they are evaluated in order:
+
+    * if ConnectionFactory is specified (not null), all other properties are
+      ignored;
+
+    * else if ConnectionFactoryName is specified (not null), all other properties
+      are ignored.
+
+  For the application server environment, connection factories always return
+  connections that are enlisted in the thread's current transaction context. To
+  use optimistic transactions in this environment requires a connection factory
+  that returns connections that are not enlisted in the current transaction
+  context. For this purpose, the following two properties are used:
+
+    * ConnectionFactory2: the connection factory from which nontransactional
+      datastore connections are obtained
+
+    * ConnectionFactory2Name: the name of the connection factory from which
+      nontransactional datastore connections are obtained. This name is looked up
+      with JNDI to locate the connection factory.
+
+  -----------------------------------------------------------------------------
+
+  p. 80-81
+
+  11.2 ConnectionFactory
+
+  For implementations that layer on top of standard Connector implementations, the
+  configuration will typically support all of the associated ConnectionFactory
+  properties.
+
+  When used in a managed environment, the ConnectionFactory will be obtained from
+  a ManagedConnectionFactory, which is then responsible for implementing the
+  resource adapter interactions with the container.
+
+  The following properties of the ConnectionFactory should be used if the data
+  source has a corresponding concept:
+
+    * URL: the URL for the data source
+    * UserName: the name of the user establishing the connection
+    * Password: the password for the user
+    * DriverName: the driver name for the connection
+    * ServerName: name of the server for the data source
+    * PortNumber: port number for establishing connection to the data source
+    * MaxPool: the maximum number of connections in the connection pool
+    * MinPool: the minimum number of connections in the connection pool
+    * MsWait: the number of milliseconds to wait for an available connection from
+      the connection pool before throwing a JDODataStoreException
+    * LogWriter: the PrintWriter to which messages should be sent
+    * LoginTimeout: the number of seconds to wait for a new connection to be
+      established to the data source
+
+
+  In addition to these properties, the PersistenceManagerFactory implementation
+  class can support properties specific to the data source or to the
+  PersistenceManager.
+
+  Aside from vendor-specific configuration APIs, there are three required methods
+  for PersistenceManagerFactory.
+
+  -----------------------------------------------------------------------------
+
+  p. 81
+
+  11.3 PersistenceManager access
+
+
+  If the method with the userid and password is used to acquire the
+  PersistenceManager, then all accesses to the connection factory during the life
+  of the PersistenceManager will use the userid and password to get
+  connections. If PersistenceManager instances are pooled, then only
+  PersistenceManager instances with the same userid and password will be used to
+  satisfy the request.
+
+  11.4 Close the PersistenceManagerFactory
+
+  During operation of JDO, resources might be acquired on behalf of a
+  PersistenceManagerFactory, e.g. connection pools, persistence manager pools,
+  compiled queries, cached metadata, etc. If a PersistenceManagerFactory is no
+  longer needed, these resources should be returned to the system. The close
+  method disables the PersistenceManagerFactory and allows cleanup of resources.
+
+  -----------------------------------------------------------------------------
+
+  p. 87
+
+  12.6 Interface PersistenceManager
+
+  A JDO PersistenceManager instance supports one transaction at a time, and uses
+  one connection to the underlying data source at a time. The JDO
+  PersistenceManager instance might use multiple transactions serially, and might
+  use multiple connections serially.
+
+  Therefore, to support multiple concurrent connection-oriented data sources in an
+  application, multiple JDO PersistenceManager instances are required.
+
+
+  -----------------------------------------------------------------------------
+  p. 97-98
+
+  Connection Management Scenarios
+
+    * single connection: In the simplest case, the PersistenceManager directly
+      connects to the datastore and manages transactional data. In this case,
+      there is no reason to expose any Connection properties other than those
+      needed to identify the user and the data source. During transaction
+      processing, the Connection will be used to satisfy data read, write, and
+      transaction completion requests from the PersistenceManager.
+
+    * connection pooling: In a slightly more complex situation, the
+      PersistenceManagerFactory creates multiple PersistenceManager instances
+      which use connection pooling to reduce resource consumption. The
+      PersistenceManagers are used in single datastore transactions. In this case,
+      a pooling connection manager is a separate component used by the
+      PersistenceManager instances to effect the pooling of connections. The
+      PersistenceManagerFactory will include a reference to the connection pooling
+      component, either as a JNDI name or as an object reference. The connection
+      pooling component is separately configured, and the
+      PersistenceManagerFactory simply needs to be configured to use it.
+
+    * distributed transactions: An even more complex case is where the
+      PersistenceManager instances need to use connections that are involved in
+      distributed transactions. This case requires coordination with a Transaction
+      Manager, and exposure of the XAResource from the datastore Connection. JDO
+      does not specify how the application coordinates transactions among the
+      PersistenceManager and the Transaction Manager.
+
+    * managed connections: The last case to consider is the managed environment,
+      where the PersistenceManagerFactory uses a datastore Connection whose
+      transaction completion is managed by the application server. This case
+      requires the datastore Connection to implement the J2EE Connector
+      Architecture and the PersistenceManager to use the architected interfaces to
+      obtain a reference to a Connection.
+
+  The interface between the JDO implementation and the Connection component is not
+  specified by JDO. In the non-managed environment, transaction completion is
+  handled by the Connection managed internally by the Transaction. In the managed
+  environment, transaction completion is handled by the XAResource associated with
+  the Connection. In both cases, the PersistenceManager implementation is
+  responsible for setting up the appropriate interface to the Connection
+  infrastructure.
+
+  Native Connection Management
+
+  If the JDO implementation supplies its own resource adapter
+  implementation, this is termed native connection management. For use
+  in a managed environment, the association between Transaction and
+  Connection must be established using the J2EE Connection
+  Architecture [see Appendix A reference 4:
+  http://java.sun.com/j2ee/sdk_1.3/techdocs/api/javax/resource/package-summary.html]. This
+  is done by the JDO implementation implementing the
+  javax.resource.ManagedConnectionFactory interface.
+
+  When used in a non-managed environment, with non-distributed transaction
+  management (local transactions) the application can use the
+  PersistenceManagerFactory. But if distributed transaction management is
+  required, the application needs to supply an implementation of
+  javax.resource.ManagedConnectionFactory interface. This interface provides the
+  infrastructure to enlist the XAResource with the Transaction Manager used in the
+  application.
+
+  Non-native Connection Management
+
+  If the JDO implementation uses a third party Connection interface, then it can
+  be used in a managed environment only if the third party Connection supports the
+  J2EE Connector Architecture. In this case, the PersistenceManagerFactory
+  property ConnectionFactory is used to allow the application server to manage
+  connections.
+
+  In the non-managed case, non-distributed transaction management can use the
+  PersistenceManagerFactory, as above. But if distributed transaction management
+  is required, the application needs to supply an implementation of
+  javax.resource.ConnectionManager interface to be used with the application's
+  implementation of the Connection management.
+* Alphabet Soup
+  http://java.sun.com/j2ee/sdk_1.3/techdocs/api/
+.. ManagedConnectionFactory
+   http://java.sun.com/j2ee/sdk_1.3/techdocs/api/javax/resource/spi/ManagedConnectionFactory.html
+   http://java.sun.com/j2ee/sdk_1.3/techdocs/api/javax/resource/spi/ManagedConnection.html
+   http://java.sun.com/j2ee/sdk_1.3/techdocs/api/javax/resource/cci/Connection.html
+.. XAResource
+   http://java.sun.com/j2ee/sdk_1.3/techdocs/api/javax/transaction/xa/XAResource.html
+   http://www.opengroup.org/pubs/catalog/c193.htm
+
+   http://cbbrowne.com/info/tpmonitor.html
+.. LocalTransaction
+   http://java.sun.com/j2ee/sdk_1.3/techdocs/api/javax/resource/cci/LocalTransaction.html
+   http://java.sun.com/j2ee/sdk_1.3/techdocs/api/javax/resource/spi/LocalTransaction.html
+
+* javax.sql.DataSource
+  http://www.jpox.org/docs/faq.html#datasource_pools
+* Glossary
+.. JCA (Java Connection Architecture)
+   JCA vs. DataSource
+   http://www.jpox.org/servlet/forum/viewthread?thread=472
+.. Resource adapter
+
+   | Resources adapter are system-level software drivers for specific
+   | EIS resources.
+   |
+   | A resource adapter can choose to support three different levels of
+   | transactions:
+   |      * NoTransaction--No transaction support is provided.
+   |      * LocalTransaction--Resource manager local transactions are supported.
+   |      * XATransaction--Resource adapter supports XA and the JTA
+   |        XAResource interface. A resource adapter supporting
+   |        XATransaction must also support LocalTransaction.
+
+   From Oracle:
+   | A resource adapter is a driver used by an application server or
+   | an application client to connect to a specific EIS. Examples of
+   | resource adapters are JDBC or SQLJ drivers to connect to a
+   | relational database, an ERP resource adapter to connect to an ERP
+   | system, and a TP resource adapter to connect to a TP monitor.
+
+   http://java.sun.com/developer/technicalArticles/J2EE/connectorclient/resourceadapter.html
+
+   See the table "Transactional Behavior for Resource Adapters" in
+   http://java.sun.com/blueprints/guidelines/designing_enterprise_applications_2e/transactions/transactions9.html
+   http://java.sun.com/blueprints/guidelines/designing_enterprise_applications/transaction_management/platform/index.html
+   "Using J2EE Resource Adapters in a Non-managed Environment" by
+   Kevin Kelle:
+   http://www-106.ibm.com/developerworks/websphere/library/techarticles/0109_kelle/0109_kelle.html
+
+   Writing J2EE Connector Architecture-Compliant Resource Adapters
+   http://e-docs.bea.com/wls/docs70/jconnector/rarguide.html
+
+   How-To: J2EE Connectors
+   http://www.oracle.com/technology/tech/java/oc4j/htdocs/how-to-j2c-connector.html
+.. Resource Adapter Archive (RAR)
+   A stand-alone resource adapter, materialized by a stand-alone
+   Resource Adapter Archive (RAR) file, is available to all deployed
+   applications in the application server instance.
+
+   An embedded resource adapter, bundled within an enterprise
+   application archive (EAR), is available only to the J2EE
+   application with which it is packaged.
+.. ra.xml
+   ra.xml: standard J2EE deployment descriptor for developing against
+   resource adapters
+
+* Questions
+.. What's a "caching manager"?
+   Quoting from p.24:
+     | The JDO persistence manager is a caching manager as defined by
+     | the J2EE Connector architecture, that might use either its own
+     | (native) resource adapter or a third party resource adapter.
+.. ManagedConnectionFactory, XAResource, and LocalTransaction
+   Quoting from p.24:
+     | If the JDO PersistenceManager has its own resource adapter,
+     | then implementations of the system-level contracts specified in
+     | the J2EE Connector architecture must be provided by the JDO
+     | vendor. These contracts include ManagedConnectionFactory,
+     | XAResource, and LocalTransaction interfaces.
+.. See if we can get away without JNDI
+
+   Refer to p. 79.  See if we can get away with setting
+   ConnectionFactory explicitly instead relying on a JNDI lookup of
+   ConnectionFactoryName.
+.. Managed environment
+   See p. 80.
+     | When used in a managed environment, the ConnectionFactory will
+     | be obtained from a ManagedConnectionFactory, which is then
+     | responsible for implementing the resource adapter interactions
+     | with the container.
+.. Transaction completion
+   See p. 97:
+     | The interface between the JDO implementation and the Connection
+     | component is not specified by JDO. In the non-managed
+     | environment, transaction completion is handled by the
+     | Connection managed internally by the Transaction. In the
+     | managed environment, transaction completion is handled by the
+     | XAResource associated with the Connection. In both cases, the
+     | PersistenceManager implementation is responsible for setting up
+     | the appropriate interface to the Connection infrastructure.
+
+* JPOX
+.. javax.sql.DataSource
+   | $ find src/ -name \*.java | xargs grep 'javax\.sql\.DataSource' | cut -d : -f 1 | uniq
+   | src/java/org/jpox/AbstractPersistenceManagerFactory.java
+   | src/java/org/jpox/DriverManagerDataSource.java
+   | src/java/org/jpox/NonmanagedTransaction.java
+   | src/java/org/jpox/PersistenceManagerFactoryImpl.java
+   | src/java/org/jpox/driver/JPOXDriver.java
+   | src/java/org/jpox/resource/ManagedTransaction.java
+   | src/java/org/jpox/store/StoreManager.java
+   | src/java/org/jpox/store/rdbms/adapter/DatabaseAdapter.java
+   | src/java/org/jpox/store/rdbms/adapter/HSQLAdapter.java
+   | src/java/org/jpox/store/rdbms/adapter/McKoiAdapter.java
+   | src/test/org/jpox/DBCPDataSourceFactory.java
+   | src/test/org/jpox/PersistenceTestCase.java
+.. javax.resource
+. : SPI (Service Provider Interface)
+    | $ find src/ -name \*.java | xargs grep 'javax\.resource\.cci' | cut -d : -f 1 | uniq
+    | src/java/org/jpox/resource/JdoTransactionHandle.java
+    | src/java/org/jpox/resource/PersistenceManagerFactoryImpl.java
+    | src/java/org/jpox/resource/PersistenceManagerImpl.java
+. : CCI (Common Client Interface)
+    | $ find src/ -name \*.java | xargs grep 'javax\.resource\.spi' | cut -d : -f 1 | uniq
+    | src/java/org/jpox/resource/ManagedConnectionFactoryImpl.java
+    | src/java/org/jpox/resource/ManagedConnectionImpl.java
+    | src/java/org/jpox/resource/ManagedTransaction.java
+    | src/java/org/jpox/resource/PersistenceManagerFactoryImpl.java
+.. javax.transaction
+     | $ find src/ -name \*.java | xargs grep 'javax\.transaction' | cut -d : -f 1 | uniq
+     | src/java/javax/jdo/Transaction.java
+     | src/java/org/jpox/NonmanagedTransaction.java
+     | src/java/org/jpox/resource/JdoTransactionHandle.java
+     | src/java/org/jpox/resource/ManagedConnectionImpl.java
+     | src/java/org/jpox/resource/ManagedTransaction.java
+.. ManagedConnectionFactory
+     | $ find src/ -name \*.java | xargs grep ManagedConnectionFactory | cut -d : -f 1 | uniq
+     | src/java/org/jpox/AbstractPersistenceManager.java
+     | src/java/org/jpox/PMFConfiguration.java
+     | src/java/org/jpox/resource/ManagedConnectionFactoryImpl.java
+     | src/java/org/jpox/resource/ManagedConnectionImpl.java
+     | src/java/org/jpox/resource/PersistenceManagerFactoryImpl.java
+     | src/java/org/jpox/resource/PersistenceManagerImpl.java
+.. XAResource
+   This interface is used only in
+   src/java/org/jpox/resource/ManagedConnectionImpl.java
+
+   public class ManagedConnectionImpl extends AbstractPersistenceManager
+    implements LocalTransaction, ManagedConnection {
+
+      public XAResource getXAResource()
+      throws ResourceException
+      {
+          throw new ResourceException("NYI");
+      }
+
+   }
+
+   Apparently, not yet implemented.
+.. LocalTransaction
+     | $ find src/ -name \*.java | xargs grep LocalTransaction | cut -d : -f 1 | sort | uniq
+     | src/java/org/jpox/resource/JdoTransactionHandle.java
+     | src/java/org/jpox/resource/ManagedConnectionImpl.java
+     | src/java/org/jpox/resource/ManagedTransaction.java
+     | src/java/org/jpox/resource/PersistenceManagerImpl.java
+.. JNDI
+   JPOX implements javax.naming.spi.ObjectFactory in
+   src/java/org/jpox/PersistenceManagerFactoryImpl.java
+* Speedo
+.. javax.sql.DataSource
+   | $ find src/ -name \*.java | xargs grep 'javax\.sql\.DataSource' | cut -d : -f 1 | uniq
+   | src/org/objectweb/speedo/Speedo.java
+.. javax.resource
+. : SPI
+    | $ find src/ -name \*.java | xargs grep 'javax\.resource\.spi' | cut -d : -f 1 | uniq
+    | src/org/objectweb/speedo/jca/JDOConnectionSpec.java
+    | src/org/objectweb/speedo/jca/JdoConnectionFactory.java
+    | src/org/objectweb/speedo/jca/JdoManagedConnection.java
+    | src/org/objectweb/speedo/jca/JdoManagedConnectionFactory.java
+. : CCI
+    | $ find src/ -name \*.java | xargs grep 'javax\.resource\.cci' | cut -d : -f 1 | uniq
+    | src/org/objectweb/speedo/Speedo.java
+    | src/org/objectweb/speedo/jca/JDOConnectionSpec.java
+    | src/org/objectweb/speedo/jca/JdoConnection.java
+    | src/org/objectweb/speedo/jca/JdoConnectionFactory.java
+    | src/org/objectweb/speedo/jca/JdoManagedConnection.java
+.. javax.transaction
+     | $ find src/ -name \*.java | xargs grep 'javax\.transaction' | cut -d : -f 1 | uniq
+     | src/org/objectweb/speedo/jca/JdoAttributeController.java
+     | src/org/objectweb/speedo/jca/JdoManagedConnection.java
+     | src/org/objectweb/speedo/jca/JdoManagedConnectionFactory.java
+     | src/org/objectweb/speedo/jca/XAContext.java
+     | src/org/objectweb/speedo/pm/api/ProxyManager.java
+     | src/org/objectweb/speedo/pm/lib/SpeedoProxyManager.java
+     | src/org/objectweb/speedo/workingset/lib/SpeedoTransaction.java
+.. ManagedConnectionFactory
+     | $ find src/ -name \*.java | xargs grep ManagedConnectionFactory | cut -d : -f 1 | uniq
+     | src/org/objectweb/speedo/jca/JdoConnectionFactory.java
+     | src/org/objectweb/speedo/jca/JdoManagedConnection.java
+     | src/org/objectweb/speedo/jca/JdoManagedConnectionFactory.java
+.. XAResource
+   Used in src/org/objectweb/speedo/jca/JdoManagedConnection.java
+.. LocalTransaction
+     | $ find src/ -name \*.java | xargs grep LocalTransaction | cut -d : -f 1 | uniq
+     | src/org/objectweb/speedo/jca/JdoConnection.java
+     | src/org/objectweb/speedo/jca/JdoConnectionFactory.java
+     | src/org/objectweb/speedo/jca/JdoManagedConnection.java
+     | src/org/objectweb/speedo/mapper/rdb/JDBCConnectionHolder.java
+.. JNDI
+   For testing, Speedo cooks up its own simple implementation of the
+   InitialContextFactory:
+   | $ find test/ -name \*.java | xargs grep javax.naming.spi | sed 's/:/\n  /'
+   | test/conform/org/objectweb/speedo/runtime/basic/SpeedoInitialNamingFactory.java
+   |   import javax.naming.spi.InitialContextFactory;
+   | test/conform/org/objectweb/speedo/runtime/jca/SimpleNamingManager.java
+   |   import javax.naming.spi.InitialContextFactory;
+* Third-party libraries
+.. DBCP from Apache
+   org.apache.commons.dbcp.PoolingDataSource;

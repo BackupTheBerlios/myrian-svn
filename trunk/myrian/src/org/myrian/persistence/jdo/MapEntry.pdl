@@ -1,0 +1,8 @@
+model org.myrian.persistence.jdo;
+
+object type MapEntry<K, V>
+    class org.myrian.persistence.jdo.MapEntry
+    adapter org.myrian.persistence.jdo.JDOAdapter {
+    K[0..1] key;
+    V[0..1] value;
+}
