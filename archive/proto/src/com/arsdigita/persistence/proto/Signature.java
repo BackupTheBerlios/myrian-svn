@@ -7,12 +7,12 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/01/09 $
+ * @version $Revision: #7 $ $Date: 2003/01/10 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#6 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#7 $ by $Author: ashah $, $DateTime: 2003/01/10 15:20:07 $";
 
     private ObjectType m_type;
     private HashMap m_paths = new HashMap();
@@ -25,6 +25,7 @@ public class Signature {
 
     public Signature(ObjectType type) {
         m_type = type;
+        addKeyProperties();
     }
 
     public ObjectType getObjectType() {
@@ -118,6 +119,15 @@ public class Signature {
             }
         }
         // should add aggressively loaded properties
+    }
+
+    private void addKeyProperties() {
+        Collection props = m_type.getRoot().getObjectMap(m_type)
+            .getKeyProperties();
+        for (Iterator it = props.iterator(); it.hasNext(); ) {
+            Property prop = (Property) it.next();
+            addPath(prop.getName());
+        }
     }
 
     public String toString() {
