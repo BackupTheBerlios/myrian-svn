@@ -10,12 +10,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2003/03/10 $
+ * @version $Revision: #13 $ $Date: 2003/03/10 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#12 $ by $Author: rhs $, $DateTime: 2003/03/10 15:35:44 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#13 $ by $Author: rhs $, $DateTime: 2003/03/10 17:17:21 $";
 
     private static final Path KEY = Path.get("__key__");
     private static final Path KEY_FROM = Path.get("__key_from__");
@@ -40,47 +40,95 @@ class EventSwitch extends Event.Switch {
         return Path.get(column.toString());
     }
 
-    void filter(Mutation mut, Constraint constraint, Path prefix, Object obj) {
-        Column[] cols = constraint.getColumns();
-        int index = 0;
+    private void flatten(Path prefix, Object obj, List paths, Map values) {
         LinkedList stack = new LinkedList();
         stack.add(prefix);
         stack.add(obj);
-
-        Condition cond = mut.getCondition();
 
         while (stack.size() > 0) {
             Object o = stack.removeLast();
             Path p = (Path) stack.removeLast();
 
-            ObjectType type = Session.getObjectType(o);
-            Collection keys = type.getKeyProperties();
+            Collection keys = null;
 
-            if (keys.size() == 0) {
-                Condition eq = new EqualsCondition(getPath(cols[index]), p);
-                if (cond == null) {
-                    cond = eq;
-                } else {
-                    cond = new AndCondition(eq, cond);
-                }
-                mut.set(p, o, cols[index].getType());
-                index++;
+            if (o != null) {
+                ObjectType type = Session.getObjectType(o);
+                keys = type.getKeyProperties();
+            }
+
+            if (keys == null || keys.size() == 0) {
+                paths.add(p);
+                values.put(p, o);
                 continue;
             }
 
             PropertyMap props = Session.getProperties(o);
             for (Iterator it = keys.iterator(); it.hasNext(); ) {
                 Property key = (Property) it.next();
-                stack.add(Path.get(p.getPath() + "." + key.getName()));
+                if (p == null) {
+                    stack.add(Path.get(key.getName()));
+                } else {
+                    stack.add(Path.get(p.getPath() + "." + key.getName()));
+                }
                 stack.add(props.get(key));
             }
+        }
+    }
+
+    private void filter(Mutation mut, Constraint constraint, Path prefix,
+                        Object obj) {
+        LinkedList paths = new LinkedList();
+        HashMap values = new HashMap();
+        flatten(prefix, obj, paths, values);
+
+        Column[] cols = constraint.getColumns();
+        int index = 0;
+        Condition cond = mut.getCondition();
+
+        for (Iterator it = paths.iterator(); it.hasNext(); ) {
+            Path p = (Path) it.next();
+            Object o = values.get(p);
+            Condition eq = new EqualsCondition(getPath(cols[index]), p);
+            if (cond == null) {
+                cond = eq;
+            } else {
+                cond = new AndCondition(eq, cond);
+            }
+            mut.set(p, o, cols[index].getType());
+            index++;
         }
 
         mut.setCondition(cond);
     }
 
+    private void set(DML op, Constraint constraint, Object obj) {
+        set(op, constraint.getColumns(), obj);
+    }
+
+    private void set(DML op, Column[] cols, Object obj) {
+        LinkedList paths = new LinkedList();
+        HashMap values = new HashMap();
+        flatten(null, obj, paths, values);
+
+        int index = 0;
+
+        for (Iterator it = paths.iterator(); it.hasNext(); ) {
+            Path p = (Path) it.next();
+            Object o = values.get(p);
+            op.set(cols[index++], o);
+        }
+    }
+
+    private void set(Object obj, Constraint cons, Object arg) {
+        set(obj, cons.getColumns(), arg);
+    }
+
     private void set(Object obj, Column col, Object arg) {
-        Table table = col.getTable();
+        set(obj, new Column[] { col }, arg);
+    }
+
+    private void set(Object obj, Column[] cols, Object arg) {
+        Table table = cols[0].getTable();
 
         DML op = m_engine.getOperation(obj, table);
         if (op == null) {
@@ -95,7 +143,7 @@ class EventSwitch extends Event.Switch {
             op = up;
         }
 
-        op.set(col, arg);
+        set(op, cols, arg);
     }
 
     private Collection getTables(ObjectMap om, boolean ins, boolean up,
@@ -126,7 +174,7 @@ class EventSwitch extends Event.Switch {
             Table table = (Table) it.next();
             if (e instanceof CreateEvent) {
                 DML ins = new Insert(table);
-                ins.set(getKey(table), RDBMSEngine.getKeyValue(obj));
+                set(ins, table.getPrimaryKey(), obj);
                 m_engine.addOperation(obj, ins);
             } else if (e instanceof DeleteEvent) {
                 Delete del = new Delete(table, null);
@@ -175,13 +223,11 @@ class EventSwitch extends Event.Switch {
                 }
 
                 public void onJoinTo(JoinTo m) {
-                    Column col = m.getKey().getColumns()[0];
-                    set(obj, col, RDBMSEngine.getKeyValue(arg));
+                    set(obj, m.getKey(), arg);
                 }
 
                 public void onJoinFrom(JoinFrom m) {
-                    Column col = m.getKey().getColumns()[0];
-                    set(arg, col, obj);
+                    set(arg, m.getKey(), obj);
                 }
 
                 public void onJoinThrough(JoinThrough m) {
@@ -208,8 +254,8 @@ class EventSwitch extends Event.Switch {
                         e instanceof SetEvent &&
                         arg != null) {
                         op = new Insert(table);
-                        op.set(from, RDBMSEngine.getKeyValue(obj));
-                        op.set(to, RDBMSEngine.getKeyValue(arg));
+                        set(op, m.getFrom(), obj);
+                        set(op, m.getTo(), arg);
                         m_engine.addOperation(obj, arg, op);
                     } else if (e instanceof RemoveEvent ||
                                e instanceof SetEvent &&
