@@ -18,7 +18,7 @@ import com.arsdigita.kernel.*;
 
 object type VersionedACSObject extends ACSObject {
 
-  Boolean[1..1]             isDeleted = vc_objects.is_deleted;
+  Boolean[1..1]             isDeleted = vc_objects.is_deleted CHAR(1);
   VersionedACSObject[0..1]  master;
 
   reference key (vc_objects.object_id);
@@ -140,7 +140,7 @@ query rollbackOperations {
   VersionedACSObject  acsObject;
   BigDecimal          transID;
   BigDecimal          objectID;
-  
+
   do {
     select 
       o.operation_id, o.transaction_id, o.action, o.attribute, o.classname,
@@ -184,12 +184,13 @@ data operation reparentTransactions {
 }
 
 query childObjects {
-  do {
-    select object_id from vc_objects
-    where master_id = :masterID
-  } map {
-   childID = object_id;
-  }
+    BigDecimal childID;
+    do {
+        select object_id from vc_objects
+        where master_id = :masterID
+    } map {
+        childID = object_id;
+    }
 }
 
 query objectHistoryQuery {

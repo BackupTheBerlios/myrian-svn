@@ -31,7 +31,7 @@
 // of children.
 
 // @author <a href="mailto:pmarklun@arsdigita.com">Peter Marklund</a>
-// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/formbuilder/FormSection.pdl#2 $
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/formbuilder/FormSection.pdl#3 $
 //
 
 model com.arsdigita.formbuilder;
@@ -46,6 +46,8 @@ object type FormSection extends Component {
 query RetrieveComponents {
 
     Boolean isSelected;
+    BigDecimal componentID;
+    String defaultDomainClass;
     do {
         select bebop_component_hierarchy.component_id,
                bebop_component_hierarchy.selected_p,
