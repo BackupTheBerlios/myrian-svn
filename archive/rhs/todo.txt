@@ -1,0 +1,6 @@
+ * removed hardcoded jdbc url from tests
+ * find better way to initialize session than in static block in
+   PersistenceTestCase
+ * remove DbHelper.java
+ * make sql setup and teardown work on oracle
+ * remove dead sql scripts
