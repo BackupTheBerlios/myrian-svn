@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * PackageLoader
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/09/17 $
+ * @version $Revision: #3 $ $Date: 2003/10/01 $
  **/
 
 public class PackageLoader {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/installer/PackageLoader.java#2 $ by $Author: rhs $, $DateTime: 2003/09/17 15:39:02 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/installer/PackageLoader.java#3 $ by $Author: dan $, $DateTime: 2003/10/01 07:33:18 $";
 
     private static final Logger s_log =
         Logger.getLogger(PackageLoader.class);
@@ -110,11 +110,7 @@ public class PackageLoader {
     }
 
     private static final void print(String str) {
-        String padded = "\r" + str;
-        for (int i = padded.length(); i < 80; i++) {
-            padded = padded + " ";
-        }
-        System.out.print(padded);
+        System.out.println(str);
         System.out.flush();
     }
 
