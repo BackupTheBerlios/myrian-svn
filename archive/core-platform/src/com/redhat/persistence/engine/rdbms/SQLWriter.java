@@ -13,12 +13,12 @@ import java.io.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/07/11 $
+ * @version $Revision: #3 $ $Date: 2003/07/11 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#2 $ by $Author: jorris $, $DateTime: 2003/07/11 15:22:54 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#3 $ by $Author: jorris $, $DateTime: 2003/07/11 16:08:55 $";
 
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();
@@ -28,7 +28,7 @@ public abstract class SQLWriter {
 
     public void clear() {
         m_op = null;
-        m_sql = new StringBuffer(0);
+        m_sql = new StringBuffer();
         m_bindings.clear();
         m_types.clear();
         m_expanded.clear();
