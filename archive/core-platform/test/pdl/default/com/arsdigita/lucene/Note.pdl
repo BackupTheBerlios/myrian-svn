@@ -1,0 +1,10 @@
+model com.arsdigita.lucene;
+
+import com.arsdigita.kernel.*;
+
+object type Note extends ACSObject {
+    String[1..1] name = l_notes.name VARCHAR(100);
+    String[0..1] text = l_notes.text CLOB;
+
+    reference key (l_notes.note_id);
+}
