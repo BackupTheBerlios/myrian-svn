@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/5.2.1-6.0.0/update-nullable.sql#1 $
--- $DateTime: 2003/07/21 01:44:28 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/5.2.1-6.0.0/update-nullable.sql#2 $
+-- $DateTime: 2003/07/22 15:40:08 $
 
 --alter table acs_stylesheet_node_map modify (
 --    stylesheet_id not null,
@@ -28,8 +28,24 @@ alter table portlets modify (
     portal_id not null
 );
 
+drop table cw_process_task_map;
+
 alter table cat_categories modify (
     default_ancestors varchar2(3209)
 );
 
-drop table cw_process_task_map;
+declare
+  v_exists char(1);
+begin
+  select count(*) into v_exists
+    from user_indexes uc
+   where lower(index_name) = 'cat_cat_deflt_ancestors_idx';
+
+  if (v_exists = '0') then
+    execute immediate 'create index cat_cat_deflt_ancestors_idx on cat_categories(default_ancestors)';
+  end if;
+end;
+/
+show errors;
+
+

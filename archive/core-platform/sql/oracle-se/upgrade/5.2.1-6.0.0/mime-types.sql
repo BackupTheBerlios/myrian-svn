@@ -57,22 +57,6 @@ begin
     )';
 
     execute immediate '
-    create table post_convert_html (
-        query_id INTEGER not null
-            constraint post_conve_htm_quer_id_p_qgdg9
-              primary key,
-        document CLOB
-    )';
-
-    execute immediate '
-    create table pre_convert_html (
-        id INTEGER not null
-            constraint pre_convert_html_id_p_osi1n
-              primary key,
-        content BLOB
-    )';
-
-    execute immediate '
     alter table cms_image_mime_types add
         constraint cms_ima_mim_typ_mim_ty_f_s0zsx foreign key (mime_type)
           references cms_mime_types(mime_type)';
@@ -81,11 +65,57 @@ begin
     alter table cms_text_mime_types add
         constraint cms_tex_mim_typ_mim_ty_f__tubf foreign key (mime_type)
           references cms_mime_types(mime_type)';
+  else
+    execute immediate 'comment on table cms_image_mime_types is ''''';
+    execute immediate 'comment on column cms_image_mime_types.sizer_class is ''''';
+    execute immediate 'comment on table cms_mime_types is ''''';
+    execute immediate 'comment on column cms_mime_types.file_extension is ''''';
 
   end if;
 end;
 /
 show errors;
+
+declare
+  v_exists char(1);
+begin
+
+  select count(*) into v_exists
+    from user_tables
+   where lower(table_name) = 'pre_convert_html';
+
+  if (v_exists = '1') then
+    execute immediate 'drop index convert_to_html_index';
+    execute immediate 'drop table pre_convert_html';
+  end if;
+
+  select count(*) into v_exists
+    from user_tables
+   where lower(table_name) = 'post_convert_html';
+
+  if (v_exists = '1') then
+    execute immediate 'drop table post_convert_html';
+  end if;
+
+end;
+/
+show errors;
+
+create table pre_convert_html (
+    id INTEGER not null
+        constraint pre_convert_html_id_p_osi1n
+          primary key,
+    content BLOB
+);
+create index convert_to_html_index on pre_convert_html(content) indextype is
+ctxsys.context parameters('filter ctxsys.inso_filter');
+
+create table post_convert_html (
+    query_id INTEGER not null
+        constraint post_conve_htm_quer_id_p_qgdg9
+          primary key,
+    document CLOB
+);
 
 update cms_mime_types
    set java_class = 'com.arsdigita.mimetypes.' || substr(java_class, 1 + length('com.arsdigita.cms.'))

@@ -447,10 +447,25 @@ alter table acs_permissions add
     constraint acs_per_gra_id_obj_id__p_lrweb
       primary key(object_id, grantee_id, privilege);
 
+alter table acs_stylesheet_type_map drop constraint acs_sty_typ_map_pac_ty_p_afjeo;
+alter table acs_stylesheet_type_map add
+    constraint acs_sty_typ_map_pac_ty_p_afjeo
+      primary key(stylesheet_id, package_type_id);
+
 alter table apm_package_type_listener_map drop constraint apm_pac_typ_lis_map_li_p_6_z6o;
 alter table apm_package_type_listener_map add
     constraint apm_pac_typ_lis_map_li_p_6_z6o
       primary key(package_type_id, listener_id);
+
+alter table cw_task_group_assignees drop constraint task_group_assignees_pk;
+alter table cw_task_group_assignees add
+    constraint cw_tas_gro_ass_gro_id__p_0bqv_
+        primary key(group_id, task_id);
+
+alter table cw_task_listeners drop constraint task_listeners_pk;
+alter table cw_task_listeners add
+    constraint cw_tas_lis_lis_tas_id__p_cl43z
+        primary key(listener_task_id, task_id);
 
 alter table group_member_map drop constraint grou_mem_map_gro_id_me_p_9zo_i;
 alter table group_member_map add
@@ -482,11 +497,16 @@ alter table site_nodes add
     constraint site_node_nam_paren_id_u_a3b4a
       unique(parent_id, name);
 
--- Find and fix cw_task_user_assignees fk constraint
---------------------------------------------------------------------------------
+-- Actions that require PL/SQL
+----------------------------------------------------------------------------------
 declare
+  version varchar2(4000);
+  compatibility varchar2(4000);
   v_constraint_name varchar2(4000);
 begin
+
+  -- Find and fix cw_task_user_assignees fk constraint
+  --------------------------------------------------------------------------------
   select constraint_name into v_constraint_name
     from user_constraints uc
    where lower(table_name) = 'cw_task_user_assignees'
@@ -501,24 +521,14 @@ begin
     execute immediate 'alter table cw_task_user_assignees drop constraint ' ||  v_constraint_name;
     execute immediate 'alter table cw_task_user_assignees add constraint cw_tas_use_assi_tas_id_f_feri7 foreign key(task_id) references cw_user_tasks(task_id)';
   end if;
-end;
-/
-show errors;
 
-
--- Rename constraints
---------------------------------------------------------------------------------
-declare
-  version varchar2(4000);
-  compatibility varchar2(4000);
-begin
+  -- Rename constraints
+  --------------------------------------------------------------------------------
   DBMS_UTILITY.DB_VERSION (version, compatibility);
   if (compatibility >= '9.2.0.0.0') then
     -- The following ddl will only work on Oracle 9.2 or greater
     execute immediate 'alter table cat_categories rename constraint cat_categories_pk to cat_categori_catego_id_p_yeprq';
     execute immediate 'alter table cw_task_dependencies rename constraint task_dependencies_pk to cw_tas_dep_dep_tas_id__p_hdzws';
-    execute immediate 'alter table cw_task_group_assignees rename constraint task_group_assignees_pk to cw_tas_gro_ass_gro_id__p_0bqv_';
-    execute immediate 'alter table cw_task_listeners rename constraint task_listeners_pk to cw_tas_lis_lis_tas_id__p_cl43z';
     execute immediate 'alter table cw_task_user_assignees rename constraint task_user_assignees_pk to cw_tas_use_ass_tas_id__p_vsdyq';
   end if;
 end;
