@@ -29,6 +29,7 @@ import com.redhat.persistence.metadata.Root;
 import com.redhat.persistence.metadata.Static;
 import com.redhat.persistence.metadata.UniqueKey;
 import com.redhat.persistence.metadata.Value;
+import com.redhat.persistence.metadata.Qualias;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Iterator;
@@ -37,12 +38,12 @@ import java.util.Iterator;
  * PDLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/07/08 $
  **/
 
 public class PDLWriter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLWriter.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLWriter.java#2 $ by $Author: rhs $, $DateTime: 2004/07/08 11:07:07 $";
 
     private Writer m_out;
 
@@ -142,7 +143,9 @@ public class PDLWriter {
         }
 
         ObjectType type = prop.getType();
-        if (type.getModel() == null ||
+        if (type == null) {
+            write("null");
+        } else if (type.getModel() == null ||
             type.getModel().getName().equals("global")) {
             write(type.getName());
         } else {
@@ -179,7 +182,11 @@ public class PDLWriter {
                     Column col = v.getColumn();
 		    write(col);
                     write(" ");
-                    write(Column.getTypeName(col.getType()));
+                    if (col.getType() == Integer.MIN_VALUE) {
+                        write("UNKNOWN");
+                    } else {
+                        write(Column.getTypeName(col.getType()));
+                    }
                     if (col.getSize() >= 0) {
                         write("(" + col.getSize());
                         if (col.getScale() >= 0) {
@@ -217,6 +224,10 @@ public class PDLWriter {
 		public void onStatic(Static s) {
 		    write("<static>");
 		}
+
+                public void onQualias(Qualias q) {
+                    write("qualias {" + q.getQuery() + "}");
+                }
 	    });
         }
 
