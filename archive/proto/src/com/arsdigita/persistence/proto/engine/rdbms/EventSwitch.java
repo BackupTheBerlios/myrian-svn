@@ -10,12 +10,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/02/13 $
+ * @version $Revision: #4 $ $Date: 2003/02/14 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#3 $ by $Author: rhs $, $DateTime: 2003/02/13 18:36:15 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#4 $ by $Author: rhs $, $DateTime: 2003/02/14 16:46:06 $";
 
     private static final Path KEY = Path.get("__key__");
     private static final Path KEY_FROM = Path.get("__key_from__");

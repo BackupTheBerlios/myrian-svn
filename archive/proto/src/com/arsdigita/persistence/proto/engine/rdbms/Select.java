@@ -8,12 +8,12 @@ import java.util.*;
  * Select
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/02/13 $
+ * @version $Revision: #6 $ $Date: 2003/02/14 $
  **/
 
 class Select extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#5 $ by $Author: rhs $, $DateTime: 2003/02/13 18:36:15 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#6 $ by $Author: rhs $, $DateTime: 2003/02/14 16:46:06 $";
 
     private ArrayList m_selections = new ArrayList();
     private Join m_join;
@@ -42,34 +42,8 @@ class Select extends Operation {
         return m_condition;
     }
 
-    public String toString() {
-        StringBuffer result = new StringBuffer();
-
-        result.append("select ");
-
-        if (m_selections.size() == 0) {
-            result.append("*");
-        } else {
-            for (Iterator it = m_selections.iterator(); it.hasNext(); ) {
-                Path path = (Path) it.next();
-                result.append(path);
-                if (it.hasNext()) {
-                    result.append(",\n       ");
-                }
-            }
-        }
-
-        result.append("\nfrom ");
-        result.append(m_join);
-
-        if (m_condition != null) {
-            result.append("\nwhere ");
-            result.append(m_condition);
-        }
-
-        result.append("\n\nparams = " + getParams());
-
-        return result.toString();
+    void write(SQLWriter w) {
+        w.write(this);
     }
 
 }

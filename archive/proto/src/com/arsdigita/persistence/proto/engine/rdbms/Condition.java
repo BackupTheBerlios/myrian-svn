@@ -6,12 +6,14 @@ import com.arsdigita.persistence.proto.common.*;
  * Condition
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/02/06 $
+ * @version $Revision: #5 $ $Date: 2003/02/14 $
  **/
 
-class Condition {
+abstract class Condition {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Condition.java#4 $ by $Author: rhs $, $DateTime: 2003/02/06 18:43:54 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Condition.java#5 $ by $Author: rhs $, $DateTime: 2003/02/14 16:46:06 $";
+
+    abstract void write(SQLWriter w);
 
 }
 
@@ -31,6 +33,10 @@ class AndCondition extends Condition {
 
     public Condition getRight() {
         return m_right;
+    }
+
+    void write(SQLWriter w) {
+        w.write(this);
     }
 
     public String toString() {
@@ -57,6 +63,10 @@ class OrCondition extends Condition {
         return m_right;
     }
 
+    void write(SQLWriter w) {
+        w.write(this);
+    }
+
     public String toString() {
         return m_left + " or " + m_right;
     }
@@ -75,6 +85,10 @@ class NotCondition extends Condition {
         return m_operand;
     }
 
+    void write(SQLWriter w) {
+        w.write(this);
+    }
+
     public String toString() {
         return "not " + m_operand;
     }
@@ -89,6 +103,18 @@ class InCondition extends Condition {
     public InCondition(Path column, Select select) {
         m_column = column;
         m_select = select;
+    }
+
+    public Path getColumn() {
+        return m_column;
+    }
+
+    public Select getSelect() {
+        return m_select;
+    }
+
+    void write(SQLWriter w) {
+        w.write(this);
     }
 
     public String toString() {
@@ -113,6 +139,10 @@ class EqualsCondition extends Condition {
 
     public Path getRight() {
         return m_right;
+    }
+
+    void write(SQLWriter w) {
+        w.write(this);
     }
 
     public String toString() {

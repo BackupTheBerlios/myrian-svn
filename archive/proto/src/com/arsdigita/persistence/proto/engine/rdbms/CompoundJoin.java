@@ -4,14 +4,14 @@ package com.arsdigita.persistence.proto.engine.rdbms;
  * CompoundJoin
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/02/05 $
+ * @version $Revision: #2 $ $Date: 2003/02/14 $
  **/
 
-class CompoundJoin extends Join {
+abstract class CompoundJoin extends Join {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/CompoundJoin.java#1 $ by $Author: rhs $, $DateTime: 2003/02/05 18:34:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/CompoundJoin.java#2 $ by $Author: rhs $, $DateTime: 2003/02/14 16:46:06 $";
 
-    private static class Type {}
+    public static class Type {}
 
     public static final Type INNER = new Type() {
             public String toString() {
@@ -47,6 +47,22 @@ class CompoundJoin extends Join {
         m_condition = condition;
     }
 
+    public Join getLeft() {
+        return m_left;
+    }
+
+    public Type getType() {
+        return m_type;
+    }
+
+    public Join getRight() {
+        return m_right;
+    }
+
+    public Condition getCondition() {
+        return m_condition;
+    }
+
     public String toString() {
         return m_left + "\n     " + m_type + " " + m_right + " on " +
             m_condition;
@@ -55,25 +71,49 @@ class CompoundJoin extends Join {
 }
 
 class CrossJoin extends CompoundJoin {
+
     public CrossJoin(Join left, Join right) {
         super(left, CompoundJoin.CROSS, right, null);
     }
+
+    void write(SQLWriter w) {
+        w.write(this);
+    }
+
 }
 
 class InnerJoin extends CompoundJoin {
+
     public InnerJoin(Join left, Join right, Condition cond) {
         super(left, CompoundJoin.INNER, right, cond);
     }
+
+    void write(SQLWriter w) {
+        w.write(this);
+    }
+
 }
 
 class LeftJoin extends CompoundJoin {
+
     public LeftJoin(Join left, Join right, Condition cond) {
         super(left, CompoundJoin.LEFT, right, cond);
     }
+
+    void write(SQLWriter w) {
+        w.write(this);
+    }
+
 }
 
 class RightJoin extends CompoundJoin {
+
     public RightJoin(Join left, Join right, Condition cond) {
         super(left, CompoundJoin.RIGHT, right, cond);
     }
+
+    void write(SQLWriter w) {
+        w.write(this);
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.arsdigita.persistence.proto.engine.rdbms;
 
 import com.arsdigita.persistence.proto.*;
+import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
 
 import java.util.*;
@@ -9,12 +10,12 @@ import java.util.*;
  * DML
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/02/07 $
+ * @version $Revision: #3 $ $Date: 2003/02/14 $
  **/
 
-class DML extends Operation {
+abstract class DML extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/DML.java#2 $ by $Author: rhs $, $DateTime: 2003/02/07 12:50:17 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/DML.java#3 $ by $Author: rhs $, $DateTime: 2003/02/14 16:46:06 $";
 
     private Table m_table;
     private HashMap m_bindings = new HashMap();
@@ -27,12 +28,18 @@ class DML extends Operation {
         return m_table;
     }
 
-    public void set(Column column, Object value) {
-        m_bindings.put(column, value);
+    private Path getValuePath(Column column) {
+        return Path.get("__" + column.getName() + "__");
     }
 
-    public Object get(Column column) {
-        return m_bindings.get(column);
+    public void set(Column column, Object value) {
+        Path vp = getValuePath(column);
+        m_bindings.put(column, vp);
+        set(vp, value);
+    }
+
+    public Path get(Column column) {
+        return (Path) m_bindings.get(column);
     }
 
     public Collection getColumns() {

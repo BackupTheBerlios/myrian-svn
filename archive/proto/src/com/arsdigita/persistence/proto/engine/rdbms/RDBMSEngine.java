@@ -5,6 +5,7 @@ import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
 
 import java.util.*;
+import java.sql.*;
 
 import org.apache.log4j.Logger;
 
@@ -12,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2003/02/12 $
+ * @version $Revision: #13 $ $Date: 2003/02/14 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#12 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#13 $ by $Author: rhs $, $DateTime: 2003/02/14 16:46:06 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -74,10 +75,51 @@ public class RDBMSEngine extends Engine {
     }
 
     public void flush() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(m_operations);
+        for (Iterator it = m_operations.iterator(); it.hasNext(); ) {
+            DML dml = (DML) it.next();
+            execute(dml);
         }
         clearOperations();
+    }
+
+    private Connection getConnection() {
+        throw new Error("not implemented");
+    }
+
+    private ResultSet execute(Select select) {
+        SQLWriter w = new ANSIWriter();
+        w.write(select);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(w.getSQL());
+            LOG.debug(w.getBindings());
+        }
+
+        return null;
+        /*
+        Connection conn = getConnection();
+        PreparedStatement ps = conn.prepareStatement(w.getSQL());
+        w.bind(ps);
+        return ps.executeQuery();*/
+    }
+
+    private int execute(DML dml) {
+        SQLWriter w = new ANSIWriter();
+        w.write(dml);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(w.getSQL());
+            LOG.debug(w.getBindings());
+        }
+
+        return 0;
+
+        /*Connection conn = getConnection();
+        PreparedStatement ps = conn.prepareStatement(w.getSQL());
+        try {
+            w.bind(ps);
+            return ps.executeUpdate();
+        } finally {
+        ps.close();
+        }*/
     }
 
 }
