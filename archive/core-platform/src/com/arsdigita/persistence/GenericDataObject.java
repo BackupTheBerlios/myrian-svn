@@ -38,12 +38,12 @@ import java.util.HashSet;
  *              through inheritance.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #20 $ $Date: 2002/12/11 $
+ * @version $Revision: #21 $ $Date: 2003/02/12 $
  */
 
 public class GenericDataObject implements DataObject {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#20 $ by $Author: dennis $, $DateTime: 2002/12/11 13:49:53 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#21 $ by $Author: vadim $, $DateTime: 2003/02/12 20:27:21 $";
 
     private ObjectType    m_type;
     private Session       m_session;
@@ -546,16 +546,15 @@ public class GenericDataObject implements DataObject {
         Property prop = checkProperty(propertyName);
 
         if (prop.isCollection()) {
-            throw new PersistenceException(
-                                           "Cannot set a multi valued property."
-                                           );
+            throw new PersistenceException
+                ("Cannot set a multi valued property. propertyName=" +
+                 propertyName);
         }
 
         if (!isNew() && m_type.isKeyProperty(prop)) {
             throw new PersistenceException(
                 "Cannot change a key property once an object has " +
-                "been saved."
-                );
+                "been saved. propertyName=" + propertyName);
         }
 
         // make sure that the property is loaded so it can be nulled correctly
