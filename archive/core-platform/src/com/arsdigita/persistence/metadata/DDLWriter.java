@@ -11,12 +11,12 @@ import java.util.*;
  * DDLWriter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/12 $
+ * @version $Revision: #5 $ $Date: 2002/08/12 $
  **/
 
 public class DDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#4 $ by $Author: randyg $, $DateTime: 2002/08/12 07:48:16 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLWriter.java#5 $ by $Author: rhs $, $DateTime: 2002/08/12 16:19:25 $";
 
     private File m_base;
     private boolean m_overwrite;
@@ -71,12 +71,19 @@ public class DDLWriter {
         }
 
         Set deps = new HashSet();
-        Set uncreated = new HashSet();
+        List uncreated = new ArrayList();
         Set created = new HashSet();
         Set deferred = new HashSet();
         List createOrder = new ArrayList();
 
         uncreated.addAll(tables);
+        Collections.sort(uncreated, new Comparator() {
+                public int compare(Object o1, Object o2) {
+                    Table t1 = (Table) o1;
+                    Table t2 = (Table) o2;
+                    return t1.getName().compareTo(t2.getName());
+                }
+            });
 
         int before;
 
@@ -103,8 +110,8 @@ public class DDLWriter {
         } while (created.size() > before);
 
         if (deferred.size() > 0) {
-            FileWriter writer = new FileWriter(new File(m_base,
-                                                        "deferred.sql"));
+            List alters = new ArrayList();
+
             for (Iterator it = deferred.iterator(); it.hasNext(); ) {
                 Table table = (Table) it.next();
                 if (skipped.contains(table)) {
@@ -114,12 +121,18 @@ public class DDLWriter {
                      iter.hasNext(); ) {
                     Constraint con = (Constraint) iter.next();
                     if (con.isDeferred()) {
-                        writer.write("alter table " + table.getName() +
-                                     " add\n");
-                        writer.write(con.getSQL());
-                        writer.write(";\n");
+                        alters.add("alter table " + table.getName() +
+                                   " add\n" + con.getSQL() + ";\n");
                     }
                 }
+            }
+
+            Collections.sort(alters);
+
+            FileWriter writer = new FileWriter(new File(m_base,
+                                                        "deferred.sql"));
+            for (Iterator it = alters.iterator(); it.hasNext(); ) {
+                writer.write((String) it.next());
             }
             writer.close();
         }

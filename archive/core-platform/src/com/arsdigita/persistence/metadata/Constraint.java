@@ -6,12 +6,12 @@ import java.util.*;
  * Constraint
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/08/09 $
+ * @version $Revision: #3 $ $Date: 2002/08/12 $
  **/
 
 abstract class Constraint {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Constraint.java#2 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Constraint.java#3 $ by $Author: rhs $, $DateTime: 2002/08/12 16:19:25 $";
 
     private Table m_table;
     private String m_name;
@@ -115,11 +115,28 @@ abstract class Constraint {
     abstract String getSQL();
 
     String getColumnList() {
+        return getColumnList(false);
+    }
+
+    String getColumnList(boolean sort) {
+        List cols = new ArrayList(Arrays.asList(m_columns));
+
+        if (sort) {
+            Collections.sort(cols, new Comparator() {
+                    public int compare(Object o1, Object o2) {
+                        Column c1 = (Column) o1;
+                        Column c2 = (Column) o2;
+                        return c1.getName().compareTo(c2.getName());
+                    }
+                });
+        }
+
         StringBuffer result = new StringBuffer("(");
 
-        for (int i = 0; i < m_columns.length; i++) {
-            result.append(m_columns[i].getName());
-            if (i < m_columns.length - 1) {
+        for (Iterator it = cols.iterator(); it.hasNext(); ) {
+            Column col = (Column) it.next();
+            result.append(col.getName());
+            if (it.hasNext()) {
                 result.append(", ");
             }
         }
