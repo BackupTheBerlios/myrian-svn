@@ -16,48 +16,73 @@
 package com.redhat.persistence.common;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Path
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/02/18 $
+ * @version $Revision: #5 $ $Date: 2004/02/19 $
  **/
 
 public class Path {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#4 $ by $Author: vadim $, $DateTime: 2004/02/18 17:12:14 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#5 $ by $Author: bche $, $DateTime: 2004/02/19 11:07:55 $";
 
-    private static final HashMap PATHS = new HashMap();
+    private static final HashMap MAPS = new HashMap();
 
     public static final Path get(String path) {
         if (path == null) {
             return null;
         }
 
-        Path result;
+        final Map map;
 
-        synchronized (PATHS) {
-            if (PATHS.containsKey(path)) {
-                result = (Path) PATHS.get(path);
+        final String pathPrefix = getPrefix(path);
+        //pathPrefix is something like "com.arsdigita.foo" or
+        //"com.arsdigita.bar" now.
+        
+        // this lock is held for a relatively short period of time
+        synchronized (MAPS) {                                    
+            if (MAPS.containsKey(pathPrefix) ) {
+                map = (Map) MAPS.get(pathPrefix);
             } else {
-                int dot = path.lastIndexOf('.');
-                Path parent;
-                String name;
-                if (dot > -1) {
-                    parent = get(path.substring(0, dot));
-                    name = path.substring(dot + 1);
-                } else {
-                    parent = null;
-                    name = path;
-                }
-
-                result = new Path(parent, name);
-                PATHS.put(path, result);
+                map = new HashMap();
+                MAPS.put(pathPrefix, map);
             }
         }
+        
+        // we're done with the lock on MAPS at this point
+        
+        synchronized (map) {
+            if (map.containsKey(path)) {
+                return (Path) map.get(path);
+            } else {
+                Path parent;
+                String name;
+                
+                if (pathPrefix == null) {
+                    parent = null;
+                    name = path;
+                } else {
+                    parent = get(pathPrefix);
+                    name = path.substring(pathPrefix.length()+1, path.length());
+                }
 
-        return result;
+                Path result = new Path(parent, name);
+                map.put(path, result);
+                return result;
+            }
+        }
+    }
+
+    private static String getPrefix(String path) {
+        int dot = path.lastIndexOf('.');
+        if (dot > -1) {
+            return path.substring(0, dot);
+        } else {
+            return null;
+        }
     }
 
     public static final Path add(String p1, String p2) {
