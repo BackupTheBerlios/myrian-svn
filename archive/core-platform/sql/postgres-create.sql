@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres-create.sql#16 $
--- $DateTime: 2003/02/13 14:09:25 $
+-- $Id: //core-platform/dev/sql/postgres-create.sql#17 $
+-- $DateTime: 2003/03/24 15:39:16 $
 
 begin;
 
@@ -93,6 +93,7 @@ begin;
 --\i default/kernel/view-object_package_map.sql
 
 \i default/categorization/table-cat_categories.sql
+\i default/categorization/index-cat_cat_deflt_ancestors.sql
 \i default/categorization/comment-cat_categories.sql
 \i default/categorization/table-cat_category_category_map.sql
 \i default/categorization/comment-cat_category_category_map.sql

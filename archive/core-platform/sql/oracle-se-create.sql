@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/oracle-se-create.sql#18 $
--- $DateTime: 2003/02/13 14:09:25 $
+-- $Id: //core-platform/dev/sql/oracle-se-create.sql#19 $
+-- $DateTime: 2003/03/24 15:39:16 $
 
 @@ oracle-se/function-currentDate.sql
 
@@ -110,6 +110,7 @@
 @@ default/kernel/constraint-roles.sql
 
 @@ default/categorization/table-cat_categories.sql
+@@ default/categorization/index-cat_cat_deflt_ancestors.sql
 @@ default/categorization/comment-cat_categories.sql
 @@ default/categorization/table-cat_category_category_map.sql
 @@ default/categorization/comment-cat_category_category_map.sql
