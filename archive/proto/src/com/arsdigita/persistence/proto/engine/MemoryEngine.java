@@ -7,15 +7,15 @@ import com.arsdigita.persistence.OID;
 import java.util.*;
 
 /**
- * Engine
+ * MemoryEngine
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/12/04 $
+ * @version $Revision: #1 $ $Date: 2002/12/06 $
  **/
 
-public class Engine implements PersistenceEngine {
+public class MemoryEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/Engine.java#2 $ by $Author: rhs $, $DateTime: 2002/12/04 19:18:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#1 $ by $Author: rhs $, $DateTime: 2002/12/06 17:55:29 $";
 
     private static class EventList extends ArrayList {
         public Event getEvent(int index) {
@@ -28,99 +28,82 @@ public class Engine implements PersistenceEngine {
     private EventList m_uncomitted = new EventList();
     private EventList m_unflushed = new EventList();
 
-    private Session m_ssn;
-
-    public Engine(Session ssn) {
-        m_ssn = ssn;
+    public MemoryEngine(Session ssn) {
+        super(ssn);
     }
 
-    public void commit() {
+    protected void commit() {
         synchronized (DATA) {
             DATA.addAll(m_uncomitted);
             m_uncomitted.clear();
         }
     }
 
-    public synchronized void rollback() {
+    protected synchronized void rollback() {
         m_uncomitted.clear();
     }
 
-    public RecordSet execute(Query query) {
+    protected RecordSet execute(Query query) {
         System.out.println("Executing " + query);
         DumbRecordSet drs = new DumbRecordSet(query);
         System.out.println(" --> " + drs.getOIDs());
         return drs;
     }
 
-    public synchronized void write(Event event) {
+    protected synchronized void write(Event event) {
         m_unflushed.add(event);
     }
 
-    public synchronized void flush() {
+    protected synchronized void flush() {
         m_uncomitted.addAll(m_unflushed);
         m_unflushed.clear();
     }
 
-    public FilterSource getFilterSource() {
-        return new FilterSource() {
-
-                public AndFilter getAnd(Filter leftOperand,
-                                        Filter rightOperand) {
-                    return new DumbAndFilter(leftOperand, rightOperand);
-                }
-
-                public OrFilter getOr(Filter leftOperand,
-                                      Filter rightOperand) {
-                    return new DumbOrFilter(leftOperand, rightOperand);
-                }
-
-                public NotFilter getNot(Filter operand) {
-                    return new DumbNotFilter(operand);
-                }
-
-                public EqualsFilter getEquals(Path path, Object value) {
-                    return new DumbEqualsFilter(path, value);
-                }
-
-                public InFilter getIn(Path path, Query query) {
-                    return new DumbInFilter(path, query);
-                }
-
-                public ContainsFilter getContains(Path path, Object value) {
-                    return new DumbContainsFilter(path, value);
-                }
-            };
+    protected Filter getAnd(Filter leftOperand, Filter rightOperand) {
+        return new DumbAndFilter(leftOperand, rightOperand);
     }
 
-    private static final EventSource ES = new EventSource() {
+    protected Filter getOr(Filter leftOperand, Filter rightOperand) {
+        return new DumbOrFilter(leftOperand, rightOperand);
+    }
 
-            public CreateEvent getCreate(Session ssn, OID oid) {
-                return new CreateEvent(ssn, oid) {};
-            }
+    protected Filter getNot(Filter operand) {
+        return new DumbNotFilter(operand);
+    }
 
-            public DeleteEvent getDelete(Session ssn, OID oid) {
-                return new DeleteEvent(ssn, oid) {};
-            }
+    protected Filter getEquals(Path path, Object value) {
+        return new DumbEqualsFilter(path, value);
+    }
 
-            public SetEvent getSet(Session ssn, OID oid, Property prop,
-                                   Object arg) {
-                return new SetEvent(ssn, oid, prop, arg) {};
-            }
+    protected Filter getIn(Path path, Query query) {
+        return new DumbInFilter(path, query);
+    }
 
-            public AddEvent getAdd(Session ssn, OID oid, Property prop,
-                                   Object arg) {
-                return new AddEvent(ssn, oid, prop, arg) {};
-            }
+    protected Filter getContains(Path path, Object value) {
+        return new DumbContainsFilter(path, value);
+    }
 
-            public RemoveEvent getRemove(Session ssn, OID oid, Property prop,
-                                   Object arg) {
-                return new RemoveEvent(ssn, oid, prop, arg) {};
-            }
+    protected CreateEvent getCreate(Session ssn, OID oid) {
+        return new CreateEvent(ssn, oid) {};
+    }
 
-        };
+    protected DeleteEvent getDelete(Session ssn, OID oid) {
+        return new DeleteEvent(ssn, oid) {};
+    }
 
-    public EventSource getEventSource() {
-        return ES;
+    protected SetEvent getSet(Session ssn, OID oid, Property prop,
+                              Object arg) {
+        return new SetEvent(ssn, oid, prop, arg) {};
+    }
+
+    protected AddEvent getAdd(Session ssn, OID oid, Property prop,
+                              Object arg) {
+        return new AddEvent(ssn, oid, prop, arg) {};
+    }
+
+    protected RemoveEvent getRemove(Session ssn, OID oid, Property prop,
+                                    Object arg) {
+        return new RemoveEvent(ssn, oid, prop, arg) {};
     }
 
     private Object get(OID oid, Property prop) {
@@ -244,7 +227,7 @@ public class Engine implements PersistenceEngine {
         }
 
         public Object get(Path p) {
-            return Engine.this.get(m_oid, p);
+            return MemoryEngine.this.get(m_oid, p);
         }
 
     }

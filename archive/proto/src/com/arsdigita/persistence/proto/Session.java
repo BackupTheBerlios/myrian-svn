@@ -11,23 +11,19 @@ import org.apache.log4j.Logger;
  * Session
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/12/06 $
+ * @version $Revision: #4 $ $Date: 2002/12/06 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#3 $ by $Author: rhs $, $DateTime: 2002/12/06 11:46:27 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#4 $ by $Author: rhs $, $DateTime: 2002/12/06 17:55:29 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
     private static final PersistentObjectSource POS =
         new PersistentObjectSource();
 
-    final PersistenceEngine ENGINE =
-        new com.arsdigita.persistence.proto.engine.Engine(this);
-    final EventSource ES = ENGINE.getEventSource();
-    final FilterSource FS = ENGINE.getFilterSource();
-
+    private final Engine m_engine = Engine.getInstance(this);
     private HashMap m_odata = new HashMap();
 
     // These are kept up to date by code in Event.java
@@ -52,7 +48,7 @@ public class Session {
         // the new object will pick up all the changes made to the old one.
         // Not sure what to do about this except perhaps disallow it at some
         // point.
-        addEvent(ES.getCreate(this, oid), od);
+        addEvent(m_engine.getCreate(this, oid), od);
 
         for (Iterator it = oid.getObjectType().getKeyProperties();
              it.hasNext(); ) {
@@ -96,7 +92,7 @@ public class Session {
                         }
                     }
                 }
-                addEvent(ES.getDelete(this, oid), od);
+                addEvent(m_engine.getDelete(this, oid), od);
                 result = true;
             }
             od.setVisiting(false);
@@ -131,8 +127,7 @@ public class Session {
     }
 
     public PersistentCollection retrieve(Query query) {
-        // should fetch objects from db
-        throw new Error("Not implemented.");
+        return POS.getPersistentCollection(this, new DataSet(this, query));
     }
 
     public void set(OID oid, Property prop, Object value) {
@@ -151,7 +146,7 @@ public class Session {
         }
 
         PropertyData pd = fetchPropertyData(oid, prop);
-        addEvent(ES.getSet(this, oid, prop, value), pd);
+        addEvent(m_engine.getSet(this, oid, prop, value), pd);
 
         if (prop.isRole() && prop.isComponent()) {
             PersistentObject po = (PersistentObject) old;
@@ -165,10 +160,11 @@ public class Session {
             PersistentObject me = retrieve(oid);
             if (ass.isCollection()) {
                 if (oldpo != null) {
-                    addEvent(ES.getRemove(this, oldpo.getOID(), ass, me));
+                    addEvent(m_engine.getRemove(this, oldpo.getOID(), ass,
+                                                me));
                 }
                 if (po != null) {
-                    addEvent(ES.getAdd(this, po.getOID(), ass, me));
+                    addEvent(m_engine.getAdd(this, po.getOID(), ass, me));
                 }
             } else {
                 throw new IllegalStateException
@@ -225,20 +221,20 @@ public class Session {
 
         // should deal with link attributes here
         PropertyData pd = fetchPropertyData(oid, prop);
-        addEvent(ES.getAdd(this, oid, prop, value), pd);
+        addEvent(m_engine.getAdd(this, oid, prop, value), pd);
         if (prop.getAssociatedProperty() != null) {
             PersistentObject me = retrieve(oid);
             Property ass = prop.getAssociatedProperty();
             PersistentObject po = (PersistentObject) value;
             if (ass.isCollection()) {
-                addEvent(ES.getAdd(this, po.getOID(), ass, me));
+                addEvent(m_engine.getAdd(this, po.getOID(), ass, me));
             } else {
                 PersistentObject old =
                     (PersistentObject) get(po.getOID(), ass);
                 if (old != null) {
-                    addEvent(ES.getRemove(this, old.getOID(), ass, po));
+                    addEvent(m_engine.getRemove(this, old.getOID(), ass, po));
                 }
-                addEvent(ES.getSet(this, po.getOID(), ass, me));
+                addEvent(m_engine.getSet(this, po.getOID(), ass, me));
             }
         }
 
@@ -255,7 +251,7 @@ public class Session {
         }
 
         PropertyData pd = fetchPropertyData(oid, prop);
-        addEvent(ES.getRemove(this, oid, prop, value), pd);
+        addEvent(m_engine.getRemove(this, oid, prop, value), pd);
 
         if (prop.isRole() && prop.isComponent()) {
             PersistentObject po = (PersistentObject) value;
@@ -267,9 +263,9 @@ public class Session {
             PersistentObject me = retrieve(oid);
             PersistentObject po = (PersistentObject) value;
             if (ass.isCollection()) {
-                addEvent(ES.getRemove(this, po.getOID(), ass, me));
+                addEvent(m_engine.getRemove(this, po.getOID(), ass, me));
             } else {
-                addEvent(ES.getSet(this, po.getOID(), ass, null));
+                addEvent(m_engine.getSet(this, po.getOID(), ass, null));
             }
         }
 
@@ -301,10 +297,10 @@ public class Session {
         }
 
         for (Event ev = m_head; ev != null; ev = ev.getNext()) {
-            ENGINE.write(ev);
+            m_engine.write(ev);
         }
 
-        ENGINE.flush();
+        m_engine.flush();
 
         for (Event ev = m_head; ev != null; ev = ev.getNext()) {
             ev.sync();
@@ -316,6 +312,10 @@ public class Session {
         if (LOG.isDebugEnabled()) {
             untrace("flush");
         }
+    }
+
+    Engine getEngine() {
+        return m_engine;
     }
 
     void load(OID oid, Property prop, Object value) {
@@ -389,7 +389,7 @@ public class Session {
 
     private ObjectData fetchObjectData(OID oid) {
         if (!hasObjectData(oid)) {
-            RecordSet rs = ENGINE.execute(getRetrieveQuery(oid));
+            RecordSet rs = m_engine.execute(getRetrieveQuery(oid));
             // Cache non-existent objects
             if (!rs.next()) {
                 m_odata.put(oid, null);
@@ -424,7 +424,7 @@ public class Session {
         } else if (od.isNew()){
             pd = new PropertyData(od, prop, null);
         } else {
-            RecordSet rs = ENGINE.execute(getRetrieveQuery(oid, prop));
+            RecordSet rs = m_engine.execute(getRetrieveQuery(oid, prop));
             OID value = null;
             while (rs.next()) {
                 value = rs.load(this);
@@ -457,12 +457,12 @@ public class Session {
         for (Iterator it = oid.getObjectType().getKeyProperties();
              it.hasNext(); ) {
             Property prop = (Property) it.next();
-            Filter eq = FS.getEquals(Path.getInstance(prop.getName()),
-                                     oid.get(prop.getName()));
+            Filter eq = m_engine.getEquals(Path.getInstance(prop.getName()),
+                                           oid.get(prop.getName()));
             if (f == null) {
                 f = eq;
             } else {
-                f = FS.getAnd(eq, f);
+                f = m_engine.getAnd(eq, f);
             }
         }
 
@@ -490,11 +490,11 @@ public class Session {
             Property ass = prop.getAssociatedProperty();
             if (ass != null) {
                 if (ass.isCollection()) {
-                    f = FS.getContains(Path.getInstance(ass.getName()),
-                                       oid);
+                    f = m_engine.getContains(Path.getInstance(ass.getName()),
+                                             oid);
                 } else {
-                    f = FS.getEquals(Path.getInstance(ass.getName()),
-                                     oid);
+                    f = m_engine.getEquals(Path.getInstance(ass.getName()),
+                                           oid);
                 }
             }
             return new Query(sig, f);
