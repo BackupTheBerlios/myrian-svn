@@ -17,7 +17,7 @@
 -- tests to run.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #6 $ $Date: 2002/07/23 $
+-- @version $Revision: #7 $ $Date: 2002/07/25 $
 --
 
 @@ ../../default/persistence/setup.sql
@@ -27,4 +27,3 @@
 --@@ sql-operation-test.sql
 @@ data-operation-test.sql
 --@@ link-test.sql
---@@ test-create.sql

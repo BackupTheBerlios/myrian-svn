@@ -63,7 +63,7 @@ import org.apache.log4j.Category;
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@arsdigita.com">randyg@arsdigita.com</a>
  * @author <a href="mailto:deison@arsdigita.com">deison@arsdigita.com</a>
- * @version $Revision: #5 $ $Date: 2002/07/23 $
+ * @version $Revision: #6 $ $Date: 2002/07/25 $
  */
 // NOTE if we ever support anything other than forward-only,
 // we'll need to shut off the auto-closing functionality
@@ -71,7 +71,7 @@ import org.apache.log4j.Category;
 // results and general confusion.
 class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#5 $ by $Author: randyg $, $DateTime: 2002/07/23 15:15:57 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#6 $ by $Author: randyg $, $DateTime: 2002/07/25 15:26:21 $";
 
     private final static Category log =
         Category.getInstance(DataQueryImpl.class.getName());
@@ -892,6 +892,11 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
                     );
             }
         } catch (SQLException e) {
+            try {
+                rs.close();
+            } catch (SQLException closeException) {
+                log.warn("Couldn't close result set.", closeException);
+            }
             throw PersistenceException.newInstance("Error counting query", e);
         } finally {
             try {
@@ -985,10 +990,18 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
             }
         }
 
-        return SessionManager.getSession().getDataStore().fireOperation(
-            processOperation(count),
-            m_source
-            );
+        Operation operation = processOperation(count);
+        ResultSet rs = SessionManager.getSession().getDataStore()
+            .fireOperation(operation, m_source);
+        if (rs == null) {
+            throw new PersistenceException
+                ("Error executing query: Result Set is Null. " + 
+                 Utilities.LINE_BREAK + "Query is " + 
+                 operation.getSQL() + Utilities.LINE_BREAK +
+                 "Object is " + toString());
+        } else {
+            return rs;
+        }
     }
 
 
@@ -1162,7 +1175,6 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
         for (Iterator it = m_op.getMappings(); it.hasNext(); ) {
             result.addMapping((Mapping) it.next());
         }
-
         return result;
     }
 
