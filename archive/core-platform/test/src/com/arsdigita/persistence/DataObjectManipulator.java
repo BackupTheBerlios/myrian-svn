@@ -16,12 +16,12 @@
 package com.arsdigita.persistence;
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.metadata.*;
-import com.arsdigita.persistence.proto.common.*;
-import com.arsdigita.persistence.proto.metadata.Root;
-import com.arsdigita.persistence.proto.metadata.ObjectMap;
-import com.arsdigita.persistence.proto.metadata.Column;
-import com.arsdigita.persistence.proto.metadata.Mapping;
-import com.arsdigita.persistence.proto.metadata.Value;
+import com.redhat.persistence.common.*;
+import com.redhat.persistence.metadata.Root;
+import com.redhat.persistence.metadata.ObjectMap;
+import com.redhat.persistence.metadata.Column;
+import com.redhat.persistence.metadata.Mapping;
+import com.redhat.persistence.metadata.Value;
 import com.arsdigita.util.StringUtils;
 import com.arsdigita.util.CheckedWrapperException;
 
@@ -37,11 +37,11 @@ import org.apache.log4j.*;
  * DataObjectManipulator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #7 $ $Date: 2003/05/12 $
+ * @version $Revision: #8 $ $Date: 2003/07/08 $
  */
 public class DataObjectManipulator {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataObjectManipulator.java#7 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataObjectManipulator.java#8 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
     private static final Logger s_log =
         Logger.getLogger(DataObjectManipulator.class.getName());
 

@@ -15,7 +15,7 @@
 
 package com.arsdigita.persistence.metadata;
 
-import com.arsdigita.persistence.proto.metadata.Root;
+import com.redhat.persistence.metadata.Root;
 
 import java.util.*;
 
@@ -24,15 +24,15 @@ import java.util.*;
  * Associations.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/05/12 $
+ * @version $Revision: #6 $ $Date: 2003/07/08 $
  */
 
 public class Model extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Model.java#5 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Model.java#6 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
 
     static Model wrap(Root root,
-		      com.arsdigita.persistence.proto.metadata.Model model) {
+		      com.redhat.persistence.metadata.Model model) {
 	if (model == null) {
 	    return null;
 	} else {
@@ -41,14 +41,14 @@ public class Model extends Element {
     }
 
     private Root m_root;
-    private com.arsdigita.persistence.proto.metadata.Model m_model;
+    private com.redhat.persistence.metadata.Model m_model;
 
     /**
      * Constructs a new model with the given name.
      **/
 
     private Model(Root root,
-		  com.arsdigita.persistence.proto.metadata.Model model) {
+		  com.redhat.persistence.metadata.Model model) {
         super(root, model);
 	m_root = root;
         m_model = model;
@@ -113,8 +113,8 @@ public class Model extends Element {
 
 	for (Iterator it = m_root.getObjectTypes().iterator();
 	     it.hasNext(); ) {
-	    com.arsdigita.persistence.proto.metadata.ObjectType ot =
-		(com.arsdigita.persistence.proto.metadata.ObjectType)
+	    com.redhat.persistence.metadata.ObjectType ot =
+		(com.redhat.persistence.metadata.ObjectType)
 		it.next();
 	    if (ot.getModel().equals(m_model)) {
 		result.add(ot);

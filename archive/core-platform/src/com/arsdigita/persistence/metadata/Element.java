@@ -15,7 +15,7 @@
 
 package com.arsdigita.persistence.metadata;
 
-import com.arsdigita.persistence.proto.metadata.Root;
+import com.redhat.persistence.metadata.Root;
 
 import org.apache.log4j.Logger;
 
@@ -24,12 +24,12 @@ import org.apache.log4j.Logger;
  * all metadata classes.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/05/12 $
+ * @version $Revision: #9 $ $Date: 2003/07/08 $
  */
 
 abstract public class Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Element.java#8 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Element.java#9 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
 
     private static final Logger s_log =
         Logger.getLogger(Element.class.getName());

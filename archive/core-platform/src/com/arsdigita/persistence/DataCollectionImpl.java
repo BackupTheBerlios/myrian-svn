@@ -1,18 +1,18 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.ObjectType;
-import com.arsdigita.persistence.proto.PersistentCollection;
+import com.redhat.persistence.PersistentCollection;
 
 /**
  * DataCollectionImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/05/12 $
+ * @version $Revision: #7 $ $Date: 2003/07/08 $
  **/
 
 class DataCollectionImpl extends DataQueryImpl implements DataCollection {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataCollectionImpl.java#6 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataCollectionImpl.java#7 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
 
     DataCollectionImpl(Session ssn, PersistentCollection pc) {
         super(ssn, pc);

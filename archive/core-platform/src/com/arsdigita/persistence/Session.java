@@ -19,23 +19,23 @@ import com.arsdigita.db.ConnectionManager;
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
-import com.arsdigita.persistence.proto.common.Path;
-import com.arsdigita.persistence.proto.Adapter;
-import com.arsdigita.persistence.proto.Query;
-import com.arsdigita.persistence.proto.PropertyMap;
-import com.arsdigita.persistence.proto.EventProcessor;
-import com.arsdigita.persistence.proto.Event;
-import com.arsdigita.persistence.proto.CreateEvent;
-import com.arsdigita.persistence.proto.DeleteEvent;
-import com.arsdigita.persistence.proto.ProtoException;
-import com.arsdigita.persistence.proto.PropertyEvent;
-import com.arsdigita.persistence.proto.metadata.Root;
-import com.arsdigita.persistence.proto.metadata.Property;
-import com.arsdigita.persistence.proto.engine.rdbms.RDBMSEngine;
-import com.arsdigita.persistence.proto.engine.rdbms.RDBMSQuerySource;
-import com.arsdigita.persistence.proto.engine.rdbms.ConnectionSource;
-import com.arsdigita.persistence.proto.engine.rdbms.OracleWriter;
-import com.arsdigita.persistence.proto.engine.rdbms.PostgresWriter;
+import com.redhat.persistence.common.Path;
+import com.redhat.persistence.Adapter;
+import com.redhat.persistence.Query;
+import com.redhat.persistence.PropertyMap;
+import com.redhat.persistence.EventProcessor;
+import com.redhat.persistence.Event;
+import com.redhat.persistence.CreateEvent;
+import com.redhat.persistence.DeleteEvent;
+import com.redhat.persistence.ProtoException;
+import com.redhat.persistence.PropertyEvent;
+import com.redhat.persistence.metadata.Root;
+import com.redhat.persistence.metadata.Property;
+import com.redhat.persistence.engine.rdbms.RDBMSEngine;
+import com.redhat.persistence.engine.rdbms.RDBMSQuerySource;
+import com.redhat.persistence.engine.rdbms.ConnectionSource;
+import com.redhat.persistence.engine.rdbms.OracleWriter;
+import com.redhat.persistence.engine.rdbms.PostgresWriter;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
@@ -57,7 +57,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #21 $ $Date: 2003/07/07 $
+ * @version $Revision: #22 $ $Date: 2003/07/08 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -75,19 +75,19 @@ public class Session {
     // This is just a temporary way to get an adapter registered.
     static {
         Adapter ad = new Adapter() {
-                public void setSession(Object obj, com.arsdigita.persistence.proto.Session ssn) {
+                public void setSession(Object obj, com.redhat.persistence.Session ssn) {
                     DataObjectImpl dobj = (DataObjectImpl) obj;
                     dobj.setSession(ssn);
                     getSessionFromProto(ssn).addDataObject(dobj);
                 }
 
-                public Object getObject(com.arsdigita.persistence.proto.metadata.ObjectType type,
+                public Object getObject(com.redhat.persistence.metadata.ObjectType type,
                                         PropertyMap props) {
 		    if (!type.isKeyed()) {
                         return props;
                     }
 
-                    com.arsdigita.persistence.proto.metadata.ObjectType sp =
+                    com.redhat.persistence.metadata.ObjectType sp =
                         type;
 
                     if (type.hasProperty("objectType")) {
@@ -128,7 +128,7 @@ public class Session {
                     return result;
                 }
 
-                public com.arsdigita.persistence.proto.metadata.ObjectType
+                public com.redhat.persistence.metadata.ObjectType
                 getObjectType(Object obj) {
                     if (obj instanceof PropertyMap) {
                         return ((PropertyMap) obj).getObjectType();
@@ -177,7 +177,7 @@ public class Session {
         }
     }
 
-    private class PSession extends com.arsdigita.persistence.proto.Session {
+    private class PSession extends com.redhat.persistence.Session {
         PSession() { super(Session.this.m_engine, Session.this.m_qs); }
         private Session getOldSession() { return Session.this; }
     }
@@ -185,7 +185,7 @@ public class Session {
     private PSession m_ssn = this.new PSession();
 
     static Session getSessionFromProto(
-        com.arsdigita.persistence.proto.Session ssn) {
+        com.redhat.persistence.Session ssn) {
         try {
             return ((PSession) ssn).getOldSession();
         } catch (ClassCastException cce) {
@@ -217,7 +217,7 @@ public class Session {
                     public void onDelete(DeleteEvent e) { }
 
                     public void onSet(
-                        com.arsdigita.persistence.proto.SetEvent e) {
+                        com.redhat.persistence.SetEvent e) {
                         new SetEvent((DataObjectImpl) e.getObject(),
                                      e.getProperty().getName(),
                                      e.getPreviousValue(),
@@ -225,14 +225,14 @@ public class Session {
                     }
 
                     public void onAdd(
-                        com.arsdigita.persistence.proto.AddEvent e) {
+                        com.redhat.persistence.AddEvent e) {
                         new AddEvent((DataObjectImpl) e.getObject(),
                                      e.getProperty().getName(),
                                      (DataObjectImpl) e.getArgument()).fire();
                     }
 
                     public void onRemove(
-                        com.arsdigita.persistence.proto.RemoveEvent e) {
+                        com.redhat.persistence.RemoveEvent e) {
                         new RemoveEvent((DataObjectImpl) e.getObject(),
                                         e.getProperty().getName(),
                                         (DataObjectImpl) e.getArgument()).fire();
@@ -339,7 +339,7 @@ public class Session {
         }
     }
 
-    com.arsdigita.persistence.proto.Session getProtoSession() {
+    com.redhat.persistence.Session getProtoSession() {
         return m_ssn;
     }
 
@@ -668,7 +668,7 @@ public class Session {
      **/
 
     public DataQuery retrieveQuery(String name) {
-        com.arsdigita.persistence.proto.metadata.ObjectType ot
+        com.redhat.persistence.metadata.ObjectType ot
             = Root.getRoot().getObjectType(name);
         if (ot == null) {
             throw new PersistenceException("no such query: " + name);
@@ -709,7 +709,7 @@ public class Session {
      **/
 
     public DataOperation retrieveDataOperation(String name) {
-        com.arsdigita.persistence.proto.metadata.DataOperation op
+        com.redhat.persistence.metadata.DataOperation op
             = Root.getRoot().getDataOperation(Path.get(name));
         if (op == null) {
             throw new PersistenceException("no such data operation: " + name);

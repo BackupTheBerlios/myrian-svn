@@ -1,8 +1,8 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.*;
-import com.arsdigita.persistence.proto.ProtoException;
-import com.arsdigita.persistence.proto.Session;
+import com.redhat.persistence.ProtoException;
+import com.redhat.persistence.Session;
 
 import java.util.*;
 import org.apache.log4j.Logger;
@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2003/07/07 $
+ * @version $Revision: #12 $ $Date: 2003/07/08 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#11 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#12 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -121,7 +121,7 @@ class DataObjectImpl implements DataObject {
         m_ssn = ssn;
     }
 
-    private com.arsdigita.persistence.proto.metadata.Property convert(String property) {
+    private com.redhat.persistence.metadata.Property convert(String property) {
         return C.prop(getObjectType().getProperty(property));
     }
 
@@ -206,7 +206,7 @@ class DataObjectImpl implements DataObject {
             }
         }
 
-        com.arsdigita.persistence.proto.Session ssn =
+        com.redhat.persistence.Session ssn =
             SessionManager.getSession().getProtoSession();
 
         for (Iterator it = getObjectType().getProperties();
@@ -464,7 +464,7 @@ class DataObjectImpl implements DataObject {
     }
 
     private Object get(Session s,
-                       com.arsdigita.persistence.proto.metadata.Property p) {
+                       com.redhat.persistence.metadata.Property p) {
         try {
             return s.get(this, p);
         } catch (ProtoException pe) {

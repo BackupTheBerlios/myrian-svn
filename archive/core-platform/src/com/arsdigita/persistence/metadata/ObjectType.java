@@ -27,15 +27,15 @@ import java.io.*;
  * be marked as special "key" properties.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/07/07 $
+ * @version $Revision: #13 $ $Date: 2003/07/08 $
  **/
 
 public class ObjectType extends CompoundType {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#12 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#13 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
 
     static ObjectType
-	wrap(com.arsdigita.persistence.proto.metadata.ObjectType type) {
+	wrap(com.redhat.persistence.metadata.ObjectType type) {
 	if (type == null) {
 	    return null;
 	} else {
@@ -47,17 +47,17 @@ public class ObjectType extends CompoundType {
 	ArrayList result = new ArrayList(types.size());
 	for (Iterator it = types.iterator(); it.hasNext(); ) {
 	    result.add
-		(wrap((com.arsdigita.persistence.proto.metadata.ObjectType)
+		(wrap((com.redhat.persistence.metadata.ObjectType)
 		      it.next()));
 	}
 	return result;
     }
 
 
-    private com.arsdigita.persistence.proto.metadata.ObjectType m_type;
+    private com.redhat.persistence.metadata.ObjectType m_type;
 
     private
-	ObjectType(com.arsdigita.persistence.proto.metadata.ObjectType type) {
+	ObjectType(com.redhat.persistence.metadata.ObjectType type) {
 	super(type);
         m_type = type;
     }

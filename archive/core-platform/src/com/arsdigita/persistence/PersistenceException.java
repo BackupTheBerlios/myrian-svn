@@ -23,14 +23,14 @@ import com.arsdigita.db.DbException;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/07/07 $
+ * @version $Revision: #7 $ $Date: 2003/07/08 $
  */
 
 public class PersistenceException extends UncheckedWrapperException {
 
     private String m_messageStack = null;
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/PersistenceException.java#6 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/PersistenceException.java#7 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
 
     /**
      * Constructor for a PersistenceException which does not wrap
@@ -125,9 +125,9 @@ public class PersistenceException extends UncheckedWrapperException {
                 return new DbNotAvailableException(s, (DbException)rootCause);
             }
         } else if (rootCause instanceof
-                   com.arsdigita.persistence.proto.DuplicateObjectException) {
+                   com.redhat.persistence.DuplicateObjectException) {
             return new UniqueConstraintException
-                (s, (com.arsdigita.persistence.proto.DuplicateObjectException)
+                (s, (com.redhat.persistence.DuplicateObjectException)
                  rootCause);
         }
         return new PersistenceException(s, rootCause);

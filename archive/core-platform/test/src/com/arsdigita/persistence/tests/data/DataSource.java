@@ -17,12 +17,12 @@ package com.arsdigita.persistence.tests.data;
 
 import com.arsdigita.persistence.*;
 import com.arsdigita.persistence.metadata.*;
-import com.arsdigita.persistence.proto.common.*;
-import com.arsdigita.persistence.proto.metadata.Root;
-import com.arsdigita.persistence.proto.metadata.ObjectMap;
-import com.arsdigita.persistence.proto.metadata.Column;
-import com.arsdigita.persistence.proto.metadata.Mapping;
-import com.arsdigita.persistence.proto.metadata.Value;
+import com.redhat.persistence.common.*;
+import com.redhat.persistence.metadata.Root;
+import com.redhat.persistence.metadata.ObjectMap;
+import com.redhat.persistence.metadata.Column;
+import com.redhat.persistence.metadata.Mapping;
+import com.redhat.persistence.metadata.Value;
 import com.arsdigita.util.*;
 
 import org.apache.log4j.Logger;
@@ -44,12 +44,12 @@ import java.security.*;
  * value of the correct type for the specified property.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/05/12 $
+ * @version $Revision: #5 $ $Date: 2003/07/08 $
  **/
 
 public class DataSource {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/DataSource.java#4 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/DataSource.java#5 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
 
     private static final Logger LOG = Logger.getLogger(DataSource.class);
 

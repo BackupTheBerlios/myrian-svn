@@ -1,17 +1,17 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.*;
-import com.arsdigita.persistence.proto.common.ParseException;
-import com.arsdigita.persistence.proto.common.Path;
-import com.arsdigita.persistence.proto.common.SQLParser;
-import com.arsdigita.persistence.proto.ProtoException;
-import com.arsdigita.persistence.proto.PersistentCollection;
-import com.arsdigita.persistence.proto.Cursor;
-import com.arsdigita.persistence.proto.Query;
-import com.arsdigita.persistence.proto.Signature;
-import com.arsdigita.persistence.proto.Parameter;
-import com.arsdigita.persistence.proto.Expression;
-import com.arsdigita.persistence.proto.metadata.Root;
+import com.redhat.persistence.common.ParseException;
+import com.redhat.persistence.common.Path;
+import com.redhat.persistence.common.SQLParser;
+import com.redhat.persistence.ProtoException;
+import com.redhat.persistence.PersistentCollection;
+import com.redhat.persistence.Cursor;
+import com.redhat.persistence.Query;
+import com.redhat.persistence.Signature;
+import com.redhat.persistence.Parameter;
+import com.redhat.persistence.Expression;
+import com.redhat.persistence.metadata.Root;
 import com.arsdigita.util.Assert;
 
 import java.io.StringReader;
@@ -22,19 +22,19 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #28 $ $Date: 2003/07/07 $
+ * @version $Revision: #29 $ $Date: 2003/07/08 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#28 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#29 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 
     private static final FilterFactory s_factory = new FilterFactoryImpl();
 
     private Session m_ssn;
-    private com.arsdigita.persistence.proto.Session m_pssn;
+    private com.redhat.persistence.Session m_pssn;
     private HashMap m_bindings = new HashMap();
     final private Query m_original;
     private Query m_query;

@@ -15,8 +15,8 @@
 
 package com.arsdigita.persistence.metadata;
 
-import com.arsdigita.persistence.proto.metadata.Role;
-import com.arsdigita.persistence.proto.metadata.Link;
+import com.redhat.persistence.metadata.Role;
+import com.redhat.persistence.metadata.Link;
 
 import java.util.*;
 
@@ -30,7 +30,7 @@ import java.util.*;
  * REQUIRED, and COLLECTION.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/07/07 $
+ * @version $Revision: #11 $ $Date: 2003/07/08 $
  **/
 
 public class Property extends Element {
@@ -67,11 +67,11 @@ public class Property extends Element {
         "[0..n]"
     };
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#10 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#11 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
 
 
     static Property
-	wrap(com.arsdigita.persistence.proto.metadata.Property prop) {
+	wrap(com.redhat.persistence.metadata.Property prop) {
 	if (prop == null) {
 	    return null;
 	} else {
@@ -82,8 +82,8 @@ public class Property extends Element {
     static Collection wrap(Collection props) {
 	ArrayList result = new ArrayList(props.size());
 	for (Iterator it = props.iterator(); it.hasNext(); ) {
-	    com.arsdigita.persistence.proto.metadata.Property prop =
-		(com.arsdigita.persistence.proto.metadata.Property) it.next();
+	    com.redhat.persistence.metadata.Property prop =
+		(com.redhat.persistence.metadata.Property) it.next();
 	    if (prop.getName().charAt(0) != '~') {
 		result.add(wrap(prop));
 	    }
@@ -92,9 +92,9 @@ public class Property extends Element {
     }
 
 
-    com.arsdigita.persistence.proto.metadata.Property m_prop;
+    com.redhat.persistence.metadata.Property m_prop;
 
-    private Property(com.arsdigita.persistence.proto.metadata.Property prop) {
+    private Property(com.redhat.persistence.metadata.Property prop) {
         super(prop.getRoot(), prop);
 	m_prop = prop;
     }

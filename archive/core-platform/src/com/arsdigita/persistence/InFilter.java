@@ -1,7 +1,7 @@
 package com.arsdigita.persistence;
 
-import com.arsdigita.persistence.proto.common.*;
-import com.arsdigita.persistence.proto.metadata.*;
+import com.redhat.persistence.common.*;
+import com.redhat.persistence.metadata.*;
 import com.arsdigita.db.DbHelper;
 
 import java.util.*;
@@ -12,14 +12,14 @@ import org.apache.log4j.Logger;
  * InFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/05/12 $
+ * @version $Revision: #4 $ $Date: 2003/07/08 $
  **/
 
 class InFilter extends FilterImpl implements Filter {
 
     private static Logger s_log = Logger.getLogger(InFilter.class);
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/InFilter.java#3 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/InFilter.java#4 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
 
     private String m_prop;
     private String m_subProp;

@@ -1,6 +1,6 @@
 package com.arsdigita.persistence;
 
-import com.arsdigita.persistence.proto.TestSession;
+import com.redhat.persistence.TestSession;
 
 public class TestTransaction {
 

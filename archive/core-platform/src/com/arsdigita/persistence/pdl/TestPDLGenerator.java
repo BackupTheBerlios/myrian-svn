@@ -2,9 +2,9 @@ package com.arsdigita.persistence.pdl;
 
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.metadata.MetadataRoot;
-import com.arsdigita.persistence.proto.metadata.Root;
-import com.arsdigita.persistence.proto.metadata.Table;
-import com.arsdigita.persistence.proto.pdl.DDLWriter;
+import com.redhat.persistence.metadata.Root;
+import com.redhat.persistence.metadata.Table;
+import com.redhat.persistence.pdl.DDLWriter;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;

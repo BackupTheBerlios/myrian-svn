@@ -16,7 +16,7 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.MetadataRoot;
-import com.arsdigita.persistence.proto.EventProcessorManager;
+import com.redhat.persistence.EventProcessorManager;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -34,12 +34,12 @@ import org.apache.log4j.Logger;
  *
  * @see Initializer
  * @author Archit Shah 
- * @version $Revision: #9 $ $Date: 2003/07/07 $
+ * @version $Revision: #10 $ $Date: 2003/07/08 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#9 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#10 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
 
     private static String s_url = null;           // the jdbc URL
     private static String s_username = null;      // the database username
@@ -76,7 +76,7 @@ public class SessionManager {
 
     /**
      * This method provides an indirect way for applications to register {@link
-     * com.arsdigita.persistence.proto.EventProcessor event processors} with the
+     * com.redhat.persistence.EventProcessor event processors} with the
      * {@link Session session} object.
      *
      * <p>This works like so</p>
@@ -87,13 +87,13 @@ public class SessionManager {
      *
      *  <li>Each {@link Session session} returned by {@link #getSession()} will
      *  have a reference to a single (per thread) instance of the {@link
-     *  com.arsdigita.persistence.proto.EventProcessor event processor} managed
+     *  com.redhat.persistence.EventProcessor event processor} managed
      *  the {@link EventProcessorManager event processor manager} that you
      *  registered.</li>
      *
-     *  <li>The {@link com.arsdigita.persistence.proto.Session session} will
+     *  <li>The {@link com.redhat.persistence.Session session} will
      *  dispatch events from its {@link
-     *  com.arsdigita.persistence.proto.Session#flush()} method to to your event
+     *  com.redhat.persistence.Session#flush()} method to to your event
      *  processor's <code>write(Event)</code> method. </li>
      * </ul>
      **/

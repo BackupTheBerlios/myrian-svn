@@ -18,11 +18,11 @@ package com.arsdigita.persistence.pdl;
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
-import com.arsdigita.persistence.proto.metadata.Column;
-import com.arsdigita.persistence.proto.metadata.Root;
-import com.arsdigita.persistence.proto.metadata.ObjectMap;
-import com.arsdigita.persistence.proto.metadata.Table;
-import com.arsdigita.persistence.proto.metadata.UniqueKey;
+import com.redhat.persistence.metadata.Column;
+import com.redhat.persistence.metadata.Root;
+import com.redhat.persistence.metadata.ObjectMap;
+import com.redhat.persistence.metadata.Table;
+import com.redhat.persistence.metadata.UniqueKey;
 import com.arsdigita.kernel.ACSObject;
 import com.arsdigita.util.UncheckedWrapperException;
 import com.arsdigita.util.Assert;
@@ -196,7 +196,7 @@ public class SQLRegressionGenerator {
                                         PrintStream out,
                                         boolean fix) {
 
-        com.arsdigita.persistence.proto.metadata.ObjectType protoType = Root.getRoot().getObjectType(type.getQualifiedName());
+        com.redhat.persistence.metadata.ObjectType protoType = Root.getRoot().getObjectType(type.getQualifiedName());
         Assert.truth(protoType != null, "null proto type for " + type.getQualifiedName() );
 
         Column key;

@@ -15,7 +15,7 @@
 
 package com.arsdigita.persistence;
 
-import com.arsdigita.persistence.proto.DuplicateObjectException;
+import com.redhat.persistence.DuplicateObjectException;
 import java.sql.SQLException;
 
 /**
@@ -27,13 +27,13 @@ import java.sql.SQLException;
  * PersistenceException instead of SQLException.
  *
  * @author David Eison
- * @version $Revision: #5 $
+ * @version $Revision: #6 $
  * @since 4.6
  */
 
 public class UniqueConstraintException extends PersistenceException {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/UniqueConstraintException.java#5 $ by $Author: ashah $, $DateTime: 2003/07/02 17:18:32 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/UniqueConstraintException.java#6 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
 
     /**
      * No public constructor.

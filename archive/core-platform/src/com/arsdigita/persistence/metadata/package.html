@@ -10,7 +10,7 @@ and the database schema used to persist data objects. </p>
 
 <p> When the system starts up, the persistence layer reads the PDL
 files into an Abstract Syntax Tree using the files within {@link
-com.arsdigita.persistence.proto.pdl.nodes}.  The Abstract Syntax Tree
+com.redhat.persistence.pdl.nodes}.  The Abstract Syntax Tree
 then populates the classes within this package.  These classes are
 then used by the operational persistence layer (the classes within the
 {@link com.arsdigita.persistence} package) to perform the standard
@@ -56,11 +56,11 @@ database), Associations (mappings between database tables), and Events
 retrieved within the database).  </p>
 
 <p> A QueryType is composed of a set of Operations and {@link
-com.arsdigita.persistence.proto.metadata.Mapping}s that allow the user
+com.redhat.persistence.metadata.Mapping}s that allow the user
 to retrieve arbitrary information from the database.  </p>
 
 <hr>
-<font size="-2">Last modified: $Date: 2003/07/03 $</font>
+<font size="-2">Last modified: $Date: 2003/07/08 $</font>
     
 </body>
 </html>

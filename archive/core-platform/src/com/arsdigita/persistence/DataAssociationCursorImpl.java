@@ -1,21 +1,21 @@
 package com.arsdigita.persistence;
 
-import com.arsdigita.persistence.proto.common.Path;
+import com.redhat.persistence.common.Path;
 import com.arsdigita.persistence.metadata.Property;
-import com.arsdigita.persistence.proto.PersistentCollection;
-import com.arsdigita.persistence.proto.Signature;
+import com.redhat.persistence.PersistentCollection;
+import com.redhat.persistence.Signature;
 
 /**
  * DataAssociationCursorImpl
  *
  * @author Archit Shah &lt;ashah@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2003/05/15 $
+ * @version $Revision: #11 $ $Date: 2003/07/08 $
  **/
 
 class DataAssociationCursorImpl extends DataCollectionImpl
     implements DataAssociationCursor {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#10 $ by $Author: justin $, $DateTime: 2003/05/15 18:33:33 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#11 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
 
     private DataAssociationImpl m_assn;
 

@@ -1,24 +1,24 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.Property;
-import com.arsdigita.persistence.proto.ProtoException;
+import com.redhat.persistence.ProtoException;
 
 /**
  * DataAssociationImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2003/07/02 $
+ * @version $Revision: #15 $ $Date: 2003/07/08 $
  **/
 
 class DataAssociationImpl extends DataAssociationCursorImpl
     implements DataAssociation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#14 $ by $Author: ashah $, $DateTime: 2003/07/02 17:18:32 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#15 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
 
-    private com.arsdigita.persistence.proto.Session m_pssn;
+    private com.redhat.persistence.Session m_pssn;
     private DataObject m_data;
     private Property m_prop;
-    private com.arsdigita.persistence.proto.metadata.Property m_pprop;
+    private com.redhat.persistence.metadata.Property m_pprop;
 
     DataAssociationImpl(Session ssn, DataObject data, Property prop) {
         super(ssn, data, prop);

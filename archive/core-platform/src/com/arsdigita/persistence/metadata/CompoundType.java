@@ -24,12 +24,12 @@ import java.util.*;
  * property contained in a CompoundType has an associated DataType.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/07/07 $
+ * @version $Revision: #10 $ $Date: 2003/07/08 $
  */
 
 abstract public class CompoundType extends DataType {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/CompoundType.java#9 $ by $Author: vadim $, $DateTime: 2003/07/07 12:16:50 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/CompoundType.java#10 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
 
 
     /**
@@ -41,7 +41,7 @@ abstract public class CompoundType extends DataType {
      **/
 
     public CompoundType
-	(com.arsdigita.persistence.proto.metadata.ObjectType obj) {
+	(com.redhat.persistence.metadata.ObjectType obj) {
         super(obj);
     }
 

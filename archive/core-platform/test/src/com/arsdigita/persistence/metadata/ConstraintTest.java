@@ -15,7 +15,7 @@
 
 package com.arsdigita.persistence.metadata;
 
-import com.arsdigita.persistence.proto.metadata.*;
+import com.redhat.persistence.metadata.*;
 
 import junit.framework.*;
 import java.util.ArrayList;
