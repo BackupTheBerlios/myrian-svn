@@ -30,12 +30,12 @@ import java.util.List;
  * Script
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/09/20 $
+ * @version $Revision: #7 $ $Date: 2002/10/07 $
  */
 
 public class Script {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Script.java#6 $ by $Author: dan $, $DateTime: 2002/09/20 11:50:07 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Script.java#7 $ by $Author: jorris $, $DateTime: 2002/10/07 11:55:42 $";
 
     private static final Logger s_log =
         Logger.getLogger(Script.class);
@@ -166,8 +166,8 @@ public class Script {
             for (int i = 0; i < m_initializers.size(); i++) {
                 Initializer ini = (Initializer) m_initializers.get(i);
                 if (loggerIsInitialized) {
-                    s_log.info("Running initializer " + ini.getClass().getName() +
-                               " (" + i + " of " + m_initializers.size() + " complete)");
+                    s_log.warn("Running initializer " + ini.getClass().getName() +
+                               " (" + (i + 1) + " of " + m_initializers.size() + " complete)");
                 }
 
                 final String name = ini.getClass().getName();
@@ -186,6 +186,7 @@ public class Script {
             throw new InitializationException("Initialization Script startup error!", e);
         }
         isStarted = true;
+        s_log.warn("Initialization Complete");
         return initializersRun;
     }
 
