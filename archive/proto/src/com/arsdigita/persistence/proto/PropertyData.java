@@ -9,12 +9,12 @@ import java.io.*;
  * PropertyData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/12/02 $
+ * @version $Revision: #2 $ $Date: 2002/12/04 $
  **/
 
 class PropertyData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyData.java#1 $ by $Author: rhs $, $DateTime: 2002/12/02 12:04:21 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyData.java#2 $ by $Author: rhs $, $DateTime: 2002/12/04 19:18:22 $";
 
     private ObjectData m_odata;
     private Property m_prop;
@@ -46,6 +46,10 @@ class PropertyData {
     }
 
     public Object getValue() {
+        return m_value;
+    }
+
+    public Object get() {
         if (!m_prop.isCollection()) {
             for (int i = m_events.size() - 1; i >= 0; i--) {
                 PropertyEvent ev = (PropertyEvent) m_events.get(i);
@@ -62,8 +66,18 @@ class PropertyData {
         m_events.add(ev);
     }
 
+    public void removeEvent(PropertyEvent ev) {
+        m_events.remove(ev);
+    }
+
     public List getEvents() {
         return m_events;
+    }
+
+    void dump() {
+        PrintWriter pw = new PrintWriter(System.out);
+        dump(pw);
+        pw.flush();
     }
 
     void dump(PrintWriter out) {

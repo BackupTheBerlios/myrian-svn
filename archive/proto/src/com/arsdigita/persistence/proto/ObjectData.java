@@ -9,18 +9,19 @@ import java.io.*;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/12/02 $
+ * @version $Revision: #2 $ $Date: 2002/12/04 $
  **/
 
 class ObjectData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#1 $ by $Author: rhs $, $DateTime: 2002/12/02 12:04:21 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#2 $ by $Author: rhs $, $DateTime: 2002/12/04 19:18:22 $";
 
     private Session m_ssn;
     private PersistentObject m_object;
+    private ArrayList m_events = new ArrayList();
+    private boolean m_isVisiting = false;
 
     HashMap m_pdata = new HashMap();
-    ArrayList m_events = new ArrayList();
 
     public ObjectData(Session ssn, PersistentObject object) {
         m_ssn = ssn;
@@ -57,6 +58,10 @@ class ObjectData {
         m_events.add(ev);
     }
 
+    public void removeEvent(ObjectEvent ev) {
+        m_events.remove(ev);
+    }
+
     public boolean isNew() {
         for (int i = 0; i < m_events.size(); i++) {
             Event ev = (Event) m_events.get(i);
@@ -79,6 +84,20 @@ class ObjectData {
         }
 
         return false;
+    }
+
+    public boolean isVisiting() {
+        return m_isVisiting;
+    }
+
+    public void setVisiting(boolean value) {
+        m_isVisiting = value;
+    }
+
+    void dump() {
+        PrintWriter pw = new PrintWriter(System.out);
+        dump(pw);
+        pw.flush();
     }
 
     void dump(PrintWriter out) {
