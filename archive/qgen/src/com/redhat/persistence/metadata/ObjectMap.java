@@ -26,12 +26,12 @@ import java.util.List;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/02/06 $
+ * @version $Revision: #3 $ $Date: 2004/02/24 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/metadata/ObjectMap.java#2 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/metadata/ObjectMap.java#3 $ by $Author: ashah $, $DateTime: 2004/02/24 21:17:31 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -162,6 +162,18 @@ public class ObjectMap extends Element {
             Object o = it.next();
             if (!result.contains(o)) {
                 result.add(o);
+            }
+        }
+
+        if (result.size() == 0) {
+            SQLBlock sql = getRetrieveAll();
+            if (sql != null) {
+                for (Iterator it = sql.getPaths().iterator(); it.hasNext(); ) {
+                    Object o = it.next();
+                    if (!result.contains(o)) {
+                        result.add(o);
+                    }
+                }
             }
         }
 

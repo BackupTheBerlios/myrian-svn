@@ -37,12 +37,12 @@ import org.apache.log4j.Logger;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/02/24 $
+ * @version $Revision: #3 $ $Date: 2004/02/24 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Signature.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Signature.java#3 $ by $Author: ashah $, $DateTime: 2004/02/24 21:17:31 $";
 
     private static final Logger s_log = Logger.getLogger(Signature.class);
 
@@ -219,7 +219,6 @@ public class Signature {
         if (isSource(p)) {
             return (Source) m_sourceMap.get(p);
         } else {
-            s_log.warn(p + " " + this);
             return null;
         }
     }
@@ -270,10 +269,10 @@ public class Signature {
 
     private void addDefaultProperties(Path path) {
         ObjectType type = getType(path);
-        Root root = type.getRoot();
         if (type.isKeyed()) {
-            addPaths(path, root.getObjectMap(type).getFetchedPaths());
+            addDefaultProperties(path, type);
         } else {
+            Root root = type.getRoot();
             Property prop = getProperty(path);
             // assume that path.getParent() is keyed
             ObjectMap container = root.getObjectMap(prop.getContainer());
@@ -284,34 +283,23 @@ public class Signature {
         }
     }
 
-    private void addDefaultProperties(Source source) {
-        Path path = source.getPath();
-        ObjectType type = source.getObjectType();
-
-        // immediate properties
+    private void addDefaultProperties(Path path, ObjectType type) {
+        // immediate properties (all props for unkeyed types)
         for (Iterator it = type.getImmediateProperties().iterator();
              it.hasNext(); ) {
             addPathInternal(Path.add(path, ((Property) it.next()).getName()));
         }
 
-        // aggressive loads
         if (type.isKeyed()) {
             ObjectMap om = type.getRoot().getObjectMap(type);
             addPaths(path, om.getFetchedPaths());
-
-            // XXX: push this to PDL?
-            if (om.getRetrieveAll() != null) {
-                SQLBlock b = om.getRetrieveAll();
-                for (Iterator it = b.getPaths().iterator(); it.hasNext(); ) {
-                    addPathInternal(Path.add(path, (Path) it.next()));
-                }
-            }
         }
     }
 
     private void addDefaultProperties() {
         for (Iterator it = m_sources.iterator(); it.hasNext(); ) {
-            addDefaultProperties((Source) it.next());
+            Source source = (Source) it.next();
+            addDefaultProperties(source.getPath(), source.getObjectType());
         }
     }
 
