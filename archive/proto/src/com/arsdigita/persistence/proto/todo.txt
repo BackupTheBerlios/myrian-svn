@@ -1,17 +1,36 @@
- * Static SQL (Query & DML)
- * Filtering
+Functionality:
+ * Reorder DML in relational engine
+ * Observers
  * Size
+ * DataQuery.setRange
+ * DataQuery.set/getParameter
  * Query caching
  * Link attributes
  * LOBs
+ * Weak refs
+ * Compound keys
+ * Exceptions
+ * Disconnected data
+ * Auto-detect two wayness and warn
+ * Better connection source
+ * Session.getConnection()
+ * GenericDataQuery
+ * immediate properties/specialize
+ * Data Operations
+ * sub query filtering
+ * order with null
+
+Cleanup:
  * Eliminate old metadata & PDL parser
  * Move DDL generator
- * Weak refs
- * Reorder DML in relational engine
- * Error recovery audit
- * Compound keys
  * Adapters
- * Exceptions
- * Review everything
  * Rename everything
+
+Review:
+ * Review everything
+ * Error recovery audit
+
+Documentation:
  * javadoc
+ * Design documents
+ * release notes
