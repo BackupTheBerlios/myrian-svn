@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/07/12 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Get.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Get.java#2 $ by $Author: vadim $, $DateTime: 2004/07/12 13:53:37 $";
 
     private static final Logger s_log = Logger.getLogger(Get.class);
 
@@ -80,7 +80,8 @@ public class Get extends Expression {
         ObjectType type = expr.getType();
         Property prop = type.getProperty(name);
         if (prop == null) {
-            throw new IllegalStateException("no such property: " + name);
+            throw new IllegalStateException
+                ("no such property: " + name + " in " + type);
         }
         QFrame frame = gen.frame(result, prop.getType());
 
