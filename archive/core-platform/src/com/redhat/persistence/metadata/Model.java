@@ -15,20 +15,18 @@
 
 package com.redhat.persistence.metadata;
 
-import com.arsdigita.util.CallTracer;
-
 import java.util.HashMap;
 
 /**
  * Model
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/02/09 $
+ * @version $Revision: #5 $ $Date: 2004/02/10 $
  **/
 
 public class Model {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Model.java#4 $ by $Author: jorris $, $DateTime: 2004/02/09 15:27:20 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Model.java#5 $ by $Author: vadim $, $DateTime: 2004/02/10 10:20:11 $";
 
     private static final HashMap MODELS = new HashMap();
 
