@@ -28,11 +28,11 @@ import java.util.Date;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/07/22 $
  */
 public class DataOperationTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataOperationTest.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataOperationTest.java#4 $ by $Author: jorris $, $DateTime: 2002/07/22 18:56:32 $";
 
     public DataOperationTest(String name) {
         super(name);
@@ -235,7 +235,7 @@ public class DataOperationTest extends PersistenceTestCase {
             ("examples.DataOperationProcWithInOutInt");
         operation.setParameter("oldID", integerValue);
         operation.execute();
-        BigDecimal return_integer = (BigDecimal)operation.get("newID");  
+        Integer return_integer = (Integer)operation.get("newID");
         assert("DataOperationProcWithInOutInt did not correctly change the " +
                "items returned by the query (with Integer)", 
                integerValue.toString().equals(return_integer.toString()));
