@@ -1,0 +1,49 @@
+//
+// Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
+//
+// The contents of this file are subject to the CCM Public
+// License (the "License"); you may not use this file except in
+// compliance with the License. You may obtain a copy of
+// the License at http://www.redhat.com/licenses/ccmpl.html
+//
+// Software distributed under the License is distributed on an "AS
+// IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// rights and limitations under the License.
+//
+// $Id: //core-platform/dev/test/pdl/com/arsdigita/persistence/Association.pdl#1 $ 
+// $DateTime: 2003/09/05 16:00:14 $
+
+model Association;
+
+object type Obj1 {
+    BigInteger[1..1] id;
+    object key (id);
+}
+
+object type Obj2 {
+    BigInteger[1..1] id;
+    object key (id);
+}
+
+object type Obj3 {
+    BigInteger[1..1] id;
+    object key (id);
+}
+
+association {
+    Obj2[1..1] obj2;
+    component Obj1[0..n] obj1;
+    String[0..1] linkAttr;
+}
+
+association {
+    composite Obj1[0..1] obj1;
+    Obj3[0..n] obj3;
+    String[0..1] linkAttr;
+}
+
+association {
+    composite Obj1[0..1] obj1;
+    Obj1[0..n] test;
+}

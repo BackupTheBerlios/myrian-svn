@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/08/15 $
+ * @version $Revision: #9 $ $Date: 2003/09/05 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#8 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#9 $ by $Author: ashah $, $DateTime: 2003/09/05 16:00:14 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -239,6 +239,8 @@ public class PDL {
                 public void onAssociation(AssociationNd assn) {
 		    PropertyNd one = assn.getRoleOne();
 		    PropertyNd two = assn.getRoleTwo();
+                    if (one.isComposite()) { two.setComponent(); }
+                    if (two.isComposite()) { one.setComponent(); }
 		    Collection props = assn.getProperties();
 		    ObjectType oneot =
 			m_symbols.getEmitted(one.getType());
@@ -256,14 +258,18 @@ public class PDL {
 			ObjectType ot = m_symbols.getEmitted(linkName(assn));
 
 			ot.addProperty(rone);
-			Role revOne = new Role("~" + rone.getName(), ot,
-					       true, true, true);
+			Role revOne = new Role("~" + rtwo.getName(), ot,
+                                               true,
+                                               two.isCollection(),
+                                               two.isNullable());
 			rone.getType().addProperty(revOne);
 			rone.setReverse(revOne);
 
 			ot.addProperty(rtwo);
-			Role revTwo = new Role("~" + rtwo.getName(), ot,
-					       true, true, true);
+			Role revTwo = new Role("~" + rone.getName(), ot,
+                                               true,
+                                               one.isCollection(),
+                                               one.isNullable());
 			rtwo.getType().addProperty(revTwo);
 			rtwo.setReverse(revTwo);
 
