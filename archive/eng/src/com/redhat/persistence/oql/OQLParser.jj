@@ -16,7 +16,7 @@ import java.io.*;
  * OQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/06/24 $
  */
 
 class OQLParser {
@@ -91,6 +91,13 @@ class OQLParser {
         }
 
         return result.toString();
+    }
+
+    private Map m_parameters = Collections.EMPTY_MAP;
+
+    public OQLParser(Reader r, Map parameters) {
+        this(r);
+        m_parameters = parameters;
     }
 
 }
@@ -286,7 +293,13 @@ Expression generic() :
 }
 {
     t = <ID> [ l = exprl() { return construct(t, l); } ]
-      { return new Variable(t.image); }
+      {
+          if (m_parameters.containsKey(t.image)) {
+              return new Literal(m_parameters.get(t.image));
+          } else {
+              return new Variable(t.image);
+          }
+      }
   | <SQL> t = <SQL_EXPRESSION>
       { return new Static(t.image); }
   | t = <STRING>

@@ -411,7 +411,8 @@ public class PersistenceManagerImpl implements PersistenceManager {
             }
             public Object executeWithMap(Map parameters) {
                 // XXX: need to use parameters
-                final Expression expr = Expression.valueOf((String) query);
+                final Expression expr =
+                    Expression.valueOf((String) query, parameters);
                 final ObjectType type = expr.getType(m_ssn.getRoot());
                 return new CRPCollection(m_ssn) {
                     ObjectType type() {
@@ -434,7 +435,7 @@ public class PersistenceManagerImpl implements PersistenceManager {
             public Object executeWithArray(Object[] parameters) {
                 Map m = new HashMap();
                 for (int i = 0; i < parameters.length; i++) {
-                    m.put("$" + i, parameters[i]);
+                    m.put("$" + (i+1), parameters[i]);
                 }
                 return executeWithMap(m);
             }

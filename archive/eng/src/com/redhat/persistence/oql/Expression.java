@@ -23,12 +23,12 @@ import java.util.*;
  * Expression
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/06/24 $
+ * @version $Revision: #4 $ $Date: 2004/06/24 $
  **/
 
 public abstract class Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Expression.java#3 $ by $Author: rhs $, $DateTime: 2004/06/24 13:51:54 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Expression.java#4 $ by $Author: rhs $, $DateTime: 2004/06/24 15:01:12 $";
 
     public static Expression valueOf(Path path) {
         if (path.getParent() == null) {
@@ -39,7 +39,11 @@ public abstract class Expression {
     }
 
     public static Expression valueOf(String expression) {
-        OQLParser p = new OQLParser(new StringReader(expression));
+        return valueOf(expression, Collections.EMPTY_MAP);
+    }
+
+    public static Expression valueOf(String expression, Map parameters) {
+        OQLParser p = new OQLParser(new StringReader(expression), parameters);
         try {
             return p.expression();
         } catch (ParseException e) {
