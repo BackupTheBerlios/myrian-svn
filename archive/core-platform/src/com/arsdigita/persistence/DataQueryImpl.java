@@ -63,7 +63,7 @@ import org.apache.log4j.Logger;
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@arsdigita.com">randyg@arsdigita.com</a>
  * @author <a href="mailto:deison@arsdigita.com">deison@arsdigita.com</a>
- * @version $Revision: #15 $ $Date: 2002/10/16 $
+ * @version $Revision: #16 $ $Date: 2002/10/16 $
  */
 // NOTE if we ever support anything other than forward-only,
 // we'll need to shut off the auto-closing functionality
@@ -71,7 +71,7 @@ import org.apache.log4j.Logger;
 // results and general confusion.
 class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#15 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#16 $ by $Author: richardl $, $DateTime: 2002/10/16 14:39:19 $";
 
     private static final Logger log =
         Logger.getLogger(DataQueryImpl.class);
@@ -711,7 +711,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
     }
 
     /**
-     * 
+     *
      */
     public Filter addNotInSubqueryFilter(String propertyName,
                                          String subqueryName) {
@@ -932,7 +932,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
 
     /**
-     * Returns the size of this query (i.e. the number of rows that
+     * Returns the size of this query (i.e., the number of rows that
      * are returned). This method wraps the current sql query in a
      * <pre>select count(*) from (...)</pre>. In the future, order by
      * clauses should be removed for more efficiency.

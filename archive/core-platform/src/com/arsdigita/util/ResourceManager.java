@@ -42,7 +42,7 @@ public class ResourceManager {
     private File m_webappRoot;
     private ServletContext m_servletContext;
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/ResourceManager.java#5 $ by $Author: dennis $, $DateTime: 2002/09/12 11:38:06 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/ResourceManager.java#6 $ by $Author: richardl $, $DateTime: 2002/10/16 14:39:19 $";
 
     /**
      * Empty constructor, which we make private to enforce the singleton
@@ -82,9 +82,9 @@ public class ResourceManager {
             // If we have a Servlet Context, use it.
             InputStream is = m_servletContext.getResourceAsStream(url);
             if (is == null) {
-                String errorMessage = "Failed to retrieve resource: " + url + 
+                String errorMessage = "Failed to retrieve resource: " + url +
                     "\nReal Path: " + m_servletContext.getRealPath(url);
-                
+
                 // Since this method is called during startup before the
                 // log4j initializer has been run, we test to see whether to
                 // log or print the error message.
@@ -101,7 +101,7 @@ public class ResourceManager {
             } catch (FileNotFoundException fnfe) {
                 String errorMessage = "Failed to retrieve resource: " + url +
                     "\nWebapp Root: " + m_webappRoot;
-                    
+
                 if (s_log.getAllAppenders().hasMoreElements()) {
                     s_log.warn(errorMessage);
                 } else {
@@ -132,8 +132,9 @@ public class ResourceManager {
     }
 
     /**
-     * configures this ResourceManager to use the webapp root
-     * named by {@param f}.
+     * Configures this ResourceManager to use the specified webapp
+     * root.
+     *
      * @param f the webapp root directory
      */
     public void setWebappRoot(File f) {
@@ -141,8 +142,9 @@ public class ResourceManager {
     }
 
     /**
-     * configures this ResourceManager to use the servlet context
-     * {@param sctx}.
+     * Configures this ResourceManager to use the specified servlet
+     * context.
+     *
      * @param sctx the servlet context.
      */
     public void setServletContext(ServletContext sctx) {
@@ -152,6 +154,7 @@ public class ResourceManager {
 
     /**
      * returns the ServletContext that this ResourceManager uses
+     *
      * @return the servlet context
      */
     public ServletContext getServletContext() {

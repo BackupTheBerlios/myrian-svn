@@ -25,7 +25,7 @@ import java.util.TreeSet;
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
  * @since 4.7
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/PriorityQueue.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/PriorityQueue.java#4 $
  */
 public class PriorityQueue {
     private TreeSet m_model = new TreeSet(new PQComparator());
@@ -35,7 +35,6 @@ public class PriorityQueue {
      * Creates a new PriorityQueue that orders dequeues in ascending order
      * (lowest priority first)
      *
-     * @return a new PriorityQueue for ascending dequeues
      */
     public PriorityQueue() {
         this(true);
@@ -46,7 +45,6 @@ public class PriorityQueue {
      * or descending order.
      *
      * @param ascending true for ascending order, false otherwise
-     * @return a new PriorityQueue for ascending dequeues
      */
     public PriorityQueue(boolean ascending) {
         m_ascending = ascending;

@@ -44,12 +44,12 @@ import java.util.ArrayList;
  *              through inheritance.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2002/10/16 $
+ * @version $Revision: #15 $ $Date: 2002/10/16 $
  */
 
 public class GenericDataObject implements DataObject {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#14 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#15 $ by $Author: richardl $, $DateTime: 2002/10/16 14:39:19 $";
 
     private ObjectType    m_type;
     private Session       m_session;
@@ -119,7 +119,7 @@ public class GenericDataObject implements DataObject {
     private DataHandler m_dataHandler = s_defaultHandler;
 
     /**
-     * @see DataObject.setDataHandler(DataHandler handler)
+     * @see DataObject#setDataHandler(DataHandler)
      **/
 
     public DataHandler setDataHandler(DataHandler handler) {
@@ -129,7 +129,7 @@ public class GenericDataObject implements DataObject {
     }
 
     /**
-     * @see DataObject.addObserver(DataObserver observer)
+     * @see DataObject#addObserver(DataObserver)
      **/
 
     public void addObserver(DataObserver observer) {
@@ -758,11 +758,12 @@ public class GenericDataObject implements DataObject {
      **/
 
     /**
-     * This method is called to populate the data container of a newly created
-     * Data Object instance with the values from an existing object stored
-     * in the persistence mechanism. The <i>oid</i> contains the value that
-     * was passed into Session.retrieve(). This method returns true if the
-     * data container was successfully populated from the persistence
+     * This method is called to populate the data container of a newly
+     * created Data Object instance with the values from an existing
+     * object stored in the persistence mechanism. The <i>oid</i>
+     * contains the value that was passed into
+     * Session.retrieve(). This method returns true if the data
+     * container was successfully populated from the persistence
      * mechanism, false otherwise.
      *
      * @param oid The unique id of the Data Object.

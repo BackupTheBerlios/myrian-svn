@@ -26,13 +26,13 @@ import java.util.ArrayList;
  * type combination ( @see ObjectEvent ).
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#5 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#6 $
  * @since 4.6.3
  */
 
 public interface MDSQLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#5 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#6 $ by $Author: richardl $, $DateTime: 2002/10/16 14:39:19 $";
     /**
      * Generates an Event of a particular Event type for a certain
      * ObjectType.  New Event is automatically added to the object type
@@ -61,7 +61,7 @@ public interface MDSQLGenerator {
      *  This generates events specifically for associations.  That is,
      *  if an association requires a different type of event (e.g. an
      *  update) then this will call the associations event.  Otherwise,
-     *  it delegates to {@link generateEvent}
+     *  it delegates to {@link #generateEvent}
      */
     public Event generateAssociationEvent(ObjectType type, int eventType);
 }

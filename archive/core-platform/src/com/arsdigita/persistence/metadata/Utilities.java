@@ -31,7 +31,7 @@ import java.util.Iterator;
  **/
 public class Utilities  {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Utilities.java#4 $ by $Author: rhs $, $DateTime: 2002/10/14 16:12:17 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Utilities.java#5 $ by $Author: richardl $, $DateTime: 2002/10/16 14:39:19 $";
 
     public final static String LINE_BREAK =
         System.getProperty("line.separator", "\n\r");
@@ -157,7 +157,7 @@ public class Utilities  {
     /**
      * "join" a List of Strings into a single string, with each string
      * separated by a defined separator string.
-     * @deprecated use {@link com.arsdigita.util.StringUtilities}
+     * @deprecated use {@link com.arsdigita.util.StringUtils}
      *
      * @param elements the strings to join together
      * @param sep the separator string

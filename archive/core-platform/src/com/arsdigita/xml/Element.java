@@ -28,14 +28,14 @@ import org.w3c.dom.Attr;
  * <code>org.jdom.Element</code> using <code>org.w3c.dom.Element</code>.
  *
  * @author Patrick McNeill (pmcneill@arsdigita.com)
- * @version $Revision: #6 $ $Date: 2002/08/14 $
+ * @version $Revision: #7 $ $Date: 2002/10/16 $
  * @since ACS 4.5a
  */
 public class Element {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#6 $" +
-        "$Author: dennis $" +
-        "$DateTime: 2002/08/14 23:39:40 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#7 $" +
+        "$Author: richardl $" +
+        "$DateTime: 2002/10/16 14:39:19 $";
 
     private static final Logger s_log = Logger.getLogger
         (Element.class.getName());
@@ -418,7 +418,7 @@ public class Element {
      * be fixed in a later version of Xerces.  In the meantime,
      * calling visitAllAttributes(node) before importNode should
      * help.
-     * @author Bill Schneider (bschneid@arsdigita.com)
+     *
      * @param node the org.w3c.dom.Node about to be imported
      */
     public static void visitAllAttributes(org.w3c.dom.Node node) {

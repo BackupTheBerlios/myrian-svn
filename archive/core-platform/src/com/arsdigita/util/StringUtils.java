@@ -370,7 +370,6 @@ public class StringUtils {
      * plus a platform-dependent newline character obtained from
      * {@link System#getProperties}.</p>
      *
-     * @author Ron Henderson (ron@arsdigita.com)
      */
 
     public static String addNewline(String s) {
@@ -507,9 +506,8 @@ public class StringUtils {
      *
      * @param input the String to wrap
      *
-     * @author ron@arsdigita.com
      * @since  5.1.2
-     * @version $Id: //core-platform/dev/src/com/arsdigita/util/StringUtils.java#4 $
+     * @version $Id: //core-platform/dev/src/com/arsdigita/util/StringUtils.java#5 $
      */
 
     public final static String wrap(String input) {
@@ -537,9 +535,8 @@ public class StringUtils {
      * @param maxLength the maximum number of characters between line
      * breaks
      *
-     * @author ron@arsdigita.com
      * @since  5.1.2
-     * @version $Id: //core-platform/dev/src/com/arsdigita/util/StringUtils.java#4 $ */
+     * @version $Id: //core-platform/dev/src/com/arsdigita/util/StringUtils.java#5 $ */
 
     public final static String wrap(String input, int maxLength) {
 
