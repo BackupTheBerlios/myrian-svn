@@ -12,21 +12,33 @@ import java.util.*;
  */
 class Expander extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Expander.java#2 $ by $Author: rhs $, $DateTime: 2003/05/23 10:09:08 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Expander.java#3 $ by $Author: ashah $, $DateTime: 2003/06/09 13:09:56 $";
 
     final private Session m_ssn;
     final private Collection m_deleting = new HashSet();
-    final private List m_pending;
+    final private List m_deletes = new LinkedList();
+    // m_pending == null indicates this expander is no longer usable
+    private List m_pending = new ArrayList();
 
-    Expander(Session ssn, List pending) {
+    Expander(Session ssn) {
         m_ssn = ssn;
-        m_pending = pending;
     }
 
     private void addEvent(Event ev) {
+        if (m_pending == null) {
+            throw new IllegalStateException
+                ("using expander after call to finish");
+        }
+
         ev.prepare();
         m_pending.add(ev);
         ev.log();
+    }
+
+    private void addEvents(List l) {
+        for (Iterator it = l.iterator(); it.hasNext(); ) {
+            addEvent((Event) it.next());
+        }
     }
 
     final void expand(Event ev) {
@@ -48,6 +60,14 @@ class Expander extends Event.Switch {
         } finally {
             Session.untrace(ev.getName());
         }
+    }
+
+    final List finish() {
+        addEvents(m_deletes);
+        List result = m_pending;
+        // mark expander as unusable
+        m_pending = null;
+        return result;
     }
 
     public void onCreate(CreateEvent e) {
@@ -108,7 +128,8 @@ class Expander extends Event.Switch {
             }
         }
 
-        addEvent(e);
+        // delete actually added at end
+        m_deletes.add(e);
     }
 
     public void onSet(SetEvent e) {
@@ -154,7 +175,7 @@ class Expander extends Event.Switch {
     }
 
     // also called by session
-    void clear(Object obj, Property prop) {
+    private void clear(Object obj, Property prop) {
         PersistentCollection pc =
             (PersistentCollection) m_ssn.get(obj, prop);
         Cursor c = pc.getDataSet().getCursor();

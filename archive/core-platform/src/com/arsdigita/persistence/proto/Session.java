@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/05/23 $
+ * @version $Revision: #5 $ $Date: 2003/06/09 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Session.java#4 $ by $Author: ashah $, $DateTime: 2003/05/23 12:14:49 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Session.java#5 $ by $Author: ashah $, $DateTime: 2003/06/09 13:09:56 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -163,10 +163,9 @@ public class Session {
             if (LOG.isDebugEnabled()) {
                 trace("create", new Object[] { obj });
             }
-            List pending = new LinkedList();
-            Expander e = new Expander(this, pending);
+            Expander e = new Expander(this);
             e.expand(new CreateEvent(this, obj));
-            activate(pending);
+            activate(e.finish());
         } finally {
             if (LOG.isDebugEnabled()) {
                 untrace("create");
@@ -184,10 +183,9 @@ public class Session {
                 return false;
             }
 
-            List pending = new LinkedList();
-            Expander e = new Expander(this, pending);
+            Expander e = new Expander(this);
             e.expand(new DeleteEvent(this, obj));
-            activate(pending);
+            activate(e.finish());
             return true;
         } finally {
             if (LOG.isDebugEnabled()) {
@@ -202,8 +200,7 @@ public class Session {
                 trace("set", new Object[] { obj, prop, value });
             }
 
-            List pending = new LinkedList();
-            final Expander e = new Expander(this, pending);
+            final Expander e = new Expander(this);
 
             prop.dispatch(new Property.Switch() {
                 public void onRole(Role role) {
@@ -220,7 +217,7 @@ public class Session {
                 }
             });
 
-            activate(pending);
+            activate(e.finish());
         } finally {
             if (LOG.isDebugEnabled()) {
                 untrace("set");
@@ -236,8 +233,7 @@ public class Session {
                 trace("add", new Object[] { obj, prop, value });
             }
 
-            List pending = new LinkedList();
-            final Expander e = new Expander(this, pending);
+            final Expander e = new Expander(this);
 
             prop.dispatch(new Property.Switch() {
                 public void onRole(Role role) {
@@ -258,7 +254,7 @@ public class Session {
                 }
             });
 
-            activate(pending);
+            activate(e.finish());
         } finally {
             if (LOG.isDebugEnabled()) {
                 untrace("add", result[0]);
@@ -273,10 +269,9 @@ public class Session {
             if (LOG.isDebugEnabled()) {
                 trace("remove", new Object[] { obj, prop, value } );
             }
-            List pending = new LinkedList();
-            Expander e = new Expander(this, pending);
+            Expander e = new Expander(this);
             remove(obj, prop, value, e);
-            activate(pending);
+            activate(e.finish());
         } finally {
             if (LOG.isDebugEnabled()) {
                 untrace("remove");
@@ -312,14 +307,13 @@ public class Session {
             if (LOG.isDebugEnabled()) {
                 trace("clear", new Object[] { obj, prop });
             }
-            List pending = new LinkedList();
-            final Expander e = new Expander(this, pending);
+            final Expander e = new Expander(this);
             PersistentCollection pc = (PersistentCollection) get(obj, prop);
             Cursor c = pc.getDataSet().getCursor();
             while (c.next()) {
                 remove(obj, prop, c.get(), e);
             }
-            activate(pending);
+            activate(e.finish());
         } finally {
             if (LOG.isDebugEnabled()) {
                 untrace("clear");
