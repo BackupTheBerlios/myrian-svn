@@ -21,29 +21,34 @@ import com.redhat.persistence.ProtoException;
  * MetadataException
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  **/
 
 public class MetadataException extends ProtoException {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/metadata/MetadataException.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/metadata/MetadataException.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
+    private final Root m_root;
     private final Object m_element;
 
-    public MetadataException(Object element, String msg) {
-	super(message(element, msg), false);
+    public MetadataException(Root root, Object element, String msg) {
+        super(message(root, element, msg), false);
+        m_root = root;
         m_element = element;
     }
 
-    private static String message(Object element, String msg) {
-	Root root = Root.getRoot();
-	if (root.hasLocation(element)) {
-	    return root.getFilename(element) + ": line " +
-		root.getLine(element) + ", column " + root.getColumn(element) +
-		": " + msg;
-	} else {
-	    return msg;
-	}
+    private static String message(Root root, Object element, String msg) {
+        if (root.hasLocation(element)) {
+            return root.getFilename(element) + ": line " +
+                root.getLine(element) + ", column " + root.getColumn(element) +
+                ": " + msg;
+        } else {
+            return msg;
+        }
+    }
+
+    public Root getRoot() {
+        return m_root;
     }
 
     public Object getMetadataElement() {

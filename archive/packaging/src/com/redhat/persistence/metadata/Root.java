@@ -24,12 +24,12 @@ import java.util.*;
  * Root
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  **/
 
 public class Root {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/metadata/Root.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/metadata/Root.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
     private static final Root ROOT = new Root();
 
@@ -68,6 +68,7 @@ public class Root {
     private Mist m_maps = new Mist(this);
     private Mist m_tables = new Mist(this);
     private Mist m_ops = new Mist(this);
+    private Map m_adapters = new HashMap();
 
     private Root() {}
 
@@ -154,6 +155,34 @@ public class Root {
 
     public DataOperation getDataOperation(Path name) {
         return (DataOperation) m_ops.get(name);
+    }
+
+    public void addAdapter(Class javaClass, Adapter ad) {
+        m_adapters.put(javaClass, ad);
+    }
+
+    public Adapter getAdapter(Class javaClass) {
+        for (Class c = javaClass; c != null; c = c.getSuperclass()) {
+            Adapter a = (Adapter) m_adapters.get(c);
+            if (a != null) { return a; }
+        }
+
+        throw new IllegalArgumentException("no adapter for: " + javaClass);
+    }
+
+    public Adapter getAdapter(ObjectType type) {
+        for (ObjectType ot = type; ot != null; ot = ot.getSupertype()) {
+	    Class klass = ot.getJavaClass();
+	    if (klass != null) {
+		Adapter a = getAdapter(klass);
+		if (a != null) { return a; }
+	    }
+        }
+
+        Adapter a = (Adapter) m_adapters.get(null);
+        if (a != null) { return a; }
+
+        throw new IllegalArgumentException("no adapter for: " + type);
     }
 
 }

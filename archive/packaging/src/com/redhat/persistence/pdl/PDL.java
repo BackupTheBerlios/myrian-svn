@@ -15,7 +15,6 @@
 
 package com.redhat.persistence.pdl;
 
-import com.redhat.persistence.Adapter;
 import com.redhat.persistence.common.*;
 import com.redhat.persistence.pdl.nodes.*;
 import com.redhat.persistence.metadata.*;
@@ -31,12 +30,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/pdl/PDL.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/pdl/PDL.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -360,7 +359,7 @@ public class PDL {
 		    try {
 			Class adapterClass = Class.forName(acn.getName());
 			Adapter ad = (Adapter) adapterClass.newInstance();
-			Adapter.addAdapter(javaClass, ad);
+			m_root.addAdapter(javaClass, ad);
 		    } catch (IllegalAccessException e) {
 			m_errors.fatal(acn, e.getMessage());
 		    } catch (ClassNotFoundException e) {
@@ -383,7 +382,7 @@ public class PDL {
                 ObjectType ot = m_symbols.getEmitted(pnd.getType());
                 Column col = lookup((ColumnNd)n);
                 if (col.getType() == Integer.MIN_VALUE) {
-                    Adapter ad = Adapter.getAdapter(ot.getJavaClass());
+                    Adapter ad = m_root.getAdapter(ot.getJavaClass());
                     col.setType(ad.defaultJDBCType());
                 }
             }

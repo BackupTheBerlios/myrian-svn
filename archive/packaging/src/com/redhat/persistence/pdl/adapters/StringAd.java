@@ -25,15 +25,15 @@ import java.io.*;
  * StringAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  **/
 
 public class StringAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/pdl/adapters/StringAd.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/pdl/adapters/StringAd.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
     public StringAd() {
-	super(Root.getRoot().getObjectType("global.String"), Types.VARCHAR);
+	super("global.String", Types.VARCHAR);
     }
 
     public void bind(PreparedStatement ps, int index, Object obj, int type)

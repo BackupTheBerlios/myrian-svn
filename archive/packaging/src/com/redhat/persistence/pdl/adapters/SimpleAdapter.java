@@ -23,27 +23,29 @@ import com.redhat.persistence.metadata.*;
  * SimpleAdapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  **/
 
 abstract class SimpleAdapter extends Adapter {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/pdl/adapters/SimpleAdapter.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/pdl/adapters/SimpleAdapter.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
-    private ObjectType m_type;
+    private String m_type;
     private int m_defaultJDBCType;
 
-    protected SimpleAdapter(ObjectType type, int defaultJDBCType) {
+    protected SimpleAdapter(String type, int defaultJDBCType) {
 	if (type == null) { throw new IllegalArgumentException(); }
 	m_type = type;
         m_defaultJDBCType = defaultJDBCType;
     }
 
     public PropertyMap getProperties(Object obj) {
-	return new PropertyMap(m_type);
+	return new PropertyMap(getObjectType(obj));
     }
 
-    public ObjectType getObjectType(Object obj) { return m_type; }
+    public ObjectType getObjectType(Object obj) {
+        return getRoot().getObjectType(m_type);
+    }
 
     public int defaultJDBCType() { return m_defaultJDBCType; }
 

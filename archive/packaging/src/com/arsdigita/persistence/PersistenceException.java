@@ -23,14 +23,12 @@ import com.arsdigita.db.DbException;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  */
 
 public class PersistenceException extends UncheckedWrapperException {
 
-    private String m_messageStack = null;
-
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/PersistenceException.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/PersistenceException.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
     /**
      * Constructor for a PersistenceException which does not wrap
@@ -48,7 +46,7 @@ public class PersistenceException extends UncheckedWrapperException {
      * that this exception will be wrapping.
      */
     protected PersistenceException(Throwable rootCause) {
-        this(SessionManager.getSession().getStackTrace(), rootCause);
+        this(null, rootCause);
     }
 
     /**
@@ -58,9 +56,7 @@ public class PersistenceException extends UncheckedWrapperException {
      * would normally provide.
      */
     protected PersistenceException(String s, Throwable rootCause) {
-        super((s==null)?(SessionManager.getSession().getStackTrace()):
-              (s + SessionManager.getSession().getStackTrace()),
-              rootCause);
+        super(s, rootCause);
         // TODO: Consider adding verification that if rootCause is
         // a uniqueconstraintexception or dbnotavailableexception,
         // then so is this persistenceexception.  To guard against
@@ -72,24 +68,6 @@ public class PersistenceException extends UncheckedWrapperException {
         // fully test.
     }
 
-    /**
-     *  This overrides the super getMessage so that it will print out
-     *  the debugging messages for the stack trace
-     */
-    public String getMessage() {
-        // by holding it in a local variable, you can all getMessage
-        // a bunch of times and always get the same message for the given
-        // Exception
-        if (m_messageStack == null) {
-            m_messageStack = SessionManager.getSession().getStackTrace();
-        }
-        String msg = super.getMessage();
-        if (msg != null) {
-            return msg + m_messageStack;
-        } else {
-            return m_messageStack;
-        }
-    }
 
     /**
      * It's not necessary to use newInstance for just a string argument, but

@@ -27,12 +27,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -64,7 +64,7 @@ class EventSwitch extends Event.Switch {
             Collection keys = null;
 
             if (o != null) {
-                ObjectType type = Session.getObjectType(o);
+                ObjectType type = m_engine.getSession().getObjectType(o);
                 keys = type.getKeyProperties();
             }
 
@@ -74,7 +74,7 @@ class EventSwitch extends Event.Switch {
                 continue;
             }
 
-            PropertyMap props = Session.getProperties(o);
+            PropertyMap props = m_engine.getSession().getProperties(o);
             ArrayList revKeys = new ArrayList(keys.size());
             revKeys.addAll(keys);
             Collections.reverse(revKeys);
@@ -150,7 +150,7 @@ class EventSwitch extends Event.Switch {
 
         DML op = m_engine.getOperation(obj, table);
         if (op == null) {
-            if (!getTables(Session.getObjectMap(obj),
+            if (!getTables(m_engine.getSession().getObjectMap(obj),
                            false, true, false).contains(table)) {
                 return;
             }
@@ -388,9 +388,10 @@ class EventSwitch extends Event.Switch {
         Property prop = e.getProperty();
         ObjectType type = prop.getType();
         if (type.isKeyed()) { return; }
-        ObjectMap om = Root.getRoot().getObjectMap(prop.getContainer());
+        ObjectMap om = m_engine.getSession().getRoot().getObjectMap
+            (prop.getContainer());
         Mapping m = om.getMapping(Path.get(prop.getName()));
-        Adapter ad = Adapter.getAdapter(type);
+        Adapter ad = m_engine.getSession().getRoot().getAdapter(type);
         final int jdbcType[] = { ad.defaultJDBCType() };
 
         m.dispatch(new Mapping.Switch() {
@@ -434,7 +435,7 @@ class EventSwitch extends Event.Switch {
 
     private void addOperations(Object obj, Collection blocks,
 			       boolean initialize) {
-        ObjectType type = Session.getObjectType(obj);
+        ObjectType type = m_engine.getSession().getObjectType(obj);
         for (Iterator it = blocks.iterator(); it.hasNext(); ) {
             SQLBlock block = (SQLBlock) it.next();
             Environment env = m_engine.getEnvironment(obj);
@@ -483,7 +484,7 @@ class EventSwitch extends Event.Switch {
         if (obj == null) {
             props = new PropertyMap(type);
         } else {
-            props = Session.getProperties(obj);
+            props = m_engine.getSession().getProperties(obj);
         }
 
         for (Iterator it = type.getKeyProperties().iterator();

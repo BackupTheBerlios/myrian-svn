@@ -24,12 +24,12 @@ import java.util.*;
  * Environment
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  **/
 
 class Environment {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/Environment.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/Environment.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
     private ObjectMap m_om;
     private HashMap m_values = new HashMap();
@@ -44,14 +44,15 @@ class Environment {
     }
 
     public void set(Path parameter, Object value) {
-        final int type[] = { RDBMSEngine.getType(value) };
+        final int type[] = { RDBMSEngine.getType(m_om.getRoot(), value) };
 
         if (m_om != null) {
             Path path = Path.get(parameter.getPath().substring(1));
 
             ObjectType ot = m_om.getObjectType().getType(path);
             if (ot != null) {
-                type[0] = RDBMSEngine.getType(ot.getJavaClass());
+                type[0] = RDBMSEngine.getType
+                    (m_om.getRoot(), ot.getJavaClass());
             }
 
             Mapping m = m_om.getMapping(path);

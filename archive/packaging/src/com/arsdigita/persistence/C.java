@@ -24,33 +24,37 @@ import java.util.*;
  * C
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  **/
 
 final class C {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/C.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/C.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
-    public static final com.redhat.persistence.metadata.ObjectType type(String qname) {
-        return Root.getRoot().getObjectType(qname);
+    public static final com.redhat.persistence.metadata.ObjectType type
+        (Root root, String qname) {
+        return root.getRoot().getObjectType(qname);
     }
 
-    public static final com.redhat.persistence.metadata.ObjectType type(ObjectType type) {
-        return type(type.getQualifiedName());
+    public static final com.redhat.persistence.metadata.ObjectType type
+        (Root root, ObjectType type) {
+        return type(root, type.getQualifiedName());
     }
 
-    public static final ObjectType fromType(com.redhat.persistence.metadata.ObjectType type) {
-        return MetadataRoot.getMetadataRoot().getObjectType(type.getQualifiedName());
+    public static final ObjectType fromType
+        (MetadataRoot root, com.redhat.persistence.metadata.ObjectType type) {
+        return root.getObjectType(type.getQualifiedName());
     }
 
-    public static final com.redhat.persistence.metadata.Property prop(Property prop) {
-        return type(prop.getContainer().getQualifiedName())
+    public static final com.redhat.persistence.metadata.Property prop
+        (Root root, Property prop) {
+        return type(root, prop.getContainer().getQualifiedName())
             .getProperty(prop.getName());
     }
 
-    public static final PropertyMap pmap(OID oid) {
+    public static final PropertyMap pmap(Root root, OID oid) {
         com.redhat.persistence.metadata.ObjectType type =
-            type(oid.getObjectType());
+            type(root, oid.getObjectType());
         PropertyMap result = new PropertyMap(type);
         for (Iterator it = oid.getProperties().entrySet().iterator();
              it.hasNext(); ) {

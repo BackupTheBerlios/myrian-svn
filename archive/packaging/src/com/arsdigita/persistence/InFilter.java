@@ -27,32 +27,35 @@ import org.apache.log4j.Logger;
  * InFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  **/
 
 class InFilter extends FilterImpl implements Filter {
 
     private static Logger s_log = Logger.getLogger(InFilter.class);
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/InFilter.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/InFilter.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
+    private Root m_root;
     private String m_prop;
     private String m_subProp;
     private String m_query;
 
-    InFilter(String property, String subqueryProperty, String query) {
+    InFilter(Root root, String property, String subqueryProperty,
+             String query) {
+        m_root = root;
         m_prop = property;
         m_subProp = subqueryProperty;
         m_query = query;
         if (s_log.isDebugEnabled()) {
-            s_log.debug("InFilter: " + property + " - " + subqueryProperty + " - " + query);
+            s_log.debug("InFilter: " + property + " - " + subqueryProperty +
+                        " - " + query);
         }
     }
 
     private SQLBlock getBlock(String query) {
-	Root root = Root.getRoot();
-	ObjectType ot = root.getObjectType(query);
-	return root.getObjectMap(ot).getRetrieveAll();
+	ObjectType ot = m_root.getObjectType(query);
+	return m_root.getObjectMap(ot).getRetrieveAll();
     }
 
     public String getConditions() {
@@ -76,27 +79,14 @@ class InFilter extends FilterImpl implements Filter {
 
 	Path subcol = block.getMapping(subProp);
 	if (subcol == null) {
-	    throw new MetadataException(block, "no such path: " + subProp);
+	    throw new MetadataException
+                (m_root, block, "no such path: " + subProp);
 	}
 
-        String col;
-        switch (DbHelper.getDatabase()) {
-        case DbHelper.DB_ORACLE:
-            col = subcol.getPath().toUpperCase();
-            break;
-        case DbHelper.DB_POSTGRES:
-            col = subcol.getPath().toLowerCase();
-            break;
-        default:
-            DbHelper.unsupportedDatabaseError("in filter");
-            col = null;
-            break;
-        }
-
-	return "exists ( select \"subquery_id\" from (select \"" +
-            col + "\" as \"subquery_id\" from (" +
-            m_query + ") \"insub1\" ) \"insub2\" where " +
-            "\"insub2\".\"subquery_id\" = " + m_prop + ")";
+	return "exists ( select RAW[subquery_id] from (select RAW[" +
+            subcol.getPath() + "] as RAW[subquery_id] from (" +
+            m_query + ") RAW[insub1] ) RAW[insub2] where " +
+            "RAW[insub2.subquery_id] = " + m_prop + ")";
     }
 
 }

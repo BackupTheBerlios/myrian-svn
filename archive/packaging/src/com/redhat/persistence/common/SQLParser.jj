@@ -14,12 +14,12 @@ import java.io.*;
  * SQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/08/14 $
+ * @version $Revision: #2 $ $Date: 2003/08/27 $
  */
 
 public class SQLParser {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/common/SQLParser.jj#1 $ by $Author: dennis $, $DateTime: 2003/08/14 14:53:20 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/common/SQLParser.jj#2 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
     public static interface Mapper {
         Path map(Path path);
@@ -79,7 +79,12 @@ public class SQLParser {
 
     private void append(Token t) {
         appendSpecial(t);
-        m_image.append(t.image);
+        if (t.kind == RAW) {
+            // XXX: ignore escapes for now
+            m_image.append(t.image.substring(4, t.image.length() - 1));
+        } else {
+            m_image.append(t.image);
+        }
     }
 
     private void token() {
@@ -113,7 +118,6 @@ TOKEN:
   | <INTEGER_LITERAL: ( "+" | "-" )? (<DIGIT>)+>
   | <NUMBER_LITERAL: ( "+" | "-" )? (<DIGIT>)* ( "." (<DIGIT>)+ )?
                      ( "E" | "e" ) ( "+" | "-" ) (<DIGIT>)+>
-  | <QUOTED_ID: "\"" ( ~["\""] | "\"\"" )* "\"">
 }
 
 TOKEN:
@@ -155,9 +159,9 @@ TOKEN [IGNORE_CASE]:
   | <LIKE: "like">
   | <BETWEEN: "between">
   | <IN: "in">
-  | <NOT: "not"> 
+  | <NOT: "not">
   | <AND: "and">
-  | <OR: "or"> 
+  | <OR: "or">
   | <ANY: "any">
   | <SOME: "some">
   | <EXISTS: "exists">
@@ -202,6 +206,7 @@ TOKEN [IGNORE_CASE]:
 TOKEN: {
     <ID: <CH>(<CH>|<DIGIT>)*>
   | <#CH: ["a" - "z", "A" - "Z", "_"]>
+  | <RAW: "RAW[" (~["]"] | "\\]")* "]">
 }
 
 // TODO: Add support for multi-line comments.
@@ -250,7 +255,7 @@ void symbol() :
   | t = <POS>
   | t = <NEG>
   | t = <DIV>
-  | t = <CONCAT> 
+  | t = <CONCAT>
   | t = <EQ>
   | t = <NE>
   | t = <GT>
@@ -292,7 +297,7 @@ void symbol() :
   | t = <SUBSTR>
   | t = <LENGTH>
   | t = <NVL>
-  | t = <QUOTED_ID> )
+  | t = <RAW> )
     { append(t); }
 }
 

@@ -24,12 +24,12 @@ import java.util.*;
  * for filtering the stream down to the set of events that are of interest.
  *
  * @author <a href="mailto:ashah@redhat.com">Archit Shah</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  **/
 
-public class EventStream {
+class EventStream {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/EventStream.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/EventStream.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
     // all events
     private final LinkedList m_events = new LinkedList();
@@ -40,11 +40,17 @@ public class EventStream {
     // CK(obj,prop) -> current event list
     private final Map m_collectionEvents = new HashMap();
 
+    private final Session m_ssn;
     private final boolean m_coalescing;
 
-    public EventStream() { this(false); }
+    public EventStream(Session ssn) {
+        this(ssn, false);
+    }
 
-    public EventStream(boolean coalescing) { m_coalescing = coalescing; }
+    public EventStream(Session ssn, boolean coalescing) {
+        m_ssn = ssn;
+        m_coalescing = coalescing;
+    }
 
     public int size() { return m_events.size(); }
 
@@ -61,12 +67,12 @@ public class EventStream {
         m_collectionEvents.clear();
     }
 
-    private final static Object getKey(Object obj) {
-        return Session.getSessionKey(obj);
+    private Object getKey(Object obj) {
+        return m_ssn.getSessionKey(obj);
     }
 
-    private final static Object getKey(Object obj, Property prop) {
-        return new CompoundKey(Session.getSessionKey(obj), prop);
+    private Object getKey(Object obj, Property prop) {
+        return new CompoundKey(m_ssn.getSessionKey(obj), prop);
     }
 
     public void add(Event ev) {
@@ -74,7 +80,7 @@ public class EventStream {
         ev.dispatch(new Event.Switch() {
             private void onObjectEvent(ObjectEvent e) {
                 m_objectEvents.put(getKey(e.getObject()), e);
-                ObjectType type = Session.getObjectType(e.getObject());
+                ObjectType type = m_ssn.getObjectType(e.getObject());
                 for (Iterator it = type.getProperties().iterator();
                      it.hasNext(); ) {
                     Property prop = (Property) it.next();
@@ -225,7 +231,7 @@ public class EventStream {
     public Collection getReachablePropertyEvents(Object obj) {
         ArrayList result = new ArrayList();
 
-        ObjectType ot = Session.getObjectType(obj);
+        ObjectType ot = m_ssn.getObjectType(obj);
         for (Iterator it = ot.getProperties().iterator(); it.hasNext(); ) {
             Property prop = (Property) it.next();
             if (prop.isCollection()) {

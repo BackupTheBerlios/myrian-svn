@@ -16,6 +16,7 @@
 package com.redhat.persistence;
 
 import com.redhat.persistence.common.*;
+import com.redhat.persistence.metadata.Adapter;
 import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Property;
 
@@ -27,12 +28,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/RecordSet.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/RecordSet.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -41,7 +42,8 @@ public abstract class RecordSet {
 
     protected RecordSet(Signature signature) {
         m_signature = signature;
-        m_adapter = Adapter.getAdapter(m_signature.getObjectType());
+        ObjectType type = m_signature.getObjectType();
+        m_adapter = type.getRoot().getAdapter(type);
     }
 
     public Signature getSignature() {

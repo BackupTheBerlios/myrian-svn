@@ -28,17 +28,17 @@ import java.io.StringReader;
  * GenericDataQuery
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  */
 
 public class GenericDataQuery extends DataQueryImpl {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/GenericDataQuery.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/GenericDataQuery.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
     private SQLBlock m_block;
 
     public GenericDataQuery(Session s, String sql, String[] columns) {
-        super(s, query(sql, columns));
+        super(s, query(s, sql, columns));
 	SQLParser p = new SQLParser(new StringReader(sql));
 	try {
 	    p.sql();
@@ -52,8 +52,8 @@ public class GenericDataQuery extends DataQueryImpl {
 	}
     }
 
-    private static final Query query(String sql, String[] paths) {
-	ObjectType propType = Root.getRoot().getObjectType("global.Object");
+    private static final Query query(Session s, String sql, String[] paths) {
+	ObjectType propType = s.getRoot().getObjectType("global.Object");
 	ObjectType type = new ObjectType(Model.getInstance("gdq"), sql, null);
 	Signature sig = new Signature(type);
 	for (int i = 0; i < paths.length; i++) {

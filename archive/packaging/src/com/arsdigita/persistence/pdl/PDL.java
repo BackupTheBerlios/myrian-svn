@@ -60,12 +60,12 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/pdl/PDL.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/pdl/PDL.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;
@@ -285,31 +285,16 @@ public class PDL {
     /**
      * Loads all the PDL files in a given directory
      */
-    public static void loadPDLFiles(File dir) {
-        ResourceManager rm = ResourceManager.getInstance();
-
-        File webAppRoot = rm.getWebappRoot();
-
-        // If we're not running inside a webapp, we don't want the wrong
-        // thing to happen.
-        try {
-            if ( webAppRoot != null ) {
-                dir = new File(webAppRoot.getCanonicalPath() + dir);
-            }
-        } catch (IOException e) {
-            throw new UncheckedWrapperException("cannot get file path", e);
-        }
-
+    public static MetadataRoot loadDirectory(File dir) {
         List files = findPDLFiles(dir);
         s_log.warn("Found " + files.size() + " files in the " +
                    dir.toString() + " directory.");
 
         try {
-            compilePDLFiles(files);
+            return compilePDLFiles(files);
         } catch (PDLException ex) {
             throw new UncheckedWrapperException
-                ("Persistence Initialization error while trying to " +
-                 "compile the PDL files", ex);
+                ("error while trying to compile PDL files", ex);
         }
     }
 
@@ -504,7 +489,7 @@ public class PDL {
      *
      * @param files array of PDL files to process
      */
-    public static void compilePDLFiles(Collection files)
+    public static MetadataRoot compilePDLFiles(Collection files)
         throws PDLException {
         StringBuffer sb = new StringBuffer();
         PDL pdl = new PDL();
@@ -527,13 +512,15 @@ public class PDL {
                     PDLOutputter.writePDL(MetadataRoot.getMetadataRoot(),
                                           new java.io.File(s_debugDirectory));
                 } catch (java.io.IOException ex) {
-                    s_log.error(
-                                "There was a problem generating debugging output", ex
-                                );
+                    s_log.error
+                        ("There was a problem generating debugging output",
+                         ex);
                 }
             }
         } else {
             throw new PDLException(sb.toString());
         }
+
+        return MetadataRoot.getMetadataRoot();
     }
 }

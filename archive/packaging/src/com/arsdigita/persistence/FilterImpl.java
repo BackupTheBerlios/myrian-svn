@@ -15,6 +15,8 @@
 
 package com.arsdigita.persistence;
 
+import com.redhat.persistence.metadata.Root;
+
 import java.util.Map;
 import java.util.HashMap;
 import java.lang.StringBuffer;
@@ -26,19 +28,17 @@ import org.apache.log4j.Logger;
  * be combined and manipulated to create complex queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  */
 
 abstract class FilterImpl implements Filter {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/FilterImpl.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/FilterImpl.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
     private static final Logger m_log =
         Logger.getLogger(Filter.class.getName());
 
     private Map m_bindings = new HashMap();
-    private static SQLUtilities m_util =
-        SessionManager.getSQLUtilities();
 
     protected FilterImpl() {}
 
@@ -78,6 +78,13 @@ abstract class FilterImpl implements Filter {
         return result.toString();
     }
 
+    static String createNullString(String comparator, String variableName) {
+        if (comparator.indexOf("!") > -1 || comparator.indexOf("<>") > -1) {
+            return variableName + " is not null";
+        } else {
+            return variableName + " is null";
+        }
+    }
 
     /**
      *  Creates a new filter with the given conditions
@@ -109,8 +116,8 @@ abstract class FilterImpl implements Filter {
         } else {
             // We are setting it to both null and not null because we know
             // that it is not possible to have both.
-            return simple(m_util.createNullString("!=", attribute) +
-                          " and " + m_util.createNullString("=", attribute));
+            return simple(createNullString("!=", attribute) +
+                          " and " + createNullString("=", attribute));
         }
     }
 
@@ -131,7 +138,7 @@ abstract class FilterImpl implements Filter {
         String bind = bindName(attribute);
         String conditions;
         if (value == null) {
-            conditions = m_util.createNullString("=", attribute);
+            conditions = createNullString("=", attribute);
         } else {
             conditions = attribute + " = :" + bind;
         }
@@ -156,7 +163,7 @@ abstract class FilterImpl implements Filter {
         String bind = bindName(attribute);
         String conditions;
         if (value == null) {
-            conditions = m_util.createNullString("!=", attribute);
+            conditions = createNullString("!=", attribute);
         } else {
             conditions = attribute + " != :" + bind;
         }
@@ -356,14 +363,15 @@ abstract class FilterImpl implements Filter {
      * query name of a query defined in a PDL file somewhere.
      **/
 
-    protected static Filter in(String propertyName, String queryName) {
+    protected static Filter in(Root root, String propertyName,
+                               String queryName) {
         if (propertyName == null || propertyName.equals("") ||
             queryName == null || queryName.equals("")) {
             throw new IllegalArgumentException
 		("The propertyName and queryName must be non empty.");
         }
 
-        return new InFilter(propertyName, null, queryName);
+        return new InFilter(root, propertyName, null, queryName);
     }
 
     /**
@@ -374,8 +382,8 @@ abstract class FilterImpl implements Filter {
      * in a PDL file somewhere.
      **/
 
-    protected static Filter in(String property, String subQueryProperty,
-			       String queryName) {
+    protected static Filter in(Root root, String property,
+                               String subQueryProperty, String queryName) {
         if (property == null || property.equals("") ||
             subQueryProperty == null || subQueryProperty.equals("") ||
             queryName == null || queryName.equals("") ) {
@@ -384,7 +392,7 @@ abstract class FilterImpl implements Filter {
                  "non empty.");
         }
 
-        return new InFilter(property, subQueryProperty, queryName);
+        return new InFilter(root, property, subQueryProperty, queryName);
     }
 
     /**
@@ -393,14 +401,15 @@ abstract class FilterImpl implements Filter {
      * query name of a query defined in a PDL file somewhere.
      **/
 
-    protected static Filter notIn(String propertyName, String queryName) {
+    protected static Filter notIn(Root root, String propertyName,
+                                  String queryName) {
         if (propertyName == null || propertyName.equals("") ||
             queryName == null || queryName.equals("")) {
             throw new IllegalArgumentException
 		("The propertyName and queryName must be non empty.");
         }
 
-	final InFilter in = new InFilter(propertyName, null, queryName);
+	final InFilter in = new InFilter(root, propertyName, null, queryName);
 
         return new FilterImpl() {
 		public String getConditions() {

@@ -23,15 +23,15 @@ import java.sql.*;
  * ObjectAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  **/
 
 public class ObjectAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/pdl/adapters/ObjectAd.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/pdl/adapters/ObjectAd.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
     public ObjectAd() {
-	super(Root.getRoot().getObjectType("global.Object"), Types.INTEGER);
+	super("global.Object", Types.INTEGER);
     }
 
     public void bind(PreparedStatement ps, int index, Object obj, int type)

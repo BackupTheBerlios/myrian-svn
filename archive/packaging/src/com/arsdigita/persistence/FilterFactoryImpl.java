@@ -15,18 +15,22 @@
 
 package com.arsdigita.persistence;
 
-
 /**
  * FilterFactoryImpl actually hands out the requested filters
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  */
 
 class FilterFactoryImpl implements FilterFactory {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/FilterFactoryImpl.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/FilterFactoryImpl.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
+    private Session m_ssn;
+
+    FilterFactoryImpl(Session ssn) {
+        m_ssn = ssn;
+    }
 
     /**
      *
@@ -258,7 +262,6 @@ class FilterFactoryImpl implements FilterFactory {
     public Filter compare(String expressionOne, int comparator,
                           String expressionTwo) {
         String stringComparator = null;
-        SQLUtilities util = SessionManager.getSQLUtilities();
         boolean notEqualsValue = false;
 
         switch (comparator) {
@@ -296,9 +299,9 @@ class FilterFactoryImpl implements FilterFactory {
         }
 
         String expressionOneNotNull =
-            util.createNullString(stringComparator, expressionOne);
+            FilterImpl.createNullString(stringComparator, expressionOne);
         String expressionTwoNotNull =
-            util.createNullString(stringComparator, expressionTwo);
+            FilterImpl.createNullString(stringComparator, expressionTwo);
 
         if (notEqualsValue) {
             // in this case, we have to make sure that they are not equal
@@ -323,7 +326,7 @@ class FilterFactoryImpl implements FilterFactory {
      * query name of a query defined in a PDL file somewhere.
      **/
     public Filter in(String propertyName, String queryName) {
-        return FilterImpl.in(propertyName, queryName);
+        return FilterImpl.in(m_ssn.getRoot(), propertyName, queryName);
     }
 
 
@@ -338,7 +341,8 @@ class FilterFactoryImpl implements FilterFactory {
     public Filter in( String property,
                       String subQueryProperty,
                       String queryName ) {
-        return FilterImpl.in( property, subQueryProperty, queryName );
+        return FilterImpl.in(m_ssn.getRoot(), property, subQueryProperty,
+                             queryName);
     }
 
 
@@ -348,7 +352,7 @@ class FilterFactoryImpl implements FilterFactory {
      * query name of a query defined in a PDL file somewhere.
      **/
     public Filter notIn(String propertyName, String queryName) {
-        return FilterImpl.notIn(propertyName, queryName);
+        return FilterImpl.notIn(m_ssn.getRoot(), propertyName, queryName);
     }
 
 

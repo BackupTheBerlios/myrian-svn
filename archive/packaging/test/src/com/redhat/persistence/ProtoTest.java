@@ -32,12 +32,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/redhat/persistence/ProtoTest.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/redhat/persistence/ProtoTest.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
 
     public ProtoTest(String name) {
@@ -47,25 +47,6 @@ public class ProtoTest extends TestCase {
     public void test() throws Exception {
         PDL.main(new String[] {"test/pdl/com/arsdigita/persistence/Test.pdl"});
 
-        ObjectType TEST = Root.getRoot().getObjectType("test.Test");
-        ObjectType ICLE = Root.getRoot().getObjectType("test.Icle");
-        ObjectType COMPONENT = Root.getRoot().getObjectType("test.Component");
-
-        Adapter a = new Generic.Adapter();
-        Adapter.addAdapter(Generic.class, a);
-	TEST.setJavaClass(Generic.class);
-	ICLE.setJavaClass(Generic.class);
-	COMPONENT.setJavaClass(Generic.class);
-
-        Generic test = new Generic(TEST, BigInteger.ZERO);
-        Property NAME = TEST.getProperty("name");
-        Property COLLECTION = TEST.getProperty("collection");
-        Property OPT2MANY = TEST.getProperty("opt2many");
-        doTest(test, NAME, COLLECTION);
-        doTest(test, NAME, OPT2MANY);
-    }
-
-    private void doTest(Generic obj, Property str, Property col) {
         SQLWriter w;
         switch (DbHelper.getDatabase()) {
         case DbHelper.DB_ORACLE:
@@ -81,7 +62,7 @@ public class ProtoTest extends TestCase {
         }
 
         Session ssn = new Session
-            (new RDBMSEngine
+            (Root.getRoot(), new RDBMSEngine
              (new ConnectionSource() {
                 public Connection acquire() {
                     try {
@@ -98,6 +79,25 @@ public class ProtoTest extends TestCase {
                 }
              }, w), new RDBMSQuerySource());
 
+        ObjectType TEST = ssn.getRoot().getObjectType("test.Test");
+        ObjectType ICLE = ssn.getRoot().getObjectType("test.Icle");
+        ObjectType COMPONENT = Root.getRoot().getObjectType("test.Component");
+
+        Adapter a = new Generic.Adapter();
+        ssn.getRoot().addAdapter(Generic.class, a);
+	TEST.setJavaClass(Generic.class);
+	ICLE.setJavaClass(Generic.class);
+	COMPONENT.setJavaClass(Generic.class);
+
+        Generic test = new Generic(TEST, BigInteger.ZERO);
+        Property NAME = TEST.getProperty("name");
+        Property COLLECTION = TEST.getProperty("collection");
+        Property OPT2MANY = TEST.getProperty("opt2many");
+        doTest(ssn, test, NAME, COLLECTION);
+        doTest(ssn, test, NAME, OPT2MANY);
+    }
+
+    private void doTest(Session ssn, Generic obj, Property str, Property col) {
         Property REQUIRED = obj.getType().getProperty("required");
         Generic req = new Generic(REQUIRED.getType(), new BigInteger("10"));
         ssn.create(req);
@@ -124,7 +124,7 @@ public class ProtoTest extends TestCase {
         PersistentCollection pc =
             (PersistentCollection) ssn.get(obj, col);
 
-        ObjectType ICLE = Root.getRoot().getObjectType("test.Icle");
+        ObjectType ICLE = ssn.getRoot().getObjectType("test.Icle");
         Object one = new Generic(ICLE, new BigInteger("1"));
         ssn.create(one);
         Object two = new Generic(ICLE, new BigInteger("2"));

@@ -24,18 +24,19 @@ import com.redhat.persistence.Signature;
  * DataAssociationCursorImpl
  *
  * @author Archit Shah &lt;ashah@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  **/
 
 class DataAssociationCursorImpl extends DataCollectionImpl
     implements DataAssociationCursor {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
     private DataAssociationImpl m_assn;
 
     DataAssociationCursorImpl(Session ssn, DataObject data, Property prop) {
-        super(ssn, (PersistentCollection) ssn.getProtoSession().get(data, C.prop(prop)));
+        super(ssn, (PersistentCollection) ssn.getProtoSession().get
+              (data, C.prop(ssn.getRoot(), prop)));
     }
 
     protected final void setAssociation(DataAssociationImpl assn) {

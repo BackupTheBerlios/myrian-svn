@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/08/27 $
+ * @version $Revision: #4 $ $Date: 2003/08/27 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/QGen.java#3 $ by $Author: justin $, $DateTime: 2003/08/27 12:51:55 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/QGen.java#4 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
     private static final Logger LOG = Logger.getLogger(QGen.class);
 
@@ -78,19 +78,23 @@ class QGen {
     private HashMap m_joins = new HashMap();
     private Analyzer m_anal;
     private Condition m_extra = null;
+    private RDBMSEngine m_engine;
+    private Root m_root;
 
-    public QGen(Query query) {
-	this(query, null);
+    public QGen(RDBMSEngine engine, Query query) {
+	this(engine, query, null);
     }
 
-    public QGen(Query query, SQLBlock block) {
+    public QGen(RDBMSEngine engine, Query query, SQLBlock block) {
         if (query.getSignature().getSources().size() == 0) {
             throw new IllegalArgumentException
                 ("no sources");
         }
+        m_engine = engine;
         m_query = query;
 	m_block = block;
         m_anal = new Analyzer(m_query.getFilter());
+        m_root = query.getSignature().getObjectType().getRoot();
     }
 
     private Path getColumn(Path prefix) {
@@ -255,7 +259,7 @@ class QGen {
         Signature sig = m_query.getSignature();
 
         Environment env = new Environment
-            (Root.getRoot().getObjectMap(sig.getObjectType()));
+            (m_root.getObjectMap(sig.getObjectType()));
 
         for (Iterator it = sig.getSources().iterator(); it.hasNext(); ) {
             Source src = (Source) it.next();
@@ -268,8 +272,7 @@ class QGen {
                 j = new StaticJoin
 		    (new StaticOperation(block, env, false), alias);
             } else {
-                ObjectMap map =
-                    Root.getRoot().getObjectMap(src.getObjectType());
+                ObjectMap map = m_root.getObjectMap(src.getObjectType());
                 Table start = null;
 		ObjectMap om = map;
 		while (om != null) {
@@ -343,14 +346,15 @@ class QGen {
 
         for (Iterator it = sig.getParameters().iterator(); it.hasNext(); ) {
             Parameter param = (Parameter) it.next();
-            Path[] paths = RDBMSEngine.getKeyPaths
+            Path[] paths = m_engine.getKeyPaths
                 (param.getObjectType(), null);
             for (int i = 0; i < paths.length; i++) {
                 result.set
                     (Path.add(param.getPath(), paths[i]),
-                     RDBMSEngine.get(m_query.get(param), paths[i]),
-                     RDBMSEngine.getType
-                     (param.getObjectType().getType(paths[i]).getJavaClass()));
+                     m_engine.get(m_query.get(param), paths[i]),
+                     m_engine.getType
+                     (m_root,
+                      param.getObjectType().getType(paths[i]).getJavaClass()));
             }
         }
 
@@ -506,7 +510,7 @@ class QGen {
 	// Handle parameters
         Parameter p = m_query.getSignature().getParameter(path);
         if (p != null) {
-            setColumns(path, RDBMSEngine.getKeyPaths
+            setColumns(path, m_engine.getKeyPaths
                        (p.getObjectType(), p.getPath()));
             return true;
         }
@@ -516,7 +520,7 @@ class QGen {
 	if (isStatic(src)) {
 	    SQLBlock block = getBlock(src);
 	    Path prefix = getPrefix(block);
-	    Path[] paths = RDBMSEngine.getKeyPaths
+	    Path[] paths = m_engine.getKeyPaths
 		(m_query.getSignature().getType(path), Path.add(prefix, path));
 	    cols = new Path[paths.length];
 	    boolean failed = false;
@@ -545,7 +549,7 @@ class QGen {
 	}
 
         final Property prop = m_query.getSignature().getProperty(path);
-        ObjectMap map = Root.getRoot().getObjectMap(prop.getContainer());
+        ObjectMap map = m_root.getObjectMap(prop.getContainer());
         Mapping m = map.getMapping(Path.get(prop.getName()));
 
         m.dispatch(new Mapping.Switch() {
@@ -614,8 +618,7 @@ class QGen {
                 (new StringReader(e.getExpression()),
                  new SQLParser.Mapper() {
                      public Path map(Path path) {
-                         Root r = Root.getRoot();
-                         if (r.hasObjectType(path.getPath())) {
+                         if (m_root.hasObjectType(path.getPath())) {
                              return path;
                          } else {
                              genPath(path);

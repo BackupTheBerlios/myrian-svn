@@ -18,6 +18,7 @@ package com.redhat.persistence.engine.rdbms;
 import com.arsdigita.db.ConnectionManager;
 import com.arsdigita.db.SQLExceptionHandler;
 import com.redhat.persistence.common.*;
+import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.*;
 
 import java.util.*;
@@ -29,12 +30,12 @@ import org.apache.log4j.Logger;
  * RDBMSRecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  **/
 
 class RDBMSRecordSet extends RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/RDBMSRecordSet.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/RDBMSRecordSet.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
     final private RDBMSEngine m_engine;
     final private ResultCycle m_rc;
@@ -65,8 +66,8 @@ class RDBMSRecordSet extends RecordSet {
 
     public Object get(Path p) {
         try {
-            Adapter ad = Adapter.getAdapter
-                (getSignature().getProperty(p).getType());
+            ObjectType type = getSignature().getProperty(p).getType();
+            Adapter ad = type.getRoot().getAdapter(type);
 
             StatementLifecycle cycle = m_rc.getLifecycle();
             String column = getColumn(p);

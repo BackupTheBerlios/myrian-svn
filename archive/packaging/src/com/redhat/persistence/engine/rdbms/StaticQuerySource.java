@@ -25,12 +25,12 @@ import java.util.*;
  * StaticQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  **/
 
 class StaticQuerySource extends QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/StaticQuerySource.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/StaticQuerySource.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
     private synchronized Source getSource(ObjectType type, SQLBlock block,
                                           Path prefix) {
@@ -62,7 +62,8 @@ class StaticQuerySource extends QuerySource {
 		sig.addPath(Path.relative(prefix, path));
 	    } catch (NoSuchPathException e) {
 		throw new MetadataException
-		    (block, "mapping not in signature: " + e.getPath());
+		    (type.getRoot(), block,
+                     "mapping not in signature: " + e.getPath());
 	    }
         }
 
@@ -89,7 +90,8 @@ class StaticQuerySource extends QuerySource {
 
 	if (unfetched != null) {
 	    throw new MetadataException
-		(block, "unfetched immediate properties: " + unfetched);
+		(type.getRoot(), block,
+                 "unfetched immediate properties: " + unfetched);
 	}
 
 	if (from != null) {
@@ -111,14 +113,14 @@ class StaticQuerySource extends QuerySource {
     }
 
     public Query getQuery(ObjectType type) {
-        ObjectMap om = Root.getRoot().getObjectMap(type);
+        ObjectMap om = type.getRoot().getObjectMap(type);
         Signature sig = getSignature(type, om.getRetrieveAll(), null, null);
         return new Query(sig, null);
     }
 
     public Query getQuery(PropertyMap keys) {
         ObjectType type = keys.getObjectType();
-        ObjectMap om = Root.getRoot().getObjectMap(type);
+        ObjectMap om = type.getRoot().getObjectMap(type);
         Collection keyProps = om.getKeyProperties();
 
         if (om.getRetrieveAll() == null) {
@@ -150,7 +152,7 @@ class StaticQuerySource extends QuerySource {
     }
 
     public Query getQuery(Object obj) {
-        ObjectMap om = Session.getObjectMap(obj);
+        ObjectMap om = getSession().getObjectMap(obj);
         ObjectType type = om.getObjectType();
         if (om.getRetrieveAll() == null) {
             Property key =
@@ -167,7 +169,8 @@ class StaticQuerySource extends QuerySource {
     }
 
     public Query getQuery(Object obj, Property prop) {
-        return getQuery(Session.getObjectMap(obj), Session.getProperties(obj),
+        return getQuery(getSession().getObjectMap(obj),
+                        getSession().getProperties(obj),
                         prop);
     }
 
@@ -180,7 +183,8 @@ class StaticQuerySource extends QuerySource {
             Mapping m = om.getMapping(path);
             block = m.getRetrieve();
             if (block == null) {
-                throw new MetadataException(prop, "no retrieve for " + prop);
+                throw new MetadataException(prop.getRoot(), prop,
+                                            "no retrieve for " + prop);
             }
             sig = getSignature(type, block, path, props.getObjectType());
         } else {
@@ -204,7 +208,7 @@ class StaticQuerySource extends QuerySource {
                 block = m.getRetrieve();
                 if (block == null) {
                     throw new MetadataException
-                        (prop, "no retrieve for " + prop);
+                        (prop.getRoot(), prop, "no retrieve for " + prop);
                 }
                 sig = getSignature
                     (prop.getType(), block, path, props.getObjectType());

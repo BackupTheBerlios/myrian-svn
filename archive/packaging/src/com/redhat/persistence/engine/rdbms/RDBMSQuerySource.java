@@ -23,12 +23,12 @@ import com.redhat.persistence.metadata.*;
  * RDBMSQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  **/
 
 public class RDBMSQuerySource extends QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/RDBMSQuerySource.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/RDBMSQuerySource.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
     private DynamicQuerySource m_dqs = new DynamicQuerySource();
     private StaticQuerySource m_sqs = new StaticQuerySource();
@@ -45,7 +45,7 @@ public class RDBMSQuerySource extends QuerySource {
     }
 
     public Query getQuery(ObjectType type) {
-        ObjectMap om = Root.getRoot().getObjectMap(type);
+        ObjectMap om = type.getRoot().getObjectMap(type);
         if (isStatic(om)) {
             return m_sqs.getQuery(type);
         } else {
@@ -54,7 +54,8 @@ public class RDBMSQuerySource extends QuerySource {
     }
 
     public Query getQuery(PropertyMap keys) {
-        ObjectMap om = Root.getRoot().getObjectMap(keys.getObjectType());
+        ObjectType ot = keys.getObjectType();
+        ObjectMap om = ot.getRoot().getObjectMap(ot);
         if (isStatic(om)) {
             return m_sqs.getQuery(keys);
         } else {
@@ -63,7 +64,7 @@ public class RDBMSQuerySource extends QuerySource {
     }
 
     public Query getQuery(Object obj) {
-        ObjectMap om = Session.getObjectMap(obj);
+        ObjectMap om = getSession().getObjectMap(obj);
         if (isStatic(om)) {
             return m_sqs.getQuery(obj);
         } else {
@@ -72,7 +73,7 @@ public class RDBMSQuerySource extends QuerySource {
     }
 
     public Query getQuery(Object obj, Property prop) {
-        ObjectMap om = Session.getObjectMap(obj);
+        ObjectMap om = getSession().getObjectMap(obj);
         if (isStatic(om, prop)) {
             return m_sqs.getQuery(obj, prop);
         } else {

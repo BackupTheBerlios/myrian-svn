@@ -16,85 +16,112 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.MetadataRoot;
+import com.arsdigita.persistence.pdl.PDL;
 import com.redhat.persistence.EventProcessorManager;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 
 /**
- * The SessionManager is a purely static class that allows users to retrieve
- * the current Session. It is in charge of initializing the Session with the
- * appropriate connection information. It currently does not support
- * initializing Sessions with more than one schema. It also holds a reference
- * to the global MetadataRoot. It is the responsibility of the initialization
- * to provide the JDBC information and the MetadataRoot to the SessionManager.
+ * The SessionManager is a purely static class that allows users to
+ * retrieve the current Session. It is in charge of initializing the
+ * Session with the appropriate connection information. It currently
+ * does not support initializing Sessions with more than one schema.
+ * It also holds a reference to the global MetadataRoot. It is the
+ * responsibility of the initialization to provide the JDBC
+ * information and the MetadataRoot to the SessionManager.
  *
  * @see Initializer
  * @author Archit Shah 
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/SessionManager.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/SessionManager.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
-    private static String s_url = null;           // the jdbc URL
-    private static String s_username = null;      // the database username
-    private static String s_password = null;      // the database password
-    private static ThreadLocal s_session;  // the session
-    private static SQLUtilities s_sqlUtil;
+    private static final Logger s_log = Logger.getLogger
+        (SessionManager.class.getName());
+
     private static Set s_beforeFlushProcManagers = new HashSet();
     private static Set s_afterFlushProcManagers  = new HashSet();
+    private static ThreadLocal s_sessions = new ThreadLocal() {
+        public Object initialValue() {
+            return new HashMap();
+        }
+    };
 
-    private static final Logger s_cat =
-        Logger.getLogger(SessionManager.class.getName());
-
-
-    static {
-        resetSchemaConnectionInfo();
+    public static Session open(String name, MetadataRoot root,
+                               ConnectionSource source, int database) {
+        if (hasSession(name)) {
+            throw new IllegalStateException("session already open: " + name);
+        }
+        Session result = new Session(root, source, database);
+        for (Iterator ii=s_beforeFlushProcManagers.iterator();
+             ii.hasNext(); ) {
+            EventProcessorManager mngr = (EventProcessorManager) ii.next();
+            result.getProtoSession().addBeforeFlush(mngr.getEventProcessor());
+        }
+        for (Iterator ii=s_afterFlushProcManagers.iterator(); ii.hasNext(); ) {
+            EventProcessorManager mngr = (EventProcessorManager) ii.next();
+            result.getProtoSession().addAfterFlush(mngr.getEventProcessor());
+        }
+        setSession(name, result);
+        return result;
     }
 
     /**
-     *  This returns the metadata root
-     *
-     *  @return The global MetadataRoot.
-     */
-    public static synchronized MetadataRoot getMetadataRoot() {
-        return MetadataRoot.getMetadataRoot();
+     * @return the session named "default"
+     **/
+    public static Session getSession() {
+        return getSession("default");
     }
 
+    private static Map getSessions() {
+        return (Map) s_sessions.get();
+    }
+
+    private static void setSession(String name, Session ssn) {
+        getSessions().put(name, ssn);
+    }
 
     /**
      *  @return The Session object for the current thread.
-     */
-    public static Session getSession() {
-        return (Session) s_session.get();
+     **/
+    public static Session getSession(String name) {
+        return (Session) getSessions().get(name);
     }
 
     /**
-     * This method provides an indirect way for applications to register {@link
-     * com.redhat.persistence.EventProcessor event processors} with the
-     * {@link Session session} object.
+     * @return true if a session with the given name has been opened.
+     **/
+    public static boolean hasSession(String name) {
+        return getSessions().containsKey(name);
+    }
+
+    /**
+     * This method provides an indirect way for applications to
+     * register {@link com.redhat.persistence.EventProcessor event
+     * processors} with the {@link Session session} object.
      *
      * <p>This works like so</p>
      *
      * <ul>
-     *  <li>You register your {@link EventProcessorManager event processor manager}
-     *      with this session manager.</li>
+     *  <li>You register your {@link EventProcessorManager event
+     *  processor manager} with this session manager.</li>
      *
-     *  <li>Each {@link Session session} returned by {@link #getSession()} will
-     *  have a reference to a single (per thread) instance of the {@link
-     *  com.redhat.persistence.EventProcessor event processor} managed
-     *  the {@link EventProcessorManager event processor manager} that you
-     *  registered.</li>
+     *  <li>Each {@link Session session} returned by {@link
+     *  #getSession()} will have a reference to a single (per thread)
+     *  instance of the {@link com.redhat.persistence.EventProcessor
+     *  event processor} managed the {@link EventProcessorManager
+     *  event processor manager} that you registered.</li>
      *
      *  <li>The {@link com.redhat.persistence.Session session} will
      *  dispatch events from its {@link
-     *  com.redhat.persistence.Session#flush()} method to to your event
-     *  processor's <code>write(Event)</code> method. </li>
+     *  com.redhat.persistence.Session#flush()} method to to your
+     *  event processor's <code>write(Event)</code> method. </li>
      * </ul>
      **/
     public static synchronized void addBeforeFlushProcManager
@@ -112,85 +139,13 @@ public class SessionManager {
         s_afterFlushProcManagers.add(manager);
     }
 
-     /**
-     *  This sets the connection info for this session manager
+    /**
+     *  This returns the metadata root
      *
-     *  @param schema The schema to use.  Right now, Session only
-     *                supports a single connection so this currently
-     *                ignores the schema
-     *  @param url The JDBC URL
-     *  @param username The database username
-     *  @param password The database password
+     *  @return The global MetadataRoot.
      */
-    static synchronized void setSchemaConnectionInfo(String schema, String url,
-                                                     String username, String password) {
-        // Right now Session only supports one connection, so just ignore the
-        // schema.
-        s_url = url;
-        s_username = username;
-        s_password = password;
+    public static MetadataRoot getMetadataRoot() {
+        return getSession().getMetadataRoot();
     }
-
-/*    static synchronized void setSessionFactory(SessionFactory factory) {
-        s_factory = factory;
-        }*/
-
-    /**
-     *  This resets the connection info by "forgetting" the schema, url,
-     *  username, password, and session
-     */
-    static synchronized void resetSchemaConnectionInfo() {
-        if (s_cat.isDebugEnabled()) {
-            s_cat.debug("Resetting schema connection", new Throwable());
-        }
-        s_session = new ThreadLocal() {
-                public Object initialValue() {
-                    StringBuffer sb = new StringBuffer();
-                    if (s_url == null) {
-                        sb.append(Utilities.LINE_BREAK + "  url is null");
-                    }
-                    if (s_username == null) {
-                        sb.append(Utilities.LINE_BREAK + "  username is null");
-                    }
-                    if (s_password == null) {
-                        sb.append(Utilities.LINE_BREAK + "  password is null");
-                    }
-                    if (sb.length() > 0) {
-                        throw new IllegalStateException("SessionManager has " +
-                                                        "not been initialized: " +
-                                                        sb.toString());
-                    }
-                    Session s = new Session();
-                    for (Iterator ii=s_beforeFlushProcManagers.iterator(); ii.hasNext(); ) {
-                        EventProcessorManager mngr = 
-                            (EventProcessorManager) ii.next();
-                        s.getProtoSession().addBeforeFlush(mngr.getEventProcessor());
-                    }
-                    for (Iterator ii=s_afterFlushProcManagers.iterator(); ii.hasNext(); ) {
-                        EventProcessorManager mngr = 
-                            (EventProcessorManager) ii.next();
-                        s.getProtoSession().addAfterFlush(mngr.getEventProcessor());
-                    }
-                    return s;
-                }
-            };
-    }
-
-    /**
-     *   - This retrieves the
-     *  factory that is used to create the filters for this DataQuery.
-     */
-    public static SQLUtilities getSQLUtilities() {
-        return s_sqlUtil;
-    }
-
-
-    /**
-       *  This sets the SQLUtilities for the system.
-       */
-    public static void setSQLUtilities(SQLUtilities util) {
-          s_sqlUtil = util;
-    }
-
 
 }

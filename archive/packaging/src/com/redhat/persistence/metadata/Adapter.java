@@ -13,10 +13,11 @@
  *
  */
 
-package com.redhat.persistence;
+package com.redhat.persistence.metadata;
 
 import com.redhat.persistence.common.*;
-import com.redhat.persistence.metadata.*;
+import com.redhat.persistence.Session;
+import com.redhat.persistence.PropertyMap;
 
 import java.util.*;
 import java.sql.*;
@@ -25,48 +26,28 @@ import java.sql.*;
  * Adapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #1 $ $Date: 2003/08/27 $
  **/
 
 public abstract class Adapter {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/Adapter.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/metadata/Adapter.java#1 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
 
-    private static final Map ADAPTERS = new HashMap();
+    private Root m_root;
 
-    public static final void addAdapter(Class javaClass, Adapter ad) {
-        ADAPTERS.put(javaClass, ad);
+    void setRoot(Root root) {
+        m_root = root;
     }
 
-    public static final Adapter getAdapter(Class javaClass) {
-        for (Class c = javaClass; c != null; c = c.getSuperclass()) {
-            Adapter a = (Adapter) ADAPTERS.get(c);
-            if (a != null) { return a; }
-        }
-
-        throw new IllegalArgumentException("no adapter for: " + javaClass);
+    public Root getRoot() {
+        return m_root;
     }
 
-    public static final Adapter getAdapter(ObjectType type) {
-        for (ObjectType ot = type; ot != null; ot = ot.getSupertype()) {
-	    Class klass = ot.getJavaClass();
-	    if (klass != null) {
-		Adapter a = getAdapter(klass);
-		if (a != null) { return a; }
-	    }
-        }
-
-        Adapter a = (Adapter) ADAPTERS.get(null);
-        if (a != null) { return a; }
-
-        throw new IllegalArgumentException("no adapter for: " + type);
-    }
-
-    Object getSessionKey(Object obj) {
+    public Object getSessionKey(Object obj) {
         return getSessionKey(getObjectType(obj), getProperties(obj));
     }
 
-    Object getSessionKey(ObjectType type, PropertyMap props) {
+    public Object getSessionKey(ObjectType type, PropertyMap props) {
         Collection keys = type.getKeyProperties();
         Object key = null;
 
