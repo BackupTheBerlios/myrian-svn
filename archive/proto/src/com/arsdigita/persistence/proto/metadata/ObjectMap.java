@@ -8,12 +8,12 @@ import java.util.*;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2003/02/12 $
+ * @version $Revision: #10 $ $Date: 2003/02/19 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#9 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#10 $ by $Author: rhs $, $DateTime: 2003/02/19 22:58:51 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -21,6 +21,10 @@ public class ObjectMap extends Element {
     private Join m_superJoin;
     private ArrayList m_joins = new ArrayList();
     private ArrayList m_fetched = new ArrayList();
+    private SQLBlock m_retrieve;
+    private ArrayList m_inserts = new ArrayList();
+    private ArrayList m_updates = new ArrayList();
+    private ArrayList m_deletes = new ArrayList();
 
     public ObjectMap(ObjectType type) {
         m_type = type;
@@ -198,6 +202,38 @@ public class ObjectMap extends Element {
                 });
         }
         return result;
+    }
+
+    public SQLBlock getRetrieve() {
+        return m_retrieve;
+    }
+
+    public void setRetrieve(SQLBlock retrieve) {
+        m_retrieve = retrieve;
+    }
+
+    public Collection getInserts() {
+        return m_inserts;
+    }
+
+    public void addInsert(SQLBlock insert) {
+        m_inserts.add(insert);
+    }
+
+    public Collection getUpdates() {
+        return m_updates;
+    }
+
+    public void addUpdate(SQLBlock update) {
+        m_updates.add(update);
+    }
+
+    public Collection getDeletes() {
+        return m_deletes;
+    }
+
+    public void addDelete(SQLBlock delete) {
+        m_deletes.add(delete);
     }
 
     Object getKey() {

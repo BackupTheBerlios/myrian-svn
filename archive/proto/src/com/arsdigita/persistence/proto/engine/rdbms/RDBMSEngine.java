@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #16 $ $Date: 2003/02/18 $
+ * @version $Revision: #17 $ $Date: 2003/02/19 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#16 $ by $Author: rhs $, $DateTime: 2003/02/18 01:41:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#17 $ by $Author: rhs $, $DateTime: 2003/02/19 22:58:51 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -72,6 +72,25 @@ public class RDBMSEngine extends Engine {
     DML getOperation(Object from, Object to, Table table) {
         Object key = new CompoundKey(new CompoundKey(from, to), table);
         return (DML) m_operationMap.get(key);
+    }
+
+    void addOperation(Object obj, StaticOperation op) {
+        ArrayList ops;
+        if (m_operationMap.containsKey(obj)) {
+            ops = (ArrayList) m_operationMap.get(obj);
+        } else {
+            ops = new ArrayList();
+            m_operationMap.put(obj, ops);
+        }
+        ops.add(op);
+    }
+
+    Collection getOperations(Object obj) {
+        return (Collection) m_operationMap.get(obj);
+    }
+
+    void addOperation(StaticOperation op) {
+        m_operations.add(op);
     }
 
     void clearOperations() {

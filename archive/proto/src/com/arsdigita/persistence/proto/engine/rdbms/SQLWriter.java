@@ -11,12 +11,12 @@ import java.sql.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/02/17 $
+ * @version $Revision: #3 $ $Date: 2003/02/19 $
  **/
 
 abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#2 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#3 $ by $Author: rhs $, $DateTime: 2003/02/19 22:58:51 $";
 
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();
@@ -79,6 +79,10 @@ abstract class SQLWriter {
         } finally {
             m_op = old;
         }
+    }
+
+    public void write(StaticOperation sop) {
+        write(sop.getSQLBlock().getSQL());
     }
 
     public void write(Join join) {
