@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/lucene/Document.pdl#3 $ 
-// $DateTime: 2002/12/21 01:24:31 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/lucene/Document.pdl#4 $ 
+// $DateTime: 2003/05/05 15:56:50 $
 
 model com.arsdigita.lucene;
 
@@ -35,4 +35,30 @@ object type Document {
         lucene_docs.last_modified_party INTEGER;
 
     object key(id);
+
+
+    // To avoid race conditions between indexers, we
+    // never 'set' the dirty flag - we just toggle
+    // our bit.
+    update {
+      do {
+        update lucene_docs set
+           type = :type,
+           type_info = :typeSpecificInfo,
+           timestamp = :timestamp,
+           is_deleted = :isDeleted,
+           language = :language,
+           country = :country,
+           title = :title,
+           summary = :summary,
+           content = :content,
+           creation_date = :creationDate,
+           creation_party = :creationParty,
+           last_modified_date = :lastModifiedDate,
+           last_modified_party = :lastModifiedParty,
+           is_dirty = lucene_update_dirty(timestamp, :timestamp, is_dirty, :isDirty)
+        where document_id = :id
+      }
+    }
 }
+
