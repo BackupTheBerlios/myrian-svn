@@ -18,12 +18,12 @@ import org.apache.log4j.Category;
  * Node
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2002/08/01 $
+ * @version $Revision: #9 $ $Date: 2002/08/01 $
  **/
 
 abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#8 $ by $Author: randyg $, $DateTime: 2002/08/01 11:13:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#9 $ by $Author: randyg $, $DateTime: 2002/08/01 13:55:46 $";
 
     private static final Category s_log = Category.getInstance(Node.class);
 
@@ -241,7 +241,6 @@ abstract class Node {
 
         for (Iterator it = m_children.values().iterator(); it.hasNext(); ) {
             Node child = (Node) it.next();
-            System.out.println("traversing " + child.getName());
             child.traverse(actor);
         }
     }

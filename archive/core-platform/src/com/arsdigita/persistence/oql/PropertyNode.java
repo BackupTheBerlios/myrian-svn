@@ -7,12 +7,12 @@ import java.util.*;
  * PropertyNode
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/08/01 $
+ * @version $Revision: #8 $ $Date: 2002/08/01 $
  **/
 
 class PropertyNode extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/PropertyNode.java#7 $ by $Author: randyg $, $DateTime: 2002/08/01 11:13:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/PropertyNode.java#8 $ by $Author: randyg $, $DateTime: 2002/08/01 13:55:46 $";
 
     private Property m_property;
 
@@ -83,15 +83,5 @@ class PropertyNode extends Node {
         }
 
         super.buildQuery();
-    }
-
-    public boolean equals(Object object) {
-        // TODO - make more robust
-        if (!(object instanceof PropertyNode || object == null)) {
-            return false;
-        }
-        PropertyNode node = (PropertyNode)object;
-        return getAlias().equals(node.getAlias()) &&
-            getName().equals(node.getName());
     }
 }
