@@ -8,20 +8,23 @@ import java.util.*;
  * PropertyMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/02/13 $
+ * @version $Revision: #2 $ $Date: 2003/02/26 $
  **/
 
 public class PropertyMap {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyMap.java#1 $ by $Author: rhs $, $DateTime: 2003/02/13 13:54:43 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyMap.java#2 $ by $Author: rhs $, $DateTime: 2003/02/26 20:44:08 $";
 
-    public static final PropertyMap EMPTY = new PropertyMap() {
-            public void set(PropertyMap prop, Object obj) {
-                throw new IllegalStateException("don't mutate me");
-            }
-        };
-
+    private ObjectType m_type;
     private HashMap m_values = new HashMap();
+
+    public PropertyMap(ObjectType type) {
+        m_type = type;
+    }
+
+    public ObjectType getObjectType() {
+        return m_type;
+    }
 
     public Object get(Property prop) {
         return m_values.get(prop);

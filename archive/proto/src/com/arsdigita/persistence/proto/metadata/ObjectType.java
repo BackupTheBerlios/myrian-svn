@@ -7,12 +7,12 @@ import java.util.*;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/02/06 $
+ * @version $Revision: #8 $ $Date: 2003/02/26 $
  **/
 
 public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#7 $ by $Author: rhs $, $DateTime: 2003/02/06 18:43:54 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#8 $ by $Author: rhs $, $DateTime: 2003/02/26 20:44:08 $";
 
     private Model m_model;
     private String m_name;
@@ -116,6 +116,12 @@ public class ObjectType extends Element {
         Property prop = getProperty(path);
         ObjectMap map = getRoot().getObjectMap(prop.getContainer());
         return map.getKeyProperties().contains(prop);
+    }
+
+    public boolean isImmediate(Path path) {
+        Property prop = getProperty(path);
+        Collection keys = prop.getContainer().getKeyProperties();
+        return keys.size() == 0 || keys.contains(prop);
     }
 
     public Collection getKeyProperties() {

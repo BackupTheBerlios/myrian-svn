@@ -13,12 +13,12 @@ import java.sql.*;
  * StaticEventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/02/26 $
+ * @version $Revision: #3 $ $Date: 2003/02/26 $
  **/
 
 class StaticEventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/StaticEventSwitch.java#2 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/StaticEventSwitch.java#3 $ by $Author: rhs $, $DateTime: 2003/02/26 20:44:08 $";
 
     private static final Logger LOG =
         Logger.getLogger(StaticEventSwitch.class);
@@ -139,7 +139,7 @@ class StaticEventSwitch extends Event.Switch {
 
         PropertyMap props;
         if (obj == null) {
-            props = new PropertyMap();
+            props = new PropertyMap(type);
         } else {
             props = Session.getProperties(obj);
         }

@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2003/02/17 $
+ * @version $Revision: #11 $ $Date: 2003/02/26 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#10 $ by $Author: rhs $, $DateTime: 2003/02/17 20:13:29 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/RecordSet.java#11 $ by $Author: rhs $, $DateTime: 2003/02/26 20:44:08 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -47,7 +47,7 @@ public abstract class RecordSet {
         for (Iterator it = paths.iterator(); it.hasNext(); ) {
             Path p = (Path) it.next();
             Path parent = p.getParent();
-            if (type.isKey(p)) {
+            if (type.isImmediate(p)) {
                 Object value = get(p);
                 PropertyMap props;
                 if (pmaps.containsKey(parent)) {
@@ -56,7 +56,8 @@ public abstract class RecordSet {
                     if (value == null) {
                         props = null;
                     } else {
-                        props = new PropertyMap();
+                        props = new PropertyMap
+                            (type.getProperty(p).getContainer());
                     }
                     pmaps.put(parent, props);
                 }
@@ -83,10 +84,15 @@ public abstract class RecordSet {
                 } else {
                     ot = m_signature.getProperty(p).getType();
                 }
-                Object obj = ssn.getObject(m_adapter.getSessionKey(ot, props));
+                Object obj = null;
+                if (ot.hasKey()) {
+                    obj = ssn.getObject(m_adapter.getSessionKey(ot, props));
+                }
                 if (obj == null) {
                     obj = m_adapter.getObject(ot, props);
-                    m_adapter.setSession(obj, ssn);
+                    if (ot.hasKey()) {
+                        m_adapter.setSession(obj, ssn);
+                    }
                 }
                 objs.put(p, obj);
             }
@@ -107,10 +113,12 @@ public abstract class RecordSet {
                 }
             } else {
                 Property prop = m_signature.getProperty(p);
-                if (objs.containsKey(p)) {
-                    ssn.load(obj, prop, objs.get(p));
-                } else {
-                    ssn.load(obj, prop, get(p));
+                if (prop.getContainer().hasKey()) {
+                    if (objs.containsKey(p)) {
+                        ssn.load(obj, prop, objs.get(p));
+                    } else {
+                        ssn.load(obj, prop, get(p));
+                    }
                 }
             }
         }

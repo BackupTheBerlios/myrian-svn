@@ -16,12 +16,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #17 $ $Date: 2003/02/17 $
+ * @version $Revision: #18 $ $Date: 2003/02/26 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#17 $ by $Author: rhs $, $DateTime: 2003/02/17 20:13:29 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#18 $ by $Author: rhs $, $DateTime: 2003/02/26 20:44:08 $";
 
 
     public ProtoTest(String name) {
@@ -65,7 +65,7 @@ public class ProtoTest extends TestCase {
                         // Do nothing
                     }
                 }
-            ));
+            ), new RDBMSQuerySource());
 
         Property REQUIRED = obj.getType().getProperty("required");
         Generic req = new Generic(REQUIRED.getType(), new BigInteger("10"));

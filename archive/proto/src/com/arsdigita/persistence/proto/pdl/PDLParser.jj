@@ -13,12 +13,12 @@ import com.arsdigita.persistence.proto.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/02/26 $
+ * @version $Revision: #2 $ $Date: 2003/02/26 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDLParser.jj#1 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDLParser.jj#2 $ by $Author: rhs $, $DateTime: 2003/02/26 20:44:08 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -83,7 +83,7 @@ TOKEN:
   | <EXTENDS: "extends">
   | <QUERY: "query">
   | <RETURNS: "returns">
-  | <DML: "data" <WS> "operation">
+  | <DATA_OPERATION: "data" <WS> "operation">
   | <CALL: "do" <WS> "call"> : BEGIN
   | <DO: "do"> : BEGIN
   | <MAP: "map">
@@ -150,7 +150,7 @@ FileNd file(String filename) :
     ( n = pimpwhore() <SEMI> { f.add(FileNd.IMPORTS, n); } )*
     (   n = object_type() { f.add(FileNd.OBJECT_TYPES, n); }
       | n = association() { f.add(FileNd.ASSOCIATIONS, n); }
-      | query() )*
+      | data_operation() )*
     <EOF>
     { return f; }
 }
@@ -186,10 +186,15 @@ ObjectTypeNd object_type() :
     Node n;
 }
 {
-    [ <VERSIONED> { isVersioned = true; ot.add(ObjectTypeNd.VERSIONED, new VersionedNd());} ]
-    t = <OBJECTTYPE> n = id() { ot.add(ObjectTypeNd.NAME, n); }
-    [ ( <EXTENDS> n = type() { ot.add(ObjectTypeNd.EXTENDS, n); } |
-        <ADAPTER> n = javaClass() { ot.add(ObjectTypeNd.ADAPTER, n); } ) ]
+    [ <VERSIONED> { isVersioned = true; ot.add(ObjectTypeNd.VERSIONED,
+                                               new VersionedNd());} ]
+    ( t = <QUERY> | t = <OBJECTTYPE> )
+        n = id() { ot.add(ObjectTypeNd.NAME, n); }
+    [ ( <EXTENDS> n = type() { ot.add(ObjectTypeNd.EXTENDS, n); }
+       |
+        <ADAPTER> n = javaClass() { ot.add(ObjectTypeNd.ADAPTER, n); }
+       |
+        <RETURNS> <INT> <DOT> <DOT> ( id() | <INT> ) ) ]
     <LBRACE>
         ( statement(ot) )*
     <RBRACE>
@@ -214,13 +219,11 @@ AssociationNd association() :
     { ln(a, t); return a; }
 }
 
-void query() :
+void data_operation() :
 {}
 {
-    ( <QUERY> | <DML> ) id()
-    [ <RETURNS> <INT> <DOT> <DOT> ( id() | <INT> ) ]
+    <DATA_OPERATION> id()
     <LBRACE>
-         ( property() <SEMI> )*
          [ option_block() ]
          sql_block()
     <RBRACE>
@@ -380,22 +383,22 @@ EventNd event() :
     Node n;
 }
 {
-    ( (  t = <INSERT> 
-       | t = <UPDATE> 
-       | t = <DELETE> )
+    ( ( ( t = <INSERT> | t = <UPDATE> | t = <DELETE> )
+       |
+        ( ( t = <ADD> | t = <REMOVE> | t = <CLEAR> )
+          [ n = id() { ev.add(EventNd.NAME, n); } ] )
+       |
+        ( t = <RETRIEVE> [ t = <ALL> | t = <ATTRIBUTES> |
+                           n = id() { ev.add(EventNd.NAME, n); } ] ) )
+      <LBRACE>
+          ( n = sql_block() { ev.add(EventNd.SQL, n); } | <SUPER> <SEMI> )*
+      <RBRACE>
+      { ev.setType(EventNd.getType(t.image)); ln(ev, t); }
      |
-      ( (  t = <ADD>
-         | t = <REMOVE>
-         | t = <CLEAR> )
-       [ n = id() { ev.add(EventNd.NAME, n); } ] )
-     |
-      ( t = <RETRIEVE> [ t = <ALL> | t = <ATTRIBUTES> |
-                         n = id() { ev.add(EventNd.NAME, n); } ] )
-    )
-    <LBRACE>
-        ( n = sql_block() { ev.add(EventNd.SQL, n); } | <SUPER> <SEMI> )*
-    <RBRACE>
-    { ev.setType(EventNd.getType(t.image)); ln(ev, t); return ev; }
+      n = sql_block() { ev.add(EventNd.SQL, n);
+                        ev.setType(EventNd.getType("all"));
+                        ln(ev, n); } )
+    { return ev; }
 }
 
 SQLBlockNd sql_block() :

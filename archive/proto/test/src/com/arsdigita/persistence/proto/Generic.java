@@ -7,7 +7,7 @@ import com.arsdigita.persistence.proto.metadata.ObjectType;
  * A generic class to persist and an appropriate adapter.
  *
  * @author <a href="mailto:ashah@redhat.com">Archit Shah</a>
- * @version $Revision: #1 $ $Date: 2003/02/14 $
+ * @version $Revision: #2 $ $Date: 2003/02/26 $
  **/
 
 public class Generic {
@@ -23,9 +23,9 @@ public class Generic {
         }
 
         public PropertyMap getProperties(Object obj) {
-            PropertyMap result = new PropertyMap();
-            result.put(getObjectType(obj).getProperty("id"),
-                       ((Generic) obj).getID());
+            Generic g = (Generic) obj;
+            PropertyMap result = new PropertyMap(g.getType());
+            result.put(g.getType().getProperty("id"), g.getID());
             return result;
         }
 

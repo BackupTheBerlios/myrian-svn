@@ -1,3 +1,4 @@
 
  * Switch pattern
  * Ordered maps
+ * Stable data structures

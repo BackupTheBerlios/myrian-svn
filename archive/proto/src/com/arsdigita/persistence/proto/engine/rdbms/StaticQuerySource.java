@@ -10,12 +10,12 @@ import java.util.*;
  * StaticQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/02/26 $
+ * @version $Revision: #2 $ $Date: 2003/02/26 $
  **/
 
 class StaticQuerySource extends QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/StaticQuerySource.java#1 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/StaticQuerySource.java#2 $ by $Author: rhs $, $DateTime: 2003/02/26 20:44:08 $";
 
     private synchronized Source getSource(ObjectType type, SQLBlock block,
                                           Path prefix) {
@@ -57,6 +57,12 @@ class StaticQuerySource extends QuerySource {
         return sig;
     }
 
+    public Query getQuery(ObjectType type) {
+        ObjectMap om = Root.getRoot().getObjectMap(type);
+        Signature sig = getSignature(type, om.getRetrieveAll(), null, false);
+        return new Query(sig, null);
+    }
+
     public Query getQuery(ObjectType type, Object key) {
         ObjectMap om = Root.getRoot().getObjectMap(type);
         Collection keys = om.getKeyProperties();
@@ -66,7 +72,7 @@ class StaticQuerySource extends QuerySource {
         Property keyProp = (Property) keys.iterator().next();
 
         if (om.getRetrieveAll() == null) {
-            PropertyMap props = new PropertyMap();
+            PropertyMap props = new PropertyMap(type);
             props.put(keyProp, key);
             return getQuery(om, props, keyProp);
         }

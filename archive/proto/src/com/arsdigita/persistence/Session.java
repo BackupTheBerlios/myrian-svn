@@ -22,9 +22,11 @@ import com.arsdigita.persistence.proto.Adapter;
 import com.arsdigita.persistence.proto.Signature;
 import com.arsdigita.persistence.proto.Query;
 import com.arsdigita.persistence.proto.PropertyMap;
+import com.arsdigita.persistence.proto.metadata.Root;
 import com.arsdigita.persistence.proto.metadata.Property;
 import com.arsdigita.persistence.proto.engine.MemoryEngine;
 import com.arsdigita.persistence.proto.engine.rdbms.RDBMSEngine;
+import com.arsdigita.persistence.proto.engine.rdbms.RDBMSQuerySource;
 import com.arsdigita.persistence.proto.engine.rdbms.ConnectionSource;
 
 import java.util.Iterator;
@@ -47,21 +49,27 @@ import java.sql.SQLException;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2003/02/26 $
+ * @version $Revision: #15 $ $Date: 2003/02/26 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
 
     // This is just a temporary way to get an adapter registered.
     static {
-        Adapter.addAdapter(DataObjectImpl.class, null, new Adapter() {
+        Adapter ad = new Adapter() {
                 public void setSession(Object obj, com.arsdigita.persistence.proto.Session ssn) {
                     ((DataObjectImpl) obj).setSession(ssn);
                 }
 
                 public Object getObject(com.arsdigita.persistence.proto.metadata.ObjectType type,
                                         PropertyMap props) {
-                    OID oid = new OID(C.fromType(type));
+                    ObjectType ot = C.fromType(type);
+
+                    if (ot == null) {
+                        return props;
+                    }
+
+                    OID oid = new OID(ot);
                     for (Iterator it = props.entrySet().iterator();
                          it.hasNext(); ) {
                         Map.Entry me = (Map.Entry) it.next();
@@ -72,8 +80,12 @@ public class Session {
                 }
 
                 public PropertyMap getProperties(Object obj) {
+                    if (obj instanceof PropertyMap) {
+                        return (PropertyMap) obj;
+                    }
+
                     OID oid = ((DataObjectImpl) obj).getOID();
-                    PropertyMap result = new PropertyMap();
+                    PropertyMap result = new PropertyMap(getObjectType(obj));
                     for (Iterator it =
                              oid.getProperties().entrySet().iterator();
                          it.hasNext(); ) {
@@ -85,37 +97,40 @@ public class Session {
 
                 public com.arsdigita.persistence.proto.metadata.ObjectType
                 getObjectType(Object obj) {
+                    if (obj instanceof PropertyMap) {
+                        return ((PropertyMap) obj).getObjectType();
+                    }
                     return C.type(((DataObjectImpl) obj).getObjectType());
                 }
-            });
+            };
+        Adapter.addAdapter(DataObjectImpl.class, null, ad);
+        Adapter.addAdapter(PropertyMap.class, null, ad);
     }
 
+    private ConnectionSource m_cs = new ConnectionSource() {
+            private List m_conns = new ArrayList();
+
+            public Connection acquire() {
+                if (m_conns.size() > 0) {
+                    return (Connection) m_conns.remove(m_conns.size() - 1);
+                }
+
+                try {
+                    Connection conn = ConnectionManager.getConnection();
+                    conn.setAutoCommit(false);
+                    return conn;
+                } catch (SQLException e) {
+                    throw new Error(e.getMessage());
+                }
+            }
+
+            public void release(Connection conn) {
+                m_conns.add(conn);
+            }
+        };
+    private RDBMSQuerySource m_qs = new RDBMSQuerySource();
     private com.arsdigita.persistence.proto.Session m_ssn =
-        new com.arsdigita.persistence.proto.Session(new MemoryEngine());
-    // Use the instantiation below to run with the relational engine. Right
-    // now this will only work on postgres.
-/*        new com.arsdigita.persistence.proto.Session(
-            new RDBMSEngine(new ConnectionSource() {
-                private List m_conns = new ArrayList();
-
-                public Connection acquire() {
-                    if (m_conns.size() > 0) {
-                        return (Connection) m_conns.remove(m_conns.size() - 1);
-                    }
-
-                    try {
-                        Connection conn = ConnectionManager.getConnection();
-                        conn.setAutoCommit(false);
-                        return conn;
-                    } catch (SQLException e) {
-                        throw new Error(e.getMessage());
-                    }
-                }
-
-                public void release(Connection conn) {
-                    m_conns.add(conn);
-                }
-                }));*/
+    new com.arsdigita.persistence.proto.Session(new RDBMSEngine(m_cs), m_qs);
 
     private TransactionContext m_ctx = new TransactionContext(m_ssn);
     private MetadataRoot m_root = MetadataRoot.getMetadataRoot();
@@ -311,10 +326,8 @@ public class Session {
      **/
 
     public DataCollection retrieve(ObjectType type) {
-        Signature sig = new Signature(C.type(type));
-        sig.addDefaultProperties();
-        return new DataCollectionImpl(this,
-                                      m_ssn.retrieve(new Query(sig, null)));
+        Query q = m_qs.getQuery(C.type(type));
+        return new DataCollectionImpl(this, m_ssn.retrieve(q));
     }
 
 
@@ -409,7 +422,8 @@ public class Session {
      **/
 
     public DataQuery retrieveQuery(String name) {
-        throw new Error("not implemented");
+        Query q = m_qs.getQuery(Root.getRoot().getObjectType(name));
+        return new DataQueryImpl(this, m_ssn.retrieve(q));
     }
 
     /**

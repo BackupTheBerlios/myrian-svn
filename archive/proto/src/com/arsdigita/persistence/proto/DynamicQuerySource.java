@@ -9,17 +9,23 @@ import java.util.*;
  * DynamicQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/02/26 $
+ * @version $Revision: #2 $ $Date: 2003/02/26 $
  **/
 
 public class DynamicQuerySource extends QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DynamicQuerySource.java#1 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DynamicQuerySource.java#2 $ by $Author: rhs $, $DateTime: 2003/02/26 20:44:08 $";
 
     private Signature getSignature(ObjectType type) {
         Signature result = new Signature(type);
         result.addDefaultProperties();
         return result;
+    }
+
+    public Query getQuery(ObjectType type) {
+        Signature sig = new Signature(type);
+        sig.addDefaultProperties();
+        return new Query(sig, null);
     }
 
     public Query getQuery(ObjectType type, Object key) {

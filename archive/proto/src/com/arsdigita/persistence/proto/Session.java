@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #35 $ $Date: 2003/02/26 $
+ * @version $Revision: #36 $ $Date: 2003/02/26 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#35 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#36 $ by $Author: rhs $, $DateTime: 2003/02/26 20:44:08 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -40,10 +40,9 @@ public class Session {
 
     private final static Set EVENT_PROCESSORS = new HashSet();
 
-    public Session(Engine engine) {
+    public Session(Engine engine, QuerySource source) {
         m_engine = engine;
-        m_qs = new DynamicQuerySource();
-        //m_qs = new com.arsdigita.persistence.proto.engine.rdbms.RDBMSQuerySource();
+        m_qs = source;
     }
 
     public void create(Object obj) {
@@ -278,6 +277,10 @@ public class Session {
         }
 
         final Object[] result = {null};
+
+        if (!getObjectType(obj).hasKey()) {
+            return getProperties(obj).get(prop);
+        }
 
         prop.dispatch(new Property.Switch() {
                 public void onRole(Role role) {
