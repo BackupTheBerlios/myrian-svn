@@ -27,7 +27,7 @@ import java.util.Iterator;
  * what frequency. To use, do something like:
  *
  * Class Foo {
- *    private static s_trace = new CallTracer(Foo.class, 100);
+ *    private static CallTracer s_trace = new CallTracer(Foo.class, 100);
  *
  *    public foo() {
  *       s_trace.trace();
