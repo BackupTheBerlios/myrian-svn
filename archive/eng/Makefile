@@ -3,17 +3,17 @@ LIBS:=lib
 
 -include abe.mk
 
-run-tests: $(JSTAMPS)
+run-tests: all
 	bin/run-tests
 
-jdo-tests: $(JSTAMPS)
+jdo-tests: all
 	bin/run com.redhat.persistence.TestRunner \
 		com.redhat.persistence.jdo.JDOSuite
 
-persistence-tests: $(JSTAMPS)
+persistence-tests: all
 	bin/run com.redhat.persistence.TestRunner \
 		com.arsdigita.persistence.PersistenceSuite
 
-oql-tests: $(JSTAMPS)
+oql-tests: all
 	bin/run com.redhat.persistence.TestRunner \
 		com.redhat.persistence.oql.QuerySuite
