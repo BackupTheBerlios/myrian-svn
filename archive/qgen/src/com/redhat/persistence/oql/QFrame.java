@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/02/28 $
+ * @version $Revision: #9 $ $Date: 2004/03/02 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#8 $ by $Author: rhs $, $DateTime: 2004/02/28 08:30:26 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#9 $ by $Author: rhs $, $DateTime: 2004/03/02 10:09:25 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -162,10 +162,10 @@ class QFrame {
     }
 
     String emit() {
-        return emit(true);
+        return emit(true, true);
     }
 
-    String emit(boolean select) {
+    String emit(boolean select, boolean range) {
         List where = new ArrayList();
         Set emitted = new HashSet();
         String join = null;
@@ -216,15 +216,17 @@ class QFrame {
             }
         }
 
-        // XXX: nested offsets and limits are ignored
-        if (m_offset != null) {
-            buf.append("\noffset ");
-            buf.append(m_offset.emit(m_generator));
-        }
+        if (range) {
+            // XXX: nested offsets and limits are ignored
+            if (m_offset != null) {
+                buf.append("\noffset ");
+                buf.append(m_offset.emit(m_generator));
+            }
 
-        if (m_limit != null) {
-            buf.append("\nlimit ");
-            buf.append(m_limit.emit(m_generator));
+            if (m_limit != null) {
+                buf.append("\nlimit ");
+                buf.append(m_limit.emit(m_generator));
+            }
         }
 
         if (select && (join != null || m_values.size() > 1)) {

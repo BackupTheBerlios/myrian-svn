@@ -23,12 +23,17 @@ import java.util.HashSet;
  * OracleWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/02/24 $
+ * @version $Revision: #3 $ $Date: 2004/03/02 $
  **/
 
 public class OracleWriter extends ANSIWriter {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/OracleWriter.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/OracleWriter.java#3 $ by $Author: rhs $, $DateTime: 2004/03/02 10:09:25 $";
+
+    public void write(Select select) {
+        write(select.getQuery().generate
+              (getEngine().getSession().getRoot(), true));
+    }
 
     void writeBind(Object o, int jdbcType) {
         if (o == null) {

@@ -1,5 +1,7 @@
 package com.redhat.persistence.oql;
 
+import com.arsdigita.db.DbHelper;
+
 import junit.framework.*;
 
 import java.io.*;
@@ -12,7 +14,7 @@ import org.apache.log4j.Logger;
  * QueryTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/02/27 $
+ * @version $Revision: #8 $ $Date: 2004/03/02 $
  **/
 
 public class QueryTest extends TestCase {
@@ -23,7 +25,7 @@ public class QueryTest extends TestCase {
     // being an instance of TestCase. Later versions of ant don't
     // suffer from this problem.
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QueryTest.java#7 $ by $Author: rhs $, $DateTime: 2004/02/27 16:35:42 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QueryTest.java#8 $ by $Author: rhs $, $DateTime: 2004/03/02 10:09:25 $";
 
     private static final Logger s_log = Logger.getLogger(QueryTest.class);
 
@@ -66,10 +68,12 @@ public class QueryTest extends TestCase {
                 throw new IllegalArgumentException
                     ("query string includes multiple queries: " + m_query);
             }
-            String sql = q.generate(m_suite.getRoot());
-            s_log.info("SQL:\n" + sql);
             Connection conn = m_suite.getConnection();
             Statement stmt = conn.createStatement();
+            String sql = q.generate
+                (m_suite.getRoot(),
+                 DbHelper.getDatabase(conn) == DbHelper.DB_ORACLE);
+            s_log.info("SQL:\n" + sql);
             try {
                 stmt.execute(sql);
                 ResultSet rs = stmt.getResultSet();
@@ -80,6 +84,9 @@ public class QueryTest extends TestCase {
                     Map row = new HashMap();
                     for (int i = 1; i < ncols + 1; i++) {
                         String name = md.getColumnName(i);
+                        if (name.equals("ROWNUM__")) {
+                            continue;
+                        }
                         String value = rs.getString(i);
                         row.put(name, value);
                     }

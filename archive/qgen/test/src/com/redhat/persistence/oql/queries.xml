@@ -393,8 +393,16 @@
   <test>
     <query>query(size(all(test.A)))</query>
     <results>
-      <!-- XXX how did this get to be named count? -->
-      <row count="10"/>
+      <!-- XXX how did this get to be named size? -->
+      <row size="10"/>
+    </results>
+  </test>
+
+  <test>
+    <query ordered="true">query(size(offset(sort(all(test.A), id), 3)))</query>
+    <results>
+      <!-- XXX how did this get to be named size? -->
+      <row size="7"/>
     </results>
   </test>
 

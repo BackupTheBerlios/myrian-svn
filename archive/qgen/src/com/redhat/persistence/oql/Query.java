@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2004/02/27 $
+ * @version $Revision: #11 $ $Date: 2004/03/02 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#10 $ by $Author: rhs $, $DateTime: 2004/02/27 18:11:29 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#11 $ by $Author: rhs $, $DateTime: 2004/03/02 10:09:25 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -42,12 +42,14 @@ public class Query {
     }
 
     public String generate(Root root) {
+        return generate(root, false);
+    }
+
+    private static final String ROWNUM = "rownum__";
+
+    public String generate(Root root, boolean oracle) {
         Generator gen = new Generator(root);
         m_query.frame(gen);
-
-        if (m_names.isEmpty()) {
-            return m_query.emit(gen);
-        }
 
         QFrame qframe = gen.getFrame(m_query);
         gen.push(qframe);
@@ -100,11 +102,12 @@ public class Query {
 
         StringBuffer sql = new StringBuffer();
         sql.append("select ");
+
         for (Iterator it = m_names.iterator(); it.hasNext(); ) {
             String name = (String) it.next();
             Expression e = get(name);
-            // XXX: should eliminate duplicate fetches here when we
-            // return something smarter than a string from this
+            // XXX: should eliminate duplicate fetches here when
+            // we return something smarter than a string from this
             // method.
             sql.append(e.emit(gen));
             sql.append(" as \"");
@@ -115,8 +118,46 @@ public class Query {
             }
         }
 
+        if (m_names.isEmpty()) {
+            sql.append("1");
+        }
+
         sql.append("\nfrom ");
-        sql.append(qframe.emit(false));
+        sql.append(qframe.emit(false, !oracle));
+
+        Expression offset = qframe.getOffset();
+        Expression limit = qframe.getLimit();
+        if (oracle && (offset != null || limit != null)) {
+            // We need one level of nesting here to make sure that the
+            // order by happens before the rownum assignments. The
+            // second level of nesting is required because filtering
+            // on rownum directly doesn't work.
+            sql.insert(0, "select * from (select r__.*, rownum as " +
+                       ROWNUM + " from (");
+            sql.append(") r__) where ");
+            if (offset != null) {
+                sql.append(ROWNUM);
+                sql.append(" > ");
+                sql.append(offset.emit(gen));
+            }
+            if (limit != null) {
+                if (offset != null) {
+                    sql.append(" and ");
+                }
+                sql.append(ROWNUM);
+                if (offset != null) {
+                    sql.append(" - ");
+                    sql.append(offset.emit(gen));
+                }
+                sql.append(" <= " + limit.emit(gen));
+            }
+        }
+
+        // XXX: need better way to do size
+        if (m_query instanceof Size) {
+            sql.insert(0, "select count(*) as \"size\" from (");
+            sql.append(") count__");
+        }
 
         return sql.toString();
     }
