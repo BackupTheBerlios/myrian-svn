@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/postgres-create.sql#3 $
--- $DateTime: 2004/01/20 14:16:30 $
+-- $Id: //core-platform/dev/sql/ccm-core/postgres-create.sql#4 $
+-- $DateTime: 2004/01/21 13:38:43 $
 
 begin;
 
@@ -59,6 +59,7 @@ begin;
 \i default/kernel/index-group_subgroup_map_grp_id_idx.sql
 
 \i default/kernel/table-acs_privilege_hierarchy.sql
+\i default/kernel/index-acs_privilege_hierarchy.sql
 \i default/kernel/table-dnm_privileges.sql
 \i default/kernel/comment-dnm_privileges.sql
 \i default/kernel/table-dnm_privilege_col_map.sql
