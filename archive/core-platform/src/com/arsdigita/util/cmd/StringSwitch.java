@@ -16,15 +16,14 @@
 package com.arsdigita.util.cmd;
 
 /**
- * StringSwitch
- *
+ * @deprecated Use CLI (http://jakarta.apache.org/commons/cli/index.html) instead.
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/08/15 $
+ * @version $Revision: #4 $ $Date: 2003/09/15 $
  **/
 
 public class StringSwitch extends Switch {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/cmd/StringSwitch.java#3 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/cmd/StringSwitch.java#4 $ by $Author: richardl $, $DateTime: 2003/09/15 11:53:10 $";
 
     public StringSwitch(String name, String usage, String defValue) {
         super(name, PARAMETER, usage, defValue);

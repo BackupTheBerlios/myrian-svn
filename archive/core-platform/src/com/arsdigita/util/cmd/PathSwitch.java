@@ -19,15 +19,14 @@ import com.arsdigita.util.*;
 import java.io.*;
 
 /**
- * PathSwitch
- *
+ * @deprecated Use CLI (http://jakarta.apache.org/commons/cli/index.html) instead.
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/08/15 $
+ * @version $Revision: #4 $ $Date: 2003/09/15 $
  **/
 
 public class PathSwitch extends Switch {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/cmd/PathSwitch.java#3 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/cmd/PathSwitch.java#4 $ by $Author: richardl $, $DateTime: 2003/09/15 11:53:10 $";
 
     public PathSwitch(String name, String usage, File[] defValue) {
         super(name, PARAMETER, usage, defValue);
