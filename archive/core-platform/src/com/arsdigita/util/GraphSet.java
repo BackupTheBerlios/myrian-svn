@@ -39,7 +39,7 @@ import com.arsdigita.util.Assert;
  * @author Archit Shah (ashah@mit.edut)
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-01-22
- * @version $Date: 2003/05/12 $
+ * @version $Date: 2003/07/31 $
  **/
 public class GraphSet implements Graph {
     private final static String LINE_SEP = System.getProperty("line.separator");
@@ -104,6 +104,37 @@ public class GraphSet implements Graph {
 
     public List getNodes() {
         return new ArrayList(m_nodes);
+    }
+
+    public boolean removeNode(Object nodeName) {
+        boolean hasNode = m_nodes.remove(nodeName);
+        if (hasNode) {
+            Set out = (Set) m_outgoingEdges.remove(nodeName);
+            if (out != null) {
+                for (Iterator it = out.iterator(); it.hasNext(); ) {
+                    Graph.Edge e = (Graph.Edge) it.next();
+                    incomingEdges(e.getHead()).remove(e);
+                }
+            }
+            Set in = (Set) m_incomingEdges.remove(nodeName);
+            if (in != null) {
+                for (Iterator it = in.iterator(); it.hasNext(); ) {
+                    Graph.Edge e = (Graph.Edge) it.next();
+                    outgoingEdges(e.getTail()).remove(e);
+                }
+            }
+        }
+        return hasNode;
+    }
+
+    public boolean removeEdge(Object tail, Object head, Object label) {
+        return removeEdge(new GraphEdge(tail, head, label));
+    }
+
+    public boolean removeEdge(Graph.Edge edge) {
+        boolean hasEdge = outgoingEdges(edge.getTail()).remove(edge);
+        if (hasEdge) { incomingEdges(edge.getHead()).remove(edge); }
+        return hasEdge;
     }
 
     public void removeAll() {

@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 
 /**
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/05/12 $
+ * @version $Date: 2003/07/31 $
  * @since 2003-01-22
  **/
 public class GraphSetTest extends TestCase {
@@ -106,6 +106,83 @@ public class GraphSetTest extends TestCase {
         for (Iterator ii=edges.iterator(); ii.hasNext(); ) {
             Graph.Edge edge = (Graph.Edge) ii.next();
             assertTrue("no such edge", !graph.hasEdge(edge));
+        }
+    }
+
+    public void testRemove() {
+        Graph graph = new GraphSet();
+        graph.setLabel("X");
+        graph.addEdge(NODE_A, NODE_B, "a -> b");
+        graph.addEdge(NODE_A, NODE_C, "a -> c");
+        graph.addEdge(NODE_B, NODE_C, "b -> c");
+
+        graph.addEdge(NODE_D, NODE_C, "d -> c");
+        graph.addEdge(NODE_D, NODE_A, "d -> a");
+        graph.addEdge(NODE_B, NODE_D, "b -> d");
+        graph.addEdge(NODE_D, NODE_D, "d -> d");
+
+        graph.remove(NODE_D);
+
+        for (Iterator it = graph.getNodes().iterator(); it.hasNext(); ) {
+            Object node = it.next();
+            if (node.equals(NODE_D)) {
+                fail("node d should have been removed");
+            }
+            for (Iterator it2 = graph.getOutgoingEdges(node).iterator();
+                 it2.hasNext(); ) {
+                Graph.Edge edge = (Graph.Edge) it2.next();
+                if (edge.getTail().equals(NODE_D)
+                    || edge.getHead().equals(NODE_D)) {
+                    fail("node d should have been removed");
+                }
+            }
+            for (Iterator it2 = graph.getIncomingEdges(node).iterator();
+                 it2.hasNext(); ) {
+                Graph.Edge edge = (Graph.Edge) it2.next();
+                if (edge.getTail().equals(NODE_D)
+                    || edge.getHead().equals(NODE_D)) {
+                    fail("node d should have been removed");
+                }
+            }
+        }
+    }
+
+    public void testRemoveEdge() {
+        Graph graph = new GraphSet();
+        graph.setLabel("X");
+        graph.addEdge(NODE_A, NODE_B, "a -> b");
+        graph.addEdge(NODE_A, NODE_C, "a -> c");
+        graph.addEdge(NODE_B, NODE_C, "b -> c");
+        graph.addEdge(NODE_D, NODE_C, "d -> c");
+
+        GraphEdge ge = new GraphEdge(NODE_D, NODE_D, "d -> d");
+        GraphEdge ge2 = new GraphEdge(NODE_B, NODE_D, "b -> d");
+
+        graph.addEdge(ge);
+        graph.addEdge(ge2);
+        graph.removeEdge(ge);
+        graph.removeEdge(ge2);
+
+        for (Iterator it = graph.getNodes().iterator(); it.hasNext(); ) {
+            Object node = it.next();
+            for (Iterator it2 = graph.getOutgoingEdges(node).iterator();
+                 it2.hasNext(); ) {
+                Graph.Edge edge = (Graph.Edge) it2.next();
+                if (edge.equals(ge)) {
+                    fail("edge d -> d should have been removed");
+                } else if (edge.equals(ge2)) {
+                    fail("edge b -> d should have been removed");
+                }
+            }
+            for (Iterator it2 = graph.getIncomingEdges(node).iterator();
+                 it2.hasNext(); ) {
+                Graph.Edge edge = (Graph.Edge) it2.next();
+                if (edge.equals(ge)) {
+                    fail("edge d -> d should have been removed");
+                } else if (edge.equals(ge2)) {
+                    fail("edge b -> d should have been removed");
+                }
+            }
         }
     }
 

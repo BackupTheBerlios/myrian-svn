@@ -23,7 +23,7 @@ import java.util.List;
  *
  * @author Archit Shah (ashah@mit.edu)
  * @author Vadim Nasardinov (vadimn@redhat.com)
- * @version $Date: 2003/05/12 $
+ * @version $Date: 2003/07/31 $
  * @since   2003-01-22
  **/
 public interface Graph {
@@ -83,6 +83,28 @@ public interface Graph {
      * return a Set.)
      **/
     List getNodes();
+
+    /**
+     * Removes specified node and all edges incident to it.
+     *
+     * @returns true if this Graph contains the specified node
+     **/
+    boolean removeNode(Object node);
+
+    /**
+     * A convenient shortcut for <code>removeEdge(new Graph.Edge(tail, head,
+     * label))</code>.
+     *
+     * @see #removeEdge(Graph.Edge)
+     **/
+    boolean removeEdge(Object tail, Object head, Object label);
+
+    /**
+     * Removes specified edge.
+     *
+     * @returns true if this Graph has the specified edge
+     **/
+    boolean removeEdge(Graph.Edge edge);
 
     /**
      * Removes all nodes and edges.
