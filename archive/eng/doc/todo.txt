@@ -45,3 +45,8 @@
    places in PDL try to define the same primary key in opposite orders
  * move IdentityAdapter to somewhere more generic than test/src/.../oql
  * remove session's calls to toString on persistent objects
+ * remove oracle build dependency
+ * make ReflectionAdapter use cglib's Factory interface for efficient
+   object creation
+ * figure out what to do for reference qualii in fetchPropertyData
+ * figure out if session should flush in fetchPropertyData
