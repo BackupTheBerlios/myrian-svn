@@ -42,11 +42,11 @@ import java.io.File;
  *  the framework will look here. test.testpath must be the fully qualified path name.
  *  
  * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #1 $ $Date: 2002/05/15 $
+ * @version $Revision: #2 $ $Date: 2002/05/30 $
  */
 
 public class PackageTestSuite extends TestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/tools/junit/framework/PackageTestSuite.java#1 $ by $Author: dennis $, $DateTime: 2002/05/15 17:39:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/tools/junit/framework/PackageTestSuite.java#2 $ by $Author: dennis $, $DateTime: 2002/05/30 14:04:07 $";
 
     public PackageTestSuite() {
         super();
@@ -293,7 +293,7 @@ public class PackageTestSuite extends TestSuite {
         File current = new File("");
         final String packageName =  getPackageName(suite);
         final String pathName = current.getAbsolutePath() + 
-            File.separator + "build" + File.separator + "test" +
+            File.separator + "build" + File.separator + "tests" +
             File.separator + packageName.replace('.', File.separatorChar);
 
         return pathName;        
