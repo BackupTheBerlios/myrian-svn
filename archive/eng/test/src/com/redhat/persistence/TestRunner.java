@@ -12,17 +12,17 @@ import org.apache.log4j.Logger;
  * TestRunner
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/08/12 $
+ * @version $Revision: #9 $ $Date: 2004/08/18 $
  **/
 
 public class TestRunner {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/TestRunner.java#8 $ by $Author: ashah $, $DateTime: 2004/08/12 18:17:05 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/TestRunner.java#9 $ by $Author: rhs $, $DateTime: 2004/08/18 15:35:54 $";
 
     private static final Logger s_log = Logger.getLogger(TestRunner.class);
 
     private static boolean verbose() {
-        return !"false".equals(System.getProperty("junit.verbose"));
+        return Boolean.getBoolean("junit.verbose");
     }
 
     public static final void main(String[] args) throws Exception {
@@ -111,10 +111,7 @@ public class TestRunner {
     private static final void print(Test test, Throwable t, boolean failed) {
         System.out.println
             ("Testcase " + (failed ? "FAILED" : "ERROR ") + ": " + test);
-
-        if (verbose()) {
-            t.printStackTrace(System.out);
-        }
+        t.printStackTrace(System.out);
     }
 
 }
