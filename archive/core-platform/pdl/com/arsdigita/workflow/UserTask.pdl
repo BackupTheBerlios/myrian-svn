@@ -31,14 +31,16 @@ object type UserTask extends Task {
 
 association {
 
-    UserTask[0..n] tasks = join cw_user_tasks.task_id 
-                             to cw_task_user_assignees.task_id,
-                           join cw_task_user_assignees.user_id 
-                             to users.user_id;
-    User[0..n]  assignedUsers = join users.user_id 
-                                  to cw_task_user_assignees.user_id,
-                                join cw_task_user_assignees.task_id
-                                  to cw_user_tasks.task_id;
+    UserTask[0..n] tasks;
+    User[0..n] assignedUsers;
+//    UserTask[0..n] tasks = join cw_user_tasks.task_id 
+//                             to cw_task_user_assignees.task_id,
+//                           join cw_task_user_assignees.user_id 
+//                             to users.user_id;
+//    User[0..n]  assignedUsers = join users.user_id 
+//                                  to cw_task_user_assignees.user_id,
+//                                join cw_task_user_assignees.task_id
+//                                  to cw_user_tasks.task_id;
 
     retrieve assignedUsers {
         do {
