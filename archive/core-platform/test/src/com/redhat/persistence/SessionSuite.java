@@ -19,6 +19,7 @@ import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.engine.MemoryEngine;
 import com.redhat.persistence.pdl.PDL;
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
+import com.arsdigita.tools.junit.extensions.CoreTestSetup;
 import com.arsdigita.tools.junit.framework.PackageTestSuite;
 import java.util.*;
 import junit.framework.Test;
@@ -29,12 +30,12 @@ import org.apache.log4j.Logger;
  * SessionSuite
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #3 $ $Date: 2003/10/23 $
+ * @version $Revision: #4 $ $Date: 2003/10/28 $
  **/
 
 public class SessionSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/redhat/persistence/SessionSuite.java#3 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/redhat/persistence/SessionSuite.java#4 $";
 
     private static final Logger s_log = Logger.getLogger(SessionSuite.class);
 
@@ -98,14 +99,13 @@ public class SessionSuite extends PackageTestSuite {
             }
         });
 
-        BaseTestSetup wrapper = new BaseTestSetup(s) {
+        BaseTestSetup wrapper = new CoreTestSetup(s) {
             protected void setUp() throws Exception {
                 super.setUp();
                 s.initialize();
             }
         };
 
-        wrapper.setInitScriptTarget("com.arsdigita.persistence.Initializer");
         return wrapper;
     }
 

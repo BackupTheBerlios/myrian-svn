@@ -16,6 +16,7 @@
 package com.arsdigita.util;
 
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
+import com.arsdigita.tools.junit.extensions.CoreTestSetup;
 import com.arsdigita.tools.junit.framework.PackageTestSuite;
 import junit.framework.Test;
 import org.apache.log4j.BasicConfigurator;
@@ -25,18 +26,18 @@ import org.apache.log4j.SimpleLayout;
 
 /**
  * @author Dennis Gregorovic
- * @version $Revision: #5 $ $Date: 2003/08/15 $
+ * @version $Revision: #6 $ $Date: 2003/10/28 $
  */
 public class UtilSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/UtilSuite.java#5 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/UtilSuite.java#6 $ by $Author: jorris $, $DateTime: 2003/10/28 13:22:55 $";
 
     public static Test suite() {
         initializeLogging();
         UtilSuite suite = new UtilSuite();
         populateSuite(suite);
-        BaseTestSetup wrapper = new BaseTestSetup(suite);
-        wrapper.setPerformInitialization(false);
+        BaseTestSetup wrapper = new CoreTestSetup(suite);
+//        wrapper.setPerformInitialization(false);
         return wrapper;
     }
 

@@ -15,6 +15,7 @@
 
 package com.arsdigita.persistence.metadata;
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
+import com.arsdigita.tools.junit.extensions.CoreTestSetup;
 import com.arsdigita.tools.junit.framework.PackageTestSuite;
 import junit.framework.Test;
 
@@ -22,16 +23,15 @@ import junit.framework.Test;
  * MetadataSuite - Suite of tests for persistence.metadata
  *
  * @author Jon Orris
- * @version $Revision: #7 $ $Date: 2003/08/15 $
+ * @version $Revision: #8 $ $Date: 2003/10/28 $
  */
 public class MetadataxSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/MetadataxSuite.java#7 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/MetadataxSuite.java#8 $ by $Author: jorris $, $DateTime: 2003/10/28 13:22:55 $";
 
     public static Test suite() {
         MetadataxSuite suite = new MetadataxSuite();
         populateSuite(suite);
-        BaseTestSetup wrapper = new BaseTestSetup(suite);
-        wrapper.setInitScriptTarget ("com.arsdigita.persistence.Initializer");
+        BaseTestSetup wrapper = new CoreTestSetup(suite);
 
         wrapper.setSetupSQLScript(System.getProperty("test.sql.dir") + "/../default/persistence/aggressive-test.sql");
         wrapper.setTeardownSQLScript(System.getProperty("test.sql.dir") + "/../default/persistence/aggressive-teardown.sql");

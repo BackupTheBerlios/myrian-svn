@@ -19,12 +19,15 @@ import junit.extensions.TestDecorator;
 import junit.framework.Test;
 import junit.framework.TestResult;
 import com.arsdigita.kernel.*;
+import com.arsdigita.kernel.permissions.PermissionService;
+import com.arsdigita.kernel.permissions.UniversalPermissionDescriptor;
+import com.arsdigita.kernel.permissions.PrivilegeDescriptor;
 import com.arsdigita.util.Assert;
 
 /**
  *
  * @author Jon Orris (jorris@redhat.com)
- * @version $Revision: #3 $ $DateTime: 2003/10/15 13:49:15 $
+ * @version $Revision: #4 $ $DateTime: 2003/10/28 13:22:55 $
  */
 public class PermissionDecorator extends TestDecorator {
     public PermissionDecorator(Test test) {
@@ -48,15 +51,18 @@ public class PermissionDecorator extends TestDecorator {
         UserCollection uc = User.retrieveAll();
 
         try {
-            uc.filter(KernelHelper.getSystemAdministratorEmailAddress());
-            uc.next();
-            User sysadmin = uc.getUser();
-            Assert.exists(sysadmin, User.class);
-
-            return sysadmin;
+            while(uc.next()) {
+                User sysadmin = uc.getUser();
+                if (PermissionService.checkPermission(new UniversalPermissionDescriptor
+                        (PrivilegeDescriptor.ADMIN, sysadmin))) {
+                    System.err.println("Sysadmin: " + sysadmin);
+                    return sysadmin;
+                }
+            }
         } finally {
             uc.close();
         }
+        throw new IllegalStateException("No admin found!");
     }
 
 }

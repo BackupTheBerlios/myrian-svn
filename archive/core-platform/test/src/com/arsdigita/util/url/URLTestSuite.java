@@ -2,6 +2,7 @@ package com.arsdigita.util.url;
 
 import com.arsdigita.tools.junit.framework.PackageTestSuite;
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
+import com.arsdigita.tools.junit.extensions.CoreTestSetup;
 import junit.framework.Test;
 import org.apache.log4j.BasicConfigurator;
 
@@ -26,7 +27,7 @@ import org.apache.log4j.BasicConfigurator;
  *
  */
 public class URLTestSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/url/URLTestSuite.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/url/URLTestSuite.java#3 $ by $Author: jorris $, $DateTime: 2003/10/28 13:22:55 $";
 
     public URLTestSuite() {
         super();
@@ -43,8 +44,8 @@ public class URLTestSuite extends PackageTestSuite {
     public static Test suite() {
         URLTestSuite suite = new URLTestSuite();
         populateSuite(suite);
-        BaseTestSetup wrapper = new BaseTestSetup(suite);
-        wrapper.setInitScriptTarget ("com.arsdigita.logging.Initializer");
+        BaseTestSetup wrapper = new CoreTestSetup(suite);
+//        wrapper.setInitScriptTarget ("com.arsdigita.logging.Initializer");
         return wrapper;
     }
 

@@ -16,6 +16,7 @@
 package com.redhat.persistence;
 
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
+import com.arsdigita.tools.junit.extensions.CoreTestSetup;
 import com.arsdigita.tools.junit.framework.PackageTestSuite;
 import junit.framework.Test;
 
@@ -23,12 +24,12 @@ import junit.framework.Test;
  * ProtoSuite
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/10/23 $
+ * @version $Revision: #4 $ $Date: 2003/10/28 $
  **/
 
 public class ProtoSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/redhat/persistence/ProtoSuite.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/redhat/persistence/ProtoSuite.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 13:22:55 $";
 
     public ProtoSuite() {}
 
@@ -43,8 +44,7 @@ public class ProtoSuite extends PackageTestSuite {
     public static Test suite() {
         ProtoSuite suite = new ProtoSuite();
         populateSuite(suite);
-        BaseTestSetup wrapper = new BaseTestSetup(suite);
-        wrapper.setPerformInitialization(false);
+        BaseTestSetup wrapper = new CoreTestSetup(suite);
         wrapper.setSetupSQLScript
             (System.getProperty("test.sql.dir") +
              "/com/arsdigita/persistence/setup.sql");

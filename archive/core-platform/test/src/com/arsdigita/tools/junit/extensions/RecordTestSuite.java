@@ -42,9 +42,8 @@ public class RecordTestSuite extends PackageTestSuite {
         Test timedRecordedTest2 = new TimedTestRecord ( (TestCase) CategoryTest2 );
         suite.addTest ( timedRecordedTest2 );
         
-        BaseTestSetup wrapper = new BaseTestSetup(suite);
+        BaseTestSetup wrapper = new CoreTestSetup(suite);
         
-        wrapper.setInitScriptTarget ("com.arsdigita.kernel.security.Initializer");
         return wrapper;
     }
 }

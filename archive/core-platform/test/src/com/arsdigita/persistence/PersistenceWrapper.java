@@ -16,6 +16,7 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
+import com.arsdigita.tools.junit.extensions.CoreTestSetup;
 import junit.framework.*;
 import org.apache.log4j.Logger;
 
@@ -23,18 +24,17 @@ import org.apache.log4j.Logger;
  * PersistenceWrapper
  *
  * @author Jon Orris
- * @version $Revision: #6 $ $Date: 2003/08/15 $
+ * @version $Revision: #7 $ $Date: 2003/10/28 $
  */
-public class PersistenceWrapper extends BaseTestSetup {
+public class PersistenceWrapper extends CoreTestSetup {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceWrapper.java#6 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceWrapper.java#7 $ by $Author: jorris $, $DateTime: 2003/10/28 13:22:55 $";
 
     private static Logger s_log =
         Logger.getLogger(PersistenceWrapper.class.getName());
 
     public PersistenceWrapper(TestSuite suite) {
         super(suite);
-        setInitScriptTarget ("com.arsdigita.persistence.Initializer");
         setSetupSQLScript(System.getProperty("test.sql.dir") + "/com/arsdigita/persistence/oracle-se/setup.sql");
         setTeardownSQLScript(System.getProperty("test.sql.dir") + "/com/arsdigita/persistence/oracle-se/teardown.sql");
 

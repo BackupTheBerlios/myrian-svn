@@ -16,6 +16,7 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
+import com.arsdigita.tools.junit.extensions.CoreTestSetup;
 import com.arsdigita.tools.junit.framework.PackageTestSuite;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -24,10 +25,10 @@ import junit.framework.TestCase;
  * PersistenceSuite
  *
  * @author Jon Orris
- * @version $Revision: #9 $ $Date: 2003/10/23 $
+ * @version $Revision: #10 $ $Date: 2003/10/28 $
  */
 public class PersistenceSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceSuite.java#9 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceSuite.java#10 $ by $Author: jorris $, $DateTime: 2003/10/28 13:22:55 $";
 
     public PersistenceSuite() {
         super();
@@ -46,8 +47,8 @@ public class PersistenceSuite extends PackageTestSuite {
         //suite.addTestSuite(NullTest.class);
 
         populateSuite(suite);
-        BaseTestSetup wrapper = new BaseTestSetup(suite);
-        wrapper.setPerformInitialization(false);
+        BaseTestSetup wrapper = new CoreTestSetup(suite);
+        //wrapper.setPerformInitialization(false);
 
         wrapper.addSQLSetupScript(System.getProperty("test.sql.dir") + "/com/arsdigita/persistence/setup.sql");
         wrapper.addSQLSetupScript(System.getProperty("test.sql.dir") + "/persistence/setup.sql");

@@ -16,6 +16,7 @@
 package com.arsdigita.persistence.tests.data;
 
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
+import com.arsdigita.tools.junit.extensions.CoreTestSetup;
 import com.arsdigita.tools.junit.framework.PackageTestSuite;
 import junit.framework.Test;
 
@@ -23,12 +24,12 @@ import junit.framework.Test;
  * DataSuite
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/08/15 $
+ * @version $Revision: #6 $ $Date: 2003/10/28 $
  **/
 
 public class DataSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/DataSuite.java#5 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/tests/data/DataSuite.java#6 $ by $Author: jorris $, $DateTime: 2003/10/28 13:22:55 $";
 
     public DataSuite() {}
 
@@ -43,8 +44,7 @@ public class DataSuite extends PackageTestSuite {
     public static Test suite() {
         DataSuite suite = new DataSuite();
         populateSuite(suite);
-        BaseTestSetup wrapper = new BaseTestSetup(suite);
-        wrapper.setInitScriptTarget("com.arsdigita.persistence.Initializer");
+        BaseTestSetup wrapper = new CoreTestSetup(suite);
         wrapper.addSQLSetupScript(System.getProperty("test.sql.dir") +
                                   "/com/arsdigita/persistence/tests/data/setup.sql");
         wrapper.addSQLSetupScript(System.getProperty("test.sql.dir") +

@@ -16,6 +16,7 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
+import com.arsdigita.tools.junit.extensions.CoreTestSetup;
 import com.arsdigita.persistence.metadata.*;
 import java.math.*;
 import java.util.*;
@@ -27,12 +28,12 @@ import org.apache.log4j.Logger;
  * PartyTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/10/23 $
+ * @version $Revision: #11 $ $Date: 2003/10/28 $
  */
 
 abstract public class PartyTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PartyTest.java#10 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PartyTest.java#11 $ by $Author: jorris $, $DateTime: 2003/10/28 13:22:55 $";
 
     private static Logger s_log =
         Logger.getLogger(PartyTest.class.getName());
@@ -338,8 +339,7 @@ abstract public class PartyTest extends PersistenceTestCase {
 
     public static void main(String args[]) {
         TestSuite suite = new TestSuite(PartyTest.class);
-        BaseTestSetup wrapper = new BaseTestSetup(suite);
-        wrapper.setInitScriptTarget ("com.arsdigita.persistence.Initializer");
+        BaseTestSetup wrapper = new CoreTestSetup(suite);
         junit.textui.TestRunner.run( wrapper );
 
     }

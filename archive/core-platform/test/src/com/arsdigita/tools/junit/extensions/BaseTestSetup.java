@@ -41,6 +41,8 @@ import junit.framework.TestSuite;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A Decorator to set up and tear down additional fixture state.
@@ -48,9 +50,9 @@ import java.util.List;
  * to set up additional state once before the tests are run.
  */
 public class BaseTestSetup extends TestDecorator {
-    private String m_scriptName;
-    private String m_iniName;
+
     private TestSuite m_suite;
+    private Set m_initializers = new HashSet();
 
     private List m_setupSQLScripts = new LinkedList();
     private List m_teardownSQLScripts = new LinkedList();
@@ -93,7 +95,8 @@ public class BaseTestSetup extends TestDecorator {
         if (m_suite.testCount() > 0) {
             final Connection conn = Connections.acquire
                 (RuntimeConfig.getConfig().getJDBCURL());
-            new Startup(conn).run();
+            TestStartup testStartup = new TestStartup(conn, m_initializers);
+            testStartup.run();
 
             ResourceManager.getInstance().setServletContext(new DummyServletContext());
 
@@ -141,30 +144,8 @@ public class BaseTestSetup extends TestDecorator {
         conn.close();
     }
 
-    // Unwanted things
-
-    public void setInitScript(String scriptName) {
-        m_scriptName = scriptName;
-    }
-
-    public String getInitScript() {
-        return m_scriptName;
-    }
-
-    public void setInitScriptTarget(String iniName) {
-        m_iniName = iniName;
-    }
-
-    public String getInitScriptTarget() {
-        return m_iniName;
-    }
-
-    public void setPerformInitialization(boolean performInitialization) {
-        // Nooped
-    }
-
-    public boolean getPerformInitialization() {
-        return true;
+    public void addRequiredInitializer(final String initName) {
+        m_initializers.add(initName);
     }
 
     public void setSetupSQLScript(String setupSQLScript) {
