@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #16 $ $Date: 2004/07/26 $
+ * @version $Revision: #17 $ $Date: 2004/07/27 $
  **/
 
 class CRPList implements List {
@@ -123,10 +123,6 @@ class CRPList implements List {
             return m_index - 1;
         }
 
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
         public boolean hasNext() {
             return m_elements.hasNext();
         }
@@ -154,7 +150,13 @@ class CRPList implements List {
             return entry.getValue();
         }
 
+        /* Unsupported operations */
+
         public void add(Object element) {
+            throw new UnsupportedOperationException();
+        }
+
+        public void remove() {
             throw new UnsupportedOperationException();
         }
 
@@ -169,7 +171,12 @@ class CRPList implements List {
     // ========================================================================
 
     public int hashCode() {
-        throw new UnsupportedOperationException();
+        int hashCode = 1;
+        for (Iterator it=iterator(); it.hasNext(); ) {
+            Object elem = it.next();
+            hashCode = 31*hashCode + (elem==null ? 0 : elem.hashCode());
+        }
+        return  hashCode;
     }
 
     public boolean equals(Object obj) {

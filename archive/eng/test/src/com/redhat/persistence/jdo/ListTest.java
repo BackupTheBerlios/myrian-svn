@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
  * ListTest
  *
  * @since 2004-07-13
- * @version $Revision: #2 $ $Date: 2004/07/27 $
+ * @version $Revision: #3 $ $Date: 2004/07/27 $
  **/
 public class ListTest extends WithTxnCase {
     private final static Logger s_log = Logger.getLogger(ListTest.class);
@@ -177,5 +177,11 @@ public class ListTest extends WithTxnCase {
             String actual = (String) it.next();
             assertEquals("email", (String) expected.next(), actual);
         }
+    }
+
+    public void testEquals() {
+        List auxEmails = addEmails();
+        assertEquals("emails", EMAILS, auxEmails);
+        assertEquals("hash codes", EMAILS.hashCode(), auxEmails.hashCode());
     }
 }
