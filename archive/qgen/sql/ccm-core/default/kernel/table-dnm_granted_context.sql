@@ -11,13 +11,12 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/test-qgen/sql/ccm-core/default/kernel/table-dnm_granted_context.sql#1 $
--- $DateTime: 2004/01/29 12:35:08 $
+-- $Id: //core-platform/test-qgen/sql/ccm-core/default/kernel/table-dnm_granted_context.sql#2 $
+-- $DateTime: 2004/03/05 10:45:56 $
 -- autor: Aram Kananov <aram@kananov.com>
 
 create table dnm_granted_context (
    pd_object_id integer not null
-   constraint dnm_gc_obj_fk references dnm_object_1_granted_context
    constraint dnm_gc_obj1_fk references dnm_object_grants,
    pd_context_id integer not null,
    pd_dummy_flag integer default 0 not null,
@@ -26,4 +25,5 @@ create table dnm_granted_context (
              or (pd_object_id != pd_context_id and pd_dummy_flag = 0) ),
    constraint dnm_gc primary key (pd_context_id, pd_object_id)
 ) ;
--- TODO: create separate implementation for oracle with  organization index and normal for postgres;
+-- TODO: does it make sence to create separate implementation for oracle with  
+--  organization index and normal for postgres?
