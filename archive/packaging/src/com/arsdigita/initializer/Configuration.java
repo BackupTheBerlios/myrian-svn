@@ -54,12 +54,12 @@ import java.util.*;
  *  </pre></blockquote>
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/29 $
  */
 
 public class Configuration {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/initializer/Configuration.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/initializer/Configuration.java#3 $ by $Author: justin $, $DateTime: 2003/08/29 01:24:05 $";
 
     Map m_parameters = new HashMap();
     Map m_types = new HashMap();
@@ -78,7 +78,7 @@ public class Configuration {
                               Class type, Object defaultValue)
         throws InitializationException {
         if (m_parameters.containsKey(name))
-            throw new InitializationException("Parameter already defined.");
+            throw new InitializationException("Parameter " + name + " already defined.");
         m_types.put(name, type);
         typeCheck(name, defaultValue);
         m_parameters.put(name, defaultValue);

@@ -11,10 +11,10 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/test-packaging/test/sql/postgres/domain/teardown.sql#2 $
--- $DateTime: 2003/08/19 22:28:24 $
+-- $Id: //core-platform/test-packaging/test/sql/postgres/domain/teardown.sql#3 $
+-- $DateTime: 2003/08/29 01:24:05 $
 
 
-drop function package_abstractness;
+drop function package_abstractness(integer);
 
 @@ ../../default/domain/teardown.sql
