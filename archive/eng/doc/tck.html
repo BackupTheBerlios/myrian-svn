@@ -210,8 +210,8 @@ $ ant build
     <p>This basically runs something like this:</p>
 
 <pre>$ java -Djava.security.manager -Djava.security.policy=jdotck.policy \
--DPMFProperties=iut.properties -classpath \
-enhanced:classes:iut_jars/rhp-jdo.jar:iut_jars/javatest.jar:iut_jars/jdo.jar:iut_jars/jta1_0_1.jar:jdori_jars/btree.jar:jdori_jars/jdori.jar \
+-DPMFProperties=iut.properties -DPMF2Properties=jdori2.properties -classpath \
+enhanced:classes:foo_jars/commons-collections-3.1.jar:foo_jars/commons-primitives-1.0.jar:foo_jars/javatest.jar:foo_jars/jdo.jar:foo_jars/jta1_0_1.jar:foo_jars/log4j.jar:foo_jars/postgresql.jar:foo_jars/rhp-jdo.jar \
 com.sun.javatest.agent.<strong>AgentMain</strong> -activeHost localhost</pre>
 
     <p>You can also use the GUI, like so</p>
