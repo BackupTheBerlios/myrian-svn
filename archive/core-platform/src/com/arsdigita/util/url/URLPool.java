@@ -240,13 +240,34 @@ public class URLPool {
             if (!m_running) {
                 return;
             }
-            s_log.debug("Starting run");
+
+            InputStream is = null;
+            InputStreamReader isr = null;
             BufferedReader input = null;
             try {
-
                 URLConnection con = m_url.openConnection();
+                String contentType = con.getContentType();
 
-                input = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                // XXX if no explicit encoding then we should read the
+                // first 4 bytes of the document to look for an XML
+                // byte order mark & if found, then extract the charset.
+                String encoding = "ISO-8859-1";
+                int offset = contentType.indexOf("charset=");
+                if (offset != -1) {
+                    encoding = contentType.substring(offset + 8).trim();
+                }
+
+                if (s_log.isDebugEnabled()) {
+                    s_log.debug("Received content type " + con.getContentType());
+                }
+
+                is = con.getInputStream();
+                isr = new InputStreamReader(is, encoding);
+                if (s_log.isDebugEnabled()) {
+                    s_log.debug("Process with character encoding " + isr.getEncoding());
+                }
+                input = new BufferedReader(isr);
+
                 String line;
                 StringBuffer buffer = new StringBuffer();
                 while (m_running && (line = input.readLine()) != null) {
@@ -254,14 +275,15 @@ public class URLPool {
                 }
                 m_data = buffer.toString();
 
-            }
-            catch (IOException io) {
+            } catch (IOException io) {
                 s_log.error("IO Error fetching URL: " + m_url, io);
                 return;
             } finally {
                 if (null != input) {
                     try {
                         input.close();
+                        isr.close();
+                        is.close();
                     } catch(IOException ioe) {
                         s_log.error("Error closing connection", ioe);
                     }
