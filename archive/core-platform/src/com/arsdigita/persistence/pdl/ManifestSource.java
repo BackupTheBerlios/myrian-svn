@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * The ManifestSource class provides an implementation of the {@link
@@ -12,12 +14,12 @@ import java.io.LineNumberReader;
  * manifest file that lists resources located in the java classpath.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/11/06 $
+ * @version $Revision: #4 $ $Date: 2004/01/16 $
  **/
 
 public class ManifestSource implements PDLSource {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ManifestSource.java#3 $ by $Author: rhs $, $DateTime: 2003/11/06 00:02:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ManifestSource.java#4 $ by $Author: ashah $, $DateTime: 2004/01/16 13:01:04 $";
 
     private final String m_manifest;
     private final PDLFilter m_filter;
@@ -68,32 +70,39 @@ public class ManifestSource implements PDLSource {
         if (is == null) {
             throw new IllegalStateException("no such resource: " + m_manifest);
         }
+
         try {
             LineNumberReader lines =
                 new LineNumberReader(new InputStreamReader(is));
-            while (true) {
-                try {
-                    String line = lines.readLine();
-                    if (line == null) { break; }
-                    line = line.trim();
 
-                    if (m_filter.accept(line)) {
-                        InputStream pdl = m_loader.getResourceAsStream(line);
-                        if (pdl == null) {
-                            throw new IllegalStateException
-                                (m_manifest + ": " + lines.getLineNumber() +
-                                 ": no such resource '" + line + "'");
-                        }
-                        try {
-                            compiler.parse(new InputStreamReader(pdl), line);
-                        } finally {
-                            pdl.close();
-                        }
-                    }
-                } catch (IOException e) {
-                    throw new UncheckedWrapperException(e);
+            ArrayList names = new ArrayList();
+
+            while (true) {
+                String line = lines.readLine();
+                if (line == null) { break; }
+                line = line.trim();
+                names.add(line);
+            }
+
+            for (Iterator accepted = m_filter.accept(names).iterator();
+                 accepted.hasNext(); ) {
+
+                String line = (String) accepted.next();
+
+                InputStream pdl = m_loader.getResourceAsStream(line);
+                if (pdl == null) {
+                    throw new IllegalStateException
+                        (m_manifest + ": " + lines.getLineNumber() +
+                         ": no such resource '" + line + "'");
+                }
+                try {
+                    compiler.parse(new InputStreamReader(pdl), line);
+                } finally {
+                    pdl.close();
                 }
             }
+        } catch (IOException e) {
+            throw new UncheckedWrapperException(e);
         } finally {
             try { is.close(); }
             catch (IOException e) { throw new UncheckedWrapperException(e); }

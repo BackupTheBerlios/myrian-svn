@@ -59,12 +59,12 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #25 $ $Date: 2003/10/28 $
+ * @version $Revision: #26 $ $Date: 2004/01/16 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#25 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#26 $ by $Author: ashah $, $DateTime: 2004/01/16 13:01:04 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;
@@ -205,13 +205,12 @@ public class PDL {
 
         final PDLFilter filter =
             new NameFilter(DbHelper.getDatabaseSuffix(), "pdl");
-        final HashSet output = new HashSet();
+        // accumulate the values returned by the filter
+        final Collection[] output = new Collection[] { new HashSet() };
         PDLFilter tracker = new PDLFilter() {
-            public boolean accept(String name) {
-                boolean result = filter.accept(name);
-                if (result) {
-                    output.add(name);
-                }
+            public Collection accept(Collection names) {
+                Collection result = filter.accept(names);
+                output[0].addAll(result);
                 return result;
             }
         };
@@ -220,7 +219,7 @@ public class PDL {
         parse(compiler, (File[]) options.get("-library-path"), filter);
         parse(compiler, (File[]) options.get("-path"), tracker);
         parse(compiler, args, tracker);
-        if (output.size() < 1) {
+        if (output[0].size() < 1) {
             if (s_quiet) {
                 return;
             }
@@ -255,7 +254,7 @@ public class PDL {
             List tables = new ArrayList(root.getRoot().getTables());
             for (Iterator it = tables.iterator(); it.hasNext(); ) {
                 Table table = (Table) it.next();
-                if (!output.contains(root.getRoot().getFilename(table))) {
+                if (!output[0].contains(root.getRoot().getFilename(table))) {
                     it.remove();
                 }
             }
@@ -278,6 +277,7 @@ public class PDL {
 
     private static void parse(PDLCompiler compiler, File[] path,
                               PDLFilter filter) {
+        ArrayList filenames = new ArrayList();
         for (int i = 0; i < path.length; i++) {
             File f = path[i];
             if (!f.exists()) { continue; }
@@ -286,20 +286,16 @@ public class PDL {
             } else if (f.isFile()
                        && (f.getName().endsWith(".jar")
                            || f.getName().endsWith(".zip"))) {
-                try {
-                    ZipInputStream zis = new ZipInputStream
-                        (new FileInputStream(f));
-                    try {
-                        new ZipSource(zis, filter).parse(compiler);
-                    } finally {
-                        zis.close();
-                    }
-                } catch (IOException e) {
-                    throw new UncheckedWrapperException(e);
-                }
-            } else if (filter.accept(f.getPath())) {
-                new FileSource(f).parse(compiler);
+                throw new IllegalArgumentException
+                    ("zip and jar pdl loading is not implemented yet");
+            } else {
+                filenames.add(f.getPath());
             }
+        }
+
+        Collection accepted = filter.accept(filenames);
+        for (Iterator it = accepted.iterator(); it.hasNext(); ) {
+            new FileSource((String) it.next()).parse(compiler);
         }
     }
 

@@ -8,30 +8,26 @@ import java.util.zip.ZipInputStream;
 
 /**
  * An implementation of {@link PDLSource} that loads the contents of a
- * zip or jar file.
+ * zip or jar file. This class doesn't take a filter at the moment
+ * because PDL loading needs a manifest to decide whether or not to
+ * load foo.pdl, because foo.<db>.pdl may be present.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/11/06 $
+ * @version $Revision: #4 $ $Date: 2004/01/16 $
  **/
 
-public class ZipSource implements PDLSource {
+class ZipSource implements PDLSource {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ZipSource.java#3 $ by $Author: rhs $, $DateTime: 2003/11/06 00:02:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ZipSource.java#4 $ by $Author: ashah $, $DateTime: 2004/01/16 13:01:04 $";
 
     private final ZipInputStream m_zis;
-    private final PDLFilter m_filter;
 
     /**
-     * Constructs a new ZipSource with the contents given
-     * ZipInputStream filtered by <code>filter</code>
-     *
      * @param zis the ZipInputStream to load
-     * @param filter used to filter the contents of the ZipInputStream
      **/
 
-    public ZipSource(ZipInputStream zis, PDLFilter filter) {
+    public ZipSource(ZipInputStream zis) {
         m_zis = zis;
-        m_filter = filter;
     }
 
     /**
@@ -47,8 +43,7 @@ public class ZipSource implements PDLSource {
                 final ZipEntry entry = m_zis.getNextEntry();
                 if (entry == null) { break; }
                 String name = entry.getName();
-                if (entry.isDirectory() ||
-                    !m_filter.accept(name)) { continue; }
+                if (entry.isDirectory()) { continue; }
                 compiler.parse(new InputStreamReader(m_zis) {
                     public void close() {
                         // We need to override close here to do

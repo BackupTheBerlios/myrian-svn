@@ -5,7 +5,10 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Comparator;
 
 /**
@@ -13,12 +16,12 @@ import java.util.Comparator;
  * directory.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/11/06 $
+ * @version $Revision: #4 $ $Date: 2004/01/16 $
  **/
 
 public class DirSource implements PDLSource {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/DirSource.java#3 $ by $Author: rhs $, $DateTime: 2003/11/06 00:02:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/DirSource.java#4 $ by $Author: ashah $, $DateTime: 2004/01/16 13:01:04 $";
 
     private final File m_dir;
     private final PDLFilter m_filter;
@@ -50,18 +53,23 @@ public class DirSource implements PDLSource {
     private void parse(PDLCompiler compiler, File dir) {
         File[] listing = dir.listFiles(new FileFilter() {
             public boolean accept(File file) {
-                return file.isDirectory()
-                    || m_filter.accept(file.getAbsolutePath());
+                return !file.isDirectory();
             }
         });
 
         Arrays.sort(listing, FILE_NAME);
 
+        ArrayList names = new ArrayList();
+
+        for (int i = 0; i < listing.length; i++) {
+            names.add(listing[i].getName());
+        }
+
+        Collection accepted = m_filter.accept(names);
+
         for (int i = 0; i < listing.length; i++) {
             File file = listing[i];
-            if (file.isDirectory()) {
-                parse(compiler, file);
-            } else {
+            if (accepted.contains(file.getName())) {
                 try {
                     FileReader reader = new FileReader(file);
                     try {
@@ -73,6 +81,18 @@ public class DirSource implements PDLSource {
                     throw new UncheckedWrapperException(e);
                 }
             }
+        }
+
+        File[] subdirs = dir.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+                return file.isDirectory();
+            }
+        });
+
+        Arrays.sort(subdirs, FILE_NAME);
+
+        for (int i = 0; i < subdirs.length; i++) {
+             parse(compiler, subdirs[i]);
         }
     }
 
