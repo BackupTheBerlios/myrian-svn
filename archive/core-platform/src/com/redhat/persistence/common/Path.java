@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -21,18 +21,27 @@ import com.arsdigita.util.ConcurrentDict;
  * Path
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2004/02/20 $
+ * @version $Revision: #9 $ $Date: 2004/02/23 $
  **/
 
 public class Path {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#8 $ by $Author: vadim $, $DateTime: 2004/02/20 12:36:50 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#9 $ by $Author: vadim $, $DateTime: 2004/02/23 16:43:55 $";
 
     //special case the id path since it shows up so often
     private static final Path ID_PATH = new Path(null, "id");
 
     private static final ConcurrentDict DICT =
         new ConcurrentDict(new Supplier());
+
+    private Path m_parent;  // initialized lazily from m_basename;
+    private final String m_basename;
+    private final String m_name;
+
+    private Path(String basename, String name) {
+        m_basename = basename;
+        m_name = name;
+    }
 
     public static final Path get(String path) {
         if ("id".equals(path)) {
@@ -42,15 +51,15 @@ public class Path {
     }
 
     public static final Path add(String p1, String p2) {
-	return Path.add(Path.get(p1), Path.get(p2));
+        return Path.get(concat(p1, p2));
     }
 
     public static final Path add(Path p1, String p2) {
-        return Path.add(p1, Path.get(p2));
+        return p1==null ? Path.get(p2) : Path.get(concat(p1.getPath(), p2));
     }
 
     public static final Path add(String p1, Path p2) {
-        return Path.add(Path.get(p1), p2);
+        return p2==null ? Path.get(p1): Path.get(concat(p1, p2.getPath()));
     }
 
     public static final Path add(Path p1, Path p2) {
@@ -71,16 +80,17 @@ public class Path {
         }
     }
 
-    private Path m_parent;
-    private String m_name;
-
-    private Path(Path parent, String name) {
-        m_parent = parent;
-        m_name = name;
-    }
-
     public Path getParent() {
-        return m_parent;
+        if (m_basename == null) {
+            return null;
+        }
+
+        synchronized(this) {
+            if (m_parent == null ) {
+                m_parent = Path.get(m_basename);
+            }
+            return m_parent;
+        }
     }
 
     public boolean isAncestor(Path path) {
@@ -117,10 +127,10 @@ public class Path {
     }
 
     public String getPath() {
-        if (m_parent == null) {
+        if (m_basename == null) {
             return m_name;
         } else {
-            return concat(m_parent.getPath(), m_name);
+            return concat(m_basename, m_name);
         }
     }
 
@@ -128,12 +138,16 @@ public class Path {
         return getPath();
     }
 
-
-    // both params are guaranteed to be non-null
     private static String concat(String s1, String s2) {
-        StringBuffer sb = new StringBuffer(s1.length() + s2.length() + 1);
-        sb.append(s1).append(".").append(s2);
-        return sb.toString();
+        if (s1 == null ) {
+            return s2;
+        } else if (s2 == null ) {
+            return s1;
+        } else {
+            StringBuffer sb = new StringBuffer(s1.length() + s2.length() + 1);
+            sb.append(s1).append(".").append(s2);
+            return sb.toString();
+        }
     }
 
     private static class Supplier implements ConcurrentDict.EntrySupplier {
@@ -141,17 +155,11 @@ public class Path {
             String path = (String) key;
 
             final int dot = path.lastIndexOf('.');
-            final Path parent;
-            final String name;
             if (dot > -1) {
-                parent = get(path.substring(0, dot));
-                name = path.substring(dot + 1);
+                return new Path(path.substring(0, dot), path.substring(dot + 1));
             } else {
-                parent = null;
-                name = path;
+                return new Path(null, path);
             }
-
-            return new Path(parent, name);
         }
     }
 }
