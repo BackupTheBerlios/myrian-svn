@@ -33,7 +33,7 @@ public class Initializer
 
     private Configuration m_conf = new Configuration();
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/db/Initializer.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/db/Initializer.java#3 $ by $Author: justin $, $DateTime: 2003/08/27 12:51:55 $";
 
     public static final String JDBC_URL = "jdbcUrl";
     public static final String DB_USERNAME = "dbUsername";
@@ -188,7 +188,7 @@ public class Initializer
             cm.connect();
         } catch (java.sql.SQLException e) {
             throw new InitializationException
-                ("SQLException initializing " + "dbapi " + e.getMessage());
+                ("SQLException initializing " + "dbapi " + e.getMessage(), e);
         }
 
         String driverSpecificParam1 =

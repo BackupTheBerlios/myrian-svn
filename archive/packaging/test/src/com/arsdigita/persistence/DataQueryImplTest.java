@@ -38,11 +38,11 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/DataQueryImplTest.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/test/src/com/arsdigita/persistence/DataQueryImplTest.java#3 $ by $Author: justin $, $DateTime: 2003/08/27 12:51:55 $";
 
     private static Logger s_log =
         Logger.getLogger(DataQueryImplTest.class.getName());
@@ -807,6 +807,14 @@ public class DataQueryImplTest extends DataQueryTest {
                  operation.toString());
             throw e;
         }
+    }
+
+    public void testAddPathToSelf() {
+        DataQuery dq = SessionManager.getSession().retrieveQuery
+            ("examples.GetOrdersOnlyID");
+        dq.addPath("order.seller");
+        while(dq.next()) { }
+        // just testing that sql generated doesn't cause error
     }
 
 

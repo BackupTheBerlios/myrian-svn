@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2001, 2002, 2003 Red Hat Inc. All Rights Reserved.
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
 //
 // The contents of this file are subject to the CCM Public
 // License (the "License"); you may not use this file except in
@@ -11,10 +11,10 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/test-packaging/pdl/com/arsdigita/lucene/Document.pdl#2 $ 
-// $DateTime: 2003/08/19 22:28:24 $
+// $Id: //core-platform/test-packaging/pdl/com/arsdigita/search/lucene/Document.pdl#1 $ 
+// $DateTime: 2003/08/27 12:51:55 $
 
-model com.arsdigita.lucene;
+model com.arsdigita.search.lucene;
 
 object type Document {
     BigDecimal[1..1] id            = lucene_docs.document_id INTEGER;
@@ -73,3 +73,4 @@ query dirtyDocuments {
     id = document_id;
   }
 }
+

@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/27 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/QGen.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/QGen.java#3 $ by $Author: justin $, $DateTime: 2003/08/27 12:51:55 $";
 
     private static final Logger LOG = Logger.getLogger(QGen.class);
 
@@ -521,12 +521,14 @@ class QGen {
 	    cols = new Path[paths.length];
 	    boolean failed = false;
 	    for (int i = 0; i < cols.length; i++) {
-		cols[i] = block.getMapping(paths[i]);
-		if (cols[i] == null) {
+                Path mapping = block.getMapping(paths[i]);
+		if (mapping == null) {
 		    failed = true;
 		    break;
 		}
-	    }
+                cols[i] =
+                    Path.add((((StaticJoin) getJoin(src))).getAlias(), mapping);
+            }
 
 	    if (!failed) {
 		setColumns(path, cols);
