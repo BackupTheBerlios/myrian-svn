@@ -5,6 +5,14 @@ Functionality:
      Optionally optimize with dotted arrow constraints for MDSQL
      events.
 
+     Status: Functional, currently solid arrows are set up where
+             dotted arrows should be set up since the SQL generation
+             isn't smart enough to obey the arrow constraints. This
+             simply means that instance loops may not be flushable,
+             but this isn't a blocking issue right now since instance
+             loops were previously guaranteed to cause constraint
+             violations.
+
  * Observers (3)
 
      Infinite loop prevention. Reentrance.
@@ -22,6 +30,8 @@ Functionality:
 
      Mostly done in checkout. Difficult to confirm due to lack of
      significant test coverage.
+
+     Status: Done
 
  * sub query filtering (1)
 
@@ -43,6 +53,9 @@ Functionality:
      session/engine interface or adding a new kind of event.
      Alternatively we could do a temporary solution by exposing methods
      on RDBMSEngine and doing the implementation in the wrapper layer.
+
+     Status: Basic functionality in place. Not all exotic forms may be
+             supported, but this is not currently blocking.
 
  * GenericDataQuery (1)
 
@@ -72,9 +85,13 @@ Functionality:
 
      API addtions + minor implementation.
 
+     Status: Done
+
  * DataQuery.set/getParameter (1)
 
      Passthrough code ???
+
+     Status: Done
 
  * Better connection source (1)
 
