@@ -25,10 +25,10 @@ import junit.framework.TestCase;
  * PersistenceSuite
  *
  * @author Jon Orris
- * @version $Revision: #10 $ $Date: 2003/10/28 $
+ * @version $Revision: #11 $ $Date: 2003/12/23 $
  */
 public class PersistenceSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceSuite.java#10 $ by $Author: jorris $, $DateTime: 2003/10/28 13:22:55 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceSuite.java#11 $ by $Author: dennis $, $DateTime: 2003/12/23 17:32:53 $";
 
     public PersistenceSuite() {
         super();
@@ -50,17 +50,17 @@ public class PersistenceSuite extends PackageTestSuite {
         BaseTestSetup wrapper = new CoreTestSetup(suite);
         //wrapper.setPerformInitialization(false);
 
-        wrapper.addSQLSetupScript(System.getProperty("test.sql.dir") + "/com/arsdigita/persistence/setup.sql");
-        wrapper.addSQLSetupScript(System.getProperty("test.sql.dir") + "/persistence/setup.sql");
-        wrapper.addSQLSetupScript(System.getProperty("test.sql.dir") + "/com/arsdigita/persistence/static/setup.sql");
-        wrapper.addSQLSetupScript(System.getProperty("test.sql.dir") + "/com/arsdigita/persistence/mdsql/setup.sql");
+        wrapper.addSQLSetupScript("/com/arsdigita/persistence/setup.sql");
+        wrapper.addSQLSetupScript("/persistence/setup.sql");
+        wrapper.addSQLSetupScript("/com/arsdigita/persistence/static/setup.sql");
+        wrapper.addSQLSetupScript("/com/arsdigita/persistence/mdsql/setup.sql");
 
-        wrapper.addSQLTeardownScript(System.getProperty("test.sql.dir") + "/com/arsdigita/persistence/mdsql/teardown.sql");
-        wrapper.addSQLTeardownScript(System.getProperty("test.sql.dir") + "/com/arsdigita/persistence/static/teardown.sql");
-        wrapper.addSQLTeardownScript(System.getProperty("test.sql.dir") + "/persistence/teardown.sql");
-        wrapper.addSQLTeardownScript(System.getProperty("test.sql.dir") + "/com/arsdigita/persistence/teardown.sql");
+        wrapper.addSQLTeardownScript("/com/arsdigita/persistence/mdsql/teardown.sql");
+        wrapper.addSQLTeardownScript("/com/arsdigita/persistence/static/teardown.sql");
+        wrapper.addSQLTeardownScript("/persistence/teardown.sql");
+        wrapper.addSQLTeardownScript("/com/arsdigita/persistence/teardown.sql");
 
-//        wrapper.setTeardownSQLScript(System.getProperty("test.sql.dir") + "/persistence/teardown.sql");
+//        wrapper.setTeardownSQLScript("/persistence/teardown.sql");
         return wrapper;
     }
 

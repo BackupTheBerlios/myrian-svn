@@ -24,19 +24,19 @@ import org.apache.log4j.Logger;
  * PersistenceWrapper
  *
  * @author Jon Orris
- * @version $Revision: #7 $ $Date: 2003/10/28 $
+ * @version $Revision: #8 $ $Date: 2003/12/23 $
  */
 public class PersistenceWrapper extends CoreTestSetup {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceWrapper.java#7 $ by $Author: jorris $, $DateTime: 2003/10/28 13:22:55 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceWrapper.java#8 $ by $Author: dennis $, $DateTime: 2003/12/23 17:32:53 $";
 
     private static Logger s_log =
         Logger.getLogger(PersistenceWrapper.class.getName());
 
     public PersistenceWrapper(TestSuite suite) {
         super(suite);
-        setSetupSQLScript(System.getProperty("test.sql.dir") + "/com/arsdigita/persistence/oracle-se/setup.sql");
-        setTeardownSQLScript(System.getProperty("test.sql.dir") + "/com/arsdigita/persistence/oracle-se/teardown.sql");
+        setSetupSQLScript("/com/arsdigita/persistence/oracle-se/setup.sql");
+        setTeardownSQLScript("/com/arsdigita/persistence/oracle-se/teardown.sql");
 
     }
 

@@ -23,18 +23,18 @@ import junit.framework.Test;
  * MetadataSuite - Suite of tests for persistence.metadata
  *
  * @author Jon Orris
- * @version $Revision: #8 $ $Date: 2003/10/28 $
+ * @version $Revision: #9 $ $Date: 2003/12/23 $
  */
 public class MetadataxSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/MetadataxSuite.java#8 $ by $Author: jorris $, $DateTime: 2003/10/28 13:22:55 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/MetadataxSuite.java#9 $ by $Author: dennis $, $DateTime: 2003/12/23 17:32:53 $";
 
     public static Test suite() {
         MetadataxSuite suite = new MetadataxSuite();
         populateSuite(suite);
         BaseTestSetup wrapper = new CoreTestSetup(suite);
 
-        wrapper.setSetupSQLScript(System.getProperty("test.sql.dir") + "/../default/persistence/aggressive-test.sql");
-        wrapper.setTeardownSQLScript(System.getProperty("test.sql.dir") + "/../default/persistence/aggressive-teardown.sql");
+        wrapper.setSetupSQLScript("/../default/persistence/aggressive-test.sql");
+        wrapper.setTeardownSQLScript("/../default/persistence/aggressive-teardown.sql");
         return wrapper;
     }
 
