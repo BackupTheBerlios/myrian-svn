@@ -1172,4 +1172,16 @@
       <row uname="Britney" name="Type 1" desc="Type 1 Description"/>
     </results>
   </test>
+
+  <test>
+    <!-- Encountered when fetching through certain qualias mappings. -->
+    <query fetched="name,desc" joins="1">
+      query(filter(this = all(test.Node), this.id == 31).this,
+            name = meIfHasParent.name,
+            desc = meIfHasParent.description)
+    </query>
+    <results>
+      <row name="Thirty One" desc="null"/>
+    </results>
+  </test>
 </tests>
