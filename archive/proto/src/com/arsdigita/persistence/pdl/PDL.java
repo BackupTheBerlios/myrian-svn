@@ -62,12 +62,12 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/01/14 $
+ * @version $Revision: #4 $ $Date: 2003/02/17 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/PDL.java#3 $ by $Author: dennis $, $DateTime: 2003/01/14 14:38:27 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/PDL.java#4 $ by $Author: vadim $, $DateTime: 2003/02/17 19:25:30 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;
@@ -97,6 +97,7 @@ public class PDL {
     public void generateMetadata(MetadataRoot root) {
         m_ast.generateMetadata(root);
         m_pdl.emit(com.arsdigita.persistence.proto.metadata.Root.getRoot());
+        m_pdl.emitVersioned();
     }
 
     /**

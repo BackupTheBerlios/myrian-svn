@@ -23,12 +23,12 @@ import java.util.*;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/02/17 $
  */
 
 public class Parser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/Parser.jj#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/Parser.jj#2 $ by $Author: vadim $, $DateTime: 2003/02/17 19:25:30 $";
 
     private List m_path;
     private String m_filename;
@@ -85,6 +85,7 @@ TOKEN:
 TOKEN:
 {
     <OBJECTTYPE: "object" <WS> "type">
+  | <VERSIONED: "versioned">
   | <RETRIEVE: "retrieve">
   | <INSERT: "insert">
   | <UPDATE: "update">
@@ -272,6 +273,7 @@ ObjectDef object() :
     String[] aggressive;
 }
 {
+    [ <VERSIONED> ]
     <OBJECTTYPE> name = id() [ <EXTENDS> superType = identifier() ]
      {
          od = new ObjectDef(name.image, superType);

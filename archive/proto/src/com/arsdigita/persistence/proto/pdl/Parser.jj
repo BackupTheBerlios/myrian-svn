@@ -14,12 +14,12 @@ import com.arsdigita.persistence.proto.pdl.nodes.*;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #5 $ $Date: 2003/02/12 $
+ * @version $Revision: #6 $ $Date: 2003/02/17 $
  */
 
 class Parser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/Parser.jj#5 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/Parser.jj#6 $ by $Author: vadim $, $DateTime: 2003/02/17 19:25:30 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -63,6 +63,7 @@ TOKEN:
 TOKEN:
 {
     <OBJECTTYPE: "object" <WS> "type">
+  | <VERSIONED: "versioned">
   | <RETRIEVE: "retrieve">
   | <INSERT: "insert">
   | <UPDATE: "update">
@@ -179,12 +180,18 @@ ImportNd pimpwhore() :
 
 ObjectTypeNd object_type() :
 {
+    // FIXME: don't really need the isVersioned field here. -- vadimn@redhat.com, 2003-02-17
+    boolean isVersioned = false;
     Token t;
     ObjectTypeNd ot = new ObjectTypeNd();
     Node n;
 }
 {
-    t = <OBJECTTYPE> n = id() { ot.add(ObjectTypeNd.NAME, n); }
+    [ <VERSIONED> { isVersioned = true; ot.add(ObjectTypeNd.VERSIONED, new VersionedNd());} ]
+    t = <OBJECTTYPE> n = id() {
+        ot.add(ObjectTypeNd.NAME, n);
+        // if ( isVersioned ) System.err.println(n + "  is versioned");
+    }
     [ ( <EXTENDS> n = type() { ot.add(ObjectTypeNd.EXTENDS, n); } |
         <ADAPTER> n = javaClass() { ot.add(ObjectTypeNd.ADAPTER, n); } ) ]
     <LBRACE>

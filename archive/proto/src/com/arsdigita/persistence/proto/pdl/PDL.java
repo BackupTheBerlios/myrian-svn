@@ -14,16 +14,19 @@ import java.util.*;
 import java.math.*;
 import java.sql.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #16 $ $Date: 2003/02/17 $
+ * @version $Revision: #17 $ $Date: 2003/02/17 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#16 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#17 $ by $Author: vadim $, $DateTime: 2003/02/17 19:25:30 $";
+    private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
     private ErrorReport m_errors = new ErrorReport();
@@ -264,6 +267,19 @@ public class PDL {
                                    new SimpleAdapter(type, binders[i]));
             }
         }
+    }
+
+    // FIXME: this should take the root of the versioned metadata as an
+    // argument.-- vadimn@redhat.com, 2003-02-17
+    public void emitVersioned() {
+        m_ast.traverse(new Node.Switch() {
+                public void onObjectType(ObjectTypeNd ot) {
+                    if ( ot.getVersioned() != null ) {
+                        LOG.info("emitVersioned: " + ot.getName() +
+                                 " is versioned.", new Throwable());
+                    }
+                }
+            });
     }
 
     private static interface Binder {
