@@ -17,12 +17,12 @@ import java.util.*;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2003/02/28 $
+ * @version $Revision: #10 $ $Date: 2003/03/01 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#9 $ by $Author: rhs $, $DateTime: 2003/02/28 19:58:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataQueryImpl.java#10 $ by $Author: rhs $, $DateTime: 2003/03/01 02:23:27 $";
 
     private static final FilterFactory FACTORY = new FilterFactoryImpl();
 
@@ -60,7 +60,7 @@ class DataQueryImpl implements DataQuery {
     }
 
     public boolean isEmpty() {
-        throw new Error("not implemented");
+        return m_pc.getDataSet().isEmpty(makeFilter());
     }
 
 
@@ -69,7 +69,7 @@ class DataQueryImpl implements DataQuery {
     }
 
     public boolean isFirst() {
-        throw new Error("not implemented");
+        return m_cursor.isFirst();
     }
 
 
@@ -174,11 +174,18 @@ class DataQueryImpl implements DataQuery {
 
 
     public void setOrder(String order) {
-        throw new Error("not implemented");
+        Query q = m_pc.getDataSet().getQuery();
+        q.clearOrder();
+        addOrder(order);
     }
 
 
     public void addOrder(String order) {
+        if (m_cursor != null) {
+            throw new PersistenceException
+                ("Cannot order an active data query. " +
+                 "Data query must be rewound.");
+        }
         String[] orders = StringUtils.split(order, ',');
         for (int i = 0; i < orders.length; i++) {
             String[] parts = StringUtils.split(orders[i].trim(), ' ');
@@ -262,7 +269,7 @@ class DataQueryImpl implements DataQuery {
     }
 
     public void rewind() {
-        throw new Error("not implemented");
+        m_cursor.rewind();
     }
 
 

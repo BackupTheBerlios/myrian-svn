@@ -8,12 +8,12 @@ import java.util.*;
  * Query
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/02/28 $
+ * @version $Revision: #8 $ $Date: 2003/03/01 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#7 $ by $Author: rhs $, $DateTime: 2003/02/28 19:58:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#8 $ by $Author: rhs $, $DateTime: 2003/03/01 02:23:27 $";
 
     private Signature m_signature;
     private Filter m_filter;
@@ -67,6 +67,11 @@ public class Query {
 
     public boolean isAscending(Path p) {
         return m_ascending.contains(p);
+    }
+
+    public void clearOrder() {
+        m_order.clear();
+        m_ascending.clear();
     }
 
     public void set(Parameter p, Object value) {
