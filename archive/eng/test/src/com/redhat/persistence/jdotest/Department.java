@@ -3,9 +3,6 @@ package com.redhat.persistence.jdotest;
 import java.math.BigInteger;
 
 public class Department {
-
-    public static class Key extends ID { }
-
     private BigInteger id = null;
     private String name = null;
 

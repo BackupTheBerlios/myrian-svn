@@ -3,7 +3,7 @@ package com.redhat.persistence.jdotest;
 import java.io.Serializable;
 import java.math.BigInteger;
 
-public class ID implements Serializable {
+public final class ID implements Serializable {
     public BigInteger id;
 
     public ID() { }
