@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/categorization/Category.pdl#10 $ 
-// $DateTime: 2002/11/08 14:12:25 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/categorization/Category.pdl#11 $ 
+// $DateTime: 2002/11/18 12:20:00 $
 
 model com.arsdigita.categorization;
 
@@ -434,5 +434,18 @@ data operation updateCategoryDescendants {
                                                      :oldPrefixLength + 1)
         where default_ancestors like :oldPrefix || '%'
         and not category_id = :id
+    }
+}
+
+query immediateChildObjectIDs {
+    do {
+        select
+            object_id
+        from
+            cat_object_category_map
+        where
+            category_id = :categoryID
+    } map {
+        id = object_id;
     }
 }
