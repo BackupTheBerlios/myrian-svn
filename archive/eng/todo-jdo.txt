@@ -1,0 +1,34 @@
+- stop using PropertyMap as key. switch to serializable String based
+  with transient slots for actual thing. add new PMap constructor ?
+  another option is to use defined key order and a CompoundKey. might
+  want to wait for metamodel changes, which will provide similar
+  functionality
+
+- reverse navigation in jdo implementation objects
+  - ssn -> pmi (used in JDOAdapater#setSession)
+    - use subclass technique from c.a.p
+    - add attribute map to c.r.p session
+    - add static map from ssn object to pmi
+  - pc -> sm (could also be used in setSession, but is less important)
+    - can use reflection, but that may not be appropriate depending on
+      what the spec says regarding the protected-ness of the field
+
+- FCO v SCO
+  - how do Collection implementation fit in
+  - are PersitenceCapable SCOs using embedded-* the same as components
+
+- integrate pandora/crp collections
+
+- implement alphabet soup in PMFI (setConnectionFactoryName)
+  - decide on what APIs to support for the jndi retrieved object
+  - see spec for when to use jndi versus when to use jdbc url
+
+- decide if somethine like makeDirty needs to be implemented in c.r.p
+
+- ashah should get cache eviction in c.r.p commitable to PMI#evict can
+  be implemented
+
+- add StatementProfiler to engine constructed in PMF
+
+- plan for supporting multithread
+  - does it require changes to c.r.p?

@@ -1,0 +1,3 @@
+javax.jdo.PersistenceManagerFactoryClass=com.redhat.persistence.jdo.PersistenceManagerFactoryImpl
+javax.jdo.option.ConnectionURL=jdbc:postgresql:jdo?user=name
+javax.jdo.option.ConnectionDriverName=org.postgresql.Driver
