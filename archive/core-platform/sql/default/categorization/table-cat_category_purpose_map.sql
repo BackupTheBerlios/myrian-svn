@@ -4,7 +4,7 @@ create table cat_category_purpose_map (
                           references cat_categories on delete cascade,
   purpose_id              integer
                           constraint cat_obj_map_purpose_id_fk
-                          references acs_objects on delete cascade,
+                          references cat_purposes on delete cascade,
   constraint cat_cat_pur_map_pk
   primary key(category_id, purpose_id)
 );
