@@ -244,35 +244,35 @@ public class PersistenceManagerFactoryImpl
     }
 
     public String getConnectionFactoryName() {
-        throw new Error("not implemented");
+        throw new JDOFatalUserException("not implemented");
     }
 
     public void setConnectionFactoryName(String value) {
-        throw new Error("not implemented");
+        throw new JDOFatalUserException("not implemented");
     }
 
     public Object getConnectionFactory() {
-        throw new Error("not implemented");
+        throw new JDOFatalUserException("not implemented");
     }
 
     public void setConnectionFactory(Object value) {
-        throw new Error("not implemented");
+        throw new JDOFatalUserException("not implemented");
     }
 
     public String getConnectionFactory2Name() {
-        throw new Error("not implemented");
+        throw new JDOFatalUserException("not implemented");
     }
 
     public void setConnectionFactory2Name(String value) {
-        throw new Error("not implemented");
+        throw new JDOFatalUserException("not implemented");
     }
 
     public Object getConnectionFactory2() {
-        throw new Error("not implemented");
+        throw new JDOFatalUserException("not implemented");
     }
 
     public void setConnectionFactory2(Object value) {
-        throw new Error("not implemented");
+        throw new JDOFatalUserException("not implemented");
     }
 
     public boolean getIgnoreCache() {
@@ -280,7 +280,7 @@ public class PersistenceManagerFactoryImpl
     }
 
     public void setIgnoreCache(boolean value) {
-        throw new Error("not implemented");
+        throw new JDOFatalUserException("not implemented");
     }
 
     public int getMinPool() {
@@ -326,7 +326,7 @@ public class PersistenceManagerFactoryImpl
     }
 
     public void setMultithreaded(boolean value) {
-        throw new Error("not implemented");
+        throw new JDOFatalUserException("not supported");
     }
 
     public boolean getNontransactionalRead() {
