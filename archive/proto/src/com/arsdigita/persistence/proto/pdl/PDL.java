@@ -14,12 +14,12 @@ import java.util.*;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/01/15 $
+ * @version $Revision: #8 $ $Date: 2003/01/17 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#7 $ by $Author: rhs $, $DateTime: 2003/01/15 17:57:03 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#8 $ by $Author: rhs $, $DateTime: 2003/01/17 11:07:02 $";
 
     private AST m_ast = new AST();
     private ErrorReport m_errors = new ErrorReport();
@@ -191,26 +191,13 @@ public class PDL {
                     if (mapping == null) {
                         return;
                     }
-                    if (mapping instanceof Column) {
+                    if (mapping instanceof ColumnNd) {
                         emitMapping(root, prop, (ColumnNd) mapping);
                     } else {
                         emitMapping(root, prop, (JoinPathNd) mapping);
                     }
                 }
-            }, new Node.IncludeFilter(new Node.Field[] {
-                AST.FILES, FileNd.OBJECT_TYPES, FileNd.ASSOCIATIONS,
-                AssociationNd.ROLE_ONE, AssociationNd.ROLE_TWO
-            }));
-
-        for (Iterator it = root.getObjectTypes().iterator(); it.hasNext(); ) {
-            ObjectType ot = (ObjectType) it.next();
-            if (ot.getSupertype() != null) {
-                ObjectMap om = root.getObjectMap(ot);
-                ObjectMap bm = root.getObjectMap(ot.getBasetype());
-                om.getKeyProperties().clear();
-                om.getKeyProperties().addAll(bm.getKeyProperties());
-            }
-        }
+            });
     }
 
     private void emitMapping(Root root, Property prop, ColumnNd colNd) {

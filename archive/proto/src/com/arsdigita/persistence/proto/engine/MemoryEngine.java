@@ -13,12 +13,12 @@ import java.util.*;
  * MemoryEngine
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/01/15 $
+ * @version $Revision: #9 $ $Date: 2003/01/17 $
  **/
 
 public class MemoryEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#8 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#9 $ by $Author: rhs $, $DateTime: 2003/01/17 11:07:02 $";
 
     private static final Logger LOG = Logger.getLogger(MemoryEngine.class);
 
@@ -32,9 +32,14 @@ public class MemoryEngine extends Engine {
 
     private EventList m_uncomitted = new EventList();
     private EventList m_unflushed = new EventList();
+    private com.arsdigita.persistence.proto.engine.rdbms.RDBMSEngine m_engine;
+    private EventHandler m_subHandler;
+
 
     public MemoryEngine(Session ssn) {
         super(ssn);
+        m_engine = new com.arsdigita.persistence.proto.engine.rdbms.RDBMSEngine(ssn);
+        m_subHandler = m_engine.getEventHandler();
     }
 
     protected void commit() {
@@ -63,22 +68,27 @@ public class MemoryEngine extends Engine {
     private final EventHandler m_handler = new EventHandler() {
             public void onCreate(CreateEvent e) {
                 m_unflushed.add(e);
+                m_subHandler.onCreate(e);
             }
 
             public void onDelete(DeleteEvent e) {
                 m_unflushed.add(e);
+                m_subHandler.onDelete(e);
             }
 
             public void onSet(SetEvent e) {
                 m_unflushed.add(e);
+                m_subHandler.onSet(e);
             }
 
             public void onAdd(AddEvent e) {
                 m_unflushed.add(e);
+                m_subHandler.onAdd(e);
             }
 
             public void onRemove(RemoveEvent e) {
                 m_unflushed.add(e);
+                m_subHandler.onRemove(e);
             }
         };
 
@@ -89,6 +99,9 @@ public class MemoryEngine extends Engine {
     protected synchronized void flush() {
         m_uncomitted.addAll(m_unflushed);
         m_unflushed.clear();
+
+        LOG.debug(m_engine.getOperations());
+        m_engine.getOperations().clear();
     }
 
     private Object get(OID oid, Property prop) {
