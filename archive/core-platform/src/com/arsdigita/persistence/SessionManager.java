@@ -19,6 +19,8 @@ import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.util.UncheckedWrapperException;
 import com.redhat.persistence.EventProcessorManager;
+import com.arsdigita.versioning.Versions;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -26,6 +28,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -39,17 +42,20 @@ import org.apache.log4j.Logger;
  *
  * @see Initializer
  * @author Archit Shah 
- * @version $Revision: #13 $ $Date: 2003/10/28 $
+ * @version $Revision: #14 $ $Date: 2003/10/30 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#13 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#14 $ by $Author: vadim $, $DateTime: 2003/10/30 14:31:29 $";
 
     private static final Logger s_log = Logger.getLogger
         (SessionManager.class.getName());
 
     private static Set s_beforeFlushProcManagers = new HashSet();
+    static {
+        addBeforeFlushProcManager(Versions.EPM);
+    }
     private static Set s_afterFlushProcManagers  = new HashSet();
     private static ThreadLocal s_sessions = new ThreadLocal() {
         public Object initialValue() {
