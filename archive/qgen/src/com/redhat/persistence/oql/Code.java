@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2004/02/21 $
+ * @version $Revision: #12 $ $Date: 2004/02/23 $
  **/
 
 class Code {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#11 $ by $Author: rhs $, $DateTime: 2004/02/21 18:22:56 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#12 $ by $Author: ashah $, $DateTime: 2004/02/23 11:51:21 $";
 
     private static final Logger s_log = Logger.getLogger(Code.class);
 
@@ -168,7 +168,9 @@ class Code {
     static void paths(ObjectType type, Path parent, Collection result) {
         Collection props = properties(type);
         if (props.isEmpty()) {
-            result.add(parent);
+            if (parent != null) {
+                result.add(parent);
+            }
             return;
         }
         for (Iterator it = props.iterator(); it.hasNext(); ) {

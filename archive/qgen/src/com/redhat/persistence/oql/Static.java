@@ -1,5 +1,6 @@
 package com.redhat.persistence.oql;
 
+import com.redhat.persistence.ProtoException;
 import com.redhat.persistence.common.*;
 import com.redhat.persistence.common.ParseException;
 import com.redhat.persistence.metadata.ObjectMap;
@@ -12,12 +13,12 @@ import java.util.*;
  * Static
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/02/21 $
+ * @version $Revision: #6 $ $Date: 2004/02/23 $
  **/
 
 public class Static extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#5 $ by $Author: rhs $, $DateTime: 2004/02/21 18:22:56 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Static.java#6 $ by $Author: ashah $, $DateTime: 2004/02/23 11:51:21 $";
 
     private SQL m_sql;
     private String m_type;
@@ -76,19 +77,26 @@ public class Static extends Expression {
         return p.getSQL();
     }
 
-    private static Expression bind(String image) {
+    private Expression bind(String image) {
         return expression(Path.get(image), true);
     }
 
-    private static Expression path(String image) {
+    private Expression path(String image) {
         return expression(Path.get(image), false);
     }
 
-    private static Expression expression(Path path, boolean isBind) {
+    private Expression expression(Path path, boolean isBind) {
         if (path.getParent() == null) {
             String name = path.getName();
             if (isBind) {
-                return new Literal(name.substring(1));
+                String key = name.substring(1);
+                if (m_bindings.containsKey(key)) {
+                    return new Literal(m_bindings.get(key));
+                }
+
+                // XXX: use real subtype
+                throw new ProtoException
+                    ("no " + key + " in " + m_bindings, false) {};
             } else {
                 return new Variable(name);
             }
@@ -131,8 +139,11 @@ public class Static extends Expression {
             if (isExpression(t)) {
                 Expression e = (Expression) m_expressions.get(index++);
                 buf.append(e.emit(gen));
+            } else if (t.isRaw())  {
+                // XXX: ignore escapes for now
+                String raw = t.getImage();
+                buf.append(raw.substring(4, raw.length() - 1));
             } else {
-                // XXX: need to handle raw
                 buf.append(t.getImage());
             }
         }
@@ -160,13 +171,16 @@ public class Static extends Expression {
             QFrame child = null;
             if (gen.hasType(m_all.getType())) {
                 m_all.frame(gen);
-                child = gen.getFrame(m_all);
+                if (gen.hasFrame(m_all)) {
+                    child = gen.getFrame(m_all);
+                }
             } else if (m_expression != null) {
                 m_expression.frame(gen);
                 if (gen.hasFrame(m_expression)) {
                     child = gen.getFrame(m_expression);
                 }
             }
+
             if (child != null) {
                 QFrame frame = gen.frame(this, child.getType());
                 frame.addChild(child);
@@ -177,6 +191,8 @@ public class Static extends Expression {
         String emit(Generator gen) {
             if (gen.hasFrame(this)) {
                 return gen.getFrame(this).emit();
+            } else if (gen.hasType(m_all.getType())) {
+                return m_all.emit(gen);
             } else if (m_expression != null) {
                 return m_expression.emit(gen);
             } else {

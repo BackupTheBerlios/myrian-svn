@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/02/21 $
+ * @version $Revision: #3 $ $Date: 2004/02/23 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#2 $ by $Author: rhs $, $DateTime: 2004/02/21 23:13:07 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#3 $ by $Author: ashah $, $DateTime: 2004/02/23 11:51:21 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -23,6 +23,7 @@ class Generator {
     private Map m_queries = new HashMap();
     private LinkedList m_stack = new LinkedList();
     private MultiMap m_equalities = new MultiMap();
+    private Map m_substitutions = new HashMap();
 
     Generator(Root root) {
         m_root = root;
@@ -120,6 +121,14 @@ class Generator {
 
     void addEqualities(Expression expr, List equalities) {
         m_equalities.addAll(expr, equalities);
+    }
+
+    void setSubstitute(Expression expr, Expression substitute) {
+        m_substitutions.put(expr, substitute);
+    }
+
+    Expression getSubstitute(Expression expr) {
+        return (Expression) m_substitutions.get(expr);
     }
 
     private static class Equality {

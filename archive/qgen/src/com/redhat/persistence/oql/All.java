@@ -8,12 +8,12 @@ import java.util.*;
  * All
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/02/21 $
+ * @version $Revision: #6 $ $Date: 2004/02/23 $
  **/
 
 public class All extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/All.java#5 $ by $Author: rhs $, $DateTime: 2004/02/21 18:22:56 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/All.java#6 $ by $Author: ashah $, $DateTime: 2004/02/23 11:51:21 $";
 
     private String m_type;
     private Map m_bindings;
@@ -33,25 +33,35 @@ public class All extends Expression {
 
     void frame(Generator gen) {
         ObjectType type = gen.getType(m_type);
-        QFrame frame = gen.frame(this, type);
         ObjectMap map = type.getRoot().getObjectMap(type);
         SQLBlock block = map.getRetrieveAll();
-        String[] columns = Code.columns(frame.getType(), null);
+        String[] columns = Code.columns(type, null);
+
         if (block == null) {
+            QFrame frame = gen.frame(this, type);
             frame.setTable(map.getTable().getName());
             frame.setValues(columns);
-        } else {
-            SQL sql = block.getSQL();
+        } else if (columns.length > 0) {
+            QFrame frame = gen.frame(this, type);
             Static all = new Static
-                (sql, m_type, Code.columns(type, null), false, m_bindings);
+                (block.getSQL(), m_type, columns, false, m_bindings);
             all.frame(gen);
             QFrame child = gen.getFrame(all);
             frame.addChild(child);
             frame.setValues(child.getValues());
+        } else {
+            Static all = new Static
+                (block.getSQL(), null, null, false, m_bindings);
+            all.frame(gen);
+            gen.setSubstitute(this, all);
         }
     }
 
     String emit(Generator gen) {
+        Expression sub = gen.getSubstitute(this);
+        if (sub != null) {
+            return sub.emit(gen);
+        }
         return gen.getFrame(this).emit();
     }
 
