@@ -35,13 +35,13 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#5 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#6 $
  */
 final class ParameterPrinter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#5 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/11/06 11:27:06 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#6 $" +
+        "$Author: ashah $" +
+        "$DateTime: 2003/11/10 11:09:05 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterPrinter.class);
@@ -117,12 +117,16 @@ final class ParameterPrinter {
 
     public static final void main(final String[] args) throws IOException {
         register("com.arsdigita.runtime.RuntimeConfig");
+        register("com.arsdigita.web.WebConfig");
         register("com.arsdigita.templating.TemplatingConfig");
+        register("com.arsdigita.kernel.KernelConfig");
         register("com.arsdigita.mail.MailConfig");
         register("com.arsdigita.versioning.VersioningConfig");
-        register("com.arsdigita.kernel.KernelConfig");
-        register("com.arsdigita.web.WebConfig");
+        register("com.arsdigita.search.lucene.LuceneConfig");
+        register("com.arsdigita.kernel.security.SecurityConfig");
         register("com.arsdigita.bebop.BebopConfig");
+        register("com.arsdigita.dispatcher.DispatcherConfig");
+        register("com.arsdigita.workflow.simple.WorkflowConfig");
 
         if (args.length == 0) {
             System.out.println("Usage: ParameterPrinter [--html] output-file");
