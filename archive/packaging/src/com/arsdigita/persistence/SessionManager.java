@@ -15,11 +15,14 @@
 
 package com.arsdigita.persistence;
 
+import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.pdl.PDL;
+import com.arsdigita.util.*;
 import com.redhat.persistence.EventProcessorManager;
 
 import java.io.*;
+import java.sql.*;
 import java.util.*;
 
 import org.apache.log4j.Logger;
@@ -35,12 +38,12 @@ import org.apache.log4j.Logger;
  *
  * @see Initializer
  * @author Archit Shah 
- * @version $Revision: #3 $ $Date: 2003/08/27 $
+ * @version $Revision: #4 $ $Date: 2003/09/12 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/SessionManager.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
+    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/SessionManager.java#4 $ by $Author: rhs $, $DateTime: 2003/09/12 17:42:59 $";
 
     private static final Logger s_log = Logger.getLogger
         (SessionManager.class.getName());
@@ -54,10 +57,23 @@ public class SessionManager {
     };
 
     public static Session open(String name, MetadataRoot root,
-                               ConnectionSource source, int database) {
+                               ConnectionSource source) {
         if (hasSession(name)) {
             throw new IllegalStateException("session already open: " + name);
         }
+        Connection conn = source.acquire();
+        int database;
+        try {
+            try {
+                database =
+                    DbHelper.getDatabaseFromURL(conn.getMetaData().getURL());
+            } catch (SQLException e) {
+                throw new UncheckedWrapperException(e);
+            }
+        } finally {
+            source.release(conn);
+        }
+
         Session result = new Session(root, source, database);
         for (Iterator ii=s_beforeFlushProcManagers.iterator();
              ii.hasNext(); ) {
