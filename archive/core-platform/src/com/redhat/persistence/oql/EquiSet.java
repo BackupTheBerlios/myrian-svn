@@ -4,18 +4,19 @@ import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
 import java.util.*;
 
+import org.apache.commons.collections.list.*;
 import org.apache.log4j.Logger;
 
 /**
  * EquiSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/03/25 $
+ * @version $Revision: #6 $ $Date: 2004/03/25 $
  **/
 
 class EquiSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/EquiSet.java#5 $ by $Author: richardl $, $DateTime: 2004/03/25 09:49:17 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/EquiSet.java#6 $ by $Author: rhs $, $DateTime: 2004/03/25 22:23:19 $";
 
     private static final Logger s_log = Logger.getLogger(EquiSet.class);
 
@@ -25,7 +26,7 @@ class EquiSet {
     private List m_partitions = new ArrayList();
     private List m_free = new ArrayList();
 
-    private Set m_frames = new HashSet();
+    private List m_frames = SetUniqueList.decorate(new ArrayList());
     private List m_framesets = new ArrayList();
 
     EquiSet(Generator generator) {
@@ -70,22 +71,22 @@ class EquiSet {
     }
 
     void collapse() {
-        while (collapse(m_frames)) {};
+        while (doCollapse()) {};
     }
 
     private MultiMap m_collated = new MultiMap();
     private MultiMap m_columns = new MultiMap();
     private List m_keys = new ArrayList();
 
-    boolean collapse(Collection frames) {
+    private boolean doCollapse() {
         m_collated.clear();
         m_columns.clear();
-        for (Iterator it = frames.iterator(); it.hasNext(); ) {
-            QFrame frame = (QFrame) it.next();
+        for (int i = 0; i < m_frames.size(); i++) {
+            QFrame frame = (QFrame) m_frames.get(i);
             m_keys.clear();
             keys(frame, m_keys);
-            for (int i = 0; i < m_keys.size(); i++) {
-                Object key = m_keys.get(i);
+            for (int j = 0; j < m_keys.size(); j++) {
+                Object key = m_keys.get(j);
                 m_collated.add(key, frame);
                 m_columns.addAll(key, frame.getColumns());
             }
@@ -96,13 +97,13 @@ class EquiSet {
         List keys = m_collated.keys();
         for (int i = 0; i < keys.size(); i++) {
             Object key = keys.get(i);
-            Set set = m_collated.get(key);
-            Set cols = m_columns.get(key);
-            for (Iterator it = cols.iterator(); it.hasNext(); ) {
-                String col = (String) it.next();
+            List frames = m_collated.get(key);
+            List cols = m_columns.get(key);
+            for (int j = 0; j < cols.size(); j++) {
+                String col = (String) cols.get(j);
                 m_equals.clear();
-                for (Iterator iter = set.iterator(); iter.hasNext(); ) {
-                    QFrame frame = (QFrame) iter.next();
+                for (int k = 0; k < frames.size(); k++) {
+                    QFrame frame = (QFrame) frames.get(k);
                     m_equals.add(frame.getValue(col));
                 }
                 modified |= add(m_equals);
@@ -171,7 +172,7 @@ class EquiSet {
         return result;
     }
 
-    private Set m_from = new HashSet();
+    private List m_from = SetUniqueList.decorate(new ArrayList());
 
     boolean add(List equal) {
         Integer to = null;
@@ -229,11 +230,11 @@ class EquiSet {
             }
         }
 
-        for (Iterator it = m_from.iterator(); it.hasNext(); ) {
-            Integer idx = (Integer) it.next();
+        for (int i = 0; i < m_from.size(); i++) {
+            Integer idx = (Integer) m_from.get(i);
             List from = getPartition(idx);
-            for (int i = 0; i < from.size(); i++) {
-                Object o = from.get(i);
+            for (int j = 0; j < from.size(); j++) {
+                Object o = from.get(j);
                 top.add(o);
                 m_nodes.put(o, to);
             }

@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/03/25 $
+ * @version $Revision: #9 $ $Date: 2004/03/25 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/QFrame.java#8 $ by $Author: rhs $, $DateTime: 2004/03/25 17:56:10 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/QFrame.java#9 $ by $Author: rhs $, $DateTime: 2004/03/25 22:23:19 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -40,6 +40,7 @@ class QFrame {
     private Map m_mappings;
     private String m_table;
     private Expression m_tableExpr;
+    private List m_colkeys;
     private Map m_columns;
     private List m_qvalues;
     private QFrame m_parent;
@@ -64,7 +65,9 @@ class QFrame {
         m_columnspool = new HashMap();
         m_qvaluespool = new ArrayList();
 
+
         m_children = new ArrayList();
+        m_colkeys = new ArrayList();
     }
 
     void init(Expression expression, ObjectType type, QFrame container) {
@@ -73,6 +76,7 @@ class QFrame {
         m_container = container;
 
         m_children.clear();
+        m_colkeys.clear();
 
         m_outer = false;
         m_values = null;
@@ -147,6 +151,7 @@ class QFrame {
             v = new QValue(this, column);
             m_columns.put(column, v);
             m_qvalues.add(v);
+            m_colkeys.add(column);
         }
         return v;
     }
@@ -155,12 +160,8 @@ class QFrame {
         return new QValue(this, sql);
     }
 
-    Set getColumns() {
-        if (m_columns == null) {
-            return Collections.EMPTY_SET;
-        } else {
-            return m_columns.keySet();
-        }
+    List getColumns() {
+        return m_colkeys;
     }
 
     boolean hasValue(String column) {
@@ -572,9 +573,9 @@ class QFrame {
         frames(m_generator.getUses(e), result);
     }
 
-    void frames(Collection values, Set result) {
-        for (Iterator it = values.iterator(); it.hasNext(); ) {
-            QValue value = (QValue) it.next();
+    void frames(List values, Set result) {
+        for (int i = 0; i < values.size(); i++) {
+            QValue value = (QValue) values.get(i);
             QFrame frame = value.getFrame().getDuplicate();
             if (frame.getRoot().equals(getRoot())) {
                 result.add(frame);
@@ -716,16 +717,15 @@ class QFrame {
         }
 
         if (m_condition != null) {
-            Set nn  = m_generator.getNonNull(m_condition);
-            for (Iterator it = nn.iterator(); it.hasNext(); ) {
-                QValue qv = (QValue) it.next();
-                m_nonnull.add(qv);
+            List nn  = m_generator.getNonNull(m_condition);
+            for (int i = 0; i < nn.size(); i++) {
+                m_nonnull.add(nn.get(i));
             }
         }
 
         if (m_columns != null) {
-            for (Iterator it = m_columns.values().iterator(); it.hasNext(); ) {
-                QValue qv = (QValue) it.next();
+            for (int i = 0; i < m_qvalues.size(); i++) {
+                QValue qv = (QValue) m_qvalues.get(i);
                 if (!isNullable(Collections.singletonList(qv))) {
                     m_nonnull.add(qv);
                 }
@@ -935,7 +935,7 @@ class QFrame {
         if (m_table != null) {
             QFrame dup = null;
             for (int i = 0; i < framesets.size(); i++) {
-                Set set = (Set) framesets.get(i);
+                List set = (List) framesets.get(i);
                 if (set.contains(this)) {
                     dup = frames[i];
                     if (dup == null) {

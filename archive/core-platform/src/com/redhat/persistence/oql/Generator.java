@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/03/24 $
+ * @version $Revision: #5 $ $Date: 2004/03/25 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Generator.java#4 $ by $Author: ashah $, $DateTime: 2004/03/24 13:21:25 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Generator.java#5 $ by $Author: rhs $, $DateTime: 2004/03/25 22:23:19 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -144,7 +144,7 @@ class Generator {
         return m_boolean.contains(expr);
     }
 
-    Set getEqualities(Expression expr) {
+    List getEqualities(Expression expr) {
         return m_equalities.get(expr);
     }
 
@@ -152,7 +152,7 @@ class Generator {
         m_equalities.add(expr, new Equality(a, b));
     }
 
-    void addEqualities(Expression expr, Collection equalities) {
+    void addEqualities(Expression expr, List equalities) {
         m_equalities.addAll(expr, equalities);
     }
 
@@ -164,7 +164,7 @@ class Generator {
         m_sufficient.add(expr);
     }
 
-    Set getUses(Expression expr) {
+    List getUses(Expression expr) {
         return m_uses.get(expr);
     }
 
@@ -172,11 +172,11 @@ class Generator {
         m_uses.add(expr, v);
     }
 
-    void addUses(Expression expr, Collection values) {
+    void addUses(Expression expr, List values) {
         m_uses.addAll(expr, values);
     }
 
-    Set getNull(Expression expr) {
+    List getNull(Expression expr) {
         return m_null.get(expr);
     }
 
@@ -184,11 +184,11 @@ class Generator {
         m_null.add(expr, v);
     }
 
-    void addNulls(Expression expr, Collection values) {
+    void addNulls(Expression expr, List values) {
         m_null.addAll(expr, values);
     }
 
-    Set getNonNull(Expression expr) {
+    List getNonNull(Expression expr) {
         return m_nonnull.get(expr);
     }
 
@@ -196,7 +196,7 @@ class Generator {
         m_nonnull.add(expr, v);
     }
 
-    void addNonNulls(Expression expr, Collection values) {
+    void addNonNulls(Expression expr, List values) {
         m_nonnull.addAll(expr, values);
     }
 
@@ -276,10 +276,9 @@ class Generator {
 
     private void addConstraining(Expression e, QFrame frame, Set columns,
                                  Set frames) {
-        Set equalities = getEqualities(e);
-        if (equalities == null) { return; }
-        for (Iterator it = equalities.iterator(); it.hasNext(); ) {
-            Equality eq = (Equality) it.next();
+        List equalities = getEqualities(e);
+        for (int i = 0; i < equalities.size(); i++) {
+            Equality eq = (Equality) equalities.get(i);
             QValue external = eq.getExternal(frame);
             if (external == null) { continue; }
             QFrame ext = external.getFrame();
@@ -318,9 +317,9 @@ class Generator {
     }
 
     void equate(EquiSet equiset, Expression e) {
-        Set eqs = getEqualities(e);
-        for (Iterator it = eqs.iterator(); it.hasNext(); ) {
-            Equality eq = (Equality) it.next();
+        List eqs = getEqualities(e);
+        for (int i = 0; i < eqs.size(); i++) {
+            Equality eq = (Equality) eqs.get(i);
             equiset.equate(eq.getLeft(), eq.getRight());
         }
     }
