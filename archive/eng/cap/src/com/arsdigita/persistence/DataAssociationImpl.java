@@ -21,20 +21,20 @@ import com.redhat.persistence.ProtoException;
  * DataAssociationImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/03 $
  **/
 
 class DataAssociationImpl extends DataAssociationCursorImpl
     implements DataAssociation {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataAssociationImpl.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataAssociationImpl.java#2 $ by $Author: rhs $, $DateTime: 2004/08/03 09:01:35 $";
 
     private com.redhat.persistence.Session m_pssn;
-    private DataObject m_data;
+    private DataObjectImpl m_data;
     private Property m_prop;
     private com.redhat.persistence.metadata.Property m_pprop;
 
-    DataAssociationImpl(Session ssn, DataObject data, Property prop) {
+    DataAssociationImpl(Session ssn, DataObjectImpl data, Property prop) {
         super(ssn, data, prop);
         setAssociation(this);
         m_pssn = ssn.getProtoSession();
@@ -44,6 +44,7 @@ class DataAssociationImpl extends DataAssociationCursorImpl
     }
 
     public DataObject add(DataObject obj) {
+        m_data.validateWrite();
         try {
             return (DataObject) m_pssn.add(m_data, m_pprop, obj);
         } catch (ProtoException pe) {
@@ -56,6 +57,7 @@ class DataAssociationImpl extends DataAssociationCursorImpl
     }
 
     public void clear() {
+        m_data.validateWrite();
         m_pssn.clear(m_data, m_pprop);
     }
 
@@ -73,6 +75,7 @@ class DataAssociationImpl extends DataAssociationCursorImpl
     }
 
     public void remove(DataObject obj) {
+        m_data.validateWrite();
         try {
             m_pssn.remove(m_data, m_pprop, obj);
         } catch (ProtoException pe) {
@@ -81,6 +84,7 @@ class DataAssociationImpl extends DataAssociationCursorImpl
     }
 
     public void remove(OID oid) {
+        m_data.validateWrite();
         remove(getSession().retrieve(oid));
     }
 

@@ -34,12 +34,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/03 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataObjectImpl.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataObjectImpl.java#2 $ by $Author: rhs $, $DateTime: 2004/08/03 09:01:35 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -214,8 +214,9 @@ class DataObjectImpl implements DataObject {
                     }
                 }
 
-                obj = get(SessionManager.getSession().getProtoSession(),
-                          convert(property));
+                Session ssn = SessionManager.getSession().getProtoSession();
+                Object me = ssn.retrieve(C.pmap(ssn.getRoot(), m_oid));
+                obj = ssn.get(me, convert(property));
 
                 if (obj instanceof DataObjectImpl) {
                     DataObjectImpl dobj = (DataObjectImpl) obj;
@@ -256,13 +257,15 @@ class DataObjectImpl implements DataObject {
         com.redhat.persistence.Session ssn =
             SessionManager.getSession().getProtoSession();
 
+        Object me = ssn.retrieve(C.pmap(ssn.getRoot(), m_oid));
+
         for (Iterator it = getObjectType().getProperties();
              it.hasNext(); ) {
             Property p = (Property) it.next();
             if (!p.isCollection()
                 && !p.isKeyProperty()
                 && p.getType().isSimple()) {
-                m_disconnect.put(p, get(ssn, C.prop(m_ssn.getRoot(), p)));
+                m_disconnect.put(p, ssn.get(me, C.prop(m_ssn.getRoot(), p)));
             }
         }
 
@@ -365,7 +368,7 @@ class DataObjectImpl implements DataObject {
         return m_valid;
     }
 
-    private void validate() {
+    void validate() {
         if (!isValid()) {
             if (s_log.isDebugEnabled()) {
                 s_log.debug
@@ -375,7 +378,7 @@ class DataObjectImpl implements DataObject {
         }
     }
 
-    private void validateWrite() {
+    void validateWrite() {
         validate();
         if (isDisconnected()) {
             throw new PersistenceException
