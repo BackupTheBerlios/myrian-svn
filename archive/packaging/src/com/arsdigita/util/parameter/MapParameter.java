@@ -24,13 +24,13 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/MapParameter.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/MapParameter.java#2 $
  */
 public class MapParameter extends AbstractParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/MapParameter.java#1 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/17 14:30:44 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/MapParameter.java#2 $" +
+        "$Author: rhs $" +
+        "$DateTime: 2003/10/21 23:00:37 $";
 
     private final ArrayList m_params;
 
@@ -73,7 +73,10 @@ public class MapParameter extends AbstractParameter {
         while (params.hasNext()) {
             final Parameter param = (Parameter) params.next();
 
-            map.put(param, param.read(reader, errors));
+            Object value = param.read(reader, errors);
+            if (value != null) {
+                map.put(param, value);
+            }
         }
 
         return map;
@@ -86,8 +89,9 @@ public class MapParameter extends AbstractParameter {
 
         while (params.hasNext()) {
             final Parameter param = (Parameter) params.next();
-
-            param.validate(map.get(param), errors);
+            if (map.containsKey(param)) {
+                param.validate(map.get(param), errors);
+            }
         }
     }
 
