@@ -33,12 +33,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/08/27 $
+ * @version $Revision: #5 $ $Date: 2003/08/29 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#4 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#5 $ by $Author: rhs $, $DateTime: 2003/08/29 10:31:35 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -179,7 +179,7 @@ public class RDBMSEngine extends Engine {
     Environment getEnvironment(Object obj) {
         Environment result = (Environment) m_environments.get(obj);
         if (result == null) {
-            result = new Environment(getSession().getObjectMap(obj));
+            result = new Environment(this, getSession().getObjectMap(obj));
             m_environments.put(obj, result);
         }
         return result;
@@ -361,8 +361,6 @@ public class RDBMSEngine extends Engine {
         }
     }
 
-    private RDBMSQuerySource QS = new RDBMSQuerySource();
-
     public void flush() {
         try {
             generate();
@@ -378,8 +376,9 @@ public class RDBMSEngine extends Engine {
                 SetEvent e = (SetEvent) m_mutations.get(i);
                 int jdbcType = ((Integer) m_mutationTypes.get(i)).intValue();
                 Property prop = e.getProperty();
+                QuerySource qs = getSession().getQuerySource();
                 RDBMSRecordSet rs = (RDBMSRecordSet) execute
-                    (QS.getQuery(e.getObject(), prop));
+                    (qs.getQuery(e.getObject(), prop));
                 Adapter ad = prop.getRoot().getAdapter(prop.getType());
                 try {
                     if (rs.next()) {
@@ -549,12 +548,12 @@ public class RDBMSEngine extends Engine {
     }
 
     public void execute(SQLBlock sql, Map parameters) {
-        Environment env = new Environment(null);
+        Environment env = new Environment(this, null);
         for (Iterator it = parameters.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry me = (Map.Entry) it.next();
             env.set((Path) me.getKey(), me.getValue());
         }
-        Operation op = new StaticOperation(sql, env, false);
+        Operation op = new StaticOperation(this, sql, env, false);
         SQLWriter w = new RetainUpdatesWriter();
         w.setEngine(this);
         execute(op, w);

@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/08/27 $
+ * @version $Revision: #5 $ $Date: 2003/08/29 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/QGen.java#4 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/QGen.java#5 $ by $Author: rhs $, $DateTime: 2003/08/29 10:31:35 $";
 
     private static final Logger LOG = Logger.getLogger(QGen.class);
 
@@ -94,7 +94,7 @@ class QGen {
         m_query = query;
 	m_block = block;
         m_anal = new Analyzer(m_query.getFilter());
-        m_root = query.getSignature().getObjectType().getRoot();
+        m_root = m_engine.getSession().getRoot();
     }
 
     private Path getColumn(Path prefix) {
@@ -259,7 +259,7 @@ class QGen {
         Signature sig = m_query.getSignature();
 
         Environment env = new Environment
-            (m_root.getObjectMap(sig.getObjectType()));
+            (m_engine, m_root.getObjectMap(sig.getObjectType()));
 
         for (Iterator it = sig.getSources().iterator(); it.hasNext(); ) {
             Source src = (Source) it.next();
@@ -270,7 +270,7 @@ class QGen {
                 SQLBlock block = getBlock(src);
                 Path alias = makeAlias(src.getPath(), "st_");
                 j = new StaticJoin
-		    (new StaticOperation(block, env, false), alias);
+		    (new StaticOperation(m_engine, block, env, false), alias);
             } else {
                 ObjectMap map = m_root.getObjectMap(src.getObjectType());
                 Table start = null;
@@ -330,7 +330,7 @@ class QGen {
             }
         }
 
-        Select result = new Select(join, filter, env);
+        Select result = new Select(m_engine, join, filter, env);
         result.setMappings(m_columns);
 
         int col = 1;

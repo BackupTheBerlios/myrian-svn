@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/08/27 $
+ * @version $Revision: #4 $ $Date: 2003/08/29 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/Session.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/Session.java#4 $ by $Author: rhs $, $DateTime: 2003/08/29 10:31:35 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -68,6 +68,14 @@ public class Session {
 
     public Root getRoot() {
         return m_root;
+    }
+
+    Engine getEngine() {
+        return m_engine;
+    }
+
+    public QuerySource getQuerySource() {
+        return m_qs;
     }
 
     EventStream getEventStream() { return m_events; }
@@ -650,10 +658,6 @@ public class Session {
         } finally {
             clear(false);
         }
-    }
-
-    Engine getEngine() {
-        return m_engine;
     }
 
     void load(Object obj, Property prop, Object value) {

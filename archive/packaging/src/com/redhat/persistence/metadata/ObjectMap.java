@@ -23,12 +23,12 @@ import java.util.*;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/29 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/metadata/ObjectMap.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/metadata/ObjectMap.java#3 $ by $Author: rhs $, $DateTime: 2003/08/29 10:31:35 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -301,6 +301,10 @@ public class ObjectMap extends Element {
 
     Object getElementKey() {
         return getObjectType();
+    }
+
+    public String toString() {
+        return "object map for " + m_type + " mappings: " + m_mappings;
     }
 
 }

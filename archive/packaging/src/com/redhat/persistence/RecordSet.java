@@ -28,22 +28,19 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/08/27 $
+ * @version $Revision: #4 $ $Date: 2003/08/29 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/RecordSet.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/RecordSet.java#4 $ by $Author: rhs $, $DateTime: 2003/08/29 10:31:35 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
     private Signature m_signature;
-    private Adapter m_adapter;
 
     protected RecordSet(Signature signature) {
         m_signature = signature;
-        ObjectType type = m_signature.getObjectType();
-        m_adapter = type.getRoot().getAdapter(type);
     }
 
     public Signature getSignature() {
@@ -57,6 +54,8 @@ public abstract class RecordSet {
     public abstract void close();
 
     Map load(Session ssn) {
+        Adapter adapter =
+            ssn.getRoot().getAdapter(m_signature.getObjectType());
         Collection paths = m_signature.getPaths();
 
 	LinkedList remaining = new LinkedList();
@@ -102,11 +101,11 @@ public abstract class RecordSet {
                         Object previous = null;
 			if (type.isKeyed()) {
                             previous = ssn.getObject
-                                (m_adapter.getSessionKey(type, pmap));
+                                (adapter.getSessionKey(type, pmap));
 
                             if (previous != null) {
                                 ObjectType prevType =
-                                    m_adapter.getObjectType(previous);
+                                    adapter.getObjectType(previous);
 
                                 if (type.equals(prevType)
                                     || prevType.isSubtypeOf(type)) {
@@ -120,7 +119,7 @@ public abstract class RecordSet {
 			}
 
 			if (obj == null) {
-			    obj = m_adapter.getObject(type, pmap);
+			    obj = adapter.getObject(type, pmap);
                             if (previous != obj) {
                                 ssn.use(obj);
                             }

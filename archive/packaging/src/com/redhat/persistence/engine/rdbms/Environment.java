@@ -24,19 +24,25 @@ import java.util.*;
  * Environment
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/08/27 $
+ * @version $Revision: #4 $ $Date: 2003/08/29 $
  **/
 
 class Environment {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/Environment.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/Environment.java#4 $ by $Author: rhs $, $DateTime: 2003/08/29 10:31:35 $";
 
+    private RDBMSEngine m_engine;
     private ObjectMap m_om;
     private HashMap m_values = new HashMap();
     private HashMap m_types = new HashMap();
 
-    public Environment(ObjectMap om) {
+    public Environment(RDBMSEngine engine, ObjectMap om) {
+        m_engine = engine;
         m_om = om;
+    }
+
+    RDBMSEngine getEngine() {
+        return m_engine;
     }
 
     public boolean contains(Path path) {
@@ -44,7 +50,9 @@ class Environment {
     }
 
     public void set(Path parameter, Object value) {
-        final int type[] = { RDBMSEngine.getType(m_om.getRoot(), value) };
+        final int type[] = {
+            RDBMSEngine.getType(m_engine.getSession().getRoot(), value)
+        };
 
         if (m_om != null) {
             Path path = Path.get(parameter.getPath().substring(1));
@@ -99,7 +107,7 @@ class SpliceEnvironment extends Environment {
     private Environment m_splice;
 
     public SpliceEnvironment(Environment base, Path path, Environment splice) {
-        super(null);
+        super(base.getEngine(), null);
         m_base = base;
         m_path = path;
         m_splice = splice;

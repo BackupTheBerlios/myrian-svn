@@ -24,15 +24,15 @@ import java.util.*;
  * Insert
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/29 $
  **/
 
 class Insert extends DML {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/Insert.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/Insert.java#3 $ by $Author: rhs $, $DateTime: 2003/08/29 10:31:35 $";
 
-    public Insert(Table table) {
-        super(table);
+    public Insert(RDBMSEngine engine, Table table) {
+        super(engine, table);
     }
 
     void write(SQLWriter w) {

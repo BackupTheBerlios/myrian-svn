@@ -58,7 +58,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/08/27 $
+ * @version $Revision: #4 $ $Date: 2003/08/29 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -82,7 +82,6 @@ public class Session {
         m_root = root;
         m_source = source;
         m_database = database;
-        m_ctx = new TransactionContext(this);
 
         com.redhat.persistence.engine.rdbms.ConnectionSource src =
             new com.redhat.persistence.engine.rdbms.ConnectionSource() {
@@ -110,6 +109,7 @@ public class Session {
 
         m_qs = new RDBMSQuerySource();
         m_ssn = this.new PSession(m_root.getRoot(), m_engine, m_qs);
+        m_ctx = new TransactionContext(this);
 
         m_ssn.addAfterActivate(new AfterActivate());
 
@@ -120,8 +120,9 @@ public class Session {
 
         Root r = m_root.getRoot();
         synchronized (r) {
-            if (r.getAdapter(DataObjectImpl.class) == null) {
-                Adapter ad = new DataObjectAdapter();
+            Adapter ad = r.getAdapter(DataObjectImpl.class);
+            if (!(ad instanceof DataObjectAdapter)) {
+                ad = new DataObjectAdapter();
                 r.addAdapter(DataObjectImpl.class, ad);
                 r.addAdapter(PropertyMap.class, ad);
                 r.addAdapter(null, ad);

@@ -15,6 +15,17 @@
 
 package com.arsdigita.tools.junit.extensions;
 
+import com.arsdigita.util.*;
+import com.arsdigita.util.config.*;
+import com.arsdigita.util.parameter.*;
+import com.arsdigita.db.*;
+import com.arsdigita.persistence.*;
+import com.arsdigita.persistence.metadata.*;
+import com.arsdigita.persistence.pdl.*;
+
+import java.sql.*;
+import java.io.*;
+
 import com.arsdigita.db.ConnectionManager;
 import com.arsdigita.installer.LoadSQLPlusScript;
 import com.arsdigita.util.DummyServletContext;
@@ -104,6 +115,40 @@ public class BaseTestSetup extends TestDecorator {
         return m_performInitialization;
     }
 
+    private void openSession() {
+        TestConfig conf = new TestConfig();
+        String pdl = conf.getPDL();
+        String jdbc = conf.getURL();
+        String user = conf.getUser();
+        String password = conf.getPassword();
+        int database = conf.getDatabase();
+        DbHelper.setDatabase(database);
+
+        try {
+            switch (database) {
+            case DbHelper.DB_POSTGRES:
+                Class.forName("org.postgresql.Driver");
+                break;
+            case DbHelper.DB_ORACLE:
+                Class.forName("oracle.jdbc.driver.OracleDriver");
+                break;
+            default:
+                throw new IllegalArgumentException("unsupported database");
+            }
+
+            Connection conn =
+                DriverManager.getConnection(jdbc, user, password);
+            conn.setAutoCommit(false);
+            ConnectionSource source = new DedicatedConnectionSource(conn);
+            MetadataRoot root = PDL.loadDirectory(new File(pdl));
+            SessionManager.open("default", root, source, database);
+        } catch (ClassNotFoundException e) {
+            throw new UncheckedWrapperException(e);
+        } catch (SQLException e) {
+            throw new UncheckedWrapperException(e);
+        }
+    }
+
     /**
      * Sets up the fixture. Override to set up additional fixture
      * state.
@@ -113,6 +158,7 @@ public class BaseTestSetup extends TestDecorator {
         if ( m_suite.testCount() > 0 ) {
             if (m_performInitialization) {
                 ResourceManager.getInstance().setServletContext(new DummyServletContext());
+                openSession();
                 Initializer.startup(m_suite, m_scriptName, m_iniName);
                 setupSQL ();
             }
@@ -151,6 +197,47 @@ public class BaseTestSetup extends TestDecorator {
         for (Iterator iterator = scripts.iterator(); iterator.hasNext();) {
             String script = (String) iterator.next();
             loader.loadSQLPlusScript(script);
+        }
+    }
+
+    private static class TestConfig extends BaseConfig {
+        private String m_url;
+        private String m_user;
+        private String m_password;
+        private String m_pdl;
+        private int m_database;
+
+        TestConfig() {
+            super("/test.properties");
+            m_url = (String) initialize
+                (new JDBCURLParameter("waf.test.jdbc.url"), null);
+            m_user = (String) initialize
+                (new StringParameter("waf.test.jdbc.user"), null);
+            m_password = (String) initialize
+                (new StringParameter("waf.test.jdbc.password"), null);
+            m_pdl = (String) initialize
+                (new StringParameter("waf.test.pdl"), null);
+            m_database = DbHelper.getDatabaseFromURL(m_url);
+        }
+
+        public String getURL() {
+            return m_url;
+        }
+
+        public String getUser() {
+            return m_user;
+        }
+
+        public String getPassword() {
+            return m_password;
+        }
+
+        public String getPDL() {
+            return m_pdl;
+        }
+
+        public int getDatabase() {
+            return m_database;
         }
     }
 

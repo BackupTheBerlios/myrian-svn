@@ -25,21 +25,22 @@ import java.sql.*;
  * StaticOperation
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/29 $
  **/
 
 class StaticOperation extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/StaticOperation.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/StaticOperation.java#3 $ by $Author: rhs $, $DateTime: 2003/08/29 10:31:35 $";
 
     private SQLBlock m_sql;
 
-    public StaticOperation(SQLBlock sql, Environment env) {
-	this(sql, env, true);
+    public StaticOperation(RDBMSEngine engine, SQLBlock sql, Environment env) {
+	this(engine, sql, env, true);
     }
 
-    public StaticOperation(SQLBlock sql, Environment env, boolean initialize) {
-        super(env);
+    public StaticOperation(RDBMSEngine engine, SQLBlock sql, Environment env,
+                           boolean initialize) {
+        super(engine, env);
         m_sql = sql;
         for (Iterator it = sql.getSQL().getBindings().iterator();
 	     it.hasNext(); ) {

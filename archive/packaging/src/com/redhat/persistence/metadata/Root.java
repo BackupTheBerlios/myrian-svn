@@ -18,18 +18,19 @@ package com.redhat.persistence.metadata;
 import com.redhat.persistence.common.*;
 
 import java.util.*;
+import java.io.*;
 
 
 /**
  * Root
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/08/27 $
+ * @version $Revision: #4 $ $Date: 2003/08/29 $
  **/
 
 public class Root {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/metadata/Root.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/metadata/Root.java#4 $ by $Author: rhs $, $DateTime: 2003/08/29 10:31:35 $";
 
     private static final Root ROOT = new Root();
 
@@ -159,6 +160,7 @@ public class Root {
 
     public void addAdapter(Class javaClass, Adapter ad) {
         m_adapters.put(javaClass, ad);
+        ad.setRoot(this);
     }
 
     public Adapter getAdapter(Class javaClass) {
@@ -183,6 +185,32 @@ public class Root {
         if (a != null) { return a; }
 
         throw new IllegalArgumentException("no adapter for: " + type);
+    }
+
+    public void dump(PrintStream out) {
+        out.println("types:");
+        dump(out, m_types);
+        out.println("maps:");
+        dump(out, m_maps);
+        out.println("tables:");
+        dump(out, m_tables);
+        out.println("ops:");
+        dump(out, m_ops);
+        out.println("adapters:");
+        dump(out, m_adapters);
+    }
+
+    private void dump(PrintStream out, Collection c) {
+        for (Iterator it = c.iterator(); it.hasNext(); ) {
+            out.println("    " + it.next());
+        }
+    }
+
+    private void dump(PrintStream out, Map m) {
+        for (Iterator it = m.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry me = (Map.Entry) it.next();
+            out.println("    " + me.getKey() + ": " + me.getValue());
+        }
     }
 
 }

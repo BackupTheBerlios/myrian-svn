@@ -25,13 +25,13 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/FilePropertyStore.java#4 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/FilePropertyStore.java#5 $
  */
 public class FilePropertyStore implements ParameterStore {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/FilePropertyStore.java#4 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/08/27 12:11:05 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/FilePropertyStore.java#5 $" +
+        "$Author: rhs $" +
+        "$DateTime: 2003/08/29 10:31:35 $";
 
     private static final Logger s_log = Logger.getLogger
         (FilePropertyStore.class);
@@ -44,10 +44,7 @@ public class FilePropertyStore implements ParameterStore {
         final InputStream in = getClass().getResourceAsStream(filename);
 
         if (in == null) {
-            if (s_log.isInfoEnabled()) {
-                s_log.info(filename + " was not found; using an empty " +
-                           "property record");
-            }
+            throw new IllegalStateException("no such resource: " + filename);
         } else {
             try {
                 m_props.load(in);

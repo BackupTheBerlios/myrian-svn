@@ -22,15 +22,15 @@ import com.redhat.persistence.metadata.*;
  * Delete
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/29 $
  **/
 
 class Delete extends Mutation {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/Delete.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/Delete.java#3 $ by $Author: rhs $, $DateTime: 2003/08/29 10:31:35 $";
 
-    public Delete(Table table, Condition condition) {
-        super(table, condition);
+    public Delete(RDBMSEngine engine, Table table, Condition condition) {
+        super(engine, table, condition);
     }
 
     void write(SQLWriter w) {

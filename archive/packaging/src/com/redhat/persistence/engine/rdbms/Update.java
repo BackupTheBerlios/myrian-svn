@@ -24,15 +24,15 @@ import java.util.*;
  * Update
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/19 $
+ * @version $Revision: #3 $ $Date: 2003/08/29 $
  **/
 
 class Update extends Mutation {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/Update.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/redhat/persistence/engine/rdbms/Update.java#3 $ by $Author: rhs $, $DateTime: 2003/08/29 10:31:35 $";
 
-    public Update(Table table, Condition condition) {
-        super(table, condition);
+    public Update(RDBMSEngine engine, Table table, Condition condition) {
+        super(engine, table, condition);
     }
 
     void write(SQLWriter w) {
