@@ -150,7 +150,8 @@ class PropertyData implements Violation {
     }
 
     public String toString() {
-	return "<pdata " + getObject() + "." + getProperty() + ">";
+	return "<pdata " + Session.str(getObject()) + "." + getProperty() +
+            ">";
     }
 
 }
