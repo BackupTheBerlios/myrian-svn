@@ -33,12 +33,12 @@ import org.apache.log4j.Logger;
  * LobTest - for testing Blob and Clob datatype.
  *
  * @author Jeff Teeters 
- * @version $Revision: #11 $ $Date: 2003/04/22 $
+ * @version $Revision: #12 $ $Date: 2003/07/01 $
  */
 
 public class LobTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LobTest.java#11 $ by $Author: jorris $, $DateTime: 2003/04/22 08:51:00 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LobTest.java#12 $ by $Author: ashah $, $DateTime: 2003/07/01 14:52:01 $";
 
     private Logger s_cat =
         Logger.getLogger(LobTest.class);
@@ -54,7 +54,6 @@ public class LobTest extends PersistenceTestCase {
             sourceBytes[i] = new Long(i+LO).byteValue();
         }
     }
-
 
     public LobTest(String name) {
         super(name);
@@ -321,13 +320,16 @@ public class LobTest extends PersistenceTestCase {
             Connection conn = getSession().getConnection();
 
             if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
-                executePostgresUpdate(conn, testString);
+                executePostgresUpdate(conn, testString, size);
             } else {
-                executeOracleUpdate(conn, testString);
+                executeOracleUpdate(conn, testString, size);
             }
 
-            DataObject dt = getSession().retrieve(new OID("examples.Datatype",
-                                                          BigInteger.ZERO));
+            // using ids that aren't all 0 because explicit use of Connection
+            // object writes behind persistence cache [ashah]
+            DataObject dt = getSession().retrieve
+                (new OID("examples.Datatype", BigInteger.valueOf(size)));
+
             String foundString = (String) dt.get("clob");
             dt.delete();
 
@@ -360,13 +362,14 @@ public class LobTest extends PersistenceTestCase {
     }
 
 
-    private void executeOracleUpdate(Connection conn, String testString)
+    private void executeOracleUpdate(Connection conn, String testString,
+                                     int id)
         throws java.sql.SQLException, java.io.IOException {
         PreparedStatement ps =
             conn.prepareStatement("insert into t_datatypes  (id, j_clob) " +
                                   "values  (?, EMPTY_CLOB())");
         try {
-            ps.setBigDecimal(1, new BigDecimal(BigInteger.ZERO));
+            ps.setBigDecimal(1, new BigDecimal(BigInteger.valueOf(id)));
             ps.executeUpdate();
         } finally {
             ps.close();
@@ -376,7 +379,7 @@ public class LobTest extends PersistenceTestCase {
                                    "where id = ? for update");
 
         try {
-            ps.setBigDecimal(1, new BigDecimal(BigInteger.ZERO));
+            ps.setBigDecimal(1, new BigDecimal(BigInteger.valueOf(id)));
             ResultSet rs = ps.executeQuery();
             rs.next();
             oracle.sql.CLOB Clob = (oracle.sql.CLOB)rs.getClob(1);
@@ -391,13 +394,14 @@ public class LobTest extends PersistenceTestCase {
     }
 
 
-    private void executePostgresUpdate(Connection conn, String testString)
+    private void executePostgresUpdate(Connection conn, String testString,
+                                       int id)
         throws java.sql.SQLException, java.io.IOException {
         PreparedStatement ps =
             conn.prepareStatement("insert into t_datatypes " +
                                   "(id, j_clob  ) values (? , ?)");
         try {
-            ps.setBigDecimal(1, new BigDecimal(BigInteger.ZERO));
+            ps.setBigDecimal(1, new BigDecimal(BigInteger.valueOf(id)));
             ps.setString(2, testString);
             ps.executeUpdate();
         } finally {
