@@ -26,12 +26,12 @@ import org.apache.log4j.Logger;
  * MultiThreadDataObjectTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/02/27 $
  **/
 
 public class MultiThreadDataObjectTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/MultiThreadDataObjectTest.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/MultiThreadDataObjectTest.java#2 $ by $Author: rhs $, $DateTime: 2003/02/27 11:41:38 $";
 
     private static final Logger s_log = Logger.getLogger(
                                                          MultiThreadDataObjectTest.class.getName()
@@ -47,6 +47,7 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
         super(name);
     }
 
+    private static final int START = 10000;
     private static final int NUM_OBJECTS = 10;
 
     public Map createObjectsInOtherThread() throws InterruptedException {
@@ -58,7 +59,7 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
                     TransactionContext txn = ssn.getTransactionContext();
                     txn.beginTxn();
 
-                    for (int i = 0; i < NUM_OBJECTS; i++) {
+                    for (int i = START; i < NUM_OBJECTS + START; i++) {
                         DataObject node = ssn.create("examples.Node");
                         node.set("id", new BigDecimal(i));
                         node.set("name", "Node " + i);
@@ -126,7 +127,7 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
         long size = query.size();
 
         DataObject node = getSession().create("examples.Node");
-        node.set("id", new BigDecimal(0));
+        node.set("id", new BigDecimal(START));
         node.set("name", "Root");
         node.save();
 
@@ -244,7 +245,7 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
 
     public void testAssociationTransactionState() {
         class ID {
-            private int m_id = 1;
+            private int m_id = START;
             public BigInteger next() {
                 return new BigInteger(Integer.toString(m_id++));
             }
@@ -393,8 +394,10 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
 
     public void testRefetchOnInvalidation() {
         DataObject test, icle;
-        final OID ICLE = new OID("test.Icle", BigInteger.ZERO);
-        final OID TEST = new OID("test.Test", BigInteger.ZERO);
+        final OID ICLE = new OID("test.Icle",
+                                 new BigInteger(Integer.toString(START)));
+        final OID TEST = new OID("test.Test",
+                                 new BigInteger(Integer.toString(START)));
 
         Session ssn = SessionManager.getSession();
         TransactionContext txn = ssn.getTransactionContext();
