@@ -15,20 +15,21 @@
 
 package com.arsdigita.util.parameter;
 
-import com.arsdigita.util.*;
-import java.util.*;
+import com.arsdigita.util.Classes;
+import com.arsdigita.util.UncheckedWrapperException;
+import java.util.List;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/SingletonParameter.java#4 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/SingletonParameter.java#5 $
  */
 public class SingletonParameter extends ClassParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/SingletonParameter.java#4 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/17 14:28:55 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/SingletonParameter.java#5 $" +
+        "$Author: dan $" +
+        "$DateTime: 2003/10/20 11:10:58 $";
 
     public SingletonParameter(final String name) {
         super(name);
@@ -40,7 +41,7 @@ public class SingletonParameter extends ClassParameter {
         super(name, multiplicity, defaalt);
     }
 
-    public Object unmarshal(final String value, final ErrorList errors) {
+    public Object unmarshal(final String value, final List errors) {
         final Class clacc = (Class) super.unmarshal(value, errors);
 
         try {
