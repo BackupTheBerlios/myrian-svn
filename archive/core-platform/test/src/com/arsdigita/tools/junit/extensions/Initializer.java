@@ -28,18 +28,20 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
+import java.util.Collection;
 
 /**
  *  Initializer
  *
  * @author <a href="mailto:dennis@arsdigita.com">Dennis Gregorovic</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/08/26 $
  */
 
 public class Initializer {
 
     private static Startup s_startup;
     private static String  s_webAppRoot;
+    private static Collection s_initializersRun;
 
 
     /**
@@ -72,12 +74,23 @@ public class Initializer {
         try {
             s_startup = new Startup(s_webAppRoot, scriptName);
             s_startup.setLastInitializer (iniName);
-            s_startup.init();
+            s_initializersRun = s_startup.init();
         } catch (InitializationException e) {
             reportWarning (suite, "Initialization failed with message: " +
                            e.getMessage());
         }
 
+    }
+
+
+    /**
+     *
+     * @param name The name of the initializer
+     * @return True if the initialzier was run
+     */
+    public static boolean wasInitializerRun(String name) {
+        final boolean wasRun = null != s_initializersRun && s_initializersRun.contains(name);
+        return wasRun;
     }
 
     protected static void startup(TestSuite suite, String scriptName) {
@@ -90,7 +103,7 @@ public class Initializer {
 
     protected static void shutdown() {
         System.out.println ("stopping initializers");
-
+        s_initializersRun = null;
         if (s_startup != null) {
             try {
                 s_startup.destroy();

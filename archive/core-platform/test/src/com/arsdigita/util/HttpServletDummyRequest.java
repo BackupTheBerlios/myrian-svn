@@ -15,6 +15,12 @@
 
 package com.arsdigita.util;
 
+import com.arsdigita.tools.junit.extensions.Initializer;
+import com.arsdigita.dispatcher.*;
+import com.arsdigita.kernel.security.UserContext;
+import com.arsdigita.kernel.security.SessionContext;
+import com.arsdigita.kernel.KernelRequestContext;
+
 import java.util.LinkedList;
 import javax.servlet.http.*;
 import javax.servlet.ServletContext;
@@ -28,12 +34,19 @@ import javax.servlet.*;
 */
 
 public class HttpServletDummyRequest implements HttpServletRequest {
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyRequest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyRequest.java#5 $ by $Author: jorris $, $DateTime: 2002/08/26 01:17:47 $";
 
     private HashMap parameters;
     private HashMap attributes;
     private String m_url;
     private String m_queryString;
+    private HttpSession m_session;
+    private boolean m_isSecure;
+
+     private final static String REQUEST_CONTEXT_ATTR =
+         "com.arsdigita.dispatcher.RequestContext";
+
+
 
     public HttpServletDummyRequest() {
         this(true);
@@ -42,6 +55,19 @@ public class HttpServletDummyRequest implements HttpServletRequest {
     public HttpServletDummyRequest(boolean isDebug) {
         parameters=new HashMap();
         attributes=new HashMap();
+
+        initializeRequestContext(isDebug);
+
+    }
+
+    private void initializeRequestContext(boolean isDebug) {
+        DummyRequestContext requestContext
+             = new DummyRequestContext(this, new DummyServletContext(), isDebug);
+
+        DispatcherHelper.setRequest(this);
+
+        DispatcherHelper.setRequestContext(this, requestContext);
+
     }
 
     public java.lang.Object getAttribute(java.lang.String name) {
@@ -161,7 +187,7 @@ public class HttpServletDummyRequest implements HttpServletRequest {
 
     public java.lang.String getPathTranslated() { return null; }
 
-    public java.lang.String getContextPath() { return null; }
+    public java.lang.String getContextPath() { return ""; }
 
     public void setQueryString(String s) {
         m_queryString = s;
@@ -189,9 +215,22 @@ public class HttpServletDummyRequest implements HttpServletRequest {
 
     public java.lang.String getServletPath() { return null; }
 
-    public HttpSession getSession(boolean create) { return null; }
+    public HttpSession getSession(boolean create) {
+        if (m_session == null && create) {
+             m_session = new HttpDummySession();
+         }
+         return m_session;
 
-    public HttpSession getSession() { return null; }
+    }
+
+    public HttpSession getSession() {
+        return getSession(true);
+    }
+
+
+    public void setSession(HttpSession s) {
+         m_session = s;
+     }
 
     public boolean isRequestedSessionIdValid() { return true; }
 
@@ -229,7 +268,10 @@ public class HttpServletDummyRequest implements HttpServletRequest {
     public java.lang.String getRemoteHost() { return null; }
 
     public void setAttribute(java.lang.String name,
-                             java.lang.Object o) { return; }
+                             java.lang.Object o) {
+
+        attributes.put(name, o);
+    }
 
     public void removeAttribute(java.lang.String name) { return; }
 
@@ -237,8 +279,13 @@ public class HttpServletDummyRequest implements HttpServletRequest {
 
     public java.util.Enumeration getLocales() { return null; }
 
-    public boolean isSecure() { return true; }
-
+    public boolean isSecure()
+    {
+        return m_isSecure;
+    }
+    public void setIsSecure(boolean secure) {
+        m_isSecure = secure;
+    }
     public RequestDispatcher getRequestDispatcher(java.lang.String path) {
         return null;
     }
