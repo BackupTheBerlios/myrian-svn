@@ -4,12 +4,12 @@ package com.arsdigita.persistence.proto.pdl.nodes;
  * Property
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/05/19 $
  **/
 
 public class PropertyNd extends StatementNd {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/nodes/PropertyNd.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/nodes/PropertyNd.java#2 $ by $Author: vadim $, $DateTime: 2003/05/19 15:20:26 $";
 
     public static final Field TYPE =
         new Field(PropertyNd.class, "type", TypeNd.class, 1, 1);
@@ -23,7 +23,9 @@ public class PropertyNd extends StatementNd {
     private boolean m_isComposite = false;
     private boolean m_isCollection = false;
     private boolean m_isNullable = true;
+
     private boolean m_isUnversioned = false;
+    private boolean m_isVersioned = false;
 
     /**
      * @post isUnique()
@@ -58,11 +60,22 @@ public class PropertyNd extends StatementNd {
     }
 
     /**
+     * @see #isVersioned()
+     * @post isVersioned()
+     **/
+    public void setVersioned() {
+        m_isVersioned = true;
+    }
+
+    /**
+     * @see #isUnversioned()
      * @post isUnversioned()
      **/
     public void setUnversioned() {
         m_isUnversioned = true;
     }
+
+
     public boolean isUnique() {
         return m_isUnique;
     }
@@ -83,6 +96,29 @@ public class PropertyNd extends StatementNd {
         return m_isNullable;
     }
 
+    /**
+     * Returns <code>true</code> if this property is marked "versioned" in the
+     * PDL.
+     *
+     * @see #isUnversioned()
+     * @see #setVersioned()
+     **/
+    public boolean isVersioned() {
+        return m_isVersioned;
+    }
+
+    /**
+     * Returns <code>true</code> if this property is marked "unversioned" in the PDL.
+     * 
+     * <p>Note that <code>isUnversioned()</code> is <em>not</em> the same as
+     * <code>!isVersioned()</code>. If the property is marked neither
+     * "versioned", nor "unversioned" (as most properties are), then both of
+     * these methods return <code>false</code>. However, if one of them returns
+     * <code>true</code>, then other returns <code>false</code>. </p>
+     *
+     * @see #isVersioned()
+     * @see #setVersioned()
+     **/
     public boolean isUnversioned() {
         return m_isUnversioned;
     }

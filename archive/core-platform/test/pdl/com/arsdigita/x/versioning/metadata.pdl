@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/test/pdl/com/arsdigita/x/versioning/metadata.pdl#1 $
-// $DateTime: 2003/05/12 18:19:45 $
+// $Id: //core-platform/dev/test/pdl/com/arsdigita/x/versioning/metadata.pdl#2 $
+// $DateTime: 2003/05/19 15:20:26 $
 
 model x.version.test01;
 
@@ -73,6 +73,7 @@ versioned object type VUT2 extends UT2 {
   UT1[1..1] ut1 = join t_vut2.ut1id to t_ut1.id;
   unversioned String[1..1] unverAttr = t_vut2.unver_attr VARCHAR;
   unversioned component UT5[0..n] ut5 = join t_vut2.ut5id to t_ut5.id;
+  versioned UT6[0..n] ut6s = join t_vut2.ut6id to t_ut6.id;
 
   reference key(t_vut2.id);
 }
@@ -111,6 +112,13 @@ object type C2 {
 object type UT5 {
     BigInteger[1..1] id = t_ut5.id INTEGER;
     String[0..1] ut5attr = t_ut5.attr VARCHAR;
+
+    object key(id);
+}
+
+object type UT6 {
+    BigInteger[1..1] id = t_ut6.id INTEGER;
+    String[0..1] ut6attr = t_ut6.attr VARCHAR;
 
     object key(id);
 }
