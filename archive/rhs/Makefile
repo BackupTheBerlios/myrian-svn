@@ -5,7 +5,7 @@ space:=$(empty) $(empty)
 
 JAVACC=java -cp javacc/JavaCC.zip COM.sun.labs.javacc.Main
 
-SOURCES:=src test/src
+SOURCES:=src test/src cap/src
 
 SOURCEPATH:=$(subst $(space),:,$(SOURCES:%=$(BUILD)/%))
 
@@ -15,11 +15,9 @@ CLASSPATH:=$(CLASSPATH):$(SOURCEPATH)
 
 JSTAMPS:=$(SOURCES:%=$(BUILD)/%.jstamp)
 
+all: $(JSTAMPS)
+
 -include $(SOURCES:%=$(BUILD)/%.jmake)
-
-all: $(filter-out $(BUILD)/test/%,$(JSTAMPS))
-
-test: all $(filter $(BUILD)/test/%,$(JSTAMPS))
 
 clean:
 	rm -rf $(BUILD)
@@ -48,7 +46,7 @@ $(BUILD)/%.jmake: %
 	@find $< -name *.jj -printf " \\\\\n	\$$(BUILD)/%p" \
 		| sed -e "s@\.jj@\.java@g" >> $@
 	@echo "" >> $@
-	@echo "	@mkdir -p \$$(BUILD)" >> $@
+	@echo "	@mkdir -p \$$(BUILD)/$<" >> $@
 	@echo -n "	javac -classpath \$$(CLASSPATH)" >> $@
 	@echo " -sourcepath \$$(SOURCEPATH) -d \$$(BUILD)/$< \$$?" >> $@
 	@echo "	@touch \$$(BUILD)/$<.jstamp" >> $@
