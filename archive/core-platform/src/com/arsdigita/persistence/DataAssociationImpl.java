@@ -49,12 +49,12 @@ import org.apache.log4j.Category;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/30 $
  */
 
 class DataAssociationImpl extends DataCollectionImpl implements DataAssociation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#2 $ by $Author: bche $, $DateTime: 2002/05/30 11:10:14 $";
 
     private final static Category s_cat = 
                     Category.getInstance(DataAssociationImpl.class.getName());
@@ -411,24 +411,14 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
         return getInternalCursor().getParameter(parameterName);
     }
 
-
-    /**
-     *  Deprecated methods from DataQuery
+    /*
+     * Place an empty finalize() method here to prevent
+     * persistence error where garbage collector thread
+     * calls finalize() and leads to an attempt to access
+     * a data object that it shouldn't
      */
     protected void finalize() throws Throwable {
-
-        try {
-            if (null != m_daCursor) {
-                m_daCursor.finalize();
-                m_daCursor = null;
-            }
-
-        } finally {
-            super.finalize();
-        }
-
     }
-
 
     /**
      * Explicitly closes this DataQuery.  
