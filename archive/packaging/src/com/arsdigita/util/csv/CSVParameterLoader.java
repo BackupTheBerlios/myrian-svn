@@ -25,13 +25,13 @@ import org.apache.oro.text.perl.Perl5Util;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/csv/CSVParameterLoader.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/csv/CSVParameterLoader.java#3 $
  */
 public final class CSVParameterLoader implements ParameterLoader {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/csv/CSVParameterLoader.java#2 $" +
-        "$Author: rhs $" +
-        "$DateTime: 2003/09/26 13:11:30 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/csv/CSVParameterLoader.java#3 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/10/17 14:27:50 $";
 
     private final LineNumberReader m_reader;
     private final Parameter[] m_params;
@@ -43,12 +43,18 @@ public final class CSVParameterLoader implements ParameterLoader {
         m_line = new HashMap(params.length);
     }
 
+    public final String read(final Parameter param, final ErrorList errors) {
+        return (String) m_line.get(param);
+    }
+
     public final ParameterValue load(final Parameter param) {
         final ParameterValue value = new ParameterValue();
 
-        value.setString((String) m_line.get(param));
+        // XXX this won't work correctly with compound parameters
 
-        param.unmarshal(value);
+        value.setObject(param.unmarshal
+                        (read(param, value.getErrors()), value.getErrors()));
+
         param.check(value);
 
         return value;

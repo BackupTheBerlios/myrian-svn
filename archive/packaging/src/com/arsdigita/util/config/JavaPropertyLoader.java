@@ -29,13 +29,13 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterLoader
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyLoader.java#4 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyLoader.java#5 $
  */
 public class JavaPropertyLoader implements ParameterLoader {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyLoader.java#4 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/JavaPropertyLoader.java#5 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/23 12:32:59 $";
+        "$DateTime: 2003/10/17 14:27:50 $";
 
     private static final Logger s_log = Logger.getLogger
         (JavaPropertyLoader.class);
@@ -74,14 +74,18 @@ public class JavaPropertyLoader implements ParameterLoader {
         if (m_props.containsKey(key)) {
             final ParameterValue value = new ParameterValue();
 
-            value.setString(m_props.getProperty(key));
+            value.setString(read(param, value.getErrors()));
 
-            param.unmarshal(value);
+            param.unmarshal(value.getString(), value.getErrors());
 
             return value;
         } else {
             return null;
         }
+    }
+
+    public final String read(final Parameter param, final ErrorList errors) {
+        return m_props.getProperty(param.getName());
     }
 
     /**
