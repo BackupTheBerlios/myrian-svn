@@ -59,7 +59,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #30 $ $Date: 2003/10/28 $
+ * @version $Revision: #31 $ $Date: 2003/11/06 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -594,7 +594,7 @@ public class Session {
         protected void cleanUp(boolean isCommit) { }
     }
 
-    private static class FlushEventProcessor extends EventProcessor {
+    static class FlushEventProcessor extends EventProcessor {
         final private boolean m_before;
         private List m_events = new ArrayList();
         private List m_toFire = new LinkedList();
