@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/upgrade/postgres-6.0.1-6.1.0.sql#8 $
--- $DateTime: 2004/03/22 14:04:38 $
+-- $Id: //core-platform/dev/sql/ccm-core/upgrade/postgres-6.0.1-6.1.0.sql#9 $
+-- $DateTime: 2004/03/23 20:32:03 $
 
 \echo Red Hat WAF 6.0.1 -> 6.1.0 Upgrade Script (PostgreSQL)
 
@@ -30,6 +30,7 @@ begin;
 \i ../postgres/upgrade/6.0.1-6.1.0/deferred.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/update-host-unique-index.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/update-cat_root_cat_object_map.sql
+\i ../postgres/upgrade/6.0.1-6.1.0/update-applications.sql
 
 update apm_package_types set package_uri = 'http://arsdigita.com/sitemap' where package_uri = 'http://arsdigita.com/admin/sitemap';
 
