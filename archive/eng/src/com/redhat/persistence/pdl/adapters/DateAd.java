@@ -26,12 +26,33 @@ import java.sql.Types;
  * DateAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/07/20 $
  **/
 
 public class DateAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/adapters/DateAd.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/adapters/DateAd.java#2 $ by $Author: ashah $, $DateTime: 2004/07/20 14:54:36 $";
+
+    /*
+     * before Java 1.4 Timstamp#getTime() returned only the seconds value part
+     * of the timestamp and not the milliseconds which are record in the nanos
+     * part of the timestamp
+     */
+    private static final boolean s_accountForNanos;
+
+    static {
+        String version = System.getProperty("java.version");
+        if (version.startsWith("1.")) {
+            int minor = new Integer(version.charAt(2)).intValue();
+            if (minor < 4) {
+                s_accountForNanos = true;
+            } else {
+                s_accountForNanos = false;
+            }
+        } else {
+            throw new Error("unsupported java version");
+        }
+    }
 
     public DateAd() {
         super("global.Date", Types.TIMESTAMP);
@@ -62,8 +83,12 @@ public class DateAd extends SimpleAdapter {
         if (tstamp == null) {
             return null;
         } else {
-            return new java.util.Date(tstamp.getTime() +
-                                      tstamp.getNanos() / 1000000);
+            if (s_accountForNanos) {
+                return new java.util.Date
+                    (tstamp.getTime() + tstamp.getNanos() / 1000000);
+            } else {
+                return new java.util.Date(tstamp.getTime());
+            }
         }
     }
 }
