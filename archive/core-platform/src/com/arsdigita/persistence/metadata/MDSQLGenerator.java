@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the ArsDigita Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
  * the License at http://www.arsdigita.com/ADPL.txt
@@ -21,18 +21,18 @@ import java.util.ArrayList;
 
 /**
  * A interface that defines an API to automatically generate SQL queries based
- * on the metadata provided in the PDL files.  The primary interface is the 
+ * on the metadata provided in the PDL files.  The primary interface is the
  * generateSQL function, which will generate an event for an object type/event
  * type combination ( @see ObjectEvent ).
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#3 $
  * @since 4.6.3
  */
 
 public interface MDSQLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MDSQLGenerator.java#3 $ by $Author: dan $, $DateTime: 2002/07/31 09:53:16 $";
     /**
      * Generates an Event of a particular Event type for a certain
      * ObjectType.  New Event is automatically added to the object type
@@ -55,5 +55,5 @@ public interface MDSQLGenerator {
      *                  {@link com.arsdigita.persistence.metadata.Property}
      * @return the new Event, or null if it could not be created
      */
-    public Event generateEvent(ObjectType type, Property prop, int eventType);
+    public Event generateEvent(ObjectType type, Property prop, int eventType, ObjectType link);
 }

@@ -51,12 +51,12 @@ import java.util.HashMap;
  *
  * @deprecated Use com.arsdigita.metadata.DynamicObjectType instead.
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/30 $ 
+ * @version $Revision: #4 $ $Date: 2002/07/31 $ 
  */
 
 public class DynamicObjectType {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DynamicObjectType.java#3 $ by $Author: randyg $, $DateTime: 2002/07/30 10:05:06 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DynamicObjectType.java#4 $ by $Author: dan $, $DateTime: 2002/07/31 09:53:16 $";
 
     // The DDL generator used
     private static DDLGenerator m_generator = DDLGeneratorFactory.getInstance();
@@ -754,7 +754,7 @@ public class DynamicObjectType {
                 for (int i = 0; i < Property.NUM_EVENT_TYPES; i++) {
                     Event event = generator.generateEvent(m_objectType,
                                                           prop,
-                                                          i);
+                                                          i, null);
                 }
             }
         }
@@ -866,7 +866,7 @@ public class DynamicObjectType {
 
                 if (!prop.isAttribute()) {
                     for (int i = 0; i < Property.NUM_EVENT_TYPES; i++) {
-                        Event event = generator.generateEvent(type, prop, i);
+                        Event event = generator.generateEvent(type, prop, i, null);
                     }
                 }
             }
@@ -886,7 +886,7 @@ public class DynamicObjectType {
 
                 if (!prop.isAttribute() && affected.contains(prop.getType())) {
                     for (int i = 0; i < Property.NUM_EVENT_TYPES; i++) {
-                        Event event = generator.generateEvent(type, prop, i);
+                        Event event = generator.generateEvent(type, prop, i, null);
                     }
                 }
             }

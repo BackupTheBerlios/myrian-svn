@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the ArsDigita Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
  * the License at http://www.arsdigita.com/ADPL.txt
@@ -19,6 +19,7 @@ import com.arsdigita.persistence.Utilities;
 import com.arsdigita.persistence.metadata.Association;
 import com.arsdigita.persistence.metadata.MDSQLGenerator;
 import com.arsdigita.persistence.metadata.MDSQLGeneratorFactory;
+import com.arsdigita.persistence.metadata.CompoundType;
 import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.metadata.Property;
 import com.arsdigita.persistence.metadata.Event;
@@ -28,18 +29,22 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.apache.log4j.Category;
+
 /**
  * This represents the "Association" block from a PDL file.  It is used to
  * represent a mapping between two object types, which can include various
  * additional properties and SQL Events.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/07/31 $
  */
 
 public class AssociationDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AssociationDef.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    private Category s_log = Category.getInstance(AssociationDef.class);
+
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AssociationDef.java#4 $ by $Author: dan $, $DateTime: 2002/07/31 09:53:16 $";
 
     // the two PropertyDefs that define what Objects are being associated
     private PropertyDef m_one;
@@ -105,8 +110,8 @@ public class AssociationDef extends Element {
     }
 
     /**
-     * Returns a named propertydef, or null.    
-     * 
+     * Returns a named propertydef, or null.
+     *
      * @param name the name of the propertydef to return
      * @return a named propertydef, or null.
      */
@@ -144,8 +149,8 @@ public class AssociationDef extends Element {
         m_assn = new Association(one, two);
         initLineInfo(m_assn);
 
-        ObjectType anon = (ObjectType) m_assn.getLinkType();
-        initLineInfo(anon);
+        ObjectType link = (ObjectType) m_assn.getLinkType();
+        initLineInfo(link);
 
         Iterator props = m_attrs.values().iterator();
 
@@ -153,7 +158,7 @@ public class AssociationDef extends Element {
             PropertyDef propDef = (PropertyDef)props.next();
 
             Property prop = propDef.generateLogicalModel();
-            anon.addProperty(prop);
+            link.addProperty(prop);
         }
 
         if (m_options != null) {
@@ -167,7 +172,7 @@ public class AssociationDef extends Element {
         MDSQLGenerator generator = MDSQLGeneratorFactory.getInstance();
         Property one = m_assn.getRoleOne();
         Property two = m_assn.getRoleTwo();
-        ObjectType anon = (ObjectType) m_assn.getLinkType();
+        ObjectType link = (ObjectType) m_assn.getLinkType();
 
         Iterator events;
 
@@ -188,7 +193,7 @@ public class AssociationDef extends Element {
                 }
             }
 
-            generator.generateEvent((ObjectType)two.getType(), one, i);
+            generator.generateEvent((ObjectType)two.getType(), one, i, link);
         }
 
     event_loop_two:
@@ -205,7 +210,7 @@ public class AssociationDef extends Element {
                 }
             }
 
-            generator.generateEvent((ObjectType)one.getType(), two, i);
+            generator.generateEvent((ObjectType)one.getType(), two, i, link);
         }
 
         events = m_events.iterator();
@@ -224,8 +229,8 @@ public class AssociationDef extends Element {
                 } else if (ed.getType().equals("insert") ||
                            ed.getType().equals("delete")) {
                     ed.error(ed.getType() + " events not allowed here.");
-                } else if (anon.getEvent(ed.getTypeCode()) == null) {
-                    anon.setEvent(ed.getTypeCode(), ed.generateEvent());
+                } else if (link.getEvent(ed.getTypeCode()) == null) {
+                    link.setEvent(ed.getTypeCode(), ed.generateEvent());
                 } else {
                     ed.error(
                         "Duplicate " + ed.getType() +
@@ -234,11 +239,10 @@ public class AssociationDef extends Element {
                 }
             } else if (!ed.getName().equals(one.getName()) &&
                        !ed.getName().equals(two.getName())) {
-                Property prop = anon.getProperty(ed.getName());
-
+                Property prop = link.getProperty(ed.getName());
                 if (prop != null) {
                     if (prop.getEvent(ed.getTypeCode()) == null) {
-                        prop.setEvent(ed.getTypeCode(), ed.generateEvent());
+			prop.setEvent(ed.getTypeCode(), ed.generateEvent());
                     } else {
                         ed.error(
                             "Duplicate " + ed.getType() +
@@ -247,14 +251,17 @@ public class AssociationDef extends Element {
                             );
                     }
                 }
-            }
+	    }
         }
 
         //
-        // TODO: We need to generate events for the anonymous object type.
+        // TODO: We need to generate events for the link object type.
         //       It's ignored right now since it doesn't have a key.
         //
-
+	// XXX generate the UPDATE event, this is currently
+	// failing due to MDSQL generator getTableColumns
+	// not work for the link object type
+	generator.generateEvent(link, CompoundType.UPDATE);
     }
 
     /**
@@ -274,7 +281,7 @@ public class AssociationDef extends Element {
         }
 
         for (int i = 0; i < m_events.size(); i++) {
-            result.append(Utilities.LINE_BREAK + m_events.get(i) + 
+            result.append(Utilities.LINE_BREAK + m_events.get(i) +
                           Utilities.LINE_BREAK);
         }
 

@@ -46,7 +46,7 @@ import java.util.HashMap;
  *
  * @deprecated Use com.arsdigita.metadata.DynamicAssociation instead.
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $ 
+ * @version $Revision: #3 $ $Date: 2002/07/31 $ 
  */
 
 public class DynamicAssociation {
@@ -314,12 +314,13 @@ public class DynamicAssociation {
         }
 
         MDSQLGenerator sqlgenerator = MDSQLGeneratorFactory.getInstance();
-
+	
+	// XXX link attributes
         for (int i = 0; i < Property.NUM_EVENT_TYPES; i++) {
             sqlgenerator.generateEvent((ObjectType)m_prop1.getType(),
-                                       m_prop2, i);
+                                       m_prop2, i, null);
             sqlgenerator.generateEvent((ObjectType)m_prop2.getType(),
-                                       m_prop1, i);
+                                       m_prop1, i, null);
         }
 
         return assoc;

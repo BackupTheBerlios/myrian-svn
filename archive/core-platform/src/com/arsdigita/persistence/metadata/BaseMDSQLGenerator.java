@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the ArsDigita Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
  * the License at http://www.arsdigita.com/ADPL.txt
@@ -34,25 +34,25 @@ import org.apache.log4j.Category;
 
 /**
  * A class that provides an API to automatically generate SQL queries based
- * on the metadata provided in the PDL files.  The primary interface is the 
+ * on the metadata provided in the PDL files.  The primary interface is the
  * generateSQL function, which will generate an event for an object type/event
  * type combination ( @see Event ).
  *
  * Be aware that there are some restrictions on the use of this class.
  * First, it will not work for objects that have an object key composed of
- * more than one element.  Also, the RETRIEVE and RETRIEVE_ALL event 
+ * more than one element.  Also, the RETRIEVE and RETRIEVE_ALL event
  * generators require that all of the attributes in the type hierarchy have
- * columns defined, not just the current object type (INSERT, UPDATE, and 
- * DELETE do not have this restriction).  These restrictions may be removed 
+ * columns defined, not just the current object type (INSERT, UPDATE, and
+ * DELETE do not have this restriction).  These restrictions may be removed
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#4 $
  * @since 4.6.3
  */
 abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#3 $ by $Author: rhs $, $DateTime: 2002/07/19 16:18:07 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#4 $ by $Author: dan $, $DateTime: 2002/07/31 09:53:16 $";
 
     private static final Category s_log =
         Category.getInstance(BaseMDSQLGenerator.class);
@@ -111,7 +111,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
      *                  {@link com.arsdigita.persistence.metadata.Property}
      * @return the new Event, or null if it could not be created
      */
-    public Event generateEvent(ObjectType type, Property prop, int eventType) {
+    public Event generateEvent(ObjectType type, Property prop, int eventType, ObjectType link) {
         Event event = null;
 
         // don't waste time
@@ -121,11 +121,11 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
         switch (eventType) {
             case Property.RETRIEVE:
-                event = generatePropertyRetrieve(type, prop);
+                event = generatePropertyRetrieve(type, prop, link);
                 break;
             case Property.ADD:
                 if (prop.isCollection()) {
-                    event = generateCollectionPropertyAdd(type, prop);
+                    event = generateCollectionPropertyAdd(type, prop, link);
                 } else {
                     event = generateSinglePropertyAdd(type, prop);
                 }
@@ -133,11 +133,11 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
                 break;
             case Property.REMOVE:
                 if (prop.isCollection()) {
-                    event = generateCollectionPropertyRemove(type, prop);
+                    event = generateCollectionPropertyRemove(type, prop, link);
                 } else {
                     event = generateSinglePropertyRemove(type, prop);
                 }
-                    
+
                 break;
             case Property.CLEAR:
                 if (prop.isCollection()) {
@@ -163,12 +163,12 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
     /**
      * Generates the SQL for a retrieve event for a particular object type.
-     * 
+     *
      * @param type the object type to generate the event for
      * @return the Event to retrieve an object of this type, or null
      */
     protected Event generateRetrieveAll(ObjectType type) {
-        Operation op = generateRetrieveOperation(type, null);
+        Operation op = generateRetrieveOperation(type, null, null);
 
         if (op == null) {
             return null;
@@ -183,13 +183,14 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
     /**
      * Generates the SQL for a retrieve event for a particular object type.
-     * 
+     *
      * @param type the object type to generate the event for
      * @return the Event to retrieve an object of this type, or null
      */
     protected Event generatePropertyRetrieve(ObjectType type,
-                                             Property prop) {
-        Operation op = generateRetrieveOperation(type, prop);
+                                             Property prop,
+					     ObjectType link) {
+        Operation op = generateRetrieveOperation(type, prop, link);
 
         if (op == null) {
             return null;
@@ -206,9 +207,10 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
         Property p = (Property) type.getKeyProperties().next();
         Mapping keyMapping = op.getMapping(new String[] {p.getName()});
-        sb.append(keyMapping.getColumn().getTableName() + "." + 
+        sb.append(keyMapping.getColumn().getTableName() + "." +
                   keyMapping.getColumn().getColumnName());
         sb.append(" = :" + p.getName() + "\n");
+
         op.setSQL(sb.toString());
 
         op.removeMapping(keyMapping);
@@ -226,23 +228,24 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
     /**
      * Generates the SQL for a retrieve event for a particular object type.
-     * 
+     *
      * @param type the object type to generate the event for
      * @return the Event to retrieve an object of this type, or null
      */
     protected Event generateRetrieve(ObjectType type) {
-        return generatePropertyRetrieve(type, null);
+        return generatePropertyRetrieve(type, null, null);
     }
 
 
     /**
      * Generates the SQL for a retrieve event for a particular object type.
-     * 
+     *
      * @param type the object type to generate the event for
      * @return the Event to retrieve an object of this type, or null
      */
     protected Operation generateRetrieveOperation(ObjectType type,
-                                                  Property prop) {
+                                                  Property prop,
+						  ObjectType link) {
         if (type.getReferenceKey() == null) {
             boolean found = false;
             for (Iterator it = type.getKeyProperties(); it.hasNext(); ) {
@@ -261,6 +264,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
         }
 
         try {
+	    // XXX query doesn't do anything with the link atributes yet
             Query query = new Query(type);
             if (prop == null) {
                 query.fetchDefault();
@@ -269,7 +273,6 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
             }
 
             query.generate();
-
             Operation op = query.getOperation();
 
             if (prop == null) {
@@ -289,7 +292,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
     // DML generation methods                                   //
     //**********************************************************//
 
-    /** 
+    /**
      * Generates an Insert event for a particular object type.
      *
      * @param type the ObjectType
@@ -351,7 +354,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
         return oe;
     }
 
-    /** 
+    /**
      * Generates an Update event for a particular object type.
      *
      * @param type the ObjectType
@@ -423,7 +426,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
     }
 
 
-    /** 
+    /**
      * Generates a Delete event for a particular object type.
      *
      * @param type the ObjectType
@@ -483,7 +486,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
     /**
      * Generates an Add event for a Property whose multiplicity is either
      * NULLABLE or REQUIRED.
-     * 
+     *
      * @param type the type that owns the Property
      * @param prop the Property to create an event for
      * @return an Add event for the property.
@@ -506,19 +509,19 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
             if ((typekey == null) ||
                 (refkey == null) ||
                 (Utilities.getKeyProperty(type) == null)) {
-        	    s_log.warn("generateSinglePropertyAdd: " +
+	    s_log.warn("generateSinglePropertyAdd: " +
                            type.getName() + "." + prop.getName() +
 		                   "\ntypekey: " + typekey +
                            "\ntype: " + prop.getType().getName() +
-            		       "\nrefkey: " + refkey +
+		       "\nrefkey: " + refkey +
 		                   "\nUtilities.getKeyProperty(type): " +
-    		    Utilities.getKeyProperty(type));
+		    Utilities.getKeyProperty(type));
                 return null;
             }
 
             if (!refkey.getTableName().equals(from.getTableName())) {
                 s_log.warn("generateSinglePropertyAdd: JoinPath for " +
-                           prop.getName() + " in " + type.getQualifiedName() + 
+                           prop.getName() + " in " + type.getQualifiedName() +
                            " does not start in the primary table.");
                 return null;
             }
@@ -584,15 +587,16 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
 
     /**
-     * Generates an Add event for a Property whose multiplicity is 
+     * Generates an Add event for a Property whose multiplicity is
      * COLLECTION.
-     * 
+     *
      * @param type the type that owns the Property
      * @param prop the Property to create an event for
      * @return an Add event for the property.
      */
     protected Event generateCollectionPropertyAdd(ObjectType type,
-                                                  Property prop) {
+                                                  Property prop,
+						  ObjectType link) {
         StringBuffer sb = new StringBuffer();
         List path = prop.getJoinPath().getPath();
 
@@ -629,22 +633,66 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
                            prop.getName() + " is not continuous");
                 return null;
             }
+	    
+	    List attrs = new ArrayList();
+	    if (link != null) {
+		String map = je1.getTo().getTableName();
+		
+		Iterator props = link.getDeclaredProperties();
+		while (props.hasNext()) {
+		    Property attr = (Property)props.next();
+		    if (link.isKeyProperty(attr))
+			continue;
+		    Column column = attr.getColumn();
+		    
+		    if (column != null) {
+			if (column.getTableName().equals(map)) {
+			    attrs.add(attr);
+			} else {
+			    s_log.warn("Link attribute " + attr.getName() 
+				       + "  (" + column.getTableName() 
+				       + "." + column.getColumnName()  
+				       + ") is not in mapping table " + map);
+			}
+		    } else {
+			s_log.warn("No table/column definition for link attribute " + attr.getName());
+		    }
+		}
+	    }
 
             // assume the mapping tables is je1.to/je2.from
             sb.append("insert into ")
-              .append(je1.getTo().getTableName())
-              .append(" (\n")
-              .append(je1.getTo().getColumnName())
-              .append(", ")
-              .append(je2.getFrom().getColumnName())
-              .append(")\nvalues (\n:")
-              .append(refkey.getName())
-              .append(", :")
-              .append(prop.getName())
-              .append(".")
-              .append(typekey.getName())
-              .append(")\n");
-        } else {
+		.append(je1.getTo().getTableName())
+		.append(" (\n")
+		.append(je1.getTo().getColumnName())
+		.append(", ")
+		.append(je2.getFrom().getColumnName());
+	    
+	    for (int i = 0 ; i < attrs.size() ; i++) {
+		Property attr = (Property)attrs.get(i);
+		Column column = attr.getColumn();
+		
+		sb.append(", ")
+		    .append(column.getColumnName());
+	    }
+
+
+	    sb.append(")\nvalues (\n:")
+		.append(refkey.getName())
+		.append(", :")
+		.append(prop.getName())
+		.append(".")
+		.append(typekey.getName());
+
+	    for (int i = 0 ; i < attrs.size() ; i++) {
+		Property attr = (Property)attrs.get(i);
+		Column column = attr.getColumn();
+		
+		sb.append(", :")
+		    .append(attr.getName());
+	    }
+	    sb.append(")\n");
+	} else {
             Column typeCol = Utilities.getColumn((ObjectType)prop.getType());
 
             sb.append("update ")
@@ -672,9 +720,9 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
 
     /**
-     * Generates an Remove event for a Property whose multiplicity is 
+     * Generates an Remove event for a Property whose multiplicity is
      * NULLABLE or REQUIRED.
-     * 
+     *
      * @param type the type that owns the Property
      * @param prop the Property to create an event for
      * @return an Add event for the property.
@@ -763,15 +811,16 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
 
     /**
-     * Generates an Remove event for a Property whose multiplicity is 
+     * Generates an Remove event for a Property whose multiplicity is
      * COLLECTION.
-     * 
+     *
      * @param type the type that owns the Property
      * @param prop the Property to create an event for
      * @return an Add event for the property.
      */
     protected Event generateCollectionPropertyRemove(ObjectType type,
-                                                     Property prop) {
+                                                     Property prop,
+						     ObjectType link) {
         StringBuffer sb = new StringBuffer();
         List path = prop.getJoinPath().getPath();
 
@@ -836,7 +885,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
               .append(".")
               .append(typekey.getName());
         }
-    
+
         Event event = new Event();
         event.setLineInfo(prop);
         Operation op = new Operation(sb.toString());
@@ -848,9 +897,9 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
 
     /**
-     * Generates an Clear event for a Property whose multiplicity is 
+     * Generates an Clear event for a Property whose multiplicity is
      * COLLECTION.
-     * 
+     *
      * @param type the type that owns the Property
      * @param prop the Property to create an event for
      * @return an Add event for the property.
@@ -897,7 +946,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
             op.setLineInfo(prop);
             event.addOperation(op);
 
-            // we assume true componentism here, if an entry is not in the 
+            // we assume true componentism here, if an entry is not in the
             // mapping table, it's gone
             if (prop.isComponent()) {
                 JoinElement je2 = (JoinElement)path.get(1);
@@ -951,9 +1000,9 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
     //**********************************************************//
 
     /**
-     * Add all of the Operations from an ObjectType's super object type to 
+     * Add all of the Operations from an ObjectType's super object type to
      * an object event, returning the object event.
-     * 
+     *
      * @param type the object type we're generating events for
      * @param event the event to add Operations to
      * @return the Event with the super Operations included
@@ -997,6 +1046,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
         List pathCols = new ArrayList();
 
         Column refkey = Utilities.getColumn(type);
+
 
         if ((refkey == null) || (Utilities.getKeyProperty(type) == null)) {
             return null;
@@ -1043,7 +1093,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
                     }
                 }
 
-                columns.put(col.getColumnName(), ":" + prop.getName() + "." + 
+                columns.put(col.getColumnName(), ":" + prop.getName() + "." +
                             typeName);
 
                 continue;
@@ -1136,7 +1186,7 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
         Column refkey = Utilities.getColumn(type);
 
         if (refkey == null) {
-            return null; 
+            return null;
         }
 
         columns.put(refkey.getTableName(), refkey);

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the ArsDigita Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
  * the License at http://www.arsdigita.com/ADPL.txt
@@ -36,12 +36,12 @@ import java.util.Iterator;
  * Outputs a metadata ObjectType.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/28 $
+ * @version $Revision: #4 $ $Date: 2002/07/31 $
  */
 
 public class ObjectDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ObjectDef.java#3 $ by $Author: randyg $, $DateTime: 2002/07/28 12:21:11 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ObjectDef.java#4 $ by $Author: dan $, $DateTime: 2002/07/31 09:53:16 $";
 
     // object name
     private String m_name;
@@ -104,7 +104,7 @@ public class ObjectDef extends Element {
 
     /**
      * Returns the object name
-     * 
+     *
      * @return the object name
      */
     public String getName() {
@@ -120,7 +120,7 @@ public class ObjectDef extends Element {
         return m_super;
     }
 
-    /** 
+    /**
      * Returns the generated version of this objectdef
      *
      * @return the generated version of this objectdef
@@ -150,7 +150,7 @@ public class ObjectDef extends Element {
         for (int i = 0; i < m_events.size(); i++) {
             EventDef ed = (EventDef) m_events.get(i);
             if (ed.getType().equals(type)) {
-                if ((ed.getName() == null && name == null) || 
+                if ((ed.getName() == null && name == null) ||
                      (ed.getName() != null && ed.getName().equals(name))) {
                     return ed;
                 }
@@ -227,7 +227,7 @@ public class ObjectDef extends Element {
         super.add(flex);
     }
 
-    /**     
+    /**
      * Defines a join path between two tables that compose this ObjectType
      *
      * @param jp the JoinPathDef
@@ -239,9 +239,9 @@ public class ObjectDef extends Element {
 
     /**
      * Specifies the "reference key" column for this object type.  Essentially,
-     * a reference key is a column that contains the main ID number of the 
+     * a reference key is a column that contains the main ID number of the
      * object type instance, and is used to join the object to its super
-     * type when necessary. 
+     * type when necessary.
      *
      * @param refKey ColumnDef defining the reference key column
      */
@@ -252,7 +252,7 @@ public class ObjectDef extends Element {
     /**
      * Specify a "path" for a property attribute, of any depth.  Any property
      * listed here will be aggressively loaded by MDSQL.
-     * 
+     *
      * @param path the path of the property
      */
     public void add(String[] path) {
@@ -299,11 +299,11 @@ public class ObjectDef extends Element {
         // when the validate method is once again called then
         // this line should be removed
         validate(m_props);
-    }   
+    }
 
     /**
-     * Creates the metadata that this ObjectDef represents.  If the 
-     * ObjectType is already defined, this call aborts.  If there is a 
+     * Creates the metadata that this ObjectDef represents.  If the
+     * ObjectType is already defined, this call aborts.  If there is a
      * super object, the super ObjectType is extracted.  Then the actual
      * ObjectType corresponding to this ObjectDef is created.
      *
@@ -335,7 +335,7 @@ public class ObjectDef extends Element {
         return m_type;
     }
 
-    /** 
+    /**
      * Returns true if the Events have been generated yet, false if not.
      *
      * @return true if the Events have been generated yet, false if not.
@@ -367,7 +367,7 @@ public class ObjectDef extends Element {
             }
         }
 
-        // generate MDSQL events...  later... 
+        // generate MDSQL events...  later...
         for (int i = 0; i< CompoundType.NUM_EVENT_TYPES; i++) {
             boolean found = false;
 
@@ -401,7 +401,7 @@ public class ObjectDef extends Element {
                 Operation block = (Operation)it.next();
 
                 SQLBlockDef blockDef = new SQLBlockDef(block.getSQL());
-    
+
                 Iterator maps = block.getMappings();
 
                 while (maps.hasNext()) {
@@ -434,7 +434,7 @@ mdsqlloop:
 
                 for (int j = 0; j < m_events.size(); j++) {
                     EventDef ed = (EventDef) m_events.get(j);
-    
+
                     if ((ed.getName() != null) &&
                         (ed.getName().equals(prop.getName())) &&
                         (ed.getTypeCode() == i)) {
@@ -456,7 +456,7 @@ mdsqlloop:
                     // Use MDSQL to generate an event here
                     Event event = MDSQLGeneratorFactory
                                     .getInstance()
-                                    .generateEvent(m_type, prop, i);
+                                    .generateEvent(m_type, prop, i, null);
                 }
             }
         }
@@ -529,7 +529,7 @@ mdsqlloop:
         }
 
         for (Iterator it = m_events.iterator(); it.hasNext(); ) {
-            result.append(Utilities.LINE_BREAK + it.next() + 
+            result.append(Utilities.LINE_BREAK + it.next() +
                           Utilities.LINE_BREAK);
         }
 
