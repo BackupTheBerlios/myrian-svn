@@ -6,14 +6,20 @@ import com.arsdigita.persistence.proto.common.*;
  * Condition
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/02/14 $
+ * @version $Revision: #6 $ $Date: 2003/02/17 $
  **/
 
 abstract class Condition {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Condition.java#5 $ by $Author: rhs $, $DateTime: 2003/02/14 16:46:06 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Condition.java#6 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
 
     abstract void write(SQLWriter w);
+
+    public String toString() {
+        SQLWriter w = new UnboundWriter();
+        w.write(this);
+        return w.getSQL();
+    }
 
 }
 
@@ -37,10 +43,6 @@ class AndCondition extends Condition {
 
     void write(SQLWriter w) {
         w.write(this);
-    }
-
-    public String toString() {
-        return m_left + "\nand " + m_right;
     }
 
 }
@@ -67,10 +69,6 @@ class OrCondition extends Condition {
         w.write(this);
     }
 
-    public String toString() {
-        return m_left + " or " + m_right;
-    }
-
 }
 
 class NotCondition extends Condition {
@@ -87,10 +85,6 @@ class NotCondition extends Condition {
 
     void write(SQLWriter w) {
         w.write(this);
-    }
-
-    public String toString() {
-        return "not " + m_operand;
     }
 
 }
@@ -117,10 +111,6 @@ class InCondition extends Condition {
         w.write(this);
     }
 
-    public String toString() {
-        return m_column + " in (" + m_select + ")";
-    }
-
 }
 
 class EqualsCondition extends Condition {
@@ -143,10 +133,6 @@ class EqualsCondition extends Condition {
 
     void write(SQLWriter w) {
         w.write(this);
-    }
-
-    public String toString() {
-        return m_left + " = " + m_right;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.arsdigita.persistence.proto.engine.rdbms;
 
+import com.arsdigita.persistence.proto.*;
 import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
 
@@ -10,16 +11,17 @@ import java.sql.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/02/14 $
+ * @version $Revision: #2 $ $Date: 2003/02/17 $
  **/
 
 abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#1 $ by $Author: rhs $, $DateTime: 2003/02/14 16:46:06 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#2 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
 
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();
     private ArrayList m_bindings = new ArrayList();
+    private ArrayList m_types = new ArrayList();
 
     public String getSQL() {
         return m_sql.toString();
@@ -30,7 +32,24 @@ abstract class SQLWriter {
     }
 
     public void bind(PreparedStatement ps) {
-        throw new Error("not implemented");
+        for (int i = 0; i < m_bindings.size(); i++) {
+            int index = i+1;
+            Object obj = m_bindings.get(i);
+            int type = ((Integer) m_types.get(i)).intValue();
+
+            try {
+                if (obj == null) {
+                    ps.setNull(index, type);
+                } else {
+                    Adapter ad = Adapter.getAdapter(obj.getClass());
+                    ad.bind(ps, index, obj, type);
+                }
+            } catch (SQLException e) {
+                throw new Error
+                    ("SQL error binding [" + (index) + "] to " + obj + ": " +
+                     e.getMessage());
+            }
+        }
     }
 
     public void write(String str) {
@@ -46,6 +65,7 @@ abstract class SQLWriter {
         if (m_op.isParameter(path)) {
             m_sql.append("?");
             m_bindings.add(m_op.get(path));
+            m_types.add(new Integer(m_op.getType(path)));
         } else {
             m_sql.append(path);
         }
@@ -104,6 +124,8 @@ class ANSIWriter extends SQLWriter {
             for (Iterator it = sels.iterator(); it.hasNext(); ) {
                 Path path = (Path) it.next();
                 write(path);
+                write(" as ");
+                write(select.getAlias(path));
                 if (it.hasNext()) {
                     write(",\n       ");
                 }
@@ -247,6 +269,14 @@ class ANSIWriter extends SQLWriter {
         write(cond.getLeft());
         write(" = ");
         write(cond.getRight());
+    }
+
+}
+
+class UnboundWriter extends ANSIWriter {
+
+    public void write(Path path) {
+        write(path.getPath());
     }
 
 }

@@ -11,17 +11,19 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.math.*;
+import java.sql.*;
 
 /**
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #15 $ $Date: 2003/02/14 $
+ * @version $Revision: #16 $ $Date: 2003/02/17 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#15 $ by $Author: ashah $, $DateTime: 2003/02/14 01:21:43 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#16 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
 
     private AST m_ast = new AST();
     private ErrorReport m_errors = new ErrorReport();
@@ -51,10 +53,17 @@ public class PDL {
     private static class SimpleAdapter extends Adapter {
 
         private ObjectType m_type;
+        private Binder m_binder;
 
-        SimpleAdapter(ObjectType type) {
+        SimpleAdapter(ObjectType type, Binder binder) {
             if (type == null) { throw new IllegalArgumentException(); }
             m_type = type;
+            m_binder = binder;
+        }
+
+        public void bind(PreparedStatement ps, int index, Object obj,
+                         int type) throws SQLException {
+            m_binder.bind(ps, index, obj, type);
         }
 
         public PropertyMap getProperties(Object obj) {
@@ -186,12 +195,80 @@ public class PDL {
                 Long.class,
                 Float.class
             };
+            Binder[] binders = new Binder[] {
+                new Binder() {
+                        public void bind(PreparedStatement ps, int index,
+                                         Object obj, int type)
+                            throws SQLException {
+                            ps.setInt(index, ((Integer) obj).intValue());
+                        }
+                    },
+                new Binder() {
+                        public void bind(PreparedStatement ps, int index,
+                                         Object obj, int type)
+                            throws SQLException {
+                            ps.setBigDecimal
+                                (index, new BigDecimal((BigInteger) obj));
+                        }
+                    },
+                new Binder() {
+                        public void bind(PreparedStatement ps, int index,
+                                         Object obj, int type)
+                            throws SQLException {
+                            ps.setBigDecimal(index, (BigDecimal) obj);
+                        }
+                    },
+                new Binder() {
+                        public void bind(PreparedStatement ps, int index,
+                                         Object obj, int type)
+                            throws SQLException {
+                            ps.setString(index, (String) obj);
+                        }
+                    },
+                new Binder() {
+                        public void bind(PreparedStatement ps, int index,
+                                         Object obj, int type)
+                            throws SQLException {
+                            ps.setFloat(index, ((Float) obj).floatValue());
+                        }
+                    },
+                new Binder() {
+                        public void bind(PreparedStatement ps, int index,
+                                         Object obj, int type)
+                            throws SQLException {
+                            Timestamp tstamp = new Timestamp
+                                (((java.util.Date) obj).getTime());
+                            ps.setTimestamp(index, tstamp);
+                        }
+                    },
+                new Binder() {
+                        public void bind(PreparedStatement ps, int index,
+                                         Object obj, int type)
+                            throws SQLException {
+                            ps.setBoolean
+                                (index, ((Boolean) obj).booleanValue());
+                        }
+                    },
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            };
 
             for (int i = 0; i < types.length; i++) {
                 ObjectType type = root.getObjectType(types[i]);
-                Adapter.addAdapter(classes[i], type, new SimpleAdapter(type));
+                Adapter.addAdapter(classes[i], type,
+                                   new SimpleAdapter(type, binders[i]));
             }
         }
+    }
+
+    private static interface Binder {
+        void bind(PreparedStatement ps, int index, Object obj, int type)
+            throws SQLException;
     }
 
     private void emitDDL(Root root) {
@@ -210,10 +287,22 @@ public class PDL {
                         tables.put(table.getName(), table);
                     }
 
+                    DbTypeNd type = colNd.getType();
                     Column col = table.getColumn(colNd.getName().getName());
+
                     if (col == null) {
-                        col = new Column(colNd.getName().getName());
+                        if (type == null) {
+                            col = new Column(colNd.getName().getName());
+                        } else {
+                            col = new Column
+                                (colNd.getName().getName(), type.getType(),
+                                 type.getSize(), type.getPrecision());
+                        }
                         table.addColumn(col);
+                    } else if (type != null) {
+                        col.setType(type.getType());
+                        col.setSize(type.getSize());
+                        col.setPrecision(type.getPrecision());
                     }
                 }
             });

@@ -13,21 +13,36 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2003/02/14 $
+ * @version $Revision: #14 $ $Date: 2003/02/17 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#13 $ by $Author: rhs $, $DateTime: 2003/02/14 16:46:06 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#14 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
     private ArrayList m_operations = new ArrayList();
     private HashMap m_operationMap = new HashMap();
     private EventSwitch m_switch = new EventSwitch(this);
+    private ConnectionSource m_source;
+    private Connection m_conn = null;
 
-    public RDBMSEngine(Session ssn) {
-        super(ssn);
+    public RDBMSEngine(ConnectionSource source) {
+        m_source = source;
+    }
+
+    private void acquire() {
+        if (m_conn == null) {
+            m_conn = m_source.acquire();
+        }
+    }
+
+    private void release() {
+        if (m_conn != null) {
+            m_source.release(m_conn);
+            m_conn = null;
+        }
     }
 
     void addOperation(Object obj, DML dml) {
@@ -56,16 +71,31 @@ public class RDBMSEngine extends Engine {
         m_operations.clear();
     }
 
-    protected void commit() {}
+    protected void commit() {
+        try {
+            m_conn.commit();
+        } catch (SQLException e) {
+            throw new Error(e.getMessage());
+        } finally {
+            release();
+        }
+    }
 
-    protected void rollback() {}
+    protected void rollback() {
+        try {
+            m_conn.rollback();
+        } catch (SQLException e) {
+            throw new Error(e.getMessage());
+        } finally {
+            release();
+        }
+    }
 
     public RecordSet execute(Query query) {
-        if (LOG.isDebugEnabled()) {
-            QGen qg = new QGen(query);
-            LOG.debug(qg.generate());
-        }
-        return null;
+        QGen qg = new QGen(query);
+        Select sel = qg.generate();
+        return new RDBMSRecordSet(query.getSignature(), this, execute(sel),
+                                  qg.getMappings(sel));
     }
 
     public void write(Event ev) {
@@ -82,44 +112,50 @@ public class RDBMSEngine extends Engine {
         clearOperations();
     }
 
-    private Connection getConnection() {
-        throw new Error("not implemented");
-    }
-
     private ResultSet execute(Select select) {
         SQLWriter w = new ANSIWriter();
-        w.write(select);
+        // XXX: this is a hack, for path management we need to call the
+        // operation version of write.
+        w.write((Operation) select);
+
         if (LOG.isDebugEnabled()) {
             LOG.debug(w.getSQL());
             LOG.debug(w.getBindings());
         }
 
-        return null;
-        /*
-        Connection conn = getConnection();
-        PreparedStatement ps = conn.prepareStatement(w.getSQL());
-        w.bind(ps);
-        return ps.executeQuery();*/
+        acquire();
+
+        try {
+            PreparedStatement ps = m_conn.prepareStatement(w.getSQL());
+            w.bind(ps);
+            return ps.executeQuery();
+        } catch (SQLException e) {
+            throw new Error(e.getMessage());
+        }
     }
 
     private int execute(DML dml) {
         SQLWriter w = new ANSIWriter();
         w.write(dml);
+
         if (LOG.isDebugEnabled()) {
             LOG.debug(w.getSQL());
             LOG.debug(w.getBindings());
         }
 
-        return 0;
+        acquire();
 
-        /*Connection conn = getConnection();
-        PreparedStatement ps = conn.prepareStatement(w.getSQL());
         try {
-            w.bind(ps);
-            return ps.executeUpdate();
-        } finally {
-        ps.close();
-        }*/
+            PreparedStatement ps = m_conn.prepareStatement(w.getSQL());
+            try {
+                w.bind(ps);
+                return ps.executeUpdate();
+            } finally {
+                ps.close();
+            }
+        } catch (SQLException e) {
+            throw new Error(e.getMessage());
+        }
     }
 
 }

@@ -4,12 +4,12 @@ package com.arsdigita.persistence.proto.engine.rdbms;
  * CompoundJoin
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/02/14 $
+ * @version $Revision: #3 $ $Date: 2003/02/17 $
  **/
 
 abstract class CompoundJoin extends Join {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/CompoundJoin.java#2 $ by $Author: rhs $, $DateTime: 2003/02/14 16:46:06 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/CompoundJoin.java#3 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
 
     public static class Type {}
 
@@ -61,11 +61,6 @@ abstract class CompoundJoin extends Join {
 
     public Condition getCondition() {
         return m_condition;
-    }
-
-    public String toString() {
-        return m_left + "\n     " + m_type + " " + m_right + " on " +
-            m_condition;
     }
 
 }

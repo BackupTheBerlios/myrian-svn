@@ -1,5 +1,7 @@
 package com.arsdigita.persistence.proto;
 
+import com.arsdigita.persistence.proto.metadata.ObjectMap;
+
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -8,12 +10,12 @@ import java.io.*;
  * Event
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/02/12 $
+ * @version $Revision: #9 $ $Date: 2003/02/17 $
  **/
 
 public abstract class Event {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Event.java#8 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Event.java#9 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
 
     private static final Logger LOG = Logger.getLogger(Event.class);
 
@@ -45,6 +47,10 @@ public abstract class Event {
 
     public Object getObject() {
         return m_obj;
+    }
+
+    public ObjectMap getObjectMap() {
+        return m_ssn.getObjectMap(m_obj);
     }
 
     public abstract void dispatch(Switch sw);

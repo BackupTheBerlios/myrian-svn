@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/test/pdl/Test.pdl#1 $ 
-// $DateTime: 2002/11/27 19:51:05 $
+// $Id: //core-platform/proto/test/pdl/com/arsdigita/persistence/Test.pdl#1 $ 
+// $DateTime: 2003/02/17 13:30:53 $
 
 model test;
 

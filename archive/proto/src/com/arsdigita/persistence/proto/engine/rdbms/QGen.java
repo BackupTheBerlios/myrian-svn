@@ -6,18 +6,19 @@ import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
 
 import java.util.*;
+import java.sql.*;
 
 
 /**
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/02/12 $
+ * @version $Revision: #6 $ $Date: 2003/02/17 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#5 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#6 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
 
     private Query m_query;
     private HashMap m_columns = new HashMap();
@@ -106,16 +107,27 @@ class QGen {
 
         Select result = new Select(join, condition);
 
+        int col = 0;
         for (Iterator it = sig.getPaths().iterator(); it.hasNext(); ) {
             Path path = (Path) it.next();
-            result.addSelection(getColumn(path));
+            result.addSelection(getColumn(path), "column" + (col++));
         }
 
         for (Iterator it = sig.getParameters().iterator(); it.hasNext(); ) {
             Parameter param = (Parameter) it.next();
-            result.set(param.getPath(), m_query.get(param));
+            result.set(param.getPath(), m_query.get(param), Types.INTEGER);
         }
 
+        return result;
+    }
+
+    public Map getMappings(Select sel) {
+        Map result = new HashMap();
+        for (Iterator it = m_query.getSignature().getPaths().iterator();
+             it.hasNext(); ) {
+            Path path = (Path) it.next();
+            result.put(path, sel.getAlias(getColumn(path)));
+        }
         return result;
     }
 

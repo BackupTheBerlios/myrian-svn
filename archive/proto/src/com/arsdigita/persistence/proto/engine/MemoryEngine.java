@@ -13,12 +13,12 @@ import java.util.*;
  * MemoryEngine
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #15 $ $Date: 2003/02/12 $
+ * @version $Revision: #16 $ $Date: 2003/02/17 $
  **/
 
 public class MemoryEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#15 $ by $Author: rhs $, $DateTime: 2003/02/12 16:20:01 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#16 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
 
     private static final Logger LOG = Logger.getLogger(MemoryEngine.class);
 
@@ -32,13 +32,6 @@ public class MemoryEngine extends Engine {
 
     private EventList m_uncomitted = new EventList();
     private EventList m_unflushed = new EventList();
-    private com.arsdigita.persistence.proto.engine.rdbms.RDBMSEngine m_engine;
-
-
-    public MemoryEngine(Session ssn) {
-        super(ssn);
-        m_engine = new com.arsdigita.persistence.proto.engine.rdbms.RDBMSEngine(ssn);
-    }
 
     protected void commit() {
         synchronized (DATA) {
@@ -60,7 +53,6 @@ public class MemoryEngine extends Engine {
         if (LOG.isDebugEnabled()) {
             LOG.debug("result: " + drs);
         }
-        m_engine.execute(query);
         return drs;
     }
 
@@ -88,13 +80,11 @@ public class MemoryEngine extends Engine {
 
     protected void write(Event ev) {
         ev.dispatch(m_switch);
-        m_engine.write(ev);
     }
 
     protected synchronized void flush() {
         m_uncomitted.addAll(m_unflushed);
         m_unflushed.clear();
-        m_engine.flush();
     }
 
     private void checkLiveness(Object o) {
@@ -102,7 +92,7 @@ public class MemoryEngine extends Engine {
             return;
         }
 
-        if (!getSession().getObjectType(o).hasKey()) {
+        if (!Adapter.getAdapter(o.getClass()).getObjectType(o).hasKey()) {
             return;
         }
 
@@ -184,8 +174,8 @@ public class MemoryEngine extends Engine {
             Parameter param = query.getSignature().getParameter(p);
             if (param == null) {
                 return get(obj,
-                           getSession().getObjectType(obj)
-                           .getProperty(p.getName()));
+                           Adapter.getAdapter(obj.getClass())
+                           .getObjectType(obj).getProperty(p.getName()));
             } else {
                 return query.get(param);
             }
@@ -195,8 +185,8 @@ public class MemoryEngine extends Engine {
                 return null;
             }
 
-            return get(value, getSession().getObjectType(value)
-                       .getProperty(p.getName()));
+            return get(value, Adapter.getAdapter(obj.getClass())
+                       .getObjectType(value).getProperty(p.getName()));
         }
     }
 
@@ -215,8 +205,9 @@ public class MemoryEngine extends Engine {
             for (int j = 0; j < els.length; j++) {
                 for (int i = 0; i < els[j].size(); i++) {
                     Event ev = els[j].getEvent(i);
-                    if (!getSession().getObjectType(ev.getObject()).isSubtypeOf
-                        (getSignature().getObjectType())) {
+                    Object obj = ev.getObject();
+                    if (!Adapter.getAdapter(obj.getClass()).getObjectType(obj)
+                        .isSubtypeOf(getSignature().getObjectType())) {
                         continue;
                     }
 

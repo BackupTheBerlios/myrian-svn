@@ -10,12 +10,12 @@ import java.util.*;
  * DML
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/02/14 $
+ * @version $Revision: #4 $ $Date: 2003/02/17 $
  **/
 
 abstract class DML extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/DML.java#3 $ by $Author: rhs $, $DateTime: 2003/02/14 16:46:06 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/DML.java#4 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
 
     private Table m_table;
     private HashMap m_bindings = new HashMap();
@@ -35,7 +35,7 @@ abstract class DML extends Operation {
     public void set(Column column, Object value) {
         Path vp = getValuePath(column);
         m_bindings.put(column, vp);
-        set(vp, value);
+        set(vp, value, column.getType());
     }
 
     public Path get(Column column) {

@@ -6,26 +6,12 @@ import com.arsdigita.persistence.proto.metadata.Property;
  * Engine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/01/31 $
+ * @version $Revision: #8 $ $Date: 2003/02/17 $
  **/
 
 public abstract class Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Engine.java#7 $ by $Author: rhs $, $DateTime: 2003/01/31 12:34:37 $";
-
-    static final Engine getInstance(Session ssn) {
-        return new com.arsdigita.persistence.proto.engine.MemoryEngine(ssn);
-    }
-
-    private Session m_ssn;
-
-    protected Engine(Session ssn) {
-        m_ssn = ssn;
-    }
-
-    public Session getSession() {
-        return m_ssn;
-    }
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Engine.java#8 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
 
     protected abstract void commit();
 

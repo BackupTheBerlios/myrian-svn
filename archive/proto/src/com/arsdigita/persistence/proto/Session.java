@@ -14,19 +14,20 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #29 $ $Date: 2003/02/14 $
+ * @version $Revision: #30 $ $Date: 2003/02/17 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#29 $ by $Author: ashah $, $DateTime: 2003/02/14 22:58:33 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#30 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
     private static final PersistentObjectSource POS =
         new PersistentObjectSource();
 
-    private final Engine m_engine = Engine.getInstance(this);
+
+    private final Engine m_engine;
 
     private HashMap m_odata = new HashMap();
 
@@ -34,6 +35,11 @@ public class Session {
     private LinkedList m_pending = new LinkedList();
 
     private Set m_toCheck = new HashSet();
+
+
+    public Session(Engine engine) {
+        m_engine = engine;
+    }
 
     public void create(Object obj) {
         if (LOG.isDebugEnabled()) {

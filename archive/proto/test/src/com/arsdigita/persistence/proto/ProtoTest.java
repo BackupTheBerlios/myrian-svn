@@ -4,21 +4,24 @@ import junit.framework.TestCase;
 //import com.arsdigita.tools.junit.framework.BaseTestCase;
 
 import com.arsdigita.persistence.proto.metadata.*;
+import com.arsdigita.persistence.proto.engine.rdbms.*;
 import com.arsdigita.persistence.proto.pdl.PDL;
+import com.arsdigita.db.ConnectionManager;
 import java.util.*;
 import java.math.*;
+import java.sql.*;
 import java.io.*;
 
 /**
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #15 $ $Date: 2003/02/14 $
+ * @version $Revision: #16 $ $Date: 2003/02/17 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#15 $ by $Author: ashah $, $DateTime: 2003/02/14 01:21:43 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#16 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
 
 
     public ProtoTest(String name) {
@@ -26,7 +29,7 @@ public class ProtoTest extends TestCase {
     }
 
     public void test() throws Exception {
-        PDL.main(new String[] {"test/pdl/Test.pdl"});
+        PDL.main(new String[] {"test/pdl/com/arsdigita/persistence/Test.pdl"});
 
         ObjectType TEST = Root.getRoot().getObjectType("test.Test");
         ObjectType ICLE = Root.getRoot().getObjectType("test.Icle");
@@ -46,8 +49,27 @@ public class ProtoTest extends TestCase {
     }
 
     private void doTest(Generic obj, Property str, Property col) {
-        Session ssn = new Session();
+        Session ssn = new Session(new RDBMSEngine(
+            new ConnectionSource() {
+                    public Connection acquire() {
+                        try {
+                            return ConnectionManager.getConnection();
+                        } catch (SQLException e) {
+                            throw new Error(e.getMessage());
+                        }
+                    }
+                    public void release(Connection conn) {
+                        // Do nothing
+                    }
+                }
+            ));
+
+        Property REQUIRED = obj.getType().getProperty("required");
+        Generic req = new Generic(REQUIRED.getType(), new BigInteger("10"));
+        ssn.create(req);
+
         ssn.create(obj);
+        ssn.set(obj, REQUIRED, req);
         Object obj2 = ssn.retrieve(obj.getType(), obj.getID());
         assertTrue("obj: " + obj + ", obj2: " + obj2, obj == obj2);
 

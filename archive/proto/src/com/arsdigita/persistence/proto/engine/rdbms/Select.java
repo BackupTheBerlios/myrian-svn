@@ -8,14 +8,15 @@ import java.util.*;
  * Select
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/02/14 $
+ * @version $Revision: #7 $ $Date: 2003/02/17 $
  **/
 
 class Select extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#6 $ by $Author: rhs $, $DateTime: 2003/02/14 16:46:06 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#7 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
 
     private ArrayList m_selections = new ArrayList();
+    private HashMap m_aliases = new HashMap();
     private Join m_join;
     private Condition m_condition;
 
@@ -24,10 +25,15 @@ class Select extends Operation {
         m_condition = condition;
     }
 
-    public void addSelection(Path path) {
+    public void addSelection(Path path, String alias) {
         if (!m_selections.contains(path)) {
             m_selections.add(path);
+            m_aliases.put(path, alias);
         }
+    }
+
+    public String getAlias(Path path) {
+        return (String) m_aliases.get(path);
     }
 
     public Collection getSelections() {

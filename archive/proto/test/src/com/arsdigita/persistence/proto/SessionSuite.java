@@ -1,6 +1,7 @@
 package com.arsdigita.persistence.proto;
 
 import com.arsdigita.persistence.proto.metadata.*;
+import com.arsdigita.persistence.proto.engine.MemoryEngine;
 import com.arsdigita.persistence.proto.pdl.PDL;
 import com.arsdigita.tools.junit.extensions.BaseTestSetup;
 import com.arsdigita.tools.junit.framework.PackageTestSuite;
@@ -13,12 +14,12 @@ import org.apache.log4j.Logger;
  * SessionSuite
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #6 $ $Date: 2003/02/14 $
+ * @version $Revision: #7 $ $Date: 2003/02/17 $
  **/
 
 public class SessionSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/SessionSuite.java#6 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/SessionSuite.java#7 $";
 
     private static final Logger s_log = Logger.getLogger(SessionSuite.class);
 
@@ -72,7 +73,7 @@ public class SessionSuite extends PackageTestSuite {
 
         initializeModel();
 
-        m_ssn = new Session();
+        m_ssn = new Session(new MemoryEngine());
 
         initializeData();
 

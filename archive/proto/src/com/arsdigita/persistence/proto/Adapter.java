@@ -4,17 +4,18 @@ import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
 
 import java.util.*;
+import java.sql.*;
 
 /**
  * Adapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/02/14 $
+ * @version $Revision: #7 $ $Date: 2003/02/17 $
  **/
 
 public abstract class Adapter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Adapter.java#6 $ by $Author: ashah $, $DateTime: 2003/02/14 01:21:43 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Adapter.java#7 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
 
     private static final Map ADAPTERS = new HashMap();
 
@@ -64,6 +65,15 @@ public abstract class Adapter {
         }
 
         return new CompoundKey(basetype, key);
+    }
+
+    // This needs work. It's odd to have an adapter interface here in the
+    // session layer that knows about prepared statements. Also I don't like
+    // having things that throw unsupported operation exception.
+
+    public void bind(PreparedStatement ps, int index, Object obj, int type)
+        throws SQLException {
+        throw new UnsupportedOperationException("not a bindable type");
     }
 
     public void setSession(Object obj, Session ssn) { return; }

@@ -7,12 +7,12 @@ import com.arsdigita.persistence.proto.metadata.*;
  * SimpleJoin
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/02/14 $
+ * @version $Revision: #4 $ $Date: 2003/02/17 $
  **/
 
 class SimpleJoin extends Join {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SimpleJoin.java#3 $ by $Author: rhs $, $DateTime: 2003/02/14 16:46:06 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SimpleJoin.java#4 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
 
     private Table m_table;
     private Path m_alias;
@@ -32,10 +32,6 @@ class SimpleJoin extends Join {
 
     void write(SQLWriter w) {
         w.write(this);
-    }
-
-    public String toString() {
-        return m_table.getName() + " as " + m_alias;
     }
 
 }
