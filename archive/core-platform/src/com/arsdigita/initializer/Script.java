@@ -34,12 +34,12 @@ import java.util.Set;
  * Script
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #17 $ $Date: 2004/02/23 $
+ * @version $Revision: #18 $ $Date: 2004/02/26 $
  */
 
 public class Script {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Script.java#17 $ by $Author: justin $, $DateTime: 2004/02/23 16:43:19 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Script.java#18 $ by $Author: justin $, $DateTime: 2004/02/26 13:06:36 $";
 
     private static final Logger s_log =
         Logger.getLogger(Script.class);
@@ -144,12 +144,18 @@ public class Script {
                 "This script has already been started."
             );
         }
-        final String initializerName = ini.getClass().getName();
+        String initializerName = ini.getClass().getName();
+
+        if (initializerName.equals(GenericInitializer.class.getName())) {
+            initializerName = ini.toString();
+        }
+
         m_initializers.add(ini);
-        m_initMap.put(ini.toString(), ini);
+        m_initMap.put(initializerName, ini);
 
         final boolean continueAddingInitializers =
             !initializerName.equals(m_lastInitializerToRun);
+
         return continueAddingInitializers;
     }
 
