@@ -7,15 +7,19 @@ import java.io.*;
  * CreateEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/12/06 $
+ * @version $Revision: #3 $ $Date: 2002/12/10 $
  **/
 
 public class CreateEvent extends ObjectEvent {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/CreateEvent.java#2 $ by $Author: rhs $, $DateTime: 2002/12/06 11:46:27 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/CreateEvent.java#3 $ by $Author: rhs $, $DateTime: 2002/12/10 15:09:40 $";
 
-    protected CreateEvent(Session ssn, OID oid) {
+    CreateEvent(Session ssn, OID oid) {
         super(ssn, oid);
+    }
+
+    void fire(EventHandler ev) {
+        ev.onCreate(this);
     }
 
     void sync() {

@@ -7,15 +7,19 @@ import java.io.*;
  * DeleteEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/12/04 $
+ * @version $Revision: #3 $ $Date: 2002/12/10 $
  **/
 
 public class DeleteEvent extends ObjectEvent {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DeleteEvent.java#2 $ by $Author: rhs $, $DateTime: 2002/12/04 19:18:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DeleteEvent.java#3 $ by $Author: rhs $, $DateTime: 2002/12/10 15:09:40 $";
 
-    protected DeleteEvent(Session ssn, OID oid) {
+    DeleteEvent(Session ssn, OID oid) {
         super(ssn, oid);
+    }
+
+    void fire(EventHandler ev) {
+        ev.onDelete(this);
     }
 
     void sync() {

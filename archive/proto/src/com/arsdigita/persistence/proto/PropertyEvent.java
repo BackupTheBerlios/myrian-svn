@@ -8,18 +8,18 @@ import java.io.*;
  * PropertyEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/12/06 $
+ * @version $Revision: #4 $ $Date: 2002/12/10 $
  **/
 
 public abstract class PropertyEvent extends Event {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyEvent.java#3 $ by $Author: rhs $, $DateTime: 2002/12/06 11:46:27 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyEvent.java#4 $ by $Author: rhs $, $DateTime: 2002/12/10 15:09:40 $";
 
     private Property m_prop;
     private Object m_arg;
     private PropertyData m_pdata;
 
-    protected PropertyEvent(Session ssn, OID oid, Property prop, Object arg) {
+    PropertyEvent(Session ssn, OID oid, Property prop, Object arg) {
         super(ssn, oid);
         m_prop = prop;
         m_arg = arg;

@@ -6,12 +6,12 @@ import java.util.*;
  * Query
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/12/04 $
+ * @version $Revision: #3 $ $Date: 2002/12/10 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#2 $ by $Author: rhs $, $DateTime: 2002/12/04 19:18:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#3 $ by $Author: rhs $, $DateTime: 2002/12/10 15:09:40 $";
 
     private Signature m_signature;
     private Filter m_filter;
@@ -39,7 +39,16 @@ public class Query {
     }
 
     public String toString() {
-        return m_signature + "\n" + m_filter + "\n" + m_orders;
+        StringBuffer buf = new StringBuffer();
+        buf.append(m_signature + "\nfilter(" + m_filter + ")\norder(");
+        for (Iterator it = m_orders.iterator(); it.hasNext(); ) {
+            buf.append(it.next());
+            if (it.hasNext()) {
+                buf.append(", ");
+            }
+        }
+        buf.append(")");
+        return buf.toString();
     }
 
 }

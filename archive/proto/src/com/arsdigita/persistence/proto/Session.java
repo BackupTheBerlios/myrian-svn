@@ -8,15 +8,18 @@ import java.io.*;
 import org.apache.log4j.Logger;
 
 /**
- * Session
+ * A Session object provides the primary means for client Java code to
+ * interact with the persistence layer. This code is either Java code using
+ * the persistence layer to implement object persistence, or Java code working
+ * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/12/06 $
+ * @version $Revision: #5 $ $Date: 2002/12/10 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#4 $ by $Author: rhs $, $DateTime: 2002/12/06 17:55:29 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#5 $ by $Author: rhs $, $DateTime: 2002/12/10 15:09:40 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -30,6 +33,14 @@ public class Session {
     Event m_head = null;
     Event m_tail = null;
 
+
+    /**
+     * Creates an object with the given OID.
+     *
+     * @param oid The OID of the object to create.
+     *
+     * @return The newly created object.
+     **/
 
     public PersistentObject create(OID oid) {
         if (LOG.isDebugEnabled()) {
@@ -48,7 +59,7 @@ public class Session {
         // the new object will pick up all the changes made to the old one.
         // Not sure what to do about this except perhaps disallow it at some
         // point.
-        addEvent(m_engine.getCreate(this, oid), od);
+        addEvent(new CreateEvent(this, oid), od);
 
         for (Iterator it = oid.getObjectType().getKeyProperties();
              it.hasNext(); ) {
@@ -64,6 +75,15 @@ public class Session {
 
         return result;
     }
+
+
+    /**
+     * Deletes the object with the given OID.
+     *
+     * @param oid The OID of the object to delete.
+     *
+     * @return True if an object was deleted, false otherwise.
+     **/
 
     public boolean delete(OID oid) {
         if (LOG.isDebugEnabled()) {
@@ -92,7 +112,7 @@ public class Session {
                         }
                     }
                 }
-                addEvent(m_engine.getDelete(this, oid), od);
+                addEvent(new DeleteEvent(this, oid), od);
                 result = true;
             }
             od.setVisiting(false);
@@ -104,6 +124,15 @@ public class Session {
 
         return result;
     }
+
+
+    /**
+     * Retrieves the object with the given OID.
+     *
+     * @param oid The OID of the object to retrieve.
+     *
+     * @return The retrieved object.
+     **/
 
     public PersistentObject retrieve(OID oid) {
         if (LOG.isDebugEnabled()) {
@@ -126,9 +155,29 @@ public class Session {
         return result;
     }
 
+
+    /**
+     * Returns a PersistentCollection that corresponds to the given Query.
+     *
+     * @param query A query object that specifies which objects are to be
+     *              included in the collection and which properties are to be
+     *              preloaded.
+     *
+     * @return A PersistentCollection that corresponds to the given Query.
+     **/
+
     public PersistentCollection retrieve(Query query) {
         return POS.getPersistentCollection(this, new DataSet(this, query));
     }
+
+
+    /**
+     * Sets a property of an object to a specified value.
+     *
+     * @param oid The OID of the object to be mutated.
+     * @param prop The Property to mutate.
+     * @param value The new value for the Property.
+     **/
 
     public void set(OID oid, Property prop, Object value) {
         if (LOG.isDebugEnabled()) {
@@ -146,7 +195,7 @@ public class Session {
         }
 
         PropertyData pd = fetchPropertyData(oid, prop);
-        addEvent(m_engine.getSet(this, oid, prop, value), pd);
+        addEvent(new SetEvent(this, oid, prop, value), pd);
 
         if (prop.isRole() && prop.isComponent()) {
             PersistentObject po = (PersistentObject) old;
@@ -160,11 +209,11 @@ public class Session {
             PersistentObject me = retrieve(oid);
             if (ass.isCollection()) {
                 if (oldpo != null) {
-                    addEvent(m_engine.getRemove(this, oldpo.getOID(), ass,
+                    addEvent(new RemoveEvent(this, oldpo.getOID(), ass,
                                                 me));
                 }
                 if (po != null) {
-                    addEvent(m_engine.getAdd(this, po.getOID(), ass, me));
+                    addEvent(new AddEvent(this, po.getOID(), ass, me));
                 }
             } else {
                 throw new IllegalStateException
@@ -177,6 +226,15 @@ public class Session {
             untrace("set");
         }
     }
+
+    /**
+     * Fetches the property value for the given OID.
+     *
+     * @param oid The OID of the object being accessed.
+     * @param prop The Property to access.
+     *
+     * @return The value of the property.
+     **/
 
     public Object get(OID oid, Property prop) {
         if (LOG.isDebugEnabled()) {
@@ -214,6 +272,7 @@ public class Session {
         }
     }
 
+
     public PersistentObject add(OID oid, Property prop, Object value) {
         if (LOG.isDebugEnabled()) {
             trace("add", new Object[] {oid, prop.getName(), value});
@@ -221,20 +280,20 @@ public class Session {
 
         // should deal with link attributes here
         PropertyData pd = fetchPropertyData(oid, prop);
-        addEvent(m_engine.getAdd(this, oid, prop, value), pd);
+        addEvent(new AddEvent(this, oid, prop, value), pd);
         if (prop.getAssociatedProperty() != null) {
             PersistentObject me = retrieve(oid);
             Property ass = prop.getAssociatedProperty();
             PersistentObject po = (PersistentObject) value;
             if (ass.isCollection()) {
-                addEvent(m_engine.getAdd(this, po.getOID(), ass, me));
+                addEvent(new AddEvent(this, po.getOID(), ass, me));
             } else {
                 PersistentObject old =
                     (PersistentObject) get(po.getOID(), ass);
                 if (old != null) {
-                    addEvent(m_engine.getRemove(this, old.getOID(), ass, po));
+                    addEvent(new RemoveEvent(this, old.getOID(), ass, po));
                 }
-                addEvent(m_engine.getSet(this, po.getOID(), ass, me));
+                addEvent(new SetEvent(this, po.getOID(), ass, me));
             }
         }
 
@@ -251,7 +310,7 @@ public class Session {
         }
 
         PropertyData pd = fetchPropertyData(oid, prop);
-        addEvent(m_engine.getRemove(this, oid, prop, value), pd);
+        addEvent(new RemoveEvent(this, oid, prop, value), pd);
 
         if (prop.isRole() && prop.isComponent()) {
             PersistentObject po = (PersistentObject) value;
@@ -263,9 +322,9 @@ public class Session {
             PersistentObject me = retrieve(oid);
             PersistentObject po = (PersistentObject) value;
             if (ass.isCollection()) {
-                addEvent(m_engine.getRemove(this, po.getOID(), ass, me));
+                addEvent(new RemoveEvent(this, po.getOID(), ass, me));
             } else {
-                addEvent(m_engine.getSet(this, po.getOID(), ass, null));
+                addEvent(new SetEvent(this, po.getOID(), ass, null));
             }
         }
 
@@ -273,6 +332,14 @@ public class Session {
             untrace("remove");
         }
     }
+
+
+    /**
+     * Removes all elements from the given property.
+     *
+     * @param oid The OID of the object containing the property being cleared.
+     * @param prop The property being cleared.
+     **/
 
     public void clear(OID oid, Property prop) {
         if (LOG.isDebugEnabled()) {
@@ -291,13 +358,20 @@ public class Session {
         }
     }
 
+
+    /**
+     * Performs all operations queued up by the session. This is automatically
+     * called when necessary in order to insure that queries performed by the
+     * datastore are consistent with the contents of the in memory data cache.
+     **/
+
     public void flush() {
         if (LOG.isDebugEnabled()) {
             trace("flush", new Object[0]);
         }
 
         for (Event ev = m_head; ev != null; ev = ev.getNext()) {
-            m_engine.write(ev);
+            ev.fire(m_engine.getEventHandler());
         }
 
         m_engine.flush();
@@ -312,6 +386,31 @@ public class Session {
         if (LOG.isDebugEnabled()) {
             untrace("flush");
         }
+    }
+
+
+    /**
+     * Renders all changes made within the transaction permanent and ends the
+     * transaction.
+     **/
+
+    public void commit() {
+        flush();
+        m_engine.commit();
+    }
+
+
+    /**
+     * Reverts all changes made within the transaction and ends the
+     * transaction. 
+     **/
+
+    public void rollback() {
+        // should properly roll back java state
+        m_odata.clear();
+        m_head = null;
+        m_tail = null;
+        m_engine.rollback();
     }
 
     Engine getEngine() {

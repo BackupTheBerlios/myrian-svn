@@ -7,12 +7,12 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/12/04 $
+ * @version $Revision: #3 $ $Date: 2002/12/10 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#2 $ by $Author: rhs $, $DateTime: 2002/12/04 19:18:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#3 $ by $Author: rhs $, $DateTime: 2002/12/10 15:09:40 $";
 
     private ObjectType m_type;
     private HashMap m_paths = new HashMap();
@@ -40,7 +40,19 @@ public class Signature {
     }
 
     public String toString() {
-        return getPaths().toString();
+        StringBuffer buf = new StringBuffer();
+        buf.append(m_type.getQualifiedName() + "(");
+
+        for (Iterator it = m_paths.values().iterator(); it.hasNext(); ) {
+            buf.append(it.next());
+            if (it.hasNext()) {
+                buf.append(", ");
+            }
+        }
+
+        buf.append(")");
+
+        return buf.toString();
     }
 
 }

@@ -7,12 +7,12 @@ import com.arsdigita.persistence.metadata.Property;
  * Engine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2002/12/06 $
+ * @version $Revision: #2 $ $Date: 2002/12/10 $
  **/
 
 public abstract class Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Engine.java#1 $ by $Author: rhs $, $DateTime: 2002/12/06 17:55:29 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Engine.java#2 $ by $Author: rhs $, $DateTime: 2002/12/10 15:09:40 $";
 
     static final Engine getInstance(Session ssn) {
         return new com.arsdigita.persistence.proto.engine.MemoryEngine(ssn);
@@ -34,7 +34,7 @@ public abstract class Engine {
 
     protected abstract RecordSet execute(Query query);
 
-    protected abstract void write(Event event);
+    protected abstract EventHandler getEventHandler();
 
     protected abstract void flush();
 
@@ -49,18 +49,5 @@ public abstract class Engine {
     protected abstract Filter getIn(Path path, Query query);
 
     protected abstract Filter getContains(Path path, Object value);
-
-    protected abstract CreateEvent getCreate(Session ssn, OID oid);
-
-    protected abstract DeleteEvent getDelete(Session ssn, OID oid);
-
-    protected abstract SetEvent getSet(Session ssn, OID oid, Property prop,
-                                       Object argument);
-
-    protected abstract AddEvent getAdd(Session ssn, OID oid, Property prop,
-                                       Object argument);
-
-    protected abstract RemoveEvent getRemove(Session ssn, OID oid,
-                                             Property prop, Object argument);
 
 }

@@ -4,18 +4,24 @@ import com.arsdigita.persistence.metadata.*;
 import com.arsdigita.persistence.proto.*;
 import com.arsdigita.persistence.proto.Event;
 import com.arsdigita.persistence.OID;
+
+import org.apache.log4j.Logger;
+
 import java.util.*;
+
 
 /**
  * MemoryEngine
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/12/06 $
+ * @version $Revision: #2 $ $Date: 2002/12/10 $
  **/
 
 public class MemoryEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#1 $ by $Author: rhs $, $DateTime: 2002/12/06 17:55:29 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/MemoryEngine.java#2 $ by $Author: rhs $, $DateTime: 2002/12/10 15:09:40 $";
+
+    private static final Logger LOG = Logger.getLogger(MemoryEngine.class);
 
     private static class EventList extends ArrayList {
         public Event getEvent(int index) {
@@ -44,14 +50,40 @@ public class MemoryEngine extends Engine {
     }
 
     protected RecordSet execute(Query query) {
-        System.out.println("Executing " + query);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("execute: " + query);
+        }
         DumbRecordSet drs = new DumbRecordSet(query);
-        System.out.println(" --> " + drs.getOIDs());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("result: " + drs);
+        }
         return drs;
     }
 
-    protected synchronized void write(Event event) {
-        m_unflushed.add(event);
+    private final EventHandler m_handler = new EventHandler() {
+            public void onCreate(CreateEvent e) {
+                m_unflushed.add(e);
+            }
+
+            public void onDelete(DeleteEvent e) {
+                m_unflushed.add(e);
+            }
+
+            public void onSet(SetEvent e) {
+                m_unflushed.add(e);
+            }
+
+            public void onAdd(AddEvent e) {
+                m_unflushed.add(e);
+            }
+
+            public void onRemove(RemoveEvent e) {
+                m_unflushed.remove(e);
+            }
+        };
+
+    protected EventHandler getEventHandler() {
+        return m_handler;
     }
 
     protected synchronized void flush() {
@@ -81,29 +113,6 @@ public class MemoryEngine extends Engine {
 
     protected Filter getContains(Path path, Object value) {
         return new DumbContainsFilter(path, value);
-    }
-
-    protected CreateEvent getCreate(Session ssn, OID oid) {
-        return new CreateEvent(ssn, oid) {};
-    }
-
-    protected DeleteEvent getDelete(Session ssn, OID oid) {
-        return new DeleteEvent(ssn, oid) {};
-    }
-
-    protected SetEvent getSet(Session ssn, OID oid, Property prop,
-                              Object arg) {
-        return new SetEvent(ssn, oid, prop, arg) {};
-    }
-
-    protected AddEvent getAdd(Session ssn, OID oid, Property prop,
-                              Object arg) {
-        return new AddEvent(ssn, oid, prop, arg) {};
-    }
-
-    protected RemoveEvent getRemove(Session ssn, OID oid, Property prop,
-                                    Object arg) {
-        return new RemoveEvent(ssn, oid, prop, arg) {};
     }
 
     private Object get(OID oid, Property prop) {
@@ -228,6 +237,10 @@ public class MemoryEngine extends Engine {
 
         public Object get(Path p) {
             return MemoryEngine.this.get(m_oid, p);
+        }
+
+        public String toString() {
+            return m_oids.toString();
         }
 
     }

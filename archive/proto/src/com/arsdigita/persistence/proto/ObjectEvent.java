@@ -7,16 +7,16 @@ import java.io.*;
  * ObjectEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/12/06 $
+ * @version $Revision: #4 $ $Date: 2002/12/10 $
  **/
 
 public abstract class ObjectEvent extends Event {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectEvent.java#3 $ by $Author: rhs $, $DateTime: 2002/12/06 11:46:27 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectEvent.java#4 $ by $Author: rhs $, $DateTime: 2002/12/10 15:09:40 $";
 
     private ObjectData m_odata;
 
-    protected ObjectEvent(Session ssn, OID oid) {
+    ObjectEvent(Session ssn, OID oid) {
         super(ssn, oid);
         m_odata = ssn.getObjectData(oid);
 

@@ -10,12 +10,12 @@ import java.io.*;
  * Event
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/12/06 $
+ * @version $Revision: #4 $ $Date: 2002/12/10 $
  **/
 
 public abstract class Event {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Event.java#3 $ by $Author: rhs $, $DateTime: 2002/12/06 11:46:27 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Event.java#4 $ by $Author: rhs $, $DateTime: 2002/12/10 15:09:40 $";
 
     private static final Logger LOG = Logger.getLogger(Event.class);
 
@@ -23,23 +23,9 @@ public abstract class Event {
     private OID m_oid;
     private Event m_next;
 
-    protected Event(Session ssn, OID oid) {
+    Event(Session ssn, OID oid) {
         m_ssn = ssn;
         m_oid = oid;
-    }
-
-    final void log() {
-        if (LOG.isDebugEnabled()) {
-            StringBuffer msg = new StringBuffer();
-
-            int level = m_ssn.getLevel();
-            for (int i = 0; i < level + 1; i++) {
-                msg.append("  ");
-            }
-
-            msg.append(this);
-            LOG.debug(msg.toString());
-        }
     }
 
     public Session getSession() {
@@ -49,6 +35,8 @@ public abstract class Event {
     public OID getOID() {
         return m_oid;
     }
+
+    abstract void fire(EventHandler handler);
 
     abstract void sync();
 
@@ -114,5 +102,19 @@ public abstract class Event {
     abstract void dump(PrintWriter out);
 
     abstract String getName();
+
+    final void log() {
+        if (LOG.isDebugEnabled()) {
+            StringBuffer msg = new StringBuffer();
+
+            int level = m_ssn.getLevel();
+            for (int i = 0; i < level + 1; i++) {
+                msg.append("  ");
+            }
+
+            msg.append(this);
+            LOG.debug(msg.toString());
+        }
+    }
 
 }

@@ -1,16 +1,15 @@
 The persistence implementation consists of a Session layer and a
-PersistenceEngine. The Session provides an interface to client code
+persistence engine. The Session provides an interface to client code
 and is responsible for caching persisted data in memory and recording
-what changes are made during a transaction. It uses the
-PersistenceEngine interface to retrieve data from and write data out
-through the storage mechanism. All I/O is performed through the Query
-interface and the Event interface. The Query interface describes a
-request for the data contained in some subset of the object graph. The
-Query interface is powerful enough to describe complex queries against
-the object graph and flexible enough to fetch a single attribute of a
-single object. Because of this it is the only interface necessary to
-accomplish all input from the storage mechanism that the Session
-requires.
+what changes are made during a transaction. It uses the Engine
+implementation to retrieve data from and write data to the storage
+mechanism. All I/O is performed through the Query interface and the
+Event interface. The Query interface describes a request for the data
+contained in some subset of the object graph. The Query interface is
+powerful enough to describe complex queries against the object graph
+and flexible enough to fetch a single attribute of a single object.
+Because of this it is the only interface necessary to accomplish all
+input from the storage mechanism that the Session requires.
 
 The Session stores modifications made to the object graph in the form
 of an Event stream. It expands any compound events and then passes on
@@ -105,35 +104,25 @@ additionally responsible for performing transactional writes through
 use of the begin, commit, rollback and execute(EventStream) methods.
 
   Session
-     |
-     |          ---------------------------------
-     |      1  |        PersistenceEngine        |
-      -------->|---------------------------------|
-               | commit()                        |
-               | rollback()                      |
-               | execute(Query): Cursor          |
-               | write(Event)                    |
-               | flush()                         |
-                ---------------------------------
-                      |
-                      |
-                      |     ------------------
-                      |    |   FilterSource   |
-                      |--->|------------------|
-                      |    | getAnd           |
-                      |    | getOr            |
-                      |    | ...              |
-                      |     ------------------
-                      |
-                      |     ----------------------------------------------
-                      |    |                  EventSource                 |
-                       --->|----------------------------------------------|
-                           | getCreate(ObjectData): CreateEvent           |
-                           | getDelete(ObjectData): CreateEvent           |
-                           | getSet(PropertyData, Object): SetEvent       |
-                           | getAdd(PropertyData, Object): AddEvent       |
-                           | getRemove(PropertyData, Object): RemoveEvent |
-                            ----------------------------------------------
+    /|\ 1
+     |          ----------------------------------------------
+     |      1  |                   Engine                     |
+      -------->|----------------------------------------------|
+               | commit()                                     |
+               | rollback()                                   |
+               | execute(Query): RecordSet                    |
+               | write(Event)                                 |
+               | flush()                                      |
+               | ...                                          |
+               | getAnd                                       |
+               | getOr                                        |
+               | ...                                          |
+               | getCreate(ObjectData): CreateEvent           |
+               | getDelete(ObjectData): CreateEvent           |
+               | getSet(PropertyData, Object): SetEvent       |
+               | getAdd(PropertyData, Object): AddEvent       |
+               | getRemove(PropertyData, Object): RemoveEvent |
+                ----------------------------------------------
 
 
   PersistentCollection---->DataSet<-----Cursor
@@ -265,12 +254,11 @@ deferrable constraints.
 
 Issues:
 
-  * Arbitrary SQL in filters.
   * All associations being virtually two way to handle case of delete
     automagically removing from containing associations.
   * How should event stream expand for two way associations?
-  * type resolution
   * Dealing with properties that make up the OID.
+  * type resolution
+  * Filter API, bind vs passed in values, passed in values vs other Path's.
   * Link Attributes
-  * The Cursor class seems to be overloaded serving as an I/O class as
-    well as a client API.
+  * Arbitrary SQL in filters.
