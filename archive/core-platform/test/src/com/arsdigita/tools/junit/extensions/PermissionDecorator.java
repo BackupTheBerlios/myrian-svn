@@ -24,7 +24,7 @@ import com.arsdigita.util.Assert;
 /**
  *
  * @author Jon Orris (jorris@redhat.com)
- * @version $Revision: #2 $ $DateTime: 2003/10/08 12:24:17 $
+ * @version $Revision: #3 $ $DateTime: 2003/10/15 13:49:15 $
  */
 public class PermissionDecorator extends TestDecorator {
     public PermissionDecorator(Test test) {
@@ -34,6 +34,7 @@ public class PermissionDecorator extends TestDecorator {
     public void run(TestResult testResult) {
         final TestResult finalResult = testResult;
         KernelExcursion ex = new KernelExcursion() {
+
             protected void excurse() {
                 setParty(getAdminUser());
                 PermissionDecorator.super.run(finalResult);
@@ -43,7 +44,7 @@ public class PermissionDecorator extends TestDecorator {
         ex.run();
     }
 
-    private User getAdminUser() {
+    public static User getAdminUser() {
         UserCollection uc = User.retrieveAll();
 
         try {

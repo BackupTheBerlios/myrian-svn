@@ -24,6 +24,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
+import org.apache.log4j.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -118,6 +119,7 @@ public class PerfTiming {
     private String results_var="test.perf.results";
     private String project_var ="test.perf.project";
     private TestCaseDescriptor defaultDesc;
+    private static Logger s_log = Logger.getLogger(PerfTiming.class);
 
     public PerfTiming () {
 
@@ -140,6 +142,7 @@ public class PerfTiming {
 
         xmlFile = resultsFile;
         if ( !xmlFile.exists() ) {
+            s_log.warn("Creating new file");
             createXMLFile();
         }
 
