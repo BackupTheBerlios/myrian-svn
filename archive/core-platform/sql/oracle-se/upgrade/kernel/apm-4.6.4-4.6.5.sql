@@ -1,22 +1,19 @@
 --
--- Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+-- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
 --
--- The contents of this file are subject to the ArsDigita Public 
+-- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
 -- compliance with the License. You may obtain a copy of
--- the License at http://www.arsdigita.com/ADPL.txt
+-- the License at http://www.redhat.com/licenses/ccmpl.html
 --
 -- Software distributed under the License is distributed on an "AS
 -- IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
---
--- @author bquinn@arsdigita.com
--- @version-id $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/apm-4.6.4-4.6.5.sql#2 $
---
--- Add on delete cascade and not null constraints to the package tables.
--- Remove the unused apm_package_type_map.
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/kernel/apm-4.6.4-4.6.5.sql#3 $
+-- $DateTime: 2002/10/16 14:12:35 $
+
 
 alter table apm_package_type_listener_map drop constraint apm_listener_map_pt_id_fk;
 

@@ -1,22 +1,25 @@
 --
--- Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+-- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
 --
--- The contents of this file are subject to the ArsDigita Public 
+-- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
 -- compliance with the License. You may obtain a copy of
--- the License at http://www.arsdigita.com/ADPL.txt
+-- the License at http://www.redhat.com/licenses/ccmpl.html
 --
 -- Software distributed under the License is distributed on an "AS
 -- IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/categorization/categorization-4.8.11-5.0.1.sql#3 $
+-- $DateTime: 2002/10/16 14:12:35 $
+
 
 -- Upgrades the data model from version 4.8.11 - 5.0.1
 --
 -- Copyright (C) 2001 Arsdigita Corporation
 --
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/categorization/categorization-4.8.11-5.0.1.sql#2 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/categorization/categorization-4.8.11-5.0.1.sql#3 $
 
 -- Category purposes are used to define what the various top-level
 -- branches (i.e. direct children of the "/" category) are to be used for

@@ -16,19 +16,19 @@
 package com.arsdigita.persistence;
 
 /**
- * <b><font color="red">Experimental</font></b> Link -
+ *  Link -
  * This class is used to represent the relationship between
  * two object types.  This is the same terminology that is used within
  * UML.  Links may contain properties (e.g. the property isDefault could
  * be used to indicate whether this is the defaut link for the object).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/10/16 $
  */
 
 public class Link {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/Link.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/Link.java#4 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
     private DataContainer m_data;
 

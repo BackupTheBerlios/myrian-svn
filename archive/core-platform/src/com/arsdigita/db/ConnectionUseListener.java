@@ -16,18 +16,18 @@
 package com.arsdigita.db;
 
 /**
- * <b><font color="red">Experimental</font></b>
+ * 
  *
  * A simple listener interface to allow other classes to be
  * notified when a connection's users drop to zero.
  *
  * @author <a href="mailto:eison@arsdigita.com">David Eison</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/10/16 $
  * @since 4.6
  */
 public interface ConnectionUseListener {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/ConnectionUseListener.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/ConnectionUseListener.java#4 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
     /**
      * Called when a connection has zero users.

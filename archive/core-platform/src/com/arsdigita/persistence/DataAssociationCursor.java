@@ -16,7 +16,7 @@
 package com.arsdigita.persistence;
 
 /**
- * <b><font color="red">Experimental</font></b> DataAssociationCursor -
+ *  DataAssociationCursor -
  * This is used to allow developers to iterate through the objects
  * within an association and get properties for those objects.
  * This does not implement java.util.Iterator because it is a cursor,
@@ -50,12 +50,12 @@ package com.arsdigita.persistence;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/10/16 $
  */
 
 public interface DataAssociationCursor extends DataCollection {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursor.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursor.java#4 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
     /**
      * Returns a data association that created this iterator

@@ -16,13 +16,13 @@
 package com.arsdigita.persistence;
 
 /**
- * <b><font color="red">Experimental</font></b>  An internal interface that represents a Factory
+ *   An internal interface that represents a Factory
  * object for creating sessions. The implementation is instantiated in the {@link Initializer} and
  * passed to the {@link SessionManager}. Tests can override the default factory to stub out the persistence
  * implmentation, test error handling, etc.
  *
  * @author <a href="mailto:jorris@redhat.com">jorris@redhat.com</a>
- * @version $Revision: #1 $ $Date: 2002/08/22 $
+ * @version $Revision: #2 $ $Date: 2002/10/16 $
  */
 interface SessionFactory {
 

@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
- * SmallIntBigDecimal    (Copyright 2001 ArsDigita Corporation)
+ * SmallIntBigDecimal
  *
  *  This is an implementation of BigDecimal for values <= 32 bits. This is
  *  because Integer.toString(int) is signifigantly faster than BigInteger.toSring().
@@ -29,7 +29,7 @@ import java.math.BigInteger;
  *  values from the database.
  *
  * @author <a href="mailto:jorris@arsdigita.com">jorris@arsdigita.com</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/10/16 $
  *
  */
 class SmallIntBigDecimal extends BigDecimal {

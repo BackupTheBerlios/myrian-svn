@@ -50,13 +50,12 @@ import org.apache.log4j.Logger;
  *
  * <p>
  *
- * Copyright (c) 2001, ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/14 $ */
+ * @version $Revision: #6 $ $Date: 2002/10/16 $ */
 
 public class OID {
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OID.java#5 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OID.java#6 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
     private ObjectType m_type;
     private Map m_values = new HashMap();

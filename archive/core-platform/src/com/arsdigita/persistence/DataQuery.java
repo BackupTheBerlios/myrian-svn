@@ -53,12 +53,12 @@ import java.util.Map;
  * </pre>
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/09/09 $
+ * @version $Revision: #6 $ $Date: 2002/10/16 $
  */
 
 public interface DataQuery {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQuery.java#5 $ by $Author: randyg $, $DateTime: 2002/09/09 16:02:46 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQuery.java#6 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
     /**
      * Returns the type of this data query.
@@ -297,8 +297,7 @@ public interface DataQuery {
     boolean removeFilter(Filter filter);
 
     /**
-     * <font color=red>Experimental</font>.  Highly experimental, for use
-     * by permissions service only.
+     * Highly experimental, for use by permissions service only.
      */
     Filter addInSubqueryFilter(String propertyName, String subqueryName);
 
@@ -318,7 +317,7 @@ public interface DataQuery {
                                 String queryName );
 
     /**
-     * <font color=red>Experimental</font>.
+     * 
      */
     Filter addNotInSubqueryFilter(String propertyName, String subqueryName);
 
@@ -451,7 +450,7 @@ public interface DataQuery {
      *  @exception PersistenceException is thrown if the query has
      *             already been executed.
      */
-    void addOrderWithNull(String orderOne, Object orderTwo, 
+    void addOrderWithNull(String orderOne, Object orderTwo,
                           boolean isAscending)
         throws PersistenceException;
 

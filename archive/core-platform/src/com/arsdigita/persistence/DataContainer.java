@@ -33,16 +33,14 @@ import java.util.Set;
  * Description: This class is responsible for containing the data object
  *              state. This includes scalar attribute values and other data
  *              objects referenced through roles.
- * Copyright:    Copyright (c) 2001
- * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/09/09 $
+ * @version $Revision: #7 $ $Date: 2002/10/16 $
  */
 
 class DataContainer {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataContainer.java#6 $ by $Author: jorris $, $DateTime: 2002/09/09 17:12:20 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataContainer.java#7 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
     private static final Logger s_log =
         Logger.getLogger(DataContainer.class.getName());

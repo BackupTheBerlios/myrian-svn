@@ -28,12 +28,12 @@ import org.apache.log4j.Logger;
  *
  * @see Initializer
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #5 $ $Date: 2002/08/22 $
+ * @version $Revision: #6 $ $Date: 2002/10/16 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#5 $ by $Author: jorris $, $DateTime: 2002/08/22 10:38:41 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#6 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
     private static String s_url = null;           // the jdbc URL
     private static String s_username = null;      // the database username
@@ -127,7 +127,7 @@ public class SessionManager {
     }
 
     /**
-     *  <b><font color="red">Experimental</font></b> - This retrieves the
+     *   - This retrieves the
      *  factory that is used to create the filters for this DataQuery.
      */
     public static SQLUtilities getSQLUtilities() {

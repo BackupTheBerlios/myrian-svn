@@ -1,37 +1,26 @@
 //
-// Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+// Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
 //
-// The contents of this file are subject to the ArsDigita Public 
+// The contents of this file are subject to the CCM Public
 // License (the "License"); you may not use this file except in
 // compliance with the License. You may obtain a copy of
-// the License at http://www.arsdigita.com/ADPL.txt
+// the License at http://www.redhat.com/licenses/ccmpl.html
 //
 // Software distributed under the License is distributed on an "AS
 // IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
+// $Id: //core-platform/dev/pdl/com/arsdigita/formbuilder/FormSection.pdl#5 $ 
+// $DateTime: 2002/10/16 14:12:35 $
 
-
-// We persist FormSections as well as Forms via
-// this object type. The Forms have additional action attribute
-// which is stored in the attribute string of Component. Every
-// persistent form section must have an associated process listener
-// that does the processing of the form section. The process listener
-// may also dictate the parameters that must be in the form. The process
-// listener is implemented by a developer and is persisted via its Java
-// class name. 
-// 
-// For the form hierarchy I would like to use Link attributes.
-// However, those will not be implemented until September. As a work around
-// I tried using a component association with a FormSectionComposite datatype.
-// However, this was inefficient and forced me to change my datamodel in undesirable
+model in undesirable
 // ways. Until Link attributes are supported I am now instead using a query for
 // retrieval of component children, and data operations for the adding and removing
 // of children.
 
 // @author <a href="mailto:pmarklun@arsdigita.com">Peter Marklund</a>
-// @version $Id: //core-platform/dev/pdl/com/arsdigita/formbuilder/FormSection.pdl#4 $
+// @version $Id: //core-platform/dev/pdl/com/arsdigita/formbuilder/FormSection.pdl#5 $
 //
 
 model com.arsdigita.formbuilder;

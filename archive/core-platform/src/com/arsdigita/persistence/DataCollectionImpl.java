@@ -27,17 +27,14 @@ import java.util.Map;
  * Description: This class is similar to a cursor except that it
  *              conceptually represents a list of GenericDataObjects.
  *
- * Copyright:    Copyright (c) 2001
- * Company:      ArsDigita
- *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/10/16 $
  */
 
 class DataCollectionImpl extends DataQueryImpl
     implements DataCollection {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataCollectionImpl.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataCollectionImpl.java#5 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
 
     /**

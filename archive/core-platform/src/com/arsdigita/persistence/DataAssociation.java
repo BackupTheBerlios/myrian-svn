@@ -18,7 +18,7 @@ package com.arsdigita.persistence;
 import com.arsdigita.persistence.metadata.ObjectType;
 
 /**
- * <b><font color="red">Experimental</font></b> DataAssociation - This
+ *  DataAssociation - This
  * is used to represent the relationship between two objects.  That
  * is, this is used to say that two objects are associated.  {@link
  * com.arsdigita.persistence.Link} represents the actual link between
@@ -33,13 +33,13 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $ */
+ * @version $Revision: #4 $ $Date: 2002/10/16 $ */
 
 public interface DataAssociation extends DataCollection {
     // when this no longer extends DataCollection, make sure it
     // still has get/set Query and get/set Source
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociation.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociation.java#4 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
     /**
      * Adds <i>object</i> to the persistent association.

@@ -29,11 +29,9 @@ import com.arsdigita.util.Assert;
  *              This class is intentionally NOT threadsafe;
  *              it should not be shared across threads.
  * Description: The TransactionContext class encapsulates a database transaction.
- * Copyright:    Copyright (c) 2001
- * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/08/22 $
+ * @version $Revision: #2 $ $Date: 2002/10/16 $
  */
 
 class TransactionContextImpl implements TransactionContext {
@@ -123,7 +121,7 @@ class TransactionContextImpl implements TransactionContext {
     }
 
     /**
-     * <b><font color="red">Experimental</font></b>
+     * 
      *
      * Called when a connection has zero users.
      * Will recycle the connection back into the pool if
@@ -404,7 +402,7 @@ class TransactionContextImpl implements TransactionContext {
     }
 
     /**
-     * <b><font color="red">Experimental</font></b>
+     * 
      *
      * Indicates whether aggressive closing will be used.
      */
@@ -413,7 +411,7 @@ class TransactionContextImpl implements TransactionContext {
     }
 
     /**
-     * <b><font color="red">Experimental</font></b>
+     * 
      *
      * Indicates whether aggressive closing will be used.
      */

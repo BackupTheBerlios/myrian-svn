@@ -1,22 +1,25 @@
 --
--- Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+-- Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
 --
--- The contents of this file are subject to the ArsDigita Public 
+-- The contents of this file are subject to the CCM Public
 -- License (the "License"); you may not use this file except in
 -- compliance with the License. You may obtain a copy of
--- the License at http://www.arsdigita.com/adpl.txt
+-- the License at http://www.redhat.com/licenses/ccmpl.html
 --
 -- Software distributed under the License is distributed on an "AS
 -- IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
+-- $Id: //core-platform/dev/sql/oracle-se/places/pl-us-counties-drop.sql#3 $
+-- $DateTime: 2002/10/16 14:12:35 $
+
 
 --
 -- Drop US counties.
 --
 -- @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
--- @version $Id: //core-platform/dev/sql/oracle-se/places/pl-us-counties-drop.sql#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/places/pl-us-counties-drop.sql#3 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $
 --
 
 drop table pl_us_counties;

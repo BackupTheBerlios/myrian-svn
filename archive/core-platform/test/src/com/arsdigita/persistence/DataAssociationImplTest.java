@@ -25,19 +25,18 @@ import org.apache.log4j.Logger;
  *
  * <p> Explanation about the tested class and its responsibilities </p>
  *
- * <p> Copyright 2001 ArsDigita Corporation</p>
  *     DataAssociationImpl implements com.arsdigita.persistence.DataAssociation </p>
  *
  * @author <a href="mbryzek@arsdigita.com">Michael Bryzek</a>
- * @date $Date: 2002/08/30 $
- * @version $Revision: #5 $
+ * @date $Date: 2002/10/16 $
+ * @version $Revision: #6 $
  *
  * @see com.arsdigita.persistence.DataAssociationImpl
  **/
 
 public class DataAssociationImplTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataAssociationImplTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataAssociationImplTest.java#6 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
     private static Logger log =
         Logger.getLogger(DataAssociationImplTest.class.getName());
 

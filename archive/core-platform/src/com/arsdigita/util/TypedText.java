@@ -16,7 +16,7 @@
 package com.arsdigita.util;
 
 /**
- * <font color="red">Experimental</font>
+ * 
  * A general utility class for text which carries additional type
  * information.  Specifically, we recognize plain text, HTML, and
  * preformatted text.
@@ -26,7 +26,7 @@ package com.arsdigita.util;
 
 public class TypedText {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/TypedText.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/TypedText.java#4 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
     public static final String TEXT_HTML = "text/html";
     public static final String TEXT_PLAIN = "text/plain";

@@ -63,12 +63,12 @@ import org.apache.log4j.Logger;
  * </ul>
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #5 $ $Date: 2002/10/04 $
+ * @version $Revision: #6 $ $Date: 2002/10/16 $
  * @since 4.5
  */
 public class Statement implements java.sql.Statement, ResultSetEventListener {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Statement.java#5 $ $Author: rhs $ $Date: 2002/10/04 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Statement.java#6 $ $Author: dennis $ $Date: 2002/10/16 $";
 
     private static final java.util.Set dbgStatements = new java.util.HashSet();
 
@@ -832,7 +832,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
     }
 
     /**
-     * <b><font color="red">Experimental</font></b>
+     * 
      *
      * Sets whether this statement need autocommit to be
      * off.  Basically, this should be set true for any modifying statements
@@ -850,7 +850,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
     }
 
     /**
-     * <b><font color="red">Experimental</font></b>
+     * 
      *
      * Sets whether this statement need autocommit to be
      * off.  Basically, this should be true for any modifying statements

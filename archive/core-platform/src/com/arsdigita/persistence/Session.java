@@ -30,13 +30,13 @@ import java.sql.Connection;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2002/08/22 $
+ * @version $Revision: #9 $ $Date: 2002/10/16 $
  * @see com.arsdigita.persistence.SessionManager
  */
 public interface Session {
 
    /**
-     * <b><font color="red">Experimental</font></b> - Sets the connection
+     *  - Sets the connection
      * info for the specified schema.
      *
      * @param schema The name of the schema.
@@ -179,7 +179,7 @@ public interface Session {
         throws PersistenceException;
 
     /**
-     * <b><font color="red">Experimental</font></b> - Deletes the
+     *  - Deletes the
      * persistent object of the given type with the given oid.  This method
      * is not yet implemented.
      *
@@ -323,14 +323,14 @@ public interface Session {
         throws PersistenceException;
 
     /**
-     *  <b><font color="red">Experimental</font></b> - This retrieves the
+     *   - This retrieves the
      *  factory that is used to create the filters for this DataQuery.
      */
     FilterFactory getFilterFactory();
 
 
     /**
-     * <b><font color="red">Experimental</font></b> - This allows
+     *  - This allows
      * developers to push messages on to the stack.  When a PersistenceError
      * is created, it automatically reads all of the messages off of the
      * stack and prints them as part of the error message.  Every call to
@@ -354,7 +354,7 @@ public interface Session {
     void pushMessage(String message);
 
     /**
-     * <b><font color="red">Experimental</font></b> - This allows developers
+     *  - This allows developers
      *  to pop message off of the stack.  This
      *  should be used after an action has been completed successfully
      *  and should have a corresponding call to
@@ -378,7 +378,7 @@ public interface Session {
     String popMessage();
 
     /**
-     *  <b><font color="red">Experimental</font></b> - Returns the
+     *   - Returns the
      *  stack trace for this session.
      *  @return This returns a String that represents all of the items
      *  that are on the stack.  It returns "Occured while:" followed

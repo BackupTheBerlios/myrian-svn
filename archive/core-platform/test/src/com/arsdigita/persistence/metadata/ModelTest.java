@@ -21,12 +21,12 @@ import java.sql.ResultSet;
 import junit.framework.TestCase;
 
 /**
- * ModelTest    (Copyright 2001 ArsDigita Corporation)
+ * ModelTest
  *
  * <p> This class performs unit tests on com.arsdigita.persistence.metadatax.Model </p>
  *
  * @author <a href="mailto:jorris@arsdigita.com">jorris@arsdigita.com</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/10/16 $
  *
  * @see com.arsdigita.persistence.metadata.Model
  */
@@ -34,7 +34,7 @@ import junit.framework.TestCase;
 public class ModelTest extends TestCase
 {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/ModelTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/ModelTest.java#4 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
     public ModelTest(String name) {
         super(name);

@@ -17,7 +17,7 @@ package com.arsdigita.persistence.metadata;
 import java.math.BigInteger;
 
 /**
- * SmallIntBigInteger    (Copyright 2001 ArsDigita Corporation)
+ * SmallIntBigInteger
  *
  *  This is an implementation of BigInteger for values <= 32 bits. This is
  *  because Integer.toString(int) is signifigantly faster than BigInteger.toSring().
@@ -25,11 +25,11 @@ import java.math.BigInteger;
  *  values from the database.
  *
  * @author <a href="mailto:jorris@arsdigita.com">jorris@arsdigita.com</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/10/16 $
  *
  */
 class SmallIntBigInteger extends BigInteger {
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/SmallIntBigInteger.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/SmallIntBigInteger.java#4 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
     SmallIntBigInteger(byte[] val) {
         super(val);

@@ -18,7 +18,7 @@ package com.arsdigita.persistence;
 import com.arsdigita.persistence.metadata.ObjectType;
 
 /**
- * <font color=red>Experimental</font> Adapter to make a data query look
+ *  Adapter to make a data query look
  * like a data collection. If your data query looks something like the
  * following in PDL:
  *
@@ -55,7 +55,7 @@ import com.arsdigita.persistence.metadata.ObjectType;
  * cursor, it just wraps the data query that was passed in.
  *
  * @author <a href="mailto:lutter@arsdigita.com">David Lutterkort</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDataCollectionAdapter.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDataCollectionAdapter.java#4 $
  */
 public class DataQueryDataCollectionAdapter extends DataQueryDecorator
     implements DataCollection {

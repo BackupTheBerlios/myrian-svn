@@ -42,16 +42,14 @@ import java.util.ArrayList;
  *              class is primary used for use by the persistent engine and
  *              anyone wanting to extend the functionality of GenericDataObjects
  *              through inheritance.
- * Copyright:    Copyright (c) 2001
- * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #13 $ $Date: 2002/10/01 $
+ * @version $Revision: #14 $ $Date: 2002/10/16 $
  */
 
 public class GenericDataObject implements DataObject {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#13 $ by $Author: rhs $, $DateTime: 2002/10/01 16:08:31 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#14 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
     private ObjectType    m_type;
     private Session       m_session;

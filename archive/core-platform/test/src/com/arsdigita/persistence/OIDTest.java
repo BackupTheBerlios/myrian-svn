@@ -26,18 +26,17 @@ import org.apache.log4j.Logger;
  * OIDTest
  * <p> This class performs unit tests on com.arsdigita.persistence.OID </p>
  *
- * <p> Copyright 2001 ArsDigita Corporation</p>
  *
  * @author <a href="mbryzek@arsdigita.com">Michael Bryzek</a>
- * @date $Date: 2002/08/30 $
- * @version $Revision: #5 $
+ * @date $Date: 2002/10/16 $
+ * @version $Revision: #6 $
  *
  * @see com.arsdigita.persistence.OID
  **/
 
 public class OIDTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OIDTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OIDTest.java#6 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
     private static Logger s_log =
         Logger.getLogger(OIDTest.class.getName());

@@ -40,7 +40,7 @@ import org.apache.log4j.Logger;
  * </ul>
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #7 $ $Date: 2002/10/04 $
+ * @version $Revision: #8 $ $Date: 2002/10/16 $
  * @since 4.5
  */
 // Synchronization in this class is primarily because close can be called via
@@ -49,7 +49,7 @@ import org.apache.log4j.Logger;
 // is closed out from underneath this connection.
 public class Connection implements java.sql.Connection {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Connection.java#7 $ $Author: rhs $ $Date: 2002/10/04 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Connection.java#8 $ $Author: dennis $ $Date: 2002/10/16 $";
 
     // the connection object that we wrap
     private java.sql.Connection m_conn;
@@ -575,7 +575,7 @@ public class Connection implements java.sql.Connection {
     }
 
     /**
-     * <b><font color="red">Experimental</font></b>
+     * 
      *
      * Decreases the user count and fires connection use listeners
      * if user count reaches zero.
@@ -601,7 +601,7 @@ public class Connection implements java.sql.Connection {
     }
 
     /**
-     * <b><font color="red">Experimental</font></b>
+     * 
      *
      * Increases the user count.  Presently used to track the # of outstanding
      * statements for this connection.
@@ -613,7 +613,7 @@ public class Connection implements java.sql.Connection {
     }
 
     /**
-     * <b><font color="red">Experimental</font></b>
+     * 
      *
      * Adds a request listener to this particular connection.
      * If this method is needed, it should be called before actually
@@ -628,7 +628,7 @@ public class Connection implements java.sql.Connection {
 
 
     /**
-     * <b><font color="red">Experimental</font></b>
+     * 
      *
      * Flags that a statement needed autocommit to be
      * off.  Basically, this should be set true for any modifying statements
@@ -640,7 +640,7 @@ public class Connection implements java.sql.Connection {
     }
 
     /**
-     * <b><font color="red">Experimental</font></b>
+     * 
      * Indicates whether any statement needed autocommit to be
      * off.
      */

@@ -23,16 +23,14 @@ import java.lang.reflect.Constructor;
  * Title:       GenericDataObjectFactory class
  * Description: The class is used to instantiate DataObjects using the meta
  *              data passed in.
- * Copyright:   Copyright (c) 2001
- * Company:     ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/22 $
+ * @version $Revision: #5 $ $Date: 2002/10/16 $
  */
 
 public class GenericDataObjectFactory {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObjectFactory.java#4 $ by $Author: jorris $, $DateTime: 2002/08/22 10:38:41 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObjectFactory.java#5 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
 
     /**

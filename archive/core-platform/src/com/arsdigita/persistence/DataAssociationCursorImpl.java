@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 
 
 /**
- * <b><font color="red">Experimental</font></b> DataAssociationCursor -
+ *  DataAssociationCursor -
  * This is used to allow developers to iterate through the objects
  * within an association and get properties for those objects.
  * This does not implement java.util.Iterator because it is a cursor,
@@ -65,13 +65,13 @@ import org.apache.log4j.Logger;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/10/16 $
  */
 
 class DataAssociationCursorImpl extends DataCollectionImpl
     implements DataAssociationCursor {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#5 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
     private static final Logger s_cat =
         Logger.getLogger(DataAssociationImpl.class);

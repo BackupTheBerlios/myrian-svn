@@ -24,14 +24,14 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Revision: #13 $ $Date: 2002/10/14 $
+ * @version $Revision: #14 $ $Date: 2002/10/16 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: rhs $ - $Date: 2002/10/14 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#13 $";
+    public static final String versionId = "$Author: dennis $ - $Date: 2002/10/16 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#14 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);
@@ -376,7 +376,7 @@ public class ConnectionManager {
     }
 
     /**
-     * <b><font color="red">Experimental</font></b> - to be removed
+     *  - to be removed
      * when we have close listeners and this doesn't need to be
      * externally managed anymore (SDM #149294).
      * <P>

@@ -62,16 +62,14 @@ import org.apache.log4j.Logger;
  *              other classes that are responsible for specifics such as
  *              SQL statement construction and our Database API for
  *              communicating with the database.
- * Copyright:    Copyright (c) 2001
- * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2002/09/16 $
+ * @version $Revision: #13 $ $Date: 2002/10/16 $
  */
 
 class DataStore {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#12 $ by $Author: rhs $, $DateTime: 2002/09/16 18:59:05 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#13 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
     private static final Logger LOG =
         Logger.getLogger(DataStore.class.getName());

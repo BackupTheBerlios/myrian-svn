@@ -63,7 +63,7 @@ import org.apache.log4j.Logger;
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@arsdigita.com">randyg@arsdigita.com</a>
  * @author <a href="mailto:deison@arsdigita.com">deison@arsdigita.com</a>
- * @version $Revision: #14 $ $Date: 2002/09/11 $
+ * @version $Revision: #15 $ $Date: 2002/10/16 $
  */
 // NOTE if we ever support anything other than forward-only,
 // we'll need to shut off the auto-closing functionality
@@ -71,7 +71,7 @@ import org.apache.log4j.Logger;
 // results and general confusion.
 class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#14 $ by $Author: randyg $, $DateTime: 2002/09/11 18:15:53 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#15 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
     private static final Logger log =
         Logger.getLogger(DataQueryImpl.class);
@@ -684,8 +684,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
     }
 
     /**
-     * <font color=red>Experimental</font>.  Highly experimental, for use
-     * by permissions service only.
+     * Highly experimental, for use by permissions service only.
      */
     public Filter addInSubqueryFilter(String propertyName,
                                       String subqueryName) {
@@ -712,7 +711,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
     }
 
     /**
-     * <font color=red>Experimental</font>.
+     * 
      */
     public Filter addNotInSubqueryFilter(String propertyName,
                                          String subqueryName) {
@@ -871,7 +870,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
      *  @exception PersistenceException is thrown if the query has
      *             already been executed.
      */
-    public void addOrderWithNull(String orderOne, Object orderTwo, 
+    public void addOrderWithNull(String orderOne, Object orderTwo,
                                  boolean isAscending)
         throws PersistenceException {
         String suffix = null;
@@ -880,7 +879,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
         } else {
             suffix = "desc";
         }
-        
+
         Object secondElement = orderTwo;
         if (orderTwo instanceof String && orderTwo != null) {
             String[] path = StringUtils.split((String)orderTwo, '.');
@@ -898,17 +897,17 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
                         (m_type.getProperty(orderOne).getType())) {
                         // this means that there is going to be a type conflict
                         // by the DB so we prefent it here
-                        throw new PersistenceException 
+                        throw new PersistenceException
                             ("Invalud types: The column type and the second " +
                              " value must be the same type.  However, the " +
-                             " column is " + 
+                             " column is " +
                              m_type.getProperty(orderOne).getType() +
                              " and the other value is " + MetadataRoot.STRING);
                     }
                 }
             }
         }
-        
+
         addOrder("case when (" + orderOne + " is null) then " +
                  secondElement + " else " + orderOne + " end " + suffix);
     }

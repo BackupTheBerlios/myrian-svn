@@ -21,18 +21,16 @@ package com.arsdigita.persistence;
  *              This class is intentionally NOT threadsafe;
  *              it should not be shared across threads.
  * Description: The TransactionContext class encapsulates a database transaction.
- * Copyright:    Copyright (c) 2001
- * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/22 $
+ * @version $Revision: #6 $ $Date: 2002/10/16 $
  */
 
 public interface TransactionContext extends com.arsdigita.db.ConnectionUseListener {
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/TransactionContext.java#5 $ by $Author: jorris $, $DateTime: 2002/08/22 10:38:41 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/TransactionContext.java#6 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
     /**
-     * <b><font color="red">Experimental</font></b>
+     * 
      *
      * Called when a connection has zero users.
      * Will recycle the connection back into the pool if

@@ -25,16 +25,14 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *              used for use by the persistent engine and anyone wanting to
  *              extend the functionality of GenericDataObjects through
  *              inheritance.
- * Copyright:    Copyright (c) 2001
- * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/10/16 $
  */
 
 public interface DataObject {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObject.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObject.java#4 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
 
     /**
      * Returns the type of this persistent object.
