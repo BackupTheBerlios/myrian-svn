@@ -18,7 +18,7 @@
 -- @author Joseph Bank (jbank@arsdigita.com)
 -- @author Stanislav Freidin (sfreidin@arsdigita.com)
 -- @author Karl Goldstein (karlg@arsdigita.com)
--- @version $Id: //core-platform/dev/sql/oracle-se/versioning/versioning-create.sql#1 $
+-- @version $Id: //core-platform/dev/sql/oracle-se/versioning/versioning-create.sql#2 $
 --
 
 create table vc_objects (

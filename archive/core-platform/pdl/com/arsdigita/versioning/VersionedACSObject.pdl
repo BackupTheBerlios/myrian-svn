@@ -175,7 +175,7 @@ query rollbackOperations {
     objectID                     = t.object_id;
   }
 }
-    
+
 data operation reparentTransactions {
   do {
     update vc_transactions set master_id = :master
