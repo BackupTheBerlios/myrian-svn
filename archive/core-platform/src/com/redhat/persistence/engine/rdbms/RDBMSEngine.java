@@ -61,12 +61,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #18 $ $Date: 2004/03/30 $
+ * @version $Revision: #19 $ $Date: 2004/04/05 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#18 $ by $Author: dennis $, $DateTime: 2004/03/30 17:47:27 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#19 $ by $Author: rhs $, $DateTime: 2004/04/05 15:45:45 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -484,14 +484,11 @@ public class RDBMSEngine extends Engine {
 
             try {
                 if (cycle != null) { cycle.beginExecute(); }
-                long time = System.currentTimeMillis();
                 if (ps.execute()) {
-                    time = System.currentTimeMillis() - time;
                     if (cycle != null) { cycle.endExecute(0); }
                     return new ResultCycle(this, ps.getResultSet(), cycle);
                 } else {
                     int updateCount = ps.getUpdateCount();
-                    time = System.currentTimeMillis() - time;
                     if (cycle != null) { cycle.endExecute(updateCount); }
 
                     if (LOG.isInfoEnabled()) {
