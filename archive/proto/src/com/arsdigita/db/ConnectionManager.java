@@ -16,6 +16,8 @@
 package com.arsdigita.db;
 
 import com.arsdigita.util.*;
+
+import java.sql.Connection;
 import java.sql.SQLException;
 import org.apache.log4j.Logger;
 
@@ -24,14 +26,14 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao
- * @version $Revision: #4 $ $Date: 2003/08/04 $
+ * @version $Revision: #5 $ $Date: 2003/08/06 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: dennis $ - $Date: 2003/08/04 $ $Id: //core-platform/proto/src/com/arsdigita/db/ConnectionManager.java#4 $";
+    public static final String versionId = "$Author: bche $ - $Date: 2003/08/06 $ $Id: //core-platform/proto/src/com/arsdigita/db/ConnectionManager.java#5 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);
@@ -88,11 +90,11 @@ public class ConnectionManager {
 
     static final void badConnection(Connection conn) {
         ConnectionManager cm = getInstance();
-        synchronized (cm) {
-            if (conn.m_pool == cm.m_pool) {
-                cm.disconnect();
-            }
-        }
+//        synchronized (cm) {
+//            if (conn.m_pool == cm.m_pool) {
+//                cm.disconnect();
+//            }
+//        }
 
         setCurrentThreadConnection(null);
     }

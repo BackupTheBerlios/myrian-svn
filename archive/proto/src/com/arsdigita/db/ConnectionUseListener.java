@@ -22,16 +22,16 @@ package com.arsdigita.db;
  * notified when a connection's users drop to zero.
  *
  * @author David Eison
- * @version $Revision: #4 $ $Date: 2003/08/04 $
+ * @version $Revision: #5 $ $Date: 2003/08/06 $
  * @since 4.6
  */
 public interface ConnectionUseListener {
 
-    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/ConnectionUseListener.java#4 $ by $Author: dennis $, $DateTime: 2003/08/04 16:15:53 $";
+    public static final String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/ConnectionUseListener.java#5 $ by $Author: bche $, $DateTime: 2003/08/06 14:16:04 $";
 
     /**
      * Called when a connection has zero users.
      */
-    public void connectionUserCountHitZero(com.arsdigita.db.Connection conn)
+    public void connectionUserCountHitZero(java.sql.Connection conn)
         throws java.sql.SQLException;
 }

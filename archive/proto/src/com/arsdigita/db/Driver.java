@@ -25,12 +25,12 @@ import java.util.Properties;
  * a "real" implementation of java.sql.Driver
  *
  * @author Mark Thomas
- * @version $Revision: #4 $ $Date: 2003/08/04 $
+ * @version $Revision: #5 $ $Date: 2003/08/06 $
  * @since 4.5
  */
 class Driver implements java.sql.Driver {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/Driver.java#4 $ $Author: dennis $ $Date: 2003/08/04 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/db/Driver.java#5 $ $Author: bche $ $Date: 2003/08/06 $";
 
     // The Driver object we wrap
     private java.sql.Driver driver;
@@ -60,7 +60,7 @@ class Driver implements java.sql.Driver {
     public java.sql.Connection connect(String url, Properties info)
         throws SQLException {
         try {
-            return com.arsdigita.db.Connection.wrap(driver.connect(url, info), null);
+            return driver.connect(url, info);
         } catch (SQLException e) {
             throw SQLExceptionHandler.wrap(e);
         }
