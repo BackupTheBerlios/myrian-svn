@@ -8,23 +8,37 @@ import java.io.*;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/01/10 $
+ * @version $Revision: #6 $ $Date: 2003/02/10 $
  **/
 
 class ObjectData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#5 $ by $Author: ashah $, $DateTime: 2003/01/10 19:25:47 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#6 $ by $Author: ashah $, $DateTime: 2003/02/10 15:36:01 $";
 
     private Session m_ssn;
     private PersistentObject m_object;
     private ArrayList m_events = new ArrayList();
-    private boolean m_isVisiting = false;
+
+    public static class State {
+        private String m_name;
+
+        private State(String name) { m_name = name; }
+
+        public String toString() { return m_name; }
+    };
+
+    public static final State NUBILE = new State("nubile");
+    public static final State AGILE = new State("agile");
+    public static final State SENILE = new State("senile");
+
+    private State m_state;
 
     HashMap m_pdata = new HashMap();
 
-    public ObjectData(Session ssn, PersistentObject object) {
+    public ObjectData(Session ssn, PersistentObject object, State state) {
         m_ssn = ssn;
         m_object = object;
+        m_state = state;
 
         m_ssn.addObjectData(this);
     }
@@ -57,52 +71,82 @@ class ObjectData {
         m_events.add(ev);
     }
 
-    public void removeEvent(ObjectEvent ev) {
+    void removeEvent(ObjectEvent ev) {
         m_events.remove(ev);
     }
 
     public boolean isNew() {
+        boolean evNew = false;
+        
         for (int i = 0; i < m_events.size(); i++) {
             Event ev = (Event) m_events.get(i);
             if (ev instanceof CreateEvent) {
-                return true;
+                evNew = true;
+                break;
             }
         }
 
-        return false;
+        if (evNew && isAgile()) {
+            throw new IllegalStateException("events and state out of sync");
+        }
+
+        return evNew;
     }
 
     public boolean isDeleted() {
+        boolean evDel = false;
         for (int i = m_events.size() - 1; i >= 0; i--) {
             Event ev = (Event) m_events.get(i);
             if (ev instanceof DeleteEvent) {
-                return true;
+                evDel = true;
+                break;
             } else if (ev instanceof CreateEvent) {
-                return false;
+                evDel = false;
+                break;
             }
         }
 
-        return false;
+        // del iff senile
+        // if ((evDel && !isSenile()) || (!evDel && isSenile())) {
+        // throw new IllegalStateException("events and state out of sync");
+        // }
+
+        return evDel;
     }
 
     public boolean isModified() {
-        if (m_events.size() > 0) { return true; }
+        boolean evMod = false;
 
-        for (Iterator it = m_pdata.values().iterator(); it.hasNext(); ) {
-            PropertyData pdata = (PropertyData) it.next();
-            if (pdata.isModified()) { return true; }
+        if (m_events.size() > 0) {
+            evMod = true;
+        } else {
+            for (Iterator it = m_pdata.values().iterator(); it.hasNext(); ) {
+                PropertyData pdata = (PropertyData) it.next();
+                if (pdata.isModified()) {
+                    evMod = true;
+                    break;
+                }
+            }
         }
 
-        return false;
+        // nubile -> modified
+        // senile -> modified
+        if ((isNubile() || isSenile()) && !evMod) {
+            throw new IllegalStateException("events and state out of sync");
+        }
+
+        return evMod;
     }
 
-    public boolean isVisiting() {
-        return m_isVisiting;
-    }
+    public boolean isNubile() { return m_state.equals(NUBILE); }
 
-    public void setVisiting(boolean value) {
-        m_isVisiting = value;
-    }
+    public boolean isAgile() { return m_state.equals(AGILE); }
+
+    public boolean isSenile() { return m_state.equals(SENILE); }
+
+    public void setState(State state) { m_state = state; }
+
+    public State getState() { return m_state; }
 
     void dump() {
         PrintWriter pw = new PrintWriter(System.out);

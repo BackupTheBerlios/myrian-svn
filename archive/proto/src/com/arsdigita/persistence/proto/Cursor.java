@@ -10,12 +10,12 @@ import java.util.*;
  * Cursor
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/01/15 $
+ * @version $Revision: #9 $ $Date: 2003/02/10 $
  **/
 
 public class Cursor {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Cursor.java#8 $ by $Author: rhs $, $DateTime: 2003/01/15 16:58:00 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Cursor.java#9 $ by $Author: ashah $, $DateTime: 2003/02/10 15:36:01 $";
 
     private DataSet m_dset;
     private Session m_ssn;
@@ -65,7 +65,7 @@ public class Cursor {
 
     public boolean next() {
         if (m_rs == null) {
-            m_ssn.flush();
+            m_ssn.flushNubileAgile();
             m_rs = m_ssn.getEngine().execute(m_dset.getQuery());
         }
 

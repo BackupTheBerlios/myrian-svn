@@ -8,12 +8,12 @@ import java.io.*;
  * Event
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/01/31 $
+ * @version $Revision: #7 $ $Date: 2003/02/10 $
  **/
 
 public abstract class Event {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Event.java#6 $ by $Author: rhs $, $DateTime: 2003/01/31 12:34:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Event.java#7 $ by $Author: ashah $, $DateTime: 2003/02/10 15:36:01 $";
 
     private static final Logger LOG = Logger.getLogger(Event.class);
 
@@ -33,7 +33,6 @@ public abstract class Event {
 
     private Session m_ssn;
     private OID m_oid;
-    private Event m_next;
 
     Event(Session ssn, OID oid) {
         m_ssn = ssn;
@@ -51,59 +50,6 @@ public abstract class Event {
     public abstract void dispatch(Switch sw);
 
     abstract void sync();
-
-    Event getNext() {
-        return m_next;
-    }
-
-    boolean isHead() {
-        return m_ssn.m_head == this;
-    }
-
-    private void setHead() {
-        m_ssn.m_head = this;
-    }
-
-    boolean isTail() {
-        return m_ssn.m_tail == this;
-    }
-
-    private void setTail() {
-        m_ssn.m_tail = this;
-    }
-
-    private static final void link(Event from, Event to) {
-        if (from != null) {
-            from.m_next = to;
-
-            if (from.isTail()) {
-                if (to != null) {
-                    to.setTail();
-                }
-            }
-        }
-
-        if (to != null && to.isHead()) {
-            if (from != null) {
-                from.setHead();
-            }
-        }
-    }
-
-    void insert(Event ev) {
-        if (ev == null) {
-            throw new IllegalArgumentException
-                ("Cannot insert a null event into the event stream.");
-        }
-        if (ev.m_next != null) {
-            throw new IllegalArgumentException
-                ("Cannot insert a linked event into the event stream.");
-        }
-
-        Event tmp = m_next;
-        link(this, ev);
-        link(ev, tmp);
-    }
 
     void dump() {
         PrintWriter pw = new PrintWriter(System.out);

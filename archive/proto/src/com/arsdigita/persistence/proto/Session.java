@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #20 $ $Date: 2003/02/07 $
+ * @version $Revision: #21 $ $Date: 2003/02/10 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#20 $ by $Author: ashah $, $DateTime: 2003/02/07 12:05:27 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#21 $ by $Author: ashah $, $DateTime: 2003/02/10 15:36:01 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -30,9 +30,7 @@ public class Session {
     private HashMap m_odata = new HashMap();
 
     // These are kept up to date by code in Event.java
-    Event m_head = null;
-    Event m_tail = null;
-
+    LinkedList m_evs = new LinkedList();
 
     /**
      * Creates an object with the given OID.
@@ -49,9 +47,12 @@ public class Session {
 
         ObjectData od = getObjectData(oid);
         if (od == null) {
-            od = new ObjectData(this, POS.getPersistentObject(this, oid));
+            od = new ObjectData(this, POS.getPersistentObject(this, oid),
+                                od.NUBILE);
         } else if (!od.isDeleted()) {
             throw new IllegalArgumentException("OID already exists: " + oid);
+        } else {
+            od.setState(od.NUBILE);
         }
 
         // This will have problems if there was a preexisting oid of a
@@ -76,7 +77,6 @@ public class Session {
         return result;
     }
 
-
     /**
      * Deletes the object with the given OID.
      *
@@ -96,10 +96,10 @@ public class Session {
 
         if (od == null) {
             result = false;
-        } else if (od.isVisiting()) {
+        } else if (od.isSenile()) {
             result = false;
         } else {
-            od.setVisiting(true);
+            od.setState(od.SENILE);
 
             ObjectType type = oid.getObjectType();
             Collection keys = type.getKeyProperties();
@@ -123,8 +123,6 @@ public class Session {
 
             addEvent(new DeleteEvent(this, oid));
             result = true;
-
-            od.setVisiting(false);
         }
 
         if (LOG.isDebugEnabled()) {
@@ -186,13 +184,14 @@ public class Session {
     private void cascadeDelete(OID container, PersistentObject containee) {
         ObjectData containerOD = fetchObjectData(container);
         boolean me = false;
-        if (!containerOD.isVisiting()) {
+        if (!containerOD.isSenile()) {
             me = true;
-            containerOD.setVisiting(true);
+            containerOD.setState(ObjectData.SENILE);
         }
+
         delete(containee.getOID());
 
-        if (me) { containerOD.setVisiting(false); }
+        if (me) { containerOD.setState(ObjectData.SENILE); }
     }
 
     /**
@@ -207,12 +206,13 @@ public class Session {
     private void reverseUpdateOld(OID sourceOID, Role role,
                                   PersistentObject target) {
         Role rev = role.getReverse();
+        
         PersistentObject source = retrieve(sourceOID);
         if (rev.isCollection()) {
             addEvent(new RemoveEvent(this, target.getOID(), rev, source));
         } else if (rev.isNullable()) {
             addEvent(new SetEvent(this, target.getOID(), rev, null));
-        } else if (!fetchObjectData(target.getOID()).isVisiting() &&
+        } else if (!fetchObjectData(target.getOID()).isSenile() &&
                    !isDeleted(target.getOID())) {
             throw new IllegalStateException("can't set 1..1 to null");
         }
@@ -240,7 +240,7 @@ public class Session {
             if (old != null) {
                 if (role.isNullable()) {
                     addEvent(new SetEvent(this, old.getOID(), role, null));
-                } else if (!fetchObjectData(old.getOID()).isVisiting() &&
+                } else if (!fetchObjectData(old.getOID()).isSenile() &&
                            !isDeleted(old.getOID())) {
                     throw new IllegalStateException("can't set 1..1 to null");
                 }
@@ -278,14 +278,14 @@ public class Session {
                         if (po != null) {
                             cascadeDelete(oid, po);
                         }
-                    } else if (role.isReversable()) {
+                    }
+
+                    if (role.isReversable()) {
                         if (old != null) {
                             reverseUpdateOld
                                 (oid, role, (PersistentObject) old);
                         }
-                    }
 
-                    if (role.isReversable()) {
                         if (value != null) {
                             reverseUpdateNew
                                 (oid, role, (PersistentObject) value);
@@ -395,8 +395,7 @@ public class Session {
                     addEvent(new AddEvent(Session.this, oid, role, value));
 
                     if (role.isReversable()) {
-                        reverseUpdateNew(
-                            oid, role, (PersistentObject) value);
+                        reverseUpdateNew(oid, role, (PersistentObject) value);
                     }
                 }
 
@@ -500,24 +499,43 @@ public class Session {
      * called when necessary in order to insure that queries performed by the
      * datastore are consistent with the contents of the in memory data cache.
      **/
+    public void flush() { flush(true, true, true); }
 
-    public void flush() {
+    void flushNubileAgile() { flush(true, true, false); }
+
+    private void flush(boolean nubile, boolean agile, boolean senile) {
         if (LOG.isDebugEnabled()) {
-            trace("flush", new Object[0]);
+            trace("flush", new Object[] {
+                nubile ? Boolean.TRUE : Boolean.FALSE,
+                agile ? Boolean.TRUE : Boolean.FALSE,
+                senile ? Boolean.TRUE : Boolean.FALSE});
         }
 
-        for (Event ev = m_head; ev != null; ev = ev.getNext()) {
-            m_engine.write(ev);
+        LinkedList written = new LinkedList();
+        LinkedList deferred = new LinkedList();
+
+        for (ListIterator li = m_evs.listIterator(0); li.hasNext(); ) {
+            Event ev = (Event) li.next();
+            ObjectData od = getObjectData(ev.getOID());
+
+            if ((nubile && od.isNubile()) ||
+                (agile && od.isAgile()) ||
+                (senile && od.isSenile())) {
+                m_engine.write(ev);
+                written.add(ev);
+            } else {
+                deferred.add(ev);
+            }
         }
 
         m_engine.flush();
 
-        for (Event ev = m_head; ev != null; ev = ev.getNext()) {
+        for (ListIterator li = written.listIterator(0); li.hasNext(); ) {
+            Event ev = (Event) li.next();
             ev.sync();
         }
 
-        m_head = null;
-        m_tail = null;
+        m_evs = deferred;
 
         if (LOG.isDebugEnabled()) {
             untrace("flush");
@@ -544,8 +562,7 @@ public class Session {
     public void rollback() {
         // should properly roll back java state
         m_odata.clear();
-        m_head = null;
-        m_tail = null;
+        m_evs = new LinkedList();
         m_engine.rollback();
     }
 
@@ -563,7 +580,8 @@ public class Session {
             // We may need to change the signature of this to read in enough
             // data to allow type negotiation to happen properly without
             // requiring another db hit.
-            od = new ObjectData(this, POS.getPersistentObject(this, oid));
+            od = new ObjectData(this, POS.getPersistentObject(this, oid),
+                                od.AGILE);
         }
 
         PropertyData pd = od.getPropertyData(prop);
@@ -579,12 +597,7 @@ public class Session {
     }
 
     private void appendEvent(Event ev) {
-        if (m_head == null) {
-            m_head = ev;
-            m_tail = ev;
-        } else {
-            m_tail.insert(ev);
-        }
+        m_evs.add(ev);
     }
 
     private void addEvent(ObjectEvent ev) {

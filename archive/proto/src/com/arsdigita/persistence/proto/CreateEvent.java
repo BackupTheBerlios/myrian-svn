@@ -6,12 +6,12 @@ import java.io.*;
  * CreateEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/01/31 $
+ * @version $Revision: #6 $ $Date: 2003/02/10 $
  **/
 
 public class CreateEvent extends ObjectEvent {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/CreateEvent.java#5 $ by $Author: rhs $, $DateTime: 2003/01/31 12:34:37 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/CreateEvent.java#6 $ by $Author: ashah $, $DateTime: 2003/02/10 15:36:01 $";
 
     CreateEvent(Session ssn, OID oid) {
         super(ssn, oid);
@@ -24,6 +24,7 @@ public class CreateEvent extends ObjectEvent {
     void sync() {
         super.sync();
         getSession().addObjectData(getObjectData());
+        getObjectData().setState(ObjectData.AGILE);
     }
 
     String getName() { return "create"; }
