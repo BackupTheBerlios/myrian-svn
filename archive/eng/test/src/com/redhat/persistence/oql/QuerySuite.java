@@ -20,7 +20,6 @@ package com.redhat.persistence.oql;
 import com.arsdigita.db.*;
 import com.arsdigita.util.*;
 import com.arsdigita.util.jdbc.*;
-import com.arsdigita.runtime.*;
 import com.arsdigita.xml.*;
 import com.redhat.persistence.*;
 import com.redhat.persistence.common.*;
@@ -42,12 +41,12 @@ import java.util.*;
  * QuerySuite
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/09/30 $
+ * @version $Revision: #8 $ $Date: 2004/10/01 $
  **/
 
 public class QuerySuite extends TestSuite {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/QuerySuite.java#7 $ by $Author: rhs $, $DateTime: 2004/09/30 15:44:52 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/oql/QuerySuite.java#8 $ by $Author: ashah $, $DateTime: 2004/10/01 16:02:13 $";
 
     public QuerySuite() {}
 
@@ -82,7 +81,7 @@ public class QuerySuite extends TestSuite {
 
     private void init() {
         m_root = new Root();
-        m_conn = Connections.acquire(RuntimeConfig.getConfig().getJDBCURL());
+        m_conn = Connections.acquire(TestConfig.getJDBCURL());
         DbHelper.setDatabase(DbHelper.getDatabase(m_conn));
 
         PDL pdl = new PDL();
@@ -381,7 +380,7 @@ public class QuerySuite extends TestSuite {
         if (fetched == null) { return rows; }
 
         Set fetchSet = new HashSet();
-        String[] parts = StringUtils.split(fetched, ',');
+        String[] parts = fetched.split(",");
         for (int i = 0; i < parts.length; i++) {
             fetchSet.add(parts[i]);
         }

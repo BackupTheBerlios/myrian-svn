@@ -35,12 +35,12 @@ import org.apache.log4j.Logger;
  * PersistenceTestCase
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/09/01 $
+ * @version $Revision: #5 $ $Date: 2004/10/01 $
  */
 
 public class PersistenceTestCase extends TestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PersistenceTestCase.java#4 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PersistenceTestCase.java#5 $ by $Author: ashah $, $DateTime: 2004/10/01 16:02:13 $";
 
     private static final Logger LOG =
         Logger.getLogger(PersistenceTestCase.class);
@@ -139,7 +139,7 @@ public class PersistenceTestCase extends TestCase {
         MetadataRoot root = MetadataRoot.getMetadataRoot();
         SessionManager.configure
             ("default", root, new PooledConnectionSource
-             (com.arsdigita.runtime.RuntimeConfig.getConfig().getJDBCURL(),
+             (com.redhat.persistence.TestConfig.getJDBCURL(),
               10, 30000));
         PDLCompiler pdl = new PDLCompiler();
         PDLSource testpdl = new ManifestSource

@@ -24,7 +24,6 @@ import com.redhat.persistence.engine.rdbms.*;
 import com.redhat.persistence.pdl.PDL;
 import com.redhat.persistence.pdl.Schema;
 import com.arsdigita.db.DbHelper;
-import com.arsdigita.runtime.*;
 import com.arsdigita.util.jdbc.*;
 import java.util.*;
 import java.math.*;
@@ -35,12 +34,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2004/10/01 $
+ * @version $Revision: #7 $ $Date: 2004/10/01 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/ProtoTest.java#6 $ by $Author: ashah $, $DateTime: 2004/10/01 15:19:06 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/ProtoTest.java#7 $ by $Author: ashah $, $DateTime: 2004/10/01 16:02:13 $";
 
 
     public ProtoTest(String name) {
@@ -56,7 +55,7 @@ public class ProtoTest extends TestCase {
         pdl.loadResource(TEST_PDL);
         pdl.emit(root);
 
-        String url = RuntimeConfig.getConfig().getJDBCURL();
+        String url = TestConfig.getJDBCURL();
 
         SQLWriter w;
         switch (DbHelper.getDatabaseFromURL(url)) {

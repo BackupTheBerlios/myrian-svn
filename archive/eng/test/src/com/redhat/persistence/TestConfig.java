@@ -15,34 +15,28 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-package com.arsdigita.runtime;
+package com.redhat.persistence;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * RuntimeConfig
+ * TestConfig
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/09/01 $
+ * @version $Revision: #1 $ $Date: 2004/10/01 $
  **/
 
-public class RuntimeConfig {
-    private final static String PROPERTIES = "rhs.properties";
+public class TestConfig {
+    private final static String PROPERTIES = "test.properties";
     private final static String JDBC_URL = "jdbc.url";
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/arsdigita/runtime/RuntimeConfig.java#4 $ by $Author: dennis $, $DateTime: 2004/09/01 11:40:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/TestConfig.java#1 $ by $Author: ashah $, $DateTime: 2004/10/01 16:02:13 $";
 
-    private static final RuntimeConfig CONFIG = new RuntimeConfig();
-
-    public static RuntimeConfig getConfig() {
-        return CONFIG;
-    }
-
-    public String getJDBCURL() {
+    public static String getJDBCURL() {
         InputStream is =
-            getClass().getClassLoader().getResourceAsStream(PROPERTIES);
+            TestConfig.class.getClassLoader().getResourceAsStream(PROPERTIES);
 
         if (is == null) {
             throw new IllegalStateException

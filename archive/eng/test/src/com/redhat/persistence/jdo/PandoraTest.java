@@ -17,7 +17,6 @@
  */
 package com.redhat.persistence.jdo;
 
-import com.arsdigita.runtime.RuntimeConfig;
 import com.redhat.persistence.Cursor;
 import com.redhat.persistence.Engine;
 import com.redhat.persistence.PropertyMap;
@@ -56,7 +55,7 @@ import org.apache.log4j.Logger;
  * PandoraTest
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2004/09/01 $
+ * @version $Revision: #14 $ $Date: 2004/10/01 $
  **/
 
 public class PandoraTest extends WithTxnCase {

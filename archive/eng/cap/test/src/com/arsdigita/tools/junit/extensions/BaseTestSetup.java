@@ -24,8 +24,8 @@ import java.sql.*;
 import java.io.*;
 
 import com.arsdigita.installer.SQLLoader;
-import com.arsdigita.runtime.*;
 import com.arsdigita.util.jdbc.*;
+import com.redhat.persistence.TestConfig;
 import com.redhat.persistence.pdl.*;
 import junit.extensions.TestDecorator;
 import junit.framework.Protectable;
@@ -138,8 +138,7 @@ public class BaseTestSetup extends TestDecorator {
     }
 
     private void runScripts(final List scripts) throws Exception {
-        Connection conn = Connections.acquire
-	    (RuntimeConfig.getConfig().getJDBCURL());
+        Connection conn = Connections.acquire(TestConfig.getJDBCURL());
 
         TestLoader ldr = new TestLoader(conn);
 
