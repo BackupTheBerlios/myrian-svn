@@ -1,5 +1,8 @@
 package com.redhat.persistence.jdo;
 
+import javax.jdo.JDOHelper;
+import javax.jdo.JDOUserException;
+
 public class SimpleTest extends WithTxnCase {
     public void testModification() {
         Employee e = new Employee("name", null);
@@ -54,5 +57,26 @@ public class SimpleTest extends WithTxnCase {
         assertNull("not null instance returned by e.dept", e.getDept());
         m_pm.deletePersistent(e);
         m_pm.currentTransaction().commit();
+    }
+
+    /**
+     * See 12.6.6 JDO Instance life cycle management.
+     **/
+    public void testMakePersistentAll() {
+        Object obj1 = new Employee("employee", null);
+        Object obj2 = null;
+        Object obj3 = new Object();
+        Object obj4 = new Employee("supervisor", null);
+        Object[] pcs = new Object[] {obj1, obj2, obj3, obj4};
+        try {
+            m_pm.makePersistentAll(pcs);
+            fail("JDOUserException expected");
+        } catch (JDOUserException ex) {
+            Throwable[] nested = ex.getNestedExceptions();
+            assertNotNull("nested exceptions", nested);
+            assertEquals("nested exceptions", 2, nested.length);
+            assertTrue("obj1.isNew", JDOHelper.isNew(obj1));
+            assertTrue("obj4.isNew", JDOHelper.isNew(obj4));
+        }
     }
 }
