@@ -13,8 +13,6 @@ public abstract class WithTxnCase extends AbstractCase {
     }
 
     protected void tearDown() {
-        if (m_pm.currentTransaction().isActive()) {
-            m_pm.currentTransaction().rollback();
-        }
+        m_pm.currentTransaction().rollback();
     }
 }
