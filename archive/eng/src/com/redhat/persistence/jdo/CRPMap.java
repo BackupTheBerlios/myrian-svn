@@ -9,17 +9,19 @@ import com.redhat.persistence.oql.Expression;
 
 import java.util.*;
 import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+import javax.jdo.spi.PersistenceCapable;
 
 /**
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/07/09 $
+ * @version $Revision: #5 $ $Date: 2004/07/09 $
  **/
 
 class CRPMap implements Map {
-    private final static String KEY = "key";
-    private final static String VALUE = "value";
+    private final static String KEY   = "key";
+    private final static String VALUE = "val";
 
     transient private Session m_ssn;
 
@@ -124,8 +126,16 @@ class CRPMap implements Map {
         return new Get(new Literal(m_object), m_mapProp.getName());
     }
 
-    private Map.Entry create(Object key) {
-        return new MapEntry(m_object, key);
+    private MapEntry create(Object key, Object value) {
+        PropertyMap pmap = new PropertyMap(m_mapProp.getType());
+        pmap.put(m_key, key);
+        pmap.put(m_container, m_object);
+        Adapter ad = ssn().getRoot().getAdapter(MapEntry.class);
+        MapEntry entry = (MapEntry) ad.getObject
+            (pmap.getObjectType().getBasetype(), pmap, ssn());
+        ssn().create(entry);
+        ssn().set(entry, m_value, value);
+        return entry;
     }
 
     private Map.Entry getEntry(Object key) {
@@ -145,7 +155,6 @@ class CRPMap implements Map {
             c.close();
         }
     }
-
 
     private class KeySet extends CRPCollection implements Set {
 
@@ -182,18 +191,19 @@ class CRPMap implements Map {
     // =========================================================================
 
     public Object get(Object key) {
-        throw new UnsupportedOperationException();
+        Map.Entry me = getEntry(key);
+        return me == null ? null : me.getValue();
     }
 
     public Object put(Object key, Object value) {
         lock();
         Map.Entry me = getEntry(key);
         if (me == null) {
-            me = create(key);
+            me = create(key, value);
+            return null;
+        } else {
+            return me.setValue(value);
         }
-        Object result = me.getValue();
-        me.setValue(value);
-        return result;
     }
 
     public Object remove(Object key) {

@@ -2,40 +2,36 @@ package com.redhat.persistence.jdo;
 
 import java.util.Map;
 
-final class MapEntry implements Map.Entry {
-    private Object container;
+public abstract class MapEntry implements Map.Entry {
 
-    private Object key;
-    private Object value;
+    public abstract Object getKey();
 
-    MapEntry() {}
-
-    MapEntry(Object container, Object key) {
-        this.container = container;
-        this.key = key;
-    }
-
-    public Object getKey() {
-        return key;
-    }
+    public abstract Object getVal();
+    public abstract void setVal(Object value);
 
     public Object getValue() {
-        return value;
+        return getVal();
     }
 
     public Object setValue(Object value) {
-        Object oldValue = this.value;
-        this.value = value;
+        Object oldValue = getVal();
+        setVal(value);
         return oldValue;
     }
 
     public int hashCode() {
+        Object key = getKey();
+        Object value = getVal();
+
         return (key==null ? 0 : key.hashCode()) +
             (value==null ? 0 : value.hashCode());
     }
 
     public boolean equals(Object obj) {
         if (!(obj instanceof Map.Entry)) { return false; }
+
+        Object key   = getKey();
+        Object value = getVal();
 
         Map.Entry en = (Map.Entry) obj;
         Object enKey = en.getKey();
