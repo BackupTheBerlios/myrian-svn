@@ -60,12 +60,12 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #28 $ $Date: 2004/01/19 $
+ * @version $Revision: #29 $ $Date: 2004/01/21 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#28 $ by $Author: dennis $, $DateTime: 2004/01/19 17:53:10 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#29 $ by $Author: dennis $, $DateTime: 2004/01/21 12:34:38 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;
@@ -409,6 +409,11 @@ public class PDL {
 
         while (dirs.size() > 0) {
             File dir = (File) dirs.pop();
+            if ("upgrade".equalsIgnoreCase(dir.getName())) {
+                s_log.debug("Skipping upgrade directory");
+                continue;
+            }
+
             File[] listing = dir.listFiles(new FileFilter() {
                     public boolean accept(File file) {
                         if (file.isDirectory()) {
