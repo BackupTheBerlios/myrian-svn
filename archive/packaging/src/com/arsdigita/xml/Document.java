@@ -36,7 +36,7 @@ import java.io.UnsupportedEncodingException;
  * @since ACS 4.5a
  */
 public class Document {
-    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/xml/Document.java#3 $ by $Author: dan $, $DateTime: 2003/10/21 05:49:43 $";
+    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/xml/Document.java#4 $ by $Author: dan $, $DateTime: 2003/10/21 12:03:27 $";
 
     private static final Logger s_log =
         Logger.getLogger(Document.class.getName());
@@ -48,13 +48,36 @@ public class Document {
      * Also, this XSLT will strip the <bebop:structure> debugging info
      * from the XML document if present.
      */
+    // XXX For some reason JD.XSLT doesn't copy xmlns: attributes
+    // to the output doc with <xsl:copy>
+    /*
     private final static String identityXSL =
         "<xsl:stylesheet version=\"1.0\""
         + " xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">\n"
-        + "<xsl:output method=\"html\"/>\n"
+        + "<xsl:output method=\"xml\"/>\n"
         + "<xsl:template match=\"*|@*|text()\">\n"
         + "  <xsl:copy><xsl:apply-templates select=\"node()|@*\"/></xsl:copy>"
         + "\n</xsl:template>\n"
+        + "<xsl:template match=\"bebop:structure\" "
+        + " xmlns:bebop=\"http://www.arsdigita.com/bebop/1.0\">\n"
+        + "</xsl:template>\n"
+        + "</xsl:stylesheet>";
+    */
+    // Explicitly create elements & attributes to avoid namespace
+    // problems
+    private final static String identityXSL =
+        "<xsl:stylesheet version=\"1.0\""
+        + " xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">\n"
+        + "<xsl:output method=\"xml\"/>\n"
+        + "<xsl:template match=\"text()|comment()|processing-instruction()\">\n"
+        + "  <xsl:copy/>\n"
+        + "</xsl:template>\n"
+        + "<xsl:template match=\"*\">\n"
+        + "  <xsl:element name=\"{name()}\" namespace=\"{namespace-uri()}\"><xsl:apply-templates select=\"node()|@*\"/></xsl:element>\n"
+        + "</xsl:template>\n"
+        + "<xsl:template match=\"@*\">\n"
+        + "  <xsl:attribute name=\"{name()}\" namespace=\"{namespace-uri()}\"><xsl:value-of select=\".\"/></xsl:attribute>\n"
+        + "</xsl:template>\n"
         + "<xsl:template match=\"bebop:structure\" "
         + " xmlns:bebop=\"http://www.arsdigita.com/bebop/1.0\">\n"
         + "</xsl:template>\n"
