@@ -13,7 +13,7 @@ import javax.jdo.Query;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #20 $ $Date: 2004/07/26 $
+ * @version $Revision: #21 $ $Date: 2004/07/28 $
  **/
 class CRPMap implements Map {
     private final static NullableObject NULL = new NullableObject() {
@@ -46,6 +46,10 @@ class CRPMap implements Map {
         return (PersistenceManagerImpl) JDOHelper.getPersistenceManager(this);
     }
 
+    void lock() {
+        C.lock(getPMI().getSession(), this);
+    }
+
     private Object getContainer() {
         PersistenceManagerImpl pmi = getPMI();
         StateManagerImpl smi = pmi.getStateManager(this);
@@ -53,6 +57,7 @@ class CRPMap implements Map {
     }
 
     private MapEntry newMapEntry(Object key, Object value) {
+        lock();
         PersistenceManagerImpl pmi = getPMI();
         StateManagerImpl smi = pmi.getStateManager(this);
 
@@ -105,6 +110,7 @@ class CRPMap implements Map {
     }
 
     public Object remove(Object key) {
+        lock();
         Map.Entry entry = getEntry(key);
         if (entry == null) { return null; }
 
@@ -185,7 +191,6 @@ class CRPMap implements Map {
         if (!getPMI().getSession().isPersisted(getContainer())) {
             return m_count;
         }
-
         return keys().size();
     }
 }
