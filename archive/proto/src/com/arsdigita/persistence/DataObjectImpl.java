@@ -8,38 +8,31 @@ import java.util.*;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/01/09 $
+ * @version $Revision: #2 $ $Date: 2003/01/10 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#1 $ by $Author: rhs $, $DateTime: 2003/01/09 18:21:44 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#2 $ by $Author: rhs $, $DateTime: 2003/01/10 09:31:34 $";
 
-    class PersistentObjectImpl implements PersistentObject {
-        private com.arsdigita.persistence.proto.Session m_ssn;
-        private com.arsdigita.persistence.proto.OID m_oid;
-
-        public PersistentObjectImpl(com.arsdigita.persistence.proto.Session ssn,
-                                    com.arsdigita.persistence.proto.OID oid) {
-            m_ssn = ssn;
-            m_oid = oid;
+    static final Object wrap(Session ssn, Object obj) {
+        if (obj instanceof PersistentObject) {
+            return new DataObjectImpl(ssn, (PersistentObject) obj);
+        } else {
+            return obj;
         }
+    }
 
-        public com.arsdigita.persistence.proto.Session getSession() {
-            return m_ssn;
-        }
-
-        public com.arsdigita.persistence.proto.OID getOID() {
-            return m_oid;
-        }
-
-        public DataObjectImpl getDataObject() {
-            return DataObjectImpl.this;
+    static final Object unwrap(Object obj) {
+        if (obj instanceof DataObjectImpl) {
+            return ((DataObjectImpl) obj).m_po;
+        } else {
+            return obj;
         }
     }
 
     private Session m_ssn;
-    private PersistentObjectImpl m_po = null;
+    private PersistentObject m_po = null;
     private HashMap m_temp = null;
     private ObjectType m_type = null;
 
@@ -49,10 +42,9 @@ class DataObjectImpl implements DataObject {
         m_type = type;
     }
 
-    DataObjectImpl(Session ssn, OID oid) {
+    DataObjectImpl(Session ssn, PersistentObject po) {
         m_ssn = ssn;
-        m_po = new PersistentObjectImpl(m_ssn.getProtoSession(),
-                                        oid.getProtoOID());
+        m_po = po;
     }
 
     public PersistentObject getPersistentObject() {
@@ -61,10 +53,6 @@ class DataObjectImpl implements DataObject {
 
     private com.arsdigita.persistence.proto.metadata.Property convert(String property) {
         return C.prop(getObjectType().getProperty(property));
-    }
-
-    void setSession(Session ssn) {
-        m_ssn = ssn;
     }
 
     public Session getSession() {
@@ -91,7 +79,7 @@ class DataObjectImpl implements DataObject {
         if (m_po == null) {
             return m_temp.get(property);
         } else {
-            return m_po.getSession().get(m_po.getOID(), convert(property));
+            return wrap(m_ssn, m_po.getSession().get(m_po.getOID(), convert(property)));
         }
     }
 
@@ -109,13 +97,12 @@ class DataObjectImpl implements DataObject {
                     oid.set(prop.getName(), val);
                 }
             }
-            m_po = new PersistentObjectImpl(m_ssn.getProtoSession(),
-                                            oid.getProtoOID());
             m_temp = null;
             m_type = null;
-            m_ssn.getProtoSession().create(oid.getProtoOID());
+            m_po = m_ssn.getProtoSession().create(oid.getProtoOID());
         } else {
-            m_po.getSession().set(m_po.getOID(), convert(property), value);
+            m_po.getSession().set(m_po.getOID(), convert(property),
+                                  unwrap(value));
         }
     }
 

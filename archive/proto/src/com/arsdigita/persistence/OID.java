@@ -51,10 +51,10 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/09 $ */
+ * @version $Revision: #3 $ $Date: 2003/01/10 $ */
 
 public class OID {
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/OID.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/OID.java#3 $ by $Author: rhs $, $DateTime: 2003/01/10 09:31:34 $";
 
     private com.arsdigita.persistence.proto.OID m_oid;
 
@@ -121,7 +121,8 @@ public class OID {
      * @pre type.getObjectMap().getObjectKey().getCount() == 1
      */
     public OID(ObjectType type, Object value) {
-        m_oid = new com.arsdigita.persistence.proto.OID(C.type(type), value);
+        m_oid = new com.arsdigita.persistence.proto.OID
+            (C.type(type), DataObjectImpl.unwrap(value));
     }
 
     /**
@@ -270,7 +271,7 @@ public class OID {
      **/
 
     public void set(String propertyName, Object value) {
-        m_oid.set(propertyName, value);
+        m_oid.set(propertyName, DataObjectImpl.unwrap(value));
     }
 
 

@@ -31,7 +31,7 @@ import java.sql.Connection;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/09 $
+ * @version $Revision: #3 $ $Date: 2003/01/10 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -176,12 +176,8 @@ public class Session {
      **/
 
     public DataObject create(OID oid) {
-        DataObjectImpl.PersistentObjectImpl po =
-            (DataObjectImpl.PersistentObjectImpl) m_ssn.create
-            (oid.getProtoOID());
-        DataObjectImpl doi = po.getDataObject();
-        doi.setSession(this);
-        return doi;
+        return (DataObject) DataObjectImpl.wrap
+            (this, m_ssn.create(oid.getProtoOID()));
     }
 
 
@@ -198,12 +194,8 @@ public class Session {
      **/
 
     public DataObject retrieve(OID oid) {
-        DataObjectImpl.PersistentObjectImpl po =
-            (DataObjectImpl.PersistentObjectImpl) m_ssn.retrieve
-            (oid.getProtoOID());
-        DataObjectImpl doi = po.getDataObject();
-        doi.setSession(this);
-        return doi;
+        return (DataObject) DataObjectImpl.wrap
+            (this, m_ssn.retrieve(oid.getProtoOID()));
     }
 
 
