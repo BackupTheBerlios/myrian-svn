@@ -16,7 +16,7 @@ import java.io.*;
  * OQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/07/15 $
+ * @version $Revision: #6 $ $Date: 2004/07/21 $
  */
 
 class OQLParser {
@@ -207,17 +207,7 @@ Expression expression() :
     Expression e;
 }
 {
-    e = define() { return e; }
-}
-
-Expression define() :
-{
-    Expression e;
-    Token t = null;
-}
-{
-    [ LOOKAHEAD(2) t = <ID> <EQ> ] e = binary()
-        { return  t == null ? e : new Define(e, t.image); }
+    e = binary() { return e; }
 }
 
 Expression binary() :
@@ -277,7 +267,17 @@ Expression unary() :
     Expression e;
 }
 {
-    e = not() { return e; }
+    e = define() { return e; }
+}
+
+Expression define() :
+{
+    Expression e;
+    Token t = null;
+}
+{
+   [ LOOKAHEAD(2) t = <ID> <EQ> ] e = not()
+       { return t == null ? e : new Define(e, t.image); }
 }
 
 Expression not() :
@@ -301,22 +301,13 @@ Expression get() :
 
 Expression primitive() :
 {
-    Expression e;
-}
-{
-  ( e = generic() | e = parens() )
-      { return e; }
-}
-
-Expression generic() :
-{
     Token t;
     List l;
     Expression e;
     String s = null;
 }
 {
-    t = <ID> [ l = exprl() { return construct(t, l); } ]
+     t = <ID> [ l = exprl() { return construct(t, l); } ]
       {
           if (m_parameters.containsKey(t.image)) {
               Object value = m_parameters.get(t.image);
@@ -328,6 +319,8 @@ Expression generic() :
               return new Variable(t.image);
           }
       }
+  |  <LPAREN> e = expression() <RPAREN>
+      { return e; }
   | <SQL> t = <SQL_EXPRESSION>
       { return new Static(t.image, m_parameters); }
   | t = <STRING>
@@ -370,14 +363,6 @@ List exprl() :
 }
 {
     <LPAREN> [ e = expression() { l.add(e); }
-               (<COMMA> e = expression() { l.add(e); })* ]<RPAREN>
+               (<COMMA> e = expression() { l.add(e); })* ] <RPAREN>
         { return l; }
-}
-
-Expression parens() :
-{
-    Expression e;
-}
-{
-    <LPAREN> e = expression() <RPAREN> { return e; }
 }

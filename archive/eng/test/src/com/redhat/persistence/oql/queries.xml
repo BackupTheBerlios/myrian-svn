@@ -1273,4 +1273,18 @@
       <row id="8" class="parties.Role"/>
     </results>
   </test>
+
+  <test name="boolean check">
+    <query>
+        query(filter(all(test.Group), name = "foo"))
+    </query>
+    <query>
+        query(filter(all(test.Group), name == "bar" and name = "foo"))
+    </query>
+    <query>
+        query(filter(all(test.Group), name == "bar" or name = "foo"))
+    </query>
+    <exception type="java.lang.IllegalStateException"
+                msg="expecting a boolean expression, not a define: name = &quot;foo&quot;"/>
+  </test>
 </tests>

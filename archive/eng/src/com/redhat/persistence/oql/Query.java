@@ -23,12 +23,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/06/24 $
+ * @version $Revision: #3 $ $Date: 2004/07/21 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Query.java#2 $ by $Author: rhs $, $DateTime: 2004/06/24 13:51:54 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Query.java#3 $ by $Author: rhs $, $DateTime: 2004/07/21 11:20:26 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -65,11 +65,19 @@ public class Query {
         return generate(root, false);
     }
 
+    public Code generate(Root root, boolean oracle) {
+        try {
+            return generateInternal(root, oracle);
+        } catch (Throwable t) {
+            throw new Error("oql compilation error: " + this, t);
+        }
+    }
+
     private static final String ROWNUM = "rownum__";
 
     private static final Map s_cache = new HashMap();
 
-    public Code generate(Root root, boolean oracle) {
+    private Code generateInternal(Root root, boolean oracle) {
         Generator gen = Generator.getThreadGenerator();
         gen.init(root);
 
@@ -105,6 +113,8 @@ public class Query {
         } finally {
             gen.pop();
         }
+
+        check(gen);
 
         if (s_log.isDebugEnabled()) {
             s_log.debug("unoptimized frame:\n" + qframe);
@@ -256,6 +266,18 @@ public class Query {
         }
         result.append(")");
         return result.toString();
+    }
+
+    private void check(Generator gen) {
+        List frames = gen.getFrames();
+        for (int i = 0; i < frames.size(); i++) {
+            QFrame frame = (QFrame) frames.get(i);
+            Expression e = frame.getExpression();
+            if (gen.isBoolean(e) && e instanceof Define) {
+                throw new IllegalStateException
+                    ("expecting a boolean expression, not a define: " + e);
+            }
+        }
     }
 
 }
