@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/07/20 $
+ * @version $Revision: #9 $ $Date: 2004/07/20 $
  **/
 
 class CRPList implements List {
@@ -70,7 +70,25 @@ class CRPList implements List {
     }
 
     public boolean equals(Object obj) {
-        throw new UnsupportedOperationException();
+        if (!(obj instanceof List)) { return false; }
+        List list = (List) obj;
+
+        if (size() != list.size()) { return false; }
+
+        Iterator it1 = iterator();
+        Iterator it2 = iterator();
+        while (it1.hasNext()) {
+            Object o1 = it1.next();
+            if (it2.hasNext()) {
+                Object o2 = it2.next();
+                if (!o1.equals(o2)) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        return !it2.hasNext();
     }
 
     public int size() {
@@ -122,7 +140,23 @@ class CRPList implements List {
     }
 
     public int lastIndexOf(Object element) {
-        throw new UnsupportedOperationException();
+        // XXX: there is no syntax for specifying sort order in OQL
+        Query query = getPMI().newQuery
+            ("oql",
+             "limit(sort(filter($1.auxiliaryEmails$elements$entries, value == $2), key), 1)");
+        Collection coll = (Collection) query.execute(elements, element);
+        Iterator it = coll.iterator();
+
+        MapEntry entry = null;
+        while (it.hasNext()) {
+            entry = (MapEntry) it.next();
+        }
+
+        if (entry == null) {
+            return -1;
+        } else {
+            return ((Integer) entry.getKey()).intValue();
+        }
     }
 
     public Object set(int index, Object element) {
