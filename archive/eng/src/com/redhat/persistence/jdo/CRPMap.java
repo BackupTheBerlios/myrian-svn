@@ -13,10 +13,12 @@ import javax.jdo.Query;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #18 $ $Date: 2004/07/14 $
+ * @version $Revision: #19 $ $Date: 2004/07/20 $
  **/
 class CRPMap implements Map {
     private Set entries;
+    // XXX this is not a permanent solution
+    private transient int m_count;
 
     CRPMap() {
         entries = new HashSet();
@@ -33,13 +35,17 @@ class CRPMap implements Map {
         return (PersistenceManagerImpl) JDOHelper.getPersistenceManager(this);
     }
 
+    private Object getContainer() {
+        PersistenceManagerImpl pmi = getPMI();
+        StateManagerImpl smi = pmi.getStateManager(this);
+        return pmi.getSession().retrieve(smi.getPropertyMap());
+    }
+
     private MapEntry newMapEntry(Object key, Object value) {
         PersistenceManagerImpl pmi = getPMI();
         StateManagerImpl smi = pmi.getStateManager(this);
 
-        MapEntry entry = new MapEntry
-            (pmi.getSession().retrieve(smi.getPropertyMap()), key);
-
+        MapEntry entry = new MapEntry(getContainer(), key);
         entry.setValue(value);
         return entry;
     }
@@ -58,6 +64,7 @@ class CRPMap implements Map {
 
         if (me == null) {
             entries.add(newMapEntry(key, value));
+            m_count++;
             return null;
         } else {
             return me.setValue(value);
@@ -70,6 +77,7 @@ class CRPMap implements Map {
 
         Object value = entry.getValue();
         JDOHelper.getPersistenceManager(entry).deletePersistent(entry);
+        m_count--;
         return value;
     }
 
@@ -141,6 +149,10 @@ class CRPMap implements Map {
     }
 
     public int size() {
+        if (!getPMI().getSession().isPersisted(getContainer())) {
+            return m_count;
+        }
+
         return keys().size();
     }
 }
