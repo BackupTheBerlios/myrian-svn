@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #26 $ $Date: 2003/03/05 $
+ * @version $Revision: #27 $ $Date: 2003/03/11 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#26 $ by $Author: rhs $, $DateTime: 2003/03/05 18:41:57 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#27 $ by $Author: rhs $, $DateTime: 2003/03/11 10:49:54 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -458,9 +458,10 @@ public class PDL {
 
     private class UniqueTraversal extends Node.Traversal {
 
-        private ArrayList m_cols = new ArrayList();
+        private HashMap m_cols = new HashMap();
         private Node m_nd;
-        private HashSet m_ids = new HashSet();
+        private ArrayList m_ids = new ArrayList();
+        private String m_id = null;
         private boolean m_primary;
 
         public UniqueTraversal(Node nd, Collection ids,
@@ -476,18 +477,21 @@ public class PDL {
             Node.Field f = child.getField();
             if (f == ObjectTypeNd.PROPERTIES) {
                 PropertyNd p = (PropertyNd) child;
-                return m_ids.contains(p.getName().getName());
+                m_id = p.getName().getName();
+                return m_ids.contains(m_id);
             } else if (f == PropertyNd.MAPPING) {
                 return true;
             } else if (f == JoinPathNd.JOINS) {
                 return child.getIndex() == 0;
+            } else if (f == JoinNd.FROM) {
+                return true;
             } else {
                 return false;
             }
         }
 
         public void onColumn(ColumnNd colnd) {
-            m_cols.add(colnd);
+            m_cols.put(m_id, colnd);
         }
 
         public void emit(Root root) {
@@ -496,9 +500,16 @@ public class PDL {
                 return;
             }
 
-            Column[] cols = new Column[m_cols.size()];
-            for (int i = 0; i < cols.length; i++) {
-                cols[i] = lookup(root, (ColumnNd) m_cols.get(i));
+            Column[] cols = new Column[m_ids.size()];
+            int index = 0;
+            for (Iterator it = m_ids.iterator(); it.hasNext(); ) {
+                String id = (String) it.next();
+                ColumnNd colnd = (ColumnNd) m_cols.get(id);
+                if (colnd == null) {
+                    m_errors.warn(m_nd, "no metadata for " + id);
+                    return;
+                }
+                cols[index++] = lookup(root, colnd);
             }
             unique(m_nd, cols, m_primary);
         }

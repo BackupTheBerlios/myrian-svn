@@ -1,6 +1,9 @@
 package com.arsdigita.persistence.proto.engine.rdbms;
 
 import com.arsdigita.persistence.proto.common.*;
+import com.arsdigita.persistence.proto.metadata.*;
+
+import org.apache.log4j.Logger;
 
 import java.util.*;
 
@@ -8,12 +11,14 @@ import java.util.*;
  * Operation
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/02/26 $
+ * @version $Revision: #9 $ $Date: 2003/03/11 $
  **/
 
 abstract class Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Operation.java#8 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Operation.java#9 $ by $Author: rhs $, $DateTime: 2003/03/11 10:49:54 $";
+
+    private static final Logger LOG = Logger.getLogger(Operation.class);
 
     private Environment m_env;
     private HashMap m_types = new HashMap();
