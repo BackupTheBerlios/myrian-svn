@@ -1,4 +1,4 @@
-         do {
+        do {
  select parent__objects.id as parent__objects__id,
         parent__objects.type as parent__objects__type,
         parent__query_tests.name as parent__query_tests__name,
@@ -9,8 +9,8 @@
         query_tests.id as id
    from query_tests query_tests
         left join query_tests parent__query_tests on (query_tests.parent_id = parent__query_tests.id)
-        left join objects parent__objects on (parent__query_tests.id = parent__objects.id)
         left join query_tests parent_parent__query_tests on (parent__query_tests.parent_id = parent_parent__query_tests.id)
+        left join objects parent__objects on (parent__query_tests.id = parent__objects.id)
         left join objects parent_parent__objects on (parent_parent__query_tests.id = parent_parent__objects.id)
         } map {
             id = query_tests.id;
