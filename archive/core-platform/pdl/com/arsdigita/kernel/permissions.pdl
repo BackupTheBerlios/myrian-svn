@@ -648,6 +648,11 @@ object type ObjectContext {
     }
 
     add context {
+        do {
+            update object_context
+               set context_id = :context.id
+             where object_id = :objectId
+        }
     }
 
     remove context {
