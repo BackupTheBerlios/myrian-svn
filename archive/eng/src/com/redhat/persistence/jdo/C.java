@@ -11,53 +11,67 @@ import org.apache.log4j.Logger;
 class C {
     private final static Logger s_log = Logger.getLogger(C.class);
 
-    public static StateManager getStateManager(PersistenceCapable pc) {
-        Class cls = JDOImplHelper.getInstance().
-            getPersistenceCapableSuperclass(pc.getClass());
-        try {
-            Field f = cls.getDeclaredField("jdoStateManager");
-            return (StateManager) f.get(pc);
-        } catch (NoSuchFieldException nsfe) {
-            throw new IllegalStateException
-                ("no jdoStateManager field in persistence capable superclass");
-        } catch (IllegalAccessException iae) {
-            throw new IllegalStateException
-                ("jdoStateManager field is not accessible");
+    /*
+     * XXX: This mapping needs to be computed at startup and cached.
+     **/
+    public static List getAllFields(Class pcClass) {
+        List fields = new ArrayList();
+        JDOImplHelper helper = JDOImplHelper.getInstance();
+
+        for (Class klass=pcClass;
+             klass != null;
+             klass = helper.getPersistenceCapableSuperclass(klass)) {
+
+            String[] names = helper.getFieldNames(klass);
+            if (names.length == 0) { continue; }
+            List current = new ArrayList(names.length);
+            // Yes, I know about Arrays.asList(Object[]).  It returns a list
+            // that doesn't implement addAll.
+            for (int ii=0; ii<names.length; ii++) {
+                current.add(names[ii]);
+            }
+            current.addAll(fields);
+            fields = current;
         }
+        return fields;
     }
 
-    public static Object javaGet(PersistenceCapable pc, Property prop) {
-        Class cls = pc.getClass();
-        String propName = prop.getName();
-        Method m;
-        try {
-            m = cls.getMethod
-                ("get" + propName.substring(0, 1).toUpperCase() +
-                 propName.substring(1, propName.length()), new Class[] {});
-        } catch (NoSuchMethodException nsme) {
-            return null;
-        }
+    /*
+     * XXX: This mapping needs to be computed at startup and cached.
+     * XXX: This is very similar to getAllFields.
+     **/
+    public static List getAllTypes(Class pcClass) {
+        List types = new ArrayList();
+        JDOImplHelper helper = JDOImplHelper.getInstance();
 
-        try {
-            Object result = m.invoke(pc, new Object[] { });
-            return result;
-        } catch (IllegalAccessException iae) {
-            throw new IllegalStateException
-                ("could not access getter for " + propName);
-        } catch (InvocationTargetException ite) {
-            throw new Error(ite);
+        for (Class klass=pcClass;
+             klass != null;
+             klass = helper.getPersistenceCapableSuperclass(klass)) {
+
+            Class[] names = helper.getFieldTypes(klass);
+            if (names.length == 0) { continue; }
+            List current = new ArrayList(names.length);
+            // Yes, I know about Arrays.asList(Object[]).  It returns a list
+            // that doesn't implement addAll.
+            for (int ii=0; ii<names.length; ii++) {
+                current.add(names[ii]);
+            }
+            current.addAll(types);
+            types = current;
         }
+        return types;
     }
 
-    public static PropertyMap pmap(PersistenceCapable pc, ObjectType type) {
-        PropertyMap pmap = new PropertyMap(type);
-        for (Iterator it = type.getKeyProperties().iterator();
-             it.hasNext(); ) {
-            Property prop = (Property) it.next();
-            pmap.put(prop, C.javaGet(pc, prop));
-        }
+    public static String numberToName(Class pcClass, int field) {
+        return (String) getAllFields(pcClass).get(field);
+    }
 
-        return pmap;
+    /**
+     * Returns the first occurrence of the specified field in the most derived
+     * class.
+     **/
+    public static int nameToNumber(Class pcClass, String fieldName) {
+        return getAllFields(pcClass).lastIndexOf(fieldName);
     }
 
     // used for application identity

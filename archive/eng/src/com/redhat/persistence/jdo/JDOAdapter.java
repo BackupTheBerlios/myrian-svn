@@ -12,30 +12,19 @@ public class JDOAdapter extends Adapter {
 
     public Object getObject(ObjectType base, PropertyMap props, Session ssn) {
         if (ssn == null) { throw new NullPointerException("ssn"); }
-
-        ObjectType type = props.getObjectType();
-        Class klass = type.getJavaClass();
-        StateManagerImpl smi = new StateManagerImpl(getPMI(ssn));
-        PersistenceCapable pc = JDOImplHelper.getInstance().newInstance
-            (klass, smi);
-        smi.cacheKeyProperties(pc, props);
-
-        return pc;
+        PersistenceManagerImpl pmi = getPMI(ssn);
+        return pmi.newPC(props);
     }
 
     public PropertyMap getProperties(Object obj) {
-        // XXX: do we need this? (copied from c.a.p)
-        // if (obj instanceof PropertyMap) { return (PropertyMap) obj; }
-
-        PersistenceCapable pc = (PersistenceCapable) obj;
-        ObjectType type = getObjectType(obj);
-        return C.pmap(pc, type);
+        return ((PersistenceManagerImpl)
+         ((PersistenceCapable) obj).jdoGetPersistenceManager())
+            .getStateManager((PersistenceCapable) obj).getPropertyMap();
     }
 
     public ObjectType getObjectType(Object obj) {
         if (obj == null) { throw new NullPointerException("obj"); }
-
-        return getRoot().getObjectType(obj.getClass().getName());
+        return getProperties(obj).getObjectType();
     }
 
     private static PersistenceManagerImpl getPMI(Session ssn) {

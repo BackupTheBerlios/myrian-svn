@@ -3,9 +3,10 @@ package com.redhat.persistence.jdo;
 import com.redhat.persistence.*;
 import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.oql.Expression;
+import org.apache.commons.collections.map.IdentityMap;
 import java.util.*;
 import javax.jdo.*;
-import javax.jdo.spi.PersistenceCapable;
+import javax.jdo.spi.*;
 
 import org.apache.log4j.Logger;
 
@@ -19,9 +20,60 @@ public class PersistenceManagerImpl implements PersistenceManager {
     private Transaction m_txn = new TransactionImpl(this);
     private Object m_userObject = null;
 
+    private Map m_smiMap = new IdentityMap();
+
     public PersistenceManagerImpl(Session ssn) {
         m_ssn = ssn;
         m_ssn.setAttribute(ATTR_NAME, this);
+    }
+
+    StateManagerImpl getStateManager(PersistenceCapable pc) {
+        return (StateManagerImpl) m_smiMap.get(pc);
+    }
+
+    PersistenceCapable newPC(PropertyMap pmap) {
+        ObjectType type = pmap.getObjectType();
+        Class klass = type.getJavaClass();
+        StateManagerImpl smi = new StateManagerImpl(this, pmap);
+        PersistenceCapable pc = JDOImplHelper.getInstance().newInstance
+            (klass, smi);
+        m_smiMap.put(pc, smi);
+        return pc;
+    }
+
+    private StateManagerImpl newSM(PersistenceCapable pc, PropertyMap pmap) {
+        StateManagerImpl smi = new StateManagerImpl(this, pmap);
+        // set pmap here for objects requiring id gen
+        m_smiMap.put(pc, smi);
+        pc.jdoReplaceStateManager(smi);
+        return smi;
+    }
+
+    private PropertyMap pmap(PersistenceCapable pc, ObjectType type) {
+        if (m_smiMap.containsKey(pc)) {
+            return getStateManager(pc).getPropertyMap();
+        }
+
+        PropertyMap pmap = new PropertyMap(type);
+        Class cls = pc.getClass();
+
+        try {
+            BaseStateManager smTemp = new BaseStateManager();
+            pc.jdoReplaceStateManager(smTemp);
+
+            List props = C.getAllFields(cls);
+            for (int i = 0; i < props.size(); i++) {
+                String propName = (String) props.get(i);
+                Property prop = type.getProperty(propName);
+                if (prop.isKeyProperty()) {
+                    pmap.put(prop, smTemp.provideField(pc, i));
+                }
+            }
+
+            return pmap;
+        } finally {
+            pc.jdoReplaceStateManager(null);
+        }
     }
 
     // XXX: temporary hack to make PandoraTest compile.  Will revert to
@@ -130,10 +182,7 @@ public class PersistenceManagerImpl implements PersistenceManager {
      */
     public Object getObjectId(Object obj) {
         PersistenceCapable pc = (PersistenceCapable) obj;
-        Class cls = pc.getClass();
-        Root root = m_ssn.getRoot();
-        ObjectType type = root.getObjectType(cls.getName());
-        return C.pmap(pc, type);
+        return getStateManager(pc).getPropertyMap();
     }
 
     /**
@@ -206,25 +255,29 @@ public class PersistenceManagerImpl implements PersistenceManager {
         if (type == null) {
             throw new IllegalStateException("no such type " + cls.getName());
         }
-        PropertyMap pmap = C.pmap(pc, type);
+
+        StateManagerImpl smi = getStateManager(pc);
+        if (smi == null) {
+            PropertyMap pmap = pmap(pc, type);
+            smi = newSM(pc, pmap);
+        }
+
+        PropertyMap pmap = smi.getPropertyMap();
 
         Object current = m_ssn.retrieve(pmap);
+
         if (current == null) {
             Map values = new HashMap();
             Map keys = new HashMap();
-            for (Iterator it = type.getProperties().iterator();
-                 it.hasNext(); ) {
-                Property prop = (Property) it.next();
-                Object value = C.javaGet(pc, prop);
+
+            List props = C.getAllFields(cls);
+            for (int i = 0; i < props.size(); i++) {
+                String propName = (String) props.get(i);
+                Property prop = type.getProperty(propName);
                 if (!prop.isKeyProperty()) {
-                    values.put(prop, value);
+                    values.put(prop, smi.provideField(pc, i));
                 }
             }
-
-            StateManagerImpl smi = new StateManagerImpl(this);
-            pc.jdoReplaceStateManager(smi);
-
-            smi.cacheKeyProperties(pc, pmap);
 
             m_ssn.create(pc);
 
@@ -251,6 +304,7 @@ public class PersistenceManagerImpl implements PersistenceManager {
             }
         }
     }
+
 
     /**
      * Make a Collection of instances persistent.
