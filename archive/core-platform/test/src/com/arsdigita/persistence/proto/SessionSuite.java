@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
  * SessionSuite
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #2 $ $Date: 2003/06/26 $
+ * @version $Revision: #3 $ $Date: 2003/06/30 $
  **/
 
 public class SessionSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/proto/SessionSuite.java#2 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/proto/SessionSuite.java#3 $";
 
     private static final Logger s_log = Logger.getLogger(SessionSuite.class);
 
@@ -315,7 +315,7 @@ public class SessionSuite extends PackageTestSuite {
 
         Object obj;
 
-        if (type.hasKey()) {
+        if (type.isKeyed()) {
             if (type.getKeyProperties().size() > 1) {
                 throw new IllegalStateException("compound key");
             }
@@ -374,8 +374,8 @@ public class SessionSuite extends PackageTestSuite {
             s_log.debug("props: " + ot.getName() + " " + target.getName());
         }
 
-        // collection, component, nullable
-        if (!target.hasKey()) {
+        // collection, component, nullable are the 3 args
+        if (!target.isKeyed()) {
             for (int i = 0; i < 2; i++) {
                 for (int j = 0; j < 2; j++) {
                     for (int k = 0; k < 2; k++) {
@@ -519,7 +519,7 @@ public class SessionSuite extends PackageTestSuite {
             return;
         }
 
-        if (bComponent && !b.hasKey()) {
+        if (!b.isKeyed() && (bCollection || bComponent)) {
             return;
         }
 
