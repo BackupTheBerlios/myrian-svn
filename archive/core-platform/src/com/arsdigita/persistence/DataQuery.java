@@ -53,12 +53,12 @@ import java.util.Map;
  * </pre>
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #10 $ $Date: 2003/08/15 $
+ * @version $Revision: #11 $ $Date: 2003/09/04 $
  */
 
 public interface DataQuery {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQuery.java#10 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQuery.java#11 $ by $Author: vadim $, $DateTime: 2003/09/04 10:26:58 $";
 
     /**
      * Returns the type of this data query.
@@ -127,8 +127,6 @@ public interface DataQuery {
      * set.
      * <p>
      * If the query has not yet been executed, it executes the query.
-     * <p>
-     * This is similar to {@link com.arsdigita.db.ResultSet#isLast()}
      * <p>
      * <font color=red>Not implemented yet.</font>
      *
