@@ -6,15 +6,16 @@ import java.util.*;
  * MultiMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/03/23 $
+ * @version $Revision: #3 $ $Date: 2004/03/25 $
  **/
 
 class MultiMap {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/MultiMap.java#2 $ by $Author: richardl $, $DateTime: 2004/03/23 18:01:04 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/MultiMap.java#3 $ by $Author: richardl $, $DateTime: 2004/03/25 09:49:17 $";
 
     private List m_keys = new ArrayList();
     private Map m_sets = new HashMap();
+    private List m_free = new ArrayList();
     private int m_size = 0;
 
     List keys() {
@@ -48,7 +49,7 @@ class MultiMap {
     void add(Object key, Object value) {
         Set values = (Set) m_sets.get(key);
         if (values == null) {
-            values = new HashSet();
+            values = allocateSet();
             m_sets.put(key, values);
             m_keys.add(key);
         }
@@ -63,9 +64,25 @@ class MultiMap {
         }
     }
 
+    private Set allocateSet() {
+        if (m_free.isEmpty()) {
+            return new HashSet();
+        } else {
+            Set result = (Set) m_free.remove(m_free.size() - 1);
+            result.clear();
+            return result;
+        }
+    }
+
     void clear() {
         m_keys.clear();
         m_sets.clear();
+        for (Iterator it = m_sets.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry me = (Map.Entry) it.next();
+            Set values = (Set) me.getValue();
+            values.clear();
+            m_free.add(values);
+        }
         m_size = 0;
     }
 

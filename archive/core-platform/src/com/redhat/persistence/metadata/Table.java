@@ -25,12 +25,12 @@ import java.util.Set;
  * Table
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/10/28 $
+ * @version $Revision: #4 $ $Date: 2004/03/25 $
  **/
 
 public class Table extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Table.java#3 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Table.java#4 $ by $Author: richardl $, $DateTime: 2004/03/25 09:49:17 $";
 
     private String m_name;
     private Mist m_columns = new Mist(this);
@@ -57,13 +57,27 @@ public class Table extends Element {
         return m_key;
     }
 
+    private static ThreadLocal s_cols = new ThreadLocal() {
+        public Object initialValue() {
+            return new HashSet();
+        }
+    };
+
+    private static ThreadLocal s_key = new ThreadLocal() {
+        public Object initialValue() {
+            return new HashSet();
+        }
+    };
+
     Constraint getConstraint(Class type, Column[] columns) {
-        Set cols = new HashSet();
+        Set cols = (Set) s_cols.get();
+        cols.clear();
         for (int i = 0; i < columns.length; i++) {
             cols.add(columns[i]);
         }
 
-        Set key = new HashSet();
+        Set key = (Set) s_key.get();
+        key.clear();
         for (Iterator it = m_constraints.iterator(); it.hasNext(); ) {
             Constraint con = (Constraint) it.next();
             if (type.isInstance(con)) {

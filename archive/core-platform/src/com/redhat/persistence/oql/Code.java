@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/03/23 $
+ * @version $Revision: #3 $ $Date: 2004/03/25 $
  **/
 
 public class Code {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Code.java#2 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/Code.java#3 $ by $Author: richardl $, $DateTime: 2004/03/25 09:49:17 $";
 
     private static final Logger s_log = Logger.getLogger(Code.class);
 
@@ -68,6 +68,7 @@ public class Code {
     private StringBuffer m_sql;
     private int m_lower;
     private int m_upper;
+    private int m_hash = 0;
     private List m_bindings;
 
     private Code(StringBuffer sql, List bindings) {
@@ -76,9 +77,9 @@ public class Code {
     }
 
     Code(String sql, List bindings) {
-        m_sql = new StringBuffer(sql);
+        m_sql = new StringBuffer();
         m_lower = 0;
-        m_upper = m_sql.length();
+        append(sql);
         m_bindings = bindings;
     }
 
@@ -90,8 +91,14 @@ public class Code {
         this("");
     }
 
+    private String m_str = null;
+
     public String getSQL() {
-        return m_sql.substring(m_lower, m_upper);
+        if (m_str == null) {
+            m_str = m_sql.substring(m_lower, m_upper);
+        }
+
+        return m_str;
     }
 
     public List getBindings() {
@@ -117,8 +124,7 @@ public class Code {
     Code add(String sql) {
         Code result = new Code(m_sql, m_bindings);
         result.m_lower = m_lower;
-        m_sql.append(sql);
-        result.m_upper = m_sql.length();
+        result.append(sql);
         return result;
     }
 
@@ -135,23 +141,64 @@ public class Code {
         }
         Code result = new Code(m_sql, bindings);
         result.m_lower = m_lower;
-        m_sql.append(code.getSQL());
-        result.m_upper = m_sql.length();
+        result.append(code.m_sql, code.m_lower, code.m_upper);
         return result;
     }
 
+    private void append(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            append(str.charAt(i));
+        }
+        m_upper = m_sql.length();
+    }
+
+    private void append(StringBuffer src, int lower, int upper) {
+        for (int i = lower; i < upper; i++) {
+            append(src.charAt(i));
+        }
+        m_upper = m_sql.length();
+    }
+
+    private void append(char c) {
+        m_hash *= 31;
+        m_hash += c;
+        m_sql.append(c);
+    }
+
+    private int size() {
+        return m_upper - m_lower;
+    }
+
+    private char charAt(int i) {
+        return m_sql.charAt(m_lower + i);
+    }
+
     public int hashCode() {
-        return getSQL().hashCode() ^ getBindings().hashCode();
+        return m_hash ^ getBindings().hashCode();
     }
 
     public boolean equals(Object o) {
-        if (o instanceof Code) {
-            Code c = (Code) o;
-            return getSQL().equals(c.getSQL())
-                && getBindings().equals(c.getBindings());
-        } else {
+        if (!(o instanceof Code)) {
             return super.equals(o);
         }
+
+        Code c = (Code) o;
+
+        if (this == c) {
+            return true;
+        } else if (this.size() != c.size()) {
+            return false;
+        } else if (this.hashCode() != c.hashCode()) {
+            return false;
+        }
+
+        for (int i = 0; i < size(); i++) {
+            if (charAt(i) != c.charAt(i)) {
+                return false;
+            }
+        }
+
+        return getBindings().equals(c.getBindings());
     }
 
     public String toString() {
