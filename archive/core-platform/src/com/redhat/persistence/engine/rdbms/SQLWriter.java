@@ -18,6 +18,7 @@ package com.redhat.persistence.engine.rdbms;
 import com.redhat.persistence.Condition;
 import com.redhat.persistence.Expression;
 import com.redhat.persistence.Query;
+import com.redhat.persistence.SQLWriterException;
 import com.redhat.persistence.common.ParseException;
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.common.SQL;
@@ -41,12 +42,12 @@ import java.util.Iterator;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2003/10/28 $
+ * @version $Revision: #11 $ $Date: 2003/11/17 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#10 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#11 $ by $Author: vadim $, $DateTime: 2003/11/17 17:03:49 $";
 
     private RDBMSEngine m_engine;
     private Operation m_op = null;
@@ -403,7 +404,7 @@ public abstract class SQLWriter {
         Path[] leftCols = expand(left);
         Path[] rightCols = expand(right);
         if (leftCols.length != rightCols.length) {
-            throw new IllegalArgumentException
+            throw new SQLWriterException
                 ("left and right of different lengths\n" +
                  "left expression: " + left +
                  "; columns: " + Arrays.asList(leftCols) + "\n" +

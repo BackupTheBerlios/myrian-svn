@@ -31,12 +31,12 @@ import com.arsdigita.util.UncheckedWrapperException;
  * Constraint
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/08/15 $
+ * @version $Revision: #5 $ $Date: 2003/11/17 $
  **/
 
 public abstract class Constraint {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Constraint.java#4 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Constraint.java#5 $ by $Author: vadim $, $DateTime: 2003/11/17 17:03:49 $";
 
     private Table m_table;
     private String m_name;

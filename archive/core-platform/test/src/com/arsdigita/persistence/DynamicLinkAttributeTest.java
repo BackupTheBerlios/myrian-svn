@@ -27,12 +27,12 @@ import org.apache.log4j.Logger;
  * LinkAttributeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/09/03 $
+ * @version $Revision: #8 $ $Date: 2003/11/17 $
  */
 
 public class DynamicLinkAttributeTest extends LinkAttributeTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DynamicLinkAttributeTest.java#7 $ by $Author: ashah $, $DateTime: 2003/09/03 11:13:55 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DynamicLinkAttributeTest.java#8 $ by $Author: vadim $, $DateTime: 2003/11/17 17:03:49 $";
 
     public DynamicLinkAttributeTest(String name) {
         super(name);
@@ -92,5 +92,67 @@ public class DynamicLinkAttributeTest extends LinkAttributeTest {
         dac.next();
         assertNull(dac.getLinkProperty("caption"));
         assertEquals(1L, ((DataAssociation) images[1].get("users")).size());
+    }
+
+    public void testDeepLink() {
+        Session ssn = SessionManager.getSession();
+
+        DataObject[] users = new DataObject[4];
+
+        DataObject group = getSession().create(getModelName() + ".Group");
+        group.set("id", BigInteger.valueOf(users.length));
+        group.set("email", "sipb@mit.edu");
+        group.set("name", "SIPB");
+        group.save();
+        DataAssociation members = (DataAssociation) group.get("members");
+
+        for (int i = 0; i < users.length; i++) {
+            users[i] = ssn.create(getModelName() + ".User");
+            users[i].set("id", BigInteger.valueOf(i));
+            users[i].set("email", "foo@bar.com");
+            users[i].set("firstName", "foo");
+            users[i].set("lastNames", "bar");
+            users[i].save();
+            members.add(users[i]);
+        }
+        group.save();
+
+        DataObject[] images = new DataObject[users.length/2];
+        for (int i = 0; i < images.length; i++) {
+            images[i] = ssn.create(getModelName() + ".Image");
+            images[i].set("id", BigInteger.valueOf(i));
+            byte[] bytes = "This is the image.".getBytes();
+            images[i].set("bytes", bytes);
+            images[i].save();
+        }
+
+        // create link between user i and image i/2 with caption i
+        for (int i = 0; i < users.length; i++) {
+            // set image
+            DataAssociation imageUsers =
+                (DataAssociation) images[i/2].get("users");
+            DataObject link = imageUsers.add(users[i]);
+            link.set("caption", String.valueOf(i));
+            link.save();
+        }
+
+        DataCollection dc = ssn.retrieve(getModelName() + ".Group");
+        dc.addEqualsFilter("members.image.link.caption", "0");
+        assertEquals(1, dc.size());
+
+        dc = ssn.retrieve(getModelName() + ".Group");
+        dc.addFilter("members.image.id = 0");
+        assertEquals(2, dc.size());
+
+        dc = ssn.retrieve(getModelName() + ".Image");
+        dc.addFilter("users.id = 0 and users.link.caption = '1'");
+        assertEquals(0, dc.size());
+
+        dc = ssn.retrieve(getModelName() + ".Group");
+        dc.addFilter
+            ("members.image.id = 0 and members.image.link.caption = '1'");
+        assertTrue(dc.next());
+        // assertEquals(BigInteger.valueOf(1), dc.get("members.id"));
+        assertFalse(dc.next());
     }
 }

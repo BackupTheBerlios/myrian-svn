@@ -25,6 +25,7 @@ import com.redhat.persistence.Query;
 import com.redhat.persistence.QuerySource;
 import com.redhat.persistence.RecordSet;
 import com.redhat.persistence.SetEvent;
+import com.redhat.persistence.SQLWriterException;
 import com.redhat.persistence.common.CompoundKey;
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.metadata.Adapter;
@@ -33,6 +34,9 @@ import com.redhat.persistence.metadata.Property;
 import com.redhat.persistence.metadata.Root;
 import com.redhat.persistence.metadata.SQLBlock;
 import com.redhat.persistence.metadata.Table;
+import com.arsdigita.util.UncheckedWrapperException;
+import com.arsdigita.webdevsupport.WebDevSupport;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -46,6 +50,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 
@@ -53,12 +58,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2003/10/28 $
+ * @version $Revision: #11 $ $Date: 2003/11/17 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#10 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#11 $ by $Author: vadim $, $DateTime: 2003/11/17 17:03:49 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -434,6 +439,9 @@ public class RDBMSEngine extends Engine {
                 w.clear();
                 LOG.warn("failed operation: " + op);
                 throw re;
+            } catch (SQLWriterException ex) {
+                throw new UncheckedWrapperException
+                    ("failed operation: " + op.toSafeString(), ex);
             }
 
             String sql = w.getSQL();

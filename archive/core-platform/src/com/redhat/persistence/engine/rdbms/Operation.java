@@ -18,11 +18,14 @@ package com.redhat.persistence.engine.rdbms;
 import com.redhat.persistence.Event;
 import com.redhat.persistence.Query;
 import com.redhat.persistence.common.Path;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import org.apache.log4j.Logger;
 
@@ -30,12 +33,12 @@ import org.apache.log4j.Logger;
  * Operation
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/10/28 $
+ * @version $Revision: #7 $ $Date: 2003/11/17 $
  **/
 
 abstract class Operation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Operation.java#6 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Operation.java#7 $ by $Author: vadim $, $DateTime: 2003/11/17 17:03:49 $";
 
     private static final Logger LOG = Logger.getLogger(Operation.class);
 
@@ -136,4 +139,21 @@ abstract class Operation {
         return w.getSQL() + "\n" + w.getBindings();
     }
 
+    public final String toSafeString() {
+        StringBuffer buf = new StringBuffer(128);
+        buf.append("env=").append(m_env);
+        buf.append("\nparameters=").append(m_parameters);
+        buf.append("\nmappings=");
+        if ( m_mappings == null ) {
+            buf.append(m_mappings);
+        } else {
+            for (Iterator it=m_mappings.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry entry = (Map.Entry) it.next();
+                buf.append("\n  ");
+                buf.append(entry.getKey()).append("=");
+                buf.append(Arrays.asList((Path[]) entry.getValue()));
+            }
+        }
+        return buf.toString();
+    }
 }

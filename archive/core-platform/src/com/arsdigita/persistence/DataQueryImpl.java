@@ -28,6 +28,9 @@ import com.redhat.persistence.common.ParseException;
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.common.SQLParser;
 import com.redhat.persistence.metadata.Root;
+import com.redhat.persistence.pdl.PDL;
+import com.arsdigita.util.Assert;
+
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,12 +44,12 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #33 $ $Date: 2003/10/28 $
+ * @version $Revision: #34 $ $Date: 2003/11/17 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#33 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#34 $ by $Author: vadim $, $DateTime: 2003/11/17 17:03:49 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 
@@ -156,7 +159,7 @@ class DataQueryImpl implements DataQuery {
                 ("Paths cannot be added on an active data query.");
         }
 
-        m_query.getSignature().addPath(Path.get(path));
+        m_query.getSignature().addPath(unalias(Path.get(path)));
     }
 
 
@@ -516,6 +519,15 @@ class DataQueryImpl implements DataQuery {
 	    s_log.debug("External Path: " + path);
 	    s_log.debug("Aliases: " + m_aliases.toString());
 	}
+
+        String str = path.getPath();
+        for (;;) {
+            int index = str.indexOf(".link.");
+            if (index == -1) { break; }
+            str = str.substring(0, index)
+                + PDL.LINK + "." + str.substring(index + 6);
+        }
+        path = Path.get(str);
 
         Path result = path;
 

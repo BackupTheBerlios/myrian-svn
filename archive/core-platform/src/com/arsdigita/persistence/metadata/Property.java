@@ -17,6 +17,9 @@ package com.arsdigita.persistence.metadata;
 
 import com.redhat.persistence.metadata.Link;
 import com.redhat.persistence.metadata.Role;
+import com.redhat.persistence.metadata.Link;
+import com.redhat.persistence.pdl.PDL;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -31,7 +34,7 @@ import java.util.Iterator;
  * REQUIRED, and COLLECTION.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #13 $ $Date: 2003/10/28 $
+ * @version $Revision: #14 $ $Date: 2003/11/17 $
  **/
 
 public class Property extends Element {
@@ -68,7 +71,7 @@ public class Property extends Element {
         "[0..n]"
     };
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#13 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#14 $ by $Author: vadim $, $DateTime: 2003/11/17 17:03:49 $";
 
 
     static Property
@@ -85,7 +88,8 @@ public class Property extends Element {
 	for (Iterator it = props.iterator(); it.hasNext(); ) {
 	    com.redhat.persistence.metadata.Property prop =
 		(com.redhat.persistence.metadata.Property) it.next();
-	    if (prop.getName().charAt(0) != '~') {
+	    if (prop.getName().charAt(0) != '~'
+                && prop.getName().indexOf(PDL.LINK) == -1) {
 		result.add(wrap(prop));
 	    }
 	}

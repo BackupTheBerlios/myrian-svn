@@ -52,12 +52,12 @@ import org.apache.log4j.Logger;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2003/10/28 $
+ * @version $Revision: #12 $ $Date: 2003/11/17 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/QGen.java#11 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/QGen.java#12 $ by $Author: vadim $, $DateTime: 2003/11/17 17:03:49 $";
 
     private static final Logger LOG = Logger.getLogger(QGen.class);
 
@@ -254,12 +254,18 @@ class QGen {
         return result;
     }
 
+    private String clean(String str) {
+        String result = str.replace('.', '_');
+        result = result.replace('@', '_');
+        return result;
+    }
+
     private Path makeAlias(Path prefix, String name) {
 	if (prefix == null) {
 	    return Path.get(abbreviate(name));
 	} else {
 	    return Path.get
-                (abbreviate(prefix.getPath().replace('.', '_') + "__" + name));
+                (abbreviate(clean(prefix.getPath()) + "__" + name));
 	}
     }
 
@@ -515,8 +521,7 @@ class QGen {
             alias = simple.getAlias();
         }
 
-        Path tmp = Path.add
-            (alias, path.getPath().replace('.', '_') + "__tmp__");
+        Path tmp = Path.add(alias, clean(path.getPath()) + "__tmp__");
         setColumns(tmp, getPaths(alias, constraint));
         Condition cond = Condition.equals(tmp, parent);
 

@@ -79,13 +79,15 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2003/10/31 $
+ * @version $Revision: #15 $ $Date: 2003/11/17 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#14 $ by $Author: vadim $, $DateTime: 2003/10/31 10:40:27 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#15 $ by $Author: vadim $, $DateTime: 2003/11/17 17:03:49 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
+
+    public static final String LINK = "@link";
 
     private AST m_ast = new AST();
     private boolean m_autoLoad;
@@ -326,7 +328,7 @@ public class PDL {
 			ObjectType ot = m_symbols.getEmitted(linkName(assn));
 
 			ot.addProperty(rone);
-			Role revOne = new Role("~" + rtwo.getName(), ot,
+			Role revOne = new Role(rtwo.getName() + LINK, ot,
                                                true,
                                                two.isCollection(),
                                                two.isNullable());
@@ -334,7 +336,7 @@ public class PDL {
 			rone.setReverse(revOne);
 
 			ot.addProperty(rtwo);
-			Role revTwo = new Role("~" + rone.getName(), ot,
+			Role revTwo = new Role(rone.getName() + LINK, ot,
                                                true,
                                                one.isCollection(),
                                                one.isNullable());
@@ -754,6 +756,10 @@ public class PDL {
 		    Collection keys = om.getKeyProperties();
 		    Role pone = (Role) ot.getProperty(one.getName().getName());
 		    Role ptwo = (Role) ot.getProperty(two.getName().getName());
+                    Link lone = (Link)
+                        ptwo.getType().getProperty(pone.getName());
+                    Link ltwo = (Link)
+                        pone.getType().getProperty(ptwo.getName());
 		    keys.add(ptwo);
 		    keys.add(pone);
 
@@ -761,23 +767,28 @@ public class PDL {
 			emitMapping(pone, (JoinPathNd) one.getMapping(), 1, 2);
 			emitMapping(pone.getReverse(),
 				    (JoinPathNd) two.getMapping(), 0, 1);
+                        emitMapping(ltwo, (JoinPathNd) two.getMapping(), 0, 2);
 		    } else {
 			om.addMapping(new Static(Path.get(pone.getName())));
-			m_root.getObjectMap(pone.getType()).addMapping
-			    (new Static
-			     (Path.get(pone.getReverse().getName())));
+                        ObjectMap oneom = m_root.getObjectMap(pone.getType());
+                        oneom.addMapping
+                            (new Static
+                             (Path.get(pone.getReverse().getName())));
+                        oneom.addMapping(new Static(Path.get(ltwo.getName())));
 		    }
-
 
 		    if (two.getMapping() != null) {
 			emitMapping(ptwo, (JoinPathNd) two.getMapping(), 1, 2);
 			emitMapping(ptwo.getReverse(),
 				    (JoinPathNd) one.getMapping(), 0, 1);
+                        emitMapping(lone, (JoinPathNd) one.getMapping(), 0, 2);
 		    } else {
 			om.addMapping(new Static(Path.get(ptwo.getName())));
-			m_root.getObjectMap(ptwo.getType()).addMapping
+                        ObjectMap twoom = m_root.getObjectMap(ptwo.getType());
+                        twoom.addMapping
 			    (new Static
 			     (Path.get(ptwo.getReverse().getName())));
+                        twoom.addMapping(new Static(Path.get(lone.getName())));
 		    }
 
 		    String[] paths = new String[] { pone.getName(),
@@ -791,12 +802,6 @@ public class PDL {
 		    }
 		}
 	    });
-
-	for (Iterator it = m_links.iterator(); it.hasNext(); ) {
-	    Link l = (Link) it.next();
-	    ObjectMap om = m_root.getObjectMap(l.getContainer());
-	    om.addMapping(new Static(Path.get(l.getName())));
-	}
 
         m_ast.traverse(new Node.Switch() {
                 public void onProperty(PropertyNd pn) {
@@ -1000,7 +1005,7 @@ public class PDL {
         }
     }
 
-    private void emitMapping(Role prop, JoinPathNd jpn, int start,
+    private void emitMapping(Property prop, JoinPathNd jpn, int start,
 			     int stop) {
 	if (!prop.getType().isKeyed()) {
 	    m_errors.fatal(jpn, "cannot associate to a non keyed type");
@@ -1038,7 +1043,7 @@ public class PDL {
                 setNullable(fk, prop.isNullable());
             } else {
                 m = new JoinFrom(path, fk);
-                if (!prop.isReversable()) {
+                if (!((Role) prop).isReversable()) {
                     setNullable(fk, prop.isNullable());
                 }
             }
@@ -1058,8 +1063,10 @@ public class PDL {
             } else {
                 m = new JoinThrough(path, to, from);
             }
-	    setNullable(from, false);
-	    setNullable(to, false);
+            if (prop instanceof Role) {
+                setNullable(from, false);
+                setNullable(to, false);
+            }
         } else {
             m_errors.fatal(jpn, "bad join path");
             return;
