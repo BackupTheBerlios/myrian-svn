@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
  * RDBMSRecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/23 $
  **/
 
 class RDBMSRecordSet extends RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSRecordSet.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSRecordSet.java#2 $ by $Author: vadim $, $DateTime: 2003/06/23 16:12:15 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -49,7 +49,9 @@ class RDBMSRecordSet extends RecordSet {
 	    throw new IllegalStateException("result set closed");
 	}
         try {
-            return m_rs.next();
+            boolean result = m_rs.next();
+            if (!result) { close(); }
+            return result;
         } catch (SQLException e) {
             throw new Error(e.getMessage());
         }

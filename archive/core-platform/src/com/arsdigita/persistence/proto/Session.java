@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/06/16 $
+ * @version $Revision: #8 $ $Date: 2003/06/23 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Session.java#7 $ by $Author: ashah $, $DateTime: 2003/06/16 17:16:22 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/Session.java#8 $ by $Author: vadim $, $DateTime: 2003/06/23 16:12:15 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -765,11 +765,12 @@ public class Session {
             Map values = null;
             if (rs.next()) {
                 values = rs.load(this);
+
+                if (rs.next()) {
+                    throw new IllegalStateException
+                        ("Query returned too many rows");
+                }
             }
-	    if (rs.next()) {
-		throw new IllegalStateException
-		    ("Query returned too many rows");
-	    }
 
             if (prop.getType().isKeyed()) {
 		if (values == null) {
