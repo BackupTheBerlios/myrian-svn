@@ -79,12 +79,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2003/10/28 $
+ * @version $Revision: #14 $ $Date: 2003/10/31 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#13 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#14 $ by $Author: vadim $, $DateTime: 2003/10/31 10:40:27 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -479,9 +479,10 @@ public class PDL {
     }
 
     public void emitVersioned() {
-        Node.Switch nodeSwitch = VersioningMetadata.getVersioningMetadata().
-            nodeSwitch(m_emitted);
+        VersioningMetadata.NodeSwitch nodeSwitch =
+            VersioningMetadata.getVersioningMetadata().nodeSwitch(m_emitted);
         m_ast.traverse(nodeSwitch);
+        nodeSwitch.onFinish();
     }
 
     private HashMap m_primaryKeys = new HashMap();

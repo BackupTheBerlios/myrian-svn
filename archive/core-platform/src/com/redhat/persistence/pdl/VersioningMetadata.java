@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #3 $ $Date: 2003/10/29 $
+ * @version $Revision: #4 $ $Date: 2003/10/31 $
  */
 public class VersioningMetadata {
     private final static Logger s_log =
@@ -59,7 +59,7 @@ public class VersioningMetadata {
         return s_singleton;
     }
 
-    Node.Switch nodeSwitch(Map properties) {
+    NodeSwitch nodeSwitch(Map properties) {
         return new NodeSwitch(properties);
     }
 
@@ -101,9 +101,6 @@ public class VersioningMetadata {
             (getProperty(containerName, propertyName));
     }
 
-    /**
-     * @see #registerNodeVisitor(VersioningMetadata.NodeVisitor)
-     **/
     public interface NodeVisitor {
         /**
          * This method is called whenever an object type node is traversed in
@@ -125,9 +122,14 @@ public class VersioningMetadata {
          * AST that is marked <code>unversioned</code>.
          **/
         void onUnversionedProperty(Property property);
+
+        /**
+         * This method is called when the AST traversal is finished.
+         **/
+        void onFinish();
     }
 
-    private class NodeSwitch extends Node.Switch {
+    public class NodeSwitch extends Node.Switch {
         private Map m_properties;
 
         public NodeSwitch(Map properties) {
@@ -178,6 +180,10 @@ public class VersioningMetadata {
                 throw new AssertionError("es impossible");
             }
 
+        }
+
+        public void onFinish() {
+            Versions.NODE_VISITOR.onFinish();
         }
 
         private String getContainerName(PropertyNd prop) {
