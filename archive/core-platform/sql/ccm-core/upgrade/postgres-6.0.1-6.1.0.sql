@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/upgrade/postgres-6.0.1-6.1.0.sql#6 $
--- $DateTime: 2004/03/18 11:43:00 $
+-- $Id: //core-platform/dev/sql/ccm-core/upgrade/postgres-6.0.1-6.1.0.sql#7 $
+-- $DateTime: 2004/03/21 16:01:53 $
 
 \echo Red Hat WAF 6.0.1 -> 6.1.0 Upgrade Script (PostgreSQL)
 
@@ -31,7 +31,8 @@ begin;
 \i ../postgres/upgrade/6.0.1-6.1.0/update-host-unique-index.sql
 \i ../postgres/upgrade/6.0.1-6.1.0/update-cat_root_cat_object_map.sql
 
-alter table content_sections drop content_expiration_digest_id;
+alter table cms_mime_extensions alter mime_type drop not null;
+alter table cms_mime_extensions add constraint cms_mim_exten_mim_type_f_7pwwd foreign key(mime_type) references cms_mime_types(mime_type);
 drop table ct_item_file_attachments;
 drop table parameterized_privileges;
 create index agentport_superport_id_idx on agentportlets(superportlet_id);
