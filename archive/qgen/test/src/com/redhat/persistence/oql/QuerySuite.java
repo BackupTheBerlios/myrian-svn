@@ -1,5 +1,6 @@
 package com.redhat.persistence.oql;
 
+import com.arsdigita.db.*;
 import com.arsdigita.util.*;
 import com.arsdigita.util.jdbc.*;
 import com.arsdigita.runtime.*;
@@ -24,12 +25,12 @@ import java.util.*;
  * QuerySuite
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/03/03 $
+ * @version $Revision: #8 $ $Date: 2004/03/08 $
  **/
 
 public class QuerySuite extends TestSuite {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QuerySuite.java#7 $ by $Author: rhs $, $DateTime: 2004/03/03 08:11:08 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QuerySuite.java#8 $ by $Author: rhs $, $DateTime: 2004/03/08 23:10:10 $";
 
     public QuerySuite() {}
 
@@ -55,6 +56,7 @@ public class QuerySuite extends TestSuite {
     private void init() {
         m_root = new Root();
         m_conn = Connections.acquire(RuntimeConfig.getConfig().getJDBCURL());
+        DbHelper.setDatabase(DbHelper.getDatabase(m_conn));
 
         PDL pdl = new PDL();
         pdl.loadResource("com/redhat/persistence/oql/test.pdl");

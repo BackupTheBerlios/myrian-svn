@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #17 $ $Date: 2004/03/03 $
+ * @version $Revision: #18 $ $Date: 2004/03/08 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#17 $ by $Author: ashah $, $DateTime: 2004/03/03 01:22:16 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#18 $ by $Author: rhs $, $DateTime: 2004/03/08 23:10:10 $";
 
     private static final Logger s_log = Logger.getLogger(Get.class);
 
@@ -98,7 +98,7 @@ public class Get extends Expression {
                 QFrame stframe = ((QValue) expr.getValues().get(0)).getFrame();
                 List values = new ArrayList();
                 for (int i = 0; i < columns.length; i++) {
-                    values.add(new QValue(stframe, columns[i]));
+                    values.add(stframe.getValue(columns[i]));
                 }
                 frame.setValues(values);
             } else {
@@ -350,7 +350,7 @@ public class Get extends Expression {
             QFrame frame = gen.frame(this, null);
             List values = new ArrayList();
             for (int i = 0; i < m_columns.length; i++) {
-                values.add(new QValue(m_frame, m_columns[i]));
+                values.add(m_frame.getValue(m_columns[i]));
             }
             frame.setValues(values);
         }

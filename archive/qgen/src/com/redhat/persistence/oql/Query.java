@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #11 $ $Date: 2004/03/02 $
+ * @version $Revision: #12 $ $Date: 2004/03/08 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#11 $ by $Author: rhs $, $DateTime: 2004/03/02 10:09:25 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#12 $ by $Author: rhs $, $DateTime: 2004/03/08 23:10:10 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -77,6 +77,16 @@ public class Query {
 
         if (s_log.isDebugEnabled()) {
             s_log.debug("hoisted frame:\n" + qframe);
+        }
+
+        for (Iterator it = gen.getFrames().iterator(); it.hasNext(); ) {
+            QFrame qf = (QFrame) it.next();
+            if (qf.getParent() == null) {
+                EquiSet eq = new EquiSet(gen);
+                gen.equateAll(eq, qf);
+                eq.collapse();
+                qf.setEquiSet(eq);
+            }
         }
 
         do {
@@ -159,7 +169,9 @@ public class Query {
             sql.append(") count__");
         }
 
-        return sql.toString();
+        String result = sql.toString();
+
+        return result;
     }
 
     public String toString() {

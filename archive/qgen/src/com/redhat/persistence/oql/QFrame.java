@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2004/03/03 $
+ * @version $Revision: #14 $ $Date: 2004/03/08 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#13 $ by $Author: rhs $, $DateTime: 2004/03/03 16:06:50 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#14 $ by $Author: rhs $, $DateTime: 2004/03/08 23:10:10 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -29,8 +29,9 @@ class QFrame {
     private List m_values = null;
     private String m_table = null;
     private Expression m_tableExpr = null;
+    private Map m_columns = null;
     private QFrame m_parent = null;
-    private List m_children = new ArrayList();
+    private List m_children = null;
     private Expression m_condition = null;
     private Expression m_order = null;
     private boolean m_asc = true;
@@ -38,6 +39,7 @@ class QFrame {
     private Expression m_offset = null;
     private boolean m_hoisted = false;
     private QFrame m_duplicate = null;
+    private EquiSet m_equiset;
 
     QFrame(Generator generator, Expression expression, ObjectType type,
            QFrame container) {
@@ -76,7 +78,7 @@ class QFrame {
     void setValues(String[] columns) {
         m_values = new ArrayList();
         for (int i = 0; i < columns.length; i++) {
-            m_values.add(new QValue(this, columns[i]));
+            m_values.add(getValue(columns[i]));
         }
     }
 
@@ -86,6 +88,32 @@ class QFrame {
 
     List getValues() {
         return m_values;
+    }
+
+    QValue getValue(String column) {
+        if (m_columns == null) { m_columns = new HashMap(); }
+        QValue v = (QValue) m_columns.get(column);
+        if (v == null) {
+            v = new QValue(this, column);
+            m_columns.put(column, v);
+        }
+        return v;
+    }
+
+    Set getColumns() {
+        if (m_columns == null) {
+            return Collections.EMPTY_SET;
+        } else {
+            return m_columns.keySet();
+        }
+    }
+
+    boolean hasValue(String column) {
+        if (m_columns == null) {
+            return false;
+        } else {
+            return m_columns.containsKey(column);
+        }
     }
 
     void setTable(String table) {
@@ -101,11 +129,13 @@ class QFrame {
     }
 
     void addChild(QFrame child) {
+        if (m_children == null) { m_children = new ArrayList(); }
         m_children.add(child);
         child.m_parent = this;
     }
 
     void addChild(int index, QFrame child) {
+        if (m_children == null) { m_children = new ArrayList(); }
         m_children.add(index, child);
         child.m_parent = this;
     }
@@ -115,7 +145,11 @@ class QFrame {
     }
 
     List getChildren() {
-        return m_children;
+        if (m_children == null) {
+            return Collections.EMPTY_LIST;
+        } else {
+            return m_children;
+        }
     }
 
     QFrame getParent() {
@@ -162,6 +196,18 @@ class QFrame {
     String alias() {
         if (m_duplicate != null) { return m_duplicate.alias(); }
         return m_alias;
+    }
+
+    EquiSet getEquiSet() {
+        if (m_equiset != null) {
+            return m_equiset;
+        } else {
+            return m_parent.getEquiSet();
+        }
+    }
+
+    void setEquiSet(EquiSet equiset) {
+        m_equiset = equiset;
     }
 
     String emit() {
@@ -266,7 +312,7 @@ class QFrame {
             }
             result.add(order);
         }
-        for (Iterator it = m_children.iterator(); it.hasNext(); ) {
+        for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
             child.addOrders(result);
         }
@@ -292,7 +338,7 @@ class QFrame {
             defs.add(this);
         }
 
-        for (Iterator it = m_children.iterator(); it.hasNext(); ) {
+        for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
             List conds = new ArrayList();
             String join = child.render(conds, defs, emitted);
@@ -392,7 +438,7 @@ class QFrame {
     }
 
     private void addConditions(List result) {
-        for (Iterator it = m_children.iterator(); it.hasNext(); ) {
+        for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
             child.addConditions(result);
         }
@@ -412,7 +458,7 @@ class QFrame {
     }
 
     boolean isDescendant(QFrame frame) {
-        for (Iterator it = m_children.iterator(); it.hasNext(); ) {
+        for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
             if (child.equals(frame)) { return true; }
             if (child.isDescendant(frame)) { return true; }
@@ -445,10 +491,64 @@ class QFrame {
         return true;
     }
 
+    QFrame getInnerRoot() {
+        if (m_parent == null || m_outer) {
+            return this;
+        } else {
+            return m_parent.getInnerRoot();
+        }
+    }
+
+    List getInnerConditions() {
+        List result = new ArrayList();
+        addInnerConditions(result);
+        return result;
+    }
+
+    void addInnerConditions(List result) {
+        for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
+            QFrame child = (QFrame) it.next();
+            if (!child.m_outer) {
+                child.addInnerConditions(result);
+            }
+        }
+        if (m_condition != null) {
+            result.add(m_condition);
+        }
+    }
+
+    Set nonnulls() {
+        QFrame iroot;
+        if (m_parent == null) {
+            iroot = this;
+        } else {
+            iroot = m_parent.getInnerRoot();
+        }
+        List conds = iroot.getInnerConditions();
+        Set result = new HashSet();
+        for (Iterator it = conds.iterator(); it.hasNext(); ) {
+            Expression e = (Expression) it.next();
+            Set set = m_generator.getNonNull(e);
+            for (Iterator iter = set.iterator(); iter.hasNext(); ) {
+                QValue nn = (QValue) iter.next();
+                result.add(nn);
+                Set equiv = getEquiSet().get(nn);
+                if (equiv == null) { continue; }
+                for (Iterator ii = equiv.iterator(); ii.hasNext(); ) {
+                    QValue v = (QValue) ii.next();
+                    if (v.getFrame().getInnerRoot().equals(iroot)) {
+                        result.add(v);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
     boolean innerize() {
+        Set nonnulls = nonnulls();
         boolean modified = false;
-        if (m_condition != null && !m_outer) {
-            Set nonnulls = m_generator.getNonNull(m_condition);
+        if (!m_outer) {
             Set frames = frames(nonnulls);
             modified = innerize(frames);
         }
@@ -464,7 +564,7 @@ class QFrame {
                 equals.addAll(m_generator.getEqualities(c));
             }
             if (equals != null) {
-                if (!m_generator.isNullable(this, equals)) {
+                if (!m_generator.isNullable(this, equals, nonnulls)) {
                     m_outer = false;
                     modified = true;
                 }
@@ -479,7 +579,7 @@ class QFrame {
             m_outer = false;
             modified = true;
         }
-        for (Iterator it = m_children.iterator(); it.hasNext(); ) {
+        for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
             if (child.innerize(frames)) {
                 modified = true;
@@ -490,7 +590,7 @@ class QFrame {
 
     private boolean containsAny(Set frames) {
         if (frames.contains(this)) { return true; }
-        for (Iterator it = m_children.iterator(); it.hasNext(); ) {
+        for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
             if (child.containsAny(frames)) {
                 return true;
@@ -501,7 +601,7 @@ class QFrame {
 
     boolean contains(QValue value) {
         if (value.getFrame().equals(this)) { return true; }
-        for (Iterator it = m_children.iterator(); it.hasNext(); ) {
+        for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
             if (child.contains(value)) { return true; }
         }
@@ -509,7 +609,7 @@ class QFrame {
     }
 
     boolean isConstrained(Set columns) {
-        for (Iterator it = m_children.iterator(); it.hasNext(); ) {
+        for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
             if (!child.isConstrained(columns)) { return false; }
         }
@@ -524,30 +624,32 @@ class QFrame {
 
     void shrink() {
         if (m_parent != null) { return; }
-        Set frames = new HashSet();
-        List conds = getConditions();
-        Map equisets = m_generator.equisets(conds);
-        shrink(frames, conds, equisets);
+        List framesets = getEquiSet().getFrameSets();
+        QFrame[] frames = new QFrame[framesets.size()];
+        shrink(frames, framesets);
     }
 
-    private void shrink(Set frames, List conds, Map equisets) {
-        for (Iterator it = m_children.iterator(); it.hasNext(); ) {
+    private void shrink(QFrame[] frames, List framesets) {
+        for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
-            child.shrink(frames, conds, equisets);
+            child.shrink(frames, framesets);
         }
 
         if (m_table != null) {
-            Set dups = m_generator.getDuplicates(this, conds, equisets);
-            dups.retainAll(frames);
-            if (dups.size() > 1) {
-                throw new IllegalStateException
-                    ("Multiple duplicate frames returned: " + dups);
+            QFrame dup = null;
+            for (int i = 0; i < framesets.size(); i++) {
+                Set set = (Set) framesets.get(i);
+                if (set.contains(this)) {
+                    dup = frames[i];
+                    if (dup == null) {
+                        dup = this;
+                        frames[i] = dup;
+                    }
+                }
             }
-            if (dups.size() > 0) {
-                QFrame dup = (QFrame) dups.iterator().next();
+            if (dup != null && !dup.equals(this)) {
                 setDuplicate(dup);
             }
-            frames.add(this);
         }
     }
 
@@ -594,11 +696,11 @@ class QFrame {
             result.append(" cond ");
             result.append(m_condition);
         }
-        if (m_children.isEmpty()) {
+        if (getChildren().isEmpty()) {
             return result.toString();
         }
         result.append(" {");
-        for (Iterator it = m_children.iterator(); it.hasNext(); ) {
+        for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
             QFrame child = (QFrame) it.next();
             result.append("\n");
             result.append(child.toString(depth + 1));

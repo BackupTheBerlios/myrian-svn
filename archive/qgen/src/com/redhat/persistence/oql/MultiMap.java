@@ -6,18 +6,23 @@ import java.util.*;
  * MultiMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/03/03 $
+ * @version $Revision: #5 $ $Date: 2004/03/08 $
  **/
 
 class MultiMap {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/MultiMap.java#4 $ by $Author: rhs $, $DateTime: 2004/03/03 12:16:16 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/MultiMap.java#5 $ by $Author: rhs $, $DateTime: 2004/03/08 23:10:10 $";
 
     private List m_keys = new ArrayList();
     private Map m_sets = new HashMap();
+    private int m_size = 0;
 
     List keys() {
         return m_keys;
+    }
+
+    int size() {
+        return m_size;
     }
 
     Set get(Object key) {
@@ -47,7 +52,9 @@ class MultiMap {
             m_sets.put(key, values);
             m_keys.add(key);
         }
-        values.add(value);
+        if (values.add(value)) {
+            m_size++;
+        };
     }
 
     void addAll(Object key, Collection values) {

@@ -48,12 +48,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/02/26 $
+ * @version $Revision: #4 $ $Date: 2004/03/08 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Session.java#3 $ by $Author: ashah $, $DateTime: 2004/02/26 12:50:00 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Session.java#4 $ by $Author: rhs $, $DateTime: 2004/03/08 23:10:10 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -248,7 +248,12 @@ public class Session {
         DataSet ds = getDataSet(obj);
         if (propType.isKeyed()) {
             Signature sig = new Signature(propType);
-            Expression expr = new Get(ds.getExpression(), role.getName());
+            Expression expr = ds.getExpression();
+            if (!role.isCollection()) {
+                expr = new Filter
+                    (expr, new Exists(new Variable(role.getName())));
+            }
+            expr = new Get(expr, role.getName());
             return new DataSet(this, sig, expr);
         } else {
             ds.getSignature().addPath(role.getName());

@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2004/03/03 $
+ * @version $Revision: #11 $ $Date: 2004/03/08 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#10 $ by $Author: rhs $, $DateTime: 2004/03/03 16:00:32 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#11 $ by $Author: rhs $, $DateTime: 2004/03/08 23:10:10 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -263,87 +263,18 @@ class Generator {
         }
     }
 
-    Map equisets(Collection conditions) {
-        // We have to key this map by QValue.toString() rather than a
-        // QValue, this is because there can be multiple QValues for a
-        // given frame referring to the same column. This also means
-        // that with each subsequent computation of the equisets map
-        // previous aliasing will be taken into account since the
-        // toString() will used the aliased name for the frame.
-
-        Map equisets = new HashMap();
-        for (Iterator it = conditions.iterator(); it.hasNext(); ) {
+    void equateAll(EquiSet equiset, QFrame frame) {
+        for (Iterator it = frame.getConditions().iterator(); it.hasNext(); ) {
             Expression e = (Expression) it.next();
             Set eqs = getEqualities(e);
             for (Iterator iter = eqs.iterator(); iter.hasNext(); ) {
                 Equality eq = (Equality) iter.next();
-                String l = eq.getLeft().toString();
-                String r = eq.getRight().toString();
-                Set lset = (Set) equisets.get(l);
-                Set rset = (Set) equisets.get(r);
-                if (lset == null && rset == null) {
-                    lset = rset = new HashSet();
-                } else if (lset == null && rset != null) {
-                    lset = rset;
-                } else if (lset != null && rset == null) {
-                    rset = lset;
-                } else {
-                    lset.addAll(rset);
-                    rset = lset;
-                }
-                // They're the same set at this point, so it doesn't
-                // really matter which one we add to.
-                lset.add(eq.getLeft());
-                rset.add(eq.getRight());
-                equisets.put(l, lset);
-                equisets.put(r, rset);
-            }
-        }
-
-        return equisets;
-    }
-
-    Set getDuplicates(QFrame frame, List conds, Map equisets) {
-        MultiMap columns = new MultiMap();
-        for (Iterator it = conds.iterator(); it.hasNext(); ) {
-            Expression e = (Expression) it.next();
-            addDuplicates(e, frame, columns, equisets);
-        }
-
-        Set result = new HashSet();
-        for (Iterator it = columns.keys().iterator(); it.hasNext(); ) {
-            QFrame qf = (QFrame) it.next();
-            if (frame.isConstrained(columns.get(qf))) {
-                result.add(qf.getDuplicate());
-            }
-        }
-
-        return result;
-    }
-
-    void addDuplicates(Expression e, QFrame frame, MultiMap columns,
-                       Map equisets) {
-        Set equalities = getEqualities(e);
-        if (equalities == null) { return; }
-        for (Iterator it = equalities.iterator(); it.hasNext(); ) {
-            Equality eq = (Equality) it.next();
-            QValue me = eq.getValue(frame);
-            if (me == null) { continue; }
-            if (me.getTable() == null) { continue; }
-            Set equiset = (Set) equisets.get(me.toString());
-            for (Iterator iter = equiset.iterator(); iter.hasNext(); ) {
-                QValue other = (QValue) iter.next();
-                if (other.getFrame().equals(frame)) { continue; }
-                if (me.getTable().equals(other.getTable()) &&
-                    me.getColumn().equals(other.getColumn()) &&
-                    me.getFrame().isOuter() == other.getFrame().isOuter()) {
-                    columns.add(other.getFrame(), me.getColumn());
-                }
+                equiset.equate(eq.getLeft(), eq.getRight());
             }
         }
     }
 
-    boolean isNullable(QFrame frame, List equalities) {
+    boolean isNullable(QFrame frame, List equalities, Set nonnulls) {
         List cols = new ArrayList();
         List ocols = new ArrayList();
         QFrame fframe = null;
@@ -368,6 +299,9 @@ class Generator {
                 oframe = other.getFrame();
             } else if (!oframe.equals(other.getFrame()) ||
                        !fframe.equals(from.getFrame())) {
+                return true;
+            }
+            if (other.isNullable() && !nonnulls.contains(other)) {
                 return true;
             }
             cols.add(from.getColumn());
@@ -395,7 +329,6 @@ class Generator {
         if (ot == null) { return true; }
         ForeignKey from = ot.getForeignKey(columns(ot, ocols));
         if (from == null) { return true; }
-        if (isNullable(from)) { return true; }
         UniqueKey to = t.getUniqueKey(columns(t, cols));
         if (to == null) { return true; }
         if (isNullable(to)) { return true; }
