@@ -20,7 +20,7 @@ model com.arsdigita.kernel;
 // to an application instance.
 //
 // @author <a href="mailto:bquinn@arsdigita.com">Bryan Quinn</a>
-// @version "$Id: //core-platform/dev/pdl/default/com/arsdigita/kernel/SiteNode.pdl#3 $" 
+// @version "$Id: //core-platform/dev/pdl/default/com/arsdigita/kernel/SiteNode.pdl#4 $" 
 //
 
 object type SiteNode extends ACSObject {
@@ -49,56 +49,16 @@ object type SiteNode extends ACSObject {
                                       to acs_stylesheets.stylesheet_id;
 
     reference key ( site_nodes.node_id );
+
+    aggressive load (parent.id);
 }
 
-query rootSiteNode {
-    BigDecimal id;
-    String name;
-    String url;
-    Boolean isDirectory;
-    Boolean isPattern;
-    do {
-        SELECT sn.node_id, sn.parent_id,
-        sn.name, sn.url, sn.directory_p, sn.pattern_p
-        FROM site_nodes sn
-        WHERE sn.parent_id is null
-        AND sn.name is null
-    } map {
-        id = sn.node_id;
-        name = sn.name;
-        url = sn.url;
-        isDirectory = sn.directory_p;
-        isPattern = sn.pattern_p;
-    }
-}
 
-query allSiteNodes {
-    BigDecimal id;
-    String name;
-    String url;
-    Boolean isDirectory;
-    Boolean isPattern;
+data operation updateSiteNodeDescendants {
     do {
-        SELECT sn.node_id, sn.parent_id, 
-        sn.name, sn.url, sn.directory_p, sn.pattern_p
-        FROM site_nodes sn
-    } map {
-        id = sn.node_id;
-        name = sn.name;
-        url = sn.url;
-        isDirectory = sn.directory_p;
-        isPattern = sn.pattern_p;
-    }
-}
-
-query siteNodeDescendants {
-    BigDecimal id;
-    do {
-        SELECT sn.node_id
-        FROM site_nodes sn
-        CONNECT BY sn.parent_id = PRIOR sn.node_id
-        START WITH sn.node_id = :node_id
-    } map {
-        id = sn.node_id;
+        update site_nodes
+        set url = :newPrefix || substr(url, :oldPrefixLength + 1)
+        where url like :oldPrefix || '%'
+        and not node_id = :nodeID
     }
 }

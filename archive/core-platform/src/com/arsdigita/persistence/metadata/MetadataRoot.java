@@ -27,12 +27,12 @@ import com.arsdigita.db.Initializer;
  * metadata system.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/06 $
+ * @version $Revision: #6 $ $Date: 2002/08/08 $
  **/
 
 public class MetadataRoot extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#5 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#6 $ by $Author: randyg $, $DateTime: 2002/08/08 17:08:35 $";
 
     private static final Category s_cat = Category.getInstance(MetadataRoot.class.getName());
 
@@ -90,7 +90,20 @@ public class MetadataRoot extends Element {
     new SimpleType("Boolean", java.lang.Boolean.class, Types.BIT) {
             public int bindValue(PreparedStatement ps, int index, Object value,
                              int jdbcType) throws SQLException {
-                ps.setBoolean(index, ((Boolean) value).booleanValue());
+                // Because postgres has a boolean type and we are currently
+                // using char(1) and the jdbc driver uses "false" and "true"
+                // we have to do this converstion.  Long term, we want
+                // to remove this
+                if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                    boolean booleanValue = ((Boolean) value).booleanValue();
+                    if (booleanValue) {
+                        ps.setString(index, "1"); 
+                    } else {
+                        ps.setString(index, "0"); 
+                    }
+                } else {
+                    ps.setBoolean(index, ((Boolean) value).booleanValue());
+                }
                 return 1;
             }
 
