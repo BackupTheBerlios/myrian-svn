@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres-create.sql#14 $
--- $DateTime: 2003/01/07 14:51:38 $
+-- $Id: //core-platform/dev/sql/postgres-create.sql#15 $
+-- $DateTime: 2003/02/13 13:25:42 $
 
 begin;
 
@@ -152,6 +152,20 @@ begin;
 \i default/versioning/table-vc_generic_operations.sql
 \i default/versioning/comment-vc_generic_operations.sql
 \i postgres/versioning/function-last_attr_value.sql
+
+\i default/x/versioning/table-vcx_objects.sql
+\i default/x/versioning/comment-vcx_objects.sql
+\i default/x/versioning/table-vcx_obj_changes.sql
+\i default/x/versioning/index-vcx_obj_changes.sql
+\i default/x/versioning/comment-vcx_obj_changes.sql
+\i default/x/versioning/table-vcx_actions.sql
+\i default/x/versioning/comment-vcx_actions.sql
+\i default/x/versioning/insert-vcx_actions.sql
+\i default/x/versioning/table-vcx_operations.sql
+\i default/x/versioning/index-vcx_operations.sql
+\i default/x/versioning/comment-vcx_operations.sql
+\i default/x/versioning/table-vcx_generic_operations.sql
+\i default/x/versioning/comment-vcx_generic_operations.sql
 
 \i postgres/workflow/sequence-cw_sequences.sql
 \i default/workflow/table-cw_tasks.sql
