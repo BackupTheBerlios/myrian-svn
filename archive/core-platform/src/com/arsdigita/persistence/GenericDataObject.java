@@ -46,12 +46,12 @@ import java.util.ArrayList;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/06/14 $
+ * @version $Revision: #7 $ $Date: 2002/06/14 $
  */
 
 public class GenericDataObject implements DataObject {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#6 $ by $Author: rhs $, $DateTime: 2002/06/14 12:22:31 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#7 $ by $Author: rhs $, $DateTime: 2002/06/14 15:06:47 $";
 
     private ObjectType    m_type;
     private Session       m_session;
@@ -334,7 +334,7 @@ public class GenericDataObject implements DataObject {
         } else if (isNew()) {
             doInsert();
             setNew(false);
-        } else if (isModified()) {
+        } else if (m_data.getFront().size() > 0) {
             doUpdate();
         }
 

@@ -49,12 +49,12 @@ import org.apache.log4j.Category;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/06/14 $
+ * @version $Revision: #5 $ $Date: 2002/06/14 $
  */
 
 class DataAssociationImpl extends DataCollectionImpl implements DataAssociation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#4 $ by $Author: rhs $, $DateTime: 2002/06/14 12:22:31 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#5 $ by $Author: rhs $, $DateTime: 2002/06/14 15:06:47 $";
 
     private final static Category s_cat = 
                     Category.getInstance(DataAssociationImpl.class.getName());

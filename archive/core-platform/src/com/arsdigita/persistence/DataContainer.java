@@ -37,12 +37,12 @@ import java.util.Set;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/06/14 $
  */
 
 public class DataContainer {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataContainer.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataContainer.java#2 $ by $Author: rhs $, $DateTime: 2002/06/14 15:06:47 $";
 
     private static final Category s_log =
          Category.getInstance(DataContainer.class.getName());
@@ -239,6 +239,20 @@ public class DataContainer {
     public boolean isModified() {
         if (m_front.size() > 0) {
             return true;
+        }
+
+        if (m_type != null) {
+            for (Iterator it = m_type.getProperties(); it.hasNext(); ) {
+                Property prop = (Property) it.next();
+                if (prop.isRole() && !prop.isCollection() &&
+                    prop.isComponent()) {
+                    GenericDataObject gdo =
+                        (GenericDataObject) get(prop.getName());
+                    if (gdo != null && gdo.getDataContainer().isModified()) {
+                        return true;
+                    }
+                }
+            }
         }
 
         for (Iterator it = m_assns.values().iterator(); it.hasNext(); ) {
