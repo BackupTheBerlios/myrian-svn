@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
  *
  * @author Vadim Nasardinov (vadimn@redhat.com)
  * @since 2003-02-18
- * @version $Revision: #7 $ $Date: 2003/05/05 $
+ * @version $Revision: #8 $ $Date: 2003/05/06 $
  */
 public class VersioningMetadata {
     private final static Logger LOG =
@@ -39,6 +39,7 @@ public class VersioningMetadata {
 
     private final Node.Switch m_switch;
     private final Set m_versionedTypes;
+    private final Set m_unversionedProps;
 
     /**
      * The reason for this change listener is to avoid tight coupling between
@@ -46,11 +47,12 @@ public class VersioningMetadata {
      * some sort of access to the PDL abstract syntax tree in order to be able
      * to determine whether or not an object type is marked "versioned".
      *
-     * <p>The easiest route would be to add a boolean method isMarkedVersioned()
-     * to the ObjectType class. However, we want to try to avoid joining
-     * versioning and persistence at the hip like that. Therefore, instead of
-     * adding said boolean method to the ObjectType class, we use this class -
-     * i.e. VersioningMetadata - as a communication medium.</p>
+     * <p>The easiest route would be to add a boolean method
+     * <code>isMarkedVersioned()</code> to the ObjectType class. However, we
+     * want to try to avoid joining versioning and persistence at the hip like
+     * that. Therefore, instead of adding said boolean method to the ObjectType
+     * class, we use this class - i.e. VersioningMetadata - as a communication
+     * medium.</p>
      *
      * <p>The idea is that the PDL parser will indirectly expose its underlying
      * PDL AST to this class via the callback provided by nodeSwitch(). This
@@ -67,7 +69,9 @@ public class VersioningMetadata {
 
     private VersioningMetadata() {
         m_versionedTypes = new HashSet();
+        m_unversionedProps = new HashSet();
         m_changeListeners = new ArrayList();
+
         m_switch = new Node.Switch() {
                 public void onObjectType(ObjectTypeNd ot) {
                     final String fqn = ot.getQualifiedName();
@@ -84,9 +88,22 @@ public class VersioningMetadata {
                 }
 
                 public void onProperty(PropertyNd prop) {
+                    TypeNd typeNd = prop.getType();
+                    // make the buffer big enough to avoid reallocation of the
+                    // underlying char[] array
+                    String typeName = typeNd.isQualified() ?
+                        typeNd.getQualifiedName() : typeNd.getName();
+                    StringBuffer sb = new StringBuffer(typeName.length() + 50);
+                    sb.append(typeName).append(".").append(prop.getName());
+                    String fqn = sb.toString();
+                    m_unversionedProps.add(fqn);
                     if ( prop.isUnversioned() ) {
-                        LOG.info("onProperty: " + prop.getName().getName() +
-                                 " is unversioned");
+                        LOG.info("onProperty: " + fqn + " is unversioned");
+                        // notify change listeners
+                        Iterator ii = m_changeListeners.iterator();
+                        while ( ii.hasNext() ) {
+                            ((ChangeListener) ii.next()).onUnversionedProperty(fqn);
+                        }
                     }
                 }
             };
@@ -101,21 +118,32 @@ public class VersioningMetadata {
     }
 
     /**
-     * Returns <code>true</code> if the object type named by
-     * <code>qualifiedName</code> is marked versioned in the PDL definition.
-     * Note that this a weaker test than checking of an object type is
-     * versioned. A type is versioned if is marked versioned or if one its
-     * ancestor types is marked versioned.
+     * <p>Returns <code>true</code> if the object type named by
+     * <code>qualifiedName</code> is marked <code>versioned</code> in the PDL
+     * definition.  Note that this a weaker test than checking of an object type
+     * is versioned. For example, a type may be versioned if one of its ancestor
+     * types is marked versioned.</p>
      *
-     * <p>This method is provided for unit testing only.
+     * <p>This method is provided for unit testing only.</p>
      *
      * @param qualifiedName the fully qualified name of an object type
      **/
-    // FIXME: this can probably be removed. We pass this information at AST
-    // traversal time to the listener. It is the responsibility of the listener
-    // to retain this information.  -- vadimn@redhat.com, 2003-03-03
     public boolean isMarkedVersioned(String qualifiedName) {
         return m_versionedTypes.contains(qualifiedName);
+    }
+
+
+    /**
+     * Returns <code>true</code> if the object type property whose name is
+     * <code>qualifiedName</code> is marked <code>unversioned</code> in the PDL
+     * definition.
+     *
+     * <p>This method is provided for unit testing only.</p>
+     *
+     * @param qualifiedName the fully qualified name of an object type property
+     **/
+    public boolean isMarkedUnversioned(String qualifiedName) {
+        return m_unversionedProps.contains(qualifiedName);
     }
 
     /**
@@ -132,12 +160,18 @@ public class VersioningMetadata {
      **/
     public interface ChangeListener {
         /**
-         * This method is called whenever an object type node is traversed in in
+         * This method is called whenever an object type node is traversed in
          * the PDL AST.
          *
          * @param objectTypeFQN the fully qualified name of the object
          **/
         void onObjectType(String objectTypeFQN, boolean isMarkedVersioned);
+
+        /**
+         * This method is called whenever we traverse a property node of the PDL
+         * AST that is marked <code>unversioned</code>.
+         **/
+        void onUnversionedProperty(String propertyFQN);
     }
 }
 
