@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/05/15 $
+ * @version $Revision: #3 $ $Date: 2003/05/19 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#2 $ by $Author: rhs $, $DateTime: 2003/05/15 16:48:35 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#3 $ by $Author: ashah $, $DateTime: 2003/05/19 17:42:44 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -577,7 +577,7 @@ public class PDL {
 
         m_ast.traverse(new Node.Switch() {
                 public void onProperty(PropertyNd pn) {
-                    Property prop = (Property) m_properties.get(pn);
+                    Role prop = (Role) m_properties.get(pn);
                     if (prop == null) { return; }
 
                     ObjectMap om = m_root.getObjectMap(prop.getContainer());
@@ -594,13 +594,11 @@ public class PDL {
                     // auto generate reverse way for one-way composites
                     if (pn.isComposite()
                         && pn.getParent() instanceof ObjectTypeNd) {
-                        if (!(prop instanceof Role)) {
-                            m_errors.fatal(pn, "composite non role");
-                        } else if (mapping == null) {
+                        if (mapping == null) {
                             m_errors.fatal
                                 (pn, "one-way composite must have metadata");
                         } else {
-                            Role rev = ((Role) prop).getReverse();
+                            Role rev = prop.getReverse();
                             if (mapping instanceof JoinPathNd) {
                                 emitMapping(rev, (JoinPathNd) mapping, true);
                             } else {
@@ -754,11 +752,11 @@ public class PDL {
         return fk;
     }
 
-    private void emitMapping(Property prop, JoinPathNd jpn) {
+    private void emitMapping(Role prop, JoinPathNd jpn) {
 	emitMapping(prop, jpn, false);
     }
 
-    private void emitMapping(Property prop, JoinPathNd jpn, boolean reverse) {
+    private void emitMapping(Role prop, JoinPathNd jpn, boolean reverse) {
         if (reverse) {
             emitMapping(prop, jpn, jpn.getJoins().size(), 0);
         } else {
@@ -766,7 +764,7 @@ public class PDL {
         }
     }
 
-    private void emitMapping(Property prop, JoinPathNd jpn, int start,
+    private void emitMapping(Role prop, JoinPathNd jpn, int start,
 			     int stop) {
 	if (!prop.getType().isKeyed()) {
 	    m_errors.fatal(jpn, "cannot associate to a non keyed type");
@@ -797,9 +795,12 @@ public class PDL {
 
             if (forward == joinForward) {
                 m = new JoinTo(path, fk);
-		setNullable(fk, prop.isNullable());
+                setNullable(fk, prop.isNullable());
             } else {
                 m = new JoinFrom(path, fk);
+                if (!prop.isReversable()) {
+                    setNullable(fk, prop.isNullable());
+                }
             }
         } else if (magnitude == 2) {
             JoinNd first = (JoinNd) joins.get(low);
