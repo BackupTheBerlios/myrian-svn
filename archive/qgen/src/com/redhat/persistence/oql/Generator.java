@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/02/21 $
+ * @version $Revision: #2 $ $Date: 2004/02/21 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#1 $ by $Author: rhs $, $DateTime: 2004/02/21 13:11:19 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#2 $ by $Author: rhs $, $DateTime: 2004/02/21 23:13:07 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -22,7 +22,7 @@ class Generator {
     private List m_frames = new ArrayList();
     private Map m_queries = new HashMap();
     private LinkedList m_stack = new LinkedList();
-    private Map m_equalities = new HashMap();
+    private MultiMap m_equalities = new MultiMap();
 
     Generator(Root root) {
         m_root = root;
@@ -111,28 +111,15 @@ class Generator {
     }
 
     List getEqualities(Expression expr) {
-        return (List) m_equalities.get(expr);
+        return m_equalities.get(expr);
     }
 
     void addEquality(Expression expr, QValue a, QValue b) {
-        List equalities = getEqualities(expr);
-        if (equalities == null) {
-            equalities = new ArrayList();
-            m_equalities.put(expr, equalities);
-        }
-        equalities.add(new Equality(a, b));
+        m_equalities.add(expr, new Equality(a, b));
     }
 
-    void unionEqualities(Expression expr, Expression a, Expression b) {
-        List equalities = new ArrayList();
-        Expression[] exprs = new Expression[] {a, b};
-        for (int i = 0; i < exprs.length; i++) {
-            List quals = getEqualities(exprs[i]);
-            if (quals != null) {
-                equalities.addAll(quals);
-            }
-        }
-        m_equalities.put(expr, equalities);
+    void addEqualities(Expression expr, List equalities) {
+        m_equalities.addAll(expr, equalities);
     }
 
     private static class Equality {
