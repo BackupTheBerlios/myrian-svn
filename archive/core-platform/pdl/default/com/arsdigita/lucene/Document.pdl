@@ -1,0 +1,20 @@
+model com.arsdigita.lucene;
+
+object type Document {
+    BigDecimal[1..1] id            = lucene_docs.document_id INTEGER;
+    String[1..1] type              = lucene_docs.type VARCHAR(200);
+    Date[1..1] timestamp           = lucene_docs.timestamp TIMESTAMP;
+    Boolean[1..1] isDeleted        = lucene_docs.is_deleted BIT;
+    String[0..1] language          = lucene_docs.language CHAR(2);
+    String[0..1] country           = lucene_docs.country CHAR(2);
+    String[1..1] title             = lucene_docs.title VARCHAR(4000);
+    String[0..1] summary           = lucene_docs.summary VARCHAR(4000);
+    String[0..1] content           = lucene_docs.content CLOB;
+    Date[0..1] creationDate        = lucene_docs.creation_date TIMESTAMP;
+    BigDecimal[0..1] creationParty = lucene_docs.creation_party INTEGER;
+    Date[0..1] lastModifiedDate    = lucene_docs.last_modified_date TIMESTAMP;
+    BigDecimal[0..1] lastModifiedParty =
+        lucene_docs.last_modified_party INTEGER;
+
+    object key(id);
+}
