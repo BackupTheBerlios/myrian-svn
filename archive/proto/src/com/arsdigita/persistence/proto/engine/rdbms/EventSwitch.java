@@ -10,12 +10,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/02/18 $
+ * @version $Revision: #9 $ $Date: 2003/02/18 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#8 $ by $Author: rhs $, $DateTime: 2003/02/18 02:29:27 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#9 $ by $Author: rhs $, $DateTime: 2003/02/18 23:50:16 $";
 
     private static final Path KEY = Path.get("__key__");
     private static final Path KEY_FROM = Path.get("__key_from__");
@@ -45,11 +45,6 @@ class EventSwitch extends Event.Switch {
         result.set(KEY, RDBMSEngine.getKeyValue(obj), key.getType());
         m_engine.addOperation(obj, result);
         return result;
-    }
-
-    private DML findOperation(Object from, Object to, Table map) {
-        DML op = m_engine.getOperation(from, to, map);
-        return op;
     }
 
     private void onObjectEvent(ObjectEvent e) {
