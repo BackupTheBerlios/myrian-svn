@@ -28,17 +28,12 @@ import org.apache.log4j.Logger;
 
 public class LoadSQLPlusScript {
 
-    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/installer/LoadSQLPlusScript.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/installer/LoadSQLPlusScript.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:16:25 $";
 
     private static final Logger s_log =
             Logger.getLogger(LoadSQLPlusScript.class);
 
     private Connection m_con;
-    private Statement m_stmt;
-    private int m_stmtCount = 0;
-    private boolean m_onErrorContinue = false;
-    private boolean m_echoSQLStatement = false;
-    private int m_exitValue = 0;
 
     public static void main (String args[]) {
         BasicConfigurator.configure();
@@ -56,8 +51,7 @@ public class LoadSQLPlusScript {
 
         LoadSQLPlusScript loader = new LoadSQLPlusScript();
         loader.setConnection (jdbcUrl, dbUsername, dbPassword);
-        loader.loadSQLPlusScript(scriptFilename, true, true);
-        System.exit(loader.getExitValue());
+        loader.loadSQLPlusScript(scriptFilename);
     }
 
     public void setConnection (Connection connection) {
@@ -90,107 +84,20 @@ public class LoadSQLPlusScript {
         }
     }
 
-    public int getExitValue () {
-        return m_exitValue;
-    }
-
     public void loadSQLPlusScript (String scriptFilename) {
-        /*
-        if (System.getProperty("sql.verbose") != null  &&
-        System.getProperty("sql.verbose").equals("true")) {
-        m_echoSQLStatement = true;
-        }
-
-        if (System.getProperty("sql.continue") != null  &&
-        System.getProperty("sql.continue").equals("true")) {
-        m_onErrorContinue = true;
-        }
-        */
-        m_echoSQLStatement = true;
-        m_onErrorContinue = false;
-
         loadScript(scriptFilename);
     }
 
-    public void loadSQLPlusScript(String scriptFilename,
-                                  boolean echoSQLStatement,
-                                  boolean onErrorContinue) {
-        m_echoSQLStatement = echoSQLStatement;
-        m_onErrorContinue = onErrorContinue;
-        loadScript (scriptFilename);
-    }
-
     protected void loadScript(String scriptFilename) {
-        // Parse SQL script and feed JDBC with one statement at the time
-        s_log.warn ("Loading: '" + scriptFilename + "'");
+        if (s_log.isInfoEnabled()) {
+            s_log.info("Loading: '" + scriptFilename + "'");
+        }
+        SQLLoader loader = new SQLLoader(m_con);
+        loader.load(scriptFilename);
         try {
-            m_stmt = m_con.createStatement();
-            load(scriptFilename);
-            m_stmt.close();
             m_con.commit();
         } catch (SQLException e) {
             throw new UncheckedWrapperException(e);
-        }
-    }
-
-    private void load(final String filename) {
-        try {
-            StatementParser sp = new StatementParser
-                    (filename, new FileReader(filename),
-                            new StatementParser.Switch() {
-                                public void onStatement(String sql) {
-                                    executeStatement(sql);
-                                }
-                                public void onInclude(String include) {
-                                    include(filename, include);
-                                }
-                            });
-            sp.parse();
-        } catch (ParseException e) {
-            throw new UncheckedWrapperException(e);
-        } catch (FileNotFoundException e) {
-            throw new UncheckedWrapperException(e);
-        }
-    }
-
-    private void include(String including, String included) {
-        File includedFile = new File(included);
-        if (includedFile.isAbsolute()) {
-            s_log.warn("Absolute path found: '" + included + "'");
-        } else {
-            s_log.warn("Relative path found: '" + included + "'");
-            //  Well make it absolute then.
-            includedFile =
-                    new File(new File(including).getAbsoluteFile()
-                    .getParentFile(), included).getAbsoluteFile();
-        }
-        s_log.warn("Recursively including: '" + includedFile + "'");
-        load(includedFile.toString());
-    }
-
-    private void executeStatement (String sql) {
-        m_stmtCount++;
-        s_log.info ("Statement count: " + m_stmtCount);
-        if (m_echoSQLStatement) {
-            s_log.info (sql);
-        }
-
-        try {
-            int rowsAffected = m_stmt.executeUpdate(sql);
-            s_log.warn ("  " + rowsAffected + " row(s) affected");
-            m_con.commit();
-        } catch (SQLException e) {
-            try {
-                m_con.rollback();
-            } catch (SQLException se) {
-                throw new UncheckedWrapperException(se);
-            }
-            m_exitValue = 1;
-            s_log.error(" -- FAILED: " + e.getMessage());
-            s_log.error("SQL: " + sql);
-            if (!m_onErrorContinue) {
-                throw new UncheckedWrapperException(e);
-            }
         }
     }
 

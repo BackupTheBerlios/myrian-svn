@@ -150,7 +150,7 @@ public class BaseTestSetup extends TestDecorator {
         loader.setConnection(ConnectionManager.getConnection());
         for (Iterator iterator = scripts.iterator(); iterator.hasNext();) {
             String script = (String) iterator.next();
-            loader.loadSQLPlusScript(script, false, true);
+            loader.loadSQLPlusScript(script);
         }
     }
 

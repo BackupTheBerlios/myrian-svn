@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/test-packaging/test/sql/default/persistence/setup.sql#2 $
--- $DateTime: 2003/08/19 22:28:24 $
+-- $Id: //core-platform/test-packaging/test/sql/default/persistence/setup.sql#3 $
+-- $DateTime: 2003/08/27 19:16:25 $
 
 
 --
@@ -20,11 +20,11 @@
 -- tests to run.
 --
 -- @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
--- @version $Revision: #2 $ $Date: 2003/08/19 $
+-- @version $Revision: #3 $ $Date: 2003/08/27 $
 --
 
 -- Right now this is duplicated from the individual files. This should
 -- be fixed at some point.
 
-@@ data-operation-test.sql
-@@ aggressive-test.sql
+@@ ../../default/persistence/data-operation-test.sql
+@@ ../../default/persistence/aggressive-test.sql
