@@ -24,12 +24,12 @@ import java.io.PrintStream;
  * link.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/06 $
+ * @version $Revision: #6 $ $Date: 2002/08/07 $
  **/
 
 public class Association extends ModelElement {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Association.java#5 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Association.java#6 $ by $Author: rhs $, $DateTime: 2002/08/07 20:10:44 $";
 
 
     /**
@@ -103,16 +103,44 @@ public class Association extends ModelElement {
         m_roles[0].setAssociation(this);
         m_roles[1].setAssociation(this);
 
+        if (roleOne.isComponent() && roleTwo.isComponent()) {
+            error("Only ohe end of an association can be a component");
+        }
+
+        if (roleOne.isComposite() && roleTwo.isComposite()) {
+            error("Only ohe end of an association can be a component");
+        }
+
+        for (int i = 0; i < m_roles.length; i++) {
+            if (m_roles[i].isComponent() && m_roles[i].isComposite()) {
+                m_roles[i].error("A role may not be both a composite " +
+                                 "and a component");
+            }
+        }
+
+        for (int i = 0; i < m_roles.length; i++) {
+            Property role = m_roles[i];
+            Property other = getAssociatedProperty(role);
+            if (role.isComponent()) {
+                other.setComposite(true);
+            }
+            if (role.isComposite()) {
+                other.setComponent(true);
+            }
+        }
+
         Property prop = new Property(
             m_roles[0].getName(), m_roles[0].getType(),
-            Property.REQUIRED, m_roles[0].isComponent()
+            Property.REQUIRED, m_roles[0].isComponent(),
+            m_roles[0].isComposite()
             );
         prop.setLineInfo(m_roles[0]);
         m_linkType.addProperty(prop);            
         m_linkType.addKeyProperty(m_roles[0].getName());
 
         prop = new Property(m_roles[1].getName(), m_roles[1].getType(),
-                            Property.REQUIRED, m_roles[1].isComponent());
+                            Property.REQUIRED, m_roles[1].isComponent(),
+                            m_roles[0].isComposite());
         prop.setLineInfo(m_roles[1]);
         m_linkType.addProperty(prop);
         m_linkType.addKeyProperty(m_roles[1].getName());

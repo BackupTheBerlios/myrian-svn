@@ -27,12 +27,12 @@ import com.arsdigita.persistence.Utilities;
  * multiplicity, and whether or not the property is composite.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/07 $
+ * @version $Revision: #6 $ $Date: 2002/08/07 $
  */
 
 public class PropertyDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/PropertyDef.java#5 $ by $Author: rhs $, $DateTime: 2002/08/07 15:28:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/PropertyDef.java#6 $ by $Author: rhs $, $DateTime: 2002/08/07 20:10:44 $";
 
     // property name
     private String m_name;
@@ -166,8 +166,8 @@ public class PropertyDef extends Element {
             defaultJDBCType = ((SimpleType) datatype).getJDBCtype();
         }
 
-        prop = new Property(m_name, datatype, mult,
-                            m_isComponent || m_isComposite);
+        prop = new Property(m_name, datatype, mult, m_isComponent,
+                            m_isComposite);
         initLineInfo(prop);
 
         if (m_column != null) {

@@ -28,7 +28,7 @@ import java.util.*;
  * REQUIRED, and COLLECTION.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/07 $
+ * @version $Revision: #6 $ $Date: 2002/08/07 $
  **/
 
 public class Property extends Element {
@@ -82,7 +82,7 @@ public class Property extends Element {
         "[0..n]"
     };
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#5 $ by $Author: rhs $, $DateTime: 2002/08/07 15:23:06 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#6 $ by $Author: rhs $, $DateTime: 2002/08/07 20:10:44 $";
 
     /**
      * The container type of the property.
@@ -110,6 +110,7 @@ public class Property extends Element {
      * or an association. All SimpleTypes are components.
      **/
     private boolean m_isComponent;
+    private boolean m_isComposite;
 
     /**
      * The Column used to store this Property. This may be null if the
@@ -171,7 +172,7 @@ public class Property extends Element {
      * @param name The name of the property.
      * @param type The DataType of the property.
      * @param multiplicity The multiplicity of the property.
-     * @param isComponent Indiciates if the property is a component or not.
+     * @param isComponent Indicates if the property is a component or not.
      *
      * @exception IllegalArgumentException If name is empty or null.
      * @exception IllegalArgumentException If type is null.
@@ -181,6 +182,27 @@ public class Property extends Element {
 
     public Property(String name, DataType type, int multiplicity,
                     boolean isComponent) {
+        this(name, type, multiplicity, isComponent, false);
+    }
+
+    /**
+     * Constructs a new Property with the given name, DataType, multiplicity,
+     * and compositeness.
+     *
+     * @param name The name of the property.
+     * @param type The DataType of the property.
+     * @param multiplicity The multiplicity of the property.
+     * @param isComponent Indicates if the property is a component or not.
+     * @param isComposite Indicates of the property is a composite or not.
+     *
+     * @exception IllegalArgumentException If name is empty or null.
+     * @exception IllegalArgumentException If type is null.
+     * @exception IllegalArgumentException if multiplicity is not one of the
+     *            integer type codes for multiplicity.
+     **/
+
+    public Property(String name, DataType type, int multiplicity,
+                    boolean isComponent, boolean isComposite) {
         if (name == null || name.length() == 0) {
             throw new IllegalArgumentException(
                 "The property name must be non null and non empty."
@@ -204,6 +226,7 @@ public class Property extends Element {
         m_multiplicity = multiplicity;
 
         m_isComponent = isComponent;
+        m_isComposite = isComposite;
     }
 
     void setContainer(CompoundType container) {
@@ -318,6 +341,10 @@ public class Property extends Element {
         return m_isComponent;
     }
 
+    void setComponent(boolean value) {
+        m_isComponent = value;
+    }
+
 
     /**
      * Sets the Column used to store this Property.
@@ -419,12 +446,11 @@ public class Property extends Element {
      **/
 
     public boolean isComposite() {
-        Property other = getAssociatedProperty();
-        if (other == null) {
-            return false;
-        } else {
-            return other.isComponent();
-        }
+        return m_isComposite;
+    }
+
+    void setComposite(boolean value) {
+        m_isComposite = value;
     }
 
 
@@ -610,9 +636,9 @@ public class Property extends Element {
             switch (m_joinPath.getPath().size()) {
             case 1:
                 if (m_joinPath.getJoinElement(0).getFrom().isUniqueKey()) {
-                    cascade = true;
+                    cascade = isComponent();
                 } else {
-                    cascade = false;
+                    cascade = isComposite();
                 }
                 break;
             case 2:

@@ -15,7 +15,7 @@ object type Test {
 }
 
 association {
-    Test[0..1] parent = join tests.parent_id to tests.test_id;
+    composite Test[0..1] parent = join tests.parent_id to tests.test_id;
     Test[0..n] children = join tests.test_id to tests.parent_id;
 }
 
@@ -35,5 +35,5 @@ object type Component {
 
 association {
     Test[1..1] test = join components.test_id to tests.test_id;
-    Component[0..n] components = join tests.test_id to components.test_id;
+    component Component[0..n] components = join tests.test_id to components.test_id;
 }

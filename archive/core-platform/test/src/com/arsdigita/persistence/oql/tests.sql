@@ -7,7 +7,7 @@ create table tests (
     optional_self_id INTEGER
         references tests(test_id),
     parent_id INTEGER
-        references tests(test_id),
+        references tests(test_id) on delete cascade,
     required_id INTEGER not null
         references icles(icle_id)
 );

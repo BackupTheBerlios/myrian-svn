@@ -3,5 +3,5 @@ create table components (
         primary key,
     name VARCHAR(200),
     test_id INTEGER
-        references tests(test_id)
+        references tests(test_id) on delete cascade
 );
