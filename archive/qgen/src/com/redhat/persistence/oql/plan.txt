@@ -26,17 +26,18 @@
 
  * Metadata support for qualias
    - Qualis is added as a new "logical" type of mapping, i.e. a
-     logical query fragment that goes in ObjectMap.
+     logical query fragment that goes in ObjectMap. (250 LOC)
 
- * Qualias support in analyzer/SQLG
+ * Qualias support in analyzer/SQLG (500 LOC)
 
  * Use analyzer during SQLG
 
  * Expand OQL to support necessary primitives
    - retrieve all
-   - order
-   - range
-   - simple ------------------.
+   - order (100 LOC) done
+   - range (100 LOC)
+   - size (100 LOC)
+   - simple ------------------. (250) done
                               |----> (Opaque expression with optional metadata)
  * Static SQL in OQL -> SQL --'
 
@@ -44,12 +45,16 @@
    - subtypes of Property can go away.
 
  * Legacy changes:
-   - DataQueryImpl
+   - DataQueryImpl (250 LOC)
      + addPath
      + add/setFilter
      + add/setOrder
      + setRange
-   - QuerySource
+   - QuerySource/Session.getQuery (500 LOC) (this or next, not both)
+   - Query/Condition/Expression (500 LOC)
    - Session -> Engine interface changes
      + RBMSEngine
      + RecordSet
+     + Profiler
+     + MemoryEngine
+     + Cursor/DataSet
