@@ -18,43 +18,29 @@ package com.arsdigita.util.parameter;
 import com.arsdigita.util.*;
 import java.net.*;
 import java.util.*;
+import org.apache.commons.beanutils.*;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/URLParameter.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/URLParameter.java#2 $
  */
 public class URLParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/URLParameter.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/URLParameter.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/26 11:56:51 $";
+        "$DateTime: 2003/08/27 12:11:05 $";
 
     public URLParameter(final String name) {
         super(name);
-    }
-
-    public List validate(final ParameterStore store) {
-        final String value = store.read(this);
-        final List errors = super.validate(store);
-
-        if (value != null) {
-            try {
-                new URL(value);
-            } catch (MalformedURLException mue) {
-                addError(errors, mue.getMessage());
-            }
-        }
-
-        return errors;
     }
 
     public Object unmarshal(final String value) {
         try {
             return new URL(value);
         } catch (MalformedURLException mue) {
-            throw new UncheckedWrapperException(mue);
+            throw new ConversionException(mue);
         }
     }
 }

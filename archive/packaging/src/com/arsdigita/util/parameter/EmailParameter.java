@@ -20,19 +20,20 @@ import java.net.*;
 import java.util.*;
 import javax.mail.*;
 import javax.mail.internet.*;
+import org.apache.commons.beanutils.*;
 import org.apache.oro.text.perl.Perl5Util;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EmailParameter.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EmailParameter.java#2 $
  */
 public class EmailParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EmailParameter.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/EmailParameter.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/26 11:56:51 $";
+        "$DateTime: 2003/08/27 12:11:05 $";
 
     private static final Perl5Util s_perl = new Perl5Util();
     private static final String s_regex =
@@ -42,31 +43,22 @@ public class EmailParameter extends StringParameter {
         super(name);
     }
 
-    public List validate(final ParameterStore store) {
-        final String value = store.read(this);
-        final List errors = super.validate(store);
+    public void validate(final ParameterValue value) {
+        final InternetAddress address = (InternetAddress) value.getValue();
 
-        try {
-            new InternetAddress(value);
-        } catch (AddressException ae) {
-            errors.add(ae.getMessage());
-        }
-
-        if (value != null) {
-            if (!s_perl.match(s_regex, value)) {
-                addError(errors, "\"" + value + "\" is not a valid " +
-                         "email address");
+        if (address != null) {
+            if (!s_perl.match(s_regex, address.toString())) {
+                value.addError("\"" + value + "\" is not a valid " +
+                               "email address");
             }
         }
-
-        return errors;
     }
 
     protected Object unmarshal(final String value) {
         try {
             return new InternetAddress(value);
         } catch (AddressException ae) {
-            throw new UncheckedWrapperException(ae);
+            throw new ConversionException(ae);
         }
     }
 }

@@ -22,32 +22,31 @@ import java.util.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/SymbolicNameParameter.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/SymbolicNameParameter.java#2 $
  */
 public class SymbolicNameParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/SymbolicNameParameter.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/SymbolicNameParameter.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/26 11:56:51 $";
+        "$DateTime: 2003/08/27 12:11:05 $";
 
     public SymbolicNameParameter(final String name) {
         super(name);
     }
 
-    public List validate(final ParameterStore store) {
-        final String value = store.read(this);
-        final List errors = super.validate(store);
+    public void validate(final ParameterValue value) {
+        super.validate(value);
 
-        if (value != null) {
-            for (int i = 0; i < value.length(); i++) {
-                if (!Character.isJavaIdentifierPart(value.charAt(i))) {
-                    addError(errors, "It may only contain letters, " +
-                             "digits, and underscores");
+        final String string = (String) value.getValue();
+
+        if (string != null) {
+            for (int i = 0; i < string.length(); i++) {
+                if (!Character.isJavaIdentifierPart(string.charAt(i))) {
+                    value.addError("It may only contain letters, " +
+                                   "digits, and underscores");
                     break;
                 }
             }
         }
-
-        return errors;
     }
 }

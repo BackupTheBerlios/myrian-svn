@@ -22,19 +22,19 @@ import java.util.*;
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Revision: #1 $ $Date: 2003/08/26 $
+ * @version $Revision: #2 $ $Date: 2003/08/27 $
  */
 public interface Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/Parameter.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/Parameter.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/26 11:56:51 $";
+        "$DateTime: 2003/08/27 12:11:05 $";
 
-    public boolean isRequired();
+    boolean isRequired();
 
-    public String getName();
+    String getName();
 
-    public Object getValue(ParameterStore store);
+    ParameterValue unmarshal(ParameterStore store);
 
-    public List validate(ParameterStore store);
+    void validate(ParameterValue value);
 }

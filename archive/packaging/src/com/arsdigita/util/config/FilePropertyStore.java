@@ -25,13 +25,13 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/FilePropertyStore.java#3 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/FilePropertyStore.java#4 $
  */
 public class FilePropertyStore implements ParameterStore {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/FilePropertyStore.java#3 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/FilePropertyStore.java#4 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/26 20:38:18 $";
+        "$DateTime: 2003/08/27 12:11:05 $";
 
     private static final Logger s_log = Logger.getLogger
         (FilePropertyStore.class);
@@ -68,28 +68,15 @@ public class FilePropertyStore implements ParameterStore {
         }
     }
 
-    public List readList(final Parameter param) {
-        final String string = read(param);
-        final ArrayList list = new ArrayList();
+    public void write(final Parameter param, final String value) {
+        final String name = param.getName();
 
-        final int len = string.length();
-        int start = 0;
+        // If it was set as a system property before, re-set it.
 
-        while (true) {
-            int end = string.indexOf(',', start);
-
-            if (end == -1) {
-                if (len > start) {
-                    list.add(string.substring(start, len).trim());
-                }
-
-                break;
-            } else {
-                list.add(string.substring(start, end).trim());
-                start = end + 1;
-            }
+        if (System.getProperty(name) != null) {
+            System.setProperty(name, value);
         }
 
-        return list;
+        m_props.setProperty(name, value);
     }
 }

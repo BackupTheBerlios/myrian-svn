@@ -24,20 +24,18 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#3 $
  */
 public class StringParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/StringParameter.java#3 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/26 20:38:18 $";
+        "$DateTime: 2003/08/27 12:11:05 $";
 
     private final String m_name;
     private final Class m_type;
 
-    private boolean m_isRequired;
-    private Object m_value;
-    private Object m_defaultValue;
+    private boolean m_required;
 
     static {
         Converters.set(String.class, new StringConverter());
@@ -51,7 +49,7 @@ public class StringParameter implements Parameter {
 
         m_name = name;
         m_type = type;
-        m_isRequired = true;
+        m_required = true;
     }
 
     public StringParameter(final String name) {
@@ -60,60 +58,36 @@ public class StringParameter implements Parameter {
 
     // Default is true.
     public final boolean isRequired() {
-        return m_isRequired;
+        return m_required;
     }
 
-    public void setRequired(final boolean isRequired) {
-        m_isRequired = isRequired;
+    public void setRequired(final boolean required) {
+        m_required = required;
     }
 
     public final String getName() {
         return m_name;
     }
 
-    public Object getValue(final ParameterStore store) {
-        synchronized (this) {
-            if (m_value == null) {
-                final String value = store.read(this);
+    public ParameterValue unmarshal(final ParameterStore store) {
+        final ParameterValue value = new ParameterValue();
+        final String literal = store.read(this);
 
-                if (value != null) {
-                    m_value = unmarshal(value);
-                }
-            }
-        }
-
-        if (m_value == null) {
-            return m_defaultValue;
-        } else {
-            return m_value;
-        }
-    }
-
-    public void setDefaultValue(final Object defaultValue) {
-        m_defaultValue = defaultValue;
-    }
-
-    public List validate(final ParameterStore store) {
-        final String value = store.read(this);
-        final ArrayList errors = new ArrayList();
-
-        if (isRequired() && m_defaultValue == null && value == null) {
-            addError(errors, "It cannot be null");
-        }
-
-        if (value != null) {
+        if (literal != null) {
             try {
-                unmarshal(value);
+                value.setValue(unmarshal(literal));
             } catch (ConversionException ce) {
-                addError(errors, ce.getMessage());
+                value.addError(ce.getMessage());
             }
         }
 
-        return errors;
+        return value;
     }
 
-    protected final void addError(final List errors, final String message) {
-        errors.add("The value of parameter " + getName() + " is invalid: " + message);
+    public void validate(final ParameterValue value) {
+        if (isRequired() && value.getValue() == null) {
+            value.addError("It cannot be null");
+        }
     }
 
     protected Object unmarshal(final String string) {
