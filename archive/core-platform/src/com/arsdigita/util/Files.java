@@ -14,7 +14,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Locale;
+import java.text.NumberFormat;
 import com.arsdigita.util.Assert;
+import com.arsdigita.kernel.Kernel;
 
 import org.apache.log4j.Logger;
 
@@ -24,12 +27,12 @@ import org.apache.log4j.Logger;
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
  * @author Randy Graebner &lt;randyg@alum.mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/11/18 $
+ * @version $Revision: #2 $ $Date: 2003/11/25 $
  **/
 
 public final class Files {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Files.java#1 $ by $Author: randyg $, $DateTime: 2003/11/18 15:46:04 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Files.java#2 $ by $Author: randyg $, $DateTime: 2003/11/25 12:56:28 $";
 
     private static final Logger s_log = 
         Logger.getLogger(Files.class);
@@ -125,6 +128,10 @@ public final class Files {
                 File inputFile = new File(baseFile, fileList[i]);
                 if (inputFile.isDirectory()) {
                     // we don't need to put the empty directory in the zip
+                    // the other option would be to create the ZipEntry
+                    // for the directory but that seems useless since it
+                    // could lead to empty directories when the file is
+                    // unzipped.
                     continue;
                 }
 
@@ -224,5 +231,68 @@ public final class Files {
         }
 
         return (String[]) files.toArray(new String[0]);
+    }
+
+
+    /**
+     *  This will take in a file and return the pretty size in human
+     *  readable terms.  Specifically, it will return things like
+     *  100kb or 220M instead of just the number of bytes.
+     *
+     *  The formatting is retrieved from the Locale provided by the kernel
+     */
+    public static String getPrettySize(File file) {
+        if (file == null || !file.exists()) {
+            return "0";
+        } else {
+            return getPrettySize(file.length());
+        }
+    }
+
+    /**
+     *  This will take in a file and return the pretty size in human
+     *  readable terms.  Specifically, it will return things like
+     *  100kb or 220M instead of just the number of bytes.
+     *
+     *  The formatting is retrieved from the Locale provided by the kernel
+     */
+    public static String getPrettySize(long longSize) {
+        Locale locale = Kernel.getContext().getLocale();
+        
+        NumberFormat nf = NumberFormat.getNumberInstance(locale);
+        nf.setMaximumFractionDigits(0);
+        
+        // Try finding a good matching going from small to large
+        // files, assuming that most files will be small.
+        
+        double size = (double) longSize;
+        
+        if (size < 1000) {
+            return nf.format(size) + " b";
+        } else if ((size = byteToKilo(longSize)) < 1000) {
+            return nf.format(size) + " kb";
+        }
+        
+        // Must be one MB or larger.  Change pricision and keep
+        // checking.
+        
+        nf.setMaximumFractionDigits(2);
+        
+        if ((size = byteToMega(longSize)) < 1000) {
+            return nf.format(size) + " MB";
+        } else {
+            return nf.format(size) + " GB";
+        }
+    }
+
+    /*
+     * Converstion methods
+     */
+    private static double byteToKilo(long size) {
+        return ((double) size) / 1024.;
+    }
+    
+    private static double byteToMega(long size) {
+        return ((double) size) / 1048576.;
     }
 }
