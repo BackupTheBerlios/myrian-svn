@@ -34,12 +34,12 @@ import org.apache.log4j.Logger;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2004/03/23 $
+ * @version $Revision: #9 $ $Date: 2004/03/25 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Signature.java#8 $ by $Author: dennis $, $DateTime: 2004/03/23 03:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Signature.java#9 $ by $Author: ashah $, $DateTime: 2004/03/25 22:27:18 $";
 
     private static final Logger s_log = Logger.getLogger(Signature.class);
 
@@ -57,16 +57,6 @@ public class Signature {
 
     public Signature(ObjectType type) {
         addSource(type, null);
-    }
-
-    private String clean(String str) {
-        // XXX: this is not legit we could get name conflicts
-        str = str.replace('.', '_');
-        str = str.replace('@', '_');
-        if (str.length() > 28) {
-            str = str.substring(0, 28);
-        }
-        return str;
     }
 
     public Query makeQuery(Expression expr) {
@@ -88,7 +78,23 @@ public class Signature {
     }
 
     public String getColumn(Path p) {
-        return clean(p.getPath()) + m_paths.indexOf(p);
+        final int size = 30;
+        final String path = p.getPath();
+        if (path.length() <= size) {
+            return path;
+        }
+
+        final int pathIndex = m_paths.indexOf(p);
+
+        // compute number of digits required for pathIndex
+        int used = 0;
+        for (int i = pathIndex; i > 0; i /= 10) { used++; }
+
+        StringBuffer result = new StringBuffer(size);
+        result.append(path.substring(0, size - used));
+        result.append(pathIndex);
+
+        return result.toString();
     }
 
     public ObjectType getObjectType() {
@@ -186,7 +192,10 @@ public class Signature {
                 (source.getObjectType(), Path.add(path, source.getPath()));
         }
         for (Iterator it = sig.m_paths.iterator(); it.hasNext(); ) {
-            m_paths.add(Path.add(path, (Path) it.next()));
+            Path p = Path.add(path, (Path) it.next());
+            if (!m_paths.contains(p)) {
+                m_paths.add(p);
+            }
         }
     }
 
