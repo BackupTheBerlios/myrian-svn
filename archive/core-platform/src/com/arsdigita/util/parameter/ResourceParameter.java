@@ -28,14 +28,16 @@ import org.apache.log4j.Logger;
  * InputStream for the given Resource.  If it does not, and if it is
  * required, it logs an error.  Otherwise, it returns null.
  *
+ * @deprecated Use {@link URLParameter} instead.
+ *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ResourceParameter.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ResourceParameter.java#3 $
  */
 public class ResourceParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ResourceParameter.java#2 $" +
-        "$Author: jorris $" +
-        "$DateTime: 2003/10/28 18:36:21 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ResourceParameter.java#3 $" +
+        "$Author: rhs $" +
+        "$DateTime: 2003/11/07 13:13:09 $";
 
     private static final Logger s_log = Logger.getLogger(ResourceParameter.class);
 
