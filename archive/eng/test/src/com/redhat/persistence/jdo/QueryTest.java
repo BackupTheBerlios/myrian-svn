@@ -18,7 +18,7 @@ public class QueryTest extends AbstractCase {
         if (s_pm == null) {
             AbstractCase ac = new AbstractCase() {};
             try {
-                ac.setUp();
+                ac.setUpPersistenceManager();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

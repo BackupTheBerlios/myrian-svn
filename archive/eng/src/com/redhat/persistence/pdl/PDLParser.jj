@@ -13,12 +13,12 @@ import com.redhat.persistence.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLParser.jj#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLParser.jj#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -101,6 +101,7 @@ TOKEN:
   | <UNIQUE: "unique">
   | <COMPOSITE: "composite">
   | <COMPONENT: "component">
+  | <NESTED: "nested">
   | <EXTENDS: "extends">
   | <QUERY: "query">
   | <RETURNS: "returns">
@@ -208,7 +209,8 @@ ObjectTypeNd object_type() :
     Node n;
 }
 {
-    [ <VERSIONED> { ot.setVersioned();} ]
+    [ <VERSIONED> { ot.setVersioned(); } ]
+    [ <NESTED> { ot.setNested(); } ]
     ( t = <QUERY> | t = <OBJECTTYPE> )
         n = id() { ot.add(ObjectTypeNd.NAME, n); }
     [ <EXTENDS> n = type() { ot.add(ObjectTypeNd.EXTENDS, n); } ]
@@ -270,6 +272,7 @@ void simple_statement(ObjectTypeNd ot) :
 {}
 {
     (  LOOKAHEAD(property_stmt()) property_stmt(ot)
+     | nested_mapping(ot)
      | object_key(ot)
      | reference_key(ot)
      | unique_key(ot)
@@ -314,9 +317,18 @@ PropertyNd property() :
     n = type() { p.add(PropertyNd.TYPE, n); }
     [ multiplicity(p) ]
     n = id() { p.add(PropertyNd.NAME, n); ln(p, n); }
-    [ <EQ> ( n = column() | n = join_path() | n = qualias() )
+    [ <EQ> n = property_mapping()
            { p.add(PropertyNd.MAPPING, n); } ]
     { return p; }
+}
+
+Node property_mapping() :
+{
+    Node n;
+}
+{
+    ( n = column() | n = join_path() | n = qualias() )
+    { return n; }
 }
 
 void multiplicity(PropertyNd p) :
@@ -349,6 +361,17 @@ QualiasNd qualias() :
 {
     t = <QUALIAS> q = <SQL>
     { n = new QualiasNd(q.image); ln(n, t); return n; }
+}
+
+void nested_mapping(ObjectTypeNd ot) :
+{
+    Node n, p;
+    Node nm = new NestedMappingNd();
+}
+{
+    p = path() { nm.add(NestedMappingNd.PATH, p); }
+    <EQ> n = property_mapping() { nm.add(NestedMappingNd.MAPPING, n); }
+    { ln(nm, p); ot.add(ObjectTypeNd.NESTED_MAPPINGS, nm); }
 }
 
 void object_key(ObjectTypeNd ot) :

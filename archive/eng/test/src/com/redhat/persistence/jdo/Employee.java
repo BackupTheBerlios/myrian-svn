@@ -6,6 +6,7 @@ public class Employee {
     private String name = null;
     private Float salary = new Float(1);
     private Department dept = null;
+    private Address address = new Address();
 
     public Employee() { }
 
@@ -29,4 +30,9 @@ public class Employee {
     public Department getDept() {
         return dept;
     }
+
+    public Address getAddress() {
+        return address;
+    }
+
 }

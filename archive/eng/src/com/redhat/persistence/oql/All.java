@@ -22,12 +22,12 @@ import java.util.*;
  * All
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 public class All extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/All.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/All.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private String m_type;
     private Map m_bindings;
@@ -50,14 +50,14 @@ public class All extends Expression {
     }
 
     void frame(Generator gen) {
-        final ObjectType type = gen.getType(m_type);
-        ObjectMap map = type.getRoot().getObjectMap(type);
+        ObjectType type = gen.getType(m_type);
+        final ObjectMap map = type.getRoot().getObjectMap(type);
         SQLBlock block = map.getRetrieveAll();
-        String[] columns = Code.columns(type, null);
+        String[] columns = Code.columns(map, null);
 
         if (block == null) {
-            QFrame frame = gen.frame(this, type);
-            frame.setTable(Code.table(map).getName());
+            QFrame frame = gen.frame(this, map);
+            frame.setTable(Code.table(map));
             frame.setValues(columns);
         } else if (m_substitute || gen.isBoolean(this)) {
             Static all = new Static
@@ -65,11 +65,11 @@ public class All extends Expression {
             all.frame(gen);
             gen.setSubstitute(this, all);
         } else {
-            QFrame frame = gen.frame(this, type);
+            QFrame frame = gen.frame(this, map);
             Static all = new Static
                 (block.getSQL(), columns, false, m_bindings, m_scope) {
-                protected ObjectType getType() { return type; }
-                protected boolean hasType() { return true; }
+                protected ObjectMap getMap() { return map; }
+                protected boolean hasMap() { return true; }
             };
             all.frame(gen);
             QFrame child = gen.getFrame(all);

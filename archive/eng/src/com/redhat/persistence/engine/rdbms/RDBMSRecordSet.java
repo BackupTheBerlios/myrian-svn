@@ -18,6 +18,7 @@ import com.redhat.persistence.RecordSet;
 import com.redhat.persistence.Signature;
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.metadata.Adapter;
+import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.ObjectType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,23 +30,26 @@ import org.apache.log4j.Logger;
  * RDBMSRecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/07/13 $
+ * @version $Revision: #4 $ $Date: 2004/08/05 $
  **/
 
 class RDBMSRecordSet extends RecordSet {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/RDBMSRecordSet.java#3 $ by $Author: ashah $, $DateTime: 2004/07/13 17:03:42 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/RDBMSRecordSet.java#4 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private static final Logger s_log = Logger.getLogger(RecordSet.class);
 
+    final private ObjectMap m_map;
     final private RDBMSEngine m_engine;
     final private ResultCycle m_rc;
 
-    RDBMSRecordSet(Signature sig, RDBMSEngine engine, ResultCycle rc) {
+    RDBMSRecordSet(Signature sig, ObjectMap map, RDBMSEngine engine,
+                   ResultCycle rc) {
         super(sig);
 	if (rc == null) {
 	    throw new IllegalArgumentException("null result set");
 	}
+        m_map = map;
         m_engine = engine;
         m_rc = rc;
     }
@@ -56,6 +60,10 @@ class RDBMSRecordSet extends RecordSet {
 
     String getColumn(Path p) {
         return getSignature().getColumn(p);
+    }
+
+    public ObjectMap getObjectMap() {
+        return m_map;
     }
 
     public boolean next() {

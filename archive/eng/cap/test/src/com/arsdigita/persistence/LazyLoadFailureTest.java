@@ -16,16 +16,21 @@ package com.arsdigita.persistence;
 
 import java.math.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * LazyLoadFailureTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 public class LazyLoadFailureTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/LazyLoadFailureTest.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    private static final Logger s_log =
+        Logger.getLogger(LazyLoadFailureTest.class);
+
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/LazyLoadFailureTest.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     public LazyLoadFailureTest(String name) {
         super(name);
@@ -37,7 +42,7 @@ public class LazyLoadFailureTest extends PersistenceTestCase {
     }
 
     public void test() {
-        OID oid = new OID("examples.Node", new BigDecimal(1));
+        OID oid = new OID("examples.LazyNode", new BigDecimal(1));
         Session ssn = SessionManager.getSession();
         DataObject node = ssn.create(oid);
         node.set("name", "Test Node");
@@ -57,6 +62,9 @@ public class LazyLoadFailureTest extends PersistenceTestCase {
                  + name + ") instead.");
         } catch (PersistenceException e) {
             // Test passes
+            if (s_log.isDebugEnabled()) {
+                s_log.debug("Test passed with exeption", e);
+            }
         }
     }
 

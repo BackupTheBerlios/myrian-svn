@@ -1322,6 +1322,12 @@
     <query>
         query(filter(all(test.Group), name == "bar" or name = "foo"))
     </query>
+    <query>
+        query(filter(all(test.Group), not name = "foo"))
+    </query>
+    <query>
+        query(filter(all(test.Group), not not name = "foo"))
+    </query>
     <exception type="java.lang.IllegalStateException"
                 msg="expecting a boolean expression, not a define: name = &quot;foo&quot;"/>
   </test>

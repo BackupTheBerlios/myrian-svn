@@ -15,6 +15,7 @@
 package com.redhat.persistence;
 
 import com.redhat.persistence.common.CompoundKey;
+import com.redhat.persistence.common.IdentityKey;
 import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Property;
 import java.util.ArrayList;
@@ -32,12 +33,12 @@ import java.util.Map;
  * for filtering the stream down to the set of events that are of interest.
  *
  * @author <a href="mailto:ashah@redhat.com">Archit Shah</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 class EventStream {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/EventStream.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/EventStream.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     // all events
     private final LinkedList m_events = new LinkedList();
@@ -75,12 +76,12 @@ class EventStream {
         m_collectionEvents.clear();
     }
 
-    private Object getKey(Object obj) {
-        return m_ssn.getSessionKey(obj);
+    private Object getKey(final Object obj) {
+        return new IdentityKey(obj);
     }
 
     private Object getKey(Object obj, Property prop) {
-        return new CompoundKey(m_ssn.getSessionKey(obj), prop);
+        return new CompoundKey(getKey(obj), prop);
     }
 
     public void add(Event ev) {

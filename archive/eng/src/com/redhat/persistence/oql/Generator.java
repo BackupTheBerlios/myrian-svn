@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/06/24 $
+ * @version $Revision: #3 $ $Date: 2004/08/05 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Generator.java#2 $ by $Author: rhs $, $DateTime: 2004/06/24 13:51:54 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Generator.java#3 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -242,14 +242,14 @@ class Generator {
         return m_frames;
     }
 
-    QFrame frame(Expression expr, ObjectType type) {
+    QFrame frame(Expression expr, ObjectMap map) {
         int size = m_frames.size();
         if (size == m_framepool.size()) {
             m_framepool.add(new QFrame(this));
         }
         m_frames = m_framepool.subList(0, size + 1);
         QFrame result = (QFrame) m_frames.get(size);
-        result.init(expr, type, peek());
+        result.init(expr, map, peek());
         m_queries.put(expr, result);
         return result;
     }

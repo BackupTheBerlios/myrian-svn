@@ -28,12 +28,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/07/06 $
+ * @version $Revision: #3 $ $Date: 2004/08/05 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#2 $ by $Author: vadim $, $DateTime: 2004/07/06 15:29:25 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDL.java#3 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     public static final String LINK = "@link";
@@ -325,15 +325,20 @@ public class PDL {
 
         for (Iterator it = m_symbols.getObjectTypes().iterator();
              it.hasNext(); ) {
-            ObjectTypeNd ot = (ObjectTypeNd) it.next();
-            m_root.addObjectType(m_symbols.getEmitted(ot));
+            ObjectTypeNd otn = (ObjectTypeNd) it.next();
+            ObjectType ot = m_symbols.getEmitted(otn);
+            emit(otn, ot);
+            m_root.addObjectType(ot);
         }
 
         m_ast.traverse(new Node.Switch() {
                 public void onObjectType(ObjectTypeNd otn) {
-                    ObjectMap om = new ObjectMap(m_symbols.getEmitted(otn));
-                    m_root.addObjectMap(om);
-                    m_symbols.setLocation(om, otn);
+                    if (!otn.isNested()) {
+                        ObjectMap om =
+                            new ObjectMap(m_symbols.getEmitted(otn));
+                        m_root.addObjectMap(om);
+                        m_symbols.setLocation(om, otn);
+                    }
                 }
 		public void onAssociation(AssociationNd assn) {
 		    ObjectType ot = m_symbols.getEmitted(linkName(assn));
@@ -405,26 +410,6 @@ public class PDL {
 	m_errors.check();
 
         m_ast.traverse(new Node.Switch() {
-            public void onProperty(PropertyNd pnd) {
-                Node n = pnd.getMapping();
-                if (!(n instanceof ColumnNd)) {
-                    return;
-                }
-
-                ObjectType ot = m_symbols.getEmitted(pnd.getType());
-                Column col = lookup((ColumnNd)n);
-                if (col.getType() == Integer.MIN_VALUE) {
-                    Adapter ad = m_root.getAdapter(ot.getJavaClass());
-                    col.setType(ad.defaultJDBCType());
-                }
-            }
-        });
-
-	propogateTypes();
-
-        m_errors.check();
-
-        m_ast.traverse(new Node.Switch() {
             public void onSuper(SuperNd sn) {
                 m_errors.warn
                     (sn, "super is no longer necessary and deprecated, " +
@@ -433,6 +418,144 @@ public class PDL {
         });
 
         m_errors.check();
+
+        m_ast.traverse(new Node.Switch() {
+            private ObjectMap get(ObjectMap map, Path p, PathNd pn) {
+                Path parent = p.getParent();
+                if (parent == null) {
+                    Mapping m = map.getMapping(p);
+                    if (m.isNested()) {
+                        return m.getMap();
+                    } else {
+                        m_errors.fatal
+                            (pn, p + " must refer to a nested mapping");
+                        return null;
+                    }
+                } else {
+                    ObjectMap om = get(map, parent, pn);
+                    return get(om, Path.get(p.getName()), pn);
+                }
+            }
+            public void onNestedMapping(NestedMappingNd nm) {
+                ObjectType type =
+                    m_symbols.getEmitted((ObjectTypeNd) nm.getParent());
+                ObjectMap map = m_root.getObjectMap(type);
+                PathNd pn = nm.getPath();
+                Path p = pn.getPath();
+                Role prop = (Role) type.getProperty(p);
+                if (prop == null) {
+                    m_errors.fatal(pn, "no such path");
+                    return;
+                }
+                ObjectMap om = get(map, p.getParent(), pn);
+                if (om == null) { return; }
+                Node mapping = nm.getMapping();
+                if (mapping instanceof ColumnNd) {
+                    emitMapping(om, prop, (ColumnNd) mapping);
+                } else if (mapping instanceof JoinPathNd) {
+                    emitMapping(om, prop, (JoinPathNd) mapping);
+                } else {
+                    emitMapping(om, prop, (QualiasNd) mapping);
+                }
+                // XXX: copied code
+                if (!m_root.hasObjectMap(prop.getType())) {
+                    Mapping m = om.getMapping(prop);
+                    m.setMap(new ObjectMap(prop.getType()));
+                }
+            }
+        });
+
+        m_errors.check();
+
+        m_ast.traverse(new Node.Switch() {
+            private void type(ObjectType type, Node mapping) {
+                if (!(mapping instanceof ColumnNd)) { return; }
+                Column col = lookup((ColumnNd) mapping);
+                if (col.getType() == Integer.MIN_VALUE) {
+                    Adapter ad = m_root.getAdapter(type.getJavaClass());
+                    col.setType(ad.defaultJDBCType());
+                }
+            }
+            public void onProperty(PropertyNd pnd) {
+                ObjectType ot = m_symbols.getEmitted(pnd.getType());
+                type(ot, pnd.getMapping());
+            }
+            public void onNestedMapping(NestedMappingNd nm) {
+                ObjectType container =
+                    m_symbols.getEmitted((ObjectTypeNd) nm.getParent());
+                Path p = nm.getPath().getPath();
+                Property prop = container.getProperty(p);
+                type(prop.getType(), nm.getMapping());
+            }
+        });
+
+	propogateTypes();
+
+        m_errors.check();
+
+        for (Iterator it = root.getObjectTypes().iterator(); it.hasNext(); ) {
+            reverse((ObjectType) it.next());
+        }
+
+        m_errors.check();
+    }
+
+    private void reverse(ObjectType type) {
+        for (Iterator it = type.getProperties().iterator(); it.hasNext(); ) {
+            reverse((Property) it.next());
+        }
+    }
+
+    private static int s_revid = 0;
+
+    private void reverse(Property p) {
+        if (!(p instanceof Role)) { return; }
+        Role r = (Role) p;
+        if (!r.isReversable() && r.getType().isKeyed()) {
+            ObjectMap om = m_root.getObjectMap(p.getContainer());
+            Mapping m = om.getMapping(Path.get(p.getName()));
+            if (m instanceof Static) { return; }
+            Role rev = new Role("~rev" + s_revid++, p.getContainer(),
+                                false, (m instanceof JoinThrough)
+                                || (m instanceof JoinTo), true);
+            r.getType().addProperty(rev);
+            r.setReverse(rev);
+            ObjectMap map = m_root.getObjectMap(r.getType());
+            map.addMapping(reverse(m, Path.get(rev.getName())));
+        }
+    }
+
+    private Mapping reverse(Mapping m, final Path p) {
+        final Mapping[] result = { null };
+        m.dispatch(new Mapping.Switch() {
+            public void onJoinTo(JoinTo j) {
+                result[0] = new JoinFrom(p, j.getKey());
+            }
+            public void onJoinFrom(JoinFrom j) {
+                result[0] = new JoinTo(p, j.getKey());
+            }
+            public void onJoinThrough(JoinThrough j) {
+                result[0] = new JoinThrough(p, j.getTo(), j.getFrom());
+            }
+            public void onQualias(Qualias q) {
+                String qname = q.getObjectMap().getObjectType()
+                    .getQualifiedName();
+                result[0] = new Qualias
+                    (p, "filter(all(" + qname +
+                     "), exists(filter(that = " + q.getPath().getPath() +
+                     ", this == that)))");
+            }
+            public void onValue(Value v) {
+                throw new IllegalArgumentException("not reversible: " + v);
+            }
+            public void onStatic(Static s) {
+                throw new IllegalArgumentException("not reversible: " + s);
+            }
+            public void onNested(Nested n) {
+                throw new IllegalArgumentException("not reversible: " + n);
+            }
+        });
+        return result[0];
     }
 
     // XXX: Commented out on this branch as this is the only
@@ -766,16 +889,22 @@ public class PDL {
                     if (prop == null) { return; }
 
                     ObjectMap om = m_root.getObjectMap(prop.getContainer());
+                    if (om == null) { return; }
 
                     Object mapping = pn.getMapping();
                     if (mapping == null) {
-                        om.addMapping(new Static(Path.get(prop.getName())));
+                        Path p = Path.get(prop.getName());
+                        om.addMapping(new Static(p));
                     } else if (mapping instanceof ColumnNd) {
                         emitMapping(prop, (ColumnNd) mapping);
                     } else if (mapping instanceof JoinPathNd) {
                         emitMapping(prop, (JoinPathNd) mapping);
                     } else {
                         emitMapping(prop, (QualiasNd) mapping);
+                    }
+                    if (!m_root.hasObjectMap(prop.getType())) {
+                        Mapping m = om.getMapping(prop);
+                        m.setMap(new ObjectMap(prop.getType()));
                     }
 
                     // auto generate reverse way for one-way composites
@@ -873,9 +1002,17 @@ public class PDL {
 	} while (m_fks.size() < before);
     }
 
-    private HashMap m_propByColumns = new HashMap();
+    private ObjectMap om(Property p) {
+        return m_root.getObjectMap(p.getContainer());
+    }
 
     private void emitMapping(Property prop, ColumnNd colNd) {
+        emitMapping(om(prop), prop, colNd);
+    }
+
+    private HashMap m_propByColumns = new HashMap();
+
+    private void emitMapping(ObjectMap om, Property prop, ColumnNd colNd) {
 	if (prop.getType().isKeyed()) {
 	    m_errors.fatal(colNd, "association requires a join path");
 	}
@@ -894,7 +1031,6 @@ public class PDL {
             }
         }
 
-        ObjectMap om = m_root.getObjectMap(prop.getContainer());
         Value m = new Value(Path.get(prop.getName()), col);
         om.addMapping(m);
         if (prop.isNullable()) { col.setNullable(true); }
@@ -918,8 +1054,9 @@ public class PDL {
         ForeignKey fk = from.getTable().getForeignKey(new Column[] {from});
         UniqueKey uk = to.getTable().getUniqueKey(new Column[] {to});
         if (uk == null) {
-            m_errors.fatal(tond, "not a unique key: " + to);
-            return null;
+            uk = new UniqueKey(to.getTable(), null, new Column[] {to});
+            //m_errors.fatal(tond, "not a unique key: " + to);
+            //return null;
         }
 
         if (fk != null) {
@@ -953,24 +1090,38 @@ public class PDL {
     }
 
     private void emitMapping(Role prop, JoinPathNd jpn) {
-	emitMapping(prop, jpn, false);
+	emitMapping(om(prop), prop, jpn);
     }
 
-    private void emitMapping(Role prop, JoinPathNd jpn, boolean reverse) {
+    private void emitMapping(ObjectMap om, Role prop, JoinPathNd jpn) {
+	emitMapping(om, prop, jpn, false);
+    }
+
+    private void emitMapping(Role prop, JoinPathNd jpn,
+                             boolean reverse) {
+        emitMapping(om(prop), prop, jpn, reverse);
+    }
+
+    private void emitMapping(ObjectMap om, Role prop, JoinPathNd jpn,
+                             boolean reverse) {
         if (reverse) {
-            emitMapping(prop, jpn, jpn.getJoins().size(), 0);
+            emitMapping(om, prop, jpn, jpn.getJoins().size(), 0);
         } else {
-            emitMapping(prop, jpn, 0, jpn.getJoins().size());
+            emitMapping(om, prop, jpn, 0, jpn.getJoins().size());
         }
     }
 
     private void emitMapping(Property prop, JoinPathNd jpn, int start,
-			     int stop) {
+                             int stop) {
+        emitMapping(om(prop), prop, jpn, start, stop);
+    }
+
+    private void emitMapping(ObjectMap om, Property prop, JoinPathNd jpn,
+                             int start, int stop) {
 	if (!prop.getType().isKeyed()) {
 	    m_errors.fatal(jpn, "cannot associate to a non keyed type");
 	}
 
-        ObjectMap om = m_root.getObjectMap(prop.getContainer());
         Path path = Path.get(prop.getName());
         List joins = jpn.getJoins();
         Mapping m;
@@ -1055,7 +1206,10 @@ public class PDL {
     }
 
     private void emitMapping(Property prop, QualiasNd nd) {
-        ObjectMap om = m_root.getObjectMap(prop.getContainer());
+        emitMapping(om(prop), prop, nd);
+    }
+
+    private void emitMapping(ObjectMap om, Property prop, QualiasNd nd) {
         Qualias q = new Qualias(Path.get(prop.getName()), nd.getQuery());
         om.addMapping(q);
     }
@@ -1385,6 +1539,43 @@ public class PDL {
         }
         Root root = new Root();
         pdl.emit(root);
+        OutputStreamWriter w = new OutputStreamWriter(System.out);
+        print(root, w);
+        w.flush();
+    }
+
+    private static void print(Root root, Writer w) {
+        try {
+            PDLWriter pw = new PDLWriter(w);
+            Set written = new HashSet();
+            for (Iterator it = root.getObjectTypes().iterator();
+                 it.hasNext(); ) {
+                com.redhat.persistence.metadata.ObjectType ot =
+                    (com.redhat.persistence.metadata.ObjectType) it.next();
+                pw.write(ot);
+                w.write("\n");
+                for (Iterator iter = ot.getProperties().iterator();
+                     iter.hasNext(); ) {
+                    Object o = (Object) iter.next();
+                    if (!(o instanceof Role) || written.contains(o)) {
+                        continue;
+                    }
+                    Role p = (Role) o;
+                    if (p.isReversable()) {
+                        w.write("\n");
+                        pw.writeAssociation(p);
+                        w.write("\n");
+                    }
+                    written.add(p);
+                    written.add(p.getReverse());
+                }
+                if (it.hasNext()) {
+                    w.write("\n");
+                }
+            }
+        } catch (IOException e) {
+            throw new Error(e);
+        }
     }
 
 }

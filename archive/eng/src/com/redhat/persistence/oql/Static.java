@@ -27,12 +27,12 @@ import java.util.*;
  * Static
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 public class Static extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Static.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Static.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private SQL m_sql;
     private String[] m_columns;
@@ -178,8 +178,8 @@ public class Static extends Expression {
         return size;
     }
 
-    protected ObjectType getType() { return null; }
-    protected boolean hasType() { return false; }
+    protected ObjectMap getMap() { return null; }
+    protected boolean hasMap() { return false; }
 
     void frame(Generator gen) {
         boolean bool = gen.isBoolean(this) && m_expressions.size() == 1;
@@ -189,9 +189,8 @@ public class Static extends Expression {
             e.frame(gen);
             gen.addUses(this, gen.getUses(e));
         }
-        if (hasType()) {
-            ObjectType type = getType();
-            QFrame frame = gen.frame(this, type);
+        if (hasMap()) {
+            QFrame frame = gen.frame(this, getMap());
             frame.setValues(m_columns);
             frame.setTable(this);
         } else if (!gen.isBoolean(this) && m_expressions.size() == 1
@@ -199,7 +198,7 @@ public class Static extends Expression {
             Expression e = (Expression) m_expressions.get(0);
             if (gen.hasFrame(e)) {
                 QFrame child = gen.getFrame(e);
-                QFrame frame = gen.frame(this, child.getType());
+                QFrame frame = gen.frame(this, child.getMap());
                 frame.addChild(child);
                 frame.setValues(child.getValues());
                 frame.setMappings(child.getMappings());
@@ -208,13 +207,13 @@ public class Static extends Expression {
     }
 
     Code emit(Generator gen) {
-        if (!hasType() && gen.hasFrame(this)) {
+        if (!hasMap() && gen.hasFrame(this)) {
             return gen.getFrame(this).emit();
         }
 
         Code result = new Code();
         int index = 0;
-        if (hasType()) { result = result.add("("); }
+        if (hasMap()) { result = result.add("("); }
         for (SQLToken t = m_sql.getFirst(); t != null; t = t.getNext()) {
             if (isExpression(t)) {
                 Expression e = (Expression) m_expressions.get(index++);
@@ -227,7 +226,7 @@ public class Static extends Expression {
                 result = result.add(t.getImage());
             }
         }
-        if (hasType()) { result = result.add(")"); }
+        if (hasMap()) { result = result.add(")"); }
         return result;
     }
 
@@ -294,7 +293,7 @@ public class Static extends Expression {
             }
 
             if (child != null) {
-                QFrame frame = gen.frame(this, child.getType());
+                QFrame frame = gen.frame(this, child.getMap());
                 frame.addChild(child);
                 frame.setValues(child.getValues());
                 frame.setMappings(child.getMappings());

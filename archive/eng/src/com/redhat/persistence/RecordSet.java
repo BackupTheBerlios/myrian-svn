@@ -14,8 +14,10 @@
  */
 package com.redhat.persistence;
 
+import com.redhat.persistence.common.CompoundKey;
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.metadata.Adapter;
+import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Property;
 import java.util.Collection;
@@ -29,12 +31,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/07/13 $
+ * @version $Revision: #5 $ $Date: 2004/08/05 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/RecordSet.java#4 $ by $Author: ashah $, $DateTime: 2004/07/13 17:03:42 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/RecordSet.java#5 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -52,128 +54,134 @@ public abstract class RecordSet {
         return m_signature.isFetched(path);
     }
 
+    public abstract ObjectMap getObjectMap();
+
     public abstract boolean next();
 
     public abstract Object get(Path p);
 
     public abstract void close();
 
-    Map load(Session ssn) {
-        Collection paths = m_signature.getPaths();
+    private ObjectMap getObjectMap(Path path) {
+        ObjectMap result;
+        if (path == null) {
+            result = getObjectMap();
+        } else {
+            result = getObjectMap().getMapping(path).getMap();
+        }
+        if (result == null) {
+            throw new IllegalStateException
+                ("no map for path: " + path);
+        }
+        return result;
+    }
 
-	LinkedList remaining = new LinkedList();
-	for (Iterator it = paths.iterator(); it.hasNext(); ) {
-	    Path path = (Path) it.next();
+    private Object key(Path path) {
+        ObjectMap map = getObjectMap(path);
+        ObjectType type = map.getObjectType();
+        Collection props = type.getImmediateProperties();
+        if (map.isPrimitive()) {
+            return get(path);
+        } else if (!map.isNested()) {
+            Object key = type.getBasetype();
+            for (Iterator it = props.iterator(); it.hasNext(); ) {
+                Property p = (Property) it.next();
+                key = new CompoundKey(key, key(Path.add(path, p.getName())));
+            }
+            return key;
+        } else if (m_signature.isSource(path)) {
+            PropertyMap pmap = new PropertyMap(type);
+            for (Iterator it = props.iterator(); it.hasNext(); ) {
+                Property p = (Property) it.next();
+                pmap.put(p, key(Path.add(path, p.getName())));
+            }
+            return pmap;
+        } else {
+            return new CompoundKey(key(path.getParent()), path.getName());
+        }
+    }
 
-            for (; ; path = path.getParent()) {
-                if (!remaining.contains(path)) {
-                    remaining.add(path);
-                }
-                if (m_signature.isSource(path)) {
-                    break;
+    private Object get(Session ssn, Path path) {
+        ObjectMap map = getObjectMap(path);
+        ObjectType type = map.getObjectType();
+        Collection props = type.getImmediateProperties();
+        if (map.isPrimitive()) {
+            return get(path);
+        } else if (!map.isNested()) {
+            return reify(ssn, path);
+        } else if (m_signature.isSource(path)) {
+            PropertyMap pmap = new PropertyMap(type);
+            for (Iterator it = props.iterator(); it.hasNext(); ) {
+                Property p = (Property) it.next();
+                pmap.put(p, get(ssn, Path.add(path, p.getName())));
+            }
+            return pmap;
+        } else {
+            return reify(ssn, path);
+        }
+    }
+
+    private Object reify(Session ssn, Path path) {
+        Object key = key(path);
+        ObjectData odata = ssn.getObjectDataByKey(key);
+        if (odata == null) {
+            ObjectType type = m_signature.getType(path);
+            Collection props = type.getKeyProperties();
+            PropertyMap pmap = new PropertyMap(type);
+            for (Iterator it = props.iterator(); it.hasNext(); ) {
+                Property p = (Property) it.next();
+                pmap.put(p, get(ssn, Path.add(path, p.getName())));
+            }
+            Adapter ad = ssn.getRoot().getAdapter(type);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("resurecting: " + pmap);
+            }
+            Object obj = ad.getObject(type, pmap, ssn);
+            odata = new ObjectData(ssn, obj, ObjectData.NUBILE);
+            ssn.setSessionKey(obj, key);
+            odata.setObjectMap(getObjectMap(path));
+        }
+        return odata.getObject();
+    }
+
+    private Object load(Session ssn, Map values, Path path, Map loaded) {
+        if (loaded.containsKey(path)) { return loaded.get(path); }
+        Object value = get(ssn, path);
+        if (m_signature.isSource(path)) {
+            values.put(path, value);
+        } else {
+            Path parent = path.getParent();
+            Object container = load(ssn, values, parent, loaded);
+            Property prop = m_signature.getProperty(path);
+            if (prop.isCollection()
+                || (!prop.getContainer().isKeyed()
+                    && m_signature.isSource(parent))) {
+                values.put(path, value);
+            } else {
+                ssn.load(container, prop, value);
+                ObjectMap map = getObjectMap(path);
+                if (map.isNested() && map.isCompound()) {
+                    ObjectData odata = ssn.getObjectData(value);
+                    odata.setContainer(container);
                 }
             }
         }
+        loaded.put(path, value);
+        return value;
+    }
 
-	HashMap values = new HashMap();
-	int before;
-	do {
-	    before = remaining.size();
+    Map load(Session ssn) {
+        Collection paths = m_signature.getPaths();
 
-	    OUTER: for (Iterator it = remaining.iterator(); it.hasNext(); ) {
-		Path p = (Path) it.next();
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("loading " + p);
-                }
-		ObjectType type = m_signature.getType(p);
-                Adapter adapter = ssn.getRoot().getAdapter(type);
-		Collection props = type.getImmediateProperties();
-		if (props.size() == 0) {
-		    values.put(p, get(p));
-		    it.remove();
-		} else {
-		    PropertyMap pmap = new PropertyMap(type);
-		    for (Iterator iter = props.iterator(); iter.hasNext(); ) {
-			Property prop = (Property) iter.next();
-			Path kp = Path.add(p, prop.getName());
-			if (values.containsKey(kp)) {
-			    pmap.put(prop, values.get(kp));
-			} else if (m_signature.isFetched(kp)) {
-			    continue OUTER;
-			}
-		    }
+        Map loaded = new HashMap();
+        Map values = new HashMap();
 
-		    Object obj = null;
-		    if (!pmap.isNull()) {
-                        Object previous = null;
-			if (type.isKeyed()) {
-                            previous = ssn.getObject
-                                (adapter.getSessionKey(type, pmap));
+        for (Iterator it = paths.iterator(); it.hasNext(); ) {
+            Path path = (Path) it.next();
+            load(ssn, values, path, loaded);
+        }
 
-                            if (previous != null) {
-                                ObjectType prevType =
-                                    adapter.getObjectType(previous);
-
-                                if (type.equals(prevType)
-                                    || prevType.isSubtypeOf(type)) {
-                                    obj = previous;
-                                } else if (!type.isSubtypeOf(prevType)) {
-                                    throw new IllegalStateException
-                                        ("object of wrong type in session "
-                                         + type + " " + prevType);
-                                }
-                            }
-			}
-
-			if (obj == null) {
-			    obj = adapter.getObject(type, pmap, ssn);
-                            if (previous != obj) {
-                                ssn.use(obj);
-                            }
-			}
-		    }
-		    values.put(p, obj);
-		    it.remove();
-		}
-	    }
-	} while (remaining.size() < before);
-
-	if (remaining.size() > 0) {
-	    throw new IllegalStateException
-		("unable to load the following paths: " + remaining +
-		 "\nsignature: " + m_signature);
-	}
-
-        HashMap cursorValues = new HashMap();
-
-	for (Iterator it = values.entrySet().iterator(); it.hasNext(); ) {
-	    Map.Entry me = (Map.Entry) it.next();
-	    Path p = (Path) me.getKey();
-            Object value = me.getValue();
-
-	    if (m_signature.isSource(p)) {
-                cursorValues.put(p, value);
-                continue;
-            }
-
-	    Property prop = m_signature.getProperty(p);
-            if (prop.getContainer().isKeyed() && !prop.isCollection()) {
-		Object container = values.get(p.getParent());
-		if (container == null) {
-		    if (value == null) {
-			continue;
-		    } else {
-			throw new IllegalStateException
-                            ("container of " + p + " is null");
-		    }
-		}
-		ssn.load(container, prop, value);
-	    } else {
-                cursorValues.put(p, value);
-            }
-	}
-
-	return cursorValues;
+        return values;
     }
 
 }

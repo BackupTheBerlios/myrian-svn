@@ -16,19 +16,25 @@ package com.redhat.persistence.metadata;
 
 import com.redhat.persistence.common.Path;
 
+import java.util.*;
+
 /**
  * Static
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 public class Static extends Mapping {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Static.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Static.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     public Static(Path path) {
         super(path);
+    }
+
+    public List getColumns() {
+        throw new UnsupportedOperationException();
     }
 
     public Table getTable() {

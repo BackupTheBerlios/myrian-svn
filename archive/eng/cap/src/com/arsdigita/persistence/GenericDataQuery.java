@@ -19,11 +19,7 @@ import com.redhat.persistence.Signature;
 import com.redhat.persistence.common.ParseException;
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.common.SQLParser;
-import com.redhat.persistence.metadata.Model;
-import com.redhat.persistence.metadata.ObjectType;
-import com.redhat.persistence.metadata.Role;
-import com.redhat.persistence.metadata.SQLBlock;
-import com.redhat.persistence.oql.Static;
+import com.redhat.persistence.metadata.*;
 
 import java.io.StringReader;
 import java.util.Collections;
@@ -32,12 +28,12 @@ import java.util.Collections;
  * GenericDataQuery
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  */
 
 public class GenericDataQuery extends DataQueryImpl {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/GenericDataQuery.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/GenericDataQuery.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     public GenericDataQuery(Session s, String sql, String[] columns) {
         super(s, ds(s, sql, columns));
@@ -45,12 +41,15 @@ public class GenericDataQuery extends DataQueryImpl {
 
     private static DataSet ds(Session s, String sql, String[] columns) {
 	ObjectType propType = s.getRoot().getObjectType("global.Object");
-        final ObjectType type =
-            new ObjectType(Model.getInstance("gdq"), sql, null);
+        ObjectType type = new ObjectType(Model.getInstance("gdq"), sql, null);
+        final ObjectMap map = new ObjectMap(type);
 	Signature sig = new Signature(type);
 	for (int i = 0; i < columns.length; i++) {
 	    type.addProperty
                 (new Role(columns[i], propType, false, false, true));
+            Mapping m = new Static(Path.get(columns[i]));
+            m.setMap(new ObjectMap(propType));
+            map.addMapping(m);
 	    sig.addPath(Path.get(columns[i]));
 	}
 
@@ -61,11 +60,15 @@ public class GenericDataQuery extends DataQueryImpl {
 	    throw new PersistenceException(e);
 	}
 
-        Static st = new Static
+        // XXX: now that oql runs on object maps we could actually put
+        // the sql in the object map's retrieve all rather than using
+        // a static.
+        com.redhat.persistence.oql.Static st =
+            new com.redhat.persistence.oql.Static
             (p.getSQL(), columns, false, Collections.EMPTY_MAP) {
-            protected boolean hasType() { return true; }
-            protected ObjectType getType() { return type; }
-        };
+                protected boolean hasMap() { return true; }
+                protected ObjectMap getMap() { return map; }
+            };
 
         return new DataSet(s.getProtoSession(), sig, st);
     }

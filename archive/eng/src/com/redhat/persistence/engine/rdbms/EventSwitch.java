@@ -17,6 +17,7 @@ package com.redhat.persistence.engine.rdbms;
 import com.redhat.persistence.*;
 import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,12 +32,12 @@ import org.apache.log4j.Logger;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -258,11 +259,16 @@ class EventSwitch extends Event.Switch {
     }
 
     private void onPropertyEvent(final PropertyEvent e) {
-        final Object obj = e.getObject();
+        final Object obj = m_engine.getContainer(e.getObject());
         final Object arg = e.getArgument();
 
         final ObjectMap om = e.getObjectMap();
         Mapping m = om.getMapping(Path.get(e.getProperty().getName()));
+
+        if (m == null) {
+            throw new IllegalStateException
+                ("no mapping for property: " + e.getProperty());
+        }
 
         final Role role = (Role) e.getProperty();
 
@@ -288,6 +294,10 @@ class EventSwitch extends Event.Switch {
                 // XXX need to really support read only
             }
             public void onStatic(Static m) {
+                // do nothing;
+            }
+
+            public void onNested(Nested n) {
                 // do nothing;
             }
 
@@ -385,18 +395,20 @@ class EventSwitch extends Event.Switch {
         Property prop = e.getProperty();
         Path path = Path.get(prop.getName());
 
+        Object arg = e.getArgument();
         Environment env = m_engine.getEnvironment(obj);
-        set(env, prop.getType(), e.getArgument(), path);
+        set(env, prop.getType(), arg, path);
 
-        scheduleMutation(e);
+        if (!prop.getType().isCompound()) {
+            scheduleMutation(e);
+        }
     }
 
     private void scheduleMutation(SetEvent e) {
         Property prop = e.getProperty();
         ObjectType type = prop.getType();
-        if (type.isKeyed()) { return; }
         ObjectMap om = e.getObjectMap();
-        Mapping m = om.getMapping(Path.get(prop.getName()));
+        Mapping m = om.getMapping(prop);
         Adapter ad = m_engine.getSession().getRoot().getAdapter(type);
         final int jdbcType[] = { ad.defaultJDBCType() };
 
@@ -421,6 +433,9 @@ class EventSwitch extends Event.Switch {
             }
             public void onJoinThrough(JoinThrough j) {
                 throw new IllegalStateException("bad mapping");
+            }
+            public void onNested(Nested n) {
+                throw new Error("nested mapping");
             }
         });
 
@@ -485,8 +500,10 @@ class EventSwitch extends Event.Switch {
 
     private void set(Environment env, ObjectType type, Object obj,
                      Path path) {
-        if (!type.hasKey()) {
-            env.set(Path.get(":" + path.getPath()), obj);
+        if (!type.isKeyed()) {
+            if (type.isPrimitive()) {
+                env.set(Path.get(":" + path.getPath()), obj);
+            }
             return;
         }
 

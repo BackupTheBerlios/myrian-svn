@@ -19,6 +19,7 @@ import com.redhat.persistence.metadata.JoinFrom;
 import com.redhat.persistence.metadata.JoinThrough;
 import com.redhat.persistence.metadata.JoinTo;
 import com.redhat.persistence.metadata.Mapping;
+import com.redhat.persistence.metadata.Nested;
 import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Static;
@@ -30,12 +31,12 @@ import java.util.HashMap;
  * Environment
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 class Environment {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/Environment.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/Environment.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private RDBMSEngine m_engine;
     private ObjectMap m_om;
@@ -81,6 +82,9 @@ class Environment {
                     public void onStatic(Static s) {}
                     public void onQualias(Qualias q) {
                         // XXX do real read only properties from session
+                    }
+                    public void onNested(Nested n) {
+                        throw new Error("nested mapping");
                     }
                 });
             }

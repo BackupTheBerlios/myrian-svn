@@ -15,7 +15,10 @@
 package com.redhat.persistence;
 
 import com.arsdigita.util.UncheckedWrapperException;
+import com.redhat.persistence.common.CompoundKey;
 import com.redhat.persistence.metadata.Adapter;
+import com.redhat.persistence.metadata.Mapping;
+import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Property;
 import com.redhat.persistence.metadata.Role;
@@ -35,7 +38,7 @@ import java.util.Map;
  */
 class Expander extends Event.Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Expander.java#3 $ by $Author: rhs $, $DateTime: 2004/07/16 08:30:52 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Expander.java#4 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     final private Session m_ssn;
     final private Collection m_deleting = new HashSet();
@@ -106,21 +109,33 @@ class Expander extends Event.Switch {
         final Object obj = e.getObject();
 
         ObjectData od = m_ssn.getObjectData(obj);
-        if (od == null) {
+
+        Adapter a = m_ssn.getAdapter(obj);
+        PropertyMap props = a.getProperties(obj);
+        ObjectType type = props.getObjectType();
+        ObjectMap map = m_ssn.getRoot().getObjectMap(type);
+
+        Object key = a.getSessionKey(props);
+
+        if (od == null && map != null) {
+            od = m_ssn.getObjectDataByKey(key);
+        }
+
+        if (od == null || od.isDeleted()) {
             od = new ObjectData(m_ssn, obj, od.INFANTILE);
+            if (map != null) { od.setObjectMap(map); }
         } else if (!od.isDeleted()) {
             ProtoException pe = new DuplicateObjectException(obj);
             pe.setInternal(false);
             throw pe;
-        } else {
-            od.setState(od.INFANTILE);
         }
 
-        Adapter a = m_ssn.getAdapter(obj);
+        if (!m_ssn.hasSessionKey(obj) && map != null) {
+            m_ssn.setSessionKey(obj, key);
+        }
 
         addEvent(e);
 
-        PropertyMap props = a.getProperties(obj);
         for (Iterator it = props.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry me = (Map.Entry) it.next();
             Event ev;
@@ -184,12 +199,16 @@ class Expander extends Event.Switch {
                 cascadeDelete(obj, old);
             }
         }
+
+        propogateKey(e);
     }
 
     public void onAdd(AddEvent e) {
         Role role = (Role) e.getProperty();
         if (role.isReversable()) { reverseUpdateNew(e); }
         addEvent(e);
+
+        propogateKey(e);
     }
 
     public void onRemove(RemoveEvent e) {
@@ -201,6 +220,27 @@ class Expander extends Event.Switch {
 
         if (role.isComponent()) {
             cascadeDelete(e.getObject(), e.getArgument());
+        }
+    }
+
+    private void propogateKey(PropertyEvent e) {
+        Object obj = e.getObject();
+        Object arg = e.getArgument();
+        if (arg == null) { return; }
+        Role role = (Role) e.getProperty();
+
+        if (!m_ssn.hasSessionKey(obj)) { return; }
+        if (m_ssn.hasSessionKey(arg)) { return; }
+
+        Mapping mapping = m_ssn.getObjectMap(obj).getMapping(role);
+        ObjectMap map = mapping.getMap();
+        if (map.isNested() && map.isCompound()) {
+            Object key = new CompoundKey
+                (m_ssn.getSessionKey(obj), role.getName());
+            m_ssn.setSessionKey(arg, key);
+            ObjectData od = m_ssn.getObjectData(arg);
+            od.setObjectMap(mapping.getMap());
+            od.setContainer(obj);
         }
     }
 

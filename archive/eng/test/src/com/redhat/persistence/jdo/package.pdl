@@ -26,7 +26,26 @@ object type Employee class com.redhat.persistence.jdo.Employee
     BigInteger[1..1] id = emps.id INTEGER;
     String[0..1] name = emps.name VARCHAR(200);
     Float[0..1] salary = emps.salary FLOAT;
+    Address[0..1] address;
+    address.m_street = emps.street;
+    address.m_apt = emps.apt;
+    address.m_city = emps.city;
+    address.m_state = emps.state;
+    address.m_zip = emps.zip;
+
     object key (id);
+
+    aggressive load(address);
+
+}
+
+nested object type Address class com.redhat.persistence.jdo.Address
+    adapter com.redhat.persistence.jdo.JDOAdapter {
+    String m_street;
+    String m_apt;
+    String m_city;
+    String m_state;
+    String m_zip;
 }
 
 query Employee$Gen class com.redhat.persistence.PropertyMap
@@ -132,7 +151,7 @@ object type Picture class com.redhat.persistence.jdo.Picture
 }
 
 
-object type Magazine class com.redhat.persistence.jdo.Magazine 
+object type Magazine class com.redhat.persistence.jdo.Magazine
                      adapter com.redhat.persistence.jdo.JDOAdapter {
 
     Integer[1..1] id = magazines.id INTEGER;

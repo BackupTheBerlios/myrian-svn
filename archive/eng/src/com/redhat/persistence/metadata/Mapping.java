@@ -15,19 +15,19 @@
 package com.redhat.persistence.metadata;
 
 import com.redhat.persistence.common.Path;
-import java.util.ArrayList;
-import java.util.Collection;
+
+import java.util.*;
 
 /**
  * Mapping
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 public abstract class Mapping extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Mapping.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Mapping.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     public static abstract class Switch {
         public abstract void onValue(Value m);
@@ -38,15 +38,22 @@ public abstract class Mapping extends Element {
         public void onQualias(Qualias q) {
             throw new UnsupportedOperationException();
         }
+        public abstract void onNested(Nested n);
     }
 
     private Path m_path;
+    private ObjectMap m_map;
     private SQLBlock m_retrieve;
     private ArrayList m_adds = null;
     private ArrayList m_removes = null;
 
-    protected Mapping(Path path) {
+    protected Mapping(Path path, ObjectMap map) {
         m_path = path;
+        setMap(map);
+    }
+
+    protected Mapping(Path path) {
+        this(path, null);
     }
 
     public ObjectMap getObjectMap() {
@@ -56,6 +63,38 @@ public abstract class Mapping extends Element {
     public Path getPath() {
         return m_path;
     }
+
+    public boolean isNested() {
+        return getMap().isNested();
+    }
+
+    public boolean isCompound() {
+        return getMap().isCompound();
+    }
+
+    public boolean isPrimitive() {
+        return getMap().isPrimitive();
+    }
+
+    public void setMap(ObjectMap map) {
+        if (map != null && map.getParent() == null) {
+            map.setParent(this);
+        }
+        m_map = map;
+    }
+
+    public ObjectMap getMap() {
+        if (m_map == null) {
+            ObjectMap om = getObjectMap();
+            ObjectType type = om.getObjectType();
+            Root root = om.getRoot();
+            return root.getObjectMap(type.getProperty(m_path).getType());
+        } else {
+            return m_map;
+        }
+    }
+
+    public abstract List getColumns();
 
     public abstract Table getTable();
 

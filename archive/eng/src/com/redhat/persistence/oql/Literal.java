@@ -26,12 +26,12 @@ import java.util.*;
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Literal.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Literal.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private Object m_value;
 
@@ -39,18 +39,24 @@ public class Literal extends Expression {
         m_value = value;
     }
 
-    private ObjectType type(Generator gen) {
+    private ObjectMap map(Generator gen) {
         if (m_value == null || m_value instanceof Collection) {
             return null;
         } else {
             Adapter ad = gen.getRoot().getAdapter(m_value.getClass());
             if (ad == null) { return null; }
-            return ad.getObjectType(m_value);
+            ObjectType type = ad.getObjectType(m_value);
+            Root root = gen.getRoot();
+            if (root.hasObjectMap(type)) {
+                return root.getObjectMap(type);
+            } else {
+                return new ObjectMap(type);
+            }
         }
     }
 
     void frame(Generator gen) {
-        QFrame frame = gen.frame(this, type(gen));
+        QFrame frame = gen.frame(this, map(gen));
         List result = new ArrayList();
         Object key = gen.level > 0 ? null : getBindKey(gen);
         convert(m_value, result, gen.getRoot(), key);

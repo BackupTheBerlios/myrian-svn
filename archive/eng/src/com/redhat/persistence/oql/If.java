@@ -7,12 +7,12 @@ import java.util.*;
  * If
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 public class If extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/If.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/If.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private Expression m_condition;
     private Expression m_consequence;
@@ -39,7 +39,7 @@ public class If extends Expression {
         QFrame cframe = gen.getFrame(m_consequence);
         QFrame aframe = gen.getFrame(m_alternative);
         QFrame frame = gen.frame
-            (this, merge(cframe.getType(), aframe.getType()));
+            (this, merge(cframe.getMap(), aframe.getMap()));
         gen.addUses(this, gen.getUses(m_condition));
         gen.addUses(this, gen.getUses(m_consequence));
         gen.addUses(this, gen.getUses(m_alternative));
@@ -57,13 +57,15 @@ public class If extends Expression {
             })));
     }
 
-    private ObjectType merge(ObjectType a, ObjectType b) {
-        if (a == null) { return b; }
-        if (b == null) { return a; }
-        if (a.isSubtypeOf(b)) {
+    // XXX: this doesn't really make sense with maps
+    private ObjectMap merge(ObjectMap a, ObjectMap b) {
+        if (a == null || b == null) { return null; }
+        ObjectType at = a.getObjectType();
+        ObjectType bt = b.getObjectType();
+        if (at.isSubtypeOf(bt)) {
             return b;
         }
-        if (b.isSubtypeOf(a)) {
+        if (bt.isSubtypeOf(at)) {
             return a;
         }
         throw new IllegalArgumentException

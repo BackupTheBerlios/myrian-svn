@@ -60,12 +60,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/07/29 $
+ * @version $Revision: #4 $ $Date: 2004/08/05 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#3 $ by $Author: bche $, $DateTime: 2004/07/29 13:03:57 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#4 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -223,6 +223,15 @@ public class RDBMSEngine extends Engine {
         m_mutationTypes.add(new Integer(type));
     }
 
+    Object getContainer(Object obj) {
+        Object container = getSession().getContainer(obj);
+        if (container == null) {
+            return obj;
+        } else {
+            return getContainer(container);
+        }
+    }
+
     void clear() {
         m_aggregator.clear();
         clearOperations();
@@ -266,7 +275,8 @@ public class RDBMSEngine extends Engine {
             LOG.info("Executing " + sel.getQuery());
         }
 
-        return new RDBMSRecordSet(sig, this, execute(sel));
+        return new RDBMSRecordSet
+            (sig, expr.getMap(getSession().getRoot()), this, execute(sel));
     }
 
     public long size(Expression expr) {

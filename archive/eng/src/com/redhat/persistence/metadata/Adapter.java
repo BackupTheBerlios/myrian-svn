@@ -29,12 +29,12 @@ import java.util.Iterator;
  * Subclasses must provide a public no-args constructor.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/07/08 $
+ * @version $Revision: #6 $ $Date: 2004/08/05 $
  **/
 
 public abstract class Adapter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Adapter.java#5 $ by $Author: rhs $, $DateTime: 2004/07/08 11:34:59 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Adapter.java#6 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private Root m_root;
 
@@ -46,29 +46,20 @@ public abstract class Adapter {
         return m_root;
     }
 
-    public Object getSessionKey(Object obj) {
-        return getSessionKey(getObjectType(obj), getProperties(obj));
-    }
-
-    public Object getSessionKey(ObjectType type, PropertyMap props) {
+    public Object getSessionKey(PropertyMap props) {
+        ObjectType type = props.getObjectType();
         Collection keys = type.getKeyProperties();
-        Object key = null;
-
+        Object key = type.getBasetype();
         for (Iterator it = keys.iterator(); it.hasNext(); ) {
             Property p = (Property) it.next();
             Object value = props.get(p);
             if (p.getType().isKeyed() && value != null) {
                 Adapter ad = getRoot().getAdapter(value.getClass());
-                value = ad.getSessionKey(value);
+                value = ad.getSessionKey(ad.getProperties(value));
             }
-            if (key == null) {
-                key = value;
-            } else {
-                key = new CompoundKey(key, value);
-            }
+            key = new CompoundKey(key, value);
         }
-
-        return new CompoundKey(type.getBasetype(), key);
+        return key;
     }
 
     // This needs work. It's odd to have an adapter interface here in the

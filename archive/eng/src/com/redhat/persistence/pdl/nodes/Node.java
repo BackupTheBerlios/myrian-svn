@@ -26,12 +26,12 @@ import java.util.List;
  * Node
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 public abstract class Node {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/nodes/Node.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/nodes/Node.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
 
     /**
@@ -151,6 +151,7 @@ public abstract class Node {
 
         public void onStatement(StatementNd st) {}
         public void onProperty(PropertyNd prop) {}
+        public void onNestedMapping(NestedMappingNd nd) {}
         public void onAggressiveLoad(AggressiveLoadNd al) {}
         public void onReferenceKey(ReferenceKeyNd key) {}
         public void onObjectKey(ObjectKeyNd key) {}

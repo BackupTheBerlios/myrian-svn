@@ -14,6 +14,7 @@
  */
 package com.redhat.persistence;
 
+import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.Property;
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -24,17 +25,19 @@ import org.apache.log4j.Logger;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 class ObjectData {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/ObjectData.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/ObjectData.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private static final Logger LOG = Logger.getLogger(ObjectData.class);
 
     private final Session m_ssn;
     private Object m_object;
+    private Object m_container;
+    private ObjectMap m_map;
 
     static class State {
         private String m_name;
@@ -59,6 +62,8 @@ class ObjectData {
     public ObjectData(Session ssn, Object object, State state) {
         m_ssn = ssn;
         m_object = object;
+        m_container = null;
+        m_map = null;
         setState(state);
 
         m_ssn.addObjectData(this);
@@ -74,6 +79,22 @@ class ObjectData {
 
     void setObject(Object object) {
         m_object = object;
+    }
+
+    public Object getContainer() {
+        return m_container;
+    }
+
+    void setContainer(Object container) {
+        m_container = container;
+    }
+
+    public ObjectMap getObjectMap() {
+        return m_map;
+    }
+
+    void setObjectMap(ObjectMap map) {
+        m_map = map;
     }
 
     public void addPropertyData(Property p, PropertyData pd) {

@@ -8,11 +8,7 @@ public abstract class WithTxnCase extends AbstractCase {
     }
 
     protected void setUp() throws Exception {
-        super.setUp();
         m_pm.currentTransaction().begin();
     }
 
-    protected void tearDown() {
-        m_pm.currentTransaction().rollback();
-    }
 }

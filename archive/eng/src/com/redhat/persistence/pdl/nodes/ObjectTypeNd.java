@@ -18,12 +18,12 @@ package com.redhat.persistence.pdl.nodes;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 public class ObjectTypeNd extends Node {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/nodes/ObjectTypeNd.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/nodes/ObjectTypeNd.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     public static final Field NAME =
         new Field(ObjectTypeNd.class, "name", IdentifierNd.class, 1, 1);
@@ -49,9 +49,12 @@ public class ObjectTypeNd extends Node {
         new Field(ObjectTypeNd.class, "joinPaths", JoinPathNd.class);
     public static final Field EVENTS =
         new Field(ObjectTypeNd.class, "events", EventNd.class);
+    public static final Field NESTED_MAPPINGS =
+        new Field(ObjectTypeNd.class, "nestedMappings", NestedMappingNd.class);
 
 
-    private boolean m_isVersioned;
+    private boolean m_isVersioned = false;
+    private boolean m_isNested = false;
 
     public void dispatch(Switch sw) {
         super.dispatch(sw);
@@ -72,6 +75,14 @@ public class ObjectTypeNd extends Node {
 
     public boolean isVersioned() {
         return m_isVersioned;
+    }
+
+    public void setNested() {
+        m_isNested = true;
+    }
+
+    public boolean isNested() {
+        return m_isNested;
     }
 
     public TypeNd getExtends() {

@@ -18,12 +18,12 @@ package com.redhat.persistence.oql;
  * Sort
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/07/21 $
+ * @version $Revision: #3 $ $Date: 2004/08/05 $
  **/
 
 public class Sort extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Sort.java#2 $ by $Author: ashah $, $DateTime: 2004/07/21 11:37:37 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Sort.java#3 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     public static class Order {
         private Order() {}
@@ -49,7 +49,7 @@ public class Sort extends Expression {
     void frame(Generator gen) {
         m_query.frame(gen);
         QFrame query = gen.getFrame(m_query);
-        QFrame frame = gen.frame(this, query.getType());
+        QFrame frame = gen.frame(this, query.getMap());
         frame.addChild(query);
         frame.setValues(query.getValues());
         frame.setMappings(query.getMappings());

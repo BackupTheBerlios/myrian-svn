@@ -15,22 +15,19 @@
 package com.redhat.persistence.metadata;
 
 import com.redhat.persistence.common.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+
+import java.util.*;
 
 /**
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/ObjectMap.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/ObjectMap.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -49,7 +46,17 @@ public class ObjectMap extends Element {
     }
 
     public Root getRoot() {
-        return (Root) getParent();
+        Element element = this;
+        while (true) {
+            Object parent = element.getParent();
+            if (parent == null) { return null; }
+            if (parent instanceof Root) {
+                return (Root) parent;
+            }
+            if (parent instanceof Element) {
+                element = (Element) parent;
+            }
+        }
     }
 
     public ObjectMap getSuperMap() {
@@ -60,8 +67,28 @@ public class ObjectMap extends Element {
         }
     }
 
+    public ObjectMap getBaseMap() {
+        if (m_type.getSupertype() == null) {
+            return this;
+        } else {
+            return getSuperMap().getBaseMap();
+        }
+    }
+
     public ObjectType getObjectType() {
         return m_type;
+    }
+
+    public boolean isNested() {
+        return getParent() instanceof Mapping;
+    }
+
+    public boolean isCompound() {
+        return m_type.isCompound();
+    }
+
+    public boolean isPrimitive() {
+        return m_type.isPrimitive();
     }
 
     public boolean hasMapping(Path p) {
@@ -77,16 +104,26 @@ public class ObjectMap extends Element {
         }
     }
 
+    public Mapping getMapping(Property p) {
+        return getMapping(Path.get(p.getName()));
+    }
+
     public Mapping getMapping(Path p) {
-        if (m_mappings.containsKey(p)) {
-            return (Mapping) m_mappings.get(p);
-        } else {
-            ObjectMap sm = getSuperMap();
-            if (sm == null) {
-                return null;
+        Path parent = p.getParent();
+        if (parent == null) {
+            if (m_mappings.containsKey(p)) {
+                return (Mapping) m_mappings.get(p);
             } else {
-                return sm.getMapping(p);
+                ObjectMap sm = getSuperMap();
+                if (sm == null) {
+                    return null;
+                } else {
+                    return sm.getMapping(p);
+                }
             }
+        } else {
+            Mapping m = getMapping(parent);
+            return m.getMap().getMapping(Path.get(p.getName()));
         }
     }
 
@@ -112,6 +149,15 @@ public class ObjectMap extends Element {
         ArrayList result = new ArrayList();
         result.addAll(m_mappings);
         return result;
+    }
+
+    public List getColumns() {
+        Object parent = getParent();
+        if (parent instanceof Mapping) {
+            return ((Mapping) parent).getColumns();
+        } else {
+            return Arrays.asList(m_table.getPrimaryKey().getColumns());
+        }
     }
 
     public List getKeyProperties() {
@@ -170,6 +216,17 @@ public class ObjectMap extends Element {
                 public void onStatic(Static m) {}
 
                 public void onQualias(Qualias q) {}
+
+                public void onNested(Nested n) {
+                    Collection paths = n.getMap().getDeclaredFetchedPaths();
+                    for (Iterator it = paths.iterator(); it.hasNext(); ) {
+                        Path p = (Path) it.next();
+                        Path fetched = Path.add(n.getPath(), p);
+                        if (!result.contains(fetched)) {
+                            result.add(fetched);
+                        }
+                    }
+                }
             });
         }
 
@@ -190,7 +247,12 @@ public class ObjectMap extends Element {
     }
 
     public Table getTable() {
-        return m_table;
+        Object parent = getParent();
+        if (m_table == null && parent instanceof Mapping) {
+            return ((Mapping) parent).getObjectMap().getTable();
+        } else {
+            return m_table;
+        }
     }
 
     public void setTable(Table table) {

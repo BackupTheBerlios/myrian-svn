@@ -16,22 +16,28 @@ package com.redhat.persistence.metadata;
 
 import com.redhat.persistence.common.*;
 
+import java.util.*;
+
 /**
  * Qualias
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 public class Qualias extends Mapping {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Qualias.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Qualias.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private String m_query;
 
     public Qualias(Path path, String query) {
         super(path);
         m_query = query;
+    }
+
+    public List getColumns() {
+        throw new UnsupportedOperationException();
     }
 
     public String getQuery() {

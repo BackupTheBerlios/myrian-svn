@@ -25,12 +25,12 @@ import java.util.List;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/ObjectType.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/ObjectType.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private final Model m_model;
     private final String m_name;
@@ -246,8 +246,18 @@ public class ObjectType extends Element {
 	return isKeyed();
     }
 
+    public boolean isIndependent() {
+        Root root = getRoot();
+        if (root == null) { return false; }
+        return root.hasObjectMap(this);
+    }
+
     public boolean isCompound() {
         return getProperties().size() != 0;
+    }
+
+    public boolean isPrimitive() {
+        return !isCompound();
     }
 
     public Collection getRoles() {

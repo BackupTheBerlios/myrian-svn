@@ -21,8 +21,10 @@ import com.redhat.persistence.Event;
 import com.redhat.persistence.ObjectEvent;
 import com.redhat.persistence.PropertyEvent;
 import com.redhat.persistence.RemoveEvent;
+import com.redhat.persistence.Session;
 import com.redhat.persistence.SetEvent;
 import com.redhat.persistence.common.CompoundKey;
+import com.redhat.persistence.metadata.Mapping;
 import com.redhat.persistence.metadata.Property;
 import com.redhat.persistence.metadata.Role;
 import java.util.ArrayList;
@@ -35,12 +37,12 @@ import org.apache.log4j.Logger;
  * Aggregator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/07/08 $
+ * @version $Revision: #3 $ $Date: 2004/08/05 $
  **/
 
 class Aggregator extends Event.Switch {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/Aggregator.java#2 $ by $Author: rhs $, $DateTime: 2004/07/08 11:34:59 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/Aggregator.java#3 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private static final Logger LOG = Logger.getLogger(Aggregator.class);
 
@@ -101,7 +103,12 @@ class Aggregator extends Event.Switch {
 
     Object key(Object obj) {
         if (obj == null) { return null; }
-        return m_engine.getSession().getSessionKey(obj);
+        Session ssn = m_engine.getSession();
+        if (ssn.hasSessionKey(obj)) {
+            return ssn.getSessionKey(obj);
+        } else {
+            return obj;
+        }
     }
 
     private Event getObjectEvent(Object obj) {
@@ -191,6 +198,18 @@ class Aggregator extends Event.Switch {
         m_violations.remove(new CompoundKey(key(obj), prop));
     }
 
+    private Event getViolation(Object obj) {
+        return m_violations.getEvent(key(obj));
+    }
+
+    private void setViolation(Object obj, Event ev) {
+        m_violations.setEvent(key(obj), ev);
+    }
+
+    private void clearViolation(Object obj) {
+        m_violations.remove(key(obj));
+    }
+
     private void setTwoWayEvent(Object obj, Property prop, Object arg,
                                  Event ev) {
         m_twoWay.setEvent
@@ -210,7 +229,7 @@ class Aggregator extends Event.Switch {
         return m_attributes.getEvent(key(obj));
     }
 
-    private void clearAttributeNode(Object obj) {
+    private void clearAttributeEvent(Object obj) {
         m_attributes.remove(key(obj));
     }
 
@@ -237,6 +256,7 @@ class Aggregator extends Event.Switch {
         Node nd = onObjectEvent(e);
 
         Object obj = e.getObject();
+
         Collection roles = e.getObjectMap().getObjectType().getRoles();
         for (Iterator it = roles.iterator(); it.hasNext(); ) {
             Role role = (Role) it.next();
@@ -246,6 +266,10 @@ class Aggregator extends Event.Switch {
         }
 
         setAttributeEvent(obj, e);
+
+        if (e.getObjectMap().isNested()) {
+            setViolation(obj, e);
+        }
     }
 
     public void onDelete(DeleteEvent e) {
@@ -268,17 +292,29 @@ class Aggregator extends Event.Switch {
             nd = merge(nd, findNode(attr), "attributes from delete");
         }
 
-        clearAttributeNode(obj);
+        clearAttributeEvent(obj);
+
+        clearViolation(obj);
     }
 
     private Node onPropertyEvent(PropertyEvent e) {
         Node nd = onEvent(e);
 
-        Object arg = e.getArgument();
-        nd.addDependency(getObjectEvent(arg));
-
         Object obj = e.getObject();
         Property prop = e.getProperty();
+        Object arg = e.getArgument();
+
+        Mapping m = e.getObjectMap().getMapping(prop);
+
+        if (m.isNested()) {
+            Event oev = getObjectEvent(arg);
+            if (oev != null) {
+                findNode(oev).addDependency(e);
+            }
+        } else {
+            nd.addDependency(getObjectEvent(arg));
+        }
+
         Event prev;
         if (prop.isCollection()) {
             prev = getPropertyEvent(obj, prop, arg);
@@ -334,6 +370,7 @@ class Aggregator extends Event.Switch {
         Object obj = e.getObject();
         Property prop = e.getProperty();
         Object arg = e.getArgument();
+        Mapping mapping = e.getObjectMap().getMapping(prop);
 
         if (prev != null) {
             nd = mergeTwoWay(nd, obj, prop, prev,
@@ -357,6 +394,14 @@ class Aggregator extends Event.Switch {
                 setAttributeEvent(obj, e);
             } else {
                 nd = merge(findNode(attr), nd, "attributes from set");
+            }
+        }
+
+        if (mapping.isNested() && mapping.isCompound()) {
+            Event ovile = getViolation(arg);
+            if (ovile != null) {
+                nd = merge(findNode(ovile), nd, "violation from nested type");
+                clearViolation(arg);
             }
         }
 

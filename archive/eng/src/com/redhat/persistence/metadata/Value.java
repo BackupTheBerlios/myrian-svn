@@ -16,22 +16,28 @@ package com.redhat.persistence.metadata;
 
 import com.redhat.persistence.common.Path;
 
+import java.util.*;
+
 /**
  * Value
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 public class Value extends Mapping {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Value.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Value.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private Column m_column;
 
     public Value(Path path, Column column) {
         super(path);
         m_column = column;
+    }
+
+    public List getColumns() {
+        return Collections.singletonList(m_column);
     }
 
     public Table getTable() {

@@ -21,12 +21,12 @@ import java.util.*;
  * Filter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 public class Filter extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Filter.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Filter.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private Expression m_expr;
     private Expression m_condition;
@@ -39,7 +39,7 @@ public class Filter extends Expression {
     void frame(Generator gen) {
         m_expr.frame(gen);
         QFrame expr = gen.getFrame(m_expr);
-        QFrame frame = gen.frame(this, expr.getType());
+        QFrame frame = gen.frame(this, expr.getMap());
         frame.addChild(expr);
         frame.setValues(expr.getValues());
         frame.setMappings(expr.getMappings());

@@ -9,10 +9,6 @@ public class WithoutTxnTest extends AbstractCase {
         super(name);
     }
 
-    protected void tearDown() throws Exception {
-        ((PersistenceManagerImpl) m_pm).getConnection().close();
-    }
-
     public void testMakePersistent() {
         Employee e = new Employee("name", null);
         e.setSalary(new Float(1.0f));

@@ -21,6 +21,7 @@ import com.redhat.persistence.metadata.JoinFrom;
 import com.redhat.persistence.metadata.JoinThrough;
 import com.redhat.persistence.metadata.JoinTo;
 import com.redhat.persistence.metadata.Mapping;
+import com.redhat.persistence.metadata.Nested;
 import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Property;
@@ -38,12 +39,12 @@ import java.util.Iterator;
  * PDLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/07/08 $
+ * @version $Revision: #3 $ $Date: 2004/08/05 $
  **/
 
 public class PDLWriter {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLWriter.java#2 $ by $Author: rhs $, $DateTime: 2004/07/08 11:07:07 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/pdl/PDLWriter.java#3 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private Writer m_out;
 
@@ -227,6 +228,10 @@ public class PDLWriter {
 
                 public void onQualias(Qualias q) {
                     write("qualias {" + q.getQuery() + "}");
+                }
+
+                public void onNested(Nested n) {
+                    write("<nested>");
                 }
 	    });
         }

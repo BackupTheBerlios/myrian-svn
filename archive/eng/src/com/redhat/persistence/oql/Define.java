@@ -22,12 +22,12 @@ import java.util.*;
  * Define
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/07/22 $
+ * @version $Revision: #3 $ $Date: 2004/08/05 $
  **/
 
 public class Define extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Define.java#2 $ by $Author: richardl $, $DateTime: 2004/07/22 15:13:20 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Define.java#3 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private Expression m_expr;
     private String m_name;
@@ -40,7 +40,7 @@ public class Define extends Expression {
     void frame(Generator gen) {
         m_expr.frame(gen);
         QFrame expr = gen.getFrame(m_expr);
-        QFrame frame = gen.frame(this, define(m_name, expr.getType()));
+        QFrame frame = gen.frame(this, define(m_name, expr.getMap()));
         frame.addChild(expr);
         frame.setValues(expr.getValues());
         if (expr.hasMappings()) {
@@ -71,16 +71,19 @@ public class Define extends Expression {
 
     String summary() { return "define " + m_name; }
 
-    static ObjectType define(final String name, final ObjectType type) {
+    static ObjectMap define(final String name, ObjectMap map) {
+        final ObjectType type = map.getObjectType();
         Model anon = Model.getInstance("anonymous.define");
-        ObjectType result = new ObjectType
+        ObjectType def = new ObjectType
             (anon, type.getQualifiedName() + "$" + name, (ObjectType) null) {
             public String toString() {
                 return "{" + type + " " + name + ";" + "}";
             }
         };
         Property prop = new Role(name, type, false, false, false);
-        result.addProperty(prop);
+        def.addProperty(prop);
+        ObjectMap result = new ObjectMap(def);
+        result.addMapping(new Nested(Path.get(name), map));
         return result;
     }
 

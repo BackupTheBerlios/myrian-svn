@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,12 +48,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2004/08/04 $
+ * @version $Revision: #11 $ $Date: 2004/08/05 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#10 $ by $Author: ashah $, $DateTime: 2004/08/04 13:50:11 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#11 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -66,7 +67,9 @@ public class Session {
     private final Engine m_engine;
     private final QuerySource m_qs;
 
-    private HashMap m_odata = new HashMap();
+    private Map m_odata = new HashMap();
+    private Map m_keyless = new IdentityHashMap();
+    private Map m_keys = new IdentityHashMap();
 
     private EventStream m_events = new EventStream(this);
 
@@ -104,7 +107,9 @@ public class Session {
     EventStream getEventStream() { return m_events; }
 
     public Object retrieve(PropertyMap keys) {
-        ObjectData odata = getObjectData(keys);
+        Adapter ad = m_root.getAdapter(keys.getObjectType());
+        Object key = ad.getSessionKey(keys);
+        ObjectData odata = (ObjectData) m_odata.get(key);
 
         if (odata != null) {
             if (odata.isDeleted()) { return null; }
@@ -140,7 +145,7 @@ public class Session {
 
         final Object[] result = {null};
 
-        if (!getObjectType(obj).hasKey()) {
+        if (false && !getObjectType(obj).hasKey()) {
             result[0] = getProperties(obj).get(prop);
         } else {
             prop.dispatch(new Property.Switch() {
@@ -194,6 +199,9 @@ public class Session {
 
         ObjectMap map = type.getRoot().getObjectMap(type);
         Collection keyProps = map.getKeyProperties();
+        if (keyProps.isEmpty()) {
+            throw new IllegalStateException("empty key: " + map);
+        }
 
         Expression filter = null;
 
@@ -402,7 +410,7 @@ public class Session {
                     }
 
                     pmap.put(link.getTo(), value);
-                    e.expand(new CreateEvent(Session.this, getObject(pmap)));
+                    e.expand(new CreateEvent(Session.this, newObject(pmap)));
                 }
             });
 
@@ -438,7 +446,7 @@ public class Session {
                     PropertyMap pmap = new PropertyMap(link.getLinkType());
                     pmap.put(link.getFrom(), obj);
                     pmap.put(link.getTo(), value);
-                    result[0] = getObject(pmap);
+                    result[0] = newObject(pmap);
                     e.expand(new CreateEvent(Session.this, result[0]));
                 }
             });
@@ -513,7 +521,12 @@ public class Session {
         }
     }
 
-    public Object getObject(PropertyMap pmap) {
+    private Object getObject(PropertyMap pmap) {
+	Adapter ad = m_root.getAdapter(pmap.getObjectType());
+	return getObject(ad.getSessionKey(pmap));
+    }
+
+    private Object newObject(PropertyMap pmap) {
 	Adapter ad = m_root.getAdapter(pmap.getObjectType());
 	return ad.getObject(pmap.getObjectType(), pmap, this);
     }
@@ -527,8 +540,26 @@ public class Session {
     }
 
     public ObjectMap getObjectMap(Object obj) {
-        ObjectType type = getAdapter(obj).getObjectType(obj);
-        return type.getRoot().getObjectMap(type);
+        ObjectData odata = getObjectData(obj);
+        if (odata == null) {
+            throw new IllegalArgumentException
+                ("not a session managed object: " + str(obj));
+        }
+        ObjectMap result = odata.getObjectMap();
+        if (result == null) {
+            throw new IllegalStateException
+                ("no map for object: " + str(obj));
+        }
+        return result;
+    }
+
+    public Object getContainer(Object obj) {
+        ObjectData odata = getObjectData(obj);
+        if (odata == null) {
+            throw new IllegalArgumentException
+                ("not a session managed object: " + str(obj));
+        }
+        return odata.getContainer();
     }
 
     public PropertyMap getProperties(Object obj) {
@@ -739,6 +770,8 @@ public class Session {
 
     private void clear(boolean isCommit) {
         m_odata.clear();
+        m_keyless.clear();
+        m_keys.clear();
         m_events.clear();
         m_violations.clear();
         m_beforeFlushMarker = null;
@@ -813,7 +846,8 @@ public class Session {
 
         ObjectData od = getObjectData(obj);
         if (od == null) {
-            od = new ObjectData(this, obj, od.NUBILE);
+            throw new IllegalArgumentException
+                ("not a session managed object: " + obj);
         }
 
         PropertyData pd = od.getPropertyData(prop);
@@ -864,15 +898,12 @@ public class Session {
         process(m_afterActivate, activated);
     }
 
-    Object getSessionKey(PropertyMap pmap) {
-        ObjectType ot = pmap.getObjectType();
-        Adapter ad = m_root.getAdapter(ot);
-        return ad.getSessionKey(ot, pmap);
-    }
-
     public Object getSessionKey(Object obj) {
-        Adapter ad = getAdapter(obj);
-        return ad.getSessionKey(obj);
+        Object result = m_keys.get(obj);
+        if (result == null) {
+            throw new IllegalArgumentException("no key for object: " + obj);
+        }
+        return result;
     }
 
     /**
@@ -888,16 +919,15 @@ public class Session {
             Adapter ad = getAdapter(obj);
             ObjectType type = ad.getObjectType(obj);
             Object newObj = ad.getObject(type, ad.getProperties(obj), this);
-            use(newObj);
+            use(getSessionKey(obj), newObj);
         }
     }
 
-    void use(Object obj) {
-        Adapter ad = getAdapter(obj);
-
-        ObjectData odata = getObjectData(obj);
+    void use(Object key, Object obj) {
+        ObjectData odata = (ObjectData) m_odata.get(key);
         if (odata != null) {
             odata.setObject(obj);
+            setSessionKey(obj, key);
         }
     }
 
@@ -909,24 +939,43 @@ public class Session {
         }
     }
 
-    boolean hasObjectData(Object obj) {
-        return m_odata.containsKey(getSessionKey(obj));
+    ObjectData getObjectDataByKey(Object key) {
+        return (ObjectData) m_odata.get(key);
     }
 
-    ObjectData getObjectData(PropertyMap pmap) {
-        return (ObjectData) m_odata.get(getSessionKey(pmap));
+    boolean hasObjectData(Object obj) {
+        return m_keyless.containsKey(obj)
+            || (hasSessionKey(obj) && m_odata.containsKey(getSessionKey(obj)));
     }
 
     ObjectData getObjectData(Object obj) {
-        return (ObjectData) m_odata.get(getSessionKey(obj));
-    }
-
-    void removeObjectData(Object obj) {
-        m_odata.remove(getSessionKey(obj));
+        if (m_keyless.containsKey(obj)) {
+            return (ObjectData) m_keyless.get(obj);
+        } else if (hasSessionKey(obj)) {
+            return getObjectDataByKey(getSessionKey(obj));
+        } else {
+            return null;
+        }
     }
 
     void addObjectData(ObjectData odata) {
-        m_odata.put(getSessionKey(odata.getObject()), odata);
+        m_keyless.put(odata.getObject(), odata);
+    }
+
+    public boolean hasSessionKey(Object obj) {
+        return m_keys.containsKey(obj);
+    }
+
+    void setSessionKey(Object obj, Object key) {
+        if (m_keys.containsKey(obj)) {
+            throw new IllegalArgumentException
+                ("object already assigned key: " + obj);
+        }
+        ObjectData odata = (ObjectData) m_keyless.remove(obj);
+        if (odata != null) {
+            m_odata.put(key, odata);
+        }
+        m_keys.put(obj, key);
     }
 
     PropertyData getPropertyData(Object obj, Property prop) {
@@ -943,7 +992,7 @@ public class Session {
             RecordSet rs = getDataSet(obj).getCursor().execute();
             // Cache non-existent objects
             if (!rs.next()) {
-                m_odata.put(obj, null);
+                m_odata.put(getSessionKey(obj), null);
             } else {
                 do {
                     rs.load(this);
@@ -1138,7 +1187,7 @@ public class Session {
                 if (i > 0) {
                     msg.append(", ");
                 }
-                msg.append(args[i]);
+                msg.append(str(args[i]));
             }
             msg.append(") {");
             LOG.debug(msg.toString());
@@ -1179,4 +1228,19 @@ public class Session {
             LOG.debug(buf.toString());
         }
     }
+
+    static String str(Object obj) {
+        if (obj == null) {
+            return "null";
+        } else {
+            Class klass = obj.getClass();
+            if (String.class.isAssignableFrom(klass)
+                || Number.class.isAssignableFrom(klass)) {
+                return obj.toString();
+            } else {
+                return klass + "@" + System.identityHashCode(obj);
+            }
+        }
+    }
+
 }

@@ -22,16 +22,17 @@ import java.io.PrintWriter;
  * PropertyEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 public abstract class PropertyEvent extends Event {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/PropertyEvent.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/PropertyEvent.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     final private Property m_prop;
     final private Object m_arg;
     private PropertyData m_pdata;
+    private ObjectData m_argodata;
     private PropertyEvent m_origin;
 
     PropertyEvent(Session ssn, Object obj, Property prop, Object arg) {
@@ -82,8 +83,7 @@ public abstract class PropertyEvent extends Event {
     }
 
     ObjectData getArgumentObjectData() {
-        if (getArgument() == null) { return null; }
-        return getSession().getObjectData(getArgument());
+        return m_argodata;
     }
 
     void prepare() {
@@ -91,6 +91,8 @@ public abstract class PropertyEvent extends Event {
             getSession().fetchPropertyData(getObject(), getProperty());
         if (pd == null) { throw new IllegalStateException(this.toString()); }
         setPropertyData(pd);
+        m_argodata = getArgument() == null ?
+            null : getSession().getObjectData(getArgument());
     }
 
     void activate() {
@@ -139,7 +141,7 @@ public abstract class PropertyEvent extends Event {
     }
 
     public String toString() {
-        return getName() + " " + getObject() + "." + getProperty().getName() +
-            " " + getArgument();
+        return getName() + " " + getSession().str(getObject()) + "." +
+            getProperty().getName() + " " + getSession().str(getArgument());
     }
 }

@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/QFrame.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/QFrame.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -46,7 +46,7 @@ class QFrame {
     private List m_children;
 
     private Expression m_expression;
-    private ObjectType m_type;
+    private ObjectMap m_map;
     private QFrame m_container;
 
     private boolean m_outer;
@@ -84,9 +84,9 @@ class QFrame {
         m_colkeys = new ArrayList();
     }
 
-    void init(Expression expression, ObjectType type, QFrame container) {
+    void init(Expression expression, ObjectMap map, QFrame container) {
         m_expression = expression;
-        m_type = type;
+        m_map = map;
         m_container = container;
 
         m_children.clear();
@@ -120,8 +120,16 @@ class QFrame {
         return m_expression;
     }
 
+    ObjectMap getMap() {
+        return m_map;
+    }
+
     ObjectType getType() {
-        return m_type;
+        if (m_map == null) {
+            return null;
+        } else {
+            return m_map.getObjectType();
+        }
     }
 
     QFrame getContainer() {
@@ -1103,7 +1111,7 @@ class QFrame {
         result.append(" ");
         result.append(m_expression.summary());
         result.append(" ");
-        result.append(m_type);
+        result.append(getType());
         if (m_table != null) {
             result.append(" ");
             result.append(m_table);

@@ -15,18 +15,19 @@
 package com.redhat.persistence.oql;
 
 import com.redhat.persistence.metadata.*;
+import com.redhat.persistence.metadata.Static;
 import java.util.*;
 
 /**
  * AbstractJoin
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/07/22 $
+ * @version $Revision: #3 $ $Date: 2004/08/05 $
  **/
 
 public abstract class AbstractJoin extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/AbstractJoin.java#2 $ by $Author: richardl $, $DateTime: 2004/07/22 15:13:20 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/AbstractJoin.java#3 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private Expression m_left;
     private Expression m_right;
@@ -53,7 +54,7 @@ public abstract class AbstractJoin extends Expression {
         if (this instanceof LeftJoin) {
             right.setOuter(true);
         }
-        QFrame frame = gen.frame(this, join(left.getType(), right.getType()));
+        QFrame frame = gen.frame(this, join(left.getMap(), right.getMap()));
         frame.addChild(left);
         frame.addChild(right);
         List values = new ArrayList();
@@ -83,6 +84,53 @@ public abstract class AbstractJoin extends Expression {
     abstract String getJoinType();
 
     String summary() { return getJoinType(); }
+
+    static ObjectMap join(ObjectMap left, ObjectMap right) {
+        ObjectMap result =
+            new ObjectMap(join(left.getObjectType(), right.getObjectType()));
+        addMappings(result, left);
+        addMappings(result, right);
+        // XXX: key properties
+        return result;
+    }
+
+    private static void addMappings(ObjectMap to, ObjectMap from) {
+        for (Iterator it = from.getMappings().iterator(); it.hasNext(); ) {
+            to.addMapping(copy((Mapping) it.next()));
+        }
+    }
+
+    private static Mapping copy(final Mapping m) {
+        final Mapping[] result = { null };
+        m.dispatch(new Mapping.Switch() {
+            public void onValue(Value v) {
+                result[0] = new Value(v.getPath(), v.getColumn());
+            }
+            public void onJoinTo(JoinTo j) {
+                result[0] = new JoinTo(j.getPath(), j.getKey());
+            }
+            public void onJoinFrom(JoinFrom j) {
+                result[0] = new JoinFrom(j.getPath(), j.getKey());
+            }
+            public void onJoinThrough(JoinThrough j) {
+                result[0] =
+                    new JoinThrough(j.getPath(), j.getFrom(), j.getTo());
+            }
+            public void onQualias(Qualias q) {
+                result[0] = new Qualias(q.getPath(), q.getQuery());
+            }
+            public void onNested(Nested n) {
+                result[0] = new Nested(n.getPath(), n.getMap());
+            }
+            public void onStatic(Static s) {
+                result[0] = new Static(s.getPath());
+            }
+        });
+        Mapping cp = result[0];
+        cp.setRetrieve(m.getRetrieve());
+        // don't bother copying write side static stuff
+        return result[0];
+    }
 
     static ObjectType join(final ObjectType left, final ObjectType right) {
         Model anon = Model.getInstance("anonymous.join");

@@ -136,7 +136,7 @@ class StateManagerImpl extends AbstractStateManager {
             if (prop.isKeyProperty()) {
                 return getPropertyMap().get(prop);
             } else if (prop.isCollection()) {
-                return new CRPSet(ssn(), pc, prop);
+                return new CRPSet(ssn(), m_container, prop);
             } else {
                 return ssn().get(pc, prop);
             }

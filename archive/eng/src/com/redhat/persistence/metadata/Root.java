@@ -27,12 +27,12 @@ import java.util.Map;
  * Root
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/05 $
  **/
 
 public class Root {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Root.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Root.java#2 $ by $Author: rhs $, $DateTime: 2004/08/05 12:04:47 $";
 
     private static final class Location {
 
@@ -112,6 +112,10 @@ public class Root {
 
     public Collection getObjectTypes() {
         return m_types;
+    }
+
+    public boolean hasObjectMap(ObjectType type) {
+        return m_maps.containsKey(type);
     }
 
     public ObjectMap getObjectMap(ObjectType type) {
