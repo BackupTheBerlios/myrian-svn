@@ -16,7 +16,7 @@ import java.io.*;
  * OQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2004/07/21 $
+ * @version $Revision: #7 $ $Date: 2004/07/21 $
  */
 
 class OQLParser {
@@ -31,6 +31,7 @@ class OQLParser {
         EXPRESSIONS.put("full", FullJoin.class);
         EXPRESSIONS.put("filter", Filter.class);
         EXPRESSIONS.put("sort", Sort.class);
+        EXPRESSIONS.put("rsort", RSort.class);
         EXPRESSIONS.put("offset", Offset.class);
         EXPRESSIONS.put("limit", Limit.class);
         EXPRESSIONS.put("exists", Exists.class);

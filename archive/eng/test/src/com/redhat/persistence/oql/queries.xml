@@ -671,6 +671,23 @@
   </test>
 
   <test>
+    <query ordered="true">query(offset(rsort(all(test.A), id), 3), id = id)
+    </query>
+    <query ordered="true">
+      query(rsort(filter(all(test.A), id &lt; 7), id), id = id)
+    </query>
+    <results>
+      <row id="6"/>
+      <row id="5"/>
+      <row id="4"/>
+      <row id="3"/>
+      <row id="2"/>
+      <row id="1"/>
+      <row id="0"/>
+    </results>
+  </test>
+
+  <test>
     <query subselects="0" joins="2" outers="0">
       query(join(a = all(test.A), b = all(test.B),
                  exists(filter(l = all(test.Link),
@@ -721,17 +738,21 @@
     <query subselects="0" joins="1" outers="0">
       query(join(a = all(test.A), b = all(test.B), a == 3), a = a.id, b = b.id)
     </query>
+    <query ordered="true">
+      query(rsort(join(a = all(test.A), b = all(test.B), a == 3), b.id),
+            a = a.id, b = b.id)
+    </query>
     <results>
-      <row a="3" b ="10"/>
-      <row a="3" b ="11"/>
-      <row a="3" b ="12"/>
-      <row a="3" b ="13"/>
-      <row a="3" b ="14"/>
-      <row a="3" b ="15"/>
-      <row a="3" b ="16"/>
-      <row a="3" b ="17"/>
-      <row a="3" b ="18"/>
       <row a="3" b ="19"/>
+      <row a="3" b ="18"/>
+      <row a="3" b ="17"/>
+      <row a="3" b ="16"/>
+      <row a="3" b ="15"/>
+      <row a="3" b ="14"/>
+      <row a="3" b ="13"/>
+      <row a="3" b ="12"/>
+      <row a="3" b ="11"/>
+      <row a="3" b ="10"/>
     </results>
   </test>
 
@@ -901,6 +922,23 @@
       <row a="2" b="14" index="2"/>
       <row a="2" b="16" index="3"/>
       <row a="2" b="18" index="4"/>
+      <row a="3" b="11" index="0"/>
+    </results>
+  </test>
+
+  <test>
+    <query ordered="true" subselects="0" joins="1" outers="0">
+      query(sort(rsort(all(test.A).links, index), a), a = a.id, b = b.id, index = index)
+    </query>
+    <results>
+      <row a="0" b="10" index="0"/>
+      <row a="1" b="12" index="1"/>
+      <row a="1" b="11" index="0"/>
+      <row a="2" b="18" index="4"/>
+      <row a="2" b="16" index="3"/>
+      <row a="2" b="14" index="2"/>
+      <row a="2" b="12" index="1"/>
+      <row a="2" b="10" index="0"/>
       <row a="3" b="11" index="0"/>
     </results>
   </test>

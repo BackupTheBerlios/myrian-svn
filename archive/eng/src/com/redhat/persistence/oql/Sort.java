@@ -18,12 +18,12 @@ package com.redhat.persistence.oql;
  * Sort
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/07/21 $
  **/
 
 public class Sort extends Expression {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Sort.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/oql/Sort.java#2 $ by $Author: ashah $, $DateTime: 2004/07/21 11:37:37 $";
 
     public static class Order {
         private Order() {}
@@ -80,7 +80,7 @@ public class Sort extends Expression {
     }
 
     public String toString() {
-        return "sort(" + m_query + ", " + m_key + ")";
+        return summary() + "(" + m_query + ", " + m_key + ")";
     }
 
 }
