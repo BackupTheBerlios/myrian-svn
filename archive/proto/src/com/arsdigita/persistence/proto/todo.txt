@@ -85,6 +85,7 @@ Cleanup:
  * Public way to access new session for calling flush()
  * Adapters
  * Rename everything
+ * Metadata: think about multiple clients, clean up PDL.java
 
 Testing:
   Make metatest not abort.
