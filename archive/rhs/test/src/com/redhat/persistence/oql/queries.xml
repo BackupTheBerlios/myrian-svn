@@ -1193,19 +1193,33 @@
     <query fetched="group,name,last" joins="1" outers="1">
       query(all(test.Group), group = name, name = other.name, last = other.lastName)
     </query>
+    <!-- This might look slightly weird since we're pretending there
+         is some inheritence relation between User and Group in order
+         to test discriminator-like functionality even though that
+         isn't the case in this instance -->
+    <query fetched="id,type" joins="1" outers="1" subselects="0">
+      query(g = all(test.Group),
+            id = g.id,
+            type = if(filter(u = all(test.User), u.id == g.id) == null,
+                      "test.Group", "test.User"))
+    </query>
     <results>
-      <row id="0" group="Pop" name="Ashanti" last="null"/>
-      <row id="1" group="Rock" name="Britney" last="Spears"/>
-      <row id="2" group="R&amp;B" name="Christina" last="Aguilera"/>
-      <row id="3" group="Country" name="Debbie" last="Gibson"/>
-      <row id="4" group="New Age" name="Enya" last="null"/>
-      <row id="5" group="Film" name="Faith" last="Hill"/>
-      <row id="6" group="Television" name="Gloria" last="Estefan"/>
-      <row id="7" group="80s" name="Hillary" last="Duff"/>
-      <row id="8" group="90s" name="Indigo" last="null"/>
-      <row id="9" group="00s" name="Jennifer" last="Lopez"/>
-      <row id="10" group="Music" name="null" last="null"/>
-      <row id="11" group="Entertainment" name="null" last="null"/>
+      <row id="0" type="test.User" group="Pop" name="Ashanti" last="null"/>
+      <row id="1" type="test.User" group="Rock" name="Britney" last="Spears"/>
+      <row id="2" type="test.User" group="R&amp;B" name="Christina"
+           last="Aguilera"/>
+      <row id="3" type="test.User" group="Country" name="Debbie"
+           last="Gibson"/>
+      <row id="4" type="test.User" group="New Age" name="Enya" last="null"/>
+      <row id="5" type="test.User" group="Film" name="Faith" last="Hill"/>
+      <row id="6" type="test.User" group="Television" name="Gloria"
+           last="Estefan"/>
+      <row id="7" type="test.User" group="80s" name="Hillary" last="Duff"/>
+      <row id="8" type="test.User" group="90s" name="Indigo" last="null"/>
+      <row id="9" type="test.User" group="00s" name="Jennifer" last="Lopez"/>
+      <row id="10" type="test.Group" group="Music" name="null" last="null"/>
+      <row id="11" type="test.Group" group="Entertainment" name="null"
+           last="null"/>
     </results>
   </test>
 </tests>
