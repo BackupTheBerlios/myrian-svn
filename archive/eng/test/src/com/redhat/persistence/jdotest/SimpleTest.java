@@ -10,8 +10,11 @@ import java.sql.*;
 import java.util.*;
 import java.math.BigInteger;
 import javax.jdo.*;
+
 import junit.extensions.TestSetup;
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 public class SimpleTest extends TestCase {
 
