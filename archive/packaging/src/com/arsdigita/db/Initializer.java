@@ -33,7 +33,7 @@ public class Initializer
 
     private Configuration m_conf = new Configuration();
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/db/Initializer.java#3 $ by $Author: justin $, $DateTime: 2003/08/27 12:51:55 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/db/Initializer.java#4 $ by $Author: rhs $, $DateTime: 2003/08/27 19:10:24 $";
 
     public static final String JDBC_URL = "jdbcUrl";
     public static final String DB_USERNAME = "dbUsername";
@@ -199,8 +199,20 @@ public class Initializer
 
         try {
             Connection m_conn = cm.getConnection();
-            String testDBConnection = "select 1 from dual";
-            PreparedStatement pstmt = m_conn.prepareStatement(testDBConnection);
+            String testDBConnection;
+            switch (database) {
+            case DbHelper.DB_ORACLE:
+                testDBConnection = "select 1 from dual";
+                break;
+            case DbHelper.DB_POSTGRES:
+                testDBConnection = "select 1";
+                break;
+            default:
+                DbHelper.unsupportedDatabaseError("db api");
+                testDBConnection = null;
+            }
+            PreparedStatement pstmt =
+                m_conn.prepareStatement(testDBConnection);
             ResultSet rset = pstmt.executeQuery();
             rset.next();
             rset.close();
