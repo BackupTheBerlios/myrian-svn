@@ -1,3 +1,18 @@
+--
+-- Triggers to maintain denormalizations
+--
+
+create or replace function parties_groups_in_fn () returns opaque as '
+begin
+  perform parties_add_group(new.group_id);
+  return null;
+end;' language 'plpgsql';
+
+create trigger parties_groups_in_tr
+after insert on groups
+for each row execute procedure
+parties_groups_in_fn();
+
 -- Subgroup triggers
 
 

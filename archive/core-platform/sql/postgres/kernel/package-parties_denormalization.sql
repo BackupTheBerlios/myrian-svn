@@ -73,6 +73,7 @@ create or replace function parties_remove_subgroup (
     v_subgroup_id alias for $2;
     v_path_decrement integer;
     remove_entry record;
+    v_exists_p integer;
   begin
 
       for remove_entry in 
@@ -83,7 +84,7 @@ create or replace function parties_remove_subgroup (
           where ancestors.subgroup_id = v_group_id
             and descendants.group_id = v_subgroup_id
       loop
-
+      
         if ((remove_entry.group_id = v_group_id) or
             (remove_entry.subgroup_id = v_subgroup_id)) then
             v_path_decrement := 1;
@@ -91,21 +92,23 @@ create or replace function parties_remove_subgroup (
             v_path_decrement := remove_entry.n_paths;
         end if;
 
-        -- delete this entry if n_path would become 0 if we were
-        -- to decrement n_paths
-        delete from group_subgroup_trans_index
+        select count(*) into v_exists_p from group_subgroup_trans_index
         where group_id = remove_entry.group_id
           and subgroup_id = remove_entry.subgroup_id
           and n_paths <= v_path_decrement;
 
-        -- if nothing got deleted, then decrement n_paths
-        if (NOT FOUND) then
-
+        if (v_exists_p > 0) then
+           -- delete this entry if n_path would become 0 if we were
+           -- to decrement n_paths
+           delete from group_subgroup_trans_index
+           where group_id = remove_entry.group_id
+             and subgroup_id = remove_entry.subgroup_id
+             and n_paths <= v_path_decrement;
+        else
            update group_subgroup_trans_index
               set n_paths = n_paths - v_path_decrement
             where group_id = remove_entry.group_id
               and subgroup_id = remove_entry.subgroup_id;
-
         end if;
 
       end loop;
@@ -140,16 +143,18 @@ create or replace function parties_add_member (
           end if;
 
           select count(*) into v_exists_p
-          from group_subgroup_trans_index
+          from group_member_trans_index
           where group_id = new_entry.group_id
-            and subgroup_id = new_entry.subgroup_id;
+            and member_id = v_member_id;
 
           IF (v_exists_p > 0) THEN          
+
               update group_member_trans_index
               set n_paths = n_paths + v_path_increment
               where group_id = new_entry.group_id
                 and member_id = v_member_id;
           else 
+
               insert into group_member_trans_index
               (group_id, member_id, n_paths)
               values
@@ -169,6 +174,7 @@ create or replace function parties_remove_member (
      v_member_id alias for $2;
      v_path_decrement integer;
      remove_entry record;
+     v_exists_p integer;
   begin
 
       for remove_entry in 
@@ -182,22 +188,25 @@ create or replace function parties_remove_member (
         else
             v_path_decrement := remove_entry.n_paths;
         end if;
+        
+        select count(*) into v_exists_p
+           from group_member_trans_index
+          where group_id = remove_entry.group_id
+            and member_id = v_member_id
+            and n_paths <= v_path_decrement;
 
-        -- delete this entry if n_path would become 0 if we were
-        -- to decrement n_paths
-        delete from group_member_trans_index
-        where group_id = remove_entry.group_id
-          and member_id = v_member_id
-          and n_paths <= v_path_decrement;
-
-        -- if nothing got deleted, then decrement n_paths
-        if (NOT FOUND) then
-
+        IF (v_exists_p > 0) THEN          
+          -- delete this entry if n_path would become 0 if we were
+          -- to decrement n_paths
+          delete from group_member_trans_index
+          where group_id = remove_entry.group_id
+            and member_id = v_member_id
+            and n_paths <= v_path_decrement;
+        else 
            update group_member_trans_index
               set n_paths = n_paths - v_path_decrement
             where group_id = remove_entry.group_id
               and member_id = v_path_decrement;
-
         end if;
 
       end loop;
@@ -214,6 +223,7 @@ create or replace function parties_add_subgroup_members (
     v_subgroup_id alias for $2;
     v_path_increment integer;
     new_entry record;
+    v_exists_p integer;
   begin
 
       for new_entry in 
@@ -232,9 +242,9 @@ create or replace function parties_add_subgroup_members (
           end if;
 
           select count(*) into v_exists_p
-          from group_subgroup_trans_index
+          from group_member_trans_index
           where group_id = new_entry.group_id
-            and subgroup_id = new_entry.subgroup_id;
+            and member_id = new_entry.member_id;
 
           IF (v_exists_p > 0) THEN          
               update group_member_trans_index
@@ -252,6 +262,7 @@ create or replace function parties_add_subgroup_members (
   return null;
   end;' language 'plpgsql';
 
+
 create or replace function parties_remove_subgroup_members (
       integer, integer
   )
@@ -261,8 +272,8 @@ create or replace function parties_remove_subgroup_members (
     v_subgroup_id alias for $2;
     v_path_decrement integer;
     remove_entry record;
+    v_exists_p integer;
   begin
-
       for remove_entry in
           select ancestors.group_id, members.member_id,
                  (ancestors.n_paths * members.n_paths) as n_paths
@@ -278,21 +289,24 @@ create or replace function parties_remove_subgroup_members (
             v_path_decrement := remove_entry.n_paths;
           end if;
 
-        -- delete this entry if n_path would become 0 if we were
-        -- to decrement n_paths
-        delete from group_member_trans_index
-        where group_id = remove_entry.group_id
-          and member_id = remove_entry.member_id
-          and n_paths <= v_path_decrement;
+        select count(*) into v_exists_p 
+        from group_member_trans_index
+          where group_id = remove_entry.group_id
+            and member_id = remove_entry.member_id
+            and n_paths <= v_path_decrement;
 
-        -- if nothing got deleted, then decrement n_paths
-        if (NOT FOUND) then
-
+        IF (v_exists_p > 0) THEN          
+          -- delete this entry if n_path would become 0 if we were
+          -- to decrement n_paths
+          delete from group_member_trans_index
+          where group_id = remove_entry.group_id
+            and member_id = remove_entry.member_id
+            and n_paths <= v_path_decrement;
+        else 
            update group_member_trans_index
               set n_paths = n_paths - v_path_decrement
             where group_id = remove_entry.group_id
               and member_id = remove_entry.member_id;
-
         end if;
 
       end loop;
