@@ -83,12 +83,12 @@ public class TestPDLGenerator {
         }
 
 	PDL.compilePDLFiles(library);
+	PDL.compilePDLFiles(files);
 
         Map map = getTestDirectoryMapping(files);
         for (Iterator it = map.keySet().iterator(); it.hasNext(); ) {
             String directory = (String) it.next();
             List filesForDirectory = (List) map.get(directory);
-            PDL.compilePDLFiles(filesForDirectory);
             generateSQL(directory, filesForDirectory, options);
         }
     }

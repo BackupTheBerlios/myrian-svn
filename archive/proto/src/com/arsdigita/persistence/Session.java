@@ -55,7 +55,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #26 $ $Date: 2003/04/10 $
+ * @version $Revision: #27 $ $Date: 2003/04/18 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -79,12 +79,11 @@ public class Session {
 
                 public Object getObject(com.arsdigita.persistence.proto.metadata.ObjectType type,
                                         PropertyMap props) {
-                    ObjectType ot = C.fromType(type);
-
-                    if (ot == null) {
+		    if (!type.isKeyed()) {
                         return props;
                     }
 
+                    ObjectType ot = C.fromType(type);
                     OID oid = new OID(ot);
                     for (Iterator it = props.entrySet().iterator();
                          it.hasNext(); ) {
@@ -119,8 +118,9 @@ public class Session {
                     return C.type(((DataObjectImpl) obj).getObjectType());
                 }
             };
-        Adapter.addAdapter(DataObjectImpl.class, null, ad);
-        Adapter.addAdapter(PropertyMap.class, null, ad);
+        Adapter.addAdapter(DataObjectImpl.class, ad);
+        Adapter.addAdapter(PropertyMap.class, ad);
+	Adapter.addAdapter(null, ad);
     }
 
     private ConnectionSource m_cs = new ConnectionSource() {

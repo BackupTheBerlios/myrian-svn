@@ -14,12 +14,12 @@ import org.apache.log4j.Logger;
  * SessionSuite
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #9 $ $Date: 2003/03/05 $
+ * @version $Revision: #10 $ $Date: 2003/04/18 $
  **/
 
 public class SessionSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/SessionSuite.java#9 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/SessionSuite.java#10 $";
 
     private static final Logger s_log = Logger.getLogger(SessionSuite.class);
 
@@ -247,9 +247,7 @@ public class SessionSuite extends PackageTestSuite {
         m_two = createKeyedType(m_model, "Two");
 
         Adapter a = new Generic.Adapter();
-        Adapter.addAdapter(Generic.class, m_root, a);
-        Adapter.addAdapter(Generic.class, m_one, a);
-        Adapter.addAdapter(Generic.class, m_two, a);
+        Adapter.addAdapter(Generic.class, a);
 
 //         ObjectType int3 = createUnkeyedType(
 //             m_model, "Int3", new ObjectType[] { inte, inte, inte });
@@ -262,7 +260,7 @@ public class SessionSuite extends PackageTestSuite {
 
 //         ObjectType rootone = createUnkeyedType(
 //             m_model, "RootOne", new ObjectType[] { m_root, m_one});
-                                            
+
 //         ObjectType roottwo = createUnkeyedType(
 //             m_model, "RootTwo", new ObjectType[] { m_root, m_two });
 
@@ -414,6 +412,7 @@ public class SessionSuite extends PackageTestSuite {
 
     private static ObjectType createKeyedType(Model m, String name) {
         ObjectType ot = new ObjectType(m, name, null);
+	ot.setJavaClass(Generic.class);
 
         Role id = new Role(
             "id", Root.getRoot().getObjectType(INTE),
@@ -432,6 +431,7 @@ public class SessionSuite extends PackageTestSuite {
     private static ObjectType createUnkeyedType(Model m, String name,
                                                 ObjectType[] ots) {
         ObjectType ot = new ObjectType(m, name, null);
+	ot.setJavaClass(Generic.class);
 
         Root.getRoot().addObjectType(ot);
 
@@ -448,7 +448,7 @@ public class SessionSuite extends PackageTestSuite {
                                boolean aCollection, boolean bCollection,
                                boolean aComponent, boolean bComponent,
                                boolean aNullable, boolean bNullable) {
-        
+
         if (// two component ends
             (aComponent == true && bComponent == true) ||
             // the composite side must not be a collection
@@ -473,7 +473,7 @@ public class SessionSuite extends PackageTestSuite {
         }
 
         String name =
-            a.getName() + 
+            a.getName() +
             (aCollection ? "0-n" :
              (aNullable ? "0-1" : "1-1")) +
             (bCollection ? "<->0-n" :
@@ -525,7 +525,7 @@ public class SessionSuite extends PackageTestSuite {
         }
 
         a.addProperty(new Role(
-                               a.getName() + 
+                               a.getName() +
                                (bCollection ? "->0-n" :
                                 (isNullable ? "->0-1" : "->1-1")) +
                                // (aCollection ? "->0-n" : "->0-1") +

@@ -16,8 +16,7 @@
 package com.arsdigita.persistence.oql;
 
 import com.arsdigita.persistence.*;
-import com.arsdigita.persistence.metadata.*;
-import com.arsdigita.persistence.metadata.Table;
+import com.arsdigita.persistence.proto.metadata.*;
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.util.StringUtils;
 import org.apache.log4j.Logger;
@@ -29,12 +28,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/04/09 $
+ * @version $Revision: #3 $ $Date: 2003/04/18 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/oql/QueryTest.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/oql/QueryTest.java#3 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);
@@ -44,10 +43,10 @@ public class QueryTest extends PersistenceTestCase {
     }
 
     private void doTest(String name, String typeName, String[] properties) {
-        MetadataRoot root = MetadataRoot.getMetadataRoot();
+        Root root = Root.getRoot();
         ObjectType type = root.getObjectType(typeName);
         assertTrue("No such type: " + typeName, type != null);
-        Query query = new Query(type);
+        /*Query query = new Query(type);
 
         if (properties == null) {
             query.fetchDefault();
@@ -58,8 +57,9 @@ public class QueryTest extends PersistenceTestCase {
         }
 
         query.generate();
-        Operation actual = query.getOperation();
-        compare(name + ".op", actual.toString());
+        Operation actual = query.getOperation();*/
+        //compare(name + ".op", actual.toString());
+	compare(name + ".op", "not implemented");
     }
 
     private void compare(String expectedResource, String actual) {
@@ -245,7 +245,7 @@ public class QueryTest extends PersistenceTestCase {
     }
 
     private void doTableTest(String tableName) {
-        MetadataRoot root = MetadataRoot.getMetadataRoot();
+        Root root = Root.getRoot();
         Table table = root.getTable(tableName);
         assertTrue("No such table: " + tableName, table != null);
         compare(table.getName() + ".sql", table.getSQL(false));

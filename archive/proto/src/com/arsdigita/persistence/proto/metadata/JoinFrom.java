@@ -6,12 +6,12 @@ import com.arsdigita.persistence.proto.common.*;
  * JoinFrom
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/03/05 $
+ * @version $Revision: #2 $ $Date: 2003/04/18 $
  **/
 
 public class JoinFrom extends Mapping {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/JoinFrom.java#1 $ by $Author: rhs $, $DateTime: 2003/03/05 18:41:57 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/JoinFrom.java#2 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
 
     private ForeignKey m_key;
 
@@ -21,7 +21,7 @@ public class JoinFrom extends Mapping {
     }
 
     public Table getTable() {
-        return m_key.getUniqueKey().getColumns()[0].getTable();
+        return m_key.getUniqueKey().getTable();
     }
 
     public ForeignKey getKey() {

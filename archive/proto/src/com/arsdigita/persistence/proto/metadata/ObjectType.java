@@ -7,15 +7,16 @@ import java.util.*;
  * ObjectType
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2003/04/04 $
+ * @version $Revision: #13 $ $Date: 2003/04/18 $
  **/
 
 public class ObjectType extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#12 $ by $Author: rhs $, $DateTime: 2003/04/04 20:45:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectType.java#13 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
 
     private Model m_model;
     private String m_name;
+    private Class m_class;
     private ObjectType m_super;
     private Mist m_properties = new Mist(this);
 
@@ -35,6 +36,14 @@ public class ObjectType extends Element {
 
     public String getName() {
         return m_name;
+    }
+
+    public void setJavaClass(Class klass) {
+	m_class = klass;
+    }
+
+    public Class getJavaClass() {
+	return m_class;
     }
 
     public String getQualifiedName() {
@@ -57,6 +66,14 @@ public class ObjectType extends Element {
         } else {
             return false;
         }
+    }
+
+    public boolean isKeyProperty(String name) {
+	return isKeyProperty(getProperty(name));
+    }
+
+    public boolean isKeyProperty(Property prop) {
+	return getKeyProperties().contains(prop);
     }
 
     public void addProperty(Property prop) {
@@ -176,6 +193,10 @@ public class ObjectType extends Element {
         } else {
             return m_super.getBasetype();
         }
+    }
+
+    public boolean isSubtypeOf(String name) {
+	return isSubtypeOf(getRoot().getObjectType(name));
     }
 
     public boolean isSubtypeOf(ObjectType type) {

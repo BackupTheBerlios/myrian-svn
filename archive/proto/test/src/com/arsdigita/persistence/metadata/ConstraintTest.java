@@ -15,6 +15,8 @@
 
 package com.arsdigita.persistence.metadata;
 
+import com.arsdigita.persistence.proto.metadata.*;
+
 import junit.framework.*;
 import java.util.ArrayList;
 
@@ -37,11 +39,14 @@ public class ConstraintTest extends TestCase {
 
         // generate some columns
         columns = new Column[5];
-        columns[0] = new Column(m_table, "test_my_long_column_name");
-        columns[1] = new Column(m_table, "s");
-        columns[2] = new Column(m_table, "the_longest_table_name_we_have_even_seen");
-        columns[3] = new Column(m_table, "another_name");
-        columns[4] = new Column(m_table, "yet_anotherName");
+        columns[0] = new Column("test_my_long_column_name");
+        columns[1] = new Column("s");
+        columns[2] = new Column("the_longest_table_name_we_have_even_seen");
+        columns[3] = new Column("another_name");
+        columns[4] = new Column("yet_anotherName");
+	for (int i = 0; i < columns.length; i++) {
+	    m_table.addColumn(columns[i]);
+	}
 
     }
 
@@ -87,22 +92,26 @@ public class ConstraintTest extends TestCase {
                    !names.contains(name));
         names.add(name);
         // now, make sure that we get the same name for the same item
-        Column column1 = new Column(m_table, "my_name");
+        Column column1 = new Column("my_name");
+	m_table.addColumn(column1);
         Constraint con1 = (new UniqueKey(null, column1));
 
         assertTrue("The same constraint returned different names: " +
                    con1.getName() + "; " + con1.getName(),
                    con1.getName().equals(con1.getName()));
-        Column column3 = new Column(m_table, "my_name1");
+        Column column3 = new Column("my_name1");
+	m_table.addColumn(column3);
         Constraint con3 = (new UniqueKey(null, column3));
         assertTrue("A similar name for the column returned the same " +
                    "constraint name: " + con3.getName(), 
                    !con3.getName().equals(con1.getName()));
 
         Table table = new Table("table_with_relatively_long_name");
-        Column column4 = new Column(table, "my_na");
+        Column column4 = new Column("my_na");
+	table.addColumn(column4);
         Constraint con4 = (new UniqueKey(null, column4));
-        Column column5 = new Column(table, "my_na1");
+        Column column5 = new Column("my_na1");
+	table.addColumn(column5);
         Constraint con5 = (new UniqueKey(null, column5));
         assertTrue("Two different constraints had the same name",
                    !con4.getName().equals(con5.getName()));

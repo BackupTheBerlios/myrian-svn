@@ -51,10 +51,10 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/04/15 $ */
+ * @version $Revision: #8 $ $Date: 2003/04/18 $ */
 
 public class OID {
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/OID.java#7 $ by $Author: ashah $, $DateTime: 2003/04/15 10:07:23 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/OID.java#8 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
 
     private ObjectType m_type;
     private Map m_values = new HashMap();
@@ -301,14 +301,17 @@ public class OID {
             // null has no type
             // if prop isn't an attribute, not sure what to do with it.
             if (prop.isAttribute() && value != null) {
-                // we can be sure this is a simpletype because isAttribute was true.
+                // we can be sure this is a simpletype because
+                // isAttribute was true.
                 SimpleType expectedType = (SimpleType)prop.getType();
-                Assert.assertTrue(expectedType.getJavaClass().isAssignableFrom(value.getClass()),
-                                  "expected value of type: " + expectedType.getJavaClass() +
-                                  "actual type used:" + value.getClass());
+                Assert.assertTrue
+		    (expectedType.getJavaClass().isAssignableFrom
+		     (value.getClass()),
+		     "expected value of type: " + expectedType.getJavaClass() +
+		     "actual type used:" + value.getClass());
             }
-            // TODO: can we do any data validation if the key property isn't an
-            // attribute?
+            // TODO: can we do any data validation if the key property
+            // isn't an attribute?
         }
 
         if (hasProperty(propertyName)) {

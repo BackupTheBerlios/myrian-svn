@@ -16,12 +16,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #19 $ $Date: 2003/04/11 $
+ * @version $Revision: #20 $ $Date: 2003/04/18 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#19 $ by $Author: vadim $, $DateTime: 2003/04/11 10:52:48 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#20 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
 
 
     public ProtoTest(String name) {
@@ -36,9 +36,10 @@ public class ProtoTest extends TestCase {
         ObjectType COMPONENT = Root.getRoot().getObjectType("test.Component");
 
         Adapter a = new Generic.Adapter();
-        Adapter.addAdapter(Generic.class, TEST, a);
-        Adapter.addAdapter(Generic.class, ICLE, a);
-        Adapter.addAdapter(Generic.class, COMPONENT, a);
+        Adapter.addAdapter(Generic.class, a);
+	TEST.setJavaClass(Generic.class);
+	ICLE.setJavaClass(Generic.class);
+	COMPONENT.setJavaClass(Generic.class);
 
         Generic test = new Generic(TEST, BigInteger.ZERO);
         Property NAME = TEST.getProperty("name");

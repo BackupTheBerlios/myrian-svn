@@ -15,7 +15,10 @@
 
 package com.arsdigita.persistence.metadata;
 
-import java.io.PrintStream;
+import com.arsdigita.persistence.proto.metadata.Root;
+import com.arsdigita.persistence.proto.metadata.Role;
+import com.arsdigita.persistence.proto.metadata.Link;
+
 import java.util.*;
 
 /**
@@ -28,28 +31,11 @@ import java.util.*;
  * REQUIRED, and COLLECTION.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/04/18 $
  **/
 
 public class Property extends Element {
 
-    /**
-     * These are the integer type codes for the different event types a
-     * Property may have.
-     **/
-
-    public final static int RETRIEVE = 0;
-    public final static int ADD = 1;
-    public final static int REMOVE = 2;
-    public final static int CLEAR = 3;
-    public final static int NUM_EVENT_TYPES = 4;
-
-    private final static String[] s_eventTypeText = {
-        "retrieve",
-        "add",
-        "remove",
-        "clear"
-    };
 
     /**
      * These are the integer type codes for the multiplicity of a Property.
@@ -82,163 +68,45 @@ public class Property extends Element {
         "[0..n]"
     };
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/Property.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
-
-    /**
-     * The container type of the property.
-     **/
-
-    private CompoundType m_container;
-
-    /**
-     * The name of the Property.
-     **/
-    private String m_name;
-
-    /**
-     * The DataType of the Property.
-     **/
-    private DataType m_type;
-
-    /**
-     * The multiplicity of the Property.
-     **/
-    private int m_multiplicity;
-
-    /**
-     * Indicates whether or not the Property is part of a composition relation
-     * or an association. All SimpleTypes are components.
-     **/
-    private boolean m_isComponent;
-    private boolean m_isComposite;
-
-    /**
-     * The Column used to store this Property. This may be null if the
-     * Property isn't actually stored in a Column.
-     **/
-    private Column m_column = null;
-
-    /**
-     * The JoinPath used to retrieve this Property.  This may be null if the
-     * Property is not a role reference.
-     */
-    private JoinPath m_joinPath = null;
-
-    /**
-     * If this Property plays a role in an Association then this field is
-     * set to the association.
-     **/
-    private Association m_assn = null;
-
-    /**
-     *
-     **/
-    private Event[] m_events = new Event[NUM_EVENT_TYPES];
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/Property.java#2 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
 
 
-    /**
-     * Constructs a new Property with the given name and DataType. By default
-     * the multiplicity is set to NULLABLE and isComponent defaults to true if
-     * <i>type</i> is simple, false otherwise.
-     *
-     * @param name The name of the property.
-     * @param type The DataType of the property.
-     **/
-
-    public Property(String name, DataType type) {
-        this(name, type, NULLABLE);
+    static Property
+	wrap(com.arsdigita.persistence.proto.metadata.Property prop) {
+	if (prop == null) {
+	    return null;
+	} else {
+	    return new Property(prop);
+	}
     }
 
-    /**
-     * Constructs a new Property with the given name, DataType, and
-     * multiplicity. IsComponent defaults to true if <i>type</i> is simple,
-     * false otherwise.
-     *
-     * @param name The name of the property.
-     * @param type The DataType of the property.
-     * @param multiplicity The multiplicity of the property.
-     **/
-
-    public Property(String name, DataType type, int multiplicity) {
-        // If it's a simple type it's a component, otherwise we default to
-        // association.
-        this(name, type, multiplicity, type.isSimple());
+    static Collection wrap(Collection props) {
+	ArrayList result = new ArrayList(props.size());
+	for (Iterator it = props.iterator(); it.hasNext(); ) {
+	    com.arsdigita.persistence.proto.metadata.Property prop =
+		(com.arsdigita.persistence.proto.metadata.Property) it.next();
+	    if (prop.getName().charAt(0) != '~') {
+		result.add(wrap(prop));
+	    }
+	}
+	return result;
     }
 
-    /**
-     * Constructs a new Property with the given name, DataType, multiplicity,
-     * and compositeness.
-     *
-     * @param name The name of the property.
-     * @param type The DataType of the property.
-     * @param multiplicity The multiplicity of the property.
-     * @param isComponent Indicates if the property is a component or not.
-     *
-     * @exception IllegalArgumentException If name is empty or null.
-     * @exception IllegalArgumentException If type is null.
-     * @exception IllegalArgumentException if multiplicity is not one of the
-     *            integer type codes for multiplicity.
-     **/
 
-    public Property(String name, DataType type, int multiplicity,
-                    boolean isComponent) {
-        this(name, type, multiplicity, isComponent, false);
+    com.arsdigita.persistence.proto.metadata.Property m_prop;
+
+    private Property(com.arsdigita.persistence.proto.metadata.Property prop) {
+        super(prop.getRoot(), prop);
+	m_prop = prop;
     }
 
-    /**
-     * Constructs a new Property with the given name, DataType, multiplicity,
-     * and compositeness.
-     *
-     * @param name The name of the property.
-     * @param type The DataType of the property.
-     * @param multiplicity The multiplicity of the property.
-     * @param isComponent Indicates if the property is a component or not.
-     * @param isComposite Indicates of the property is a composite or not.
-     *
-     * @exception IllegalArgumentException If name is empty or null.
-     * @exception IllegalArgumentException If type is null.
-     * @exception IllegalArgumentException if multiplicity is not one of the
-     *            integer type codes for multiplicity.
-     **/
-
-    public Property(String name, DataType type, int multiplicity,
-                    boolean isComponent, boolean isComposite) {
-        if (name == null || name.length() == 0) {
-            throw new IllegalArgumentException(
-                                               "The property name must be non null and non empty."
-                                               );
-        }
-        m_name = name;
-
-        if (type == null) {
-            throw new IllegalArgumentException(
-                                               "The property type must be non null."
-                                               );
-        }
-        m_type = type;
-
-        if (multiplicity < 0 || multiplicity >= s_multiplicityText.length) {
-            throw new IllegalArgumentException(
-                                               "The multiplicity must be one of the integer type codes " +
-                                               "defined in the Property class."
-                                               );
-        }
-        m_multiplicity = multiplicity;
-
-        m_isComponent = isComponent;
-        m_isComposite = isComposite;
-    }
-
-    void setContainer(CompoundType container) {
-        m_container = container;
-    }
 
     /**
      * Returns the container of this property.
      **/
 
     public CompoundType getContainer() {
-        return m_container;
+        return ObjectType.wrap(m_prop.getContainer());
     }
 
     /**
@@ -248,7 +116,7 @@ public class Property extends Element {
      **/
 
     public String getName() {
-        return m_name;
+        return m_prop.getName();
     }
 
 
@@ -259,7 +127,11 @@ public class Property extends Element {
      **/
 
     public DataType getType() {
-        return m_type;
+	if (isAttribute()) {
+	    return SimpleType.wrap(m_prop.getType());
+	} else {
+	    return ObjectType.wrap(m_prop.getType());
+	}
     }
 
 
@@ -271,7 +143,7 @@ public class Property extends Element {
      **/
 
     public boolean isAttribute() {
-        return m_type.isSimple();
+        return m_prop.getType().getModel().getName().equals("global");
     }
 
 
@@ -283,7 +155,7 @@ public class Property extends Element {
      **/
 
     public boolean isRole() {
-        return m_type.isCompound();
+        return !isAttribute();
     }
 
 
@@ -295,7 +167,13 @@ public class Property extends Element {
      **/
 
     public int getMultiplicity() {
-        return m_multiplicity;
+	if (isCollection()) {
+	    return COLLECTION;
+	} else if (isNullable()) {
+	    return NULLABLE;
+	} else {
+	    return REQUIRED;
+	}
     }
 
 
@@ -306,7 +184,7 @@ public class Property extends Element {
      **/
 
     public boolean isCollection() {
-        return m_multiplicity == COLLECTION;
+        return m_prop.isCollection();
     }
 
     /**
@@ -316,7 +194,7 @@ public class Property extends Element {
      **/
 
     public boolean isNullable() {
-        return m_multiplicity == NULLABLE;
+        return m_prop.isNullable();
     }
 
 
@@ -327,8 +205,9 @@ public class Property extends Element {
      **/
 
     public boolean isRequired() {
-        return m_multiplicity == REQUIRED;
+        return !m_prop.isNullable() && !m_prop.isCollection();
     }
+
 
     /**
      * Returns true if this property is a component.
@@ -337,77 +216,7 @@ public class Property extends Element {
      **/
 
     public boolean isComponent() {
-        return m_isComponent;
-    }
-
-    void setComponent(boolean value) {
-        m_isComponent = value;
-    }
-
-
-    /**
-     * Sets the Column used to store this Property.
-     *
-     * @param column The column.
-     **/
-
-    public void setColumn(Column column) {
-        m_column = column;
-    }
-
-
-    /**
-     * Returns the Column used to store this Property.
-     *
-     * @return the Column used to store this Property.
-     */
-    public Column getColumn() {
-        return m_column;
-    }
-
-
-    /**
-     * Sets the JoinPath used to retrieve this Property.
-     *
-     * @param joinPath the JoinPath
-     */
-    public void setJoinPath(JoinPath joinPath) {
-        m_joinPath = joinPath;
-    }
-
-
-    /**
-     * Returns the JoinPath used to retrieve this Property.
-     *
-     * @return the JoinPath used to retrieve this Property.
-     */
-    public JoinPath getJoinPath() {
-        return m_joinPath;
-    }
-
-    Column getKeyColumn() {
-        if (m_column != null) {
-            return m_column;
-        }
-
-        if (m_joinPath != null &&
-            !isCollection() &&
-            m_joinPath.getPath().size() == 1) {
-            return m_joinPath.getJoinElement(0).getFrom();
-        }
-
-        return null;
-    }
-
-
-    /**
-     * This method is used when a Property is made part of an association.
-     *
-     * @param assn The association that this Property is part of.
-     **/
-
-    void setAssociation(Association assn) {
-        m_assn = assn;
+        return m_prop.isComponent();
     }
 
 
@@ -419,7 +228,12 @@ public class Property extends Element {
      **/
 
     public Association getAssociation() {
-        return m_assn;
+	Property p = getAssociatedProperty();
+	if (p == null) {
+	    return null;
+	} else {
+	    return new Association(this, p);
+	}
     }
 
 
@@ -431,11 +245,11 @@ public class Property extends Element {
      **/
 
     public CompoundType getLinkType() {
-        if (m_assn == null) {
-            return null;
-        } else {
-            return m_assn.getLinkType();
-        }
+	if (m_prop instanceof Link) {
+	    return ObjectType.wrap(((Link) m_prop).getLinkType());
+	} else {
+	    return null;
+	}
     }
 
 
@@ -445,11 +259,11 @@ public class Property extends Element {
      **/
 
     public Property getAssociatedProperty() {
-        if (m_assn == null) {
-            return null;
-        } else {
-            return m_assn.getAssociatedProperty(this);
-        }
+	if (m_prop instanceof Role) {
+	    return Property.wrap(((Role) m_prop).getReverse());
+	} else {
+	    return null;
+	}
     }
 
 
@@ -459,50 +273,14 @@ public class Property extends Element {
      **/
 
     public boolean isComposite() {
-        return m_isComposite;
+        Property rev = getAssociatedProperty();
+	if (rev == null) {
+	    return false;
+	} else {
+	    return rev.isComponent();
+	}
     }
 
-    void setComposite(boolean value) {
-        m_isComposite = value;
-    }
-
-
-    /**
-     * Sets the Event of the given type.
-     *
-     * @param type The integer type code for the event type.
-     * @param event The event.
-     **/
-
-    public void setEvent(int type, Event event) {
-        m_events[type] = event;
-    }
-
-    /**
-     * Gets the Event of the given type.
-     *
-     * @param type The integer type code for the event type.
-     *
-     * @return The specified event.
-     **/
-
-    public Event getEvent(int type) {
-        return m_events[type];
-    }
-
-    public static final String getEventName(int type) {
-        return s_eventTypeText[type];
-    }
-
-    public static final int getEventCode(String name) {
-        for (int i = 0; i < s_eventTypeText.length; i++) {
-            if (s_eventTypeText[i].equals(name)) {
-                return i;
-            }
-        }
-
-        throw new IllegalArgumentException(name + ": not a valid event");
-    }
 
     /**
      * Returns the java class for the object that will be returned when
@@ -519,160 +297,12 @@ public class Property extends Element {
                 return com.arsdigita.persistence.DataObject.class;
             }
         } else {
-            return ((SimpleType) m_type).getJavaClass();
-        }
-    }
-
-    /**
-     * Outputs a serialized representation of this Properties events.
-     *
-     * @param out The PrintStream to use for output.
-     **/
-
-    void outputPDLEvents(PrintStream out) {
-        for (int i = 0; i < NUM_EVENT_TYPES; i++) {
-            Event event = getEvent(i);
-            if (event == null) {
-                continue;
-            }
-
-            out.println();
-            out.print("    " + s_eventTypeText[i] + " " + getName() + " ");
-            event.outputPDL(out);
-            out.println();
-        }
-    }
-
-
-    /**
-     * Outputs a serialized representation of this Property.
-     *
-     * The following format is used:
-     *
-     * <pre>
-     *     ["component"] &lt;name&gt; [ "[1..1]" | "[0..n]" ] &lt;type&gt; [ "=" &lt;column&gt; ]
-     * </pre>
-     *
-     * @param out The PrintStream to use for output.
-     **/
-
-    void outputPDL(PrintStream out) {
-        String start = "";
-
-        if (isComponent() && isRole()) {
-            start = start + "component ";
-        }
-
-        start = start + m_type.getQualifiedName() +
-            s_multiplicityText[m_multiplicity];
-        out.print(start);
-
-        int padd = 22 - start.length();
-        if (padd < 1) {
-            padd = 1;
-        }
-        for (int i = 0; i < padd; i++) {
-            out.print(" ");
-        }
-
-        out.print(m_name);
-
-        if (m_column != null) {
-            padd = 32 - start.length() - padd - m_name.length();
-            if (padd < 1) {
-                padd = 1;
-            }
-            for (int i = 0; i < padd; i++) {
-                out.print(" ");
-            }
-            out.print("= ");
-            m_column.outputPDL(out);
-        } else if (m_joinPath != null) {
-            padd = 32 - start.length() - padd - m_name.length();
-            if (padd < 1) {
-                padd = 1;
-            }
-            for (int i = 0; i < padd; i++) {
-                out.print(" ");
-            }
-            out.print("= ");
-            m_joinPath.outputPDL(out);
+            return ((SimpleType) getType()).getJavaClass();
         }
     }
 
     public boolean isKeyProperty() {
-        if (m_container instanceof ObjectType) {
-            ObjectType ot = (ObjectType) m_container;
-            return ot.isKeyProperty(m_name);
-        } else {
-            return false;
-        }
-    }
-
-    void setNullability() {
-        if (m_column != null) {
-            if (isKeyProperty()) {
-                m_column.setNullable(false);
-            } else {
-                m_column.setNullable(isNullable());
-            }
-        }
-
-        if (m_joinPath != null) {
-            List path = m_joinPath.getPath();
-            switch (path.size()) {
-            case 1:
-                JoinElement je = m_joinPath.getJoinElement(0);
-                if (isCollection()) {
-                    je.getTo().setNullable(true);
-                } else {
-                    je.getFrom().setNullable(isNullable());
-                }
-                break;
-            case 2:
-                JoinElement one = m_joinPath.getJoinElement(0);
-                JoinElement two = m_joinPath.getJoinElement(1);
-                one.getTo().setNullable(false);
-                two.getFrom().setNullable(false);
-                break;
-            default:
-                m_joinPath.error("Don't know how to deal with length " +
-                                 path.size() + " join paths.");
-                break;
-            }
-        }
-    }
-
-    void generateForeignKeys() {
-        if (m_joinPath != null) {
-            boolean cascade = false;
-            switch (m_joinPath.getPath().size()) {
-            case 1:
-                JoinElement je = m_joinPath.getJoinElement(0);
-                if (je.getFrom().isUniqueKey() && !je.getTo().isUniqueKey()) {
-                    cascade = isComponent();
-                } else if (je.getFrom().isUniqueKey() &&
-                           je.getTo().isUniqueKey()) {
-                    cascade = isComposite() || isComponent();
-                } else if (!je.getFrom().isUniqueKey() &&
-                           je.getTo().isUniqueKey()) {
-                    cascade = isComposite();
-                } else if (!je.getTo().isUniqueKey() &&
-                           !je.getFrom().isUniqueKey()) {
-                    // Should this be a warning?
-                }
-                break;
-            case 2:
-                cascade = true;
-                break;
-            default:
-                m_joinPath.error("Don't know how to deal with length " +
-                                 m_joinPath.getPath().size() + " join paths.");
-                break;
-            }
-
-            m_joinPath.generateForeignKeys(cascade, isCollection());
-        }
+	return m_prop.isKeyProperty();
     }
 
 }

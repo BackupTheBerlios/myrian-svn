@@ -22,14 +22,11 @@ import com.arsdigita.util.UncheckedWrapperException;
 import com.arsdigita.util.Assert;
 import com.arsdigita.util.cmd.*;
 
-import com.arsdigita.persistence.pdl.ast.AST;
 import com.arsdigita.persistence.Utilities;
 import com.arsdigita.persistence.proto.pdl.DDLWriter;
 import com.arsdigita.persistence.proto.metadata.Root;
 import com.arsdigita.persistence.metadata.MetadataRoot;
-import com.arsdigita.persistence.metadata.ObjectType;
 import com.arsdigita.persistence.proto.metadata.Table;
-import com.arsdigita.persistence.oql.Query;
 import com.arsdigita.db.DbHelper;
 
 import java.io.File;
@@ -63,31 +60,20 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/04/09 $
+ * @version $Revision: #8 $ $Date: 2003/04/18 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/PDL.java#7 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/PDL.java#8 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;
 
     // the abstract syntax tree root nod
-    private AST m_ast = new AST();
     private com.arsdigita.persistence.proto.pdl.PDL m_pdl =
         new com.arsdigita.persistence.proto.pdl.PDL();
     private StringBuffer m_file = new StringBuffer(1024*10);
-
-    /**
-     * Retrieve a reference to the abstract syntax tree generated from the
-     * PDL files.
-     *
-     * @return a reference to the AST
-     */
-    public AST getAST() {
-        return m_ast;
-    }
 
     /**
      * Generates the metadata that corresponds to the AST generated from the
@@ -96,9 +82,9 @@ public class PDL {
      * @param root the metadata root node to build the metadata beneath
      */
     public void generateMetadata(MetadataRoot root) {
-        m_ast.generateMetadata(root);
         m_pdl.emit(Root.getRoot());
         m_pdl.emitVersioned();
+	MetadataRoot.loadPrimitives();
     }
 
     /**
@@ -109,27 +95,7 @@ public class PDL {
      * @throws PDLException thrown on a parsing error.
      */
     public void load(Reader r, String filename) throws PDLException {
-        m_file.setLength(0);
-        char[] buf = new char[1024];
-        int nchars;
-        do {
-            try {
-                nchars = r.read(buf);
-            } catch (IOException e) {
-                throw new PDLException(e.getMessage());
-            }
-            if (nchars > 0) {
-                m_file.append(buf, 0, nchars);
-            }
-        } while (nchars > 0);
-
-        try {
-            Parser p = new Parser(new StringReader(m_file.toString()));
-            p.file(m_ast, filename);
-            m_pdl.load(new StringReader(m_file.toString()), filename);
-        } catch (ParseException e) {
-            throw new PDLException(e.getMessage());
-        }
+	m_pdl.load(r, filename);
     }
 
     /**
@@ -197,7 +163,6 @@ public class PDL {
             "containing the MDSQL generated events",
             null
             ));
-        CMD.addSwitch(new StringSwitch("-dot", "undocumented", null));
         CMD.addSwitch(new StringSwitch("-database", "target database", null));
         CMD.addSwitch(new FileSwitch("-sqldir", "sql directory", null));
         CMD.addSwitch(new BooleanSwitch("-debug", "sets logging to DEBUG",
@@ -296,28 +261,6 @@ public class PDL {
             } catch (IOException ioe) {
                 throw new PDLException(ioe.getMessage());
             }
-        }
-
-        String dot = (String) options.get("-dot");
-        if (dot != null) {
-            String[] parts = StringUtils.split(dot, ':');
-            if (parts.length > 2) {
-                throw new PDLException(
-                    "Badly formated specification: " + dot
-                    );
-            }
-            ObjectType type = root.getObjectType(parts[0]);
-            if (type == null) {
-                throw new PDLException("No such type: " + parts[0]);
-            }
-            Query query = new Query(type);
-            if (parts.length == 2) {
-                query.fetch(parts[1]);
-            } else {
-                query.fetchDefault();
-            }
-            query.generate();
-            query.dumpDot(new File("/tmp/out.dot"));
         }
     }
 

@@ -16,22 +16,18 @@
 package com.arsdigita.persistence;
 
 
-import com.arsdigita.persistence.sql.Element;
-
-
-
 /**
  * This manipulates SQL in a way that is specific to Oracle.  For
  * instance, it has the ability to replace bind variables with the
  * value of null with "is null" or "is not null"
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/01/09 $
+ * @version $Revision: #3 $ $Date: 2003/04/18 $
  */
 
 class OracleSQLUtilities implements SQLUtilities  {
 
-    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/OracleSQLUtilities.java#2 $ by $Author: rhs $, $DateTime: 2003/01/09 18:20:28 $";
+    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/OracleSQLUtilities.java#3 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
 
     /**
      *  This method takes a comparator (e.g. =, <=, >=, !=, <>)

@@ -31,7 +31,7 @@ import java.io.PrintStream;
  * file being named after the fully qualified model name.
  *
  * @author Patrick McNeill
- * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/PDLOutputter.java#2 $
+ * @version $Id: //core-platform/proto/src/com/arsdigita/persistence/pdl/PDLOutputter.java#3 $
  */
 public class PDLOutputter {
     /**
@@ -47,7 +47,8 @@ public class PDLOutputter {
         while (models.hasNext()) {
             Model model = (Model)models.next();
             PrintStream out = new PrintStream(new FileOutputStream(new File(directory, model.getName() + ".pdl")));
-            model.outputPDL(out);
+	    if (true) { throw new Error("not implemented"); }
+            //model.outputPDL(out);
             out.close();
         }
     }

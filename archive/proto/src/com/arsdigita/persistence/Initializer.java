@@ -18,7 +18,6 @@ package com.arsdigita.persistence;
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.initializer.Configuration;
 import com.arsdigita.initializer.InitializationException;
-import com.arsdigita.persistence.metadata.MDSQLGeneratorFactory;
 import com.arsdigita.util.ResourceManager;
 import com.arsdigita.persistence.metadata.CompoundType;
 import com.arsdigita.persistence.metadata.MetadataRoot;
@@ -36,7 +35,7 @@ import org.apache.log4j.Level;
  * the SessionManager of them.
  *
  * @author Archit Shah 
- * @version $Revision: #6 $ $Date: 2003/04/15 $
+ * @version $Revision: #7 $ $Date: 2003/04/18 $
  **/
 
 public class Initializer
@@ -70,11 +69,6 @@ public class Initializer
                              "there are no users when connection has not " +
                              "been used to modify data",
                              Boolean.class);
-        m_conf.initParameter(OPTIMIZE_BY_DEFAULT,
-                             "Use the optimizing query generator by default.",
-                             Boolean.class,
-                             ObjectType.getOptimizeDefault() ?
-                             Boolean.TRUE : Boolean.FALSE);
         m_conf.initParameter("useFirstRowsByDefault",
                              "Use the FIRST_ROWS hint in queries on which " +
                              "setRange() has been called",
@@ -117,23 +111,10 @@ public class Initializer
             DbHelper.unsupportedDatabaseError("SQL Utilities");
         }
 
-        ObjectType.setOptimizeDefault(
-            m_conf.getParameter(OPTIMIZE_BY_DEFAULT).equals(Boolean.TRUE)
-        );
 
-        CompoundType.setFirstRowsDefault
-            (Boolean.TRUE.equals
-             (m_conf.getParameter("useFirstRowsByDefault")));
-
-        if (database == DbHelper.DB_ORACLE) {
-            MDSQLGeneratorFactory.setMDSQLGenerator
-                (MDSQLGeneratorFactory.ORACLE_GENERATOR);
-        } else if (database == DbHelper.DB_POSTGRES) {
-            MDSQLGeneratorFactory.setMDSQLGenerator
-                (MDSQLGeneratorFactory.POSTGRES_GENERATOR);
-        } else {
-            DbHelper.unsupportedDatabaseError("MDSQL generator");
-        }
+        //CompoundType.setFirstRowsDefault
+        //    (Boolean.TRUE.equals
+        //     (m_conf.getParameter("useFirstRowsByDefault")));
 
         String pdlDir = (String)m_conf.getParameter(PDL_DIRECTORY);
 

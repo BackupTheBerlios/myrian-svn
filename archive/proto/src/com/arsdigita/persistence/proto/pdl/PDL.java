@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #38 $ $Date: 2003/04/09 $
+ * @version $Revision: #39 $ $Date: 2003/04/18 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#38 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#39 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -256,10 +256,12 @@ public class PDL {
 			return;
 		    }
 
-		    try{
+		    ot.setJavaClass(javaClass);
+
+		    try {
 			Class adapterClass = Class.forName(acn.getName());
 			Adapter ad = (Adapter) adapterClass.newInstance();
-			Adapter.addAdapter(javaClass, ot, ad);
+			Adapter.addAdapter(javaClass, ad);
 		    } catch (IllegalAccessException e) {
 			m_errors.fatal(acn, e.getMessage());
 		    } catch (ClassNotFoundException e) {
@@ -275,12 +277,6 @@ public class PDL {
 
     public void emitVersioned() {
         m_ast.traverse(VersioningMetadata.getVersioningMetadata().nodeSwitch());
-    }
-
-    private static interface Binder {
-        void bind(PreparedStatement ps, int index, Object obj, int type)
-            throws SQLException;
-        Object fetch(ResultSet rs, String column) throws SQLException;
     }
 
     private class UniqueTraversal extends Node.Traversal {
@@ -642,6 +638,10 @@ public class PDL {
     }
 
     private void emitMapping(Property prop, ColumnNd colNd) {
+	if (prop.getType().isKeyed()) {
+	    m_errors.fatal(colNd, "association requires a join path");
+	}
+
         ObjectMap om = m_root.getObjectMap(prop.getContainer());
         Value m = new Value(Path.get(prop.getName()), lookup(colNd));
         om.addMapping(m);
@@ -695,6 +695,10 @@ public class PDL {
 
     private void emitMapping(Property prop, JoinPathNd jpn, int start,
 			     int stop) {
+	if (!prop.getType().isKeyed()) {
+	    m_errors.fatal(jpn, "cannot associate to a non keyed type");
+	}
+
         ObjectMap om = m_root.getObjectMap(prop.getContainer());
         Path path = Path.get(prop.getName());
         List joins = jpn.getJoins();

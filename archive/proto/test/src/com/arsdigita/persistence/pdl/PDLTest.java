@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
  * PDLTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/04/18 $
  */
 
 public class PDLTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/pdl/PDLTest.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/pdl/PDLTest.java#2 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
 
     private static Logger s_log =
         Logger.getLogger(PDLTest.class.getName());
@@ -62,7 +62,7 @@ public class PDLTest extends TestCase {
             }
 
 
-        s_log.debug(m.getAST());
+        //s_log.debug(m.getAST());
 
         try
             {
@@ -116,10 +116,6 @@ public class PDLTest extends TestCase {
             MetadataRoot r = MetadataRoot.getMetadataRoot();
             PDL pdl = getPDL(basePDLName);
             pdl.generateMetadata(r);
-            if (true) {
-                s_log.info(basePDLName + " AST dump:");
-                System.out.print(pdl.getAST());
-            }
         } catch (Throwable e) {
             //s_log.info(basePDLName + " error " + e.getMessage());
             String s = e.toString();

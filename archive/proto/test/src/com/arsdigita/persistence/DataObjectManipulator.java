@@ -16,6 +16,12 @@
 package com.arsdigita.persistence;
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.metadata.*;
+import com.arsdigita.persistence.proto.common.*;
+import com.arsdigita.persistence.proto.metadata.Root;
+import com.arsdigita.persistence.proto.metadata.ObjectMap;
+import com.arsdigita.persistence.proto.metadata.Column;
+import com.arsdigita.persistence.proto.metadata.Mapping;
+import com.arsdigita.persistence.proto.metadata.Value;
 import com.arsdigita.util.StringUtils;
 import com.arsdigita.util.CheckedWrapperException;
 
@@ -31,13 +37,25 @@ import org.apache.log4j.*;
  * DataObjectManipulator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #2 $ $Date: 2003/04/02 $
+ * @version $Revision: #3 $ $Date: 2003/04/18 $
  */
 public class DataObjectManipulator {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataObjectManipulator.java#2 $ by $Author: ashah $, $DateTime: 2003/04/02 11:45:55 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/DataObjectManipulator.java#3 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
     private static final Logger s_log =
         Logger.getLogger(DataObjectManipulator.class.getName());
+
+    private static final Column getColumn(Property p) {
+	Root root = Root.getRoot();
+	ObjectMap om = root.getObjectMap
+	    (root.getObjectType(p.getContainer().getQualifiedName()));
+	Mapping m = om.getMapping(Path.get(p.getName()));
+	if (m instanceof Value) {
+	    return ((Value) m).getColumn();
+	} else {
+	    return null;
+	}
+    }
 
     public DataObjectManipulator(Session session) {
         m_session = session;
@@ -85,7 +103,7 @@ public class DataObjectManipulator {
         s_defaults.put( java.lang.Long.class, new Long(500000) );
         s_defaults.put( java.lang.Short.class, new Short((short) 57 ) );
         s_defaults.put( java.lang.String.class, "ArsDigita Corporation" );
-        s_defaults.put( java.sql.Blob.class, null );
+        s_defaults.put( byte[].class, null );
         s_defaults.put( java.sql.Clob.class, "Kinda long string to represent a CLOB for database insertion" );
     }
 
@@ -217,10 +235,10 @@ public class DataObjectManipulator {
         void logSetError(Property p, Object value) {
 
             s_log.debug("Failed to set property " + p.getName());
-            final boolean columnIsSpecified =  p.getColumn() != null;
+            final boolean columnIsSpecified =  getColumn(p) != null;
 
             if( columnIsSpecified ) {
-                s_log.debug("Bound to column " + p.getColumn().getQualifiedName());
+                s_log.debug("Bound to column " + getColumn(p).getQualifiedName());
             }
             else {
                 s_log.debug("Column is not specified for property");
@@ -572,7 +590,7 @@ public class DataObjectManipulator {
                  */
                 public void updateAllPropertyCombinations(Property p, DataObject data) throws Exception {
                     super.updateAllPropertyCombinations(p, data);
-                    Column column = p.getColumn();
+                    Column column = getColumn(p);
                     // Verify that the boundary cases for column size are correctly handled.
                     if (column != null && column.getSize() > 0) {
                         try {
@@ -618,7 +636,7 @@ public class DataObjectManipulator {
 
 
                     s_log.debug("checkSetError for Strings!");
-                    final boolean columnIsSpecified =  p.getColumn() != null;
+                    final boolean columnIsSpecified =  getColumn(p) != null;
                     final boolean isColumnSizeIssue = (t.getMessage().indexOf("inserted value too large") != -1) ||
                         (t.getMessage().indexOf("can bind a LONG value only") != -1) ||
                             (t.getMessage().indexOf("value too long for type") != -1);
@@ -631,7 +649,7 @@ public class DataObjectManipulator {
 
 
                             if( columnIsSpecified ) {
-                                final int size = p.getColumn().getSize();
+                                final int size = getColumn(p).getSize();
                                 if( stringValue.length() <= size ) {
 
                                     String msg = "Column length appears to be invalid! Lengh is " + size;
@@ -673,7 +691,7 @@ public class DataObjectManipulator {
             };
 
 
-        manip = new SimpleTypeManipulator(java.sql.Blob.class) {
+        manip = new SimpleTypeManipulator(byte[].class) {
                 void makeVariants() {
                     m_variants = new LinkedList();
                 }

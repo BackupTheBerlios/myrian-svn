@@ -17,6 +17,12 @@ package com.arsdigita.persistence.tests.data;
 
 import com.arsdigita.persistence.*;
 import com.arsdigita.persistence.metadata.*;
+import com.arsdigita.persistence.proto.common.*;
+import com.arsdigita.persistence.proto.metadata.Root;
+import com.arsdigita.persistence.proto.metadata.ObjectMap;
+import com.arsdigita.persistence.proto.metadata.Column;
+import com.arsdigita.persistence.proto.metadata.Mapping;
+import com.arsdigita.persistence.proto.metadata.Value;
 import com.arsdigita.util.*;
 
 import org.apache.log4j.Logger;
@@ -38,12 +44,12 @@ import java.security.*;
  * value of the correct type for the specified property.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/04/09 $
+ * @version $Revision: #3 $ $Date: 2003/04/18 $
  **/
 
 public class DataSource {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/tests/data/DataSource.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/tests/data/DataSource.java#3 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
 
     private static final Logger LOG = Logger.getLogger(DataSource.class);
 
@@ -116,11 +122,25 @@ public class DataSource {
         return oid;
     }
 
+    private static final Column getColumn(Property p) {
+	Root root = Root.getRoot();
+	ObjectMap om = root.getObjectMap
+	    (root.getObjectType(p.getContainer().getQualifiedName()));
+	Mapping m = om.getMapping(Path.get(p.getName()));
+	if (m instanceof Value) {
+	    return ((Value) m).getColumn();
+	} else {
+	    return null;
+	}
+    }
+
     public Object getTestData(ObjectTree tree, String path) {
         Property prop = (Property) tree.getProperty(path);
 
+	Column col = getColumn(prop);
+
         if (prop.isAttribute()) {
-            Assert.assertNotNull(prop.getColumn());
+            Assert.assertNotNull(col);
         }
 
         String toHash = m_key + ":" +
@@ -163,7 +183,7 @@ public class DataSource {
         } else if (type.equals(MetadataRoot.SHORT)) {
             return Short.valueOf(makeNumber(hash, 16, 0));
         } else if (type.equals(MetadataRoot.STRING)) {
-            int size = prop.getColumn().getSize();
+            int size = col.getSize();
             if (size < 0) {
                 LOG.warn("Size for property " + prop.getName() +
                          " unspecified. Defaulting to 10");

@@ -10,19 +10,17 @@ import java.sql.*;
  * Adapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/02/17 $
+ * @version $Revision: #9 $ $Date: 2003/04/18 $
  **/
 
 public abstract class Adapter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Adapter.java#8 $ by $Author: rhs $, $DateTime: 2003/02/17 20:13:29 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Adapter.java#9 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
 
     private static final Map ADAPTERS = new HashMap();
 
-    public static final void addAdapter(Class javaClass, ObjectType type,
-                                        Adapter ad) {
+    public static final void addAdapter(Class javaClass, Adapter ad) {
         ADAPTERS.put(javaClass, ad);
-        ADAPTERS.put(type, ad);
     }
 
     public static final Adapter getAdapter(Class javaClass) {
@@ -35,10 +33,12 @@ public abstract class Adapter {
     }
 
     public static final Adapter getAdapter(ObjectType type) {
-
         for (ObjectType ot = type; ot != null; ot = ot.getSupertype()) {
-            Adapter a = (Adapter) ADAPTERS.get(ot);
-            if (a != null) { return a; }
+	    Class klass = ot.getJavaClass();
+	    if (klass != null) {
+		Adapter a = getAdapter(klass);
+		if (a != null) { return a; }
+	    }
         }
 
         Adapter a = (Adapter) ADAPTERS.get(null);

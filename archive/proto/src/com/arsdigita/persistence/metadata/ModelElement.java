@@ -15,33 +15,29 @@
 
 package com.arsdigita.persistence.metadata;
 
+import com.arsdigita.persistence.proto.metadata.Root;
+
 /**
  * The ModelElement class represents metadata elements that are components of
  * a Model.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/27 $
+ * @version $Revision: #2 $ $Date: 2003/04/18 $
  **/
 
 abstract public class ModelElement extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/ModelElement.java#1 $ by $Author: dennis $, $DateTime: 2002/11/27 19:51:05 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/metadata/ModelElement.java#2 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
 
-    /**
-     * The model that contains this ModelElement.
-     **/
-    private Model m_model = null;
+    private Root m_root;
+    private com.arsdigita.persistence.proto.metadata.Model m_model;
 
-
-    /**
-     * Used by the Model class to set the model that this ModelElement is
-     * contained in.
-     *
-     * @param model The model that this ModelElement is to be contained in.
-     **/
-
-    public void setModel(Model model) {
-        m_model = model;
+    ModelElement(Root root,
+		 com.arsdigita.persistence.proto.metadata.Model model,
+		 Object obj) {
+	super(root, obj);
+	m_root = root;
+	m_model = model;
     }
 
 
@@ -53,7 +49,7 @@ abstract public class ModelElement extends Element {
      **/
 
     public Model getModel() {
-        return m_model;
+	return Model.wrap(m_root, m_model);
     }
 
 }

@@ -6,12 +6,12 @@ import java.util.*;
  * Mist
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/03/05 $
+ * @version $Revision: #4 $ $Date: 2003/04/18 $
  **/
 
 class Mist implements Collection {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Mist.java#3 $ by $Author: rhs $, $DateTime: 2003/03/05 18:41:57 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Mist.java#4 $ by $Author: rhs $, $DateTime: 2003/04/18 15:09:07 $";
 
     private Object m_parent = null;
     private ArrayList m_children = new ArrayList();
@@ -21,7 +21,7 @@ class Mist implements Collection {
         m_parent = parent;
     }
 
-    public boolean add(Object o) {
+    private Object check(Object o) {
         if (o == null) {
             throw new IllegalArgumentException
                 ("null child");
@@ -39,6 +39,13 @@ class Mist implements Collection {
             throw new IllegalArgumentException
                 ("null key");
         }
+
+	return key;
+    }
+
+    public boolean add(Object o) {
+	Object key = check(o);
+	Element child = (Element) o;
 
         if (child.getParent() != null) {
             throw new IllegalArgumentException
@@ -91,7 +98,16 @@ class Mist implements Collection {
     }
 
     public boolean remove(Object o) {
-        throw new UnsupportedOperationException();
+	Object key = check(o);
+	Element child = (Element) o;
+	if (!this.equals(child.getParent())) {
+	    throw new IllegalArgumentException
+		("child does not belong to this parent");
+	}
+        m_children.remove(o);
+	m_childrenMap.remove(key);
+	child.setParent(null);
+	return true;
     }
 
     public boolean removeAll(Collection c) {
