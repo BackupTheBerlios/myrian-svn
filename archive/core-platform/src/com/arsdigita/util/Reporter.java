@@ -29,13 +29,13 @@ import org.apache.log4j.Logger;
  * object.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Reporter.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Reporter.java#2 $
  */
 public final class Reporter {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/Reporter.java#1 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/Reporter.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/04/26 19:14:38 $";
+        "$DateTime: 2003/05/14 15:02:29 $";
 
     private static final Logger s_log = Logger.getLogger(Reporter.class);
 
@@ -86,7 +86,9 @@ public final class Reporter {
 
                     if (method != null) {
                         m_log.debug
-                            (property + " set to " + literal(value(method)));
+                            (property + " set to " +
+                             literal(value(method)) + " on " +
+                             m_object);
                     }
 
                     break;
