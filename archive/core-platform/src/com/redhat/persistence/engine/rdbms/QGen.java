@@ -53,12 +53,12 @@ import org.apache.log4j.Logger;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2004/02/12 $
+ * @version $Revision: #15 $ $Date: 2004/03/11 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/QGen.java#14 $ by $Author: vadim $, $DateTime: 2004/02/12 15:53:46 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/QGen.java#15 $ by $Author: richardl $, $DateTime: 2004/03/11 11:36:52 $";
 
     private static final Logger LOG = Logger.getLogger(QGen.class);
 
