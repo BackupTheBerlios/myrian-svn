@@ -16,6 +16,8 @@
 package com.arsdigita.db;
 
 import com.arsdigita.util.*;
+
+import java.sql.Connection;
 import java.sql.SQLException;
 import org.apache.log4j.Logger;
 
@@ -24,14 +26,14 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao
- * @version $Revision: #16 $ $Date: 2003/08/15 $
+ * @version $Revision: #17 $ $Date: 2003/08/19 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: dennis $ - $Date: 2003/08/15 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#16 $";
+    public static final String versionId = "$Author: bche $ - $Date: 2003/08/19 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#17 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);
@@ -86,10 +88,10 @@ public class ConnectionManager {
         m_interval = interval;
     }
 
-    static final void badConnection(Connection conn) {
+    public static final void badConnection(Connection conn) {
         ConnectionManager cm = getInstance();
         synchronized (cm) {
-            if (conn.m_pool == cm.m_pool) {
+            if (cm.m_pool.containsConnection(conn)) {
                 cm.disconnect();
             }
         }
@@ -137,7 +139,7 @@ public class ConnectionManager {
             // possibly overload the listener.
             java.sql.Connection conn = pool.getConnection();
             if (conn != null) {
-                conn.close();
+                returnConnection(conn);                
             }
         } catch (SQLException e) {
             SQLException wrapped = SQLExceptionHandler.wrap(e);
@@ -325,18 +327,40 @@ public class ConnectionManager {
      **/
 
 
+    /**
+     * Gets a connection.  Note that any code retrieving a connection needs to
+     * return the connection to the pool by calling returnConnection()
+     */
     public static java.sql.Connection getConnection()
         throws java.sql.SQLException {
         return MANAGER.gimmeConnection();
     }
 
-
+    
     static void closeConnections() {
         if (MANAGER != null &&
             MANAGER.m_pool != null) {
             MANAGER.m_pool.closeConnections();
         }
     }
+    
+    /**
+     * Returns a connection to the connection pool.  Anytime code calls getConnection(),
+     * it needs to call this method when it is done with the connection
+     * 
+     * @param conn the connection to return
+     * @throws java.sql.SQLException
+     */
+	public static void returnConnection(Connection conn)
+		throws java.sql.SQLException {
+		if (conn != null) {
+			if (MANAGER != null && MANAGER.m_pool != null) {
+				MANAGER.m_pool.returnToPool(conn);
+			} else {
+				conn.close();
+			}
+		}
+	}
 
     /**
      * Frees all of the connections in the pool.

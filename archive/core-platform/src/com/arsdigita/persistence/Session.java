@@ -58,7 +58,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #25 $ $Date: 2003/08/15 $
+ * @version $Revision: #26 $ $Date: 2003/08/19 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -443,7 +443,7 @@ public class Session {
 
     void freeConnection(Connection conn) {
 	try {
-	    conn.close();
+	    ConnectionManager.returnConnection(conn);
 	    ConnectionManager.setCurrentThreadConnection(null);
 	} catch (SQLException e) {
 	    throw new PersistenceException(e);

@@ -29,16 +29,16 @@ import java.util.Iterator;
  * Base connection pooling class
  *
  * @author Bob Donald
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#11 $ $DateTime: 2003/08/15 13:46:34 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#12 $ $DateTime: 2003/08/19 15:33:40 $
  * @since
  *
  */
 
 abstract public class BaseConnectionPool implements DatabaseConnectionPool {
 
-    public static final String versionId = "$Author: dennis $ " +
-        "- $Date: 2003/08/15 $ " + 
-        "$Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#11 $";
+    public static final String versionId = "$Author: bche $ " +
+        "- $Date: 2003/08/19 $ " + 
+        "$Id: //core-platform/dev/src/com/arsdigita/db/BaseConnectionPool.java#12 $";
 
     private static final Logger cat = Logger.getLogger(BaseConnectionPool.class.getName());
 
@@ -135,8 +135,7 @@ abstract public class BaseConnectionPool implements DatabaseConnectionPool {
         try {
             synchronized (m_monitor) {
                 conn = (java.sql.Connection) m_availConnections.remove(0);
-                m_usedConnections.add(conn);
-                conn = Connection.wrap( conn, this );
+                m_usedConnections.add(conn);                
                 cat.info("Retrieving connection from pool. " +
                          m_availConnections.size() +
                          " remaining.");
@@ -157,6 +156,17 @@ abstract public class BaseConnectionPool implements DatabaseConnectionPool {
                          " remaining.");
             }
         }
+    }
+    
+    public boolean containsConnection(java.sql.Connection conn) {
+        boolean bReturn = false;
+        if (m_availConnections.contains(conn)) {
+            bReturn = true;
+        } else if (m_usedConnections.contains(conn)) {
+            bReturn = true;
+        }
+        
+        return bReturn;
     }
 
     /**

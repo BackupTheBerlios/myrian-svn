@@ -15,6 +15,10 @@
 
 package com.redhat.persistence.engine.rdbms;
 
+import com.arsdigita.db.ConnectionManager;
+import com.arsdigita.db.SQLExceptionHandler;
+import com.arsdigita.developersupport.DeveloperSupport;
+import com.arsdigita.webdevsupport.WebDevSupport;
 import com.redhat.persistence.*;
 import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
@@ -28,12 +32,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/08/15 $
+ * @version $Revision: #7 $ $Date: 2003/08/19 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#6 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#7 $ by $Author: bche $, $DateTime: 2003/08/19 15:33:40 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -419,7 +423,30 @@ public class RDBMSEngine extends Engine {
             }
 
             acquire();
-
+            
+            /*
+             * PERFORMANCE HACK: 
+             * If there is more than one DeveloperSupportListener,
+             * there is a listener other than then one created in com.arsdigita.dispatcher.Initializer.
+             * That means we are logging queries to webdevsupport.
+             */            
+            boolean bLogQuery = DeveloperSupport.getListenerCount() > 1;
+            if (LOG.isDebugEnabled()) {                
+                LOG.debug("Logging queries: " + bLogQuery);
+            }                 
+            
+            //see what kind of operation this isfor webdevsupport
+            String sOpType = "";
+            if (bLogQuery) {                
+		if (op instanceof Select) {
+			sOpType = "executeQuery";
+		} else if (op instanceof Update) {
+			sOpType = "executeUpdate";
+		} else {
+			sOpType = "execute";
+		}
+            }                
+            
             try {
                 StatementLifecycle cycle = null;
                 if (m_profiler != null) {
@@ -439,10 +466,19 @@ public class RDBMSEngine extends Engine {
                 w.bind(ps, cycle);
 
                 if (cycle != null) { cycle.beginExecute(); }
+                long time = System.currentTimeMillis();                
                 if (ps.execute()) {
-                    if (cycle != null) { cycle.endExecute(0); }
+                    time = System.currentTimeMillis() - time;
+                    if (cycle != null) { cycle.endExecute(0); }                       
+                    if (bLogQuery) {                        
+                        DeveloperSupport.logQuery(m_conn.hashCode(), sOpType, sql, collToMap(w.getBindings()), time, null);                                     
+                    }                    
                     return new ResultCycle(this, ps.getResultSet(), cycle);
-                } else {
+                } else {                    
+                    time = System.currentTimeMillis() - time;
+                    if (bLogQuery) {
+                        DeveloperSupport.logQuery(m_conn.hashCode(), sOpType, sql, collToMap(w.getBindings()), time, null);
+                    }                                                            
                     int updateCount = ps.getUpdateCount();
                     if (cycle != null) { cycle.endExecute(updateCount); }
 
@@ -456,12 +492,35 @@ public class RDBMSEngine extends Engine {
 
                     return null;
                 }
-            } catch (SQLException e) {
+            } catch (SQLException e) {   
+                //robust connection pooling             
+                checkBadConnection(e);
                 LOG.error(sql, e);
+                if (bLogQuery) {
+                    DeveloperSupport.logQuery(m_conn.hashCode(), sOpType, sql, collToMap(w.getBindings()), 0, e);
+                }
                 throw new RDBMSException(e.getMessage()) {};
             }
         } finally {
             w.clear();
+        }
+    }
+    
+    /**
+     * Tests if the SQLException was caused by a bad connection to the database.
+     * If it is, disconnects ConnectionManager and returns true.  
+     * @param e the SQLException to check
+     * @return true if the SQLException was caused by a bad connection to the database
+     */
+    boolean checkBadConnection(SQLException e) {
+        //      robust connection pooling
+        SQLException result = SQLExceptionHandler.wrap(e);
+        if (result instanceof com.arsdigita.db.DbNotAvailableException) {
+            LOG.warn("Bad Connection...calling ConnectionManager.badConnection()");
+            ConnectionManager.badConnection(m_conn);            
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -474,7 +533,17 @@ public class RDBMSEngine extends Engine {
         Operation op = new StaticOperation(sql, env, false);
         execute(op, new RetainUpdatesWriter());
     }
-
+    
+    private HashMap collToMap(Collection c) {
+        Iterator iter = c.iterator();
+        HashMap map = new HashMap();
+        for (int i=1; iter.hasNext(); i++) {
+            map.put(new Integer(i), iter.next());
+        }
+        
+        return map;
+    }
+        
     static final Path[] getKeyPaths(ObjectType type, Path prefix) {
         return getPaths(type, prefix, false);
     }

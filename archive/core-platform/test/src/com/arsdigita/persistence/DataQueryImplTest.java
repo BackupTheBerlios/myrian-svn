@@ -38,11 +38,11 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2003/08/15 $
+ * @version $Revision: #15 $ $Date: 2003/08/19 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#14 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#15 $ by $Author: bche $, $DateTime: 2003/08/19 15:33:40 $";
 
     private static Logger s_log =
         Logger.getLogger(DataQueryImplTest.class.getName());
@@ -586,7 +586,7 @@ public class DataQueryImplTest extends DataQueryTest {
         Connection conn = ConnectionManager.getConnection();
         try {
             PreparedStatement ps =
-                (com.arsdigita.db.PreparedStatement)conn.prepareStatement
+                (java.sql.PreparedStatement)conn.prepareStatement
                 ("select entry_id, action, description, priority, " +
                  "action_time from t_data_query t");
             try {
@@ -612,7 +612,7 @@ public class DataQueryImplTest extends DataQueryTest {
                 ps.close();
             }
         } finally {
-            conn.close();
+            ConnectionManager.returnConnection(conn);            
         }
     }
 

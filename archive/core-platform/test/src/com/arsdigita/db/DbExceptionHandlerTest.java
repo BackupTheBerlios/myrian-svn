@@ -29,7 +29,7 @@ import java.sql.SQLException;
  */
 public class DbExceptionHandlerTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DbExceptionHandlerTest.java#7 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DbExceptionHandlerTest.java#8 $";
 
     private static java.sql.Connection conn;
 
@@ -77,15 +77,17 @@ public class DbExceptionHandlerTest extends TestCase {
         insertStmt.executeUpdate();
         try {
             insertStmt.executeUpdate();
-            fail("Unique constraint violation should have caused error");
-        } catch (UniqueConstraintException e) {
-            // good
+            fail("Unique constraint violation should have caused error");        
         } catch (SQLException e) {
-            // bad
-            fail("Unique constraint violation should have caused " +
-                 "UniqueConstraintException, instead caused " + e);
-        }
-        insertStmt.close();
+            SQLException wrapped = SQLExceptionHandler.wrap(e);
+            if (wrapped instanceof UniqueConstraintException) {
+                //good
+            } else
+                // bad
+                fail("Unique constraint violation should have caused " +
+                     "UniqueConstraintException, instead caused " + e);        
+            }
+            insertStmt.close();
     }
 
     public void testDbNotAvailableException() throws SQLException {

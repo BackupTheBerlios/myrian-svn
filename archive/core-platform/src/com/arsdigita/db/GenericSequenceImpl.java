@@ -32,7 +32,7 @@ import java.util.HashMap;
 
 public class GenericSequenceImpl extends SequenceImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/GenericSequenceImpl.java#5 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/GenericSequenceImpl.java#6 $ by $Author: bche $, $DateTime: 2003/08/19 15:33:40 $";
 
     /* This is a pseudo-Singleton implementation.  We create a
      * single instance for each sequence.
@@ -94,7 +94,7 @@ public class GenericSequenceImpl extends SequenceImpl {
             BigDecimal result = this.getNextValue(conn);
             return result;
         } finally {
-            conn.close();
+            ConnectionManager.returnConnection(conn);
         }
     }
 
@@ -104,7 +104,7 @@ public class GenericSequenceImpl extends SequenceImpl {
             BigDecimal result = this.getCurrentValue(conn);
             return result;
         } finally {
-            conn.close();
+            ConnectionManager.returnConnection(conn);
         }
     }
 
