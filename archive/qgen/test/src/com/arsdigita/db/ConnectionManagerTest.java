@@ -21,9 +21,11 @@ import junit.framework.TestSuite;
 
 import java.sql.SQLException;
 
+import com.arsdigita.persistence.SessionManager;
+
 public class ConnectionManagerTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/test-qgen/test/src/com/arsdigita/db/ConnectionManagerTest.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public static final String versionId = "$Id: //core-platform/test-qgen/test/src/com/arsdigita/db/ConnectionManagerTest.java#2 $ by $Author: richardl $, $DateTime: 2004/02/25 09:03:46 $";
 
     private String ORACLE_DATE_QUERY = "select sysdate from dual";
     private String POSTGRES_DATE_QUERY = "select 'now'::timestamp";
@@ -55,7 +57,7 @@ public class ConnectionManagerTest extends TestCase {
             assertNotNull(conn);
 
             String dateQuery = null;
-            if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+            if (SessionManager.getSession().getDatabase() == DbHelper.DB_POSTGRES) {
                 dateQuery = POSTGRES_DATE_QUERY;
             } else {
                 dateQuery = ORACLE_DATE_QUERY;

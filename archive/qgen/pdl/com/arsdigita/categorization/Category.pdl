@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/test-qgen/pdl/com/arsdigita/categorization/Category.pdl#2 $
-// $DateTime: 2004/01/29 12:35:08 $
+// $Id: //core-platform/test-qgen/pdl/com/arsdigita/categorization/Category.pdl#3 $
+// $DateTime: 2004/02/25 09:03:46 $
 
 model com.arsdigita.categorization;
 
@@ -87,6 +87,24 @@ association {
 
 }
 
+// NOTE: this is meant as a *read-only* association!!!
+association {
+    Category[0..n] roTransParents = join cat_categories.category_id
+                                      to cat_cat_subcat_trans_index.subcategory_id,
+                                    join cat_cat_subcat_trans_index.category_id
+                                      to cat_categories.category_id;
+
+    Category[0..n] roTransSubcats = join cat_categories.category_id
+                                          to cat_cat_subcat_trans_index.category_id,
+                                        join cat_cat_subcat_trans_index.subcategory_id
+                                          to cat_categories.category_id;
+
+    // Since this is a read-only association, neither "add", nor
+    // "remove" should do anything.
+    add { }
+
+    remove { }
+}
 
 // this returns all related categories (both ways)
 // To get the children, do 'get("related")' and then filter on

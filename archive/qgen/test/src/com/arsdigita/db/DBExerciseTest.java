@@ -21,6 +21,12 @@ import junit.extensions.*;
 import java.io.*;
 import java.sql.SQLException;
 
+import com.arsdigita.runtime.RuntimeConfig;
+import com.arsdigita.persistence.metadata.MetadataRoot;
+import com.arsdigita.persistence.SessionManager;
+import com.arsdigita.persistence.DedicatedConnectionSource;
+import com.arsdigita.persistence.Session;
+
 /**
  * This test exists to exercise the database and the sundry JDBC
  * methods.  It should ultimately be extended to include most or
@@ -32,7 +38,7 @@ import java.sql.SQLException;
 
 public class DBExerciseTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/test-qgen/test/src/com/arsdigita/db/DBExerciseTest.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public static final String versionId = "$Id: //core-platform/test-qgen/test/src/com/arsdigita/db/DBExerciseTest.java#2 $ by $Author: richardl $, $DateTime: 2004/02/25 09:03:46 $";
 
     private static java.sql.Connection conn;
 
@@ -49,8 +55,11 @@ public class DBExerciseTest extends TestCase {
         junit.textui.TestRunner.run(DBExerciseTest.class);
     }
 
-    protected void setUp() {
-
+    static void setupSession() {
+        final String key = "default";
+        String url = RuntimeConfig.getConfig().getJDBCURL();
+        final MetadataRoot root = MetadataRoot.getMetadataRoot();
+        SessionManager.configure(key, root, new DedicatedConnectionSource(url));
     }
 
     public static Test suite() throws SQLException {
@@ -59,10 +68,11 @@ public class DBExerciseTest extends TestCase {
 
         TestSetup wrapper = new TestSetup(suite) {
                 public void setUp() throws SQLException {
-                    conn = ConnectionManager.getConnection();
+                    //setupSession();
+                    conn = SessionManager.getSession().getConnection();
                     java.sql.PreparedStatement tableStmt = null;
 
-                    if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+                    if (SessionManager.getSession().getDatabase() == DbHelper.DB_POSTGRES) {
                         tableStmt = conn.prepareStatement
                             ("create table db_test (\n" +
                              "    theId          integer primary key,\n" +

@@ -7,6 +7,7 @@ PARSER_BEGIN(ScriptParser)
 
 package com.arsdigita.initializer;
 
+import com.arsdigita.util.*;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -14,12 +15,12 @@ import java.util.*;
  * ScriptParser.java
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/25 $
  */
 
-class ScriptParser {
+public class ScriptParser {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/initializer/ScriptParser.jj#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/initializer/ScriptParser.jj#2 $ by $Author: richardl $, $DateTime: 2004/02/25 09:03:46 $";
 
 }
 
@@ -123,6 +124,10 @@ Initializer initializerClass() throws InitializationException :
                 e.getTargetException().getMessage()
                 );
         }
+//         return (Initializer) Classes.newInstance
+//             (GenericInitializer.class,
+//              new Class[] {String.class},
+//              new Object[] {className.toString()});
     }
 }
 

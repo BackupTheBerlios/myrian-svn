@@ -1,7 +1,10 @@
 package com.arsdigita.installer;
 
+import com.arsdigita.util.Assert;
 import com.arsdigita.util.UncheckedWrapperException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -12,12 +15,12 @@ import org.apache.log4j.Logger;
  * SQLLoader
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/25 $
  **/
 
 public abstract class SQLLoader {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/installer/SQLLoader.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/installer/SQLLoader.java#2 $ by $Author: richardl $, $DateTime: 2004/02/25 09:03:46 $";
 
     private static final Logger s_log = Logger.getLogger(SQLLoader.class);
 
@@ -28,6 +31,27 @@ public abstract class SQLLoader {
     }
 
     protected abstract Reader open(String name);
+
+    public static void load(final Connection conn,
+                            final String script) {
+        if (conn == null) throw new IllegalArgumentException();
+        if (script == null) throw new IllegalArgumentException();
+
+        final SQLLoader loader = new SQLLoader(conn) {
+                protected final Reader open(final String name) {
+                    final ClassLoader cload = getClass().getClassLoader();
+                    final InputStream is = cload.getResourceAsStream(name);
+
+                    if (is == null) {
+                        return null;
+                    } else {
+                        return new InputStreamReader(is);
+                    }
+                }
+            };
+
+        loader.load(script);
+    }
 
     public void load(String name) {
         try {
@@ -128,9 +152,9 @@ public abstract class SQLLoader {
         }
 
         try {
-            int rowsAffected = stmt.executeUpdate(sql);
+            stmt.execute(sql);
             if (s_log.isDebugEnabled()) {
-                s_log.debug("  " + rowsAffected + " row(s) affected");
+                s_log.debug(stmt.getUpdateCount() + " row(s) affected");
             }
         } catch (SQLException e) {
             throw new UncheckedWrapperException(sql, e);

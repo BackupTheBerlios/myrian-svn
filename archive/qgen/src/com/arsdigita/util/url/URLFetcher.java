@@ -74,16 +74,34 @@ public class URLFetcher {
      * Fetches the URL using the service specified by the key param. Looks in
      * the cache for the url, if not present fetches the url & stores it in
      * the cache.Returns the data for the page, or null if the fetch failed.
+     *
+     * @deprecated use {@link fetchURLData(String url, String key)} instead
     */
     public static String fetchURL(String url, String key) {
-        Assert.assertTrue(!StringUtils.emptyString(url), "URL must not be empty!");
+        URLData data = fetchURLData(url, key);
+        if (data != null) {
+            return data.getContentAsString();
+        }
+        return null;
+    }
+
+
+    /**
+     * Fetches the URL using the service specified by the key param. Looks in
+     * the cache for the url, if not present fetches the url & stores it in
+     * the cache.Returns the data for the page, or null if the fetch failed.
+    */
+    public static URLData fetchURLData(String url, String key) {
+        Assert.assertTrue(!StringUtils.emptyString(url), 
+                          "URL must not be empty!");
 
         CacheService cs = getService(key);
 
-        String urlData = cs.cache.retrieve(url);
+        URLData urlData = cs.cache.retrieveData(url);
         if (urlData == null) {
-            urlData = cs.pool.fetchURL(url);
-            if (urlData.length() > 0) {
+            urlData = cs.pool.fetchURLData(url);
+            if (urlData != null && urlData.getContent() != null &&
+                urlData.getContent().length > 0) {
                 cs.cache.store(url,urlData);
             } else {
                 if (cs.cacheFailedRetrievals == true) {
@@ -132,6 +150,4 @@ public class URLFetcher {
             this.cacheFailedRetrievals = cacheFailedRetrievals;
         }
     }
-
-
 }

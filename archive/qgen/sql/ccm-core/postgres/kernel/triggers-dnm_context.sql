@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/test-qgen/sql/ccm-core/postgres/kernel/triggers-dnm_context.sql#1 $
--- $DateTime: 2004/01/29 12:35:08 $
+-- $Id: //core-platform/test-qgen/sql/ccm-core/postgres/kernel/triggers-dnm_context.sql#2 $
+-- $DateTime: 2004/02/25 09:03:46 $
 -- autor: Aram Kananov <aram@kananov.com>
 
 create or replace function acs_object_dnm_ctx_add_fn () 
@@ -51,13 +51,19 @@ create or replace function object_context_dnm_fn ()
   returns trigger as '
   declare 
   begin
-    if TG_OP = ''INSERT'' OR TG_OP = ''UPDATE'' THEN
+    if TG_OP = ''INSERT'' then
       perform dnm_context_change_context(new.object_id, new.context_id);
       return new;
-    ELSE 
+    elsif  TG_OP = ''UPDATE'' then 
+      if coalesce(new.context_id,0) != coalesce(old.context_id,0) then
+         -- do not call change context if new/old context values are null or equal 
+         perform dnm_context_change_context(new.object_id, new.context_id);
+      end if;
+         return new;      
+    else 
       perform dnm_context_change_context(old.object_id, 0);
       return old;
-    END IF;    
+    end if;    
   end; ' language 'plpgsql'
 ;
 

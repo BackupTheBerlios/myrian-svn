@@ -24,23 +24,27 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Script
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/25 $
  */
 
 public class Script {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/initializer/Script.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/initializer/Script.java#2 $ by $Author: richardl $, $DateTime: 2004/02/25 09:03:46 $";
 
     private static final Logger s_log =
         Logger.getLogger(Script.class);
 
+    private Map m_initMap = new HashMap();
     private List m_initializers = new ArrayList();
     private String m_lastInitializerToRun;
     private boolean m_isStarted = false;
@@ -142,10 +146,15 @@ public class Script {
         }
         final String initializerName = ini.getClass().getName();
         m_initializers.add(ini);
+        m_initMap.put(ini.toString(), ini);
 
         final boolean continueAddingInitializers =
             !initializerName.equals(m_lastInitializerToRun);
         return continueAddingInitializers;
+    }
+
+    public Initializer getInitializer(final String name) {
+        return (Initializer) m_initMap.get(name);
     }
 
     /**
@@ -164,7 +173,7 @@ public class Script {
      * Starts up all initializers that this script contains.
      **/
 
-    public Collection startup() throws InitializationException {
+    public Set startup() throws InitializationException {
         return startup(null);
     }
 
@@ -179,7 +188,7 @@ public class Script {
      * @return A Collection containing the names of all initalizers run
      **/
 
-    public Collection startup(String iniName) throws InitializationException {
+    public Set startup(String iniName) throws InitializationException {
         HashSet initializersRun = new HashSet();
         Initializer ini = null;
 
@@ -195,7 +204,7 @@ public class Script {
             final String name = ini.getClass().getName();
 
             ini.startup();
-            initializersRun.add(name);
+            initializersRun.add(ini);
             if (name.equals(iniName)) {
                 break;
             }

@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public class URLRewriterTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/test-qgen/test/src/com/arsdigita/util/URLRewriterTest.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public static final String versionId = "$Id: //core-platform/test-qgen/test/src/com/arsdigita/util/URLRewriterTest.java#2 $ by $Author: richardl $, $DateTime: 2004/02/25 09:03:46 $";
 
     public URLRewriterTest(String s) {
         super(s);
@@ -41,6 +41,8 @@ public class URLRewriterTest extends TestCase {
 
     public void testGetGlobalParams() {
         HttpServletDummyRequest req = new HttpServletDummyRequest("localhost","", "/foo", "/bar", null);
+        new RequestEnvironment(req, new HttpServletDummyResponse());
+        
         HashSet set = new HashSet();
         set.add("param1");
         set.add("param2");

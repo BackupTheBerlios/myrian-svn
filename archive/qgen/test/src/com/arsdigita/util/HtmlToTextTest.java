@@ -90,8 +90,8 @@ public class HtmlToTextTest extends TestCase {
         try {
             for (int i = 0; i < s_testFiles.length; i++) {
                 in = read(getHtmlPath(s_testFiles[i]));
-                expected_out = read(getTextPath(s_testFiles[i]));
-                actual_out = s_htmlToText.convert(in);
+                expected_out = read(getTextPath(s_testFiles[i])).trim();
+                actual_out = s_htmlToText.convert(in).trim();
 
                 assertEquals("HTML conversion failed",
                              expected_out,

@@ -32,6 +32,9 @@ import java.net.MalformedURLException;
 import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.arsdigita.util.StringUtils;
 
@@ -157,8 +160,27 @@ public class URLPool {
      * @param url The URL to fetch data from
      *
      * @return Data from the URL, or null if unable to fetch.
+     * @deprecated Use {@link fetchURLData(String url)} instead
      */
     public String fetchURL(String url) {
+        URLData data = fetchURLData(url);
+        if (data != null) {
+            return data.getContentAsString();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     *
+     * fetches the remote URL, returning the data from the page, or null if an
+     * error occurred.
+     *
+     * @param url The URL to fetch data from
+     *
+     * @return Data from the URL, or null if unable to fetch.
+     */
+    public URLData fetchURLData(String url) {
         URL theURL = null;
         try {
             theURL = makeURL(url);
@@ -214,15 +236,16 @@ public class URLPool {
     }
 
     private static class URLFetcher extends Thread {
-        private String m_data = "";
+        private URLData m_data;
         private URL m_url;
         private boolean m_running = true;
 
         public URLFetcher(URL url) {
             m_url = url;
+            m_data = new URLData(url.toString());
         }
 
-        public String getData() {
+        public URLData getData() {
             return m_data;
         }
 
@@ -244,37 +267,34 @@ public class URLPool {
             BufferedReader input = null;
             try {
                 URLConnection con = m_url.openConnection();
-                String contentType = con.getContentType();
-
-                // XXX if no explicit encoding then we should read the
-                // first 4 bytes of the document to look for an XML
-                // byte order mark & if found, then extract the charset.
-                String encoding = "ISO-8859-1";
-                int offset = contentType.indexOf("charset=");
-                if (offset != -1) {
-                    encoding = contentType.substring(offset + 8).trim();
-                }
-
-                if (s_log.isDebugEnabled()) {
-                    s_log.debug("Received content type " + con.getContentType());
-                }
 
                 is = con.getInputStream();
-                isr = new InputStreamReader(is, encoding);
-                if (s_log.isDebugEnabled()) {
-                    s_log.debug("Process with character encoding " + isr.getEncoding());
-                }
-                input = new BufferedReader(isr);
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-                String line;
-                StringBuffer buffer = new StringBuffer();
-                while (m_running && (line = input.readLine()) != null) {
-                    buffer.append(line).append(StringUtils.NEW_LINE);
+                byte[] buffer = new byte[8];
+                int length = -1;
+                while ((length = is.read(buffer)) != -1) {
+                    os.write(buffer, 0, length);
                 }
-                m_data = buffer.toString();
+                
+                m_data.setContent(os.toByteArray());
 
+                int i = 1;
+                String currentKey = con.getHeaderFieldKey(i);
+                HashMap headers = new HashMap();
+                m_data.setHeaders(headers);
+                while (currentKey != null) {
+                    String currentValue = con.getHeaderField(i);
+                    // we make all of the keys lowercase to standardize
+                    // the syntax and make things easy to look up within 
+                    // the map
+                    headers.put(currentKey.toLowerCase(), currentValue);
+                    i++;
+                    currentKey = con.getHeaderFieldKey(i);
+                }
             } catch (IOException io) {
                 s_log.error("IO Error fetching URL: " + m_url, io);
+                m_data.setException(io);
                 return;
             } finally {
                 if (null != input) {
@@ -290,5 +310,4 @@ public class URLPool {
 
         }
     }
-
 }

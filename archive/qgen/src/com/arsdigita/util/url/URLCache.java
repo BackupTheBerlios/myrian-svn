@@ -168,16 +168,34 @@ public class  URLCache {
     };
 
     /**
+     *  @deprecated use {@link store(String url, URLData data)}
+     */
+    public synchronized void store(String url, String data) {
+        URLData urlData = new URLData(url);
+        urlData.setContent(data.getBytes());
+        store(url, urlData);
+    }
+
+    /**
      *  Stores data for a url in the cache. Expiry time is the default expiry
      *  time.
      *
      * @param url - URL to be stored in the cache.
      * @param data - data to be stored in the cache
      */
-    public synchronized void store(String url, String data) {
+    public synchronized void store(String url, URLData data) {
         store (url, data, m_defaultExpiryTime);
     };
 
+
+    /**
+     *  @deprecated use {@link store(String url, URLData data, long expiry)}
+     */
+    public synchronized void store(String url, String data, long expiry) {
+        URLData urlData = new URLData(url);
+        urlData.setContent(data.getBytes());
+        store(url, urlData, expiry);
+    }
 
     /**
      *  Stores data for a url in the cache.
@@ -186,7 +204,7 @@ public class  URLCache {
      * @param data - data to be stored in the cache
      * @param expiry - expiry time in milliseconds.
      */
-    public synchronized void store(String url, String data, long expiry) {
+    public synchronized void store(String url, URLData data, long expiry) {
         assertURL(url);
         if (null == data) {
             throw new IllegalArgumentException("Data can be empty, but not null!");
@@ -194,10 +212,10 @@ public class  URLCache {
 
         assertExpiryTime(expiry);
 
-        final long dataSize = data.length() + url.length();
+        final long dataSize = data.getContent().length + url.length();
         if (dataSize > m_maxSize) {
             throw new IllegalArgumentException("Cannot store data greater than maximum Cache size: " + m_maxSize +
-                    ". URL is " + url.length() + " Data is: " + data.length());
+                    ". URL is " + url.length() + " Data is: " + data.getContent().length);
         }
 
         s_log.debug("Storing location URL " + url + " in the URLCache.");
@@ -237,7 +255,7 @@ public class  URLCache {
                 String entryURL = (String) ent.getKey();
                 Entry e2 = (Entry) ent.getValue();
                 //s_log.debug("Evicting " + ent.getKey() + " from the URLCache. (Just evicting)");
-                final long entrySize = entryURL.length() + e2.data.length();
+                final long entrySize = entryURL.length() + e2.data.getContent().length;
                 iter.remove();
                 m_curSize -= entrySize;
                 newSize -= entrySize;
@@ -246,8 +264,8 @@ public class  URLCache {
 
     }
 
-    private synchronized void addToCache(String url, String data, long expiry) {
-        final long dataSize = data.length() + url.length();
+    private synchronized void addToCache(String url, URLData data, long expiry) {
+        final long dataSize = data.getContent().length + url.length();
         Assert.assertTrue(m_curSize + dataSize <= m_maxSize);
         Entry e = new Entry(data, System.currentTimeMillis(), expiry);
         m_cache.put(url, e);
@@ -264,7 +282,7 @@ public class  URLCache {
         Entry e = (Entry)m_cache.get(url);
         if (e != null) {
             m_cache.remove(url);
-            m_curSize = m_curSize-url.length()-e.data.length();
+            m_curSize = m_curSize-url.length()-e.data.getContent().length;
         }
     };
 
@@ -288,7 +306,7 @@ public class  URLCache {
             if (e2.isExpired()) {
 //                s_log.debug("Evicting " + ent.getKey() + " from the URLCache. (Expired)");
                 iter.remove();
-                m_curSize = m_curSize - entryURL.length()- e2.data.length();
+                m_curSize = m_curSize - entryURL.length()- e2.data.getContent().length;
             }
         }
     }
@@ -297,9 +315,22 @@ public class  URLCache {
     /**
      *retrieves a url from the cache, returning null if not present or it has
      *expired.
+     * @deprecated use {@link retrieveData(String url)}
      */
-
     public String retrieve(String url) {
+        URLData data = retrieveData(url);
+        if (data != null) {
+            return data.getContentAsString();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     *retrieves a url from the cache, returning null if not present or it has
+     *expired.
+     */
+    public URLData retrieveData(String url) {
         assertURL(url);
         s_log.debug("Trying to retrieve " + url + " from the URLCache.");
 
@@ -348,12 +379,12 @@ public class  URLCache {
      * contains the object's creation time.
      */
     private final class Entry {
-        final String data;
+        final URLData data;
         long lastUse;
         final long creationTime;
         final long expiry;
 
-        Entry (String data, long lastUse, long expiry) {
+        Entry (URLData data, long lastUse, long expiry) {
             this.data = data;
             this.lastUse = lastUse;
             this.creationTime = System.currentTimeMillis();
