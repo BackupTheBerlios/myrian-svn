@@ -15,7 +15,9 @@
 
 package com.arsdigita.util;
 
-import java.util.*;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * data structure for a fixed-size cache table.  Note that Cache is
@@ -24,20 +26,20 @@ import java.util.*;
  * cache, whose methods <em>are</em> threadsafe.
  *
  * @author Bill Schneider 
- * @version $Revision: #2 $, $Date: 2003/08/19 $
+ * @version $Revision: #3 $, $Date: 2003/10/17 $
  */
 
 public class Cache {
 
-    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/util/Cache.java#2 $ by $Author: rhs $, $DateTime: 2003/08/19 22:28:24 $";
+    public static final String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/util/Cache.java#3 $ by $Author: dan $, $DateTime: 2003/10/17 09:25:42 $";
 
     // map keys to their values
-    private static Cache instance = new Cache(32000);
+    private static Cache s_instance = new Cache(32000);
 
-    private HashMap map;
-    private long maxSize;
-    private long curSize;
-    private long maxAge;
+    private HashMap m_map;
+    private long m_maxSize;
+    private long m_curSize;
+    private long m_maxAge;
 
     /**
      * Create a new Cache of a fixed size.  If more elements are put into
@@ -64,10 +66,10 @@ public class Cache {
      * (may be overriden by put).
      */
     public Cache(long size, long maxAge) {
-        map = new HashMap();
-        this.maxSize = size;
-        this.curSize = 0;
-        this.maxAge = maxAge;
+        m_map = new HashMap();
+        m_maxSize = size;
+        m_curSize = 0;
+        m_maxAge = maxAge;
     }
 
     /**
@@ -77,7 +79,7 @@ public class Cache {
      * @param value the value
      */
     public void put(Object key, Object value) {
-        put (key, value, this.maxAge);
+        put(key, value, m_maxAge);
     }
 
     /**
@@ -89,27 +91,27 @@ public class Cache {
      */
     public void put(Object key, Object value, long maxAge) {
         Entry e = new Entry(value, System.currentTimeMillis(), maxAge);
-        if (curSize >= maxSize) {
+        if (m_curSize >= m_maxSize) {
             // have to evict something... find the least
             // recently used item
-            Iterator iter = map.entrySet().iterator();
+            Iterator iter = m_map.entrySet().iterator();
             long min = Long.MAX_VALUE;
             Object minKey = null;
             while (iter.hasNext()) {
                 Map.Entry ent = (Map.Entry)iter.next();
-                Entry e2 = (Entry)map.get(ent.getKey());
+                Entry e2 = (Entry)m_map.get(ent.getKey());
                 long now = System.currentTimeMillis();
-                if (e2.lastUse < min ||
-                    (e2.maxAge > 0 && e2.creationTime < now - e2.maxAge)) {
-                    min = e2.lastUse;
+                if (e2.m_lastUse < min ||
+                    (e2.m_maxAge > 0 && e2.m_creationTime < now - e2.m_maxAge)) {
+                    min = e2.m_lastUse;
                     minKey = ent.getKey();
                 }
             }
-            map.remove(minKey);
-            curSize--;
+            m_map.remove(minKey);
+            m_curSize--;
         }
-        curSize++;
-        map.put(key, e);
+        m_curSize++;
+        m_map.put(key, e);
     }
 
     /**
@@ -119,22 +121,41 @@ public class Cache {
      * @return the object mapped by <code>key</code>, or null
      */
     public Object get(Object key) {
-        Entry e = (Entry)map.get(key);
-        if (e == null) return null;
+        Entry e = (Entry)m_map.get(key);
+
+        if (e == null) {
+            return null;
+        }
+
         // make sure the item hasn't expired
-        if (maxAge > 0) {
+        if (m_maxAge > 0) {
             long now = System.currentTimeMillis();
-            if (e.creationTime < now - maxAge) {
+            if (e.m_creationTime < now - m_maxAge) {
                 // put in cache more than maxAge ms ago, so remove it
-                map.remove(key);
+                m_map.remove(key);
                 // and pretend we never saw it
                 return null;
             }
         }
-        e.lastUse = System.currentTimeMillis();
-        return e.o;
+        e.m_lastUse = System.currentTimeMillis();
+        return e.m_o;
     }
 
+    
+    /**
+     * Removes the mapping for this key if it exists
+     * @param key key whose mapping is to be removed
+     */
+    public void remove(Object key) {
+        m_map.remove(key);
+    }
+
+    /**
+     * Removes all mapping from this map
+     */
+    public void clear() {
+        m_map.clear();
+    }
 
     /**
      * Puts a new key/value pair into the static global cache with default
@@ -143,7 +164,7 @@ public class Cache {
      * @param value the value
      */
     public static synchronized void putGlobal(Object key, Object value) {
-        instance.put(key, value, instance.maxAge);
+        s_instance.put(key, value, s_instance.m_maxAge);
     }
 
     /**
@@ -156,7 +177,15 @@ public class Cache {
     public static synchronized void putGlobal(Object key,
                                               Object value,
                                               long maxAge) {
-        instance.put(key, value, maxAge);
+        s_instance.put(key, value, maxAge);
+    }
+
+    /**
+     * Removes the mapping for this key if it exists
+     * @param key key whose mapping is to be removed
+     */
+    public static synchronized void removeGlobal(Object key) {
+        s_instance.remove(key);
     }
 
     /**
@@ -167,7 +196,7 @@ public class Cache {
      * @return the object mapped by <code>key</code>, or null
      */
     public static synchronized Object getGlobal(Object key) {
-        return instance.get(key);
+        return s_instance.get(key);
     }
 
     /**
@@ -175,17 +204,17 @@ public class Cache {
      * interest and the last time the object's been looked up; also
      * contains the object's creation time.
      */
-    private class Entry {
-        Object o;
-        long lastUse;
-        long creationTime;
-        long maxAge;
+    private static class Entry {
+        Object m_o;
+        long m_lastUse;
+        long m_creationTime;
+        long m_maxAge;
 
-        Entry (Object o, long lastUse, long maxAge) {
-            this.o = o;
-            this.lastUse = lastUse;
-            this.creationTime = System.currentTimeMillis();
-            this.maxAge = maxAge;
+        Entry(Object o, long lastUse, long maxAge) {
+            m_o = o;
+            m_lastUse = lastUse;
+            m_creationTime = System.currentTimeMillis();
+            m_maxAge = maxAge;
         }
     }
 
