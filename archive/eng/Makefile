@@ -10,12 +10,13 @@ JAVACC=sh javacc-3.2/bin/javacc
 endif
 
 SOURCES:=src test/src cap/src cap/test/src
+CONF   := conf
 
 SOURCEPATH:=$(subst $(space),:,$(SOURCES:%=$(BUILD)/%))
 
 CLASSPATH:=$(CLASSPATH):$(subst $(space),:,$(wildcard lib/*.jar))
 CLASSPATH:=$(CLASSPATH):$(subst $(space),:,$(wildcard lib/*.zip))
-CLASSPATH:=$(CLASSPATH):$(SOURCEPATH)
+CLASSPATH:=$(CLASSPATH):$(SOURCEPATH):$(CONF)
 
 JSTAMPS:=$(SOURCES:%=$(BUILD)/%.jstamp)
 JARS:=$(SOURCES:%=$(BUILD)/%.jar)
@@ -27,6 +28,8 @@ DOC_DEST:=$(BUILD)/doc
 ifndef JDO_ENHANCE
 JDO_ENHANCE=java -classpath lib/jdo.jar:jdori/jdori.jar:jdori/jdori-enhancer.jar com.sun.jdori.enhancer.Main
 endif
+
+.PHONY: all jars clean docs tags runtests
 
 all: $(JSTAMPS)
 
@@ -98,3 +101,6 @@ $(BUILD)/%.jar: $(BUILD)/%.jstamp
 	jar cf $@ -C $(BUILD)/$* .
 	find $* \( -name "*.pdl" -or -name "*.xsl" \) -printf "-C $* %P\n" | \
 		xargs -r jar uf $@
+
+run-tests: $(JSTAMPS)
+	bin/run-tests
