@@ -14,12 +14,12 @@ import java.io.*;
  * SQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/27 $
  */
 
 public class SQLParser {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/common/SQLParser.jj#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/common/SQLParser.jj#2 $ by $Author: rhs $, $DateTime: 2004/02/27 08:57:45 $";
 
     public static interface Mapper {
         Path map(Path path);
@@ -199,6 +199,7 @@ TOKEN: {
   // @ is used by link attribute implementation
   | <#CH: ["a" - "z", "A" - "Z", "_", "@"]>
   | <RAW: "RAW[" (~["]"] | "\\]")* "]">
+  | <QUOTED_ID: "\"" ( ~["\""] | "\"\"" )* "\"">
 }
 
 // TODO: Add support for multi-line comments.
@@ -284,6 +285,7 @@ void symbol() :
   | t = <AS>
   | t = <MINUS>
   | t = <PRIOR>
+  | t = <QUOTED_ID>
   | t = <RAW> {
       appendSpecial(t);
       token();
