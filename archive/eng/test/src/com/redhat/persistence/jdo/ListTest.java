@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
  * ListTest
  *
  * @since 2004-07-13
- * @version $Revision: #1 $ $Date: 2004/07/20 $
+ * @version $Revision: #2 $ $Date: 2004/07/27 $
  **/
 public class ListTest extends WithTxnCase {
     private final static Logger s_log = Logger.getLogger(ListTest.class);
@@ -42,17 +42,17 @@ public class ListTest extends WithTxnCase {
         m_pm.makePersistent(m_group);
     }
 
-    private void addEmails() {
-        List auxEmails = m_group.getAuxiliaryEmails();
+    private List addEmails() {
+        final List auxEmails = m_group.getAuxiliaryEmails();
         for (Iterator it=EMAILS.iterator(); it.hasNext(); ) {
             auxEmails.add(it.next());
         }
+        return auxEmails;
     }
 
     public void testAdd() {
-        addEmails();
+        List auxEmails = addEmails();
 
-        List auxEmails = m_group.getAuxiliaryEmails();
         for (Iterator it=auxEmails.iterator(); it.hasNext(); ) {
             assertTrue("has email", EMAILS.contains((String) it.next()));
         }
@@ -85,10 +85,10 @@ public class ListTest extends WithTxnCase {
     }
 
     public void testToPreallocatedArray() {
-        addEmails();
+        List auxEmails = addEmails();
 
-        String[] actual = (String[])
-            m_group.getAuxiliaryEmails().toArray(new String[EMAILS.size()]);
+        String[] actual =
+            (String[]) auxEmails.toArray(new String[EMAILS.size()]);
 
         assertEquals("as arrays",
                     Arrays.asList(EMAILS.toArray()),
@@ -96,8 +96,7 @@ public class ListTest extends WithTxnCase {
     }
 
     public void testGet() {
-        addEmails();
-        List auxEmails = m_group.getAuxiliaryEmails();
+        List auxEmails = addEmails();
 
         try {
             auxEmails.get(-1);
@@ -119,9 +118,7 @@ public class ListTest extends WithTxnCase {
     }
 
     public void testIndexOf() {
-        addEmails();
-
-        List auxEmails = m_group.getAuxiliaryEmails();
+        List auxEmails = addEmails();
 
         for (int ii=0; ii<EMAILS.size(); ii++) {
             String email = (String) EMAILS.get(ii);
@@ -130,9 +127,7 @@ public class ListTest extends WithTxnCase {
     }
 
     public void testRemoveIndex() {
-        addEmails();
-
-        List auxEmails = m_group.getAuxiliaryEmails();
+        List auxEmails = addEmails();
 
         String zerothElement = (String) auxEmails.remove(0);
         assertEquals("zeroth element", EMAILS.get(0), zerothElement);
@@ -149,9 +144,7 @@ public class ListTest extends WithTxnCase {
 
 
     public void testRemoveElement() {
-        addEmails();
-
-        List auxEmails = m_group.getAuxiliaryEmails();
+        List auxEmails = addEmails();
 
         boolean hadZeroth = auxEmails.remove(EMAILS.get(0));
 
@@ -162,9 +155,7 @@ public class ListTest extends WithTxnCase {
     }
 
     public void testSet() {
-        addEmails();
-
-        List auxEmails = m_group.getAuxiliaryEmails();
+        List auxEmails = addEmails();
         final String newEmail = "new@email.example.com";
         String oldEmail = (String) auxEmails.set(1, newEmail);
         assertEquals("old email", EMAILS.get(1), oldEmail);
@@ -179,9 +170,7 @@ public class ListTest extends WithTxnCase {
     }
 
     public void testIterator() {
-        addEmails();
-
-        List auxEmails = m_group.getAuxiliaryEmails();
+        List auxEmails = addEmails();
         Iterator expected = EMAILS.iterator();
 
         for (Iterator it=auxEmails.iterator(); it.hasNext(); ) {
