@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/02/24 $
+ * @version $Revision: #4 $ $Date: 2004/02/24 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/RecordSet.java#3 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/RecordSet.java#4 $ by $Author: ashah $, $DateTime: 2004/02/24 15:07:33 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
@@ -83,7 +83,9 @@ public abstract class RecordSet {
 
 	    OUTER: for (Iterator it = remaining.iterator(); it.hasNext(); ) {
 		Path p = (Path) it.next();
-                LOG.warn("loading " + p);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("loading " + p);
+                }
 		ObjectType type = m_signature.getType(p);
                 Adapter adapter = ssn.getRoot().getAdapter(type);
 		Collection props = type.getImmediateProperties();
