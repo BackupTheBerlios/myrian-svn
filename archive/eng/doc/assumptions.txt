@@ -1,0 +1,12 @@
+# Since: 2004-06-29
+# Version: $Id: //eng/persistence/dev/doc/assumptions.txt#1 $
+
+* The fully-qualifed class name and object type name of a JDO instance
+  have to match.  We rely on this when we write code like this:
+
+    ObjectType type = root.getObjectType(pc.getClass().getName());
+
+* Each JDO instance gets own StateManagerImpl.  We rely on this in
+  AbstractStateManager#provideField(PersistenceCapable pc, int field).
+  If this were not so, the provideField method would have to be
+  synchronized.
