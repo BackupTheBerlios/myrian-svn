@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
  * Description: The TransactionContext class encapsulates a database transaction.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/03/10 $
  */
 
 public class TransactionContext {
 
-    String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/TransactionContext.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/TransactionContext.java#2 $ by $Author: richardl $, $DateTime: 2004/03/10 13:09:19 $";
 
     private static final Logger s_cat =
         Logger.getLogger(TransactionContext.class);
@@ -92,7 +92,6 @@ public class TransactionContext {
             m_inTxn = false;
             fireCommitEvent();
         } finally {
-            m_inTxn = false;
             clearAttributes();
             if (!success) { m_ossn.invalidateDataObjects(false, true); }
         }
@@ -113,7 +112,6 @@ public class TransactionContext {
             m_inTxn = false;
             fireCommitEvent();
         } finally {
-            m_inTxn = false;
             clearAttributes();
             if (!success) { m_ossn.invalidateDataObjects(false, true); }
         }
@@ -130,12 +128,15 @@ public class TransactionContext {
     public void abortTxn() {
         boolean success = false;
         try {
-            fireBeforeAbortEvent();
-            m_ossn.invalidateDataObjects(false, false);
-            m_ssn.rollback();
+            try {
+                fireBeforeAbortEvent();
+                m_ossn.invalidateDataObjects(false, false);
+            } finally {
+                m_ssn.rollback();
+                m_inTxn = false;
+            }
             success = true;
         } finally {
-            m_inTxn = false;
             if (!success) { m_ossn.invalidateDataObjects(false, true); }
             fireAbortEvent();
             clearAttributes();
