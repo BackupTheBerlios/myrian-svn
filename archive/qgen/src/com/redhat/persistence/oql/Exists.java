@@ -4,14 +4,14 @@ package com.redhat.persistence.oql;
  * Exists
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/02/09 $
+ * @version $Revision: #6 $ $Date: 2004/02/09 $
  **/
 
 public class Exists extends UnaryCondition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Exists.java#5 $ by $Author: rhs $, $DateTime: 2004/02/09 11:51:40 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Exists.java#6 $ by $Author: ashah $, $DateTime: 2004/02/09 16:16:05 $";
 
-    Exists(Expression query) {
+    public Exists(Expression query) {
         super(query);
     }
 

@@ -4,14 +4,14 @@ package com.redhat.persistence.oql;
  * Not
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/01/23 $
+ * @version $Revision: #4 $ $Date: 2004/02/09 $
  **/
 
 public class Not extends UnaryCondition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Not.java#3 $ by $Author: rhs $, $DateTime: 2004/01/23 15:34:30 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Not.java#4 $ by $Author: ashah $, $DateTime: 2004/02/09 16:16:05 $";
 
-    Not(Expression expr) {
+    public Not(Expression expr) {
         super(expr);
     }
 

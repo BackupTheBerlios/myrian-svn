@@ -6,16 +6,16 @@ import com.redhat.persistence.metadata.*;
  * All
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/02/06 $
+ * @version $Revision: #3 $ $Date: 2004/02/09 $
  **/
 
 public class All extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/All.java#2 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/All.java#3 $ by $Author: ashah $, $DateTime: 2004/02/09 16:16:05 $";
 
     private String m_type;
 
-    All(String type) {
+    public All(String type) {
         m_type = type;
     }
 

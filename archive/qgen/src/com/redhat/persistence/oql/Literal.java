@@ -4,16 +4,16 @@ package com.redhat.persistence.oql;
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/02/09 $
+ * @version $Revision: #6 $ $Date: 2004/02/09 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#5 $ by $Author: rhs $, $DateTime: 2004/02/09 14:57:03 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#6 $ by $Author: ashah $, $DateTime: 2004/02/09 16:16:05 $";
 
     private Object m_value;
 
-    Literal(Object value) {
+    public Literal(Object value) {
         m_value = value;
     }
 

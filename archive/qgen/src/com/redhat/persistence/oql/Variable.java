@@ -8,16 +8,16 @@ import java.util.*;
  * Variable
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/02/09 $
+ * @version $Revision: #7 $ $Date: 2004/02/09 $
  **/
 
 public class Variable extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Variable.java#6 $ by $Author: rhs $, $DateTime: 2004/02/09 11:51:40 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Variable.java#7 $ by $Author: ashah $, $DateTime: 2004/02/09 16:16:05 $";
 
     private String m_name;
 
-    Variable(String name) {
+    public Variable(String name) {
         m_name = name;
     }
 

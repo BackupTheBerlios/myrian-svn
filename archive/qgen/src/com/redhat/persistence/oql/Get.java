@@ -7,17 +7,17 @@ import java.util.*;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/02/09 $
+ * @version $Revision: #9 $ $Date: 2004/02/09 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#8 $ by $Author: rhs $, $DateTime: 2004/02/09 11:51:40 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#9 $ by $Author: ashah $, $DateTime: 2004/02/09 16:16:05 $";
 
     private Expression m_expr;
     private String m_name;
 
-    Get(Expression expr, String name) {
+    public Get(Expression expr, String name) {
         m_expr = expr;
         m_name = name;
     }

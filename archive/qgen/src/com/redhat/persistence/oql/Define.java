@@ -7,17 +7,17 @@ import java.util.*;
  * Define
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/02/06 $
+ * @version $Revision: #8 $ $Date: 2004/02/09 $
  **/
 
 public class Define extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Define.java#7 $ by $Author: rhs $, $DateTime: 2004/02/06 17:14:57 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Define.java#8 $ by $Author: ashah $, $DateTime: 2004/02/09 16:16:05 $";
 
     private Expression m_expr;
     private String m_name;
 
-    Define(Expression expr, String name) {
+    public Define(Expression expr, String name) {
         m_expr = expr;
         m_name = name;
     }

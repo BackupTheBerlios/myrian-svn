@@ -4,14 +4,14 @@ package com.redhat.persistence.oql;
  * Equals
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/02/09 $
+ * @version $Revision: #7 $ $Date: 2004/02/09 $
  **/
 
 public class Equals extends BinaryCondition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Equals.java#6 $ by $Author: rhs $, $DateTime: 2004/02/09 11:51:40 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Equals.java#7 $ by $Author: ashah $, $DateTime: 2004/02/09 16:16:05 $";
 
-    Equals(Expression left, Expression right) {
+    public Equals(Expression left, Expression right) {
         super(left, right);
     }
 

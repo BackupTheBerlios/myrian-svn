@@ -4,17 +4,17 @@ package com.redhat.persistence.oql;
  * Range
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2004/02/06 $
+ * @version $Revision: #4 $ $Date: 2004/02/09 $
  **/
 
 public abstract class Range extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Range.java#3 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Range.java#4 $ by $Author: ashah $, $DateTime: 2004/02/09 16:16:05 $";
 
     Expression m_query;
     Expression m_operand;
 
-    Range(Expression query, Expression operand) {
+    public Range(Expression query, Expression operand) {
         m_query = query;
         m_operand = operand;
     }

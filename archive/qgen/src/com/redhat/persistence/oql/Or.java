@@ -6,14 +6,14 @@ import java.util.*;
  * Or
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/01/16 $
+ * @version $Revision: #3 $ $Date: 2004/02/09 $
  **/
 
 public class Or extends BinaryCondition {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Or.java#2 $ by $Author: rhs $, $DateTime: 2004/01/16 16:27:01 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Or.java#3 $ by $Author: ashah $, $DateTime: 2004/02/09 16:16:05 $";
 
-    Or(Expression left, Expression right) {
+    public Or(Expression left, Expression right) {
         super(left, right);
     }
 
