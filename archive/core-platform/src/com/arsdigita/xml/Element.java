@@ -28,14 +28,14 @@ import org.w3c.dom.Attr;
  * <code>org.jdom.Element</code> using <code>org.w3c.dom.Element</code>.
  *
  * @author Patrick McNeill 
- * @version $Revision: #9 $ $Date: 2002/12/11 $
+ * @version $Revision: #10 $ $Date: 2003/06/02 $
  * @since ACS 4.5a
  */
 public class Element {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#9 $" +
-        "$Author: dennis $" +
-        "$DateTime: 2002/12/11 13:49:53 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#10 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/06/02 15:00:59 $";
 
     private static final Logger s_log = Logger.getLogger
         (Element.class.getName());
@@ -389,7 +389,7 @@ public class Element {
           e.printStackTrace(new java.io.PrintWriter(sw));
           System.out.println(sw.toString().substring(0, 300));
         */
-        visitAllAttributes(m_element);
+
         m_element = (org.w3c.dom.Element)doc.importNode(m_element, true);
     }
 
@@ -402,6 +402,7 @@ public class Element {
      * help.
      *
      * @param node the org.w3c.dom.Node about to be imported
+     * @deprecated with no replacement, 1 May 2003
      */
     public static void visitAllAttributes(org.w3c.dom.Node node) {
         org.w3c.dom.NamedNodeMap nnm = node.getAttributes();
