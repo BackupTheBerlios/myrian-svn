@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #22 $ $Date: 2003/03/11 $
+ * @version $Revision: #23 $ $Date: 2003/03/12 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#22 $ by $Author: rhs $, $DateTime: 2003/03/11 16:05:41 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#23 $ by $Author: rhs $, $DateTime: 2003/03/12 18:21:58 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -387,15 +387,46 @@ public class RDBMSEngine extends Engine {
         return execute(op);
     }
 
-    static final Object getKeyValue(Object obj) {
-        if (obj == null) { return null; }
-        Adapter ad = Adapter.getAdapter(obj.getClass());
-        ObjectType type = ad.getObjectType(obj);
-        Collection keys = type.getKeyProperties();
-        if (keys.size() != 1) {
-            throw new Error("not implemented: " + type);
+    public static final Path[] getKeyPaths(ObjectType type, Path prefix) {
+        LinkedList result = new LinkedList();
+        LinkedList stack = new LinkedList();
+        stack.add(prefix);
+
+        while (stack.size() > 0) {
+            Path p = (Path) stack.removeLast();
+
+            ObjectType ot = type.getType(Path.relative(prefix, p));
+            Collection keys = ot.getKeyProperties();
+            if (keys.size() == 0) {
+                result.add(p);
+                continue;
+            }
+
+            ArrayList revKeys = new ArrayList(keys.size());
+            revKeys.addAll(keys);
+            Collections.reverse(revKeys);
+
+            for (Iterator it = revKeys.iterator(); it.hasNext(); ) {
+                Property key = (Property) it.next();
+                stack.add(Path.add(p, key.getName()));
+            }
         }
-        return ad.getProperties(obj).get((Property) keys.iterator().next());
+
+        return (Path[]) result.toArray(new Path[0]);
+    }
+
+    public static final Object get(Object obj, Path path) {
+        if (path == null) {
+            return obj;
+        }
+
+        Object o = get(obj, path.getParent());
+        if (o == null) {
+            return null;
+        }
+
+        PropertyMap props = Session.getProperties(o);
+        return props.get(props.getObjectType().getProperty(path.getName()));
     }
 
 }

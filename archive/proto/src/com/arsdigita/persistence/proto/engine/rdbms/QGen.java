@@ -1,7 +1,6 @@
 package com.arsdigita.persistence.proto.engine.rdbms;
 
 import com.arsdigita.persistence.proto.*;
-import com.arsdigita.persistence.proto.Query;
 import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.metadata.*;
 import com.arsdigita.persistence.proto.pdl.SQLParser;
@@ -16,12 +15,12 @@ import java.io.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #12 $ $Date: 2003/03/05 $
+ * @version $Revision: #13 $ $Date: 2003/03/12 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#12 $ by $Author: rhs $, $DateTime: 2003/03/05 18:41:57 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#13 $ by $Author: rhs $, $DateTime: 2003/03/12 18:21:58 $";
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -56,6 +55,7 @@ class QGen {
 
     private Query m_query;
     private HashMap m_columns = new HashMap();
+    private HashMap m_keys = new HashMap();
     private HashMap m_tables = new HashMap();
     private HashMap m_joins = new HashMap();
 
@@ -68,11 +68,20 @@ class QGen {
     }
 
     private Path getColumn(Path prefix) {
-        return (Path) m_columns.get(prefix);
+        Path[] result = getColumns(prefix);
+        if (result.length != 1) {
+            throw new IllegalStateException
+                ("once column requested for multi-column prefix");
+        }
+        return result[0];
     }
 
-    private void setColumn(Path prefix, Path column) {
-        m_columns.put(prefix, column);
+    private Path[] getColumns(Path prefix) {
+        return (Path[]) m_columns.get(prefix);
+    }
+
+    private void setColumns(Path prefix, Path[] columns) {
+        m_columns.put(prefix, columns);
     }
 
     private Set getTables(Path prefix) {
@@ -96,13 +105,12 @@ class QGen {
         m_joins.put(src, join);
     }
 
-    private static final Column getKey(Table table) {
-        UniqueKey key = table.getPrimaryKey();
-        if (key == null) {
-            throw new Error("table has no primary key: " + table);
-        } else {
-            return key.getColumns()[0];
+    private Path[] getColumns(SQLBlock block, Path[] paths) {
+        Path[] result = new Path[paths.length];
+        for (int i = 0; i < paths.length; i++) {
+            result[i] = block.getMapping(paths[i]);
         }
+        return result;
     }
 
     public Select generate() {
@@ -125,9 +133,13 @@ class QGen {
                     if (prefix != null) {
                         path = prefix.getRelative(path);
                     }
-                    setColumn(path, column);
+                    setColumns(path, new Path[] {column});
                     if (src.getObjectType().isKey(path)) {
-                        setColumn(path.getParent(), column);
+                        Path parent = path.getParent();
+                        setColumns
+                            (parent, getColumns
+                             (block, RDBMSEngine.getKeyPaths
+                              (src.getObjectType().getType(path), parent)));
                     }
                 }
                 Path alias = Path.get(src.getPath() + "__static");
@@ -141,8 +153,9 @@ class QGen {
                 }
                 Path alias = Path.get(src.getPath() + "__" + start.getName());
                 j = new SimpleJoin(start, alias);
-                setColumn(src.getPath(),
-                          Path.get(src.getPath() + "__" + getKey(start)));
+
+                setColumns(src.getPath(),
+                           getPaths(alias, start.getPrimaryKey()));
                 addTable(src.getPath(), start);
             }
 
@@ -186,13 +199,13 @@ class QGen {
 
         for (Iterator it = sig.getParameters().iterator(); it.hasNext(); ) {
             Parameter param = (Parameter) it.next();
-            if (param.getObjectType().hasKey()) {
-                result.set(param.getPath(),
-                           RDBMSEngine.getKeyValue(m_query.get(param)),
-                           Types.INTEGER);
-            } else {
-                result.set(param.getPath(), m_query.get(param),
-                           Types.INTEGER);
+            Path[] paths = RDBMSEngine.getKeyPaths
+                (param.getObjectType(), null);
+            for (int i = 0; i < paths.length; i++) {
+                result.set
+                    (Path.add(param.getPath(), paths[i]),
+                     RDBMSEngine.get(m_query.get(param), paths[i]),
+                     Types.INTEGER);
             }
         }
 
@@ -239,15 +252,25 @@ class QGen {
         }
     }
 
-    private void addJoin(Path path, Column to) {
-        Path parentColumn = getColumn(path.getParent());
-        Table table = to.getTable();
+    private Path[] getPaths(Path alias, Constraint constraint) {
+        Column[] cols = constraint.getColumns();
+        Path[] result = new Path[cols.length];
+        for (int i = 0; i < cols.length; i++) {
+            result[i] = Path.add(alias, cols[i].getName());
+        }
+        return result;
+    }
+
+    private Path addJoin(Path path, Constraint constraint) {
+        Table table = constraint.getTable();
+        Path alias = Path.get(path.getParent() + "__" + table.getName());
+
         if (!getTables(path.getParent()).contains(table)) {
             Join join = getJoin(path);
-            Join simple = new SimpleJoin
-                (table, Path.get(path.getParent() + "__" + table.getName()));
-            Condition cond = new EqualsCondition
-                (parentColumn, Path.get(path.getParent() + "__" + to));
+            Join simple = new SimpleJoin(table, alias);
+            Path[] cols = getColumns(path.getParent());
+            Condition cond = Condition.equals
+                (cols, getPaths(alias, constraint));
             if (isOuter(path)) {
                 join = new LeftJoin(join, simple, cond);
             } else {
@@ -256,16 +279,20 @@ class QGen {
             setJoin(path, join);
             addTable(path.getParent(), table);
         }
+
+        return alias;
     }
 
     private void genPath(final Path path) {
-        Path column = getColumn(path);
-        if (column != null) {
+        Path[] cols = getColumns(path);
+        if (cols != null) {
             return;
         }
 
-        if (m_query.getSignature().isParameter(path)) {
-            setColumn(path, path);
+        Parameter p = m_query.getSignature().getParameter(path);
+        if (p != null) {
+            setColumns(path, RDBMSEngine.getKeyPaths
+                       (p.getObjectType(), p.getPath()));
             return;
         }
 
@@ -277,31 +304,27 @@ class QGen {
 
         m.dispatch(new Mapping.Switch() {
                 public void onValue(Value m) {
-                    addJoin(path, getKey(m.getColumn().getTable()));
-                    setColumn(path, Path.get(path.getParent() + "__" +
-                                             m.getColumn()));
+                    Path alias = addJoin
+                        (path, m.getColumn().getTable().getPrimaryKey());
+                    setColumns(path, new Path[] {
+                        Path.add(alias, m.getColumn().getName())
+                    });
                 }
 
                 public void onJoinTo(JoinTo m) {
-                    Column to = m.getKey().getColumns()[0];
-                    addJoin(path, getKey(to.getTable()));
-                    setColumn(path, Path.get(path.getParent() + "__" + to));
+                    Path alias = addJoin(path, m.getKey());
+                    setColumns(path, getPaths(alias, m.getKey()));
                 }
 
                 public void onJoinFrom(JoinFrom m) {
-                    Column to = m.getKey().getColumns()[0];
-                    addJoin(path, to);
-                    setColumn(path, Path.get
-                              (path.getParent() + "__" +
-                               getKey(to.getTable())));
+                    Path alias = addJoin(path, m.getKey());
+                    setColumns(path, getPaths
+                               (alias, m.getKey().getTable().getPrimaryKey()));
                 }
 
                 public void onJoinThrough(JoinThrough m) {
-                    addJoin(path, m.getFrom().getColumns()[0]);
-                    setColumn
-                        (path, Path.get
-                         (path.getParent() + "__" +
-                          m.getTo().getColumns()[0]));
+                    Path alias = addJoin(path, m.getFrom());
+                    setColumns(path, getPaths(alias, m.getTo()));
                 }
 
                 public void onStatic(Static m) {
@@ -335,8 +358,8 @@ class QGen {
                 public void onEquals(EqualsFilter f) {
                     genPath(f.getLeft());
                     genPath(f.getRight());
-                    result[0] = new EqualsCondition(getColumn(f.getLeft()),
-                                                    getColumn(f.getRight()));
+                    result[0] = Condition.equals(getColumns(f.getLeft()),
+                                                 getColumns(f.getRight()));
                 }
 
                 public void onIn(InFilter f) {
@@ -349,9 +372,9 @@ class QGen {
                 public void onContains(ContainsFilter f) {
                     genPath(f.getCollection());
                     genPath(f.getElement());
-                    result[0] = new EqualsCondition
-                        (getColumn(f.getCollection()),
-                         getColumn(f.getElement()));
+                    result[0] = Condition.equals
+                        (getColumns(f.getCollection()),
+                         getColumns(f.getElement()));
                 }
 
                 public void onPassthrough(final PassthroughFilter f) {

@@ -6,12 +6,12 @@ import java.util.*;
  * Path
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/02/26 $
+ * @version $Revision: #4 $ $Date: 2003/03/12 $
  **/
 
 public class Path {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/common/Path.java#3 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/common/Path.java#4 $ by $Author: rhs $, $DateTime: 2003/03/12 18:21:58 $";
 
     private static final HashMap PATHS = new HashMap();
 
@@ -43,6 +43,32 @@ public class Path {
         }
 
         return result;
+    }
+
+    public static final Path add(Path p1, String p2) {
+        return Path.add(p1, Path.get(p2));
+    }
+
+    public static final Path add(String p1, Path p2) {
+        return Path.add(Path.get(p1), p2);
+    }
+
+    public static final Path add(Path p1, Path p2) {
+        if (p1 == null) {
+            return p2;
+        } else if (p2 == null) {
+            return p1;
+        } else {
+            return Path.get(p1.getPath() + "." + p2.getPath());
+        }
+    }
+
+    public static final Path relative(Path base, Path descendent) {
+        if (base == null) {
+            return descendent;
+        } else {
+            return base.getRelative(descendent);
+        }
     }
 
     private Path m_parent;

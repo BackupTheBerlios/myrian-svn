@@ -12,12 +12,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2003/03/11 $
+ * @version $Revision: #15 $ $Date: 2003/03/12 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#14 $ by $Author: rhs $, $DateTime: 2003/03/11 10:49:54 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#15 $ by $Author: rhs $, $DateTime: 2003/03/12 18:21:58 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -31,20 +31,13 @@ class EventSwitch extends Event.Switch {
         m_engine = engine;
     }
 
-    private static final Column getKey(Table table) {
-        UniqueKey uk = table.getPrimaryKey();
-        if (uk == null) {
-            throw new IllegalArgumentException("no primary key: " + table);
-        } else {
-            return uk.getColumns()[0];
-        }
-    }
-
     private static final Path getPath(Column column) {
         return Path.get(column.toString());
     }
 
-    private void flatten(Path prefix, Object obj, List paths, Map values) {
+    // I think this will be broken if obj is null or if it contains any keys
+    // that are null.
+    void flatten(Path prefix, Object obj, List paths, Map values) {
         LinkedList stack = new LinkedList();
         stack.add(prefix);
         stack.add(obj);

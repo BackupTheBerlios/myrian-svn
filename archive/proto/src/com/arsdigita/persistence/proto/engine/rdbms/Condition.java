@@ -7,12 +7,12 @@ import java.util.*;
  * Condition
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/02/28 $
+ * @version $Revision: #8 $ $Date: 2003/03/12 $
  **/
 
 abstract class Condition {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Condition.java#7 $ by $Author: rhs $, $DateTime: 2003/02/28 17:44:25 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Condition.java#8 $ by $Author: rhs $, $DateTime: 2003/03/12 18:21:58 $";
 
     abstract void write(SQLWriter w);
 
@@ -20,6 +20,25 @@ abstract class Condition {
         SQLWriter w = new UnboundWriter();
         w.write(this);
         return w.getSQL();
+    }
+
+    public static Condition equals(Path[] left, Path[] right) {
+        if (left.length != right.length) {
+            throw new IllegalArgumentException
+                ("left and right must be the same length");
+        }
+
+        Condition cond = null;
+        for (int i = 0; i < left.length; i++) {
+            Condition eq = new EqualsCondition(left[i], right[i]);
+            if (cond == null) {
+                cond = eq;
+            } else {
+                cond = new AndCondition(cond, eq);
+            }
+        }
+
+        return cond;
     }
 
 }
