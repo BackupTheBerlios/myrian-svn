@@ -12,14 +12,18 @@ import org.apache.log4j.Logger;
  * TestRunner
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/08/12 $
+ * @version $Revision: #8 $ $Date: 2004/08/12 $
  **/
 
 public class TestRunner {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/TestRunner.java#7 $ by $Author: ashah $, $DateTime: 2004/08/12 15:46:57 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/TestRunner.java#8 $ by $Author: ashah $, $DateTime: 2004/08/12 18:17:05 $";
 
     private static final Logger s_log = Logger.getLogger(TestRunner.class);
+
+    private static boolean verbose() {
+        return !"false".equals(System.getProperty("junit.verbose"));
+    }
 
     public static final void main(String[] args) throws Exception {
         List results = new ArrayList();
@@ -31,6 +35,12 @@ public class TestRunner {
 
         for (int i = 0; i < results.size(); i++) {
             TestResult result = (TestResult) results.get(i);
+            if (result.runCount() == 0) {
+                if (verbose()) {
+                    System.out.println("Test " + args[i] + ": SKIPPED");
+                }
+                continue;
+            }
             System.out.println
                 ("Test " + args[i] + ": " +
                  (result.wasSuccessful() ? "PASSED" : "FAILED"));
@@ -102,7 +112,7 @@ public class TestRunner {
         System.out.println
             ("Testcase " + (failed ? "FAILED" : "ERROR ") + ": " + test);
 
-        if (!"false".equals(System.getProperty("junit.verbose"))) {
+        if (verbose()) {
             t.printStackTrace(System.out);
         }
     }
