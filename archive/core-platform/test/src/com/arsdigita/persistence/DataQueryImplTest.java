@@ -38,11 +38,11 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2002/09/11 $
+ * @version $Revision: #10 $ $Date: 2002/10/01 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#9 $ by $Author: randyg $, $DateTime: 2002/09/11 18:15:53 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#10 $ by $Author: rhs $, $DateTime: 2002/10/01 15:44:47 $";
 
     private static Logger s_log =
         Logger.getLogger(DataQueryImplTest.class.getName());
@@ -54,13 +54,13 @@ public class DataQueryImplTest extends DataQueryTest {
 
     protected void persistenceSetUp() {
         load("com/arsdigita/persistence/testpdl/static/DataQuery.pdl");
+        load("com/arsdigita/persistence/testpdl/static/DataQueryExtra.pdl");
         load("com/arsdigita/persistence/testpdl/static/DataOperation.pdl");
+        load("com/arsdigita/persistence/testpdl/static/DataOperationExtra.pdl");
         super.persistenceSetUp();
     }
 
     protected void persistenceTearDown() {
-        load("com/arsdigita/persistence/testpdl/static/DataQuery.pdl");
-        load("com/arsdigita/persistence/testpdl/static/DataOperation.pdl");
         super.persistenceTearDown();
     }
 

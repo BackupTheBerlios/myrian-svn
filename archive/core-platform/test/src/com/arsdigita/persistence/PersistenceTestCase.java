@@ -15,6 +15,7 @@
 
 package com.arsdigita.persistence;
 
+import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.pdl.PDL;
 import com.arsdigita.persistence.pdl.PDLOutputter;
@@ -30,12 +31,12 @@ import java.io.InputStream;
  * PersistenceTestCase
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2002/08/14 $
+ * @version $Revision: #9 $ $Date: 2002/10/01 $
  */
 
 public class PersistenceTestCase extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#8 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#9 $ by $Author: rhs $, $DateTime: 2002/10/01 15:44:47 $";
 
     // Prevent loading the same PDL file twice
     private static Set s_loadedPDLResources = new HashSet();
@@ -58,31 +59,24 @@ public class PersistenceTestCase extends TestCase {
 
         s_loadedPDLResources.add(resource);
 
-        String extraResource = null;
-
-        if (resource.indexOf("testpdl") > -1) {
-            String prefix = resource.substring
-                (0, resource.indexOf("testpdl") + 8);
-            String suffix = resource.substring(resource.indexOf("testpdl") + 7);
-            resource = prefix + "default" + suffix;
-            if (com.arsdigita.db.DbHelper.getDatabase() ==
-                com.arsdigita.db.DbHelper.DB_POSTGRES) {
-                extraResource = prefix + "postgres" + suffix;
-            } else {
-                extraResource = prefix + "oracle-se" + suffix;
-            }
-        }
+        String shadow = resource.substring(0, resource.lastIndexOf('.'));
+        String ext = resource.substring(resource.lastIndexOf('.') + 1,
+                                        resource.length());
+        shadow = shadow + "." + DbHelper.getDatabaseSuffix() + "." + ext;
 
         try {
             PDL m = new PDL();
-            if (extraResource != null &&
-                m.getClass().getClassLoader().getResourceAsStream
-                (extraResource) != null) {
-                m.loadResource(extraResource);
-                s_loadedPDLResources.add(extraResource);
+
+            String[] resources = new String[] {shadow, resource};
+            for (int i = 0; i < resources.length; i++) {
+                if (m.getClass().getClassLoader().getResourceAsStream
+                    (resources[i]) != null) {
+                    m.loadResource(resources[i]);
+                    s_loadedPDLResources.add(resources[i]);
+                    break;
+                }
             }
 
-            m.loadResource(resource);
             m.generateMetadata(MetadataRoot.getMetadataRoot());
 
             String outputPDLDir = null;

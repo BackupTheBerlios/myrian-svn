@@ -30,11 +30,11 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/30 $
+ * @version $Revision: #7 $ $Date: 2002/10/01 $
  */
 public class GenericDataObjectTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/GenericDataObjectTest.java#6 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/GenericDataObjectTest.java#7 $ by $Author: rhs $, $DateTime: 2002/10/01 15:44:47 $";
 
     public GenericDataObjectTest(String name) {
         super(name);
@@ -42,6 +42,7 @@ public class GenericDataObjectTest extends PersistenceTestCase {
 
     protected void persistenceSetUp() {
         load("com/arsdigita/persistence/testpdl/static/DataQuery.pdl");
+        load("com/arsdigita/persistence/testpdl/static/DataQueryExtra.pdl");
         load("com/arsdigita/persistence/testpdl/static/Node.pdl");
         load("com/arsdigita/persistence/testpdl/static/Party.pdl");
         load("com/arsdigita/persistence/testpdl/static/Order.pdl");
@@ -50,10 +51,6 @@ public class GenericDataObjectTest extends PersistenceTestCase {
     }
 
     protected void persistenceTearDown() {
-        load("com/arsdigita/persistence/testpdl/static/DataQuery.pdl");
-        load("com/arsdigita/persistence/testpdl/static/Node.pdl");
-        load("com/arsdigita/persistence/testpdl/static/Party.pdl");
-        load("com/arsdigita/persistence/testpdl/static/Order.pdl");
         super.persistenceTearDown();
     }
 

@@ -29,10 +29,10 @@ import org.apache.log4j.Logger;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/08/30 $
+ * @version $Revision: #8 $ $Date: 2002/10/01 $
  */
 public class FilterTest extends PersistenceTestCase {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/FilterTest.java#7 $ by $Author: dennis $, $DateTime: 2002/08/30 17:07:43 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/FilterTest.java#8 $ by $Author: rhs $, $DateTime: 2002/10/01 15:44:47 $";
 
     private static Logger s_log =
         Logger.getLogger(FilterTest.class.getName());
@@ -43,7 +43,9 @@ public class FilterTest extends PersistenceTestCase {
 
     protected void persistenceSetUp() {
         load("com/arsdigita/persistence/testpdl/static/DataQuery.pdl");
+        load("com/arsdigita/persistence/testpdl/static/DataQueryExtra.pdl");
         load("com/arsdigita/persistence/testpdl/static/DataOperation.pdl");
+        load("com/arsdigita/persistence/testpdl/static/DataOperationExtra.pdl");
         super.persistenceSetUp();
     }
 
