@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/postgres/kernel/package-dnm_context.sql#2 $
--- $DateTime: 2004/01/15 15:12:26 $
+-- $Id: //core-platform/dev/sql/ccm-core/postgres/kernel/package-dnm_context.sql#3 $
+-- $DateTime: 2004/01/20 14:16:30 $
 -- autor: Aram Kananov <aram@kananov.com>
 
 
@@ -257,8 +257,6 @@ create or replace function dnm_context_change_context (
         where pd_object_id = p_object_id
       ;
       
-
-
       -- delete old ancesctors for p_object_id and its children in 
       -- dnm_ungranted_context
       delete from dnm_ungranted_context
@@ -300,44 +298,47 @@ create or replace function dnm_context_change_context (
       -- update granted context_id from ungranted children of p_object_id
       update dnm_object_1_granted_context 
         set pd_context_id = v_new_granted_context
-        where pd_object_id in ( select object_id 
-                                  from dnm_ungranted_context 
-                                  where ancestor_id = p_object_id)
+        from dnm_ungranted_context dugc
+        where dnm_object_1_granted_context.pd_object_id = dugc.object_id 
+          and dugc.ancestor_id = p_object_id
       ;
                    
-
-
-
       -- delete from dnm_granted_context ancestors for 
       -- granted children of p_object_id
-      delete from dnm_granted_context 
+	delete from dnm_granted_context 
         where pd_object_id in ( select pd_object_id 
-                                  from dnm_object_1_granted_context dogc
-                                  where dogc.pd_non_effective_context_id in ( select p_object_id 
-                                                                              union all
-                                                                              select object_id 
-                                                                                from dnm_ungranted_context
-                                                                                where ancestor_id = p_object_id))
+                                  from dnm_ungranted_context dugc, dnm_object_1_granted_context dogc
+                                  where dugc.ancestor_id = p_object_id 
+                                    and dogc.pd_non_effective_context_id = dugc.object_id)
           and pd_context_id in ( select pd_context_id 
                                    from dnm_granted_context 
                                    where pd_object_id = v_old_granted_context_id)
       ;
 
+      delete from dnm_granted_context 
+        where pd_object_id in ( select pd_object_id 
+                                  from dnm_object_1_granted_context dogc
+                                  where dogc.pd_non_effective_context_id  = p_object_id)
+          and pd_context_id in ( select pd_context_id 
+                                   from dnm_granted_context 
+                                   where pd_object_id = v_old_granted_context_id)
+      ;
+
+
       -- add new ancestors to granted children of p_object_id
       insert into dnm_granted_context
         (pd_object_id, pd_context_id, pd_dummy_flag)
         select dgc1.pd_object_id, dgc2.pd_context_id, 0
-          from dnm_granted_context dgc1, dnm_granted_context dgc2
-          where dgc1.pd_context_id in ( select dogc.pd_object_id 
-                                     from dnm_object_1_granted_context dogc
-                                     where dogc.pd_non_effective_context_id in ( select p_object_id 
-                                                                                 union all
-                                                                                 select object_id 
-                                                                                 from dnm_ungranted_context
-                                                                                 where ancestor_id = p_object_id))
+          from dnm_granted_context dgc1, dnm_granted_context dgc2, dnm_object_1_granted_context dogc
+          where dgc1.pd_context_id = dogc.pd_object_id 
+            and dogc.pd_non_effective_context_id in ( select p_object_id 
+                                                      union all
+                                                      select object_id 
+                                                        from dnm_ungranted_context
+                                                        where ancestor_id = p_object_id)
             and dgc2.pd_object_id = v_new_granted_context
       ;
-      
+
     end if;
     return null;
   end;' language 'plpgsql'
