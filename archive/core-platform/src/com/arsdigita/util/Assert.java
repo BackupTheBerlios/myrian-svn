@@ -30,27 +30,39 @@ import org.apache.log4j.Logger;
  * @author David Lutterkort &lt;dlutter@redhat.com&gt;
  * @author Uday Mathur
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#17 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#18 $
  */
 public class Assert {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#17 $" +
-        "$Author: dennis $" +
-        "$DateTime: 2003/08/15 13:46:34 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/Assert.java#18 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/09/09 14:53:22 $";
 
     private static final Logger s_log = Logger.getLogger
         (Assert.class);
 
     private static final String DEFAULT_MESSAGE = "Assertion failure";
 
+    private static final boolean s_enabled;
+
+    static {
+        final String enabled = System.getProperty("waf.util.assert_enabled");
+
+        if (enabled == null) {
+            s_enabled = false;
+        } else {
+            s_enabled = enabled.equals("true");
+        }
+    }
+
     /**
      * Tells whether asserts are turned on.  Use this to wrap code
      * that should be optimized away if assertions are disabled.
+     *
+     * By default, assertions are disabled
      */
     public static final boolean isEnabled() {
-        // Making this a little less costly will be good. XXX
-
-        return Util.getConfig().isAssertEnabled();
+        return s_enabled;
     }
 
     /**
