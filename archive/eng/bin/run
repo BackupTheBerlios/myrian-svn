@@ -1,4 +1,14 @@
 #!/bin/sh
+
+if [ -z "$1"]; then
+    script=`basename $0`
+    echo "Usage:"
+    echo "   $script <jre-args>"
+    echo "Example:"
+    echo "   $script com.redhat.persistence.TestRunner com.redhat.persistence.jdotest.SimpleTest"
+    exit 1
+fi
+
 function extend() {
     for word in $*; do
         if [ -z $CLASSPATH ]; then
