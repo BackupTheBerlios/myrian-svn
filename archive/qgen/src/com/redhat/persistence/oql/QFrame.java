@@ -10,12 +10,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #25 $ $Date: 2004/03/22 $
+ * @version $Revision: #26 $ $Date: 2004/03/22 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#25 $ by $Author: rhs $, $DateTime: 2004/03/22 15:15:14 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#26 $ by $Author: rhs $, $DateTime: 2004/03/22 16:41:14 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -713,7 +713,9 @@ class QFrame {
             }
         }
 
-        modified |= innerizeChildren(this);
+        if (m_columns != null) {
+            modified |= innerizeAncestors(m_columns.values());
+        }
 
         if (m_outer) {
             List equals = getEquals();
@@ -832,35 +834,21 @@ class QFrame {
         else { return isConnected(fk, to); }
     }
 
-    boolean innerizeChildren(QFrame ancestor) {
+    boolean innerizeAncestors(Collection values) {
         boolean modified = false;
-        if (!this.equals(ancestor) && m_outer && containsAnyNN(ancestor)) {
-            m_outer = false;
-            modified = true;
-        }
-        for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
-            QFrame child = (QFrame) it.next();
-            if (child.innerizeChildren(ancestor)) {
-                modified = true;
+        if (m_outer) {
+            for (Iterator it = values.iterator(); it.hasNext(); ) {
+                QValue v = (QValue) it.next();
+                if (m_parent.nn(v)) {
+                    m_outer = false;
+                    modified = true;
+                }
             }
+        }
+        if (m_parent != null) {
+            modified |= m_parent.innerizeAncestors(values);
         }
         return modified;
-    }
-
-    private boolean containsAnyNN(QFrame ancestor) {
-        if (m_columns != null) {
-            for (Iterator it = m_columns.values().iterator(); it.hasNext(); ) {
-                QValue qv = (QValue) it.next();
-                if (ancestor.nn(qv)) { return true; }
-            }
-        }
-        for (Iterator it = getChildren().iterator(); it.hasNext(); ) {
-            QFrame child = (QFrame) it.next();
-            if (child.containsAnyNN(ancestor)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     boolean contains(QValue value) {
