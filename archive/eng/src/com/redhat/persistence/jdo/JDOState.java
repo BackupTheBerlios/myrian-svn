@@ -366,4 +366,8 @@ final class JDOState {
     boolean isHollow() {
         return m_state == S_HOLLOW;
     }
+
+    public String toString() {
+        return byteToState(m_state);
+    }
 }

@@ -146,6 +146,13 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
         m_ssn = null;
     }
 
+    void commit() {
+        for (Iterator smis=m_smiMap.values().iterator(); smis.hasNext(); ) {
+            StateManagerImpl smi = (StateManagerImpl) smis.next();
+            smi.getState().commit(false);
+        }
+    }
+
     /**
      * Return the Transaction instance associated with a PersistenceManager.
      */

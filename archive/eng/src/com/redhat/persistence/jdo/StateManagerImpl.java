@@ -3,6 +3,7 @@ package com.redhat.persistence.jdo;
 import com.redhat.persistence.*;
 import com.redhat.persistence.metadata.*;
 import java.util.*;
+import javax.jdo.JDOFatalInternalException;
 import javax.jdo.JDOUserException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.spi.JDOImplHelper;
@@ -166,15 +167,25 @@ class StateManagerImpl extends AbstractStateManager {
      * Tests whether this object has been deleted.
      */
     public boolean isDeleted(PersistenceCapable pc) {
-        return ssn().isDeleted(pc);
+        final boolean rhpResult = ssn().isDeleted(pc);
+        // sanity check
+        if (rhpResult != m_state.isDeleted()) {
+            throw new JDOFatalInternalException
+                ("ssn.isDeleted=" + rhpResult + ", but m_state=" + m_state);
+        }
+        return rhpResult;
     }
 
     /**
      * Tests whether this object is dirty.
      */
     public boolean isDirty(PersistenceCapable pc) {
-        // XXX: semantics for new objects
-        return ssn().isModified(pc);
+        final boolean rhpResult = ssn().isModified(pc);
+        if (rhpResult != m_state.isDirty()) {
+            throw new JDOFatalInternalException
+                ("ssn.isModified=" + rhpResult + ", but m_state=" + m_state);
+        }
+        return rhpResult;
     }
 
     /**
@@ -188,21 +199,26 @@ class StateManagerImpl extends AbstractStateManager {
      * Tests whether this object has been newly made persistent.
      */
     public boolean isNew(PersistenceCapable pc) {
-        return ssn().isNew(pc);
+        final boolean isNew = ssn().isNew(pc);
+        if (isNew && !(m_state.isHollow() || m_state.isNew())) {
+            throw new JDOFatalInternalException
+                ("ssn.isNew=" + isNew + ", but m_state=" + m_state);
+        }
+        return isNew;
     }
 
     /**
      * Tests whether this object is persistent.
      */
     public boolean isPersistent(PersistenceCapable pc) {
-        throw new Error("not implemented");
+        return m_state.isPersistent();
     }
 
     /**
      * Tests whether this object is transactional.
      */
     public boolean isTransactional(PersistenceCapable pc) {
-        throw new Error("not implemented");
+        return m_state.isTransactional();
     }
 
     /**

@@ -34,6 +34,7 @@ class TransactionImpl implements Transaction {
     public void commit() {
         try {
             ssn().commit();
+            m_pmi.commit();
         } finally {
             m_inTxn = false;
         }
