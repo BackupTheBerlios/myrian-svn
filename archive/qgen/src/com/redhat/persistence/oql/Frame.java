@@ -1,5 +1,6 @@
 package com.redhat.persistence.oql;
 
+import com.redhat.persistence.common.*;
 import com.redhat.persistence.metadata.*;
 import java.util.*;
 
@@ -7,107 +8,105 @@ import java.util.*;
  * Frame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/30 $
+ * @version $Revision: #2 $ $Date: 2004/01/16 $
  **/
 
 class Frame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Frame.java#1 $ by $Author: rhs $, $DateTime: 2003/12/30 22:37:27 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Frame.java#2 $ by $Author: rhs $, $DateTime: 2004/01/16 16:31:45 $";
 
-    private Expression m_expr;
-    private Frame m_parent;
+    Frame parent;
+    TypeNode type;
 
-    private ObjectType m_type = null;
-    private boolean m_nullable = true;
-    private boolean m_collection = true;
-    private int m_correlationMax = Integer.MAX_VALUE;
-    private int m_correlationMin = Integer.MIN_VALUE;
-    private Set m_constrained = new HashSet();
-    private Set m_injection = new HashSet();
-    private Set m_keys = new HashSet();
+    private Map m_panes = new HashMap();
+    private List m_dumpers = new ArrayList();
+    private Pane m_parent;
 
-    Frame(Expression expr, Frame parent) {
-        m_expr = expr;
-        m_parent = parent;
-    }
+    Frame(Frame parent, TypeNode type) {
+        this.parent = parent;
+        this.type = type;
 
-    Expression getExpression() {
-        return m_expr;
-    }
-
-    Frame getParent() {
-        return m_parent;
-    }
-
-    void setType(ObjectType type) {
-        m_type = type;
-    }
-
-    ObjectType getType() {
-        return m_type;
-    }
-
-    void setNullable(boolean value) {
-        m_nullable = value;
-    }
-
-    boolean isNullable() {
-        return m_nullable;
-    }
-
-    void setCollection(boolean value) {
-        m_collection = value;
-    }
-
-    boolean isCollection() {
-        return m_collection;
-    }
-
-    void setCorrelationMax(int correlationMax) {
-        m_correlationMax = correlationMax;
-    }
-
-    int getCorrelationMax() {
-        return m_correlationMax;
-    }
-
-    void setCorrelationMin(int correlationMin) {
-        m_correlationMin = correlationMin;
-    }
-
-    int getCorrelationMin() {
-        return m_correlationMin;
-    }
-
-    Set getConstrained() {
-        return m_constrained;
-    }
-
-    Set getInjection() {
-        return m_injection;
-    }
-
-    void addKey(Collection key) {
-        m_keys.add(Collections.unmodifiableList(new ArrayList(key)));
-    }
-
-    Set getKeys() {
-        return m_keys;
-    }
-
-    void addAllKeys(Collection keys) {
-        for (Iterator it = keys.iterator(); it.hasNext(); ) {
-            addKey((Collection) it.next());
+        if (this.parent != null) {
+            this.parent.m_dumpers.add(this);
+            m_parent = this.parent.m_parent;
         }
     }
 
-    boolean isKey(Collection key) {
-        return m_keys.contains
-            (Collections.unmodifiableList(new ArrayList(key)));
+    Pane add(Expression expression) {
+        Pane pane = new Pane(this, expression, m_parent);
+        m_dumpers.add(pane);
+        m_panes.put(expression, pane);
+        return pane;
     }
 
-    boolean isSet() {
-        return !m_keys.isEmpty();
+    Pane getPane(Expression expr) {
+        return (Pane) m_panes.get(expr);
+    }
+
+    Pane graph(Expression expr) {
+        Pane result = add(expr);
+        Pane previous = m_parent;
+        m_parent = result;
+        try {
+            expr.graph(result);
+        } finally {
+            m_parent = previous;
+        }
+        return result;
+    }
+
+    void dump(Indentor out) {
+        for (Iterator it = m_dumpers.iterator(); it.hasNext(); ) {
+            Object o = it.next();
+            if (o instanceof Pane) {
+                ((Pane) o).dump(out);
+            } else if (o instanceof Frame) {
+                out.level+=2;
+                try {
+                    ((Frame) o).dump(out);
+                } finally {
+                    out.level-=2;
+                }
+            }
+        }
+    }
+
+    static Frame root(Root root) {
+        ObjectType type = new ObjectType(null, "root", null);
+        for (Iterator it = root.getObjectTypes().iterator(); it.hasNext(); ) {
+            ObjectType to = (ObjectType) it.next();
+            if (to.isKeyed()) {
+                Expression.addKey(to, to.getKeyProperties());
+                addPath(type, Path.get(to.getQualifiedName()), to);
+            }
+        }
+
+        TypeNode tn = new TypeNode() { void updateType() {} };
+        tn.type = type;
+        Frame frame = new Frame(null, tn);
+        return frame;
+    }
+
+    private static void addPath(ObjectType from, Path path, ObjectType to) {
+        if (path.getParent() == null) {
+            Property prop = from.getProperty(path.getName());
+            if (prop != null) { return; }
+            from.addProperty
+                (new Role(path.getName(), to, false, to.getRoot() != null,
+                          true));
+        } else {
+            Property prop = from.getProperty(path.getParent());
+            ObjectType type;
+            if (prop == null) {
+                type = new ObjectType(null, path.getPath() + " intermediate",
+                                      null);
+                addPath(from, path.getParent(), type);
+            } else {
+                type = prop.getType();
+            }
+
+            addPath(type, Path.get(path.getName()), to);
+        }
     }
 
 }
