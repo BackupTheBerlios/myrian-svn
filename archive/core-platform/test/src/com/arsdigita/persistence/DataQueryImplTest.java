@@ -38,11 +38,11 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2002/09/09 $
+ * @version $Revision: #9 $ $Date: 2002/09/11 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#8 $ by $Author: randyg $, $DateTime: 2002/09/09 16:02:46 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#9 $ by $Author: randyg $, $DateTime: 2002/09/11 18:15:53 $";
 
     private static Logger s_log =
         Logger.getLogger(DataQueryImplTest.class.getName());
@@ -267,6 +267,28 @@ public class DataQueryImplTest extends DataQueryTest {
                    priorValue.compareTo( currentValue ) > 0 );
 
             priorValue = currentValue;
+
+        }
+        descQuery = null;
+
+        // Test that passing in a string actually works
+        descQuery = getDefaultQuery();
+        try {
+            descQuery.addOrderWithNull(ORDER_FIELD, "---", false);
+            fail("Adding values of different types should fail");
+        } catch (PersistenceException e) {
+            // this should happen
+        }
+        descQuery.addOrderWithNull("action", "---", false);
+
+        assertTrue( "Should be several items in this query set!", descQuery.next() );
+        String prior = (String) descQuery.get("action");
+        while ( descQuery.next() ) {
+            final String currentValue = (String) descQuery.get("action");
+            assertTrue("Query was retrieved out of order.",
+                   prior.compareTo( currentValue ) >= 0 );
+
+            prior = currentValue;
 
         }
         descQuery = null;
