@@ -10,12 +10,12 @@ import org.apache.log4j.Category;
  * Node
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/06/10 $
+ * @version $Revision: #5 $ $Date: 2002/07/10 $
  **/
 
 abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#4 $ by $Author: rhs $, $DateTime: 2002/06/10 15:35:38 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#5 $ by $Author: rhs $, $DateTime: 2002/07/10 16:04:39 $";
 
     private static final Category s_log = Category.getInstance(Node.class);
 
@@ -25,6 +25,7 @@ abstract class Node {
     private Map m_children = new HashMap();
     private Map m_selections = new HashMap();
     private Map m_tables = new HashMap();
+    private Set m_conditions = new HashSet();
 
     public Node(Node parent, ObjectType type) {
         m_parent = parent;
@@ -61,6 +62,14 @@ abstract class Node {
 
     void removeTable(Table table) {
         m_tables.remove(table.getName());
+    }
+
+    void addCondition(Condition condition) {
+        m_conditions.add(condition);
+    }
+
+    void removeCondition(Condition condition) {
+        m_conditions.remove(condition);
     }
 
     Table getTable(String name) {
@@ -165,6 +174,8 @@ abstract class Node {
 
     abstract boolean isNullable();
 
+    abstract void error(String message);
+
     void traverse(Actor actor) {
         actor.act(this);
 
@@ -213,17 +224,20 @@ abstract class Node {
         }
 
         Set connected = new HashSet();
-        boolean start = true;
+        Table start = null;
         for (Iterator it = getTables().iterator(); it.hasNext(); ) {
             Table table = (Table) it.next();
             if (table.getEntering().size() > 0) {
-                start = false;
+                if (start == null) {
+                    start = table;
+                }
                 connected.add(table);
             }
         }
 
-        if (start && getTables().size() > 0) {
-            connected.add(getTables().iterator().next());
+        if (start == null && getTables().size() > 0) {
+            start = (Table) getTables().iterator().next();
+            connected.add(start);
         }
 
         int before;
@@ -239,7 +253,7 @@ abstract class Node {
 
                 if (connected.contains(from.getTable()) &&
                     !connected.contains(to.getTable())) {
-                    new Condition(query, from, to);
+                    new Condition(this, from, to);
                     connected.add(to.getTable());
                 }
             }
@@ -252,14 +266,35 @@ abstract class Node {
 
                 if (connected.contains(from.getTable()) &&
                     !connected.contains(to.getTable())) {
-                    new Condition(query, from, to);
+                    new Condition(this, from, to);
                     connected.add(to.getTable());
                 }
             }
         } while (connected.size() > before);
 
         if (connected.size() < getTables().size()) {
-            getObjectType().error("Not enough join paths to form this query.");
+            StringBuffer msg = new StringBuffer();
+            msg.append("Could not form a properly constrained join:\n" +
+                       "Tables being joined: ");
+            for (Iterator it = getTables().iterator(); it.hasNext(); ) {
+                Table table = (Table) it.next();
+                msg.append(table.getName());
+                if (it.hasNext()) {
+                    msg.append(", ");
+                }
+            }
+
+            msg.append("\nConstraints used: ");
+
+            for (Iterator it = m_conditions.iterator(); it.hasNext(); ) {
+                Condition cond = (Condition) it.next();
+                msg.append(
+                    cond.getTail().getFullName() + " = " +
+                    cond.getHead().getFullName()
+                    );
+            }
+
+            error(msg.toString());
         }
 
         for (Iterator it = getSelections().iterator(); it.hasNext(); ) {

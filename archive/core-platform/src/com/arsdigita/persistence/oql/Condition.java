@@ -7,39 +7,43 @@ import java.util.*;
  * Condition
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/06/10 $
+ * @version $Revision: #3 $ $Date: 2002/07/10 $
  **/
 
 class Condition {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Condition.java#2 $ by $Author: rhs $, $DateTime: 2002/06/10 15:35:38 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Condition.java#3 $ by $Author: rhs $, $DateTime: 2002/07/10 16:04:39 $";
 
     private Set m_columns = new HashSet();
-    private Query m_query;
+    private Node m_node;
     private Column m_tail;
     private Column m_head;
+    private Query m_query;
 
-    public Condition(Query query, Column tail, Column head) {
-        Assert.assertNotNull(query, "query");
+    public Condition(Node node, Column tail, Column head) {
+        Assert.assertNotNull(node, "node");
         Assert.assertNotNull(tail, "tail");
         Assert.assertNotNull(head, "head");
 
-        m_query = query;
+        m_node = node;
         m_tail = tail;
         m_head = head;
+        m_query = node.getQuery();
 
         m_columns.add(tail);
         m_columns.add(head);
 
-        m_query.addCondition(this);
+        m_node.addCondition(this);
         m_tail.getTable().addCondition(this);
         m_head.getTable().addCondition(this);
+        m_query.addCondition(this);
     }
 
     public void remove() {
-        m_query.removeCondition(this);
+        m_node.removeCondition(this);
         m_tail.getTable().removeCondition(this);
         m_head.getTable().removeCondition(this);
+        m_query.removeCondition(this);
     }
 
     public Column getTail() {

@@ -7,12 +7,12 @@ import java.util.HashSet;
  * Column
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/06/10 $
+ * @version $Revision: #4 $ $Date: 2002/07/10 $
  **/
 
 class Column {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Column.java#3 $ by $Author: rhs $, $DateTime: 2002/06/10 15:35:38 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Column.java#4 $ by $Author: rhs $, $DateTime: 2002/07/10 16:04:39 $";
 
     private Table m_table;
     private String m_name;
@@ -31,6 +31,10 @@ class Column {
 
     public Table getTable() {
         return m_table;
+    }
+
+    String getFullName() {
+        return m_table.getName() + "." + getName();
     }
 
     public String getName() {

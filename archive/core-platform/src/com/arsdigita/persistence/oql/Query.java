@@ -12,12 +12,12 @@ import org.apache.log4j.Category;
  * specified in a PDL file to generate sql queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/06/10 $
+ * @version $Revision: #6 $ $Date: 2002/07/10 $
  **/
 
 public class Query extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#5 $ by $Author: rhs $, $DateTime: 2002/06/10 15:35:38 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#6 $ by $Author: rhs $, $DateTime: 2002/07/10 16:04:39 $";
 
     private static final Category s_log = Category.getInstance(Query.class);
 

@@ -8,12 +8,12 @@ import java.util.*;
  * Optimizer
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/06/10 $
+ * @version $Revision: #2 $ $Date: 2002/07/10 $
  **/
 
 class Optimizer extends Actor {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Optimizer.java#1 $ by $Author: rhs $, $DateTime: 2002/06/10 15:35:38 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Optimizer.java#2 $ by $Author: rhs $, $DateTime: 2002/07/10 16:04:39 $";
 
     public void act(Table table) {
         Query query = table.getQuery();
@@ -32,22 +32,22 @@ class Optimizer extends Actor {
                     two.getHead().getTable().equals(table) &&
                     one.getHead().equals(two.getHead())) {
                     if (!one.isOuter() && !two.isOuter()) {
-                        added = new Condition(query, one.getTail(),
+                        added = new Condition(table.getNode(), one.getTail(),
                                               two.getTail());
                     }
                 } else if (one.getTail().getTable().equals(table) &&
                            two.getTail().getTable().equals(table) &&
                            one.getTail().equals(two.getTail())) {
                     if (!one.isOuter() && !two.isOuter()) {
-                        added = new Condition(query, one.getHead(),
+                        added = new Condition(table.getNode(), one.getHead(),
                                               two.getHead());
                     }
                 } else if (one.getHead().getTable().equals(table) &&
                            one.getHead().equals(two.getTail())){
-                    added = new Condition(query, one.getTail(),
+                    added = new Condition(table.getNode(), one.getTail(),
                                           two.getHead());
                 } else if (one.getTail().equals(two.getHead())) {
-                    added = new Condition(query, two.getTail(),
+                    added = new Condition(table.getNode(), two.getTail(),
                                           one.getHead());
                 }
 
