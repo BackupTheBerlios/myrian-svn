@@ -11,12 +11,12 @@ import org.apache.log4j.Category;
  * MultiThreadDataObjectTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/06/19 $
  **/
 
 public class MultiThreadDataObjectTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/MultiThreadDataObjectTest.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/MultiThreadDataObjectTest.java#2 $ by $Author: rhs $, $DateTime: 2002/06/19 14:32:40 $";
 
     private static final Category s_log = Category.getInstance(
         MultiThreadDataObjectTest.class.getName()
@@ -376,4 +376,54 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
         return group;
 
     }
+
+    public void testRefetchOnInvalidation() {
+        DataObject test, icle;
+        final OID ICLE = new OID("test.Icle", BigInteger.ZERO);
+        final OID TEST = new OID("test.Test", BigInteger.ZERO);
+
+        Session ssn = SessionManager.getSession();
+        TransactionContext txn = ssn.getTransactionContext();
+
+        try {
+            icle = ssn.create(ICLE);
+            icle.save();
+
+            test = ssn.create(TEST);
+            test.set("required", icle);
+            test.save();
+
+            test = ssn.retrieve(TEST);
+
+            txn.commitTxn();
+            txn.beginTxn();
+
+            assertTrue("test was not disconnected", test.isDisconnected());
+            icle = (DataObject) test.get("required");
+
+            txn.abortTxn();
+            txn.beginTxn();
+
+            assertTrue("icle was not invalidated", !icle.isValid());
+            icle = (DataObject) test.get("required");
+            assertTrue("icle was not refetched", icle.isValid());
+        } finally {
+            if (!txn.inTxn()) {
+                txn.beginTxn();
+            }
+
+            test = ssn.retrieve(TEST);
+            if (test != null) {
+                test.delete();
+            }
+            icle = ssn.retrieve(ICLE);
+            if (icle != null) {
+                icle.delete();
+            }
+
+            txn.commitTxn();
+            txn.beginTxn();
+        }
+    }
+
 }

@@ -46,12 +46,12 @@ import java.util.ArrayList;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2002/06/14 $
+ * @version $Revision: #9 $ $Date: 2002/06/19 $
  */
 
 public class GenericDataObject implements DataObject {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#8 $ by $Author: rhs $, $DateTime: 2002/06/14 15:44:47 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#9 $ by $Author: rhs $, $DateTime: 2002/06/19 14:32:40 $";
 
     private ObjectType    m_type;
     private Session       m_session;
@@ -435,7 +435,19 @@ public class GenericDataObject implements DataObject {
 //               (!prop.isCollection() &&
 //                !m_data.isPropertyModified(propertyName))))) {
         if (m_data.hasProperty(propertyName)) {
-            return m_data.get(propertyName);
+            if (prop.isRole() && !prop.isCollection()) {
+                // Make sure that we are returning a valid data object.
+                DataObject result = (DataObject) m_data.get(propertyName);
+                if (result == null) { return result; }
+                if (result.isValid()) {
+                    return result;
+                } else {
+                    m_data.clearProperty(propertyName);
+                    return get(propertyName);
+                }
+            } else {
+                return m_data.get(propertyName);
+            }
         }
 
         if (prop.isRole()) {
