@@ -12,13 +12,12 @@ create index GROUP_SUBGRP_MAP_SUBGRP_ID_idx on GROUP_SUBGROUP_MAP(SUBGROUP_ID);
 create index MESSAGE_THREADS_SENDER_idx on MESSAGE_THREADS(SENDER);
 create index MESSAGES_OBJECT_ID_idx on MESSAGES(OBJECT_ID);
 create index NT_QUEUE_PARTY_TO_idx on NT_QUEUE(PARTY_TO);
--- foreign key index on object_context 
+-- foreign key index on object_context
 -- This index makes oracle 9i go totally mad
 -- create index object_context_context_id_idx on object_context(context_id);
 create index OBJECT_CONTEXT_CONTEXT_ID_idx on OBJECT_CONTEXT(CONTEXT_ID);
 create index OBJECT_CONTEXT_MAP_CTX_ID_idx on OBJECT_CONTEXT_MAP(CONTEXT_ID);
 create index PARAMETER_PRIV_BASE_PRIV_idx on PARAMETERIZED_PRIVILEGES(BASE_PRIVILEGE);
-create index PL_US_CNTIES_ST_FIPS_CODE_idx on PL_US_COUNTIES(STATE_FIPS_CODE);
 create index UNG_CTX_NLF_MP_IMPL_CTX_ID_idx on UNGRANTED_CONTEXT_NON_LEAF_MAP(IMPLIED_CONTEXT_ID);
 create index VC_OBJECTS_MASTER_ID_idx on VC_OBJECTS(MASTER_ID);
 create index VC_TRANSACTIONS_OBJECT_ID_idx on VC_TRANSACTIONS(OBJECT_ID);

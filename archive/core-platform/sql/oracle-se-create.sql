@@ -124,20 +124,6 @@
 @@ default/search/insert-dummy.sql
 @@ default/search/package-search_indexing.sql
 
-@@ oracle-se/places/table-places.sql
-@@ default/places/table-place_hierarchy.sql
-@@ default/places/index-place_hierarchy.sql
-@@ default/places/table-place_hierarchy_tc.sql
-@@ default/places/index-place_hierarchy_tc.sql
-@@ default/places/trigger-place_hierarchy.sql
-@@ default/places/table-pl_countries.sql
-@@ default/places/table-pl_regions.sql
-@@ default/places/table-pl_municipalities.sql
-@@ default/places/table-pl_postal_codes.sql
-@@ default/places/table-pl_us_states.sql
-@@ default/places/table-pl_us_counties.sql
-@@ default/places/index-pl_us_counties.sql
-
 @@ default/versioning/table-vc_objects.sql
 @@ default/versioning/comment-vc_objects.sql
 @@ oracle-se/versioning/table-vc_transactions.sql
@@ -209,11 +195,9 @@
 @@ default/formbuilder/sequence-forms_unique_id_seq.sql
 @@ default/formbuilder/comment-forms_unique_id_seq.sql
 
-@@ default/addresses/table-us_addresses.sql
-
 @@ default/persistence/table-persistence_dynamic_ot.sql
 @@ default/persistence/table-persistence_dynamic_assoc.sql
 
-@@ default/kernel/index-foreign_keys.sql 
+@@ default/kernel/index-foreign_keys.sql
 
 @@ ddl/oracle-se/deferred.sql
