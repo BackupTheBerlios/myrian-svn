@@ -26,12 +26,12 @@ import org.apache.log4j.Logger;
  * MultiThreadDataObjectTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/05/12 $
+ * @version $Revision: #9 $ $Date: 2003/06/09 $
  **/
 
 public class MultiThreadDataObjectTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/MultiThreadDataObjectTest.java#8 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/MultiThreadDataObjectTest.java#9 $ by $Author: ashah $, $DateTime: 2003/06/09 16:15:22 $";
 
     private static final Logger s_log = Logger.getLogger(MultiThreadDataObjectTest.class);
 
@@ -62,7 +62,6 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
                         node.set("id", new BigDecimal(i));
                         node.set("name", "Node " + i);
                         node.save();
-                        node.disconnect();
                         objects.put(node.get("id"), node);
                     }
 
@@ -200,7 +199,6 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
             node.set("name", "SavedNode");
             OID savedOID = node.getOID();
             node.save();
-            node.disconnect();
             txn.commitTxn();
             assertTrue(node.isValid() && node.isDisconnected());
 
@@ -222,7 +220,6 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
 
             txn.beginTxn();
             node = ssn.retrieve(savedOID);
-            node.disconnect();
             txn.commitTxn();
             assertTrue(node.isValid() && node.isDisconnected());
             assertEquals("Disconnected Lazy load failed on ID!", savedId, node.get("id") );
@@ -280,10 +277,6 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
             DataAssociation members = (DataAssociation) qa.get("members");
             members.add(jon);
             qa.save();
-
-            color.disconnect();
-            jon.disconnect();
-            qa.disconnect();
 
             txn.commitTxn();
             assertTrue(qa.isValid() && qa.isDisconnected());
@@ -427,14 +420,16 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
 
             test = ssn.retrieve(TEST);
 
-            test.disconnect();
-
-            icle = (DataObject) test.get("required");
-
             txn.commitTxn();
             txn.beginTxn();
 
             assertTrue("test was not disconnected", test.isDisconnected());
+            icle = (DataObject) test.get("required");
+            icle.set("name", "will abort");
+
+            txn.abortTxn();
+            txn.beginTxn();
+
             assertTrue("icle was not invalidated", !icle.isValid());
             icle = (DataObject) test.get("required");
             assertTrue("icle was not refetched", icle.isValid());
