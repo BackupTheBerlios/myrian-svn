@@ -2,6 +2,6 @@ package com.redhat.persistence.jdo;
 
 import com.redhat.persistence.oql.Expression;
 
-public interface OQLCollection {
+interface OQLCollection {
     Expression expression();
 }
