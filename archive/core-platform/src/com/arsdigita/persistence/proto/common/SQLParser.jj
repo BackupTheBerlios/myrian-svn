@@ -14,12 +14,12 @@ import java.io.*;
  * SQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/05/16 $
+ * @version $Revision: #3 $ $Date: 2003/07/08 $
  */
 
 public class SQLParser {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/common/SQLParser.jj#2 $ by $Author: jparsons $, $DateTime: 2003/05/16 15:54:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/common/SQLParser.jj#3 $ by $Author: jparsons $, $DateTime: 2003/07/08 18:09:00 $";
 
     public static interface Mapper {
         Path map(Path path);
@@ -142,6 +142,7 @@ TOKEN:
   | <GE: ">=">
   | <BEGIN_HINT: "/*+">
   | <END_HINT: "*/">
+  | <CAST: "::">
 }
 
 TOKEN [IGNORE_CASE]:
@@ -241,6 +242,7 @@ void symbol() :
  (
     t = <PERIOD>
   | t = <SEMI>
+  | t = <CAST>
   | t = <MUL>
   | t = <POS>
   | t = <NEG>
