@@ -27,14 +27,14 @@ import org.apache.log4j.Logger;
  * InFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/08/27 $
+ * @version $Revision: #4 $ $Date: 2003/10/22 $
  **/
 
 class InFilter extends FilterImpl implements Filter {
 
     private static Logger s_log = Logger.getLogger(InFilter.class);
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/InFilter.java#3 $ by $Author: rhs $, $DateTime: 2003/08/27 19:33:58 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/InFilter.java#4 $ by $Author: dan $, $DateTime: 2003/10/22 09:08:42 $";
 
     private Root m_root;
     private String m_prop;
@@ -54,36 +54,40 @@ class InFilter extends FilterImpl implements Filter {
     }
 
     private SQLBlock getBlock(String query) {
-	ObjectType ot = m_root.getObjectType(query);
-	return m_root.getObjectMap(ot).getRetrieveAll();
+        ObjectType ot = m_root.getObjectType(query);
+        ObjectMap map = m_root.getObjectMap(ot);
+        if (map == null) {
+            throw new PersistenceException("no such query: " + query);
+        }
+        return map.getRetrieveAll();
     }
 
     public String getConditions() {
-	SQLBlock block = getBlock(m_query);
-	Path subProp;
-	if (m_subProp == null) {
-	    Iterator paths = block.getPaths().iterator();
-	    if (paths.hasNext()) {
-		subProp = (Path) paths.next();
-	    } else {
-		return m_prop + " in (" + m_query + ")";
-	    }
+        SQLBlock block = getBlock(m_query);
+        Path subProp;
+        if (m_subProp == null) {
+            Iterator paths = block.getPaths().iterator();
+            if (paths.hasNext()) {
+                subProp = (Path) paths.next();
+            } else {
+                return m_prop + " in (" + m_query + ")";
+            }
 
-	    if (paths.hasNext()) {
-		throw new PersistenceException
-		    ("subquery has more than one mapping");
-	    }
-	} else {
-	    subProp = Path.get(m_subProp);
-	}
+            if (paths.hasNext()) {
+                throw new PersistenceException
+                    ("subquery has more than one mapping");
+            }
+        } else {
+            subProp = Path.get(m_subProp);
+        }
 
-	Path subcol = block.getMapping(subProp);
-	if (subcol == null) {
-	    throw new MetadataException
+        Path subcol = block.getMapping(subProp);
+        if (subcol == null) {
+            throw new MetadataException
                 (m_root, block, "no such path: " + subProp);
-	}
+        }
 
-	return "exists ( select RAW[subquery_id] from (select RAW[" +
+        return "exists ( select RAW[subquery_id] from (select RAW[" +
             subcol.getPath() + "] as RAW[subquery_id] from (" +
             m_query + ") RAW[insub1] ) RAW[insub2] where " +
             "RAW[insub2.subquery_id] = " + m_prop + ")";
