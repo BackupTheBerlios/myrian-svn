@@ -14,7 +14,7 @@ class StatementParser {
 
     public static abstract class Switch {
 	public abstract void onStatement(String statement);
-	public abstract void onInclude(String include);
+	public abstract void onInclude(String include, boolean relative);
     }
 
     private String m_filename;
@@ -54,39 +54,6 @@ class StatementParser {
         }
         m_plsql = false;
 	return result;
-    }
-
-    public static final void main(String[] args) throws FileNotFoundException {
-	for (int i = 0; i < args.length; i++) {
-	    String filename = args[i];
-	    parseFile(filename);
-	}
-    }
-
-    private static void parseFile(final String filename)
-	throws FileNotFoundException {
-	    try {
-		StatementParser p = new StatementParser
-		    (filename, new FileReader(filename), new Switch() {
-			    public void onStatement(String statement) {
-				System.out.println("STATEMENT: " + statement);
-			    }
-			    public void onInclude(String include) {
-				try {
-				    File f = new File
-					(new File(filename).getParent(),
-					 include);
-				    parseFile(f.getCanonicalPath());
-				} catch (IOException e) {
-				    System.out.println
-					(filename + ": " + e.getMessage());
-				}
-			    }
-			});
-		p.parse();
-	    } catch (ParseException p) {
-		System.out.println(filename + ": " + p.getMessage());
-	    }
     }
 
 }
@@ -152,6 +119,7 @@ void parse() :
 
 void statement() :
 {
+    Token i;
     Token t;
 }
 {
@@ -159,9 +127,9 @@ void statement() :
 	t = <NAKED_BEGIN> { append(t); }
 	t = <SEMICOLON> { append(t); }
       | LOOKAHEAD(plsql()) plsql() { m_plsql = true; }
-      | LOOKAHEAD(<INCLUDE>) <INCLUDE> t = <SQL_TOKEN>
+      | LOOKAHEAD(<INCLUDE>) i = <INCLUDE> t = <SQL_TOKEN>
 	{
-	    m_switch.onInclude(t.image);
+            m_switch.onInclude(t.image, i.image.equals("@@"));
 	    return;
 	}
       | [ t = <PLSQL_BEGIN> { append(t); } ]
