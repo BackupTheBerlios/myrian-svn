@@ -26,12 +26,12 @@ import java.util.*;
  * the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/05/07 $
+ * @version $Revision: #8 $ $Date: 2003/05/15 $
  */
 
 public class Column extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Column.java#7 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Column.java#8 $ by $Author: vadim $, $DateTime: 2003/05/15 11:08:57 $";
 
     /**
      * The name of this Column.

@@ -33,12 +33,12 @@ import org.apache.log4j.Logger;
  * LobTest - for testing Blob and Clob datatype.
  *
  * @author Jeff Teeters 
- * @version $Revision: #2 $ $Date: 2003/04/09 $
+ * @version $Revision: #3 $ $Date: 2003/05/15 $
  */
 
 public class LobTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/LobTest.java#2 $ by $Author: rhs $, $DateTime: 2003/04/09 16:35:55 $";
+    public static final String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/LobTest.java#3 $ by $Author: vadim $, $DateTime: 2003/05/15 11:08:57 $";
 
     private Logger s_cat =
         Logger.getLogger(LobTest.class);

@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/pdl/com/arsdigita/categorization/Category.pdl#4 $
-// $DateTime: 2003/04/15 10:38:49 $
+// $Id: //core-platform/proto/pdl/com/arsdigita/categorization/Category.pdl#5 $
+// $DateTime: 2003/05/15 11:08:57 $
 
 model com.arsdigita.categorization;
 
@@ -292,13 +292,10 @@ data operation swapObjectWithNextObject {
 query minObjectCategorySortKey {
     BigDecimal sortKey;
 
-    options {
-        WRAP_QUERIES = false;
-    }
-
     do {
         select min(sort_key) as sort_key from cat_object_category_map
         where category_id = :categoryID
+        and sort_key > :currentSortKey
     } map {
         sortKey = sort_key;
     }
@@ -307,13 +304,10 @@ query minObjectCategorySortKey {
 query maxObjectCategorySortKey {
     BigDecimal sortKey;
 
-    options {
-        WRAP_QUERIES = false;
-    }
-
     do {
         select max(sort_key) as sort_key from cat_object_category_map
         where category_id = :categoryID
+        and sort_key < :currentSortKey
     } map {
         sortKey = sort_key;
     }
@@ -322,13 +316,10 @@ query maxObjectCategorySortKey {
 query minCategoryCategorySortKey {
     BigDecimal sortKey;
 
-    options {
-        WRAP_QUERIES = false;
-    }
-
     do {
         select min(sort_key) as sort_key from cat_category_category_map
         where category_id = :categoryID
+        and sort_key > :currentSortKey
     } map {
         sortKey = sort_key;
     }
@@ -337,13 +328,10 @@ query minCategoryCategorySortKey {
 query maxCategoryCategorySortKey {
     BigDecimal sortKey;
 
-    options {
-        WRAP_QUERIES = false;
-    }
-
     do {
         select max(sort_key) as sort_key from cat_category_category_map
         where category_id = :categoryID
+        and sort_key < :currentSortKey
     } map {
         sortKey = sort_key;
     }
