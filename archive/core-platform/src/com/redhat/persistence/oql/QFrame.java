@@ -11,19 +11,25 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/03/25 $
+ * @version $Revision: #8 $ $Date: 2004/03/25 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/QFrame.java#7 $ by $Author: rhs $, $DateTime: 2004/03/25 16:44:14 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/oql/QFrame.java#8 $ by $Author: rhs $, $DateTime: 2004/03/25 17:56:10 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
     private Generator m_generator;
     private String m_alias;
+
     private EquiSet m_equisetpool;
     private List m_nonnullpool;
+    private List m_valuespool;
+    private Map m_columnspool;
+    private List m_qvaluespool;
+
+    private List m_children;
 
     private Expression m_expression;
     private ObjectType m_type;
@@ -35,8 +41,8 @@ class QFrame {
     private String m_table;
     private Expression m_tableExpr;
     private Map m_columns;
+    private List m_qvalues;
     private QFrame m_parent;
-    private List m_children;
     private Expression m_condition;
     private Expression m_order;
     private boolean m_asc;
@@ -51,8 +57,14 @@ class QFrame {
     QFrame(Generator generator) {
         m_generator = generator;
         m_alias = "t" + m_generator.getFrames().size();
+
         m_equisetpool = new EquiSet(m_generator);
         m_nonnullpool = SetUniqueList.decorate(new ArrayList());
+        m_valuespool = new ArrayList();
+        m_columnspool = new HashMap();
+        m_qvaluespool = new ArrayList();
+
+        m_children = new ArrayList();
     }
 
     void init(Expression expression, ObjectType type, QFrame container) {
@@ -60,14 +72,16 @@ class QFrame {
         m_type = type;
         m_container = container;
 
+        m_children.clear();
+
         m_outer = false;
         m_values = null;
         m_mappings = null;
         m_table = null;
         m_tableExpr = null;
         m_columns = null;
+        m_qvalues = null;
         m_parent = null;
-        m_children = null;
         m_condition = null;
         m_order = null;
         m_asc = true;
@@ -106,7 +120,8 @@ class QFrame {
     }
 
     void setValues(String[] columns) {
-        m_values = new ArrayList();
+        m_valuespool.clear();
+        m_values = m_valuespool;
         for (int i = 0; i < columns.length; i++) {
             m_values.add(getValue(columns[i]));
         }
@@ -121,11 +136,17 @@ class QFrame {
     }
 
     QValue getValue(String column) {
-        if (m_columns == null) { m_columns = new HashMap(); }
+        if (m_columns == null) {
+            m_columnspool.clear();
+            m_qvaluespool.clear();
+            m_columns = m_columnspool;
+            m_qvalues = m_qvaluespool;
+        }
         QValue v = (QValue) m_columns.get(column);
         if (v == null) {
             v = new QValue(this, column);
             m_columns.put(column, v);
+            m_qvalues.add(v);
         }
         return v;
     }
@@ -196,13 +217,11 @@ class QFrame {
     }
 
     void addChild(QFrame child) {
-        if (m_children == null) { m_children = new ArrayList(); }
         m_children.add(child);
         child.m_parent = this;
     }
 
     void addChild(int index, QFrame child) {
-        if (m_children == null) { m_children = new ArrayList(); }
         m_children.add(index, child);
         child.m_parent = this;
     }
@@ -212,11 +231,8 @@ class QFrame {
     }
 
     List getChildren() {
-        if (m_children == null) {
-            return Collections.EMPTY_LIST;
-        } else {
-            return m_children;
-        }
+        return m_children;
+
     }
 
     QFrame getParent() {
@@ -450,6 +466,8 @@ class QFrame {
         return code;
     }
 
+    private Set m_used = new HashSet();
+
     private void render(LinkedList joins, List where, QFrame oroot,
                         QFrame root, Set emitted) {
         // If the first non empty frame is outer we treat it as inner.
@@ -477,12 +495,13 @@ class QFrame {
         if (m_condition != null) {
             Code c = m_condition.emit(m_generator);
             if (!c.isTrue() && !emitted.contains(c)) {
-                Set used = frames(m_condition);
+                m_used.clear();
+                frames(m_condition, m_used);
                 boolean join = false;
                 for (Iterator it = joins.iterator(); it.hasNext(); ) {
                     JFrame frame = (JFrame) it.next();
-                    boolean modified = used.removeAll(frame.defined);
-                    if (used.isEmpty()) {
+                    boolean modified = m_used.removeAll(frame.defined);
+                    if (m_used.isEmpty()) {
                         // We default to putting things in the where
                         // clause here because oracle won't resolve
                         // external variable references correctly when
@@ -514,10 +533,11 @@ class QFrame {
                     LinkedList skipped = null;
                     JFrame left = (JFrame) joins.removeFirst();
                     while (true) {
-                        used = frames(m_condition);
-                        used.removeAll(right.defined);
-                        boolean cross = used.removeAll(left.defined);
-                        if (used.isEmpty()) {
+                        m_used.clear();
+                        frames(m_condition, m_used);
+                        m_used.removeAll(right.defined);
+                        boolean cross = m_used.removeAll(left.defined);
+                        if (m_used.isEmpty()) {
                             joins.addFirst(JFrame.join(left, right, c));
                             break;
                         } else if (joins.isEmpty()) {
@@ -548,12 +568,11 @@ class QFrame {
         }
     }
 
-    Set frames(Expression e) {
-        return frames(m_generator.getUses(e));
+    void frames(Expression e, Set result) {
+        frames(m_generator.getUses(e), result);
     }
 
-    Set frames(Collection values) {
-        Set result = new HashSet();
+    void frames(Collection values, Set result) {
         for (Iterator it = values.iterator(); it.hasNext(); ) {
             QValue value = (QValue) it.next();
             QFrame frame = value.getFrame().getDuplicate();
@@ -561,7 +580,6 @@ class QFrame {
                 result.add(frame);
             }
         }
-        return result;
     }
 
     void addConditions(List result) {
@@ -742,7 +760,7 @@ class QFrame {
         }
 
         if (m_columns != null) {
-            modified |= innerizeAncestors(m_columns.values());
+            modified |= innerizeAncestors(m_qvalues);
         }
 
         if (m_outer) {
@@ -863,11 +881,11 @@ class QFrame {
         else { return isConnected(fk, to); }
     }
 
-    boolean innerizeAncestors(Collection values) {
+    boolean innerizeAncestors(List values) {
         boolean modified = false;
         if (m_outer) {
-            for (Iterator it = values.iterator(); it.hasNext(); ) {
-                QValue v = (QValue) it.next();
+            for (int i = 0; i < values.size(); i++) {
+                QValue v = (QValue) values.get(i);
                 if (m_parent.nn(v)) {
                     m_outer = false;
                     modified = true;
