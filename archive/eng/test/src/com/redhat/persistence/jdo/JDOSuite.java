@@ -13,7 +13,10 @@ public class JDOSuite extends TestSuite {
         suite.addTestSuite(MapTest.class);
         suite.addTestSuite(ListTest.class);
         suite.addTestSuite(ManagerTest.class);
+        suite.addTestSuite(BiTxnTest.class);
+
         suite.addTest(QueryTest.suite());
+
         return new JDOTestSetup(suite);
     }
 }

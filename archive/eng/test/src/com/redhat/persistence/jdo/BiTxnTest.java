@@ -1,0 +1,76 @@
+package com.redhat.persistence.jdo;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.jdo.JDOHelper;
+
+import org.apache.log4j.Logger;
+
+/**
+ * Tests lifecycle of JDO instances across transactions.
+ *
+ * @since 2004-08-04
+ * @version $Id: //eng/persistence/dev/test/src/com/redhat/persistence/jdo/BiTxnTest.java#1 $
+ **/
+public class BiTxnTest extends AbstractCase {
+    private final static Logger s_log = Logger.getLogger(BiTxnTest.class);
+
+    // XXX: This is a quick and dirty hack.  This class contains tests that
+    // span more than one transaction.  This means that we can't bail out of db
+    // changes by merely performing a rollback.  Therefore, we attempt to clean
+    // up after ourselves by deleting all rows from all tables in the order
+    // that respects foreign key constraints.  The list of table and their
+    // ordering is currently hardcoded and need to be kept in sync with the
+    // data model by hand.
+    private final static String[] TABLES =
+    {"items", "orders", "products", "pictures", "group_member_map", "groups",
+     "users", "auxiliary_emails", "parties", "emps", "depts", "mag_index",
+     "magazines"};
+
+    public BiTxnTest() {}
+
+    public BiTxnTest(String name) {
+        super(name);
+    }
+
+    protected void setUp() throws Exception {
+        super.setUp();
+        m_pm.currentTransaction().begin();
+    }
+
+    protected void tearDown() throws Exception {
+        m_pm.currentTransaction().rollback();
+        m_pm.currentTransaction().begin();
+
+        PersistenceManagerImpl pm = (PersistenceManagerImpl) m_pm;
+        Connection conn = pm.getConnection();
+        Statement stmt = conn.createStatement();
+
+        try {
+            for (int ii=0; ii<TABLES.length; ii++) {
+                stmt.execute("delete from " + TABLES[ii]);
+            }
+        } finally {
+            stmt.close();
+        }
+        m_pm.currentTransaction().commit();
+    }
+
+    private void checkpoint() {
+        m_pm.currentTransaction().commit();
+        m_pm.currentTransaction().begin();
+    }
+
+    public void testNontransAfterCommit() {
+        Group group = new Group(0);
+        group.setEmail("java-project@redhat.com");
+        group.setName("Java Hackers");
+        m_pm.makePersistent(group);
+
+        assertTrue("is transactional", JDOHelper.isTransactional(group));
+        checkpoint();
+        assertTrue("is nontransactional", !JDOHelper.isTransactional(group));
+    }
+}
