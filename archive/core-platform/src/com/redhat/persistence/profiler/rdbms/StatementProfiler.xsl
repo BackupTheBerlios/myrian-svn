@@ -49,8 +49,7 @@
 
         <h2>Elapsed time by SQL text</h2>
 
-        <p>This currently only accounts for time in the execute phase.
-        The largest consumer of time is listed first.</p>
+        <p>The largest consumer of time is listed first.</p>
 
         <table>
           <tr>
@@ -65,17 +64,17 @@
           </tr>
 
           <xsl:for-each select="text">
-            <xsl:sort select="count(//statement[@text = current()/@id]/lifecycle/*/millis)" data-type="number" order="descending"/>
+            <xsl:sort select="sum(//statement[@text = current()/@id]/lifecycle/*/millis)" data-type="number" order="descending"/>
 
             <tr>
               <th><a href="#text{@id}"><xsl:value-of select="@id"/></a></th>
-              <td><xsl:value-of select="count(//statement[@text = current()/@id]/lifecycle/prepare/millis)"/></td>
-              <td><xsl:value-of select="count(//statement[@text = current()/@id]/lifecycle/set/millis)"/></td>
-              <td><xsl:value-of select="count(//statement[@text = current()/@id]/lifecycle/execute/millis)"/></td>
-              <td><xsl:value-of select="count(//statement[@text = current()/@id]/lifecycle/next/millis)"/></td>
-              <td><xsl:value-of select="count(//statement[@text = current()/@id]/lifecycle/get/millis)"/></td>
-              <td><xsl:value-of select="count(//statement[@text = current()/@id]/lifecycle/close/millis)"/></td>
-              <td><xsl:value-of select="count(//statement[@text = current()/@id]/lifecycle/*/millis)"/></td>
+              <td><xsl:value-of select="sum(//statement[@text = current()/@id]/lifecycle/prepare/millis)"/></td>
+              <td><xsl:value-of select="sum(//statement[@text = current()/@id]/lifecycle/set/millis)"/></td>
+              <td><xsl:value-of select="sum(//statement[@text = current()/@id]/lifecycle/execute/millis)"/></td>
+              <td><xsl:value-of select="sum(//statement[@text = current()/@id]/lifecycle/next/millis)"/></td>
+              <td><xsl:value-of select="sum(//statement[@text = current()/@id]/lifecycle/get/millis)"/></td>
+              <td><xsl:value-of select="sum(//statement[@text = current()/@id]/lifecycle/close/millis)"/></td>
+              <td><xsl:value-of select="sum(//statement[@text = current()/@id]/lifecycle/*/millis)"/></td>
             </tr>
           </xsl:for-each>
         </table>
@@ -92,6 +91,39 @@
             <tr>
               <th><a id="text{@id}"><xsl:value-of select="@id"/></a></th>
               <td><pre><xsl:value-of select="."/></pre></td>
+            </tr>
+          </xsl:for-each>
+        </table>
+
+
+        <h2>Elapsed time by object type</h2>
+
+        <p>The largest consumer of time is listed first.</p>
+
+        <table>
+          <tr>
+            <th>Object Type</th>
+            <th>Prepare</th>
+            <th>Set</th>
+            <th>Execute</th>
+            <th>Next</th>
+            <th>Get</th>
+            <th>Close</th>
+            <th>Total</th>
+          </tr>
+
+          <xsl:for-each select="type">
+            <xsl:sort select="sum(//statement[objectType = current()]/lifecycle/*/millis)" data-type="number" order="descending"/>
+
+            <tr>
+              <th><xsl:value-of select="."/></th>
+              <td><xsl:value-of select="sum(//statement[objectType = current()]/lifecycle/prepare/millis)"/></td>
+              <td><xsl:value-of select="sum(//statement[objectType = current()]/lifecycle/set/millis)"/></td>
+              <td><xsl:value-of select="sum(//statement[objectType = current()]/lifecycle/execute/millis)"/></td>
+              <td><xsl:value-of select="sum(//statement[objectType = current()]/lifecycle/next/millis)"/></td>
+              <td><xsl:value-of select="sum(//statement[objectType = current()]/lifecycle/get/millis)"/></td>
+              <td><xsl:value-of select="sum(//statement[objectType = current()]/lifecycle/close/millis)"/></td>
+              <td><xsl:value-of select="sum(//statement[objectType = current()]/lifecycle/*/millis)"/></td>
             </tr>
           </xsl:for-each>
         </table>

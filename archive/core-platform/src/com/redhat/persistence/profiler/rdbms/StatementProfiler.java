@@ -2,6 +2,7 @@ package com.redhat.persistence.profiler.rdbms;
 
 import com.arsdigita.util.*;
 import com.redhat.persistence.*;
+import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.engine.rdbms.*;
 import java.io.*;
 import java.util.*;
@@ -10,10 +11,16 @@ public class StatementProfiler implements RDBMSProfiler {
     private boolean m_isEnabled;
     private PrintWriter m_out;
     private final ArrayList m_texts;
+    private final ArrayList m_tables;
+    private final ArrayList m_types;
+    private boolean m_inPhase;
 
     public StatementProfiler() {
         m_isEnabled = false;
         m_texts = new ArrayList();
+        m_tables = new ArrayList();
+        m_types = new ArrayList();
+        m_inPhase = false;
     }
 
     public StatementLifecycle getLifecycle(final RDBMSStatement statement) {
@@ -22,16 +29,39 @@ public class StatementProfiler implements RDBMSProfiler {
 
             final String text = statement.getText();
 
-            synchronized (m_texts) {
-                if (!m_texts.contains(text)) {
-                    m_texts.add(text);
+            if (!m_texts.contains(text)) {
+                m_texts.add(text);
+            }
+
+            SQLSummary summary = SQLSummary.get(text);
+            String[] tables = summary.getTables();
+            for (int i = 0; i < tables.length; i++) {
+                if (!m_tables.contains(tables[i])) {
+                    m_tables.add(tables[i]);
                 }
+            }
+
+            ObjectType type = null;
+            Query query = statement.getQuery();
+            if (query != null) {
+                type = query.getSignature().getObjectType();
+            } else {
+                for (Iterator it = statement.getEvents().iterator();
+                     it.hasNext(); ) {
+                    Event ev = (Event) it.next();
+                    type = Session.getObjectType(ev.getObject());
+                    break;
+                }
+            }
+
+            if (type != null && !m_types.contains(type)) {
+                m_types.add(type);
             }
 
             final int textid = m_texts.indexOf(text);
 
             final Lifecycle lifecycle = new Lifecycle
-                (statement, textid);
+                (statement, textid, summary, type);
 
             return lifecycle;
         } else {
@@ -74,6 +104,21 @@ public class StatementProfiler implements RDBMSProfiler {
                 m_out.write("</text>");
             }
 
+            for (Iterator it = m_types.iterator(); it.hasNext(); ) {
+                ObjectType ot = (ObjectType) it.next();
+                m_out.write("\n");
+                m_out.write("<type>");
+                m_out.write(ot.getQualifiedName());
+                m_out.write("</type>");
+            }
+
+            for (Iterator it = m_tables.iterator(); it.hasNext(); ) {
+                m_out.write("\n");
+                m_out.write("<table>");
+                m_out.write((String) it.next());
+                m_out.write("</table>");
+            }
+
             m_out.write("\n");
             m_out.write("</profile>");
             m_out.flush();
@@ -102,25 +147,31 @@ public class StatementProfiler implements RDBMSProfiler {
     private final class Lifecycle implements StatementLifecycle {
         private final RDBMSStatement m_statement;
         private final int m_text;
+        private final SQLSummary m_summary;
+        private final ObjectType m_type;
         private long m_begin;
-        private long m_elapsed;
 
         Lifecycle(final RDBMSStatement statement,
-                  final int text) {
+                  final int text, final SQLSummary summary,
+                  final ObjectType type) {
             m_statement = statement;
             m_text = text;
+            m_summary = summary;
+            m_type = type;
         }
 
         public void beginPrepare() {
-            final SQLSummary summary = SQLSummary.get(m_statement.getText());
-
             m_out.write("\n");
             m_out.write("<statement");
             m_out.write(" text=\"" + m_text + "\"");
-            m_out.write(" type=\"" + summary.getType() + "\"");
+            m_out.write(" type=\"" + m_summary.getType() + "\"");
             m_out.write(">");
 
-            final String[] tables = summary.getTables();
+            if (m_type != null) {
+                elem("objectType", m_type.getQualifiedName());
+            }
+
+            final String[] tables = m_summary.getTables();
 
             for (int i = 0; i < tables.length; i++) {
                 elem("table", tables[i]);
@@ -145,7 +196,8 @@ public class StatementProfiler implements RDBMSProfiler {
             end("prepare");
         }
 
-        public void beginSet(final int pos, final int type, final Object object) {
+        public void beginSet(final int pos, final int type,
+                             final Object object) {
             begin("set");
 
             elem("pos", Integer.toString(pos));
@@ -196,9 +248,6 @@ public class StatementProfiler implements RDBMSProfiler {
             end("close");
 
             m_out.write("</lifecycle>");
-
-            elem("millis", Long.toString(m_elapsed));
-
             m_out.write("</statement>");
         }
 
@@ -215,15 +264,23 @@ public class StatementProfiler implements RDBMSProfiler {
         }
 
         private void begin(final String tag) {
+            if (m_inPhase) {
+                throw new IllegalStateException("nested begin");
+            }
+            m_inPhase = true;
+
             begin();
 
             m_out.write("<" + tag + ">");
         }
 
         private long end() {
-            final long elapsed = now() - m_begin;
+            if (!m_inPhase) {
+                throw new IllegalStateException("end called without begin");
+            }
+            m_inPhase = false;
 
-            m_elapsed += elapsed;
+            final long elapsed = now() - m_begin;
 
             return elapsed;
         }
