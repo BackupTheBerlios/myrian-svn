@@ -8,12 +8,12 @@ import java.util.*;
  * Query
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/03/31 $
+ * @version $Revision: #13 $ $Date: 2003/04/07 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#12 $ by $Author: rhs $, $DateTime: 2003/03/31 10:58:30 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Query.java#13 $ by $Author: rhs $, $DateTime: 2003/04/07 14:17:43 $";
 
     private Signature m_signature;
     private Filter m_filter;
@@ -132,14 +132,22 @@ public class Query {
         for (Iterator it = m_order.iterator(); it.hasNext(); ) {
             Path p = (Path) it.next();
             buf.append(p);
+
+	    if (isDefaulted(p)) {
+		buf.append(" (");
+		buf.append(getDefault(p));
+		buf.append(")");
+	    }
+
             if (!isAscending(p)) {
                 buf.append(" desc");
             }
+
             if (it.hasNext()) {
                 buf.append(", ");
             }
         }
-        buf.append(")");
+        buf.append(")\nparameters");
         buf.append(m_values);
         return buf.toString();
     }

@@ -9,12 +9,12 @@ import java.util.*;
  * DynamicQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/02/26 $
+ * @version $Revision: #3 $ $Date: 2003/04/07 $
  **/
 
 public class DynamicQuerySource extends QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DynamicQuerySource.java#2 $ by $Author: rhs $, $DateTime: 2003/02/26 20:44:08 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/DynamicQuerySource.java#3 $ by $Author: rhs $, $DateTime: 2003/04/07 14:17:43 $";
 
     private Signature getSignature(ObjectType type) {
         Signature result = new Signature(type);
@@ -58,17 +58,21 @@ public class DynamicQuerySource extends QuerySource {
     }
 
     public Query getQuery(Object obj, Property prop) {
-        if (prop.isCollection()) {
+        if (prop.getType().isKeyed()) {
             ObjectType type = prop.getType();
             Signature sig = getSignature(type);
             Parameter start = new Parameter(prop.getContainer(),
                                             Path.get("__start__"));
             sig.addParameter(start);
 
-            // should filter to associated object(s)
-            // should deal with one way associations
-            Filter f = new ContainsFilter
-                (Path.get("__start__." + prop.getName()), null);
+	    Filter f;
+	    if (prop.isCollection()) {
+		f = new ContainsFilter
+		    (Path.add(start.getPath(), prop.getName()), null);
+	    } else {
+		f = new EqualsFilter
+		    (Path.add(start.getPath(), prop.getName()), null);
+	    }
             Query q = new Query(sig, f);
             q.set(start, obj);
             return q;
@@ -80,7 +84,7 @@ public class DynamicQuerySource extends QuerySource {
             Parameter start = new Parameter(type, Path.get("__start__"));
             sig.addParameter(start);
             Query q = new Query
-                (sig, new EqualsFilter(Path.get("__start__"), null));
+                (sig, new EqualsFilter(start.getPath(), null));
             q.set(start, obj);
             return q;
         }

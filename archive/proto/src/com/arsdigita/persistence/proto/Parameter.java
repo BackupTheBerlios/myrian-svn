@@ -7,12 +7,12 @@ import com.arsdigita.persistence.proto.metadata.ObjectType;
  * Parameter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/04/07 $
+ * @version $Revision: #4 $ $Date: 2003/04/07 $
  **/
 
 public class Parameter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Parameter.java#3 $ by $Author: rhs $, $DateTime: 2003/04/07 12:12:49 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Parameter.java#4 $ by $Author: rhs $, $DateTime: 2003/04/07 14:17:43 $";
 
     private ObjectType m_type;
     private Path m_path;
@@ -31,7 +31,7 @@ public class Parameter {
     }
 
     public String toString() {
-	return m_path + ": " + m_type;
+	return m_type + " " + m_path;
     }
 
 }
