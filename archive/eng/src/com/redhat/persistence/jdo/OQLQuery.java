@@ -26,8 +26,8 @@ public class OQLQuery implements javax.jdo.Query {
         Map parameters = new HashMap(params);
         for (Iterator it = parameters.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry me = (Map.Entry) it.next();
-            if (me.getValue() instanceof CRPCollection) {
-                CRPCollection c = (CRPCollection) me.getValue();
+            if (me.getValue() instanceof OQLCollection) {
+                OQLCollection c = (OQLCollection) me.getValue();
                 me.setValue(c.expression());
             }
         }
