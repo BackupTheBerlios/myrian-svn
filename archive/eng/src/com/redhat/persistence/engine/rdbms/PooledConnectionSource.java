@@ -33,11 +33,11 @@ import org.apache.log4j.Logger;
  * PooledConnectionSource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/09/07 $
+ * @version $Revision: #5 $ $Date: 2004/09/27 $
  **/
 public final class PooledConnectionSource implements ConnectionSource {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/PooledConnectionSource.java#4 $ by $Author: dennis $, $DateTime: 2004/09/07 10:26:15 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/engine/rdbms/PooledConnectionSource.java#5 $ by $Author: vadim $, $DateTime: 2004/09/27 11:18:39 $";
 
     private static final Logger s_log =
         Logger.getLogger(PooledConnectionSource.class);
@@ -103,7 +103,7 @@ public final class PooledConnectionSource implements ConnectionSource {
     public synchronized void release(Connection conn) {
         if (!m_connections.contains(conn)) {
             throw new IllegalArgumentException
-                ("connection did come from ths source: " + conn);
+                ("connection did not come from ths source: " + conn);
         }
 
         boolean remove;
