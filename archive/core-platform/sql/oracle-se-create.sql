@@ -148,8 +148,6 @@
 @@ default/versioning/comment-vc_operations.sql
 @@ default/versioning/table-vc_generic_operations.sql
 @@ default/versioning/comment-vc_generic_operations.sql
-@@ default/versioning/table-vc_clob_operations.sql
-@@ default/versioning/table-vc_blob_operations.sql
 @@ default/versioning/function-last_attr_value.sql
 
 @@ default/workflow/sequence-cw_sequences.sql

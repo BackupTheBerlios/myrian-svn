@@ -133,8 +133,6 @@ create view dual as select 1;
 \i default/versioning/comment-vc_operations.sql
 \i default/versioning/table-vc_generic_operations.sql
 \i default/versioning/comment-vc_generic_operations.sql
-\i postgres/versioning/table-vc_clob_operations.sql
-\i postgres/versioning/table-vc_blob_operations.sql
 \i postgres/versioning/function-last_attr_value.sql
 
 \i postgres/workflow/sequence-cw_sequences.sql
