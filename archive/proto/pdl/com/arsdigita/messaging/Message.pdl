@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/pdl/com/arsdigita/messaging/Message.pdl#1 $ 
-// $DateTime: 2002/11/27 19:51:05 $
+// $Id: //core-platform/proto/pdl/com/arsdigita/messaging/Message.pdl#2 $ 
+// $DateTime: 2003/05/07 16:15:39 $
 
 model com.arsdigita.messaging;
 
@@ -27,23 +27,12 @@ object type Message extends ACSObject {
     Date[1..1]       sent = messages.sent_date TIMESTAMP;
     BigDecimal[0..1] inReplyTo = messages.in_reply_to INTEGER;
     BigDecimal objectID = messages.object_id INTEGER;
-    String[1..1]     messageID = messages.rfc_message_id INTEGER;
-   
+    String[0..1]     messageID = messages.rfc_message_id VARCHAR(1000);
+
     Party[1..1] sender = join messages.sender to parties.party_id;
+
     component MessagePart[0..n] messagePart = 
         join messages.message_id to message_parts.message_id;
 
     reference key (messages.message_id);
-
-    // this can be removed once the "composite" keyword is honored
-    remove messagePart {
-        do {
-            delete from message_parts 
-            where  part_id    = :messagePart.id
-            and    message_id = :id
-        }
-    }
 }
-
-
-
