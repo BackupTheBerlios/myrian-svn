@@ -27,23 +27,23 @@ import org.apache.commons.beanutils.converters.*;
  * typically created and populated by a ParameterRecord
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#6 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#7 $
  */
 public final class ParameterValue {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#6 $" +
-        "$Author: randyg $" +
-        "$DateTime: 2003/10/10 16:04:50 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#7 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/10/17 14:30:44 $";
 
-    private final ArrayList m_errors;
+    private final ErrorList m_errors;
     private String m_string;
     private Object m_object;
 
     public ParameterValue() {
-        m_errors = new ArrayList();
+        m_errors = new ErrorList();
     }
 
-    public final List getErrors() {
+    public final ErrorList getErrors() {
         return m_errors;
     }
 

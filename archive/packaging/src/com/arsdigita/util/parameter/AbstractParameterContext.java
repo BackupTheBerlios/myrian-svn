@@ -16,54 +16,107 @@
 package com.arsdigita.util.parameter;
 
 import com.arsdigita.util.*;
+import java.io.*;
 import java.util.*;
+import org.apache.log4j.Logger;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameterContext.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameterContext.java#2 $
  */
 public abstract class AbstractParameterContext implements ParameterContext {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameterContext.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameterContext.java#2 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/17 11:35:44 $";
+        "$DateTime: 2003/10/17 14:30:44 $";
 
-    private final ArrayList m_params;
-    private final HashMap m_values;
+    private static final Logger s_log = Logger.getLogger
+        (AbstractParameterContext.class);
 
-    public AbstractParameterContext() {
-        m_params = new ArrayList();
-        m_values = new HashMap();
+    private final MapParameter m_param;
+    private final HashMap m_map;
+    private final Properties m_info;
+
+    public AbstractParameterContext(final String name) {
+        m_param = new MapParameter(name);
+        m_map = new HashMap();
+        m_info = new Properties();
     }
 
     public final void register(final Parameter param) {
-        m_params.add(param);
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Registering " + param + " on " + this);
+        }
+
+        if (Assert.isEnabled()) {
+            Assert.truth(!m_param.contains(param),
+                         param + " is already registered");
+        }
+
+        m_param.add(param);
     }
 
-    public final Object get(final Parameter param) {
-        Assert.exists(param, Parameter.class);
+    // XXX change this?
+    public final Parameter[] getParameters() {
+        final ArrayList list = new ArrayList();
+        final Iterator params = m_param.iterator();
 
-        return m_values.get(param);
+        while (params.hasNext()) {
+            list.add(params.next());
+        }
+
+        return (Parameter[]) list.toArray(new Parameter[list.size()]);
     }
 
-    public final void set(final Parameter param, final Object value) {
+    /**
+     * Gets the value of <code>param</code>.  If the loaded value is
+     * null, <code>param.getDefaultValue()</code> is returned.
+     *
+     * @param param The named <code>Parameter</code> whose value you
+     * wish to retrieve; it cannot be null
+     */
+    public Object get(final Parameter param) {
+        if (Assert.isEnabled()) {
+            Assert.exists(param, Parameter.class);
+            Assert.truth(m_param.contains(param),
+                         param + " has not been registered");
+        }
+
+        // XXX check for is loaded?
+
+        final Object value = m_map.get(param);
+
+        if (value == null) {
+            return param.getDefaultValue();
+        } else {
+            return value;
+        }
+    }
+
+    /**
+     * Sets the value of <code>param</code> to <code>value</code>.
+     *
+     * @param param The named <code>Parameter</code> whose value you
+     * wish to set; it cannot be null
+     * @param value The new value of <code>param</code>; it can be
+     * null
+     */
+    public void set(final Parameter param, final Object value) {
+        if (s_log.isDebugEnabled()) {
+            s_log.debug("Setting " + param + " to " + value);
+        }
+
         Assert.exists(param, Parameter.class);
 
-        m_values.put(param, value);
+        m_map.put(param, value);
     }
 
     public final ErrorList load(ParameterReader reader) {
         final ErrorList errors = new ErrorList();
 
-        final Iterator params = m_params.iterator();
-
-        while (params.hasNext()) {
-            final Parameter param = (Parameter) params.next();
-
-            //set(param, param.read(reader, errors));
-        }
+        m_map.putAll((Map) m_param.read(reader, errors));
 
         return errors;
     }
@@ -71,24 +124,67 @@ public abstract class AbstractParameterContext implements ParameterContext {
     public final ErrorList validate() {
         final ErrorList errors = new ErrorList();
 
-        final Iterator params = m_params.iterator();
-
-        while (params.hasNext()) {
-            final Parameter param = (Parameter) params.next();
-
-            //param.validate(get(param), errors);
-        }
+        m_param.validate(m_map, errors);
 
         return errors;
     }
 
     public final void save(ParameterWriter writer) {
-        final Iterator params = m_params.iterator();
+        m_param.write(writer, m_map);
+    }
+
+    /**
+     * Loads source data for <code>ParameterInfo</code> objects from
+     * the file <code>parameter.info</code> next to
+     * <code>this.getClass()</code>.
+     */
+    protected final void loadInfo() {
+        final String name = getClass().getName().replace('.', '/');
+        final InputStream in = getClass().getClassLoader
+            ().getResourceAsStream(name + "_parameter.properties");
+
+        Assert.exists(in, InputStream.class);
+
+        try {
+            m_info.load(in);
+        } catch (IOException ioe) {
+            throw new UncheckedWrapperException(ioe);
+        }
+
+        final Iterator params = m_param.iterator();
 
         while (params.hasNext()) {
             final Parameter param = (Parameter) params.next();
 
-            //param.write(writer, get(param));
+            param.setInfo(new Info(param));
+        }
+    }
+
+    //
+    // Private classes and methods
+    //
+
+    private class Info implements ParameterInfo {
+        private final String m_name;
+
+        Info(final Parameter param) {
+            m_name = param.getName();
+        }
+
+        public final String getTitle() {
+            return m_info.getProperty(m_name + ".title");
+        }
+
+        public final String getPurpose() {
+            return m_info.getProperty(m_name + ".purpose");
+        }
+
+        public final String getExample() {
+            return m_info.getProperty(m_name + ".example");
+        }
+
+        public final String getFormat() {
+            return m_info.getProperty(m_name + ".format");
         }
     }
 }
