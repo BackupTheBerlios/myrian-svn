@@ -62,7 +62,7 @@ query maxSortKey {
 query getMessageTree {
     BigDecimal root;
     String sortKey;
-    BigDecimal sortSize;
+    BigDecimal id;
     BigDecimal object;
     do {
         select   message_id,

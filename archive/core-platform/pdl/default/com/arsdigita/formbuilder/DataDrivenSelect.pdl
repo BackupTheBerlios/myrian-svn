@@ -16,8 +16,8 @@
 model com.arsdigita.formbuilder;
 
 object type DataDrivenSelect extends Widget {
-    Boolean multiple = forms_dd_select.multiple_p;
-    BigDecimal queryId = forms_dd_select.query_id;
+    Boolean multiple = forms_dd_select.multiple_p CHAR(1);
+    BigDecimal queryId = forms_dd_select.query_id INTEGER;
 
     reference key (forms_dd_select.widget_id);
 }

@@ -16,115 +16,14 @@
 // in OptionGroups such as SingleSelect, RadioGroup and CheckboxGroup.
 //
 // @author <a href="mailto:pmarklun@arsdigita.com">Peter Marklund</a>
-// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/formbuilder/Option.pdl#1 $
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/formbuilder/Option.pdl#2 $
 //
 
 model com.arsdigita.formbuilder;
 
 object type Option extends Component {
-    String[1..1] parameterValue;
-    String[1..1] label;
+    String[1..1] parameterValue = bebop_options.parameter_name VARCHAR(100);
+    String[1..1] label = bebop_options.label VARCHAR(300);
 
-    retrieve {
-        do {
-            select bebop_options.option_id, 
-                   bebop_options.parameter_name,
-                   bebop_options.label,
-		           bebop_components.admin_name,
-		           bebop_components.description,
-		           bebop_components.attribute_string,
-                   bebop_components.active_p,
-                   acs_objects.object_type,
-                   acs_objects.default_domain_class
-	          from bebop_options, bebop_components, acs_objects
-	    	  where bebop_options.option_id = :id
-                and acs_objects.object_id = 
-                      bebop_components.component_id
-                and bebop_components.component_id =
-                      bebop_options.option_id
-        } map {
-            // ACSObject attributes
-            id = bebop_options.option_id;
-            objectType = acs_objects.object_type;
-            defaultDomainClass = acs_objects.default_domain_class;
-
-            // Component attributes
-            adminName = bebop_components.admin_name;
-            description = bebop_components.description;
-	        attributeString = bebop_components.attribute_string;
-            isActive = bebop_components.active_p;
-
-            // Widget attributes
-            parameterValue = bebop_options.parameter_name;
-            label = bebop_options.label;
-        }
-    }
-
-    retrieve all {
-        do {
-            select bebop_options.option_id, 
-                   bebop_options.parameter_name,
-                   bebop_options.label,
-		           bebop_components.admin_name,
-		           bebop_components.description,
-		           bebop_components.attribute_string,
-                   bebop_components.active_p,
-                   acs_objects.object_type,
-                   acs_objects.default_domain_class
-	          from bebop_options, bebop_components, acs_objects
-	    	  where acs_objects.object_id = 
-                      bebop_components.component_id
-                and bebop_components.component_id =
-                      bebop_options.option_id
-        } map {
-            // ACSObject attributes
-            id = bebop_options.option_id;
-            objectType = acs_objects.object_type;
-            defaultDomainClass = acs_objects.default_domain_class;
-
-            // Component attributes
-            adminName = bebop_components.admin_name;
-            description = bebop_components.description;
-	        attributeString = bebop_components.attribute_string;
-            isActive = bebop_components.active_p;
-
-            // Widget attributes
-            parameterValue = bebop_options.parameter_name;
-            label = bebop_options.label;
-        }
-    }
-
-    insert {
-        // Insert the ACSObject and Component attributes
-        super;
-
-        // Insert the Widget attributes
-        do {
-            insert into bebop_options 
-              (option_id, parameter_name, label)
-              values
-              (:id, :parameterValue, :label)
-        }
-    }    
-    
-    update {
-        // Update the ACSObject and Component attributes
-        super;
-
-        // Update the Widget attributes
-        do {
-            update bebop_options
-                set parameter_name = :parameterValue,
-                    label = :label
-                where option_id = :id
-        }
-    }
-
-    delete {
-        do {
-            delete from bebop_options where option_id = :id
-        }
-
-        super;
-    }    
+    reference key (bebop_options.option_id);
 }

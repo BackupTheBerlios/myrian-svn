@@ -17,9 +17,9 @@ model com.arsdigita.formbuilder.actions;
 import com.arsdigita.formbuilder.*;
 
 object type TemplateEmailListener extends ProcessListener {
-    String[1..1] recipient = forms_lstnr_tmpl_email.recipient;
-    String[1..1] subject = forms_lstnr_tmpl_email.subject;
-    String[1..1] body = forms_lstnr_tmpl_email.body;
+    String[1..1] recipient = forms_lstnr_tmpl_email.recipient VARCHAR(120);
+    String[1..1] subject = forms_lstnr_tmpl_email.subject VARCHAR(120);
+    String[1..1] body = forms_lstnr_tmpl_email.body VARCHAR(4000);
 
     reference key (forms_lstnr_tmpl_email.listener_id);
 }

@@ -114,11 +114,11 @@ association {
 }
 
 object type ResourceImpl extends VersionedACSObject { 
-    BigDecimal[0..1] parentID    = docs_resources.parent_id;
-    String[1..1]     name        = docs_resources.name;
-    String[0..1]     description = docs_resources.description;
-    Boolean[1..1]    isFolder    = docs_resources.is_folder;
-    String[1..1]     path        = docs_resources.path;
+    BigDecimal[0..1] parentID    = docs_resources.parent_id INTEGER;
+    String[1..1]     name        = docs_resources.name VARCHAR(200);
+    String[0..1]     description = docs_resources.description VARCHAR(4000);
+    Boolean[1..1]    isFolder    = docs_resources.is_folder CHAR(1);
+    String[1..1]     path        = docs_resources.path VARCHAR(4000);
   
     reference key (docs_resources.resource_id);
 }

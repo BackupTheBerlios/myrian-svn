@@ -31,13 +31,13 @@
 // of children.
 
 // @author <a href="mailto:pmarklun@arsdigita.com">Peter Marklund</a>
-// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/formbuilder/FormSection.pdl#1 $
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/formbuilder/FormSection.pdl#2 $
 //
 
 model com.arsdigita.formbuilder;
 
 object type FormSection extends Component {
-    String[0..1] action = bebop_form_sections.action;
+    String[0..1] action = bebop_form_sections.action VARCHAR(500);
 
     reference key (bebop_form_sections.form_section_id);    
 }

@@ -17,8 +17,8 @@ model com.arsdigita.formbuilder.actions;
 import com.arsdigita.formbuilder.*;
 
 object type XMLEmailListener extends ProcessListener {
-    String[1..1] recipient = forms_lstnr_xml_email.recipient;
-    String[1..1] subject = forms_lstnr_xml_email.subject;
+    String[1..1] recipient = forms_lstnr_xml_email.recipient VARCHAR(120);
+    String[1..1] subject = forms_lstnr_xml_email.subject VARCHAR(120);
 
     reference key (forms_lstnr_xml_email.listener_id);
 }

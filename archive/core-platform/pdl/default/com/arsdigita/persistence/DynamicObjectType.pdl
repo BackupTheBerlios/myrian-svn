@@ -20,7 +20,7 @@ import com.arsdigita.kernel.*;
 
 object type DynamicObjectType extends ACSObject {
     String[1..1] pdlFile = persistence_dynamic_ot.pdl_file CLOB;
-    String[1..1] dynamicType = persistence_dynamic_ot.dynamic_object_type;
+    String[1..1] dynamicType = persistence_dynamic_ot.dynamic_object_type VARCHAR(700);
 
     reference key (persistence_dynamic_ot.pdl_id);
 }

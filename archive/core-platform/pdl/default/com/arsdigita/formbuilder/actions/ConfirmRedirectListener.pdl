@@ -17,7 +17,7 @@ model com.arsdigita.formbuilder.actions;
 import com.arsdigita.formbuilder.*;
 
 object type ConfirmRedirectListener extends ProcessListener {
-    String[1..1] url = forms_lstnr_conf_redirect.url;
+    String[1..1] url = forms_lstnr_conf_redirect.url VARCHAR(160);
 
     reference key (forms_lstnr_conf_redirect.listener_id);
 }

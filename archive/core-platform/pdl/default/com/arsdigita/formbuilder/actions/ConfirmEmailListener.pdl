@@ -17,9 +17,9 @@ model com.arsdigita.formbuilder.actions;
 import com.arsdigita.formbuilder.*;
 
 object type ConfirmEmailListener extends ProcessListener {
-    String[1..1] from = forms_lstnr_conf_email.sender;
-    String[1..1] subject = forms_lstnr_conf_email.subject;
-    String[1..1] body = forms_lstnr_conf_email.body;
+    String[1..1] from = forms_lstnr_conf_email.sender VARCHAR(120);
+    String[1..1] subject = forms_lstnr_conf_email.subject VARCHAR(120);
+    String[1..1] body = forms_lstnr_conf_email.body VARCHAR(4000);
 
     reference key (forms_lstnr_conf_email.listener_id);
 }

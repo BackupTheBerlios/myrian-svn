@@ -18,9 +18,9 @@ model com.arsdigita.formbuilder;
 import com.arsdigita.kernel.*;
 
 object type PersistentDataQuery extends ACSObject {
-    BigDecimal typeId = forms_dataquery.type_id;
-    String description = forms_dataquery.description;
-    String name = forms_dataquery.name;
+    BigDecimal typeId = forms_dataquery.type_id INTEGER;
+    String description = forms_dataquery.description VARCHAR(200);
+    String name = forms_dataquery.name VARCHAR(60);
 
     reference key (forms_dataquery.query_id);
 }

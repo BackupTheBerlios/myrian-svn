@@ -21,15 +21,15 @@
 // may be persisted via the association in Listener.pdl
 //
 // @author <a href="mailto:pmarklun@arsdigita.com">Peter Marklund</a>
-// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/formbuilder/Widget.pdl#1 $
+// @version $Id: //core-platform/dev/pdl/default/com/arsdigita/formbuilder/Widget.pdl#2 $
 //
 
 model com.arsdigita.formbuilder;
 
 object type Widget extends Component {
-    String[1..1] parameterName = bebop_widgets.parameter_name;
-    String[0..1] parameterModel = bebop_widgets.parameter_model;
-    String[0..1] defaultValue = bebop_widgets.default_value;
+    String[1..1] parameterName = bebop_widgets.parameter_name VARCHAR(100);
+    String[0..1] parameterModel = bebop_widgets.parameter_model VARCHAR(150);
+    String[0..1] defaultValue = bebop_widgets.default_value VARCHAR(4000);
 
     reference key (bebop_widgets.widget_id);
 }

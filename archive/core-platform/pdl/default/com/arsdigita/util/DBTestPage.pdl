@@ -18,6 +18,7 @@
 model com.arsdigita.util;
 
 query dbTest {
+    String success;
     do {
         select 'success' as success from dual
     } map {

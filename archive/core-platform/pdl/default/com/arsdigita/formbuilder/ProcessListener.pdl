@@ -3,9 +3,9 @@ model com.arsdigita.formbuilder;
 import com.arsdigita.kernel.*;
 
 object type ProcessListener extends ACSObject {
-    String[0..1] name = bebop_process_listeners.name;
-    String[0..1] description = bebop_process_listeners.description;
-    String[0..1] listenerClass = bebop_process_listeners.listener_class;
+    String[0..1] name = bebop_process_listeners.name VARCHAR(40);
+    String[0..1] description = bebop_process_listeners.description VARCHAR(120);
+    String[0..1] listenerClass = bebop_process_listeners.listener_class VARCHAR(100);
 
     reference key (bebop_process_listeners.listener_id);	
 }

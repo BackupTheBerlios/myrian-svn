@@ -15,7 +15,7 @@
 model com.arsdigita.formbuilder;
 
 object type WidgetLabel extends Widget {
-    BigDecimal[1..1] widgetId = forms_widget_label.widget_id;
+    BigDecimal[1..1] widgetId = forms_widget_label.widget_id INTEGER;
 
     reference key (forms_widget_label.label_id);
 }

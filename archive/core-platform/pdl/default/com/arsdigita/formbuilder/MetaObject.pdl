@@ -17,11 +17,11 @@ model com.arsdigita.formbuilder;
 import com.arsdigita.kernel.*;
 
 object type MetaObject extends ACSObject {
-    BigDecimal[1..1] typeId        = bebop_meta_object.type_id;
-    String[1..1] prettyName        = bebop_meta_object.pretty_name;
-    String[1..1] prettyPlural      = bebop_meta_object.pretty_plural;
-    String[1..1] className         = bebop_meta_object.class_name;
-    String[1..1] propertiesForm    = bebop_meta_object.props_form;
+    BigDecimal[1..1] typeId        = bebop_meta_object.type_id INTEGER;
+    String[1..1] prettyName        = bebop_meta_object.pretty_name VARCHAR(50);
+    String[1..1] prettyPlural      = bebop_meta_object.pretty_plural VARCHAR(50);
+    String[1..1] className         = bebop_meta_object.class_name VARCHAR(200);
+    String[1..1] propertiesForm    = bebop_meta_object.props_form VARCHAR(200);
 
     reference key (bebop_meta_object.object_id);
 }
