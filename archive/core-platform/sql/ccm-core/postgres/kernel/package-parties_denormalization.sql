@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/postgres/kernel/package-parties_denormalization.sql#1 $
--- $DateTime: 2003/10/23 15:28:18 $
+-- $Id: //core-platform/dev/sql/ccm-core/postgres/kernel/package-parties_denormalization.sql#2 $
+-- $DateTime: 2003/11/03 13:07:27 $
 
 create or replace function parties_add_subgroup (
      integer, integer
@@ -145,7 +145,7 @@ create or replace function parties_remove_member (
            update group_member_trans_index
               set n_paths = n_paths - v_path_decrement
             where group_id = remove_entry.group_id
-              and member_id = v_path_decrement;
+              and member_id = v_member_id;
         end if;
 
       end loop;
