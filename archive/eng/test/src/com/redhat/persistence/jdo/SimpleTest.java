@@ -9,12 +9,9 @@ public class SimpleTest extends WithTxnCase {
         e.setSalary(new Float(1.0f));
         m_pm.makePersistent(e);
         e.setSalary(new Float(e.getSalary().floatValue() + 2.0f));
-        Object eId = m_pm.getObjectId(e);
         m_pm.currentTransaction().commit();
 
-        e = null;
         m_pm.currentTransaction().begin();
-        e = (Employee) m_pm.getObjectById(eId, true);
         assertTrue("set after makePersistent", e.getSalary().floatValue() > 2);
         m_pm.currentTransaction().commit();
     }

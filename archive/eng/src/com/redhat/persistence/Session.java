@@ -40,6 +40,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
+import org.apache.commons.collections.map.AbstractReferenceMap;
+import org.apache.commons.collections.map.ReferenceIdentityMap;
 
 /**
  * A Session object provides the primary means for client Java code to
@@ -48,12 +50,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2004/08/06 $
+ * @version $Revision: #13 $ $Date: 2004/08/09 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#12 $ by $Author: rhs $, $DateTime: 2004/08/06 08:43:09 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/Session.java#13 $ by $Author: ashah $, $DateTime: 2004/08/09 14:54:25 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -67,9 +69,10 @@ public class Session {
     private final Engine m_engine;
     private final QuerySource m_qs;
 
-    private Map m_odata = new HashMap();
-    private Map m_keyless = new IdentityHashMap();
-    private Map m_keys = new IdentityHashMap();
+    private final Map m_odata = new HashMap();
+    private final Map m_keyless = new IdentityHashMap();
+    private final Map m_keys = new ReferenceIdentityMap
+        (AbstractReferenceMap.WEAK, AbstractReferenceMap.HARD, true);
 
     private EventStream m_events = new EventStream(this);
 
@@ -769,7 +772,6 @@ public class Session {
     private void clear(boolean isCommit) {
         m_odata.clear();
         m_keyless.clear();
-        m_keys.clear();
         m_events.clear();
         m_violations.clear();
         m_beforeFlushMarker = null;
