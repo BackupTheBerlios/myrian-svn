@@ -16,18 +16,24 @@
 package com.arsdigita.persistence.oql;
 
 import com.arsdigita.persistence.metadata.ObjectType;
-import java.util.*;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Stack;
 
 /**
  * Validator
  *
+ * This Actor validates a Query object.
+ *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/14 $
+ * @version $Revision: #4 $ $Date: 2002/09/16 $
  **/
 
 class Validator extends Actor {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Validator.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Validator.java#4 $ by $Author: jorris $, $DateTime: 2002/09/16 11:44:08 $";
 
     private int m_nonOuter = 0;
     private Set m_connected = new HashSet();
@@ -68,15 +74,21 @@ class Validator extends Actor {
 
         m_tables.removeAll(m_connected);
         if (m_tables.size() > 0) {
-            query.error("The following tables could not be reached " +
-                        m_tables + " starting from " + m_connected + ".");
+            StringBuffer msg = new StringBuffer();
+            msg.append("The following tables could not be reached ");
+            msg.append(m_tables);
+            msg.append(" starting from ");
+            msg.append(m_connected);
+            msg.append(". Possible causes: A table name is mispelled in the reference key or join statement.");
+            query.error(msg.toString());
         }
 
         ObjectType type = query.getObjectType();
         String baseTable = type.getReferenceKey() != null ?
             type.getReferenceKey().getTableName() : null;
 
-        if (baseTable != null && query.getTable(baseTable) == null) {
+        final boolean tableIsMissing = baseTable != null && query.getTable(baseTable) == null;
+        if (tableIsMissing) {
             query.error("Missing base table: " + baseTable);
         }
     }
