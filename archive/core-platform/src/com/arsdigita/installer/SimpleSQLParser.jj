@@ -46,7 +46,7 @@ public class SimpleSQLParser {
     //  For static methods
     void useSQLStatement (Class c, String invokingMethodName) 
             throws ParseException, FileNotFoundException, IllegalAccessException,
-                   InvocationTargetException, NoSuchMethodException
+                   NoSuchMethodException, InvocationTargetException
     {
         Class parameterTypes[] = { String.class };
         Method invokingMethod = c.getMethod(invokingMethodName, parameterTypes);
@@ -57,7 +57,7 @@ public class SimpleSQLParser {
     //  Non-static methods must reference object they're dealing with
     void useSQLStatement (Object obj, String invokingMethodName) 
             throws ParseException, FileNotFoundException, IllegalAccessException,
-                   InvocationTargetException, NoSuchMethodException
+                   NoSuchMethodException, InvocationTargetException
     {
         Class parameterTypes[] = { String.class };
         Method invokingMethod = obj.getClass().getMethod(invokingMethodName, parameterTypes);
@@ -118,8 +118,9 @@ TOKEN:
 
 
 void useSQLStatement (Object obj, Method invokingMethod) 
-        throws FileNotFoundException, InvocationTargetException,
-               IllegalAccessException
+        throws FileNotFoundException, 
+               IllegalAccessException,
+               InvocationTargetException
         :
 {
     String s;

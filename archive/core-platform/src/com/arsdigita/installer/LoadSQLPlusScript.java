@@ -14,7 +14,7 @@
  */
 
 /**
- * $Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#3 $
+ * $Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#4 $
  *
  *  This is the class with sole purpose to feed SQL*Plus script through
  *  JDBC interface.  SQL*Plus scripts are being parsed by SimpleOracleSQLParser,
@@ -24,13 +24,15 @@
 
 package com.arsdigita.installer;
 
-import java.sql.*;
-import java.io.*;
-import java.lang.reflect.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.io.FileNotFoundException;
 
 public class LoadSQLPlusScript {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#3 $ by $Author: randyg $, $DateTime: 2002/07/19 15:52:15 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#4 $ by $Author: dennis $, $DateTime: 2002/08/08 11:07:31 $";
 
     private Connection s_con;
     private Statement s_stmt;
@@ -38,9 +40,7 @@ public class LoadSQLPlusScript {
     private boolean s_onErrorContinue = false;
     private boolean s_echoSQLStatement = false;
     private int s_exitValue = 0;
-    
-    public LoadSQLPlusScript () {
-    }
+    private String s_database = "oracle";
 
     public static void main (String args[]) {
 
@@ -59,11 +59,8 @@ public class LoadSQLPlusScript {
         LoadSQLPlusScript loader = new LoadSQLPlusScript();
 
         try {
-            loader.loadSQLPlusScript(jdbcUrl, dbUsername, dbPassword, scriptFilename);
-        } catch (InvocationTargetException e) {
-            Throwable t = e.getTargetException();
-            System.err.println(t.toString());
-            System.exit(1);
+            loader.setConnection (jdbcUrl, dbUsername, dbPassword);
+            loader.loadSQLPlusScript(scriptFilename);
         } catch (Exception e) {
             System.err.println(e.toString());
             System.exit(1);
@@ -73,25 +70,32 @@ public class LoadSQLPlusScript {
 
     }
 
+    public void setDatabase (String database) {
+        s_database = database;
+    }
+
     public void setConnection (Connection connection) {
-        this.s_con = connection;
+        s_con = connection;
+    }
+
+    public void setConnection (String jdbcUrl, String dbUsername, String dbPassword) 
+        throws SQLException {
+        s_con = DriverManager.getConnection(jdbcUrl, 
+                                            dbUsername,
+                                            dbPassword);
     }
 
     public int getExitValue () {
         return s_exitValue;
     }
 
-    public void loadSQLPlusScript (String jdbcUrl, 
-                                   String dbUsername,
-                                   String dbPassword, 
-                                   String scriptFilename)
+    public void loadSQLPlusScript (String scriptFilename)
         throws ClassNotFoundException, 
         SQLException,
         ParseException, 
         FileNotFoundException,
         IllegalAccessException, 
-        NoSuchMethodException,
-        InvocationTargetException {
+        NoSuchMethodException {
 
         if (System.getProperty("sql.verbose") != null  &&
                 System.getProperty("sql.verbose").equals("true")) {
@@ -103,54 +107,35 @@ public class LoadSQLPlusScript {
             s_onErrorContinue = true;
         }
 
-        m_loadSQLPlusScript(jdbcUrl, dbUsername, dbPassword, scriptFilename);
+        m_loadSQLPlusScript(scriptFilename);
     }
 
-    public void loadSQLPlusScript (String jdbcUrl, 
-                                   String dbUsername,
-                                   String dbPassword, 
-                                   String scriptFilename,
+    public void loadSQLPlusScript (String scriptFilename,
                                    boolean echoSQLStatement, 
                                    boolean onErrorContinue)
         throws ClassNotFoundException, SQLException,
                 ParseException, FileNotFoundException,
-                IllegalAccessException, NoSuchMethodException,
-                InvocationTargetException {
+                IllegalAccessException, NoSuchMethodException {
         s_echoSQLStatement = echoSQLStatement;
         s_onErrorContinue = onErrorContinue;
-        m_loadSQLPlusScript (jdbcUrl, dbUsername, dbPassword, scriptFilename);
+        m_loadSQLPlusScript (scriptFilename);
     }
 
-    protected void m_loadSQLPlusScript (String jdbcUrl, 
-                                        String dbUsername,
-                                        String dbPassword, 
-                                        String scriptFilename)
+    protected void m_loadSQLPlusScript (String scriptFilename)
         throws ClassNotFoundException, SQLException,
                 ParseException, FileNotFoundException,
-                IllegalAccessException, NoSuchMethodException,
-                InvocationTargetException {
+                IllegalAccessException, NoSuchMethodException {
         
-        // if there is a jdbcUrl, us that.  Otherwise, look to see
-        // if the existing connection is postgres
-
-        if ((jdbcUrl != null && jdbcUrl.indexOf("postgres") > -1) ||
-            (s_con != null && com.arsdigita.db.Initializer.getDatabase() ==
-                 com.arsdigita.db.Initializer.POSTGRES)) {
+        if (s_database == "postgres") {
             Class.forName("org.postgresql.Driver");
         } else {
             Class.forName("oracle.jdbc.driver.OracleDriver");
         }
-
+        
         // Parse SQL script and feed JDBC with one statement at the time
         System.err.println("Trying to open: '" + scriptFilename + "'");
         SimpleSQLParser parser = new SimpleSQLParser(scriptFilename);
-
-        if ( s_con == null ) {
-            s_con = DriverManager.getConnection(jdbcUrl, 
-                                                dbUsername,
-                                                dbPassword);
-        }
-
+        
         // iterate over parser.SQLStamentList();
 
         s_stmt = s_con.createStatement();
