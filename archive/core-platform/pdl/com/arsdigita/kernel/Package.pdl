@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/Package.pdl#5 $ 
-// $DateTime: 2002/10/16 14:12:35 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/Package.pdl#6 $ 
+// $DateTime: 2003/07/03 12:34:51 $
 
 model com.arsdigita.kernel;
 
@@ -75,6 +75,6 @@ object type PackageInstance extends ACSObject {
             DELETE from apm_packages
             WHERE package_id = :id
         }
-        super;
+
     }
 }
