@@ -13,7 +13,7 @@ import javax.jdo.Query;
  * CRPMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #24 $ $Date: 2004/07/30 $
+ * @version $Revision: #25 $ $Date: 2004/08/11 $
  **/
 class CRPMap implements Map {
     private final static NullableObject NULL = new NullableObject() {
@@ -229,5 +229,17 @@ class CRPMap implements Map {
             return m_count;
         }
         return keys().size();
+    }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Map)) { return false; }
+
+        Map map = (Map) obj;
+
+        return entrySet().equals(map.entrySet());
+    }
+
+    public int hashCode() {
+        return entrySet().hashCode();
     }
 }

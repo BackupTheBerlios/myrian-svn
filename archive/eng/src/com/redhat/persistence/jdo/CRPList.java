@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #21 $ $Date: 2004/07/30 $
+ * @version $Revision: #22 $ $Date: 2004/08/11 $
  **/
 
 class CRPList implements List {
@@ -193,7 +193,7 @@ class CRPList implements List {
         if (size() != list.size()) { return false; }
 
         Iterator it1 = iterator();
-        Iterator it2 = iterator();
+        Iterator it2 = list.iterator();
         while (it1.hasNext()) {
             Object o1 = it1.next();
             if (it2.hasNext()) {

@@ -11,7 +11,7 @@ import java.util.Set;
  *
  * @author  Vadim Nasardinov (vadimn@redhat.com)
  * @since   2004-07-14
- * @version $Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/ProxySet.java#3 $
+ * @version $Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/ProxySet.java#4 $
  **/
 class ProxySet implements Set, OQLCollection {
     private final OQLCollection m_coll;
@@ -76,5 +76,12 @@ class ProxySet implements Set, OQLCollection {
     public Object[] toArray(Object[] ary) {
         return m_coll.toArray(ary);
     }
-}
 
+    public boolean equals(Object obj) {
+        return m_coll.equals(obj);
+    }
+
+    public int hashCode() {
+        return m_coll.hashCode();
+    }
+}

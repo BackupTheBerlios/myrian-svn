@@ -1,11 +1,11 @@
 package com.redhat.persistence.jdo;
 
 import com.redhat.persistence.Session;
-import com.redhat.persistence.jdo.C;
 import com.redhat.persistence.jdo.PersistenceManagerImpl;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
  * MapTest
  *
  * @since 2004-07-13
- * @version $Revision: #6 $ $Date: 2004/07/28 $
+ * @version $Revision: #7 $ $Date: 2004/08/11 $
  **/
 public class MapTest extends WithTxnCase {
     private final static Logger s_log = Logger.getLogger(MapTest.class);
@@ -106,9 +106,19 @@ public class MapTest extends WithTxnCase {
         Map idx = m_mag.getIndex();
         assertFalse("empty", idx.isEmpty());
         idx.clear();
-        // XXX: remove flushAll once debugged
-        m_ssn.flushAll();
         assertEquals("size", 0, idx.size());
     }
 
+    public void testEquals() {
+        Map map = new HashMap();
+        map.putAll(m_mag.getIndex());
+        assertEquals("map.equals(m_mag.getIndex())", map, m_mag.getIndex());
+        assertEquals("m_mag.getIndex().equals(map)", m_mag.getIndex(), map);
+    }
+
+    public void testHashCode() {
+        Map map = new HashMap();
+        map.putAll(m_mag.getIndex());
+        assertEquals("hash codes", map.hashCode(), m_mag.getIndex().hashCode());
+    }
 }

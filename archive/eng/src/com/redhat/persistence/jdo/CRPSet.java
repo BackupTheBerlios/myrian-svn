@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
  * CRPSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/07/14 $
+ * @version $Revision: #7 $ $Date: 2004/08/11 $
  **/
 
 class CRPSet extends CRPCollection implements Set {
@@ -48,10 +48,6 @@ class CRPSet extends CRPCollection implements Set {
     }
 
     public boolean add(Object o) {
-        if (s_log.isDebugEnabled()) {
-            s_log.debug("CRPSet.add: " + o);
-        }
-
         PersistenceManagerImpl pmi =
             (PersistenceManagerImpl) JDOHelper.getPersistenceManager(m_object);
 
@@ -88,4 +84,27 @@ class CRPSet extends CRPCollection implements Set {
         }
     }
 
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Set)) { return false; }
+
+        Set set = (Set) obj;
+
+        if (size() != set.size()) { return false; }
+
+        for (Iterator it=iterator(); it.hasNext(); ) {
+            if (!set.contains(it.next())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public int hashCode() {
+        int result = 0;
+        for (Iterator it=iterator(); it.hasNext(); ) {
+            Object elem = it.next();
+            result += elem == null ? 0 : elem.hashCode();
+        }
+        return result;
+    }
 }
