@@ -15,14 +15,15 @@
 model com.arsdigita.ui.admin;
 
 query AllNoParentGroups {
-  do {
-    select group_id
-       from groups
-     where group_id not in (select subgroup_id
-                                            from group_subgroup_map)
-  } map {
-    groupID = group_id;
-  }
+    BigDecimal groupID;
+    do {
+        select group_id
+          from groups
+         where group_id not in (select subgroup_id
+                                  from group_subgroup_map)
+    } map {
+        groupID = group_id;
+    }
 }
 
 // Retrieve subgroup count for giving group id
@@ -42,6 +43,10 @@ query SubGroupCount {
 // of three separate queries, one to retrieve person name, one to 
 // retrieve user email, and one to retrieve user information.
 query RetrieveAllUsersInfo {
+    BigDecimal userID;
+    String userDisplayName;
+    String userScreenName;
+    String userPrimaryEmail;
   do {
     select acs_objects.object_id, 
            acs_objects.display_name, 

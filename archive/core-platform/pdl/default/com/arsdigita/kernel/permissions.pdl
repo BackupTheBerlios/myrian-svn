@@ -24,11 +24,11 @@ import com.arsdigita.kernel.*;
 // MDSQL does not correctly handle multiple keys
 //
 object type Permission {
-    BigDecimal[1..1] objectId = acs_permissions.object_id;
-    BigDecimal[1..1] partyId = acs_permissions.grantee_id;
-    String[1..1]     privilege = acs_permissions.privilege;
-    Date[1..1]       creationDate = acs_permissions.creation_date;
-    String[0..1]     creationIP = acs_permissions.creation_ip;
+    BigDecimal[1..1] objectId = acs_permissions.object_id INTEGER;
+    BigDecimal[1..1] partyId = acs_permissions.grantee_id INTEGER;
+    String[1..1]     privilege = acs_permissions.privilege VARCHAR(100); 
+    Date[1..1]       creationDate = acs_permissions.creation_date TIMESTAMP;
+    String[0..1]     creationIP = acs_permissions.creation_ip VARCHAR(50);
 
     ACSObject[1..1]  object;
     Party[1..1]      party;
@@ -576,7 +576,7 @@ object type Privilege {
 // ObjectContext
 //
 object type ObjectContext {
-    BigDecimal[1..1] objectId = object_context.object_id;
+    BigDecimal[1..1] objectId = object_context.object_id INTEGER;
 
     ACSObject[1..1] object = join object_context.object_id 
                                to acs_objects.object_id;
@@ -612,9 +612,9 @@ object type ObjectContext {
 
 
 object type ParameterizedPrivilege {
-    String[1..1] basePrivilege = parameterized_privileges.base_privilege;
-    String[1..1] paramKey = parameterized_privileges.param_key;
-    String[0..1] paramName = parameterized_privileges.param_name;
+    String[1..1] basePrivilege = parameterized_privileges.base_privilege VARCHAR(100);
+    String[1..1] paramKey = parameterized_privileges.param_key VARCHAR(100);
+    String[0..1] paramName = parameterized_privileges.param_name VARCHAR(100);
 
     object key (paramKey, basePrivilege);
 

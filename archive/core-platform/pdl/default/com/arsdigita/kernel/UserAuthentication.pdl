@@ -15,12 +15,12 @@
 model com.arsdigita.kernel;
 
 object type UserAuthentication {
-    BigDecimal id = user_authentication.auth_id;
-    String[1..1] loginName = parties.primary_email;
-    String[1..1] password = user_authentication.password;
-    String salt = user_authentication.salt;
-    String passwordQuestion = user_authentication.password_question;
-    String passwordAnswer = user_authentication.password_answer;
+    BigDecimal id = user_authentication.auth_id INTEGER;
+    String[1..1] loginName = parties.primary_email VARCHAR(100);
+    String[1..1] password = user_authentication.password VARCHAR(100);
+    String salt = user_authentication.salt VARCHAR(100);
+    String passwordQuestion = user_authentication.password_question VARCHAR(1000);
+    String passwordAnswer = user_authentication.password_answer VARCHAR(1000);
     User[1..1] user = join user_authentication.user_id to users.user_id;
 
     object key(id);
