@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/UserAuthentication.pdl#11 $
-// $DateTime: 2003/07/17 18:48:29 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/UserAuthentication.pdl#12 $
+// $DateTime: 2003/07/17 23:34:29 $
 
 model com.arsdigita.kernel;
 
@@ -27,7 +27,7 @@ object type UserAuthentication {
     User[1..1] user = join user_authentication.user_id to users.user_id;
 
     object key(id);
-    UserAuthentication[1..1] party =
+    Party[1..1] party =
         join user_authentication.auth_id to parties.party_id;
 
     // MDSQL also deletes from parties
