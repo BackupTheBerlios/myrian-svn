@@ -10,6 +10,9 @@ Functionality:
  * Weak refs
  * Compound keys
  * Exceptions
+ * type checks for PropertyEvent
+ * null/"" handling (maybe: DOI.set converts ""-> null. Session disallows "".)
+ * throwing appropriate exceptions save()
  * Disconnected data
  * Auto-detect two wayness and warn
  * Better connection source
