@@ -10,27 +10,38 @@ import javax.jdo.spi.*;
 
 import org.xml.sax.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * JDOHandler
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/09/24 $
+ * @version $Revision: #5 $ $Date: 2004/09/27 $
  **/
 
 class JDOHandler extends ReflectionHandler {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/JDOHandler.java#4 $ by $Author: rhs $, $DateTime: 2004/09/24 08:05:38 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/jdo/JDOHandler.java#5 $ by $Author: vadim $, $DateTime: 2004/09/27 14:37:02 $";
+    private final static Logger s_log = Logger.getLogger(JDOHandler.class);
+
+    private final static byte P_MOD_NONE          = (byte) 0;
+    private final static byte P_MOD_PERSISTENT    = (byte) 1;
+    private final static byte P_MOD_TRANSACTIONAL = (byte) P_MOD_PERSISTENT << 1;
+    private final static byte P_MOD_DEFAULT       = (byte) P_MOD_PERSISTENT << 2;
+
+    private final static String INDENT = "    ";
 
     private ClassLoader m_loader;
     private String m_resource;
-    private Locator m_locator = null
-;
+    private Locator m_locator = null;
     private String m_package = null;
 
     private Class m_class = null;
     private Class m_super = null;
     private List m_keys = new ArrayList();
     private boolean m_embeddedClass = false;
+    private byte m_persistenceModifier = P_MOD_DEFAULT;
+
     private boolean m_generate = true;
     private int m_line = -1;
 
@@ -166,6 +177,30 @@ class JDOHandler extends ReflectionHandler {
         }
     }
 
+    private static byte pModFlag(String flag) {
+        if (flag == null || "".equals(flag) ) {
+            return P_MOD_DEFAULT;
+        }
+        final String lcase = flag.toLowerCase();
+        if ("none".equals(lcase)) {
+            return P_MOD_NONE;
+        } else if ("transactional".equals(lcase)) {
+            return P_MOD_TRANSACTIONAL;
+        } else if ("persistent".equals(lcase)) {
+            return P_MOD_PERSISTENT;
+        } else {
+            throw new IllegalStateException("unknown modifier: " + flag);
+        }
+    }
+
+    private static boolean isPModPersistent(byte flag) {
+        return (P_MOD_PERSISTENT & flag) > 0;
+    }
+
+    private static boolean isPModDefault(byte flag) {
+        return (P_MOD_DEFAULT & flag) > 0;
+    }
+
     public void handleEmbedded(String value) {
         m_embeddedClass = isTrue(value, false);
     }
@@ -182,13 +217,13 @@ class JDOHandler extends ReflectionHandler {
 
     public void startField(Attributes attributes) {
         String name = attributes.getValue("name");
-        String modifier = attributes.getValue("persistence-modifier");
         String primary = attributes.getValue("primary-key");
         String nullValue = attributes.getValue("null-value");
         String fetch = attributes.getValue("default-fetch-group");
         String embedded = attributes.getValue("embedded");
         m_embedded = isTrue(embedded, false);
-
+        m_persistenceModifier =
+            pModFlag(attributes.getValue("persistence-modifier"));
         try {
             m_field = m_class.getDeclaredField(name);
         } catch (NoSuchFieldException e) {
@@ -338,15 +373,16 @@ class JDOHandler extends ReflectionHandler {
     }
 
     public void endField() {
-        String type;
+        final String type;
         if (m_key == null) {
             type = pdlType(m_type);
         } else {
             type = MapEntry.class.getName() +
                 "<" + pdlType(m_key) + ", " + pdlType(m_value) + ">";
         }
+
         StringBuffer pdl = new StringBuffer();
-        pdl.append("    ");
+        pdl.append(INDENT);
         if (m_key != null) { pdl.append("component "); }
         pdl.append(type);
         if (m_required || m_collection) {
@@ -354,6 +390,14 @@ class JDOHandler extends ReflectionHandler {
                        (m_collection ? "n" : "1") + "]");
         }
         String field = m_field.getName();
+
+        if (!isPModDefault(m_persistenceModifier) &&
+            !isPModPersistent(m_persistenceModifier)) {
+
+            m_fields.put(m_field, INDENT + "// ignored: " + type + " " + field);
+            return;
+        }
+
         pdl.append(" " + field);
         if (isList(m_field)) { pdl.append("$elements"); }
         if (m_key != null) { pdl.append("$entries"); }
@@ -417,7 +461,7 @@ class JDOHandler extends ReflectionHandler {
                 }
                 if (isPersistent(field)) {
                     StringBuffer pdl = new StringBuffer();
-                    pdl.append("    " + pdlType(field.getType()) + " " +
+                    pdl.append(INDENT + pdlType(field.getType()) + " " +
                                field.getName());
                     if (!m_embeddedClass) {
                         pdl.append(" = ");

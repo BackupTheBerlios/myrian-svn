@@ -13,12 +13,12 @@ import javax.jdo.spi.*;
  * SchemaLoader
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/09/24 $
+ * @version $Revision: #3 $ $Date: 2004/09/27 $
  **/
 
 public class SchemaLoader {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/tools/SchemaLoader.java#2 $ by $Author: rhs $, $DateTime: 2004/09/24 08:26:32 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/tools/SchemaLoader.java#3 $ by $Author: vadim $, $DateTime: 2004/09/27 14:37:02 $";
 
     private static void die(String message) {
         System.err.println(message);
@@ -84,7 +84,6 @@ public class SchemaLoader {
             for (Iterator it = nonpc.iterator(); it.hasNext(); ) {
                 System.err.println("not persistence capable: " + it.next());
             }
-            System.exit(1);
         }
 
         System.out.print((load ? "L" : "Unl") + "oading schema...");
