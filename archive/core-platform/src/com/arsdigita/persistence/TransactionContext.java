@@ -29,12 +29,12 @@ import org.apache.log4j.Logger;
  * Description: The TransactionContext class encapsulates a database transaction.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/05/27 $
+ * @version $Revision: #12 $ $Date: 2003/06/10 $
  */
 
 public class TransactionContext {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/TransactionContext.java#11 $ by $Author: ashah $, $DateTime: 2003/05/27 15:53:12 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/TransactionContext.java#12 $ by $Author: jorris $, $DateTime: 2003/06/10 10:53:05 $";
 
     private static final Logger s_cat =
         Logger.getLogger(TransactionContext.class);
@@ -86,6 +86,7 @@ public class TransactionContext {
         boolean success = false;
         try {
             fireBeforeCommitEvent();
+            m_ssn.flush();
             m_ossn.invalidateDataObjects(true, false);
             m_ssn.commit();
             success = true;
@@ -106,6 +107,7 @@ public class TransactionContext {
         boolean success = false;
         try {
             fireBeforeCommitEvent();
+            m_ssn.flush();
             m_ossn.invalidateDataObjects(true, false);
             r.run();
             success = true;
