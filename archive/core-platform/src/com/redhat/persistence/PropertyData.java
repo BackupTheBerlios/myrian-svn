@@ -26,12 +26,12 @@ import java.util.List;
  * PropertyData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/10/28 $
+ * @version $Revision: #4 $ $Date: 2003/11/26 $
  **/
 
 class PropertyData {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/PropertyData.java#3 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/PropertyData.java#4 $ by $Author: ashah $, $DateTime: 2003/11/26 20:16:05 $";
 
     final private ObjectData m_odata;
     final private Property m_prop;
@@ -61,6 +61,11 @@ class PropertyData {
     }
 
     public void setValue(Object value) {
+        if (getProperty().isCollection()) {
+            throw new IllegalStateException
+                ("setting value of collections is not allowed. "
+                 + "property: " + m_prop + " value: " + value);
+        }
         m_value = value;
     }
 

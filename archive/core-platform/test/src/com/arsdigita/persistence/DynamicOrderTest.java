@@ -19,12 +19,12 @@ package com.arsdigita.persistence;
  * PartyTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/08/15 $
+ * @version $Revision: #5 $ $Date: 2003/11/26 $
  */
 
 public class DynamicOrderTest extends OrderTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DynamicOrderTest.java#4 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DynamicOrderTest.java#5 $ by $Author: ashah $, $DateTime: 2003/11/26 20:16:05 $";
 
     public DynamicOrderTest(String name) {
         super(name);
@@ -40,4 +40,12 @@ public class DynamicOrderTest extends OrderTest {
         return "mdsql";
     }
 
+    public void testAddPathThroughCollection() {
+        DataObject order = makeOrder(3);
+        DataCollection dc = getSession().retrieve(getModelName() + ".Order");
+        dc.addPath("items.name");
+        dc.addFilter("id = items.id");
+        dc.next();
+        assertEquals(dc.get("id"), dc.get("items.id"));
+    }
 }

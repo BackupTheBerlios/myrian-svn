@@ -25,12 +25,12 @@ import java.sql.SQLException;
  * Test
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #13 $ $Date: 2003/08/15 $
+ * @version $Revision: #14 $ $Date: 2003/11/26 $
  */
 
 public abstract class OrderTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderTest.java#13 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderTest.java#14 $ by $Author: ashah $, $DateTime: 2003/11/26 20:16:05 $";
 
     public OrderTest(String name) {
         super(name);
@@ -288,7 +288,7 @@ public abstract class OrderTest extends PersistenceTestCase {
 
     }
 
-    private DataObject makeOrder(int numItems) {
+    protected DataObject makeOrder(int numItems) {
         Session ssn = getSession();
         DataObject order = ssn.create(getModelName() + ".Order");
 
