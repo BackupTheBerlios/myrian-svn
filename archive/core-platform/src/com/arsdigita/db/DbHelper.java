@@ -276,7 +276,7 @@ public class DbHelper {
 
         switch (getDatabase()) {
         case DB_POSTGRES:
-            result = s.substring(0, maxLength);
+            result = s.substring(0, maxLength-1);
             break;
         case DB_ORACLE:
             byte sBytes[] = s.getBytes();
