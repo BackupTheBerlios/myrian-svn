@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Red Hat Inc. All Rights Reserved.
+ * Copyright (C) 2003-2004 Red Hat Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
@@ -28,14 +28,14 @@ import org.apache.log4j.Logger;
  * InFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/10/28 $
+ * @version $Revision: #8 $ $Date: 2004/02/26 $
  **/
 
 class InFilter extends FilterImpl implements Filter {
 
     private static Logger s_log = Logger.getLogger(InFilter.class);
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/InFilter.java#7 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/InFilter.java#8 $ by $Author: vadim $, $DateTime: 2004/02/26 12:36:40 $";
 
     private Root m_root;
     private String m_prop;
@@ -88,10 +88,14 @@ class InFilter extends FilterImpl implements Filter {
                 (m_root, block, "no such path: " + subProp);
         }
 
-        return "exists ( select RAW[subquery_id] from (select RAW[" +
-            subcol.getPath() + "] as RAW[subquery_id] from (" +
-            m_query + ") RAW[insub1] ) RAW[insub2] where " +
-            "RAW[insub2.subquery_id] = " + m_prop + ")";
+        final StringBuffer sb = new StringBuffer();
+        sb.append("exisTs ( select RAW[subquery_id] from (select RAW[");
+        sb.append(subcol.getPath());
+        sb.append("] as RAW[subquery_id] from (");
+        sb.append(m_query);
+        sb.append(") RAW[insub1] ) RAW[insub2] where ");
+        sb.append("RAW[insub2.subquery_id] = ");
+        sb.append(m_prop).append(")");
+        return sb.toString();
     }
-
 }
