@@ -110,7 +110,7 @@ run-tests: $(JSTAMPS)
 	bin/run-tests
 
 jdo-tests: $(JSTAMPS)
-	bin/run com.redhat.persistence.TestRunner com.redhat.persistence.jdotest.SimpleTest
+	bin/run com.redhat.persistence.TestRunner com.redhat.persistence.jdotest.JDOSuite
 
 pandora-tests: $(JSTAMPS)
 	bin/run -Djdbc.drivers=$(DRIVERS) com.redhat.persistence.jdotest.PandoraTest test
