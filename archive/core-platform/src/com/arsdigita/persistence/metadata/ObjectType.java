@@ -35,12 +35,12 @@ import com.arsdigita.persistence.DataHandler;
  * be marked as special "key" properties.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2002/10/16 $
+ * @version $Revision: #10 $ $Date: 2002/10/16 $
  **/
 
 public class ObjectType extends CompoundType {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#9 $ by $Author: rhs $, $DateTime: 2002/10/16 16:22:05 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#10 $ by $Author: richardl $, $DateTime: 2002/10/16 17:34:15 $";
 
     private static boolean m_optimizeDefault = true;
 
@@ -514,7 +514,7 @@ public class ObjectType extends CompoundType {
 
 
     /**
-     * @see isSubtypeOf(ObjectType)
+     * @see #isSubtypeOf(ObjectType)
      **/
 
     public boolean isSubtypeOf(String qualifiedName) {
