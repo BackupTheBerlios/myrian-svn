@@ -13,12 +13,12 @@ import java.io.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #26 $ $Date: 2003/05/07 $
+ * @version $Revision: #27 $ $Date: 2003/05/12 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#26 $ by $Author: rhs $, $DateTime: 2003/05/07 09:50:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#27 $ by $Author: rhs $, $DateTime: 2003/05/12 11:56:45 $";
 
     private static final HashMap SOURCES = new HashMap();
     private static final HashMap BLOCKS = new HashMap();
@@ -159,7 +159,9 @@ class QGen {
         }
 
         String result = candidate;
-        for (int attempt = 1; m_aliases.values().contains(result); attempt++) {
+        for (int attempt = 1;
+             m_aliases.values().contains(Path.get(result));
+             attempt++) {
             String id = "" + attempt;
             result = candidate.substring
                 (0, Math.min(candidate.length(), limit - id.length())) + id;
