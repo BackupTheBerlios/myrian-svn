@@ -21,12 +21,12 @@ import java.util.HashMap;
  * Path
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/10/28 $
+ * @version $Revision: #4 $ $Date: 2004/02/18 $
  **/
 
 public class Path {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#3 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#4 $ by $Author: vadim $, $DateTime: 2004/02/18 17:12:14 $";
 
     private static final HashMap PATHS = new HashMap();
 
@@ -78,7 +78,7 @@ public class Path {
         } else if (p2 == null) {
             return p1;
         } else {
-            return Path.get(p1.getPath() + "." + p2.getPath());
+            return Path.get(concat(p1.getPath(),p2.getPath()));
         }
     }
 
@@ -122,7 +122,7 @@ public class Path {
             if (parent == null) {
                 return path.getName();
             } else {
-                return parent + "." + path.getName();
+                return concat(parent, path.getName());
             }
         }
     }
@@ -139,7 +139,7 @@ public class Path {
         if (m_parent == null) {
             return m_name;
         } else {
-            return m_parent + "." + m_name;
+            return concat(m_parent.getPath(), m_name);
         }
     }
 
@@ -147,4 +147,11 @@ public class Path {
         return getPath();
     }
 
+
+    // both params are guaranteed to be non-null
+    private static String concat(String s1, String s2) {
+        StringBuffer sb = new StringBuffer(s1.length() + s2.length() + 1);
+        sb.append(s1).append(".").append(s2);
+        return sb.toString();
+    }
 }
