@@ -234,7 +234,9 @@ public class QueryTest extends AbstractCase {
         for (int i = 0; i < c.length; i++) {
             for (int j = 0; j < it[i].length; j++) {
                 it[i][j] = c[i].iterator();
-                it[i][j].next();
+                if (j == 0) {
+                    it[i][j].next();
+                }
             }
         }
 
