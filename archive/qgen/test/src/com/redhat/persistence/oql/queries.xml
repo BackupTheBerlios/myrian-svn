@@ -997,4 +997,12 @@
       <row id="3" name="Three" p2.id="23" p2.name="Twenty Three"/>
     </results>
   </test>
+
+  <test name="FilterParens">
+    <query fetched="id">
+      query(filter(filter(all(test.A), id == 0),
+                   1 == id and (id == 0 or 1 == id)), id = id)
+    </query>
+    <results></results>
+  </test>
 </tests>
