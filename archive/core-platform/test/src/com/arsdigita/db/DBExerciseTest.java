@@ -32,7 +32,7 @@ import java.sql.SQLException;
 
 public class DBExerciseTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DBExerciseTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DBExerciseTest.java#4 $ by $Author: randyg $, $DateTime: 2002/08/15 18:18:25 $";
 
     private static java.sql.Connection conn;
 
@@ -60,14 +60,21 @@ public class DBExerciseTest extends TestCase {
         TestSetup wrapper = new TestSetup(suite) {
                 public void setUp() throws SQLException {
                     conn = ConnectionManager.getConnection();
+                    java.sql.PreparedStatement tableStmt = null;
 
-                    java.sql.PreparedStatement tableStmt =
-                        conn.prepareStatement(
-                                              "create table db_test (\n" +
-                                              "    theId          integer primary key,\n" +
-                                              "    aBlob          blob\n" +
-                                              ")");
-
+                    if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+                        tableStmt = conn.prepareStatement
+                            ("create table db_test (\n" +
+                             "    theId          integer primary key,\n" +
+                             "    aBlob          bytea\n" +
+                             ")");
+                    } else {
+                        tableStmt = conn.prepareStatement
+                            ("create table db_test (\n" +
+                             "    theId          integer primary key,\n" +
+                             "    aBlob          blob\n" +
+                             ")");
+                    }
                     tableStmt.executeUpdate();
                     tableStmt.close();
                 }
@@ -94,7 +101,7 @@ public class DBExerciseTest extends TestCase {
                 conn.prepareStatement("insert into db_test\n" +
                                       "(theId, aBlob)\n" +
                                       "values\n" +
-                                      "(1,?)");
+                                      "(?,?)");
 
             // might not be the right location
             File blobFile = new File(dirRoot, blobFileName);
@@ -105,7 +112,8 @@ public class DBExerciseTest extends TestCase {
             in.readFully(blobBytes);
             in.close();
 
-            blobInsertStmt.setBytes(1,blobBytes);
+            blobInsertStmt.setInt(1, 1);
+            blobInsertStmt.setBytes(2,blobBytes);
             blobInsertStmt.executeUpdate();
             blobInsertStmt.close();
 
@@ -117,9 +125,14 @@ public class DBExerciseTest extends TestCase {
             java.sql.ResultSet rs = blobRetrieveStmt.executeQuery();
 
             if (rs.next()) {
-                java.sql.Blob blob = rs.getBlob(1);
-                long blobSize = blob.length();
-                assertEquals(fileSize, blobSize);
+                long size = 0;
+                if (DbHelper.getDatabase() == DbHelper.DB_POSTGRES) {
+                    size = (new Integer(rs.getBytes(1).length)).longValue();
+                } else {
+                    java.sql.Blob blob = rs.getBlob(1);
+                    size = blob.length();
+                }
+                assertEquals(fileSize, size);
             } else {
                 fail("Didn't find row we just inserted");
             }
@@ -127,6 +140,7 @@ public class DBExerciseTest extends TestCase {
             blobRetrieveStmt.close();
 
         } catch (Exception e) {
+            e.printStackTrace();
             fail(e.getMessage());
         }
     }

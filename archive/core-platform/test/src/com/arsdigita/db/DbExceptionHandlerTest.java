@@ -29,7 +29,7 @@ import java.sql.SQLException;
  */
 public class DbExceptionHandlerTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DbExceptionHandlerTest.java#3 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DbExceptionHandlerTest.java#4 $";
 
     private static java.sql.Connection conn;
 
@@ -54,8 +54,7 @@ public class DbExceptionHandlerTest extends TestCase {
         java.sql.PreparedStatement tableStmt =
             conn.prepareStatement(
                                   "create table db_test (\n" +
-                                  "    theId          integer primary key,\n" +
-                                  "    aBlob          blob\n" +
+                                  "    theId          integer primary key\n" +
                                   ")");
 
         tableStmt.executeUpdate();
@@ -108,8 +107,10 @@ public class DbExceptionHandlerTest extends TestCase {
             } catch (DbNotAvailableException err) {
                 // good
             } catch (SQLException err) {
+                throw new com.arsdigita.util.UncheckedWrapperException(err);
+                /*
                 fail("Setting garbage connection info should have caused " +
-                     "DbNotAvailableException, instead caused " + err);
+                "DbNotAvailableException, instead caused " + err);*/
             }
         }
 

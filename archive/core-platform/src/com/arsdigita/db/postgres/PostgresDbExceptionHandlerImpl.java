@@ -30,12 +30,12 @@ import java.sql.PreparedStatement;
  * Class for processing of Postgres DB Exceptions.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #4 $
+ * @version $Revision: #5 $
  * @since 4.6
  */
 public class PostgresDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresDbExceptionHandlerImpl.java#4 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresDbExceptionHandlerImpl.java#5 $";
 
     static {
         errors.put("Cannot insert a duplicate key into unique index",
@@ -48,6 +48,9 @@ public class PostgresDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
         errors.put("Something unusual has occured to cause the driver to fail.",
                    com.arsdigita.db.DbNotAvailableException.class);
         errors.put("No suitable driver", com.arsdigita.db.DbNotAvailableException.class);
+
+        errors.put("The user property is missing", com.arsdigita.db.DbNotAvailableException.class);
+
     }
 
 }
