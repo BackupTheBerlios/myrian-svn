@@ -27,15 +27,19 @@ import org.apache.log4j.Logger;
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
  * @author Randy Graebner &lt;randyg@alum.mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/11/25 $
+ * @version $Revision: #3 $ $Date: 2003/11/26 $
  **/
 
 public final class Files {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Files.java#2 $ by $Author: randyg $, $DateTime: 2003/11/25 12:56:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Files.java#3 $ by $Author: dennis $, $DateTime: 2003/11/26 18:09:02 $";
 
     private static final Logger s_log = 
         Logger.getLogger(Files.class);
+
+    public final static int OVERWRITE = 0;
+    public final static int UPDATE = 1;
+    public final static int IGNORE_EXISTING = 2;
 
     private Files() {}
 
@@ -51,6 +55,10 @@ public final class Files {
     }
 
     public static void copy(File from, File to) throws IOException {
+        copy(from,to,OVERWRITE);
+    }
+
+    public static void copy(File from, File to, int mode) throws IOException {
         if (to.isDirectory()) {
             to = new File(to, from.getName());
         }
@@ -60,7 +68,16 @@ public final class Files {
             if (!(to.exists() && to.isDirectory())) {
                 throw new IOException("couldn't make directory: " + to);
             }
+            File[] files = from.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                copy(files[i], to, mode);
+            }
         } else {
+            if (to.exists()) {
+                if ( mode == IGNORE_EXISTING ) { return; }
+                if ( mode == UPDATE &&
+                     to.lastModified() > from.lastModified() ) { return; }
+            }
             InputStream is = new FileInputStream(from);
             OutputStream os = new FileOutputStream(to);
             byte[] buf = new byte[64*1024];
@@ -70,13 +87,6 @@ public final class Files {
             }
             os.close();
             is.close();
-        }
-
-        if (from.isDirectory()) {
-            File[] files = from.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                copy(files[i], to);
-            }
         }
     }
 
