@@ -21,16 +21,19 @@ import org.apache.commons.beanutils.*;
 import org.apache.commons.beanutils.converters.*;
 
 /**
- * Subject to change.
+ * Subject to Change
+ *
+ * This encapsulates the information for a single parameter.  This is
+ * typically created and populated by a ParameterRecord
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#5 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#6 $
  */
 public final class ParameterValue {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#5 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/09/23 14:39:23 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#6 $" +
+        "$Author: randyg $" +
+        "$DateTime: 2003/10/10 16:04:50 $";
 
     private final ArrayList m_errors;
     private String m_string;
