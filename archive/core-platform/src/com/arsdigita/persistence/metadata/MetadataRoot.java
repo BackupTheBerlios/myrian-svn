@@ -28,12 +28,12 @@ import com.arsdigita.db.DbHelper;
  * metadata system.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2002/08/15 $
+ * @version $Revision: #12 $ $Date: 2002/09/03 $
  **/
 
 public class MetadataRoot extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#11 $ by $Author: randyg $, $DateTime: 2002/08/15 17:48:20 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#12 $ by $Author: randyg $, $DateTime: 2002/09/03 09:35:24 $";
 
     private static final Logger s_cat = Logger.getLogger(MetadataRoot.class.getName());
 
@@ -411,8 +411,15 @@ public class MetadataRoot extends Element {
                         byte[] bytes = (byte[]) value;
                         // This is supported by the oracle OCI driver and the PG driver
                         // http://www.oradoc.com/ora816/java.816/a81354/oralob2.htm#1058119
-                        ps.setBinaryStream(index, new ByteArrayInputStream(bytes),
-                                           bytes.length);
+                        //System.out.println("index = " + index);
+                        //System.out.println("bytes = " + bytes);
+                        //System.out.println("lenxx= " + bytes.length);
+                        byte[] l_bytes = new byte[bytes.length];
+                        int l_bytesRead;
+                        l_bytesRead = (new ByteArrayInputStream(bytes)).read(l_bytes, 0, bytes.length);
+                        //                        ps.setBinaryStream(index, new ByteArrayInputStream(bytes),
+                        //                                           bytes.length);
+                        ps.setBytes(index, bytes);
                         return 1;
                     } else {
                         return 0;
