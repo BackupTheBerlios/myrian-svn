@@ -32,12 +32,12 @@ import org.apache.log4j.Logger;
  * PersistenceTestCase
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/06/07 $
+ * @version $Revision: #2 $ $Date: 2004/08/17 $
  */
 
 public class PersistenceTestCase extends TestCase {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PersistenceTestCase.java#1 $ by $Author: rhs $, $DateTime: 2004/06/07 13:49:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/PersistenceTestCase.java#2 $ by $Author: rhs $, $DateTime: 2004/08/17 17:45:09 $";
 
     private static final Logger LOG =
         Logger.getLogger(PersistenceTestCase.class);
@@ -163,6 +163,10 @@ public class PersistenceTestCase extends TestCase {
 
     protected Session getSession() {
         return m_session;
+    }
+
+    protected com.redhat.persistence.Session getProtoSession() {
+        return m_session.getProtoSession();
     }
 
     protected RDBMSEngine getEngine() {
