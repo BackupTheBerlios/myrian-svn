@@ -2,7 +2,7 @@
 
 # Author:  Vadim Nasardinov (vadimn@redhat.com)
 # Since:   2004-09-28
-# Version: $Id: //eng/persistence/dev/bin/rename-package.py#3 $
+# Version: $Id: //eng/persistence/dev/bin/rename-package.py#4 $
 
 '''Usage:
     $ rename-package.py --from <old-package-name> --to <new-package-name> <dir1> [<dir2> ...]
@@ -17,39 +17,48 @@ from os.path import join, isdir, isfile, splitext, walk
 class Config:
     '''Represents command-line options'''
 
-    def __init__(self, script, opts):
-        self._script = script
+    def __init__(self):
+        from optparse import OptionParser, OptionGroup
+        self._script = sys.argv[0]
+        usage = "\n\t%prog [options] dir1 [dir2 ...]"
+        parser = OptionParser(usage)
+        self._parser = parser
+        u_opts = OptionGroup(parser, "User options",
+                             "User-facing options.")
 
-        import getopt
-        hash = {}
-        flags = ["from=", "to=", "help", "replace"]
-        (options, self._paths) = getopt.getopt(opts, "", flags)
-        if not options:
-            display_help_and_exit()
+        u_opts.add_option("-f", "--from", dest="from_pkg",
+                          metavar="FROM_PKG",
+                          help="[required] (Part of) a java package name that" +
+                          " you'd like to rename, e.g. 'com.arsdigita'")
+        u_opts.add_option("-t", "--to", dest="to_pkg", metavar="TO_PKG",
+                          help="[required] The new (possibly partial) java" +
+                          "package name to which FROM_PKG is to be renamed," +
+                          " e.g. 'org.acme'.")
+        parser.add_option_group(u_opts)
+        special = OptionGroup(parser, "Special options",
+                              "Only used by auto-generated shell scripts." +
+                              " Do not use, unless you know what you're doing.")
+        special.add_option("-r", "--replace", action="store_true",
+                           dest="replace",
+                           help="Actually edit the supplied file in place.")
+        parser.add_option_group(special)
+
+        (options, self._paths) = parser.parse_args()
 
         if len(self._paths) == 0:
-            print "Error: No paths given.\n"
-            display_help_and_exit()
+            self.error("Error: No paths given.")
 
-        for (key, value) in options:
-            # an option starts with "--" and possibly ends in "="
-            hash[key[2:].rstrip("=")] = value
+        self._from_pkg = options.from_pkg
+        self._to_pkg   = options.to_pkg
+        self._replace_option = options.replace
 
-        self._from_pkg = hash["from"]
-        self._to_pkg   = hash["to"]
-        self._help = hash.has_key("help")
-
-        self._replace_option = hash.has_key("replace")
-
-        if self.replace_requested():
+        if options.replace:
             if not isfile(self.get_fname()):
-                print "Error: %s is not a file\n" % self.get_fname()
-                display_help_and_exit()
+                self.error("Error: %s is not a file." % self.get_fname())
         else:
             for dd in self._paths:
                 if not isdir(dd):
-                    print "Error:", dd, "is not a directory.\n"
-                    display_help_and_exit()
+                    self.error("Error:", dd, "is not a directory.")
 
     def get_script(self):
         return self._script
@@ -66,12 +75,8 @@ class Config:
     def get_to_dir(self):
         return self._to_pkg.replace(".", "/")
 
-    def help_requested(self):
-        return self._help
-
     def replace_requested(self):
         return self._replace_option
-
 
     def get_fname(self):
         if self.replace_requested():
@@ -85,10 +90,8 @@ class Config:
         else:
             return list(self._paths)
 
-
-def display_help_and_exit():
-    print __doc__
-    sys.exit(0)
+    def error(self, msg):
+        self._parser.error("%s\nTry\n\t%s --help" % (msg, self._script))
 
 def ext_filter(extension):
     return lambda fname: fname.endswith(extension)
@@ -177,12 +180,10 @@ def generate_script(config):
 def edit_in_place(config):
     fname = config.get_fname()
     if not isfile(fname):
-        print "Error: %s is not a file" % fname
-        display_help_and_exit()
+        config.error("Error: %s is not a file." % fname)
 
     if not os.access(fname, os.W_OK):
-        print "Error: %s is not writable" % fname
-        display_help_and_exit()
+        config.error("Error: %s is not writable." % fname)
 
     from_pkg = config.get_from_pkg()
     to_pkg   = config.get_to_pkg()
@@ -196,9 +197,7 @@ def edit_in_place(config):
         print line
 
 if __name__ == '__main__':
-    config = Config(sys.argv[0], sys.argv[1:])
-    if config.help_requested():
-        display_help_and_exit()
+    config = Config()
     if config.replace_requested():
         import fileinput
         edit_in_place(config)
