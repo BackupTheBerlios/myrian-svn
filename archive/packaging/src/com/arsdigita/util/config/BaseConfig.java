@@ -31,13 +31,13 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterStore
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#8 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#9 $
  */
 public class BaseConfig {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#8 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/BaseConfig.java#9 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/11 12:29:48 $";
+        "$DateTime: 2003/09/12 19:03:44 $";
 
     private static final Logger s_log = Logger.getLogger
         (BaseConfig.class);
@@ -57,13 +57,14 @@ public class BaseConfig {
 
     /**
      * Constructs a configuration record that uses the Java properties
-     * file referenced by <code>resource</code> as its store.  If no
-     * such resource is found, an empty properties file is used.
+     * file referenced by <code>resource</code> as its store.
      *
      * @param resource The location on the class path of a Java
      * properties file; it cannot be null
+     * @param required Determines whether or not we ignore missing
+     * resources
      */
-    protected BaseConfig(final String resource) {
+    protected BaseConfig(final String resource, final boolean required) {
         Assert.exists(resource, String.class);
 
         final Properties props = new Properties();
@@ -71,9 +72,14 @@ public class BaseConfig {
         final InputStream in = getClass().getResourceAsStream(resource);
 
         if (in == null) {
-            if (s_log.isInfoEnabled()) {
-                s_log.info(resource + " was not found; using an empty " +
-                           "property record");
+            if (required) {
+                throw new ConfigurationError
+                    ("Resource " + resource + " not found; it is required");
+            } else {
+                if (s_log.isInfoEnabled()) {
+                    s_log.info(resource + " was not found; using an empty " +
+                               "property record");
+                }
             }
         } else {
             if (s_log.isDebugEnabled()) {
@@ -89,6 +95,18 @@ public class BaseConfig {
         }
 
         m_store = new JavaPropertyStore(props);
+    }
+
+    /**
+     * Constructs a configuration record that uses the Java properties
+     * file referenced by <code>resource</code> as its store.  If no
+     * such resource is found, an empty properties file is used.
+     *
+     * @param resource The location on the class path of a Java
+     * properties file; it cannot be null
+     */
+    protected BaseConfig(final String resource) {
+        this(resource, false);
     }
 
     /**
