@@ -42,7 +42,7 @@ public class ResourceManager {
     private File m_webappRoot;
     private ServletContext m_servletContext;
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/ResourceManager.java#6 $ by $Author: richardl $, $DateTime: 2002/10/16 14:39:19 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/ResourceManager.java#7 $ by $Author: jorris $, $DateTime: 2003/03/11 16:57:51 $";
 
     /**
      * Empty constructor, which we make private to enforce the singleton
@@ -71,12 +71,15 @@ public class ResourceManager {
      * @param url a URL interpreted as a pathname relative to the webapp root
      * @return a new input stream reading the named file, or null
      * if not found
-     * @exception throws java.lang.IllegalStateException if class is
+     * @exception java.lang.IllegalStateException if class is
      * not configured prior to use.
      */
     public InputStream getResourceAsStream(String url) {
         if (m_webappRoot == null && m_servletContext == null) {
             throw new IllegalStateException(CONFIGURE_MESSAGE);
+        }
+        if (StringUtils.emptyString(url)) {
+            throw new IllegalArgumentException("URL is empty: " + url);
         }
         if (m_servletContext != null) {
             // If we have a Servlet Context, use it.
@@ -89,7 +92,7 @@ public class ResourceManager {
                 // log4j initializer has been run, we test to see whether to
                 // log or print the error message.
                 if (s_log.getAllAppenders().hasMoreElements()) {
-                    s_log.warn(errorMessage);
+                    s_log.error(errorMessage);
                 } else {
                     System.err.println(errorMessage);
                 }
@@ -103,12 +106,41 @@ public class ResourceManager {
                     "\nWebapp Root: " + m_webappRoot;
 
                 if (s_log.getAllAppenders().hasMoreElements()) {
-                    s_log.warn(errorMessage);
+                    s_log.error(errorMessage);
                 } else {
                     System.err.println(errorMessage);
                 }
                 return null;
             }
+        }
+    }
+
+    /**
+     * Gets the full path to a resource.
+     *
+     * Kinda hacky way of making sure that XML file loading works. Many Initializers load XML files from WEB-INF,
+     * and had done so by calling ServletContext.getRealPath(). Problem is, under test, there is no ServletContext.
+     * Swithcing to ResourceManager.getResourceAsStream works so long as there is no DTD. Calling this method gets
+     * the correct path, and lets the parser properly load the file.
+     *
+     * Will probably remove when TestServletContext is always available.
+     *
+     * @param url
+     * @return Full path
+     */
+    public String getResourcePath(String url) {
+        if (m_webappRoot == null && m_servletContext == null) {
+            throw new IllegalStateException(CONFIGURE_MESSAGE);
+        }
+        if (StringUtils.emptyString(url)) {
+            throw new IllegalArgumentException("URL is empty: " + url);
+        }
+
+        if (m_servletContext != null) {
+            return m_servletContext.getRealPath(url);
+        } else {
+            File f = new File(m_webappRoot, url);
+            return f.getAbsolutePath();
         }
     }
 
@@ -121,7 +153,7 @@ public class ResourceManager {
      * @param url a URL interpreted as a pathname relative to the webapp root
      * @return a File object referring to the named resource, or null
      * if not found
-     * @exception throws java.lang.IllegalStateException if class is
+     * @exception java.lang.IllegalStateException if class is
      * not configured prior to use.
      */
     public File getResourceAsFile(String url) {
@@ -175,7 +207,7 @@ public class ResourceManager {
      * 0L if this isn't available (within a WAR file, for example),
      * the file isn't found, or there's an I/O error.  This is consistent
      * with File.lastModified.
-     * @exception throws java.lang.IllegalStateException if class is
+     * @exception java.lang.IllegalStateException if class is
      * not configured prior to use.
      */
     public long getLastModified(String path) {
