@@ -24,12 +24,12 @@ import java.io.*;
  * Table
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/20 $
  **/
 
 public class Table extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/metadata/Table.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/metadata/Table.java#2 $ by $Author: rhs $, $DateTime: 2003/06/20 11:21:05 $";
 
     private String m_name;
     private Mist m_columns = new Mist(this);
@@ -185,7 +185,7 @@ public class Table extends Element {
                           "deferred due to circular dependencies");
         }
 
-        result.append("\n);");
+        result.append("\n)");
 
         return result.toString();
     }

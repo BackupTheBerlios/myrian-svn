@@ -32,12 +32,12 @@ import java.util.*;
  * DDLWriter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/20 $
  **/
 
 public class DDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/DDLWriter.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/DDLWriter.java#2 $ by $Author: rhs $, $DateTime: 2003/06/20 11:21:05 $";
 
     private File m_base;
     private boolean m_overwrite;
@@ -100,7 +100,7 @@ public class DDLWriter {
 
             FileWriter writer = new FileWriter(file);
             writer.write(table.getSQL());
-            writer.write("\n");
+            writer.write(";\n");
             writer.close();
         }
 
