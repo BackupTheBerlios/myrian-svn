@@ -21,14 +21,16 @@ import junit.framework.Test;
  * PDLSuite
  *
  * @author Jon Orris
- * @version $Revision: #2 $ $Date: 2004/08/30 $
+ * @version $Revision: #3 $ $Date: 2004/09/01 $
  */
 public class PDLSuite extends PackageTestSuite {
-    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/pdl/PDLSuite.java#2 $ by $Author: dennis $, $DateTime: 2004/08/30 14:24:55 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/cap/test/src/com/arsdigita/persistence/pdl/PDLSuite.java#3 $ by $Author: rhs $, $DateTime: 2004/09/01 09:57:25 $";
 
     public static Test suite() {
         PDLSuite suite = new PDLSuite();
-        populateSuite(suite);
+        suite.addTestSuite(AssociationMetadataTest.class);
+        suite.addTestSuite(NameFilterTest.class);
+        suite.addTestSuite(PDLTest.class);
         BaseTestSetup wrapper = new BaseTestSetup(suite);
         return wrapper;
     }
