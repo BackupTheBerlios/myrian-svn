@@ -40,7 +40,7 @@ import org.apache.log4j.Logger;
  * </ul>
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/09/16 $
  * @since 4.5
  */
 // Synchronization in this class is primarily because close can be called via
@@ -49,7 +49,7 @@ import org.apache.log4j.Logger;
 // is closed out from underneath this connection.
 public class Connection implements java.sql.Connection {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Connection.java#4 $ $Author: dennis $ $Date: 2002/08/14 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Connection.java#5 $ $Author: randyg $ $Date: 2002/09/16 $";
 
     // the connection object that we wrap
     private java.sql.Connection m_conn;
@@ -213,6 +213,7 @@ public class Connection implements java.sql.Connection {
         try {
             if (m_conn != null) {
                 if (m_pool != null ) {
+                    rollback();
                     m_pool.returnToPool(m_conn);
                 } else {
                     m_conn.close();
