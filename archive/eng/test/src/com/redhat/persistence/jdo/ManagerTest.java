@@ -1,6 +1,7 @@
 package com.redhat.persistence.jdo;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.JDOUserException;
 
 /**
  * This tests PersistenceManagerImpl and StateManagerImpl.
@@ -32,5 +33,16 @@ public class ManagerTest extends WithTxnCase {
         assertNotNull("id2", id2);
 
         assertEquals("identities", id1, id2);
+    }
+
+    public void testPersistentNewDeleted() {
+        m_pm.deletePersistent(m_group);
+        try {
+            m_group.getName();
+            // See Section 5.5.7.
+            fail("should've thrown an exception");
+        } catch (JDOUserException ex) {
+            ; // expected
+        }
     }
 }
