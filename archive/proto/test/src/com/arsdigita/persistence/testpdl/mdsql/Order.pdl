@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/test/src/com/arsdigita/persistence/testpdl/mdsql/Order.pdl#1 $ 
-// $DateTime: 2002/11/27 19:51:05 $
+// $Id: //core-platform/proto/test/src/com/arsdigita/persistence/testpdl/mdsql/Order.pdl#2 $ 
+// $DateTime: 2003/04/05 12:49:23 $
 
 model mdsql;
 
@@ -69,7 +69,7 @@ object type OtherItem {
 
 
 association {
-    Order[1..1] order = join t_other_items.other_id to t_order_other_item_map.other_item_id,
+    Order[0..1] order = join t_other_items.other_id to t_order_other_item_map.other_item_id,
                         join t_order_other_item_map.order_id to t_orders.order_id;
     OtherItem[0..n] relatedOtherItems = 
                     join t_orders.order_id to t_order_other_item_map.order_id,
@@ -82,7 +82,6 @@ query OrdersMaxPrices {
     String seller;
     String shippingAddress;
     Date shippingDate;
-    Boolean hasShipped;
     BigDecimal maxPrice;
 
     do {
