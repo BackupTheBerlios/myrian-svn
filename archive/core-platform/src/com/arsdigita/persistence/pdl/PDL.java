@@ -59,12 +59,12 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #26 $ $Date: 2004/01/16 $
+ * @version $Revision: #27 $ $Date: 2004/01/16 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#26 $ by $Author: ashah $, $DateTime: 2004/01/16 13:01:04 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#27 $ by $Author: ashah $, $DateTime: 2004/01/16 18:19:19 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;
@@ -226,6 +226,12 @@ public class PDL {
             usage();
         }
 
+        HashSet pdlFiles = new HashSet();
+        for (Iterator it = output[0].iterator(); it.hasNext(); ) {
+            File pdlFile = new File((String) it.next());
+            pdlFiles.add(pdlFile);
+        }
+
         File debugDir = (File) options.get("-generate-events");
         if (debugDir != null) {
             if (!debugDir.exists() || !debugDir.isDirectory()) {
@@ -252,12 +258,15 @@ public class PDL {
             }
 
             List tables = new ArrayList(root.getRoot().getTables());
+
             for (Iterator it = tables.iterator(); it.hasNext(); ) {
                 Table table = (Table) it.next();
-                if (!output[0].contains(root.getRoot().getFilename(table))) {
+                File tableFile = new File(root.getRoot().getFilename(table));
+                if (!pdlFiles.contains(tableFile)) {
                     it.remove();
                 }
             }
+
             try {
                 writer.write(tables);
             } catch (IOException ioe) {

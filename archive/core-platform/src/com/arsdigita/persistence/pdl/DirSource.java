@@ -16,12 +16,12 @@ import java.util.Comparator;
  * directory.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/01/16 $
+ * @version $Revision: #5 $ $Date: 2004/01/16 $
  **/
 
 public class DirSource implements PDLSource {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/DirSource.java#4 $ by $Author: ashah $, $DateTime: 2004/01/16 13:01:04 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/DirSource.java#5 $ by $Author: ashah $, $DateTime: 2004/01/16 18:19:19 $";
 
     private final File m_dir;
     private final PDLFilter m_filter;
@@ -62,14 +62,14 @@ public class DirSource implements PDLSource {
         ArrayList names = new ArrayList();
 
         for (int i = 0; i < listing.length; i++) {
-            names.add(listing[i].getName());
+            names.add(listing[i].getAbsolutePath());
         }
 
         Collection accepted = m_filter.accept(names);
 
         for (int i = 0; i < listing.length; i++) {
             File file = listing[i];
-            if (accepted.contains(file.getName())) {
+            if (accepted.contains(file.getAbsolutePath())) {
                 try {
                     FileReader reader = new FileReader(file);
                     try {
