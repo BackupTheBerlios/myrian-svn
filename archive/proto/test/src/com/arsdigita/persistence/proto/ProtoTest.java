@@ -13,34 +13,25 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #8 $ $Date: 2003/02/12 $
+ * @version $Revision: #9 $ $Date: 2003/02/12 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#8 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#9 $ by $Author: rhs $, $DateTime: 2003/02/12 16:20:01 $";
 
 
-    private static class Test {
+    private static class Generic {
 
+        private ObjectType m_type;
         private BigInteger m_id;
 
-        public Test(BigInteger id) {
+        public Generic(ObjectType type, BigInteger id) {
             m_id = id;
         }
 
-        public BigInteger getID() {
-            return m_id;
-        }
-
-    }
-
-    private static class Icle {
-
-        private BigInteger m_id;
-
-        public Icle(BigInteger id) {
-            m_id = id;
+        public ObjectType getType() {
+            return m_type;
         }
 
         public BigInteger getID() {
@@ -57,57 +48,49 @@ public class ProtoTest extends TestCase {
     public void test() throws Exception {
         PDL.main(new String[] {"test/pdl/Test.pdl"});
 
-        Adapter.addAdapter(Test.class, new Adapter() {
+        Adapter.addAdapter(Generic.class, new Adapter() {
                 public Object getKey(Object obj) {
-                    return "test.Test:" + ((Test) obj).getID();
+                    return ((Generic) obj).getID();
                 }
 
                 public ObjectType getObjectType(Object obj) {
-                    return Root.getRoot().getObjectType("test.Test");
-                }
-            });
-        Adapter.addAdapter(Icle.class, new Adapter() {
-                public Object getKey(Object obj) {
-                    return "test.Icle:" + ((Icle) obj).getID();
-                }
-
-                public ObjectType getObjectType(Object obj) {
-                    return Root.getRoot().getObjectType("test.Icle");
+                    return ((Generic) obj).getType();
                 }
             });
 
-        Test test = new Test(BigInteger.ZERO);
-        ObjectType type = Root.getRoot().getObjectType("test.Icle");
-        Property NAME = type.getProperty("name");
-        Property COLLECTION = type.getProperty("collection");
-        Property OPT2MANY = type.getProperty("opt2many");
-        doTest(test, test.getID(), NAME, COLLECTION);
-        doTest(test, test.getID(), NAME, OPT2MANY);
+        ObjectType TEST = Root.getRoot().getObjectType("test.Icle");
+
+        Generic test = new Generic(TEST, BigInteger.ZERO);
+        Property NAME = TEST.getProperty("name");
+        Property COLLECTION = TEST.getProperty("collection");
+        Property OPT2MANY = TEST.getProperty("opt2many");
+        doTest(test, NAME, COLLECTION);
+        doTest(test, NAME, OPT2MANY);
     }
 
-    private void doTest(Object obj, Object id, Property str, Property col) {
+    private void doTest(Generic obj, Property str, Property col) {
         Session ssn = new Session();
         ssn.create(obj);
-        ObjectType type = ssn.getObjectType(obj);
-        Object obj2 = ssn.retrieve(type, id);
+        Object obj2 = ssn.retrieve(obj.getType(), obj.getID());
         assertTrue(obj == obj2);
 
         ssn.set(obj, str, "foo");
         assertEquals("foo", ssn.get(obj, str));
 
         ssn.delete(obj);
-        assertEquals(null, ssn.retrieve(type, id));
+        assertEquals(null, ssn.retrieve(obj.getType(), obj.getID()));
 
         ssn.create(obj);
 
         PersistentCollection pc =
             (PersistentCollection) ssn.get(obj, col);
 
-        Object one = new Icle(new BigInteger("1"));
+        ObjectType ICLE = Root.getRoot().getObjectType("test.Icle");
+        Object one = new Generic(ICLE, new BigInteger("1"));
         ssn.create(one);
-        Object two = new Icle(new BigInteger("2"));
+        Object two = new Generic(ICLE, new BigInteger("2"));
         ssn.create(two);
-        Object three = new Icle(new BigInteger("3"));
+        Object three = new Generic(ICLE, new BigInteger("3"));
         ssn.create(three);
 
         ssn.add(obj, col, one);
