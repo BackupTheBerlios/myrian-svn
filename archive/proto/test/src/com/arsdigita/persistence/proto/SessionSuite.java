@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * SessionSuite
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #5 $ $Date: 2003/02/14 $
+ * @version $Revision: #6 $ $Date: 2003/02/14 $
  **/
 
 public class SessionSuite extends PackageTestSuite {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/SessionSuite.java#5 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/SessionSuite.java#6 $";
 
     private static final Logger s_log = Logger.getLogger(SessionSuite.class);
 
@@ -41,7 +41,7 @@ public class SessionSuite extends PackageTestSuite {
         });
 
         BaseTestSetup wrapper = new BaseTestSetup(suite);
-        wrapper.setInitScriptTarget("com.arsdigita.logging.Initializer");
+        wrapper.setInitScriptTarget("com.arsdigita.persistence.Initializer");
         return wrapper;
     }
 
