@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #60 $ $Date: 2003/04/17 $
+ * @version $Revision: #61 $ $Date: 2003/04/28 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#60 $ by $Author: ashah $, $DateTime: 2003/04/17 02:41:34 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#61 $ by $Author: ashah $, $DateTime: 2003/04/28 16:45:07 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -274,27 +274,8 @@ public class Session {
                 trace("remove", new Object[] { obj, prop, value } );
             }
             List pending = new LinkedList();
-            final Expander e = new Expander(this, pending);
-
-            prop.dispatch(new Property.Switch() {
-                public void onRole(Role role) {
-                    e.expand(new RemoveEvent(Session.this, obj, role, value));
-                }
-
-                public void onAlias(Alias alias) {
-                    e.expand(new RemoveEvent
-                             (Session.this, obj, alias.getTarget(), value));
-                }
-
-                public void onLink(Link link) {
-                    Query q = getQuery(obj, link, value);
-		    Cursor c = retrieve(q).getDataSet().getCursor();
-		    while (c.next()) {
-                        e.expand(new DeleteEvent(Session.this, c.get("link")));
-		    }
-                }
-            });
-
+            Expander e = new Expander(this, pending);
+            remove(obj, prop, value, e);
             activate(pending);
         } finally {
             if (LOG.isDebugEnabled()) {
@@ -304,6 +285,28 @@ public class Session {
     }
 
 
+    private void remove(final Object obj, Property prop, final Object value,
+                        final Expander e) {
+        prop.dispatch(new Property.Switch() {
+            public void onRole(Role role) {
+                e.expand(new RemoveEvent(Session.this, obj, role, value));
+            }
+
+            public void onAlias(Alias alias) {
+                e.expand(new RemoveEvent
+                         (Session.this, obj, alias.getTarget(), value));
+            }
+
+            public void onLink(Link link) {
+                Query q = getQuery(obj, link, value);
+                Cursor c = retrieve(q).getDataSet().getCursor();
+                while (c.next()) {
+                    e.expand(new DeleteEvent(Session.this, c.get("link")));
+                }
+            }
+        });
+    }
+
     public void clear(Object obj, Property prop) {
         try {
             if (LOG.isDebugEnabled()) {
@@ -311,7 +314,11 @@ public class Session {
             }
             List pending = new LinkedList();
             final Expander e = new Expander(this, pending);
-            e.clear(obj, prop);
+            PersistentCollection pc = (PersistentCollection) get(obj, prop);
+            Cursor c = pc.getDataSet().getCursor();
+            while (c.next()) {
+                remove(obj, prop, c.get(), e);
+            }
             activate(pending);
         } finally {
             if (LOG.isDebugEnabled()) {

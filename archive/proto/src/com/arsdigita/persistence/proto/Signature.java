@@ -8,12 +8,12 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #19 $ $Date: 2003/04/04 $
+ * @version $Revision: #20 $ $Date: 2003/04/28 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#19 $ by $Author: rhs $, $DateTime: 2003/04/04 20:45:14 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#20 $ by $Author: ashah $, $DateTime: 2003/04/28 16:45:07 $";
 
     private ArrayList m_paths = new ArrayList();
 
@@ -169,11 +169,11 @@ public class Signature {
             prop.getType().getModel().equals(Model.getInstance("global"));
     }
 
-    public void addProperties(Collection props) {
+    private void addProperties(Collection props) {
         addProperties(null, props);
     }
 
-    public void addProperties(Path path, Collection props) {
+    private void addProperties(Path path, Collection props) {
         ObjectType type;
         String prefix;
 
@@ -187,19 +187,27 @@ public class Signature {
 
         for (Iterator it = props.iterator(); it.hasNext(); ) {
             Property prop = (Property) it.next();
-            if (isAttribute(prop)) {
-                addPath(prefix + prop.getName());
-            }
+            addPath(prefix + prop.getName());
         }
         // should add aggressively loaded properties
     }
 
+    private Collection getAttributeProperties(Collection properties) {
+        ArrayList result = new ArrayList(properties.size());
+        for (Iterator it = properties.iterator(); it.hasNext(); ) {
+            Property prop = (Property) it.next();
+            if (isAttribute(prop)) { result.add(prop); }
+        }
+        return result;
+    }
+
     public void addDefaultProperties(Path path) {
-        addProperties(path, getObjectType().getType(path).getProperties());
+        addProperties(path, getAttributeProperties
+                      (getObjectType().getType(path).getProperties()));
     }
 
     public void addDefaultProperties() {
-        addProperties(getObjectType().getProperties());
+        addProperties(getAttributeProperties(getObjectType().getProperties()));
     }
 
     private void addKeyProperties() {
