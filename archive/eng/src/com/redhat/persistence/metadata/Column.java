@@ -32,12 +32,12 @@ import java.util.Set;
  * the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/09/23 $
+ * @version $Revision: #6 $ $Date: 2004/09/24 $
  */
 
 public class Column extends Element {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Column.java#5 $ by $Author: rhs $, $DateTime: 2004/09/23 15:23:25 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/src/com/redhat/persistence/metadata/Column.java#6 $ by $Author: rhs $, $DateTime: 2004/09/24 08:01:40 $";
 
     /**
      * The name of this Column.
@@ -388,6 +388,7 @@ public class Column extends Element {
         ORACLE.put(new Integer(Types.TIMESTAMP), "DATE");
         POSTGRES.put(new Integer(Types.TIMESTAMP), "TIMESTAMPTZ");
         DEFAULT.put(new Integer(Types.TINYINT), "TINYINT");
+        POSTGRES.put(new Integer(Types.TINYINT), "SMALLINT");
         DEFAULT.put(new Integer(Types.VARBINARY), "VARBINARY");
         DEFAULT.put(new Integer(Types.VARCHAR), "VARCHAR");
     }
