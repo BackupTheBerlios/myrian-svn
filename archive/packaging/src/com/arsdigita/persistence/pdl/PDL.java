@@ -30,6 +30,7 @@ import com.arsdigita.db.DbHelper;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStream;
@@ -49,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.zip.ZipInputStream;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -60,12 +62,12 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/09/11 $
+ * @version $Revision: #6 $ $Date: 2003/09/30 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/pdl/PDL.java#5 $ by $Author: rhs $, $DateTime: 2003/09/11 14:54:54 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/persistence/pdl/PDL.java#6 $ by $Author: rhs $, $DateTime: 2003/09/30 10:16:38 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;
@@ -204,11 +206,24 @@ public class PDL {
             DbHelper.setDatabase(DbHelper.DB_ORACLE);
         }
 
-        List library = findPDLFiles((File[]) options.get("-library-path"));
-        List files = findPDLFiles((File[]) options.get("-path"));
-        files.addAll(Arrays.asList(args));
+        final PDLFilter filter =
+            new NameFilter(DbHelper.getDatabaseSuffix(), "pdl");
+        final HashSet output = new HashSet();
+        PDLFilter tracker = new PDLFilter() {
+            public boolean accept(String name) {
+                boolean result = filter.accept(name);
+                if (result) {
+                    output.add(name);
+                }
+                return result;
+            }
+        };
 
-        if (files.size() < 1) {
+        PDLCompiler compiler = new PDLCompiler();
+        parse(compiler, (File[]) options.get("-library-path"), filter);
+        parse(compiler, (File[]) options.get("-path"), tracker);
+        parse(compiler, args, tracker);
+        if (output.size() < 1) {
             if (s_quiet) {
                 return;
             }
@@ -223,13 +238,8 @@ public class PDL {
             setDebugDirectory(debugDir);
         }
 
-        List all = new LinkedList();
-        all.addAll(library);
-        all.addAll(files);
-
-        compilePDLFiles(all);
-
         MetadataRoot root = MetadataRoot.getMetadataRoot();
+        compiler.emit(root);
 
         String ddlDir = (String) options.get("-generate-ddl");
         if (ddlDir != null) {
@@ -248,7 +258,7 @@ public class PDL {
             List tables = new ArrayList(root.getRoot().getTables());
             for (Iterator it = tables.iterator(); it.hasNext(); ) {
                 Table table = (Table) it.next();
-                if (!files.contains(root.getRoot().getFilename(table))) {
+                if (!output.contains(root.getRoot().getFilename(table))) {
                     it.remove();
                 }
             }
@@ -256,6 +266,42 @@ public class PDL {
                 writer.write(tables);
             } catch (IOException ioe) {
                 throw new PDLException(ioe.getMessage());
+            }
+        }
+    }
+
+    private static void parse(PDLCompiler compiler, String[] path,
+                              PDLFilter filter) {
+        File[] fpath =new File[path.length];
+        for (int i = 0; i < path.length; i++) {
+            fpath[i] = new File(path[i]);
+        }
+        parse(compiler, fpath, filter);
+    }
+
+    private static void parse(PDLCompiler compiler, File[] path,
+                              PDLFilter filter) {
+        for (int i = 0; i < path.length; i++) {
+            File f = path[i];
+            if (!f.exists()) { continue; }
+            if (f.isDirectory()) {
+                new DirSource(f, filter).parse(compiler);
+            } else if (f.isFile()
+                       && (f.getName().endsWith(".jar")
+                           || f.getName().endsWith(".zip"))) {
+                try {
+                    ZipInputStream zis = new ZipInputStream
+                        (new FileInputStream(f));
+                    try {
+                        new ZipSource(zis, filter).parse(compiler);
+                    } finally {
+                        zis.close();
+                    }
+                } catch (IOException e) {
+                    throw new UncheckedWrapperException(e);
+                }
+            } else if (filter.accept(f.getPath())) {
+                new FileSource(f).parse(compiler);
             }
         }
     }
