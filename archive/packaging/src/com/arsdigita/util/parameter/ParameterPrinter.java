@@ -27,13 +27,13 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterPrinter.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterPrinter.java#3 $
  */
 final class ParameterPrinter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterPrinter.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterPrinter.java#3 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/09 10:25:57 $";
+        "$DateTime: 2003/10/20 01:22:54 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterPrinter.class);
@@ -47,11 +47,60 @@ final class ParameterPrinter {
         final Iterator records = s_records.iterator();
 
         while (records.hasNext()) {
-            ((ParameterRecord) records.next()).writeXML(out);
+            writeRecord(((ParameterRecord) records.next()), out);
         }
 
         out.write("</records>");
         out.close();
+    }
+
+    private static void writeRecord(final ParameterRecord record,
+                                    final PrintWriter out) {
+        out.write("<record>");
+
+        final Parameter[] params = record.getParameters();
+
+        for (int i = 0; i < params.length; i++) {
+            writeParameter(params[i], out);
+        }
+
+        out.write("</record>");
+    }
+
+    private static void writeParameter(final Parameter param,
+                                       final PrintWriter out) {
+        out.write("<parameter>");
+
+        field(out, "name", param.getName());
+
+        if (param.isRequired()) {
+            out.write("<required/>");
+        }
+
+        final ParameterInfo info = param.getInfo();
+
+        if (info != null) {
+            field(out, "title", info.getTitle());
+            field(out, "purpose", info.getPurpose());
+            field(out, "example", info.getExample());
+            field(out, "format", info.getFormat());
+        }
+
+        out.write("</parameter>");
+    }
+
+    private static void field(final PrintWriter out,
+                              final String name,
+                              final String value) {
+        if (value != null) {
+            out.write("<");
+            out.write(name);
+            out.write("><![CDATA[");
+            out.write(value);
+            out.write("]]></");
+            out.write(name);
+            out.write(">");
+        }
     }
 
     private static void register(final String classname) {
