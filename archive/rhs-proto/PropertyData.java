@@ -9,19 +9,17 @@ import java.io.*;
  * PropertyData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/25 $
+ * @version $Revision: #2 $ $Date: 2002/11/27 $
  **/
 
 class PropertyData {
 
-    public final static String versionId = "$Id: //users/rhs/persistence-proto/PropertyData.java#1 $ by $Author: rhs $, $DateTime: 2002/11/25 19:30:13 $";
+    public final static String versionId = "$Id: //users/rhs/persistence-proto/PropertyData.java#2 $ by $Author: rhs $, $DateTime: 2002/11/27 17:41:53 $";
 
     private ObjectData m_odata;
     private Property m_prop;
     private Object m_value;
-
-    HashSet m_data = new HashSet();
-    ArrayList m_events = new ArrayList();
+    private ArrayList m_events = new ArrayList();
 
     public PropertyData(ObjectData odata, Property prop, Object value) {
         m_odata = odata;
@@ -58,6 +56,14 @@ class PropertyData {
         }
 
         return m_value;
+    }
+
+    public void addEvent(PropertyEvent ev) {
+        m_events.add(ev);
+    }
+
+    public List getEvents() {
+        return m_events;
     }
 
     void dump(PrintWriter out) {

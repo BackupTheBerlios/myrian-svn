@@ -1,24 +1,30 @@
 package com.arsdigita.persistence.proto;
 
+import com.arsdigita.persistence.metadata.Property;
+import com.arsdigita.persistence.OID;
+
 /**
  * EventSource
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/25 $
+ * @version $Revision: #2 $ $Date: 2002/11/27 $
  **/
 
 public interface EventSource {
 
-    public final static String versionId = "$Id: //users/rhs/persistence-proto/EventSource.java#1 $ by $Author: rhs $, $DateTime: 2002/11/25 19:30:13 $";
+    public final static String versionId = "$Id: //users/rhs/persistence-proto/EventSource.java#2 $ by $Author: rhs $, $DateTime: 2002/11/27 17:41:53 $";
 
-    public CreateEvent getCreate(ObjectData odata);
+    public CreateEvent getCreate(Session ssn, OID oid);
 
-    public DeleteEvent getDelete(ObjectData odata);
+    public DeleteEvent getDelete(Session ssn, OID oid);
 
-    public SetEvent getSet(PropertyData pdata, Object argument);
+    public SetEvent getSet(Session ssn, OID oid, Property prop,
+                           Object argument);
 
-    public AddEvent getAdd(PropertyData pdata, Object argument);
+    public AddEvent getAdd(Session ssn, OID oid, Property prop,
+                           Object argument);
 
-    public RemoveEvent getRemove(PropertyData pdata, Object argument);
+    public RemoveEvent getRemove(Session ssn, OID oid, Property prop,
+                                 Object argument);
 
 }

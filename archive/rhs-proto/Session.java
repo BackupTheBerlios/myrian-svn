@@ -9,15 +9,19 @@ import java.io.*;
  * Session
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/25 $
+ * @version $Revision: #2 $ $Date: 2002/11/27 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //users/rhs/persistence-proto/Session.java#1 $ by $Author: rhs $, $DateTime: 2002/11/25 19:30:13 $";
+    public final static String versionId = "$Id: //users/rhs/persistence-proto/Session.java#2 $ by $Author: rhs $, $DateTime: 2002/11/27 17:41:53 $";
 
     private static final PersistentObjectSource POS =
         new PersistentObjectSource();
+
+    final PersistenceEngine ENGINE =
+        new com.arsdigita.persistence.proto.engine.Engine(this);
+    private final EventSource ES = ENGINE.getEventSource();
 
     HashMap m_odata = new HashMap();
     Event m_head = null;
@@ -29,7 +33,15 @@ public class Session {
 
     private ObjectData getObjectData(OID oid) {
         if (!hasObjectData(oid)) {
-            // should fetch object from db
+            Cursor c = ENGINE.execute(getRetrieveQuery(oid));
+            // Cache non existent objects
+            if (!c.next()) {
+                m_odata.put(oid, null);
+            }
+            while (c.next()) {
+                // XXX: This is a bit odd, but Cursor loads data into the
+                // session automagically. Maybe that should change.
+            }
         }
 
         ObjectData od = (ObjectData) m_odata.get(oid);
@@ -48,17 +60,38 @@ public class Session {
         if (od.hasPropertyData(prop)) {
             pd = od.getPropertyData(prop);
         } else if (prop.isCollection()) {
-            pd = new PropertyData(od, prop, null);
-            pd.setValue(POS.getPersistentCollection(this,
-                                                    new PropertyDataSet(pd)));
+            pd = new PropertyData
+                (od, prop, POS.getPersistentCollection
+                 (this, new DataSet (this, getRetrieveQuery(oid, prop))));
         } else if (od.isNew()){
             pd = new PropertyData(od, prop, null);
         } else {
             // should fetch property from db
-            pd = new PropertyData(od, prop, null);
+            Cursor c = ENGINE.execute(getRetrieveQuery(oid, prop));
+            while (c.next()) {
+                // XXX: See above XXX
+            }
+            pd = od.getPropertyData(prop);
         }
 
         return pd;
+    }
+
+    void load(OID oid, Property prop, Object value) {
+        ObjectData od = (ObjectData) m_odata.get(oid);
+        if (od == null) {
+            // We may need to change the signature of this to read in enough
+            // data to allow type negotiation to happen properly without
+            // requiring another db hit.
+            od = new ObjectData(this, POS.getPersistentObject(this, oid));
+        }
+
+        PropertyData pd = od.getPropertyData(prop);
+        if (pd == null) {
+            pd = new PropertyData(od, prop, value);
+        } else {
+            pd.setValue(value);
+        }
     }
 
     public PersistentObject create(OID oid) {
@@ -74,7 +107,13 @@ public class Session {
         // the new object will pick up all the changes made to the old one.
         // Not sure what to do about this except perhaps disallow it at some
         // point.
-        new CreateEvent(od);
+        od.addEvent(ES.getCreate(this, oid));
+
+        for (Iterator it = oid.getObjectType().getKeyProperties();
+             it.hasNext(); ) {
+            Property prop = (Property) it.next();
+            set(oid, prop, oid.get(prop.getName()));
+        }
 
         return od.getPersistentObject();
     }
@@ -84,7 +123,7 @@ public class Session {
         if (od == null) {
             return false;
         } else {
-            new DeleteEvent(od);
+            od.addEvent(ES.getDelete(this, oid));
             return true;
         }
     }
@@ -98,14 +137,14 @@ public class Session {
         }
     }
 
-    public DataCollection retrieve(Query query) {
+    public PersistentCollection retrieve(Query query) {
         // should fetch objects from db
         throw new Error("Not implemented.");
     }
 
     public void set(OID oid, Property prop, Object value) {
         PropertyData pd = getPropertyData(oid, prop);
-        new SetEvent(pd, value);
+        pd.addEvent(ES.getSet(this, oid, prop, value));
     }
 
     public Object get(OID oid, Property prop) {
@@ -136,25 +175,70 @@ public class Session {
 
     public PersistentObject add(OID oid, Property prop, Object value) {
         PropertyData pd = getPropertyData(oid, prop);
-        new AddEvent(pd, value);
+        pd.addEvent(ES.getAdd(this, oid, prop, value));
         // should deal with link attributes here
         return null;
     }
 
     public void remove(OID oid, Property prop, Object value) {
         PropertyData pd = getPropertyData(oid, prop);
-        new RemoveEvent(pd, value);
+        pd.addEvent(ES.getRemove(this, oid, prop, value));
     }
 
     public void flush() {
-        // should write event stream out to db
-        throw new Error("Not implemented.");
+        // should expand event stream
+        // should invalidate or update session data
+        for (Event ev = m_head; ev != null; ev = ev.m_next) {
+            ENGINE.write(ev);
+        }
+
+        ENGINE.flush();
+
+        m_odata.clear();
+
+        m_head = null;
+        m_tail = null;
     }
 
     void dump(PrintWriter out) {
         for (Iterator it = m_odata.values().iterator(); it.hasNext(); ) {
             ObjectData od = (ObjectData) it.next();
             od.dump(out);
+        }
+    }
+
+    private Signature getRetrieveSignature(ObjectType type) {
+        Signature result = new Signature(type);
+        for (Iterator it = type.getProperties(); it.hasNext(); ) {
+            Property prop = (Property) it.next();
+            if (prop.isAttribute()) {
+                result.addPath(prop.getName());
+            }
+        }
+        // should add aggressively loaded properties
+
+        return result;
+    }
+
+    private Query getRetrieveQuery(OID oid) {
+        ObjectType type = oid.getObjectType();
+        Signature sig = getRetrieveSignature(type);
+        // should filter to oid
+        return new Query(sig, null);
+    }
+
+    private Query getRetrieveQuery(OID oid, Property prop) {
+        if (prop.isAttribute()) {
+            ObjectType type = oid.getObjectType();
+            Signature sig = new Signature(type);
+            sig.addPath(prop.getName());
+            // should filter to oid
+            return new Query(sig, null);
+        } else {
+            ObjectType type = (ObjectType) prop.getType();
+            Signature sig = getRetrieveSignature(type);
+            // should filter to associated object(s)
+            return new Query(sig, null);
         }
     }
 

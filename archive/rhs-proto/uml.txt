@@ -1,3 +1,140 @@
+The persistence implementation consists of a Session layer and a
+PersistenceEngine. The Session provides an interface to client code
+and is responsible for caching persisted data in memory and recording
+what changes are made during a transaction. It uses the
+PersistenceEngine interface to retrieve data from and write data out
+through the storage mechanism. All I/O is performed through the Query
+interface and the Event interface. The Query interface describes a
+request for the data contained in some subset of the object graph. The
+Query interface is powerful enough to describe complex queries against
+the object graph and flexible enough to fetch a single attribute of a
+single object. Because of this it is the only interface necessary to
+accomplish all input from the storage mechanism that the Session
+requires.
+
+The Session stores modifications made to the object graph in the form
+of an Event stream. It expands any compound events and then passes on
+the expanded event stream to the PersistenceEngine for writing to the
+storage mechanism. Typically this storage mechanism will be an RDBMS,
+but this is not required. Storage to an XML file (for export/import)
+or to an in memory data structure (for unit testing) are just some
+cases where other storage mechanisms may be desirable.
+
+Client Interface of the Session Layer:
+
+   ----------------------------------------------
+  |                   Session                    |
+  |----------------------------------------------|
+  | retrieve(Query): PersistentCollection        |
+  | create(OID): PersistentObject                |
+  | delete(OID): PersistentObject                |
+  | set(OID, Property, Object)                   |
+  | add(OID, Property, Object): PersistentObject |
+  | remove(OID, Property, Object)                |
+  | commit()                                     |
+  | rollback()                                   |
+   ----------------------------------------------
+      /|\1    /|\1
+       |       |
+       |       | n
+       |      -----------------------         --------------------------------
+       |     |   PersistentObject    |       |              OID               |
+       |     |-----------------------|      1|--------------------------------|
+       |     | getSession(): Session |------>| getObjectType(): ObjectType    |
+       |     | getOID(): OID         |       |                                |
+       |      -----------------------         --------------------------------
+       |
+       |      ---------------------          -----------
+       |     |       DataSet       |        |   Query   |
+       |     |---------------------|       1|-----------|
+        -----|                     |------->|           |
+             | getCursor(): Cursor |        |           |
+             |                     |        |           |
+              ---------------------          -----------
+
+
+The following diagram describes the form of a query made against the
+object model. A query consists of a Signature, a Filter, and an Order.
+The Signature of the Query identifies what ObjectType the query will
+return and what portions of the object graph starting from that object
+will be retrieved. The Filter is typically a compound filter such as
+an And or an Or that is made up from the primitive filters such as EQ,
+LT, LTE, etc. These primitive filters filter a value. This value must
+appear in the Signature of the query. The In and Contains filter are
+an example of yet another kind of filter because they operate on a
+property and another Query. The Order specifies the order in which the
+results are to be returned based on the values in the Signature.
+
+
+  Query
+    |    1
+    |-----> Signature
+    |          |  |     1
+    |          |   ------> ObjectType
+    |          |n
+    |       1 \|/       1
+    |      -->Path ------> Property
+    |     |___| /|\
+    |           1|__________
+    |    1                  |
+    |-----> Filter          |
+    |        /_\            |
+    |         |             |
+    |         |--And        |
+    |         |--Or         |
+    |         |--Not        |
+    |         |--EQ         |
+    |         |--LT         |
+    |         |--LTE        |
+    |         |--Like       |
+    |         |--In         |
+    |          --Contains   |
+    |    n                  |
+     -----> Order           |
+              |             |
+              |_____________|
+                     |
+                isAscending
+
+
+
+The session does all of its IO through the PersistenceEngine
+interface. The PersistenceEngine is responsible for accepting queries
+of the form described above and producing a result Cursor, and
+additionally responsible for performing transactional writes through
+use of the begin, commit, rollback and execute(EventStream) methods.
+
+  Session
+     |
+     |          ---------------------------------
+     |      1  |        PersistenceEngine        |
+      -------->|---------------------------------|
+               | commit()                        |
+               | rollback()                      |
+               | execute(Query): Cursor          |
+               | write(Event)                    |
+               | flush()                         |
+                ---------------------------------
+                      |
+                      |
+                      |     ------------------
+                      |    |   FilterSource   |
+                      |--->|------------------|
+                      |    | getAnd           |
+                      |    | getOr            |
+                      |    | ...              |
+                      |     ------------------
+                      |
+                      |     ----------------------------------------------
+                      |    |                  EventSource                 |
+                       --->|----------------------------------------------|
+                           | getCreate(ObjectData): CreateEvent           |
+                           | getDelete(ObjectData): CreateEvent           |
+                           | getSet(PropertyData, Object): SetEvent       |
+                           | getAdd(PropertyData, Object): AddEvent       |
+                           | getRemove(PropertyData, Object): RemoveEvent |
+                            ----------------------------------------------
+
 
   PersistentCollection---->DataSet<-----Cursor
       n|                  1       1    n
@@ -126,84 +263,14 @@ deferrable constraints.
    Vendor specific SQL is generated and issued.
 
 
-The following diagram describes the form of a query made against the
-object model. A query consists of a Signature, a Filter, and an Order.
-The Signature of the Query identifies what ObjectType the query will
-return and what portions of the object graph starting from that object
-will be retrieved. The Filter is typically a compound filter such as
-an And or an Or that is made up from the primitive filters such as EQ,
-LT, LTE, etc. These primitive filters filter a value. This value must
-appear in the Signature of the query. The In and Contains filter are
-an example of yet another kind of filter because they operate on a
-property and another Query. The Order specifies the order in which the
-results are to be returned based on the values in the Signature.
+Issues:
 
-
-  Query
-    |    1
-    |-----> Signature
-    |          |  |     1
-    |          |   ------> ObjectType
-    |          |n
-    |       1 \|/       1
-    |      -->Path ------> Property
-    |     |___| /|\
-    |           n|__________
-    |    1                  |
-    |-----> Filter          |
-    |        /_\            |
-    |         |             |
-    |         |--And        |
-    |         |--Or         |
-    |         |--Not        |
-    |         |--EQ         |
-    |         |--LT         |
-    |         |--LTE        |
-    |         |--Like       |
-    |         |--In         |
-    |          --Contains   |
-    |    1                  |
-     -----> Order           |
-              |             |
-              |_____________|
-                     |
-                isAscending
-
-
-
-The session does all of its IO through the PersistenceEngine
-interface. The PersistenceEngine is responsible for accepting queries
-of the form described above and producing a result Cursor, and
-additionally responsible for performing transactional writes through
-use of the begin, commit, rollback and execute(EventStream) methods.
-
-  Session
-     |
-     |          ---------------------------------
-     |      1  |        PersistenceEngine        |
-      -------->|---------------------------------|
-               | commit()                        |
-               | rollback()                      |
-               | execute(Query): Cursor          |
-               | write(Event)                    |
-               | flush()                         |
-                ---------------------------------
-                      |
-                      |
-                      |     ------------------
-                      |    |   FilterSource   |
-                      |--->|------------------|
-                      |    | getAnd           |
-                      |    | getOr            |
-                      |    | ...              |
-                      |     ------------------
-                      |
-                      |     ----------------------------------------------
-                      |    |                  EventSource                 |
-                       --->|----------------------------------------------|
-                           | getCreate(ObjectData): CreateEvent           |
-                           | getDelete(ObjectData): CreateEvent           |
-                           | getSet(PropertyData, Object): SetEvent       |
-                           | getAdd(PropertyData, Object): AddEvent       |
-                           | getRemove(PropertyData, Object): RemoveEvent |
-                            ----------------------------------------------
+  * Arbitrary SQL in filters.
+  * All associations being virtually two way to handle case of delete
+    automagically removing from containing associations.
+  * How should event stream expand for two way associations?
+  * type resolution
+  * Dealing with properties that make up the OID.
+  * Link Attributes
+  * The Cursor class seems to be overloaded serving as an I/O class as
+    well as a client API.

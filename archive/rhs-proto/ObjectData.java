@@ -9,12 +9,12 @@ import java.io.*;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/11/25 $
+ * @version $Revision: #2 $ $Date: 2002/11/27 $
  **/
 
 class ObjectData {
 
-    public final static String versionId = "$Id: //users/rhs/persistence-proto/ObjectData.java#1 $ by $Author: rhs $, $DateTime: 2002/11/25 19:30:13 $";
+    public final static String versionId = "$Id: //users/rhs/persistence-proto/ObjectData.java#2 $ by $Author: rhs $, $DateTime: 2002/11/27 17:41:53 $";
 
     private Session m_ssn;
     private PersistentObject m_object;
@@ -51,6 +51,10 @@ class ObjectData {
 
     public boolean hasPropertyData(Property prop) {
         return m_pdata.containsKey(prop);
+    }
+
+    public void addEvent(ObjectEvent ev) {
+        m_events.add(ev);
     }
 
     public boolean isNew() {
