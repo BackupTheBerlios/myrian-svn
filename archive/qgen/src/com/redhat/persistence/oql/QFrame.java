@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * QFrame
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #20 $ $Date: 2004/03/19 $
+ * @version $Revision: #21 $ $Date: 2004/03/19 $
  **/
 
 class QFrame {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#20 $ by $Author: rhs $, $DateTime: 2004/03/19 16:09:52 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/QFrame.java#21 $ by $Author: rhs $, $DateTime: 2004/03/19 17:28:49 $";
 
     private static final Logger s_log = Logger.getLogger(QFrame.class);
 
@@ -572,12 +572,7 @@ class QFrame {
                     m_parent.m_children.remove(this);
                     target.addChild(this);
 
-                    // XXX: the isNullable(from) test shouldn't be
-                    // disabled (nor should the one down below in
-                    // equifill), but it breaks QuerySuite in a number of
-                    // cases that I don't have time to figure out right
-                    // now.
-                    if (!isNullable(to) && (true || !isNullable(from))) {
+                    if (!isNullable(to)) {
                         m_outer = false;
                     }
                 }
@@ -597,7 +592,7 @@ class QFrame {
                     List from = new ArrayList();
                     List to = new ArrayList();
                     m_generator.split(child, equals, from, to);
-                    if (isConnected(to, from) && (true || !isNullable(from))) {
+                    if (isConnected(to, from)) {
                         child.m_equiset = m_equiset;
                     }
                 }
