@@ -10,12 +10,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #13 $ $Date: 2003/03/28 $
+ * @version $Revision: #14 $ $Date: 2003/03/28 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#13 $ by $Author: ashah $, $DateTime: 2003/03/28 12:30:01 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#14 $ by $Author: ashah $, $DateTime: 2003/03/28 15:46:14 $";
 
     private final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -115,6 +115,10 @@ class DataObjectImpl implements DataObject {
         if ("".equals(value)) { value = null; }
         try {
             Property prop = getObjectType().getProperty(property);
+            if (prop == null) {
+                throw new PersistenceException
+                    ("no such property: " + property + " for " + this);
+            }
             if (prop.isKeyProperty()) {
                 m_oid.set(property, value);
                 if (m_oid.isInitialized()) {
