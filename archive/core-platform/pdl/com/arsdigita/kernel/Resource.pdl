@@ -11,8 +11,8 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/Resource.pdl#2 $ 
-// $DateTime: 2002/10/16 14:12:35 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/kernel/Resource.pdl#3 $ 
+// $DateTime: 2002/10/16 15:11:40 $
 
 model com.arsdigita.kernel;
 
@@ -23,7 +23,8 @@ import com.arsdigita.portal.Portlet;
 
 object type ResourceType {
     BigDecimal id = application_types.application_type_id INTEGER;
-    String objectType = application_types.object_type VARCHAR(100);
+    unique String[1..1] objectType =
+        application_types.object_type VARCHAR(100);
     String title = application_types.title VARCHAR(200);
     String description = application_types.description VARCHAR(4000);
     Boolean isWorkspaceApplication =
