@@ -16,7 +16,7 @@ import java.io.*;
  * OQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2004/01/27 $
+ * @version $Revision: #7 $ $Date: 2004/01/27 $
  */
 
 class OQLParser {
@@ -76,7 +76,7 @@ class OQLParser {
 
 PARSER_END(OQLParser)
 
-<DEFAULT,BEGIN> SKIP:
+<DEFAULT,BEGINSQL> SKIP:
 {
     " "
   | "\t"
@@ -90,19 +90,15 @@ TOKEN:
     <LPAREN: "(">
   | <RPAREN: ")">
   | <COMMA: ",">
-  | <DOT: ".">
   | <EQ: "=">
   | <EQUALS: "==">
+  | <DOT: ".">
   | <AND: "and">
   | <OR: "or">
   | <NOT: "not">
-  | <STATIC: "static"> : BEGIN
+  | <SQL: "sql"> : BEGINSQL
   | <ALL: "all">
-}
-
-TOKEN:
-{
-    <#CH: <ESC>|<CHARS>>
+  | <#CH: <ESC>|<CHARS>>
   | <#CHARS: ["a" - "z", "A" - "Z", "_", "$"]>
   | <#ESC: "\\" ~[]>
   | <#DIGIT: ["0" - "9"]>
@@ -114,14 +110,14 @@ TOKEN:
   | <ID: (<CH>) (<CH>|<DIGIT>)* ( "[]" )?>
 }
 
-<BEGIN> MORE:
+<BEGINSQL> MORE:
 {
   <"{"> { image.deleteCharAt(image.length() - 1); } : INSQL
 }
 
 <INSQL> TOKEN:
 {
-    <SQL: "}">
+    <SQL_EXPRESSION: "}">
     {
         image.deleteCharAt(image.length() - 1);
         matchedToken.image = image.toString();
@@ -136,6 +132,21 @@ TOKEN:
 SPECIAL_TOKEN:
 {
     <COMMENT: "//" (~["\n", "\r"])* ("\n"|"\r"|"\r\n")>
+}
+
+<DEFAULT> MORE:
+{
+    <"/*"> : INMULTILINE
+}
+
+<INMULTILINE> MORE:
+{
+    <~[]>
+}
+
+<INMULTILINE> SPECIAL_TOKEN:
+{
+    <MULTILINE_COMMENT: "*/"> : DEFAULT
 }
 
 /**
@@ -234,11 +245,12 @@ Expression generic() :
     Token t;
     List l;
     Expression e;
+    String s = null;
 }
 {
     t = <ID> [ l = exprl() { return construct(t, l); } ]
       { return new Variable(t.image); }
-  | <STATIC> t = <SQL>
+  | <SQL> t = <SQL_EXPRESSION>
       { return new Static(t.image); }
   | t = <STRING>
       { return new Literal(parseString(t.image)); }
@@ -248,20 +260,27 @@ Expression generic() :
       { return new Literal(new BigDecimal(t.image)); }
   | t = <BOOLEAN>
       { return new Literal(Boolean.valueOf(t.image)); }
-  | e = type()
+  | e = all()
       { return e; }
 }
 
-Expression type() :
+Expression all() :
 {
-    Token t;
-    StringBuffer type = new StringBuffer();
+    String t;
 }
 {
-    <ALL> <LPAREN> t = <ID> { type.append(t.image); }
-    ( <DOT> t = <ID> { type.append('.'); type.append(t.image); } )*
-    <RPAREN>
-        { return new All(type.toString()); }
+    <ALL> <LPAREN> t = type() <RPAREN> { return new All(t); }
+}
+
+String type() :
+{
+    Token t;
+    StringBuffer buf = new StringBuffer();
+}
+{
+    t = <ID> { buf.append(t.image); }
+    ( <DOT> t = <ID> { buf.append('.'); buf.append(t.image); } )*
+        { return buf.toString(); }
 }
 
 List exprl() :
