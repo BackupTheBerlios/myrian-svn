@@ -21,15 +21,13 @@ import java.util.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterStore.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterLoader.java#1 $
  */
-public interface ParameterStore {
+public interface ParameterLoader {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterStore.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterLoader.java#1 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/08/27 12:11:05 $";
+        "$DateTime: 2003/09/23 01:57:55 $";
 
-    String read(Parameter param);
-
-    void write(Parameter param, String value);
+    ParameterValue load(Parameter param);
 }

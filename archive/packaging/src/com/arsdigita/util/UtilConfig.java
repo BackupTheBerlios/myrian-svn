@@ -26,34 +26,28 @@ import org.apache.log4j.Logger;
  * @author Justin Ross
  * @see com.arsdigita.util.Util
  */
-final class UtilConfig extends JavaPropertyRecord {
+final class UtilConfig extends ParameterRecord {
     public static final String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/UtilConfig.java#5 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/UtilConfig.java#6 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/16 13:41:28 $";
+        "$DateTime: 2003/09/23 01:57:55 $";
 
     private static final Logger s_log = Logger.getLogger(UtilConfig.class);
 
-    private final String m_dir;
+    private final Parameter m_dir;
 
     UtilConfig() {
-        super("util", new Properties());
+        super("util");
 
         // XXX need conf URL support here
-        final InputStream in = getClass().getResourceAsStream
-            ("ccm-core/util.properties");
-
-        if (in != null) {
-            load(in);
-        }
-
-        final StringParameter dir = new StringParameter
+        m_dir = new StringParameter
             ("waf.util.logging.error_report_dir", Parameter.OPTIONAL, null);
-        m_dir = (String) initialize(dir);
 
-        if (m_dir != null) {
-            ErrorReport.initializeAppender(m_dir);
-        }
+        register(m_dir);
+    }
+
+    final String getErrorReportDirectory() {
+        return (String) get(m_dir);
     }
 
     final void setAssertEnabled(final boolean isEnabled) {

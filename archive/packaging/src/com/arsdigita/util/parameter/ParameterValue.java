@@ -24,27 +24,45 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#3 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#4 $
  */
 public final class ParameterValue {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#3 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#4 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/15 15:51:43 $";
+        "$DateTime: 2003/09/23 01:57:55 $";
 
-    private Object m_value;
-    private final List m_errors;
+    private final ArrayList m_errors;
+    private String m_string;
+    private Object m_object;
 
-    public ParameterValue(final Object value, final List errors) {
-        m_value = value;
-        m_errors = errors;
+    public ParameterValue() {
+        m_errors = new ArrayList();
     }
 
-    public final Object getValue() {
-        return m_value;
+    ParameterValue(final Object object) {
+        this();
+
+        m_object = object;
     }
 
     public final List getErrors() {
         return m_errors;
+    }
+
+    public final String getString() {
+        return m_string;
+    }
+
+    public final void setString(final String string) {
+        m_string = string;
+    }
+
+    public final Object getObject() {
+        return m_object;
+    }
+
+    public final void setObject(final Object value) {
+        m_object = value;
     }
 }

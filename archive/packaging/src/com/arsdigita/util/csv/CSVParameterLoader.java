@@ -25,30 +25,30 @@ import org.apache.oro.text.perl.Perl5Util;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/csv/CSVParameterStore.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/csv/CSVParameterLoader.java#1 $
  */
-public final class CSVParameterStore implements ParameterStore {
+public final class CSVParameterLoader implements ParameterLoader {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/csv/CSVParameterStore.java#2 $" +
-        "$Author: rhs $" +
-        "$DateTime: 2003/09/16 17:28:12 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/csv/CSVParameterLoader.java#1 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/09/23 01:57:55 $";
 
     private final LineNumberReader m_reader;
     private final Parameter[] m_params;
     private final HashMap m_line;
 
-    public CSVParameterStore(final Reader reader, final Parameter[] params) {
+    public CSVParameterLoader(final Reader reader, final Parameter[] params) {
         m_reader = new LineNumberReader(reader);
         m_params = params;
         m_line = new HashMap(params.length);
     }
 
-    public final String read(final Parameter param) {
-        return (String) m_line.get(param);
-    }
+    public final ParameterValue load(final Parameter param) {
+        final ParameterValue value = new ParameterValue();
 
-    public final void write(final Parameter param, final String value) {
-        // Nada
+        value.setString((String) m_line.get(param));
+
+        return value;
     }
 
     public final boolean next() {
@@ -77,7 +77,7 @@ public final class CSVParameterStore implements ParameterStore {
 
     private static final char ESCAPE = '\\';
     private static final char QUOTE = '"';
-    private static final char SEPERATOR = ',';
+    private static final char SEPARATOR = ',';
 
     private char escape(char c) {
         switch (c) {
@@ -135,7 +135,7 @@ public final class CSVParameterStore implements ParameterStore {
                 end = buf.length();
             } else {
                 switch (c) {
-                case SEPERATOR:
+                case SEPARATOR:
                     result.add(field(buf, begin, end));
                     buf = new StringBuffer(length);
                     begin = -1;

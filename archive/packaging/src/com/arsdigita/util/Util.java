@@ -15,6 +15,12 @@
 
 package com.arsdigita.util;
 
+import com.arsdigita.init.*;
+import com.arsdigita.logging.*;
+import com.arsdigita.util.parameter.*;
+import com.arsdigita.util.config.*;
+import java.io.*;
+import java.util.*;
 import org.apache.log4j.Logger;
 
 /**
@@ -25,13 +31,34 @@ import org.apache.log4j.Logger;
  */
 final class Util {
     public static final String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/Util.java#2 $" +
-        "$Author: rhs $" +
-        "$DateTime: 2003/08/19 22:28:24 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/Util.java#3 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/09/23 01:57:55 $";
 
     private static final Logger s_log = Logger.getLogger(Util.class);
 
     private static final UtilConfig s_config = new UtilConfig();
+
+    static {
+        final JavaPropertyLoader loader = new JavaPropertyLoader
+            (new Properties());
+
+        // XXX need conf URL support here
+        final InputStream in = Thread.currentThread().getContextClassLoader
+            ().getResourceAsStream("ccm-core/util.properties");
+
+        if (in != null) {
+            loader.load(in);
+        }
+
+        s_config.load(loader);
+
+        final String errorDir = s_config.getErrorReportDirectory();
+
+        if (errorDir != null) {
+            ErrorReport.initializeAppender(errorDir);
+        }
+    }
 
     /**
      * Returns the util config record.

@@ -13,11 +13,10 @@
  *
  */
 
-package com.arsdigita.util.config;
+package com.arsdigita.util.parameter;
 
 import com.arsdigita.util.*;
-import com.arsdigita.util.parameter.*;
-import com.arsdigita.templating.*;
+import com.arsdigita.templating.*; // XXX arh, dependency
 import java.io.*;
 import java.util.*;
 import javax.xml.transform.*;
@@ -28,35 +27,35 @@ import org.apache.log4j.Logger;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/config/ConfigPrinter.java#1 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterPrinter.java#1 $
  */
-public class ConfigPrinter {
+final class ParameterPrinter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/config/ConfigPrinter.java#1 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterPrinter.java#1 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/19 02:38:52 $";
+        "$DateTime: 2003/09/23 01:57:55 $";
 
     private static final Logger s_log = Logger.getLogger
-        (ConfigPrinter.class);
+        (ParameterPrinter.class);
 
-    private static final ArrayList s_configs = new ArrayList();
+    private static final ArrayList s_records = new ArrayList();
 
-    static void register(final ConfigRecord config) {
+    static void register(final ParameterRecord record) {
         if (s_log.isInfoEnabled()) {
-            s_log.info("Registering " + config);
+            s_log.info("Registering " + record);
         }
 
-        s_configs.add(config);
+        s_records.add(record);
     }
 
     private static void writeXML(final PrintWriter out) {
         out.write("<?xml version=\"1.0\"?>");
         out.write("<records>");
 
-        final Iterator configs = s_configs.iterator();
+        final Iterator records = s_records.iterator();
 
-        while (configs.hasNext()) {
-            ((ConfigRecord) configs.next()).writeXML(out);
+        while (records.hasNext()) {
+            ((ParameterRecord) records.next()).writeXML(out);
         }
 
         out.write("</records>");
@@ -65,14 +64,16 @@ public class ConfigPrinter {
 
     public static final void main(final String[] args) throws IOException {
         try {
-            // XXX These are cheats to get the configs loaded.
+            // XXX These are cheats to get the config parameters
+            // registered.
 
-            Classes.loadClass("com.arsdigita.util.Util");
-            Classes.loadClass("com.arsdigita.init.Init");
-            Classes.loadClass("com.arsdigita.templating.Templating");
-            Classes.loadClass("com.arsdigita.versioning.Versioning");
-            Classes.loadClass("com.arsdigita.web.BaseServlet");
-            Classes.loadClass("com.arsdigita.bebop.Bebop");
+            Classes.newInstance("com.arsdigita.util.UtilConfig");
+            Classes.newInstance("com.arsdigita.init.InitConfig");
+            Classes.newInstance("com.arsdigita.templating.TemplatingConfig");
+            Classes.newInstance("com.arsdigita.mail.MailConfig");
+            Classes.newInstance("com.arsdigita.versioning.VersioningConfig");
+            Classes.newInstance("com.arsdigita.web.WebConfig");
+            Classes.newInstance("com.arsdigita.bebop.BebopConfig");
         } catch (Exception e) {
             s_log.error(e.getMessage(), e);
         }
@@ -84,7 +85,7 @@ public class ConfigPrinter {
             writeXML(out);
 
             final XSLTemplate template = new XSLTemplate
-                (ConfigPrinter.class.getResource("ConfigPrinter.xsl.properties")); // XXX build system work around
+                (ParameterPrinter.class.getResource("ParameterPrinter.xsl.properties")); // XXX build system work around
 
             final Source source = new StreamSource
                 (new StringReader(sout.toString()));

@@ -24,18 +24,19 @@ import org.apache.commons.beanutils.converters.*;
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#3 $
  */
 public abstract class AbstractParameter implements Parameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#2 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/AbstractParameter.java#3 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/09/19 02:38:52 $";
+        "$DateTime: 2003/09/23 01:57:55 $";
 
     private final String m_name;
     private final Class m_type;
     private final int m_multiplicity;
     private final Object m_default;
+    private ParameterInfo m_info;
 
     protected AbstractParameter(final String name,
                                 final int multiplicity,
@@ -65,24 +66,36 @@ public abstract class AbstractParameter implements Parameter {
         return m_name;
     }
 
-    public final Object getDefaultValue() {
+    // Not final.  This is an extension point.
+    public Object getDefaultValue() {
         return m_default;
+    }
+
+    public final ParameterInfo getInfo() {
+        return m_info;
+    }
+
+    public final void setInfo(final ParameterInfo info) {
+        m_info = info;
     }
 
     //
     // Lifecycle events
     //
 
-    public final ParameterValue unmarshal(final ParameterStore store) {
-        final ArrayList errors = new ArrayList();
-        final String literal = store.read(this);
+    public final ParameterValue unmarshal(final ParameterLoader loader) {
+        final ParameterValue value = loader.load(this);
 
-        if (literal == null) {
-            return new ParameterValue(m_default, errors);
+        if (value == null) {
+            return new ParameterValue(m_default);
         } else {
-            final Object value = unmarshal(literal, errors);
+            final String string = value.getString();
+            final List errors = value.getErrors();
+            final Object result = unmarshal(string, errors);
 
-            return new ParameterValue(value, errors);
+            value.setObject(result);
+
+            return value;
         }
     }
 
@@ -97,7 +110,7 @@ public abstract class AbstractParameter implements Parameter {
     }
 
     public final void validate(final ParameterValue value) {
-        final Object object = value.getValue();
+        final Object object = value.getObject();
         final List errors = value.getErrors();
 
         if (isRequired() && object == null) {
