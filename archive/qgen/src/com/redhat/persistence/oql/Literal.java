@@ -1,15 +1,18 @@
 package com.redhat.persistence.oql;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 /**
  * Literal
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/02/09 $
+ * @version $Revision: #7 $ $Date: 2004/02/13 $
  **/
 
 public class Literal extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#6 $ by $Author: ashah $, $DateTime: 2004/02/09 16:16:05 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Literal.java#7 $ by $Author: ashah $, $DateTime: 2004/02/13 21:49:42 $";
 
     private Object m_value;
 
@@ -29,16 +32,49 @@ public class Literal extends Expression {
             frame = code.frame(code.getType(m_value));
         }
         // XXX: should have option to use bind variables here
-        String literal;
-        if (m_value instanceof String) {
-            literal = quote((String) m_value);
-        } else {
-            literal = "" + m_value;
-        }
+        String literal = convert(m_value);
         frame.setColumns(new String[] { literal });
         code.addVirtual(this);
         code.setFrame(this, frame);
         return frame;
+    }
+
+    private static String convert(Object value) {
+        if (value instanceof Collection) {
+            Collection c = (Collection) value;
+            StringBuffer sb = new StringBuffer("(");
+            for (Iterator it = c.iterator(); it.hasNext(); ) {
+                sb.append(convert(it.next()));
+                if (it.hasNext()) {
+                    sb.append(",");
+                } else {
+                    sb.append(")");
+                }
+            }
+
+            return sb.toString();
+        }
+
+        String literal;
+        if (value instanceof String) {
+            literal = quote((String) value);
+        } else if (value instanceof com.redhat.persistence.PropertyMap) {
+            java.util.Map.Entry me = (java.util.Map.Entry)
+                ((com.redhat.persistence.PropertyMap) value).
+                entrySet().iterator().next();
+            literal = me.getValue().toString();
+        } else if (value instanceof com.arsdigita.persistence.DataObject) {
+            if (((com.arsdigita.persistence.DataObject) value).getOID()
+                .getNumberOfProperties() == 1) {
+                literal = ((com.arsdigita.persistence.DataObject) value).getOID().get("id").toString();
+            } else {
+                literal = value.toString();
+            }
+        } else {
+            literal = "" + value;
+        }
+
+        return literal;
     }
 
     // XXX: temporary hack

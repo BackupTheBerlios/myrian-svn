@@ -11,12 +11,12 @@ import java.util.*;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2004/02/06 $
+ * @version $Revision: #8 $ $Date: 2004/02/13 $
  **/
 
 class Code {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#7 $ by $Author: rhs $, $DateTime: 2004/02/06 17:14:57 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#8 $ by $Author: ashah $, $DateTime: 2004/02/13 21:49:42 $";
 
     private Root m_root;
     private LinkedList m_stack = new LinkedList();
@@ -372,12 +372,12 @@ class Code {
     }
 
     static void paths(ObjectType type, Path parent, Collection result) {
-        Collection key = type.getKeyProperties();
-        if (key.isEmpty()) {
+        Collection props = properties(type);
+        if (props.isEmpty()) {
             result.add(parent);
             return;
         }
-        for (Iterator it = key.iterator(); it.hasNext(); ) {
+        for (Iterator it = props.iterator(); it.hasNext(); ) {
             Property prop = (Property) it.next();
             paths(prop.getType(), Path.add(parent, prop.getName()), result);
         }
@@ -468,6 +468,12 @@ class Code {
     void materialize(Expression e) {
         Frame f = getFrame(e);
         String[] columns = f.getColumns();
+
+        if (isVirtual(e) && columns == null) {
+            e.emit(this);
+            return;
+        }
+
         if (isVirtual(e)) {
             if (columns.length > 1) {
                 append("(");
@@ -534,4 +540,13 @@ class Code {
         qualias.emit(this);
     }
 
+    private Map m_staticChildren = new HashMap();
+
+    void setChildren(com.redhat.persistence.oql.Static expr, List children) {
+        m_staticChildren.put(expr, children);
+    }
+
+    List getChildren(com.redhat.persistence.oql.Static expr) {
+        return (List) m_staticChildren.get(expr);
+    }
 }
