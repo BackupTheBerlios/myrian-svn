@@ -6,12 +6,12 @@ import com.arsdigita.persistence.OID;
  * PersistentObjectSource
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/12/04 $
+ * @version $Revision: #3 $ $Date: 2002/12/06 $
  **/
 
 class PersistentObjectSource {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PersistentObjectSource.java#2 $ by $Author: rhs $, $DateTime: 2002/12/04 19:18:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PersistentObjectSource.java#3 $ by $Author: rhs $, $DateTime: 2002/12/06 11:46:27 $";
 
     public PersistentObject getPersistentObject(final Session ssn,
                                                 final OID oid) {
@@ -36,6 +36,10 @@ class PersistentObjectSource {
                     } else {
                         return false;
                     }
+                }
+
+                public String toString() {
+                    return oid.toString();
                 }
             };
     }

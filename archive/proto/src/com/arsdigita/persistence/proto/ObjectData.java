@@ -9,12 +9,12 @@ import java.io.*;
  * ObjectData
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/12/04 $
+ * @version $Revision: #3 $ $Date: 2002/12/06 $
  **/
 
 class ObjectData {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#2 $ by $Author: rhs $, $DateTime: 2002/12/04 19:18:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/ObjectData.java#3 $ by $Author: rhs $, $DateTime: 2002/12/06 11:46:27 $";
 
     private Session m_ssn;
     private PersistentObject m_object;
@@ -27,7 +27,7 @@ class ObjectData {
         m_ssn = ssn;
         m_object = object;
 
-        m_ssn.m_odata.put(m_object.getOID(), this);
+        m_ssn.addObjectData(this);
     }
 
     public Session getSession() {

@@ -8,12 +8,12 @@ import java.io.*;
  * PropertyEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/12/04 $
+ * @version $Revision: #3 $ $Date: 2002/12/06 $
  **/
 
 public abstract class PropertyEvent extends Event {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyEvent.java#2 $ by $Author: rhs $, $DateTime: 2002/12/04 19:18:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyEvent.java#3 $ by $Author: rhs $, $DateTime: 2002/12/06 11:46:27 $";
 
     private Property m_prop;
     private Object m_arg;
@@ -24,6 +24,8 @@ public abstract class PropertyEvent extends Event {
         m_prop = prop;
         m_arg = arg;
         m_pdata = ssn.getPropertyData(oid, prop);
+
+        log();
     }
 
     public Property getProperty() {
@@ -48,6 +50,11 @@ public abstract class PropertyEvent extends Event {
         out.print("(");
         out.print(m_arg);
         out.println(")");
+    }
+
+    public String toString() {
+        return getName() + " " + getOID() + "." + getProperty().getName() +
+            " " + getArgument();
     }
 
 }

@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * Session
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/12/04 $
+ * @version $Revision: #3 $ $Date: 2002/12/06 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#2 $ by $Author: rhs $, $DateTime: 2002/12/04 19:18:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#3 $ by $Author: rhs $, $DateTime: 2002/12/06 11:46:27 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -27,7 +27,8 @@ public class Session {
         new com.arsdigita.persistence.proto.engine.Engine(this);
     final EventSource ES = ENGINE.getEventSource();
     final FilterSource FS = ENGINE.getFilterSource();
-    HashMap m_odata = new HashMap();
+
+    private HashMap m_odata = new HashMap();
 
     // These are kept up to date by code in Event.java
     Event m_head = null;
@@ -144,16 +145,36 @@ public class Session {
         // the proper remove. Not sure what makes the most sense yet.
 
         Object old = null;
-        if (prop.isRole() && prop.isComponent()) {
+        if (prop.isRole() && prop.isComponent() ||
+            prop.getAssociatedProperty() != null) {
             old = get(oid, prop);
         }
 
         PropertyData pd = fetchPropertyData(oid, prop);
         addEvent(ES.getSet(this, oid, prop, value), pd);
 
-        if (prop.isRole() && prop.isComponent() && old != null) {
+        if (prop.isRole() && prop.isComponent()) {
             PersistentObject po = (PersistentObject) old;
-            delete(po.getOID());
+            if (po != null) {
+                delete(po.getOID());
+            }
+        } else if (prop.getAssociatedProperty() != null) {
+            Property ass = prop.getAssociatedProperty();
+            PersistentObject oldpo = (PersistentObject) old;
+            PersistentObject po = (PersistentObject) value;
+            PersistentObject me = retrieve(oid);
+            if (ass.isCollection()) {
+                if (oldpo != null) {
+                    addEvent(ES.getRemove(this, oldpo.getOID(), ass, me));
+                }
+                if (po != null) {
+                    addEvent(ES.getAdd(this, po.getOID(), ass, me));
+                }
+            } else {
+                throw new IllegalStateException
+                    ("This case is just fucked up. " +
+                     "I'll wait till it happens to deal with it.");
+            }
         }
 
         if (LOG.isDebugEnabled()) {
@@ -202,9 +223,24 @@ public class Session {
             trace("add", new Object[] {oid, prop.getName(), value});
         }
 
+        // should deal with link attributes here
         PropertyData pd = fetchPropertyData(oid, prop);
         addEvent(ES.getAdd(this, oid, prop, value), pd);
-        // should deal with link attributes here
+        if (prop.getAssociatedProperty() != null) {
+            PersistentObject me = retrieve(oid);
+            Property ass = prop.getAssociatedProperty();
+            PersistentObject po = (PersistentObject) value;
+            if (ass.isCollection()) {
+                addEvent(ES.getAdd(this, po.getOID(), ass, me));
+            } else {
+                PersistentObject old =
+                    (PersistentObject) get(po.getOID(), ass);
+                if (old != null) {
+                    addEvent(ES.getRemove(this, old.getOID(), ass, po));
+                }
+                addEvent(ES.getSet(this, po.getOID(), ass, me));
+            }
+        }
 
         if (LOG.isDebugEnabled()) {
             untrace("add", null);
@@ -225,6 +261,15 @@ public class Session {
             PersistentObject po = (PersistentObject) value;
             if (po != null) {
                 delete(po.getOID());
+            }
+        } else if (prop.getAssociatedProperty() != null) {
+            Property ass = (Property) prop.getAssociatedProperty();
+            PersistentObject me = retrieve(oid);
+            PersistentObject po = (PersistentObject) value;
+            if (ass.isCollection()) {
+                addEvent(ES.getRemove(this, po.getOID(), ass, me));
+            } else {
+                addEvent(ES.getSet(this, po.getOID(), ass, null));
             }
         }
 
@@ -327,6 +372,10 @@ public class Session {
 
     void removeObjectData(OID oid) {
         m_odata.remove(oid);
+    }
+
+    void addObjectData(ObjectData odata) {
+        m_odata.put(odata.getOID(), odata);
     }
 
     PropertyData getPropertyData(OID oid, Property prop) {
@@ -471,12 +520,12 @@ public class Session {
             }
         };
 
-    private static final int getLevel() {
+    static final int getLevel() {
         Integer level = (Integer) LEVEL.get();
         return level.intValue();
     }
 
-    private static final void setLevel(int level) {
+    static final void setLevel(int level) {
         LEVEL.set(new Integer(level));
     }
 
@@ -495,8 +544,10 @@ public class Session {
                 }
                 msg.append(args[i]);
             }
-            msg.append(")");
-            LOG.debug(msg.toString());
+            msg.append(") {");
+            if (level == 0) {
+                LOG.debug(msg.toString());
+            }
 
             setLevel(level + 1);
         }
@@ -525,11 +576,15 @@ public class Session {
             for (int i = 0; i < level - 1; i++) {
                 buf.append("  ");
             }
+            buf.append("} (");
             buf.append(method);
+            buf.append(")");
             if (msg != null) {
                 buf.append(msg);
             }
-            LOG.debug(buf.toString());
+            if (level == 1) {
+                LOG.debug(buf.toString());
+            }
         }
     }
 

@@ -4,6 +4,7 @@ import com.arsdigita.tools.junit.framework.BaseTestCase;
 
 import com.arsdigita.persistence.metadata.*;
 import com.arsdigita.persistence.OID;
+import java.util.*;
 import java.math.*;
 import java.io.*;
 
@@ -11,12 +12,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/12/04 $
+ * @version $Revision: #3 $ $Date: 2002/12/06 $
  **/
 
 public class ProtoTest extends BaseTestCase {
 
-    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#2 $ by $Author: rhs $, $DateTime: 2002/12/04 19:18:22 $";
+    public final static String versionId = "$Id: //core-platform/proto/test/src/com/arsdigita/persistence/proto/ProtoTest.java#3 $ by $Author: rhs $, $DateTime: 2002/12/06 11:46:27 $";
 
     public ProtoTest(String name) {
         super(name);
@@ -25,7 +26,7 @@ public class ProtoTest extends BaseTestCase {
     public void test() {
         OID oid = new OID("test.Test", BigInteger.ZERO);
         Property NAME = oid.getObjectType().getProperty("name");
-        Property COLLECTION = oid.getObjectType().getProperty("opt2many");
+        Property OPT2MANY = oid.getObjectType().getProperty("opt2many");
 
         Session ssn = new Session();
         PersistentObject po = ssn.create(oid);
@@ -41,7 +42,7 @@ public class ProtoTest extends BaseTestCase {
         ssn.create(oid);
 
         PersistentCollection pc =
-            (PersistentCollection) ssn.get(oid, COLLECTION);
+            (PersistentCollection) ssn.get(oid, OPT2MANY);
 
         Object one = ssn.create
             (new OID("test.Icle", new BigInteger("1")));
@@ -50,43 +51,54 @@ public class ProtoTest extends BaseTestCase {
         Object three = ssn.create
             (new OID("test.Icle", new BigInteger("3")));
 
-        ssn.add(oid, COLLECTION, one);
+        ssn.add(oid, OPT2MANY, one);
         assertCollection(new Object[] {one}, pc);
-        ssn.add(oid, COLLECTION, two);
+        ssn.add(oid, OPT2MANY, two);
         assertCollection(new Object[] {one, two}, pc);
-        ssn.add(oid, COLLECTION, three);
+        ssn.add(oid, OPT2MANY, three);
         assertCollection(new Object[] {one, two, three}, pc);
-        ssn.remove(oid, COLLECTION, two);
+        ssn.remove(oid, OPT2MANY, two);
         assertCollection(new Object[] {one, three}, pc);
-        ssn.remove(oid, COLLECTION, three);
+        ssn.remove(oid, OPT2MANY, three);
         assertCollection(new Object[] {one}, pc);
-        ssn.add(oid, COLLECTION, three);
+        ssn.add(oid, OPT2MANY, three);
         assertCollection(new Object[] {one, three}, pc);
 
-        System.out.println("Foo:");
+        System.out.println();
+        System.out.println("---------------------------------");
+        System.out.println();
         ssn.dump();
 
         ssn.flush();
 
-        System.out.println("Bar:");
+        System.out.println();
+        System.out.println("---------------------------------");
+        System.out.println();
         ssn.dump();
 
-        assertTrue(ssn.retrieve(oid) != po);
-
-        System.out.println("Baz:");
+        ssn.delete(oid);
+        ssn.flush();
+        System.out.println();
+        System.out.println("---------------------------------");
+        System.out.println();
         ssn.dump();
     }
 
     private static void assertCollection(Object[] expected,
                                          PersistentCollection actual) {
-        DataSet ds = actual.getDataSet();
-        Cursor c = ds.getCursor();
-        int index = 0;
-        while (c.next()) {
-            assertEquals(expected[index++], c.get());
+        HashSet exp = new HashSet();
+        for (int i = 0; i < expected.length; i++) {
+            exp.add(expected[i]);
         }
 
-        assertEquals(expected.length, index);
+        HashSet act = new HashSet();
+        DataSet ds = actual.getDataSet();
+        Cursor c = ds.getCursor();
+        while (c.next()) {
+            act.add(c.get());
+        }
+
+        assertEquals(exp, act);
     }
 
 }
