@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #15 $ $Date: 2004/02/28 $
+ * @version $Revision: #16 $ $Date: 2004/03/03 $
  **/
 
 class Code {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#15 $ by $Author: rhs $, $DateTime: 2004/02/28 08:30:26 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#16 $ by $Author: ashah $, $DateTime: 2004/03/03 01:22:16 $";
 
     private static final Logger s_log = Logger.getLogger(Code.class);
 
@@ -37,7 +37,7 @@ class Code {
         return result.toString();
     }
 
-    static String[] names(Column[] columns, String alias) {
+    private static String[] names(Column[] columns, String alias) {
         String[] result = new String[columns.length];
         for (int i = 0; i < columns.length; i++) {
             Column col = columns[i];
@@ -66,11 +66,27 @@ class Code {
         return m;
     }
 
+    private static boolean isStaticAttribute(Mapping m) {
+        if (m instanceof Static) { return true; }
+        ObjectMap map = m.getObjectMap();
+        if (map.getTable() == null && map.getRetrieveAll() != null) {
+            return true;
+        }
+
+        return false;
+    }
+
     static String[] columns(final Property prop, final String alias) {
         Mapping m = getMapping(prop);
 
         if (m.getRetrieve() != null) {
             return columns(prop.getType(), alias);
+        }
+
+        if (isStaticAttribute(m)) {
+            ObjectMap map = m.getObjectMap();
+            SQLBlock block = map.getRetrieveAll();
+            return columns(paths(prop.getType(), m.getPath()), block);
         }
 
         final String[][] result = new String[][] { null };
@@ -80,28 +96,23 @@ class Code {
                 result[0] = names(new Column[] {v.getColumn()}, alias);
             }
             public void onJoinTo(JoinTo j) {
-                result[0] = columns(j.getKey(), alias);
+                result[0] = columns(j.getKey(), prop.getType(), alias);
             }
             public void onJoinFrom(JoinFrom j) {
-                result[0] =
-                    columns(j.getKey().getTable().getPrimaryKey(), alias);
+                result[0] = columns
+                    (j.getKey().getTable().getPrimaryKey(),
+                     prop.getType(),
+                     alias);
             }
             public void onJoinThrough(JoinThrough jt) {
-                result[0] = columns(jt.getTo(), alias);
+                result[0] = columns(jt.getTo(), prop.getType(), alias);
             }
             public void onStatic(Static s) {
-                ObjectMap map = s.getObjectMap();
-                SQLBlock block = map.getRetrieveAll();
-                result[0] = columns
-                    (paths(prop.getType(), s.getPath()), block);
+                throw new IllegalStateException();
             }
         });
 
         return result[0];
-    }
-
-    static String[] columns(Constraint c, String alias) {
-        return names(c.getColumns(), alias);
     }
 
     static void equals(String[] left, String[] right, StringBuffer buf) {
@@ -128,6 +139,10 @@ class Code {
             return table(prop.getType());
         }
 
+        if (isStaticAttribute(m)) {
+            return null;
+        }
+
         final String[] result = new String[] { null };
 
         m.dispatch(new Mapping.Switch() {
@@ -143,7 +158,9 @@ class Code {
             public void onJoinThrough(JoinThrough jt) {
                 result[0] = jt.getFrom().getTable().getName();
             }
-            public void onStatic(Static s) {}
+            public void onStatic(Static s) {
+                throw new IllegalStateException();
+            }
         });
 
         return result[0];
@@ -238,8 +255,82 @@ class Code {
                 return concat(alias + ".", columns);
             }
         } else {
-            return names(table(om).getPrimaryKey().getColumns(), alias);
+            return names(cols(type), alias);
         }
+    }
+
+    static String[] columns(Constraint c, ObjectType type, String alias) {
+        return names(cols(c, type), alias);
+    }
+
+    private static Column[] cols(Constraint c, ObjectType type) {
+        Column[] cols = c.getColumns();
+        Root root = type.getRoot();
+        ObjectType basetype = type.getBasetype();
+        ObjectMap map = root.getObjectMap(basetype);
+        Column[] currentOrder = table(map).getPrimaryKey().getColumns();
+        Column[] desiredOrder = cols(basetype);
+        return sort(cols, currentOrder, desiredOrder);
+    }
+
+    private static Column[] cols(ObjectType type) {
+        Root root = type.getRoot();
+        ObjectMap map = root.getObjectMap(type);
+        if (type.getSupertype() == null) {
+            Collection props = map.getKeyProperties();
+            final ArrayList result = new ArrayList();
+
+            for (Iterator it = props.iterator(); it.hasNext(); ) {
+                final Property prop = (Property) it.next();
+                Mapping mapping = map.getMapping(Path.get(prop.getName()));
+                mapping.dispatch(new Mapping.Switch() {
+                    public void onValue(Value m) {
+                        result.add(m.getColumn());
+                    }
+                    public void onJoinTo(JoinTo m) {
+                        result.addAll
+                            (Arrays.asList(cols(m.getKey(), prop.getType())));
+                    }
+                    public void onJoinFrom(JoinFrom m) {
+                        throw new UnsupportedOperationException();
+                    }
+                    public void onJoinThrough(JoinThrough m) {
+                        throw new UnsupportedOperationException();
+                    }
+                    public void onStatic(Static m) {
+                        throw new UnsupportedOperationException();
+                    }
+                });
+            }
+
+            return (Column[]) result.toArray(new Column[] {});
+        } else {
+            return cols(table(map).getPrimaryKey(), type);
+        }
+    }
+
+    private static Column[] sort(Column[] toSort,
+                                 Column[] currentOrder,
+                                 Column[] desiredOrder) {
+        final int length = toSort.length;
+        if (length != currentOrder.length || length != desiredOrder.length) {
+            throw new IllegalArgumentException("length of arrays differs");
+        }
+
+        Column[] result = new Column[length];
+        for (int i = 0; i < length; i++) {
+            for (int j = 0; j < length; j++) {
+                if (desiredOrder[i].equals(currentOrder[j])) {
+                    result[i] = toSort[j];
+                    break;
+                }
+            }
+            if (result[i] == null) {
+                throw new IllegalStateException();
+            }
+        }
+
+        return result;
     }
 
     static String[] concat(String prefix, String[] strs) {

@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * Get
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #16 $ $Date: 2004/03/01 $
+ * @version $Revision: #17 $ $Date: 2004/03/03 $
  **/
 
 public class Get extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#16 $ by $Author: rhs $, $DateTime: 2004/03/01 11:43:59 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Get.java#17 $ by $Author: ashah $, $DateTime: 2004/03/03 01:22:16 $";
 
     private static final Logger s_log = Logger.getLogger(Get.class);
 
@@ -326,7 +326,7 @@ public class Get extends Expression {
         }
 
         private void conditions(Constraint c) {
-            String[] columns = Code.columns(c, null);
+            String[] columns = Code.columns(c, m_expr.getType(), null);
             m_key = new Key(m_frame, columns);
         }
 
