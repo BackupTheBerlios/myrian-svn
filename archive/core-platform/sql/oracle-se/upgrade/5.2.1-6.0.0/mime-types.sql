@@ -70,6 +70,10 @@ begin
     execute immediate 'comment on column cms_image_mime_types.sizer_class is ''''';
     execute immediate 'comment on table cms_mime_types is ''''';
     execute immediate 'comment on column cms_mime_types.file_extension is ''''';
+    execute immediate 'comment on column cms_mime_types.java_class is ''''';
+    execute immediate 'comment on column cms_mime_types.object_type is ''''';
+    execute immediate 'comment on table cms_text_mime_types is ''''';
+    execute immediate 'comment on column cms_text_mime_types.is_inso is ''''';
 
   end if;
 end;

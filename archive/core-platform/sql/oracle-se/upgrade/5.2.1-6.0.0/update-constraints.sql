@@ -472,11 +472,6 @@ alter table group_subgroup_map add
     constraint grou_sub_map_gro_id_su_p_8caa0
       primary key(subgroup_id, group_id);
 
--- Normally, Oracle automatically creates an index for every primary key.  However,
--- because of the 'ocm_container_object_idx' index, which indexes these same keys in
--- reverse order, Oracle does not create the index.  So, we do it explicitly.
-create index obje_con_map_con_id_ob_p_ul6se on object_container_map (object_id, container_id);
-
 alter table parameterized_privileges drop constraint para_pri_bas_pri_par_k_p_a1rpb;
 alter table parameterized_privileges add
     constraint para_pri_bas_pri_par_k_p_a1rpb

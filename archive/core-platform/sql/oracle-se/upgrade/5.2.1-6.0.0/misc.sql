@@ -11,15 +11,10 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/oracle-se/upgrade/5.2.1-6.0.0/misc.sql#2 $
--- $DateTime: 2003/07/31 09:07:40 $
+-- $Id: //core-platform/dev/sql/oracle-se/upgrade/5.2.1-6.0.0/misc.sql#3 $
+-- $DateTime: 2003/08/08 16:56:11 $
 
 drop function last_attr_value;
-
-alter table cat_categories modify (
-    abstract_p not null,
-    enabled_p not null
-);
 
 alter table portlets modify (
     portal_id not null
@@ -27,8 +22,23 @@ alter table portlets modify (
 
 drop table cw_process_task_map;
 
+update cw_tasks set is_active = 0 where is_active is null;
+
+commit;
+
+-- cat_categories
+--------------------------------------------------------------------------------
+alter table cat_categories drop constraint cat_categories_abstract_p_ck;
+alter table cat_categories modify (
+    abstract_p not null,
+    enabled_p not null
+);
 alter table cat_categories modify (
     default_ancestors varchar2(3209)
+);
+
+alter table cat_categories add (
+    url VARCHAR(200)
 );
 
 declare
