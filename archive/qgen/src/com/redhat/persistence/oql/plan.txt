@@ -33,13 +33,13 @@
  * Use analyzer during SQLG
 
  * Expand OQL to support necessary primitives
-   - retrieve all
+   - retrieve all done
    - order (100 LOC) done
    - range (100 LOC) done
    - size (100 LOC) done
    - simple ------------------. (250) done
                               |----> (Opaque expression with optional metadata)
- * Static SQL in OQL -> SQL --'
+ * Static SQL in OQL -> SQL --' done
 
  * Metadata simplification:
    - subtypes of Property can go away.
