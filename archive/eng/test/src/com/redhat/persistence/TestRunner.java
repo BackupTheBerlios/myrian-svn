@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
  * TestRunner
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2004/08/18 $
+ * @version $Revision: #10 $ $Date: 2004/08/18 $
  **/
 
 public class TestRunner {
 
-    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/TestRunner.java#9 $ by $Author: rhs $, $DateTime: 2004/08/18 15:35:54 $";
+    public final static String versionId = "$Id: //eng/persistence/dev/test/src/com/redhat/persistence/TestRunner.java#10 $ by $Author: rhs $, $DateTime: 2004/08/18 15:42:47 $";
 
     private static final Logger s_log = Logger.getLogger(TestRunner.class);
 
@@ -67,8 +67,8 @@ public class TestRunner {
         final TestResult result = new TestResult() {
             protected void run(TestCase test) {
                 String name = "" + test;
-                if (ex != null && ex.matcher(name).matches()) { return; }
-                if (in == null || in.matcher(name).matches()) {
+                if (ex != null && ex.matcher(name).find()) { return; }
+                if (in == null || in.matcher(name).find()) {
                     super.run(test);
                 }
             }
@@ -110,7 +110,7 @@ public class TestRunner {
 
     private static final void print(Test test, Throwable t, boolean failed) {
         System.out.println
-            ("Testcase " + (failed ? "FAILED" : "ERROR ") + ": " + test);
+            ("Testcase " + (failed ? "FAILED" : " ERROR") + ": " + test);
         t.printStackTrace(System.out);
     }
 
