@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #27 $ $Date: 2003/03/11 $
+ * @version $Revision: #28 $ $Date: 2003/03/11 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#27 $ by $Author: rhs $, $DateTime: 2003/03/11 10:49:54 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#28 $ by $Author: rhs $, $DateTime: 2003/03/11 16:05:41 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -170,6 +170,10 @@ public class PDL {
         m_errors.check();
 
         emitEvents(root);
+
+        m_errors.check();
+
+        emitDataOperations(root);
 
         m_errors.check();
 
@@ -930,6 +934,17 @@ public class PDL {
         Path path = Path.get(role);
         Mapping m = om.getMapping(path);
         return m;
+    }
+
+    private void emitDataOperations(final Root root) {
+        m_ast.traverse(new Node.Switch() {
+                public void onDataOperation(DataOperationNd nd) {
+                    Path name = Path.get(nd.getFile().getModel().getName() +
+                                         "." + nd.getName().getName());
+                    root.addDataOperation
+                        (new DataOperation(name, getBlock(nd.getSQL())));
+                }
+            });
     }
 
     public static final void main(String[] args) throws Exception {

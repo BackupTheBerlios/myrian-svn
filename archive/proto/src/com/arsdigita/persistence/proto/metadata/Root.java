@@ -1,5 +1,7 @@
 package com.arsdigita.persistence.proto.metadata;
 
+import com.arsdigita.persistence.proto.common.*;
+
 import java.util.*;
 
 
@@ -7,12 +9,12 @@ import java.util.*;
  * Root
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/01/15 $
+ * @version $Revision: #4 $ $Date: 2003/03/11 $
  **/
 
 public class Root {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Root.java#3 $ by $Author: rhs $, $DateTime: 2003/01/15 09:35:55 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Root.java#4 $ by $Author: rhs $, $DateTime: 2003/03/11 16:05:41 $";
 
     private static final Root ROOT = new Root();
 
@@ -23,6 +25,7 @@ public class Root {
     private Mist m_types = new Mist(this);
     private Mist m_maps = new Mist(this);
     private Mist m_tables = new Mist(this);
+    private Mist m_ops = new Mist(this);
 
     private Root() {}
 
@@ -64,6 +67,18 @@ public class Root {
 
     public Collection getTables() {
         return m_tables;
+    }
+
+    public Collection getDataOperations() {
+        return m_ops;
+    }
+
+    public void addDataOperation(DataOperation op) {
+        m_ops.add(op);
+    }
+
+    public DataOperation getDataOperation(Path name) {
+        return (DataOperation) m_ops.get(name);
     }
 
 }

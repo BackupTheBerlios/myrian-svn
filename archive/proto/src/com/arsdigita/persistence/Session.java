@@ -18,6 +18,7 @@ package com.arsdigita.persistence;
 import com.arsdigita.db.ConnectionManager;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
+import com.arsdigita.persistence.proto.common.Path;
 import com.arsdigita.persistence.proto.Adapter;
 import com.arsdigita.persistence.proto.Signature;
 import com.arsdigita.persistence.proto.Query;
@@ -54,7 +55,7 @@ import java.sql.SQLException;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #17 $ $Date: 2003/03/06 $
+ * @version $Revision: #18 $ $Date: 2003/03/11 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -135,8 +136,9 @@ public class Session {
             }
         };
     private RDBMSQuerySource m_qs = new RDBMSQuerySource();
+    private RDBMSEngine m_engine = new RDBMSEngine(m_cs);
     private com.arsdigita.persistence.proto.Session m_ssn =
-    new com.arsdigita.persistence.proto.Session(new RDBMSEngine(m_cs), m_qs);
+        new com.arsdigita.persistence.proto.Session(m_engine, m_qs);
 
     private TransactionContext m_ctx = new TransactionContext(m_ssn);
     private MetadataRoot m_root = MetadataRoot.getMetadataRoot();
@@ -185,6 +187,10 @@ public class Session {
 
     com.arsdigita.persistence.proto.Session getProtoSession() {
         return m_ssn;
+    }
+
+    RDBMSEngine getEngine() {
+        return m_engine;
     }
 
     /**
@@ -506,7 +512,8 @@ public class Session {
      **/
 
     public DataOperation retrieveDataOperation(String name) {
-        throw new Error("not implemented");        
+        return new DataOperation
+            (this, Root.getRoot().getDataOperation(Path.get(name)).getSQL());
     }
 
 

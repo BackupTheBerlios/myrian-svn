@@ -13,12 +13,12 @@ import com.arsdigita.persistence.proto.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/02/26 $
+ * @version $Revision: #3 $ $Date: 2003/03/11 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDLParser.jj#2 $ by $Author: rhs $, $DateTime: 2003/02/26 20:44:08 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDLParser.jj#3 $ by $Author: rhs $, $DateTime: 2003/03/11 16:05:41 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -150,7 +150,7 @@ FileNd file(String filename) :
     ( n = pimpwhore() <SEMI> { f.add(FileNd.IMPORTS, n); } )*
     (   n = object_type() { f.add(FileNd.OBJECT_TYPES, n); }
       | n = association() { f.add(FileNd.ASSOCIATIONS, n); }
-      | data_operation() )*
+      | n = data_operation() { f.add(FileNd.DATA_OPERATIONS, n); } )*
     <EOF>
     { return f; }
 }
@@ -219,14 +219,19 @@ AssociationNd association() :
     { ln(a, t); return a; }
 }
 
-void data_operation() :
-{}
+DataOperationNd data_operation() :
 {
-    <DATA_OPERATION> id()
+    DataOperationNd don = new DataOperationNd();
+    Node nd;
+    Token t;
+}
+{
+    t = <DATA_OPERATION> nd = id() { don.add(DataOperationNd.NAME, nd); }
     <LBRACE>
          [ option_block() ]
-         sql_block()
+         nd = sql_block() { don.add(DataOperationNd.SQL, nd); }
     <RBRACE>
+    { ln(don, t); return don; }
 }
 
 /**

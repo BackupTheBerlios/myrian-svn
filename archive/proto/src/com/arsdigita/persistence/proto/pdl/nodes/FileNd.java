@@ -6,12 +6,12 @@ import java.util.*;
  * File
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/01/15 $
+ * @version $Revision: #2 $ $Date: 2003/03/11 $
  **/
 
 public class FileNd extends Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/FileNd.java#1 $ by $Author: rhs $, $DateTime: 2003/01/15 10:39:47 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/FileNd.java#2 $ by $Author: rhs $, $DateTime: 2003/03/11 16:05:41 $";
 
     public static final Field MODEL =
         new Field(FileNd.class, "model", ModelNd.class, 1, 1);
@@ -21,6 +21,8 @@ public class FileNd extends Node {
         new Field(FileNd.class, "objectTypes", ObjectTypeNd.class);
     public static final Field ASSOCIATIONS =
         new Field(FileNd.class, "associations", AssociationNd.class);
+    public static final Field DATA_OPERATIONS =
+        new Field(FileNd.class, "dataOperations", DataOperationNd.class);
 
     private String m_name;
 
