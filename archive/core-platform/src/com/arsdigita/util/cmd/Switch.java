@@ -15,18 +15,18 @@
 
 package com.arsdigita.util.cmd;
 
-import com.arsdigita.util.*;
-import java.util.*;
+import com.arsdigita.util.Assert;
+import java.util.List;
 
 /**
  * @deprecated Use CLI (http://jakarta.apache.org/commons/cli/index.html) instead.
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/09/15 $
+ * @version $Revision: #5 $ $Date: 2003/10/28 $
  **/
 
 public abstract class Switch {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/cmd/Switch.java#4 $ by $Author: richardl $, $DateTime: 2003/09/15 11:53:10 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/cmd/Switch.java#5 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     public static abstract class Type {
         abstract String[] parse(CommandLine cmd, List args);

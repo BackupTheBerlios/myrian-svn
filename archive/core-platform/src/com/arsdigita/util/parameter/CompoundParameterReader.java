@@ -15,7 +15,9 @@
 
 package com.arsdigita.util.parameter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import org.apache.log4j.Logger;
 
 /**
@@ -23,13 +25,13 @@ import org.apache.log4j.Logger;
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/CompoundParameterReader.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/CompoundParameterReader.java#2 $
  */
 public class CompoundParameterReader implements ParameterReader {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/CompoundParameterReader.java#1 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/23 15:28:18 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/CompoundParameterReader.java#2 $" +
+        "$Author: jorris $" +
+        "$DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger s_log = Logger.getLogger
         (CompoundParameterReader.class);

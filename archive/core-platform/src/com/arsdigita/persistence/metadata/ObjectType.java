@@ -16,9 +16,10 @@
 package com.arsdigita.persistence.metadata;
 
 import com.arsdigita.persistence.PersistenceException;
-import com.arsdigita.util.*;
-import java.util.*;
-import java.io.*;
+import com.arsdigita.util.Assert;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 
 /**
@@ -27,12 +28,12 @@ import java.io.*;
  * be marked as special "key" properties.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #15 $ $Date: 2003/09/10 $
+ * @version $Revision: #16 $ $Date: 2003/10/28 $
  **/
 
 public class ObjectType extends CompoundType {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#15 $ by $Author: ashah $, $DateTime: 2003/09/10 00:21:05 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#16 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     static ObjectType
 	wrap(com.redhat.persistence.metadata.ObjectType type) {

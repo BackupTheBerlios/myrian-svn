@@ -15,25 +15,33 @@
 
 package com.arsdigita.util.parameter;
 
-import com.arsdigita.util.*;
-import com.arsdigita.templating.*; // XXX arh, dependency
-import java.io.*;
-import java.util.*;
-import javax.xml.transform.*;
-import javax.xml.transform.stream.*;
+import com.arsdigita.templating.XSLTemplate;
+import com.arsdigita.util.Classes;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import org.apache.log4j.Logger;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#3 $
  */
 final class ParameterPrinter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#2 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/23 15:28:18 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterPrinter.java#3 $" +
+        "$Author: jorris $" +
+        "$DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterPrinter.class);

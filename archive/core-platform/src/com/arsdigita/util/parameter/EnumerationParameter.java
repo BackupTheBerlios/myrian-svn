@@ -15,21 +15,20 @@
 
 package com.arsdigita.util.parameter;
 
-import com.arsdigita.util.*;
-import java.util.*;
+import java.util.HashMap;
 import org.apache.log4j.Logger;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/EnumerationParameter.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/EnumerationParameter.java#3 $
  */
 public class EnumerationParameter extends AbstractParameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/EnumerationParameter.java#2 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/23 15:28:18 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/EnumerationParameter.java#3 $" +
+        "$Author: jorris $" +
+        "$DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger s_log = Logger.getLogger
         (EnumerationParameter.class);

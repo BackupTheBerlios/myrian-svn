@@ -16,20 +16,20 @@
 package com.redhat.persistence.engine.rdbms;
 
 import com.arsdigita.developersupport.StackTraces;
-import java.sql.*;
-
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import org.apache.log4j.Logger;
 
 /**
  * ResultCycle
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/09/26 $
+ * @version $Revision: #5 $ $Date: 2003/10/28 $
  **/
 
 class ResultCycle {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/ResultCycle.java#4 $ by $Author: bche $, $DateTime: 2003/09/26 15:53:08 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/ResultCycle.java#5 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger LOG = Logger.getLogger(ResultCycle.class);
 

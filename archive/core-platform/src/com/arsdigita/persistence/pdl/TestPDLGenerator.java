@@ -2,16 +2,22 @@ package com.arsdigita.persistence.pdl;
 
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.metadata.MetadataRoot;
-import com.redhat.persistence.metadata.Root;
 import com.redhat.persistence.metadata.Table;
 import com.redhat.persistence.pdl.DDLWriter;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
 
 /*
  * Copyright (C) 2003, 2003 Red Hat Inc. All Rights Reserved.

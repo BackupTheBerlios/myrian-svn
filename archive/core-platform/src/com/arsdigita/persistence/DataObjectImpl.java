@@ -15,23 +15,27 @@
 
 package com.arsdigita.persistence;
 
-import com.arsdigita.persistence.metadata.*;
+import com.arsdigita.persistence.metadata.ObjectType;
+import com.arsdigita.persistence.metadata.Property;
 import com.redhat.persistence.ProtoException;
 import com.redhat.persistence.Session;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import org.apache.log4j.Logger;
 
 /**
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #16 $ $Date: 2003/10/23 $
+ * @version $Revision: #17 $ $Date: 2003/10/28 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#16 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#17 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 

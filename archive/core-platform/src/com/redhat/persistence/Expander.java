@@ -15,9 +15,18 @@
 
 package com.redhat.persistence;
 
-import com.redhat.persistence.metadata.*;
 import com.arsdigita.util.UncheckedWrapperException;
-import java.util.*;
+import com.redhat.persistence.metadata.Adapter;
+import com.redhat.persistence.metadata.ObjectType;
+import com.redhat.persistence.metadata.Property;
+import com.redhat.persistence.metadata.Role;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Expands events. Each top level call to Session creates an exapnder and uses
@@ -27,7 +36,7 @@ import java.util.*;
  */
 class Expander extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Expander.java#3 $ by $Author: ashah $, $DateTime: 2003/09/30 13:19:19 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Expander.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     final private Session m_ssn;
     final private Collection m_deleting = new HashSet();

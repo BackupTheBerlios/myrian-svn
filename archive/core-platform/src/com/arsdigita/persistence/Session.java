@@ -18,33 +18,34 @@ package com.arsdigita.persistence;
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
-import com.redhat.persistence.common.Path;
-import com.redhat.persistence.Query;
-import com.redhat.persistence.PropertyMap;
-import com.redhat.persistence.Engine;
-import com.redhat.persistence.EventProcessor;
-import com.redhat.persistence.Event;
 import com.redhat.persistence.CreateEvent;
 import com.redhat.persistence.DeleteEvent;
-import com.redhat.persistence.ProtoException;
+import com.redhat.persistence.Engine;
+import com.redhat.persistence.Event;
+import com.redhat.persistence.EventProcessor;
 import com.redhat.persistence.PropertyEvent;
+import com.redhat.persistence.PropertyMap;
+import com.redhat.persistence.ProtoException;
+import com.redhat.persistence.Query;
 import com.redhat.persistence.QuerySource;
-import com.redhat.persistence.metadata.Adapter;
-import com.redhat.persistence.metadata.Root;
-import com.redhat.persistence.metadata.Property;
-import com.redhat.persistence.engine.rdbms.RDBMSEngine;
-import com.redhat.persistence.engine.rdbms.RDBMSQuerySource;
+import com.redhat.persistence.common.Path;
 import com.redhat.persistence.engine.rdbms.OracleWriter;
 import com.redhat.persistence.engine.rdbms.PostgresWriter;
-import com.redhat.persistence.profiler.rdbms.*;
-
+import com.redhat.persistence.engine.rdbms.RDBMSEngine;
+import com.redhat.persistence.engine.rdbms.RDBMSQuerySource;
+import com.redhat.persistence.metadata.Adapter;
+import com.redhat.persistence.metadata.Property;
+import com.redhat.persistence.metadata.Root;
+import com.redhat.persistence.profiler.rdbms.StatementProfiler;
 import java.lang.ref.WeakReference;
-import java.util.*;
-
 import java.sql.Connection;
-import java.sql.SQLException;
-import org.apache.log4j.Logger;
-
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.log4j.Logger;
 
 /**
@@ -58,7 +59,7 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #29 $ $Date: 2003/10/23 $
+ * @version $Revision: #30 $ $Date: 2003/10/28 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {

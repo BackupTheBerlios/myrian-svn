@@ -16,20 +16,22 @@
 package com.arsdigita.persistence.metadata;
 
 import com.redhat.persistence.metadata.Root;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * A Model provides a logical namespace for a related set of ObjectTypes and
  * Associations.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2003/08/15 $
+ * @version $Revision: #8 $ $Date: 2003/10/28 $
  */
 
 public class Model extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Model.java#7 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Model.java#8 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     static Model wrap(Root root,
 		      com.redhat.persistence.metadata.Model model) {

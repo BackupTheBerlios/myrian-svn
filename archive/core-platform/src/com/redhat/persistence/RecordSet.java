@@ -15,25 +15,27 @@
 
 package com.redhat.persistence;
 
-import com.redhat.persistence.common.*;
+import com.redhat.persistence.common.Path;
 import com.redhat.persistence.metadata.Adapter;
 import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Property;
-
-import java.util.*;
-
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
  * RecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/10/23 $
+ * @version $Revision: #4 $ $Date: 2003/10/28 $
  **/
 
 public abstract class RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/RecordSet.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/RecordSet.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger LOG = Logger.getLogger(RecordSet.class);
 

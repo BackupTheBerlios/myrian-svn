@@ -15,21 +15,19 @@
 
 package com.redhat.persistence.engine.rdbms;
 
-import com.redhat.persistence.*;
-import com.redhat.persistence.metadata.*;
-
-import java.util.*;
+import com.redhat.persistence.Condition;
+import com.redhat.persistence.metadata.Table;
 
 /**
  * Update
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/10/23 $
+ * @version $Revision: #4 $ $Date: 2003/10/28 $
  **/
 
 class Update extends Mutation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Update.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Update.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     public Update(RDBMSEngine engine, Table table, Condition condition) {
         super(engine, table, condition);

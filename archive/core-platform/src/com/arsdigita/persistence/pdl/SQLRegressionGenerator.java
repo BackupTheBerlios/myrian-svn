@@ -16,27 +16,34 @@
 package com.arsdigita.persistence.pdl;
 
 import com.arsdigita.db.DbHelper;
+import com.arsdigita.kernel.ACSObject;
 import com.arsdigita.persistence.SessionManager;
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.metadata.ObjectType;
+import com.arsdigita.util.Assert;
+import com.arsdigita.util.UncheckedWrapperException;
+import com.arsdigita.util.cmd.BooleanSwitch;
+import com.arsdigita.util.cmd.CommandLine;
+import com.arsdigita.util.cmd.PathSwitch;
+import com.arsdigita.util.cmd.StringSwitch;
 import com.redhat.persistence.metadata.Column;
-import com.redhat.persistence.metadata.Root;
 import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.Table;
 import com.redhat.persistence.metadata.UniqueKey;
-import com.arsdigita.kernel.ACSObject;
-import com.arsdigita.util.UncheckedWrapperException;
-import com.arsdigita.util.Assert;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
-import java.io.File;
-import java.io.PrintStream;
-import java.io.FileOutputStream;
-import java.io.FileNotFoundException;
-import java.util.*;
-import com.arsdigita.util.cmd.*;
 
 
 /**

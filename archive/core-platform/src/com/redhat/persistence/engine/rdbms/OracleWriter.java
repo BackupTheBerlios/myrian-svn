@@ -15,22 +15,22 @@
 
 package com.redhat.persistence.engine.rdbms;
 
-import com.redhat.persistence.*;
-import com.redhat.persistence.common.*;
-
-import java.util.*;
-import java.sql.*;
+import com.redhat.persistence.Condition;
+import com.redhat.persistence.Expression;
+import java.sql.Types;
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * OracleWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/08/15 $
+ * @version $Revision: #4 $ $Date: 2003/10/28 $
  **/
 
 public class OracleWriter extends ANSIWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/OracleWriter.java#3 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/OracleWriter.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final Expression and(Expression left, Expression right) {
         if (left == null) { return right; }

@@ -16,28 +16,27 @@
 package com.arsdigita.persistence.pdl;
 
 
-import com.arsdigita.util.ResourceManager;
-import com.arsdigita.util.UncheckedWrapperException;
-import com.arsdigita.util.Assert;
-import com.arsdigita.util.cmd.*;
-
-import com.arsdigita.persistence.Utilities;
-import com.redhat.persistence.pdl.DDLWriter;
-import com.redhat.persistence.metadata.Root;
-import com.arsdigita.persistence.metadata.MetadataRoot;
-import com.redhat.persistence.metadata.Table;
 import com.arsdigita.db.DbHelper;
-
+import com.arsdigita.persistence.Utilities;
+import com.arsdigita.persistence.metadata.MetadataRoot;
+import com.arsdigita.util.Assert;
+import com.arsdigita.util.UncheckedWrapperException;
+import com.arsdigita.util.cmd.BooleanSwitch;
+import com.arsdigita.util.cmd.CommandLine;
+import com.arsdigita.util.cmd.FileSwitch;
+import com.arsdigita.util.cmd.PathSwitch;
+import com.arsdigita.util.cmd.StringSwitch;
+import com.redhat.persistence.metadata.Table;
+import com.redhat.persistence.pdl.DDLWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
 import java.io.Reader;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -45,13 +44,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.zip.ZipInputStream;
-
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -62,12 +59,12 @@ import org.apache.log4j.Logger;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #24 $ $Date: 2003/10/23 $
+ * @version $Revision: #25 $ $Date: 2003/10/28 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#24 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#25 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
     private static boolean s_quiet = false;

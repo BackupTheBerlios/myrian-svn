@@ -16,7 +16,7 @@
 package com.arsdigita.persistence.metadata;
 
 
-import java.util.*;
+import java.util.Iterator;
 
 /**
  * The CompoundType class represents types that are built up from SimpleTypes
@@ -24,12 +24,12 @@ import java.util.*;
  * property contained in a CompoundType has an associated DataType.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/08/15 $
+ * @version $Revision: #12 $ $Date: 2003/10/28 $
  */
 
 abstract public class CompoundType extends DataType {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/CompoundType.java#11 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/CompoundType.java#12 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
 
     /**

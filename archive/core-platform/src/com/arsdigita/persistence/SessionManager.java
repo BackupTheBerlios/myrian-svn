@@ -17,14 +17,15 @@ package com.arsdigita.persistence;
 
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.metadata.MetadataRoot;
-import com.arsdigita.persistence.pdl.PDL;
-import com.arsdigita.util.*;
+import com.arsdigita.util.UncheckedWrapperException;
 import com.redhat.persistence.EventProcessorManager;
-
-import java.io.*;
-import java.sql.*;
-import java.util.*;
-
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import org.apache.log4j.Logger;
 
 /**
@@ -38,12 +39,12 @@ import org.apache.log4j.Logger;
  *
  * @see Initializer
  * @author Archit Shah 
- * @version $Revision: #12 $ $Date: 2003/10/23 $
+ * @version $Revision: #13 $ $Date: 2003/10/28 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#12 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#13 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger s_log = Logger.getLogger
         (SessionManager.class.getName());

@@ -15,20 +15,22 @@
 
 package com.redhat.persistence;
 
-import com.redhat.persistence.common.*;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * Query
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/28 $
  **/
 
 public class Query extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Query.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Query.java#3 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private Signature m_signature;
     private Expression m_filter;

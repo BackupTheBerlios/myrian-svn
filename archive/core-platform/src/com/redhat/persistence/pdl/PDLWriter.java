@@ -16,24 +16,33 @@
 package com.redhat.persistence.pdl;
 
 import com.arsdigita.util.UncheckedWrapperException;
-import com.redhat.persistence.common.*;
-import com.redhat.persistence.metadata.*;
-
-import java.util.*;
-
-import java.io.Writer;
+import com.redhat.persistence.common.Path;
+import com.redhat.persistence.metadata.Column;
+import com.redhat.persistence.metadata.JoinFrom;
+import com.redhat.persistence.metadata.JoinThrough;
+import com.redhat.persistence.metadata.JoinTo;
+import com.redhat.persistence.metadata.Mapping;
+import com.redhat.persistence.metadata.ObjectMap;
+import com.redhat.persistence.metadata.ObjectType;
+import com.redhat.persistence.metadata.Property;
+import com.redhat.persistence.metadata.Role;
+import com.redhat.persistence.metadata.Static;
+import com.redhat.persistence.metadata.UniqueKey;
+import com.redhat.persistence.metadata.Value;
 import java.io.IOException;
+import java.io.Writer;
+import java.util.Iterator;
 
 /**
  * PDLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/08/15 $
+ * @version $Revision: #4 $ $Date: 2003/10/28 $
  **/
 
 public class PDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDLWriter.java#3 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDLWriter.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private Writer m_out;
 

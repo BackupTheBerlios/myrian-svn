@@ -15,18 +15,19 @@
 
 package com.redhat.persistence.pdl.nodes;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
 
 /**
  * EventNd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/28 $
  **/
 
 public class EventNd extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/nodes/EventNd.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/nodes/EventNd.java#3 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final HashMap TYPES = new HashMap();
 

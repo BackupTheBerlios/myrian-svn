@@ -15,20 +15,23 @@
 
 package com.redhat.persistence.metadata;
 
-import com.redhat.persistence.common.*;
-
-import java.util.*;
+import com.redhat.persistence.common.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/10/23 $
+ * @version $Revision: #4 $ $Date: 2003/10/28 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/ObjectMap.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/ObjectMap.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);

@@ -1,19 +1,20 @@
 package com.arsdigita.persistence.pdl;
 
-import com.arsdigita.util.*;
-
-import java.io.*;
+import com.arsdigita.util.UncheckedWrapperException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 
 /**
  * FileSource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/10/23 $
+ * @version $Revision: #2 $ $Date: 2003/10/28 $
  **/
 
 public class FileSource implements PDLSource {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/FileSource.java#1 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/FileSource.java#2 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private final File m_file;
 

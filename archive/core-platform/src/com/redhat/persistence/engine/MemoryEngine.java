@@ -15,25 +15,39 @@
 
 package com.redhat.persistence.engine;
 
-import com.redhat.persistence.common.*;
-import com.redhat.persistence.metadata.*;
-import com.redhat.persistence.*;
-
+import com.redhat.persistence.AddEvent;
+import com.redhat.persistence.Condition;
+import com.redhat.persistence.CreateEvent;
+import com.redhat.persistence.DeleteEvent;
+import com.redhat.persistence.Engine;
+import com.redhat.persistence.Event;
+import com.redhat.persistence.Expression;
+import com.redhat.persistence.Parameter;
+import com.redhat.persistence.PropertyEvent;
+import com.redhat.persistence.Query;
+import com.redhat.persistence.RecordSet;
+import com.redhat.persistence.RemoveEvent;
+import com.redhat.persistence.SetEvent;
+import com.redhat.persistence.common.Path;
+import com.redhat.persistence.metadata.Property;
+import com.redhat.persistence.metadata.Root;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import org.apache.log4j.Logger;
-
-import java.util.*;
 
 
 /**
  * MemoryEngine
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/10/23 $
+ * @version $Revision: #4 $ $Date: 2003/10/28 $
  **/
 
 public class MemoryEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/MemoryEngine.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/MemoryEngine.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger LOG = Logger.getLogger(MemoryEngine.class);
 

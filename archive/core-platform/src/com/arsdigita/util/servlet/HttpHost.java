@@ -15,8 +15,8 @@
 
 package com.arsdigita.util.servlet;
 
-import com.arsdigita.util.*;
-import javax.servlet.http.*;
+import com.arsdigita.util.Assert;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 
 /**
@@ -25,13 +25,13 @@ import org.apache.log4j.Logger;
  *
  * @author Dan Berrange
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/servlet/HttpHost.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/servlet/HttpHost.java#2 $
  */
 public class HttpHost {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/servlet/HttpHost.java#1 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/09/26 15:31:04 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/servlet/HttpHost.java#2 $" +
+        "$Author: jorris $" +
+        "$DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger s_log = Logger.getLogger(HttpHost.class);
 

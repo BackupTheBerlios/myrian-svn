@@ -15,18 +15,18 @@
 
 package com.redhat.persistence.metadata;
 
-import com.redhat.persistence.common.*;
+
 
 /**
  * Link
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/28 $
  **/
 
 public class Link extends Property {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Link.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Link.java#3 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private Role m_from;
     private Role m_to;

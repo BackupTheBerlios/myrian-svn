@@ -15,10 +15,12 @@
 
 package com.arsdigita.util.servlet;
 
-import com.arsdigita.util.*;
-import javax.servlet.http.*;
-import java.net.*;
-import java.util.*;
+import com.arsdigita.util.Assert;
+import com.arsdigita.util.UncheckedWrapperException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 
 /**
@@ -117,13 +119,13 @@ import org.apache.log4j.Logger;
  * no query string.</p>
  *
  * @author Justin Ross &lt;<a href="mailto:jross@redhat.com">jross@redhat.com</a>&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/servlet/HttpResourceLocator.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/servlet/HttpResourceLocator.java#3 $
  */
 public class HttpResourceLocator {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/servlet/HttpResourceLocator.java#2 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/23 15:28:18 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/servlet/HttpResourceLocator.java#3 $" +
+        "$Author: jorris $" +
+        "$DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger s_log = Logger.getLogger
         (HttpResourceLocator.class);

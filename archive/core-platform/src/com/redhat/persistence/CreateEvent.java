@@ -17,19 +17,18 @@ package com.redhat.persistence;
 
 import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Role;
-import java.io.*;
-import java.util.*;
+import java.util.Iterator;
 
 /**
  * CreateEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/10/21 $
+ * @version $Revision: #4 $ $Date: 2003/10/28 $
  **/
 
 public class CreateEvent extends ObjectEvent {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/CreateEvent.java#3 $ by $Author: ashah $, $DateTime: 2003/10/21 11:38:25 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/CreateEvent.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     CreateEvent(Session ssn, Object obj) {
         super(ssn, obj);

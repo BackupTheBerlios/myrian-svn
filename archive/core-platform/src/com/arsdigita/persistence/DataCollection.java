@@ -17,8 +17,6 @@ package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.ObjectType;
 
-import java.sql.*;
-
 /**
  * The DataCollection interface defines the public methods available on a
  * collection of DataObjects. DataCollections can be used to efficiently
@@ -57,7 +55,7 @@ import java.sql.*;
  *   </pre>
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2003/08/15 $
+ * @version $Revision: #5 $ $Date: 2003/10/28 $
  *
  * @see com.arsdigita.persistence.SessionManager
  * @see com.arsdigita.persistence.Session
@@ -67,7 +65,7 @@ import java.sql.*;
 
 public interface DataCollection extends DataQuery {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataCollection.java#4 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataCollection.java#5 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     /**
      * Returns a data object for the current position in the collection.

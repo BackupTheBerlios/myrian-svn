@@ -1,22 +1,23 @@
 package com.arsdigita.installer;
 
 import com.arsdigita.util.UncheckedWrapperException;
-
-import java.io.*;
-import java.sql.*;
-
+import java.io.IOException;
+import java.io.Reader;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import org.apache.log4j.Logger;
 
 /**
  * SQLLoader
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/10/23 $
+ * @version $Revision: #2 $ $Date: 2003/10/28 $
  **/
 
 public abstract class SQLLoader {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/SQLLoader.java#1 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/SQLLoader.java#2 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger s_log = Logger.getLogger(SQLLoader.class);
 

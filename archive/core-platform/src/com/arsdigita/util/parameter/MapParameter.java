@@ -15,22 +15,22 @@
 
 package com.arsdigita.util.parameter;
 
-import com.arsdigita.util.*;
-import java.util.*;
-import org.apache.commons.beanutils.*;
-import org.apache.commons.beanutils.converters.*;
+import com.arsdigita.util.Assert;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/MapParameter.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/MapParameter.java#2 $
  */
 public class MapParameter extends AbstractParameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/MapParameter.java#1 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/23 15:28:18 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/MapParameter.java#2 $" +
+        "$Author: jorris $" +
+        "$DateTime: 2003/10/28 18:36:21 $";
 
     private final ArrayList m_params;
 

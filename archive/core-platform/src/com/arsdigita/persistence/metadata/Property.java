@@ -15,10 +15,11 @@
 
 package com.arsdigita.persistence.metadata;
 
-import com.redhat.persistence.metadata.Role;
 import com.redhat.persistence.metadata.Link;
-
-import java.util.*;
+import com.redhat.persistence.metadata.Role;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * The Property class represents one property of a CompoundType. Each property
@@ -30,7 +31,7 @@ import java.util.*;
  * REQUIRED, and COLLECTION.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/08/15 $
+ * @version $Revision: #13 $ $Date: 2003/10/28 $
  **/
 
 public class Property extends Element {
@@ -67,7 +68,7 @@ public class Property extends Element {
         "[0..n]"
     };
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#12 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Property.java#13 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
 
     static Property

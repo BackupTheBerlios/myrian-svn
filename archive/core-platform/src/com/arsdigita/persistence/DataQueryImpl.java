@@ -15,34 +15,38 @@
 
 package com.arsdigita.persistence;
 
-import com.arsdigita.persistence.metadata.*;
+import com.arsdigita.persistence.metadata.CompoundType;
+import com.arsdigita.util.Assert;
+import com.redhat.persistence.Cursor;
+import com.redhat.persistence.Expression;
+import com.redhat.persistence.Parameter;
+import com.redhat.persistence.PersistentCollection;
+import com.redhat.persistence.ProtoException;
+import com.redhat.persistence.Query;
+import com.redhat.persistence.Signature;
 import com.redhat.persistence.common.ParseException;
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.common.SQLParser;
-import com.redhat.persistence.ProtoException;
-import com.redhat.persistence.PersistentCollection;
-import com.redhat.persistence.Cursor;
-import com.redhat.persistence.Query;
-import com.redhat.persistence.Signature;
-import com.redhat.persistence.Parameter;
-import com.redhat.persistence.Expression;
 import com.redhat.persistence.metadata.Root;
-import com.arsdigita.util.Assert;
-
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #32 $ $Date: 2003/10/23 $
+ * @version $Revision: #33 $ $Date: 2003/10/28 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#32 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#33 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
 

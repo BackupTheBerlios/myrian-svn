@@ -15,12 +15,15 @@
 
 package com.arsdigita.persistence.pdl;
 
-import com.arsdigita.persistence.metadata.*;
-import com.redhat.persistence.pdl.PDLWriter;
+import com.arsdigita.persistence.metadata.MetadataRoot;
+import com.arsdigita.persistence.metadata.Model;
+import com.arsdigita.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Root;
-
-import java.io.*;
-import java.util.*;
+import com.redhat.persistence.pdl.PDLWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Iterator;
 
 
 /**
@@ -30,7 +33,7 @@ import java.util.*;
  * file being named after the fully qualified model name.
  *
  * @author Patrick McNeill
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDLOutputter.java#10 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDLOutputter.java#11 $
  */
 public class PDLOutputter {
     /**

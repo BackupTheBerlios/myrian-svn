@@ -15,20 +15,22 @@
 
 package com.redhat.persistence.pdl.adapters;
 
-import com.redhat.persistence.metadata.*;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 
 
 /**
  * LongAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/10/23 $
+ * @version $Revision: #4 $ $Date: 2003/10/28 $
  **/
 
 public class LongAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/adapters/LongAd.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/adapters/LongAd.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     public LongAd() {
 	super("global.Long", Types.BIGINT);

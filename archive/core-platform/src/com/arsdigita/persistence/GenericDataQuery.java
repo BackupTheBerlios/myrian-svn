@@ -15,25 +15,29 @@
 
 package com.arsdigita.persistence;
 
-import com.redhat.persistence.common.*;
-import com.redhat.persistence.metadata.*;
 import com.redhat.persistence.Cursor;
 import com.redhat.persistence.Query;
 import com.redhat.persistence.RecordSet;
 import com.redhat.persistence.Signature;
-
+import com.redhat.persistence.common.ParseException;
+import com.redhat.persistence.common.Path;
+import com.redhat.persistence.common.SQLParser;
+import com.redhat.persistence.metadata.Model;
+import com.redhat.persistence.metadata.ObjectType;
+import com.redhat.persistence.metadata.Role;
+import com.redhat.persistence.metadata.SQLBlock;
 import java.io.StringReader;
 
 /**
  * GenericDataQuery
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/10/23 $
+ * @version $Revision: #12 $ $Date: 2003/10/28 $
  */
 
 public class GenericDataQuery extends DataQueryImpl {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataQuery.java#11 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataQuery.java#12 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private SQLBlock m_block;
 

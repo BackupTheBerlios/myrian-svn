@@ -15,18 +15,18 @@
 
 package com.redhat.persistence.engine.rdbms;
 
-import com.redhat.persistence.*;
+import com.redhat.persistence.Condition;
 
 /**
  * CompoundJoin
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/28 $
  **/
 
 abstract class CompoundJoin extends Join {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/CompoundJoin.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/CompoundJoin.java#3 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     public static class Type {}
 

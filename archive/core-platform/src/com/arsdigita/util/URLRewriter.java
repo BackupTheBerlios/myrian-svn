@@ -15,14 +15,15 @@
 
 package com.arsdigita.util;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-import java.util.Map;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.net.URLEncoder;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -33,9 +34,9 @@ import org.apache.log4j.Logger;
  */
 public class URLRewriter {
     public static final String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/URLRewriter.java#12 $" +
-        "$Author: dennis $" +
-        "$DateTime: 2003/08/15 13:46:34 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/URLRewriter.java#13 $" +
+        "$Author: jorris $" +
+        "$DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger s_log =
         Logger.getLogger(URLRewriter.class);

@@ -16,12 +16,12 @@
 package com.arsdigita.persistence.metadata;
 
 import com.redhat.persistence.metadata.Root;
-
-import java.util.*;
-import java.io.*;
-import java.sql.*;
-import java.math.*;
-
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 import org.apache.log4j.Logger;
 
 /**
@@ -29,12 +29,12 @@ import org.apache.log4j.Logger;
  * metadata system.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #21 $ $Date: 2003/10/23 $
+ * @version $Revision: #22 $ $Date: 2003/10/28 $
  **/
 
 public class MetadataRoot extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#21 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/MetadataRoot.java#22 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger s_cat = Logger.getLogger(MetadataRoot.class.getName());
 

@@ -15,12 +15,12 @@
 
 package com.arsdigita.util;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
 import java.net.URLEncoder;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * A (static) class of generally-useful Java servlet utilities.
@@ -29,7 +29,7 @@ import java.util.Enumeration;
 
 public class ServletUtils {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/ServletUtils.java#4 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/ServletUtils.java#5 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private ServletUtils() { }
 

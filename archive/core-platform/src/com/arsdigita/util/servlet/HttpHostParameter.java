@@ -15,10 +15,9 @@
 
 package com.arsdigita.util.servlet;
 
-import com.arsdigita.domain.*;
-import com.arsdigita.util.*;
-import com.arsdigita.util.parameter.*;
-import java.util.*;
+import com.arsdigita.util.parameter.ErrorList;
+import com.arsdigita.util.parameter.ParameterError;
+import com.arsdigita.util.parameter.StringParameter;
 import org.apache.log4j.Logger;
 
 /**

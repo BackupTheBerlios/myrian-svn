@@ -15,27 +15,25 @@
 
 package com.redhat.persistence.engine.rdbms;
 
-import com.arsdigita.db.ConnectionManager;
-import com.arsdigita.db.SQLExceptionHandler;
-import com.redhat.persistence.common.*;
-import com.redhat.persistence.metadata.*;
-import com.redhat.persistence.*;
-
-import java.util.*;
-import java.sql.*;
-
-import org.apache.log4j.Logger;
+import com.redhat.persistence.RecordSet;
+import com.redhat.persistence.Signature;
+import com.redhat.persistence.common.Path;
+import com.redhat.persistence.metadata.Adapter;
+import com.redhat.persistence.metadata.ObjectType;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * RDBMSRecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/10/23 $
+ * @version $Revision: #6 $ $Date: 2003/10/28 $
  **/
 
 class RDBMSRecordSet extends RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSRecordSet.java#5 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSRecordSet.java#6 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     final private RDBMSEngine m_engine;
     final private ResultCycle m_rc;

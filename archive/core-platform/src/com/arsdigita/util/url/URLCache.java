@@ -14,12 +14,14 @@
 */
 
 package com.arsdigita.util.url;
-import org.apache.log4j.Logger;
-
-import java.util.*;
-
 import com.arsdigita.util.Assert;
 import com.arsdigita.util.StringUtils;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import org.apache.log4j.Logger;
 
 /**
  * Helper class for caching fetched URLs. A more advanced implementation of

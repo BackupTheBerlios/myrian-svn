@@ -1,20 +1,18 @@
 package com.arsdigita.util.parameter;
 
-import com.arsdigita.util.*;
-import java.util.*;
-import org.apache.commons.beanutils.converters.*;
+import org.apache.commons.beanutils.converters.IntegerConverter;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/IntegerParameter.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/IntegerParameter.java#3 $
  */
 public class IntegerParameter extends AbstractParameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/IntegerParameter.java#2 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/09/26 15:31:04 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/IntegerParameter.java#3 $" +
+        "$Author: jorris $" +
+        "$DateTime: 2003/10/28 18:36:21 $";
 
     static {
         Converters.set(Integer.class, new IntegerConverter());

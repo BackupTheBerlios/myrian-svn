@@ -16,22 +16,26 @@
 package com.redhat.persistence.metadata;
 
 import com.arsdigita.db.DbHelper;
-
 import java.io.PrintStream;
 import java.sql.Types;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The Column class is used to keep information about the physical schema in
  * the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/08/15 $
+ * @version $Revision: #7 $ $Date: 2003/10/28 $
  */
 
 public class Column extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Column.java#6 $ by $Author: rhs $, $DateTime: 2003/08/15 15:37:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Column.java#7 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     /**
      * The name of this Column.

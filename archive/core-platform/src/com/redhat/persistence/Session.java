@@ -15,12 +15,27 @@
 
 package com.redhat.persistence;
 
-import com.redhat.persistence.common.*;
-import com.redhat.persistence.metadata.*;
-
-import java.util.*;
-import java.io.*;
-
+import com.redhat.persistence.common.Path;
+import com.redhat.persistence.metadata.Adapter;
+import com.redhat.persistence.metadata.Alias;
+import com.redhat.persistence.metadata.Link;
+import com.redhat.persistence.metadata.MetadataException;
+import com.redhat.persistence.metadata.ObjectMap;
+import com.redhat.persistence.metadata.ObjectType;
+import com.redhat.persistence.metadata.Property;
+import com.redhat.persistence.metadata.Role;
+import com.redhat.persistence.metadata.Root;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.log4j.Logger;
 
 /**
@@ -30,12 +45,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2003/10/23 $
+ * @version $Revision: #10 $ $Date: 2003/10/28 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Session.java#9 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Session.java#10 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 

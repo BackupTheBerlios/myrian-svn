@@ -15,21 +15,24 @@
 
 package com.arsdigita.persistence;
 
-import com.arsdigita.persistence.metadata.*;
-import com.redhat.persistence.metadata.Root;
+import com.arsdigita.persistence.metadata.MetadataRoot;
+import com.arsdigita.persistence.metadata.ObjectType;
+import com.arsdigita.persistence.metadata.Property;
 import com.redhat.persistence.PropertyMap;
-import java.util.*;
+import com.redhat.persistence.metadata.Root;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * C
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/10/23 $
+ * @version $Revision: #5 $ $Date: 2003/10/28 $
  **/
 
 final class C {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/C.java#4 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/C.java#5 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     public static final com.redhat.persistence.metadata.ObjectType type
         (Root root, String qname) {

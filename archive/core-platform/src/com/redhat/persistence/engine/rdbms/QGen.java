@@ -15,14 +15,36 @@
 
 package com.redhat.persistence.engine.rdbms;
 
-import com.redhat.persistence.*;
-import com.redhat.persistence.common.*;
-import com.redhat.persistence.metadata.*;
-
-import java.util.*;
-import java.sql.*;
-import java.io.*;
-
+import com.redhat.persistence.Condition;
+import com.redhat.persistence.Expression;
+import com.redhat.persistence.Parameter;
+import com.redhat.persistence.Query;
+import com.redhat.persistence.Signature;
+import com.redhat.persistence.Source;
+import com.redhat.persistence.common.CompoundKey;
+import com.redhat.persistence.common.ParseException;
+import com.redhat.persistence.common.Path;
+import com.redhat.persistence.common.SQLParser;
+import com.redhat.persistence.metadata.Column;
+import com.redhat.persistence.metadata.Constraint;
+import com.redhat.persistence.metadata.JoinFrom;
+import com.redhat.persistence.metadata.JoinThrough;
+import com.redhat.persistence.metadata.JoinTo;
+import com.redhat.persistence.metadata.Mapping;
+import com.redhat.persistence.metadata.ObjectMap;
+import com.redhat.persistence.metadata.Property;
+import com.redhat.persistence.metadata.Root;
+import com.redhat.persistence.metadata.SQLBlock;
+import com.redhat.persistence.metadata.Static;
+import com.redhat.persistence.metadata.Table;
+import com.redhat.persistence.metadata.Value;
+import java.io.StringReader;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import org.apache.log4j.Logger;
 
 
@@ -30,12 +52,12 @@ import org.apache.log4j.Logger;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2003/10/23 $
+ * @version $Revision: #11 $ $Date: 2003/10/28 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/QGen.java#10 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/QGen.java#11 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger LOG = Logger.getLogger(QGen.class);
 

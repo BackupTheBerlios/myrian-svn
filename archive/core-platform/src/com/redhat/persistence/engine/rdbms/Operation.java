@@ -15,24 +15,27 @@
 
 package com.redhat.persistence.engine.rdbms;
 
-import com.redhat.persistence.*;
-import com.redhat.persistence.common.*;
-import com.redhat.persistence.metadata.*;
-
+import com.redhat.persistence.Event;
+import com.redhat.persistence.Query;
+import com.redhat.persistence.common.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import org.apache.log4j.Logger;
-
-import java.util.*;
 
 /**
  * Operation
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2003/10/23 $
+ * @version $Revision: #6 $ $Date: 2003/10/28 $
  **/
 
 abstract class Operation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Operation.java#5 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Operation.java#6 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger LOG = Logger.getLogger(Operation.class);
 

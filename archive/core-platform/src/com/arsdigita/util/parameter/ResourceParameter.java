@@ -15,11 +15,11 @@
 
 package com.arsdigita.util.parameter;
 
-import com.arsdigita.util.*;
-import java.net.*;
-import java.util.*;
-import java.io.*;
-import org.apache.commons.beanutils.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.net.URL;
 import org.apache.log4j.Logger;
 
 /**
@@ -29,13 +29,13 @@ import org.apache.log4j.Logger;
  * required, it logs an error.  Otherwise, it returns null.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ResourceParameter.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ResourceParameter.java#2 $
  */
 public class ResourceParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ResourceParameter.java#1 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/23 15:28:18 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ResourceParameter.java#2 $" +
+        "$Author: jorris $" +
+        "$DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger s_log = Logger.getLogger(ResourceParameter.class);
 

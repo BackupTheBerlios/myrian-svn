@@ -15,21 +15,23 @@
 
 package com.redhat.persistence.engine.rdbms;
 
-import com.redhat.persistence.common.*;
-import com.redhat.persistence.*;
-
-import java.util.*;
+import com.redhat.persistence.Expression;
+import com.redhat.persistence.common.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Select
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/10/23 $
+ * @version $Revision: #4 $ $Date: 2003/10/28 $
  **/
 
 class Select extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Select.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Select.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private Join m_join;
     private Expression m_filter;

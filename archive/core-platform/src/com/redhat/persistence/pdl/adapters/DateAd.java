@@ -15,22 +15,24 @@
 
 package com.redhat.persistence.pdl.adapters;
 
-import com.redhat.persistence.metadata.*;
 import com.arsdigita.util.AssertionError;
-
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
 
 
 /**
  * DateAd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/10/23 $
+ * @version $Revision: #4 $ $Date: 2003/10/28 $
  **/
 
 public class DateAd extends SimpleAdapter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/adapters/DateAd.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/adapters/DateAd.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     public DateAd() {
         super("global.Date", Types.TIMESTAMP);

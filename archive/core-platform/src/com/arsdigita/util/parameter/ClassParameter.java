@@ -15,21 +15,19 @@
 
 package com.arsdigita.util.parameter;
 
-import com.arsdigita.util.*;
-import java.util.*;
-import org.apache.commons.beanutils.converters.*;
+import org.apache.commons.beanutils.converters.ClassConverter;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ClassParameter.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ClassParameter.java#4 $
  */
 public class ClassParameter extends AbstractParameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ClassParameter.java#3 $" +
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ClassParameter.java#4 $" +
         "$Author: jorris $" +
-        "$DateTime: 2003/10/24 13:22:48 $";
+        "$DateTime: 2003/10/28 18:36:21 $";
 
     static {
         Converters.set(Class.class, new ClassConverter());

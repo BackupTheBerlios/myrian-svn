@@ -15,23 +15,27 @@
 
 package com.arsdigita.util.csv;
 
-import com.arsdigita.util.*;
-import com.arsdigita.util.parameter.*;
-import java.io.*;
-import java.util.*;
-import javax.mail.internet.*;
+import com.arsdigita.util.parameter.EmailParameter;
+import com.arsdigita.util.parameter.IntegerParameter;
+import com.arsdigita.util.parameter.Parameter;
+import com.arsdigita.util.parameter.ParameterValue;
+import com.arsdigita.util.parameter.StringParameter;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import javax.mail.internet.InternetAddress;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/csv/CSV.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/csv/CSV.java#4 $
  */
 public final class CSV {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/csv/CSV.java#3 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/23 15:28:18 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/csv/CSV.java#4 $" +
+        "$Author: jorris $" +
+        "$DateTime: 2003/10/28 18:36:21 $";
 
     public static final Object[][] load(final Reader reader,
                                         final Parameter[] params) {

@@ -15,23 +15,25 @@
 
 package com.redhat.persistence.metadata;
 
-import com.redhat.persistence.common.*;
-import com.redhat.persistence.Session;
 import com.redhat.persistence.PropertyMap;
-
-import java.util.*;
-import java.sql.*;
+import com.redhat.persistence.Session;
+import com.redhat.persistence.common.CompoundKey;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Adapter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/10/23 $
+ * @version $Revision: #2 $ $Date: 2003/10/28 $
  **/
 
 public abstract class Adapter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Adapter.java#1 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Adapter.java#2 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private Root m_root;
 

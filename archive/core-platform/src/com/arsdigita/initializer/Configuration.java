@@ -15,7 +15,9 @@
 
 package com.arsdigita.initializer;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class is used by the initialization system to pass configuration
@@ -54,12 +56,12 @@ import java.util.*;
  *  </pre></blockquote>
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/08/27 $
+ * @version $Revision: #6 $ $Date: 2003/10/28 $
  */
 
 public class Configuration {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Configuration.java#5 $ by $Author: bche $, $DateTime: 2003/08/27 15:03:05 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Configuration.java#6 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     Map m_parameters = new HashMap();
     Map m_types = new HashMap();

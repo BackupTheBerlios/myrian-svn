@@ -15,9 +15,11 @@
 
 package com.arsdigita.util;
 
-import com.arsdigita.util.parameter.*;
-import java.io.*;
-import java.util.*;
+import com.arsdigita.util.parameter.Parameter;
+import com.arsdigita.util.parameter.ParameterWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Properties;
 import org.apache.log4j.Logger;
 
 /**
@@ -28,13 +30,13 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterWriter
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/JavaPropertyWriter.java#1 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/JavaPropertyWriter.java#2 $
  */
 public class JavaPropertyWriter implements ParameterWriter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/JavaPropertyWriter.java#1 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/23 15:28:18 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/JavaPropertyWriter.java#2 $" +
+        "$Author: jorris $" +
+        "$DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger s_log = Logger.getLogger
         (JavaPropertyWriter.class);

@@ -15,22 +15,20 @@
 
 package com.arsdigita.util.parameter;
 
-import com.arsdigita.util.*;
-import java.net.*;
-import java.util.*;
-import org.apache.commons.beanutils.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/URLParameter.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/URLParameter.java#4 $
  */
 public class URLParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/URLParameter.java#3 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/23 15:28:18 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/URLParameter.java#4 $" +
+        "$Author: jorris $" +
+        "$DateTime: 2003/10/28 18:36:21 $";
 
     public URLParameter(final String name) {
         super(name);

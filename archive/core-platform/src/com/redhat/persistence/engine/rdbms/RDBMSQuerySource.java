@@ -15,22 +15,37 @@
 
 package com.redhat.persistence.engine.rdbms;
 
-import com.redhat.persistence.*;
-import com.redhat.persistence.common.*;
-import com.redhat.persistence.metadata.*;
-
-import java.util.*;
+import com.redhat.persistence.Condition;
+import com.redhat.persistence.DynamicQuerySource;
+import com.redhat.persistence.Expression;
+import com.redhat.persistence.NoSuchPathException;
+import com.redhat.persistence.Parameter;
+import com.redhat.persistence.PropertyMap;
+import com.redhat.persistence.Query;
+import com.redhat.persistence.Signature;
+import com.redhat.persistence.Source;
+import com.redhat.persistence.common.Path;
+import com.redhat.persistence.metadata.Mapping;
+import com.redhat.persistence.metadata.MetadataException;
+import com.redhat.persistence.metadata.ObjectMap;
+import com.redhat.persistence.metadata.ObjectType;
+import com.redhat.persistence.metadata.Property;
+import com.redhat.persistence.metadata.SQLBlock;
+import com.redhat.persistence.metadata.Static;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * RDBMSQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/10/23 $
+ * @version $Revision: #4 $ $Date: 2003/10/28 $
  **/
 
 public class RDBMSQuerySource extends DynamicQuerySource {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSQuerySource.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSQuerySource.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private synchronized Source getSource(ObjectType type, SQLBlock block,
                                           Path prefix) {

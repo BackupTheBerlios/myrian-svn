@@ -15,24 +15,33 @@
 
 package com.redhat.persistence.engine.rdbms;
 
-import com.redhat.persistence.*;
-import com.redhat.persistence.common.*;
-import com.redhat.persistence.metadata.*;
-
-import java.util.*;
-
+import com.redhat.persistence.AddEvent;
+import com.redhat.persistence.CreateEvent;
+import com.redhat.persistence.DeleteEvent;
+import com.redhat.persistence.Event;
+import com.redhat.persistence.ObjectEvent;
+import com.redhat.persistence.PropertyEvent;
+import com.redhat.persistence.RemoveEvent;
+import com.redhat.persistence.SetEvent;
+import com.redhat.persistence.common.CompoundKey;
+import com.redhat.persistence.metadata.Property;
+import com.redhat.persistence.metadata.Role;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import org.apache.log4j.Logger;
 
 /**
  * Aggregator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/08/15 $
+ * @version $Revision: #5 $ $Date: 2003/10/28 $
  **/
 
 class Aggregator extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Aggregator.java#4 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/Aggregator.java#5 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger LOG = Logger.getLogger(Aggregator.class);
 

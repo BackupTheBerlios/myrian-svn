@@ -1,19 +1,18 @@
 package com.arsdigita.persistence.pdl;
 
-import com.arsdigita.persistence.metadata.*;
-
+import com.arsdigita.persistence.metadata.MetadataRoot;
 import java.io.Reader;
 
 /**
  * PDLCompiler
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/09/26 $
+ * @version $Revision: #2 $ $Date: 2003/10/28 $
  **/
 
 public class PDLCompiler {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDLCompiler.java#1 $ by $Author: justin $, $DateTime: 2003/09/26 16:16:05 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDLCompiler.java#2 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private final com.redhat.persistence.pdl.PDL m_pdl;
 

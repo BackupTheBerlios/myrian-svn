@@ -15,20 +15,18 @@
 
 package com.redhat.persistence.engine.rdbms;
 
-import com.redhat.persistence.*;
 import com.redhat.persistence.Condition;
-import com.redhat.persistence.common.*;
-import com.redhat.persistence.metadata.*;
-
-import java.util.*;
-import java.sql.*;
-import java.io.*;
+import com.redhat.persistence.Expression;
+import com.redhat.persistence.common.Path;
+import com.redhat.persistence.metadata.Column;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * ANSIWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/10/23 $
+ * @version $Revision: #2 $ $Date: 2003/10/28 $
  **/
 
 

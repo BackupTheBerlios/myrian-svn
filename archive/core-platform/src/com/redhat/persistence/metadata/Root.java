@@ -15,22 +15,24 @@
 
 package com.redhat.persistence.metadata;
 
-import com.redhat.persistence.common.*;
-
-import java.util.*;
-import java.io.*;
+import com.redhat.persistence.common.Path;
+import java.io.PrintStream;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 
 /**
  * Root
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/10/23 $
+ * @version $Revision: #4 $ $Date: 2003/10/28 $
  **/
 
 public class Root {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Root.java#3 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/metadata/Root.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final class Location {
 

@@ -15,10 +15,10 @@
 
 package com.arsdigita.persistence;
 
-import com.redhat.persistence.common.*;
-import com.redhat.persistence.metadata.SQLBlock;
 import com.redhat.persistence.ProtoException;
-import java.util.*;
+import com.redhat.persistence.common.Path;
+import com.redhat.persistence.metadata.SQLBlock;
+import java.util.HashMap;
 import org.apache.log4j.Logger;
 
 
@@ -28,11 +28,11 @@ import org.apache.log4j.Logger;
  *
  * @author Patrick McNeill
  * @since 4.5
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#12 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#13 $
  */
 public class DataOperation {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#12 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#13 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger s_cat =
         Logger.getLogger(DataOperation.class);

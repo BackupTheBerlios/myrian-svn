@@ -15,19 +15,19 @@
 
 package com.arsdigita.util.parameter;
 
-import java.util.*;
+
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Revision: #1 $ $Date: 2003/09/26 $
+ * @version $Revision: #2 $ $Date: 2003/10/28 $
  */
 public interface ParameterInfo {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterInfo.java#1 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/09/26 15:31:04 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterInfo.java#2 $" +
+        "$Author: jorris $" +
+        "$DateTime: 2003/10/28 18:36:21 $";
 
     String getTitle();
 

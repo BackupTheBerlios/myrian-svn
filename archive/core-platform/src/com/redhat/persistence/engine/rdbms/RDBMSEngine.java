@@ -18,14 +18,34 @@ package com.redhat.persistence.engine.rdbms;
 import com.arsdigita.db.ConnectionManager;
 import com.arsdigita.db.SQLExceptionHandler;
 import com.arsdigita.developersupport.DeveloperSupport;
-import com.arsdigita.webdevsupport.WebDevSupport;
-import com.redhat.persistence.*;
-import com.redhat.persistence.common.*;
-import com.redhat.persistence.metadata.*;
-
-import java.util.*;
-import java.sql.*;
-
+import com.redhat.persistence.Engine;
+import com.redhat.persistence.Event;
+import com.redhat.persistence.PropertyMap;
+import com.redhat.persistence.Query;
+import com.redhat.persistence.QuerySource;
+import com.redhat.persistence.RecordSet;
+import com.redhat.persistence.SetEvent;
+import com.redhat.persistence.common.CompoundKey;
+import com.redhat.persistence.common.Path;
+import com.redhat.persistence.metadata.Adapter;
+import com.redhat.persistence.metadata.ObjectType;
+import com.redhat.persistence.metadata.Property;
+import com.redhat.persistence.metadata.Root;
+import com.redhat.persistence.metadata.SQLBlock;
+import com.redhat.persistence.metadata.Table;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 
@@ -33,12 +53,12 @@ import org.apache.log4j.Priority;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2003/10/23 $
+ * @version $Revision: #10 $ $Date: 2003/10/28 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#9 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/RDBMSEngine.java#10 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 

@@ -15,23 +15,29 @@
 
 package com.arsdigita.util.csv;
 
-import com.arsdigita.util.*;
-import com.arsdigita.util.parameter.*;
-import java.io.*;
-import java.util.*;
-import org.apache.oro.text.perl.Perl5Util;
+import com.arsdigita.util.UncheckedWrapperException;
+import com.arsdigita.util.parameter.ErrorList;
+import com.arsdigita.util.parameter.Parameter;
+import com.arsdigita.util.parameter.ParameterLoader;
+import com.arsdigita.util.parameter.ParameterValue;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Subject to change.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/csv/CSVParameterLoader.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/csv/CSVParameterLoader.java#3 $
  */
 public final class CSVParameterLoader implements ParameterLoader {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/csv/CSVParameterLoader.java#2 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/23 15:28:18 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/csv/CSVParameterLoader.java#3 $" +
+        "$Author: jorris $" +
+        "$DateTime: 2003/10/28 18:36:21 $";
 
     private final LineNumberReader m_reader;
     private final Parameter[] m_params;

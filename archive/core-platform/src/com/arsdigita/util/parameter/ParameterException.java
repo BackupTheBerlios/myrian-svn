@@ -15,9 +15,8 @@
 
 package com.arsdigita.util.parameter;
 
-import com.arsdigita.util.*;
-import java.io.*;
-import java.util.*;
+import com.arsdigita.util.Assert;
+import java.util.List;
 import org.apache.log4j.Logger;
 
 /**
@@ -26,13 +25,13 @@ import org.apache.log4j.Logger;
  * An error to indicate invalid configurations.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterException.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterException.java#3 $
  */
 public final class ParameterException extends RuntimeException {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterException.java#2 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/23 15:28:18 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterException.java#3 $" +
+        "$Author: jorris $" +
+        "$DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterException.class);

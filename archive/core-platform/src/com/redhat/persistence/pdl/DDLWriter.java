@@ -15,29 +15,34 @@
 
 package com.redhat.persistence.pdl;
 
-import com.redhat.persistence.metadata.*;
-
-import com.arsdigita.util.Assert;
-
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.Utilities;
-
+import com.arsdigita.util.Assert;
+import com.redhat.persistence.metadata.Constraint;
+import com.redhat.persistence.metadata.Root;
+import com.redhat.persistence.metadata.Table;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * DDLWriter
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/28 $
  **/
 
 public class DDLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/DDLWriter.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/DDLWriter.java#3 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private File m_base;
     private boolean m_overwrite;

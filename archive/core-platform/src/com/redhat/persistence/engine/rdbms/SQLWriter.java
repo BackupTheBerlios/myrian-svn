@@ -15,25 +15,38 @@
 
 package com.redhat.persistence.engine.rdbms;
 
-import com.redhat.persistence.*;
 import com.redhat.persistence.Condition;
-import com.redhat.persistence.common.*;
-import com.redhat.persistence.metadata.*;
-
-import java.util.*;
-import java.sql.*;
-import java.io.*;
+import com.redhat.persistence.Expression;
+import com.redhat.persistence.Query;
+import com.redhat.persistence.common.ParseException;
+import com.redhat.persistence.common.Path;
+import com.redhat.persistence.common.SQL;
+import com.redhat.persistence.common.SQLParser;
+import com.redhat.persistence.common.SQLToken;
+import com.redhat.persistence.metadata.Adapter;
+import com.redhat.persistence.metadata.Column;
+import com.redhat.persistence.metadata.ObjectMap;
+import com.redhat.persistence.metadata.Root;
+import com.redhat.persistence.metadata.SQLBlock;
+import java.io.StringReader;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2003/10/23 $
+ * @version $Revision: #10 $ $Date: 2003/10/28 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#9 $ by $Author: jorris $, $DateTime: 2003/10/23 16:13:51 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#10 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private RDBMSEngine m_engine;
     private Operation m_op = null;

@@ -15,20 +15,27 @@
 
 package com.redhat.persistence;
 
-import com.redhat.persistence.common.*;
-import com.redhat.persistence.metadata.*;
-import java.util.*;
+import com.redhat.persistence.common.Path;
+import com.redhat.persistence.metadata.Model;
+import com.redhat.persistence.metadata.ObjectMap;
+import com.redhat.persistence.metadata.ObjectType;
+import com.redhat.persistence.metadata.Property;
+import com.redhat.persistence.metadata.Root;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/10/23 $
+ * @version $Revision: #6 $ $Date: 2003/10/28 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Signature.java#5 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/Signature.java#6 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private ArrayList m_paths = new ArrayList();
 

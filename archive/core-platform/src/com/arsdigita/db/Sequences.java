@@ -17,12 +17,10 @@ package com.arsdigita.db;
 
 import com.arsdigita.db.oracle.OracleSequenceImpl;
 import com.arsdigita.db.postgres.PostgresSequenceImpl;
-import com.arsdigita.util.*;
 import com.arsdigita.persistence.SessionManager;
-
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 import org.apache.log4j.Logger;
 
 /**
@@ -41,7 +39,7 @@ import org.apache.log4j.Logger;
 
 public class Sequences {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Sequences.java#7 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Sequences.java#8 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger s_log =
         Logger.getLogger(Sequences.class);

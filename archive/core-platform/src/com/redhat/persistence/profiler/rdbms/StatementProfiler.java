@@ -15,12 +15,21 @@
 
 package com.redhat.persistence.profiler.rdbms;
 
-import com.arsdigita.util.*;
-import com.redhat.persistence.*;
-import com.redhat.persistence.metadata.*;
-import com.redhat.persistence.engine.rdbms.*;
-import java.io.*;
-import java.util.*;
+import com.arsdigita.util.Assert;
+import com.arsdigita.util.UncheckedWrapperException;
+import com.redhat.persistence.Event;
+import com.redhat.persistence.Query;
+import com.redhat.persistence.engine.rdbms.RDBMSProfiler;
+import com.redhat.persistence.engine.rdbms.RDBMSStatement;
+import com.redhat.persistence.engine.rdbms.StatementLifecycle;
+import com.redhat.persistence.metadata.ObjectType;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class StatementProfiler implements RDBMSProfiler {
     private boolean m_isEnabled;

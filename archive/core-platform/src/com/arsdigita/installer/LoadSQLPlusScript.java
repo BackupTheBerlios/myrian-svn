@@ -15,20 +15,20 @@
 
 package com.arsdigita.installer;
 
-import com.arsdigita.util.UncheckedWrapperException;
 import com.arsdigita.db.DbHelper;
-
+import com.arsdigita.util.UncheckedWrapperException;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.Reader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.io.*;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 public class LoadSQLPlusScript {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#14 $ by $Author: justin $, $DateTime: 2003/10/23 15:28:18 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#15 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final Logger s_log =
             Logger.getLogger(LoadSQLPlusScript.class);

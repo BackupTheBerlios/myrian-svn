@@ -15,10 +15,9 @@
 
 package com.arsdigita.db;
 
-import com.arsdigita.util.*;
-import com.arsdigita.util.jdbc.*;
 import com.arsdigita.runtime.RuntimeConfig;
-
+import com.arsdigita.util.Assert;
+import com.arsdigita.util.jdbc.Connections;
 import java.sql.Connection;
 import java.sql.SQLException;
 import org.apache.log4j.Logger;
@@ -28,14 +27,14 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao
- * @version $Revision: #19 $ $Date: 2003/10/28 $
+ * @version $Revision: #20 $ $Date: 2003/10/28 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: rhs $ - $Date: 2003/10/28 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#19 $";
+    public static final String versionId = "$Author: jorris $ - $Date: 2003/10/28 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#20 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);

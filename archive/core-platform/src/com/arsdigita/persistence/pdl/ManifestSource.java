@@ -1,19 +1,21 @@
 package com.arsdigita.persistence.pdl;
 
-import com.arsdigita.util.*;
-
-import java.io.*;
+import com.arsdigita.util.UncheckedWrapperException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 
 /**
  * ManifestSource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/09/26 $
+ * @version $Revision: #2 $ $Date: 2003/10/28 $
  **/
 
 public class ManifestSource implements PDLSource {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ManifestSource.java#1 $ by $Author: justin $, $DateTime: 2003/09/26 16:16:05 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ManifestSource.java#2 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private final String m_manifest;
     private final PDLFilter m_filter;

@@ -16,18 +16,20 @@
 package com.redhat.persistence.pdl;
 
 import com.redhat.persistence.pdl.nodes.Node;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * ErrorReport
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/28 $
  **/
 
 class ErrorReport {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/ErrorReport.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/ErrorReport.java#3 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private ArrayList m_messages = new ArrayList();
     private boolean m_fatal = false;

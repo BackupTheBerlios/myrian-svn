@@ -15,18 +15,18 @@
 
 package com.redhat.persistence.common;
 
-import java.util.*;
+import java.util.HashMap;
 
 /**
  * Path
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/08/15 $
+ * @version $Revision: #3 $ $Date: 2003/10/28 $
  **/
 
 public class Path {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#2 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#3 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private static final HashMap PATHS = new HashMap();
 

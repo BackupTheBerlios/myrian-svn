@@ -15,20 +15,30 @@
 
 package com.redhat.persistence.pdl;
 
-import com.redhat.persistence.pdl.nodes.*;
-import com.redhat.persistence.metadata.*;
-import java.util.*;
+import com.redhat.persistence.metadata.Model;
+import com.redhat.persistence.metadata.ObjectType;
+import com.redhat.persistence.metadata.Root;
+import com.redhat.persistence.pdl.nodes.FileNd;
+import com.redhat.persistence.pdl.nodes.ImportNd;
+import com.redhat.persistence.pdl.nodes.Node;
+import com.redhat.persistence.pdl.nodes.ObjectTypeNd;
+import com.redhat.persistence.pdl.nodes.TypeNd;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * SymbolTable
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/08/15 $
+ * @version $Revision: #4 $ $Date: 2003/10/28 $
  **/
 
 class SymbolTable {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/SymbolTable.java#3 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/SymbolTable.java#4 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
 
     private HashMap m_types = new HashMap();
     private ArrayList m_order = new ArrayList();

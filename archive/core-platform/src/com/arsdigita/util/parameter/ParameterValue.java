@@ -15,19 +15,16 @@
 
 package com.arsdigita.util.parameter;
 
-import com.arsdigita.util.*;
-import java.util.*;
-import org.apache.commons.beanutils.*;
-import org.apache.commons.beanutils.converters.*;
+
 
 /**
  * @deprecated The parameter APIs no longer need this class.
  */
 public final class ParameterValue {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterValue.java#3 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/10/23 15:28:18 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ParameterValue.java#4 $" +
+        "$Author: jorris $" +
+        "$DateTime: 2003/10/28 18:36:21 $";
 
     private final ErrorList m_errors;
     private String m_string;
