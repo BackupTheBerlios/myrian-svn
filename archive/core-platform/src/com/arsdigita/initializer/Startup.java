@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * Convenience class designed to run initializers. Either manually specify the
@@ -30,13 +31,13 @@ import java.util.Collection;
  *
  * @author Michael Bryzek
  * @author Dennis Gregorovic
- * @version $Revision: #8 $ $Date: 2003/08/15 $
+ * @version $Revision: #9 $ $Date: 2004/02/23 $
  * @since ACS 4.7
  *
  **/
 public class Startup {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Startup.java#8 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Startup.java#9 $ by $Author: justin $, $DateTime: 2004/02/23 16:43:19 $";
 
     /** The name of the property containing the web app root **/
     public static final String WEB_APP_ROOT = "webAppRoot";
@@ -101,7 +102,7 @@ public class Startup {
      *
      * @return Collection of the names of all initializers run.
      **/
-    public Collection init() throws InitializationException {
+    public Set init() throws InitializationException {
         ResourceManager rm = ResourceManager.getInstance();
         rm.setWebappRoot(new File(m_webAppRoot));
 
@@ -112,7 +113,7 @@ public class Startup {
             throw new InitializationException("Couldn't find " + m_scriptName);
         }
 
-        Collection initializersRun = null;
+        Set initializersRun = null;
         try {
             if (m_lastInitializer == null) {
                 m_ini = new Script(r);

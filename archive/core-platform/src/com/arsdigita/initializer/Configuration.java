@@ -56,12 +56,12 @@ import java.util.Set;
  *  </pre></blockquote>
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2003/10/28 $
+ * @version $Revision: #7 $ $Date: 2004/02/23 $
  */
 
 public class Configuration {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Configuration.java#6 $ by $Author: jorris $, $DateTime: 2003/10/28 18:36:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Configuration.java#7 $ by $Author: justin $, $DateTime: 2004/02/23 16:43:19 $";
 
     Map m_parameters = new HashMap();
     Map m_types = new HashMap();
@@ -128,8 +128,8 @@ public class Configuration {
 
     public void setParameter(String name, Object value)
         throws InitializationException {
-        paramCheck(name);
-        typeCheck(name, value);
+        //paramCheck(name);
+        //typeCheck(name, value);
         m_parameters.put(name, value);
     }
 
@@ -142,7 +142,7 @@ public class Configuration {
      **/
 
     public Object getParameter(String name) throws InitializationException {
-        paramCheck(name);
+        //paramCheck(name);
         return m_parameters.get(name);
     }
 
