@@ -22,67 +22,52 @@ import java.util.Map;
  * Path
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/02/19 $
+ * @version $Revision: #6 $ $Date: 2004/02/19 $
  **/
 
 public class Path {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#5 $ by $Author: bche $, $DateTime: 2004/02/19 11:07:55 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#6 $ by $Author: bche $, $DateTime: 2004/02/19 14:31:02 $";
 
-    private static final HashMap MAPS = new HashMap();
+    private static final int N_BUCKETS = 64;
+    private static final int BITMASK = N_BUCKETS - 1;
+    private static final Map[] BUCKETS = new Map[N_BUCKETS];
+    static {
+        for (int ii=0; ii<N_BUCKETS; ii++) {
+            BUCKETS[ii] = new HashMap();
+        }
+    }
 
     public static final Path get(String path) {
         if (path == null) {
             return null;
         }
 
-        final Map map;
+        Map paths = BUCKETS[path.hashCode() & BITMASK];
 
-        final String pathPrefix = getPrefix(path);
-        //pathPrefix is something like "com.arsdigita.foo" or
-        //"com.arsdigita.bar" now.
-        
-        // this lock is held for a relatively short period of time
-        synchronized (MAPS) {                                    
-            if (MAPS.containsKey(pathPrefix) ) {
-                map = (Map) MAPS.get(pathPrefix);
+        Path result;
+
+        synchronized (paths) {
+            if (paths.containsKey(path)) {
+                result = (Path) paths.get(path);
             } else {
-                map = new HashMap();
-                MAPS.put(pathPrefix, map);
-            }
-        }
-        
-        // we're done with the lock on MAPS at this point
-        
-        synchronized (map) {
-            if (map.containsKey(path)) {
-                return (Path) map.get(path);
-            } else {
+                int dot = path.lastIndexOf('.');
                 Path parent;
                 String name;
-                
-                if (pathPrefix == null) {
+                if (dot > -1) {
+                    parent = get(path.substring(0, dot));
+                    name = path.substring(dot + 1);
+                } else {
                     parent = null;
                     name = path;
-                } else {
-                    parent = get(pathPrefix);
-                    name = path.substring(pathPrefix.length()+1, path.length());
                 }
 
-                Path result = new Path(parent, name);
-                map.put(path, result);
-                return result;
+                result = new Path(parent, name);
+                paths.put(path, result);
             }
         }
-    }
 
-    private static String getPrefix(String path) {
-        int dot = path.lastIndexOf('.');
-        if (dot > -1) {
-            return path.substring(0, dot);
-        } else {
-            return null;
-        }
+        return result;
     }
 
     public static final Path add(String p1, String p2) {
