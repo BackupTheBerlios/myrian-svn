@@ -1,0 +1,12 @@
+# Since:   2004-06-29
+# Version: $Id: //eng/persistence/dev/doc/bugs.txt#1 $
+
+* Opened
+.. PersistenceManager.makePersistent(Object) fails silently (rather
+   than violently) when it is invoked on an object that already exists
+   in the database.
+
+   Reported: 2004-06-23
+   By: rhs
+
+* Closed
