@@ -20,230 +20,35 @@ model com.arsdigita.kernel;
 // to an application instance.
 //
 // @author <a href="mailto:bquinn@arsdigita.com">Bryan Quinn</a>
-// @version "$Id: //core-platform/dev/pdl/com/arsdigita/kernel/SiteNode.pdl#2 $" 
+// @version "$Id: //core-platform/dev/pdl/com/arsdigita/kernel/SiteNode.pdl#3 $" 
 //
 
 object type SiteNode extends ACSObject {
-    String name;
-    String url;
+    String name = site_nodes.name;
+    String url = site_nodes.url;
     
     // If true, it is legal to create child nodes. 
-    Boolean isDirectory;
+    Boolean[1..1] isDirectory = site_nodes.directory_p;
 
     // If true, URLs that are logical children of this node should
     // be mapped to this node, e.g. "www.arsdigita.com/news/item123" 
     // would be mapped to this node still.
-    Boolean isPattern;
+    Boolean[1..1] isPattern = site_nodes.pattern_p;
 
-    SiteNode[0..1] parent;
-    composite SiteNode[0..n] children;	    
-    PackageInstance[0..1] mountedObject;
-    Stylesheet[0..n] defaultStyle;
+    SiteNode[0..1] parent = join site_nodes.parent_id to site_nodes.node_id;
 
-    retrieve {
-        do {
-            SELECT sn.node_id, sn.parent_id,
-            sn.name, sn.url, sn.directory_p, sn.pattern_p, 
-            o.object_type, o.display_name, o.default_domain_class
-            FROM site_nodes sn, acs_objects o
-            WHERE sn.node_id = o.object_id
-            AND node_id = :id
-        } map {	
-            id = sn.node_id;
-            name = sn.name;
-            url = sn.url;
-            isDirectory = sn.directory_p;
-            isPattern = sn.pattern_p;
-            objectType = o.object_type;
-            displayName = o.display_name;
-            defaultDomainClass = o.default_domain_class;
-        }
-    }
+    composite SiteNode[0..n] children =
+        join site_nodes.parent_id to site_nodes.node_id;
 
-    retrieve all {
-        do {
-            SELECT sn.node_id, sn.parent_id,
-            sn.name, sn.url, sn.directory_p, sn.pattern_p, 
-            o.object_type, o.display_name
-            FROM site_nodes sn, acs_objects o
-            WHERE sn.node_id = o.object_id
-        } map {	
-            id = sn.node_id;
-            name = sn.name;
-            url = sn.url;
-            isDirectory = sn.directory_p;
-            isPattern = sn.pattern_p;
-            objectType = o.object_type;
-            displayName = o.display_name;
-        }
-    }
+    PackageInstance[0..1] mountedObject =
+        join site_nodes.object_id to apm_packages.package_id;
 
-    insert {
-        super;
+    Stylesheet[0..n] defaultStyle = join site_nodes.node_id
+                                      to acs_stylesheet_node_map.node_id,
+                                    join acs_stylesheet_node_map.stylesheet_id
+                                      to acs_stylesheets.stylesheet_id;
 
-        do {
-            INSERT INTO site_nodes
-            (node_id, parent_id, name, url, directory_p, pattern_p, object_id)
-            VALUES
-            (:id, :parent.id, :name, :url, :isDirectory, :isPattern, null)
-        }
-    }
-
-    update {
-        super;
-        do {
-            UPDATE site_nodes SET
-            parent_id = :parent.id,
-            name = :name,
-            url = :url,
-            directory_p = :isDirectory,
-            pattern_p = :isPattern
-            WHERE node_id = :id
-        }
-    }
-
-    // Because the children assocation is composite,
-    // the persistence system is responsible for deleting
-    // all children recursively.  A "clear children" event 
-    // below is useful to make this more efficient.  However,
-    // the system should be able to delete it even without the event.
-    delete {
-        do {
-            DELETE from site_nodes
-            where node_id = :id
-        }
-        super;
-    }
-
-    retrieve mountedObject {
-        do {
-            SELECT ap.pretty_name, ap.package_id,
-            o.object_type, o.display_name
-            FROM apm_packages ap, acs_objects o, site_nodes sn
-            WHERE ap.package_id = o.object_id
-            AND sn.object_id = o.object_id
-            AND sn.node_id = :id
-        } map {
-            mountedObject.id = ap.package_id;
-            mountedObject.prettyName = ap.pretty_name;
-            mountedObject.objectType = o.object_type;
-            mountedObject.displayName = o.display_name;
-        }
-    }
-
-    add mountedObject {
-        do {
-            UPDATE site_nodes
-            SET object_id = :mountedObject.id
-            WHERE node_id = :id
-        }
-    }
-
-    remove mountedObject {
-        do {	    
-            UPDATE site_nodes
-            SET object_id = null
-            WHERE node_id = :id
-        }
-    }
-
-    // XXX bquinn@arsdigita.com (5/17/2001)
-    // This ugly join is currently necessary because the persistence
-    // system does not provide a convenient method to follow an 0..1
-    // multiplicity assocation.
-
-    retrieve parent {
-        do {
-            SELECT sn.node_id, sn.parent_id, 
-            sn.name, sn.url, sn.directory_p, sn.pattern_p, 
-            o.object_type, o.display_name
-            FROM site_nodes sn, site_nodes child, acs_objects o
-            WHERE sn.node_id = child.parent_id 
-            AND o.object_id = sn.node_id
-            AND child.node_id = :id
-        } map {
-            parent.id = sn.node_id;
-            parent.objectType = o.object_type;
-            parent.displayName = o.display_name;
-            parent.name = sn.name;
-            parent.url = sn.url;
-            parent.isDirectory = sn.directory_p;
-            parent.isPattern = sn.pattern_p;    
-        }
-    }
-
-    add parent {
-        do {
-            UPDATE site_nodes
-            SET parent_id = :parent.id
-            WHERE node_id = :id
-        }
-    }
-
-    remove parent {
-        do {
-            UPDATE site_nodes
-            SET parent_id = null
-            WHERE node_id = :id
-        }
-    }
-
-    retrieve children {
-        do {
-            SELECT sn.node_id, sn.parent_id, 
-            sn.name, sn.url, sn.directory_p, sn.pattern_p, 
-            o.object_type, o.display_name
-            FROM site_nodes sn, acs_objects o
-            WHERE o.object_id = sn.node_id
-            AND parent_id = :id
-        } map {
-            children.id = sn.node_id;
-            children.objectType = o.object_type;
-            children.displayName = o.display_name;
-            children.name = sn.name;	    
-            children.url = sn.url;	    
-            children.isDirectory = sn.directory_p;
-            children.isPattern = sn.pattern_p;	   
-        }
-    }
-    
-    add defaultStyle {
-        do {
-            INSERT INTO acs_stylesheet_node_map
-            (stylesheet_id, node_id)
-            VALUES
-            (:defaultStyle.id, :id)
-        }
-    }
-
-    remove defaultStyle {
-        do {
-            DELETE FROM acs_stylesheet_node_map
-            WHERE node_id = :id
-            AND stylesheet_id = :defaultStyle.id
-        }
-    }
-
-    retrieve defaultStyle {
-        do {
-            SELECT ss.stylesheet_id, ss.output_type, ss.locale_id,
-	        ss.pathname, ss.item_id, o.object_type, o.display_name
-            FROM acs_stylesheets ss, acs_stylesheet_node_map asm, 
-                 acs_objects o
-            WHERE ss.stylesheet_id = asm.stylesheet_id
-            AND ss.stylesheet_id = o.object_id
-            AND asm.node_id = :id
-            ORDER BY nvl(locale_id, 0) DESC
-        } map {
-            defaultStyle.id = ss.stylesheet_id;
-            defaultStyle.pathName = ss.pathname;
-            defaultStyle.objectType = o.object_type;
-            defaultStyle.displayName = o.display_name;
-            defaultStyle.outputType = ss.output_type;
-            defaultStyle.itemID = ss.item_id;
-            defaultStyle.localeID = ss.locale_id;
-        }
-    }
+    reference key ( site_nodes.node_id );
 }
 
 query rootSiteNode {
