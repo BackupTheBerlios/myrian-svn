@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Generator
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #14 $ $Date: 2004/03/23 $
+ * @version $Revision: #15 $ $Date: 2004/03/23 $
  **/
 
 class Generator {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#14 $ by $Author: rhs $, $DateTime: 2004/03/23 16:12:52 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Generator.java#15 $ by $Author: rhs $, $DateTime: 2004/03/23 19:48:30 $";
 
     private static final Logger s_log = Logger.getLogger(Generator.class);
 
@@ -264,8 +264,8 @@ class Generator {
         m_ccolumns.clear();
         m_cframes.clear();
         frame.addConditions(m_cconds);
-        for (Iterator it = m_cconds.iterator(); it.hasNext(); ) {
-            Expression e = (Expression) it.next();
+        for (int i = 0; i < m_cconds.size(); i++) {
+            Expression e = (Expression) m_cconds.get(i);
             addConstraining(e, frame, m_ccolumns, m_cframes);
         }
         if (m_ccolumns.isEmpty() || !frame.isConstrained(m_ccolumns)) {
