@@ -67,7 +67,7 @@ Functionality:
      Dig up Oracle specific code from perforce. Figure out how to call
      it without hack up RDBMSEngine to be oracle specific.
 
-     Status: Not started.
+     Status: Done, still wrestling with moral implications.
 
  * DynamicObjectType and DynamicAssociation
 
