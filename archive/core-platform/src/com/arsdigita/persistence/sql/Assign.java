@@ -21,12 +21,12 @@ import java.util.List;
  * Assign
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/11/14 $
  **/
 
 public class Assign extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Assign.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Assign.java#5 $ by $Author: rhs $, $DateTime: 2002/11/14 18:09:55 $";
 
     private Identifier m_lhs;
     private SQL m_rhs;
@@ -58,6 +58,12 @@ public class Assign extends Element {
         m_lhs.output(result, tran);
         result.print(" = ");
         m_rhs.output(result, tran);
+    }
+
+    public void traverse(Visitor v) {
+        v.visit(this);
+        m_lhs.traverse(v);
+        m_rhs.traverse(v);
     }
 
 }

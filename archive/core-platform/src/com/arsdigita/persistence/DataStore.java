@@ -56,12 +56,12 @@ import org.apache.log4j.Logger;
  *              communicating with the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2002/11/01 $
+ * @version $Revision: #15 $ $Date: 2002/11/14 $
  */
 
 class DataStore {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#14 $ by $Author: vadim $, $DateTime: 2002/11/01 09:30:48 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataStore.java#15 $ by $Author: rhs $, $DateTime: 2002/11/14 18:09:55 $";
 
     private static final Logger LOG =
         Logger.getLogger(DataStore.class.getName());
@@ -248,13 +248,7 @@ class DataStore {
             }
         }
 
-        SQLWriter sql = new SQLWriter();
-
-        final int size = 10;
-        final List types = new ArrayList(size);
-        final List jdbcTypes = new ArrayList(size);
-        final List values = new ArrayList(size);
-        final List refreshPaths = new ArrayList(size);
+        final SQLWriter sql = new SQLWriter();
 
         el.output(sql, new Element.Transformer() {
                 public boolean transform(Element element,
@@ -262,20 +256,10 @@ class DataStore {
                     if (element.isBindVar()) {
                         Identifier id = (Identifier) element;
                         Object value = source.lookupValue(id.getPath());
-                        values.add(value);
-
                         Property prop = source.lookupProperty(id.getPath());
                         SimpleType type = (SimpleType) prop.getType();
-                        types.add(type);
-
                         int jdbcType = jdbcType(op, id.getPath(), prop);
-                        jdbcTypes.add(new Integer(jdbcType));
-
                         result.print(type.getLiteral(value, jdbcType));
-                        if (type.needsRefresh(value, jdbcType)) {
-                            refreshPaths.add(id.getPath());
-                        }
-
                         return true;
                     } else {
                         return false;
@@ -283,7 +267,7 @@ class DataStore {
                 }
             });
 
-        com.arsdigita.db.PreparedStatement ps;
+        final com.arsdigita.db.PreparedStatement ps;
         // This will only work correctly if conn is really of type
         // com.arsdigita.db.Connection.
         try {
@@ -300,22 +284,41 @@ class DataStore {
         // reuse.
         ps.setCloseAfterUse(true);
 
-        int index = 1;
-        for (int i = 0; i < values.size(); i++) {
-            Object value = values.get(i);
-            SimpleType type = (SimpleType) types.get(i);
-            int jdbcType = ((Integer) jdbcTypes.get(i)).intValue();
+        final int[] index = {1};
+        final ArrayList[] refreshPaths = {null};
+        el.traverse(new Element.Visitor() {
+                public void visit(Element element) {
+                    if (!element.isBindVar()) {
+                        return;
+                    }
 
-            try {
-                index += type.bind(ps, index, value, jdbcType);
-            } catch (SQLException e) {
-                throw PersistenceException.newInstance(e);
-            } catch (ClassCastException e) {
-                throw PersistenceException.newInstance
-                    ("Error binding value number " + index +
-                     " in sql: " + sql + "\n" + e.getMessage());
-            }
-        }
+                    Identifier id = (Identifier) element;
+                    Object value = source.lookupValue(id.getPath());
+                    Property prop = source.lookupProperty(id.getPath());
+                    SimpleType type = (SimpleType) prop.getType();
+                    int jdbcType = jdbcType(op, id.getPath(), prop);
+                    if (type.needsRefresh(value, jdbcType)) {
+                        if (refreshPaths[0] == null) {
+                            refreshPaths[0] = new ArrayList();
+                        }
+                        refreshPaths[0].add(id.getPath());
+                    }
+
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Binding " + id + " to " + value);
+                    }
+
+                    try {
+                        index[0] += type.bind(ps, index[0], value, jdbcType);
+                    } catch (SQLException e) {
+                        throw PersistenceException.newInstance(e);
+                    } catch (ClassCastException e) {
+                        throw PersistenceException.newInstance
+                            ("Error binding value number " + index[0] +
+                             " in sql: " + sql + "\n" + e.getMessage());
+                    }
+                }
+            });
 
         if ((!el.isSelect() || el.isSelectForUpdate()) && !el.isDDL()) {
             ps.setNeedsAutoCommitOff(true);
@@ -330,15 +333,15 @@ class DataStore {
             if (ps.execute()) {
                 return ps.getResultSet();
             } else {
-                doRefresh(source, refreshPaths);
+                if (refreshPaths[0] != null) {
+                    doRefresh(source, refreshPaths[0]);
+                }
                 return null;
             }
         } catch (SQLException e) {
             throw PersistenceException.newInstance
                 ("Error executing SQL: " + Utilities.LINE_BREAK +
-                 sql.toString() +
-                 Utilities.LINE_BREAK + "Variables Set: " +
-                 values, e);
+                 sql.toString(), e);
         }
     }
 

@@ -23,12 +23,12 @@ import java.util.Map;
  * Clause
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/11/14 $
  **/
 
 public class Clause extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Clause.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Clause.java#5 $ by $Author: rhs $, $DateTime: 2002/11/14 18:09:55 $";
 
     private Symbol m_start;
     private SQL m_sql;
@@ -113,6 +113,16 @@ public class Clause extends Element {
 
     private static String generateKey(Symbol start, SQL sql) {
         return start.toString() + sql.toString();
+    }
+
+    public void traverse(Visitor v) {
+        v.visit(this);
+        if (m_start != null) {
+            m_start.traverse(v);
+        }
+        if (m_sql != null) {
+            m_sql.traverse(v);
+        }
     }
 
 }

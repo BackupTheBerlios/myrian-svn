@@ -21,12 +21,12 @@ import java.util.*;
  * SetClause
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/11/14 $
  **/
 
 public class SetClause extends Clause {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/SetClause.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/SetClause.java#5 $ by $Author: rhs $, $DateTime: 2002/11/14 18:09:55 $";
 
     private List m_assigns = new ArrayList();
     private List m_assignsNoMod = Collections.unmodifiableList(m_assigns);
@@ -65,4 +65,12 @@ public class SetClause extends Clause {
         }
         result.popIndent();
     }
+
+    public void traverse(Visitor v) {
+        v.visit(this);
+        for (Iterator it = m_assigns.iterator(); it.hasNext(); ) {
+            ((Element) it.next()).traverse(v);
+        }
+    }
+
 }

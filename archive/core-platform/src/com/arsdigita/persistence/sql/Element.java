@@ -24,12 +24,12 @@ import java.io.*;
  * Element
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/14 $
+ * @version $Revision: #5 $ $Date: 2002/11/14 $
  **/
 
 public abstract class Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Element.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Element.java#5 $ by $Author: rhs $, $DateTime: 2002/11/14 18:09:55 $";
 
     private static final Map s_cache = new HashMap();
 
@@ -178,8 +178,14 @@ public abstract class Element {
         return m_string;
     }
 
+    public abstract void traverse(Visitor v);
+
     public static interface Transformer {
         boolean transform(Element el, SQLWriter result);
+    }
+
+    public static interface Visitor {
+        void visit(Element el);
     }
 
     private static final Transformer NOOP = new Transformer() {
