@@ -18,7 +18,10 @@ package com.arsdigita.tools.junit.framework;
 import junit.framework.*;
 import com.arsdigita.persistence.Session;
 import com.arsdigita.persistence.SessionManager;
+import com.arsdigita.kernel.TestHelper;
 import org.apache.log4j.Logger;
+
+import java.util.Locale;
 
 public abstract class BaseTestCase extends TestCase {
 
@@ -62,6 +65,7 @@ public abstract class BaseTestCase extends TestCase {
 
         Session sess = SessionManager.getSession();
         sess.getTransactionContext().beginTxn();
+        TestHelper.setLocale(Locale.ENGLISH);
     }
 
     protected void baseTearDown() {
