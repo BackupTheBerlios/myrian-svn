@@ -7,12 +7,12 @@ import org.apache.log4j.Category;
  * RefetchTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/06/24 $
  **/
 
 public class RefetchTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/RefetchTest.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/RefetchTest.java#2 $ by $Author: jorris $, $DateTime: 2002/06/24 13:04:06 $";
 
     private static final Category s_log =
         Category.getInstance(RefetchTest.class);
@@ -54,24 +54,33 @@ public class RefetchTest extends PersistenceTestCase {
         node.save();
 
         DataCollection nodes = ssn.retrieve(REFETCH_TEST);
-        nodes.addEqualsFilter(ID, NODE_ID);
+        try {
+            nodes.addEqualsFilter(ID, NODE_ID);
+         //   s_log.warn("Node size: " + nodes.size());
+             if (nodes.next()) {
+                 node = nodes.getDataObject();
+             } else {
+                 fail("Node wasn't saved properly.");
+             }
 
-        if (nodes.next()) {
-            node = nodes.getDataObject();
-        } else {
-            fail("Node wasn't saved properly.");
+             DataObject newParent = ssn.retrieve(NODE_OID);
+
+             BigInteger preID = (BigInteger) newParent.get(ID);
+
+             node.set(PARENT, newParent);
+             node.get(NAME);
+
+             BigInteger postID = (BigInteger) newParent.get(ID);
+
+             assertEquals(preID, postID);
+
+        } finally {
+            try {
+                nodes.close();
+            } catch (Exception e) {
+                s_log.error("Error closing", e);
+            }
         }
-
-        DataObject newParent = ssn.retrieve(NODE_OID);
-
-        BigInteger preID = (BigInteger) newParent.get(ID);
-
-        node.set(PARENT, newParent);
-        node.get(NAME);
-
-        BigInteger postID = (BigInteger) newParent.get(ID);
-
-        assertEquals(preID, postID);
     }
 
 }

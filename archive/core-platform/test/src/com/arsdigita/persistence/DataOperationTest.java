@@ -28,11 +28,11 @@ import java.util.Date;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/06/24 $
  */
 public class DataOperationTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataOperationTest.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataOperationTest.java#2 $ by $Author: jorris $, $DateTime: 2002/06/24 13:04:06 $";
 
     public DataOperationTest(String name) {
         super(name);
@@ -293,37 +293,46 @@ public class DataOperationTest extends PersistenceTestCase {
      */
     public void testPLSQLWithRandomArgs() {
         // make sure that the table is empty
-        DataQuery query = getSession().retrieveQuery
-            ("examples.PLSQLQueryWithArbitraryArgs");
-        assert("the table already has items in it", query.size() == 0);
+        DataQuery query = null;
+        try {
+            query = getSession().retrieveQuery
+                ("examples.PLSQLQueryWithArbitraryArgs");
+            assert("the table already has items in it", query.size() == 0);
 
-        DataOperation operation = getSession().
-            retrieveDataOperation("examples.PLSQLWithArbitraryArgsQuery");
-        operation.setParameter("arg1", new Integer(1));
-        operation.setParameter("arg2", new Integer(2));
-        operation.setParameter("arg5", new Integer(5));
-        operation.execute();
+            DataOperation operation = getSession().
+                retrieveDataOperation("examples.PLSQLWithArbitraryArgsQuery");
+            operation.setParameter("arg1", new Integer(1));
+            operation.setParameter("arg2", new Integer(2));
+            operation.setParameter("arg5", new Integer(5));
+            operation.execute();
 
-        // get the row that was just inserted
-        query.next();
+            // get the row that was just inserted
+            query.next();
 
-        // now we want to check the value for all 5 items
-        Object arg1 = query.get("arg1");
-        Object arg2 = query.get("arg2");
-        Object arg3 = query.get("arg3");
-        Object arg4 = query.get("arg4");
-        Object arg5 = query.get("arg5");
+            // now we want to check the value for all 5 items
+            Object arg1 = query.get("arg1");
+            Object arg2 = query.get("arg2");
+            Object arg3 = query.get("arg3");
+            Object arg4 = query.get("arg4");
+            Object arg5 = query.get("arg5");
 
-        assert("The first argument should have been 1.  Instead, it is [" +
-               arg1 + "]", "1".equals(arg1.toString()));
-        assert("The second argument should have been 1.  Instead, it is [" +
-               arg2 + "]", "2".equals(arg2.toString()));
-        assert("The third argument should have been null.  Instead, it is [" +
-               arg3 + "]", arg3 == null);
-        assert("The fourth argument should have been null.  Instead, it is [" +
-               arg5 + "]", arg4 == null);
-        assert("The fifth argument should have been 5.  Instead, it is [" +
-               arg5 + "]", "5".equals(arg5.toString()));
+            assert("The first argument should have been 1.  Instead, it is [" +
+                   arg1 + "]", "1".equals(arg1.toString()));
+            assert("The second argument should have been 1.  Instead, it is [" +
+                   arg2 + "]", "2".equals(arg2.toString()));
+            assert("The third argument should have been null.  Instead, it is [" +
+                   arg3 + "]", arg3 == null);
+            assert("The fourth argument should have been null.  Instead, it is [" +
+                   arg5 + "]", arg4 == null);
+            assert("The fifth argument should have been 5.  Instead, it is [" +
+                   arg5 + "]", "5".equals(arg5.toString()));
+
+
+        } finally {
+            if ( null != query ) {
+                query.close();
+            }
+        }
 
     }
 
