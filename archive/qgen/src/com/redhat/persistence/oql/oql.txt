@@ -1,0 +1,81 @@
+Below is the AST for the new OQL. This will very likely be
+methodically transformed into a grammer and so should not be all that
+different from the parse tree. There is currently no provision for
+generic function and/or method calls.
+
+  * Singleton and/or Collection may be unnecessary, we could use naked
+    variables instead and do type checking and/or coersion based on
+    context.
+
+  Expression
+      |
+      |---> Literal
+      |
+      |---> Variable
+      |
+      |---> Path (This isn't the best name for this, it actually refers to an
+      |           attribute reference.)
+      |---> Query
+      |       |
+      |       |---> Singleton
+      |       |
+      |       |---> Collection
+      |       |
+      |       |---> Filter
+      |       |
+      |       |---> Join
+      |       |       |
+      |       |       |---> LeftJoin
+      |       |       |
+      |       |       |---> RightJoin
+      |       |       |
+      |       |       |---> FullJoin
+      |       |       |
+      |       |       '---> CrossJoin
+      |       |
+      |       |---> Name
+      |       |
+      |       |---> Get
+      |       |
+      |       |---> Order
+      |       |
+      |       |---> Range
+      |       |
+      |       '---> Aggregate
+      |
+      '---> Condition
+              |
+              |---> And
+              |
+              |---> Or
+              |
+              |---> Not
+              |
+              |---> Exists
+              |
+              |---> Equals
+              |
+              |---> LessThan
+              |
+              '---> GreaterThan
+
+Inheritence Tree:
+  Expression.java
+    Variable.java
+  Condition.java
+    Not.java
+    Exists.java
+    BinaryCondition.java
+      And.java
+      Or.java
+      Equals.java
+  Query.java
+    AbstractJoin.java
+      Join.java
+      CrossJoin.java
+      FullJoin.java
+      LeftJoin.java
+      RightJoin.java
+    Filter.java
+    Define.java
+    Get.java

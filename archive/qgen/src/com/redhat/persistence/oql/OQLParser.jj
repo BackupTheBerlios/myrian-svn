@@ -1,0 +1,220 @@
+options {
+    STATIC = false;
+    DEBUG_PARSER = false;
+}
+
+PARSER_BEGIN(OQLParser)
+
+package com.redhat.persistence.oql;
+
+import java.lang.reflect.*;
+import java.util.*;
+import java.io.*;
+
+/**
+ * OQLParser
+ *
+ * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
+ * @version $Revision: #1 $ $Date: 2003/12/30 $
+ */
+
+class OQLParser {
+
+    private static Map EXPRESSIONS = new HashMap();
+
+    static {
+        EXPRESSIONS.put("join", Join.class);
+        EXPRESSIONS.put("left", LeftJoin.class);
+        EXPRESSIONS.put("right", RightJoin.class);
+        EXPRESSIONS.put("cross", CrossJoin.class);
+        EXPRESSIONS.put("full", FullJoin.class);
+        EXPRESSIONS.put("filter", Filter.class);
+        EXPRESSIONS.put("exists", Exists.class);
+    }
+
+    static Expression construct(Token t, List expressions) {
+        Class klass = (Class) EXPRESSIONS.get(t.image);
+        if (klass == null) {
+            throw new IllegalArgumentException
+                ("no such expression: " + t.image);
+        }
+        Class[] params = new Class[expressions.size()];
+        for (int i = 0; i < params.length; i++) {
+            params[i] = Expression.class;
+        }
+        try {
+            Constructor cons = klass.getDeclaredConstructor(params);
+            return (Expression) cons.newInstance(expressions.toArray());
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException
+                ("no such method: " + t.image + Arrays.asList(params));
+        } catch (InstantiationException e) {
+            throw new IllegalStateException(e.getMessage());
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e.getMessage());
+        } catch (InvocationTargetException e) {
+            throw new IllegalStateException(e.getMessage());
+        }
+    }
+
+    public static final void main(String[] args) throws Exception {
+        boolean a = true, b = true, c = true, d = true, e = false, f = true;
+        if (a && b && c && d || e && f) { System.out.println("true"); }
+        OQLParser p = new OQLParser(new InputStreamReader(System.in));
+        System.out.println(p.expression());
+    }
+
+}
+
+PARSER_END(OQLParser)
+
+<DEFAULT,BEGIN> SKIP:
+{
+    " "
+  | "\t"
+  | "\n"
+  | "\r"
+  | "\f"
+}
+
+TOKEN:
+{
+    <LPAREN: "(">
+  | <RPAREN: ")">
+  | <COMMA: ",">
+  | <DOT: ".">
+  | <EQ: "=">
+  | <EQUALS: "==">
+  | <AND: "and">
+  | <OR: "or">
+  | <NOT: "not">
+}
+
+TOKEN:
+{
+    <ID: (<CH>) (<CH>|<DIGIT>)* ( "[]" )?>
+  | <#CH: <ESC>|<CHARS>>
+  | <#CHARS: ["a" - "z", "A" - "Z", "_", "$"]>
+  | <#ESC: "\\" ~[]>
+  | <#DIGIT: ["0" - "9"]>
+}
+
+/**
+ * Top level constructs.
+ **/
+
+Expression expression() :
+{
+    Expression e;
+}
+{
+    e = define() { return e; }
+}
+
+Expression define() :
+{
+    Expression e;
+    Token t = null;
+}
+{
+    [ LOOKAHEAD(2) t = <ID> <EQ> ] e = binary()
+        { return  t == null ? e : new Define(e, t.image); }
+}
+
+Expression binary() :
+{
+    Expression e;
+}
+{
+    e = or() { return e; }
+}
+
+Expression or() :
+{
+    Expression l, r;
+}
+{
+    l = and() [ <OR> r = or() { return new Or(l, r); } ] { return l; }
+}
+
+Expression and() :
+{
+    Expression l, r;
+}
+{
+    l = equals() [ <AND> r = and() { return new And(l, r); } ] { return l; }
+}
+
+Expression equals() :
+{
+    Expression l, r;
+}
+{
+    l = unary() [ <EQUALS> r = equals() { return new Equals(l, r); } ]
+        { return l; }
+}
+
+Expression unary() :
+{
+    Expression e;
+}
+{
+    e = not() { return e; }
+}
+
+Expression not() :
+{
+    Expression e;
+    boolean not = false;
+}
+{
+    [ <NOT> { not = true; } ] e = get() { return not ? new Not(e) : e; }
+}
+
+Expression get() :
+{
+    Expression e;
+    Token t;
+}
+{
+    e = primitive() ( <DOT> t = <ID> { e = new Get(e, t.image); } )*
+        { return e; }
+}
+
+Expression primitive() :
+{
+    Expression e;
+}
+{
+  ( e = generic() | e = parens() )
+      { return e; }
+}
+
+Expression generic() :
+{
+    Token t;
+    List l;
+}
+{
+    t = <ID> [ l = exprl() { return construct(t, l); } ]
+        { return new Variable(t.image); }
+}
+
+List exprl() :
+{
+    Expression e;
+    List l = new ArrayList();
+}
+{
+    <LPAREN> [ e = expression() { l.add(e); }
+               (<COMMA> e = expression() { l.add(e); })* ]<RPAREN>
+        { return l; }
+}
+
+Expression parens() :
+{
+    Expression e;
+}
+{
+    <LPAREN> e = expression() <RPAREN> { return e; }
+}

@@ -1,0 +1,23 @@
+
+ * Write prototype data structures and analyzer code in order to
+   demonstrate the feasability of deriving the necessary information
+   to optimize the given queries.
+
+ * Enumerate test queries for prototype code based at a minimum on all
+   the different situations in which persistence uses the query
+   interface for navigating data structures.
+
+ * Qualias support.
+
+ * Final oql data structures and analyzer. (Prototype + Current
+   Analyzer = 1.5KLOC)
+
+ * Write dumb sql generation, i.e. sql generation that does not take
+   advantage of the analyzer. (Current QGen + Analyzer = 1KLOC)
+
+ * Modify persistence to use new query data structures. At this point
+   we should have a fully running end to end system.
+   (Session.getQuery() + QuerySource impls = 0.5KLOC)
+
+ * Modify sql generation code to produce more optimized sql based on
+   the analyzed query.
