@@ -37,12 +37,12 @@ import org.apache.log4j.Logger;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2004/02/24 $
+ * @version $Revision: #4 $ $Date: 2004/02/26 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Signature.java#3 $ by $Author: ashah $, $DateTime: 2004/02/24 21:17:31 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Signature.java#4 $ by $Author: ashah $, $DateTime: 2004/02/26 12:50:00 $";
 
     private static final Logger s_log = Logger.getLogger(Signature.class);
 
@@ -104,7 +104,6 @@ public class Signature {
         return getSource(null).getObjectType();
     }
 
-
     public boolean hasPath(Path p) {
         return m_paths.contains(p);
     }
@@ -116,24 +115,25 @@ public class Signature {
     /**
      * Add all leaves of key property hierarchy
      */
-    private void addPathKeys(Path path) {
+    private void addPathImmediates(Path path) {
 	ObjectType type = getType(path);
-	Collection keys = type.getKeyProperties();
-        // XXX: ignores possibility of non-toplevel nonkeyed compound types
-	if (keys.size() == 0 && !isSource(path)) {
+        Collection props = type.getImmediateProperties();
+        // all props for unkeyed, immediate only for keyed
+
+        if (props.size() == 0 && !isSource(path)) {
             if (!m_paths.contains(path)) {
                 m_paths.add(path);
             }
         } else {
-            for (Iterator it = keys.iterator(); it.hasNext(); ) {
+            for (Iterator it = props.iterator(); it.hasNext(); ) {
                 Property prop = (Property) it.next();
-		addPathKeys(Path.add(path, prop.getName()));
+		addPathImmediates(Path.add(path, prop.getName()));
             }
         }
     }
 
-    private void addPathInternal(Path path) {
-        addPathKeys(path);
+    private void makePathLoadable(Path path) {
+        addPathImmediates(path);
         // XXX: forcing container id properties to be loaded
         // this does not need to be done here. could push to wrapper layer
         // and change RecordSet to deal with null containers by passing
@@ -141,7 +141,7 @@ public class Signature {
         if (!isSource(path)) {
             Path parent = path.getParent();
             if (!m_paths.contains(parent)) {
-                addPathInternal(parent);
+                makePathLoadable(parent);
             }
         }
     }
@@ -153,17 +153,8 @@ public class Signature {
 
         if (path == null) { return; }
 
-        addPathInternal(path);
+        makePathLoadable(path);
         addDefaultProperties(path);
-    }
-
-    Path getPath(String path) {
-        Path p = Path.get(path);
-        if (m_paths.contains(p)) {
-            return p;
-        } else {
-            return null;
-        }
     }
 
     public Collection getPaths() {
@@ -231,30 +222,7 @@ public class Signature {
         return m_sources;
     }
 
-    static final boolean isAttribute(Property prop) {
-        // This should really look at the mapping metadata to figure out what
-        // to load by default.
-        return !prop.isCollection() &&
-            prop.getType().getModel().equals(Model.getInstance("global"));
-    }
-
-    private void addProperties(Collection props) {
-        addProperties(null, props);
-    }
-
-    private void addProperties(Path path, Collection props) {
-        ArrayList paths = new ArrayList(props.size());
-        for (Iterator it = props.iterator(); it.hasNext(); ) {
-            paths.add(Path.get(((Property) it.next()).getName()));
-        }
-        addPaths(path, paths);
-    }
-
-    private void addPaths(Collection paths) {
-        addPaths(null, paths);
-    }
-
-    private void addPaths(Path prefix, Collection paths) {
+    private void addPathImmediates(Path prefix, Collection paths) {
         for (Iterator it = paths.iterator(); it.hasNext(); ) {
             Path p = (Path) it.next();
             Path path;
@@ -263,50 +231,37 @@ public class Signature {
             } else {
                 path = Path.add(prefix, p);
             }
-            addPathInternal(path);
+            addPathImmediates(path);
         }
     }
 
     private void addDefaultProperties(Path path) {
         ObjectType type = getType(path);
-        if (type.isKeyed()) {
-            addDefaultProperties(path, type);
-        } else {
+        addFetchedPaths(path, type);
+
+        if (!isSource(path)) {
             Root root = type.getRoot();
             Property prop = getProperty(path);
             // assume that path.getParent() is keyed
             ObjectMap container = root.getObjectMap(prop.getContainer());
             if (container != null) {
-                addPaths
+                addPathImmediates
                     (path.getParent(), container.getDeclaredFetchedPaths());
             }
         }
     }
 
-    private void addDefaultProperties(Path path, ObjectType type) {
-        // immediate properties (all props for unkeyed types)
-        for (Iterator it = type.getImmediateProperties().iterator();
-             it.hasNext(); ) {
-            addPathInternal(Path.add(path, ((Property) it.next()).getName()));
-        }
-
-        if (type.isKeyed()) {
-            ObjectMap om = type.getRoot().getObjectMap(type);
-            addPaths(path, om.getFetchedPaths());
-        }
+    private void addFetchedPaths(Path path, ObjectType type) {
+        ObjectMap om = type.getRoot().getObjectMap(type);
+        addPathImmediates(path, om.getFetchedPaths());
     }
 
     private void addDefaultProperties() {
         for (Iterator it = m_sources.iterator(); it.hasNext(); ) {
             Source source = (Source) it.next();
-            addDefaultProperties(source.getPath(), source.getObjectType());
+            makePathLoadable(source.getPath());
+            addFetchedPaths(source.getPath(), source.getObjectType());
         }
-    }
-
-    public boolean isImmediate(Path path) {
-	Property prop = getProperty(path);
-	Collection keys = prop.getContainer().getKeyProperties();
-	return keys.size() == 0 || keys.contains(prop);
     }
 
     public Property getProperty(Path path) {

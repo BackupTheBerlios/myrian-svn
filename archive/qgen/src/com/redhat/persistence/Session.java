@@ -48,12 +48,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2004/02/24 $
+ * @version $Revision: #3 $ $Date: 2004/02/26 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Session.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Session.java#3 $ by $Author: ashah $, $DateTime: 2004/02/26 12:50:00 $";
 
     static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -299,12 +299,6 @@ public class Session {
             expr = new Filter
                 (expr, new Equals(new Variable(LINK_ASSOCIATION) , to));
 	}
-
-  	for (Iterator it = link.getLinkType().getProperties().iterator();
-  	     it.hasNext(); ) {
-            Property prop = (Property) it.next();
-            sig.addPath(Path.add("link", prop.getName()));
-  	}
 
         return new DataSet(this, sig, expr);
     }
