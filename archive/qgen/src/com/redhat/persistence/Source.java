@@ -22,12 +22,12 @@ import com.redhat.persistence.metadata.ObjectType;
  * Source
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/24 $
  **/
 
 public class Source {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Source.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Source.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
 
     private ObjectType m_type;
     private Path m_path;
@@ -49,4 +49,7 @@ public class Source {
         return m_path;
     }
 
+    public String toString() {
+        return "<source " + m_path + "," + m_type.getQualifiedName() + ">";
+    }
 }

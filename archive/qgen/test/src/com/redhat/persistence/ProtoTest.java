@@ -32,12 +32,12 @@ import java.io.*;
  * ProtoTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/24 $
  **/
 
 public class ProtoTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/ProtoTest.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/ProtoTest.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
 
 
     public ProtoTest(String name) {
@@ -83,7 +83,7 @@ public class ProtoTest extends TestCase {
                 public void release(Connection conn) {
                     // Do nothing
                 }
-             }, w), new RDBMSQuerySource());
+             }, w), new QuerySource());
 
         ObjectType TEST = ssn.getRoot().getObjectType("test.Test");
         ObjectType ICLE = ssn.getRoot().getObjectType("test.Icle");

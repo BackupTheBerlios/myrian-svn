@@ -21,16 +21,15 @@ import com.redhat.persistence.common.Path;
  * Expression
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/24 $
  **/
 
 public abstract class Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Expression.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Expression.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
 
     public static abstract class Switch {
 
-        public abstract void onQuery(Query q);
         public abstract void onCondition(Condition c);
         public abstract void onVariable(Variable r);
         public abstract void onValue(Value v);

@@ -16,7 +16,7 @@
 package com.redhat.persistence.engine.rdbms;
 
 import com.redhat.persistence.Event;
-import com.redhat.persistence.Query;
+import com.redhat.persistence.Signature;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,16 +25,16 @@ import java.util.Collections;
  * RDBMSStatement
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/24 $
  **/
 
 public class RDBMSStatement {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/RDBMSStatement.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/RDBMSStatement.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
 
     private final String m_text;
     private final ArrayList m_events = new ArrayList();
-    private Query m_query = null;
+    private Signature m_sig = null;
 
     RDBMSStatement(String text) {
         m_text = text;
@@ -44,12 +44,12 @@ public class RDBMSStatement {
         return m_text;
     }
 
-    void setQuery(Query query) {
-        m_query = query;
+    void setSignature(Signature sig) {
+        m_sig = sig;
     }
 
-    public Query getQuery() {
-        return m_query;
+    public Signature getSignature() {
+        return m_sig;
     }
 
     void addEvent(Event ev) {

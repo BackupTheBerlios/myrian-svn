@@ -15,27 +15,27 @@
 
 package com.arsdigita.persistence;
 
-import com.redhat.persistence.common.Path;
 import com.arsdigita.persistence.metadata.Property;
-import com.redhat.persistence.PersistentCollection;
 import com.redhat.persistence.Signature;
+import com.redhat.persistence.common.Path;
+import com.redhat.persistence.metadata.Link;
 
 /**
  * DataAssociationCursorImpl
  *
  * @author Archit Shah &lt;ashah@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/24 $
  **/
 
 class DataAssociationCursorImpl extends DataCollectionImpl
     implements DataAssociationCursor {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
 
     private DataAssociationImpl m_assn;
 
     DataAssociationCursorImpl(Session ssn, DataObject data, Property prop) {
-        super(ssn, (PersistentCollection) ssn.getProtoSession().get
+        super(ssn, ssn.getProtoSession().getDataSet
               (data, C.prop(ssn.getRoot(), prop)));
     }
 
@@ -47,13 +47,29 @@ class DataAssociationCursorImpl extends DataCollectionImpl
         return m_assn;
     }
 
+    private boolean hasLinkAttributes() {
+        return (m_assn.getProperty() instanceof Link);
+    }
+
+    protected Path resolvePath(Path path) {
+        if (!hasLinkAttributes()) {
+            return super.resolvePath(path);
+        }
+
+        if (path == null || getTypeInternal().getProperty(path) != null) {
+            path = Path.add
+                (com.redhat.persistence.Session.LINK_ASSOCIATION, path);
+        }
+
+        return super.resolvePath(path);
+    }
+
     public DataObject getLink() {
-        Signature sig = getOriginal().getSignature();
-        if (sig.isSource(Path.get("link"))) {
-            return (DataObject) get("link");
-        } else {
+        if (!hasLinkAttributes()) {
             return null;
         }
+
+        return (DataObject) get("link");
     }
 
 
@@ -67,6 +83,10 @@ class DataAssociationCursorImpl extends DataCollectionImpl
      *  @return The Link Property specified by the parameter
      */
     public Object getLinkProperty(String name) {
+        if (!hasLinkAttributes()) {
+            return null;
+        }
+
         return get("link." + name);
     }
 

@@ -24,12 +24,12 @@ import java.util.*;
  * QuerySuite
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/02/24 $
+ * @version $Revision: #5 $ $Date: 2004/02/24 $
  **/
 
 public class QuerySuite extends TestSuite {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QuerySuite.java#4 $ by $Author: rhs $, $DateTime: 2004/02/24 10:13:24 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/test/src/com/redhat/persistence/oql/QuerySuite.java#5 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
 
     public QuerySuite() {}
 
@@ -101,7 +101,7 @@ public class QuerySuite extends TestSuite {
             public void release(Connection conn) {}
         };
         Engine engine = new RDBMSEngine(src, new PostgresWriter());
-        Session ssn = new Session(m_root, engine,new DynamicQuerySource());
+        Session ssn = new Session(m_root, engine, new QuerySource());
 
         DataLoader loader = new DataLoader(ssn);
         XML.parseResource("com/redhat/persistence/oql/data.xml", loader);

@@ -16,7 +16,6 @@
 package com.redhat.persistence.engine.rdbms;
 
 import com.redhat.persistence.Condition;
-import com.redhat.persistence.Expression;
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.metadata.Column;
 import java.util.Collection;
@@ -26,86 +25,14 @@ import java.util.Iterator;
  * ANSIWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/24 $
  **/
 
 
 public class ANSIWriter extends SQLWriter {
 
-    protected void writeSelect(Select select) {
-        write("select ");
-
-        Collection sels = select.getSelections();
-
-        if (select.isCount()) {
-            write("count(*)\nfrom (\nselect 1");
-        } else {
-            if (sels.size() == 0) {
-                write("*");
-            } else {
-                for (Iterator it = sels.iterator(); it.hasNext(); ) {
-                    Path path = (Path) it.next();
-                    write(path);
-                    write(" as ");
-                    write(select.getAlias(path));
-                    if (it.hasNext()) {
-                        write(",\n       ");
-                    }
-                }
-            }
-        }
-    }
-
-    protected void writeOrder(Select select) {
-        if (select.isCount()) { return; }
-
-        Collection order = select.getOrder();
-
-        if (order.size() > 0) {
-            write("\norder by ");
-        }
-
-        for (Iterator it = order.iterator(); it.hasNext(); ) {
-            Expression e = (Expression) it.next();
-            write(e);
-
-            if (!select.isAscending(e)) {
-                write(" desc");
-            }
-
-            if (it.hasNext()) {
-                write(", ");
-            }
-        }
-    }
-
     public void write(Select select) {
-        writeSelect(select);
-
-        Join join = select.getJoin();
-        Expression filter = select.getFilter();
-
-        write("\nfrom ");
-        write(join);
-
-        if (filter != null) {
-            write("\nwhere ");
-            write(filter);
-        }
-
-        writeOrder(select);
-
-        if (select.getOffset() != null) {
-            write("\noffset " + select.getOffset());
-        }
-
-        if (select.getLimit() != null) {
-            write("\nlimit " + select.getLimit());
-        }
-
-        if (select.isCount()) {
-            write("\n) count__");
-        }
+        write(select.getQuery().generate(getEngine().getSession().getRoot()));
     }
 
     public void write(Insert insert) {

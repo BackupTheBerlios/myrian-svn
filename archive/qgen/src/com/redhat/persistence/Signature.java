@@ -21,50 +21,89 @@ import com.redhat.persistence.metadata.ObjectMap;
 import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Property;
 import com.redhat.persistence.metadata.Root;
+import com.redhat.persistence.metadata.SQLBlock;
+import com.redhat.persistence.oql.Expression;
+import com.redhat.persistence.oql.Get;
+import com.redhat.persistence.oql.Variable;
+import com.redhat.persistence.oql.Query;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import org.apache.log4j.Logger;
 
 /**
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/24 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Signature.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Signature.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
 
-    private ArrayList m_paths = new ArrayList();
+    private static final Logger s_log = Logger.getLogger(Signature.class);
 
+    private HashSet m_paths = new HashSet();
     private ArrayList m_sources = new ArrayList();
     private HashMap m_sourceMap = new HashMap();
 
-    private ArrayList m_parameters = new ArrayList();
-    private HashMap m_parameterMap = new HashMap();
+    public Signature() { }
 
-    public Signature(Source src) {
-        addSource(src);
-        addKeyProperties();
+    public Signature(Signature sig) {
+        m_paths.addAll(sig.m_paths);
+        m_sources.addAll(sig.m_sources);
+        m_sourceMap.putAll(sig.m_sourceMap);
     }
 
     public Signature(ObjectType type) {
-        this(new Source(type));
+        addSource(type, null);
     }
 
-    public Signature(Signature sig) {
-	m_paths.addAll(sig.m_paths);
-	m_sources.addAll(sig.m_sources);
-	m_sourceMap.putAll(sig.m_sourceMap);
-	m_parameters.addAll(sig.m_parameters);
-	m_parameterMap.putAll(sig.m_parameterMap);
+    // XXX: should be public static in oql
+    private static Expression expression(Path path) {
+        if (path.getParent() == null) {
+            return new Variable(path.getName());
+        } else {
+            return new Get(expression(path.getParent()), path.getName());
+        }
+    }
+
+    private String clean(String str) {
+        // XXX: this is not legit we could get name conflicts
+        str = str.replace('.', '_');
+        str = str.replace('@', '_');
+        return str;
+    }
+
+    public Query makeQuery(Expression expr) {
+        addDefaultProperties();
+
+        if (m_paths.size() == 0) {
+            throw new IllegalStateException(this + "\n");
+        }
+
+        Query q = new Query(expr);
+
+        for (Iterator it = m_paths.iterator(); it.hasNext(); ) {
+            Path path = (Path) it.next();
+            if (path == null) { continue; }
+            q.fetch(clean(path.getPath()), expression(path));
+        }
+
+        return q;
+    }
+
+    public String getColumn(Path p) {
+        return clean(p.getPath());
     }
 
     public ObjectType getObjectType() {
         return getSource(null).getObjectType();
     }
+
 
     public boolean hasPath(Path p) {
         return m_paths.contains(p);
@@ -80,7 +119,8 @@ public class Signature {
     private void addPathKeys(Path path) {
 	ObjectType type = getType(path);
 	Collection keys = type.getKeyProperties();
-	if (keys.size() == 0) {
+        // XXX: ignores possibility of non-toplevel nonkeyed compound types
+	if (keys.size() == 0 && !isSource(path)) {
             if (!m_paths.contains(path)) {
                 m_paths.add(path);
             }
@@ -92,14 +132,29 @@ public class Signature {
         }
     }
 
+    private void addPathInternal(Path path) {
+        addPathKeys(path);
+        // XXX: forcing container id properties to be loaded
+        // this does not need to be done here. could push to wrapper layer
+        // and change RecordSet to deal with null containers by passing
+        // value to Cursor and loading in session
+        if (!isSource(path)) {
+            Path parent = path.getParent();
+            if (!m_paths.contains(parent)) {
+                addPathInternal(parent);
+            }
+        }
+    }
+
     public void addPath(Path path) {
 	if (!exists(path)) {
 	    throw new NoSuchPathException(path);
 	}
+
         if (path == null) { return; }
-        addPathKeys(path);
-        // make sure its container id properties are loaded
-        addPath(path.getParent());
+
+        addPathInternal(path);
+        addDefaultProperties(path);
     }
 
     Path getPath(String path) {
@@ -116,7 +171,10 @@ public class Signature {
     }
 
     public boolean isFetched(Path path) {
-	for (Iterator it = getPaths().iterator(); it.hasNext(); ) {
+        // XXX: isFetched(null) ?
+        if (path == null) { return true; }
+
+ 	for (Iterator it = getPaths().iterator(); it.hasNext(); ) {
 	    Path p = (Path) it.next();
 	    if (path.isAncestor(p)) {
 		return true;
@@ -124,6 +182,21 @@ public class Signature {
 	}
 
 	return false;
+    }
+
+    public void addSignature(Signature sig, Path path) {
+        for (Iterator it = sig.m_sources.iterator(); it.hasNext(); ) {
+            Source source = (Source) it.next();
+            addSource
+                (source.getObjectType(), Path.add(path, source.getPath()));
+        }
+        for (Iterator it = sig.m_paths.iterator(); it.hasNext(); ) {
+            m_paths.add(Path.add(path, (Path) it.next()));
+        }
+    }
+
+    public void addSource(ObjectType type, Path path) {
+        addSource(new Source(type, path));
     }
 
     public void addSource(Source s) {
@@ -138,18 +211,17 @@ public class Signature {
                  s.getPath());
         }
 
-        if (m_parameterMap.containsKey(s.getPath())) {
-            throw new IllegalArgumentException
-                ("Query contains a parameter with that path: " +
-                 s.getPath());
-        }
-
         m_sources.add(s);
         m_sourceMap.put(s.getPath(), s);
     }
 
     public Source getSource(Path p) {
-        return (Source) m_sourceMap.get(p);
+        if (isSource(p)) {
+            return (Source) m_sourceMap.get(p);
+        } else {
+            s_log.warn(p + " " + this);
+            return null;
+        }
     }
 
     public boolean isSource(Path p) {
@@ -158,39 +230,6 @@ public class Signature {
 
     public Collection getSources() {
         return m_sources;
-    }
-
-    public void addParameter(Parameter p) {
-        if (p == null) {
-            throw new IllegalArgumentException
-                ("Cannot add a null parameter.");
-        }
-
-        if (m_parameterMap.containsKey(p.getPath())) {
-            throw new IllegalArgumentException
-                ("Query already contains a parameter for that path: " +
-                 p.getPath());
-        }
-
-        if (m_sourceMap.containsKey(p.getPath())) {
-            throw new IllegalArgumentException
-                ("Query contains a source with that path: " + p.getPath());
-        }
-
-        m_parameters.add(p);
-        m_parameterMap.put(p.getPath(), p);
-    }
-
-    public boolean isParameter(Path p) {
-        return m_parameterMap.containsKey(p);
-    }
-
-    public Parameter getParameter(Path p) {
-        return (Parameter) m_parameterMap.get(p);
-    }
-
-    public Collection getParameters() {
-        return m_parameters;
     }
 
     static final boolean isAttribute(Property prop) {
@@ -216,45 +255,64 @@ public class Signature {
         addPaths(null, paths);
     }
 
-    private void addPaths(Path path, Collection paths) {
-        ObjectType type;
-        String prefix;
-
-        if (path == null) {
-            type = getObjectType();
-            prefix = "";
-        } else {
-            type = getObjectType().getType(path);
-            prefix = path.getPath() + ".";
-        }
-
+    private void addPaths(Path prefix, Collection paths) {
         for (Iterator it = paths.iterator(); it.hasNext(); ) {
             Path p = (Path) it.next();
-            addPath(prefix + p.getPath());
+            Path path;
+            if (prefix == null) {
+                path = p;
+            } else {
+                path = Path.add(prefix, p);
+            }
+            addPathInternal(path);
         }
     }
 
-    public void addDefaultProperties(Path path) {
-        ObjectType type = getObjectType().getType(path);
+    private void addDefaultProperties(Path path) {
+        ObjectType type = getType(path);
         Root root = type.getRoot();
         if (type.isKeyed()) {
             addPaths(path, root.getObjectMap(type).getFetchedPaths());
         } else {
-            Property prop = getObjectType().getProperty(path);
+            Property prop = getProperty(path);
             // assume that path.getParent() is keyed
             ObjectMap container = root.getObjectMap(prop.getContainer());
-            addPaths(path.getParent(), container.getDeclaredFetchedPaths());
+            if (container != null) {
+                addPaths
+                    (path.getParent(), container.getDeclaredFetchedPaths());
+            }
         }
     }
 
-    public void addDefaultProperties() {
-        ObjectType type = getObjectType();
-        Root root = type.getRoot();
-        addPaths(root.getObjectMap(type).getFetchedPaths());
+    private void addDefaultProperties(Source source) {
+        Path path = source.getPath();
+        ObjectType type = source.getObjectType();
+
+        // immediate properties
+        for (Iterator it = type.getImmediateProperties().iterator();
+             it.hasNext(); ) {
+            addPathInternal(Path.add(path, ((Property) it.next()).getName()));
+        }
+
+        // aggressive loads
+        if (type.isKeyed()) {
+            ObjectMap om = type.getRoot().getObjectMap(type);
+            addPaths(path, om.getFetchedPaths());
+
+            // XXX: push this to PDL?
+            if (om.getRetrieveAll() != null) {
+                SQLBlock b = om.getRetrieveAll();
+                for (Iterator it = b.getPaths().iterator(); it.hasNext(); ) {
+                    addPathInternal(Path.add(path, (Path) it.next()));
+                }
+            }
+        }
     }
 
-    private void addKeyProperties() {
-        addProperties(getObjectType().getKeyProperties());
+    private void addDefaultProperties() {
+        for (Iterator it = m_sources.iterator(); it.hasNext(); ) {
+            addDefaultProperties((Source) it.next());
+        }
     }
 
     public boolean isImmediate(Path path) {
@@ -265,10 +323,7 @@ public class Signature {
 
     public Property getProperty(Path path) {
         Path parent = path.getParent();
-        if (isParameter(parent)) {
-            return getParameter(parent).getObjectType().getProperty
-                (path.getName());
-        } else if (isSource(parent)) {
+        if (isSource(parent)) {
             return getSource(parent).getObjectType().getProperty
                 (path.getName());
         } else {
@@ -283,9 +338,7 @@ public class Signature {
     }
 
     public ObjectType getType(Path path) {
-	if (isParameter(path)) {
-	    return getParameter(path).getObjectType();
-	} else if (isSource(path)) {
+        if (isSource(path)) {
 	    return getSource(path).getObjectType();
 	} else {
 	    return getProperty(path).getType();
@@ -293,9 +346,7 @@ public class Signature {
     }
 
     public boolean exists(Path p) {
-	if (isParameter(p)) {
-	    return true;
-	} else if (isSource(p)) {
+        if (isSource(p)) {
 	    return true;
 	} else {
 	    return exists(p.getParent()) &&
@@ -304,19 +355,6 @@ public class Signature {
     }
 
     public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(getObjectType().getQualifiedName() + "(");
-
-        for (Iterator it = m_paths.iterator(); it.hasNext(); ) {
-            buf.append(it.next());
-            if (it.hasNext()) {
-                buf.append(", ");
-            }
-        }
-
-        buf.append(")");
-
-        return buf.toString();
+        return "Paths are  " + m_paths + ", sources are " + m_sources;
     }
-
 }

@@ -15,8 +15,10 @@
 
 package com.redhat.persistence.engine.rdbms;
 
-import com.redhat.persistence.Expression;
+import com.redhat.persistence.Signature;
 import com.redhat.persistence.common.Path;
+import com.redhat.persistence.oql.Expression;
+import com.redhat.persistence.oql.Query;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,99 +28,32 @@ import java.util.HashSet;
  * Select
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/24 $
  **/
 
 class Select extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/Select.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/Select.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
 
-    private Join m_join;
-    private Expression m_filter;
-    private ArrayList m_selections = new ArrayList();
-    private HashMap m_aliases = new HashMap();
-    private ArrayList m_order = new ArrayList();
-    private HashSet m_ascending = new HashSet();
-    private Integer m_offset = null;
-    private Integer m_limit = null;
-    private boolean m_isCount = false;
+    private Query m_query;
+    private Signature m_sig ;
 
-    public Select(RDBMSEngine engine, Join join, Expression filter) {
-        this(engine, join, filter, new Environment(engine, null));
+    public Select(RDBMSEngine engine, Signature sig, Expression expr) {
+        this(engine, sig.makeQuery(expr));
+        m_sig = sig;
     }
 
-    public Select(RDBMSEngine engine, Join join, Expression filter,
-                  Environment env) {
-        super(engine, env);
-        m_join = join;
-        m_filter = filter;
+    public Select(RDBMSEngine engine, Query query) {
+        super(engine, new Environment(engine, null));
+        m_query = query;
     }
 
-    public Join getJoin() {
-        return m_join;
+    public Query getQuery() {
+        return m_query;
     }
 
-    public Expression getFilter() {
-        return m_filter;
-    }
-
-    public void addSelection(Path path, String alias) {
-        if (!m_selections.contains(path)) {
-            m_selections.add(path);
-            m_aliases.put(path, alias);
-        }
-    }
-
-    public String getAlias(Path path) {
-        return (String) m_aliases.get(path);
-    }
-
-    public Collection getSelections() {
-        return m_selections;
-    }
-
-    public void setCount(boolean value) {
-        m_isCount = value;
-    }
-
-    public boolean isCount() {
-        return m_isCount;
-    }
-
-    public void addOrder(Expression expr, boolean isAscending) {
-        if (m_order.contains(expr)) {
-            throw new IllegalArgumentException
-                ("already ordered by this path");
-        }
-
-        m_order.add(expr);
-        if (isAscending) {
-            m_ascending.add(expr);
-        }
-    }
-
-    public boolean isAscending(Expression expr) {
-        return m_ascending.contains(expr);
-    }
-
-    public Collection getOrder() {
-        return m_order;
-    }
-
-    public Integer getOffset() {
-        return m_offset;
-    }
-
-    public void setOffset(Integer offset) {
-        m_offset = offset;
-    }
-
-    public Integer getLimit() {
-        return m_limit;
-    }
-
-    public void setLimit(Integer limit) {
-        m_limit = limit;
+    public Signature getSignature() {
+        return m_sig;
     }
 
     void write(SQLWriter w) {

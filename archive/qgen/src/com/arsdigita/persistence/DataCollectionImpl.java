@@ -16,30 +16,32 @@
 package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.ObjectType;
-import com.redhat.persistence.PersistentCollection;
+import com.redhat.persistence.DataSet;
+import com.redhat.persistence.common.Path;
 
 /**
  * DataCollectionImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/24 $
  **/
 
 class DataCollectionImpl extends DataQueryImpl implements DataCollection {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataCollectionImpl.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataCollectionImpl.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
 
-    DataCollectionImpl(Session ssn, PersistentCollection pc) {
-        super(ssn, pc);
+    DataCollectionImpl(Session ssn, DataSet ds) {
+        super(ssn, ds);
     }
 
     public ObjectType getObjectType() {
-        return C.fromType(getSession().getMetadataRoot(),
-                          getOriginal().getSignature().getObjectType());
+        return C.fromType(getSession().getMetadataRoot(), getTypeInternal());
     }
 
     public DataObject getDataObject() {
-        return (DataObject) m_cursor.get();
+        Path p = Path.get(null);
+        p = resolvePath(p);
+        return (DataObject) m_cursor.get(p);
     }
 
     /**

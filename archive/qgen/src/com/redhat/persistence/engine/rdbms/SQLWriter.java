@@ -18,7 +18,6 @@ package com.redhat.persistence.engine.rdbms;
 import com.arsdigita.util.WrappedError;
 import com.redhat.persistence.Condition;
 import com.redhat.persistence.Expression;
-import com.redhat.persistence.Query;
 import com.redhat.persistence.SQLWriterException;
 import com.redhat.persistence.common.ParseException;
 import com.redhat.persistence.common.Path;
@@ -44,12 +43,12 @@ import java.util.Iterator;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/01/29 $
+ * @version $Revision: #3 $ $Date: 2004/02/24 $
  **/
 
 public abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#2 $ by $Author: ashah $, $DateTime: 2004/01/29 12:35:08 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/SQLWriter.java#3 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
 
     private RDBMSEngine m_engine;
     private Operation m_op = null;
@@ -271,7 +270,6 @@ public abstract class SQLWriter {
     }
 
     private final Expression.Switch m_esw = new Expression.Switch() {
-        public void onQuery(Query q) { write(q); }
         public void onCondition(Condition c) { write(c); }
         public void onVariable(Expression.Variable v) { write(v); }
         public void onValue(Expression.Value v) { write(v); }
@@ -293,11 +291,6 @@ public abstract class SQLWriter {
 
     public void write(Condition cond) {
         cond.dispatch(m_csw);
-    }
-
-    public void write(Query q) {
-        QGen qg = new QGen(getEngine(), q);
-        write((Operation) qg.generate());
     }
 
     public void write(Expression.Variable v) {
@@ -377,9 +370,6 @@ public abstract class SQLWriter {
                 }
             }
             public void onValue(Expression.Value v) {
-                throw new Error("not implemented");
-            }
-            public void onQuery(Query q) {
                 throw new Error("not implemented");
             }
             public void onPassthrough(Expression.Passthrough p) {

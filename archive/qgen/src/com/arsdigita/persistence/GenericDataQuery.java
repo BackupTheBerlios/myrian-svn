@@ -15,9 +15,6 @@
 
 package com.arsdigita.persistence;
 
-import com.redhat.persistence.Cursor;
-import com.redhat.persistence.Query;
-import com.redhat.persistence.RecordSet;
 import com.redhat.persistence.Signature;
 import com.redhat.persistence.common.ParseException;
 import com.redhat.persistence.common.Path;
@@ -27,22 +24,23 @@ import com.redhat.persistence.metadata.ObjectType;
 import com.redhat.persistence.metadata.Role;
 import com.redhat.persistence.metadata.SQLBlock;
 import java.io.StringReader;
+import com.redhat.persistence.oql.Static;
 
 /**
  * GenericDataQuery
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/24 $
  */
 
 public class GenericDataQuery extends DataQueryImpl {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/GenericDataQuery.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/GenericDataQuery.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
 
     private SQLBlock m_block;
 
     public GenericDataQuery(Session s, String sql, String[] columns) {
-        super(s, query(s, sql, columns));
+        super(s, sig(s, sql, columns), new Static(sql));
 	SQLParser p = new SQLParser(new StringReader(sql));
 	try {
 	    p.sql();
@@ -56,7 +54,7 @@ public class GenericDataQuery extends DataQueryImpl {
 	}
     }
 
-    private static final Query query(Session s, String sql, String[] paths) {
+    private static final Signature sig(Session s, String sql, String[] paths) {
 	ObjectType propType = s.getRoot().getObjectType("global.Object");
 	ObjectType type = new ObjectType(Model.getInstance("gdq"), sql, null);
 	Signature sig = new Signature(type);
@@ -65,20 +63,7 @@ public class GenericDataQuery extends DataQueryImpl {
 		(new Role(paths[i], propType, false, false, true));
 	    sig.addPath(Path.get(paths[i]));
 	}
-	return new Query(sig, null);
-    }
-
-    protected Cursor execute(final Query query) {
-	return new Cursor(getSession().getProtoSession(), query) {
-		protected RecordSet execute() {
-		    return GenericDataQuery.this.getSession().getEngine()
-			.execute(query, m_block);
-		}
-	    };
-    }
-
-    public long size() {
-        return getSession().getEngine().size(makeQuery(), m_block);
+        return sig;
     }
 
 }

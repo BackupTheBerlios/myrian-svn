@@ -15,58 +15,58 @@
 
 package com.redhat.persistence;
 
+import com.redhat.persistence.oql.Expression;
+import com.redhat.persistence.oql.Size;
+import java.math.BigInteger;
 
 /**
  * DataSet
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/24 $
  **/
 
 public class DataSet {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/DataSet.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/DataSet.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
 
     private Session m_ssn;
-    private Query m_query;
+    private Signature m_sig;
+    private Expression m_expr;
 
-    protected DataSet(Session ssn, Query query) {
+    public DataSet(Session ssn, Signature sig, Expression expr) {
         m_ssn = ssn;
-        m_query = query;
+        m_sig = sig;
+        setExpression(expr);
     }
 
     public Session getSession() {
         return m_ssn;
     }
 
-    public Query getQuery() {
-        return m_query;
+    public Signature getSignature() {
+        return m_sig;
+    }
+
+    public Expression getExpression() {
+        return m_expr;
+    }
+
+    void setExpression(Expression expr) {
+        // XXX: type check
+        m_expr = expr;
     }
 
     public Cursor getCursor() {
-        return getCursor(null);
-    }
-
-    public Cursor getCursor(Expression filter) {
-	return new Cursor(m_ssn, new Query(m_query, filter));
+        return new Cursor(this);
     }
 
     public long size() {
-        return size(null);
-    }
-
-    public long size(Expression filter) {
-        m_ssn.flush();
-        return m_ssn.getEngine().size(new Query(m_query, filter));
+        getSession().flush();
+        return getSession().getEngine().size(m_expr);
     }
 
     public boolean isEmpty() {
-        // XXX: This could be smarter.
-        return isEmpty(null);
+        return size() == 0L;
     }
-
-    public boolean isEmpty(Expression filter) {
-        return size(filter) == 0;
-    }
-
 }

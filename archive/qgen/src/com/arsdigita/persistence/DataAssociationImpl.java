@@ -22,13 +22,13 @@ import com.redhat.persistence.ProtoException;
  * DataAssociationImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/24 $
  **/
 
 class DataAssociationImpl extends DataAssociationCursorImpl
     implements DataAssociation {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataAssociationImpl.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataAssociationImpl.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
 
     private com.redhat.persistence.Session m_pssn;
     private DataObject m_data;
@@ -50,6 +50,10 @@ class DataAssociationImpl extends DataAssociationCursorImpl
         } catch (ProtoException pe) {
             throw PersistenceException.newInstance(pe);
         }
+    }
+
+    com.redhat.persistence.metadata.Property getProperty() {
+        return m_pprop;
     }
 
     public void clear() {

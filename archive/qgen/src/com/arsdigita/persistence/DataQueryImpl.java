@@ -18,18 +18,31 @@ package com.arsdigita.persistence;
 import com.arsdigita.persistence.metadata.CompoundType;
 import com.arsdigita.util.Assert;
 import com.redhat.persistence.Cursor;
-import com.redhat.persistence.Expression;
-import com.redhat.persistence.Parameter;
-import com.redhat.persistence.PersistentCollection;
+import com.redhat.persistence.DataSet;
 import com.redhat.persistence.ProtoException;
-import com.redhat.persistence.Query;
 import com.redhat.persistence.Signature;
+import com.redhat.persistence.Source;
 import com.redhat.persistence.common.ParseException;
 import com.redhat.persistence.common.Path;
 import com.redhat.persistence.common.SQLParser;
+import com.redhat.persistence.metadata.ObjectType;
+import com.redhat.persistence.metadata.Property;
 import com.redhat.persistence.metadata.Root;
+import com.redhat.persistence.oql.All;
+import com.redhat.persistence.oql.Define;
+import com.redhat.persistence.oql.Equals;
+import com.redhat.persistence.oql.Exists;
+import com.redhat.persistence.oql.Expression;
+import com.redhat.persistence.oql.Get;
+import com.redhat.persistence.oql.Join;
+import com.redhat.persistence.oql.Limit;
+import com.redhat.persistence.oql.Literal;
+import com.redhat.persistence.oql.Offset;
+import com.redhat.persistence.oql.Query;
+import com.redhat.persistence.oql.Sort;
+import com.redhat.persistence.oql.Static;
+import com.redhat.persistence.oql.Variable;
 import com.redhat.persistence.pdl.PDL;
-import com.arsdigita.util.Assert;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -44,49 +57,76 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/24 $
  **/
 
 class DataQueryImpl implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataQueryImpl.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/arsdigita/persistence/DataQueryImpl.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
 
     private static final Logger s_log = Logger.getLogger(DataQueryImpl.class);
+
+    private static final Path s_asc = Path.get("asc");
+    private static final Path s_desc = Path.get("desc");
 
     private Session m_ssn;
     private com.redhat.persistence.Session m_pssn;
     private HashMap m_bindings = new HashMap();
-    final private Query m_original;
-    private Query m_query;
+
+    final private Signature m_originalSig;
+    private Signature m_signature;
+
+    final private Expression m_originalExpr;
+    private Expression m_expr;
+
     Cursor m_cursor = null;
     private CompoundFilter m_filter;
+
+    private ArrayList m_orders = new ArrayList();
+
+    // This indicates the offset/limit sent of the query
+    private Integer m_offset = null;
+    private Integer m_limit = null;
 
     // This indicates the limits on the number of rows returned by the query
     private int m_lowerBound = 0;
     private int m_upperBound = Integer.MAX_VALUE;
 
     private final List m_aliases = new ArrayList();
+    // used by addPath to implement addPath for paths traversing 0..n
+    private HashMap m_joins = new HashMap();
+
     private final FilterFactory m_factory;
 
-    DataQueryImpl(Session ssn, PersistentCollection pc) {
-	this(ssn, pc.getDataSet().getQuery());
+    DataQueryImpl(Session ssn, DataSet ds) {
+        this(ssn, ds.getSignature(), ds.getExpression());
     }
 
-    DataQueryImpl(Session ssn, Query query) {
+    DataQueryImpl(Session ssn, Signature sig, Expression expr) {
         m_ssn = ssn;
         m_pssn = ssn.getProtoSession();
-	m_original = query;
-	m_query = new Query(m_original, null);
+        m_originalSig = sig;
+        m_originalExpr = expr;
         m_factory = new FilterFactoryImpl(ssn);
-        m_filter = getFilterFactory().and();
+        reset();
     }
 
     Session getSession() {
         return m_ssn;
     }
 
-    Query getOriginal() {
-	return m_original;
+    /**
+     * Returns the com.redhat.persistence type of the query.
+     */
+    ObjectType getTypeInternal() {
+        // XXX: link attribute hack
+        if (m_originalSig.isSource(Path.get("link"))) {
+            return m_originalSig.getSource
+                (Path.get(com.redhat.persistence.Session.LINK_ASSOCIATION))
+                .getObjectType();
+        } else {
+            return m_originalSig.getObjectType();
+        }
     }
 
     public CompoundType getType() {
@@ -94,17 +134,34 @@ class DataQueryImpl implements DataQuery {
     }
 
     public boolean hasProperty(String propertyName) {
-        return propertyExists(unalias(Path.get(propertyName)));
+        // XXX: link attributes
+        Path p =  unalias(Path.get(propertyName));
+        return hasProperty(p);
+    }
+
+    private boolean hasProperty(Path p) {
+        // XXX: link attributes
+        return getTypeInternal().getProperty(p) != null;
     }
 
     public void reset() {
 	close();
+        clearOrder();
 	m_cursor = null;
-        m_bindings.clear();
-	m_query = new Query(m_original, null);
-	m_filter = getFilterFactory().and();
 	m_lowerBound = 0;
 	m_upperBound = Integer.MAX_VALUE;
+        m_offset = null;
+        m_limit = null;
+        m_signature = new Signature(m_originalSig);
+        m_joins.clear();
+        m_bindings.clear();
+
+        m_filter = getFilterFactory().and();
+
+        m_expr = new Define(m_originalExpr, "this");
+        m_signature = new Signature();
+        m_signature.addSignature(m_originalSig, Path.get("this"));
+        m_joins.put(null, "this");
     }
 
 
@@ -114,7 +171,8 @@ class DataQueryImpl implements DataQuery {
 
     public boolean isEmpty() {
 	try {
-	    return m_pssn.retrieve(makeQuery()).getDataSet().isEmpty();
+	    return new DataSet
+                (m_pssn, m_signature, makeExpr()).isEmpty();
 	} catch (ProtoException e) {
 	    throw PersistenceException.newInstance(e);
 	}
@@ -152,16 +210,82 @@ class DataQueryImpl implements DataQuery {
         throw new Error("not implemented");
     }
 
-
     public void addPath(String path) {
+        addPath(Path.get(path));
+    }
+
+    private void addPath(Path path) {
         if (m_cursor != null) {
             throw new PersistenceException
                 ("Paths cannot be added on an active data query.");
         }
 
-        m_query.getSignature().addPath(unalias(Path.get(path)));
+        Path p = unalias(path);
+
+        s_log.warn("addPath(" + path + ")");
+
+        // find out if the path traverses a collection property
+        ObjectType type = getTypeInternal();
+        for (Path r = p; r != null; r = r.getParent()) {
+            Property prop = type.getProperty(r);
+            if (prop.isCollection()) {
+                // path traverses collection, need to add join
+                addJoin(r);
+                s_log.warn("addJoin(" + r + ")");
+                break;
+            }
+        }
+
+        m_signature.addPath(resolvePath(p));
     }
 
+    protected Path resolvePath(Path path) {
+        if (m_joins.size() == 0) { return path; }
+
+        Path base = path;
+        for (; base != null; base = base.getParent()) {
+            if (m_joins.containsKey(base)) {
+                break;
+            }
+        }
+
+        Path candidate = Path.add
+            ((String) m_joins.get(base), Path.relative(base, path));
+        if (m_signature.exists(candidate)) {
+            return candidate;
+        }
+        return path;
+    }
+
+    private static Expression expression(Path path) {
+        if (path.getParent() == null) {
+            return new Variable(path.getName());
+        } else {
+            return new Get(expression(path.getParent()), path.getName());
+        }
+    }
+
+    private void addJoin(Path path) {
+        if (m_joins.containsKey(path)) { return; }
+
+        String alias = path.getPath().replace('.', '_');
+        ObjectType type = getTypeInternal().getProperty(path).getType();
+
+        m_joins.put(path, alias);
+
+        // XXX: a.b and a.b.c.d may need to be joined against for a.b.c
+        Expression cond = new Exists
+            (new com.redhat.persistence.oql.Filter
+             (new Define(expression(Path.add("this", path)), "target"),
+              new Equals(new Variable(alias), new Variable("target"))));
+
+        m_expr = new Join
+            (m_expr,
+             new Define(new All(type.getQualifiedName()), alias),
+             cond);
+
+        m_signature.addSource(type, Path.get(alias));
+    }
 
     public Filter setFilter(String conditions) {
         clearFilter();
@@ -242,9 +366,8 @@ class DataQueryImpl implements DataQuery {
         return m_factory;
     }
 
-
     public void setOrder(String order) {
-        m_query.clearOrder();
+        clearOrder();
         addOrder(order);
     }
 
@@ -255,7 +378,14 @@ class DataQueryImpl implements DataQuery {
                  "Data query must be rewound.");
         }
         order = unalias(order);
-        m_query.addOrder(Expression.passthrough(order), true);
+
+        if (m_orders.contains(order)) {
+            throw new IllegalArgumentException
+                ("already ordered by expr: " + order);
+        }
+
+        m_orders.add(order);
+        // XXX: ascending
     }
 
     private int m_order = 0;
@@ -271,16 +401,18 @@ class DataQueryImpl implements DataQuery {
 
         Object secondElement = orderTwo;
         if (orderTwo instanceof String && orderTwo != null) {
-            Path path = Path.get((String) orderTwo);
-            if (!m_query.getSignature().exists(path)) {
+            Path two = unalias(Path.get((String) orderTwo));
+            // XXX:
+            if (!hasProperty(two)) {
                 String var = "order" + m_order++;
                 secondElement = ":" + var;
                 setParameter(var, orderTwo);
                 if (orderOne != null) {
                     Root root = getSession().getRoot();
+                    ObjectType typeOne = getTypeInternal().getProperty
+                        (unalias(Path.get(orderOne))).getType();
                     if (!root.getObjectType("global.String").equals
-                        (m_query.getSignature().getType
-                         (Path.get(orderOne)))) {
+                        (typeOne)) {
                         // this means that there is going to be a type conflict
                         // by the DB so we prevent it here
                         throw new PersistenceException("type mismatch");
@@ -294,45 +426,17 @@ class DataQueryImpl implements DataQuery {
     }
 
     public void clearOrder() {
-        m_query.clearOrder();
+        m_orders.clear();
         m_order = 0;
     }
 
-    private void setParameter(Query query, String parameterName,
-			      Object value) {
-        Object tobj;
-	if (value == null) {
-	    tobj = "";
-	} else if (value instanceof Collection) {
-            Collection c = (Collection) value;
-            if (c.size() == 0) {
-                throw new Error("zero sized collection");
-            } else {
-                tobj = c.iterator().next();
-            }
-        } else {
-            tobj = value;
-        }
-
-        Signature sig = query.getSignature();
-        Path path = Path.get(parameterName);
-        Parameter p = sig.getParameter(path);
-        if (p == null) {
-            // XXX: should add notion of multiplicity to Parameter
-            p = new Parameter(m_pssn.getObjectType(tobj), path);
-            sig.addParameter(p);
-        }
-        query.set(p, value);
-    }
-
-
     public void setParameter(String parameterName, Object value) {
-	m_bindings.put(":" + parameterName, value);
+	m_bindings.put(parameterName, value);
     }
 
 
     public Object getParameter(String parameterName) {
-	return m_bindings.get(":" + parameterName);
+	return m_bindings.get(parameterName);
     }
 
 
@@ -347,10 +451,10 @@ class DataQueryImpl implements DataQuery {
                  "than the endIndex [" + endIndex + "]");
         }
 
-        m_query.setOffset(new Integer(beginIndex.intValue() - 1));
+        m_offset = new Integer(beginIndex.intValue() - 1);
+
         if (endIndex != null) {
-            m_query.setLimit(new Integer(endIndex.intValue() -
-					 beginIndex.intValue()));
+            m_limit = new Integer(endIndex.intValue() - beginIndex.intValue());
         }
     }
 
@@ -391,7 +495,7 @@ class DataQueryImpl implements DataQuery {
 
 
     public Object get(String propertyName) {
-        Path path = unalias(Path.get(propertyName));
+        Path path = resolvePath(unalias(Path.get(propertyName)));
 	try {
 	    return m_cursor.get(path);
 	} catch (ProtoException e) {
@@ -405,51 +509,103 @@ class DataQueryImpl implements DataQuery {
         return (int) m_cursor.getPosition();
     }
 
-    Query makeQuery() {
+    private Expression makeExpr() {
+        final ObjectType type = getTypeInternal();
+
         String conditions = m_filter.getConditions();
-	Query q;
-        if (conditions == null || conditions.equals("")) {
-	    q = new Query(m_query, null);
-	} else {
-            conditions = unalias(conditions);
-	    q = new Query(m_query, Expression.passthrough(conditions));
-	}
+        if (conditions != null) {
+            SQLParser p = new SQLParser
+                (new StringReader(conditions),
+                 new SQLParser.IdentityMapper() {
+                     public Path map(Path path) {
+                         Path p = unalias(path);
+                         if (type.getProperty(p) != null) {
+                             addPath(path);
+                         }
 
-	Map filterBindings = m_filter.getBindings();
-	for (Iterator it = filterBindings.entrySet().iterator();
-	     it.hasNext(); ) {
-	    Map.Entry me = (Map.Entry) it.next();
-	    String key = (String) me.getKey();
-            if (key.charAt(0) == ':') {
-                key = unalias(Path.get(key)).toString();
+                         return resolvePath(p);
+                     }
+                 });
+            try {
+                p.sql();
+            } catch (ParseException e) {
+                throw new IllegalArgumentException(e.getMessage());
             }
-	    setParameter(key, me.getValue());
-	}
 
-	for (Iterator it = m_bindings.entrySet().iterator(); it.hasNext(); ) {
-	    Map.Entry me = (Map.Entry) it.next();
-	    String key = (String) me.getKey();
-            if (key.charAt(0) == ':') {
-                key = unalias(Path.get(key)).toString();
+            conditions = p.getSQL().toString();
+        }
+
+        String[] orders = new String[m_orders.size()];
+
+        for (int i = m_orders.size() - 1; i >= 0; i--) {
+            String order = (String) m_orders.get(i);
+            SQLParser p = new SQLParser
+                (new StringReader(order),
+                 new SQLParser.IdentityMapper() {
+                     public Path map(Path path) {
+                         if (path.equals(s_asc) || path.equals(s_desc)) {
+                             return path;
+                         }
+
+                         Path p = unalias(path);
+                         if (type.getProperty(p) != null) {
+                             addPath(path);
+                         }
+
+                         return resolvePath(p);
+                     }
+                 });
+            try {
+                p.sql();
+            } catch (ParseException e) {
+                throw new IllegalArgumentException(e.getMessage());
             }
-	    setParameter(q, key, me.getValue());
-	}
+            orders[i] = p.getSQL().toString();
+        }
 
-        return q;
+        Expression expr = m_expr;
+
+        if (m_bindings.size() > 0) {
+            if (m_joins.size() > 1) {
+                throw new Error("not implemented yet");
+            }
+            expr = new Define
+                (new Static(getTypeInternal().getQualifiedName(), m_bindings),
+                 "this");
+        }
+
+        if (conditions != null) {
+            expr = new com.redhat.persistence.oql.Filter
+                (expr, new Static(conditions, m_filter.getBindings()));
+        }
+
+        for (int i = orders.length - 1; i >= 0; i--) {
+            expr = new Sort(expr, new Static(orders[i], m_bindings));
+        }
+
+        if (m_offset != null) {
+            expr = new Offset(expr, new Literal(m_offset));
+        }
+
+        if (m_limit != null) {
+            expr = new Limit(expr, new Literal(m_limit));
+        }
+
+        return expr;
     }
 
     private void checkCursor() {
         if (m_cursor == null) {
 	    try {
-		m_cursor = execute(makeQuery());
+		m_cursor = execute(m_signature, makeExpr());
 	    } catch (ProtoException e) {
 		throw PersistenceException.newInstance(e);
 	    }
         }
     }
 
-    protected Cursor execute(Query query) {
-	return m_pssn.retrieve(query).getDataSet().getCursor();
+    protected Cursor execute(Signature sig, Expression expr) {
+	return new DataSet(m_pssn, sig, expr).getCursor();
     }
 
     public boolean next() {
@@ -486,17 +642,16 @@ class DataQueryImpl implements DataQuery {
 
     public long size() {
 	try {
-	    return m_pssn.retrieve(makeQuery()).getDataSet().size();
+	    return new DataSet
+                (m_pssn, m_signature, makeExpr()).size();
 	} catch (ProtoException e) {
 	    throw PersistenceException.newInstance(e);
 	}
     }
 
-    private final boolean propertyExists(Path path) {
-        return m_query.getSignature().exists(path);
-    }
-
     private String unalias(String expr) {
+        if (expr == null) { return null; }
+
         SQLParser p = new SQLParser
             (new StringReader(expr),
              new SQLParser.IdentityMapper() {
@@ -521,9 +676,9 @@ class DataQueryImpl implements DataQuery {
 	}
 
         String str = path.getPath();
-        for (;;) {
-            int index = str.indexOf(".link.");
-            if (index == -1) { break; }
+
+        final int index = str.indexOf(".link.");
+        if (index != -1) {
             str = str.substring(0, index)
                 + PDL.LINK + "." + str.substring(index + 6);
         }
@@ -535,10 +690,10 @@ class DataQueryImpl implements DataQuery {
             Alias alias = (Alias) it.next();
             if (alias.isMatch(path)) {
 		if (s_log.isDebugEnabled()) {
-		    s_log.debug("matched " + alias);
+                    s_log.debug("matched " + alias);
 		}
                 Path candidate = alias.unalias(path);
-                if (propertyExists(candidate)) {
+                if (hasProperty(candidate)) {
                     result = candidate;
                     break;
                 }

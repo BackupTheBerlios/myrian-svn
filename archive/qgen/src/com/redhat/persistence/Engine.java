@@ -14,17 +14,19 @@
 
 package com.redhat.persistence;
 
+import com.redhat.persistence.oql.Expression;
+
 
 /**
  * Engine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/24 $
  **/
 
 public abstract class Engine {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Engine.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/Engine.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
 
     private Session m_ssn;
 
@@ -40,7 +42,7 @@ public abstract class Engine {
     protected abstract void flush();
     protected abstract void rollback();
     protected abstract void commit();
-    protected abstract RecordSet execute(Query query);
-    protected abstract long size(Query query);
+    protected abstract RecordSet execute(Signature sig, Expression expr);
+    protected abstract long size(Expression expr);
 
 }

@@ -28,26 +28,23 @@ import java.util.Map;
  * RDBMSRecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/12/10 $
+ * @version $Revision: #2 $ $Date: 2004/02/24 $
  **/
 
 class RDBMSRecordSet extends RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/RDBMSRecordSet.java#1 $ by $Author: dennis $, $DateTime: 2003/12/10 16:59:20 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/RDBMSRecordSet.java#2 $ by $Author: ashah $, $DateTime: 2004/02/24 12:49:36 $";
 
     final private RDBMSEngine m_engine;
     final private ResultCycle m_rc;
-    final private Map m_mappings;
 
-    RDBMSRecordSet(Signature sig, RDBMSEngine engine, ResultCycle rc,
-                   Map mappings) {
+    RDBMSRecordSet(Signature sig, RDBMSEngine engine, ResultCycle rc) {
         super(sig);
 	if (rc == null) {
 	    throw new IllegalArgumentException("null result set");
 	}
         m_engine = engine;
         m_rc = rc;
-        m_mappings = mappings;
     }
 
     ResultSet getResultSet() {
@@ -55,7 +52,7 @@ class RDBMSRecordSet extends RecordSet {
     }
 
     String getColumn(Path p) {
-        return (String) m_mappings.get(p);
+        return getSignature().getColumn(p);
     }
 
     public boolean next() {
