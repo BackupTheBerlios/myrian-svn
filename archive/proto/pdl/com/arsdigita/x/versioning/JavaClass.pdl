@@ -10,19 +10,15 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/proto/pdl/com/arsdigita/x/versioning/Operation.pdl#5 $ 
+// $Id: //core-platform/proto/pdl/com/arsdigita/x/versioning/JavaClass.pdl#1 $ 
 // $DateTime: 2003/04/10 18:10:38 $
 
 model com.arsdigita.x.versioning;
 
-object type Operation {
-  BigInteger[1..1]     id = vcx_operations.operation_id INTEGER;
+object type JavaClass {
+  BigInteger[1..1] id = vcx_java_classes.id INTEGER;
 
-  Event[1..1]     event = join vcx_operations.event_id to vcx_events.event_id;
-  String[1..1]    attribute = vcx_operations.attribute VARCHAR(200);
-  JavaClass[1..1] javaclass = join vcx_operations.class_id to vcx_java_classes.id;
+  String[1..1]   name = vcx_java_classes.name VARCHAR(400);
 
-  composite DataObjectChange[1..1] changeset = join vcx_operations.change_id 
-                                                 to vcx_obj_changes.change_id;
   object key (id);
 }
