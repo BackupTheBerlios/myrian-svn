@@ -24,18 +24,18 @@ import org.apache.log4j.Logger;
 
 /**
  * This takes in a path and makes sure that the resource exists either
- * as a File or an actual resource.  If it does, it returns the InputStream
- * for the given Resource.  If it does not, if it is required it logs
- * an error.  Otherwise, it returns null.
+ * as a File or an actual resource.  If it does, it returns the
+ * InputStream for the given Resource.  If it does not, and if it is
+ * required, it logs an error.  Otherwise, it returns null.
  *
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ResourceParameter.java#2 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ResourceParameter.java#3 $
  */
 public class ResourceParameter extends StringParameter {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ResourceParameter.java#2 $" +
-        "$Author: randyg $" +
-        "$DateTime: 2003/10/13 17:35:06 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ResourceParameter.java#3 $" +
+        "$Author: justin $" +
+        "$DateTime: 2003/10/20 23:01:49 $";
 
     private static final Logger s_log = Logger.getLogger(ResourceParameter.class);
 

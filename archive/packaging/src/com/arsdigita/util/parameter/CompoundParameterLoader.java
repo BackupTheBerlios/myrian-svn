@@ -3,15 +3,13 @@ package com.arsdigita.util.parameter;
 import java.util.*;
 
 /**
- * CompoundParameterLoader
- *
- * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/10/17 $
+ * @deprecated Use {@link
+ * com.arsdigita.util.parameter.CompoundParameterReader} instead.
  **/
 
 public class CompoundParameterLoader implements ParameterLoader {
 
-    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/CompoundParameterLoader.java#2 $ by $Author: justin $, $DateTime: 2003/10/17 14:27:50 $";
+    public final static String versionId = "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/CompoundParameterLoader.java#3 $ by $Author: justin $, $DateTime: 2003/10/20 23:01:49 $";
 
     private final List m_loaders;
 

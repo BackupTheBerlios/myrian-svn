@@ -21,19 +21,13 @@ import org.apache.commons.beanutils.*;
 import org.apache.commons.beanutils.converters.*;
 
 /**
- * Subject to Change
- *
- * This encapsulates the information for a single parameter.  This is
- * typically created and populated by a ParameterRecord
- *
- * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#7 $
+ * @deprecated The parameter APIs no longer need this class.
  */
 public final class ParameterValue {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#7 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterValue.java#8 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/17 14:30:44 $";
+        "$DateTime: 2003/10/20 23:01:49 $";
 
     private final ErrorList m_errors;
     private String m_string;

@@ -22,21 +22,14 @@ import java.util.*;
 import org.apache.log4j.Logger;
 
 /**
- * Subject to change.
- *
- * A base class for defining configuration records.  It uses {@link
- * com.arsdigita.util.parameter parameters} to recover configuration
- * from a persistent store.
- *
- * @see com.arsdigita.util.parameter.ParameterReader
- * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#16 $
+ * @deprecated Use {@link com.arsdigita.runtime.AbstractConfig}
+ * instead.
  */
 public abstract class ParameterRecord extends AbstractParameterContext {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#16 $" +
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#17 $" +
         "$Author: justin $" +
-        "$DateTime: 2003/10/20 22:11:50 $";
+        "$DateTime: 2003/10/20 23:01:49 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterRecord.class);
