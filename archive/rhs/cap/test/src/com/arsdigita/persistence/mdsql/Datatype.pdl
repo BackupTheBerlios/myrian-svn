@@ -11,8 +11,8 @@
 // or implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/mdsql/Datatype.pdl#1 $
-// $DateTime: 2004/05/03 13:36:20 $
+// $Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/mdsql/Datatype.pdl#2 $
+// $DateTime: 2004/05/03 15:41:58 $
 model examples;
 
 object type Datatype {
@@ -29,8 +29,7 @@ object type Datatype {
     Long             long = t_datatypes.j_long BIGINT;
     Short            short = t_datatypes.j_short INTEGER;
     String           string = t_datatypes.j_string VARCHAR(4000);
-    // XXX: Should be byte[], but that isn't supported yet.
-    Blob             blob = t_datatypes.j_blob BLOB;
+    byte[]             blob = t_datatypes.j_blob BLOB;
     String           clob = t_datatypes.j_clob CLOB;
 
     object key(id);
@@ -51,8 +50,7 @@ query TypedQuery {
     Long             long;
     Short            short;
     String           string;
-    // XXX: Should be byte[], but that isn't supported yet.
-    Blob             blob;
+    byte[]             blob;
     String           clob;
 
     do {

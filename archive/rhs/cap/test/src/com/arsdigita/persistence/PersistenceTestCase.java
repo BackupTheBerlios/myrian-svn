@@ -16,8 +16,7 @@ package com.arsdigita.persistence;
 
 import com.arsdigita.db.DbHelper;
 import com.arsdigita.persistence.metadata.MetadataRoot;
-import com.arsdigita.persistence.pdl.PDL;
-import com.arsdigita.persistence.pdl.PDLOutputter;
+import com.arsdigita.persistence.pdl.*;
 import com.redhat.persistence.engine.rdbms.RDBMSEngine;
 import junit.framework.TestCase;
 
@@ -33,12 +32,12 @@ import org.apache.log4j.Logger;
  * PersistenceTestCase
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2004/05/03 $
+ * @version $Revision: #2 $ $Date: 2004/05/03 $
  */
 
 public class PersistenceTestCase extends TestCase {
 
-    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/PersistenceTestCase.java#1 $ by $Author: rhs $, $DateTime: 2004/05/03 11:48:01 $";
+    public final static String versionId = "$Id: //users/rhs/persistence/cap/test/src/com/arsdigita/persistence/PersistenceTestCase.java#2 $ by $Author: rhs $, $DateTime: 2004/05/03 15:41:58 $";
 
     private static final Logger LOG =
         Logger.getLogger(PersistenceTestCase.class);
@@ -131,6 +130,19 @@ public class PersistenceTestCase extends TestCase {
         } finally {
             persistenceTearDown();
         }
+    }
+
+    static {
+        MetadataRoot root = new MetadataRoot();
+        SessionManager.configure
+            ("default", root, new PooledConnectionSource
+             (com.arsdigita.runtime.RuntimeConfig.getConfig().getJDBCURL(),
+              10, 30000));
+        PDLCompiler pdl = new PDLCompiler();
+        PDLSource testpdl = new ManifestSource
+            ("cap-test-pdl.mf", new NameFilter("pg", "pdl"));
+        testpdl.parse(pdl);
+        pdl.emit(root);
     }
 
     protected void persistenceSetUp() {

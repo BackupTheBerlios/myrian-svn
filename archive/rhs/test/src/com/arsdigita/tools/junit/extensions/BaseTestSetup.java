@@ -140,7 +140,8 @@ public class BaseTestSetup extends TestDecorator {
         if (filename.exists() && filename.isFile()) {
             return filename.toString();
         }
-        return null;
+        throw new IllegalArgumentException
+            ("unable to resolve script: " + script);
     }
 
     public void setSetupSQLScript(String setupSQLScript) {
