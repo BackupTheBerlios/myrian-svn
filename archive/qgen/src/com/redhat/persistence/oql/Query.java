@@ -9,12 +9,12 @@ import org.apache.log4j.Logger;
  * Query
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #15 $ $Date: 2004/03/18 $
+ * @version $Revision: #16 $ $Date: 2004/03/19 $
  **/
 
 public class Query {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#15 $ by $Author: rhs $, $DateTime: 2004/03/18 17:18:33 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Query.java#16 $ by $Author: rhs $, $DateTime: 2004/03/19 19:22:26 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -140,7 +140,7 @@ public class Query {
         }
 
         if (m_names.isEmpty()) {
-            sql = sql.add("1");
+            sql = sql.add("1 as dummy");
         }
 
         sql = sql.add("\nfrom ").add(qframe.emit(false, !oracle));
