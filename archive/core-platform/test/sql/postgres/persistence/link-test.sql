@@ -13,17 +13,26 @@
 --
 
 --
--- This file sets up all the data models necessary for the persistence
--- tests to run.
+-- This file contains the data model for the party test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #10 $ $Date: 2002/07/30 $
+-- @version $Revision: #3 $ $Date: 2002/07/30 $
 --
 
-@@ ../../default/persistence/setup.sql
-@@ party-test.sql
-@@ datatype-test.sql
-@@ data-query-test.sql
-@@ sql-operation-test.sql
-@@ data-operation-test.sql
-@@ link-test.sql
+create table t_articles (
+    article_id    integer primary key,
+    text          text
+);
+
+create table t_images (
+    image_id    integer primary key,
+    bytes       bytea
+);
+
+create table t_article_image_map (
+    article_id    integer references t_articles,
+    image_id      integer references t_images,
+    caption       varchar(4000),
+    primary key (article_id, image_id)
+);
+
