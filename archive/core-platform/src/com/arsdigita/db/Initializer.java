@@ -26,9 +26,16 @@ public class Initializer
     private static final Category s_log =
          Category.getInstance(Initializer.class);
 
+    // The next set of variables are used to hold a reference to the
+    // type of database being used.
+    public static final int NOT_SPECIFIED = 0;
+    public static final int ORACLE = 1;
+    public static final int POSTGRES = 2;
+    private static int m_database = NOT_SPECIFIED;
+
     private Configuration m_conf = new Configuration();
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#2 $ by $Author: jorris $, $DateTime: 2002/06/10 19:04:44 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#3 $ by $Author: randyg $, $DateTime: 2002/07/17 14:30:02 $";
 
     public Initializer() throws InitializationException {
         m_conf.initParameter("jdbcUrl", 
@@ -95,15 +102,27 @@ public class Initializer
 
         String useFixForOracle901 = (String) m_conf.getParameter("useFixForOracle901");
 
+        try {
+            SQLExceptionHandler.setDbExceptionHandlerImplName(dbErrorHandler);
+        } catch (Exception e) {
+            s_log.error("Error setting up exception handler", e);
+            throw new InitializationException(
+                "Error setting DbExceptionHandlerImpl", e);
+        }
+
         if ( dbPool == null ) {
             dbPool = "com.arsdigita.db.oracle.OracleConnectionPoolImpl";
         }
+
 
         if ( sImpl == null ) {
             sImpl = "com.arsdigita.db.oracle.OracleSequenceImpl";
         }
 
-        if (null != useFixForOracle901 &&  useFixForOracle901.equals("true")) {
+        setDatabase(dbPool);
+
+        if (null != useFixForOracle901 &&  useFixForOracle901.equals("true") &&
+            getDatabase() == ORACLE) {
             com.arsdigita.db.oracle.OracleConnectionPoolImpl.setUseFixFor901(true);
         }
 
@@ -145,13 +164,6 @@ public class Initializer
                 "param1", driverSpecificParam1);
         }
 
-        try {
-            SQLExceptionHandler.setDbExceptionHandlerImplName(dbErrorHandler);
-        } catch (Exception e) {
-            throw new InitializationException(
-                "Error setting DbExceptionHandlerImpl", e);
-        }
-
         s_log.warn("Database initializer finished.");
 
     }
@@ -159,4 +171,34 @@ public class Initializer
     public void shutdown() {
 		ConnectionManager.freeConnections();
 	}
+
+
+    /**
+     *  @param className This is the string representation of a class that
+     *  can be used to determine the type of database.  For instance,
+     *  com.arsdigita.oracle.* or com.arsdigita.postgres.* both work.
+     */
+    private void setDatabase(String className) {
+        if (className == null) {
+            m_database = NOT_SPECIFIED;
+        } else if (className.toLowerCase().indexOf("oracle") > -1) {
+            m_database = ORACLE;
+        } else if (className.toLowerCase().indexOf("postgres") > -1) {
+            m_database = POSTGRES;
+        } else {
+            m_database = NOT_SPECIFIED;
+        }
+    }
+
+
+    /**
+     *  This will return the type of database that is being used by
+     *  the system.  It will return NOT_SPECIFIED if no database has been
+     *  specified.  Otherwise, it will return an int corresponding to
+     *  one of the database constants defined in this file.
+     */
+    public static int getDatabase() {
+        return m_database;
+    }
+     
 }

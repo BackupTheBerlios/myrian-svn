@@ -15,13 +15,18 @@
 
 package com.arsdigita.db;
 
-import junit.framework.*;
+import junit.framework.TestCase;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import java.sql.SQLException;
 
 public class ConnectionManagerTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/ConnectionManagerTest.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/ConnectionManagerTest.java#2 $ by $Author: randyg $, $DateTime: 2002/07/17 14:30:02 $";
+
+    private String ORACLE_DATE_QUERY = "select sysdate from dual";
+    private String POSTGRES_DATE_QUERY = "select 'now'::datetime";
 
     private static java.sql.Connection conn = null;
 
@@ -45,11 +50,19 @@ public class ConnectionManagerTest extends TestCase {
 
     public void testGetConnection() throws SQLException {
         conn = ConnectionManager.getConnection();
+
         try {
             assertNotNull(conn);
 
+            String dateQuery = null;
+            if (Initializer.getDatabase() == Initializer.POSTGRES) {
+                dateQuery = POSTGRES_DATE_QUERY;
+            } else {
+                dateQuery = ORACLE_DATE_QUERY;
+            }
+
             java.sql.PreparedStatement stmt = 
-                    conn.prepareStatement("select sysdate from dual");
+                conn.prepareStatement(dateQuery);
             try {
                 java.sql.ResultSet rs = stmt.executeQuery();
                 try {

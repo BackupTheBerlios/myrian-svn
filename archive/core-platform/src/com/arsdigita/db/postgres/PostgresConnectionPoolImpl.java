@@ -26,16 +26,16 @@ import org.apache.log4j.Category;
  * Connection pooling class for PosgreSQL databases.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresConnectionPoolImpl.java#1 $ $DateTime: 2002/05/12 18:23:13 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresConnectionPoolImpl.java#2 $ $DateTime: 2002/07/17 14:30:02 $
  * @since 4.5
  * 
  */
 
 public class PostgresConnectionPoolImpl extends BaseConnectionPool {
 
-    public static final String versionId = "$Author: dennis $ - $Date: 2002/05/12 $ $Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresConnectionPoolImpl.java#1 $";
+    public static final String versionId = "$Author: randyg $ - $Date: 2002/07/17 $ $Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresConnectionPoolImpl.java#2 $";
 
-    private static final Category cat = Category.getInstance(PostgresConnectionPoolImpl.class.getName());
+    private static final Category s_log = Category.getInstance(PostgresConnectionPoolImpl.class.getName());
 
     public void setConnectionInfo(String url, String username,
                                   String password) throws SQLException {
@@ -48,17 +48,17 @@ public class PostgresConnectionPoolImpl extends BaseConnectionPool {
             // we don't *need* a bogus "throw e" call here 
             // since this is a void method.  Since cnfe isn't declared
             // to be thrown, we'll just leave the "throw e" out.
-        }
+        } 
     }
 
     public java.sql.Connection getNewConnection() throws java.sql.SQLException {
 
-	try {
+        try {
             java.sql.Connection conn =
                 java.sql.DriverManager.getConnection(m_url, m_user, m_password);
             return conn;
         } catch (SQLException e) {
-            cat.error(e);
+            s_log.error(e);
             SQLExceptionHandler.throwSQLException(e);
             throw e;  // code should never get here, but just in case
         }        

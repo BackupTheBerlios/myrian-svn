@@ -30,12 +30,12 @@ import java.sql.PreparedStatement;
  * Class for processing of Postgres DB Exceptions.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #1 $
+ * @version $Revision: #2 $
  * @since 4.6
  */
-public abstract class PostgresDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
+public class PostgresDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresDbExceptionHandlerImpl.java#1 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresDbExceptionHandlerImpl.java#2 $";
 
     static {
         errors.put("Cannot insert a duplicate key into unique index", 
