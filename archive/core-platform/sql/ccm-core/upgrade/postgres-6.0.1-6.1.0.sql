@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/upgrade/postgres-6.0.1-6.1.0.sql#9 $
--- $DateTime: 2004/03/23 20:32:03 $
+-- $Id: //core-platform/dev/sql/ccm-core/upgrade/postgres-6.0.1-6.1.0.sql#10 $
+-- $DateTime: 2004/03/25 15:06:04 $
 
 \echo Red Hat WAF 6.0.1 -> 6.1.0 Upgrade Script (PostgreSQL)
 
@@ -36,7 +36,6 @@ update apm_package_types set package_uri = 'http://arsdigita.com/sitemap' where 
 
 alter table cms_mime_extensions alter mime_type drop not null;
 alter table cms_mime_extensions add constraint cms_mim_exten_mim_type_f_7pwwd foreign key(mime_type) references cms_mime_types(mime_type);
-drop table ct_item_file_attachments;
 drop table parameterized_privileges;
 create index agentport_superport_id_idx on agentportlets(superportlet_id);
 create index init_reqs_reqd_init_idx on init_requirements(required_init);
