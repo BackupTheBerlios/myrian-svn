@@ -31,13 +31,13 @@ import org.apache.log4j.Logger;
  *
  * @see com.arsdigita.util.parameter.ParameterLoader
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#8 $
+ * @version $Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#9 $
  */
 public abstract class ParameterRecord {
     public final static String versionId =
-        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#8 $" +
-        "$Author: rhs $" +
-        "$DateTime: 2003/09/26 13:11:30 $";
+        "$Id: //core-platform/test-packaging/src/com/arsdigita/util/parameter/ParameterRecord.java#9 $" +
+        "$Author: dan $" +
+        "$DateTime: 2003/10/06 09:53:27 $";
 
     private static final Logger s_log = Logger.getLogger
         (ParameterRecord.class);
@@ -63,7 +63,8 @@ public abstract class ParameterRecord {
 
     protected final void register(final Parameter param) {
         if (s_log.isDebugEnabled()) {
-            s_log.debug("Registering " + param + " on " + this);
+            s_log.debug("Registering " + param.getName() + 
+                        " (" + param + ") on " + this);
         }
 
         if (Assert.isEnabled()) {
@@ -140,7 +141,8 @@ public abstract class ParameterRecord {
     // Does not param.check.
     protected final ParameterValue getValue(final Parameter param) {
         if (s_log.isDebugEnabled()) {
-            s_log.debug("Getting value of " + param);
+            s_log.debug("Getting value of " + param.getName() + 
+                        " (" + param + ")");
         }
 
         if (Assert.isEnabled()) {
@@ -177,7 +179,8 @@ public abstract class ParameterRecord {
     protected final void setValue(final Parameter param,
                                   final ParameterValue value) {
         if (s_log.isDebugEnabled()) {
-            s_log.debug("Setting " + param + " to " + value);
+            s_log.debug("Setting " + param.getName() + 
+                        " (" + param + ") to " + value);
         }
 
         if (Assert.isEnabled()) {
@@ -204,7 +207,8 @@ public abstract class ParameterRecord {
 
     private void load(final Parameter param, final ParameterLoader loader) {
         if (s_log.isDebugEnabled()) {
-            s_log.debug("Loading " + param + " from " + loader);
+            s_log.debug("Loading " + param.getName() + 
+                        " (" + param + ") from " + loader);
         }
 
         if (Assert.isEnabled()) {
