@@ -22,17 +22,21 @@ package com.arsdigita.persistence;
  * Description: The TransactionContext class encapsulates a database transaction.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2003/03/14 $
+ * @version $Revision: #4 $ $Date: 2003/03/28 $
  */
 
 public class TransactionContext {
 
-    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/TransactionContext.java#3 $ by $Author: rhs $, $DateTime: 2003/03/14 13:52:50 $";
+    String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/TransactionContext.java#4 $ by $Author: rhs $, $DateTime: 2003/03/28 13:41:52 $";
 
+    private static boolean s_aggressive = false;
+
+    private Session m_ossn;
     private com.arsdigita.persistence.proto.Session m_ssn;
 
-    TransactionContext(com.arsdigita.persistence.proto.Session ssn) {
-        m_ssn = ssn;
+    TransactionContext(com.arsdigita.persistence.Session ssn) {
+	m_ossn = ssn;
+        m_ssn = ssn.getProtoSession();
     }
 
     /**
@@ -60,7 +64,11 @@ public class TransactionContext {
      **/
 
     public void commitTxn() {
-        m_ssn.commit();
+	try {
+	    m_ssn.commit();
+	} finally {
+	    m_ossn.freeConnection();
+	}
     }
 
     /**
@@ -72,7 +80,11 @@ public class TransactionContext {
      **/
 
     public void abortTxn() {
-        m_ssn.rollback();
+	try {
+	    m_ssn.rollback();
+	} finally {
+	    m_ossn.freeConnection();
+	}
     }
 
     /**
@@ -126,12 +138,12 @@ public class TransactionContext {
         throw new Error("not implemented");
     }
 
-    public boolean getAggressiveClose() {
-        throw new Error("not implemented");
+    static boolean getAggressiveClose() {
+        return s_aggressive;
     }
 
-    public void setAggressiveClose(boolean value) {
-        throw new Error("not implemented");
+    static void setAggressiveClose(boolean value) {
+        s_aggressive = value;
     }
 
 }

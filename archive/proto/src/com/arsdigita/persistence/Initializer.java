@@ -36,7 +36,7 @@ import org.apache.log4j.Level;
  * the SessionManager of them.
  *
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #3 $ $Date: 2003/01/09 $
+ * @version $Revision: #4 $ $Date: 2003/03/28 $
  **/
 
 public class Initializer
@@ -148,23 +148,23 @@ public class Initializer
         }
 
         SessionManager.setSchemaConnectionInfo( "",  "", "", "");
-/*        final SessionFactory factory = getSessionFactory();
-        SessionManager.setSessionFactory(factory);
-
 
         Boolean aggressiveClose =
             (Boolean)m_conf.getParameter(AGGRESSIVE_CONNECTION_CLOSE);
-        if (aggressiveClose != null && aggressiveClose.booleanValue()) {
-	    if (s_log.isInfoEnabled()) {
-		s_log.info("Using aggressive connection closing");
+        if (aggressiveClose != null) {
+	    if (aggressiveClose.booleanValue()) {
+		if (s_log.isInfoEnabled()) {
+		    s_log.info("Using aggressive connection closing");
+		}
+		TransactionContext.setAggressiveClose(true);
+	    } else {
+		if (s_log.isInfoEnabled()) {
+		    s_log.info("Not using aggressive connection closing " +
+			       "[aggressiveConnectionClose parameter]");
+		}
+		TransactionContext.setAggressiveClose(false);
 	    }
-            factory.setAggressiveConnectionClose(true);
-        } else {
-	    if (s_log.isInfoEnabled()) {
-		s_log.info("Not using aggressive connection closing " + 
-			   "[aggressiveConnectionClose parameter]");
-	    }
-            }*/
+	}
 
         //SessionManager.setSessionFactory();
         PDL.loadPDLFiles(new File(pdlDir));

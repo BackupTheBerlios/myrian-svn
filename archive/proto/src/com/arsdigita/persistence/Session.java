@@ -41,6 +41,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import org.apache.log4j.Logger;
 
+import org.apache.log4j.Logger;
+
 /**
  * <p>All persistence operations take place within the context of a session.
  * The operational persistence methods operate on the object types and
@@ -52,12 +54,12 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #22 $ $Date: 2003/03/28 $
+ * @version $Revision: #23 $ $Date: 2003/03/28 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
 
-    private static final Logger s_log = Logger.getLogger(Session.class);
+    private static final Logger LOG = Logger.getLogger(Session.class);
 
     // This is just a temporary way to get an adapter registered.
     static {
@@ -117,14 +119,25 @@ public class Session {
                 return Session.this.getConnection();
             }
 
-            public void release(Connection conn) { }
+            public void release(Connection conn) {
+		if (m_ctx.getAggressiveClose()) {
+		    if (LOG.isDebugEnabled()) {
+			LOG.debug("connectionUserCountHitZero returning " +
+				  "connection " + conn +
+				  " to pool because no " +
+				  "data modification was done",
+				  new Throwable("Stack trace"));
+		    }
+		    Session.this.freeConnection(conn);
+		}
+	    }
         };
     private RDBMSQuerySource m_qs = new RDBMSQuerySource();
     private RDBMSEngine m_engine = new RDBMSEngine(m_cs);
     private com.arsdigita.persistence.proto.Session m_ssn =
         new com.arsdigita.persistence.proto.Session(m_engine, m_qs);
 
-    private TransactionContext m_ctx = new TransactionContext(m_ssn);
+    private TransactionContext m_ctx = new TransactionContext(this);
     private MetadataRoot m_root = MetadataRoot.getMetadataRoot();
 
     private static final void fireEvent(DataEvent e) {
@@ -303,6 +316,21 @@ public class Session {
         }
     }
 
+    void freeConnection() {
+	Connection conn = ConnectionManager.getCurrentThreadConnection();
+	if (conn != null) {
+	    freeConnection(conn);
+	}
+    }
+
+    void freeConnection(Connection conn) {
+	try {
+	    conn.close();
+	    ConnectionManager.setCurrentThreadConnection(null);
+	} catch (SQLException e) {
+	    throw new PersistenceException(e);
+	}
+    }
 
     /**
      * Creates and returns a DataObject of the given type. All fields of

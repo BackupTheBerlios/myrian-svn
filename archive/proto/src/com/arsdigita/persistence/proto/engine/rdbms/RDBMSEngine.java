@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #25 $ $Date: 2003/03/27 $
+ * @version $Revision: #26 $ $Date: 2003/03/28 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#25 $ by $Author: rhs $, $DateTime: 2003/03/27 15:13:02 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#26 $ by $Author: rhs $, $DateTime: 2003/03/28 13:41:52 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
 
@@ -34,22 +34,38 @@ public class RDBMSEngine extends Engine {
 
     private ConnectionSource m_source;
     private Connection m_conn = null;
+    private int m_connUsers = 0;
 
     public RDBMSEngine(ConnectionSource source) {
         m_source = source;
     }
 
-    private void acquire() {
+    void acquire() {
         if (m_conn == null) {
             m_conn = m_source.acquire();
         }
+	m_connUsers++;
     }
 
-    private void release() {
-        if (m_conn != null) {
+    void release() {
+	if (m_conn == null) {
+	    return;
+	}
+
+	m_connUsers--;
+
+	if (m_connUsers == 0) {
             m_source.release(m_conn);
             m_conn = null;
         }
+    }
+
+    void releaseAll() {
+	if (m_conn != null) {
+	    m_source.release(m_conn);
+	    m_conn = null;
+	    m_connUsers = 0;
+	}
     }
 
     void addOperation(Object obj, DML dml) {
@@ -150,7 +166,7 @@ public class RDBMSEngine extends Engine {
         } catch (SQLException e) {
             throw new Error(e.getMessage());
         } finally {
-            release();
+            releaseAll();
         }
     }
 
@@ -161,7 +177,7 @@ public class RDBMSEngine extends Engine {
         } catch (SQLException e) {
             throw new Error(e.getMessage());
         } finally {
-            release();
+            releaseAll();
             clearOperations();
         }
     }
@@ -369,7 +385,7 @@ public class RDBMSEngine extends Engine {
 		if (LOG.isDebugEnabled()) {
 		    LOG.debug(ps.getUpdateCount() + " rows affected");
 		}
-                release();
+                ps.close();
                 return null;
             }
         } catch (SQLException e) {

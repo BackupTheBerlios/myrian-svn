@@ -6,16 +6,20 @@ import com.arsdigita.persistence.proto.*;
 import java.util.*;
 import java.sql.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * RDBMSRecordSet
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/03/12 $
+ * @version $Revision: #5 $ $Date: 2003/03/28 $
  **/
 
 class RDBMSRecordSet extends RecordSet {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSRecordSet.java#4 $ by $Author: ashah $, $DateTime: 2003/03/12 14:58:16 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSRecordSet.java#5 $ by $Author: rhs $, $DateTime: 2003/03/28 13:41:52 $";
+
+    private static final Logger LOG = Logger.getLogger(RecordSet.class);
 
     final private RDBMSEngine m_engine;
     private ResultSet m_rs;
@@ -51,8 +55,13 @@ class RDBMSRecordSet extends RecordSet {
     public void close() {
         if (m_rs == null) { return; }
         try {
+	    if (LOG.isDebugEnabled()) {
+		LOG.debug("Closing Statement because resultset was closed.");
+	    }
+	    m_rs.getStatement().close();
             m_rs.close();
             m_rs = null;
+	    m_engine.release();
         } catch (SQLException e) {
             throw new Error(e.getMessage());
         }
