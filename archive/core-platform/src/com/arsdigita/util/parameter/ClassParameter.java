@@ -25,13 +25,13 @@ import org.apache.commons.beanutils.converters.ClassConverter;
  * @see java.lang.Class
  * @see Parameter
  * @author Justin Ross &lt;jross@redhat.com&gt;
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ClassParameter.java#5 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/parameter/ClassParameter.java#6 $
  */
 public class ClassParameter extends AbstractParameter {
     public final static String versionId =
-        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ClassParameter.java#5 $" +
-        "$Author: justin $" +
-        "$DateTime: 2003/11/10 12:56:08 $";
+        "$Id: //core-platform/dev/src/com/arsdigita/util/parameter/ClassParameter.java#6 $" +
+        "$Author: dan $" +
+        "$DateTime: 2004/01/06 12:49:45 $";
 
     static {
         Converters.set(Class.class, new ClassConverter());
@@ -61,6 +61,10 @@ public class ClassParameter extends AbstractParameter {
 
     protected String marshal(Object value) {
         Class theClass = ((Class) value);
-        return theClass.getName();
+        if (theClass == null) {
+            return null;
+        } else {
+            return theClass.getName();
+        }
     }
 }
