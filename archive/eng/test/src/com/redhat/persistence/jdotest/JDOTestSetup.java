@@ -38,7 +38,6 @@ public class JDOTestSetup extends TestSetup {
         String pdlFile = "com/redhat/persistence/jdotest/package.pdl";
         InputStream is = cl.getResourceAsStream(pdlFile);
         if (is != null) {
-            System.err.println("loading PDL");
             pdl.load(new InputStreamReader(is), pdlFile);
         }
 
@@ -49,7 +48,6 @@ public class JDOTestSetup extends TestSetup {
         Root root = pmf.getMetadataRoot();
         Connection conn = Connections.acquire
             (s_pmf.getConnectionURL());
-        System.err.println("loading schema");
         Schema.load(root, conn);
         conn.commit();
     }
@@ -63,5 +61,4 @@ public class JDOTestSetup extends TestSetup {
         Schema.unload(root, conn);
         conn.commit();
     }
-
 }
