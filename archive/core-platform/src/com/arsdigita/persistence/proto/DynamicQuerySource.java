@@ -9,12 +9,12 @@ import java.util.*;
  * DynamicQuerySource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/06/25 $
  **/
 
 public class DynamicQuerySource extends QuerySource {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/DynamicQuerySource.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/DynamicQuerySource.java#2 $ by $Author: rhs $, $DateTime: 2003/06/25 00:05:01 $";
 
     private Signature getSignature(ObjectType type) {
         Signature result = new Signature(type);
@@ -41,7 +41,7 @@ public class DynamicQuerySource extends QuerySource {
             Property keyProp = (Property) it.next();
             Object key = keys.get(keyProp);
             Parameter keyParam = new Parameter
-                (keyProp.getType(), Path.add("__key__", keyProp.getName()));
+                (keyProp.getType(), Path.add("key__", keyProp.getName()));
             sig.addParameter(keyParam);
             query.set(keyParam, key);
             Expression propFilt = Condition.equals
