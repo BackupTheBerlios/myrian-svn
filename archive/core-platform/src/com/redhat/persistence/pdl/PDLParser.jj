@@ -13,12 +13,12 @@ import com.redhat.persistence.pdl.nodes.*;
  * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/07/09 $
+ * @version $Revision: #3 $ $Date: 2003/08/12 $
  */
 
 class PDLParser {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDLParser.jj#2 $ by $Author: ashah $, $DateTime: 2003/07/09 12:34:39 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDLParser.jj#3 $ by $Author: rhs $, $DateTime: 2003/08/12 13:08:12 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -144,7 +144,7 @@ TOKEN:
 
 TOKEN:
 {
-    <ID: (<ESC>|<CH>) (<ESC>|<CH>|<DIGIT>)*>
+    <ID: (<ESC>|<CH>) (<ESC>|<CH>|<DIGIT>)* ( "[]" )?>
   | <#CH: ["a" - "z", "A" - "Z", "_", "$"]>
   | <#ESC: "\\" ~[]>
   | <INT: (<DIGIT>)+>

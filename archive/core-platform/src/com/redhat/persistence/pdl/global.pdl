@@ -48,6 +48,10 @@ object type Date
     class java.util.Date
     adapter com.redhat.persistence.pdl.adapters.DateAd {}
 
+object type byte[]
+    class \[B
+    adapter com.redhat.persistence.pdl.adapters.BlobAd {}
+
 object type Blob
     class \[B
     adapter com.redhat.persistence.pdl.adapters.BlobAd {}
