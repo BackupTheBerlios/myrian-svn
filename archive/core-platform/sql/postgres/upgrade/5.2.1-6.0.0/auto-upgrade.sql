@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres/upgrade/5.2.1-6.0.0/auto-upgrade.sql#4 $
--- $DateTime: 2003/08/18 12:57:27 $
+-- $Id: //core-platform/dev/sql/postgres/upgrade/5.2.1-6.0.0/auto-upgrade.sql#5 $
+-- $DateTime: 2003/08/18 23:10:37 $
 
 
 --------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ alter table CAT_CATEGORIES alter ABSTRACT_P drop default;
 --------------------------------------------------------------------------------
 -- These constraints have been added.
 --------------------------------------------------------------------------------
-ALTER TABLE acs_auditing ADD CONSTRAINT audited_acs_object_id_fk FOREIGN KEY(object_id) references acs_objects(object_id);
+ALTER TABLE acs_auditing ADD CONSTRAINT audited_acs_object_id_fk FOREIGN KEY(object_id) references acs_objects(object_id) ON DELETE CASCADE;
 ALTER TABLE acs_auditing ADD CONSTRAINT audited_creation_user_fk FOREIGN KEY(creation_user) references users(user_id);
 ALTER TABLE acs_auditing ADD CONSTRAINT audited_modifying_user_fk FOREIGN KEY(modifying_user) references users(user_id);
 ALTER TABLE acs_permissions ADD CONSTRAINT acs_permiss_creat_user_f_hiyn9 FOREIGN KEY(creation_user) references users(user_id);
@@ -97,13 +97,13 @@ ALTER TABLE bebop_listener_map ADD CONSTRAINT bebop_listener_map_un UNIQUE (comp
 ALTER TABLE bebop_listeners ADD CONSTRAINT bebop_listeners_id_fk FOREIGN KEY(listener_id) references acs_objects(object_id);
 ALTER TABLE bebop_meta_object ADD CONSTRAINT bebop_meta_obj_object_id_fk FOREIGN KEY(object_id) references acs_objects(object_id);
 ALTER TABLE bebop_meta_object ADD CONSTRAINT bebop_meta_obj_un UNIQUE (type_id,class_name);
-ALTER TABLE bebop_meta_object ADD CONSTRAINT bebop_meta_object_type_id_fk FOREIGN KEY(type_id) references bebop_object_type(type_id);
+ALTER TABLE bebop_meta_object ADD CONSTRAINT bebop_meta_object_type_id_fk FOREIGN KEY(type_id) references bebop_object_type(type_id) ON DELETE CASCADE;
 ALTER TABLE bebop_object_type ADD CONSTRAINT bebop_object_type_type_id_fk FOREIGN KEY(type_id) references acs_objects(object_id);
 ALTER TABLE bebop_object_type ADD CONSTRAINT bebop_object_type_un UNIQUE (app_type,class_name);
 ALTER TABLE bebop_process_listeners ADD CONSTRAINT bebop_process_listeners_fk FOREIGN KEY(listener_id) references acs_objects(object_id);
 ALTER TABLE bebop_widgets ADD CONSTRAINT bebop_widgets_id_fk FOREIGN KEY(widget_id) references bebop_components(component_id);
-ALTER TABLE cat_cat_subcat_trans_index ADD CONSTRAINT cat_cat_subcat_index_c_fk FOREIGN KEY(category_id) references cat_categories(category_id);
-ALTER TABLE cat_cat_subcat_trans_index ADD CONSTRAINT cat_cat_subcat_index_s_fk FOREIGN KEY(subcategory_id) references cat_categories(category_id);
+ALTER TABLE cat_cat_subcat_trans_index ADD CONSTRAINT cat_cat_subcat_index_c_fk FOREIGN KEY(category_id) references cat_categories(category_id) ON DELETE CASCADE;
+ALTER TABLE cat_cat_subcat_trans_index ADD CONSTRAINT cat_cat_subcat_index_s_fk FOREIGN KEY(subcategory_id) references cat_categories(category_id) ON DELETE CASCADE;
 ALTER TABLE cat_categories ADD CONSTRAINT cat_categori_catego_id_f__xtwr FOREIGN KEY(category_id) references acs_objects(object_id);
 ALTER TABLE cat_category_category_map ADD CONSTRAINT cat_cat_catmap_un UNIQUE (category_id,related_category_id);
 ALTER TABLE cat_category_category_map ADD CONSTRAINT cat_cat_map_category_id_fk FOREIGN KEY(related_category_id) references cat_categories(category_id);
@@ -113,18 +113,18 @@ ALTER TABLE cat_category_purpose_map ADD CONSTRAINT cat_obj_map_purpose_id_fk FO
 ALTER TABLE cat_object_category_map ADD CONSTRAINT cat_obj_cat_map_cat_id_fk FOREIGN KEY(category_id) references cat_categories(category_id);
 ALTER TABLE cat_object_category_map ADD CONSTRAINT cat_obj_cat_map_un UNIQUE (category_id,object_id);
 ALTER TABLE cat_object_category_map ADD CONSTRAINT cat_obj_map_object_id_fk FOREIGN KEY(object_id) references acs_objects(object_id);
-ALTER TABLE cat_object_root_category_map ADD CONSTRAINT cat_obj_object_id_fk FOREIGN KEY(object_id) references acs_objects(object_id);
-ALTER TABLE cat_object_root_category_map ADD CONSTRAINT cat_obj_package_id_fk FOREIGN KEY(package_id) references apm_packages(package_id);
-ALTER TABLE cat_object_root_category_map ADD CONSTRAINT cat_obj_root_map_fk FOREIGN KEY(root_category_id) references cat_categories(category_id);
+ALTER TABLE cat_object_root_category_map ADD CONSTRAINT cat_obj_object_id_fk FOREIGN KEY(object_id) references acs_objects(object_id) ON DELETE CASCADE;
+ALTER TABLE cat_object_root_category_map ADD CONSTRAINT cat_obj_package_id_fk FOREIGN KEY(package_id) references apm_packages(package_id) ON DELETE CASCADE;
+ALTER TABLE cat_object_root_category_map ADD CONSTRAINT cat_obj_root_map_fk FOREIGN KEY(root_category_id) references cat_categories(category_id) ON DELETE CASCADE;
 ALTER TABLE cat_purposes ADD CONSTRAINT cat_purposes_key_un UNIQUE (key);
 ALTER TABLE cat_purposes ADD CONSTRAINT cat_purposes_purpose_id_fk FOREIGN KEY(purpose_id) references acs_objects(object_id);
 ALTER TABLE cat_root_cat_object_map ADD CONSTRAINT cat_roo_cat_obj_map_ca_f_jqvmd FOREIGN KEY(category_id) references cat_categories(category_id);
 ALTER TABLE cat_root_cat_object_map ADD CONSTRAINT cat_roo_cat_obj_map_ob_f_anfmx FOREIGN KEY(object_id) references acs_objects(object_id);
 ALTER TABLE cw_process_definitions ADD CONSTRAINT process_def_id_fk FOREIGN KEY(process_def_id) references cw_processes(process_id);
-ALTER TABLE cw_processes ADD CONSTRAINT process_process_def_id_fk FOREIGN KEY(process_def_id) references cw_tasks(task_id);
+ALTER TABLE cw_processes ADD CONSTRAINT process_process_def_id_fk FOREIGN KEY(process_def_id) references cw_tasks(task_id) ON DELETE CASCADE;
 ALTER TABLE cw_processes ADD CONSTRAINT process_task_id_fk FOREIGN KEY(process_id) references cw_tasks(task_id);
 ALTER TABLE cw_processes ADD CONSTRAINT processes_object_fk FOREIGN KEY(object_id) references acs_objects(object_id);
-ALTER TABLE cw_system_tasks ADD CONSTRAINT system_tasks_task_id_fk FOREIGN KEY(task_id) references cw_tasks(task_id);
+ALTER TABLE cw_system_tasks ADD CONSTRAINT system_tasks_task_id_fk FOREIGN KEY(task_id) references cw_tasks(task_id) ON DELETE CASCADE;
 ALTER TABLE cw_task_comments ADD CONSTRAINT task_comments_task_id_fk FOREIGN KEY(task_id) references cw_tasks(task_id);
 ALTER TABLE cw_task_dependencies ADD CONSTRAINT cw_tas_depe_dep_tas_id_f_bn0m5 FOREIGN KEY(dependent_task_id) references cw_tasks(task_id);
 ALTER TABLE cw_task_dependencies ADD CONSTRAINT cw_tas_dependen_tas_id_f_b1uoz FOREIGN KEY(task_id) references cw_tasks(task_id);
@@ -134,12 +134,12 @@ ALTER TABLE cw_task_listeners ADD CONSTRAINT cw_tas_list_lis_tas_id_f_x1n02 FORE
 ALTER TABLE cw_task_listeners ADD CONSTRAINT cw_tas_listener_tas_id_f_s2fj9 FOREIGN KEY(task_id) references cw_tasks(task_id);
 ALTER TABLE cw_task_user_assignees ADD CONSTRAINT cw_tas_use_assi_tas_id_f_feri7 FOREIGN KEY(task_id) references cw_user_tasks(task_id);
 ALTER TABLE cw_task_user_assignees ADD CONSTRAINT cw_tas_use_assi_use_id_f_w856_ FOREIGN KEY(user_id) references users(user_id);
-ALTER TABLE cw_tasks ADD CONSTRAINT task_parent_task_id FOREIGN KEY(parent_task_id) references cw_tasks(task_id);
+ALTER TABLE cw_tasks ADD CONSTRAINT task_parent_task_id FOREIGN KEY(parent_task_id) references cw_tasks(task_id) ON DELETE CASCADE;
 ALTER TABLE cw_user_tasks ADD CONSTRAINT user_tasks_task_id_fk FOREIGN KEY(task_id) references cw_tasks(task_id);
 ALTER TABLE forms_dataquery ADD CONSTRAINT forms_dataquery_un UNIQUE (type_id,name);
 ALTER TABLE forms_dataquery ADD CONSTRAINT forms_dq_query_id_fk FOREIGN KEY(query_id) references acs_objects(object_id);
-ALTER TABLE forms_dataquery ADD CONSTRAINT forms_dq_query_type_id_fk FOREIGN KEY(type_id) references bebop_object_type(type_id);
-ALTER TABLE forms_dd_select ADD CONSTRAINT forms_dds_query_id_fk FOREIGN KEY(query_id) references forms_dataquery(query_id);
+ALTER TABLE forms_dataquery ADD CONSTRAINT forms_dq_query_type_id_fk FOREIGN KEY(type_id) references bebop_object_type(type_id) ON DELETE CASCADE;
+ALTER TABLE forms_dd_select ADD CONSTRAINT forms_dds_query_id_fk FOREIGN KEY(query_id) references forms_dataquery(query_id) ON DELETE CASCADE;
 ALTER TABLE forms_dd_select ADD CONSTRAINT forms_dds_widget_id_fk FOREIGN KEY(widget_id) references bebop_widgets(widget_id);
 ALTER TABLE forms_lstnr_conf_email ADD CONSTRAINT forms_lstnr_conf_email_fk FOREIGN KEY(listener_id) references bebop_process_listeners(listener_id);
 ALTER TABLE forms_lstnr_conf_redirect ADD CONSTRAINT forms_lstnr_conf_redirect_fk FOREIGN KEY(listener_id) references bebop_process_listeners(listener_id);
@@ -147,7 +147,7 @@ ALTER TABLE forms_lstnr_simple_email ADD CONSTRAINT forms_lstnr_simple_email_fk 
 ALTER TABLE forms_lstnr_tmpl_email ADD CONSTRAINT forms_lstnr_tmpl_email_fk FOREIGN KEY(listener_id) references bebop_process_listeners(listener_id);
 ALTER TABLE forms_lstnr_xml_email ADD CONSTRAINT forms_lstnr_xml_email_fk FOREIGN KEY(listener_id) references bebop_process_listeners(listener_id);
 ALTER TABLE forms_widget_label ADD CONSTRAINT forms_wgt_label_label_id_fk FOREIGN KEY(label_id) references bebop_widgets(widget_id);
-ALTER TABLE forms_widget_label ADD CONSTRAINT forms_wgt_label_widget_id_fk FOREIGN KEY(widget_id) references bebop_widgets(widget_id);
+ALTER TABLE forms_widget_label ADD CONSTRAINT forms_wgt_label_widget_id_fk FOREIGN KEY(widget_id) references bebop_widgets(widget_id) ON DELETE CASCADE;
 ALTER TABLE g11n_catalogs ADD CONSTRAINT g11n_catalogs_locale_id_fk FOREIGN KEY(locale_id) references g11n_locales(locale_id);
 ALTER TABLE g11n_locale_charset_map ADD CONSTRAINT g11n_lcm_charset_id_fk FOREIGN KEY(charset_id) references g11n_charsets(charset_id);
 ALTER TABLE g11n_locale_charset_map ADD CONSTRAINT g11n_lcm_locale_id_fk FOREIGN KEY(locale_id) references g11n_locales(locale_id);
@@ -156,12 +156,12 @@ ALTER TABLE granted_context_non_leaf_map ADD CONSTRAINT gcnlm_implied_context_id
 ALTER TABLE granted_context_non_leaf_map ADD CONSTRAINT gcnlm_object_id_fk FOREIGN KEY(object_id) references acs_objects(object_id);
 ALTER TABLE group_member_map ADD CONSTRAINT grou_memb_map_membe_id_f_bs3u_ FOREIGN KEY(member_id) references users(user_id);
 ALTER TABLE group_member_map ADD CONSTRAINT grou_membe_map_grou_id_f_d7lhm FOREIGN KEY(group_id) references groups(group_id);
-ALTER TABLE group_member_trans_index ADD CONSTRAINT gmti_group_id_fk FOREIGN KEY(group_id) references groups(group_id);
-ALTER TABLE group_member_trans_index ADD CONSTRAINT gmti_subgroup_id_fk FOREIGN KEY(member_id) references users(user_id);
+ALTER TABLE group_member_trans_index ADD CONSTRAINT gmti_group_id_fk FOREIGN KEY(group_id) references groups(group_id) ON DELETE CASCADE;
+ALTER TABLE group_member_trans_index ADD CONSTRAINT gmti_subgroup_id_fk FOREIGN KEY(member_id) references users(user_id) ON DELETE CASCADE;
 ALTER TABLE group_subgroup_map ADD CONSTRAINT grou_subg_map_subgr_id_f_1jo4e FOREIGN KEY(subgroup_id) references groups(group_id);
 ALTER TABLE group_subgroup_map ADD CONSTRAINT grou_subgro_map_gro_id_f_todnr FOREIGN KEY(group_id) references groups(group_id);
-ALTER TABLE group_subgroup_trans_index ADD CONSTRAINT gsti_group_id_fk FOREIGN KEY(group_id) references groups(group_id);
-ALTER TABLE group_subgroup_trans_index ADD CONSTRAINT gsti_subgroup_id_fk FOREIGN KEY(subgroup_id) references groups(group_id);
+ALTER TABLE group_subgroup_trans_index ADD CONSTRAINT gsti_group_id_fk FOREIGN KEY(group_id) references groups(group_id) ON DELETE CASCADE;
+ALTER TABLE group_subgroup_trans_index ADD CONSTRAINT gsti_subgroup_id_fk FOREIGN KEY(subgroup_id) references groups(group_id) ON DELETE CASCADE;
 ALTER TABLE groups ADD CONSTRAINT groups_group_id_f_l4tvr FOREIGN KEY(group_id) references parties(party_id);
 ALTER TABLE message_parts ADD CONSTRAINT message_parts_message_id_fk FOREIGN KEY(message_id) references messages(message_id);
 ALTER TABLE message_threads ADD CONSTRAINT msg_threads_root_id_fk FOREIGN KEY(root_id) references messages(message_id);
@@ -169,17 +169,17 @@ ALTER TABLE message_threads ADD CONSTRAINT msg_threads_root_id_un UNIQUE (root_i
 ALTER TABLE message_threads ADD CONSTRAINT msg_threads_sender_fk FOREIGN KEY(sender) references parties(party_id);
 ALTER TABLE message_threads ADD CONSTRAINT msg_threads_thread_id_fk FOREIGN KEY(thread_id) references acs_objects(object_id);
 ALTER TABLE messages ADD CONSTRAINT messages_message_id_fk FOREIGN KEY(message_id) references acs_objects(object_id);
-ALTER TABLE messages ADD CONSTRAINT messages_object_id_fk FOREIGN KEY(object_id) references acs_objects(object_id);
-ALTER TABLE messages ADD CONSTRAINT messages_reply_to_fk FOREIGN KEY(in_reply_to) references messages(message_id);
-ALTER TABLE messages ADD CONSTRAINT messages_root_id_fk FOREIGN KEY(root_id) references messages(message_id);
+ALTER TABLE messages ADD CONSTRAINT messages_object_id_fk FOREIGN KEY(object_id) references acs_objects(object_id) ON DELETE CASCADE;
+ALTER TABLE messages ADD CONSTRAINT messages_reply_to_fk FOREIGN KEY(in_reply_to) references messages(message_id) ON DELETE SET NULL;
+ALTER TABLE messages ADD CONSTRAINT messages_root_id_fk FOREIGN KEY(root_id) references messages(message_id) ON DELETE CASCADE;
 ALTER TABLE messages ADD CONSTRAINT messages_sender_fk FOREIGN KEY(sender) references parties(party_id);
 ALTER TABLE nt_digests ADD CONSTRAINT nt_digest_fk FOREIGN KEY(digest_id) references acs_objects(object_id);
 ALTER TABLE nt_digests ADD CONSTRAINT nt_digest_party_from_fk FOREIGN KEY(party_from) references parties(party_id);
-ALTER TABLE nt_queue ADD CONSTRAINT nt_queue_party_to_fk FOREIGN KEY(party_to) references parties(party_id);
-ALTER TABLE nt_queue ADD CONSTRAINT nt_queue_request_fk FOREIGN KEY(request_id) references nt_requests(request_id);
+ALTER TABLE nt_queue ADD CONSTRAINT nt_queue_party_to_fk FOREIGN KEY(party_to) references parties(party_id) ON DELETE CASCADE;
+ALTER TABLE nt_queue ADD CONSTRAINT nt_queue_request_fk FOREIGN KEY(request_id) references nt_requests(request_id) ON DELETE CASCADE;
 ALTER TABLE nt_requests ADD CONSTRAINT nt_requests_digest_fk FOREIGN KEY(digest_id) references nt_digests(digest_id);
 ALTER TABLE nt_requests ADD CONSTRAINT nt_requests_fk FOREIGN KEY(request_id) references acs_objects(object_id);
-ALTER TABLE nt_requests ADD CONSTRAINT nt_requests_message_fk FOREIGN KEY(message_id) references messages(message_id);
+ALTER TABLE nt_requests ADD CONSTRAINT nt_requests_message_fk FOREIGN KEY(message_id) references messages(message_id) ON DELETE CASCADE;
 ALTER TABLE nt_requests ADD CONSTRAINT nt_requests_party_to_fk FOREIGN KEY(party_to) references parties(party_id);
 ALTER TABLE object_container_map ADD CONSTRAINT obje_cont_map_conta_id_f_v66b1 FOREIGN KEY(container_id) references acs_objects(object_id);
 ALTER TABLE object_container_map ADD CONSTRAINT obje_contai_map_obj_id_f_guads FOREIGN KEY(object_id) references acs_objects(object_id);
@@ -212,9 +212,9 @@ ALTER TABLE user_authentication ADD CONSTRAINT user_authentica_use_id_f_z1jvj FO
 ALTER TABLE users ADD CONSTRAINT users_name_id_f_0xbbm FOREIGN KEY(name_id) references person_names(name_id);
 ALTER TABLE users ADD CONSTRAINT users_screen_name_u__c5u2 UNIQUE (screen_name);
 ALTER TABLE users ADD CONSTRAINT users_user_id_f_t_lso FOREIGN KEY(user_id) references parties(party_id);
-ALTER TABLE vc_generic_operations ADD CONSTRAINT vc_gen_operations_fk FOREIGN KEY(operation_id) references vc_operations(operation_id);
-ALTER TABLE vc_objects ADD CONSTRAINT vc_objects_mst_fk FOREIGN KEY(master_id) references acs_objects(object_id);
-ALTER TABLE vc_objects ADD CONSTRAINT vc_objects_obj_fk FOREIGN KEY(object_id) references acs_objects(object_id);
+ALTER TABLE vc_generic_operations ADD CONSTRAINT vc_gen_operations_fk FOREIGN KEY(operation_id) references vc_operations(operation_id) ON DELETE CASCADE;
+ALTER TABLE vc_objects ADD CONSTRAINT vc_objects_mst_fk FOREIGN KEY(master_id) references acs_objects(object_id) ON DELETE SET NULL;
+ALTER TABLE vc_objects ADD CONSTRAINT vc_objects_obj_fk FOREIGN KEY(object_id) references acs_objects(object_id) ON DELETE CASCADE;
 
 
 --------------------------------------------------------------------------------
