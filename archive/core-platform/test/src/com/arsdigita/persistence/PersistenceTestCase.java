@@ -17,6 +17,7 @@ package com.arsdigita.persistence;
 
 import com.arsdigita.persistence.metadata.MetadataRoot;
 import com.arsdigita.persistence.pdl.PDL;
+import com.arsdigita.persistence.pdl.PDLOutputter;
 import junit.framework.TestCase;
 
 import java.util.HashSet;
@@ -29,12 +30,12 @@ import java.io.InputStream;
  * PersistenceTestCase
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/07/30 $
+ * @version $Revision: #5 $ $Date: 2002/08/01 $
  */
 
 public class PersistenceTestCase extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#4 $ by $Author: randyg $, $DateTime: 2002/07/30 16:44:08 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#5 $ by $Author: randyg $, $DateTime: 2002/08/01 11:13:21 $";
 
     // Prevent loading the same PDL file twice
     private static Set s_loadedPDLResources = new HashSet();
@@ -45,8 +46,12 @@ public class PersistenceTestCase extends TestCase {
      *  used.  It does that by locating the substring "testpdl" and 
      *  replacing it with "testpdl/<database-here>" such as 
      *  "testpdl/oracle-se"
+     *  @param outputPDL If true and if the value of "outputPDLDir" within
+     *  the source code itself has been changed then it will output
+     *  the PDL.  This should eventaully be fixed to take in a config
+     *  file parameter so that the source code does not need to change.
      */
-    protected static void load(String resource) {
+    protected static void load(String resource, boolean outputPDL) {
         if (s_loadedPDLResources.contains(resource)) {
             return;
         }
@@ -79,6 +84,17 @@ public class PersistenceTestCase extends TestCase {
 
             m.loadResource(resource);
             m.generateMetadata(MetadataRoot.getMetadataRoot());
+
+            String outputPDLDir = "/home/randyg/pdl";
+            if (outputPDL) {
+                try {
+                    PDLOutputter.writePDL(MetadataRoot.getMetadataRoot(),
+                                          new java.io.File(outputPDLDir));
+                } catch (java.io.IOException e) {
+                    System.err.println
+                        ("There was a problem generating debugging output");
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new Error(e.getMessage());
@@ -86,6 +102,17 @@ public class PersistenceTestCase extends TestCase {
         s_loadedPDLResources.add(resource);
     }
 
+
+    /**
+     *  This loads the passed in resource.  It also checks for the existence
+     *  of files with the same name for the specific database that is being
+     *  used.  It does that by locating the substring "testpdl" and 
+     *  replacing it with "testpdl/<database-here>" such as 
+     *  "testpdl/oracle-se"
+     */
+    protected static void load(String resource) {
+        load(resource, false);
+    }
 
     public PersistenceTestCase(String name) {
         super(name);

@@ -13,12 +13,12 @@ import org.apache.log4j.Category;
  * specified in a PDL file to generate sql queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2002/07/22 $
+ * @version $Revision: #10 $ $Date: 2002/08/01 $
  **/
 
 public class Query extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#9 $ by $Author: rhs $, $DateTime: 2002/07/22 16:04:48 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#10 $ by $Author: randyg $, $DateTime: 2002/08/01 11:13:21 $";
 
     private static final Category s_log = Category.getInstance(Query.class);
 
@@ -28,7 +28,6 @@ public class Query extends Node {
     private List m_errors = new ArrayList();
     private List m_modifications = new ArrayList();
 
-
     /**
      * Constructs a query for retrieving all objects of the given type. By
      * default fetches only the key properties of the type (see {@link
@@ -37,10 +36,54 @@ public class Query extends Node {
      *
      * @param type The object type for the query to fetch.
      **/
-
     public Query(ObjectType type) {
         super(null, type);
-        fetchKey();
+        fetchKey();   
+    }
+
+    /**
+     * This method is used to add link attributes to this query.  This
+     * is typically only used for Associations.
+     */
+    public void addLinkAttributes(Property parentProperty, ObjectType link) {
+        if (link != null) {
+            Collection keyProperties = new ArrayList();
+            for (Iterator it = link.getKeyProperties(); it.hasNext(); ) {
+                Property p = (Property)it.next();
+                keyProperties.add(p);
+            }
+            
+            // The properties that are not key properties are the "link"
+            // properties
+            for (Iterator it = link.getProperties(); it.hasNext(); ) {
+                Property property = (Property) it.next();
+                if (!keyProperties.contains(property)) {
+                    
+                    if (property.isAttribute()) {
+                        if (property.getColumn() == null) {
+                            throw new NoMetadataException
+                                (property.getFilename() + ": " + 
+                                 property.getLineNumber() +
+                                 ": No metadata found for property " + 
+                                 property.getName() +
+                                 " while generating SQL for query: " + 
+                                 getQuery());
+                        }
+                        
+                        Node parent = getChildNode(parentProperty);
+                        parent.addLinkSelection(parent, property);
+                    } else {
+                        throw new NoMetadataException
+                            (property.getFilename() + ": " + 
+                             property.getLineNumber() +
+                             ": No metadata found for property " + 
+                             property.getName() + " while generating SQL " +
+                             "for query: " + getQuery() + "; " +
+                             "Object link attributes are not supported");
+                    }
+                }
+            }
+        }
     }
 
     Set getSelections(Column column) {

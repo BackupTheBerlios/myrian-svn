@@ -48,12 +48,12 @@ import org.apache.log4j.Priority;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/08/01 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#4 $ by $Author: randyg $, $DateTime: 2002/08/01 11:13:21 $";
 
     private static final Category s_log = Category.getInstance(PDL.class);
 
@@ -267,6 +267,10 @@ public class PDL {
 
     public static void setDebugDirectory(String directory) {
         s_debugDirectory = directory;
+    }
+
+    public static String getDebugDirectory() {
+        return s_debugDirectory;
     }
 
     /**

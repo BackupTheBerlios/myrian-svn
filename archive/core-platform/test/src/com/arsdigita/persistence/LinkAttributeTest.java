@@ -15,7 +15,8 @@
 
 package com.arsdigita.persistence;
 
-import java.math.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Arrays;
 import org.apache.log4j.Category;
 
@@ -23,12 +24,12 @@ import org.apache.log4j.Category;
  * LinkAttributeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/31 $
+ * @version $Revision: #4 $ $Date: 2002/08/01 $
  **/
 
 public abstract class LinkAttributeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LinkAttributeTest.java#3 $ by $Author: randyg $, $DateTime: 2002/07/31 10:54:52 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LinkAttributeTest.java#4 $ by $Author: randyg $, $DateTime: 2002/08/01 11:13:21 $";
 
     private static Category s_log = 
         Category.getInstance(LinkAttributeTest.class.getName());
@@ -42,6 +43,7 @@ public abstract class LinkAttributeTest extends PersistenceTestCase {
     public void testArticle() {
         Session ssn = SessionManager.getSession();
         DataObject article = ssn.create(getModelName() + ".Article");
+
         article.set("id", BigInteger.ZERO);
         String text = "This is the article text.";
         article.set("text", text);
@@ -61,6 +63,7 @@ public abstract class LinkAttributeTest extends PersistenceTestCase {
     public void testImage() {
         Session ssn = SessionManager.getSession();
         DataObject image = ssn.create(getModelName() + ".Image");
+
         image.set("id", BigInteger.ZERO);
         byte[] bytes = "This is the image.".getBytes();
         image.set("bytes", bytes);
@@ -77,6 +80,7 @@ public abstract class LinkAttributeTest extends PersistenceTestCase {
 
         assertEquals("image not deleted properly", null, ssn.retrieve(oid));
     }
+
 
     public void testLinkAttributes() {
         Session ssn = SessionManager.getSession();
@@ -144,5 +148,4 @@ public abstract class LinkAttributeTest extends PersistenceTestCase {
                      numItems,
                      cursor.size());
     }
-
 }

@@ -47,12 +47,12 @@ import org.apache.log4j.Category;
  * in the future, but we do not consider them to be essential at the moment.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#4 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#5 $
  * @since 4.6.3
  */
 abstract class BaseMDSQLGenerator implements MDSQLGenerator {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#4 $ by $Author: dan $, $DateTime: 2002/07/31 09:53:16 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseMDSQLGenerator.java#5 $ by $Author: randyg $, $DateTime: 2002/08/01 11:13:21 $";
 
     private static final Category s_log =
         Category.getInstance(BaseMDSQLGenerator.class);
@@ -264,12 +264,12 @@ abstract class BaseMDSQLGenerator implements MDSQLGenerator {
         }
 
         try {
-	    // XXX query doesn't do anything with the link atributes yet
             Query query = new Query(type);
             if (prop == null) {
                 query.fetchDefault();
             } else {
                 query.fetch(prop.getName());
+                query.addLinkAttributes(prop, link);
             }
 
             query.generate();

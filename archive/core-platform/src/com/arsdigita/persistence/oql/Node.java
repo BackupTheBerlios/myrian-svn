@@ -1,21 +1,29 @@
 package com.arsdigita.persistence.oql;
 
-import com.arsdigita.util.*;
-import com.arsdigita.persistence.metadata.*;
-//import com.arsdigita.persistence.metadata.Column;
-import java.util.*;
+import com.arsdigita.util.StringUtils;
+import com.arsdigita.persistence.metadata.ObjectType;
+import com.arsdigita.persistence.metadata.JoinElement;
+import com.arsdigita.persistence.metadata.JoinPath;
+import com.arsdigita.persistence.metadata.Property;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.ArrayList;
 import org.apache.log4j.Category;
 
 /**
  * Node
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/07/19 $
+ * @version $Revision: #8 $ $Date: 2002/08/01 $
  **/
 
 abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#7 $ by $Author: rhs $, $DateTime: 2002/07/19 16:18:07 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#8 $ by $Author: randyg $, $DateTime: 2002/08/01 11:13:21 $";
 
     private static final Category s_log = Category.getInstance(Node.class);
 
@@ -48,12 +56,49 @@ abstract class Node {
         return m_children.values();
     }
 
+    /**
+     *  This returns the child node that corresponds to the passed in property
+     *  This will return null if no such node exists.
+     *  This facilitates the existence of LinkAttributes
+     */
+    Node getChildNode(Property property) {
+        return (Node)m_children.get(property.getName());
+    }
+
+
     public ObjectType getObjectType() {
         return m_type;
     }
 
     Collection getSelections() {
         return m_selections.values();
+    }
+
+    /**
+     *  This returns the selection corresponding to the given 
+     *  node/property pair.
+     *  It returns null if no such selection exists.
+     */
+    /*
+    Selection getSelection(Node node, Property property) {
+        // right now, we ignore the node parameter but we have it in 
+        // the UI to reserve the right to use it later
+        return (Selection)m_selections.get(property.getName())
+    }
+    */
+
+    void addSelection(Node node, Property property) {
+        if (m_selections.get(property.getName()) == null) {
+            m_selections.put(property.getName(), 
+                             new Selection(node, property));
+        }
+    }
+
+    void addLinkSelection(Node node, Property property) {
+        if (m_selections.get(property.getName()) == null) {
+            m_selections.put(property.getName(), 
+                             new LinkSelection(node, property));
+        }
     }
 
     void addTable(Table table) {
@@ -151,10 +196,8 @@ abstract class Node {
                     " while generating SQL for query: " + getQuery()
                     );
             }
-
-            if (!m_selections.containsKey(prop.getName())) {
-                m_selections.put(prop.getName(), new Selection(this, prop));
-            }
+            
+            addSelection(this, prop);
         } else {
             Node child = (Node) m_children.get(first);
             if (child == null) {
@@ -169,6 +212,7 @@ abstract class Node {
             }
         }
     }
+
 
     abstract String getName();
 
@@ -197,6 +241,7 @@ abstract class Node {
 
         for (Iterator it = m_children.values().iterator(); it.hasNext(); ) {
             Node child = (Node) it.next();
+            System.out.println("traversing " + child.getName());
             child.traverse(actor);
         }
     }
