@@ -15,37 +15,28 @@
 
 package com.arsdigita.persistence;
 
-import com.arsdigita.db.DbHelper;
-import com.arsdigita.initializer.Configuration;
-import com.arsdigita.initializer.InitializationException;
 import com.arsdigita.persistence.metadata.MetadataRoot;
-import com.arsdigita.persistence.pdl.PDL;
-import com.arsdigita.persistence.pdl.PDLException;
-import java.io.File;
+import com.arsdigita.persistence.pdl.PDLCompiler;
+import com.arsdigita.runtime.DataInitEvent;
+import com.arsdigita.runtime.DomainInitEvent;
+import com.arsdigita.runtime.LegacyInitEvent;
 import java.io.StringReader;
-import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
 
 /**
- * Initializer gets the information required to create Sessions and informs
- * the SessionManager of them.
+ * Initializer loads UDCTs.
  *
- * @author Archit Shah 
- * @version $Revision: #18 $ $Date: 2003/10/23 $
+ * @author Archit Shah
+ * @version $Revision: #19 $ $Date: 2004/01/22 $
  **/
 
-public class Initializer
-    implements com.arsdigita.initializer.Initializer {
+public class Initializer implements com.arsdigita.runtime.Initializer {
 
     private static final Logger s_log =
         Logger.getLogger(Initializer.class.getName());
 
-    private Configuration m_conf = new Configuration();
-
-    public Configuration getConfiguration() {
-        return m_conf;
-    }
+    public void init(DataInitEvent evt) { }
 
     /**
      * Sets up the session and loads the persistence metadata from a
@@ -53,7 +44,7 @@ public class Initializer
      * to search for is defined by the metadataXmlFileName
      * initialization parameter.
      **/
-    public void startup() {
+    public void init(DomainInitEvent evt) {
         // Finally the files out of the database
         TransactionContext txn = null;
         try {
@@ -62,7 +53,7 @@ public class Initializer
             txn.beginTxn();
 
             MetadataRoot root = MetadataRoot.getMetadataRoot();
-            PDL pdl = new PDL();
+            PDLCompiler pdl = new PDLCompiler();
             DataCollection collection = SessionManager.getSession()
                 .retrieve("com.arsdigita.persistence.DynamicObjectType");
             while (collection.next()) {
@@ -84,8 +75,8 @@ public class Initializer
                 }
 
                 String pdlFile = (String)collection.get("pdlFile");
-                pdl.load(new StringReader(pdlFile),
-                         "DATABASE: " + currentFile);
+                pdl.parse(new StringReader(pdlFile),
+                          "DATABASE: " + currentFile);
             }
 
             collection = SessionManager.getSession()
@@ -107,11 +98,11 @@ public class Initializer
                 }
 
                 String pdlFile = (String)collection.get("pdlFile");
-                pdl.load(new StringReader(pdlFile),
-                         "DATABASE: " + currentFile);
+                pdl.parse(new StringReader(pdlFile),
+                          "DATABASE: " + currentFile);
             }
 
-            pdl.generateMetadata(root);
+            pdl.emit(root);
 
             //try {
             // Future use -- Patrick
@@ -121,18 +112,12 @@ public class Initializer
             //}
 
             txn.commitTxn();
-        } catch (PDLException e) {
-            throw new InitializationException
-                ("Persistence Initialization error while trying to " +
-                 "compile the PDL files: " + e.getMessage());
-        } catch (Exception e2) {
+        } finally {
             if (txn != null && txn.inTxn()) {
                 txn.abortTxn();
             }
-            throw new InitializationException(e2);
         }
     }
 
-    public void shutdown() {}
-
+    public void init(LegacyInitEvent evt) { }
 }
