@@ -13,6 +13,10 @@ ifndef JAVACC
 JAVACC=sh javacc-3.2/bin/javacc
 endif
 
+ifndef JJTREE
+JJTREE=sh javacc-3.2/bin/jjtree
+endif
+
 SOURCES:=src test/src cap/src cap/test/src
 CONF   := conf
 
@@ -62,6 +66,8 @@ $(BUILD)/%.jmake: %
 	@find $< -follow -name *.java -printf " \\\\\n	%p" >> $@
 	@find $< -follow -name *.jj -printf " \\\\\n	\$$(BUILD)/%p" \
 		| sed -e "s@\.jj@\.java@g" >> $@
+	@find $< -follow -name *.jjt -printf " \\\\\n	\$$(BUILD)/%p" \
+		| sed -e "s@\.jjt@\.java@g" >> $@
 	@echo "" >> $@
 	@echo -n "JDO_SOURCES:=" >> $@
 	@find $< -follow -name *.jdo -printf " \\\\\n	%p" >> $@
@@ -96,6 +102,13 @@ $(BUILD)/%.jmake: %
 $(BUILD)/%.java: %.jj
 	@mkdir -p $(dir $(BUILD)/$<)
 	@$(JAVACC) -OUTPUT_DIRECTORY=$(dir $(BUILD)/$<) $<
+
+$(BUILD)/%.java: $(BUILD)/%.jj
+	@$(JAVACC) -OUTPUT_DIRECTORY=$(dir $<) $<
+
+$(BUILD)/%.jj: %.jjt
+	@mkdir -p $(dir $(BUILD)/$<)
+	@$(JJTREE) -OUTPUT_DIRECTORY=$(dir $(BUILD)/$<) $<
 
 $(BUILD)/%.jar: $(BUILD)/%.jstamp
 	jar cf $@ -C $(BUILD)/$* .
