@@ -8,21 +8,23 @@ import java.util.*;
  * SymbolTable
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/07/08 $
+ * @version $Revision: #2 $ $Date: 2003/07/09 $
  **/
 
 class SymbolTable {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/SymbolTable.java#1 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/SymbolTable.java#2 $ by $Author: ashah $, $DateTime: 2003/07/09 11:33:50 $";
 
     private HashMap m_types = new HashMap();
     private ArrayList m_order = new ArrayList();
     private HashMap m_resolutions = new HashMap();
     private HashMap m_emitted = new HashMap();
     private ErrorReport m_report;
+    private Root m_root;
 
-    public SymbolTable(ErrorReport report) {
+    public SymbolTable(ErrorReport report, Root root) {
         m_report = report;
+        m_root = root;
     }
 
     public void define(ObjectTypeNd type) {
@@ -206,7 +208,13 @@ class SymbolTable {
                     (Model.getInstance(ot.getFile().getModel().getName()),
                      ot.getName().getName(), sup);
             addEmitted(type);
+            setLocation(type, ot);
         }
+    }
+
+    final void setLocation(Object element, Node nd) {
+        m_root.setLocation
+            (element, nd.getFile().getName(), nd.getLine(), nd.getColumn());
     }
 
 }

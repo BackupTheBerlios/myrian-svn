@@ -16,17 +16,17 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/07/08 $
+ * @version $Revision: #2 $ $Date: 2003/07/09 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#1 $ by $Author: rhs $, $DateTime: 2003/07/08 21:04:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/pdl/PDL.java#2 $ by $Author: ashah $, $DateTime: 2003/07/09 11:33:50 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
     private ErrorReport m_errors = new ErrorReport();
-    private SymbolTable m_symbols = new SymbolTable(m_errors);
+    private SymbolTable m_symbols;
     private HashMap m_properties = new HashMap();
     private HashSet m_links = new HashSet();
     private HashSet m_fks = new HashSet();
@@ -70,6 +70,8 @@ public class PDL {
     private Root m_root;
 
     public void emit(Root root) {
+	m_root = root;
+        m_symbols = new SymbolTable(m_errors, m_root);
         m_ast.traverse(new Node.Switch() {
             public void onNode(Node nd) {
                 for (Iterator it = nd.getFields().iterator(); it.hasNext(); ) {
@@ -82,8 +84,6 @@ public class PDL {
         });
 
         m_errors.check();
-
-	m_root = root;
 
         for (Iterator it = m_root.getObjectTypes().iterator();
 	     it.hasNext(); ) {
@@ -156,6 +156,8 @@ public class PDL {
                                  prop.isComponent(),
                                  prop.isCollection(),
                                  prop.isNullable());
+                    m_symbols.setLocation(result, prop);
+
                     type.addProperty(result);
                     if (prop.isImmediate()) {
                         type.addImmediateProperty(result);
@@ -194,8 +196,10 @@ public class PDL {
 		    if (props.size() > 0) {
 			Role rone = new Role(one.getName().getName(), oneot,
 					     one.isComponent(), false, false);
+                        m_symbols.setLocation(rone, one);
 			Role rtwo = new Role(two.getName().getName(), twoot,
 					     two.isComponent(), false, false);
+                        m_symbols.setLocation(rtwo, two);
 
 			ObjectType ot = m_symbols.getEmitted(linkName(assn));
 
@@ -219,12 +223,14 @@ public class PDL {
 			Link l = new Link(rone.getName(), rtwo, rone,
 					  one.isCollection(),
 					  one.isNullable());
+                        m_symbols.setLocation(l, one);
 			m_links.add(l);
 			twoot.addProperty(l);
 			l = new Link(rtwo.getName(), rone, rtwo,
 				     two.isCollection(), two.isNullable());
-			oneot.addProperty(l);
+                        m_symbols.setLocation(l, two);
 			m_links.add(l);
+			oneot.addProperty(l);
 		    } else {
 			Role rone = define(oneot, two);
 			Role rtwo = define(twoot, one);
@@ -248,14 +254,17 @@ public class PDL {
 
         m_ast.traverse(new Node.Switch() {
                 public void onObjectType(ObjectTypeNd otn) {
-                    m_root.addObjectMap
-                        (new ObjectMap(m_symbols.getEmitted(otn)));
+                    ObjectMap om = new ObjectMap(m_symbols.getEmitted(otn));
+                    m_root.addObjectMap(om);
+                    m_symbols.setLocation(om, otn);
                 }
 		public void onAssociation(AssociationNd assn) {
 		    ObjectType ot = m_symbols.getEmitted(linkName(assn));
 		    if (ot != null) {
-			m_root.addObjectType(ot);
-			m_root.addObjectMap(new ObjectMap(ot));
+                        ObjectMap om = new ObjectMap(ot);
+                        m_root.addObjectType(ot);
+			m_root.addObjectMap(om);
+                        m_symbols.setLocation(om, assn);
 		    }
 		}
             });
@@ -431,8 +440,7 @@ public class PDL {
             }
             table.setPrimaryKey(key);
             m_primaryKeys.put(key, nd);
-	    m_root.setLocation(table, nd.getFile().getName(), nd.getLine(),
-			       nd.getColumn());
+            m_symbols.setLocation(table, nd);
         }
     }
 
@@ -456,21 +464,19 @@ public class PDL {
                     if (table == null) {
                         table = new Table(colNd.getTable().getName());
                         tables.put(table.getName(), table);
+                        m_symbols.setLocation(table, colNd);
                     }
 
                     DbTypeNd type = colNd.getType();
                     Column col = table.getColumn(colNd.getName().getName());
 
                     if (col == null) {
-                        if (type == null) {
-                            col = new Column(colNd.getName().getName());
-                        } else {
-                            col = new Column
-                                (colNd.getName().getName(), type.getType(),
-                                 type.getSize(), type.getPrecision());
-                        }
+                        col = new Column(colNd.getName().getName());
                         table.addColumn(col);
-                    } else if (type != null) {
+                        m_symbols.setLocation(col, colNd);
+                    }
+
+                    if (type != null) {
                         col.setType(type.getType());
                         col.setSize(type.getSize());
                         col.setPrecision(type.getPrecision());
@@ -1180,6 +1186,7 @@ public class PDL {
             SQLParser p = new SQLParser(new StringReader(nd.getSQL()));
             p.sql();
             final SQLBlock block = new SQLBlock(p.getSQL());
+            m_symbols.setLocation(block, nd);
             for (Iterator ii = p.getAssigns().iterator(); ii.hasNext(); ) {
                 SQLParser.Assign assn = (SQLParser.Assign) ii.next();
                 block.addAssign(assn.getBegin(), assn.getEnd().getNext());
@@ -1208,8 +1215,6 @@ public class PDL {
                     block.addType(path, nd.getType().getType());
                 }
             });
-            m_root.setLocation(block, nd.getFile().getName(), nd.getLine(),
-                               nd.getColumn());
             return block;
         } catch (com.redhat.persistence.common.ParseException e) {
             m_errors.fatal(nd, e.getMessage());
