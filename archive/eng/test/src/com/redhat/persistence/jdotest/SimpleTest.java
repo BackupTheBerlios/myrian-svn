@@ -106,7 +106,6 @@ public class SimpleTest extends TestCase {
         assertTrue("Bad employee name", eName.equals(e.getName()));
         assertNotNull("null instance returned by getDept", e.getDept());
         assertTrue("Bad department name", dName.equals(e.getDept().getName()));
-        pm.currentTransaction().begin();
         pm.deletePersistent(e.getDept());
         pm.deletePersistent(e);
         pm.currentTransaction().commit();
@@ -127,7 +126,6 @@ public class SimpleTest extends TestCase {
         assertNotNull("null instance returned by getObjectById", e);
         assertEquals("Bad employee name", eName, e.getName());
         assertNull("not null instance returned by e.dept", e.getDept());
-        pm.currentTransaction().begin();
         pm.deletePersistent(e);
         pm.currentTransaction().commit();
     }

@@ -2,6 +2,7 @@ package com.redhat.persistence.jdo;
 
 import com.arsdigita.db.DbHelper;
 import com.redhat.persistence.Engine;
+import com.redhat.persistence.QuerySource;
 import com.redhat.persistence.Session;
 import com.redhat.persistence.engine.rdbms.ConnectionSource;
 import com.redhat.persistence.engine.rdbms.OracleWriter;
@@ -158,7 +159,7 @@ public class PersistenceManagerFactoryImpl
             DbHelper.unsupportedDatabaseError("persistence");
         }
 
-        Session ssn = new Session(m_root, engine, null);
+        Session ssn = new Session(m_root, engine, new QuerySource());
         return new PersistenceManagerImpl(ssn);
     }
 
