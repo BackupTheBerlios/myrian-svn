@@ -17,6 +17,8 @@ package com.arsdigita.util;
 
 import junit.framework.TestCase;
 
+import java.util.HashMap;
+
 public class StringUtilsTest extends TestCase {
 
     public StringUtilsTest(String name) {
@@ -221,5 +223,27 @@ public class StringUtilsTest extends TestCase {
         assertEquals("line wrapping failed",
                      expected_out, 
                      actual_out);
+    }
+    
+    public void testPlaceholders() {
+	String in = "foo ::bar:: wizz";
+	String expected_out = "foo eek wizz";
+	String actual_out = StringUtils.interpolate(in, "bar", "eek");
+	
+	assertEquals("interpolate failed simple placeholder",
+		     expected_out,
+		     actual_out);
+	
+	HashMap vars = new HashMap();
+	vars.put("bar", "eek");
+	vars.put("more", "wibble");
+	
+	in = "foo ::bar:: wizz ::more:: done";
+	expected_out = "foo eek wizz wibble done";
+	actual_out = StringUtils.interpolate(in, vars);
+	assertEquals("interpolate failed hashmap test",
+		     expected_out,
+		     actual_out);
+	
     }
 }

@@ -24,6 +24,17 @@ import java.lang.StringBuffer;
 import java.util.Set;
 import org.apache.oro.text.perl.Perl5Util;
 
+import org.apache.oro.text.regex.MatchResult;
+import org.apache.oro.text.regex.Pattern;
+import org.apache.oro.text.regex.Perl5Matcher;
+import org.apache.oro.text.regex.Perl5Compiler;
+import org.apache.oro.text.regex.PatternMatcher;
+import org.apache.oro.text.regex.PatternMatcherInput;
+import org.apache.oro.text.regex.Substitution;
+import org.apache.oro.text.regex.Util;
+import org.apache.oro.text.regex.MalformedPatternException;
+
+
 /**
  * A (static) class of generally-useful string utilities.
  * @author Bill Schneider
@@ -498,7 +509,7 @@ public class StringUtils {
      *
      * @author ron@arsdigita.com
      * @since  5.1.2
-     * @version $Id: //core-platform/dev/src/com/arsdigita/util/StringUtils.java#2 $ 
+     * @version $Id: //core-platform/dev/src/com/arsdigita/util/StringUtils.java#3 $ 
      */
 
     public final static String wrap(String input) {
@@ -528,7 +539,7 @@ public class StringUtils {
      *
      * @author ron@arsdigita.com
      * @since  5.1.2
-     * @version $Id: //core-platform/dev/src/com/arsdigita/util/StringUtils.java#2 $ */
+     * @version $Id: //core-platform/dev/src/com/arsdigita/util/StringUtils.java#3 $ */
 
     public final static String wrap(String input, int maxLength) {
 
@@ -641,5 +652,106 @@ public class StringUtils {
         return true;
     }
 
+    /**
+     * This method performs interpolation on multiple variables.
+     * The keys in the hash table correspond directly to the placeholders
+     * in the string. The values in the hash table can either be
+     * plain strings, or an instance of the PlaceholderValueGenerator
+     * interface
+     *
+     * Variable placeholders are indicated in text by surrounding
+     * a key word with a pair of colons. The keys in the hash
+     * table correspond to the names
+     *
+     * eg. "::forename:: has the email address ::email::"
+     *
+     * @param text the text to interpolate
+     * @param vars a hash table containing key -> value mappings
+     * 
+     */
+    public static String interpolate(String text, Map vars) {
+        HashSubstitution subst = new HashSubstitution(vars);
+        Perl5Matcher matcher = new Perl5Matcher();
+        Perl5Compiler compiler = new Perl5Compiler();
+        StringBuffer result = new StringBuffer();
+        PatternMatcherInput input = new PatternMatcherInput(text);
+        
+        try {
+            Util.substitute(result, 
+                            matcher, 
+                            compiler.compile("(::(?:\\w+(?:\\.\\w+)*)::)"),
+                            subst,
+                            input,
+                            Util.SUBSTITUTE_ALL);
+        } catch (MalformedPatternException e) {
+            throw new UncheckedWrapperException("cannot perform substitution", e);
+        }
+        return result.toString();
+    }
+    
+    
+    /**
+     * THis method performs a single variable substitution
+     * on a string. The placeholder takes the form of 
+     * ::key:: within the sample text.
+     *
+     * @param text the text to process for substitutions
+     * @param key the name of the placeholder
+     * @param value the value to insert upon encountering a placeholder
+     */
+    public static String interpolate(String text, String key, String value) {
+        String pattern = "s/::" + key + "::/" + value + "/";
+        
+        return s_re.substitute(pattern, text);
+    }
+    
+
+
+    /**
+     * An interface allowing the value for a placeholder to be
+     * dynamically generated.
+     */
+    public interface PlaceholderValueGenerator {
+	/**
+	 * Returns the value corresponding to the supplied key
+	 * placeholder.
+	 *
+	 * @param the key being substituted
+	 */
+        public String generate(String key);
+    }
+
+
+
+    private static class HashSubstitution implements Substitution {
+        private Map m_hash;
+        
+        public HashSubstitution(Map hash) {
+            m_hash = hash;
+        }
+        
+        public void appendSubstitution(StringBuffer appendBuffer,
+                                       MatchResult match,
+                                       int substitutionCount,
+                                       PatternMatcherInput originalInput,
+                                       PatternMatcher matcher,
+                                       Pattern pattern) {
+            String placeholder = match.toString();
+            String key = placeholder.substring(2, placeholder.length()-2);
+
+            Object value = (m_hash.containsKey(key) ?
+                            m_hash.get(key) :
+                            placeholder);
+            String val;
+            try {
+                PlaceholderValueGenerator gen = (PlaceholderValueGenerator)value;
+                val = gen.generate(key);
+            } catch (ClassCastException ex) {
+                val = (String)value;
+            }
+
+            appendBuffer.append(val);
+        }
+    }
 }
 
