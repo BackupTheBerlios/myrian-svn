@@ -12,8 +12,13 @@ begin
   if date_trunc(''minute'', newTimestamp) < date_trunc(''minute'', oldTimestamp) then
     return oldDirty;
   else
-    return newDirty;
+    if newDirty <> 2147483647 then
+        return bitand(newDirty, oldDirty);
+    else
+        return newDirty;
+    end if;
   end if;
 end;' language 'plpgsql';
+
 
     

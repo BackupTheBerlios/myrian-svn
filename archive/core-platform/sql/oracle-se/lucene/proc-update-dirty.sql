@@ -6,10 +6,13 @@ as begin
   if newTimestamp < oldTimestamp then
     return oldDirty;
   else
-    return newDirty;
+    if newDirty <> 2147483647 then
+        return bitand(newDirty, oldDirty);
+    else
+        return newDirty;
+    end if;
   end if;
 end;
 /
 
 show errors
-
