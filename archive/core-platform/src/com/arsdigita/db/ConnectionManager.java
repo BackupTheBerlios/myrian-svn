@@ -24,14 +24,14 @@ import org.apache.log4j.Logger;
  * Central location for obtaining database connection.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Revision: #9 $ $Date: 2002/10/09 $
+ * @version $Revision: #10 $ $Date: 2002/10/10 $
  * @since 4.5
  *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: rhs $ - $Date: 2002/10/09 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#9 $";
+    public static final String versionId = "$Author: rhs $ - $Date: 2002/10/10 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#10 $";
 
     private static final Logger LOG =
         Logger.getLogger(ConnectionManager.class);
@@ -68,10 +68,22 @@ public class ConnectionManager {
     private String m_username;
     private String m_password;
 
+    // This records the last time we attempted to reinitialize the connection
+    // pool.
+    private long m_lastAttempt = 0;
+
+    // By default we wait at least 30 seconds between attempts to reconnect to
+    // the db.
+    private long m_interval = 30000;
+
     ConnectionManager(String url, String username, String password) {
         m_url = url;
         m_username = username;
         m_password = password;
+    }
+
+    void setInterval(long interval) {
+        m_interval = interval;
     }
 
     static final void badConnection(Connection conn) {
@@ -90,6 +102,7 @@ public class ConnectionManager {
             CURRENT_THREAD_CONNECTION = new ThreadLocal();
             m_pool.closeConnections();
             m_pool = null;
+            m_lastAttempt = System.currentTimeMillis();
         }
     }
 
@@ -117,6 +130,8 @@ public class ConnectionManager {
         pool.setConnectionInfo(m_url, m_username, m_password);
         LOG.info("Setting connection pool size to " + m_connectionPoolSize);
         pool.setConnectionPoolSize(m_connectionPoolSize);
+
+        m_lastAttempt = System.currentTimeMillis();
 
         // We have to wait until here to set m_pool to the new value since we
         // don't want to make the pool available to other threads without
@@ -201,7 +216,14 @@ public class ConnectionManager {
         throws java.sql.SQLException {
 
         if (m_pool == null) {
-            connect();
+            long since = System.currentTimeMillis() - m_lastAttempt;
+            if (since > m_interval) {
+                connect();
+            } else {
+                throw new DbNotAvailableException
+                    ("The database went down. Will reattempt connecting in " +
+                     (m_interval - since) + " milliseconds.");
+            }
         }
 
         int retries = 0;
@@ -227,7 +249,11 @@ public class ConnectionManager {
             try {
                 conn = m_pool.getConnection();
             } catch (SQLException e) {
-                throw SQLExceptionHandler.wrap(e);
+                SQLException wrapped = SQLExceptionHandler.wrap(e);
+                if (wrapped instanceof DbNotAvailableException) {
+                    disconnect();
+                }
+                throw wrapped;
             }
             //}
 

@@ -30,16 +30,19 @@ import java.sql.PreparedStatement;
  * Class for processing of Oracle DB Exceptions.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
- * @version $Revision: #8 $
+ * @version $Revision: #9 $
  * @since 4.6
  */
 public class OracleDbExceptionHandlerImpl extends DbExceptionHandlerBaseImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleDbExceptionHandlerImpl.java#8 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/oracle/OracleDbExceptionHandlerImpl.java#9 $";
 
     static {
         // lots of stuff can keep us away from the DB...
         errors.put("ORA-01034",
+                   com.arsdigita.db.DbNotAvailableException.class);
+        // initialization or shutdown in progress
+        errors.put("ORA-01033",
                    com.arsdigita.db.DbNotAvailableException.class);
         errors.put("No suitable driver",
                    com.arsdigita.db.DbNotAvailableException.class);

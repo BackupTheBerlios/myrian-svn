@@ -30,7 +30,7 @@ public class Initializer
 
     private Configuration m_conf = new Configuration();
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#9 $ by $Author: rhs $, $DateTime: 2002/09/23 17:23:42 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#10 $ by $Author: rhs $, $DateTime: 2002/10/10 11:39:36 $";
 
     public static final String JDBC_URL = "jdbcUrl";
     public static final String DB_USERNAME = "dbUsername";
@@ -40,6 +40,8 @@ public class Initializer
     public static final String CONNECTION_POOL_SIZE = "connectionPoolSize";
     public static final String DRIVER_SPECIFIC_PARAM1 = "driverSpecificParam1";
     public static final String USE_FIX_FOR_ORACLE_901 = "useFixForOracle901";
+    public static final String CONNECTION_POOL_RESTART_INTERVAL =
+        "connectionPoolRestartInterval";
 
     public Initializer() throws InitializationException {
         m_conf.initParameter(JDBC_URL,
@@ -73,6 +75,11 @@ public class Initializer
                              "Turns on a fix specific to oracle 9.0.1. " +
                              "Corrects qctcte1 bug",
                              String.class);
+        m_conf.initParameter(CONNECTION_POOL_RESTART_INTERVAL,
+                             "Number of ms ConnectionManager should sleep " +
+                             "before trying to reinitialize the " +
+                             "connection pool.",
+                             Integer.class);
     }
 
     public Configuration getConfiguration() {
@@ -122,6 +129,11 @@ public class Initializer
 
         ConnectionManager cm =
             new ConnectionManager(jdbcUrl, dbUsername, dbPassword);
+        Integer interval = (Integer) m_conf.getParameter
+            (CONNECTION_POOL_RESTART_INTERVAL);
+        if (interval != null) {
+            cm.setInterval(interval.longValue());
+        }
 
 
         if (database == DbHelper.DB_ORACLE) {
