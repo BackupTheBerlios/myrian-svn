@@ -11,12 +11,12 @@ import java.util.*;
  * Code
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/02/06 $
+ * @version $Revision: #7 $ $Date: 2004/02/06 $
  **/
 
 class Code {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#6 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Code.java#7 $ by $Author: rhs $, $DateTime: 2004/02/06 17:14:57 $";
 
     private Root m_root;
     private LinkedList m_stack = new LinkedList();
@@ -509,15 +509,19 @@ class Code {
         catch (ParseException e) {
             throw new IllegalStateException(e.getMessage());
         }
+        Frame thisFrame = frame(Define.define("this", parent.type));
+        thisFrame.setColumns(parent.getColumns());
         LinkedList stack = m_stack;
         try {
             m_stack = new LinkedList();
             push(parent);
+            push(thisFrame);
             try {
                 Code.Frame frame = qualias.frame(this);
                 m_qualiases.put(expr, qualias);
                 return frame;
             } finally {
+                pop();
                 pop();
             }
         } finally {

@@ -7,12 +7,12 @@ import java.util.*;
  * Define
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/02/06 $
+ * @version $Revision: #7 $ $Date: 2004/02/06 $
  **/
 
 public class Define extends Expression {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Define.java#6 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/oql/Define.java#7 $ by $Author: rhs $, $DateTime: 2004/02/06 17:14:57 $";
 
     private Expression m_expr;
     private String m_name;
@@ -54,8 +54,7 @@ public class Define extends Expression {
         m_expr.emit(code);
     }
 
-    private static ObjectType define(final String name,
-                                     final ObjectType type) {
+    static ObjectType define(final String name, final ObjectType type) {
         Model anon = Model.getInstance("anonymous.define");
         ObjectType result = new ObjectType
             (anon, type.getQualifiedName() + "$" + name, null) {

@@ -607,4 +607,21 @@
       <row a="3" b="11" index="0"/>
     </results>
   </test>
+
+  <test>
+    <query>query(all(test.User), id = id, name = name)</query>
+    <query>query(all(test.User), id = id, name = firstName)</query>
+    <results>
+      <row id="0" name="Ashanti"/>
+      <row id="1" name="Britney"/>
+      <row id="2" name="Christina"/>
+      <row id="3" name="Debbie"/>
+      <row id="4" name="Enya"/>
+      <row id="5" name="Faith"/>
+      <row id="6" name="Gloria"/>
+      <row id="7" name="Hillary"/>
+      <row id="8" name="Indigo"/>
+      <row id="9" name="Jennifer"/>
+    </results>
+  </test>
 </tests>

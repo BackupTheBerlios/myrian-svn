@@ -32,12 +32,12 @@ import org.apache.log4j.Logger;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2004/02/06 $
+ * @version $Revision: #3 $ $Date: 2004/02/06 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#2 $ by $Author: rhs $, $DateTime: 2004/02/06 15:43:04 $";
+    public final static String versionId = "$Id: //core-platform/test-qgen/src/com/redhat/persistence/engine/rdbms/EventSwitch.java#3 $ by $Author: rhs $, $DateTime: 2004/02/06 17:14:57 $";
 
     private static final Logger LOG = Logger.getLogger(EventSwitch.class);
 
@@ -411,6 +411,9 @@ class EventSwitch extends Event.Switch {
                 // before since types specified in static operations
                 // will be ignored. I don't yet know if this is
                 // necessary to fix.
+            }
+            public void onQualias(Qualias q) {
+                // XXX do realy read only from session
             }
             public void onJoinTo(JoinTo j) {
                 throw new IllegalStateException("bad mapping");
