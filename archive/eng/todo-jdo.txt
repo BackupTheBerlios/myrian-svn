@@ -5,7 +5,7 @@
   functionality
 
 - reverse navigation in jdo implementation objects
-  - ssn -> pmi (used in JDOAdapater#setSession)
+  - ssn -> pmi (used in JDOAdapater#getObject)
     - use subclass technique from c.a.p
     - add attribute map to c.r.p session
     - add static map from ssn object to pmi
@@ -13,11 +13,13 @@
     - can use reflection, but that may not be appropriate depending on
       what the spec says regarding the protected-ness of the field
 
-- FCO v SCO
+- First-class Objects vs Second-class Objects
   - how do Collection implementation fit in
   - are PersitenceCapable SCOs using embedded-* the same as components
 
 - integrate pandora/crp collections
+
+- metadata
 
 - implement alphabet soup in PMFI (setConnectionFactoryName)
   - decide on what APIs to support for the jndi retrieved object
