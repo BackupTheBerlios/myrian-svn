@@ -16,7 +16,7 @@ import java.io.*;
  * OQLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2004/02/06 $
+ * @version $Revision: #10 $ $Date: 2004/02/06 $
  */
 
 class OQLParser {
@@ -72,6 +72,26 @@ class OQLParser {
         return result.toString();
     }
 
+    static final String unescape(String str) {
+        StringBuffer result = new StringBuffer(str.length());
+
+        boolean escaped = false;
+
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (escaped) {
+                result.append(c);
+                escaped = false;
+            } else if (c == '\\') {
+                escaped = true;
+            } else {
+                result.append(c);
+            }
+        }
+
+        return result.toString();
+    }
+
 }
 
 PARSER_END(OQLParser)
@@ -109,6 +129,7 @@ TOKEN:
               ( "E" | "e" ) ( "+" | "-" ) (<DIGIT>)+>
   | <BOOLEAN: ( "true" | "false" )>
   | <ID: (<CH>) (<CH>|<DIGIT>)* ( "[]" )?>
+        { matchedToken.image = OQLParser.unescape(image.toString()); }
 }
 
 <BEGINSQL> MORE:

@@ -6,6 +6,8 @@ object type A class com.redhat.persistence.PropertyMap
     String name = a.name;
     Link[0..1] first = qualias { filter(links, index == 0) };
     Link[0..n] links = qualias { filter(all(test.Link), a == this) };
+    B[0..n] bees = qualias { links.b };
+    Link[0..n] bees\@link = qualias { links };
 
     object key(id);
 }
