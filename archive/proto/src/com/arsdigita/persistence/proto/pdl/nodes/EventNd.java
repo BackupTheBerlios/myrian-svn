@@ -6,12 +6,12 @@ import java.util.*;
  * EventNd
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/02/26 $
+ * @version $Revision: #2 $ $Date: 2003/02/27 $
  **/
 
 public class EventNd extends Node {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/EventNd.java#1 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/EventNd.java#2 $ by $Author: rhs $, $DateTime: 2003/02/27 11:01:00 $";
 
     private static final HashMap TYPES = new HashMap();
 
@@ -65,6 +65,11 @@ public class EventNd extends Node {
 
     public Collection getSQL() {
         return (Collection) get(SQL);
+    }
+
+    public boolean isSingle() {
+        return m_type.equals(RETRIEVE_ALL) ||
+            (m_type.equals(RETRIEVE) && getName() != null);
     }
 
     public void dispatch(Switch sw) {

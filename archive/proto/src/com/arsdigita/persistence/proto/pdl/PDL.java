@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #22 $ $Date: 2003/02/26 $
+ * @version $Revision: #23 $ $Date: 2003/02/27 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#22 $ by $Author: rhs $, $DateTime: 2003/02/26 20:44:08 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#23 $ by $Author: rhs $, $DateTime: 2003/02/27 11:01:00 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -705,11 +705,28 @@ public class PDL {
                 m_symbols.getEmitted(assn.getRoleTwo().getType());
 
             if (ev.getName() == null) {
-                addEvent(oneType, ev, two);
                 addEvent(twoType, ev, one);
             } else if (ev.getName().getName().equals(one)) {
+                if (!ev.isSingle()) {
+                    Collection blocks = getSQLBlocks(oneType, ev, two);
+                    if (blocks.size() > 0) {
+                        m_errors.warn
+                            (ev, "both ends of a two way specified, " +
+                             "ignoring this event");
+                        return;
+                    }
+                }
                 addEvent(twoType, ev, one);
             } else if (ev.getName().getName().equals(two)) {
+                if (!ev.isSingle()) {
+                    Collection blocks = getSQLBlocks(twoType, ev, one);
+                    if (blocks.size() > 0) {
+                        m_errors.warn
+                            (ev, "both ends of a two way specified, " +
+                             "ignoring this event");
+                        return;
+                    }
+                }
                 addEvent(oneType, ev, two);
             } else {
                 m_errors.warn
@@ -726,7 +743,11 @@ public class PDL {
         addEvent(ot.getRoot().getObjectMap(ot), ev, role);
     }
 
-    private void addEvent(ObjectMap om, EventNd ev, String role) {
+    private Collection getSQLBlocks(ObjectType ot, EventNd ev, String role) {
+        return getSQLBlocks(ot.getRoot().getObjectMap(ot), ev, role);
+    }
+
+    private Collection getSQLBlocks(ObjectMap om, EventNd ev, String role) {
         Collection blocks;
         if (ev.getType().equals(EventNd.INSERT)) {
             blocks = om.getDeclaredInserts();
@@ -738,20 +759,36 @@ public class PDL {
             if (role == null) {
                 blocks = om.getDeclaredRetrieves();
             } else {
-                Mapping m = getMapping(om, role);
-                m.setRetrieve(getBlock(ev));
-                return;
+                throw new Error("single block event");
             }
         } else if (ev.getType().equals(EventNd.ADD)) {
             blocks = getMapping(om, role).getAdds();
         } else if (ev.getType().equals(EventNd.REMOVE)) {
             blocks = getMapping(om, role).getRemoves();
+        } else if (ev.getType().equals(EventNd.CLEAR)) {
+            blocks = new ArrayList();
+        } else if (ev.getType().equals(EventNd.RETRIEVE_ATTRIBUTES)) {
+            blocks = new ArrayList();
+        } else {
+            m_errors.fatal(ev, "bad event type: " + ev.getType());
+            blocks = new ArrayList();
+        }
+
+        return blocks;
+    }
+
+    private void addEvent(ObjectMap om, EventNd ev, String role) {
+        if (ev.getType().equals(EventNd.RETRIEVE) &&
+            role != null) {
+            Mapping m = getMapping(om, role);
+            m.setRetrieve(getBlock(ev));
+            return;
         } else if (ev.getType().equals(EventNd.RETRIEVE_ALL)) {
             om.setRetrieveAll(getBlock(ev));
             return;
-        } else {
-            return;
         }
+
+        Collection blocks = getSQLBlocks(om, ev, role);
 
         for (Iterator it = ev.getSQL().iterator(); it.hasNext(); ) {
             SQLBlockNd nd = (SQLBlockNd) it.next();

@@ -49,7 +49,7 @@ import java.sql.SQLException;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #15 $ $Date: 2003/02/26 $
+ * @version $Revision: #16 $ $Date: 2003/02/27 $
  * @see com.arsdigita.persistence.SessionManager
  **/
 public class Session {
@@ -111,13 +111,14 @@ public class Session {
             private List m_conns = new ArrayList();
 
             public Connection acquire() {
-                if (m_conns.size() > 0) {
-                    return (Connection) m_conns.remove(m_conns.size() - 1);
-                }
-
                 try {
-                    Connection conn = ConnectionManager.getConnection();
-                    conn.setAutoCommit(false);
+                    Connection conn =
+                        ConnectionManager.getCurrentThreadConnection();
+                    if (conn == null) {
+                        conn = ConnectionManager.getConnection();
+                        ConnectionManager.setCurrentThreadConnection(conn);
+                        conn.setAutoCommit(false);
+                    }
                     return conn;
                 } catch (SQLException e) {
                     throw new Error(e.getMessage());
@@ -125,7 +126,7 @@ public class Session {
             }
 
             public void release(Connection conn) {
-                m_conns.add(conn);
+                
             }
         };
     private RDBMSQuerySource m_qs = new RDBMSQuerySource();
