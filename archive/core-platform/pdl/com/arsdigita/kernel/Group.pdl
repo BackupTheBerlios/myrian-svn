@@ -20,29 +20,11 @@ model com.arsdigita.kernel;
 
 object type Group extends Party {
     String      name = groups.name VARCHAR(200);
-    Role[0..n]  roles;
+    Role[0..n]  roles = join groups.group_id to roles.group_id;
 
     reference key (groups.group_id);
 
-    retrieve roles {
-        do {
-            select role_id, name, description
-	      from roles
-	     where group_id = :id
-        } map {
-            roles.roleId       = role_id;
-            roles.name         = name;
-            roles.description  = description;
-        }
-    }
-
     add roles { }
-
-    clear roles {
-        do {
-            delete from roles where group_id = :id
-        }
-    }
 
     delete {
         do {

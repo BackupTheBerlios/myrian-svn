@@ -15,106 +15,26 @@
 model com.arsdigita.kernel;
 
 object type Role {
-    BigDecimal[1..1] roleId;
+    BigDecimal[1..1] roleId = roles.role_id;
 
     // The name of this role
-    String[1..1]     name;
+    String[1..1]     name = roles.name;
 
     // The group for which this role is defined
-    Group[1..1]      sourceGroup;
+    Group[1..1]      sourceGroup = join roles.group_id to group.group_id;
 
     // The group which stores members in this role
-    Group[1..1]      implicitGroup;
+    Group[1..1]      implicitGroup = join roles.implicit_group_id
+                                       to groups.group_id;
 
     // A textual description of this role
-    String[0..1]     description;
+    String[0..1]     description = roles.description;
 
     object key (roleId);
 
-    retrieve {
-        do {
-            select *
-              from roles
-             where role_id = :roleId
-        } map {
-            roleId = role_id;
-            name = name;
-            description = description;
-        }
-    }
-
-    insert {
-        do {
-            insert into roles
-            (role_id, name, description, group_id, implicit_group_id)
-            values
-            (:roleId, :name, :description, :sourceGroup.id, :implicitGroup.id)
-        }
-    }    
-
-    update {
-        do {
-            update roles
-               set name = :name,
-                   description = :description,
-                   group_id = :sourceGroup.id
-                   implicit_group_id = :implicitGroup.id
-             where role_id = :roleId
-        }
-    }
-
-    delete {
-        do { delete from roles where role_id = :roleId }
-    }
-
-    retrieve sourceGroup {
-        do {
-	        select groups.group_id, groups.name,
-	               parties.uri, 
-                   acs_objects.object_type, acs_objects.display_name 
-	          from roles,
-                   groups, 
-	               parties, 
-	               acs_objects
-	         where roles.group_id = groups.group_id
-               and roles.role_id = :roleId
-               and parties.party_id = groups.group_id
-	           and acs_objects.object_id = parties.party_id
-        } map {
-            sourceGroup.id = groups.group_id;
-            sourceGroup.name = groups.name;
-            sourceGroup.uri = parties.uri;
-            sourceGroup.objectType = acs_objects.object_type;
-            sourceGroup.displayName = acs_objects.display_name;
-        }
-    }
-
+    // we don't want to be able to add or remove the source or implicit groups
     add sourceGroup { }
     remove sourceGroup { }
-
-    retrieve implicitGroup {
-        do {
-	        select groups.group_id, groups.name,
-	               parties.uri, 
-                   acs_objects.object_type, acs_objects.display_name 
-	          from roles,
-                   groups, 
-	               parties, 
-	               acs_objects
-	         where roles.implicit_group_id = groups.group_id
-               and roles.role_id = :roleId
-               and parties.party_id = groups.group_id
-	           and acs_objects.object_id = parties.party_id
-        } map {
-            implicitGroup.id = groups.group_id;
-            implicitGroup.name = groups.name;
-            implicitGroup.uri = parties.uri;
-            implicitGroup.objectType = acs_objects.object_type;
-            implicitGroup.displayName = acs_objects.display_name;
-        }
-    }
-
     add implicitGroup { }
     remove implicitGroup { }
-
 }
