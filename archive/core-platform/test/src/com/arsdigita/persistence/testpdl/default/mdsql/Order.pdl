@@ -67,67 +67,11 @@ object type OtherItem {
 
 
 association {
-    Order[1..1] order;
-    OtherItem[0..n] relatedOtherItems;
-
-    retrieve order {
-        do {
-            select o.* 
-            from t_orders o, t_order_other_item_map m
-            where m.other_item_id = :id
-            and o.order_id = m.order_id
-        } map {
-            order.id = order_id;
-            order.buyer = buyer;
-            order.seller = seller;
-            order.shippingAddress = shipping_address;
-        }
-    }
-
-    retrieve relatedOtherItems {
-        do {
-            select * 
-            from t_other_items o, t_order_other_item_map m
-            where m.order_id = :id
-            and o.other_id = m.other_item_id
-        } map {
-            relatedOtherItems.id = o.other_id;
-            relatedOtherItems.price = o.price;
-            relatedOtherItems.name = o.name;
-            relatedOtherItems.inStock = o.in_stock_p;
-        }
-    }
-    
-
-    add order {
-        do {
-            insert into t_order_other_item_map (order_id, other_item_id)
-            values
-            (:order.id, :id)
-        }
-    }
-
-    add relatedOtherItems {
-        do {
-            insert into t_order_other_item_map (order_id, other_item_id)
-            values
-            (:id, :relatedOtherItems.id)
-        }
-    }
-
-    remove order {
-        do {
-            delete from t_order_other_item_map 
-            where order_id = :order.id and other_item_id = :id
-        }
-    }
-
-    remove relatedOtherItems {
-        do {
-            delete from t_order_other_item_map 
-            where order_id = :id and other_item_id = :relatedOtherItems.id
-        }
-    }
+    Order[1..1] order = join t_other_items.other_id to t_order_other_item_map.other_item_id,
+                        join t_order_other_item_map.order_id to t_orders.order_id;
+    OtherItem[0..n] relatedOtherItems = 
+                    join t_orders.order_id to t_order_other_item_map.order_id,
+                    join t_order_other_item_map.other_item_id to t_other_items.other_id ;
 }
 
 query OrdersMaxPrices {

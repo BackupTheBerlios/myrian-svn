@@ -17,12 +17,11 @@
 -- tests to run.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #9 $ $Date: 2002/08/15 $
+-- @version $Revision: #10 $ $Date: 2002/09/03 $
 --
 
 @@ create.sql
 @@ ../../default/persistence/setup.sql
-@@ party-test.sql
 @@ data-query-test.sql
 @@ sql-operation-test.sql
 @@ data-operation-test.sql

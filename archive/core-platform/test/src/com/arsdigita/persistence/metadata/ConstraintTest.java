@@ -31,9 +31,12 @@ public class ConstraintTest extends TestCase {
     }
 
     public void testUniqueKeyConstraint() {
+        ArrayList names = new ArrayList();
+
         // test to make sure there is an exception for adding the same 
         // constraint twice
         UniqueKey key = new UniqueKey(m_table, null, columns);
+        names.add(key.getName());
         try {
             key = new UniqueKey(m_table, null, columns);
             fail("Adding the same key twice should cause an exception");
@@ -48,7 +51,6 @@ public class ConstraintTest extends TestCase {
         }
 
         // test name generation
-        ArrayList names = new ArrayList();
         names.add(columns[0].getName());
         String name = (new UniqueKey(null, columns[1])).getName();
         assertTrue("name: " + name + " was generated twice", 

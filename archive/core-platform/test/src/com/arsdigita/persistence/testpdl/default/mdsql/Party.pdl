@@ -46,70 +46,9 @@ object type Group extends Party {
 
 
 association {
-    Group[0..n] groups;
-    User[0..n] members;
-
-    retrieve groups {
-        do {
-            select g.group_id, p.email, name
-            from t_parties p, t_groups g, t_user_group_map m
-            where party_id = g.group_id
-            and g.group_id = m.group_id
-            and member_id = :id
-        } map {
-	    groups.id = g.group_id;
-            groups.email = p.email;
-            groups.name = g.name;
-        }
-    }
-
-    retrieve members {
-        do {
-            select p.party_id, p.email, first_name, last_names, bio
-            from t_parties p, t_users u, t_user_group_map
-            where party_id = user_id
-            and user_id = member_id
-            and group_id = :id
-        } map {
-	    members.id = p.party_id;
-            members.email = p.email;
-            members.firstName = u.first_name;
-            members.lastNames = u.last_names;
-            members.bio = u.bio;
-        }
-    }
-
-    add members {
-        do {
-            insert into t_user_group_map
-            (group_id, member_id)
-            values
-            (:id, :members.id)
-        }
-    }
-
-    remove members {
-        do {
-            delete from t_user_group_map
-            where group_id = :id
-            and member_id = :members.id
-        }
-    }
-
-    add groups {
-        do {
-            insert into t_user_group_map
-            (group_id, member_id)
-            values
-            (:groups.id, :id)
-        }
-    }
-
-    remove groups {
-        do {
-            delete from t_user_group_map
-            where group_id = :groups.id
-            and member_id = :id
-        }
-    }
+    Group[0..n] groups = join t_users.user_id to t_user_group_map.member_id,
+                         join t_user_group_map.group_id to t_groups.group_id;
+    User[0..n] members = join t_groups.group_id to t_user_group_map.group_id,
+                         join t_user_group_map.member_id to t_users.user_id;
+    Date[0..1] membershipDate = t_user_group_map.membership_date DATE;
 }
