@@ -316,11 +316,30 @@ class StateManagerImpl extends AbstractStateManager {
         }
     }
 
+    private boolean isTransientTransactional(PersistenceCapable pc,
+                                             int field) {
+
+        byte fieldFlag = m_pmi.getAllFieldFlags(pc.getClass())[field];
+        if ((PersistenceCapable.CHECK_WRITE & fieldFlag) == 0) {
+            return false;
+        }
+        if ((PersistenceCapable.CHECK_READ & fieldFlag) > 0) {
+            // CHECK_WRITE+CHECK_READ means it's the "default fetch group"
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Mark the field as modified by the user.
      */
     public void setObjectField(PersistenceCapable pc, int field,
                                Object currentValue, Object newValue) {
+
+        if (isTransientTransactional(pc, field)) {
+            return;
+        }
+
         if (isComponent(pc, field)) {
             String name = name(pc, field);
 

@@ -22,6 +22,7 @@ import java.util.List;
 interface ClassInfo {
     List getAllFields(Class pcClass);
     List getAllTypes(Class pcClass);
+    byte[] getAllFieldFlags(Class pcClass);
     String numberToName(Class pcClass, int fieldNumber);
     Class numberToType(Class pcClass, int fieldNumber);
     /**

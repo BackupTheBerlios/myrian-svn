@@ -683,6 +683,10 @@ public class PersistenceManagerImpl implements PersistenceManager, ClassInfo {
         return m_classInfo.getAllTypes(pcClass);
     }
 
+    public byte[] getAllFieldFlags(Class pcClass) {
+        return m_classInfo.getAllFieldFlags(pcClass);
+    }
+
     public String numberToName(Class pcClass, int fieldNumber) {
         return m_classInfo.numberToName(pcClass, fieldNumber);
     }

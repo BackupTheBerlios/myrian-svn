@@ -397,10 +397,12 @@ public class PersistenceManagerFactoryImpl
     private static class Registrar implements RegisterClassListener, ClassInfo {
         private final Map m_classFields;
         private final Map m_classTypes;
+        private final Map m_fieldFlags;
 
         Registrar() {
             m_classFields = new HashMap();
             m_classTypes  = new HashMap();
+            m_fieldFlags  = new HashMap();
         }
 
         public void registerClass(RegisterClassEvent event) {
@@ -419,6 +421,9 @@ public class PersistenceManagerFactoryImpl
             // XXX: cacheTypes should make use of event.getFieldTypes
             m_classTypes.put(klass,
                              Collections.unmodifiableList(cacheTypes(klass)));
+            // XXX: cacheFieldFlags should make use of event.getFieldFlags
+            m_fieldFlags.put(klass, cacheFieldFlags(klass));
+
         }
 
         private static List cacheFields(Class pcClass) {
@@ -446,19 +451,44 @@ public class PersistenceManagerFactoryImpl
                  klass != null;
                  klass = helper.getPersistenceCapableSuperclass(klass)) {
 
-                Class[] names = helper.getFieldTypes(klass);
-                if (names.length == 0) { continue; }
-                List current = new ArrayList(names.length);
-                // Yes, I know about Arrays.asList(Object[]).  It returns a list
-                // that doesn't implement addAll.
-                for (int ii=0; ii<names.length; ii++) {
-                    current.add(names[ii]);
+                Class[] ftypes = helper.getFieldTypes(klass);
+                if (ftypes.length == 0) { continue; }
+                List current = new ArrayList(ftypes.length);
+                for (int ii=0; ii<ftypes.length; ii++) {
+                    current.add(ftypes[ii]);
                 }
                 current.addAll(types);
                 types = current;
             }
             return types;
         }
+
+        private static byte[] cacheFieldFlags(Class pcClass) {
+            List flags = new ArrayList();
+            JDOImplHelper helper = JDOImplHelper.getInstance();
+
+            for (Class klass=pcClass;
+                 klass != null;
+                 klass = helper.getPersistenceCapableSuperclass(klass)) {
+
+                byte[] fFlags = helper.getFieldFlags(klass);
+                if (fFlags.length == 0) { continue; }
+                List current = new ArrayList(fFlags.length);
+                for (int ii=0; ii<fFlags.length; ii++) {
+                    current.add(new Byte(fFlags[ii]));
+                }
+                current.addAll(flags);
+                flags = current;
+            }
+            byte[] result = new byte[flags.size()];
+            int idx = 0;
+            for (Iterator ii=flags.iterator(); ii.hasNext(); ) {
+                Byte flag = (Byte) ii.next();
+                result[idx++] = flag.byteValue();
+            }
+            return result;
+        }
+
 
         private static String toString(RegisterClassEvent event) {
             return "registering " + event.getRegisteredClass().getName() +
@@ -480,6 +510,11 @@ public class PersistenceManagerFactoryImpl
 
         public List getAllTypes(Class pcClass) {
             return (List) m_classTypes.get(pcClass);
+        }
+
+        // XXX: should we worry about returning a modifiable array?
+        public byte[] getAllFieldFlags(Class pcClass) {
+            return (byte[]) m_fieldFlags.get(pcClass);
         }
 
         public String numberToName(Class pcClass, int fieldNumber) {
