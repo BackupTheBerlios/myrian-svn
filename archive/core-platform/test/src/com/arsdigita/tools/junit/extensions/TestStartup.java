@@ -35,8 +35,7 @@ import java.util.Collections;
 public class TestStartup extends Startup {
     private Set m_requiredInits;
 
-    public TestStartup(Connection conn, Set requiredInits) {
-        super(conn);
+    public TestStartup(Set requiredInits) {
         if (requiredInits.size() == 0) {
             throw new IllegalStateException("Empty set of required initializers!");
         }

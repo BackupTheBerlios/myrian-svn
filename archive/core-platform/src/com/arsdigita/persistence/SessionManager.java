@@ -42,12 +42,12 @@ import org.apache.log4j.Logger;
  *
  * @see Initializer
  * @author Archit Shah 
- * @version $Revision: #14 $ $Date: 2003/10/30 $
+ * @version $Revision: #15 $ $Date: 2003/11/07 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#14 $ by $Author: vadim $, $DateTime: 2003/10/30 14:31:29 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#15 $ by $Author: rhs $, $DateTime: 2003/11/07 19:15:58 $";
 
     private static final Logger s_log = Logger.getLogger
         (SessionManager.class.getName());
@@ -57,11 +57,50 @@ public class SessionManager {
         addBeforeFlushProcManager(Versions.EPM);
     }
     private static Set s_afterFlushProcManagers  = new HashSet();
+    private static Map s_configurations = new HashMap();
     private static ThreadLocal s_sessions = new ThreadLocal() {
         public Object initialValue() {
             return new HashMap();
         }
     };
+
+    private static class Config {
+
+        private String m_name;
+        private MetadataRoot m_root;
+        private ConnectionSource m_source;
+
+        public Config(String name, MetadataRoot root,
+                      ConnectionSource source) {
+            m_name = name;
+            m_root = root;
+            m_source = source;
+        }
+
+        public String getName() {
+            return m_name;
+        }
+
+        public MetadataRoot getRoot() {
+            return m_root;
+        }
+
+        public ConnectionSource getSource() {
+            return m_source;
+        }
+
+    }
+
+    public static void configure(String name, MetadataRoot root,
+                                 ConnectionSource source) {
+        synchronized (s_configurations) {
+            if (s_configurations.containsKey(name)) {
+                throw new IllegalArgumentException
+                    ("already configured: " + name);
+            }
+            s_configurations.put(name, new Config(name, root, source));
+        }
+    }
 
     public static Session open(String name, MetadataRoot root,
                                ConnectionSource source) {
@@ -114,7 +153,18 @@ public class SessionManager {
      *  @return The Session object for the current thread.
      **/
     public static Session getSession(String name) {
-        return (Session) getSessions().get(name);
+        Map map = getSessions();
+        if (!map.containsKey(name)) {
+            synchronized (s_configurations) {
+                Config conf = (Config) s_configurations.get(name);
+                if (conf == null) {
+                    return null;
+                } else {
+                    return open(name, conf.getRoot(), conf.getSource());
+                }
+            }
+        }
+        return (Session) map.get(name);
     }
 
     /**

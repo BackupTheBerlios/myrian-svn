@@ -93,9 +93,7 @@ public class BaseTestSetup extends TestDecorator {
      */
     protected void setUp() throws Exception {
         if (m_suite.testCount() > 0) {
-            final Connection conn = Connections.acquire
-                (RuntimeConfig.getConfig().getJDBCURL());
-            TestStartup testStartup = new TestStartup(conn, m_initializers);
+            TestStartup testStartup = new TestStartup(m_initializers);
             testStartup.run();
 
             ResourceManager.getInstance().setServletContext(new DummyServletContext());
