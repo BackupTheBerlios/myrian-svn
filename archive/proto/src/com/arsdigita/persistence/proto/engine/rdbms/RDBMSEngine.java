@@ -13,18 +13,22 @@ import org.apache.log4j.Logger;
  * RDBMSEngine
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #17 $ $Date: 2003/02/19 $
+ * @version $Revision: #18 $ $Date: 2003/02/26 $
  **/
 
 public class RDBMSEngine extends Engine {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#17 $ by $Author: rhs $, $DateTime: 2003/02/19 22:58:51 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/RDBMSEngine.java#18 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
 
     private static final Logger LOG = Logger.getLogger(RDBMSEngine.class);
+
 
     private ArrayList m_operations = new ArrayList();
     private HashMap m_operationMap = new HashMap();
     private EventSwitch m_switch = new EventSwitch(this);
+    private StaticEventSwitch m_staticSwitch = new StaticEventSwitch(this);
+    private HashMap m_environments = new HashMap();
+
     private ConnectionSource m_source;
     private Connection m_conn = null;
 
@@ -74,7 +78,7 @@ public class RDBMSEngine extends Engine {
         return (DML) m_operationMap.get(key);
     }
 
-    void addOperation(Object obj, StaticOperation op) {
+    Collection addOperations(Object obj) {
         ArrayList ops;
         if (m_operationMap.containsKey(obj)) {
             ops = (ArrayList) m_operationMap.get(obj);
@@ -82,7 +86,24 @@ public class RDBMSEngine extends Engine {
             ops = new ArrayList();
             m_operationMap.put(obj, ops);
         }
+        return ops;
+    }
+
+    void clearOperations(Object obj) {
+        Collection ops = getOperations(obj);
+        if (ops != null) {
+            for (Iterator it = ops.iterator(); it.hasNext(); ) {
+                Operation op = (Operation) it.next();
+                m_operations.remove(op);
+                it.remove();
+            }
+        }
+    }
+
+    void addOperation(Object obj, StaticOperation op) {
+        Collection ops = addOperations(obj);
         ops.add(op);
+        addOperation(op);
     }
 
     Collection getOperations(Object obj) {
@@ -93,9 +114,19 @@ public class RDBMSEngine extends Engine {
         m_operations.add(op);
     }
 
+    Environment getEnvironment(Object obj) {
+        Environment result = (Environment) m_environments.get(obj);
+        if (result == null) {
+            result = new Environment();
+            m_environments.put(obj, result);
+        }
+        return result;
+    }
+
     void clearOperations() {
         m_operationMap.clear();
         m_operations.clear();
+        m_environments.clear();
     }
 
     protected void commit() {
@@ -131,31 +162,41 @@ public class RDBMSEngine extends Engine {
     }
 
     public void write(Event ev) {
-        if (LOG.isDebugEnabled()) {
-            ev.dispatch(m_switch);
-        }
+        ev.dispatch(m_switch);
+        ev.dispatch(m_staticSwitch);
     }
 
     public void flush() {
         try {
             for (Iterator it = m_operations.iterator(); it.hasNext(); ) {
-                DML dml = (DML) it.next();
-                execute(dml);
+                Operation op = (Operation) it.next();
+                it.remove();
+                ResultSet rs = execute(op);
+                if (rs != null) {
+                    try {
+                        rs.close();
+                    } catch (SQLException e) {
+                        throw new Error(e.getMessage());
+                    }
+                }
             }
         } finally {
             clearOperations();
         }
     }
 
-    private ResultSet execute(Select select) {
+    private ResultSet execute(Operation op) {
         SQLWriter w = new ANSIWriter();
-        // XXX: this is a hack, for path management we need to call the
-        // operation version of write.
-        w.write((Operation) select);
+        w.write(op);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug(w.getSQL());
             LOG.debug(w.getBindings());
+            LOG.debug(op.getEnvironment());
+        }
+
+        if (w.getSQL().equals("")) {
+            return null;
         }
 
         acquire();
@@ -163,32 +204,16 @@ public class RDBMSEngine extends Engine {
         try {
             PreparedStatement ps = m_conn.prepareStatement(w.getSQL());
             w.bind(ps);
-            return ps.executeQuery();
-        } catch (SQLException e) {
-            throw new Error(e.getMessage());
-        }
-    }
-
-    private int execute(DML dml) {
-        SQLWriter w = new ANSIWriter();
-        w.write(dml);
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(w.getSQL());
-            LOG.debug(w.getBindings());
-        }
-
-        acquire();
-
-        try {
-            PreparedStatement ps = m_conn.prepareStatement(w.getSQL());
-            try {
-                w.bind(ps);
-                return ps.executeUpdate();
-            } finally {
-                ps.close();
+            if (ps.execute()) {
+                return ps.getResultSet();
+            } else {
+                release();
+                return null;
             }
         } catch (SQLException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(m_operations);
+            }
             throw new Error(e.getMessage());
         }
     }

@@ -8,14 +8,13 @@ import java.util.*;
  * Signature
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/02/06 $
+ * @version $Revision: #13 $ $Date: 2003/02/26 $
  **/
 
 public class Signature {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#12 $ by $Author: rhs $, $DateTime: 2003/02/06 18:43:54 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Signature.java#13 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
 
-    private ObjectType m_type;
     private ArrayList m_paths = new ArrayList();
 
     private ArrayList m_sources = new ArrayList();
@@ -24,14 +23,22 @@ public class Signature {
     private ArrayList m_parameters = new ArrayList();
     private HashMap m_parameterMap = new HashMap();
 
+    public Signature(Source src) {
+        addSource(src);
+        addKeyProperties();
+    }
+
     public Signature(ObjectType type) {
-        m_type = type;
-        addSource(new Source(m_type));
+        this(new Source(type));
         addKeyProperties();
     }
 
     public ObjectType getObjectType() {
-        return m_type;
+        return getSource(null).getObjectType();
+    }
+
+    public boolean hasPath(Path p) {
+        return m_paths.contains(p);
     }
 
     public void addPath(String path) {
@@ -140,10 +147,10 @@ public class Signature {
         String prefix;
 
         if (path == null) {
-            type = m_type;
+            type = getObjectType();
             prefix = "";
         } else {
-            type = m_type.getType(path);
+            type = getObjectType().getType(path);
             prefix = path.getPath() + ".";
         }
 
@@ -157,15 +164,16 @@ public class Signature {
     }
 
     public void addDefaultProperties(Path path) {
-        addProperties(path, m_type.getType(path).getProperties());
+        addProperties(path, getObjectType().getType(path).getProperties());
     }
 
     public void addDefaultProperties() {
-        addProperties(m_type.getProperties());
+        addProperties(getObjectType().getProperties());
     }
 
     private void addKeyProperties() {
-        Collection props = m_type.getRoot().getObjectMap(m_type)
+        ObjectType type = getObjectType();
+        Collection props = type.getRoot().getObjectMap(type)
             .getKeyProperties();
         addProperties(props);
     }
@@ -185,7 +193,7 @@ public class Signature {
 
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append(m_type.getQualifiedName() + "(");
+        buf.append(getObjectType().getQualifiedName() + "(");
 
         for (Iterator it = m_paths.iterator(); it.hasNext(); ) {
             buf.append(it.next());

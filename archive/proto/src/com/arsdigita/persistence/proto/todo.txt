@@ -1,11 +1,17 @@
  * Static SQL (Query & DML)
  * Filtering
+ * Size
+ * Query caching
  * Link attributes
+ * LOBs
  * Eliminate old metadata & PDL parser
  * Move DDL generator
  * Weak refs
  * Reorder DML in relational engine
  * Error recovery audit
+ * Compound keys
+ * Adapters
+ * Exceptions
  * Review everything
  * Rename everything
  * javadoc

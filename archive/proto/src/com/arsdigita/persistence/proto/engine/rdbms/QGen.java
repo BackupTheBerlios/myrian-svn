@@ -13,12 +13,43 @@ import java.sql.*;
  * QGen
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2003/02/18 $
+ * @version $Revision: #9 $ $Date: 2003/02/26 $
  **/
 
 class QGen {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#8 $ by $Author: rhs $, $DateTime: 2003/02/18 20:24:39 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/QGen.java#9 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
+
+    private static final HashMap SOURCES = new HashMap();
+    private static final HashMap BLOCKS = new HashMap();
+    private static final HashMap PREFIXES = new HashMap();
+
+    static final boolean hasSource(SQLBlock block) {
+        return SOURCES.containsKey(block);
+    }
+
+    static final Source getSource(SQLBlock block) {
+        return (Source) SOURCES.get(block);
+    }
+
+    static final boolean hasSQLBlock(Source src) {
+        return BLOCKS.containsKey(src);
+    }
+
+    static final SQLBlock getSQLBlock(Source src) {
+        return (SQLBlock) BLOCKS.get(src);
+    }
+
+    static final void addSource(Source src, SQLBlock block, Path prefix) {
+        SOURCES.put(block, src);
+        BLOCKS.put(src, block);
+        PREFIXES.put(block, prefix);
+    }
+
+    static final Path getPrefix(SQLBlock block) {
+        return (Path) PREFIXES.get(block);
+    }
+
 
     private Query m_query;
     private HashMap m_columns = new HashMap();
@@ -73,19 +104,46 @@ class QGen {
 
     public Select generate() {
         Signature sig = m_query.getSignature();
+
+        Environment env = new Environment();
+
         for (Iterator it = sig.getSources().iterator(); it.hasNext(); ) {
             Source src = (Source) it.next();
-            ObjectMap map = Root.getRoot().getObjectMap(src.getObjectType());
-            Table start = map.getTable();
-            if (start == null) {
-                return null;
+
+            Join j;
+
+            if (hasSQLBlock(src)) {
+                SQLBlock block = getSQLBlock(src);
+                Path prefix = getPrefix(block);
+                for (Iterator iter = block.getPaths().iterator();
+                     iter.hasNext(); ) {
+                    Path path = (Path) iter.next();
+                    Path column = block.getMapping(path);
+                    if (prefix != null) {
+                        path = prefix.getRelative(path);
+                    }
+                    setColumn(path, column);
+                    if (src.getObjectType().isKey(path)) {
+                        setColumn(path.getParent(), column);
+                    }
+                }
+                Path alias = Path.get(src.getPath() + "__static");
+                j = new StaticJoin(new StaticOperation(block, env), alias);
+            } else {
+                ObjectMap map =
+                    Root.getRoot().getObjectMap(src.getObjectType());
+                Table start = map.getTable();
+                if (start == null) {
+                    throw new Error("no metadata");
+                }
+                Path alias = Path.get(src.getPath() + "__" + start.getName());
+                j = new SimpleJoin(start, alias);
+                setColumn(src.getPath(),
+                          Path.get(src.getPath() + "__" + getKey(start)));
+                addTable(src.getPath(), start);
             }
-            Join j = new SimpleJoin
-                (start, Path.get(src.getPath() + "__" + start.getName()));
-            setColumn(src.getPath(), Path.get(src.getPath() + "__" +
-                                              getKey(start)));
+
             setJoin(src, j);
-            addTable(src.getPath(), start);
         }
 
         for (Iterator it = sig.getPaths().iterator(); it.hasNext(); ) {
@@ -105,7 +163,7 @@ class QGen {
             }
         }
 
-        Select result = new Select(join, condition);
+        Select result = new Select(join, condition, env);
 
         int col = 0;
         for (Iterator it = sig.getPaths().iterator(); it.hasNext(); ) {
@@ -204,8 +262,9 @@ class QGen {
         ObjectMap map = Root.getRoot().getObjectMap(prop.getContainer());
         Mapping m = map.getMapping(Path.get(prop.getName()));
 
-        // XXX: no metadata
-        if (m == null) { return; }
+        if (m == null) {
+            throw new Error("no metadata for path: " + path);
+        }
 
         m.dispatch(new Mapping.Switch() {
                 public void onValue(ValueMapping vm) {
@@ -235,6 +294,10 @@ class QGen {
                     } else {
                         throw new Error("huh?");
                     }
+                }
+
+                public void onStatic(StaticMapping sm) {
+                    // do nothing
                 }
             });
     }

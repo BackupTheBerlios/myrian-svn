@@ -3,23 +3,22 @@ options {
     DEBUG_PARSER = false;
 }
 
-PARSER_BEGIN(Parser)
+PARSER_BEGIN(PDLParser)
 
 package com.arsdigita.persistence.proto.pdl;
 
 import com.arsdigita.persistence.proto.pdl.nodes.*;
 
 /**
- * Parser
+ * PDLParser
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #8 $ $Date: 2003/02/19 $
+ * @version $Revision: #1 $ $Date: 2003/02/26 $
  */
 
-class Parser {
+class PDLParser {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/Parser.jj#8 $ by $Author: rhs $, $DateTime: 2003/02/19 10:14:49 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDLParser.jj#1 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
 
     private static final void ln(Node node, Token t) {
         node.setLine(t.beginLine);
@@ -33,7 +32,7 @@ class Parser {
 
 }
 
-PARSER_END(Parser)
+PARSER_END(PDLParser)
 
 <DEFAULT,BEGIN> SKIP:
 {
@@ -210,7 +209,7 @@ AssociationNd association() :
         n = property() <SEMI> { a.add(AssociationNd.ROLE_TWO, n); }
         ( n = property() <SEMI> { a.add(AssociationNd.PROPERTIES, n); } )*
       [ option_block() ]
-      ( event() )*
+      ( n = event() { a.add(AssociationNd.EVENTS, n); } )*
     <RBRACE>
     { ln(a, t); return a; }
 }
@@ -250,9 +249,11 @@ void simple_statement(ObjectTypeNd ot) :
 }
 
 void compound_statement(ObjectTypeNd ot) :
-{}
 {
-    (  event()
+    Node n;
+}
+{
+    (  n = event() { ot.add(ObjectTypeNd.EVENTS, n); }
      | option_block() )
 }
 
@@ -372,15 +373,29 @@ void join_stmt(ObjectTypeNd ot) :
  * Compound statements
  **/
 
-void event() :
-{}
+EventNd event() :
 {
-    ( ( <INSERT> | <UPDATE> | <DELETE> ) |
-      ( ( <ADD> | <REMOVE> | <CLEAR> ) [ id() ] ) |
-      ( <RETRIEVE> [ <ALL> | <ATTRIBUTES> | id() ] ) )
+    EventNd ev = new EventNd();
+    Token t;
+    Node n;
+}
+{
+    ( (  t = <INSERT> 
+       | t = <UPDATE> 
+       | t = <DELETE> )
+     |
+      ( (  t = <ADD>
+         | t = <REMOVE>
+         | t = <CLEAR> )
+       [ n = id() { ev.add(EventNd.NAME, n); } ] )
+     |
+      ( t = <RETRIEVE> [ t = <ALL> | t = <ATTRIBUTES> |
+                         n = id() { ev.add(EventNd.NAME, n); } ] )
+    )
     <LBRACE>
-        ( sql_block() | <SUPER> <SEMI> )*
+        ( n = sql_block() { ev.add(EventNd.SQL, n); } | <SUPER> <SEMI> )*
     <RBRACE>
+    { ev.setType(EventNd.getType(t.image)); ln(ev, t); return ev; }
 }
 
 SQLBlockNd sql_block() :

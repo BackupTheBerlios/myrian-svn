@@ -8,12 +8,12 @@ import java.util.*;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/02/14 $
+ * @version $Revision: #7 $ $Date: 2003/02/26 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#6 $ by $Author: ashah $, $DateTime: 2003/02/14 01:21:43 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/DataObjectImpl.java#7 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
 
     private Session m_ssn;
     private OID m_oid;
@@ -134,6 +134,10 @@ class DataObjectImpl implements DataObject {
 
     public int hashCode() {
         return m_oid.hashCode();
+    }
+
+    public String toString() {
+        return m_oid.toString();
     }
 
 }

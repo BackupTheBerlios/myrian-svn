@@ -7,16 +7,17 @@ import java.util.*;
  * Mapping
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2003/02/19 $
+ * @version $Revision: #7 $ $Date: 2003/02/26 $
  **/
 
 public abstract class Mapping extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Mapping.java#6 $ by $Author: rhs $, $DateTime: 2003/02/19 22:58:51 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/Mapping.java#7 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
 
     public static abstract class Switch {
         public abstract void onValue(ValueMapping vm);
-        public abstract void onReference(ReferenceMapping vm);
+        public abstract void onReference(ReferenceMapping rm);
+        public abstract void onStatic(StaticMapping sm);
     }
 
     private Path m_path;

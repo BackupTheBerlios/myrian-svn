@@ -6,12 +6,12 @@ import java.util.*;
  * Path
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2003/02/06 $
+ * @version $Revision: #3 $ $Date: 2003/02/26 $
  **/
 
 public class Path {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/common/Path.java#2 $ by $Author: rhs $, $DateTime: 2003/02/06 18:43:54 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/common/Path.java#3 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
 
     private static final HashMap PATHS = new HashMap();
 
@@ -55,6 +55,35 @@ public class Path {
 
     public Path getParent() {
         return m_parent;
+    }
+
+    public boolean isAncestor(Path path) {
+        if (path == null) {
+            return false;
+        } else if (this.equals(path)) {
+            return true;
+        } else {
+            return isAncestor(path.getParent());
+        }
+    }
+
+    private String getRelativeString(Path path) {
+        if (path == null) {
+            throw new Error("not a child path");
+        } else if (this.equals(path)) {
+            return null;
+        } else {
+            String parent = getRelativeString(path.getParent());
+            if (parent == null) {
+                return path.getName();
+            } else {
+                return parent + "." + path.getName();
+            }
+        }
+    }
+
+    public Path getRelative(Path path) {
+        return Path.get(getRelativeString(path));
     }
 
     public String getName() {

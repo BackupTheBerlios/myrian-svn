@@ -1,0 +1,367 @@
+options {
+    STATIC = false;
+    DEBUG_PARSER = false;
+}
+
+PARSER_BEGIN(SQLParser)
+
+package com.arsdigita.persistence.proto.pdl;
+
+import java.util.*;
+
+/**
+ * SQLParser
+ *
+ * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
+ * @version $Revision: #1 $ $Date: 2003/02/26 $
+ */
+
+class SQLParser {
+
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/SQLParser.jj#1 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
+
+    private StringBuffer m_sql = new StringBuffer();
+    private ArrayList m_bindings = new ArrayList();
+    private ArrayList m_assigns = new ArrayList();
+
+    public class Assign {
+
+        private int m_begin;
+        private int m_end;
+        private ArrayList m_bindings = new ArrayList();
+
+        public Assign(int begin, int end, List bindings) {
+            m_begin = begin;
+            m_end = end;
+            m_bindings.addAll(bindings);
+        }
+
+        public int getBegin() {
+            return m_begin;
+        }
+
+        public int getEnd() {
+            return m_end;
+        }
+
+        public List getBindings() {
+            return m_bindings;
+        }
+
+        public String toString() {
+            return "'" + m_sql.substring(m_begin, m_end) + "'";
+        }
+    }
+
+    public String getSQL() {
+        return m_sql.toString();
+    }
+
+    public Collection getBindings() {
+        return m_bindings;
+    }
+
+    public Collection getAssigns() {
+        return m_assigns;
+    }
+
+    private void appendSpecial(Token t) {
+        Token sp = t;
+        while (sp.specialToken != null) { sp = sp.specialToken; }
+        if (sp == t) { return; }
+        while (sp != null) {
+            m_sql.append(sp.image);
+            sp = sp.next;
+        }
+    }
+
+    private void append(Token t) {
+        appendSpecial(t);
+        m_sql.append(t.image);
+    }
+
+}
+
+PARSER_END(SQLParser)
+
+<DEFAULT,BEGIN> SPECIAL_TOKEN:
+{
+    " "
+  | "\t"
+  | "\n"
+  | "\r"
+  | "\f"
+}
+
+TOKEN:
+{
+    <STRING_LITERAL: "'" ( ~["'"] | "''" )* "'">
+  | <#DIGIT: ["0" - "9"]>
+  | <INTEGER_LITERAL: ( "+" | "-" )? (<DIGIT>)+>
+  | <NUMBER_LITERAL: ( "+" | "-" )? (<DIGIT>)* ( "." (<DIGIT>)+ )?
+                     ( "E" | "e" ) ( "+" | "-" ) (<DIGIT>)+>
+}
+
+TOKEN:
+{
+    <BINDVAR: ":" ( <ID> | <INTEGER_LITERAL> )>
+}
+
+TOKEN:
+{
+    <LPAREN: "(">
+  | <RPAREN: ")">
+  | <COMMA: ",">
+  | <PERIOD: ".">
+  | <SEMI: ";">
+  | <MUL: "*">
+  | <POS: "+">
+  | <NEG: "-">
+  | <DIV: "/">
+  | <CONCAT: "||"> 
+  | <EQ: "=">
+  | <NE: ( "!=" | "^=" | "<>" )>
+  | <GT: ">">
+  | <LT: "<">
+  | <LE: "<=">
+  | <PUT: "=>">
+  | <GE: ">=">
+  | <BEGIN_HINT: "/*+">
+  | <END_HINT: "*/">
+}
+
+TOKEN [IGNORE_CASE]:
+{
+    <#WS: ([" ", "\t", "\n", "\r", "\f"])+>
+  | <NULL: "null">
+  | <IS_NULL: "is" <WS> "null">
+  | <IS_NOT_NULL: "is" <WS> "not" <WS> "null">
+  | <LIKE: "like">
+  | <BETWEEN: "between">
+  | <IN: "in">
+  | <NOT: "not"> 
+  | <AND: "and">
+  | <OR: "or"> 
+  | <ANY: "any">
+  | <SOME: "some">
+  | <EXISTS: "exists">
+  | <UNION: "union">
+  | <UNION_ALL: "union" <WS> "all">
+  | <INTERSECT: "intersect">
+  | <MINUS: "minus">
+  | <PRIOR: "prior">
+  | <LIMIT: "limit">
+  | <OFFSET: "offset">
+// Clause beginnings
+  | <SELECT: "select">
+  | <INSERT_INTO: "insert" <WS> "into">
+  | <UPDATE: "update">
+  | <DELETE_FROM: "delete" <WS> "from">
+  | <FROM: "from">
+  | <WHERE: "where">
+  | <WITH: "with">
+  | <START_WITH: "start" <WS> "with">
+  | <CONNECT_BY: "connect" <WS> "by">
+  | <GROUP_BY: "group" <WS> "by">
+  | <ORDER_BY: "order" <WS> "by">
+  | <FOR_UPDATE: "for" <WS> "update">
+  | <VALUES: "values">
+  | <SET: "set">
+}
+
+TOKEN: {
+    <ID: <CH>(<CH>|<DIGIT>)*>
+  | <#CH: ["a" - "z", "A" - "Z", "_"]>
+}
+
+// TODO: Add support for multi-line comments.
+
+SPECIAL_TOKEN:
+{
+    <COMMENT: "--" (~["\n", "\r"])* ("\n"|"\r"|"\r\n")>
+}
+
+void sql() :
+{}
+{
+ [ ( statement() | unstructuredElement()
+     ( ( unstructuredElement() | clauseStart() ) )* ) ] <EOF>
+}
+
+void statement() :
+{}
+{
+    ( clause() )+
+}
+
+void literal() :
+{
+    Token t;
+}
+{
+ (  t = <STRING_LITERAL>
+  | t = <INTEGER_LITERAL>
+  | t = <NUMBER_LITERAL> )
+    { append(t); }
+}
+
+void symbol() :
+{
+    Token t;
+}
+{
+ (
+    t = <PERIOD>
+  | t = <SEMI>
+  | t = <MUL>
+  | t = <POS>
+  | t = <NEG>
+  | t = <DIV>
+  | t = <CONCAT> 
+  | t = <EQ>
+  | t = <NE>
+  | t = <GT>
+  | t = <LT>
+  | t = <LE>
+  | t = <PUT>
+  | t = <GE>
+  | t = <BEGIN_HINT>
+  | t = <END_HINT>
+  | t = <NULL>
+  | t = <IS_NULL>
+  | t = <IS_NOT_NULL>
+  | t = <LIKE>
+  | t = <BETWEEN>
+  | t = <IN>
+  | t = <NOT> 
+  | t = <AND>
+  | t = <OR> 
+  | t = <ANY>
+  | t = <SOME>
+  | t = <EXISTS>
+  | t = <UNION>
+  | t = <UNION_ALL>
+  | t = <INTERSECT>
+  | t = <LIMIT>
+  | t = <OFFSET>
+  | t = <MINUS>
+  | t = <PRIOR> )
+    { append(t); }
+}
+
+void clauseStart() :
+{
+    Token t;
+}
+{
+ (
+    t = <SELECT>
+  | t = <INSERT_INTO>
+  | t = <UPDATE>
+  | t = <DELETE_FROM>
+  | t = <FROM>
+  | t = <WHERE>
+  | t = <WITH>
+  | t = <START_WITH>
+  | t = <CONNECT_BY>
+  | t = <GROUP_BY>
+  | t = <ORDER_BY>
+  | t = <FOR_UPDATE>
+  | t = <VALUES>
+  | t = <SET> )
+    { append(t); }
+}
+
+void parens() :
+{
+    Token t;
+}
+{
+ ( LOOKAHEAD(2) t = <LPAREN> { append(t); } statement() t = <RPAREN>
+     { append(t); }
+  | t = <LPAREN> { append(t); } ( unstructuredElement() )* t = <RPAREN>
+     { append(t); } )
+}
+
+void identifier() :
+{
+    Token b = null, t, u;
+    boolean bind = false;
+    StringBuffer buf = new StringBuffer();
+}
+{
+    ( b = <BINDVAR> { bind = true; buf.append(b.image); } |
+      t = <ID> { append(t); } )
+        ( LOOKAHEAD(2) t = <PERIOD> u = <ID> {
+            if (bind) {
+                buf.append(t.image);
+                buf.append(u.image);
+            } else {
+                append(t);
+                append(u);
+            }
+        } )*
+    {
+        if (bind) {
+            m_bindings.add(buf.substring(1));
+            appendSpecial(b);
+            m_sql.append("?");
+        }
+    }
+}
+
+void unstructuredElementNoComma() :
+{}
+{
+  (   literal()
+    | symbol()
+    | parens()
+    | identifier()
+     )
+}
+
+void unstructuredElement() :
+{
+    Token t;
+}
+{
+  (  t = <COMMA> { append(t); }
+   | unstructuredElementNoComma()
+    )
+}
+
+void unstructuredSQL() :
+{}
+{
+    ( unstructuredElement() )*
+}
+
+void clause() :
+{}
+{
+ ( LOOKAHEAD(1) setClause() | clauseStart() unstructuredSQL() )
+}
+
+void setClause() :
+{
+    Token t;
+}
+{
+    t = <SET> { append(t); } assign() ( t = <COMMA> { append(t); } assign() )*
+}
+
+void assign() :
+{
+    Token t;
+    int begin, beginBind;
+}
+{
+
+    { begin = m_sql.length(); beginBind = m_bindings.size(); }
+    identifier() t = <EQ> { append(t); } ( unstructuredElementNoComma() )+
+    {
+        m_assigns.add
+            (new Assign(begin, m_sql.length(),
+                        m_bindings.subList(beginBind, m_bindings.size())));
+    }
+}

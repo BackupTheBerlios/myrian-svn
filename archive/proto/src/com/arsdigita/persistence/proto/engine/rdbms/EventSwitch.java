@@ -10,12 +10,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2003/02/18 $
+ * @version $Revision: #10 $ $Date: 2003/02/26 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#9 $ by $Author: rhs $, $DateTime: 2003/02/18 23:50:16 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#10 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
 
     private static final Path KEY = Path.get("__key__");
     private static final Path KEY_FROM = Path.get("__key_from__");
@@ -35,21 +35,49 @@ class EventSwitch extends Event.Switch {
         return Path.get(column.toString());
     }
 
-    private DML findOperation(Object obj, Table table) {
-        DML op = m_engine.getOperation(obj, table);
-        if (op != null) { return op; }
+    private void set(Object obj, Column col, Object arg) {
+        Table table = col.getTable();
 
-        Column key = getKey(table);
-        DML result =
-            new Update(table, new EqualsCondition(getPath(key), KEY));
-        result.set(KEY, RDBMSEngine.getKeyValue(obj), key.getType());
-        m_engine.addOperation(obj, result);
-        return result;
+        DML op = m_engine.getOperation(obj, table);
+        if (op == null) {
+            if (!getTables(Session.getObjectMap(obj),
+                           false, true, false).contains(table)) {
+                return;
+            }
+
+            Column key = getKey(table);
+            op = new Update(table, new EqualsCondition(getPath(key), KEY));
+            op.set(KEY, RDBMSEngine.getKeyValue(obj), key.getType());
+            m_engine.addOperation(obj, op);
+        }
+
+        op.set(col, arg);
+    }
+
+    private Collection getTables(ObjectMap om, boolean ins, boolean up,
+                                 boolean del) {
+        Collection tables = om.getTables();
+
+        while (om != null) {
+            if ((ins && om.getInserts().size() > 0) ||
+                (up && om.getUpdates().size() > 0) ||
+                (del && om.getDeletes().size() > 0)) {
+                tables.removeAll(om.getDeclaredTables());
+            }
+
+            om = om.getSuperMap();
+        }
+
+        return tables;
     }
 
     private void onObjectEvent(ObjectEvent e) {
         Object obj = e.getObject();
-        Collection tables = e.getObjectMap().getTables();
+
+        Collection tables = getTables
+            (e.getObjectMap(), e instanceof CreateEvent, false,
+             e instanceof DeleteEvent);
+
         for (Iterator it = tables.iterator(); it.hasNext(); ) {
             Table table = (Table) it.next();
             if (e instanceof CreateEvent) {
@@ -84,24 +112,28 @@ class EventSwitch extends Event.Switch {
         final ObjectMap om = e.getObjectMap();
         Mapping m = om.getMapping(Path.get(e.getProperty().getName()));
         // XXX: no metadata
-        if (m == null) {
+        if (m == null ||
+            (e instanceof AddEvent && m.getAdds().size() > 0) ||
+            (e instanceof RemoveEvent && m.getRemoves().size() > 0)) {
             return;
         }
 
         final Role role = (Role) e.getProperty();
 
         m.dispatch(new Mapping.Switch() {
+                public void onStatic(StaticMapping sm) {
+                    // do nothing;
+                }
+
                 public void onValue(ValueMapping vm) {
                     Column col = vm.getColumn();
-                    DML op = findOperation(obj, col.getTable());
-                    op.set(col, arg);
+                    set(obj, col, arg);
                 }
 
                 public void onReference(ReferenceMapping rm) {
                     if (rm.isJoinFrom()) {
                         Column col = rm.getJoin(0).getTo();
-                        DML op = findOperation(arg, col.getTable());
-                        op.set(col, RDBMSEngine.getKeyValue(obj));
+                        set(arg, col, obj);
                     } else if (rm.isJoinThrough()) {
                         Column from = rm.getJoin(0).getTo();
                         Column to = rm.getJoin(1).getFrom();
@@ -163,8 +195,7 @@ class EventSwitch extends Event.Switch {
                         }
                     } else if (rm.isJoinTo()) {
                         Column col = rm.getJoin(0).getFrom();
-                        DML op = findOperation(obj, col.getTable());
-                        op.set(col, RDBMSEngine.getKeyValue(arg));
+                        set(obj, col, RDBMSEngine.getKeyValue(arg));
                     } else {
                         throw new IllegalArgumentException
                             ("not a join from, to, or through");

@@ -8,12 +8,12 @@ import java.util.*;
  * Select
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/02/17 $
+ * @version $Revision: #8 $ $Date: 2003/02/26 $
  **/
 
 class Select extends Operation {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#7 $ by $Author: rhs $, $DateTime: 2003/02/17 13:30:53 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Select.java#8 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
 
     private ArrayList m_selections = new ArrayList();
     private HashMap m_aliases = new HashMap();
@@ -21,6 +21,11 @@ class Select extends Operation {
     private Condition m_condition;
 
     public Select(Join join, Condition condition) {
+        this(join, condition, new Environment());
+    }
+
+    public Select(Join join, Condition condition, Environment env) {
+        super(env);
         m_join = join;
         m_condition = condition;
     }

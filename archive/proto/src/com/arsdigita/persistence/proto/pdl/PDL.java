@@ -6,13 +6,10 @@ import com.arsdigita.persistence.proto.common.*;
 import com.arsdigita.persistence.proto.pdl.nodes.*;
 import com.arsdigita.persistence.proto.metadata.*;
 
-import java.io.Reader;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.math.*;
 import java.sql.*;
+import java.io.*;
 
 import org.apache.log4j.Logger;
 
@@ -20,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #20 $ $Date: 2003/02/18 $
+ * @version $Revision: #21 $ $Date: 2003/02/26 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#20 $ by $Author: vadim $, $DateTime: 2003/02/18 19:30:21 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/PDL.java#21 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -37,7 +34,7 @@ public class PDL {
 
     public void load(Reader r, String filename) {
         try {
-            Parser p = new Parser(r);
+            PDLParser p = new PDLParser(r);
             FileNd file = p.file(filename);
             m_ast.add(AST.FILES, file);
         } catch (ParseException e) {
@@ -166,6 +163,10 @@ public class PDL {
         m_errors.check();
 
         emitConstraints(root);
+
+        m_errors.check();
+
+        emitEvents(root);
 
         m_errors.check();
 
@@ -518,6 +519,10 @@ public class PDL {
 
                         cols.add(rm.getJoin(0).getFrom());
                     }
+
+                    public void onStatic(StaticMapping sm) {
+                        throw new Error("can't do this");
+                    }
                 });
         }
 
@@ -678,12 +683,152 @@ public class PDL {
         return table.getColumn(colNd.getName().getName());
     }
 
+    private void emitEvents(final Root root) {
+        m_ast.traverse(new Node.Switch() {
+                public void onEvent(EventNd nd) {
+                    addEvent(root, nd);
+                }
+            });
+    }
+
+    private void addEvent(Root root, EventNd ev) {
+        if (ev.getParent() instanceof ObjectTypeNd) {
+            ObjectTypeNd otn = (ObjectTypeNd) ev.getParent();
+            addEvent(m_symbols.getEmitted(otn), ev, ev.getName());
+        } else {
+            AssociationNd assn = (AssociationNd) ev.getParent();
+            String one = assn.getRoleOne().getName().getName();
+            String two = assn.getRoleTwo().getName().getName();
+            ObjectType oneType =
+                m_symbols.getEmitted(assn.getRoleOne().getType());
+            ObjectType twoType =
+                m_symbols.getEmitted(assn.getRoleTwo().getType());
+
+            if (ev.getName() == null) {
+                addEvent(oneType, ev, two);
+                addEvent(twoType, ev, one);
+            } else if (ev.getName().getName().equals(one)) {
+                addEvent(twoType, ev, one);
+            } else if (ev.getName().getName().equals(two)) {
+                addEvent(oneType, ev, two);
+            } else {
+                m_errors.warn
+                    (ev.getName(), "no such role: " + ev.getName().getName());
+            }
+        }
+    }
+
+    private void addEvent(ObjectType ot, EventNd ev, IdentifierNd role) {
+        addEvent(ot, ev, role == null ? null : role.getName());
+    }
+
+    private void addEvent(ObjectType ot, EventNd ev, String role) {
+        addEvent(ot.getRoot().getObjectMap(ot), ev, role);
+    }
+
+    private void addEvent(ObjectMap om, EventNd ev, String role) {
+        Collection blocks;
+        if (ev.getType().equals(EventNd.INSERT)) {
+            blocks = om.getDeclaredInserts();
+        } else if (ev.getType().equals(EventNd.UPDATE)) {
+            blocks = om.getDeclaredUpdates();
+        } else if (ev.getType().equals(EventNd.DELETE)) {
+            blocks = om.getDeclaredDeletes();
+        } else if (ev.getType().equals(EventNd.RETRIEVE)) {
+            if (role == null) {
+                blocks = om.getDeclaredRetrieves();
+            } else {
+                Mapping m = getMapping(om, role);
+                m.setRetrieve(getBlock(ev));
+                return;
+            }
+        } else if (ev.getType().equals(EventNd.ADD)) {
+            blocks = getMapping(om, role).getAdds();
+        } else if (ev.getType().equals(EventNd.REMOVE)) {
+            blocks = getMapping(om, role).getRemoves();
+        } else if (ev.getType().equals(EventNd.RETRIEVE_ALL)) {
+            om.setRetrieveAll(getBlock(ev));
+            return;
+        } else {
+            return;
+        }
+
+        for (Iterator it = ev.getSQL().iterator(); it.hasNext(); ) {
+            SQLBlockNd nd = (SQLBlockNd) it.next();
+            blocks.add(getBlock(nd));
+        }
+    }
+
+    private SQLBlock getBlock(EventNd ev) {
+        if (ev.getSQL().size() > 1) {
+            m_errors.fatal(ev, "more than one sql block");
+        }
+        SQLBlockNd nd;
+        Iterator it = ev.getSQL().iterator();
+        if (it.hasNext()) {
+            return getBlock((SQLBlockNd) it.next());
+        } else {
+            return null;
+        }
+    }
+
+    private SQLBlock getBlock(SQLBlockNd nd) {
+            try {
+                SQLParser p = new SQLParser(new StringReader(nd.getSQL()));
+                p.sql();
+                final SQLBlock block = new SQLBlock(p.getSQL());
+                for (Iterator ii = p.getBindings().iterator();
+                     ii.hasNext(); ) {
+                    Path path = Path.get((String) ii.next());
+                    block.addBinding(path);
+                }
+                for (Iterator ii = p.getAssigns().iterator(); ii.hasNext(); ) {
+                    SQLParser.Assign assn = (SQLParser.Assign) ii.next();
+                    SQLBlock.Assign bassn = block.addAssign
+                        (assn.getBegin(), assn.getEnd());
+                    for (Iterator iter = assn.getBindings().iterator();
+                         iter.hasNext(); ) {
+                        Path path = Path.get((String) iter.next());
+                        bassn.addBinding(path);
+                    }
+                }
+
+                nd.traverse(new Node.Switch() {
+                        public void onMapping(MappingNd nd) {
+                            Path col = nd.getCol().getPath();
+                            col = Path.get(col.getName());
+                            block.addMapping(nd.getPath().getPath(), col);
+                        }
+
+                        public void onBinding(BindingNd nd) {
+                            block.addType(nd.getPath().getPath(),
+                                          nd.getType().getType());
+                        }
+                    });
+                return block;
+            } catch (ParseException e) {
+                m_errors.fatal(nd, e.getMessage());
+                return null;
+            }
+    }
+
+    private Mapping getMapping(ObjectMap om, String role) {
+        Path path = Path.get(role);
+        Mapping m = om.getMapping(path);
+        if (m == null) {
+            m = new StaticMapping(path);
+            om.addMapping(m);
+        }
+        return m;
+    }
+
     public static final void main(String[] args) throws Exception {
         PDL pdl = new PDL();
         for (int i = 0; i < args.length; i++) {
             pdl.load(new FileReader(args[i]), args[i]);
         }
-        pdl.emit(Root.getRoot());
+        Root root = Root.getRoot();
+        pdl.emit(root);
     }
 
 }

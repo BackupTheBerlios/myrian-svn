@@ -4,12 +4,12 @@ package com.arsdigita.persistence.proto.pdl.nodes;
  * Association
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/01/15 $
+ * @version $Revision: #2 $ $Date: 2003/02/26 $
  **/
 
 public class AssociationNd extends StatementNd {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/AssociationNd.java#1 $ by $Author: rhs $, $DateTime: 2003/01/15 10:39:47 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/pdl/nodes/AssociationNd.java#2 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
 
     public static final Field ROLE_ONE =
         new Field(AssociationNd.class, "roleOne", PropertyNd.class, 1, 1);
@@ -17,6 +17,8 @@ public class AssociationNd extends StatementNd {
         new Field(AssociationNd.class, "roleTwo", PropertyNd.class, 1, 1);
     public static final Field PROPERTIES =
         new Field(AssociationNd.class, "properties", PropertyNd.class);
+    public static final Field EVENTS =
+        new Field(AssociationNd.class, "events", EventNd.class);
 
     public void dispatch(Switch sw) {
         super.dispatch(sw);

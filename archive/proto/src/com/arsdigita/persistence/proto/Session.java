@@ -16,12 +16,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #34 $ $Date: 2003/02/20 $
+ * @version $Revision: #35 $ $Date: 2003/02/26 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#34 $ by $Author: vadim $, $DateTime: 2003/02/20 16:04:48 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#35 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -29,6 +29,7 @@ public class Session {
         new PersistentObjectSource();
 
     private final Engine m_engine;
+    private final QuerySource m_qs;
 
     private HashMap m_odata = new HashMap();
 
@@ -41,6 +42,8 @@ public class Session {
 
     public Session(Engine engine) {
         m_engine = engine;
+        m_qs = new DynamicQuerySource();
+        //m_qs = new com.arsdigita.persistence.proto.engine.rdbms.RDBMSQuerySource();
     }
 
     public void create(Object obj) {
@@ -132,7 +135,7 @@ public class Session {
 
 
     public Object retrieve(ObjectType obj, Object id) {
-        PersistentCollection pc = retrieve(getQuery(obj, id));
+        PersistentCollection pc = retrieve(m_qs.getQuery(obj, id));
         Cursor c = pc.getDataSet().getCursor();
         if (c.next()) {
             Object result = c.get();
@@ -408,16 +411,20 @@ public class Session {
         }
     }
 
-    public ObjectType getObjectType(Object obj) {
+    public static ObjectType getObjectType(Object obj) {
         return getAdapter(obj).getObjectType(obj);
     }
 
-    private Adapter getAdapter(Object obj) {
+    private static Adapter getAdapter(Object obj) {
         return Adapter.getAdapter(obj.getClass());
     }
 
-    public ObjectMap getObjectMap(Object obj) {
+    public static ObjectMap getObjectMap(Object obj) {
         return Root.getRoot().getObjectMap(getAdapter(obj).getObjectType(obj));
+    }
+
+    public static PropertyMap getProperties(Object obj) {
+        return getAdapter(obj).getProperties(obj);
     }
 
     public boolean isNew(Object obj) {
@@ -592,7 +599,7 @@ public class Session {
 
     private ObjectData fetchObjectData(Object obj) {
         if (!hasObjectData(obj)) {
-            RecordSet rs = m_engine.execute(getRetrieveQuery(obj));
+            RecordSet rs = m_engine.execute(m_qs.getQuery(obj));
             // Cache non-existent objects
             if (!rs.next()) {
                 m_odata.put(obj, null);
@@ -623,11 +630,11 @@ public class Session {
         } else if (prop.isCollection()) {
             pd = new PropertyData
                 (od, prop, POS.getPersistentCollection
-                 (this, new DataSet(this, getRetrieveQuery(obj, prop))));
+                 (this, new DataSet(this, m_qs.getQuery(obj, prop))));
         } else if (od.isNew()){
             pd = new PropertyData(od, prop, null);
         } else {
-            RecordSet rs = m_engine.execute(getRetrieveQuery(obj, prop));
+            RecordSet rs = m_engine.execute(m_qs.getQuery(obj, prop));
             boolean found = false;
             while (rs.next()) {
                 found = true;
@@ -647,70 +654,6 @@ public class Session {
         }
 
         return pd;
-    }
-
-
-    private Signature getRetrieveSignature(ObjectType type) {
-        Signature result = new Signature(type);
-        result.addDefaultProperties();
-        return result;
-    }
-
-    private Query getQuery(ObjectType type, Object id) {
-        Signature sig = getRetrieveSignature(type);
-        ObjectMap map = Root.getRoot().getObjectMap(type);
-        Collection keys = map.getKeyProperties();
-        if (keys.size() != 1) {
-            throw new IllegalArgumentException("type has more than one key");
-        }
-        Property key = (Property) keys.iterator().next();
-        Parameter idParam = new Parameter(key.getType(), Path.get("__id__"));
-        sig.addParameter(idParam);
-        Filter f =
-            new EqualsFilter(Path.get(key.getName()), idParam.getPath());
-        Query result = new Query(sig, f);
-        result.set(idParam, id);
-        return result;
-    }
-
-    private Query getRetrieveQuery(Object obj) {
-        ObjectType type = getObjectType(obj);
-        Signature sig = getRetrieveSignature(type);
-        Parameter start = new Parameter(type, Path.get("__start__"));
-        sig.addParameter(start);
-        Query q = new Query
-            (sig, new EqualsFilter(Path.get("__start__"), null));
-        q.set(start, obj);
-        return q;
-    }
-
-    private Query getRetrieveQuery(Object obj, Property prop) {
-        if (prop.isCollection()) {
-            ObjectType type = prop.getType();
-            Signature sig = getRetrieveSignature(type);
-            Parameter start = new Parameter(prop.getContainer(),
-                                            Path.get("__start__"));
-            sig.addParameter(start);
-
-            // should filter to associated object(s)
-            // should deal with one way associations
-            Filter f = new ContainsFilter
-                (Path.get("__start__." + prop.getName()), null);
-            Query q = new Query(sig, f);
-            q.set(start, obj);
-            return q;
-        } else {
-            ObjectType type = getObjectType(obj);
-            Signature sig = new Signature(type);
-            sig.addPath(prop.getName());
-            sig.addDefaultProperties(Path.get(prop.getName()));
-            Parameter start = new Parameter(type, Path.get("__start__"));
-            sig.addParameter(start);
-            Query q = new Query
-                (sig, new EqualsFilter(Path.get("__start__"), null));
-            q.set(start, obj);
-            return q;
-        }
     }
 
     public static void addEventProcessor(EventProcessor ep) {

@@ -8,12 +8,12 @@ import java.util.*;
  * ObjectMap
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #10 $ $Date: 2003/02/19 $
+ * @version $Revision: #11 $ $Date: 2003/02/26 $
  **/
 
 public class ObjectMap extends Element {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#10 $ by $Author: rhs $, $DateTime: 2003/02/19 22:58:51 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/metadata/ObjectMap.java#11 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
 
     private ObjectType m_type;
     private Mist m_mappings = new Mist(this);
@@ -21,7 +21,8 @@ public class ObjectMap extends Element {
     private Join m_superJoin;
     private ArrayList m_joins = new ArrayList();
     private ArrayList m_fetched = new ArrayList();
-    private SQLBlock m_retrieve;
+    private SQLBlock m_retrieveAll;
+    private ArrayList m_retrieves = new ArrayList();
     private ArrayList m_inserts = new ArrayList();
     private ArrayList m_updates = new ArrayList();
     private ArrayList m_deletes = new ArrayList();
@@ -34,7 +35,7 @@ public class ObjectMap extends Element {
         return (Root) getParent();
     }
 
-    ObjectMap getSuperMap() {
+    public ObjectMap getSuperMap() {
         if (m_type.getSupertype() == null) {
             return null;
         } else {
@@ -175,9 +176,17 @@ public class ObjectMap extends Element {
         }
     }
 
+    public Collection getDeclaredTables() {
+        return getTables(getObjectType().getDeclaredProperties());
+    }
+
     public Collection getTables() {
+        return getTables(getObjectType().getProperties());
+    }
+
+    private Collection getTables(Collection properties) {
         final ArrayList result = new ArrayList();
-        for (Iterator it = getObjectType().getProperties().iterator();
+        for (Iterator it = properties.iterator();
              it.hasNext(); ) {
             Property prop = (Property) it.next();
             Mapping m = getMapping(Path.get(prop.getName()));
@@ -199,37 +208,81 @@ public class ObjectMap extends Element {
                             }
                         }
                     }
+
+                    public void onStatic(StaticMapping sm) {
+                        // do nothing
+                    }
                 });
         }
         return result;
     }
 
-    public SQLBlock getRetrieve() {
-        return m_retrieve;
+    public SQLBlock getRetrieveAll() {
+        return m_retrieveAll;
     }
 
-    public void setRetrieve(SQLBlock retrieve) {
-        m_retrieve = retrieve;
+    public void setRetrieveAll(SQLBlock retrieveAll) {
+        m_retrieveAll = retrieveAll;
     }
 
-    public Collection getInserts() {
+    public Collection getDeclaredRetrieves() {
+        return m_retrieves;
+    }
+
+    public Collection getRetrieves() {
+        if (getSuperMap() == null) {
+            return m_retrieves;
+        } else {
+            ArrayList result = new ArrayList();
+            result.addAll(getSuperMap().getRetrieves());
+            result.addAll(m_retrieves);
+            return result;
+        }
+    }
+
+    public Collection getDeclaredInserts() {
         return m_inserts;
     }
 
-    public void addInsert(SQLBlock insert) {
-        m_inserts.add(insert);
+    public Collection getInserts() {
+        if (getSuperMap() == null) {
+            return m_inserts;
+        } else {
+            ArrayList result = new ArrayList();
+            result.addAll(getSuperMap().getInserts());
+            result.addAll(m_inserts);
+            return result;
+        }
     }
 
-    public Collection getUpdates() {
+    public Collection getDeclaredUpdates() {
         return m_updates;
     }
 
-    public void addUpdate(SQLBlock update) {
-        m_updates.add(update);
+    public Collection getUpdates() {
+        if (getSuperMap() == null) {
+            return m_updates;
+        } else {
+            ArrayList result = new ArrayList();
+            result.addAll(getSuperMap().getUpdates());
+            result.addAll(m_updates);
+            return result;
+        }
+    }
+
+    public Collection getDeclaredDeletes() {
+        return m_deletes;
     }
 
     public Collection getDeletes() {
-        return m_deletes;
+        if (getSuperMap() == null) {
+            return m_deletes;
+        } else {
+            ArrayList result = new ArrayList();
+            result.addAll(m_deletes);
+            result.addAll(getSuperMap().getDeletes());
+            return result;
+        }
     }
 
     public void addDelete(SQLBlock delete) {

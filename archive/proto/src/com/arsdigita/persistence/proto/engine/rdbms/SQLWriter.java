@@ -11,12 +11,12 @@ import java.sql.*;
  * SQLWriter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #3 $ $Date: 2003/02/19 $
+ * @version $Revision: #4 $ $Date: 2003/02/26 $
  **/
 
 abstract class SQLWriter {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#3 $ by $Author: rhs $, $DateTime: 2003/02/19 22:58:51 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/SQLWriter.java#4 $ by $Author: rhs $, $DateTime: 2003/02/26 12:01:31 $";
 
     private Operation m_op = null;
     private StringBuffer m_sql = new StringBuffer();
@@ -72,6 +72,8 @@ abstract class SQLWriter {
     }
 
     public void write(Operation op) {
+        // XXX: this is a hack, for binding to work properly we need to call
+        // the Operation version of write.
         Operation old = m_op;
         try {
             m_op = op;
@@ -82,7 +84,57 @@ abstract class SQLWriter {
     }
 
     public void write(StaticOperation sop) {
-        write(sop.getSQLBlock().getSQL());
+        SQLBlock block = sop.getSQLBlock();
+
+        HashSet exclude = new HashSet();
+        StringBuffer sql = new StringBuffer();
+
+        sql.append(block.getBegin());
+
+        boolean execute = false;
+
+        for (Iterator it = block.getAssigns().iterator(); it.hasNext(); ) {
+            SQLBlock.Assign assign = (SQLBlock.Assign) it.next();
+            boolean keep = true;
+            for (Iterator iter = assign.getBindings().iterator();
+                 iter.hasNext(); ) {
+                Path p = (Path) iter.next();
+                if (!keep && sop.isParameter(p)) {
+                    throw new Error("missing bind variables");
+                }
+
+                if (!sop.isParameter(p)) {
+                    keep = false;
+                    exclude.add(p);
+                }
+            }
+
+            if (keep) {
+                if (execute) {
+                    sql.append(',');
+                }
+                execute = true;
+                sql.append(assign.toString());
+            }
+        }
+
+        sql.append(block.getEnd());
+
+        if (execute || block.getAssigns().size() == 0) {
+            write(sql.toString());
+        }
+
+        for (Iterator it = block.getBindings().iterator(); it.hasNext(); ) {
+            Path p = (Path) it.next();
+            if (exclude.contains(p)) { continue; }
+            if (sop.isParameter(p)) {
+                m_bindings.add(sop.get(p));
+                m_types.add(new Integer(sop.getType(p)));
+            } else {
+                m_bindings.add(null);
+                m_types.add(new Integer(Types.INTEGER));
+            }
+        }
     }
 
     public void write(Join join) {
@@ -98,6 +150,7 @@ abstract class SQLWriter {
     public abstract void write(Update update);
     public abstract void write(Delete delete);
 
+    public abstract void write(StaticJoin join);
     public abstract void write(SimpleJoin join);
     public abstract void write(InnerJoin join);
     public abstract void write(LeftJoin join);
@@ -186,7 +239,7 @@ class ANSIWriter extends SQLWriter {
             write(" = ");
             write(update.get(col));
             if (it.hasNext()) {
-                write("\n    ");
+                write(",\n    ");
             }
         }
 
@@ -207,6 +260,13 @@ class ANSIWriter extends SQLWriter {
         }
     }
 
+
+    public void write(StaticJoin join) {
+        write("(");
+        write(join.getStaticOperation());
+        write(") as ");
+        write(join.getAlias());
+    }
 
     public void write(SimpleJoin join) {
         write(join.getTable().getName());
