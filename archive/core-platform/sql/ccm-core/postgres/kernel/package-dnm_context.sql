@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/ccm-core/postgres/kernel/package-dnm_context.sql#1 $
--- $DateTime: 2004/01/15 10:03:14 $
+-- $Id: //core-platform/dev/sql/ccm-core/postgres/kernel/package-dnm_context.sql#2 $
+-- $DateTime: 2004/01/15 15:12:26 $
 -- autor: Aram Kananov <aram@kananov.com>
 
 
@@ -267,7 +267,7 @@ create or replace function dnm_context_change_context (
                              select object_id 
                                from dnm_ungranted_context
                                where ancestor_id = p_object_id)
-          and ancestor_id = ( select ancestor_id 
+          and ancestor_id in ( select ancestor_id 
                                 from dnm_ungranted_context
                                 where object_id = p_object_id)
       ;
