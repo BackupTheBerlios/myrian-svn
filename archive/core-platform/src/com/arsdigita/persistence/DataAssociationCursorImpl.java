@@ -9,13 +9,13 @@ import com.arsdigita.persistence.proto.Signature;
  * DataAssociationCursorImpl
  *
  * @author Archit Shah &lt;ashah@mit.edu&gt;
- * @version $Revision: #9 $ $Date: 2003/05/15 $
+ * @version $Revision: #10 $ $Date: 2003/05/15 $
  **/
 
 class DataAssociationCursorImpl extends DataCollectionImpl
     implements DataAssociationCursor {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#9 $ by $Author: rhs $, $DateTime: 2003/05/15 16:44:04 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#10 $ by $Author: justin $, $DateTime: 2003/05/15 18:33:33 $";
 
     private DataAssociationImpl m_assn;
 
