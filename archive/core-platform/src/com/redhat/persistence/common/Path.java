@@ -21,12 +21,12 @@ import com.arsdigita.util.ConcurrentDict;
  * Path
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #9 $ $Date: 2004/02/23 $
+ * @version $Revision: #10 $ $Date: 2004/03/25 $
  **/
 
 public class Path {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#9 $ by $Author: vadim $, $DateTime: 2004/02/23 16:43:55 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/redhat/persistence/common/Path.java#10 $ by $Author: vadim $, $DateTime: 2004/03/25 15:22:48 $";
 
     //special case the id path since it shows up so often
     private static final Path ID_PATH = new Path(null, "id");
@@ -37,10 +37,12 @@ public class Path {
     private Path m_parent;  // initialized lazily from m_basename;
     private final String m_basename;
     private final String m_name;
+    private final String m_path;
 
     private Path(String basename, String name) {
         m_basename = basename;
         m_name = name;
+        m_path = concat(m_basename, m_name);
     }
 
     public static final Path get(String path) {
@@ -55,11 +57,11 @@ public class Path {
     }
 
     public static final Path add(Path p1, String p2) {
-        return p1==null ? Path.get(p2) : Path.get(concat(p1.getPath(), p2));
+        return p1==null ? Path.get(p2) : Path.get(concat(p1.m_path, p2));
     }
 
     public static final Path add(String p1, Path p2) {
-        return p2==null ? Path.get(p1): Path.get(concat(p1, p2.getPath()));
+        return p2==null ? Path.get(p1): Path.get(concat(p1, p2.m_path));
     }
 
     public static final Path add(Path p1, Path p2) {
@@ -68,7 +70,7 @@ public class Path {
         } else if (p2 == null) {
             return p1;
         } else {
-            return Path.get(concat(p1.getPath(),p2.getPath()));
+            return Path.get(concat(p1.m_path, p2.m_path));
         }
     }
 
@@ -127,15 +129,11 @@ public class Path {
     }
 
     public String getPath() {
-        if (m_basename == null) {
-            return m_name;
-        } else {
-            return concat(m_basename, m_name);
-        }
+        return m_path;
     }
 
     public String toString() {
-        return getPath();
+        return m_path;
     }
 
     private static String concat(String s1, String s2) {
