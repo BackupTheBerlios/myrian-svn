@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -27,14 +27,14 @@ import org.apache.log4j.Logger;
  * PartyTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/14 $
+ * @version $Revision: #6 $ $Date: 2002/08/14 $
  */
 
 abstract public class PartyTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PartyTest.java#5 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PartyTest.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-    private static Logger s_log = 
+    private static Logger s_log =
         Logger.getLogger(PartyTest.class.getName());
 
     public PartyTest(String name) {
@@ -181,21 +181,21 @@ abstract public class PartyTest extends PersistenceTestCase {
         assertEquals("Group name incorrect in data association.",
                      "Test Group",
                      groups.get("name"));
-        
+
         if (groups.next())
             fail("Data association should contain at most one row.");
 
         BigInteger userId2 = new BigInteger("2");
         DataObject user2 = makeBasicUser( userId2,
-                "jorris@arsdigita.com",
-                "Jon",
-                "orris");
+                                          "jorris@arsdigita.com",
+                                          "Jon",
+                                          "orris");
         members.add(user2);
 
         DataObject user3 = makeBasicUser( new BigInteger("3"),
-                "foo@bar.com",
-                "Foo",
-                "Bar");
+                                          "foo@bar.com",
+                                          "Foo",
+                                          "Bar");
         members.add(user3);
         group.save();
         members = (DataAssociation) group.get("members");
@@ -203,9 +203,9 @@ abstract public class PartyTest extends PersistenceTestCase {
         members.remove(user2);
         group.save();
         while(members.next())
-        {
-            assert("User2 should have been removed!", userId2.equals(members.get("id")) == false );
-        }
+            {
+                assert("User2 should have been removed!", userId2.equals(members.get("id")) == false );
+            }
 
     }
 
@@ -236,91 +236,91 @@ abstract public class PartyTest extends PersistenceTestCase {
     private static final int NUM_MEMBERS = 10;
 
     public void testCascadedDeletes() {
-	DataObject group = getSession().create(getModelName() + ".Group");
+        DataObject group = getSession().create(getModelName() + ".Group");
         group.set("id", new BigInteger("1"));
         group.set("email", "test@group.com");
         group.set("name", "Test Group");
 
-	DataAssociation members = (DataAssociation) group.get("members");
+        DataAssociation members = (DataAssociation) group.get("members");
 
-	for (int i = 2; i < NUM_MEMBERS + 2; i++) {
-	    DataObject user = getSession().create(getModelName() + ".User");
-	    user.set("id", new BigInteger(Integer.toString(i)));
-	    user.set("email", "user" + i + "@foo.com");
-	    user.set("firstName", "Joe");
-	    user.set("lastNames", "User " + i);
-	    user.save();
-	    members.add(user);
-	}
-
-	group.save();
-
-	assertEquals("members not saved properly", 10, members.size());
-
-	OID oid = new OID(getModelName() + ".Group", new BigInteger("1"));
-
-    if (com.arsdigita.db.DbHelper.getDatabase() !=
-        com.arsdigita.db.DbHelper.DB_POSTGRES) {
-        group = getSession().retrieve(oid);
-        try {
-            group.delete();
-            fail("group was successfully deleted when it should " +
-                 "have errored out with constraint failures");
-        } catch (PersistenceException e) {
-            // Do nothing.
+        for (int i = 2; i < NUM_MEMBERS + 2; i++) {
+            DataObject user = getSession().create(getModelName() + ".User");
+            user.set("id", new BigInteger(Integer.toString(i)));
+            user.set("email", "user" + i + "@foo.com");
+            user.set("firstName", "Joe");
+            user.set("lastNames", "User " + i);
+            user.save();
+            members.add(user);
         }
-    }
 
-	group = getSession().retrieve(oid);
-	members = (DataAssociation) group.get("members");
-	DataAssociationCursor cursor = members.cursor();
-    cursor = members.cursor();
+        group.save();
 
-	while (cursor.next()) {
-	    cursor.remove();
-	}
+        assertEquals("members not saved properly", 10, members.size());
 
-	group.delete();
+        OID oid = new OID(getModelName() + ".Group", new BigInteger("1"));
 
-	assertEquals("group was not properly deleted",
-		     null,
-		     getSession().retrieve(oid));
+        if (com.arsdigita.db.DbHelper.getDatabase() !=
+            com.arsdigita.db.DbHelper.DB_POSTGRES) {
+            group = getSession().retrieve(oid);
+            try {
+                group.delete();
+                fail("group was successfully deleted when it should " +
+                     "have errored out with constraint failures");
+            } catch (PersistenceException e) {
+                // Do nothing.
+            }
+        }
+
+        group = getSession().retrieve(oid);
+        members = (DataAssociation) group.get("members");
+        DataAssociationCursor cursor = members.cursor();
+        cursor = members.cursor();
+
+        while (cursor.next()) {
+            cursor.remove();
+        }
+
+        group.delete();
+
+        assertEquals("group was not properly deleted",
+                     null,
+                     getSession().retrieve(oid));
     }
 
     public void testSaveComposites() {
-	Session ssn = getSession();
-	DataObject user = ssn.create(getModelName() + ".User");
-	user.set("id", new BigInteger("1"));
-	user.set("email", "rhs@mit.edu");
-	user.set("firstName", "Rafael");
-	user.set("lastNames", " H. Schloming");
+        Session ssn = getSession();
+        DataObject user = ssn.create(getModelName() + ".User");
+        user.set("id", new BigInteger("1"));
+        user.set("email", "rhs@mit.edu");
+        user.set("firstName", "Rafael");
+        user.set("lastNames", " H. Schloming");
 
-	DataObject color = ssn.create(getModelName() + ".Color");
-	color.set("id", new BigInteger("1"));
-	color.set("name", "red");
+        DataObject color = ssn.create(getModelName() + ".Color");
+        color.set("id", new BigInteger("1"));
+        color.set("name", "red");
 
-	user.set("favorateColor", color);
-	user.save();
+        user.set("favorateColor", color);
+        user.save();
 
-	OID oid = new OID(getModelName() + ".User", new BigInteger("1"));
-	user = ssn.retrieve(oid);
-	color = (DataObject) user.get("favorateColor");
-	assertEquals("Color not saved properly", "red", color.get("name"));
+        OID oid = new OID(getModelName() + ".User", new BigInteger("1"));
+        user = ssn.retrieve(oid);
+        color = (DataObject) user.get("favorateColor");
+        assertEquals("Color not saved properly", "red", color.get("name"));
 
-	color.set("name", "green");
-	user.save();
+        color.set("name", "green");
+        user.save();
 
-	user = ssn.retrieve(oid);
-	color = (DataObject) user.get("favorateColor");
-	assertEquals("Save not cascaded properly",
-		     "green",
-		     color.get("name"));
+        user = ssn.retrieve(oid);
+        color = (DataObject) user.get("favorateColor");
+        assertEquals("Save not cascaded properly",
+                     "green",
+                     color.get("name"));
     }
 
     private DataObject makeBasicUser(BigInteger id,
-            String email,
-            String firstName,
-            String lastNames)
+                                     String email,
+                                     String firstName,
+                                     String lastNames)
     {
         DataObject user = getSession().create(getModelName() + ".User");
         user.set("id", id);
@@ -328,9 +328,9 @@ abstract public class PartyTest extends PersistenceTestCase {
         user.set("firstName", firstName);
         user.set("lastNames", lastNames);
         user.save();
-        
+
         return user;
-        
+
     }
 
     public static void main(String args[]) {
@@ -338,8 +338,7 @@ abstract public class PartyTest extends PersistenceTestCase {
         BaseTestSetup wrapper = new BaseTestSetup(suite);
         wrapper.setInitScriptTarget ("com.arsdigita.persistence.Initializer");
         junit.textui.TestRunner.run( wrapper );
-        
+
     }
 
 }
- 

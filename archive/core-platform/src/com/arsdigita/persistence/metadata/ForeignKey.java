@@ -1,15 +1,30 @@
+/*
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.redhat.com/licenses/ccmpl.html
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
+
 package com.arsdigita.persistence.metadata;
 
 /**
  * ForeignKey
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/09 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  **/
 
 public class ForeignKey extends Constraint {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ForeignKey.java#3 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ForeignKey.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private UniqueKey m_key;
     private boolean m_cascade;
@@ -19,8 +34,8 @@ public class ForeignKey extends Constraint {
         super(table, name, columns);
         if (key == null) {
             throw new IllegalArgumentException(
-                "Unique key cannot be null."
-                );
+                                               "Unique key cannot be null."
+                                               );
         }
         m_key = key;
         m_cascade = cascade;
@@ -29,9 +44,9 @@ public class ForeignKey extends Constraint {
         Column[] uk = m_key.getColumns();
         if (fk.length != uk.length) {
             throw new IllegalArgumentException(
-                "Foreign columns don't match unique key: fk = " + getSQL()
-                + " uk = " + key.getSQL()
-                );
+                                               "Foreign columns don't match unique key: fk = " + getSQL()
+                                               + " uk = " + key.getSQL()
+                                               );
         }
 
         for (int i = 0; i < fk.length; i++) {
@@ -42,8 +57,8 @@ public class ForeignKey extends Constraint {
                 if (fk[i].getType() != uk[i].getType() &&
                     fk[i].getSize() != uk[i].getSize()) {
                     throw new IllegalArgumentException(
-                        "Foreign columns don't match unique key."
-                        );
+                                                       "Foreign columns don't match unique key."
+                                                       );
                 }
             }
         }

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -22,142 +22,142 @@ import java.io.PrintWriter;
 
 public class HttpServletDummyResponse implements HttpServletResponse {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyResponse.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
-    
-  private PrintStream _out;
-  private boolean     _committed;
-  
-  public HttpServletDummyResponse() {
-    _out = System.out;
-    _committed = false;
-  }
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/util/HttpServletDummyResponse.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-  public HttpServletDummyResponse(PrintStream out) {
-    _out=out;
-    _committed = false;
-  }
+    private PrintStream _out;
+    private boolean     _committed;
 
-  public void addCookie(javax.servlet.http.Cookie cookie) {
-    throw new UnsupportedOperationException("Method not implemented");
-  }
-  
-  public void addDateHeader(String name, long date) {
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public HttpServletDummyResponse() {
+        _out = System.out;
+        _committed = false;
+    }
 
-  public void addHeader(String name, String value) {
-    throw new UnsupportedOperationException("Method not implemented");
-  }
-  
-  public void addIntHeader(String name, int value) {
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public HttpServletDummyResponse(PrintStream out) {
+        _out=out;
+        _committed = false;
+    }
 
-  public boolean containsHeader(String name) {
-    throw new UnsupportedOperationException("Method not implemented");
-  }
-  
-  public String encodeRedirectURL(String url) {
-    return url;
-  }
+    public void addCookie(javax.servlet.http.Cookie cookie) {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
-  public String encodeRedirectUrl(String url) {
-    return encodeRedirectURL(url);
-  }
-  
-  public String encodeURL(String url){
-    return url;
-  }
+    public void addDateHeader(String name, long date) {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
-  public String encodeUrl(String url){
-    return encodeURL(url);
-  }
+    public void addHeader(String name, String value) {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
-  public void sendError(int sc) throws java.io.IOException{
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public void addIntHeader(String name, int value) {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
-  public void sendError(int sc, String msg) throws java.io.IOException{
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public boolean containsHeader(String name) {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
-  public void sendRedirect(String location) throws java.io.IOException{
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public String encodeRedirectURL(String url) {
+        return url;
+    }
 
-  public void setDateHeader(String name, long date){
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public String encodeRedirectUrl(String url) {
+        return encodeRedirectURL(url);
+    }
 
-  public void setHeader(String name, String value){
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public String encodeURL(String url){
+        return url;
+    }
 
-  public void setIntHeader(String name, int value){
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public String encodeUrl(String url){
+        return encodeURL(url);
+    }
 
-  public void setStatus(int sc){
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public void sendError(int sc) throws java.io.IOException{
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
-  public void setStatus(int sc, String sm){
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public void sendError(int sc, String msg) throws java.io.IOException{
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
-  
-  /* Methods from SevletResponse */
-  public void flushBuffer() throws java.io.IOException{
-    _committed = true;
-    _out.flush();
-  }
+    public void sendRedirect(String location) throws java.io.IOException{
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
-  public void resetBuffer() {
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public void setDateHeader(String name, long date){
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
-  public int getBufferSize(){
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public void setHeader(String name, String value){
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
-  public String getCharacterEncoding(){
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public void setIntHeader(String name, int value){
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
-  public java.util.Locale getLocale(){
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public void setStatus(int sc){
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
-  public javax.servlet.ServletOutputStream getOutputStream() throws java.io.IOException{
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public void setStatus(int sc, String sm){
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
-  public PrintWriter getWriter() throws java.io.IOException {
-    return new PrintWriter(_out);
-  }
 
-  public boolean isCommitted() {
-    return _committed;
-  }
+    /* Methods from SevletResponse */
+    public void flushBuffer() throws java.io.IOException{
+        _committed = true;
+        _out.flush();
+    }
 
-  public void reset() {
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public void resetBuffer() {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
-  public void setBufferSize(int size) {
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public int getBufferSize(){
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
-  public void setContentLength(int len) {
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public String getCharacterEncoding(){
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
-  public void setContentType(String type) {
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public java.util.Locale getLocale(){
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
-  public void setLocale(java.util.Locale loc) {
-    throw new UnsupportedOperationException("Method not implemented");
-  }
+    public javax.servlet.ServletOutputStream getOutputStream() throws java.io.IOException{
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    public PrintWriter getWriter() throws java.io.IOException {
+        return new PrintWriter(_out);
+    }
+
+    public boolean isCommitted() {
+        return _committed;
+    }
+
+    public void reset() {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    public void setBufferSize(int size) {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    public void setContentLength(int len) {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    public void setContentType(String type) {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    public void setLocale(java.util.Locale loc) {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
 
 }

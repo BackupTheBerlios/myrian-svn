@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -34,13 +34,13 @@ import org.apache.log4j.Logger;
  * class works as advertised.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/13 $
+ * @version $Revision: #5 $ $Date: 2002/08/14 $
  */
 
 public class DynamicObjectTypeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/DynamicObjectTypeTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
-    private static Logger s_log = 
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/DynamicObjectTypeTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    private static Logger s_log =
         Logger.getLogger(DynamicObjectTypeTest.class.getName());
 
     private MetadataRoot m_root;
@@ -65,7 +65,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
         m_root = MetadataRoot.getMetadataRoot();
 
         supertype = m_root.getObjectType(superTypeString);
-        while (m_root.getObjectType(objectTypeModel + "." +  
+        while (m_root.getObjectType(objectTypeModel + "." +
                                     objectTypeName) != null) {
             counter++;
             String nextCount = (new Integer(counter)).toString();
@@ -93,15 +93,15 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
                     statement.executeUpdate("drop table " + table);
                 } catch (Exception e) {
                     s_log.info("Error executing statement " +
-                                       "'drop table " + table + "': " + e);
-                }        
+                               "'drop table " + table + "': " + e);
+                }
             }
         } catch (Exception e) {
             s_log.info("Error creating statement: " + e.getMessage());
         } finally {
             try {
                 statement.close();
-            } catch (Exception e) { 
+            } catch (Exception e) {
                 //ignore
             }
         }
@@ -112,13 +112,13 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
         iter = m_objectTypes.iterator();
         while (iter.hasNext()) {
             DataOperation operation = SessionManager.getSession()
-                                                    .retrieveDataOperation
+                .retrieveDataOperation
                 ("examples.DataOperationToDeleteTestDynamicObjectTypes");
             String name = ((ObjectType)iter.next()).getQualifiedName();
             operation.setParameter("dynamicType", name.toLowerCase());
             operation.execute();
         }
-        // this is here so that the "delete" operation above takes 
+        // this is here so that the "delete" operation above takes
         getSession().getTransactionContext().commitTxn();
         getSession().getTransactionContext().beginTxn();
         super.persistenceTearDown();
@@ -128,7 +128,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
     public void testConstructors() throws Exception {
         dot.addOptionalAttribute("optionalAttribute", MetadataRoot.STRING, 300);
         dot.addOptionalAttribute("optionalAttribute2", MetadataRoot.BOOLEAN);
-        dot.addRequiredAttribute("requiredAttribute", MetadataRoot.BOOLEAN, 
+        dot.addRequiredAttribute("requiredAttribute", MetadataRoot.BOOLEAN,
                                  new Boolean(true));
         dot.addRequiredAttribute("requiredAttribute2", MetadataRoot.STRING, 200,
                                  "my new text string");
@@ -145,12 +145,12 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
                " but actually was '" + actualSuperType + "'",
                superTypeString.equals(actualSuperType));
 
-        validateProperties(objectType.getDeclaredProperties(), 
-                           new String[] {"optionalAttribute", 
-                                         "optionalAttribute2", 
-                                         "requiredAttribute", 
+        validateProperties(objectType.getDeclaredProperties(),
+                           new String[] {"optionalAttribute",
+                                         "optionalAttribute2",
+                                         "requiredAttribute",
                                          "requiredAttribute2"});
-        
+
         dot = new DynamicObjectType("com.arsdigita.kernel." + objectTypeName);
         dot.addRequiredAttribute("requiredAttribute3", MetadataRoot.BOOLEAN,
                                  new Boolean(false));
@@ -164,12 +164,12 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
                " but actually was '" + actualSuperType + "'",
                superTypeString.equals(actualSuperType));
 
-        validateProperties(objectType.getDeclaredProperties(), 
-                           new String[] {"optionalAttribute", 
-                                         "optionalAttribute2", 
-                                         "requiredAttribute", 
-                                         "requiredAttribute2", 
-                                         "requiredAttribute3", 
+        validateProperties(objectType.getDeclaredProperties(),
+                           new String[] {"optionalAttribute",
+                                         "optionalAttribute2",
+                                         "requiredAttribute",
+                                         "requiredAttribute2",
+                                         "requiredAttribute3",
                                          "requiredAttribute4"});
 
         dot = new DynamicObjectType(objectType);
@@ -185,24 +185,24 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
                " but actually was '" + actualSuperType + "'",
                superTypeString.equals(actualSuperType));
 
-        validateProperties(objectType.getDeclaredProperties(), 
-                           new String[] {"optionalAttribute", 
-                                         "optionalAttribute2", 
-                                         "requiredAttribute", 
-                                         "requiredAttribute2", 
-                                         "requiredAttribute3", 
-                                         "requiredAttribute4", 
-                                         "requiredAttribute5", 
+        validateProperties(objectType.getDeclaredProperties(),
+                           new String[] {"optionalAttribute",
+                                         "optionalAttribute2",
+                                         "requiredAttribute",
+                                         "requiredAttribute2",
+                                         "requiredAttribute3",
+                                         "requiredAttribute4",
+                                         "requiredAttribute5",
                                          "requiredAttribute6"});
         DataOperation operation = SessionManager.getSession()
             .retrieveDataOperation
             ("examples.DataOperationToDeleteTestDynamicObjectTypes");
-        operation.setParameter("dynamicType", "com.arsdigita.kernel." + 
+        operation.setParameter("dynamicType", "com.arsdigita.kernel." +
                                objectTypeName);
 
 
-        // now test 
-        //DynamicObjectType(String name, ObjectType supertype, String model) 
+        // now test
+        //DynamicObjectType(String name, ObjectType supertype, String model)
         dot = new DynamicObjectType("testType", supertype, null);
         ObjectType dotObject = dot.save();
         Model dotModel = dotObject.getModel();
@@ -210,7 +210,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
         m_tables.add(dotObject.getReferenceKey().getTableName());
 
         dot = new DynamicObjectType("testType2", null, dotObject.getModel());
-        Property prop = dot.addRequiredAttribute("requiredAttribute6", 
+        Property prop = dot.addRequiredAttribute("requiredAttribute6",
                                                  MetadataRoot.DATE, 400,
                                                  new Date());
         dotObject = dot.save();
@@ -219,7 +219,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
         m_tables.add(prop.getColumn().getTableName());
 
         assert("The model name should be [com.arsdigita.kernel] not [" +
-               dotObject.getModel().getName() + "]", 
+               dotObject.getModel().getName() + "]",
                "com.arsdigita.kernel".equals(dotObject.getModel().getName()));
         assert(dotObject.getModel().equals(dotModel));
 
@@ -249,27 +249,27 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
     public void testAddRequiredAttribute() {
         Property prop = dot.addRequiredAttribute("myOptionalProp", m_root.DATE,
                                                  new Date());
- 
-        validateProperties(dot.getObjectType().getDeclaredProperties(), 
+
+        validateProperties(dot.getObjectType().getDeclaredProperties(),
                            new String[] {"myOptionalProp"});
 
-        Property prop2 = dot.addRequiredAttribute("myOptionalProp2", 
+        Property prop2 = dot.addRequiredAttribute("myOptionalProp2",
                                                   m_root.FLOAT, 400,
                                                   new Float(4));
-        assert("the size for the new string attribute should be 400, not " + 
+        assert("the size for the new string attribute should be 400, not " +
                prop2.getColumn().getSize(), prop2.getColumn().getSize() == 400);
-                                             
-        validateProperties(dot.getObjectType().getDeclaredProperties(), 
+
+        validateProperties(dot.getObjectType().getDeclaredProperties(),
                            new String[] {"myOptionalProp", "myOptionalProp2"});
 
 
-       // make sure that the column names are different but the table names
+        // make sure that the column names are different but the table names
         // are the same
         assert("the tables names are different when they should both be " +
                "the same", prop.getColumn().getTableName().equals
                (prop2.getColumn().getTableName()));
 
-        assert("the column names are the same when they should be different ", 
+        assert("the column names are the same when they should be different ",
                !prop.getColumn().getColumnName().equals
                (prop2.getColumn().getColumnName()));
 
@@ -287,7 +287,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
         try {
             prop = dot.addRequiredAttribute("myoptionalprop", m_root.FLOAT,
                                             new Float(444));
-            fail("Adding attributes with the same name (but different " + 
+            fail("Adding attributes with the same name (but different " +
                  "capitalization should throw an exception");
         } catch (PersistenceException e) {
             // this should be here so let it fall through
@@ -303,16 +303,16 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
      */
     public void testAddOptionalAttribute() {
         Property prop = dot.addOptionalAttribute("myOptionalProp", m_root.INTEGER);
- 
-        validateProperties(dot.getObjectType().getDeclaredProperties(), 
+
+        validateProperties(dot.getObjectType().getDeclaredProperties(),
                            new String[] {"myOptionalProp"});
 
-        Property prop2 = dot.addOptionalAttribute("myOptionalProp2", 
+        Property prop2 = dot.addOptionalAttribute("myOptionalProp2",
                                                   m_root.STRING, 400);
-        assert("the size for the new string attribute should be 400, not " + 
+        assert("the size for the new string attribute should be 400, not " +
                prop2.getColumn().getSize(), prop2.getColumn().getSize() == 400);
-                                             
-        validateProperties(dot.getObjectType().getDeclaredProperties(), 
+
+        validateProperties(dot.getObjectType().getDeclaredProperties(),
                            new String[] {"myOptionalProp", "myOptionalProp2"});
 
         // make sure that the column names are different but the table names
@@ -321,7 +321,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
                "the same", prop.getColumn().getTableName().equals
                (prop2.getColumn().getTableName()));
 
-        assert("the column names are the same when they should be different ", 
+        assert("the column names are the same when they should be different ",
                !prop.getColumn().getColumnName().equals
                (prop2.getColumn().getColumnName()));
 
@@ -337,7 +337,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
         // same name, different caps.  We do not support this one either
         try {
             prop = dot.addOptionalAttribute("myoptionalprop", m_root.INTEGER);
-            fail("Adding attributes with the same name (but different " + 
+            fail("Adding attributes with the same name (but different " +
                  "capitalization should throw an exception");
         } catch (PersistenceException e) {
             // this should be here so let it fall through
@@ -348,9 +348,9 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
     }
 
     public void testAddRoleReference() {
-        ObjectType acsobj = 
+        ObjectType acsobj =
             MetadataRoot.getMetadataRoot()
-                        .getObjectType("com.arsdigita.kernel.ACSObject");
+            .getObjectType("com.arsdigita.kernel.ACSObject");
 
         DataObject defaultObj =
             getSession().create("com.arsdigita.kernel.ACSObject");
@@ -372,9 +372,9 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
 
         String mappingTable =
             ((JoinElement)objectType.getProperty("myCollectionRR")
-                                    .getJoinPath()
-                                    .getPath()
-                                    .get(0)).getTo().getTableName();
+             .getJoinPath()
+             .getPath()
+             .get(0)).getTo().getTableName();
 
         m_tables.add(mappingTable);
 
@@ -428,7 +428,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
         String tableName = objectType.getReferenceKey().getTableName();
         m_tables.add(tableName);
         m_objectTypes.add(objectType);
- 
+
         dot.addOptionalAttribute("testAttribute", MetadataRoot.STRING);
         ObjectType type = dot.save();
 
@@ -473,7 +473,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
         }
     }
 
-    // test that all child objects have their events regenerated when a 
+    // test that all child objects have their events regenerated when a
     // parent class is altered
     public void testAlteredParents() {
         ObjectType type = dot.save();
@@ -514,7 +514,7 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
 
         value = (String)testObj.get("testAttr1");
         assert("Grand child value not saved correctly",
-                value.equals("Test Attribute"));
+               value.equals("Test Attribute"));
 
         testObj.delete();
 
@@ -551,14 +551,14 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
         associated.set("displayName", "Default Object");
         associated.set("testAttr1", "Test Attr");
         associated.save();
-        
+
         DataObject subassociated = getSession().create(subtype);
         subassociated.set("id", new BigDecimal(-58));
         subassociated.set("objectType", subtype.getQualifiedName());
         subassociated.set("displayName", "Default Object");
         subassociated.set("testAttr1", "Test Attr");
         subassociated.save();
-        
+
         DataObject testObj = getSession().create(type2);
         testObj.set("id", new BigDecimal(-57));
         testObj.set("objectType", type2.getQualifiedName());
@@ -623,14 +623,14 @@ public class DynamicObjectTypeTest extends PersistenceTestCase {
             count++;
             String name = ((Property)properties.next()).getName();
             list2.add(name);
-            assert("The ObjectType contained the property [" + name + "] " + 
+            assert("The ObjectType contained the property [" + name + "] " +
                    "but it should not have", list.contains(name));
         }
-        
+
         if (count != list.size()) {
             fail("The ObjectType had " + count + " elements but the array " +
-                 "only had " + list.size() + Utilities.LINE_BREAK + 
-                 "The ObjectType had " + list2.toString() + 
+                 "only had " + list.size() + Utilities.LINE_BREAK +
+                 "The ObjectType had " + list2.toString() +
                  Utilities.LINE_BREAK + "while it should have had " +
                  Utilities.LINE_BREAK + list.toString());
         }

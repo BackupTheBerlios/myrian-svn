@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -27,12 +27,12 @@ import com.arsdigita.persistence.Utilities;
  * multiplicity, and whether or not the property is composite.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/08/09 $
+ * @version $Revision: #8 $ $Date: 2002/08/14 $
  */
 
 public class PropertyDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/PropertyDef.java#7 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/PropertyDef.java#8 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     // property name
     private String m_name;
@@ -100,7 +100,7 @@ public class PropertyDef extends Element {
 
     /**
      * Specifies the join path used to retrieve this role reference.
-     * 
+     *
      * @param jp the joinpathdef
      */
     public void setJoinPath(JoinPathDef jp) {
@@ -116,7 +116,7 @@ public class PropertyDef extends Element {
         return m_name;
     }
 
-    /** 
+    /**
      * Returns the ColumnDef of this property.
      *
      * @return the ColumnDef of this property.
@@ -141,7 +141,7 @@ public class PropertyDef extends Element {
      */
     public boolean isAttribute() {
         return (MetadataRoot.getMetadataRoot()
-                            .getPrimitiveType(m_type.getName()) != null);
+                .getPrimitiveType(m_type.getName()) != null);
     }
 
     public boolean isUnique() {
@@ -192,14 +192,14 @@ public class PropertyDef extends Element {
     }
 
 
-    /** 
+    /**
      * Ensure that this element is in a valid state
      */
     void validate() {
         if (getColumn() != null) {
-            getColumn().validate("Object Type: " +getModelDef().getName() + 
-                                 "." + getObjectDef().getName() + 
-                                 Utilities.LINE_BREAK + 
+            getColumn().validate("Object Type: " +getModelDef().getName() +
+                                 "." + getObjectDef().getName() +
+                                 Utilities.LINE_BREAK +
                                  "Property: " + m_name +
                                  Utilities.LINE_BREAK);
         }

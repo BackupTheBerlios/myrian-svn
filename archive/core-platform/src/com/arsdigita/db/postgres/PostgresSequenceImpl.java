@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -33,7 +33,7 @@ import java.sql.PreparedStatement;
 
 public class PostgresSequenceImpl extends SequenceImpl {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresSequenceImpl.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/postgres/PostgresSequenceImpl.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private String m_sequenceName;
 
@@ -69,14 +69,14 @@ public class PostgresSequenceImpl extends SequenceImpl {
 
     public BigDecimal getCurrentValue(Connection conn) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement(
-            "select currval('" + m_sequenceName + "')");
+                                                       "select currval('" + m_sequenceName + "')");
         try {
             ResultSet rs = stmt.executeQuery();
             try {
                 if (rs.next()) {
                     return rs.getBigDecimal(1);
                 } else {
-                    throw new SQLException("Sequence " + m_sequenceName 
+                    throw new SQLException("Sequence " + m_sequenceName
                                            + " does not exist.");
                 }
             } finally {
@@ -89,7 +89,7 @@ public class PostgresSequenceImpl extends SequenceImpl {
 
     public BigDecimal getNextValue(Connection conn) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement(
-            "select nextval('" + m_sequenceName + "')");
+                                                       "select nextval('" + m_sequenceName + "')");
         try {
             ResultSet rs = stmt.executeQuery();
 

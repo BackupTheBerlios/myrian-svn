@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -33,14 +33,14 @@ import org.apache.log4j.Logger;
  * LobTest - for testing Blob and Clob datatype.
  *
  * @author Jeff Teeters (teeters@arsdigita.com)
- * @version $Revision: #6 $ $Date: 2002/08/14 $
+ * @version $Revision: #7 $ $Date: 2002/08/14 $
  */
 
 public class LobTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LobTest.java#6 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/LobTest.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-    private Logger s_cat = 
+    private Logger s_cat =
         Logger.getLogger(LobTest.class);
 
     private Session m_session;
@@ -71,7 +71,7 @@ public class LobTest extends PersistenceTestCase {
     }
 
     public void testDoNothing() {
-        // no-op to avoid 'no tests found' warning message if 
+        // no-op to avoid 'no tests found' warning message if
         // all the other tests in this class are flagged with FAILS.
     }
 
@@ -168,21 +168,21 @@ public class LobTest extends PersistenceTestCase {
             count++;
         }
         s_cat.error(count + " steps.  Failed storing large " + lobType +
-                    ".  Low (size worked) = " + low + 
+                    ".  Low (size worked) = " + low +
                     ".  High (size failed) = " + high + ".");
-        fail(count + " steps.  Failed storing large " + lobType + 
+        fail(count + " steps.  Failed storing large " + lobType +
              ".  Low (size worked) = " + low +
              ".  High (size failed) = " + high + ".");
     }
-	
-    
+
+
     // Support routine for above test.  Returns errMsg or null if ok.
     private String sizeWorks(int size, String lobType) {
         if (lobType.equals("blob")){
             return runBlobTest(size);
         } else if (lobType.equals("clob")) {
             return runClobTest(size);
-        } else if (lobType.equals("oracleclob") || 
+        } else if (lobType.equals("oracleclob") ||
                    lobType.equals("postgresclob")) {
             return runClobDatabaseSpecificTest(size);
         } else {
@@ -198,7 +198,7 @@ public class LobTest extends PersistenceTestCase {
             byte [] testBytes = new byte[size];
             int i;
             for (i = 0; i < size; i++) {
-                // no longer using random so that the data can be checked 
+                // no longer using random so that the data can be checked
                 // against a known pattern.
                 testBytes[i] = sourceBytes[i % (HI-LO+1)];
             }
@@ -216,7 +216,7 @@ public class LobTest extends PersistenceTestCase {
                 return "Length mismatch.  Found length=" + foundBytes.length;
             } else if (foundBytes.length == 0) {
                 return "Length matches, but is zero.";
-            } 
+            }
             for (i = 0; i < foundBytes.length; i++)
                 if (foundBytes[i] != testBytes[i])
                     return "Mismatch at byte " + i;
@@ -241,7 +241,7 @@ public class LobTest extends PersistenceTestCase {
             byte [] testBytes = new byte[size];
             int i;
             for (i = 0; i < size; i++) {
-                // no longer using random so that the data can be checked 
+                // no longer using random so that the data can be checked
                 // against a known pattern.
                 testBytes[i] = sourceBytes[i % (HI-LO+1)];
             }
@@ -251,7 +251,7 @@ public class LobTest extends PersistenceTestCase {
             dt.set("id", BigInteger.ZERO);
             dt.set("clob", testString);
             dt.save();
-            
+
             dt = getSession().retrieve(new OID("examples.Datatype", BigInteger.ZERO));
             String bar = (String) dt.get("string");
             String foundString = (String) dt.get("clob");
@@ -297,7 +297,7 @@ public class LobTest extends PersistenceTestCase {
 
         for (i = 0; i < testString.length(); i++) {
             if (testString.charAt(i) != testChars[i]) {
-                return "Mismatch at character " + i + " (" + 
+                return "Mismatch at character " + i + " (" +
                     testChars[i] + " vs. " + testString.charAt(i) + ")";
             }
         }
@@ -312,12 +312,12 @@ public class LobTest extends PersistenceTestCase {
             byte [] testBytes = new byte[size];
             int i;
             for (i = 0; i < size; i++) {
-                // no longer using random so that the data can be checked 
+                // no longer using random so that the data can be checked
                 // against a known pattern.
                 testBytes[i] = sourceBytes[i % (HI-LO+1)];
             }
             String testString = new String(testBytes);
-            
+
             Connection conn = getSession().getTransactionContext()
                 .getConnection();
 
@@ -327,7 +327,7 @@ public class LobTest extends PersistenceTestCase {
                 executeOracleUpdate(conn, testString);
             }
 
-            DataObject dt = getSession().retrieve(new OID("examples.Datatype", 
+            DataObject dt = getSession().retrieve(new OID("examples.Datatype",
                                                           BigInteger.ZERO));
             String foundString = (String) dt.get("clob");
             dt.delete();
@@ -361,7 +361,7 @@ public class LobTest extends PersistenceTestCase {
     }
 
 
-    private void executeOracleUpdate(Connection conn, String testString) 
+    private void executeOracleUpdate(Connection conn, String testString)
         throws java.sql.SQLException, java.io.IOException {
         PreparedStatement ps =
             conn.prepareStatement("insert into t_datatypes  (id, j_clob) " +
@@ -375,7 +375,7 @@ public class LobTest extends PersistenceTestCase {
 
         ps = conn.prepareStatement("select j_clob from t_datatypes " +
                                    "where id = ? for update");
-        
+
         try {
             ps.setBigDecimal(1, new BigDecimal(BigInteger.ZERO));
             ResultSet rs = ps.executeQuery();
@@ -392,7 +392,7 @@ public class LobTest extends PersistenceTestCase {
     }
 
 
-    private void executePostgresUpdate(Connection conn, String testString) 
+    private void executePostgresUpdate(Connection conn, String testString)
         throws java.sql.SQLException, java.io.IOException {
         PreparedStatement ps =
             conn.prepareStatement("insert into t_datatypes " +

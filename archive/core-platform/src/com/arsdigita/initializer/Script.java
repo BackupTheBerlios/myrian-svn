@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -23,21 +23,21 @@ import org.apache.log4j.Logger;
  * Script
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/13 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  */
 
 public class Script {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Script.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Script.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-    private static final Logger s_log = 
+    private static final Logger s_log =
         Logger.getLogger(Script.class);
 
     private List m_initializers = new ArrayList();
     private String iniName;
     private boolean isStarted = false;
     private boolean isShutdown = false;
-    
+
     /**
      * Constructs a new initialization script from the given string buffer.
      *
@@ -111,8 +111,8 @@ public class Script {
         throws InitializationException {
         if (isStarted)
             throw new InitializationException(
-                "This script has already been started."
-                );
+                                              "This script has already been started."
+                                              );
         m_initializers.add(ini);
         if (ini.getClass().getName().equals(iniName)) {
             // stop here
@@ -151,8 +151,8 @@ public class Script {
     public void startup(String iniName) throws InitializationException {
         if (isStarted)
             throw new InitializationException(
-                "Startup has already been called."
-                );
+                                              "Startup has already been called."
+                                              );
         for (int i = 0; i < m_initializers.size(); i++) {
             Initializer ini = (Initializer) m_initializers.get(i);
             ini.startup();
@@ -180,12 +180,12 @@ public class Script {
     public void shutdown(String iniName) throws InitializationException {
         if (isShutdown)
             throw new InitializationException(
-                "Shutdown has already been called."
-                );
+                                              "Shutdown has already been called."
+                                              );
         if (!isStarted)
             throw new InitializationException(
-                "Startup hasn't been called yet."
-                );
+                                              "Startup hasn't been called yet."
+                                              );
 
         boolean shutdown = false;
         if (iniName == null)
@@ -211,12 +211,12 @@ public class Script {
                     t.printStackTrace(System.err);
                 }
             }
-            
+
         } finally {
             super.finalize();
         }
 
-        
+
     }
 
 }

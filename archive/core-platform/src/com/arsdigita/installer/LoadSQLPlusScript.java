@@ -1,24 +1,15 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
  * implied. See the License for the specific language governing
  * rights and limitations under the License.
- *
- */
-
-/**
- * $Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#6 $
- *
- *  This is the class with sole purpose to feed SQL*Plus script through
- *  JDBC interface.  SQL*Plus scripts are being parsed by SimpleOracleSQLParser,
- *  and the extracted statements are then being executed one at the time.
  *
  */
 
@@ -36,7 +27,7 @@ import org.apache.log4j.Logger;
 
 public class LoadSQLPlusScript {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 16:49:53 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/installer/LoadSQLPlusScript.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private static final Logger s_log =
         Logger.getLogger(LoadSQLPlusScript.class);
@@ -56,8 +47,8 @@ public class LoadSQLPlusScript {
 
         if (args.length != 4) {
             s_log.error (
-                "Usage: LoadSQLPlusScript " +
-                "<JDBC_URL> <username> <password> <script_filename>");
+                         "Usage: LoadSQLPlusScript " +
+                         "<JDBC_URL> <username> <password> <script_filename>");
             System.exit(1);
         }
 
@@ -88,9 +79,9 @@ public class LoadSQLPlusScript {
         s_con = connection;
     }
 
-    public void setConnection (String jdbcUrl, String dbUsername, String dbPassword) 
+    public void setConnection (String jdbcUrl, String dbUsername, String dbPassword)
         throws SQLException {
-        s_con = DriverManager.getConnection(jdbcUrl, 
+        s_con = DriverManager.getConnection(jdbcUrl,
                                             dbUsername,
                                             dbPassword);
     }
@@ -100,20 +91,20 @@ public class LoadSQLPlusScript {
     }
 
     public void loadSQLPlusScript (String scriptFilename)
-        throws ClassNotFoundException, 
-        SQLException,
-        ParseException, 
-        FileNotFoundException,
-        IllegalAccessException, 
-        NoSuchMethodException {
+        throws ClassNotFoundException,
+               SQLException,
+               ParseException,
+               FileNotFoundException,
+               IllegalAccessException,
+               NoSuchMethodException {
 
         if (System.getProperty("sql.verbose") != null  &&
-                System.getProperty("sql.verbose").equals("true")) {
+            System.getProperty("sql.verbose").equals("true")) {
             s_echoSQLStatement = true;
         }
 
         if (System.getProperty("sql.continue") != null  &&
-                System.getProperty("sql.continue").equals("true")) {
+            System.getProperty("sql.continue").equals("true")) {
             s_onErrorContinue = true;
         }
 
@@ -121,11 +112,11 @@ public class LoadSQLPlusScript {
     }
 
     public void loadSQLPlusScript (String scriptFilename,
-                                   boolean echoSQLStatement, 
+                                   boolean echoSQLStatement,
                                    boolean onErrorContinue)
         throws ClassNotFoundException, SQLException,
-                ParseException, FileNotFoundException,
-                IllegalAccessException, NoSuchMethodException {
+               ParseException, FileNotFoundException,
+               IllegalAccessException, NoSuchMethodException {
         s_echoSQLStatement = echoSQLStatement;
         s_onErrorContinue = onErrorContinue;
         m_loadSQLPlusScript (scriptFilename);
@@ -133,19 +124,19 @@ public class LoadSQLPlusScript {
 
     protected void m_loadSQLPlusScript (String scriptFilename)
         throws ClassNotFoundException, SQLException,
-                ParseException, FileNotFoundException,
-                IllegalAccessException, NoSuchMethodException {
-        
+               ParseException, FileNotFoundException,
+               IllegalAccessException, NoSuchMethodException {
+
         if (s_database == "postgres") {
             Class.forName("org.postgresql.Driver");
         } else {
             Class.forName("oracle.jdbc.driver.OracleDriver");
         }
-        
+
         // Parse SQL script and feed JDBC with one statement at the time
         s_log.warn ("Trying to open: '" + scriptFilename + "'");
         SimpleSQLParser parser = new SimpleSQLParser(scriptFilename);
-        
+
         // iterate over parser.SQLStamentList();
 
         s_stmt = s_con.createStatement();
@@ -169,7 +160,7 @@ public class LoadSQLPlusScript {
      *  classes.)
      */
 
-    public void executeOneStatement (String sqlString) 
+    public void executeOneStatement (String sqlString)
         throws SQLException {
         s_stmtCount++;
         s_log.info ("Statement count: " + s_stmtCount);

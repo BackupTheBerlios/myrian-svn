@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -37,13 +37,13 @@ import java.sql.DatabaseMetaData;
  * {@link com.arsdigita.persistence.metadata.DynamicObjectType}.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleDDLGenerator.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleDDLGenerator.java#4 $
  * @since 4.6.3 */
 
 final class OracleDDLGenerator extends BaseDDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleDDLGenerator.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
-    
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/OracleDDLGenerator.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+
     private static final int MAX_COLUMN_NAME_LEN = 26;
 
 
@@ -143,7 +143,7 @@ final class OracleDDLGenerator extends BaseDDLGenerator {
         // we append the default sysdate and then we may append
         // more on later if the time asked for is not this time
         StringBuffer sb = new StringBuffer(" default sysdate");
-        
+
         // if the difference in time between NOW and when the time
         // was created is more than 1 minute then we add an offset to
         // sysdate.  To do this, we convert milleseconds (the java
@@ -157,13 +157,13 @@ final class OracleDDLGenerator extends BaseDDLGenerator {
             } else {
                 sb.append(" + " + offset*(-1));
             }
-        } 
+        }
         return sb.toString();
     }
-    
+
 
     /**
-     * Database systems have varying restrictions on the length of 
+     * Database systems have varying restrictions on the length of
      * column names.
      * This method obtains the max length for the particular implementation.
      *

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -25,12 +25,12 @@ import java.util.Properties;
  * a "real" implementation of java.sql.Driver
  *
  * @author <a href="mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/14 $
  * @since 4.5
  */
 class Driver implements java.sql.Driver {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Driver.java#2 $ $Author: dennis $ $Date: 2002/07/18 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Driver.java#3 $ $Author: dennis $ $Date: 2002/08/14 $";
 
     // The Driver object we wrap
     private java.sql.Driver driver;
@@ -41,10 +41,10 @@ class Driver implements java.sql.Driver {
         this.driver = driver;
     }
 
-    
-    /** 
+
+    /**
      * Returns true if the driver thinks that it can open a
-     * connection to the given URL. 
+     * connection to the given URL.
      */
     public boolean acceptsURL(String url) throws SQLException {
         try {
@@ -56,10 +56,10 @@ class Driver implements java.sql.Driver {
     }
 
     /**
-     * Attempts to make a database connection to the given URL. 
+     * Attempts to make a database connection to the given URL.
      */
     public java.sql.Connection connect(String url, Properties info)
-            throws SQLException {
+        throws SQLException {
         try {
             return com.arsdigita.db.Connection.wrap(driver.connect(url, info), null);
         } catch (SQLException e) {
@@ -76,17 +76,17 @@ class Driver implements java.sql.Driver {
     }
 
     /**
-     * Gets the driver's minor version number. 
+     * Gets the driver's minor version number.
      */
     public int getMinorVersion() {
         return driver.getMinorVersion();
     }
 
     /**
-     * Gets information about the possible properties for this driver. 
+     * Gets information about the possible properties for this driver.
      */
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info)
-            throws SQLException {
+        throws SQLException {
         try {
             return driver.getPropertyInfo(url, info);
         } catch (SQLException e) {
@@ -95,19 +95,11 @@ class Driver implements java.sql.Driver {
         }
     }
 
-    /** 
-     *  Reports whether this driver is a genuine JDBC COMPLIANTTM driver. 
+    /**
+     *  Reports whether this driver is a genuine JDBC COMPLIANTTM driver.
      */
     public boolean jdbcCompliant() {
         return driver.jdbcCompliant();
     }
 
 }
-
-
-
-
-
-
-
-

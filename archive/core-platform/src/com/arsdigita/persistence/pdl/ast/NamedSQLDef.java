@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -22,15 +22,15 @@ import java.util.Iterator;
 
 
 /**
- * Defines a data query that is not associated with an object type or 
+ * Defines a data query that is not associated with an object type or
  * association.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/14 $
  */
 public abstract class NamedSQLDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/NamedSQLDef.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/NamedSQLDef.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     // the query name
     protected String m_name;
@@ -63,8 +63,8 @@ public abstract class NamedSQLDef extends Element {
     }
 
     /**
-     * Returns a named propertydef, or null.    
-     * 
+     * Returns a named propertydef, or null.
+     *
      * @param name the name of the propertydef to return
      * @return a named propertydef, or null.
      */
@@ -98,7 +98,7 @@ public abstract class NamedSQLDef extends Element {
      **/
 
     public void add(OptionBlock options) {
-	m_options = options;
+        m_options = options;
     }
 
     /**

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -22,11 +22,11 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
 
-public class ACSJDOMTest extends TestCase { 
+public class ACSJDOMTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/xml/ACSJDOMTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/xml/ACSJDOMTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-    public static final String BEBOP_XML_NS = 
+    public static final String BEBOP_XML_NS =
         "http://www.arsdigita.com/bebop/1.0";
 
     public ACSJDOMTest ( String name ) {
@@ -56,9 +56,9 @@ public class ACSJDOMTest extends TestCase {
          * Construct a DOM document...
          */
         org.w3c.dom.Document domDoc = DocumentBuilderFactory
-                                        .newInstance()
-                                        .newDocumentBuilder()
-                                        .newDocument();
+            .newInstance()
+            .newDocumentBuilder()
+            .newDocument();
 
         org.w3c.dom.Element domPage =
             domDoc.createElementNS(BEBOP_XML_NS, "page");
@@ -159,15 +159,15 @@ public class ACSJDOMTest extends TestCase {
                      dom2String);
     }
 
-/*
-        assertNotNull(seqValue1);
-        assertEquals("nextval followed by currval didn't get the " +
-                     "same thing.  This might just mean someone else " +
-                     "called nextval in the middle.",
-                     seqValue1,seqValue2);
+    /*
+      assertNotNull(seqValue1);
+      assertEquals("nextval followed by currval didn't get the " +
+      "same thing.  This might just mean someone else " +
+      "called nextval in the middle.",
+      seqValue1,seqValue2);
 
-        assert(! seqValue1.equals(seqValue2));
-*/
+      assert(! seqValue1.equals(seqValue2));
+    */
 
 
 }

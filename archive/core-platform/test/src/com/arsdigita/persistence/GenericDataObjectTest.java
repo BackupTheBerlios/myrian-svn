@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -24,17 +24,17 @@ import com.arsdigita.persistence.metadata.ObjectType;
 /**
  * GenericDataObjectText
  *
- * This class tests GenericDataObject, using data contained in 
+ * This class tests GenericDataObject, using data contained in
  * //enterprise/infrastructure/dev/persistence/sql/data-query-test.sql
  *
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  */
 public class GenericDataObjectTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/GenericDataObjectTest.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/GenericDataObjectTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     public GenericDataObjectTest(String name) {
         super(name);
@@ -45,13 +45,13 @@ public class GenericDataObjectTest extends PersistenceTestCase {
         load("com/arsdigita/persistence/testpdl/static/Node.pdl");
         load("com/arsdigita/persistence/testpdl/static/Party.pdl");
         load("com/arsdigita/persistence/testpdl/static/Order.pdl");
-         
+
         super.persistenceSetUp();
     }
 
     protected void persistenceTearDown() {
         load("com/arsdigita/persistence/testpdl/static/DataQuery.pdl");
-        load("com/arsdigita/persistence/testpdl/static/Node.pdl"); 
+        load("com/arsdigita/persistence/testpdl/static/Node.pdl");
         load("com/arsdigita/persistence/testpdl/static/Party.pdl");
         load("com/arsdigita/persistence/testpdl/static/Order.pdl");
         super.persistenceTearDown();
@@ -63,7 +63,7 @@ public class GenericDataObjectTest extends PersistenceTestCase {
      * an exception
      */
     public void testCRUD() {
-        DataQuery query = getSession().retrieveQuery("examples.nodesQuery");   
+        DataQuery query = getSession().retrieveQuery("examples.nodesQuery");
         long initialSize = query.size();
 
         DataObject node = getSession().create("examples.Node");
@@ -77,19 +77,19 @@ public class GenericDataObjectTest extends PersistenceTestCase {
 
 
         // make sure it is there
-        query = getSession().retrieveQuery("examples.nodesQuery");   
+        query = getSession().retrieveQuery("examples.nodesQuery");
         assertEquals("The saving of a node did not actually save",
-               initialSize + 1, query.size());
+                     initialSize + 1, query.size());
 
         node.delete();
 
         // make sure it is not there
-        query = getSession().retrieveQuery("examples.nodesQuery");   
+        query = getSession().retrieveQuery("examples.nodesQuery");
         assert("The deleting of a node did not actually delete.",
-               query.size() == initialSize);  
-        // should this be allowed?       
-        node.delete(); 
-        
+               query.size() == initialSize);
+        // should this be allowed?
+        node.delete();
+
         try {
             node.save();
             fail("saving a dataobject after deleting should cause and error");
@@ -119,14 +119,14 @@ public class GenericDataObjectTest extends PersistenceTestCase {
         node.save();
 
         DataObject node2 = getSession().retrieve(
-            new OID("examples.Node", new BigDecimal(7)));
+                                                 new OID("examples.Node", new BigDecimal(7)));
 
         DataObject parent2 = (DataObject)node2.get("parent");
 
         assert("Parents not equal", parent.equals(parent2));
 
         DataObject node3 = getSession().retrieve(
-            new OID("examples.Node", new BigDecimal(7)));
+                                                 new OID("examples.Node", new BigDecimal(7)));
 
         // try erasing the parent.
         node3.set("parent", null);
@@ -139,13 +139,13 @@ public class GenericDataObjectTest extends PersistenceTestCase {
     }
 
 
-    
+
 
     public void testSpecialize() {
         DataObject node = getSession().create("examples.Node");
         try {
             node.specialize("grick!");
-            fail("Specialized on a nonsensical ObjectType name!");    
+            fail("Specialized on a nonsensical ObjectType name!");
         } catch (RuntimeException e) {
         }
 
@@ -173,13 +173,13 @@ public class GenericDataObjectTest extends PersistenceTestCase {
         party.set("firstName", "Jon");
         party.set("lastNames", "Orris");
         party.save();
-        
+
         try {
             party.specialize("examples.Party");
             fail("Reversed specialization!");
         } catch (RuntimeException e) {
         }
-           
+
     }
 
     /**
@@ -207,16 +207,8 @@ public class GenericDataObjectTest extends PersistenceTestCase {
 
     }
 
-     public static void main(String args[]) {
+    public static void main(String args[]) {
         junit.textui.TestRunner.run(GenericDataObjectTest.class);
     }
 
 }
-
-
-
-
-
-
-
-

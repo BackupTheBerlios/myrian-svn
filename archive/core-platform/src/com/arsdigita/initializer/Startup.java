@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.redhat.com/licenses/ccmpl.html
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
+
 package com.arsdigita.initializer;
 
 import com.arsdigita.util.ResourceManager;
@@ -14,15 +29,15 @@ import java.io.Reader;
  *
  * @author <a href="mbryzek@arsdigita.com">Michael Bryzek</a>
  * @author <a href="dennis@arsdigita.com">Dennis Gregorovic</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/14 $
  * @since ACS 4.7
  *
  **/
 public class Startup {
-    
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Startup.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
-    
-     /** The name of the property containing the web app root **/
+
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/initializer/Startup.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+
+    /** The name of the property containing the web app root **/
     public static final String WEB_APP_ROOT = "webAppRoot";
 
     /** The name of the property containing the script name **/
@@ -38,19 +53,19 @@ public class Startup {
      *
      *<pre>
      * String scriptName = "/WEB-INF/resources/enterprise.init";
-     * String webAppRoot = 
+     * String webAppRoot =
      *    "/usr/local/jakarta-tomcat-3.2.3/webapps/enterprise";
      *
      *  Startup startup = new Startup(webAppRoot, scriptName);
      *  startup.init();
      *</pre>
-     * 
+     *
      * @param webAppRoot The web app root to use (e.g. $TOMCAT_HOME/webapps/enterprise);
      * @param scriptName The relative (from web app root) path to the
      * script that defines the initializers
      * (e.g. /WEB-INF/resources/enterprise.init)
      *
-     **/ 
+     **/
     public Startup(String webAppRoot, String scriptName) {
         m_webAppRoot = webAppRoot;
         m_scriptName = scriptName;
@@ -66,7 +81,7 @@ public class Startup {
     public Startup() throws InitializationException {
         this(getProperty(WEB_APP_ROOT), getProperty(SCRIPT_NAME));
     }
-     
+
 
     /**
      * Sets the name of the last initializer to run. If not set, all the
@@ -78,7 +93,7 @@ public class Startup {
     public void setLastInitializer(String lastInitializer) {
         m_lastInitializer = lastInitializer;
     }
-    
+
 
     /**
      * Starts up the web environment for the ACS.
@@ -93,12 +108,12 @@ public class Startup {
         } catch (FileNotFoundException e) {
             throw new InitializationException("Couldn't find " + m_scriptName);
         }
-        
+
         try {
             if (m_lastInitializer == null) {
                 m_ini = new Script(r);
                 m_ini.startup();
-            } else {                
+            } else {
                 m_ini = new Script(r, m_lastInitializer);
                 m_ini.startup(m_lastInitializer);
             }

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 /**
  * DataQueryTest
  *
- * This class tests DataQuery, using data contained in 
+ * This class tests DataQuery, using data contained in
  * //enterprise/infrastructure/dev/persistence/sql/data-query-test.sql
  *
  *  This data must be loaded as a precondition of this test running.
@@ -35,11 +35,11 @@ import java.math.BigDecimal;
  * facilitates this future refactoring.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  */
 public abstract class DataQueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryTest.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     public DataQueryTest(String name) {
         super(name);
@@ -64,8 +64,8 @@ public abstract class DataQueryTest extends PersistenceTestCase {
      *
      */
     public abstract void testAddOrder();
-    
-     /**
+
+    /**
      *  This tests the ability to add multiple filters to a data query
      */
     public abstract void testAddFilter();
@@ -87,15 +87,15 @@ public abstract class DataQueryTest extends PersistenceTestCase {
     }
 
     /**
-     *  This tests cursor methods: first(), last(), isFirst(), isLast(), 
+     *  This tests cursor methods: first(), last(), isFirst(), isLast(),
      *  previous(), next().
      *
      * Fails because first/last/isLast/previous are unsupported for
      * forward-only resultsets.
      *
      * @see <a href="http://developer.arsdigita.com/acs5/sdm/one-ticket?
-                     ticket_id=140759">Bug #140759</a>
-     */
+     ticket_id=140759">Bug #140759</a>
+    */
     public void FAILStestCursorMovement() {
 
         // TODO: uncomment This test will fail, since the cursor
@@ -105,53 +105,53 @@ public abstract class DataQueryTest extends PersistenceTestCase {
         // system. Currently, this test would break the weekly formal
         // build.
 
-         DataQuery dq = getDefaultQuery();   
+        DataQuery dq = getDefaultQuery();
 
-         // first is unsupported for foward-only resultsets.
-         assert("first() Failed! There should be rows in this query!", 
-                dq.first());
+        // first is unsupported for foward-only resultsets.
+        assert("first() Failed! There should be rows in this query!",
+               dq.first());
 
-         assert("Should be on the first row!", dq.isFirst() );
+        assert("Should be on the first row!", dq.isFirst() );
 
-         assert("last() Failed! There should be rows in this query!", 
-                dq.last());
-         assert("Should be on the last row!", dq.isLast() );
-         try {
+        assert("last() Failed! There should be rows in this query!",
+               dq.last());
+        assert("Should be on the last row!", dq.isLast() );
+        try {
             dq.next();
             dq.get("id");
             fail("Should throw exception if get() called when cursor off " +
                  "DataQuery");
-         }
-         catch (PersistenceException e) {
-         }
+        }
+        catch (PersistenceException e) {
+        }
 
-         // Back to the beginning
-         assert("first() Failed! There should be rows in this query!", 
-                dq.first());
-         assert("Should be on the first row!", dq.isFirst() );
+        // Back to the beginning
+        assert("first() Failed! There should be rows in this query!",
+               dq.first());
+        assert("Should be on the first row!", dq.isFirst() );
 
-         BigDecimal firstValue = (BigDecimal) dq.get("id");
-         dq.next();
-         
-         BigDecimal secondValue = (BigDecimal) dq.get("id");
-         dq.next();
+        BigDecimal firstValue = (BigDecimal) dq.get("id");
+        dq.next();
 
-         dq.previous();
-         assert( "previous() did not work first time!", 
-                 secondValue.equals(dq.get("id")) );
-         dq.previous();
-         assert( "previous() did not work second time!", 
-                 firstValue.equals(dq.get("id")) );
-         assert("Should be on the first row!", dq.isFirst() );
+        BigDecimal secondValue = (BigDecimal) dq.get("id");
+        dq.next();
+
+        dq.previous();
+        assert( "previous() did not work first time!",
+                secondValue.equals(dq.get("id")) );
+        dq.previous();
+        assert( "previous() did not work second time!",
+                firstValue.equals(dq.get("id")) );
+        assert("Should be on the first row!", dq.isFirst() );
 
     }
 
     public void testSizeAndPosition() {
         DataQuery dq = getDefaultQuery();
         final long size = dq.size();
-        // Seems silly, but there were severe errors with size() in another 
+        // Seems silly, but there were severe errors with size() in another
         // persistence class.
-        assertEquals("Size differs on second call!", size, dq.size() );   
+        assertEquals("Size differs on second call!", size, dq.size() );
 
         long count = 0;
         while (dq.next()) {
@@ -161,7 +161,7 @@ public abstract class DataQueryTest extends PersistenceTestCase {
 
         assertEquals("Count of records and size differ!", count, size );
         // Once more for paranoia's sake...
-        assertEquals("Size differs on third call!", size, dq.size() );   
+        assertEquals("Size differs on third call!", size, dq.size() );
 
     }
 
@@ -189,10 +189,10 @@ public abstract class DataQueryTest extends PersistenceTestCase {
                 while (dq.next());
             } catch (Exception e) {
                 dq.close();
-                fail("Problem on iteration " + i + "; this is probably the \n" + 
-                      "out of cursors problem, and will probably cause some \n" +
-                      "trouble with test teardown as well. \n" + 
-                      "Error is:" + e.toString());
+                fail("Problem on iteration " + i + "; this is probably the \n" +
+                     "out of cursors problem, and will probably cause some \n" +
+                     "trouble with test teardown as well. \n" +
+                     "Error is:" + e.toString());
             }
         }
     }
@@ -211,15 +211,3 @@ public abstract class DataQueryTest extends PersistenceTestCase {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-

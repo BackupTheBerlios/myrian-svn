@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -32,17 +32,17 @@ import java.io.StringWriter;
 
 
 /**
- * Defines a data query that is not associated with an object type or 
+ * Defines a data query that is not associated with an object type or
  * association.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/13 $
+ * @version $Revision: #6 $ $Date: 2002/08/14 $
  */
 public class QueryDef extends NamedSQLDef {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/QueryDef.java#5 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/QueryDef.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-    // this determines if it is a "zero or one row ", "one row" query 
+    // this determines if it is a "zero or one row ", "one row" query
     // or a multi-row query
     private int m_lowerBound = 0;
     private int m_upperBound = Integer.MAX_VALUE;
@@ -68,7 +68,7 @@ public class QueryDef extends NamedSQLDef {
         m_upperBound = upperBound;
     }
 
-    
+
     /**
      *  This sets the lower bound on the number of rows that can be
      *  returned by this query
@@ -134,12 +134,12 @@ public class QueryDef extends NamedSQLDef {
             String path = ((MapStatement)it.next()).getPrettyPath();
             if (getPropertyDef(path) == null) {
                 // Check to see if the property is part of an object type
-                if (!(path.indexOf(".") > -1 && 
-                    getPropertyDef(path.substring
-                                   (0, path.lastIndexOf("."))) != null)) { 
+                if (!(path.indexOf(".") > -1 &&
+                      getPropertyDef(path.substring
+                                     (0, path.lastIndexOf("."))) != null)) {
                     warning.append("Property: " + path + Utilities.LINE_BREAK);
                 }
-            } 
+            }
         }
 
         if (warning.length() > 0) {
@@ -152,7 +152,7 @@ public class QueryDef extends NamedSQLDef {
                         " the property at the top of the query.  For " +
                         " backwards compatibility we are going to use the " +
                         " default JDBC type as defined by the database " +
-                        " (which could lead to errors)." + 
+                        " (which could lead to errors)." +
                         Utilities.LINE_BREAK +
                         count + "Model: " + getModelDef().getName() + "." + getName() +
                         Utilities.LINE_BREAK +

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -32,19 +32,19 @@ import org.apache.log4j.Logger;
  * this class is to provide DDL to create and alter tables used by
  * {@link com.arsdigita.persistence.metadata.DynamicObjectType}.
  *
- * Note that the DDLGenerator does not support dropping tables and 
+ * Note that the DDLGenerator does not support dropping tables and
  * columns.  This is to avoid data loss and allow rolling back of UDCT
  * operations.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#6 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#7 $
  * @since 4.6.3 */
 
 final class PostgresDDLGenerator extends BaseDDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#6 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/PostgresDDLGenerator.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-    private static final Logger s_log = 
+    private static final Logger s_log =
         Logger.getLogger(PostgresDDLGenerator.class);
 
     private static final int MAX_COLUMN_NAME_LEN = 26;
@@ -81,8 +81,8 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
 
     /**
      * Takes an object type, a primary key property, and a collection of
-     * additional properties.  Returns either a collection of "create table" 
-     * or a collection of "alter table" statements to add the properties 
+     * additional properties.  Returns either a collection of "create table"
+     * or a collection of "alter table" statements to add the properties
      * to the object type's table.  If there is nothing to modify, this
      * returns null.
      *
@@ -103,7 +103,7 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
 
         if (!tableExists) {
             // create table
-            return super.generateTable(type, keyColumn, 
+            return super.generateTable(type, keyColumn,
                                        properties, defaultValueMap);
         } else {
             // alter table
@@ -111,12 +111,12 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
             if (properties == null) {
                 return list;
             }
-                
+
             Iterator props = properties.iterator();
-            
+
             while (props.hasNext()) {
                 Property property = (Property)props.next();
-                
+
                 // collections are handled by mapping tables later
                 if (!property.isCollection()) {
                     Object defaultValue = null;
@@ -129,22 +129,22 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
                         propCol = ((JoinElement)property.getJoinPath()
                                    .getPath().get(0)).getFrom();
                     }
-                    
-                    String columnType = 
+
+                    String columnType =
                         getJDBCTypeString(property, propCol);
-                    String columnName = 
+                    String columnName =
                         alterStringForSQL(propCol.getColumnName());
-                    
+
                     StringBuffer sb = new StringBuffer();
-                    
+
                     list.add("alter table " + tableName + " add " +
                              columnName + " " + columnType);
 
                     if (defaultValueMap != null) {
                         Object value = defaultValueMap.get(property.getName());
                         if (value != null) {
-                            list.add("alter table " + tableName + " alter " + 
-                                     columnName + " set " + 
+                            list.add("alter table " + tableName + " alter " +
+                                     columnName + " set " +
                                      getDefaultString(value));
                         }
                     }
@@ -155,14 +155,14 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
                         list.add("alter table " + tableName + " add " +
                                  "constraint " + constraintName + " " +
                                  "check (" + columnName + " notnull)");
-                    } 
+                    }
                 }
             }
-            
+
             if (list.size() == 0) {
                 return null;
             }
-            
+
             return list;
         }
     }
@@ -176,7 +176,7 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
      *  @param suffix The suffix of the constraint name.  This is often
      *  something like "nn" for "not null" or "fk" for foreign key.
      */
-    private String getConstraintName(String tableName, String columnName, 
+    private String getConstraintName(String tableName, String columnName,
                                      String suffix) {
         boolean findNewName = true;
         String constraintName = tableName + "_" + columnName;
@@ -203,7 +203,7 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
                 if (!constraints.contains(constraintName)) {
                     constraints.add(constraintName);
                     findNewName = false;
-                } 
+                }
             }
             if (findNewName) {
                 constraintName = incrementName(constraintName, count)
@@ -280,7 +280,7 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
         // we append the default now() and then we may append
         // more on later if the time asked for is not this time
         StringBuffer sb = new StringBuffer(" default now()");
-        
+
         // if the difference in time between NOW and when the time
         // was created is more than 1 minute then we add an offset to
         // sysdate.  To do this, we convert milleseconds (the java
@@ -294,13 +294,13 @@ final class PostgresDDLGenerator extends BaseDDLGenerator {
             } else {
                 sb.append(" + reltime('" + offset*(-1) + " hours'::timespan)");
             }
-        } 
+        }
         return sb.toString();
     }
 
 
     /**
-     * Database systems have varying restrictions on the length of 
+     * Database systems have varying restrictions on the length of
      * column names.
      * This method obtains the max length for the particular implementation.
      *

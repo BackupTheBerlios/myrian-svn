@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -25,17 +25,17 @@ import java.sql.SQLException;
  * Test
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/14 $
+ * @version $Revision: #7 $ $Date: 2002/08/14 $
  */
 
 public abstract class OrderTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderTest.java#6 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/OrderTest.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     public OrderTest(String name) {
         super(name);
     }
-    
+
     protected String m_testType = null;
 
     abstract String getModelName();
@@ -74,7 +74,7 @@ public abstract class OrderTest extends PersistenceTestCase {
         order = getSession().retrieve(new OID(getModelName() + ".Order", 1));
         order.set("seller", "IBM");
         order.save();
-        
+
         // Retrieve the updated Order.
         order = getSession().retrieve(new OID(getModelName() + ".Order", 1));
         assertEquals("Buyer was not retrieved correctly.",
@@ -86,7 +86,7 @@ public abstract class OrderTest extends PersistenceTestCase {
                      "102 R Inman St.\nCambridge MA, 02139",
                      order.get("shippingAddress"));
 
-        DataQuery query = 
+        DataQuery query =
             getSession().retrieveQuery(getModelName() + ".OrdersNumberOfLineItems");
         Filter f = query.addFilter("order_id = :order_id");
         f.set("order_id", order.get("id"));
@@ -117,7 +117,7 @@ public abstract class OrderTest extends PersistenceTestCase {
             fail("DataAssociation was not retrieved correctly: " +
                  value.getClass());
         }
-        
+
         // Add objects to a persistent association.
         Set added = new HashSet();
         long numberOfLineItems = 10;
@@ -134,7 +134,7 @@ public abstract class OrderTest extends PersistenceTestCase {
             added.add("Item " + i);
         }
         order.save();
-        
+
         // Retrieve a persistent association with items in it.
         order = getSession().retrieve(new OID(getModelName() + ".Order", 1));
         items = (DataAssociation) order.get("items");
@@ -142,7 +142,7 @@ public abstract class OrderTest extends PersistenceTestCase {
         DataObject object = null;
         while (items.next()) {
             retrieved.add(items.get("name"));
-            assert("inStock is " + items.get("inStock").getClass() + 
+            assert("inStock is " + items.get("inStock").getClass() +
                    ", should be a Boolean",
                    items.get("inStock") instanceof Boolean);
             object = items.getDataObject();
@@ -166,14 +166,14 @@ public abstract class OrderTest extends PersistenceTestCase {
                 // it should be here
                 // sometimes it should be here (for the static test)
                 assert("We caught an UndefinedEventException in the dynamic test. " +
-                       "It should have been a PersistenceException", 
+                       "It should have been a PersistenceException",
                        "static".equals(m_testType));
             } catch (PersistenceException e) {
                 // sometimes it should be here (for the dynamic test)
                 assert("We caught a PersistenceException in the static test.  " +
-                       "It should have been an UndefinedEventException", 
+                       "It should have been an UndefinedEventException",
                        "dynamic".equals(m_testType));
-            } 
+            }
         }
 
 
@@ -203,12 +203,12 @@ public abstract class OrderTest extends PersistenceTestCase {
                      "102 R Inman St.\nCambridge MA, 02139",
                      order.get("shippingAddress"));
 
-        DataQuery ordersMaxPrices = 
+        DataQuery ordersMaxPrices =
             getSession().retrieveQuery(getModelName() + ".OrdersMaxPrices");
         assert(ordersMaxPrices.next());
 
         assertTrue("Order was not retrieved correctly.",
-                     1 == ((Number)ordersMaxPrices.get("orderId")).intValue());
+                   1 == ((Number)ordersMaxPrices.get("orderId")).intValue());
         assertEquals("Buyer was not retrived correctly.",
                      "Rafael H. Schloming",
                      ordersMaxPrices.get("buyer"));
@@ -216,14 +216,14 @@ public abstract class OrderTest extends PersistenceTestCase {
                      null,
                      ordersMaxPrices.get("seller"));
         assertEquals(
-            "maxPrice was not retrived correctly.",
-            (new BigDecimal(maxPrice)).setScale(
-                4, BigDecimal.ROUND_HALF_UP
-                ),
-            ((BigDecimal) ordersMaxPrices.get("maxPrice")).setScale(
-                4, BigDecimal.ROUND_HALF_UP
-                )
-            );
+                     "maxPrice was not retrived correctly.",
+                     (new BigDecimal(maxPrice)).setScale(
+                                                         4, BigDecimal.ROUND_HALF_UP
+                                                         ),
+                     ((BigDecimal) ordersMaxPrices.get("maxPrice")).setScale(
+                                                                             4, BigDecimal.ROUND_HALF_UP
+                                                                             )
+                     );
         assert(!ordersMaxPrices.next());
 
         DataCollection allItems = getSession().retrieve(getModelName() + ".LineItem");
@@ -247,13 +247,13 @@ public abstract class OrderTest extends PersistenceTestCase {
                          order.get("id"));
         }
 
-        DataQuery query = 
+        DataQuery query =
             getSession().retrieveQuery(getModelName() + ".OrdersNumberOfLineItems");
         Filter f = query.addFilter("order_id = :order_id");
         f.set("order_id", order.get("id"));
         long actualNumberLineItems = query.size();
         if (actualNumberLineItems != numberOfLineItems) {
-            fail("Number of line items should be " + numberOfLineItems + 
+            fail("Number of line items should be " + numberOfLineItems +
                  ". We got: " + actualNumberLineItems);
         }
 
@@ -294,17 +294,17 @@ public abstract class OrderTest extends PersistenceTestCase {
         assertEquals("Text was not properly set",
                      "This is a test of an extended object type",
                      orderExt.get("text"));
-        
+
         // Update an orderExt.
         orderExt = getSession().retrieve(new OID(getModelName() + ".OrderExt", 100));
         orderExt.set("text", "Trying to reset just the text");
         orderExt.save();
-        
+
     }
 
     private DataObject makeOrder(int numItems) {
-	Session ssn = getSession();
-	DataObject order = ssn.create(getModelName() + ".Order");
+        Session ssn = getSession();
+        DataObject order = ssn.create(getModelName() + ".Order");
 
         order.set("id", new BigDecimal(1));
         order.set("buyer", "Rafael H. Schloming");
@@ -314,16 +314,16 @@ public abstract class OrderTest extends PersistenceTestCase {
                   new java.sql.Date(System.currentTimeMillis()));
         order.set("hasShipped", Boolean.FALSE);
 
-	DataAssociation items = (DataAssociation) order.get("items");
+        DataAssociation items = (DataAssociation) order.get("items");
 
-	for (int i = 0; i < numItems; i++) {
-	    DataObject item = ssn.create(getModelName() + ".LineItem");
-	    item.set("id", new BigDecimal(i));
-	    item.set("name", "Item " + i);
-	    item.set("price", new Float(i + 0.99));
+        for (int i = 0; i < numItems; i++) {
+            DataObject item = ssn.create(getModelName() + ".LineItem");
+            item.set("id", new BigDecimal(i));
+            item.set("name", "Item " + i);
+            item.set("price", new Float(i + 0.99));
             item.set("order", order);
-	    items.add(item);
-	}
+            items.add(item);
+        }
 
         return order;
     }
@@ -332,24 +332,24 @@ public abstract class OrderTest extends PersistenceTestCase {
         int numItems = 10;
 
         DataObject order = makeOrder(numItems);
-	order.save();
+        order.save();
 
         DataAssociation items = (DataAssociation) order.get("items");
 
-	assertEquals("order not saved properly", numItems, items.size());
+        assertEquals("order not saved properly", numItems, items.size());
 
 
-	DataAssociationCursor cursor = items.cursor();
-	while (cursor.next()) {
-	    DataObject item = cursor.getDataObject();
-	    item.set("price", new Float(0));
-	}
+        DataAssociationCursor cursor = items.cursor();
+        while (cursor.next()) {
+            DataObject item = cursor.getDataObject();
+            item.set("price", new Float(0));
+        }
 
-	order.save();
+        order.save();
 
-	cursor = items.cursor();
-	cursor.addFilter("price != 0");
-	assertEquals("saves not cascaded", 0, cursor.size());
+        cursor = items.cursor();
+        cursor.addFilter("price != 0");
+        assertEquals("saves not cascaded", 0, cursor.size());
     }
 
     public void FAILStestDeletingCompositions() {
@@ -359,7 +359,7 @@ public abstract class OrderTest extends PersistenceTestCase {
 
         DataAssociation items = (DataAssociation) order.get("items");
 
-	assertEquals("order not saved properly", numItems, items.size());
+        assertEquals("order not saved properly", numItems, items.size());
 
         DataAssociationCursor cursor = items.cursor();
         while (cursor.next()) {
@@ -373,14 +373,14 @@ public abstract class OrderTest extends PersistenceTestCase {
 
     public void FAILStestClear() {
         int numItems = 10;
-	DataObject order = makeOrder(numItems);
-	order.save();
+        DataObject order = makeOrder(numItems);
+        order.save();
 
         DataAssociation items = (DataAssociation) order.get("items");
 
-	assertEquals("order not saved properly", numItems, items.size());
+        assertEquals("order not saved properly", numItems, items.size());
 
-	items.clear();
+        items.clear();
         order.save();
 
         assertEquals("items not cleared properly", 0, items.size());

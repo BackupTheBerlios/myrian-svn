@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the GNU Public License
- * Version 2 (the "License"); you may not use this file except in
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/doc/license.text
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -20,11 +20,11 @@ import java.io.File;
 
 /**
  *  PackageTestSuite
- *  
+ *
  *  This class is the foundation for the test suite methodology. At each package level,
  *  an PackageTestSuite derived class is defined.  For Ant to handle TestSuites, the class
  *  must define:
- *  <code> 
+ *  <code>
  *      public static Test suite();
  *  </code>
  *
@@ -40,13 +40,13 @@ import java.io.File;
  *  The PackageTestSuite.populateSuite method adds all the valid test cases in the same
  *  package as the derived Suite class. Optionally, if the property test.testpath is defined,
  *  the framework will look here. test.testpath must be the fully qualified path name.
- *  
+ *
  * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  */
 
 public class PackageTestSuite extends TestSuite {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/tools/junit/framework/PackageTestSuite.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/tools/junit/framework/PackageTestSuite.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     public PackageTestSuite() {
         super();
@@ -66,10 +66,10 @@ public class PackageTestSuite extends TestSuite {
      *
      *  If the test class has a field named FAILS, the test will not be added to the suite.
      *  FAILS can be any public static type, such as:
-     *   
+     *
      *  <code> public static final boolean FAILS = true; </code>
      *
-     *  If the TestCase requires initialization of some external resources, the 
+     *  If the TestCase requires initialization of some external resources, the
      *  class should implement the following method:
      *
      *  <code>
@@ -88,47 +88,47 @@ public class PackageTestSuite extends TestSuite {
      *          return fooSetup;
      *      }
      *  }
-     *  
+     *
      *  public FooSetup extends TestSetup {
-     *      // called once before any tests are run 
-     *      protected void setUp() {  
+     *      // called once before any tests are run
+     *      protected void setUp() {
      *          GlobalResource.initialize();
      *          SQLLoader.loadAllSQL();
      *      }
      *
-     *      // called once after all tests are run 
-     *      protected void tearDown() {  
+     *      // called once after all tests are run
+     *      protected void tearDown() {
      *          GlobalResource.cleanup();
      *          SQLLoader.clearDatabase();
      *      }
      *  }
      *  </code>
      *
-     *  There is an alternative methodology, which may be cleaner. Since this whole system, 
-     *  like the original Ant test setup, relies on class names, there may be a 
-     *  better way. If the test for some class Foo requires a TestSetup wrapper, 
+     *  There is an alternative methodology, which may be cleaner. Since this whole system,
+     *  like the original Ant test setup, relies on class names, there may be a
+     *  better way. If the test for some class Foo requires a TestSetup wrapper,
      *  the classes could be named as follows:
-     *  
+     *
      *      FooTestImpl.java - The TestCase based class. Was FooTest in prior example
      *      FooTest.java - The TestSetup derived class, which is created wrapping
      *          FooTestImpl.java.  Was FooSetup in above example
-     * 
+     *
      *  An example  would be:
      *  <code>
      *  public class FooTest extends TestSetup {
      *        public FooTest(Test test)
      *        {
      *            super(test);
-     *        } 
+     *        }
      *        public static Test suite() {
      *          return new FooTest(new TestSuite(FooTestImpl.class));
      *       }
      *  }
-     *  </code>     
+     *  </code>
      *  @param testClass The test class to add to the suite.
      */
     public void addTestSuite(final Class testClass) {
-        
+
         if( Modifier.isAbstract(testClass.getModifiers()) ){
             return;
         }
@@ -139,36 +139,36 @@ public class PackageTestSuite extends TestSuite {
             return;
         }
         catch(Exception e) {
-            // Ignored. There is no such Field defined on the class.    
+            // Ignored. There is no such Field defined on the class.
         }
 
         // See if the class defines a suite factory method.
         try {
-            Method wrapperFactory = testClass.getMethod("suite", new Class[0]);     
+            Method wrapperFactory = testClass.getMethod("suite", new Class[0]);
             try {
                 Test testWrapper = (Test) wrapperFactory.invoke( null, new Object[0] );
                 addTest( testWrapper );
-            
+
             }
             catch(final Exception e) {
                 // Something evil occured. The method is not static, public, etc.
                 addTest( new TestCase("suiteFailed") {
-                    public void testWrapperFailed() {
-                        fail("Failed to invoke" + testClass.toString() + ".suite(). " + e.getMessage());
+                        public void testWrapperFailed() {
+                            fail("Failed to invoke" + testClass.toString() + ".suite(). " + e.getMessage());
+                        }
                     }
-                }
-                );
+                         );
             }
-            
+
         }
         // This class does not make a wrapper for itself.
         catch(NoSuchMethodException e) {
             //super.addTestSuite(testClass);
             addTest( new PackageTestSuite(testClass) );
         }
-       
+
     }
-    
+
     /**
      *  For each TestCase based class in the same package as the suite,
      *  add the TestCase to the suite.
@@ -177,20 +177,20 @@ public class PackageTestSuite extends TestSuite {
      */
     protected static void populateSuite(PackageTestSuite suite) {
         String testCasePath = getTestCasePath(suite);
-        
+
         File testFileDir = new File(testCasePath);
         String[] filenames = testFileDir.list();
         if( filenames != null ) {
-            addTestCases(filenames, suite);            
+            addTestCases(filenames, suite);
         }
 
     }
 
     /**
-     *  Adds a given test to the suite. If the test somehow cannot be found, a 
+     *  Adds a given test to the suite. If the test somehow cannot be found, a
      *  failing test shall be added to the suite.
      *
-     *  @param fullClassName The fully qualified name of the class. 
+     *  @param fullClassName The fully qualified name of the class.
      *      I.e. com.arsdigita.whatever.SomethingTest
      *
      *  @param suite The PackageTestSuite to add TestCases to.
@@ -198,7 +198,7 @@ public class PackageTestSuite extends TestSuite {
      */
     private static void addTestCase(final String fullClassName, PackageTestSuite suite) {
         try {
-            Class theClass = Class.forName(fullClassName);    
+            Class theClass = Class.forName(fullClassName);
             suite.addTestSuite(theClass);
         }
         catch(final ClassNotFoundException e) {
@@ -207,14 +207,14 @@ public class PackageTestSuite extends TestSuite {
                         fail("Unexpected failure to find test class " + fullClassName + ". " + e.getMessage());
                     }
                 }
-            );
+                           );
         }
-        
+
     }
 
     /**
      *  Adds all of the valid Test classes to the suite. A valid test class is
-     *  assumed to be named SomethingTest.  
+     *  assumed to be named SomethingTest.
      *
      *  @param filenames The list of all files in the test class directory.
      *  @param suite The PackageTestSuite to add TestCases to.
@@ -223,38 +223,38 @@ public class PackageTestSuite extends TestSuite {
     private static void addTestCases(String[] filenames, PackageTestSuite suite) {
         final String packageName =  getPackageName(suite);
         for( int i = 0; i < filenames.length; i++) {
-              final String filename = filenames[i];
-              
-              final boolean isTestClass;
+            final String filename = filenames[i];
 
-              String testClass = System.getProperty("junit.test", "");
-              String testCactus = System.getProperty("junit.usecactus", "");
+            final boolean isTestClass;
 
-              if ( ! testClass.equals("") ) {
-                  isTestClass = filename.equals(testClass);
-              } else {
-                  if ( testCactus.equalsIgnoreCase("true") ) {
-                      isTestClass = filename.endsWith( "Test.class" );
-                  } 
-                  else if ( testCactus.equalsIgnoreCase("only") ) {
-                      isTestClass = filename.endsWith( "CactusTest.class" );
-                  } 
-                  else {
-                      isTestClass = filename.endsWith( "Test.class" ) &&
-                          !filename.endsWith( "CactusTest.class" );
-                  }
-              }
+            String testClass = System.getProperty("junit.test", "");
+            String testCactus = System.getProperty("junit.usecactus", "");
 
-              if ( isTestClass ) {
-                   
-                   final String className = packageName + "." +
-                        filename.substring( 0, filename.indexOf('.'));
-                    System.out.println("Class: " + className);
+            if ( ! testClass.equals("") ) {
+                isTestClass = filename.equals(testClass);
+            } else {
+                if ( testCactus.equalsIgnoreCase("true") ) {
+                    isTestClass = filename.endsWith( "Test.class" );
+                }
+                else if ( testCactus.equalsIgnoreCase("only") ) {
+                    isTestClass = filename.endsWith( "CactusTest.class" );
+                }
+                else {
+                    isTestClass = filename.endsWith( "Test.class" ) &&
+                        !filename.endsWith( "CactusTest.class" );
+                }
+            }
 
-                    addTestCase( className, suite );
-              }
-         }
-        
+            if ( isTestClass ) {
+
+                final String className = packageName + "." +
+                    filename.substring( 0, filename.indexOf('.'));
+                System.out.println("Class: " + className);
+
+                addTestCase( className, suite );
+            }
+        }
+
     }
 
     public static Test suite() {
@@ -272,11 +272,11 @@ public class PackageTestSuite extends TestSuite {
      *
      *      1) When ant is running recursively, its cwd is the top level
      *      directory for the project, i.e. infrastructure/persistence.
-     *      
+     *
      *      2) The build system always places the test class files in
      * {cwd}/build/test
      *
-     *  It is a real pity that java reflection doesn't have something like 
+     *  It is a real pity that java reflection doesn't have something like
      *  Package.getClasses()
      *
      *  @param suite The PackageTestSuite that tests are being added to. Is in same
@@ -292,11 +292,11 @@ public class PackageTestSuite extends TestSuite {
 
         File current = new File("");
         final String packageName =  getPackageName(suite);
-        final String pathName = current.getAbsolutePath() + 
+        final String pathName = current.getAbsolutePath() +
             File.separator + "build" + File.separator + "tests" +
             File.separator + packageName.replace('.', File.separatorChar);
 
-        return pathName;        
+        return pathName;
     }
 
     /**
@@ -309,9 +309,8 @@ public class PackageTestSuite extends TestSuite {
         Package p = suite.getClass().getPackage();
         String fullPackageName = p.toString();
         String packageName = fullPackageName.substring(fullPackageName.indexOf(' ') + 1 );
-        
+
         return packageName;
     }
 
 }
-

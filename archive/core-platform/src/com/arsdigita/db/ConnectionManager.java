@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -19,21 +19,21 @@ import java.sql.SQLException;
 import org.apache.log4j.Logger;
 
 /**
- * 
+ *
  * Central location for obtaining database connection.
  *
  * @author David Dao (<a href="mailto:ddao@arsdigita.com"></a>)
- * @version $Revision: #3 $ $Date: 2002/08/13 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  * @since 4.5
- * 
+ *
  */
 
 public class ConnectionManager {
 
-    public static final String versionId = "$Author: dennis $ - $Date: 2002/08/13 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#3 $";
+    public static final String versionId = "$Author: dennis $ - $Date: 2002/08/14 $ $Id: //core-platform/dev/src/com/arsdigita/db/ConnectionManager.java#4 $";
 
     private static DatabaseConnectionPool s_pool = null;
-    private static String s_poolName = 
+    private static String s_poolName =
         "com.arsdigita.db.oracle.OracleConnectionPoolImpl";
 
     // # of times a getConnection will retry if connection is null
@@ -43,7 +43,7 @@ public class ConnectionManager {
     // # of milliseconds thread will sleep between retries.
     // set by connectionRetrySleep in enterprise.init
     private static long s_retrySleep = 100;
-    
+
     // max # of connections to pool
     // set by connectionPoolSize in enterprise.init
     private static int s_connectionPoolSize = 8;
@@ -58,7 +58,7 @@ public class ConnectionManager {
         throws java.sql.SQLException {
 
         synchronized (ConnectionManager.class) {
-            
+
             // check to see if pool is already intialized
             // for this url, username, and password.
 
@@ -67,12 +67,12 @@ public class ConnectionManager {
                      s_pool.getUserName().equals(username) &&
                      s_pool.getPassword().equals(password) ) {
                     // pool already intialized.
-                    return; 
+                    return;
                 } else {
                     s_pool.freeConnections();
                 }
-            }  
-            
+            }
+
             // reset the pool
             s_pool = null;
 
@@ -80,13 +80,13 @@ public class ConnectionManager {
                 s_pool = (DatabaseConnectionPool)Class.forName(s_poolName)
                     .newInstance();
             } catch (Exception e) {
-                //ClassNotFoundException, InstantiationException, 
+                //ClassNotFoundException, InstantiationException,
                 //IllegalAccessException
                 cat.error("Unable to initialize DB pool", e);
                 throw new DbException(e);
             }
 
-            cat.info("Setting connection info to " + url + ", " + 
+            cat.info("Setting connection info to " + url + ", " +
                      username + ", " + password);
             s_pool.setConnectionInfo(url, username, password);
             cat.info("Setting connection pool size to " + s_connectionPoolSize);
@@ -144,12 +144,12 @@ public class ConnectionManager {
             try {
                 s_pool.setDriverSpecificParameter(name, value);
             } catch (java.sql.SQLException  e) {
-                cat.error("Unable to set driver specific parameter " + 
+                cat.error("Unable to set driver specific parameter " +
                           name + " to " + value);
             }
         } else {
-            cat.error("setDriverSpecificParameter must be called after " + 
-                      "setting default connection info.  Ignoring set for " + 
+            cat.error("setDriverSpecificParameter must be called after " +
+                      "setting default connection info.  Ignoring set for " +
                       name + " to " + value);
         }
     }
@@ -166,18 +166,18 @@ public class ConnectionManager {
      * Return an available connection from the pool.
      */
     // intentionally not synchronized, due to the sleep.
-    public static java.sql.Connection getConnection() 
-            throws java.sql.SQLException {
+    public static java.sql.Connection getConnection()
+        throws java.sql.SQLException {
 
         int retries = 0;
         long time = System.currentTimeMillis();
-        
+
         do {
             java.sql.Connection conn = null;
             // note that some drivers can be configured
             // to block in getConnection, in which case
-            // this synchronized will be quite a 
-            // bottleneck.  Note that it's not 
+            // this synchronized will be quite a
+            // bottleneck.  Note that it's not
             // an ordered first-come-first-served system
             // that determines which of several competing
             // threads gets the monitor lock.
@@ -185,7 +185,7 @@ public class ConnectionManager {
             // controlling the order of who gets this lock?
             // TODO: Consider removing this synchronization
             // altogether, assuming s_pool is practically
-            // immutable, and pushing all synchronization 
+            // immutable, and pushing all synchronization
             // responsibility down to the DB pool driver.
             // Or, maybe switch to wait/notify, see below TODO.
             //synchronized(ConnectionManager.class) {
@@ -200,18 +200,18 @@ public class ConnectionManager {
 
             if (cat.isInfoEnabled()) {
                 long newtime = System.currentTimeMillis() - time;
-                
-                cat.info("getConnection(). Executed in " + newtime + 
+
+                cat.info("getConnection(). Executed in " + newtime +
                          " total ms. across " + retries + " retries");
                 Throwable t = new Throwable("getConnection stack trace");
                 cat.debug(null, t);
             }
-	
+
             // Wrap the connection object with our implementation.
             if (conn == null) {
                 retries++;
                 if (retries <= s_retryLimit) {
-                    cat.warn("Unable to get connection, sleeping (retry #" + 
+                    cat.warn("Unable to get connection, sleeping (retry #" +
                              retries + ")");
                     try {
                         // TODO: consider synchronizing and changing this to
@@ -222,11 +222,11 @@ public class ConnectionManager {
                         // ignore
                     }
                 } else {
-                    cat.warn("Unable to get connection, giving up " + 
+                    cat.warn("Unable to get connection, giving up " +
                              "(beyond retry limit at #" + retries + ")");
                     throw new java.sql.SQLException("Unable to get connection");
                 }
-            } else {   
+            } else {
                 // TODO: set threadlocal connection here once we have SDM #149294.
                 return conn;
             }
@@ -240,14 +240,14 @@ public class ConnectionManager {
     /**
      * Returns the connection presently in use by this thread.
      * Presently relies on TransactionContext correctly clearing
-     * this information.  TODO: Change to use a close listener for 
+     * this information.  TODO: Change to use a close listener for
      * clearing when/if we implement them (SDM #149294).
      *
      * May return null if there is no connection presently in use.
      * Will not ever allocate a connection, so presumably whatever
      * opened the connection will be responsible for closing it.
      *
-     * This should be used whenever possible to avoid opening 
+     * This should be used whenever possible to avoid opening
      * multiple connections for one thread.
      *
      * @return This thread's current connection, or null if none.
@@ -273,11 +273,9 @@ public class ConnectionManager {
     /**
      * Frees all of the connections in the pool.
      */
-	public static void freeConnections() {
-		if (s_pool != null) {
-			s_pool.freeConnections();
-		}
-	}
+    public static void freeConnections() {
+        if (s_pool != null) {
+            s_pool.freeConnections();
+        }
+    }
 }
-										   
-

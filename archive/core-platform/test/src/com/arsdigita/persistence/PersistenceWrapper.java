@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -23,13 +23,13 @@ import org.apache.log4j.Logger;
  * PersistenceWrapper
  *
  * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #3 $ $Date: 2002/08/13 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  */
 public class PersistenceWrapper extends BaseTestSetup {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceWrapper.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceWrapper.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-    private static Logger s_log = 
+    private static Logger s_log =
         Logger.getLogger(PersistenceWrapper.class.getName());
 
     public PersistenceWrapper(TestSuite suite) {
@@ -46,11 +46,11 @@ public class PersistenceWrapper extends BaseTestSetup {
         TestSuite suite = new TestSuite();
         if( null != className ) {
             try {
-                Class testClass = Class.forName(className);                
+                Class testClass = Class.forName(className);
                 suite.addTestSuite( testClass );
             }
             catch(ClassNotFoundException e) {
-                
+
             }
 
 

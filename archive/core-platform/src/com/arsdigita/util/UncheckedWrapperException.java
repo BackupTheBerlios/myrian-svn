@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,6 +12,7 @@
  * rights and limitations under the License.
  *
  */
+
 package com.arsdigita.util;
 
 /**
@@ -20,29 +21,29 @@ package com.arsdigita.util;
  *
  * TODO: This should become a skeleton when/if we switch to Java 1.4.
  * http://java.sun.com/j2se/1.4/docs/guide/lang/chained-exceptions.html
- * 
+ *
  * The basic exception methods are overridden with methods that
  * combine this wrapper and its root cause, so it can be
  * treated just like any normal exception in actual use.
  *
- * Note that it is not necessary to provide a string along 
+ * Note that it is not necessary to provide a string along
  * with a root cause; in particular, the following usage:
  * <tt>new UncheckedWrapperException(e);</tt> is more correct than
  * <tt>new UncheckedWrapperException(e.getMessage(), e);</tt>
  *
  * @author David Eison (eison@arsdigita.com)
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#3 $
  */
 public class UncheckedWrapperException extends RuntimeException {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#2 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/UncheckedWrapperException.java#3 $";
 
     Throwable m_rootCause;
 
     /**
      * Constructor which only takes a msg, which will cause this
      * UncheckedWrapperException to behave like a normal RuntimeException.
-     * While it doesn't seem to make a lot of sense to have a wrapper 
+     * While it doesn't seem to make a lot of sense to have a wrapper
      * exception that doesn't wrap anything, this is needed so that it
      * can be used as a direct replacement for RuntimeException.
      */
@@ -57,7 +58,7 @@ public class UncheckedWrapperException extends RuntimeException {
     public UncheckedWrapperException (Throwable rootCause) {
         this(null, rootCause);
     }
-    
+
     /**
      * Constructor which takes a message string and a root cause
      * that this exception will be wrapping.  The message string
@@ -83,7 +84,7 @@ public class UncheckedWrapperException extends RuntimeException {
         return m_rootCause;
     }
 
-    // All further methods override normal throwable behavior to 
+    // All further methods override normal throwable behavior to
     // combine information w/ the root cause.
 
     /**
@@ -134,8 +135,8 @@ public class UncheckedWrapperException extends RuntimeException {
     public void printStackTrace() {
         super.printStackTrace();
         if (m_rootCause != null) {
-           System.err.print("Root cause: ");
-           m_rootCause.printStackTrace();
+            System.err.print("Root cause: ");
+            m_rootCause.printStackTrace();
         }
     }
 

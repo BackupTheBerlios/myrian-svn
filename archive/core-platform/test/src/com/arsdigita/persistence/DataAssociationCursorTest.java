@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -27,11 +27,11 @@ import java.util.*;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/14 $
  */
 public class DataAssociationCursorTest extends DataCollectionTest {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataAssociationCursorTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataAssociationCursorTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     OrderAssociation m_orderAssoc;
 
@@ -94,8 +94,8 @@ public class DataAssociationCursorTest extends DataCollectionTest {
                 fail("Id " + deadId + " not removed from DataAssociation!");
             }
         }
-        
-        
+
+
     }
     /**
      *  Tests the ordering capability of DataQuery.
@@ -103,7 +103,7 @@ public class DataAssociationCursorTest extends DataCollectionTest {
      *
      */
     public void testSetOrder() {
-        
+
     }
 
     /**
@@ -112,14 +112,14 @@ public class DataAssociationCursorTest extends DataCollectionTest {
      *
      */
     public void testAddOrder() {
-        
+
     }
-    
-     /**
+
+    /**
      *  This tests the ability to add multiple filters to a data query
      */
     public void testAddFilter() {
-        
+
     }
 
     protected DataQuery getDefaultQuery() {

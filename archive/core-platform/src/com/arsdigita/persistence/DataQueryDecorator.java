@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -23,14 +23,14 @@ import java.util.Map;
  * methods can be added to a stock data query.
  *
  * @author <a href="mailto:lutter@arsdigita.com">David Lutterkort</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDecorator.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDecorator.java#3 $
  */
 public class DataQueryDecorator implements DataQuery {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDecorator.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDecorator.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private DataQuery m_dq;
-    
+
     /**
      * Decorate the data query <code>dq</code>.
      *
@@ -42,7 +42,7 @@ public class DataQueryDecorator implements DataQuery {
 
     /**
      * Retrieve the query with name <code>queryName</code> and decorate
-     * it. 
+     * it.
      *
      * @param queryName the name of the data query to decorate.
      */
@@ -62,7 +62,7 @@ public class DataQueryDecorator implements DataQuery {
     public void rewind() {
         m_dq.rewind();
     }
-        
+
     public Object get(String propertyName) {
         return m_dq.get(propertyName);
     }
@@ -103,11 +103,11 @@ public class DataQueryDecorator implements DataQuery {
     public boolean isLast() throws PersistenceException {
         return m_dq.isLast();
     }
-    
+
     public boolean isAfterLast() throws PersistenceException {
         return m_dq.isAfterLast();
     }
-    
+
     public boolean last() throws PersistenceException {
         return m_dq.last();
     }
@@ -123,7 +123,7 @@ public class DataQueryDecorator implements DataQuery {
     public Filter addFilter(String conditions) {
         return m_dq.addFilter(conditions);
     }
-    
+
     public Filter addFilter(Filter filter) {
         return m_dq.addFilter(filter);
     }
@@ -132,19 +132,19 @@ public class DataQueryDecorator implements DataQuery {
         return m_dq.removeFilter(filter);
     }
 
-    public Filter addInSubqueryFilter(String propertyName, 
+    public Filter addInSubqueryFilter(String propertyName,
                                       String subqueryName) {
         return m_dq.addInSubqueryFilter(propertyName, subqueryName);
     }
 
-    public Filter addInSubqueryFilter(String property, 
-				      String subQueryProperty,
+    public Filter addInSubqueryFilter(String property,
+                                      String subQueryProperty,
                                       String subqueryName) {
         return m_dq.addInSubqueryFilter(property, subQueryProperty,
-					subqueryName);
+                                        subqueryName);
     }
 
-    public Filter addNotInSubqueryFilter(String propertyName, 
+    public Filter addNotInSubqueryFilter(String propertyName,
                                          String subqueryName) {
         return m_dq.addNotInSubqueryFilter(propertyName, subqueryName);
     }

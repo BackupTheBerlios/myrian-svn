@@ -1,10 +1,10 @@
 /*
  * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ACS Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.redhat.com/licenses/acspl.html
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -25,7 +25,7 @@ import com.arsdigita.bebop.event.PrintEvent;
 import org.apache.log4j.Logger;
 
 /**
- * This page checks to make sure that the database is still working 
+ * This page checks to make sure that the database is still working
  * properly.  If it is, the page contains the word "success".  If it
  * is not then it returned the word "failed".
  *
@@ -34,22 +34,22 @@ import org.apache.log4j.Logger;
  * and look at the output
  *
  * @author Randy Graebner (randyg@alum.mit.edu)
- * @version $Revision: #3 $, $Date: 2002/08/13 $
+ * @version $Revision: #4 $, $Date: 2002/08/14 $
  */
 public class DBTestPage extends Page {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/DBTestPage.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/DBTestPage.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private static final Logger s_log =
         Logger.getLogger(DBTestPage.class);
-    
-    /** 
+
+    /**
      *  This creates a new page with the correct label and print listener
      */
     public DBTestPage() {
         super();
         setTitle(new Label(new PrintListener() {
-                public void prepare(PrintEvent e) {        
+                public void prepare(PrintEvent e) {
                     Label label = (Label)e.getTarget();
                     try {
                         DataQuery query = SessionManager.getSession()
@@ -70,9 +70,6 @@ public class DBTestPage extends Page {
         lock();
     }
 
-    
+
 
 }
-
-
-  

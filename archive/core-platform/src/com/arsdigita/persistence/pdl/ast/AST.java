@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -30,12 +30,12 @@ import java.util.ArrayList;
  * AST
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/06 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  */
 
 public class AST extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AST.java#3 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AST.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     // the various models that make up this AST/Metadata
     private Map m_models = new HashMap();
@@ -44,7 +44,7 @@ public class AST extends Element {
 
     /**
      * Returns the ModelDef named "name".
-     * 
+     *
      * @param name the name of the ModelDef to retrieve
      * @return the ModelDef named "name", null if it doesn't exist
      */
@@ -55,7 +55,7 @@ public class AST extends Element {
     /**
      * Returns the ModelDef named "name".  If the ModelDef does not exist,
      * and "create" is true, the ModelDef is created.
-     * 
+     *
      * @param name the name of the ModelDef to retrieve
      * @param create true to create when not found, false otherwise
      * @return the ModelDef named "name", null if not found and create is false
@@ -74,9 +74,9 @@ public class AST extends Element {
 
     /**
      * Creates metadata in memory, using "root" as the root of the metadata
-     * hierarchy.  The metadata created corresponds to the abstract syntax 
+     * hierarchy.  The metadata created corresponds to the abstract syntax
      * tree's contents, which is drawn from the PDL files.
-     * 
+     *
      * @param root the metadata root
      */
     public void generateMetadata(MetadataRoot root) {
@@ -129,9 +129,9 @@ public class AST extends Element {
             Identifier sup = od.getSuper();
             if (sup == null) {
                 od.error(
-                    "Unable to generate object type, but I have no idea " +
-                    "why. Please report this as a persistence bug."
-                    );
+                         "Unable to generate object type, but I have no idea " +
+                         "why. Please report this as a persistence bug."
+                         );
             } else {
                 sup.error("No such object type: " + sup.getName());
             }

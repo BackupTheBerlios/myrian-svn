@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -29,12 +29,12 @@ import java.io.ByteArrayOutputStream;
  * all metadata classes.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/13 $
+ * @version $Revision: #7 $ $Date: 2002/08/14 $
  */
 
 abstract public class Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Element.java#6 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Element.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private static final Logger s_log =
         Logger.getLogger(Element.class.getName());
@@ -52,17 +52,17 @@ abstract public class Element {
                 StringWriter str = new StringWriter();
                 PrintWriter msg = new PrintWriter(str);
                 msg.println(
-                    "Warning: The key named '" + key + "' was not actually " +
-                    "found in the metadata."
-                    );
+                            "Warning: The key named '" + key + "' was not actually " +
+                            "found in the metadata."
+                            );
                 msg.println(
-                    "For backwards compatibility we are assuming you mean " +
-                    " this: '" + entryKey + "'. Please fix this bug ASAP."
-                    );
+                            "For backwards compatibility we are assuming you mean " +
+                            " this: '" + entryKey + "'. Please fix this bug ASAP."
+                            );
                 msg.println(
-                    "Here is the stack trace so you can figure out where " +
-                    "this bug is occuring:"
-                    );
+                            "Here is the stack trace so you can figure out where " +
+                            "this bug is occuring:"
+                            );
                 t.printStackTrace(msg);
                 s_log.warn(str.toString());
                 return me.getValue();
@@ -120,8 +120,8 @@ abstract public class Element {
 
     public void error(String msg) {
         throw new Error(
-            m_filename + ": " + m_line + " column " + m_column + ": " + msg
-            );
+                        m_filename + ": " + m_line + " column " + m_column + ": " + msg
+                        );
     }
 
     /**
@@ -152,8 +152,8 @@ abstract public class Element {
             m_options.put(name, value);
         } else {
             throw new IllegalArgumentException(
-                "No such option: " + name
-                );
+                                               "No such option: " + name
+                                               );
         }
     }
 
@@ -191,7 +191,7 @@ abstract public class Element {
      *    .....
      * }
      * </pre></code>
-     * 
+     *
      */
     public void outputOptionsPDL(PrintStream out) {
         if (m_options.size() > 0) {
@@ -199,9 +199,9 @@ abstract public class Element {
             for (Iterator it = m_options.entrySet().iterator(); it.hasNext(); ) {
                 Map.Entry me = (Map.Entry) it.next();
                 String entryKey = (String) me.getKey();
-                out.println("        " + entryKey + " = " + 
+                out.println("        " + entryKey + " = " +
                             m_options.get(entryKey) + ";");
-            }                
+            }
             out.println("    }");
         }
     }

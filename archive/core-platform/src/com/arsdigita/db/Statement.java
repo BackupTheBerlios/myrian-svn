@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -42,33 +42,33 @@ import org.apache.log4j.Logger;
  * <li>This implementation has been extended to support "closeAfterUse",
  * where the statement will be closed automatically when it is
  * no longer needed.<P>
- * As an optimization to enhance ability to close statements, it is 
+ * As an optimization to enhance ability to close statements, it is
  * assumed that only one result will be returned from any execute
- * (one resultset or one update count) when closeAfterUse is enabled.  
- * Thus, the statement will be closed if execute returns false, and 
- * getMoreResults will throw an IllegalStateException.  
- * If the boolean variant of execute returns true, 
+ * (one resultset or one update count) when closeAfterUse is enabled.
+ * Thus, the statement will be closed if execute returns false, and
+ * getMoreResults will throw an IllegalStateException.
+ * If the boolean variant of execute returns true,
  * it is necessary to call getResultSet, and the statement will
  * be closed when that result set is closed.
- * closeAfterUse must not be used (and the statement must be 
+ * closeAfterUse must not be used (and the statement must be
  * explicitly closed by the caller) if multiple results are needed.
  * <P>
  * Note that all subclasses should ensure that they implement
  * closeAfterUse correctly.</li>
  * <li>Supports tracking whether this statement
  * needs autocommit off or not (a statement that was used for
- * modifying data should cause its Connection  to not be aggressively closed, 
- * as transaction-like behavior would be lost, so it needs autocommit 
+ * modifying data should cause its Connection  to not be aggressively closed,
+ * as transaction-like behavior would be lost, so it needs autocommit
  * off)</li>
  * </ul>
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #3 $ $Date: 2002/08/13 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  * @since 4.5
  */
 public class Statement implements java.sql.Statement, ResultSetEventListener {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Statement.java#3 $ $Author: dennis $ $Date: 2002/08/13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Statement.java#4 $ $Author: dennis $ $Date: 2002/08/14 $";
 
     private static final java.util.Set dbgStatements = new java.util.HashSet();
 
@@ -108,18 +108,18 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         if (s_cat.isDebugEnabled()) {
             synchronized (dbgStatements) {
                 dbgStatements.add(stmt);
-                s_cat.debug("Statement constructor: created " + this + ", " + 
-                          "statement count is now " + dbgStatements.size(), 
-                          new Throwable("Stack trace"));
+                s_cat.debug("Statement constructor: created " + this + ", " +
+                            "statement count is now " + dbgStatements.size(),
+                            new Throwable("Stack trace"));
             }
         }
     }
 
     // Methods
 
-    /** 
+    /**
      * Adds an SQL command to the current batch of commmands for this
-     * Statement object. 
+     * Statement object.
      */
     public void addBatch(String sql) throws SQLException {
         try {
@@ -131,9 +131,9 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         }
     }
 
-    /** 
+    /**
      * Cancels this Statement object if both the DBMS and driver
-     * support aborting an SQL statement. 
+     * support aborting an SQL statement.
      */
     public void cancel() throws SQLException {
         try {
@@ -164,16 +164,16 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         }
     }
 
-    /** 
+    /**
      * Releases this Statement object's database and JDBC resources
      * immediately instead of waiting for this to happen when it is
-     * automatically closed. 
-     * 
+     * automatically closed.
+     *
      * NOTE that this may be run by a finalizer thread, so any
-     * listeners with side effects should be threadsafe or 
+     * listeners with side effects should be threadsafe or
      * guarantee that they will not be needed while this Statement
-     * is being closed (e.g. the connection needs to synchronize 
-     * intelligently, since there is no guarantee that it won't be 
+     * is being closed (e.g. the connection needs to synchronize
+     * intelligently, since there is no guarantee that it won't be
      * used at the same time as the finalizer).
      */
     public synchronized void close() throws SQLException {
@@ -187,13 +187,13 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
                         if (!dbgStatements.contains(m_stmt)) {
                             s_cat.warn("Statement close: closing Statement that " +
                                        "was never opened or has already " +
-                                       "been closed: " + m_stmt, 
+                                       "been closed: " + m_stmt,
                                        new Throwable("Stack trace"));
                         } else {
                             dbgStatements.remove(m_stmt);
                         }
-                        
-                        s_cat.debug("Statement close: Statement count is now " + 
+
+                        s_cat.debug("Statement close: Statement count is now " +
                                     dbgStatements.size());
                     }
                 }
@@ -202,7 +202,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         } catch (SQLException e) {
             throwSQLException(e);
             throw e;  // code should never get here, but just in case
-        }        
+        }
     }
 
     protected synchronized void finalize() throws Throwable {
@@ -232,11 +232,11 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
                     }
                 } catch (SQLException e) {
                     sb = new StringBuffer("Could not retrieve more information " +
-                                          "about closed Statement: " + 
+                                          "about closed Statement: " +
                                           e.getMessage());
                 }
-                s_cat.warn("Statement was not closed by programmer: " + this + 
-                           ", closing in garbage collection.  Lots of these " + 
+                s_cat.warn("Statement was not closed by programmer: " + this +
+                           ", closing in garbage collection.  Lots of these " +
                            "messages can indicate the cause of an out " +
                            "of cursors error. " + sb.toString());
                 try {
@@ -251,7 +251,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
     }
 
     /**
-     * This one just hits the log file, not DS.  It should be called before 
+     * This one just hits the log file, not DS.  It should be called before
      * running the query, and the other logQuery called after running.
      */
     private void logQuery(String type, String sql) throws SQLException {
@@ -302,7 +302,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
                                       type,
                                       sql,
                                       null,
-                                      0, 
+                                      0,
                                       sqle);
         } catch (SQLException e) {
             throwSQLException(e);
@@ -310,8 +310,8 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         }
     }
 
-    /** 
-     * Executes an SQL statement that may return multiple results. 
+    /**
+     * Executes an SQL statement that may return multiple results.
      */
     public boolean execute(String sql) throws SQLException {
         if (!m_closeAfterUse) {
@@ -329,12 +329,12 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
                 // getUpdateCount will close this statement
                 getUpdateCount();
             }
-            return retval;        
+            return retval;
         }
     }
 
     /**
-     * The actual execute; wrapped to implement the closeAfterUse 
+     * The actual execute; wrapped to implement the closeAfterUse
      * functionality.
      */
     private boolean doExecute(String sql) throws SQLException {
@@ -356,10 +356,10 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         }
     }
 
-    /** 
+    /**
      * Submits a batch of commands to the database for execution and
      * if all commands execute successfully, returns an array of
-     * update counts. 
+     * update counts.
      */
     public int[] executeBatch() throws SQLException {
         if (!m_closeAfterUse) {
@@ -371,11 +371,11 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
             } finally {
                 close();
             }
-        }        
+        }
     }
 
     /**
-     * The actual executeBatch; wrapped to implement the closeAfterUse 
+     * The actual executeBatch; wrapped to implement the closeAfterUse
      * functionality.
      */
     private int[] doExecuteBatch() throws SQLException {
@@ -402,9 +402,9 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         }
     }
 
-    /** 
+    /**
      * Executes an SQL statement that returns a single ResultSet
-     * object. 
+     * object.
      */
     public java.sql.ResultSet executeQuery(String sql) throws SQLException {
         if (!m_closeAfterUse) {
@@ -419,12 +419,12 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
                 throw e;
             }
             rs.addResultSetEventListener(this);
-            return rs;        
+            return rs;
         }
     }
 
     /**
-     * The actual executeQuery; wrapped to implement the closeAfterUse 
+     * The actual executeQuery; wrapped to implement the closeAfterUse
      * functionality.
      */
     private ResultSet doExecuteQuery(String sql) throws SQLException {
@@ -447,7 +447,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
     }
 
     /**
-     * Executes a SQL INSERT, UPDATE or DELETE statement. 
+     * Executes a SQL INSERT, UPDATE or DELETE statement.
      */
     public int executeUpdate(String sql) throws SQLException {
         if (!m_closeAfterUse) {
@@ -463,7 +463,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
     }
 
     /**
-     * The actual executeUpdate; wrapped to implement the closeAfterUse 
+     * The actual executeUpdate; wrapped to implement the closeAfterUse
      * functionality.
      */
     private int doExecuteUpdate(String sql) throws SQLException {
@@ -485,9 +485,9 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         }
     }
 
-    /** 
+    /**
      * Returns the Connection object that produced this Statement
-     * object. 
+     * object.
      */
     public java.sql.Connection getConnection() throws SQLException {
         // doesn't actually throw SQLException, but we have to
@@ -495,10 +495,10 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         return m_conn;
     }
 
-    /** 
+    /**
      * Retrieves the direction for fetching rows from database tables
      * that is the default for result sets generated from this
-     * Statement object. 
+     * Statement object.
      */
     public int getFetchDirection() throws SQLException {
         try {
@@ -509,10 +509,10 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         }
     }
 
-    /** 
+    /**
      * Retrieves the number of result set rows that is the default
      * fetch size for result sets generated from this Statement
-     * object. 
+     * object.
      */
     public int getFetchSize() throws SQLException {
         try {
@@ -523,9 +523,9 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         }
     }
 
-    /** 
+    /**
      * Returns the maximum number of bytes allowed for any column
-     * value. 
+     * value.
      */
     public int getMaxFieldSize() throws SQLException {
         try {
@@ -536,9 +536,9 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         }
     }
 
-    /** 
+    /**
      * Retrieves the maximum number of rows that a ResultSet object
-     * can contain. 
+     * can contain.
      */
     public int getMaxRows() throws SQLException {
         try {
@@ -549,8 +549,8 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         }
     }
 
-    /**  
-     * Moves to a Statement object's next result. 
+    /**
+     * Moves to a Statement object's next result.
      */
     public boolean getMoreResults() throws SQLException {
         try {
@@ -565,9 +565,9 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         }
     }
 
-    /** 
+    /**
      * Retrieves the number of seconds the driver will wait for a
-     * Statement object to execute. 
+     * Statement object to execute.
      */
     public int getQueryTimeout() throws SQLException {
         try {
@@ -579,7 +579,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
     }
 
     /**
-     * Returns the current result as a ResultSet object. 
+     * Returns the current result as a ResultSet object.
      */
     public java.sql.ResultSet getResultSet() throws SQLException {
         if (!m_closeAfterUse) {
@@ -597,11 +597,11 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
             }
             rs.addResultSetEventListener(this);
             return rs;
-        } 
+        }
     }
 
     /**
-     * The actual getResultSet; wrapped to implement the closeAfterUse 
+     * The actual getResultSet; wrapped to implement the closeAfterUse
      * functionality.
      */
     private ResultSet doGetResultSet() throws SQLException {
@@ -614,9 +614,9 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
     }
 
 
-    /** 
+    /**
      * Retrieves the result set concurrency for ResultSet objects
-     * generated by this Statement object. 
+     * generated by this Statement object.
      */
     public int getResultSetConcurrency() throws SQLException {
         try {
@@ -629,7 +629,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
 
     /**
      * Retrieves the result set type for ResultSet objects generated
-     * by this Statement object. 
+     * by this Statement object.
      */
     public int getResultSetType() throws SQLException {
         try {
@@ -643,7 +643,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
     /**
      * Returns the current result as an update count; if the result
      * is a ResultSet object or there are no more results, -1 is
-     * returned. 
+     * returned.
      */
     public int getUpdateCount() throws SQLException {
         if (!m_closeAfterUse) {
@@ -653,13 +653,13 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
                 m_lastUpdateCount = doGetUpdateCount();
                 m_lastUpdateCountCurrent = true;
                 close();
-            } 
+            }
             return m_lastUpdateCount;
         }
     }
 
     /**
-     * The actual getUpdateCount; wrapped to implement the closeAfterUse 
+     * The actual getUpdateCount; wrapped to implement the closeAfterUse
      * functionality.
      */
     private int doGetUpdateCount() throws SQLException {
@@ -673,7 +673,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
 
     /**
      * Retrieves the first warning reported by calls on this
-     * Statement object. 
+     * Statement object.
      */
     public SQLWarning getWarnings() throws SQLException {
         try {
@@ -686,7 +686,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
 
     /**
      * Defines the SQL cursor name that will be used by subsequent
-     * Statement object execute methods. 
+     * Statement object execute methods.
      */
     public void setCursorName(String name) throws SQLException {
         try {
@@ -698,7 +698,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
     }
 
     /**
-     * Sets escape processing on or off. 
+     * Sets escape processing on or off.
      */
     public void setEscapeProcessing(boolean enable) throws SQLException {
         try {
@@ -711,7 +711,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
 
     /**
      * Gives the driver a hint as to the direction in which the rows
-     * in a result set will be processed. 
+     * in a result set will be processed.
      */
     public void setFetchDirection(int direction) throws SQLException {
         try {
@@ -722,10 +722,10 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         }
     }
 
-    /** 
+    /**
      * Gives the JDBC driver a hint as to the number of rows that
      * should be fetched from the database when more rows are
-     * needed. 
+     * needed.
      */
     public void setFetchSize(int rows) throws SQLException {
         try {
@@ -751,7 +751,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
 
     /**
      * Sets the limit for the maximum number of rows that any
-     * ResultSet object can contain to the given number. 
+     * ResultSet object can contain to the given number.
      */
     public void setMaxRows(int max) throws SQLException {
         try {
@@ -793,7 +793,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
     /**
      * Two statements are equal if they wrap the same
      * statement.
-     */ 
+     */
     public boolean equals(Object o) {
         if (o instanceof com.arsdigita.db.Statement) {
             if (m_stmt == null) {
@@ -846,7 +846,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
     protected void resetLastUpdateCount() {
         m_lastUpdateCount = -1;
         m_lastUpdateCountCurrent = false;
-    }    
+    }
 
     /**
      * ResultSetEventListener interface.
@@ -854,8 +854,8 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
      */
     public void resultSetClosed(ResultSetEvent event) throws java.sql.SQLException {
         if (s_cat.isDebugEnabled()) {
-            s_cat.debug("Closing Statement because resultset was closed. " + 
-                        "Statement: " + this + ", resultset: " + 
+            s_cat.debug("Closing Statement because resultset was closed. " +
+                        "Statement: " + this + ", resultset: " +
                         event.getResultSet());
         }
         close();
@@ -871,7 +871,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
      *
      * This value defaults to 'true', since that is
      * safer behavior.  This flag is intended to be used
-     * by the transaction context's listener to determine 
+     * by the transaction context's listener to determine
      * whether to hold on to a connection after use or recycle
      * it back to the connection pool.
      */
@@ -885,7 +885,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
      * Sets whether this statement need autocommit to be
      * off.  Basically, this should be true for any modifying statements
      * (e.g. insert, update, delete) and false for any select.
-     * It is the caller's responsibility to provide this 
+     * It is the caller's responsibility to provide this
      * information, in order to avoid re-parsing the SQL.
      * If the caller does not provide this information,
      * it is assumed that this value is 'true'.
@@ -894,7 +894,7 @@ public class Statement implements java.sql.Statement, ResultSetEventListener {
         return m_needsAutoCommitOff;
     }
 
-    protected void throwSQLException (SQLException e) throws SQLException { 
+    protected void throwSQLException (SQLException e) throws SQLException {
         SQLExceptionHandler.throwSQLException(e);
     }
 }

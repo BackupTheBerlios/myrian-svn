@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -33,18 +33,18 @@ import org.apache.log4j.Logger;
 /**
  * DataQueryImplTest
  *
- * This class tests DataQueryImpl, using data contained in 
+ * This class tests DataQueryImpl, using data contained in
  * //enterprise/infrastructure/dev/persistence/sql/data-query-test.sql
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/13 $
+ * @version $Revision: #6 $ $Date: 2002/08/14 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataQueryImplTest.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-    private static Logger s_log = 
+    private static Logger s_log =
         Logger.getLogger(DataQueryImplTest.class.getName());
 
     private static final int NUM_WRITE_ACTIONS = 5;
@@ -53,7 +53,7 @@ public class DataQueryImplTest extends DataQueryTest {
     }
 
     protected void persistenceSetUp() {
-        load("com/arsdigita/persistence/testpdl/static/DataQuery.pdl"); 
+        load("com/arsdigita/persistence/testpdl/static/DataQuery.pdl");
         load("com/arsdigita/persistence/testpdl/static/DataOperation.pdl");
         super.persistenceSetUp();
     }
@@ -80,9 +80,9 @@ public class DataQueryImplTest extends DataQueryTest {
 
         while ( dq.next() ) {
             final BigDecimal currentValue = (BigDecimal) dq.get(ORDER_FIELD);
-            assert("Query was retrieved out of order.", 
-                priorValue.compareTo( currentValue ) < 0 );
-            
+            assert("Query was retrieved out of order.",
+                   priorValue.compareTo( currentValue ) < 0 );
+
             priorValue = currentValue;
 
         }
@@ -95,9 +95,9 @@ public class DataQueryImplTest extends DataQueryTest {
 
         while ( descQuery.next() ) {
             final BigDecimal currentValue = (BigDecimal) descQuery.get(ORDER_FIELD);
-            assert("Query was retrieved out of order.", 
-                priorValue.compareTo( currentValue ) > 0 );
-            
+            assert("Query was retrieved out of order.",
+                   priorValue.compareTo( currentValue ) > 0 );
+
             priorValue = currentValue;
 
         }
@@ -105,23 +105,23 @@ public class DataQueryImplTest extends DataQueryTest {
 
         DataQuery multipleColumnOrder = getDefaultQuery();
         multipleColumnOrder.setOrder("action desc, priority asc");
-        assert("Should be several items in this query set!", 
+        assert("Should be several items in this query set!",
                multipleColumnOrder.next() );
-        
+
         BigDecimal priorPriority = (BigDecimal) multipleColumnOrder.get("priority");
         String priorAction = (String) multipleColumnOrder.get("action");
-        
+
         while (multipleColumnOrder.next()) {
-            final BigDecimal currentPriority = 
-                               (BigDecimal) multipleColumnOrder.get("priority");
+            final BigDecimal currentPriority =
+                (BigDecimal) multipleColumnOrder.get("priority");
             final String currentAction = (String) multipleColumnOrder.get("action");
-            assert("Action order wrong!", 
+            assert("Action order wrong!",
                    priorAction.compareTo( currentAction ) >= 0 );
             if ( priorAction.equals(currentAction) ) {
-                assert("Priority order wrong! " + priorPriority.toString() + 
-                       " vs " + currentPriority.toString(), 
+                assert("Priority order wrong! " + priorPriority.toString() +
+                       " vs " + currentPriority.toString(),
                        priorPriority.compareTo(currentPriority) <= 0 );
-                
+
             }
 
             priorPriority = currentPriority;
@@ -147,9 +147,9 @@ public class DataQueryImplTest extends DataQueryTest {
 
         while ( dq.next() ) {
             final BigDecimal currentValue = (BigDecimal) dq.get(ORDER_FIELD);
-            assert("Query was retrieved out of order.", 
-                priorValue.compareTo( currentValue ) < 0 );
-            
+            assert("Query was retrieved out of order.",
+                   priorValue.compareTo( currentValue ) < 0 );
+
             priorValue = currentValue;
 
         }
@@ -162,9 +162,9 @@ public class DataQueryImplTest extends DataQueryTest {
 
         while ( descQuery.next() ) {
             final BigDecimal currentValue = (BigDecimal) descQuery.get(ORDER_FIELD);
-            assert("Query was retrieved out of order.", 
-                priorValue.compareTo( currentValue ) > 0 );
-            
+            assert("Query was retrieved out of order.",
+                   priorValue.compareTo( currentValue ) > 0 );
+
             priorValue = currentValue;
 
         }
@@ -172,23 +172,23 @@ public class DataQueryImplTest extends DataQueryTest {
 
         DataQuery multipleColumnOrder = getDefaultQuery();
         multipleColumnOrder.addOrder("action desc, priority asc");
-        assert("Should be several items in this query set!", 
+        assert("Should be several items in this query set!",
                multipleColumnOrder.next() );
-        
+
         BigDecimal priorPriority = (BigDecimal) multipleColumnOrder.get("priority");
         String priorAction = (String) multipleColumnOrder.get("action");
-        
+
         while (multipleColumnOrder.next()) {
-            final BigDecimal currentPriority = 
-                               (BigDecimal) multipleColumnOrder.get("priority");
+            final BigDecimal currentPriority =
+                (BigDecimal) multipleColumnOrder.get("priority");
             final String currentAction = (String) multipleColumnOrder.get("action");
-            assert("Action order wrong!", 
+            assert("Action order wrong!",
                    priorAction.compareTo( currentAction ) >= 0 );
             if ( priorAction.equals(currentAction) ) {
-                assert("Priority order wrong! " + priorPriority.toString() + 
-                       " vs " + currentPriority.toString(), 
+                assert("Priority order wrong! " + priorPriority.toString() +
+                       " vs " + currentPriority.toString(),
                        priorPriority.compareTo(currentPriority) <= 0 );
-                
+
             }
 
             priorPriority = currentPriority;
@@ -212,7 +212,7 @@ public class DataQueryImplTest extends DataQueryTest {
         }
         multiOrder.close();
         singleOrder.close();
-        
+
     }
 
     public void testCaseInsensativity() {
@@ -236,7 +236,7 @@ public class DataQueryImplTest extends DataQueryTest {
     public void testAddFilter() {
         DataQuery query = getDefaultQuery();
         long size = query.size();
-        
+
         // let's add a single filter that we know does not do anything
         query = getDefaultQuery();
         Filter f = query.addFilter("1=1");
@@ -256,10 +256,10 @@ public class DataQueryImplTest extends DataQueryTest {
         filter.set("lowerPriority", new Integer(3));
         filter = query.addFilter("priority > :upperPriority");
         filter.set("upperPriority", new Integer(7));
-        
+
         DataQuery query2 = getDefaultQuery();
         filter = query2.addFilter("priority < :lowerPriority and " +
-                                 "priority > :upperPriority");
+                                  "priority > :upperPriority");
         filter.set("lowerPriority", new Integer(3));
         filter.set("upperPriority", "7");
 
@@ -283,12 +283,12 @@ public class DataQueryImplTest extends DataQueryTest {
         query = getDefaultQuery();
         filter = query.addFilter("priority < :lowerPriority");
         filter.set("lowerPriority", "6");
-        
+
         f = query.getFilterFactory().simple("action = :action");
         f.set("action", "write");
         query.addFilter(f);
         long withAddingFilter = query.size();
-        
+
         query = getDefaultQuery();
         filter = query.addFilter("priority < :lowerPriority");
         filter.set("lowerPriority", "6");
@@ -315,107 +315,107 @@ public class DataQueryImplTest extends DataQueryTest {
         query.addEqualsFilter(name, value);
         int count = 0;
         while (query.next()) {
-            assertEquals("Equals filter failed for " + name + ":" + 
+            assertEquals("Equals filter failed for " + name + ":" +
                          value, value, query.get(name));
             count++;
-        }   
-        return count;     
+        }
+        return count;
     }
 
 
     /**
      * This tests the use of arbitray bind variables within a query.
      */
-     public void testBindVariables() {
-         DataQuery query = getSession().
-             retrieveQuery("examples.DataQueryWithBindVariables");   
+    public void testBindVariables() {
+        DataQuery query = getSession().
+            retrieveQuery("examples.DataQueryWithBindVariables");
 
-         // neither variable being bound should throw a PersistenceException
-         try {
-             query.next();
-             fail("calling query.next should have failed because no variables " +
-                  "were bound");
-         } catch (PersistenceException e) {
-             // this is the correct behavior
-         }
-       
-         // bind only "priority"
-         query.setParameter("priority", "3");
-         try {
-             query.next();
-             fail("calling query.next should have failed because only " +
-                  "'priority' was bound");
-         } catch (PersistenceException e) {
-             // this is the correct behavior
-         }
- 
- 
-         // bind only "description"
-         // we want a new query
-         query = getSession().retrieveQuery("examples.DataQueryWithBindVariables");
-         query.setParameter("description", "wrote");
-         try {
-             query.next();
-             fail("calling query.next should have failed because only " +
-                  "'description' was bound");
-         } catch (PersistenceException e) {
-             // this is the correct behavior
-         }
- 
-         // bind both
-         // we want a new query
-         query = getSession().retrieveQuery("examples.DataQueryWithBindVariables");
-         query.setParameter("priority", "3");
-         
-         try {
-             assert(query.size() == 1);
-         } catch (PersistenceException e) {
-             // this is the correct behavior because it is missing a parameter
-         }
-         query.setParameter("description", "wrote");
-        
-         // Test the ability to get out the parameter values
-         assert("The retrieved value for 'description' was not correct",
-                "wrote".equals(query.getParameter("description").toString()));
-         assert("The retrieved value for 'priority' was not correct",
-                "3".equals(query.getParameter("priority").toString()));
- 
-         // try to get a parameter that does not exist
-         assert("Trying to get a non-existent parameter actually returned " +
-                "something besides null",
-                null == query.getParameter("this does not exist"));
- 
-         // here we want to test binding arbitrary date values
-         query = getSession().retrieveQuery("examples.DataQuery");
-         long size = query.size();
-         query = getSession().retrieveQuery(
-                                    "examples.DataQueryWithDateBindVariable");
-         
-         java.util.Date date = new java.util.Date();
-        
-         // now we want the date to be around 1980 so we divide
-         // the current time by 3 and set the date
-         date.setTime(date.getTime()/3);
- 
-         // let's bind
-         query.setParameter("actionTime", date);
-         assert("Binding with actionTime should return more than zero but less " +
-                "than the full size.  Instead, it returned " + query.size(),
-                query.size() > 0 && query.size() < size);
-         
-         query = getDefaultQuery();
-         date = new java.util.Date();
-         date.setTime(date.getTime()/3);
-         Filter f = query.addFilter("actionTime > :actionTime");
-         f.set("actionTime", date);
-         /*         while (query.next()) {
-             s_log.info("ZZZZ the object is " + query.get("actionTime"));
-             s_log.info("YYYY the object is " + query.get("id").getClass());
-             s_log.info("YYYY the object is " + 
-             query.get("action").getClass());
-             }*/
+        // neither variable being bound should throw a PersistenceException
+        try {
+            query.next();
+            fail("calling query.next should have failed because no variables " +
+                 "were bound");
+        } catch (PersistenceException e) {
+            // this is the correct behavior
+        }
 
-     }
+        // bind only "priority"
+        query.setParameter("priority", "3");
+        try {
+            query.next();
+            fail("calling query.next should have failed because only " +
+                 "'priority' was bound");
+        } catch (PersistenceException e) {
+            // this is the correct behavior
+        }
+
+
+        // bind only "description"
+        // we want a new query
+        query = getSession().retrieveQuery("examples.DataQueryWithBindVariables");
+        query.setParameter("description", "wrote");
+        try {
+            query.next();
+            fail("calling query.next should have failed because only " +
+                 "'description' was bound");
+        } catch (PersistenceException e) {
+            // this is the correct behavior
+        }
+
+        // bind both
+        // we want a new query
+        query = getSession().retrieveQuery("examples.DataQueryWithBindVariables");
+        query.setParameter("priority", "3");
+
+        try {
+            assert(query.size() == 1);
+        } catch (PersistenceException e) {
+            // this is the correct behavior because it is missing a parameter
+        }
+        query.setParameter("description", "wrote");
+
+        // Test the ability to get out the parameter values
+        assert("The retrieved value for 'description' was not correct",
+               "wrote".equals(query.getParameter("description").toString()));
+        assert("The retrieved value for 'priority' was not correct",
+               "3".equals(query.getParameter("priority").toString()));
+
+        // try to get a parameter that does not exist
+        assert("Trying to get a non-existent parameter actually returned " +
+               "something besides null",
+               null == query.getParameter("this does not exist"));
+
+        // here we want to test binding arbitrary date values
+        query = getSession().retrieveQuery("examples.DataQuery");
+        long size = query.size();
+        query = getSession().retrieveQuery(
+                                           "examples.DataQueryWithDateBindVariable");
+
+        java.util.Date date = new java.util.Date();
+
+        // now we want the date to be around 1980 so we divide
+        // the current time by 3 and set the date
+        date.setTime(date.getTime()/3);
+
+        // let's bind
+        query.setParameter("actionTime", date);
+        assert("Binding with actionTime should return more than zero but less " +
+               "than the full size.  Instead, it returned " + query.size(),
+               query.size() > 0 && query.size() < size);
+
+        query = getDefaultQuery();
+        date = new java.util.Date();
+        date.setTime(date.getTime()/3);
+        Filter f = query.addFilter("actionTime > :actionTime");
+        f.set("actionTime", date);
+        /*         while (query.next()) {
+                   s_log.info("ZZZZ the object is " + query.get("actionTime"));
+                   s_log.info("YYYY the object is " + query.get("id").getClass());
+                   s_log.info("YYYY the object is " +
+                   query.get("action").getClass());
+                   }*/
+
+    }
 
 
     /**
@@ -431,164 +431,164 @@ public class DataQueryImplTest extends DataQueryTest {
 
         // next test to make sure that the keyword actually set the
         // variable
-         query = getSession().retrieveQuery("examples.DataQueryNoView");
-         assert("by default, a DataQuery with 'no view' set should say so.",
-                query.isNoView());
+        query = getSession().retrieveQuery("examples.DataQueryNoView");
+        assert("by default, a DataQuery with 'no view' set should say so.",
+               query.isNoView());
 
-         boolean hasParen = false;
-         String queryString = query.toString();
-         int index = queryString.indexOf("from") + 4;
-         int parenIndex = queryString.indexOf("(");
-         if (parenIndex > index) {
-             // make sure that there is only white space between the end
-             // of "from" and the "(".  If so, it is wrapped
-             while (index < parenIndex) {
-                 char current = queryString.charAt(index);
-                 if (current == ' ') {
-                     index++;
-                 } else {
-                     // we have a non-whitespace so break
-                     break;
-                 }
-             }
-             if (index >= parenIndex) {
-                 hasParen = true;
-             }
-         }
-         assert("The query should not have a '(' between the word 'from' and " +
-                "the next word", !hasParen);
-             
-         // The rest of the method tests the following situations
-         // for both "count" and comparing the elements
-         // 1. no where clause on query...both should return the same thing
-         // 2. no where clause on query...should return different
-         // 3. where clause exists...both should return the same thing
-         // 4. subselect where both should return the same
+        boolean hasParen = false;
+        String queryString = query.toString();
+        int index = queryString.indexOf("from") + 4;
+        int parenIndex = queryString.indexOf("(");
+        if (parenIndex > index) {
+            // make sure that there is only white space between the end
+            // of "from" and the "(".  If so, it is wrapped
+            while (index < parenIndex) {
+                char current = queryString.charAt(index);
+                if (current == ' ') {
+                    index++;
+                } else {
+                    // we have a non-whitespace so break
+                    break;
+                }
+            }
+            if (index >= parenIndex) {
+                hasParen = true;
+            }
+        }
+        assert("The query should not have a '(' between the word 'from' and " +
+               "the next word", !hasParen);
+
+        // The rest of the method tests the following situations
+        // for both "count" and comparing the elements
+        // 1. no where clause on query...both should return the same thing
+        // 2. no where clause on query...should return different
+        // 3. where clause exists...both should return the same thing
+        // 4. subselect where both should return the same
 
 
-         // 1. no where clause on query...both should return the same thing
-         query = getSession().retrieveQuery("examples.DataQueryNoView");
-         DataQuery query2 = getSession().retrieveQuery("examples.DataQueryNoView");
-         query2.setNoView(false);
-         assert("after setting noView to false, it should return false", 
-                !query2.isNoView());
-         
-         compareQueries("The view should not matter with no where clause", 
-                        query, query2, "id", true);
+        // 1. no where clause on query...both should return the same thing
+        query = getSession().retrieveQuery("examples.DataQueryNoView");
+        DataQuery query2 = getSession().retrieveQuery("examples.DataQueryNoView");
+        query2.setNoView(false);
+        assert("after setting noView to false, it should return false",
+               !query2.isNoView());
 
-         query = getSession().retrieveQuery("examples.DataQueryNoView");
-         Filter filter = query.addFilter("action = :action");
-         filter.set("action", "write");
+        compareQueries("The view should not matter with no where clause",
+                       query, query2, "id", true);
 
-         query2 = getSession().retrieveQuery("examples.DataQueryNoView");
-         query2.setNoView(false);
-         assert("after setting noView to false, it should return false", 
-                !query2.isNoView());
-         filter = query2.addFilter("action = :action");
-         filter.set("action", "write");
+        query = getSession().retrieveQuery("examples.DataQueryNoView");
+        Filter filter = query.addFilter("action = :action");
+        filter.set("action", "write");
 
-         compareQueries("The view should not matter even with a where clause", 
-                        query, query2, "id", true);
+        query2 = getSession().retrieveQuery("examples.DataQueryNoView");
+        query2.setNoView(false);
+        assert("after setting noView to false, it should return false",
+               !query2.isNoView());
+        filter = query2.addFilter("action = :action");
+        filter.set("action", "write");
 
-         // 2. no where clause...should return different
-         query = getSession().retrieveQuery("examples.DataQueryUnion");
-         query2 = getSession().retrieveQuery("examples.DataQueryUnion");
-         query.setNoView(true);
-         query2.setNoView(false);
-         assert("after setting noView to true, it should return true", 
-                query.isNoView());
-         assert("after setting noView to false, it should return false", 
-                !query2.isNoView());
-         
-         query.setParameter("action", "write");
-         query.setParameter("priority", "9");
-         query2.setParameter("action", "write");
-         query2.setParameter("priority", "9");
+        compareQueries("The view should not matter even with a where clause",
+                       query, query2, "id", true);
 
-         compareQueries("The view should not matter with a union and no " +
-                        "where clause", query, query2, "id", true);
+        // 2. no where clause...should return different
+        query = getSession().retrieveQuery("examples.DataQueryUnion");
+        query2 = getSession().retrieveQuery("examples.DataQueryUnion");
+        query.setNoView(true);
+        query2.setNoView(false);
+        assert("after setting noView to true, it should return true",
+               query.isNoView());
+        assert("after setting noView to false, it should return false",
+               !query2.isNoView());
 
-         query = getSession().retrieveQuery("examples.DataQueryUnion");
-         query.setNoView(true);
-         query.setParameter("action", "write");
-         query.setParameter("priority", "9");
+        query.setParameter("action", "write");
+        query.setParameter("priority", "9");
+        query2.setParameter("action", "write");
+        query2.setParameter("priority", "9");
 
-         filter = query.addFilter("action = :actionFilter");
-         filter.set("actionFilter", "read");
+        compareQueries("The view should not matter with a union and no " +
+                       "where clause", query, query2, "id", true);
 
-         query2 = getSession().retrieveQuery("examples.DataQueryUnion");
-         query2.setNoView(false);
-         query2.setParameter("action", "write");
-         query2.setParameter("priority", "9");
+        query = getSession().retrieveQuery("examples.DataQueryUnion");
+        query.setNoView(true);
+        query.setParameter("action", "write");
+        query.setParameter("priority", "9");
 
-         filter = query2.addFilter("action = :actionFilter");
-         filter.set("actionFilter", "read");
+        filter = query.addFilter("action = :actionFilter");
+        filter.set("actionFilter", "read");
 
-         assert("after setting noView to true, it should return true", 
-                query.isNoView());
+        query2 = getSession().retrieveQuery("examples.DataQueryUnion");
+        query2.setNoView(false);
+        query2.setParameter("action", "write");
+        query2.setParameter("priority", "9");
 
-         compareQueries("The view should return different results",
-                        query, query2, "id", false);
+        filter = query2.addFilter("action = :actionFilter");
+        filter.set("actionFilter", "read");
 
-         // checking out the data query with max
-         query = getSession().retrieveQuery("examples.DataQueryWithMax");
-         query.setNoView(true);
-         filter = query.addFilter("priority < :priorityFilter");
-         filter.set("priorityFilter", "4");
+        assert("after setting noView to true, it should return true",
+               query.isNoView());
 
-         query2 = getSession().retrieveQuery("examples.DataQueryWithMax");
-         query2.setNoView(false);
-         filter = query2.addFilter("priority < :priorityFilter");
-         filter.set("priorityFilter", "4");
+        compareQueries("The view should return different results",
+                       query, query2, "id", false);
 
-         compareQueries("The view should return different results",
-                        query, query2, "priority", false);
-         
+        // checking out the data query with max
+        query = getSession().retrieveQuery("examples.DataQueryWithMax");
+        query.setNoView(true);
+        filter = query.addFilter("priority < :priorityFilter");
+        filter.set("priorityFilter", "4");
 
-         // 3. where clause exists...both should return the same thing
-         query = getSession().retrieveQuery(
-                                       "examples.DataQueryWithDateBindVariable");
-         query.setNoView(true);
-         query2 = getSession().retrieveQuery(
-                                       "examples.DataQueryWithDateBindVariable");
-         query2.setNoView(false);
+        query2 = getSession().retrieveQuery("examples.DataQueryWithMax");
+        query2.setNoView(false);
+        filter = query2.addFilter("priority < :priorityFilter");
+        filter.set("priorityFilter", "4");
 
-         java.util.Date date = new java.util.Date();
-         date.setTime(date.getTime()/3);
-         query.setParameter("actionTime", date);
-         query2.setParameter("actionTime", date);
+        compareQueries("The view should return different results",
+                       query, query2, "priority", false);
 
-         filter = query2.addFilter("action = :actionFilter");
-         filter.set("actionFilter", "read");
 
-         filter = query.addFilter("action = :actionFilter");
-         filter.set("actionFilter", "read");
+        // 3. where clause exists...both should return the same thing
+        query = getSession().retrieveQuery(
+                                           "examples.DataQueryWithDateBindVariable");
+        query.setNoView(true);
+        query2 = getSession().retrieveQuery(
+                                            "examples.DataQueryWithDateBindVariable");
+        query2.setNoView(false);
 
-         compareQueries("The view should return the same results",
-                        query, query2, "priority", true);
+        java.util.Date date = new java.util.Date();
+        date.setTime(date.getTime()/3);
+        query.setParameter("actionTime", date);
+        query2.setParameter("actionTime", date);
 
-         // 4. subselect where both should return the same
-         query = getSession().retrieveQuery(
-                                       "examples.DataQueryWithMaxAndSubSelect");
-         query.setNoView(true);
-         query.setParameter("action", "read");
+        filter = query2.addFilter("action = :actionFilter");
+        filter.set("actionFilter", "read");
 
-         query2 = getSession().retrieveQuery(
-                                       "examples.DataQueryWithMaxAndSubSelect");
-         query2.setNoView(false);
-         query2.setParameter("action", "read");
-         compareQueries("The view should return the same results for subselect",
-                        query, query2, "priority", true);
-        
-         query = getSession().retrieveQuery(
-                                       "examples.DataQueryWithMaxAndSubSelect");
-         query.setNoView(true);
-         query.setParameter("action", "read");
+        filter = query.addFilter("action = :actionFilter");
+        filter.set("actionFilter", "read");
 
-         query2 = getSession().retrieveQuery(
-                                       "examples.DataQueryWithMaxAndSubSelect");
-         query2.setNoView(false);
-         query2.setParameter("action", "read");
+        compareQueries("The view should return the same results",
+                       query, query2, "priority", true);
+
+        // 4. subselect where both should return the same
+        query = getSession().retrieveQuery(
+                                           "examples.DataQueryWithMaxAndSubSelect");
+        query.setNoView(true);
+        query.setParameter("action", "read");
+
+        query2 = getSession().retrieveQuery(
+                                            "examples.DataQueryWithMaxAndSubSelect");
+        query2.setNoView(false);
+        query2.setParameter("action", "read");
+        compareQueries("The view should return the same results for subselect",
+                       query, query2, "priority", true);
+
+        query = getSession().retrieveQuery(
+                                           "examples.DataQueryWithMaxAndSubSelect");
+        query.setNoView(true);
+        query.setParameter("action", "read");
+
+        query2 = getSession().retrieveQuery(
+                                            "examples.DataQueryWithMaxAndSubSelect");
+        query2.setNoView(false);
+        query2.setParameter("action", "read");
 
     }
 
@@ -617,7 +617,7 @@ public class DataQueryImplTest extends DataQueryTest {
         query.setParameter("actions", l);
         while (query.next()) {
             s_log.info(query.get("action") + ": " +
-                               query.get("description"));
+                       query.get("description"));
         }
     }
 
@@ -640,7 +640,7 @@ public class DataQueryImplTest extends DataQueryTest {
 
         while (j < 2*i) {
             j++;
-            assert("Next should continue returning false after initial false", 
+            assert("Next should continue returning false after initial false",
                    !dq.next());
         }
         dq.close();
@@ -712,7 +712,7 @@ public class DataQueryImplTest extends DataQueryTest {
         DataQuery dq = getDefaultQuery();
         Connection conn = ConnectionManager.getConnection();
         try {
-            PreparedStatement ps = 
+            PreparedStatement ps =
                 (com.arsdigita.db.PreparedStatement)conn.prepareStatement
                 ("select entry_id, action, description, priority, " +
                  "action_time from t_data_query t");
@@ -722,11 +722,11 @@ public class DataQueryImplTest extends DataQueryTest {
 
                 // can't do first with a forward-only resultset.
                 while (rs.next()) {
-                    assertTrue("ResultSet and DataQuery next should match", 
+                    assertTrue("ResultSet and DataQuery next should match",
                                dq.next());
                     checkRSandDQpositionFunctions(rs, dq);
                 }
-                assertTrue("ResultSet and DataQuery next should match", 
+                assertTrue("ResultSet and DataQuery next should match",
                            !dq.next());
                 checkRSandDQpositionFunctions(rs, dq);
 
@@ -743,7 +743,7 @@ public class DataQueryImplTest extends DataQueryTest {
         }
     }
 
-    
+
     /**
      *  Test the setRange methods
      */
@@ -755,20 +755,20 @@ public class DataQueryImplTest extends DataQueryTest {
         query.setRange(new Integer(1));
         assert("adding the range starting with 1 should not change the " +
                "number or rows returned.  Instead of getting " + fullSize +
-               "rows, we got " + query.size() + " rows.", 
+               "rows, we got " + query.size() + " rows.",
                query.size() == fullSize);
         query.next();
         BigDecimal id = (BigDecimal)query.get("id");
         String action = (String)query.get("action");
         String description = (String)query.get("description");
-        query.close();       
+        query.close();
 
         // beginIndex > 1 gives us less rows and the first row is
         query = getDefaultQuery();
         query.setRange(new Integer(4));
         assert("adding the range starting with 4 should give us 3 less " +
                "rows returned.  Instead of getting " + (fullSize - 3) +
-               " rows, we got " + query.size() + " rows.", 
+               " rows, we got " + query.size() + " rows.",
                query.size() == fullSize - 3);
 
         // not the same as the first row with beginIndex = 1
@@ -777,7 +777,7 @@ public class DataQueryImplTest extends DataQueryTest {
                !(id.equals((BigDecimal)query.get("id")) &&
                  action.equals((String)query.get("action")) &&
                  description.equals((String)query.get("description"))));
-        query.close();       
+        query.close();
 
         // beginIndex > [size of query with no index] then 0 rows returned
         query = getDefaultQuery();
@@ -844,7 +844,7 @@ public class DataQueryImplTest extends DataQueryTest {
                !(id.equals((BigDecimal)query.get("id")) &&
                  action.equals((String)query.get("action")) &&
                  description.equals((String)query.get("description"))));
-        query.close();       
+        query.close();
     }
 
 
@@ -886,7 +886,7 @@ public class DataQueryImplTest extends DataQueryTest {
             operation.close();
         } catch (Exception e) {
             fail("An exception should not have been thrown. " +
-                 Utilities.LINE_BREAK + e.getMessage() + 
+                 Utilities.LINE_BREAK + e.getMessage() +
                  operation.toString());
             throw e;
         }
@@ -904,16 +904,16 @@ public class DataQueryImplTest extends DataQueryTest {
         BigDecimal id = new BigDecimal(1304);
         DataObject object = SessionManager.getSession()
             .retrieve(new OID("examples.multipleObjectIDs", id));
-                              
+
         System.out.println("id = " + object.get("id"));
         System.out.println("objectID = " + object.get("objectID"));
         assert("The ID is not what it should be.  It should be " + id +
-               " but it is actually " + object.get("id"), 
+               " but it is actually " + object.get("id"),
                id == (BigDecimal)object.get("id"));
     }
 
 
-    /** 
+    /**
      *  this tests the getPropertyValues method for DataQuery
      */
     public void getPropertyValues() {
@@ -922,12 +922,12 @@ public class DataQueryImplTest extends DataQueryTest {
         BigDecimal id = (BigDecimal)query.get("id");
         String description = (String)query.get("description");
         String action = (String)query.get("action");
-        
+
         Map values = query.getPropertyValues();
         assert("The ID is not the same", id.equals(values.get("id")));
-        assert("The DESCRIPTION is not the same", 
+        assert("The DESCRIPTION is not the same",
                description.equals(values.get("description")));
-        assert("The ACTION is not the same", 
+        assert("The ACTION is not the same",
                action.equals(values.get("action")));
 
         // now make sure that the items from the next map are not
@@ -940,7 +940,7 @@ public class DataQueryImplTest extends DataQueryTest {
     }
 
 
-    private void checkRSandDQpositionFunctions(ResultSet rs, DataQuery dq) 
+    private void checkRSandDQpositionFunctions(ResultSet rs, DataQuery dq)
         throws java.sql.SQLException {
         assertEquals(rs.isFirst(), dq.isFirst());
         assertEquals(rs.isBeforeFirst(), dq.isBeforeFirst());
@@ -949,9 +949,9 @@ public class DataQueryImplTest extends DataQueryTest {
         assertEquals(rs.isAfterLast(), dq.isAfterLast());
         assertEquals(rs.getRow(), dq.getPosition());
     }
-    
+
     protected DataQuery getDefaultQuery() {
-        DataQuery dq = getSession().retrieveQuery("examples.DataQuery");   
+        DataQuery dq = getSession().retrieveQuery("examples.DataQuery");
         return dq;
     }
 
@@ -966,7 +966,7 @@ public class DataQueryImplTest extends DataQueryTest {
      *  @param toCompare The string name of the attribute to use when
      *                   comparing
      */
-    private void compareQueries(String errorText, DataQuery query1, 
+    private void compareQueries(String errorText, DataQuery query1,
                                 DataQuery query2, String toCompare,
                                 boolean shouldBeIdential) {
         long query1size = query1.size();
@@ -978,11 +978,11 @@ public class DataQueryImplTest extends DataQueryTest {
         } else {
             sameSize = query1size != query2size;
         }
-        assert("COUNT: " + errorText + " The queries are: " + 
-               Utilities.LINE_BREAK + " Query1 = " + query1.toString() + 
-               Utilities.LINE_BREAK +" count = " + query1.size() + 
+        assert("COUNT: " + errorText + " The queries are: " +
+               Utilities.LINE_BREAK + " Query1 = " + query1.toString() +
+               Utilities.LINE_BREAK +" count = " + query1.size() +
                Utilities.LINE_BREAK + " Query2 = " + query2.toString() +
-               Utilities.LINE_BREAK + " count = " + query2.size(), 
+               Utilities.LINE_BREAK + " count = " + query2.size(),
                sameSize);
 
         Collection col = new ArrayList();
@@ -992,9 +992,9 @@ public class DataQueryImplTest extends DataQueryTest {
 
         while (query2.next()) {
             if (shouldBeIdential) {
-                assert("COMPARE: " + errorText + "The queries are: " + 
-                       Utilities.LINE_BREAK + " Query1 = " + query1.toString() + 
-                       Utilities.LINE_BREAK +" count = " + query1size + 
+                assert("COMPARE: " + errorText + "The queries are: " +
+                       Utilities.LINE_BREAK + " Query1 = " + query1.toString() +
+                       Utilities.LINE_BREAK +" count = " + query1size +
                        Utilities.LINE_BREAK + " Query2 = " + query2.toString() +
                        Utilities.LINE_BREAK + " count = " + query2size,
                        col.contains(query2.get(toCompare)));
@@ -1013,15 +1013,3 @@ public class DataQueryImplTest extends DataQueryTest {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-

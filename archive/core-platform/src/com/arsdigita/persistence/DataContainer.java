@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -37,15 +37,15 @@ import java.util.Set;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/13 $
+ * @version $Revision: #5 $ $Date: 2002/08/14 $
  */
 
 public class DataContainer {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataContainer.java#4 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataContainer.java#5 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private static final Logger s_log =
-         Logger.getLogger(DataContainer.class.getName());
+        Logger.getLogger(DataContainer.class.getName());
 
     // The type of the data contained in this data container.
     private CompoundType m_type;
@@ -84,7 +84,7 @@ public class DataContainer {
     void sync() {
         for (Iterator it = m_front.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry me = (Map.Entry) it.next();
-	    checkKey((String) me.getKey(), me.getValue());
+            checkKey((String) me.getKey(), me.getValue());
             m_back.put(me.getKey(), me.getValue());
         }
         m_front.clear();
@@ -116,13 +116,13 @@ public class DataContainer {
     }
 
     private void checkKey(String name, Object value) {
-	if (m_type != null && m_type instanceof ObjectType) {
-	    ObjectType type = (ObjectType) m_type;
-	    if (type.isKeyProperty(name) && value == null) {
-		throw new PersistenceException
-		    ("Cannot set key property \"" + name + "\" to null.");
-	    }
-	}
+        if (m_type != null && m_type instanceof ObjectType) {
+            ObjectType type = (ObjectType) m_type;
+            if (type.isKeyProperty(name) && value == null) {
+                throw new PersistenceException
+                    ("Cannot set key property \"" + name + "\" to null.");
+            }
+        }
     }
 
     /**
@@ -137,7 +137,7 @@ public class DataContainer {
      * @param value The initial value of the property.
      **/
     public void initProperty(String name, Object value) {
-	checkKey(name, value);
+        checkKey(name, value);
 
         if (value instanceof DataAssociationImpl) {
             m_assns.put(name, value);
@@ -166,7 +166,7 @@ public class DataContainer {
      **/
 
     public void set(String propertyName, Object value) {
-	checkKey(propertyName, value);
+        checkKey(propertyName, value);
 
         // if this changes so that we may put null values into m_assns
         // then we need to change isPropertyModified as well
@@ -268,14 +268,14 @@ public class DataContainer {
 
     /**
      * @param propertyName The name of the property to check
-     * @return true if the property name is the name of an association.  
+     * @return true if the property name is the name of an association.
      * false otherwise.
      */
     public boolean isAssociation(String propertyName) {
         return m_assns.containsKey(propertyName);
     }
 
- 
+
     /**
      * Returns true if the property specified by <i>name</i> has been
      * modified.
@@ -288,8 +288,8 @@ public class DataContainer {
     public boolean isPropertyModified(String name) {
         if ((m_type != null) && (!m_type.hasProperty(name))) {
             throw new PersistenceException(
-                "Property " + name + " does not exist in " +
-                m_type.getQualifiedName());
+                                           "Property " + name + " does not exist in " +
+                                           m_type.getQualifiedName());
         }
 
         if (m_assns.containsKey(name)) {
@@ -321,10 +321,10 @@ public class DataContainer {
      **/
 
     public String toString() {
-        return "<properties: " + getProperties() + 
-                ", Front store data:" + m_front + 
-                ", Back store data: " + m_back + 
-                ", Associations: " + m_assns + ">";
+        return "<properties: " + getProperties() +
+            ", Front store data:" + m_front +
+            ", Back store data: " + m_back +
+            ", Associations: " + m_assns + ">";
     }
 
 
@@ -347,10 +347,10 @@ public class DataContainer {
 
             if (prop == null || !prop.isRole()) {
                 throw new PersistenceException(
-                    "Cannot assign to property in type " +
-                    m_type.getQualifiedName() +
-                    ": " + formatPath(path)
-                    );
+                                               "Cannot assign to property in type " +
+                                               m_type.getQualifiedName() +
+                                               ": " + formatPath(path)
+                                               );
             }
 
             Object obj = dc.m_back.get(path[i]);
@@ -359,10 +359,10 @@ public class DataContainer {
                 if (dc.m_back.containsKey(path[i])) { return; }
                 Session ssn = SessionManager.getSession();
                 obj = GenericDataObjectFactory.createObject(
-                    (ObjectType) prop.getType(), 
-                    ssn,
-                    false
-                    );
+                                                            (ObjectType) prop.getType(),
+                                                            ssn,
+                                                            false
+                                                            );
                 ((GenericDataObject)
                  obj).getDataContainer().setType((ObjectType) prop.getType());
                 dc.initProperty(prop.getName(), obj);
@@ -399,10 +399,10 @@ public class DataContainer {
                 dc = ((DataAssociationImpl) obj).getDataContainer();
             } else {
                 throw new PersistenceException(
-                    "Cannot lookup property in type " +
-                    m_type.getQualifiedName() +
-                    ": " + formatPath(path)
-                    );
+                                               "Cannot lookup property in type " +
+                                               m_type.getQualifiedName() +
+                                               ": " + formatPath(path)
+                                               );
             }
         }
 
@@ -422,10 +422,10 @@ public class DataContainer {
 
             if (prop == null) {
                 throw new PersistenceException(
-                    "No such property in type " +
-                    m_type.getQualifiedName() +
-                    ": " + formatPath(path)
-                    );
+                                               "No such property in type " +
+                                               m_type.getQualifiedName() +
+                                               ": " + formatPath(path)
+                                               );
             }
 
             type = prop.getType();
@@ -459,9 +459,9 @@ public class DataContainer {
 
     static DataContainer join(DataContainer front, DataContainer back) {
         CompoundType type = new ObjectType(
-            front.m_type.getQualifiedName() + " and " +
-            back.m_type.getQualifiedName()
-            );
+                                           front.m_type.getQualifiedName() + " and " +
+                                           back.m_type.getQualifiedName()
+                                           );
         type.setFilename(back.m_type.getFilename());
         type.setLineInfo(back.m_type.getLineNumber(),
                          back.m_type.getColumnNumber());

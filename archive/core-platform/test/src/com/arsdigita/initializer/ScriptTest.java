@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -23,12 +23,12 @@ import java.util.*;
  * ScriptTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/14 $
  */
 
 public class ScriptTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/initializer/ScriptTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/initializer/ScriptTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     public ScriptTest(String name) {
         super(name);
@@ -37,12 +37,12 @@ public class ScriptTest extends TestCase {
     public void testParser() {
         try {
             Script s = new Script(
-                "init com.arsdigita.initializer.FooInitializer {\n" +
-                "  stringParam = \"string\";\n" +
-                "  objectParam = 3;\n" +
-                "  listParam = {1, 2, 3, {4, 5, 6}};\n" +
-                "}"
-                );
+                                  "init com.arsdigita.initializer.FooInitializer {\n" +
+                                  "  stringParam = \"string\";\n" +
+                                  "  objectParam = 3;\n" +
+                                  "  listParam = {1, 2, 3, {4, 5, 6}};\n" +
+                                  "}"
+                                  );
 
             List inis = s.getInitializers();
             assertEquals("There should be exactly one " +
@@ -76,8 +76,8 @@ public class ScriptTest extends TestCase {
     public void testStartupAndShutdown() {
         try {
             Script s = new Script(
-                "init com.arsdigita.initializer.FooInitializer {}"
-                );
+                                  "init com.arsdigita.initializer.FooInitializer {}"
+                                  );
 
             assert("FooInitializer should start out as not started",
                    !FooInitializer.isStarted());

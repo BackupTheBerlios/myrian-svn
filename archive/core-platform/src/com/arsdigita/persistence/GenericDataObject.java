@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -46,12 +46,12 @@ import java.util.ArrayList;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2002/07/18 $
+ * @version $Revision: #11 $ $Date: 2002/08/14 $
  */
 
 public class GenericDataObject implements DataObject {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#10 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#11 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private ObjectType    m_type;
     private Session       m_session;
@@ -60,7 +60,7 @@ public class GenericDataObject implements DataObject {
     private boolean m_valid = true;
     private boolean m_disconnected = false;
     private boolean m_isNew = false;
-    
+
     // The object type of the data object at the time that doRetrieve(OID)
     // is executed.  If the dataObject is specialized to a subtype, then
     // m_type will be different from m_retrievedType.
@@ -142,12 +142,12 @@ public class GenericDataObject implements DataObject {
         if (!m_observers.contains(entry)) {
             if (m_firing != null) {
                 throw new IllegalStateException(
-                    "Can't add a new observer from within another " +
-                    "observer.\n" +
-                    "Trying to add: " + observer + "\n" +
-                    "Currently firing: " + m_firing + "\n" +
-                    "Current observers: " + m_observers
-                    );
+                                                "Can't add a new observer from within another " +
+                                                "observer.\n" +
+                                                "Trying to add: " + observer + "\n" +
+                                                "Currently firing: " + m_firing + "\n" +
+                                                "Current observers: " + m_observers
+                                                );
             }
             m_observers.add(entry);
         }
@@ -164,13 +164,13 @@ public class GenericDataObject implements DataObject {
                 if (entry.isFiring(event)) {
                     if (errorOnSave) {
                         throw new PersistenceException(
-                            "Loop detected while firing a DataObserver. " +
-                            "This probably resulted from calling the save " +
-                            "method of a data object from within a " +
-                            "beforeSave observer registered on that " +
-                            "same data object, or the analogous situation " +
-                            "with delete and beforeDelete/afterDelete."
-                            );
+                                                       "Loop detected while firing a DataObserver. " +
+                                                       "This probably resulted from calling the save " +
+                                                       "method of a data object from within a " +
+                                                       "beforeSave observer registered on that " +
+                                                       "same data object, or the analogous situation " +
+                                                       "with delete and beforeDelete/afterDelete."
+                                                       );
                     }
                 } else {
                     try {
@@ -213,7 +213,7 @@ public class GenericDataObject implements DataObject {
 
     /**
      *  This sets the object type of this object
-     *  
+     *
      *  @param type The ObjectType for this DataObject
      */
     void setObjectType(ObjectType type) {
@@ -274,7 +274,7 @@ public class GenericDataObject implements DataObject {
      *
      * @param subtype The subtype to which to specialize.
      *
-     * @pre subType.isASuperType(getObjectType()) || subtype.equals(getObjectType()) 
+     * @pre subType.isASuperType(getObjectType()) || subtype.equals(getObjectType())
      *
      * @post subtype.equals(getObjectType())
      **/
@@ -302,13 +302,13 @@ public class GenericDataObject implements DataObject {
             throw new PersistenceException("Null value passed to specialize.");
         }
 
-        ObjectType subtype = 
+        ObjectType subtype =
             MetadataRoot.getMetadataRoot().getObjectType(subtypeName);
 
         if (subtype == null) {
             throw new PersistenceException(
-                "No such type: " + subtypeName
-                );
+                                           "No such type: " + subtypeName
+                                           );
         }
 
         specialize(subtype);
@@ -319,7 +319,7 @@ public class GenericDataObject implements DataObject {
      * Writes any modifications made to this object to the persistence
      * mechanism used to store the object.
      *
-     * @exception PersistenceException thrown if 
+     * @exception PersistenceException thrown if
      * {@link #delete()} has been called on this object.
      **/
     public void save() throws PersistenceException {
@@ -357,7 +357,7 @@ public class GenericDataObject implements DataObject {
 
         fireBeforeDelete();
 
-	saveAssociations();
+        saveAssociations();
 
         // Delete any components
         for (Iterator it = m_type.getProperties(); it.hasNext(); ) {
@@ -429,11 +429,11 @@ public class GenericDataObject implements DataObject {
         //    of 1 and the property has NOT been modified.  We reretrieve
         //    the unmodified value because it is possible that the other
         //    end of the association changed
-//        if (m_data.hasProperty(propertyName) && 
-//            !(prop.isRole() && 
-//              ((prop.isCollection() && m_data.get(propertyName) == null) ||
-//               (!prop.isCollection() &&
-//                !m_data.isPropertyModified(propertyName))))) {
+        //        if (m_data.hasProperty(propertyName) &&
+        //            !(prop.isRole() &&
+        //              ((prop.isCollection() && m_data.get(propertyName) == null) ||
+        //               (!prop.isCollection() &&
+        //                !m_data.isPropertyModified(propertyName))))) {
         if (m_data.hasProperty(propertyName)) {
             if (prop.isRole() && !prop.isCollection()) {
                 // Make sure that we are returning a valid data object.
@@ -466,11 +466,11 @@ public class GenericDataObject implements DataObject {
                 Event event = prop.getEvent(Property.RETRIEVE);
                 if (event == null) {
                     throw new PersistenceException(
-                        "No retrieve event defined for " +
-                        "property '" + prop.getName() +
-                        "' of object type '" + m_type.getQualifiedName() +
-                        "' " + m_type.toString()
-                        );
+                                                   "No retrieve event defined for " +
+                                                   "property '" + prop.getName() +
+                                                   "' of object type '" + m_type.getQualifiedName() +
+                                                   "' " + m_type.toString()
+                                                   );
                 }
                 Operation op = (Operation) event.getOperations().next();
                 DataAssociationImpl assn =
@@ -487,7 +487,7 @@ public class GenericDataObject implements DataObject {
             // First try just retrieving the attribute
             if (! doRetrieve(propertyName) ) {
                 // doRettrieve(Attribute) failed.
-                // We now try to do a full retrieve of the data object if 
+                // We now try to do a full retrieve of the data object if
                 // either of the following is true:
                 //    - a full retrieve was never executed.  This could be the
                 //      case if this data object was new and then saved.
@@ -511,23 +511,23 @@ public class GenericDataObject implements DataObject {
                         // to handle this.
 
                         throw new ObjectDeletedException(
-                            "Unable to retrieve attribute " + 
-                            propertyName +
-                            " of object type " + m_type.getName() +
-                            " because the object has been deleted."
-                            );
+                                                         "Unable to retrieve attribute " +
+                                                         propertyName +
+                                                         " of object type " + m_type.getName() +
+                                                         " because the object has been deleted."
+                                                         );
                     }
                 }
             }
 
             if (!m_data.hasProperty(propertyName)) {
                 throw new PersistenceException(
-                    "Unable to lazy load property: " + propertyName
-                    );
+                                               "Unable to lazy load property: " + propertyName
+                                               );
             }
 
-            // If we get here, then either doRetrieve(Attribute) or 
-            // doRetrieve(OID) succeeded (meaning that some sqlblock was 
+            // If we get here, then either doRetrieve(Attribute) or
+            // doRetrieve(OID) succeeded (meaning that some sqlblock was
             // executed).
             return m_data.get(propertyName);
         }
@@ -548,8 +548,8 @@ public class GenericDataObject implements DataObject {
 
         if (prop.isCollection()) {
             throw new PersistenceException(
-                "Cannot set a multi valued property."
-                );
+                                           "Cannot set a multi valued property."
+                                           );
         }
 
         // make sure that the property is loaded so it can be nulled correctly
@@ -584,7 +584,7 @@ public class GenericDataObject implements DataObject {
 
 
     /**
-     * Returns true if this persistent object has been deleted from 
+     * Returns true if this persistent object has been deleted from
      * the database.  This does a database hit to check.
      *
      * @return True if the object has been deleted
@@ -595,9 +595,9 @@ public class GenericDataObject implements DataObject {
     }
 
     /**
-     * Returns true if this persistent object has been disconnected from 
-     * the transaction context. If true, the object can still be read, but 
-     * any attempt to update any of the object's attributes will cause an 
+     * Returns true if this persistent object has been disconnected from
+     * the transaction context. If true, the object can still be read, but
+     * any attempt to update any of the object's attributes will cause an
      *  exception to be thrown.
      *
      * @return True if the object has been disconnected
@@ -636,7 +636,7 @@ public class GenericDataObject implements DataObject {
 
     /**
      *  Returns true if this persistent object is in a valid state.
-     *  An invalid DataObject usually results from using a data object that was 
+     *  An invalid DataObject usually results from using a data object that was
      *  retrieved during a transaction that has been rolled back.
      *
      * @return True if the object has been modified, false otherwise.
@@ -666,11 +666,11 @@ public class GenericDataObject implements DataObject {
     private void saveAssociations() throws PersistenceException {
         validate(true);
 
-	// This function is getting way to long and harry. It would be quite
-	// possible to rewrite the loops as one hopefully simpler loop, but I
-	// don't want to do that a couple minutes before the formal build, so
-	// I'll just note that this function should be dramatically
-	// simplified. rhs@mit.edu
+        // This function is getting way to long and harry. It would be quite
+        // possible to rewrite the loops as one hopefully simpler loop, but I
+        // don't want to do that a couple minutes before the formal build, so
+        // I'll just note that this function should be dramatically
+        // simplified. rhs@mit.edu
 
         // Loop through all data associations and perform any necessary
         // operations. This process is the same for both updating and
@@ -697,10 +697,10 @@ public class GenericDataObject implements DataObject {
                     toAdd = (GenericDataObject) value;
                 } catch (ClassCastException e) {
                     throw new PersistenceException(
-                        "Expecting the " + key + " property of " +
-                        m_type.getQualifiedName() + " to be set to a DataObject, " +
-                        "but found " + value.getClass().getName() + "."
-                        );
+                                                   "Expecting the " + key + " property of " +
+                                                   m_type.getQualifiedName() + " to be set to a DataObject, " +
+                                                   "but found " + value.getClass().getName() + "."
+                                                   );
                 }
 
                 if (toAdd != null && toAdd.equals(toRemove)) {
@@ -723,16 +723,16 @@ public class GenericDataObject implements DataObject {
             }
         }
 
-	for (Iterator it = m_type.getProperties(); it.hasNext(); ) {
-	    Property prop = (Property) it.next();
-	    if (prop.isRole() && prop.isComponent() && !prop.isCollection()) {
-		GenericDataObject toSave =
-		    (GenericDataObject) m_data.get(prop.getName());
-		if (toSave != null && !toSave.m_isDeleted) {
-		    toSave.save();
-		}
-	    }
-	}
+        for (Iterator it = m_type.getProperties(); it.hasNext(); ) {
+            Property prop = (Property) it.next();
+            if (prop.isRole() && prop.isComponent() && !prop.isCollection()) {
+                GenericDataObject toSave =
+                    (GenericDataObject) m_data.get(prop.getName());
+                if (toSave != null && !toSave.m_isDeleted) {
+                    toSave.save();
+                }
+            }
+        }
     }
 
     public String toString() {
@@ -746,10 +746,10 @@ public class GenericDataObject implements DataObject {
             Property prop = (Property) iter.next();
             sb.append("   - " + prop.getName() + Utilities.LINE_BREAK);
         }
-    
+
         return sb.toString();
     }
-    
+
     /**
      * Overridable methods for specializing Data Objects. *
      **/
@@ -928,14 +928,14 @@ public class GenericDataObject implements DataObject {
     /**
      * Checks that the passed in property is not null and if it is generates
      * an exception.
-     * 
+     *
      * @param name The name of the property to check.
      * @exception PersistenceException Thrown if the object type does
      * not have the specified property
      *
      * @author <a href="mailto:mbryzek@arsdigita.com">Michael Bryzek</a>
      **/
-    private Property checkProperty(String name) 
+    private Property checkProperty(String name)
         throws PersistenceException
     {
         Property prop = m_type.getProperty(name);
@@ -989,11 +989,11 @@ public class GenericDataObject implements DataObject {
 
     /**
      * Is this data object equal to another data object?
-     * Default implementation only compares OID (provided 
+     * Default implementation only compares OID (provided
      * it isn't empty).
      *
      * @param category A category
-     * @return true if the two objects have the same OID, 
+     * @return true if the two objects have the same OID,
      *  unless no OID info exists in which case true if they
      *  are at the same memory location (the default .equals).
      */
@@ -1013,13 +1013,13 @@ public class GenericDataObject implements DataObject {
     }
 
 
-    /**     
+    /**
      * We override the standard hashCode method because
      * we have overridden equals.
-     *  
+     *
      * This delegates to OID.hashCode, unless the OID is
      * empty, in which case we delegate to super.hashCode
-     * and end up with something based on this object's 
+     * and end up with something based on this object's
      * location in memory.
      */
     public int hashCode() {
@@ -1050,23 +1050,23 @@ public class GenericDataObject implements DataObject {
     void validate(boolean write) {
         if (!m_valid) {
             throw new PersistenceException(
-                "This data object is not valid. This usually results " +
-                "from using a data object that was retrieved during " +
-                "a transaction that has been rolled back."
-                );
+                                           "This data object is not valid. This usually results " +
+                                           "from using a data object that was retrieved during " +
+                                           "a transaction that has been rolled back."
+                                           );
         }
 
         if (write && m_disconnected) {
             throw new PersistenceException(
-                "Cannot write to the database using a disconnected object."
-                );
+                                           "Cannot write to the database using a disconnected object."
+                                           );
         }
 
         if (!m_disconnected && m_session != SessionManager.getSession()) {
             throw new PersistenceException(
-                "This data object is being accessed from another " +
-                "thread before its originating transaction has terminated."
-                );
+                                           "This data object is being accessed from another " +
+                                           "thread before its originating transaction has terminated."
+                                           );
         }
     }
 
@@ -1091,9 +1091,9 @@ public class GenericDataObject implements DataObject {
 
     void disconnect(boolean valid) {
         Assert.assertTrue(
-            getSession() != null,
-            "Session is null"
-            );
+                          getSession() != null,
+                          "Session is null"
+                          );
 
         if (isDisconnected()) {
             return;
@@ -1123,34 +1123,34 @@ public class GenericDataObject implements DataObject {
      * necessary.
      **/
 
-/*    private synchronized void reconnect() {
-        if (m_session == null) {
-            setSession(SessionManager.getSession());
+    /*    private synchronized void reconnect() {
+          if (m_session == null) {
+          setSession(SessionManager.getSession());
 
-            if (isNew()) { return; }
+          if (isNew()) { return; }
 
-            for (Iterator it = m_type.getProperties(); it.hasNext(); ) {
-                Property prop = (Property) it.next();
-                if (prop.isRole() && !prop.isCollection() &&
-                    !m_data.isPropertyModified(prop.getName())) {
-                    m_data.clearProperty(prop.getName());
-                }
-            }
+          for (Iterator it = m_type.getProperties(); it.hasNext(); ) {
+          Property prop = (Property) it.next();
+          if (prop.isRole() && !prop.isCollection() &&
+          !m_data.isPropertyModified(prop.getName())) {
+          m_data.clearProperty(prop.getName());
+          }
+          }
 
-            // Refetch to be sure there is no stale data.
-            if (!doRetrieve(getOID())) {
-                m_isDeleted = true;
-                throw new PersistenceException(
-                    "This data object has been deleted."
-                    );
-            }
-        } else if (m_session != SessionManager.getSession()) {
-            throw new PersistenceException(
-                "This data object is currently being used in another thread."
-                );
-        }
-    }
-*/
+          // Refetch to be sure there is no stale data.
+          if (!doRetrieve(getOID())) {
+          m_isDeleted = true;
+          throw new PersistenceException(
+          "This data object has been deleted."
+          );
+          }
+          } else if (m_session != SessionManager.getSession()) {
+          throw new PersistenceException(
+          "This data object is currently being used in another thread."
+          );
+          }
+          }
+    */
 
     public GenericDataObject copy() {
         GenericDataObject result =

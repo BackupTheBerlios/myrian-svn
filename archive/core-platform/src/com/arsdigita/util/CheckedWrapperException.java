@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,6 +12,7 @@
  * rights and limitations under the License.
  *
  */
+
 package com.arsdigita.util;
 
 /**
@@ -31,11 +32,11 @@ package com.arsdigita.util;
  * <tt>new UncheckedWrapperException(e.getMessage(), e);</tt>
  *
  * @author David Eison (eison@arsdigita.com)
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/CheckedWrapperException.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/CheckedWrapperException.java#3 $
  */
 public class CheckedWrapperException extends Exception {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/CheckedWrapperException.java#2 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/CheckedWrapperException.java#3 $";
     private static final String NEW_LINE = System.getProperty("line.separator");
     Throwable m_rootCause;
 
@@ -137,7 +138,7 @@ public class CheckedWrapperException extends Exception {
         if (m_rootCause != null) {
             System.err.println("");
             System.err.print("Root cause: ");
-           m_rootCause.printStackTrace();
+            m_rootCause.printStackTrace();
         }
     }
 

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -26,37 +26,37 @@ import java.util.List;
 import java.util.ArrayList;
 import org.apache.log4j.Logger;
 
-// imports for deprecated DataAssociation 
+// imports for deprecated DataAssociation
 
 // imports for deprecated DataQuery
 
 
 
 /**
- * DataAssociationImpl - This is the default implementation for 
+ * DataAssociationImpl - This is the default implementation for
  * DataAssociation.  This is used to represent the relationship between
  * two objects.   That is, this is used to say that two objects are
  * associated.  {@link com.arsdigita.persistence.Link} represents the
  * actual link between two objects and holds the extra information
- * about the association.  
+ * about the association.
  *
  * <p>
  *
  * It is important to note that when the deprecated methods in this class
  * are removed, <font color="red"><b>this class will no long extend
- * DataCollection</b></font>.  If you want something that extends 
+ * DataCollection</b></font>.  If you want something that extends
  * DataCollection, use DataAssociationCursor instead.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #8 $ $Date: 2002/08/13 $
+ * @version $Revision: #9 $ $Date: 2002/08/14 $
  */
 
 class DataAssociationImpl extends DataCollectionImpl implements DataAssociation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#8 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#9 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-    private static final Logger s_cat = 
+    private static final Logger s_cat =
         Logger.getLogger(DataAssociationImpl.class);
 
 
@@ -79,7 +79,7 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
      *  Create a new DataAssociationImpl
      *
      *  @param parent The parent GenericDataObject for the Association
-     *  @param role The role that is being created 
+     *  @param role The role that is being created
      */
     DataAssociationImpl(GenericDataObject parent, String role, Operation op) {
         super((ObjectType)parent.getObjectType().getProperty(role).getType(),
@@ -133,7 +133,7 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
      * through all of the data associations
      **/
     public DataAssociationCursor getDataAssociationCursor() {
-        DataAssociationCursorImpl cursor = 
+        DataAssociationCursorImpl cursor =
             new DataAssociationCursorImpl(m_parent, m_role, this,
                                           getOperation());
         return cursor;
@@ -143,14 +143,14 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
     /**
      * Returns a data association iterator that allows users to iterate
      * through all of the data associations
-     *  
+     *
      * This is a convenience method for getDataAssociationCursor()
      */
     public DataAssociationCursor cursor() {
         return getDataAssociationCursor();
     }
 
-    
+
     /**
      *  This removes all of the Associations with the parent object
      *  (It is like deleting all rows in a mapping table or updating
@@ -211,8 +211,8 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
     public DataObject add(DataObject object) {
         if (object == null) {
             throw new IllegalArgumentException(
-                "Null object was passed to DataAssociation.add()"
-                );
+                                               "Null object was passed to DataAssociation.add()"
+                                               );
         }
 
         m_parent.fireObserver(new AddEvent(m_parent, m_role, object));
@@ -241,7 +241,7 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
     /**
      *  Removes the object associated with the current position in the
      *  collection.
-     * @deprecated Use {@link #remove(DataObject object)} or 
+     * @deprecated Use {@link #remove(DataObject object)} or
      * {@link #cursor()}, loop through the objects
      * and then call remove()
      */
@@ -261,10 +261,10 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
 
         if (m_linkType != null) {
             DataObject link = GenericDataObjectFactory.createObject(
-                m_linkType,
-                SessionManager.getSession(),
-                false
-                );
+                                                                    m_linkType,
+                                                                    SessionManager.getSession(),
+                                                                    false
+                                                                    );
 
             DataContainer linkData =
                 ((GenericDataObject) link).getDataContainer();
@@ -292,7 +292,7 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
      * save() is called on the association's parent object. This means, for
      * example, that cursor() will return the same cursor that it did before
      * any objects are added.
-     * @param oid The OID of the object to remove.   
+     * @param oid The OID of the object to remove.
      */
     public void remove(OID oid) {
         remove(getObjectFromOID(oid));
@@ -371,10 +371,10 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
 
     /**
      *  Returns a boolean indicating whetherr or not this association has
-     *  been modified 
+     *  been modified
      *
      *  @return a boolean indicating whetherr or not this association has
-     *  been modified 
+     *  been modified
      */
     public boolean isModified() {
         return m_toAdd.size() > 0 || m_toRemove.size() > 0;
@@ -383,7 +383,7 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
 
     /**
      *  This is a simple string representation of DataAssociationImpl.
-     *  For something more involved, you should use 
+     *  For something more involved, you should use
      *  {@link #toString(Set s, int level)}
      *
      *  This is not complex because if it were, it could be possible
@@ -406,7 +406,7 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
         getInternalCursor().setParameter(parameterName, value);
     }
 
-    
+
     /**
      * Allows a caller to get a parameter value for a parameter that
      * has already been set
@@ -430,13 +430,13 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
     }
 
     /**
-     * Explicitly closes this DataQuery.  
+     * Explicitly closes this DataQuery.
      * Query will automatically be closed when next
-     * returns false, but this method should be 
-     * explicitly called in the case where all of the data in a query 
+     * returns false, but this method should be
+     * explicitly called in the case where all of the data in a query
      * is not needed (e.g. a "while (next())" loop is exited early or
      * only one value is retrieved with if (next()) {...}).
-     */    
+     */
     public void close() {
         getInternalCursor().close();
     }
@@ -519,7 +519,7 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
      * Note: Calling the method isLast may be expensive because the
      * JDBC driver might need to fetch ahead one row in order to
      * determine whether the current row is the last row in the result
-     * set.  
+     * set.
      * <p>
      * If the query has not yet been executed, it executes the query.
      * <p>
@@ -606,7 +606,7 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
      * <code>"priority < 3 and priority > 3"</code>
      * which is clearly now what the developer wants.
      * <p>
-     * The following will work.  
+     * The following will work.
      * <pre>
      * <code>
      * Filter filter = query.addFilter("priority < :lowerBound");
@@ -615,10 +615,10 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
      * filter.set("upperBound", new Integer(8));
      * </code>
      * </pre>
-     * It is actually the same as 
+     * It is actually the same as
      * <pre>
      * <code>
-     * Filter filter = query.addFilter("priority < :lowerBound 
+     * Filter filter = query.addFilter("priority < :lowerBound
      *                                  and priority > :uperBound");
      * filter.set("upperBound", new Integer(8));
      * filter.set("lowerBound", new Integer(3));
@@ -627,26 +627,26 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
      *
      * @param conditions The conditions for the filter.  This is a string
      *        that should represent part of a SQL "where" clause.  Specifically,
-     *        it should normally take the form of 
+     *        it should normally take the form of
      *        <pre><code>
      *        &lt;column_name&gt; &lt;condition&gt; &lt;attribute bind variable&gt;
      *        </code></pre>
      *        where the "condition" is something like "=", "&lt;", "&gt;", or
      *        "!=".  The "bind variable" should be a colon followed by
-     *        some attribute name that will later be set with a call to 
-     *        {@link com.arsdigita.persistence.Filter#set(java.lang.String, 
+     *        some attribute name that will later be set with a call to
+     *        {@link com.arsdigita.persistence.Filter#set(java.lang.String,
      *               java.lang.Object)}
      *        <p>
      *        It is possible to set multiple conditions with a single
      *        addFilter statement by combining the conditions with an "and"
      *        or an "or".  Conditions may be grouped by using parentheses.
-     *        Consecutive calls to addFilter append the filters using 
+     *        Consecutive calls to addFilter append the filters using
      *        "and".
      *
      *        <p>
      *        If there is already a filter that exists for this query
      *        then the passed in conditions are added to the current
-     *        conditions with an AND like <code>(&lt;current conditions&gt;) 
+     *        conditions with an AND like <code>(&lt;current conditions&gt;)
      *        and (&lt; passed in conditions&gt;)</code>
      *
      * @return The filter that has just been added to the query
@@ -663,13 +663,13 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
     public Filter addFilter(Filter filter) {
         return getInternalCursor().addFilter(filter);
     }
-    
+
 
     /**
      * <font color=red>Experimental</font>.  Highly experimental, for use
      * by permissions service only.
      */
-    public Filter addInSubqueryFilter(String propertyName, 
+    public Filter addInSubqueryFilter(String propertyName,
                                       String subqueryName) {
         return getInternalCursor().addInSubqueryFilter(propertyName, subqueryName);
     }
@@ -722,23 +722,23 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
      *              addOrder("creationDate");
      *              addOrder("creationUser");
      *              </code></pre>
-     *              is the same as 
+     *              is the same as
      *              <pre><code>
      *              addOrder("creationDate, creationUser");
      *              </code></pre>
-     *              
+     *
      *              <p>
      *              If the items should be ordered in ascending order,
      *              the attribute name should be followed by the word "asc"
      *              If the items should be ordered in descending order,
      *              the attribute should be followed by the word "desc"
      *              For instance, or order by ascending date and descending
-     *              user (for users created with the same date), you would 
+     *              user (for users created with the same date), you would
      *              use the following:
      *              <pre><code>
      *              addOrder("creationDate asc, creationUser desc");
      *              </code></pre>
-     *              
+     *
      **/
     public void addOrder(String order) throws PersistenceException {
         getInternalCursor().addOrder(order);
@@ -785,7 +785,7 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
         return getInternalCursor().getDataObject();
     }
 
-    
+
     /**
      *  This returns the ObjectType for the DataObjects returned by
      *  this "collection"
@@ -806,10 +806,10 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
         ObjectType objectType = oid.getObjectType();
         GenericDataObject object =
             GenericDataObjectFactory.createObject(
-                objectType,
-                SessionManager.getSession(),
-                false
-                );
+                                                  objectType,
+                                                  SessionManager.getSession(),
+                                                  false
+                                                  );
 
         // now we set all of the properties specified by the OID
         Iterator iterator = objectType.getKeyProperties();
@@ -823,12 +823,12 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
         return object;
     }
 
-	public boolean contains(OID oid) {
-		return cursor().contains(oid);
-	}
+    public boolean contains(OID oid) {
+        return cursor().contains(oid);
+    }
 
-	public boolean contains(DataObject dobj) {
-		return cursor().contains(dobj);
-	}
+    public boolean contains(DataObject dobj) {
+        return cursor().contains(dobj);
+    }
 
 }

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -40,14 +40,14 @@ import org.apache.log4j.Logger;
  * <li>Supports notifying listeners when the ResultSet is closed,
  * thereby enabling close-after-use Statements.</li>
  * </ul>
- * 
+ *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #3 $ $Date: 2002/08/13 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  * @since 4.5
  */
 public class ResultSet implements java.sql.ResultSet {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/ResultSet.java#3 $ $Author: dennis $ $Date: 2002/08/13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/ResultSet.java#4 $ $Author: dennis $ $Date: 2002/08/14 $";
 
     private static final Logger s_cat = Logger.getLogger(com.arsdigita.db.ResultSet.class.getName());
 
@@ -68,88 +68,88 @@ public class ResultSet implements java.sql.ResultSet {
         if (s_cat.isDebugEnabled()) {
             synchronized (dbgResultSets) {
                 dbgResultSets.add(rset);
-                s_cat.debug("ResultSet constructor: created " + this + ", " + 
-                            "ResultSet count is now " + dbgResultSets.size(), 
+                s_cat.debug("ResultSet constructor: created " + this + ", " +
+                            "ResultSet count is now " + dbgResultSets.size(),
                             new Throwable("Stack trace"));
             }
         }
     }
 
-    /** 
-     * Moves the cursor to the given row number in this ResultSet 
-     * object. 
+    /**
+     * Moves the cursor to the given row number in this ResultSet
+     * object.
      */
     public synchronized boolean absolute(int row) throws SQLException {
         try {
             return m_rset.absolute(row);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Moves the cursor to the end of this ResultSet object, just
-     * after the last row. 
+     * after the last row.
      */
     public synchronized void afterLast() throws SQLException {
         try {
             m_rset.afterLast();
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Moves the cursor to the front of this ResultSet object, just
-     * before the first row. 
+     * before the first row.
      */
     public synchronized void beforeFirst() throws SQLException {
         try {
             m_rset.beforeFirst();
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Cancels the updates made to the current row in this ResultSet
-     * object. 
+     * object.
      */
     public synchronized void cancelRowUpdates() throws SQLException {
         try {
             m_rset.cancelRowUpdates();
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
-     * Clears all warnings reported on this ResultSet object. 
+     * Clears all warnings reported on this ResultSet object.
      */
     public synchronized void clearWarnings() throws SQLException {
         try {
             m_rset.clearWarnings();
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Releases this ResultSet object's database and JDBC resources
      * immediately instead of waiting for this to happen when it is
-     * automatically closed. 
+     * automatically closed.
      *
      * NOTE that this may be run by a finalizer thread, so any
-     * listeners with side effects should be threadsafe or 
+     * listeners with side effects should be threadsafe or
      * guarantee that they will not be needed while this resultset
      * is being closed (e.g. a close-after-use statement could not be
      * used while this resultset was being closed, so it doesn't
-     * need to synchronize when responding to this close.  The 
+     * need to synchronize when responding to this close.  The
      * connection, however, does need to synchronize, since
      * there is no guarantee that it won't be used at the same
      * time as the finalizer).
@@ -159,7 +159,7 @@ public class ResultSet implements java.sql.ResultSet {
             m_rset.close();
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
         fireClosedListeners();
         if (s_cat.isDebugEnabled()) {
@@ -167,14 +167,14 @@ public class ResultSet implements java.sql.ResultSet {
                 if (!dbgResultSets.contains(m_rset)) {
                     s_cat.warn("ResultSet close: closing resultset that " +
                                "was never opened or has already " +
-                               "been closed: " + m_rset, 
+                               "been closed: " + m_rset,
                                new Throwable("Stack Trace"));
                 } else {
                     dbgResultSets.remove(m_rset);
                 }
 
-                s_cat.debug("ResultSet close: ResultSet count is now " + 
-                           dbgResultSets.size());
+                s_cat.debug("ResultSet close: ResultSet count is now " +
+                            dbgResultSets.size());
             }
         }
         m_rset = null;
@@ -183,8 +183,8 @@ public class ResultSet implements java.sql.ResultSet {
     protected synchronized void finalize() throws Throwable {
         try {
             if (m_rset != null) {
-                s_cat.warn("ResultSet was not closed by programmer: " + this + 
-                           ", closing in garbage collection.  Lots of these " + 
+                s_cat.warn("ResultSet was not closed by programmer: " + this +
+                           ", closing in garbage collection.  Lots of these " +
                            "messages can indicate the cause of an out " +
                            "of cursors error.");
                 try {
@@ -198,22 +198,22 @@ public class ResultSet implements java.sql.ResultSet {
         }
     }
 
-    /** 
+    /**
      * Deletes the current row from this ResultSet object and from
-     * the underlying database. 
+     * the underlying database.
      */
     public synchronized void deleteRow() throws SQLException {
         try {
             m_rset.deleteRow();
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Maps the given ResultSet column name to its ResultSet column
-     * index. 
+     * index.
      */
     public synchronized int findColumn(String columnName) throws SQLException {
         try {
@@ -222,635 +222,635 @@ public class ResultSet implements java.sql.ResultSet {
             s_cat.warn("Could not retrieve the column named: \"" +
                        columnName + "\"");
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
-     * Moves the cursor to the first row in this ResultSet object. 
+     * Moves the cursor to the first row in this ResultSet object.
      */
     public synchronized boolean first() throws SQLException {
         try {
             return m_rset.first();
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Returns the value of the designated column in the current row
      * of this ResultSet object as an Array object in the Java
-     * programming language. 
+     * programming language.
      */
     public synchronized Array getArray(int i) throws SQLException {
         try {
             return m_rset.getArray(i);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Returns the value of the designated column in the current row
      * of this ResultSet object as an Array object in the Java
-     * programming language. 
+     * programming language.
      */
     public synchronized Array getArray(String colName) throws SQLException {
         try {
             return m_rset.getArray(colName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
-     * this ResultSet object as a stream of ASCII characters. 
+     * this ResultSet object as a stream of ASCII characters.
      */
     public synchronized InputStream getAsciiStream(int columnIndex) throws SQLException {
         try {
             return m_rset.getAsciiStream(columnIndex);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
-     * this ResultSet object as a stream of ASCII characters. 
+     * this ResultSet object as a stream of ASCII characters.
      */
     public synchronized InputStream getAsciiStream(String columnName) throws SQLException {
         try {
             return m_rset.getAsciiStream(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a java.math.BigDecimal with full
-     * precision. 
+     * precision.
      */
     public synchronized BigDecimal getBigDecimal(int columnIndex) throws SQLException {
         try {
             return m_rset.getBigDecimal(columnIndex);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * @deprecated
      */
     public synchronized BigDecimal getBigDecimal(int columnIndex, int scale)
-            throws SQLException {
+        throws SQLException {
         try {
             return m_rset.getBigDecimal(columnIndex, scale);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a java.math.BigDecimal with full
-     * precision. 
+     * precision.
      */
     public synchronized BigDecimal getBigDecimal(String columnName) throws SQLException {
         try {
             return m_rset.getBigDecimal(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * @deprecated
      */
     public synchronized BigDecimal getBigDecimal(String columnName, int scale)
-            throws SQLException {
+        throws SQLException {
         try {
             return m_rset.getBigDecimal(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of a column in the current row as a stream of
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a binary stream of uninterpreted
-     * bytes. 
+     * bytes.
      */
     public synchronized InputStream getBinaryStream(int columnIndex) throws SQLException {
         try {
             return m_rset.getBinaryStream(columnIndex);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
-     * this ResultSet object as a stream of uninterpreted bytes. 
+     * this ResultSet object as a stream of uninterpreted bytes.
      */
     public synchronized InputStream getBinaryStream(String columnName) throws SQLException {
         try {
             return m_rset.getBinaryStream(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Returns the value of the designated column in the current row
      * of this ResultSet object as a Blob object in the Java
-     * programming language. 
+     * programming language.
      */
     public synchronized Blob getBlob(int i) throws SQLException {
         try {
             return m_rset.getBlob(i);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Returns the value of the designated column in the current row
      * of this ResultSet object as a Blob object in the Java
-     * programming language. 
+     * programming language.
      */
     public synchronized Blob getBlob(String colName) throws SQLException {
         try {
             return m_rset.getBlob(colName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a boolean in the Java programming
-     * language. 
+     * language.
      */
     public synchronized boolean getBoolean(int columnIndex) throws SQLException {
         try {
             return m_rset.getBoolean(columnIndex);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a boolean in the Java programming
-     * language. 
+     * language.
      */
     public synchronized boolean getBoolean(String columnName) throws SQLException {
         try {
             return m_rset.getBoolean(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a byte in the Java programming
-     * language. 
+     * language.
      */
     public synchronized byte getByte(int columnIndex) throws SQLException {
         try {
             return m_rset.getByte(columnIndex);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a byte in the Java programming
-     * language. 
+     * language.
      */
     public synchronized byte getByte(String columnName) throws SQLException {
         try {
             return m_rset.getByte(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a byte array in the Java programming
-     * language. 
+     * language.
      */
     public synchronized byte[] getBytes(int columnIndex) throws SQLException {
         try {
             return m_rset.getBytes(columnIndex);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a byte array in the Java programming
-     * language. 
+     * language.
      */
     public synchronized byte[] getBytes(String columnName) throws SQLException {
         try {
             return m_rset.getBytes(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
-     * this ResultSet object as a java.io.Reader object. 
+     * this ResultSet object as a java.io.Reader object.
      */
     public synchronized Reader getCharacterStream(int columnIndex) throws SQLException {
         try {
             return m_rset.getCharacterStream(columnIndex);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
-     * this ResultSet object as a java.io.Reader object. 
+     * this ResultSet object as a java.io.Reader object.
      */
     public synchronized Reader getCharacterStream(String columnName) throws SQLException {
         try {
             return m_rset.getCharacterStream(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Returns the value of the designated column in the current row
      * of this ResultSet object as a Clob object in the Java
-     * programming language. 
+     * programming language.
      */
     public synchronized Clob getClob(int i) throws SQLException {
         try {
             return m_rset.getClob(i);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Returns the value of the designated column in the current row
      * of this ResultSet object as a Clob object in the Java
-     * programming language. 
+     * programming language.
      */
     public synchronized Clob getClob(String colName) throws SQLException {
         try {
             return m_rset.getClob(colName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
-     * Returns the concurrency mode of this ResultSet object. 
+     * Returns the concurrency mode of this ResultSet object.
      */
     public synchronized int getConcurrency() throws SQLException {
         try {
             return m_rset.getConcurrency();
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the name of the SQL cursor used by this ResultSet
-     * object. 
+     * object.
      */
     public synchronized String getCursorName() throws SQLException {
         try {
             return m_rset.getCursorName();
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a java.sql.Date object in the Java
-     * programming language. 
+     * programming language.
      */
     public synchronized Date getDate(int columnIndex) throws SQLException {
         try {
             return m_rset.getDate(columnIndex);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Returns the value of the designated column in the current row
      * of this ResultSet object as a java.sql.Date object in the Java
-     * programming language. 
+     * programming language.
      */
     public synchronized Date getDate(int columnIndex, Calendar cal) throws SQLException {
         try {
             return m_rset.getDate(columnIndex, cal);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a java.sql.Date object in the Java
-     * programming language. 
+     * programming language.
      */
     public synchronized Date getDate(String columnName) throws SQLException {
         try {
             return m_rset.getDate(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Returns the value of the designated column in the current row
      * of this ResultSet object as a java.sql.Date object in the Java
-     * programming language. 
+     * programming language.
      */
     public synchronized Date getDate(String columnName, Calendar cal) throws SQLException {
         try {
             return m_rset.getDate(columnName, cal);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a double in the Java programming
-     * language. 
+     * language.
      */
     public synchronized double getDouble(int columnIndex) throws SQLException {
         try {
             return m_rset.getDouble(columnIndex);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a double in the Java programming
-     * language. 
+     * language.
      */
     public synchronized double getDouble(String columnName) throws SQLException {
         try {
             return m_rset.getDouble(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
-     * Returns the fetch direction for this ResultSet object. 
+     * Returns the fetch direction for this ResultSet object.
      */
     public synchronized int getFetchDirection() throws SQLException {
         try {
             return m_rset.getFetchDirection();
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
-     * Returns the fetch size for this ResultSet object. 
+     * Returns the fetch size for this ResultSet object.
      */
     public synchronized int getFetchSize() throws SQLException {
         try {
             return m_rset.getFetchSize();
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a float in the Java programming
-     * language. 
+     * language.
      */
     public synchronized float getFloat(int columnIndex) throws SQLException {
         try {
             return m_rset.getFloat(columnIndex);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a float in the Java programming
-     * language. 
+     * language.
      */
     public synchronized float getFloat(String columnName) throws SQLException {
         try {
             return m_rset.getFloat(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as an int in the Java programming
-     * language. 
+     * language.
      */
     public synchronized int getInt(int columnIndex) throws SQLException {
         try {
             return m_rset.getInt(columnIndex);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as an int in the Java programming
-     * language. 
+     * language.
      */
     public synchronized int getInt(String columnName) throws SQLException {
         try {
             return m_rset.getInt(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a long in the Java programming
-     * language. 
+     * language.
      */
     public synchronized long getLong(int columnIndex) throws SQLException {
         try {
             return m_rset.getLong(columnIndex);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a long in the Java programming
-     * language. 
+     * language.
      */
     public synchronized long getLong(String columnName) throws SQLException {
         try {
             return m_rset.getLong(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
      * Retrieves the number, types and properties of this ResultSet
-     * object's columns. 
+     * object's columns.
      */
     public synchronized ResultSetMetaData getMetaData() throws SQLException {
         try {
             return m_rset.getMetaData();
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as an Object in the Java programming
-     * language. 
+     * language.
      */
     public synchronized Object getObject(int columnIndex) throws SQLException {
         try {
             return m_rset.getObject(columnIndex);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
      * Returns the value of the designated column in the current row
      * of this ResultSet object as an Object in the Java programming
-     * language. 
+     * language.
      */
     public synchronized Object getObject(int i, Map map) throws SQLException {
         try {
             return m_rset.getObject(i, map);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as an Object in the Java programming
-     * language. 
+     * language.
      */
     public synchronized Object getObject(String columnName) throws SQLException {
         try {
             return m_rset.getObject(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
      * Returns the value of the designated column in the current row
      * of this ResultSet object as an Object in the Java programming
-     * language. 
+     * language.
      */
     public synchronized Object getObject(String colName, Map map) throws SQLException {
         try {
             return m_rset.getObject(colName, map);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
      * Returns the value of the designated column in the current row
      * of this ResultSet object as a Ref object in the Java
-     * programming language. 
+     * programming language.
      */
     public synchronized Ref getRef(int i) throws SQLException {
         try {
             return m_rset.getRef(i);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
      * Returns the value of the designated column in the current row
      * of this ResultSet object as a Ref object in the Java
-     * programming language. 
+     * programming language.
      */
     public synchronized Ref getRef(String colName) throws SQLException {
         try {
             return m_rset.getRef(colName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
@@ -860,41 +860,41 @@ public class ResultSet implements java.sql.ResultSet {
             return m_rset.getRow();
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a short in the Java programming
-     * language. 
+     * language.
      */
     public synchronized short getShort(int columnIndex) throws SQLException {
         try {
             return m_rset.getShort(columnIndex);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a short in the Java programming
-     * language. 
+     * language.
      */
     public synchronized short getShort(String columnName) throws SQLException {
         try {
             return m_rset.getShort(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
      * Returns the Statement object that produced this ResultSet
-     * object. 
+     * object.
      */
     public java.sql.Statement getStatement() throws SQLException {
         return m_stmt;
@@ -903,98 +903,98 @@ public class ResultSet implements java.sql.ResultSet {
     /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a String in the Java programming
-     * language. 
+     * language.
      */
     public synchronized String getString(int columnIndex) throws SQLException {
         try {
             return m_rset.getString(columnIndex);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a String in the Java programming
-     * language. 
+     * language.
      */
     public synchronized String getString(String columnName) throws SQLException {
         try {
             return m_rset.getString(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a java.sql.Time object in the Java
-     * programming language. 
+     * programming language.
      */
     public synchronized Time getTime(int columnIndex) throws SQLException {
         try {
             return m_rset.getTime(columnIndex);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
      * Returns the value of the designated column in the current row
      * of this ResultSet object as a java.sql.Time object in the Java
-     * programming language. 
+     * programming language.
      */
     public synchronized Time getTime(int columnIndex, Calendar cal) throws SQLException {
         try {
             return m_rset.getTime(columnIndex, cal);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a java.sql.Time object in the Java
-     * programming language. 
-     */	   
+     * programming language.
+     */
     public synchronized Time getTime(String columnName) throws SQLException {
         try {
             return m_rset.getTime(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
+    /**
      * Returns the value of the designated column in the current row
      * of this ResultSet object as a java.sql.Time object in the Java
-     * programming language. 
+     * programming language.
      */
     public synchronized Time getTime(String columnName, Calendar cal) throws SQLException {
         try {
             return m_rset.getTime(columnName, cal);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
      * Gets the value of the designated column in the current row of
      * this ResultSet object as a java.sql.Timestamp object in the
-     * Java programming language. 
+     * Java programming language.
      */
     public synchronized Timestamp getTimestamp(int columnIndex) throws SQLException {
         try {
             return m_rset.getTimestamp(columnIndex);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
@@ -1010,27 +1010,27 @@ public class ResultSet implements java.sql.ResultSet {
             return m_rset.getTimestamp(columnIndex, cal);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
      * Gets the value of the designated column in the current row of
-     * this ResultSet object as a java.sql.Timestamp object. 
+     * this ResultSet object as a java.sql.Timestamp object.
      */
     public synchronized Timestamp getTimestamp(String columnName) throws SQLException {
         try {
             return m_rset.getTimestamp(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
      * Returns the value of the designated column in the current row
      * of this ResultSet object as a java.sql.Timestamp object in the
-     * Java programming language. 
+     * Java programming language.
      */
     public synchronized Timestamp getTimestamp(String columnName, Calendar cal)
         throws SQLException
@@ -1039,31 +1039,31 @@ public class ResultSet implements java.sql.ResultSet {
             return m_rset.getTimestamp(columnName, cal);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
-    /** 
-     * Returns the type of this ResultSet object. 
+    /**
+     * Returns the type of this ResultSet object.
      */
     public synchronized int getType() throws SQLException {
         try {
             return m_rset.getType();
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
-     * @deprecated Use getCharacterStream in place of getUnicodeStream 
+     * @deprecated Use getCharacterStream in place of getUnicodeStream
      */
     public synchronized InputStream getUnicodeStream(int columnIndex) throws SQLException {
         try {
             return m_rset.getUnicodeStream(columnIndex);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
@@ -1071,12 +1071,12 @@ public class ResultSet implements java.sql.ResultSet {
      * @deprecated
      */
     public synchronized InputStream getUnicodeStream(String columnName)
-            throws SQLException {
+        throws SQLException {
         try {
             return m_rset.getUnicodeStream(columnName);
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
@@ -1089,33 +1089,33 @@ public class ResultSet implements java.sql.ResultSet {
             return m_rset.getWarnings();
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
      * Inserts the contents of the insert row into this ResultSet
-     * object and into the database. 
+     * object and into the database.
      */
     public synchronized void insertRow() throws SQLException {
         try {
             m_rset.insertRow();
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
     /**
      * Indicates whether the cursor is after the last row in this
-     * ResultSet object. 
+     * ResultSet object.
      */
     public synchronized boolean isAfterLast() throws SQLException {
         try {
             return m_rset.isAfterLast();
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
-            throw e;  //code should never get here, but just in case 
+            throw e;  //code should never get here, but just in case
         }
     }
 
@@ -1134,7 +1134,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     /**
      * Indicates whether the cursor is on the first row of this
-     * ResultSet object. 
+     * ResultSet object.
      */
     public synchronized boolean isFirst() throws SQLException {
         try {
@@ -1147,7 +1147,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     /**
      * Indicates whether the cursor is on the last row of this
-     * ResultSet object. 
+     * ResultSet object.
      */
     public synchronized boolean isLast() throws SQLException {
         try {
@@ -1159,7 +1159,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Moves the cursor to the last row in this ResultSet object. 
+     * Moves the cursor to the last row in this ResultSet object.
      */
     public synchronized boolean last() throws SQLException {
         try {
@@ -1172,7 +1172,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     /**
      * Moves the cursor to the remembered cursor position, usually
-     * the current row. 
+     * the current row.
      */
     public synchronized void moveToCurrentRow() throws SQLException {
         try {
@@ -1184,7 +1184,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Moves the cursor to the insert row. 
+     * Moves the cursor to the insert row.
      */
     public synchronized void moveToInsertRow() throws SQLException {
         try {
@@ -1196,7 +1196,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Moves the cursor down one row from its current position. 
+     * Moves the cursor down one row from its current position.
      */
     public synchronized boolean next() throws SQLException {
         try {
@@ -1209,7 +1209,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     /**
      * Moves the cursor to the previous row in this ResultSet
-     * object. 
+     * object.
      */
     public synchronized boolean previous() throws SQLException {
         try {
@@ -1222,7 +1222,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     /**
      * Refreshes the current row with its most recent value in the
-     * database. 
+     * database.
      */
     public synchronized void refreshRow() throws SQLException {
         try {
@@ -1235,7 +1235,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     /**
      * Moves the cursor a relative number of rows, either positive or
-     * negative. 
+     * negative.
      */
     public synchronized boolean relative(int rows) throws SQLException {
         try {
@@ -1247,7 +1247,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Indicates whether a row has been deleted. 
+     * Indicates whether a row has been deleted.
      */
     public synchronized boolean rowDeleted() throws SQLException {
         try {
@@ -1259,7 +1259,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Indicates whether the current row has had an insertion. 
+     * Indicates whether the current row has had an insertion.
      */
     public synchronized boolean rowInserted() throws SQLException {
         try {
@@ -1271,7 +1271,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Indicates whether the current row has been updated. 
+     * Indicates whether the current row has been updated.
      */
     public synchronized boolean rowUpdated() throws SQLException {
         try {
@@ -1284,7 +1284,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     /**
      * Gives a hint as to the direction in which the rows in this
-     * ResultSet object will be processed. 
+     * ResultSet object will be processed.
      */
     public synchronized void setFetchDirection(int direction) throws SQLException {
         try {
@@ -1298,7 +1298,7 @@ public class ResultSet implements java.sql.ResultSet {
     /**
      * Gives the JDBC driver a hint as to the number of rows that
      * should be fetched from the database when more rows are needed
-     * for this ResultSet object. 
+     * for this ResultSet object.
      */
     public synchronized void setFetchSize(int rows) throws SQLException {
         try {
@@ -1310,10 +1310,10 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with an ascii stream value. 
+     * Updates the designated column with an ascii stream value.
      */
     public synchronized void updateAsciiStream(int columnIndex, InputStream x, int length)
-            throws SQLException {
+        throws SQLException {
         try {
             m_rset.updateAsciiStream(columnIndex, x, length);
         } catch (SQLException e) {
@@ -1323,10 +1323,10 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with an ascii stream value. 
+     * Updates the designated column with an ascii stream value.
      */
     public synchronized void updateAsciiStream(String columnName, InputStream x, int length)
-            throws SQLException {
+        throws SQLException {
         try {
             m_rset.updateAsciiStream(columnName, x, length);
         } catch (SQLException e) {
@@ -1340,7 +1340,7 @@ public class ResultSet implements java.sql.ResultSet {
      * value.
      */
     public synchronized void updateBigDecimal(int columnIndex, BigDecimal x)
-            throws SQLException {
+        throws SQLException {
         try {
             m_rset.updateBigDecimal(columnIndex, x);
         } catch (SQLException e) {
@@ -1351,10 +1351,10 @@ public class ResultSet implements java.sql.ResultSet {
 
     /**
      * Updates the designated column with a java.sql.BigDecimal
-     * value. 
+     * value.
      */
     public synchronized void updateBigDecimal(String columnName, BigDecimal x)
-            throws SQLException {
+        throws SQLException {
         try {
             m_rset.updateBigDecimal(columnName, x);
         } catch (SQLException e) {
@@ -1364,10 +1364,10 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a binary stream value. 
+     * Updates the designated column with a binary stream value.
      */
     public synchronized void updateBinaryStream(int columnIndex, InputStream x, int length)
-            throws SQLException {
+        throws SQLException {
         try {
             m_rset.updateBinaryStream(columnIndex, x, length);
         } catch (SQLException e) {
@@ -1376,11 +1376,11 @@ public class ResultSet implements java.sql.ResultSet {
         }
     }
 
-    /**  
-     * Updates the designated column with a binary stream value. 
+    /**
+     * Updates the designated column with a binary stream value.
      */
     public synchronized void updateBinaryStream(String columnName, InputStream x,int length)
-            throws SQLException {
+        throws SQLException {
         try {
             m_rset.updateBinaryStream(columnName, x, length);
         } catch (SQLException e) {
@@ -1390,7 +1390,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a boolean value. 
+     * Updates the designated column with a boolean value.
      */
     public synchronized void updateBoolean(int columnIndex, boolean x) throws SQLException {
         try {
@@ -1402,10 +1402,10 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a boolean value. 
+     * Updates the designated column with a boolean value.
      */
     public synchronized void updateBoolean(String columnName, boolean x)
-            throws SQLException {
+        throws SQLException {
         try {
             m_rset.updateBoolean(columnName, x);
         } catch (SQLException e) {
@@ -1415,7 +1415,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a byte value. 
+     * Updates the designated column with a byte value.
      */
     public synchronized void updateByte(int columnIndex, byte x) throws SQLException {
         try {
@@ -1427,7 +1427,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a byte value. 
+     * Updates the designated column with a byte value.
      */
     public synchronized void updateByte(String columnName, byte x) throws SQLException {
         try {
@@ -1439,7 +1439,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a byte array value. 
+     * Updates the designated column with a byte array value.
      */
     public synchronized void updateBytes(int columnIndex, byte[] x) throws SQLException {
         try {
@@ -1451,7 +1451,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a boolean value. 
+     * Updates the designated column with a boolean value.
      */
     public synchronized void updateBytes(String columnName, byte[] x) throws SQLException {
         try {
@@ -1464,10 +1464,10 @@ public class ResultSet implements java.sql.ResultSet {
 
     /**
      * Updates the designated column with a character stream
-     * value. 
+     * value.
      */
     public synchronized void updateCharacterStream(int columnIndex, Reader x, int length)
-            throws SQLException {
+        throws SQLException {
         try {
             m_rset.updateCharacterStream(columnIndex, x, length);
         } catch (SQLException e) {
@@ -1478,11 +1478,11 @@ public class ResultSet implements java.sql.ResultSet {
 
     /**
      * Updates the designated column with a character stream
-     * value. 
+     * value.
      */
     public synchronized void updateCharacterStream(String columnName, Reader reader,
-                                      int length) 
-            throws SQLException {
+                                                   int length)
+        throws SQLException {
         try {
             m_rset.updateCharacterStream(columnName, reader, length);
         } catch (SQLException e) {
@@ -1491,8 +1491,8 @@ public class ResultSet implements java.sql.ResultSet {
         }
     }
 
-    /** 
-     * Updates the designated column with a java.sql.Date value. 
+    /**
+     * Updates the designated column with a java.sql.Date value.
      */
     public synchronized void updateDate(int columnIndex, Date x) throws SQLException {
         try {
@@ -1504,7 +1504,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a java.sql.Date value. 
+     * Updates the designated column with a java.sql.Date value.
      */
     public synchronized void updateDate(String columnName, Date x) throws SQLException {
         try {
@@ -1516,7 +1516,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a double value. 
+     * Updates the designated column with a double value.
      */
     public synchronized void updateDouble(int columnIndex, double x) throws SQLException {
         try {
@@ -1528,7 +1528,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a double value. 
+     * Updates the designated column with a double value.
      */
     public synchronized void updateDouble(String columnName, double x) throws SQLException {
         try {
@@ -1540,7 +1540,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a float value. 
+     * Updates the designated column with a float value.
      */
     public synchronized void updateFloat(int columnIndex, float x) throws SQLException {
         try {
@@ -1552,7 +1552,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a float value. 
+     * Updates the designated column with a float value.
      */
     public synchronized void updateFloat(String columnName, float x) throws SQLException {
         try {
@@ -1564,7 +1564,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with an int value. 
+     * Updates the designated column with an int value.
      */
     public synchronized void updateInt(int columnIndex, int x) throws SQLException {
         try {
@@ -1576,7 +1576,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with an int value. 
+     * Updates the designated column with an int value.
      */
     public synchronized void updateInt(String columnName, int x) throws SQLException {
         try {
@@ -1588,7 +1588,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a long value. 
+     * Updates the designated column with a long value.
      */
     public synchronized void updateLong(int columnIndex, long x) throws SQLException {
         try {
@@ -1600,7 +1600,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a long value. 
+     * Updates the designated column with a long value.
      */
     public synchronized void updateLong(String columnName, long x) throws SQLException {
         try {
@@ -1612,7 +1612,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Gives a nullable column a null value. 
+     * Gives a nullable column a null value.
      */
     public synchronized void updateNull(int columnIndex) throws SQLException {
         try {
@@ -1624,7 +1624,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a null value. 
+     * Updates the designated column with a null value.
      */
     public synchronized void updateNull(String columnName) throws SQLException {
         try {
@@ -1636,7 +1636,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with an Object value. 
+     * Updates the designated column with an Object value.
      */
     public synchronized void updateObject(int columnIndex, Object x) throws SQLException {
         try {
@@ -1648,10 +1648,10 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with an Object value. 
+     * Updates the designated column with an Object value.
      */
     public synchronized void updateObject(int columnIndex, Object x, int scale)
-            throws SQLException {
+        throws SQLException {
         try {
             m_rset.updateObject(columnIndex, x, scale);
         } catch (SQLException e) {
@@ -1661,7 +1661,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with an Object value. 
+     * Updates the designated column with an Object value.
      */
     public synchronized void updateObject(String columnName, Object x) throws SQLException {
         try {
@@ -1673,10 +1673,10 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with an Object value. 
+     * Updates the designated column with an Object value.
      */
     public synchronized void updateObject(String columnName, Object x, int scale)
-            throws SQLException {
+        throws SQLException {
         try {
             m_rset.updateObject(columnName, x, scale);
         } catch (SQLException e) {
@@ -1687,7 +1687,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     /**
      * Updates the underlying database with the new contents of the
-     * current row of this ResultSet object. 
+     * current row of this ResultSet object.
      */
     public synchronized void updateRow() throws SQLException {
         try {
@@ -1699,7 +1699,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a short value. 
+     * Updates the designated column with a short value.
      */
     public synchronized void updateShort(int columnIndex, short x) throws SQLException {
         try {
@@ -1711,7 +1711,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a short value. 
+     * Updates the designated column with a short value.
      */
     public synchronized void updateShort(String columnName, short x) throws SQLException {
         try {
@@ -1723,7 +1723,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a String value. 
+     * Updates the designated column with a String value.
      */
     public synchronized void updateString(int columnIndex, String x) throws SQLException {
         try {
@@ -1735,7 +1735,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a String value. 
+     * Updates the designated column with a String value.
      */
     public synchronized void updateString(String columnName, String x) throws SQLException {
         try {
@@ -1747,7 +1747,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a java.sql.Time value. 
+     * Updates the designated column with a java.sql.Time value.
      */
     public synchronized void updateTime(int columnIndex, Time x) throws SQLException {
         try {
@@ -1759,7 +1759,7 @@ public class ResultSet implements java.sql.ResultSet {
     }
 
     /**
-     * Updates the designated column with a java.sql.Time value. 
+     * Updates the designated column with a java.sql.Time value.
      */
     public synchronized void updateTime(String columnName, Time x) throws SQLException {
         try {
@@ -1772,10 +1772,10 @@ public class ResultSet implements java.sql.ResultSet {
 
     /**
      * Updates the designated column with a java.sql.Timestamp
-     * value. 
+     * value.
      */
     public synchronized void updateTimestamp(int columnIndex, Timestamp x)
-            throws SQLException {
+        throws SQLException {
         try {
             m_rset.updateTimestamp(columnIndex, x);
         } catch (SQLException e) {
@@ -1786,10 +1786,10 @@ public class ResultSet implements java.sql.ResultSet {
 
     /**
      * Updates the designated column with a java.sql.Timestamp
-     * value. 
+     * value.
      */
     public synchronized void updateTimestamp(String columnName, Timestamp x)
-            throws SQLException {
+        throws SQLException {
         try {
             m_rset.updateTimestamp(columnName, x);
         } catch (SQLException e) {
@@ -1800,7 +1800,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     /**
      * Reports whether the last column read had a value of SQL
-     * NULL. 
+     * NULL.
      */
     public synchronized boolean wasNull() throws SQLException {
         try {
@@ -1815,28 +1815,28 @@ public class ResultSet implements java.sql.ResultSet {
      * Wraps a ResultSet instance.
      */
     static synchronized ResultSet wrap(com.arsdigita.db.Connection conn,
-                          java.sql.ResultSet rset)
-            throws SQLException {
+                                       java.sql.ResultSet rset)
+        throws SQLException {
         return wrap(conn, null, rset);
     }
 
-    /** 
+    /**
      * Wraps a ResultSet instance.
      */
     static synchronized ResultSet wrap(com.arsdigita.db.Statement stmt,
-                          java.sql.ResultSet rset)
-            throws SQLException {
+                                       java.sql.ResultSet rset)
+        throws SQLException {
         return wrap(null, stmt, rset);
     }
 
-    /** 
+    /**
      * Wraps a ResultSet instance.  Work
      * routine for previous package methods.
      * */
     private synchronized static ResultSet wrap(com.arsdigita.db.Connection conn,
-                                  com.arsdigita.db.Statement stmt,
-                                  java.sql.ResultSet rset)
-            throws SQLException {
+                                               com.arsdigita.db.Statement stmt,
+                                               java.sql.ResultSet rset)
+        throws SQLException {
         try {
             if (null == rset) {
                 return null;
@@ -1857,7 +1857,7 @@ public class ResultSet implements java.sql.ResultSet {
 
     /**
      * NOTE that the listeners may be called by a finalizer thread, so any
-     * listeners with side effects should be threadsafe or 
+     * listeners with side effects should be threadsafe or
      * guarantee that they will not be needed while this resultset
      * is being closed.
      */

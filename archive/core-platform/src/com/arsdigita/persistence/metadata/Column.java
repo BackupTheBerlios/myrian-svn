@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -26,12 +26,12 @@ import java.util.*;
  * the database.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/14 $
+ * @version $Revision: #7 $ $Date: 2002/08/14 $
  */
 
 public class Column extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Column.java#6 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Column.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     /**
      * The table this Column belongs to.
@@ -45,7 +45,7 @@ public class Column extends Element {
 
     /**
      * The jdbc type code for this Column.  If not jdbc type is provided
-     * the Integer.MIN_VALUE is used. 
+     * the Integer.MIN_VALUE is used.
      **/
     private int m_type;
 
@@ -130,14 +130,14 @@ public class Column extends Element {
 
         if (m_size == 0) {
             throw new IllegalArgumentException(
-                "Size cannot be zero"
-                );
+                                               "Size cannot be zero"
+                                               );
         }
 
         if (m_table.getColumn(m_name) != null) {
             throw new IllegalArgumentException(
-                "Table already has column: " + m_name
-                );
+                                               "Table already has column: " + m_name
+                                               );
         }
         m_table.addColumn(this);
     }

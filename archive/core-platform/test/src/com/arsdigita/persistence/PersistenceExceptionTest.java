@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -31,7 +31,7 @@ import java.math.BigInteger;
  */
 public class PersistenceExceptionTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceExceptionTest.java#2 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceExceptionTest.java#3 $";
 
     private Session ssn;
 
@@ -54,7 +54,7 @@ public class PersistenceExceptionTest extends PersistenceTestCase {
         DataObject dt = ssn.create("examples.Datatype");
         dt.set("id", BigInteger.ZERO);
         dt.save();
-        
+
         dt = ssn.create("examples.Datatype");
         dt.set("id", BigInteger.ZERO);
         try {
@@ -64,13 +64,13 @@ public class PersistenceExceptionTest extends PersistenceTestCase {
             // good
         } catch (Throwable e) {
             // bad
-            fail("Unique constraint violation should have caused " + 
+            fail("Unique constraint violation should have caused " +
                  "UniqueConstraintException, instead caused " + e);
         }
     }
 
     public void testDbNotAvailableException() {
-        // TODO: Figure out other ways to simulate DB failure 
+        // TODO: Figure out other ways to simulate DB failure
         // than just garbage connection info?  Is this possible?
 
         java.sql.PreparedStatement insertStmt = null;
@@ -80,7 +80,7 @@ public class PersistenceExceptionTest extends PersistenceTestCase {
             fail("Using garbage connection info should have caused error");
         } catch (SQLException e) {
             // This gets ugly because we resorted to pure JDBC instead
-            // of com.arsdigita.db stuff.  So, the SQLException we just caught 
+            // of com.arsdigita.db stuff.  So, the SQLException we just caught
             // is a real unprocessed SQLException.  We process it once, like
             // the com.arsdigita.db code would do.  We then catch it and process
             // it again, like the persistence code would do.  We then see
@@ -104,7 +104,7 @@ public class PersistenceExceptionTest extends PersistenceTestCase {
             fail("Using garbage connection info should have caused error");
         } catch (SQLException e) {
             // This gets ugly because we resorted to pure JDBC instead
-            // of com.arsdigita.db stuff.  So, the SQLException we just caught 
+            // of com.arsdigita.db stuff.  So, the SQLException we just caught
             // is a real unprocessed SQLException.  We process it once, like
             // the com.arsdigita.db code would do.  We then catch it and process
             // it again, like the persistence code would do.  We then see
@@ -128,7 +128,7 @@ public class PersistenceExceptionTest extends PersistenceTestCase {
             fail("Using garbage connection info should have caused error");
         } catch (SQLException e) {
             // This gets ugly because we resorted to pure JDBC instead
-            // of com.arsdigita.db stuff.  So, the SQLException we just caught 
+            // of com.arsdigita.db stuff.  So, the SQLException we just caught
             // is a real unprocessed SQLException.  We process it once, like
             // the com.arsdigita.db code would do.  We then catch it and process
             // it again, like the persistence code would do.  We then see
@@ -151,14 +151,14 @@ public class PersistenceExceptionTest extends PersistenceTestCase {
             badConn = java.sql.DriverManager.getConnection("jdbc:oracle:oci8:@totalgarbage");
             insertStmt =
                 badConn.prepareStatement("insert into db_test\n" +
-                                      "(theId)\n" +
-                                      "values\n" +
-                                      "(1)");
+                                         "(theId)\n" +
+                                         "values\n" +
+                                         "(1)");
             insertStmt.executeUpdate();
             fail("Using garbage connection info should have caused error");
         } catch (SQLException e) {
             // This gets ugly because we resorted to pure JDBC instead
-            // of com.arsdigita.db stuff.  So, the SQLException we just caught 
+            // of com.arsdigita.db stuff.  So, the SQLException we just caught
             // is a real unprocessed SQLException.  We process it once, like
             // the com.arsdigita.db code would do.  We then catch it and process
             // it again, like the persistence code would do.  We then see

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -18,18 +18,18 @@ package com.arsdigita.util;
 import java.util.*;
 
 /**
- * data structure for a fixed-size cache table.  Note that Cache is 
+ * data structure for a fixed-size cache table.  Note that Cache is
  * not thread-safe; it is up to the caller to synchronize if a cache
  * is shared across multiple threads.  Also includes a static global
  * cache, whose methods <em>are</em> threadsafe.
- * 
+ *
  * @author Bill Schneider (bschneid@arsdigita.com)
- * @version $Revision: #2 $, $Date: 2002/07/18 $
+ * @version $Revision: #3 $, $Date: 2002/08/14 $
  */
 
 public class Cache {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Cache.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Cache.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     // map keys to their values
     private static Cache instance = new Cache(32000);
@@ -42,7 +42,7 @@ public class Cache {
     /**
      * Create a new Cache of a fixed size.  If more elements are put into
      * the cache than it can hold, the least-recently used item will
-     * be evicted.  
+     * be evicted.
      *
      * @param size the number of items to allow before eviction
      */
@@ -55,7 +55,7 @@ public class Cache {
      * the cache than it can hold, the least-recently used item will be
      * evicted.
      * <p>
-     * Also allows an expiration time to be set; items in the cache 
+     * Also allows an expiration time to be set; items in the cache
      * that are older than that time will be evicted.
      *
      * @param size the number of items to allow before eviction
@@ -76,31 +76,31 @@ public class Cache {
      * @param key the key
      * @param value the value
      */
-    public void put(Object key, Object value) { 
+    public void put(Object key, Object value) {
         put (key, value, this.maxAge);
     }
 
     /**
-     * Puts a new key/value pair into the cache.  
+     * Puts a new key/value pair into the cache.
      * @param key the key
      * @param value the value
-     * @param maxAge the maximum lifetime of this cache entry, in 
+     * @param maxAge the maximum lifetime of this cache entry, in
      * milliseconds
      */
     public void put(Object key, Object value, long maxAge) {
         Entry e = new Entry(value, System.currentTimeMillis(), maxAge);
-        if (curSize >= maxSize) { 
+        if (curSize >= maxSize) {
             // have to evict something... find the least
             // recently used item
             Iterator iter = map.entrySet().iterator();
             long min = Long.MAX_VALUE;
             Object minKey = null;
-            while (iter.hasNext()) { 
+            while (iter.hasNext()) {
                 Map.Entry ent = (Map.Entry)iter.next();
                 Entry e2 = (Entry)map.get(ent.getKey());
                 long now = System.currentTimeMillis();
-                if (e2.lastUse < min || 
-                    (e2.maxAge > 0 && e2.creationTime < now - e2.maxAge)) { 
+                if (e2.lastUse < min ||
+                    (e2.maxAge > 0 && e2.creationTime < now - e2.maxAge)) {
                     min = e2.lastUse;
                     minKey = ent.getKey();
                 }
@@ -116,13 +116,13 @@ public class Cache {
      * Returns an object from the cache, if it exists and hasn't expired.
      * Returns null otherwise.
      * @param key the key to look up
-     * @return the object mapped by <code>key</code>, or null 
+     * @return the object mapped by <code>key</code>, or null
      */
-    public Object get(Object key) { 
+    public Object get(Object key) {
         Entry e = (Entry)map.get(key);
         if (e == null) return null;
-        // make sure the item hasn't expired 
-        if (maxAge > 0) { 
+        // make sure the item hasn't expired
+        if (maxAge > 0) {
             long now = System.currentTimeMillis();
             if (e.creationTime < now - maxAge) {
                 // put in cache more than maxAge ms ago, so remove it
@@ -153,23 +153,23 @@ public class Cache {
      * @param value the value
      * @param maxAge the lifetime of this cache entry in ms
      */
-    public static synchronized void putGlobal(Object key, 
-                                              Object value, 
+    public static synchronized void putGlobal(Object key,
+                                              Object value,
                                               long maxAge) {
         instance.put(key, value, maxAge);
     }
 
     /**
-     * Returns an object from the global cache, if it exists and hasn't 
+     * Returns an object from the global cache, if it exists and hasn't
      * expired.
      * Returns null otherwise.
      * @param key the key to look up
-     * @return the object mapped by <code>key</code>, or null 
+     * @return the object mapped by <code>key</code>, or null
      */
-    public static synchronized Object getGlobal(Object key) { 
+    public static synchronized Object getGlobal(Object key) {
         return instance.get(key);
     }
-    
+
     /**
      * A single entry in the Cache.  Contains the actual object of
      * interest and the last time the object's been looked up; also
@@ -181,7 +181,7 @@ public class Cache {
         long creationTime;
         long maxAge;
 
-        Entry (Object o, long lastUse, long maxAge) { 
+        Entry (Object o, long lastUse, long maxAge) {
             this.o = o;
             this.lastUse = lastUse;
             this.creationTime = System.currentTimeMillis();
@@ -190,6 +190,3 @@ public class Cache {
     }
 
 }
-
-
-

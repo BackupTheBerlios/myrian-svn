@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -22,19 +22,19 @@ import java.io.*;
 import java.sql.SQLException;
 
 /**
- * This test verifies the exception-type-narrowing functionality 
+ * This test verifies the exception-type-narrowing functionality
  * of the DbExceptionHandler
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
  */
 public class DbExceptionHandlerTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DbExceptionHandlerTest.java#2 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DbExceptionHandlerTest.java#3 $";
 
     private static java.sql.Connection conn;
-    
-    private static final String dirRoot = 
-        System.getProperty("test.base.dir") + 
+
+    private static final String dirRoot =
+        System.getProperty("test.base.dir") +
         "/com/arsdigita/db/";
     private static final String blobFileName = "adlogo.gif";
 
@@ -51,13 +51,13 @@ public class DbExceptionHandlerTest extends TestCase {
     public void setUp() throws SQLException {
         conn = ConnectionManager.getConnection();
 
-        java.sql.PreparedStatement tableStmt = 
+        java.sql.PreparedStatement tableStmt =
             conn.prepareStatement(
                                   "create table db_test (\n" +
                                   "    theId          integer primary key,\n" +
                                   "    aBlob          blob\n" +
                                   ")");
-        
+
         tableStmt.executeUpdate();
         tableStmt.close();
     }
@@ -83,14 +83,14 @@ public class DbExceptionHandlerTest extends TestCase {
             // good
         } catch (SQLException e) {
             // bad
-            fail("Unique constraint violation should have caused " + 
+            fail("Unique constraint violation should have caused " +
                  "UniqueConstraintException, instead caused " + e);
         }
         insertStmt.close();
     }
 
     public void testDbNotAvailableException() throws SQLException {
-        // TODO: Figure out other ways to simulate DB failure 
+        // TODO: Figure out other ways to simulate DB failure
         // than just garbage connection info?  Is this possible?
 
         java.sql.PreparedStatement insertStmt = null;
@@ -99,7 +99,7 @@ public class DbExceptionHandlerTest extends TestCase {
             badConn = java.sql.DriverManager.getConnection("total garbage");
             fail("Using garbage connection info should have caused error");
         } catch (SQLException e) {
-            // Normally the job of parsing the SQLException and re-throwing 
+            // Normally the job of parsing the SQLException and re-throwing
             // the right type is handled by code in the pool or buried in DB.
             // However, here we're using straight JDBC, so we need to explicitly
             // cause the parsing to happen.
@@ -117,7 +117,7 @@ public class DbExceptionHandlerTest extends TestCase {
             badConn = java.sql.DriverManager.getConnection("jdbc:totalgarbage");
             fail("Using garbage connection info should have caused error");
         } catch (SQLException e) {
-            // Normally the job of parsing the SQLException and re-throwing 
+            // Normally the job of parsing the SQLException and re-throwing
             // the right type is handled by code in the pool or buried in DB.
             // However, here we're using straight JDBC, so we need to explicitly
             // cause the parsing to happen.
@@ -135,7 +135,7 @@ public class DbExceptionHandlerTest extends TestCase {
             badConn = java.sql.DriverManager.getConnection("jdbc:oracle:garbage");
             fail("Using garbage connection info should have caused error");
         } catch (SQLException e) {
-            // Normally the job of parsing the SQLException and re-throwing 
+            // Normally the job of parsing the SQLException and re-throwing
             // the right type is handled by code in the pool or buried in DB.
             // However, here we're using straight JDBC, so we need to explicitly
             // cause the parsing to happen.
@@ -153,13 +153,13 @@ public class DbExceptionHandlerTest extends TestCase {
             badConn = java.sql.DriverManager.getConnection("jdbc:oracle:oci8:@totalgarbage");
             insertStmt =
                 badConn.prepareStatement("insert into db_test\n" +
-                                      "(theId)\n" +
-                                      "values\n" +
-                                      "(1)");
+                                         "(theId)\n" +
+                                         "values\n" +
+                                         "(1)");
             insertStmt.executeUpdate();
             fail("Using garbage connection info should have caused error");
         } catch (SQLException e) {
-            // Normally the job of parsing the SQLException and re-throwing 
+            // Normally the job of parsing the SQLException and re-throwing
             // the right type is handled by code in the pool or buried in DB.
             // However, here we're using straight JDBC, so we need to explicitly
             // cause the parsing to happen.

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -17,8 +17,8 @@ package com.arsdigita.util;
 
 /**
  * <font color="red">Experimental</font>
- * A general utility class for text which carries additional type 
- * information.  Specifically, we recognize plain text, HTML, and 
+ * A general utility class for text which carries additional type
+ * information.  Specifically, we recognize plain text, HTML, and
  * preformatted text.
  *
  * @author Kevin Scaldeferri (kevin@arsdigita.com)
@@ -26,13 +26,13 @@ package com.arsdigita.util;
 
 public class TypedText {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/TypedText.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/TypedText.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     public static final String TEXT_HTML = "text/html";
     public static final String TEXT_PLAIN = "text/plain";
-    public static final String TEXT_PREFORMATTED = 
+    public static final String TEXT_PREFORMATTED =
         TEXT_PLAIN + "; format=preformatted";
-    
+
 
     private String m_text;
     private String m_type;
@@ -42,7 +42,7 @@ public class TypedText {
         m_type = type;
     }
 
-    
+
     public String getText() {
         return m_text;
     }
@@ -67,7 +67,7 @@ public class TypedText {
         if (m_text == null) {
             return "";
         }
-        
+
         // Should probably change this to a state pattern
         if (m_type.equals(TEXT_HTML)) {
             return m_text;
@@ -87,7 +87,7 @@ public class TypedText {
     public boolean equals(Object o) {
         if (o instanceof TypedText) {
             TypedText t = (TypedText) o;
-            return getText().equals(t.getText()) 
+            return getText().equals(t.getText())
                 && getType().equals(t.getType());
         } else {
             return false;

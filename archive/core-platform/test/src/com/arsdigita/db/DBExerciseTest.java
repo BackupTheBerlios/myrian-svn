@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -32,12 +32,12 @@ import java.sql.SQLException;
 
 public class DBExerciseTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DBExerciseTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/DBExerciseTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private static java.sql.Connection conn;
-    
-    private static final String dirRoot = 
-        System.getProperty("test.base.dir") + 
+
+    private static final String dirRoot =
+        System.getProperty("test.base.dir") +
         "/com/arsdigita/db/";
     private static final String blobFileName = "adlogo.gif";
 
@@ -61,12 +61,12 @@ public class DBExerciseTest extends TestCase {
                 public void setUp() throws SQLException {
                     conn = ConnectionManager.getConnection();
 
-                    java.sql.PreparedStatement tableStmt = 
+                    java.sql.PreparedStatement tableStmt =
                         conn.prepareStatement(
-                            "create table db_test (\n" +
-                            "    theId          integer primary key,\n" +
-                            "    aBlob          blob\n" +
-                            ")");
+                                              "create table db_test (\n" +
+                                              "    theId          integer primary key,\n" +
+                                              "    aBlob          blob\n" +
+                                              ")");
 
                     tableStmt.executeUpdate();
                     tableStmt.close();
@@ -92,9 +92,9 @@ public class DBExerciseTest extends TestCase {
         try {
             java.sql.PreparedStatement blobInsertStmt =
                 conn.prepareStatement("insert into db_test\n" +
-                                     "(theId, aBlob)\n" +
-                                     "values\n" +
-                                     "(1,?)");
+                                      "(theId, aBlob)\n" +
+                                      "values\n" +
+                                      "(1,?)");
 
             // might not be the right location
             File blobFile = new File(dirRoot, blobFileName);

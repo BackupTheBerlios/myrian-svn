@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -27,19 +27,19 @@ import org.apache.log4j.Logger;
 
 public class ResourceManager {
 
-    private final static String CONFIGURE_MESSAGE = 
+    private final static String CONFIGURE_MESSAGE =
         "Must configure ResourceManager by calling setWebappRoot or "
         + "setServletContext before use.";
 
-    private static final Logger s_log = 
+    private static final Logger s_log =
         Logger.getLogger(ResourceManager.class);
 
     private static ResourceManager s_instance = new ResourceManager();
-	
+
     private File m_webappRoot;
     private ServletContext m_servletContext;
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/ResourceManager.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/ResourceManager.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     /**
      * Empty constructor, which we make private to enforce the singleton
@@ -54,9 +54,9 @@ public class ResourceManager {
 
     /**
      * implements singleton pattern
-     * @return the instance 
+     * @return the instance
      */
-    public static ResourceManager getInstance() { 
+    public static ResourceManager getInstance() {
         return s_instance;
     }
 
@@ -66,7 +66,7 @@ public class ResourceManager {
      * reading pathnames relative to the webapp root.
      *
      * @param url a URL interpreted as a pathname relative to the webapp root
-     * @return a new input stream reading the named file, or null 
+     * @return a new input stream reading the named file, or null
      * if not found
      * @exception throws java.lang.IllegalStateException if class is
      * not configured prior to use.
@@ -76,7 +76,7 @@ public class ResourceManager {
             throw new IllegalStateException(CONFIGURE_MESSAGE);
         }
         try {
-            // TODO: if we have a servlet context, use it! 
+            // TODO: if we have a servlet context, use it!
             // Maybe we're in a WAR file, in which case we *have*
             // to use sctx.getResourceAsStream.
             if (m_servletContext != null) {
@@ -89,7 +89,7 @@ public class ResourceManager {
             } else {
                 return new FileInputStream(new File(m_webappRoot, url));
             }
-        } catch (FileNotFoundException fnfe) { 
+        } catch (FileNotFoundException fnfe) {
             return null;
         }
     }
@@ -101,12 +101,12 @@ public class ResourceManager {
      * we return a File object.
      *
      * @param url a URL interpreted as a pathname relative to the webapp root
-     * @return a File object referring to the named resource, or null 
+     * @return a File object referring to the named resource, or null
      * if not found
      * @exception throws java.lang.IllegalStateException if class is
      * not configured prior to use.
      */
-    public File getResourceAsFile(String url) { 
+    public File getResourceAsFile(String url) {
         if (m_servletContext == null) {
             throw new IllegalStateException(CONFIGURE_MESSAGE);
         }
@@ -114,11 +114,11 @@ public class ResourceManager {
     }
 
     /**
-     * configures this ResourceManager to use the webapp root 
+     * configures this ResourceManager to use the webapp root
      * named by {@param f}.
      * @param f the webapp root directory
      */
-    public void setWebappRoot(File f) { 
+    public void setWebappRoot(File f) {
         m_webappRoot = f;
     }
 
@@ -143,7 +143,7 @@ public class ResourceManager {
     /**
      * @return the webapp root for this ResourceManager.
      */
-    public File getWebappRoot() { 
+    public File getWebappRoot() {
         return m_webappRoot;
     }
 
@@ -157,10 +157,10 @@ public class ResourceManager {
      * @exception throws java.lang.IllegalStateException if class is
      * not configured prior to use.
      */
-    public long getLastModified(String path) { 
+    public long getLastModified(String path) {
         if (m_webappRoot == null) {
             throw new IllegalStateException(CONFIGURE_MESSAGE);
-        } 
+        }
         return new File(m_webappRoot, path).lastModified();
     }
 }

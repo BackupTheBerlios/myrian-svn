@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -39,11 +39,11 @@ import java.util.Set;
  *
  * @author <a href="mailto:yon@arsdigita.com">yon@arsdigita.com</a>
  * @author <a href="mailto:lutter@arsdigita.com">David Lutterkort</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/14 $
  */
 public class SequentialMap extends AbstractMap implements Map {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/SequentialMap.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/SequentialMap.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private ArrayList m_entries = null;
     private Set m_entrySet = null;
@@ -219,8 +219,8 @@ public class SequentialMap extends AbstractMap implements Map {
      * @return Object The key of the element at the specified index.
      */
     public Object getKey(int index) {
-            return ((Entry) m_entries.get(index)).getKey();
-        }
+        return ((Entry) m_entries.get(index)).getKey();
+    }
 
     /**
      * Associates the specified value with the specified key in this map. The
@@ -294,16 +294,16 @@ public class SequentialMap extends AbstractMap implements Map {
     }
 
     /**
-    * <p>
-    * Removes the mapping for this key from this map if present.
-    * </p>
-    *
-    * @param key key whose mapping is to be removed from the map.
-    *
-    * @return Object The previous value associated with specified key, or null
-    *         if there was no mapping for key. A null return can also indicate
-    *         that the map previously associated null with the specified key.
-    */
+     * <p>
+     * Removes the mapping for this key from this map if present.
+     * </p>
+     *
+     * @param key key whose mapping is to be removed from the map.
+     *
+     * @return Object The previous value associated with specified key, or null
+     *         if there was no mapping for key. A null return can also indicate
+     *         that the map previously associated null with the specified key.
+     */
     public Object remove(Object key) {
         Object result = null;
         int i = indexOf(key);
@@ -346,26 +346,26 @@ public class SequentialMap extends AbstractMap implements Map {
     public Set entrySet() {
         if (m_entrySet == null) {
             m_entrySet = new AbstractSet() {
-                public Iterator iterator() {
-                    return m_entries.iterator();
-                }
+                    public Iterator iterator() {
+                        return m_entries.iterator();
+                    }
 
-                public boolean contains(Object o) {
-                    return m_entries.contains(o);
-                }
+                    public boolean contains(Object o) {
+                        return m_entries.contains(o);
+                    }
 
-                public boolean remove(Object o) {
-                    return m_entries.remove(o);
-                }
+                    public boolean remove(Object o) {
+                        return m_entries.remove(o);
+                    }
 
-                public int size() {
-                    return m_entries.size();
-                }
+                    public int size() {
+                        return m_entries.size();
+                    }
 
-                public void clear() {
-                    m_entries.clear();
-                }
-            };
+                    public void clear() {
+                        m_entries.clear();
+                    }
+                };
         }
 
         return m_entrySet;

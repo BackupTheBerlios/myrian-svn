@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
 /**
  * An OID represents a unique object ID. An OID is composed of an
  * object type and 1 or more values.
- * 
+ *
  * <p> The OID class encapsulates the details of the primary key of an
  *  object.  You use instances of OID for retrieving an object from
  *  the database and you would set the OID to a known value. You can
@@ -46,17 +46,17 @@ import org.apache.log4j.Logger;
  * object. The OID class is meant to handle both this special case and
  * the more general case where there does not exist a single, unique
  * integer.
- * 
+ *
  *
  * <p>
  *
  * Copyright (c) 2001, ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/13 $ */
+ * @version $Revision: #5 $ $Date: 2002/08/14 $ */
 
 public class OID {
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OID.java#4 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/OID.java#5 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private ObjectType m_type;
     private Map m_values = new HashMap();
@@ -66,10 +66,10 @@ public class OID {
      */
     private static MessageFormat m_format = new MessageFormat("[{0}:{1}]");
 
-    /** 
+    /**
      *  used to log errors
      */
-    private static final Logger m_log = 
+    private static final Logger m_log =
         Logger.getLogger(OID.class);
 
 
@@ -101,15 +101,15 @@ public class OID {
     }
 
     /**
-     * Creates an OID with a single attribute for the key. To create 
+     * Creates an OID with a single attribute for the key. To create
      * a multi-valued OID, use a single arg OID constructor, and add
      * individual properties with the set method.  This constructor
-     * should be used when the object type being instantiated has a 
+     * should be used when the object type being instantiated has a
      * single primary key.  For instance, if the object type is
      * <code>com.arsdigita.kernel.ACSObject</code> then the value
      * should be the <code>object_id</code>.  So, if developers wanted
-     * to create the OID for ID zero, they would call 
-     * <code>new OID(acsObjectType, new BigDecimal(0))</code>.  A 
+     * to create the OID for ID zero, they would call
+     * <code>new OID(acsObjectType, new BigDecimal(0))</code>.  A
      * <code>BigDecimal</code> is passed in because the "id" attribute
      * for the ACSObject type is declared as <code>BigDecimal</code> in
      * the PDL file.
@@ -122,7 +122,7 @@ public class OID {
      *            != 1</code>).
      *
      * @pre type != null
-     * @pre type.getObjectMap().getObjectKey().getCount() == 1 
+     * @pre type.getObjectMap().getObjectKey().getCount() == 1
      */
     public OID(ObjectType type, Object value) {
         this(type);
@@ -135,14 +135,14 @@ public class OID {
 
         if (it.hasNext()) {
             throw new PersistenceException(
-                "This object type has a compound key."
-                );
+                                           "This object type has a compound key."
+                                           );
         }
 
         String attr = prop.getName();
         set(attr, value);
     }
-    
+
     /**
      *  This looks up the specified ObjectType within the SessionManager
      *  and returns the ObjectType object that is specified by the string.
@@ -283,7 +283,7 @@ public class OID {
     public void set(String propertyName, Object value) {
         Property prop = m_type.getProperty(propertyName);
 
-        // We do some type-checking here, to ensure that OIDs are being 
+        // We do some type-checking here, to ensure that OIDs are being
         // created with legit types of values.
         if (Assert.isAssertOn()) {
             if (prop == null) {
@@ -295,9 +295,9 @@ public class OID {
                 while (i.hasNext()) {
                     valid.append(", ").append(((Property)i.next()).getName());
                 }
-                Assert.assertNotNull(prop, "getProperty(" + propertyName + 
-                                     ") for type " + m_type.getName() + 
-                                     " where valid properties are {" + 
+                Assert.assertNotNull(prop, "getProperty(" + propertyName +
+                                     ") for type " + m_type.getName() +
+                                     " where valid properties are {" +
                                      valid + "}");
             }
             // null has no type
@@ -306,10 +306,10 @@ public class OID {
                 // we can be sure this is a simpletype because isAttribute was true.
                 SimpleType expectedType = (SimpleType)prop.getType();
                 Assert.assertTrue(expectedType.getJavaClass().isAssignableFrom(value.getClass()),
-                                    "expected value of type: " + expectedType.getJavaClass() + 
-                                    "actual type used:" + value.getClass());
+                                  "expected value of type: " + expectedType.getJavaClass() +
+                                  "actual type used:" + value.getClass());
             }
-            // TODO: can we do any data validation if the key property isn't an 
+            // TODO: can we do any data validation if the key property isn't an
             // attribute?
         }
 
@@ -329,7 +329,7 @@ public class OID {
 
     /**
      *  @param name The name of the property
-     * 
+     *
      *  @return true if there is a property mapped to name, false if not.
      */
     public boolean hasProperty(String name) {
@@ -384,7 +384,7 @@ public class OID {
 
 
     /**
-     * Serializes the OID. 
+     * Serializes the OID.
      */
     public String toString() {
         String fullType = m_type.getQualifiedName();
@@ -401,11 +401,11 @@ public class OID {
             st = new StringTokenizer(java.net.URLDecoder.decode(s), "[:{}],");
 
             if (st.countTokens() < 2) {
-            throw new IllegalArgumentException
-                ("Invalid OID '" + s + "'. It must have at least the object " +
-                 "type and the value");
+                throw new IllegalArgumentException
+                    ("Invalid OID '" + s + "'. It must have at least the object " +
+                     "type and the value");
             }
-        } 
+        }
 
         String type = st.nextToken();
 
@@ -413,7 +413,7 @@ public class OID {
             // we know that the first item is the type of the object
             // represented by this OID
             OID oid = new OID(type);
-        
+
             // for the rest of them, we are going to "split" on the
             // "=" sign
             int nTokens = 0;
@@ -440,14 +440,14 @@ public class OID {
                         break;
                     }
                 }
-                
+
                 if (bigDecimal) {
                     oid.set(key, new BigDecimal(value));
                 } else {
                     oid.set(key, value);
                 }
                 nTokens++;
-            } 
+            }
             return oid;
         } catch (PersistenceException e) {
             throw new IllegalArgumentException
@@ -455,7 +455,7 @@ public class OID {
                  "] is not defined");
         }
     }
-    
+
     /**
      * Indicates if two OIDs have the same base type and contain the
      * same values.  Note that if values are null this isn't an ideal
@@ -478,16 +478,16 @@ public class OID {
                 while (i.hasNext() && i2.hasNext()) {
                     Object o = i.next();
                     Object o2 = i2.next();
-                    if (o != null && 
-                        o2 != null && 
+                    if (o != null &&
+                        o2 != null &&
                         !o.getClass().isInstance(o2) &&
                         !o2.getClass().isInstance(o) &&
                         o.toString().equals(o2.toString())) {
-                        m_log.error("Equality check problem comparing OID " + 
-                                    this + " to " + obj + ": value " + o + 
-                                    " is of type " + o.getClass() + 
-                                    " while value " + o2 + " is of type " + 
-                                    o2.getClass() + "; check OID creation for " + 
+                        m_log.error("Equality check problem comparing OID " +
+                                    this + " to " + obj + ": value " + o +
+                                    " is of type " + o.getClass() +
+                                    " while value " + o2 + " is of type " +
+                                    o2.getClass() + "; check OID creation for " +
                                     "both these objects for incorrect type " +
                                     "conversions or toStrings.");
                     }
@@ -497,14 +497,14 @@ public class OID {
             // we rely on the toString ecause the HashMap.equals does not
             // give us what we need
             return m_type.getBasetype().equals(oid.m_type.getBasetype()) &&
-                   m_values.equals(oid.m_values);
-        } 
+                m_values.equals(oid.m_values);
+        }
         return false;
     }
 
     /**
      * Simple hashcode method to calculate hashcode based on the information
-     * used in the equals method.  Needed because we overrode equals; 
+     * used in the equals method.  Needed because we overrode equals;
      * two equivalent objects must hash to the same value.
      */
     public int hashCode() {
@@ -513,4 +513,3 @@ public class OID {
         return (m_type.getBasetype().hashCode() + m_values.hashCode());
     }
 }
-

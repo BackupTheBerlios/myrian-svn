@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.redhat.com/licenses/ccmpl.html
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
+
 package com.arsdigita.persistence;
 import com.arsdigita.persistence.metadata.*;
 import com.arsdigita.util.StringUtils;
@@ -14,11 +29,11 @@ import org.apache.log4j.*;
  * DataObjectManipulator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #3 $ $Date: 2002/08/13 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  */
 public class DataObjectManipulator {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataObjectManipulator.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataObjectManipulator.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
     private static final Logger s_log =
         Logger.getLogger(DataObjectManipulator.class.getName());
     static  {
@@ -32,7 +47,7 @@ public class DataObjectManipulator {
     }
 
     public void setDefaultProperty(Property p, DataObject data) throws Exception {
-        SimpleTypeManipulator manip = getManipulator(p); 
+        SimpleTypeManipulator manip = getManipulator(p);
         manip.setDefaultProperty( p, data );
 
     }
@@ -40,24 +55,24 @@ public class DataObjectManipulator {
     public SimpleTypeManipulator getManipulator(Property p) {
         SimpleTypeManipulator manip = (SimpleTypeManipulator) m_manipulators.get(p.getJavaClass());
         if( null == manip ) {
-            throw new IllegalArgumentException("Unsupported java type: " + p.getJavaClass() + " for Property " + p.getName()); 
+            throw new IllegalArgumentException("Unsupported java type: " + p.getJavaClass() + " for Property " + p.getName());
         }
         else {
             return manip;
-        } 
+        }
 
     }
 
     public void updateAllPropertyCombinations(Property p, DataObject data) throws Exception {
         DataObjectManipulator.SimpleTypeManipulator manip = getManipulator(p);
-        manip.updateAllPropertyCombinations(p, data); 
+        manip.updateAllPropertyCombinations(p, data);
     }
 
     final Session getSession()  {
         return m_session;
     }
 
-    static Map s_defaults = new HashMap();  
+    static Map s_defaults = new HashMap();
     static {
         s_defaults.put( java.math.BigInteger.class, BigInteger.ONE );
         s_defaults.put( java.math.BigDecimal.class, new BigDecimal("1") );
@@ -78,8 +93,8 @@ public class DataObjectManipulator {
 
 
     public abstract class SimpleTypeManipulator {
-        // The class that the subtype gets bound to. When calling against a Property 
-        // object, the precondition Property.getJavaClass().equals(m_propertyClass) 
+        // The class that the subtype gets bound to. When calling against a Property
+        // object, the precondition Property.getJavaClass().equals(m_propertyClass)
         // must hold.
         final Class m_propertyClass;
         /* This is the default  value for a given property type
@@ -92,7 +107,7 @@ public class DataObjectManipulator {
         SimpleTypeManipulator(Class propertyClass) {
             m_propertyClass = propertyClass;
             m_default = s_defaults.get(propertyClass);
-            m_manipulators.put( propertyClass, this ); 
+            m_manipulators.put( propertyClass, this );
             makeVariants();
         }
 
@@ -108,7 +123,7 @@ public class DataObjectManipulator {
         /**
          *  Abstract method that creates and populates the m_variants collection.
          *  Implemented for each Manipulator subtype.
-         *  
+         *
          *  @post getVariantValues() != null
          */
         abstract void makeVariants();
@@ -123,7 +138,7 @@ public class DataObjectManipulator {
         void setDefaultProperty(Property p, DataObject data) {
             assertPropertyClass(p);
             data.set( p.getName(), getDefaultValue());
-        } 
+        }
 
 
         /**
@@ -132,7 +147,7 @@ public class DataObjectManipulator {
          *  @post getDefaultValue() == null || getDefaultValue().getClass().equals(getPropertyClass())
          */
         final Object getDefaultValue() {
-            return m_default;    
+            return m_default;
         }
 
         Collection getVariantValues() {
@@ -142,11 +157,11 @@ public class DataObjectManipulator {
 
         /**
          *  This method checks to see if an error that resulted from setting a property
-         *  and saving a data object was valid or not. For example, passing null to a 
+         *  and saving a data object was valid or not. For example, passing null to a
          *  non-null property is valid.
          *  If the error was not valid, the Exception parameter is rethrown.
          *  The default implementation logs the error and rethrows it.
-         * 
+         *
          *  @param t The exception that resulted from the invalid update.
          *  @param p The Property that was being updated.
          *  @param data The DataObject that was being saved.
@@ -157,14 +172,14 @@ public class DataObjectManipulator {
             s_log.debug("Default checkSetError");
             throw t;
         }
-        
+
         /**
          *  Checks to see if the value that should have been set is the same as the
          *  value retrieved from the database. If not, an exception is thrown.
-         *  
+         *
          *  @param propertyName The name of the property that was updated.
          *  @param inMemoryValue The value that the property was set to.
-         *  @param fromDatabaseValue The value of the property fetched from the database 
+         *  @param fromDatabaseValue The value of the property fetched from the database
          *      after saving.
          */
         public void checkEquals( String propertyName, Object inMemoryValue, Object fromDatabaseValue ) throws Exception {
@@ -196,7 +211,7 @@ public class DataObjectManipulator {
         /**
          *  Logs the fact that a Property failed to update. If the column is specified,
          *  this is also logged. The attemted update value is also logged.
-         * 
+         *
          *  @param p The property that failed to update.
          *  @param value The value that was used to update the property.
          */
@@ -236,16 +251,16 @@ public class DataObjectManipulator {
                 // will not cause the test to fail, but will leave the DataObject in an inconsistent state.
                 // These are proper update failures, such as an oversized default String value being sent
                 // to a constrained column.
-               data = getSession().retrieve(id);
+                data = getSession().retrieve(id);
             }
 
-             // Verify that nulls are handled correctly for all columns
-            setProperty(p, data, null);  
+            // Verify that nulls are handled correctly for all columns
+            setProperty(p, data, null);
             data = getSession().retrieve(id);
 
         }
 
-        /** 
+        /**
          *  Attempts to update the Property to a given value. If an invalid failure
          *  to update occurs, an exception is thrown. If the update appears successful,
          *  the DataObject is re-fetched from the database, and the property value compared
@@ -254,7 +269,7 @@ public class DataObjectManipulator {
          *  @param p The property to update.
          *  @param data The DataObject to save.
          *  @param value The value to update the property with.
-         *  
+         *
          *  @pre p.equals(data.getObjectType.getProperty(p.getName()))
          */
         void setProperty(Property p, DataObject data, Object value) throws Exception {
@@ -262,7 +277,7 @@ public class DataObjectManipulator {
             OID id = data.getOID();
             s_log.debug("setting property : " + data.getObjectType().getQualifiedName() + "." + data.getObjectType().getName() + "." + p.getName());// + " to value: " + value);
             s_log.debug("Old value was: " + data.get(p.getName()));
-            final boolean valueIsNull = ( value == null || value instanceof String && ((String) value).length() == 0);  
+            final boolean valueIsNull = ( value == null || value instanceof String && ((String) value).length() == 0);
             boolean savedNullInRequiredField = false;
             try {
                 data.set( p.getName(), value );
@@ -270,10 +285,10 @@ public class DataObjectManipulator {
                 // This is neccessary since fail cannot be called here.
                 // Its exception would be caught. Need to check this
                 // value after the catch block
-                savedNullInRequiredField = ( p.isRequired() && valueIsNull );    
+                savedNullInRequiredField = ( p.isRequired() && valueIsNull );
             } catch (Exception t) {
                 if( p.isRequired() && valueIsNull ) {
-                    return;    
+                    return;
                 }
                 if( p.isNullable() && valueIsNull ) {
                     String msg = "Failed to save DataObject: " +  data.getObjectType().getName();
@@ -290,380 +305,380 @@ public class DataObjectManipulator {
                     return;
                 }
             }
-            
+
             if (savedNullInRequiredField) {
                 String msg = "DataObject saved null value in a required Property: " + p.getName();
                 s_log.debug(msg);
                 throw new Exception(msg);
-            }  
+            }
             DataObject fromDatabase = getSession().retrieve(id);
             Object newValue = fromDatabase.get(p.getName());
             checkEquals( p.getName(), value, newValue );
-    
+
         }
 
     }  // end SimpleTypeManipulator
 
 
     private void makeManipulators() {
-    
+
         SimpleTypeManipulator manip;
 
         manip = new SimpleTypeManipulator(java.math.BigInteger.class) {
-            void makeVariants() {
-                m_variants = new LinkedList();
-                m_variants.add(new BigInteger(Integer.toString(Integer.MIN_VALUE)));
-                m_variants.add(new BigInteger(Integer.toString(Integer.MIN_VALUE + 1)));
-                m_variants.add(BigInteger.ZERO);
-                m_variants.add(new BigInteger(Integer.toString(Integer.MAX_VALUE - 1)));
-                m_variants.add(new BigInteger(Integer.toString(Integer.MAX_VALUE)));
+                void makeVariants() {
+                    m_variants = new LinkedList();
+                    m_variants.add(new BigInteger(Integer.toString(Integer.MIN_VALUE)));
+                    m_variants.add(new BigInteger(Integer.toString(Integer.MIN_VALUE + 1)));
+                    m_variants.add(BigInteger.ZERO);
+                    m_variants.add(new BigInteger(Integer.toString(Integer.MAX_VALUE - 1)));
+                    m_variants.add(new BigInteger(Integer.toString(Integer.MAX_VALUE)));
 
-            }
-        };
+                }
+            };
 
 
         manip = new SimpleTypeManipulator(java.math.BigDecimal.class) {
-            void makeVariants() {
-                m_variants = new LinkedList();
-                m_variants.add(new BigDecimal(new BigInteger(Integer.toString(Integer.MIN_VALUE))));
-                m_variants.add(new BigDecimal(new BigInteger(Integer.toString(Integer.MIN_VALUE + 1))));
-                m_variants.add(new BigDecimal(BigInteger.ZERO));
-                m_variants.add(new BigDecimal(new BigInteger(Integer.toString(Integer.MAX_VALUE - 1))));
-                m_variants.add(new BigDecimal(new BigInteger(Integer.toString(Integer.MAX_VALUE))));
+                void makeVariants() {
+                    m_variants = new LinkedList();
+                    m_variants.add(new BigDecimal(new BigInteger(Integer.toString(Integer.MIN_VALUE))));
+                    m_variants.add(new BigDecimal(new BigInteger(Integer.toString(Integer.MIN_VALUE + 1))));
+                    m_variants.add(new BigDecimal(BigInteger.ZERO));
+                    m_variants.add(new BigDecimal(new BigInteger(Integer.toString(Integer.MAX_VALUE - 1))));
+                    m_variants.add(new BigDecimal(new BigInteger(Integer.toString(Integer.MAX_VALUE))));
 
 
 
-            }
-        };
+                }
+            };
 
 
         manip = new SimpleTypeManipulator(java.lang.Boolean.class) {
-            void makeVariants() {
-                m_variants = new LinkedList();
-                m_variants.add(Boolean.FALSE);
-                m_variants.add(Boolean.TRUE);            
-            }
-        };
+                void makeVariants() {
+                    m_variants = new LinkedList();
+                    m_variants.add(Boolean.FALSE);
+                    m_variants.add(Boolean.TRUE);
+                }
+            };
 
 
         manip = new SimpleTypeManipulator(java.lang.Byte.class) {
-            void makeVariants() {
-                m_variants = new LinkedList();
-                m_variants.add(new Byte(Byte.MIN_VALUE));
-                m_variants.add(new Byte((byte)(Byte.MIN_VALUE + 1)));
-                m_variants.add(new Byte((byte)0));
-                m_variants.add(new Byte((byte)(Byte.MAX_VALUE - 1)));
-                m_variants.add(new Byte(Byte.MAX_VALUE));
+                void makeVariants() {
+                    m_variants = new LinkedList();
+                    m_variants.add(new Byte(Byte.MIN_VALUE));
+                    m_variants.add(new Byte((byte)(Byte.MIN_VALUE + 1)));
+                    m_variants.add(new Byte((byte)0));
+                    m_variants.add(new Byte((byte)(Byte.MAX_VALUE - 1)));
+                    m_variants.add(new Byte(Byte.MAX_VALUE));
 
-            }
-        };
+                }
+            };
 
 
         manip = new SimpleTypeManipulator(java.lang.Character.class) {
-            void makeVariants() {
-                m_variants = new LinkedList();
-                m_variants.add(new Character(Character.MIN_VALUE));
-                m_variants.add(new Character((char)(Character.MIN_VALUE + 1)));
-                m_variants.add(new Character('a'));
-                m_variants.add(new Character('b'));
-                m_variants.add(new Character('c'));
-                m_variants.add(new Character('x'));
-                m_variants.add(new Character('y'));
-                m_variants.add(new Character('z'));
+                void makeVariants() {
+                    m_variants = new LinkedList();
+                    m_variants.add(new Character(Character.MIN_VALUE));
+                    m_variants.add(new Character((char)(Character.MIN_VALUE + 1)));
+                    m_variants.add(new Character('a'));
+                    m_variants.add(new Character('b'));
+                    m_variants.add(new Character('c'));
+                    m_variants.add(new Character('x'));
+                    m_variants.add(new Character('y'));
+                    m_variants.add(new Character('z'));
 
-            }
-        };
+                }
+            };
 
 
         manip = new SimpleTypeManipulator(java.util.Date.class) {
-            void makeVariants() {
-                m_variants = new LinkedList();
-                m_variants.add(new Date());
+                void makeVariants() {
+                    m_variants = new LinkedList();
+                    m_variants.add(new Date());
 
-                Calendar cal = Calendar.getInstance();
-                cal.set(2000, 0, 1);
-                m_variants.add(cal.getTime());
-                cal.set(1999, 11, 31);
-                m_variants.add(cal.getTime());
-                cal.set(2000, 2, 29);
-                m_variants.add(cal.getTime());
+                    Calendar cal = Calendar.getInstance();
+                    cal.set(2000, 0, 1);
+                    m_variants.add(cal.getTime());
+                    cal.set(1999, 11, 31);
+                    m_variants.add(cal.getTime());
+                    cal.set(2000, 2, 29);
+                    m_variants.add(cal.getTime());
 
-            }
-
-            /**
-             *  Checks to see if the value that should have been set is the same as the
-             *  value retrieved from the database. If not, an exception is thrown.
-             *  
-             *  @param propertyName The name of the property that was updated.
-             *  @param inMemoryValue The value that the property was set to.
-             *  @param fromDatabaseValue The value of the property fetched from the database 
-             *      after saving.
-             */
-            public void checkEquals( String propertyName, Object inMemoryValue, Object fromDatabaseValue ) throws Exception {
-                if( inMemoryValue == null && fromDatabaseValue == null ) {
-                    return;
                 }
-                final boolean onlyOneIsNull = ( inMemoryValue == null || fromDatabaseValue == null );
-                if( onlyOneIsNull ) {
-                    equalsError( propertyName, inMemoryValue, fromDatabaseValue);
-                }
-                else {
-                    Calendar cal1 = Calendar.getInstance();
-                    cal1.setTime((Date) inMemoryValue);
-                    cal1.set(Calendar.MILLISECOND, 0);
-                    Date first = cal1.getTime();
 
-                    Calendar cal2 = Calendar.getInstance();
-                    cal2.setTime((Date) fromDatabaseValue);
-                    cal2.set(Calendar.MILLISECOND, 0);
-                    Date second = cal2.getTime();
-
-                    if( !first.equals(second) ) {
-                        equalsError( propertyName, inMemoryValue, fromDatabaseValue);         
+                /**
+                 *  Checks to see if the value that should have been set is the same as the
+                 *  value retrieved from the database. If not, an exception is thrown.
+                 *
+                 *  @param propertyName The name of the property that was updated.
+                 *  @param inMemoryValue The value that the property was set to.
+                 *  @param fromDatabaseValue The value of the property fetched from the database
+                 *      after saving.
+                 */
+                public void checkEquals( String propertyName, Object inMemoryValue, Object fromDatabaseValue ) throws Exception {
+                    if( inMemoryValue == null && fromDatabaseValue == null ) {
+                        return;
                     }
+                    final boolean onlyOneIsNull = ( inMemoryValue == null || fromDatabaseValue == null );
+                    if( onlyOneIsNull ) {
+                        equalsError( propertyName, inMemoryValue, fromDatabaseValue);
+                    }
+                    else {
+                        Calendar cal1 = Calendar.getInstance();
+                        cal1.setTime((Date) inMemoryValue);
+                        cal1.set(Calendar.MILLISECOND, 0);
+                        Date first = cal1.getTime();
+
+                        Calendar cal2 = Calendar.getInstance();
+                        cal2.setTime((Date) fromDatabaseValue);
+                        cal2.set(Calendar.MILLISECOND, 0);
+                        Date second = cal2.getTime();
+
+                        if( !first.equals(second) ) {
+                            equalsError( propertyName, inMemoryValue, fromDatabaseValue);
+                        }
+                    }
+
                 }
 
-            }
-
-        };
+            };
 
 
         manip = new SimpleTypeManipulator(java.lang.Double.class) {
-            void makeVariants() {
-                m_variants = new LinkedList();
-                m_variants.add(new Double("1.0E-130"));
-                m_variants.add(new Double(-300.92199));
-                m_variants.add(new Double(-16.60));
-                m_variants.add(new Double(0));
-                m_variants.add(new Double(300.92199));
-                m_variants.add(new Double(16.60));
-                m_variants.add(new Double("9.99E125"));
+                void makeVariants() {
+                    m_variants = new LinkedList();
+                    m_variants.add(new Double("1.0E-130"));
+                    m_variants.add(new Double(-300.92199));
+                    m_variants.add(new Double(-16.60));
+                    m_variants.add(new Double(0));
+                    m_variants.add(new Double(300.92199));
+                    m_variants.add(new Double(16.60));
+                    m_variants.add(new Double("9.99E125"));
 
-            }
-            public void checkEquals( String propertyName, Object inMemoryValue, Object fromDatabaseValue ) throws Exception {
-                if( null == inMemoryValue && null == fromDatabaseValue ) {
-                    return;
                 }
-                final boolean onlyOneIsNull = ( null == inMemoryValue || null == fromDatabaseValue );
-                if( onlyOneIsNull ) {
-                    equalsError( propertyName, inMemoryValue, fromDatabaseValue);
-                }
+                public void checkEquals( String propertyName, Object inMemoryValue, Object fromDatabaseValue ) throws Exception {
+                    if( null == inMemoryValue && null == fromDatabaseValue ) {
+                        return;
+                    }
+                    final boolean onlyOneIsNull = ( null == inMemoryValue || null == fromDatabaseValue );
+                    if( onlyOneIsNull ) {
+                        equalsError( propertyName, inMemoryValue, fromDatabaseValue);
+                    }
 
-                Double memoryDouble = (Double) inMemoryValue;
-                Double databaseDouble = (Double) fromDatabaseValue;
+                    Double memoryDouble = (Double) inMemoryValue;
+                    Double databaseDouble = (Double) fromDatabaseValue;
 
-                if (Double.doubleToLongBits(memoryDouble.doubleValue()) != Double.doubleToLongBits(databaseDouble.doubleValue())) {
-                    equalsError( propertyName, inMemoryValue, fromDatabaseValue);
+                    if (Double.doubleToLongBits(memoryDouble.doubleValue()) != Double.doubleToLongBits(databaseDouble.doubleValue())) {
+                        equalsError( propertyName, inMemoryValue, fromDatabaseValue);
+                    }
                 }
-            }
-        };
+            };
 
 
         manip = new SimpleTypeManipulator(java.lang.Float.class) {
-            void makeVariants() {
-                m_variants = new LinkedList();
-                m_variants.add(new Float("1.0E-130"));
-                 m_variants.add(new Float(-300.92199f));
-                 m_variants.add(new Float(-16.60f));
-                 m_variants.add(new Float(0));
-                 m_variants.add(new Float(300.92199f));
-                 m_variants.add(new Float(16.60f));
-                 m_variants.add(new Float("9.99E125"));
- 
+                void makeVariants() {
+                    m_variants = new LinkedList();
+                    m_variants.add(new Float("1.0E-130"));
+                    m_variants.add(new Float(-300.92199f));
+                    m_variants.add(new Float(-16.60f));
+                    m_variants.add(new Float(0));
+                    m_variants.add(new Float(300.92199f));
+                    m_variants.add(new Float(16.60f));
+                    m_variants.add(new Float("9.99E125"));
 
-            }
 
-            public void checkEquals( String propertyName, Object inMemoryValue, Object fromDatabaseValue ) throws Exception {
-                if( null == inMemoryValue && null == fromDatabaseValue ) {
-                    return;
-                }
-                final boolean onlyOneIsNull = ( null == inMemoryValue || null == fromDatabaseValue );
-                if( onlyOneIsNull ) {
-                    equalsError( propertyName, inMemoryValue, fromDatabaseValue);
                 }
 
-                Float memoryFloat = (Float) inMemoryValue;
-                Float databaseFloat = (Float) fromDatabaseValue;
+                public void checkEquals( String propertyName, Object inMemoryValue, Object fromDatabaseValue ) throws Exception {
+                    if( null == inMemoryValue && null == fromDatabaseValue ) {
+                        return;
+                    }
+                    final boolean onlyOneIsNull = ( null == inMemoryValue || null == fromDatabaseValue );
+                    if( onlyOneIsNull ) {
+                        equalsError( propertyName, inMemoryValue, fromDatabaseValue);
+                    }
 
-                if (Float.floatToIntBits(memoryFloat.floatValue()) != Float.floatToIntBits(databaseFloat.floatValue())) {
-                    equalsError( propertyName, inMemoryValue, fromDatabaseValue);
+                    Float memoryFloat = (Float) inMemoryValue;
+                    Float databaseFloat = (Float) fromDatabaseValue;
+
+                    if (Float.floatToIntBits(memoryFloat.floatValue()) != Float.floatToIntBits(databaseFloat.floatValue())) {
+                        equalsError( propertyName, inMemoryValue, fromDatabaseValue);
+                    }
                 }
-            }
 
-        };
+            };
 
 
         manip = new SimpleTypeManipulator(java.lang.Integer.class) {
-            void makeVariants() {
-                m_variants = new LinkedList();
-                m_variants.add(new Integer(Integer.MIN_VALUE));
-                m_variants.add(new Integer(Integer.MIN_VALUE + 1));
-                m_variants.add(new Integer(0));
-                m_variants.add(new Integer(Integer.MAX_VALUE - 1));
-                m_variants.add(new Integer(Integer.MAX_VALUE));
+                void makeVariants() {
+                    m_variants = new LinkedList();
+                    m_variants.add(new Integer(Integer.MIN_VALUE));
+                    m_variants.add(new Integer(Integer.MIN_VALUE + 1));
+                    m_variants.add(new Integer(0));
+                    m_variants.add(new Integer(Integer.MAX_VALUE - 1));
+                    m_variants.add(new Integer(Integer.MAX_VALUE));
 
-            }
-        };
+                }
+            };
 
 
         manip = new SimpleTypeManipulator(java.lang.Long.class) {
-            void makeVariants() {
-                m_variants = new LinkedList();
-                m_variants.add(new Long(Long.MIN_VALUE));
-                m_variants.add(new Long(Long.MIN_VALUE + 1));
-                m_variants.add(new Long(0));
-                m_variants.add(new Long(Long.MAX_VALUE - 1));
-                m_variants.add(new Long(Long.MAX_VALUE));
+                void makeVariants() {
+                    m_variants = new LinkedList();
+                    m_variants.add(new Long(Long.MIN_VALUE));
+                    m_variants.add(new Long(Long.MIN_VALUE + 1));
+                    m_variants.add(new Long(0));
+                    m_variants.add(new Long(Long.MAX_VALUE - 1));
+                    m_variants.add(new Long(Long.MAX_VALUE));
 
-            }
-        };
+                }
+            };
 
 
         manip = new SimpleTypeManipulator(java.lang.Short.class) {
-            void makeVariants() {
-                m_variants = new LinkedList();
-                m_variants.add(new Short(Short.MIN_VALUE));
-                m_variants.add(new Short((short)(Short.MIN_VALUE + 1)));
-                m_variants.add(new Short((short)0));
-                m_variants.add(new Short((short)(Short.MAX_VALUE - 1)));
-                m_variants.add(new Short(Short.MAX_VALUE));
+                void makeVariants() {
+                    m_variants = new LinkedList();
+                    m_variants.add(new Short(Short.MIN_VALUE));
+                    m_variants.add(new Short((short)(Short.MIN_VALUE + 1)));
+                    m_variants.add(new Short((short)0));
+                    m_variants.add(new Short((short)(Short.MAX_VALUE - 1)));
+                    m_variants.add(new Short(Short.MAX_VALUE));
 
-            }
-        };
+                }
+            };
 
 
         manip = new SimpleTypeManipulator(java.lang.String.class) {
-            void makeVariants() {
-                m_variants = new LinkedList();
-                m_variants.add("FooBar");
-                m_variants.add("");
-                m_variants.add(repeatChar('a', 500));
-                m_variants.add(repeatChar('a', 5000));
-            }
-            /**
-             *  Iterates over all of the variantValues for the given Property and
-             *  attempts to update the property to that value. If an invalid failure
-             *  to update occurs, an exception is thrown.
-             *
-             *  @param p The property to update.
-             *  @param data The DataObject to save.
-             *
-             *  @pre p.equals(data.getObjectType.getProperty(p.getName()))
-             */
-            public void updateAllPropertyCombinations(Property p, DataObject data) throws Exception {
-                super.updateAllPropertyCombinations(p, data);
-                Column column = p.getColumn();
-                // Verify that the boundary cases for column size are correctly handled.
-                if( column != null && column.getSize() > 0 ) {
-                    try {
-                        OID id = data.getOID();
-                        final int size = column.getSize();
-                        String justBelowBoundary = repeatChar('X', size - 1);
-                        setProperty(p, data, justBelowBoundary);
-                        data = getSession().retrieve(id);
-
-                        String atBoundary = repeatChar('X', size);
-                        setProperty(p, data, atBoundary);
-                        data = getSession().retrieve(id);
-
-                        String justAboveBoundary = repeatChar('X', size + 1);
-                        setProperty(p, data, justAboveBoundary);
-                        data = getSession().retrieve(id);
-                        
-                    } catch (Exception e) {
-                        s_log.debug("Failure to update string property combinations for property: " + p.getName());
-                        s_log.debug("Column: " + column.getQualifiedName() + " Size: " + column.getSize());
-                        throw e;
-                    }
-
+                void makeVariants() {
+                    m_variants = new LinkedList();
+                    m_variants.add("FooBar");
+                    m_variants.add("");
+                    m_variants.add(repeatChar('a', 500));
+                    m_variants.add(repeatChar('a', 5000));
                 }
-            }
-            /**
-             *  This method checks to see if an error that resulted from setting a property
-             *  and saving a data object was valid or not. For example, passing null to a 
-             *  non-null property is valid.
-             *  If the error was not valid, the Exception parameter is rethrown.
-             *  This implementation checks for special errors that can occur with String
-             *  Properties.
-             * 
-             *  @param t The exception that resulted from the invalid update.
-             *  @param p The Property that was being updated.
-             *  @param data The DataObject that was being saved.
-             *  @param value The value that the property was being set to.
-             */
-            public void checkSetError(Exception t, Property p, DataObject data, Object value) throws Exception {
-                        
-                
-                s_log.debug("checkSetError for Strings!");
-                final boolean columnIsSpecified =  p.getColumn() != null;
-                final boolean isColumnSizeIssue = (t.getMessage().indexOf("inserted value too large") != -1) ||
-                   (t.getMessage().indexOf("can bind a LONG value only") != -1);
+                /**
+                 *  Iterates over all of the variantValues for the given Property and
+                 *  attempts to update the property to that value. If an invalid failure
+                 *  to update occurs, an exception is thrown.
+                 *
+                 *  @param p The property to update.
+                 *  @param data The DataObject to save.
+                 *
+                 *  @pre p.equals(data.getObjectType.getProperty(p.getName()))
+                 */
+                public void updateAllPropertyCombinations(Property p, DataObject data) throws Exception {
+                    super.updateAllPropertyCombinations(p, data);
+                    Column column = p.getColumn();
+                    // Verify that the boundary cases for column size are correctly handled.
+                    if( column != null && column.getSize() > 0 ) {
+                        try {
+                            OID id = data.getOID();
+                            final int size = column.getSize();
+                            String justBelowBoundary = repeatChar('X', size - 1);
+                            setProperty(p, data, justBelowBoundary);
+                            data = getSession().retrieve(id);
 
-                if( isColumnSizeIssue ) {
-                    if( p.getType().equals(MetadataRoot.STRING) ) {
-                       
-                        String stringValue = (String) value;
-                        s_log.debug("Value was too large for column. Size: " + stringValue.length());
-        
-                        
-                        if( columnIsSpecified ) {
-                            final int size = p.getColumn().getSize();    
-                            if( stringValue.length() <= size ) {
-                                s_log.debug("Column length appears to be invalid! Lengh is " + size);
-                                logSetError(p, value);
-                                throw t;
-                            }     
-                        } else {
-                            s_log.debug("Column does not have size specified in the PDL, so it is not possible to determine if this is an error");
-        
+                            String atBoundary = repeatChar('X', size);
+                            setProperty(p, data, atBoundary);
+                            data = getSession().retrieve(id);
+
+                            String justAboveBoundary = repeatChar('X', size + 1);
+                            setProperty(p, data, justAboveBoundary);
+                            data = getSession().retrieve(id);
+
+                        } catch (Exception e) {
+                            s_log.debug("Failure to update string property combinations for property: " + p.getName());
+                            s_log.debug("Column: " + column.getQualifiedName() + " Size: " + column.getSize());
+                            throw e;
                         }
+
                     }
-                    
-                } else {
-                    logSetError(p, value);
-                    throw t;
                 }
-                    
-            }
+                /**
+                 *  This method checks to see if an error that resulted from setting a property
+                 *  and saving a data object was valid or not. For example, passing null to a
+                 *  non-null property is valid.
+                 *  If the error was not valid, the Exception parameter is rethrown.
+                 *  This implementation checks for special errors that can occur with String
+                 *  Properties.
+                 *
+                 *  @param t The exception that resulted from the invalid update.
+                 *  @param p The Property that was being updated.
+                 *  @param data The DataObject that was being saved.
+                 *  @param value The value that the property was being set to.
+                 */
+                public void checkSetError(Exception t, Property p, DataObject data, Object value) throws Exception {
 
-            /**
-             *  Checks to see if the value that should have been set is the same as the
-             *  value retrieved from the database. If not, an exception is thrown.
-             *  
-             *  @param propertyName The name of the property that was updated.
-             *  @param inMemoryValue The value that the property was set to.
-             *  @param fromDatabaseValue The value of the property fetched from the database 
-             *      after saving.
-             */
-            public void checkEquals( String propertyName, Object inMemoryValue, Object fromDatabaseValue ) throws Exception {
 
-                final boolean bothStringsAreNull =
-                    StringUtils.emptyString(inMemoryValue) && StringUtils.emptyString(fromDatabaseValue);
-                if( bothStringsAreNull == false ) {
-                    super.checkEquals(propertyName, inMemoryValue, fromDatabaseValue);
+                    s_log.debug("checkSetError for Strings!");
+                    final boolean columnIsSpecified =  p.getColumn() != null;
+                    final boolean isColumnSizeIssue = (t.getMessage().indexOf("inserted value too large") != -1) ||
+                        (t.getMessage().indexOf("can bind a LONG value only") != -1);
+
+                    if( isColumnSizeIssue ) {
+                        if( p.getType().equals(MetadataRoot.STRING) ) {
+
+                            String stringValue = (String) value;
+                            s_log.debug("Value was too large for column. Size: " + stringValue.length());
+
+
+                            if( columnIsSpecified ) {
+                                final int size = p.getColumn().getSize();
+                                if( stringValue.length() <= size ) {
+                                    s_log.debug("Column length appears to be invalid! Lengh is " + size);
+                                    logSetError(p, value);
+                                    throw t;
+                                }
+                            } else {
+                                s_log.debug("Column does not have size specified in the PDL, so it is not possible to determine if this is an error");
+
+                            }
+                        }
+
+                    } else {
+                        logSetError(p, value);
+                        throw t;
+                    }
+
                 }
-            }
 
-        };
+                /**
+                 *  Checks to see if the value that should have been set is the same as the
+                 *  value retrieved from the database. If not, an exception is thrown.
+                 *
+                 *  @param propertyName The name of the property that was updated.
+                 *  @param inMemoryValue The value that the property was set to.
+                 *  @param fromDatabaseValue The value of the property fetched from the database
+                 *      after saving.
+                 */
+                public void checkEquals( String propertyName, Object inMemoryValue, Object fromDatabaseValue ) throws Exception {
+
+                    final boolean bothStringsAreNull =
+                        StringUtils.emptyString(inMemoryValue) && StringUtils.emptyString(fromDatabaseValue);
+                    if( bothStringsAreNull == false ) {
+                        super.checkEquals(propertyName, inMemoryValue, fromDatabaseValue);
+                    }
+                }
+
+            };
 
 
         manip = new SimpleTypeManipulator(java.sql.Blob.class) {
-            void makeVariants() {
-                m_variants = new LinkedList();            
-            }
-        };
+                void makeVariants() {
+                    m_variants = new LinkedList();
+                }
+            };
 
 
         manip = new SimpleTypeManipulator(java.sql.Clob.class) {
-            void makeVariants() {
-                m_variants = new LinkedList();
-                m_variants.add("");
-                m_variants.add(repeatChar('a', 500));
-                m_variants.add(repeatChar('a', 5000));
-                m_variants.add(repeatChar('a', 50000));
+                void makeVariants() {
+                    m_variants = new LinkedList();
+                    m_variants.add("");
+                    m_variants.add(repeatChar('a', 500));
+                    m_variants.add(repeatChar('a', 5000));
+                    m_variants.add(repeatChar('a', 50000));
 
-            }
-        };
+                }
+            };
 
 
     }
@@ -674,8 +689,8 @@ public class DataObjectManipulator {
      *
      *  @param c The character to repeat.
      *  @param numRepetitions The number of times to repeat the character.
-     *  @return The new String 
-     *  
+     *  @return The new String
+     *
      *  @pre numRepetitions > 0
      *  @post $result.length() == numRepetitions
      */
@@ -688,7 +703,7 @@ public class DataObjectManipulator {
         return sb.toString();
     }
 
-    
+
 
     private Map m_manipulators = new HashMap();
     private Session m_session;

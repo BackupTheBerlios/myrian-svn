@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -30,14 +30,14 @@ import org.apache.log4j.Logger;
  * SQLBlockDef
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/13 $
+ * @version $Revision: #6 $ $Date: 2002/08/14 $
  */
 
 public class SQLBlockDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/SQLBlockDef.java#5 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/SQLBlockDef.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-    private static final Logger s_log = 
+    private static final Logger s_log =
         Logger.getLogger(SQLBlockDef.class);
 
     private String m_sql;
@@ -104,14 +104,14 @@ public class SQLBlockDef extends Element {
 
             while (maps.hasNext()) {
                 MapStatement stmt = (MapStatement)maps.next();
-    
+
                 if (stmt instanceof MappingDef) {
                     MappingDef map = (MappingDef)stmt;
 
                     if (Arrays.equals(map.getPath(), newMap.getPath())) {
                         error(
-                            map.getPrettyPath() + " already mapped in block"
-                            );
+                              map.getPrettyPath() + " already mapped in block"
+                              );
                     }
                 }
             }
@@ -181,13 +181,13 @@ public class SQLBlockDef extends Element {
         } else if (m_sql.charAt(0) == '\n' || m_sql.charAt(0) == '\r') {
             result.append(m_sql + "}");
         } else {
-            result.append(Utilities.LINE_BREAK + "            " + m_sql + 
+            result.append(Utilities.LINE_BREAK + "            " + m_sql +
                           Utilities.LINE_BREAK + "        }");
         }
         int i;
         for (i = 0; i < m_mapStmts.size(); i++) {
             if (i == 0) result.append(" map {");
-            result.append(Utilities.LINE_BREAK + "            " + 
+            result.append(Utilities.LINE_BREAK + "            " +
                           m_mapStmts.get(i) + ";");
         }
 
@@ -208,10 +208,10 @@ public class SQLBlockDef extends Element {
 
 
     /**
-     *  @param isCallable This dictates whether the statement is 
+     *  @param isCallable This dictates whether the statement is
      *   CallableStatement or a PreparedStatement should be used when
      *   executing the operation
-     */ 
+     */
     public void setCallableStatement(boolean isCallable) {
         m_isCallableStatement = isCallable;
     }

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -37,14 +37,14 @@ import org.apache.log4j.Logger;
  * additional properties and SQL Events.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/13 $
+ * @version $Revision: #7 $ $Date: 2002/08/14 $
  */
 
 public class AssociationDef extends Element {
 
     private static final Logger s_log = Logger.getLogger(AssociationDef.class);
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AssociationDef.java#6 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/AssociationDef.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     // the two PropertyDefs that define what Objects are being associated
     private PropertyDef m_one;
@@ -179,7 +179,7 @@ public class AssociationDef extends Element {
         int i;
 
         // generate events for all the random associations
-    event_loop_one:
+        event_loop_one:
         for (i = 0; i < Property.NUM_EVENT_TYPES; i++) {
             events = m_events.iterator();
 
@@ -196,7 +196,7 @@ public class AssociationDef extends Element {
             generator.generateEvent((ObjectType)two.getType(), one, i, link);
         }
 
-    event_loop_two:
+        event_loop_two:
         for (i = 0; i < Property.NUM_EVENT_TYPES; i++) {
             events = m_events.iterator();
 
@@ -233,9 +233,9 @@ public class AssociationDef extends Element {
                     link.setEvent(ed.getTypeCode(), ed.generateEvent());
                 } else {
                     ed.error(
-                        "Duplicate " + ed.getType() +
-                        " event definition for association."
-                        );
+                             "Duplicate " + ed.getType() +
+                             " event definition for association."
+                             );
                 }
             } else if (!ed.getName().equals(one.getName()) &&
                        !ed.getName().equals(two.getName())) {
@@ -245,10 +245,10 @@ public class AssociationDef extends Element {
                         prop.setEvent(ed.getTypeCode(), ed.generateEvent());
                     } else {
                         ed.error(
-                            "Duplicate " + ed.getType() +
-                            " event definition for property" +
-                            prop.getName()
-                            );
+                                 "Duplicate " + ed.getType() +
+                                 " event definition for property" +
+                                 prop.getName()
+                                 );
                     }
                 }
             }

@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.redhat.com/licenses/ccmpl.html
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
+
 package com.arsdigita.persistence;
 
 import java.math.*;
@@ -11,16 +26,16 @@ import org.apache.log4j.Logger;
  * MultiThreadDataObjectTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/13 $
+ * @version $Revision: #6 $ $Date: 2002/08/14 $
  **/
 
 public class MultiThreadDataObjectTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/MultiThreadDataObjectTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/MultiThreadDataObjectTest.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private static final Logger s_log = Logger.getLogger(
-        MultiThreadDataObjectTest.class.getName()
-        );
+                                                         MultiThreadDataObjectTest.class.getName()
+                                                         );
 
     protected void persistenceSetUp() {
         load("com/arsdigita/persistence/testpdl/static/Node.pdl");
@@ -82,7 +97,7 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
                     // Do nothing
                 }
             }
-            
+
         } finally {
             Session ssn = SessionManager.getSession();
 
@@ -102,7 +117,7 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
      *  we want to make sure that it throws an error when we try to do it
      */
     public void testMultipleTransaction() throws java.sql.SQLException {
-       
+
         // we get two sessions to guarantee to get two transactions.
         // we have to get teh second one first so make sure that we
         // keep the stack trace
@@ -160,7 +175,7 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
             // is disallowed.
             try {
                 node.set("name", "foobar");
-                fail("Updated a node that is disconnected!");  
+                fail("Updated a node that is disconnected!");
             } catch (PersistenceException e) {
             }
 
@@ -168,13 +183,13 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
             // is disallowed.
             try {
                 node.save();
-                fail("Saved a node that is disconnected!");  
+                fail("Saved a node that is disconnected!");
             } catch (PersistenceException e) {
             }
 
             txn.beginTxn();
             node = ssn.create("examples.Node");
-            assertTrue(node.isValid() && !node.isDisconnected()); 
+            assertTrue(node.isValid() && !node.isDisconnected());
             BigDecimal savedId =  new BigDecimal(id++);
             node.set("id", savedId);
             node.set("name", "SavedNode");
@@ -187,7 +202,7 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
             // is disallowed.
             try {
                 node.set("name", "foobar");
-                fail("Updated a node that is disconnected!");  
+                fail("Updated a node that is disconnected!");
             } catch (PersistenceException e) {
             }
 
@@ -195,7 +210,7 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
             // is disallowed.
             try {
                 node.save();
-                fail("Saved a node that is disconnected!");  
+                fail("Saved a node that is disconnected!");
             } catch (PersistenceException e) {
             }
 
@@ -214,7 +229,7 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
                 txn.abortTxn();
             }
             txn.beginTxn();
-            
+
             DataCollection nodes =  getSession().retrieve("examples.Node");
             while(nodes.next()) {
                 DataObject deadNode = nodes.getDataObject();
@@ -224,7 +239,7 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
             txn.commitTxn();
 
         }
-            
+
     }
 
     public void testAssociationTransactionState() {
@@ -235,23 +250,23 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
             }
         }
         ID id = new ID();
-       
+
         Session ssn = SessionManager.getSession();
         TransactionContext txn = ssn.getTransactionContext();
 
         try {
 
             DataObject color = ssn.create("mdsql.Color");
-            color.set("id", id.next()); 
+            color.set("id", id.next());
             color.set("name", "blue");
-             
+
             DataObject jon = makeUser(ssn,
-                    id.next(),
-                    "jorris@arsdigita.com",
-                    "Jon",
-                    "Orris",
-                    "Stuff!",
-                    color);
+                                      id.next(),
+                                      "jorris@arsdigita.com",
+                                      "Jon",
+                                      "Orris",
+                                      "Stuff!",
+                                      color);
 
             jon.save();
             DataObject qa = makeGroup(ssn, id.next(), "qa@arsdigita.com", "QA");
@@ -260,7 +275,7 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
             members.add(jon);
             qa.save();
 
-            txn.commitTxn(); 
+            txn.commitTxn();
             assertTrue(qa.isValid() && qa.isDisconnected());
             assertTrue(jon.isValid() && jon.isDisconnected());
             assertTrue(color.isValid() && color.isDisconnected());
@@ -274,7 +289,7 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
                 qa.set("name", "!QA");
                 fail("Set value of a disconnected object!");
             } catch (PersistenceException e) {
-            } 
+            }
 
             try {
                 color.set("name", "purple");
@@ -284,12 +299,12 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
 
             txn.beginTxn();
             DataObject matt = makeUser(ssn,
-                    id.next(),
-                    "mboland@arsdigita.com",
-                    "Matt",
-                    "Boland",
-                    "Stuff!",
-                    null);
+                                       id.next(),
+                                       "mboland@arsdigita.com",
+                                       "Matt",
+                                       "Boland",
+                                       "Stuff!",
+                                       null);
             matt.save();
             members.add(matt);
 
@@ -301,16 +316,16 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
 
             txn.abortTxn();
             //assertTrue(members.isValid() && members.isDisconnected());
-                
+
         } finally {
             if( txn.inTxn() ) {
                 txn.abortTxn();
-            }  
+            }
             txn.beginTxn();
             DataCollection users =  getSession().retrieve("mdsql.User");
             while(users.next()) {
                 DataObject dead = users.getDataObject();
-                DataAssociationCursor cursor = ((DataAssociation) dead.get("groups")).cursor(); 
+                DataAssociationCursor cursor = ((DataAssociation) dead.get("groups")).cursor();
                 while(cursor.next()) {
                     cursor.remove();
                 }
@@ -326,7 +341,7 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
             DataCollection groups =  getSession().retrieve("mdsql.Group");
             while(groups.next()) {
                 DataObject dead = groups.getDataObject();
-                DataAssociationCursor cursor = ((DataAssociation) dead.get("members")).cursor(); 
+                DataAssociationCursor cursor = ((DataAssociation) dead.get("members")).cursor();
                 while(cursor.next()) {
                     cursor.remove();
                 }
@@ -334,21 +349,21 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
             }
 
             txn.commitTxn();
-            
-        } 
-        
+
+        }
 
 
-            
+
+
     }
 
     private DataObject makeUser(Session ssn,
-            BigInteger id,
-            String email,
-            String firstName,
-            String lastNames,
-            String bio,
-            DataObject color)
+                                BigInteger id,
+                                String email,
+                                String firstName,
+                                String lastNames,
+                                String bio,
+                                DataObject color)
     {
         DataObject user = ssn.create("mdsql.User");
         user.set("id", id);
@@ -357,12 +372,12 @@ public class MultiThreadDataObjectTest extends PersistenceTestCase {
         user.set("lastNames", lastNames);
         if( null != bio ) {
             user.set("bio",bio);
-        }        
+        }
         if (null != color) {
             user.set("favorateColor", color);
         }
         return user;
-        
+
     }
 
 

@@ -17,7 +17,7 @@
 -- test cases.
 --
 -- @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
--- @version $Revision: #1 $ $Date: 2002/08/13 $
+-- @version $Revision: #2 $ $Date: 2002/08/14 $
 --
 
 create table t_package (

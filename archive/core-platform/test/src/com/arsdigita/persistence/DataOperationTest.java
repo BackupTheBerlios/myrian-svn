@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -23,17 +23,17 @@ import com.arsdigita.db.DbHelper;
 /**
  * DataOperationText
  *
- * This class tests DataOperation, using data contained in 
+ * This class tests DataOperation, using data contained in
  * //enterprise/infrastructure/dev/persistence/sql/data-query-test.sql
  *
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/14 $
+ * @version $Revision: #7 $ $Date: 2002/08/14 $
  */
 public class DataOperationTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataOperationTest.java#6 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataOperationTest.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     public DataOperationTest(String name) {
         super(name);
@@ -55,7 +55,7 @@ public class DataOperationTest extends PersistenceTestCase {
      */
     public void testDataOperationWithBindVariables() {
         DataOperation operation = getSession().
-            retrieveDataOperation("examples.DataOperationWithBindVariables");   
+            retrieveDataOperation("examples.DataOperationWithBindVariables");
 
         // neither variable being bound should throw a PersistenceException
         try {
@@ -65,7 +65,7 @@ public class DataOperationTest extends PersistenceTestCase {
         } catch (PersistenceException e) {
             // this is the correct behavior
         }
-      
+
         // bind only "priority"
         operation.setParameter("priority", new BigDecimal(3));
         try {
@@ -80,7 +80,7 @@ public class DataOperationTest extends PersistenceTestCase {
         // bind only "description"
         // we want a new operation
         operation = getSession().retrieveDataOperation(
-                                       "examples.DataOperationWithBindVariables");
+                                                       "examples.DataOperationWithBindVariables");
         operation.setParameter("description", "wrote");
         try {
             operation.execute();
@@ -104,7 +104,7 @@ public class DataOperationTest extends PersistenceTestCase {
 
         // binding all three variables
         operation = getSession().retrieveDataOperation(
-                                      "examples.DataOperationWithBindVariables");
+                                                       "examples.DataOperationWithBindVariables");
         operation.setParameter("priority", new BigDecimal(30000));
         operation.setParameter("description", "wrote");
         operation.setParameter("currentPriority", new BigDecimal(8));
@@ -112,10 +112,10 @@ public class DataOperationTest extends PersistenceTestCase {
         // let's make sure that there are not currently any items with the
         // high priority to so that we are sure that our query works
         DataQuery query = getSession().retrieveQuery(
-                                          "examples.DataQueryWithBindVariables");
+                                                     "examples.DataQueryWithBindVariables");
         query.setParameter("priority", new BigDecimal(29999));
         query.setParameter("description", "wrote");
-        
+
         try {
             assert(query.size() == 0);
         } catch (PersistenceException e) {
@@ -129,7 +129,7 @@ public class DataOperationTest extends PersistenceTestCase {
         // let's make sure it succeeded
         query = getSession().retrieveQuery("examples.DataQueryWithBindVariables");
         query.setParameter("priority", new BigDecimal(29999));
-        
+
         try {
             assert(query.size() > 0);
         } catch (PersistenceException e) {
@@ -140,11 +140,11 @@ public class DataOperationTest extends PersistenceTestCase {
 
         // let's undo the update
         operation = getSession().retrieveDataOperation(
-                                 "examples.DataOperationWithBindVariables");
+                                                       "examples.DataOperationWithBindVariables");
         operation.setParameter("priority", new BigDecimal(9));
         operation.setParameter("description", "wrote");
         operation.setParameter("currentPriority", "29999");
-       
+
         // Test the ability to get out the parameter values
         assert("The retrieved value for 'description' was not correct",
                "wrote".equals(operation.getParameter("description").toString()));
@@ -165,7 +165,7 @@ public class DataOperationTest extends PersistenceTestCase {
      */
     public void testDataOperationWithPLSQL() throws Exception {
         DataOperation operation = getSession().
-            retrieveDataOperation("examples.DataOperationWithPLSQL");   
+            retrieveDataOperation("examples.DataOperationWithPLSQL");
 
         // neither variable being bound should throw a PersistenceException
         DataQuery query = getSession().retrieveQuery("examples.DataQuery");
@@ -201,7 +201,7 @@ public class DataOperationTest extends PersistenceTestCase {
         }
 
         assert("DataOperationFunction did not correctly change the items " +
-               "returned by the query.  Expected " + (size + 1) + 
+               "returned by the query.  Expected " + (size + 1) +
                " but got " + query.size(), size + 1 == query.size());
         size = query.size();
         int nextID = Integer.parseInt(return_value);
@@ -221,7 +221,7 @@ public class DataOperationTest extends PersistenceTestCase {
             operation = getSession().retrieveDataOperation
                 ("examples.DataOperationProcWithOut");
             operation.execute();
-            return_value = (String)operation.get("newID");  
+            return_value = (String)operation.get("newID");
         }
         assert("DataOperationProcWithOut did not correctly change the items " +
                "returned by the query", size + 1 == query.size());
@@ -276,7 +276,7 @@ public class DataOperationTest extends PersistenceTestCase {
             return_integer = (Integer)operation.get("newID");
         }
         assert("DataOperationProcWithInOutInt did not correctly change the " +
-               "items returned by the query (with Integer)", 
+               "items returned by the query (with Integer)",
                integerValue.toString().equals(return_integer.toString()));
         assert("DataOperationProcWithInOutInt and Integer did not add a row",
                size + 1 == query.size());
@@ -286,7 +286,7 @@ public class DataOperationTest extends PersistenceTestCase {
                "We expected " + (newID + 8) + " but got " + nextID,
                newID + 8 == nextID);
         newID = nextID;
-        
+
 
         // now we test using Dates
         Date date = new Date();
@@ -313,7 +313,7 @@ public class DataOperationTest extends PersistenceTestCase {
         query.addEqualsFilter("id", return_integer);
         query.next();
         long newTime = date.getTime() - ((Date)query.get("actionTime")).getTime();
-        assert("The time retrieved is not near the time set", 
+        assert("The time retrieved is not near the time set",
                newTime > -1000 && newTime < 1000);
         query.close();
     }
@@ -324,7 +324,7 @@ public class DataOperationTest extends PersistenceTestCase {
      */
     public void testDataOperationWithPLSQLParams() {
         DataOperation operation = getSession().
-            retrieveDataOperation("examples.DataOperationWithPLSQLAndArgs");   
+            retrieveDataOperation("examples.DataOperationWithPLSQLAndArgs");
         operation.setParameter("priority", new BigDecimal(3));
 
         // neither variable being bound should throw a PersistenceException
@@ -394,11 +394,3 @@ public class DataOperationTest extends PersistenceTestCase {
     }
 
 }
-
-
-
-
-
-
-
-

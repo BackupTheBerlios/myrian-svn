@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -44,29 +44,29 @@ public class StringUtils {
 
     private static Perl5Util s_re = new Perl5Util();
 
-    private StringUtils() { 
+    private StringUtils() {
         // can't instantiate me!
-    } 
+    }
 
-    /** 
+    /**
      * Tests if a string is empty.
      * @param s A string to test
-     * @return <code>true</code> if <code>s</code> is null or empty; 
+     * @return <code>true</code> if <code>s</code> is null or empty;
      * otherwise <code>false</code>
      */
     public final static boolean emptyString(String s) {
         boolean expr = (s == null || s.length() == 0);
         return expr;
     }
-    
-    /** 
+
+    /**
      * Tests if a string is empty.
      * @param o A string to test
-     * @return <code>true</code> if <code>o</code> is null or empty; 
+     * @return <code>true</code> if <code>o</code> is null or empty;
      * otherwise <code>false</code>
      */
     public final static boolean emptyString(Object o) {
-        boolean expr = 
+        boolean expr =
             (o == null || (o instanceof String && ((String)o).length() ==0));
         return expr;
     }
@@ -88,10 +88,10 @@ public class StringUtils {
     public final static String quoteHtml(String s) {
         if (s != null) {
             StringBuffer result = new StringBuffer(s.length() + 10);
-            for (int i = 0; i < s.length(); i++) { 
+            for (int i = 0; i < s.length(); i++) {
                 char ch = s.charAt(i);
-                switch (ch) { 
-                case '&': 
+                switch (ch) {
+                case '&':
                     result.append("&amp;");
                     break;
                 case '"':
@@ -103,18 +103,18 @@ public class StringUtils {
                 case '>':
                     result.append("&gt;");
                     break;
-                default: 
+                default:
                     result.append(ch);
                 }
             }
             return result.toString();
         } else {
             return "";
-        } 
+        }
     }
 
-    /** 
-     * Takes a plaintext string, and returns an HTML string that, when 
+    /**
+     * Takes a plaintext string, and returns an HTML string that, when
      * rendered by a web browser, will appear as the original input string
      *
      * @param s The input plaintext string
@@ -131,8 +131,8 @@ public class StringUtils {
         s = s_re.substitute("s/\r/<br>/g", s);
         return s;
     }
-    
-    /** 
+
+    /**
      * Removes tags and substitutes P tags with newlines.  For much
      * more extensive conversion of HTML fragments to plain text
      * equivalents, see {@link HtmlToText}.
@@ -154,8 +154,8 @@ public class StringUtils {
 
 
     /**
-     * Convert a string of items separated by a separator 
-     * character to an array of the items.  sep is the separator 
+     * Convert a string of items separated by a separator
+     * character to an array of the items.  sep is the separator
      * character.  Example: Input - s == "cat,house,dog" sep==','
      * Output - {"cat", "house", "dog"}
      * @param s string contains items separated by a separator character.
@@ -236,7 +236,7 @@ public class StringUtils {
                 return null;   // Did not find key
             }
             key_end = key_start + key.length();
-            if (plist.charAt(key_end) == '=' && 
+            if (plist.charAt(key_end) == '=' &&
                 (key_start == 0 || plist.charAt(key_start - 1) == sep)) {
                 // Found isolated parameter value, this is the match
                 int value_end = plist.indexOf(sep, key_end);
@@ -255,38 +255,38 @@ public class StringUtils {
         return null;
     }
 
-  /**
-   * Strip extra white space from a string.  This replaces any white space 
-   * character or consecutive white space characters with a single space.
-   * It is useful when comparing strings that should be equal except for
-   * possible differences in white space.  Example:  input = "I  \ndo\tsee".
-   * Output = "I do see".
-   * @param s string that may contain extra white space
-   * @return string the same as the input, but with extra white space
-   * removed and replaced by a single space.
-   */
-  static public String stripWhiteSpace(String s) {
-      StringBuffer to = new StringBuffer();
-      boolean inSpace = true;
-      boolean isSpace;
-      char c;
-      for (int i=0; i<s.length(); i++) {
-          c = s.charAt(i);
-          isSpace = Character.isWhitespace(c);
-          if (!isSpace) {
-              to.append(c);
-              inSpace = false;
-          } else if (!inSpace) {
-                  to.append(' ');
-                  inSpace = true;
-              }
-      }
-      return to.toString().trim();
-  }
+    /**
+     * Strip extra white space from a string.  This replaces any white space
+     * character or consecutive white space characters with a single space.
+     * It is useful when comparing strings that should be equal except for
+     * possible differences in white space.  Example:  input = "I  \ndo\tsee".
+     * Output = "I do see".
+     * @param s string that may contain extra white space
+     * @return string the same as the input, but with extra white space
+     * removed and replaced by a single space.
+     */
+    static public String stripWhiteSpace(String s) {
+        StringBuffer to = new StringBuffer();
+        boolean inSpace = true;
+        boolean isSpace;
+        char c;
+        for (int i=0; i<s.length(); i++) {
+            c = s.charAt(i);
+            isSpace = Character.isWhitespace(c);
+            if (!isSpace) {
+                to.append(c);
+                inSpace = false;
+            } else if (!inSpace) {
+                to.append(' ');
+                inSpace = true;
+            }
+        }
+        return to.toString().trim();
+    }
 
-    /** 
+    /**
      * Get a String representation for an Object.  If it has an
-     * asString method, use that; otherwise fall back on toString 
+     * asString method, use that; otherwise fall back on toString
      */
 
     public static String toString(Object o) {
@@ -301,43 +301,43 @@ public class StringUtils {
         }
     }
 
-    /** 
+    /**
      * create a String representation of a map.  This method is not
      * too necessary, because Map.toString() does almost the same.
      */
 
     public static String toString(Map m) {
-      StringBuffer to = new StringBuffer();
-      if (m == null) {
-          to.append("null");
-      } else {
-          to.append(m.getClass().getName());
-          Set entrySet = m.entrySet();
-          if (entrySet == null) {
-              to.append("[null entrySet]");
-          } else {
-              Iterator entries = entrySet.iterator();
-              if (entries == null) {
-                  to.append("[null iterator]");
-              } else {
-                  String newLine = System.getProperty("line.separator");
-                  to.append("{");
-                  String comma = newLine;
-          
-                  while (entries.hasNext()) {
-                      to.append(comma);
-                      comma = "," + newLine;
-                      Entry e = (Entry)entries.next();
-                      to  .append(toString(e.getKey()))
-                          .append(" => ")
-                          .append(toString(e.getValue()));
-                  }
-                  to.append(newLine).append("}");
-              }
-          }
-      }
-      String result = to.toString();
-      return result;
+        StringBuffer to = new StringBuffer();
+        if (m == null) {
+            to.append("null");
+        } else {
+            to.append(m.getClass().getName());
+            Set entrySet = m.entrySet();
+            if (entrySet == null) {
+                to.append("[null entrySet]");
+            } else {
+                Iterator entries = entrySet.iterator();
+                if (entries == null) {
+                    to.append("[null iterator]");
+                } else {
+                    String newLine = System.getProperty("line.separator");
+                    to.append("{");
+                    String comma = newLine;
+
+                    while (entries.hasNext()) {
+                        to.append(comma);
+                        comma = "," + newLine;
+                        Entry e = (Entry)entries.next();
+                        to  .append(toString(e.getKey()))
+                            .append(" => ")
+                            .append(toString(e.getValue()));
+                    }
+                    to.append(newLine).append("}");
+                }
+            }
+        }
+        String result = to.toString();
+        return result;
     }
 
     /**
@@ -345,13 +345,13 @@ public class StringUtils {
      * @param str a string to strip
      * @return the input string with all new-line characters
      * removed.
-     * @post result.indexOf('\r') == 0 
+     * @post result.indexOf('\r') == 0
      * @post result.indexOf('\n') == 0
      */
-    public static String stripNewLines(String str) { 
+    public static String stripNewLines(String str) {
         int len = str.length();
         StringBuffer sb = new StringBuffer(len);
-        for (int i = 0; i < len; i++) { 
+        for (int i = 0; i < len; i++) {
             char ch = str.charAt(i);
             if (ch != '\r' && ch != '\n') {
                 sb.append(ch);
@@ -368,7 +368,7 @@ public class StringUtils {
      * returns a reference to the original string.  If not, a new
      * <code>String</code> object is created containing the original
      * plus a platform-dependent newline character obtained from
-     * {@link System#getProperties}.</p> 
+     * {@link System#getProperties}.</p>
      *
      * @author Ron Henderson (ron@arsdigita.com)
      */
@@ -384,7 +384,7 @@ public class StringUtils {
         }
     }
 
-    
+
     /**
      *  This takes the passed in string and truncates it.
      *  It cuts the string off at the length specified and then
@@ -410,7 +410,7 @@ public class StringUtils {
      *  @param length The length which to truncate the string
      *  @param removeHTML Whether or not to convert the HTML to text
      */
-    public static String truncateString(String s, int length, 
+    public static String truncateString(String s, int length,
                                         boolean removeHTML) {
         if (s == null) {
             return "";
@@ -424,13 +424,13 @@ public class StringUtils {
         if (string.length() <= length) {
             return string;
         }
-        
+
         return string.substring(0, string.lastIndexOf(" ", length));
     }
 
 
     /**
-     * "join" a List of Strings into a single string, with each string 
+     * "join" a List of Strings into a single string, with each string
      * separated by a defined separator string.
      *
      * @param elements the strings to join together
@@ -471,7 +471,7 @@ public class StringUtils {
         }
         return "";
     }
-    
+
     /**
      * Returns a String containing the specified repeat count of a
      * given pattern String.
@@ -493,7 +493,7 @@ public class StringUtils {
      * given pattern character.
      *
      * @param pattern the pattern character
-     * @param repeatCount the number of time to repeat it 
+     * @param repeatCount the number of time to repeat it
      */
 
     public final static String repeat(char pattern, int repeatCount) {
@@ -509,7 +509,7 @@ public class StringUtils {
      *
      * @author ron@arsdigita.com
      * @since  5.1.2
-     * @version $Id: //core-platform/dev/src/com/arsdigita/util/StringUtils.java#3 $ 
+     * @version $Id: //core-platform/dev/src/com/arsdigita/util/StringUtils.java#4 $
      */
 
     public final static String wrap(String input) {
@@ -539,7 +539,7 @@ public class StringUtils {
      *
      * @author ron@arsdigita.com
      * @since  5.1.2
-     * @version $Id: //core-platform/dev/src/com/arsdigita/util/StringUtils.java#3 $ */
+     * @version $Id: //core-platform/dev/src/com/arsdigita/util/StringUtils.java#4 $ */
 
     public final static String wrap(String input, int maxLength) {
 
@@ -561,11 +561,11 @@ public class StringUtils {
         int startOfLine = 0;
 
         while (startOfLine < input.length()) {
-            
+
             String line = input.substring
                 (startOfLine, Math.min(input.length(),
                                        startOfLine + maxLength));
-            
+
             if (line.equals("")) {
                 break;
             }
@@ -582,7 +582,7 @@ public class StringUtils {
                 continue;
             }
 
-            if (startOfLine + maxLength > input.length()) { 
+            if (startOfLine + maxLength > input.length()) {
 
                 // we're on the last line and it is < maxLength so
                 // just return it
@@ -595,35 +595,35 @@ public class StringUtils {
             if (lastSpace == -1) {
 
                 // no space found!  Try the first space in the whole
-                // rest of the string 
-                
+                // rest of the string
+
                 int nextSpace = input.indexOf
                     (SPACE, startOfLine);
                 int nextNewLine = input.indexOf
                     (ENDL, startOfLine);
-                
+
                 if (nextSpace == -1) {
                     lastSpace = nextNewLine;
                 } else {
                     lastSpace = Math.min
                         (nextSpace,nextNewLine);
                 }
-                
+
                 if (lastSpace == -1) {
                     // didn't find any more whitespace, append the
-                    // whole thing as a line 
+                    // whole thing as a line
                     output.append(input.substring(startOfLine));
                     break;
-                } 
+                }
 
-                // code below will add this to the start of the line 
+                // code below will add this to the start of the line
 
                 lastSpace -= startOfLine;
             }
-            
+
             // append up to the last space
 
-            output.append(input.substring(startOfLine, 
+            output.append(input.substring(startOfLine,
                                           startOfLine + lastSpace));
             output.append(ENDL);
 
@@ -667,7 +667,7 @@ public class StringUtils {
      *
      * @param text the text to interpolate
      * @param vars a hash table containing key -> value mappings
-     * 
+     *
      */
     public static String interpolate(String text, Map vars) {
         HashSubstitution subst = new HashSubstitution(vars);
@@ -675,10 +675,10 @@ public class StringUtils {
         Perl5Compiler compiler = new Perl5Compiler();
         StringBuffer result = new StringBuffer();
         PatternMatcherInput input = new PatternMatcherInput(text);
-        
+
         try {
-            Util.substitute(result, 
-                            matcher, 
+            Util.substitute(result,
+                            matcher,
                             compiler.compile("(::(?:\\w+(?:\\.\\w+)*)::)"),
                             subst,
                             input,
@@ -688,11 +688,11 @@ public class StringUtils {
         }
         return result.toString();
     }
-    
-    
+
+
     /**
      * THis method performs a single variable substitution
-     * on a string. The placeholder takes the form of 
+     * on a string. The placeholder takes the form of
      * ::key:: within the sample text.
      *
      * @param text the text to process for substitutions
@@ -701,10 +701,10 @@ public class StringUtils {
      */
     public static String interpolate(String text, String key, String value) {
         String pattern = "s/::" + key + "::/" + value + "/";
-        
+
         return s_re.substitute(pattern, text);
     }
-    
+
 
 
     /**
@@ -712,12 +712,12 @@ public class StringUtils {
      * dynamically generated.
      */
     public interface PlaceholderValueGenerator {
-	/**
-	 * Returns the value corresponding to the supplied key
-	 * placeholder.
-	 *
-	 * @param the key being substituted
-	 */
+        /**
+         * Returns the value corresponding to the supplied key
+         * placeholder.
+         *
+         * @param the key being substituted
+         */
         public String generate(String key);
     }
 
@@ -725,11 +725,11 @@ public class StringUtils {
 
     private static class HashSubstitution implements Substitution {
         private Map m_hash;
-        
+
         public HashSubstitution(Map hash) {
             m_hash = hash;
         }
-        
+
         public void appendSubstitution(StringBuffer appendBuffer,
                                        MatchResult match,
                                        int substitutionCount,
@@ -754,4 +754,3 @@ public class StringUtils {
         }
     }
 }
-

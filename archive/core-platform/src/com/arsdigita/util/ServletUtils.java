@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -29,7 +29,7 @@ import java.util.Enumeration;
 
 public class ServletUtils {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/ServletUtils.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/ServletUtils.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private ServletUtils() { }
 
@@ -37,14 +37,14 @@ public class ServletUtils {
      * Returns a string that can be appended to a URL as a query string.
      * This exports URL variables and their values in the current request to
      * for use in a new request.  <p>
-     * If request contains the variables 
+     * If request contains the variables
      * "one"=1, "two"=2, and "three"=3, then exportURLVars(req, "one two")
      *  will return "one=1&two=2".
      * @param req the HttpServletRequest
      * @param vars a space-separated list of variables to export.  If vars
-     * is null, export all available.  
+     * is null, export all available.
      */
-    public static final String exportURLVars(HttpServletRequest req, 
+    public static final String exportURLVars(HttpServletRequest req,
                                              String vars) {
         boolean firstTime = true;
         StringBuffer buf = new StringBuffer();
@@ -71,13 +71,13 @@ public class ServletUtils {
                 buf.append('=');
                 buf.append(URLEncoder.encode(value));
                 firstTime = false;
-            } 
+            }
         }
         return buf.toString();
     }
-    
 
-    /** 
+
+    /**
      * Returns a cookie value as a String, given a cookie name.
      * @param request The servlet request
      * @param withName The cookie name
@@ -85,14 +85,14 @@ public class ServletUtils {
      * @see javax.servlet.http.Cookie
      * @see javax.servlet.http.HttpServletRequest#getCookies()
      */
-    public final static String getCookieValue(HttpServletRequest request, 
+    public final static String getCookieValue(HttpServletRequest request,
                                               String withName) {
         Cookie[] cookies = request.getCookies();
-        
+
         if (cookies == null) {
             return null;
         }
-        
+
         for (int i = 0; i < cookies.length; i++) {
             Cookie c = cookies[i];
             if (c.getName().equals(withName)) {

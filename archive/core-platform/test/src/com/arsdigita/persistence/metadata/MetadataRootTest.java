@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -22,24 +22,24 @@ import junit.framework.TestCase;
 
 /**
  * MetadataRootTest    (Copyright 2001 ArsDigita Corporation)
- * 
+ *
  * <p> This class performs unit tests on com.arsdigita.persistence.metadatax.MetadataRoot </p>
  *
  * @author <a href="mailto:jorris@arsdigita.com">jorris@arsdigita.com</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
- * 
+ * @version $Revision: #3 $ $Date: 2002/08/14 $
+ *
  * @see com.arsdigita.persistence.metadata.MetadataRoot
  */
 
 public class MetadataRootTest extends TestCase
 {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/MetadataRootTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/MetadataRootTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     public MetadataRootTest(String name) {
         super(name);
     }
-    
+
     public void testModels() {
         MetadataRoot root = getNewRoot();
         Model foo = new Model("foo");
@@ -51,7 +51,7 @@ public class MetadataRootTest extends TestCase
         root.addModel(bar);
         Model category = new Model("com.arsdigita.categorization");
         root.addModel(category);
-        
+
         Iterator iter = root.getModels();
         ArrayList list = new ArrayList();
         while(iter.hasNext())  {
@@ -63,7 +63,7 @@ public class MetadataRootTest extends TestCase
         assertTrue( list.contains(category) );
 
     }
-   
+
     public void testRemoveModelsViaIterator() {
         MetadataRoot root = getNewRoot();
         root.addModel(new Model("smurf"));
@@ -77,10 +77,10 @@ public class MetadataRootTest extends TestCase
                 iter.remove();
                 fail("Successfully removed models from MetadataRoot via iterator!");
             }
-        
+
         } catch (UnsupportedOperationException e) {
         }
-       
+
     }
 
     public void testDuplicateModels() {
@@ -96,29 +96,29 @@ public class MetadataRootTest extends TestCase
     }
 
     public void testGetObjectType()  {
-         ObjectType gronk = new ObjectType("gronk");
-         Model m = new Model("com.arsdigita.stuff");
-         m.addDataType(gronk);
-         assertNotNull(m.getObjectType("gronk"));
-         MetadataRoot root = getNewRoot();
-         root.addModel(m);
+        ObjectType gronk = new ObjectType("gronk");
+        Model m = new Model("com.arsdigita.stuff");
+        m.addDataType(gronk);
+        assertNotNull(m.getObjectType("gronk"));
+        MetadataRoot root = getNewRoot();
+        root.addModel(m);
 
-         String name = "com.arsdigita.stuff.gronk";
-         ObjectType found = root.getObjectType(name);
-         assertNotNull(found);
+        String name = "com.arsdigita.stuff.gronk";
+        ObjectType found = root.getObjectType(name);
+        assertNotNull(found);
 
-         // mispelling of model name
-         found = root.getObjectType("com.ardigita.stuff.gronk");
-         assertTrue( null == found );
+        // mispelling of model name
+        found = root.getObjectType("com.ardigita.stuff.gronk");
+        assertTrue( null == found );
 
-         // missing model
-         found = root.getObjectType(".gronk");
-         assertTrue( null == found );
+        // missing model
+        found = root.getObjectType(".gronk");
+        assertTrue( null == found );
 
-         // No such object type
-         assertTrue( null == root.getObjectType("com.arsdigita.stuff.foo"));
+        // No such object type
+        assertTrue( null == root.getObjectType("com.arsdigita.stuff.foo"));
 
-  
+
     }
 
     public void testGetQueryType()  {
@@ -126,24 +126,24 @@ public class MetadataRootTest extends TestCase
         QueryType query = new QueryType("QueryOfHappiness", new Event());
         m.addDataType( query );
         MetadataRoot root = getNewRoot();
-        root.addModel(m); 
+        root.addModel(m);
         assertEquals( query, root.getQueryType("com.arsdigita.stuff.QueryOfHappiness"));
         assertEquals( null, root.getQueryType("no.such.model.QueryOfHappiness"));
         assertEquals( null, root.getQueryType("com.arsdigita.stuff.NoSuchQuery"));
     }
-  
+
     public void testGetDataOperationType()  {
         Model m = new Model("com.arsdigita.stuff");
 
         DataOperationType op = new DataOperationType("Operation", new Event());
         m.addDataOperationType( op );
         MetadataRoot root = getNewRoot();
-        root.addModel(m); 
+        root.addModel(m);
         assertEquals( op, root.getDataOperationType("com.arsdigita.stuff.Operation"));
         assertEquals( null, root.getDataOperationType("no.such.model.Operation"));
         assertEquals( null, root.getDataOperationType("com.arsdigita.stuff.NoSuchQuery"));
     }
-      
+
 
     // Simple regression test
     public void testGetPrimitiveType() {
@@ -168,5 +168,5 @@ public class MetadataRootTest extends TestCase
 
     private MetadataRoot getNewRoot()  {
         return MetadataRoot.newInstance();
-    }    
+    }
 }

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -21,12 +21,12 @@ package com.arsdigita.persistence;
  * factories to hand out filters
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/14 $
  */
 
 public interface FilterFactory {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterFactory.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterFactory.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     // These are variables indicating what to use in the comparrison
     public final static int EQUALS = 1;
@@ -38,26 +38,26 @@ public interface FilterFactory {
     public final static int STARTS_WITH = 7;
     public final static int ENDS_WITH = 8;
     public final static int CONTAINS = 9;
-    
+
 
     /**
      *
      *  @param sql The conditions for the filter.  This is a string
      *        that should represent part of a SQL "where" clause.  Specifically,
-     *        it should normally take the form of 
+     *        it should normally take the form of
      *        <pre><code>
      *        &lt;column_name&gt; &lt;condition&gt; &lt;attribute bind variable&gt;
      *        </code></pre>
      *        where the "condition" is something like "=", "&lt;", "&gt;", or
      *        "!=".  The "bind variable" should be a colon followed by
-     *        some attribute name that will later be set with a call to 
-     *        {@link com.arsdigita.persistence.Filter#set(java.lang.String, 
+     *        some attribute name that will later be set with a call to
+     *        {@link com.arsdigita.persistence.Filter#set(java.lang.String,
      *               java.lang.Object)}
      *        <p>
      *        It is possible to set multiple conditions with a single
      *        addFilter statement by combining the conditions with an "and"
      *        or an "or".  Conditions may be grouped by using parentheses.
-     *        Consecutive calls to addFilter append the filters using 
+     *        Consecutive calls to addFilter append the filters using
      *        "and".
      */
     Filter simple(String sql);
@@ -103,11 +103,11 @@ public interface FilterFactory {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     Filter lessThan(String attribute, Object value,
-        boolean trueForAllIfValueIsNull);
+                    boolean trueForAllIfValueIsNull);
 
 
     /**
@@ -121,11 +121,11 @@ public interface FilterFactory {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     Filter lessThanEquals(String attribute, Object value,
-        boolean trueForAllIfValueIsNull);
+                          boolean trueForAllIfValueIsNull);
 
 
     /**
@@ -139,7 +139,7 @@ public interface FilterFactory {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     Filter greaterThan(String attribute, Object value,
@@ -157,13 +157,13 @@ public interface FilterFactory {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     Filter greaterThanEquals(String attribute, Object value,
                              boolean trueForAllIfValueIsNull);
 
-    
+
     /**
      *  This creates the appropriate SQL for the given attribute and
      *  passed in value.  It creates a filter for "<code>attributeName
@@ -175,7 +175,7 @@ public interface FilterFactory {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     Filter startsWith(String attribute, String value,
@@ -193,7 +193,7 @@ public interface FilterFactory {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     Filter endsWith(String attribute, String value,
@@ -211,7 +211,7 @@ public interface FilterFactory {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     Filter contains(String attribute, String value,
@@ -226,7 +226,7 @@ public interface FilterFactory {
      *  <code><pre>
      *  ((&lt;expressionOne&gt; &lt;comparator&gt; &lt;expressionTwo&gt;)
      *    or
-     *   (&lt;expressionOne&gt; is [not] null 
+     *   (&lt;expressionOne&gt; is [not] null
      *     and &lt;expressionTwo&gt; is [not] null))
      *  </pre></code>
      *  <p>
@@ -258,13 +258,13 @@ public interface FilterFactory {
 
 
     /**
-    * This creates a filter that constructs an "in" style subquery with the
-    * given property to be filtered on and subquery. subQueryProperty is the 
-    * property in the subquery which relates to the property being filtered 
-    * on. The subquery must be a fully qualified query name of a query defined
-    * in a PDL file somewhere. 
-    **/
-	
+     * This creates a filter that constructs an "in" style subquery with the
+     * given property to be filtered on and subquery. subQueryProperty is the
+     * property in the subquery which relates to the property being filtered
+     * on. The subquery must be a fully qualified query name of a query defined
+     * in a PDL file somewhere.
+     **/
+
     Filter in( String property, String subQueryProperty, String queryName );
 
 
@@ -277,7 +277,7 @@ public interface FilterFactory {
     Filter notIn(String propertyName, String queryName);
 
 
-    /** 
+    /**
      *  This creates and returns a filter that can be used to AND
      *  existing filters together.  Whenever addFilter is called
      *  on the filters that is returned, it ANDs the passed in
@@ -286,7 +286,7 @@ public interface FilterFactory {
     CompoundFilter and();
 
 
-    /** 
+    /**
      *  This creates and returns a filter that can be used to OR
      *  existing filters together.  Whenever addFilter is called
      *  on the filters that is returned, it ORs the passed in
@@ -295,11 +295,3 @@ public interface FilterFactory {
     CompoundFilter or();
 
 }
-
-
-
-
-
-
-
-

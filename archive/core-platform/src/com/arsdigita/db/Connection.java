@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -40,20 +40,20 @@ import org.apache.log4j.Logger;
  * </ul>
  *
  * @author <a href="mailto:mthomas@arsdigita.com">Mark Thomas</a>
- * @version $Revision: #3 $ $Date: 2002/08/13 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  * @since 4.5
  */
-// Synchronization in this class is primarily because close can be called via 
-// a finalizer thread, so m_conn needs to be guarded so that 
+// Synchronization in this class is primarily because close can be called via
+// a finalizer thread, so m_conn needs to be guarded so that
 // ensureConnectionExists can make a new one if m_conn
 // is closed out from underneath this connection.
 public class Connection implements java.sql.Connection {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Connection.java#3 $ $Author: dennis $ $Date: 2002/08/13 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Connection.java#4 $ $Author: dennis $ $Date: 2002/08/14 $";
 
     // the connection object that we wrap
-    private java.sql.Connection m_conn;	 
-	private BaseConnectionPool  m_pool;
+    private java.sql.Connection m_conn;
+    private BaseConnectionPool  m_pool;
 
     private static final Logger s_cat = Logger.getLogger(com.arsdigita.db.Connection.class.getName());
 
@@ -63,12 +63,12 @@ public class Connection implements java.sql.Connection {
     /**
      * Keeps track of user counts based on underlying java.sql.connection object.
      *
-     * It should be safe to do this tracking here at the 
-     * com.arsdigita.db.Connection level, since no thread should 
+     * It should be safe to do this tracking here at the
+     * com.arsdigita.db.Connection level, since no thread should
      * ever receive a new com.arsdigita.db.Connection if the
      * one presently in use has modified data.  If this assumption is ever
      * violated, it will be necessary to associate the flag
-     * with the underlying java.sql.connection object, implying a 
+     * with the underlying java.sql.connection object, implying a
      * static hashset to access a simple flag variable class.
      */
     private int m_userCount = 0;
@@ -77,15 +77,15 @@ public class Connection implements java.sql.Connection {
      * Tracks whether this connection needs autocommit off (e.g. has
      * modified any data).
      *
-     * It should be safe to do this tracking here at the 
-     * com.arsdigita.db.Connection level, since no thread should 
+     * It should be safe to do this tracking here at the
+     * com.arsdigita.db.Connection level, since no thread should
      * ever receive a new com.arsdigita.db.Connection if the
      * one presently in use has modified data.  If this assumption is ever
      * violated, it could be necessary to associate this flag
-     * with the underlying java.sql.connection object, e.g. a 
+     * with the underlying java.sql.connection object, e.g. a
      * static hashset to access a simple flag variable class.
      *
-     * Defaults to false here, but all Statements default to true, 
+     * Defaults to false here, but all Statements default to true,
      * so the first statement that is executed will flag this unless
      * the statement was explicitly set to indicate it does not
      * need autocommit off.
@@ -118,32 +118,32 @@ public class Connection implements java.sql.Connection {
             // only checked for if debug is enabled because
             // they would slow things down if always checked
             // for.
-            Throwable t = 
-                    new Throwable("Connection create stack trace for debugging");
+            Throwable t =
+                new Throwable("Connection create stack trace for debugging");
             synchronized (dbgConnections) {
                 if (dbgConnections.contains(m_conn)) {
-                    s_cat.warn("connection constructor: Creating new " + 
+                    s_cat.warn("connection constructor: Creating new " +
                                "connection wrapping " + m_conn + " before " +
                                "previous wrapper for this connection was " +
                                "closed.");
                 }
                 dbgConnections.add(m_conn);
                 s_cat.debug("connection constructor: created " + this + ", " +
-                            "connection count is now " + dbgConnections.size(), 
+                            "connection count is now " + dbgConnections.size(),
                             t);
-                if (dbgConnections.size() > 
-                        ConnectionManager.getConnectionPoolSize()) {
+                if (dbgConnections.size() >
+                    ConnectionManager.getConnectionPoolSize()) {
                     s_cat.warn("connection constructor: connections list " +
                                "exceeded pool size: " + dbgConnections);
                 }
             }
             dbgTimestamp = System.currentTimeMillis();
-        }		
+        }
         // TODO : Need to set class variables here, somehow....
     }
 
-    /** 
-     * Clears all warnings reported for this Connection object. 
+    /**
+     * Clears all warnings reported for this Connection object.
      */
     public synchronized void clearWarnings() throws SQLException {
         ensureConnectionExists();
@@ -157,8 +157,8 @@ public class Connection implements java.sql.Connection {
 
     /**
      * Releases a Connection's database and JDBC resources
-     * immediately, but allows an underlying connection to be 
-     * automatically re-obtained later.  This is useful for 
+     * immediately, but allows an underlying connection to be
+     * automatically re-obtained later.  This is useful for
      * aggressive closing as soon as there are no current users
      * of the connection, as the connection can be re-obtained
      * when there is a new user.
@@ -168,15 +168,15 @@ public class Connection implements java.sql.Connection {
         m_softClose = true;
     }
 
-    /** 
+    /**
      * Releases a Connection's database and JDBC resources
      * immediately instead of waiting for them to be automatically
-     * released. 
+     * released.
      */
     // TODO: determine if this should fire connection use listeners?
     // presently they are only fired when the user count is
     // explicitly reduced to zero, at which point they are used
-    // to close the connection.  So, if they did fire the use 
+    // to close the connection.  So, if they did fire the use
     // listeners, changes would have to be made to avoid infinite loops.
     public synchronized void close() throws SQLException {
         if (s_cat.isDebugEnabled()) {
@@ -187,9 +187,9 @@ public class Connection implements java.sql.Connection {
             Throwable t = new Throwable("Connection close stack trace for " +
                                         "debugging");
             synchronized (dbgConnections) {
-                if (dbgConnections.size() > 
+                if (dbgConnections.size() >
                     ConnectionManager.getConnectionPoolSize()) {
-                    s_cat.warn("connection close: un-closed connections " + 
+                    s_cat.warn("connection close: un-closed connections " +
                                "list exceeded pool size: " + dbgConnections);
                 }
                 if (!dbgConnections.contains(m_conn)) {
@@ -199,16 +199,16 @@ public class Connection implements java.sql.Connection {
                 } else {
                     dbgConnections.remove(m_conn);
                 }
-                s_cat.debug("un-closed connection count is now " + 
-                            dbgConnections.size() + ", connection was held " + 
-                            "open for " + 
-                            (System.currentTimeMillis() - dbgTimestamp) + 
+                s_cat.debug("un-closed connection count is now " +
+                            dbgConnections.size() + ", connection was held " +
+                            "open for " +
+                            (System.currentTimeMillis() - dbgTimestamp) +
                             " ms.", t);
             }
         }
 
         m_softClose = false;
-        
+
         // put the connection back in the pool or just close it
         try {
             if (m_conn != null) {
@@ -228,8 +228,8 @@ public class Connection implements java.sql.Connection {
     protected synchronized void finalize() throws Throwable {
         try {
             if (!isClosed()) {
-                s_cat.warn("Connection was not closed by programmer: " + this + 
-                           ", closing in garbage collection.  This " + 
+                s_cat.warn("Connection was not closed by programmer: " + this +
+                           ", closing in garbage collection.  This " +
                            "can lead to out of cursor exceptions so it should " +
                            "be corrected by the programmer.");
                 try {
@@ -243,10 +243,10 @@ public class Connection implements java.sql.Connection {
         }
     }
 
-    /** 
+    /**
      * Makes all changes made since the previous commit/rollback
      * permanent and releases any database locks currently held by the
-     * Connection. 
+     * Connection.
      */
     public synchronized void commit() throws SQLException {
         ensureConnectionExists();
@@ -260,10 +260,10 @@ public class Connection implements java.sql.Connection {
 
     /**
      * Creates a Statement object for sending SQL statements to the
-     * database. 
+     * database.
      *
-     * This is really a com.arsdigita.db.Statement, but the 
-     * interface doesn't let us change the return type.     
+     * This is really a com.arsdigita.db.Statement, but the
+     * interface doesn't let us change the return type.
      */
     public synchronized java.sql.Statement createStatement() throws SQLException {
         ensureConnectionExists();
@@ -277,14 +277,14 @@ public class Connection implements java.sql.Connection {
 
     /**
      * Creates a Statement object that will generate ResultSet
-     * objects with the given type and concurrency. 
+     * objects with the given type and concurrency.
      *
-     * This is really a com.arsdigita.db.Statement, but the 
-     * interface doesn't let us change the return type.     
+     * This is really a com.arsdigita.db.Statement, but the
+     * interface doesn't let us change the return type.
      */
     public synchronized java.sql.Statement createStatement(int resultSetType,
-                                              int resultSetConcurrency)
-            throws SQLException {
+                                                           int resultSetConcurrency)
+        throws SQLException {
         ensureConnectionExists();
         try {
             return Statement.wrap(this,
@@ -297,7 +297,7 @@ public class Connection implements java.sql.Connection {
     }
 
     /**
-     * Gets the current auto-commit state. 
+     * Gets the current auto-commit state.
      */
     public synchronized  boolean getAutoCommit() throws SQLException {
         ensureConnectionExists();
@@ -310,7 +310,7 @@ public class Connection implements java.sql.Connection {
     }
 
     /**
-     * Returns the Connection's current catalog name. 
+     * Returns the Connection's current catalog name.
      */
     public synchronized String getCatalog() throws SQLException {
         ensureConnectionExists();
@@ -323,10 +323,10 @@ public class Connection implements java.sql.Connection {
     }
 
     /**
-     * Gets the metadata regarding this connection's database. 
+     * Gets the metadata regarding this connection's database.
      *
-     * This is really a com.arsdigita.db.DatabaseMetaData, but the 
-     * interface doesn't let us change the return type.     
+     * This is really a com.arsdigita.db.DatabaseMetaData, but the
+     * interface doesn't let us change the return type.
      */
     public synchronized java.sql.DatabaseMetaData getMetaData() throws SQLException {
         ensureConnectionExists();
@@ -339,7 +339,7 @@ public class Connection implements java.sql.Connection {
     }
 
     /**
-     * Gets this Connection's current transaction isolation level. 
+     * Gets this Connection's current transaction isolation level.
      */
     public synchronized int getTransactionIsolation() throws SQLException {
         ensureConnectionExists();
@@ -352,7 +352,7 @@ public class Connection implements java.sql.Connection {
     }
 
     /**
-     * Gets the type map object associated with this connection. 
+     * Gets the type map object associated with this connection.
      */
     public synchronized Map getTypeMap() throws SQLException {
         ensureConnectionExists();
@@ -364,9 +364,9 @@ public class Connection implements java.sql.Connection {
         }
     }
 
-    /** 
+    /**
      * Returns the first warning reported by calls on this
-     * Connection. 
+     * Connection.
      */
     public synchronized SQLWarning getWarnings() throws SQLException {
         ensureConnectionExists();
@@ -379,7 +379,7 @@ public class Connection implements java.sql.Connection {
     }
 
     /**
-     * Tests to see if a Connection is closed. 
+     * Tests to see if a Connection is closed.
      */
     public synchronized boolean isClosed() throws SQLException {
         try {
@@ -391,7 +391,7 @@ public class Connection implements java.sql.Connection {
     }
 
     /**
-     * Tests to see if the connection is in read-only mode. 
+     * Tests to see if the connection is in read-only mode.
      */
     public synchronized boolean isReadOnly() throws SQLException {
         ensureConnectionExists();
@@ -405,7 +405,7 @@ public class Connection implements java.sql.Connection {
 
     /**
      * Converts the given SQL statement into the system's native SQL
-     * grammar. 
+     * grammar.
      */
     public synchronized String nativeSQL(String sql) throws SQLException {
         s_cat.info("nativeSQL: ");
@@ -421,10 +421,10 @@ public class Connection implements java.sql.Connection {
 
     /**
      * Creates a CallableStatement object for calling database stored
-     * procedures. 
+     * procedures.
      *
-     * This is really a com.arsdigita.db.CallableStatement, but the 
-     * interface doesn't let us change the return type.     
+     * This is really a com.arsdigita.db.CallableStatement, but the
+     * interface doesn't let us change the return type.
      */
     public synchronized java.sql.CallableStatement prepareCall(String sql) throws SQLException {
         // logging will happen at statement use time
@@ -439,22 +439,22 @@ public class Connection implements java.sql.Connection {
 
     /**
      * Creates a CallableStatement object that will generate
-     * ResultSet objects with the given type and concurrency. 
+     * ResultSet objects with the given type and concurrency.
      *
-     * This is really a com.arsdigita.db.CallableStatement, but the 
-     * interface doesn't let us change the return type.     
+     * This is really a com.arsdigita.db.CallableStatement, but the
+     * interface doesn't let us change the return type.
      */
     public synchronized java.sql.CallableStatement prepareCall(String sql,
-                                                  int resultSetType,
-                                                  int resultSetConcurrency)
-            throws SQLException {
+                                                               int resultSetType,
+                                                               int resultSetConcurrency)
+        throws SQLException {
         // logging will happen at statement use time
         ensureConnectionExists();
         try {
-            return CallableStatement.wrap(this, 
+            return CallableStatement.wrap(this,
                                           sql,
                                           m_conn.prepareCall(sql,
-                                                             resultSetType, 
+                                                             resultSetType,
                                                              resultSetConcurrency));
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
@@ -462,15 +462,15 @@ public class Connection implements java.sql.Connection {
         }
     }
 
-    /** 
+    /**
      * Creates a PreparedStatement object for sending parameterized
-     * SQL statements to the database. 
+     * SQL statements to the database.
      *
-     * This is really a com.arsdigita.db.PreparedStatement, but the 
+     * This is really a com.arsdigita.db.PreparedStatement, but the
      * interface doesn't let us change the return type.
      */
     public synchronized java.sql.PreparedStatement prepareStatement(String sql)
-            throws SQLException {
+        throws SQLException {
         // logging will happen at statement use time
         ensureConnectionExists();
         try {
@@ -481,24 +481,24 @@ public class Connection implements java.sql.Connection {
         }
     }
 
-    /** 
+    /**
      * Creates a PreparedStatement object that will generate
-     * ResultSet objects with the given type and concurrency. 
+     * ResultSet objects with the given type and concurrency.
      *
-     * This is really a com.arsdigita.db.PreparedStatement, but the 
+     * This is really a com.arsdigita.db.PreparedStatement, but the
      * interface doesn't let us change the return type.
      */
     public synchronized java.sql.PreparedStatement prepareStatement(String sql,
-                                                       int resultSetType,
-                                                       int resultSetConcurrency)
-            throws SQLException {
+                                                                    int resultSetType,
+                                                                    int resultSetConcurrency)
+        throws SQLException {
         // logging will happen at statement use time
         ensureConnectionExists();
         try {
-            return PreparedStatement.wrap(this, 
+            return PreparedStatement.wrap(this,
                                           sql,
                                           m_conn.prepareStatement(sql,
-                                                                  resultSetType, 
+                                                                  resultSetType,
                                                                   resultSetConcurrency));
         } catch (SQLException e) {
             SQLExceptionHandler.throwSQLException(e);
@@ -509,7 +509,7 @@ public class Connection implements java.sql.Connection {
     /**
      * Drops all changes made since the previous commit/rollback and
      * releases any database locks currently held by this
-     * Connection. 
+     * Connection.
      */
     public synchronized void rollback() throws SQLException {
         ensureConnectionExists();
@@ -522,7 +522,7 @@ public class Connection implements java.sql.Connection {
     }
 
     /**
-     * Sets this connection's auto-commit mode. 
+     * Sets this connection's auto-commit mode.
      */
     public synchronized void setAutoCommit(boolean autoCommit) throws SQLException {
         ensureConnectionExists();
@@ -536,7 +536,7 @@ public class Connection implements java.sql.Connection {
 
     /**
      * Sets a catalog name in order to select a subspace of this
-     * Connection's database in which to work. 
+     * Connection's database in which to work.
      */
     public synchronized void setCatalog(String catalog) throws SQLException {
         ensureConnectionExists();
@@ -548,9 +548,9 @@ public class Connection implements java.sql.Connection {
         }
     }
 
-    /** 
+    /**
      * Puts this connection in read-only mode as a hint to enable
-     * database optimizations. 
+     * database optimizations.
      */
     public synchronized void setReadOnly(boolean readOnly) throws SQLException {
         ensureConnectionExists();
@@ -564,7 +564,7 @@ public class Connection implements java.sql.Connection {
 
     /**
      * Attempts to change the transaction isolation level to the one
-     * given. 
+     * given.
      */
     public synchronized void setTransactionIsolation(int level) throws SQLException {
         ensureConnectionExists();
@@ -578,7 +578,7 @@ public class Connection implements java.sql.Connection {
 
     /**
      * Installs the given type map as the type map for this
-     * connection. 
+     * connection.
      */
     public synchronized void setTypeMap(Map map) throws SQLException {
         ensureConnectionExists();
@@ -590,7 +590,7 @@ public class Connection implements java.sql.Connection {
         }
     }
 
-    /** 
+    /**
      * Wraps a Connection instance.
      */
     static Connection wrap(java.sql.Connection conn, BaseConnectionPool pool) {
@@ -601,8 +601,8 @@ public class Connection implements java.sql.Connection {
      * <b><font color="red">Experimental</font></b>
      *
      * Decreases the user count and fires connection use listeners
-     * if user count reaches zero.  
-     * Presently used to track the # of outstanding statements for 
+     * if user count reaches zero.
+     * Presently used to track the # of outstanding statements for
      * this connection.
      */
     protected synchronized void reduceUserCount() {
@@ -616,7 +616,7 @@ public class Connection implements java.sql.Connection {
                 try {
                     l.connectionUserCountHitZero(this);
                 } catch (Exception e) {
-                    s_cat.error("Error running connection used listener " + 
+                    s_cat.error("Error running connection used listener " +
                                 l, e);
                 }
             }
@@ -637,13 +637,13 @@ public class Connection implements java.sql.Connection {
 
     /**
      * <b><font color="red">Experimental</font></b>
-     * 
+     *
      * Adds a request listener to this particular connection.
-     * If this method is needed, it should be called before actually 
+     * If this method is needed, it should be called before actually
      * using the connection.
      */
-    public void addConnectionUseListener(ConnectionUseListener ul) { 
-        // Connection can't be in use at the time this should be called, so 
+    public void addConnectionUseListener(ConnectionUseListener ul) {
+        // Connection can't be in use at the time this should be called, so
         // no need to synchronize (for once...).
         s_listeners.add(ul);
     }
@@ -665,24 +665,24 @@ public class Connection implements java.sql.Connection {
     /**
      * <b><font color="red">Experimental</font></b>
      * Indicates whether any statement needed autocommit to be
-     * off.  
+     * off.
      */
     public boolean getNeedsAutoCommitOff() {
         return m_needsAutoCommitOff;
     }
 
-    /** 
+    /**
      * Allocates m_conn if it is null.
      *
      * This is due to the delaying of holding on to a connection until
-     * a modification occurs; unfortunately there is no way to be sure that 
-     * a connection is no longer needed, so when no more statements are in 
-     * use we return the underlying java.sql.Connection to the connection 
-     * pool while allowing the user to still have their 
-     * com.arsdigita.db.Connection object.  If they then use the 
-     * com.arsdigita.db.Connection again, we pull another underlying 
+     * a modification occurs; unfortunately there is no way to be sure that
+     * a connection is no longer needed, so when no more statements are in
+     * use we return the underlying java.sql.Connection to the connection
+     * pool while allowing the user to still have their
+     * com.arsdigita.db.Connection object.  If they then use the
+     * com.arsdigita.db.Connection again, we pull another underlying
      * java.sql.Connection from the pool.
-     * 
+     *
      * All calls to this method should be from a synchronized method.
      */
     private void ensureConnectionExists() throws java.sql.SQLException {
@@ -690,11 +690,11 @@ public class Connection implements java.sql.Connection {
             if (m_softClose) {
                 // the connection-users-hit-zero check fired too early.
                 // so, we get back a connection, re-register as the current
-                // thread listener, shut off autocommit, and 
+                // thread listener, shut off autocommit, and
                 // resume business as usual.
                 s_cat.info("Connection " + this + " was closed early, re-opening");
-                
-                // we want a raw java.sql.Connection for m_conn, 
+
+                // we want a raw java.sql.Connection for m_conn,
                 // not something we wrapped.
                 m_conn = ((com.arsdigita.db.Connection)ConnectionManager.
                           getConnection()).m_conn;
@@ -711,11 +711,8 @@ public class Connection implements java.sql.Connection {
      * connection and this wrapper.
      */
     public String toString() {
-        return "Connection[" + ((m_conn==null)?"null":(Integer.toString(m_conn.hashCode()))) + 
-            ", pool " + m_pool + ", needsAutoCommitOff " + 
+        return "Connection[" + ((m_conn==null)?"null":(Integer.toString(m_conn.hashCode()))) +
+            ", pool " + m_pool + ", needsAutoCommitOff " +
             m_needsAutoCommitOff + "]";
     }
 }
-
-
-

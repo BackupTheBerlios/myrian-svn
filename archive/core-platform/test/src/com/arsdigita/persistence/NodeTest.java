@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -25,14 +25,14 @@ import org.apache.log4j.Logger;
  * NodeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/13 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  */
 
 public abstract class NodeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/NodeTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/NodeTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-    private static Logger s_log = 
+    private static Logger s_log =
         Logger.getLogger(NodeTest.class.getName());
 
     public NodeTest(String name) {
@@ -72,35 +72,35 @@ public abstract class NodeTest extends PersistenceTestCase {
         assertEquals("Node was not deleted properly.",
                      null,
                      node);
-                
-       try {
-           node = createNode(0, "Root");
-           node.set("parent", "grizzle!");
-           node.save();
-           fail("Set parent to an invalid type!");
-        
+
+        try {
+            node = createNode(0, "Root");
+            node.set("parent", "grizzle!");
+            node.save();
+            fail("Set parent to an invalid type!");
+
         } catch (PersistenceException e) {
         }
-           
+
         try {
             node = createNode(0, "Root");
             node.set("foo", "bar");
             node.save();
             fail("Set an invalid attribute!");
-         
-         } catch (PersistenceException e) {
-         }
+
+        } catch (PersistenceException e) {
+        }
 
 
         // XXX: I don't think this should be illegal
         /*try {
-            node = createNode(0, "Root");
-            node.set("parent", node);
-            node.save();
-            fail("Set parent to itself!");
-        }
-        catch (PersistenceException e) {
-        }*/
+          node = createNode(0, "Root");
+          node.set("parent", node);
+          node.save();
+          fail("Set parent to itself!");
+          }
+          catch (PersistenceException e) {
+          }*/
 
         try {
             node = createNode(0, "Root");
@@ -108,18 +108,18 @@ public abstract class NodeTest extends PersistenceTestCase {
             node = createNode(0, "Root");
             node.save();
             fail("Created two nodes with same id!");
-         
-         } catch (PersistenceException e) {
-            node.delete();
-         }
 
-         try {
-             node = createNode(0, "Root");
-             node.get("foobar");
-             fail("Got nonexistent property!");
-          
-          } catch (PersistenceException e) {
-          }
+        } catch (PersistenceException e) {
+            node.delete();
+        }
+
+        try {
+            node = createNode(0, "Root");
+            node.get("foobar");
+            fail("Got nonexistent property!");
+
+        } catch (PersistenceException e) {
+        }
 
     }
 

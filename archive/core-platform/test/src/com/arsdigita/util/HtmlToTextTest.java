@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -33,7 +33,7 @@ public class HtmlToTextTest extends TestCase {
      * All tests use a single static converter
      */
 
-    static HtmlToText s_htmlToText = 
+    static HtmlToText s_htmlToText =
         new HtmlToText();
 
     /**
@@ -42,7 +42,7 @@ public class HtmlToTextTest extends TestCase {
 
     static String s_testFiles[] = {
         "blockquote.html",
-        "headings.html",  
+        "headings.html",
         "image.html",
         "strong.html",
         "em.html",
@@ -55,11 +55,11 @@ public class HtmlToTextTest extends TestCase {
         "wrap.html"
     };
 
-    static String s_testDirectory = 
+    static String s_testDirectory =
         System.getProperty("test.base.dir") +
         "/com/arsdigita/util/files/";
 
-    
+
     public HtmlToTextTest(String name) {
         super(name);
     }
@@ -93,7 +93,7 @@ public class HtmlToTextTest extends TestCase {
                 in = read(getHtmlPath(s_testFiles[i]));
                 expected_out = read(getTextPath(s_testFiles[i]));
                 actual_out = s_htmlToText.convert(in);
-                
+
                 assertEquals("HTML conversion failed",
                              expected_out,
                              actual_out);
@@ -102,9 +102,9 @@ public class HtmlToTextTest extends TestCase {
             fail("Error processing test file: " + ex.getMessage());
         }
     }
-    
+
     /**
-     * Return the path for an HTML test file 
+     * Return the path for an HTML test file
      */
 
     private static String getHtmlPath(String testName) {
@@ -116,22 +116,22 @@ public class HtmlToTextTest extends TestCase {
      */
 
     private static String getTextPath(String testName) {
-        return  s_testDirectory + 
-            testName.substring(0,testName.length()-4) + "txt"; 
+        return  s_testDirectory +
+            testName.substring(0,testName.length()-4) + "txt";
     }
 
     /**
      * Read a test file into a String
      */
 
-    private static String read(String fileName) 
+    private static String read(String fileName)
         throws java.io.IOException {
 
         StringBuffer content = new StringBuffer();
 
         BufferedReader in = new BufferedReader
             (new FileReader(fileName));
-        for (String line = in.readLine(); 
+        for (String line = in.readLine();
              line != null; line = in.readLine()) {
             content.append(line).append('\n');
         }
@@ -139,6 +139,3 @@ public class HtmlToTextTest extends TestCase {
         return content.toString();
     }
 }
-
-
-

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -20,14 +20,14 @@ import java.sql.Types;
 
 /**
  * Defines a database datatype.  It contains the datatype name, and optionally
- * a size (such as the 400 in varchar(400)). 
+ * a size (such as the 400 in varchar(400)).
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #3 $ $Date: 2002/08/06 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  */
 public class DataTypeDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/DataTypeDef.java#3 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/DataTypeDef.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     // the type name
     private String m_type;
@@ -68,7 +68,7 @@ public class DataTypeDef extends Element {
 
     /**
      * Create a new DataTypeDef with the given type and size.
-     * 
+     *
      * @param type the datatype
      * @param size the size, -1 for no size
      * @pre type != null
@@ -80,7 +80,7 @@ public class DataTypeDef extends Element {
 
     /**
      * Create a new DataTypeDef with the given type and no size.
-     * 
+     *
      * @param type the datatype
      * @pre type != null
      */
@@ -98,7 +98,7 @@ public class DataTypeDef extends Element {
             return m_type;
         } else {
             return m_type + "(" + m_size + ")";
-        }  
+        }
     }
 
     public int getSize() {

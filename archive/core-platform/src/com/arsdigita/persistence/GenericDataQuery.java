@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -26,29 +26,29 @@ import com.arsdigita.persistence.metadata.Column;
  * GenericDataQuery
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/06 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  */
 
 public class GenericDataQuery extends DataQueryImpl {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataQuery.java#3 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataQuery.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     public GenericDataQuery(Session s, String sql, String[] columns) {
         super(
-            new QueryType(
-                "<generic>",
-                new com.arsdigita.persistence.metadata.Event()
-                    ),
-            new Operation(sql)
-                );
+              new QueryType(
+                            "<generic>",
+                            new com.arsdigita.persistence.metadata.Event()
+                            ),
+              new Operation(sql)
+              );
 
         Operation op = getOperation();
         for (int i = 0; i < columns.length; i++) {
             m_type.addProperty(new Property(columns[i],
                                             MetadataRoot.OBJECT));
             op.addMapping(
-                new Mapping(new String[] {columns[i]}, null, columns[i])
-                    );
+                          new Mapping(new String[] {columns[i]}, null, columns[i])
+                          );
         }
     }
 

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -21,20 +21,20 @@ import com.arsdigita.persistence.metadata.ObjectType;
  * Title:       DataObject interface
  * Description: This interface defines the public methods of Data Objects.
  *              This interface is primarily how client code interacts with any
- *              GenericDataObject. The GenericDataObject class is primary 
- *              used for use by the persistent engine and anyone wanting to 
- *              extend the functionality of GenericDataObjects through 
+ *              GenericDataObject. The GenericDataObject class is primary
+ *              used for use by the persistent engine and anyone wanting to
+ *              extend the functionality of GenericDataObjects through
  *              inheritance.
  * Copyright:    Copyright (c) 2001
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/14 $
  */
 
 public interface DataObject {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObject.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObject.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     /**
      * Returns the type of this persistent object.
@@ -89,7 +89,7 @@ public interface DataObject {
     boolean isNew();
 
     /**
-     * Returns true if this persistent object has been deleted from 
+     * Returns true if this persistent object has been deleted from
      * the database.  This does a database hit to check.
      *
      * @return True if the object has been deleted
@@ -98,9 +98,9 @@ public interface DataObject {
     boolean isDeleted();
 
     /**
-     * Returns true if this persistent object has been disconnected from 
-     * the transaction context. If true, the object can still be read, but 
-     * any attempt to update any of the object's attributes will cause an 
+     * Returns true if this persistent object has been disconnected from
+     * the transaction context. If true, the object can still be read, but
+     * any attempt to update any of the object's attributes will cause an
      *  exception to be thrown.
      *
      * @return True if the object has been disconnected
@@ -137,7 +137,7 @@ public interface DataObject {
 
     /**
      *  Returns true if this persistent object is in a valid state.
-     *  An invalid DataObject usually results from using a data object that was 
+     *  An invalid DataObject usually results from using a data object that was
      *  retrieved during a transaction that has been rolled back.
      *
      * @return True if the object has been modified, false otherwise.
@@ -160,7 +160,7 @@ public interface DataObject {
      *
      * @param subtype The subtype to which to specialize.
      *
-     * @pre subType.isASuperType(getObjectType()) || subtype.equals(getObjectType()) 
+     * @pre subType.isASuperType(getObjectType()) || subtype.equals(getObjectType())
      *
      * @post subtype.equals(getObjectType())
      **/
@@ -181,7 +181,7 @@ public interface DataObject {
 
     /**
      * Persists any changes made to this persistent object.
-     * 
+     *
      * @post !(isNew() || isModified())
      **/
 

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -23,18 +23,18 @@ import org.apache.log4j.Logger;
  * The root class for all nodes in the abstract syntax tree (AST).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/13 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  */
 public abstract class Element extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/Element.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/Element.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-    private static final Logger s_log = 
+    private static final Logger s_log =
         Logger.getLogger(Element.class);
 
     /**
      * Set the line information of this element to match that of another.
-     * 
+     *
      * @param e the element to take line information from
      */
     public void setLineInfo(Element e) {
@@ -68,7 +68,7 @@ public abstract class Element extends Node {
      **/
     private String formatError(String message) {
         return System.getProperty("line.separator") + getFilename()
-	    + ":" + getLineNumber() + ": column " + getColumnNumber() +
+            + ":" + getLineNumber() + ": column " + getColumnNumber() +
             ": " + message;
     }
 
@@ -123,7 +123,7 @@ public abstract class Element extends Node {
 
     /**
      * Returns the ObjectDef that contains this element
-     * 
+     *
      * @return the ObjectDef that contains this element
      */
     public ObjectDef getObjectDef() {
@@ -139,7 +139,7 @@ public abstract class Element extends Node {
         return (AssociationDef) getParentByType(AssociationDef.class);
     }
 
-    /** 
+    /**
      * Ensure that this element is in a valid state
      */
     void validate() {
@@ -147,7 +147,7 @@ public abstract class Element extends Node {
     }
 
     /**
-     * Validate a particular element 
+     * Validate a particular element
      *
      * @param el the element to validate
      */
@@ -156,7 +156,7 @@ public abstract class Element extends Node {
             el.validate();
     }
 
-    /** 
+    /**
      * Validate a set of elements
      *
      * @param m a Map of elements to validate

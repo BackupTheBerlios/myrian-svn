@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -28,20 +28,20 @@ import org.apache.log4j.Logger;
  *
  * @see Initializer
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #3 $ $Date: 2002/08/13 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  */
 
 public class SessionManager {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/SessionManager.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private static String s_url = null;           // the jdbc URL
     private static String s_username = null;      // the database username
     private static String s_password = null;      // the database password
     private static ThreadLocal s_session;  // the session
 
-    private static final Logger s_cat = 
-            Logger.getLogger(SessionManager.class.getName());
+    private static final Logger s_cat =
+        Logger.getLogger(SessionManager.class.getName());
 
 
     static {
@@ -74,10 +74,10 @@ public class SessionManager {
      *                ignores the schema
      *  @param url The JDBC URL
      *  @param username The database username
-     *  @param password The database password  
-     */ 
+     *  @param password The database password
+     */
     static synchronized void setSchemaConnectionInfo(String schema, String url,
-                                        String username, String password) {
+                                                     String username, String password) {
         // Right now Session only supports one connection, so just ignore the
         // schema.
         s_url = url;
@@ -95,26 +95,26 @@ public class SessionManager {
             s_cat.debug("Resetting schema connection", new Throwable());
         }
         s_session = new ThreadLocal() {
-            public Object initialValue() {
-                StringBuffer sb = new StringBuffer();
-                if (s_url == null) {
-                    sb.append(Utilities.LINE_BREAK + "  url is null");
+                public Object initialValue() {
+                    StringBuffer sb = new StringBuffer();
+                    if (s_url == null) {
+                        sb.append(Utilities.LINE_BREAK + "  url is null");
+                    }
+                    if (s_username == null) {
+                        sb.append(Utilities.LINE_BREAK + "  username is null");
+                    }
+                    if (s_password == null) {
+                        sb.append(Utilities.LINE_BREAK + "  password is null");
+                    }
+                    if (sb.length() > 0) {
+                        throw new IllegalStateException("SessionManager has " +
+                                                        "not been initialized: " +
+                                                        sb.toString());
+                    }
+                    Session s = new Session(getMetadataRoot());
+                    s.setSchemaConnectionInfo("", s_url, s_username, s_password);
+                    return s;
                 }
-                if (s_username == null) {
-                    sb.append(Utilities.LINE_BREAK + "  username is null");
-                }
-                if (s_password == null) {
-                    sb.append(Utilities.LINE_BREAK + "  password is null");
-                }
-                if (sb.length() > 0) {
-                    throw new IllegalStateException("SessionManager has " +
-                                                    "not been initialized: " + 
-                                                    sb.toString());
-                }
-                Session s = new Session(getMetadataRoot());
-                s.setSchemaConnectionInfo("", s_url, s_username, s_password);
-                return s;
-            }
-        };
+            };
     }
 }

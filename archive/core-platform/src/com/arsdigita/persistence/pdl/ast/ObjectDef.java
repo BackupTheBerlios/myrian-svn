@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -36,12 +36,12 @@ import java.util.Iterator;
  * Outputs a metadata ObjectType.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/09 $
+ * @version $Revision: #7 $ $Date: 2002/08/14 $
  */
 
 public class ObjectDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ObjectDef.java#6 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ObjectDef.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     // object name
     private String m_name;
@@ -153,7 +153,7 @@ public class ObjectDef extends Element {
             EventDef ed = (EventDef) m_events.get(i);
             if (ed.getType().equals(type)) {
                 if ((ed.getName() == null && name == null) ||
-                     (ed.getName() != null && ed.getName().equals(name))) {
+                    (ed.getName() != null && ed.getName().equals(name))) {
                     return ed;
                 }
             }
@@ -187,7 +187,7 @@ public class ObjectDef extends Element {
 
                     if (hasColumn && (prop.getColumn() != null) &&
                         ad.getColumn().getName().equals(
-                            prop.getColumn().getName())) {
+                                                        prop.getColumn().getName())) {
                         error("Duplicate column name [" +
                               ad.getColumn().getName() + "] in " + m_name);
                     }
@@ -280,20 +280,20 @@ public class ObjectDef extends Element {
 
         // I'm going to comment this out for now in order to get incremental
         // loading working. I'll think about how to add it back later.
-//          // check the supertype hierarchy to see if there's a loop
-//          StringBuffer sb = new StringBuffer();
-//          ObjectDef superDef = getSuperObjectDef();
+        //          // check the supertype hierarchy to see if there's a loop
+        //          StringBuffer sb = new StringBuffer();
+        //          ObjectDef superDef = getSuperObjectDef();
 
-//          sb.append(getName());
+        //          sb.append(getName());
 
-//          while (superDef != null) {
-//              sb.append(", child of ").append(superDef.getName());
-//              if (superDef.equals(this)) {
-//                  error(getName() + " has a loop in its inheritance path" +
-//                        Utilities.LINE_BREAK + sb.toString());
-//              }
-//              superDef = superDef.getSuperObjectDef();
-//         }
+        //          while (superDef != null) {
+        //              sb.append(", child of ").append(superDef.getName());
+        //              if (superDef.equals(this)) {
+        //                  error(getName() + " has a loop in its inheritance path" +
+        //                        Utilities.LINE_BREAK + sb.toString());
+        //              }
+        //              superDef = superDef.getSuperObjectDef();
+        //         }
     }
 
     void validateMappings() {
@@ -366,10 +366,10 @@ public class ObjectDef extends Element {
                                     ed.generateEvent());
                 } else {
                     ed.error(
-                        "Duplicate " + ed.getType() +
-                        " event definition for object type " +
-                        m_type.getQualifiedName()
-                        );
+                             "Duplicate " + ed.getType() +
+                             " event definition for object type " +
+                             m_type.getQualifiedName()
+                             );
                 }
             }
         }
@@ -435,7 +435,7 @@ public class ObjectDef extends Element {
                 continue;
             }
 
-mdsqlloop:
+            mdsqlloop:
             for (int i = 0; i<Property.NUM_EVENT_TYPES; i++) {
 
                 for (int j = 0; j < m_events.size(); j++) {
@@ -449,11 +449,11 @@ mdsqlloop:
                             continue mdsqlloop;
                         } else {
                             ed.error(
-                                "Duplicate " + ed.getType() +
-                                " event definition for property " +
-                                prop.getName() + " of object type " +
-                                m_type.getQualifiedName()
-                                );
+                                     "Duplicate " + ed.getType() +
+                                     " event definition for property " +
+                                     prop.getName() + " of object type " +
+                                     m_type.getQualifiedName()
+                                     );
                         }
                     }
                 }
@@ -461,8 +461,8 @@ mdsqlloop:
                 if (prop.getEvent(i) == null) {
                     // Use MDSQL to generate an event here
                     Event event = MDSQLGeneratorFactory
-                                    .getInstance()
-                                    .generateEvent(m_type, prop, i, null);
+                        .getInstance()
+                        .generateEvent(m_type, prop, i, null);
                 }
             }
         }
@@ -506,16 +506,16 @@ mdsqlloop:
         if (m_refKey != null) {
             Property prop = (Property) m_type.getKeyProperties().next();
             m_type.setReferenceKey(
-                m_refKey.generateLogicalModel(prop.getColumn().getType())
-                );
+                                   m_refKey.generateLogicalModel(prop.getColumn().getType())
+                                   );
         }
 
-/*
-        for (int i = 0; i < m_flexFields.size(); i++ ) {
-            FlexFieldDef flex = (FlexFieldDef)m_flexFields.get(i);
-            flex.generateLogicalModel(type);
-        }
-*/
+        /*
+          for (int i = 0; i < m_flexFields.size(); i++ ) {
+          FlexFieldDef flex = (FlexFieldDef)m_flexFields.get(i);
+          flex.generateLogicalModel(type);
+          }
+        */
 
         for (int i = 0; i < m_joinPaths.size(); i++ ) {
             JoinPathDef jp = (JoinPathDef)m_joinPaths.get(i);

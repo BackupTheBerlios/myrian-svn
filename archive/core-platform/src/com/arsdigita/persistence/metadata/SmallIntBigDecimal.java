@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -12,24 +12,25 @@
  * rights and limitations under the License.
  *
  */
+
 package com.arsdigita.persistence.metadata;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
  * SmallIntBigDecimal    (Copyright 2001 ArsDigita Corporation)
- * 
+ *
  *  This is an implementation of BigDecimal for values <= 32 bits. This is
- *  because Integer.toString(int) is signifigantly faster than BigInteger.toSring().  
+ *  because Integer.toString(int) is signifigantly faster than BigInteger.toSring().
  *  All BigDecimals in Persistence are really integer values, so the conversion is
  *  valid.
- *  
+ *
  *  This class is intended to be used within MetadataRoot when instantiating
  *  values from the database.
  *
  * @author <a href="mailto:jorris@arsdigita.com">jorris@arsdigita.com</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
- * 
+ * @version $Revision: #3 $ $Date: 2002/08/14 $
+ *
  */
 class SmallIntBigDecimal extends BigDecimal {
 
@@ -41,6 +42,6 @@ class SmallIntBigDecimal extends BigDecimal {
     }
 
     public String toString() {
-        return Integer.toString(toBigInteger().intValue());    
+        return Integer.toString(toBigInteger().intValue());
     }
 }

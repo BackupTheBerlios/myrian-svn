@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -23,7 +23,7 @@ import java.sql.SQLException;
 
 public class ConnectionManagerTest extends TestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/ConnectionManagerTest.java#4 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/db/ConnectionManagerTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private String ORACLE_DATE_QUERY = "select sysdate from dual";
     private String POSTGRES_DATE_QUERY = "select 'now'::datetime";
@@ -61,7 +61,7 @@ public class ConnectionManagerTest extends TestCase {
                 dateQuery = ORACLE_DATE_QUERY;
             }
 
-            java.sql.PreparedStatement stmt = 
+            java.sql.PreparedStatement stmt =
                 conn.prepareStatement(dateQuery);
             try {
                 java.sql.ResultSet rs = stmt.executeQuery();

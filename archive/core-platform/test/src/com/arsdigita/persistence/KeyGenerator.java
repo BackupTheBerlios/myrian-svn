@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -27,15 +27,15 @@ import org.apache.log4j.*;
  * Attemps to generate default keys for DataObjects. Used in the 'MetaTest' framework.
  * Needs further doc.
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/14 $
  */
 
 public class KeyGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/KeyGenerator.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/KeyGenerator.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     static Map s_keys = new HashMap();
-    private KeyGenerator() 
+    private KeyGenerator()
     {
     }
     /**
@@ -56,8 +56,8 @@ public class KeyGenerator {
         else {
             key.incrementValues();
         }
-        
-        key.setObjectKey(object);   
+
+        key.setObjectKey(object);
     }
 
     private static class Key {
@@ -78,9 +78,9 @@ public class KeyGenerator {
                         buf.append(" which has class: " + p.getJavaClass());
                         throw new Exception(buf.toString());
                     } else {
-                        m_keyValues.put( p.getName(), initialValue );   
+                        m_keyValues.put( p.getName(), initialValue );
                     }
-                    
+
                 }
             } // while
 
@@ -96,24 +96,24 @@ public class KeyGenerator {
                 SimpleTypeValue st = (SimpleTypeValue) s_simpleValues.get(oldValue.getClass());
                 Object newValue = st.increment(oldValue);
                 m_keyValues.put(key, newValue);
-            }    
+            }
         }
 
         void setObjectKey(DataObject object) {
-            Assert.assertTrue( m_type.equals(object.getObjectType()) || object.getObjectType().isSubtypeOf(m_type) ); 
+            Assert.assertTrue( m_type.equals(object.getObjectType()) || object.getObjectType().isSubtypeOf(m_type) );
 
             Iterator iter = m_keyValues.entrySet().iterator();
             while(iter.hasNext()) {
                 Map.Entry entry = (Map.Entry) iter.next();
                 String name = (String) entry.getKey();
                 Object value = entry.getValue();
-                object.set(name, value); 
-            }    
+                object.set(name, value);
+            }
         }
     } // key
 
 
-    static Map s_defaults = new HashMap();  
+    static Map s_defaults = new HashMap();
     static {
         s_defaults.put( java.math.BigInteger.class, BigInteger.ONE );
         s_defaults.put( java.math.BigDecimal.class, new BigDecimal("1") );
@@ -145,17 +145,17 @@ public class KeyGenerator {
                 BigDecimal bigValue = (BigDecimal) value;
                 BigDecimal newValue = bigValue.add((BigDecimal) m_defaultValue);
                 return newValue;
-            }    
+            }
         };
-        
+
         new SimpleTypeValue(java.math.BigInteger.class) {
             Object increment(Object value) {
                 BigInteger bigValue = (BigInteger) value;
                 BigInteger newValue = bigValue.add((BigInteger) m_defaultValue);
                 return newValue;
-            }    
-        };     
-        
+            }
+        };
+
         new SimpleTypeValue(java.lang.Boolean.class) {
             Object increment(Object value) {
                 Boolean boolVal = (Boolean) value;
@@ -163,40 +163,40 @@ public class KeyGenerator {
                     return Boolean.FALSE;
                 }
                 return Boolean.TRUE;
-            }    
-        };     
-        
+            }
+        };
+
         new SimpleTypeValue(java.lang.Byte.class) {
             Object increment(Object value) {
-                Byte numericValue = (Byte) value; 
+                Byte numericValue = (Byte) value;
                 Byte newValue = new Byte((byte)(numericValue.byteValue() + ((Byte) m_defaultValue).byteValue()));
                 return newValue;
-            }    
-        }; 
-            
+            }
+        };
+
         new SimpleTypeValue(java.lang.Integer.class) {
             Object increment(Object value) {
-                Integer numericValue = (Integer) value; 
+                Integer numericValue = (Integer) value;
                 Integer newValue = new Integer(numericValue.intValue() + ((Integer) m_defaultValue).intValue());
                 return newValue;
-            }    
-        };     
+            }
+        };
 
         new SimpleTypeValue(java.lang.Long.class) {
             Object increment(Object value) {
-                Long numericValue = (Long) value; 
+                Long numericValue = (Long) value;
                 Long newValue = new Long(numericValue.longValue() + ((Long) m_defaultValue).longValue());
                 return newValue;
-            }    
-        };     
-        
+            }
+        };
+
         new SimpleTypeValue(java.lang.Short.class) {
             Object increment(Object value) {
-                Short numericValue = (Short) value; 
+                Short numericValue = (Short) value;
                 Short newValue = new Short((short)(numericValue.shortValue() + ((Short) m_defaultValue).shortValue()));
                 return newValue;
-            }    
-        }; 
+            }
+        };
 
         new SimpleTypeValue(java.util.Date.class) {
             Object increment(Object value) {
@@ -206,15 +206,15 @@ public class KeyGenerator {
                 cal.roll(Calendar.MINUTE, 1);
 
                 return cal.getTime();
-            }    
+            }
         };
-        
+
         new SimpleTypeValue(java.lang.Character.class) {
             Object increment(Object value) {
-                Character charValue = (Character) value; 
+                Character charValue = (Character) value;
                 return new Character( (char)(charValue.charValue() + 1));
-            }    
-        }; 
+            }
+        };
         new SimpleTypeValue(java.lang.String.class) {
             Object increment(Object value) {
                 String str = (String) value;
@@ -222,15 +222,15 @@ public class KeyGenerator {
                 final char charVal = buf.charAt(buf.length() - 1);
                 if( charVal == 'z' ) {
                     buf.append('A');
-                } 
+                }
                 else {
                     buf.setCharAt(buf.length() - 1, (char)( charVal + 1));
                 }
                 return buf.toString();
-            }    
-        }; 
-         
-             
+            }
+        };
+
+
     }
 
 }

@@ -16,7 +16,7 @@
 -- This file contains the data model for the versioning tests
 --
 -- @author <a href="mailto:jbank@mit.edu">jbank@arsdigita.com</a>
--- @version $Revision: #2 $ $Date: 2002/07/18 $
+-- @version $Revision: #3 $ $Date: 2002/08/14 $
 --
 
 create table t_versioned_datatypes (

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -13,8 +13,6 @@
  *
  */
 
-// DataAssociationImplTest.java
-
 package com.arsdigita.persistence;
 
 import java.math.BigDecimal;
@@ -22,25 +20,25 @@ import junit.framework.TestSuite;
 import org.apache.log4j.Logger;
 
 /**
- * DataAssociationImplTest    
+ * DataAssociationImplTest
  * <p> This class performs unit tests on com.arsdigita.persistence.DataAssociationImpl </p>
- * 
+ *
  * <p> Explanation about the tested class and its responsibilities </p>
- * 
+ *
  * <p> Copyright 2001 ArsDigita Corporation</p>
  *     DataAssociationImpl implements com.arsdigita.persistence.DataAssociation </p>
- * 
+ *
  * @author <a href="mbryzek@arsdigita.com">Michael Bryzek</a>
- * @date $Date: 2002/08/13 $
- * @version $Revision: #3 $
- * 
+ * @date $Date: 2002/08/14 $
+ * @version $Revision: #4 $
+ *
  * @see com.arsdigita.persistence.DataAssociationImpl
  **/
 
 public class DataAssociationImplTest extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataAssociationImplTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
-    private static Logger log =                          
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataAssociationImplTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    private static Logger log =
         Logger.getLogger(DataAssociationImplTest.class.getName());
 
     private OrderAssociation m_orderAssoc;
@@ -79,27 +77,27 @@ public class DataAssociationImplTest extends PersistenceTestCase {
         m_orderAssoc.tearDown();
     }
 
-    
+
     public void testAdd() {
-       DataObject li = getSession().create("examples.LineItem");
-       BigDecimal newId = new BigDecimal(OrderAssociation.NUM_ITEMS);
-       li.set("id", newId);
-       li.set("name", "Item grick");
-       li.set("price", new Float(2.99));
- 
+        DataObject li = getSession().create("examples.LineItem");
+        BigDecimal newId = new BigDecimal(OrderAssociation.NUM_ITEMS);
+        li.set("id", newId);
+        li.set("name", "Item grick");
+        li.set("price", new Float(2.99));
+
         m_orderAssoc.getLineItems().add(li);
         assertTrue("Item should be not be added until after parent saved!",
-                !findItemById(m_orderAssoc.getLineItems().cursor(), newId));
+                   !findItemById(m_orderAssoc.getLineItems().cursor(), newId));
         m_orderAssoc.getOrder().save();
 
         assertTrue("Item should be added after parent saved!",
-                findItemById(m_orderAssoc.getLineItems().cursor(), newId));
+                   findItemById(m_orderAssoc.getLineItems().cursor(), newId));
 
-    }                                           
+    }
 
 
     public void testClear() {
-           // not implemented
+        // not implemented
     }
 
     public void testCursor() {
@@ -108,7 +106,7 @@ public class DataAssociationImplTest extends PersistenceTestCase {
             log.info("id: " + c.get("id"));
         }
         assertEquals("Cursor contains insufficient items!!!", OrderAssociation.NUM_ITEMS, c.size() );
-        
+
     }
 
     /**
@@ -142,28 +140,28 @@ public class DataAssociationImplTest extends PersistenceTestCase {
     }
 
     public void testGetLink() {
-        
+
     }
 
 
     public void testIsModified() {
-       BigDecimal newId = new BigDecimal(OrderAssociation.NUM_ITEMS); 
-       DataObject li = getSession().create("examples.LineItem");
+        BigDecimal newId = new BigDecimal(OrderAssociation.NUM_ITEMS);
+        DataObject li = getSession().create("examples.LineItem");
 
-       li.set("id", newId);
-       m_orderAssoc.getLineItems().add(li); 
+        li.set("id", newId);
+        m_orderAssoc.getLineItems().add(li);
 
-       assertTrue("assocation not modified after add!!", m_orderAssoc.getLineItems().isModified());
-       m_orderAssoc.getLineItems().remove(li);
-       assertTrue("assocation modified after remove!!", !m_orderAssoc.getLineItems().isModified());
+        assertTrue("assocation not modified after add!!", m_orderAssoc.getLineItems().isModified());
+        m_orderAssoc.getLineItems().remove(li);
+        assertTrue("assocation modified after remove!!", !m_orderAssoc.getLineItems().isModified());
 
-       DataAssociationCursor c = m_orderAssoc.getLineItems().cursor();
-       c.next();
-       li = c.getDataObject();
-       m_orderAssoc.getLineItems().remove(li);       
-       assertTrue("assocation not modified after remove!!", m_orderAssoc.getLineItems().isModified());
+        DataAssociationCursor c = m_orderAssoc.getLineItems().cursor();
+        c.next();
+        li = c.getDataObject();
+        m_orderAssoc.getLineItems().remove(li);
+        assertTrue("assocation not modified after remove!!", m_orderAssoc.getLineItems().isModified());
 
-       c.close();
+        c.close();
     }
 
     public void testRemove() {
@@ -171,13 +169,13 @@ public class DataAssociationImplTest extends PersistenceTestCase {
         c.next();
         DataObject li = c.getDataObject();
         BigDecimal id = (BigDecimal) li.get("id");
-        m_orderAssoc.getLineItems().remove(li);       
+        m_orderAssoc.getLineItems().remove(li);
         assertTrue("assocation not modified after remove!!", m_orderAssoc.getLineItems().isModified());
         assertTrue("Item shouldn't be removed from cursor until parent saved!",
-                findItemById(m_orderAssoc.getLineItems().cursor(), id));
+                   findItemById(m_orderAssoc.getLineItems().cursor(), id));
         m_orderAssoc.getOrder().save();
         assertTrue("Item should be removed from cursor after parent saved!",
-                !findItemById(m_orderAssoc.getLineItems().cursor(), id));
+                   !findItemById(m_orderAssoc.getLineItems().cursor(), id));
         c.close();
     }
 
@@ -186,52 +184,52 @@ public class DataAssociationImplTest extends PersistenceTestCase {
         c.next();
         DataObject li = c.getDataObject();
         BigDecimal id = (BigDecimal) li.get("id");
-        m_orderAssoc.getLineItems().remove(li.getOID());       
+        m_orderAssoc.getLineItems().remove(li.getOID());
         assertTrue("assocation not modified after remove!!", m_orderAssoc.getLineItems().isModified());
         assertTrue("Item shouldn't be removed from cursor until parent saved!",
-                findItemById(m_orderAssoc.getLineItems().cursor(), id));
+                   findItemById(m_orderAssoc.getLineItems().cursor(), id));
         m_orderAssoc.getOrder().save();
         c.close();
         c = m_orderAssoc.getLineItems().cursor();
         assertTrue("Item should be removed from cursor after parent saved!",
-                !findItemById(m_orderAssoc.getLineItems().cursor(), id));
+                   !findItemById(m_orderAssoc.getLineItems().cursor(), id));
         c.close();
     }
 
 
     /**
-      * Test case to ensure you can get independent data associations
-      * by calling get.
-      * 
-      * http://developer.arsdigita.com/acs5/sdm/one-ticket?ticket_id=138526
-      **/
-     public void testConsecutiveCalls() {
-         // TODO: Re-enable this test once we figure out how to handle
-         // having data association iterators
- 
- 
-         // We move the cursor in lineItems two rows. This makes it
-         // easy to test that the call to get returns an independent
-         // DataAssociation.
-         DataAssociationCursor firstCursor = m_orderAssoc.getLineItems().cursor();
-         firstCursor.next();
-         firstCursor.next();
-         assert("m_orderAssoc.getLineItems() is still at first element after calling next",
-                ! (firstCursor.isFirst() || firstCursor.isBeforeFirst()));
-         DataAssociation items = (DataAssociation) m_orderAssoc.getOrder().get("items");
-         DataAssociationCursor secondCursor = items.cursor();
-         assertEquals("Consecutive calls to get returned data associations " +
-                      "of different sizes",
-                      firstCursor.size(), secondCursor.size());
-         assert("Items is at position: " + secondCursor.getPosition() + 
-                ". It should be before the first position",
-                secondCursor.isBeforeFirst());
+     * Test case to ensure you can get independent data associations
+     * by calling get.
+     *
+     * http://developer.arsdigita.com/acs5/sdm/one-ticket?ticket_id=138526
+     **/
+    public void testConsecutiveCalls() {
+        // TODO: Re-enable this test once we figure out how to handle
+        // having data association iterators
 
-         firstCursor.close();
-         secondCursor.close();
-     }
-     
-     DataAssociation getLineItems() {
+
+        // We move the cursor in lineItems two rows. This makes it
+        // easy to test that the call to get returns an independent
+        // DataAssociation.
+        DataAssociationCursor firstCursor = m_orderAssoc.getLineItems().cursor();
+        firstCursor.next();
+        firstCursor.next();
+        assert("m_orderAssoc.getLineItems() is still at first element after calling next",
+               ! (firstCursor.isFirst() || firstCursor.isBeforeFirst()));
+        DataAssociation items = (DataAssociation) m_orderAssoc.getOrder().get("items");
+        DataAssociationCursor secondCursor = items.cursor();
+        assertEquals("Consecutive calls to get returned data associations " +
+                     "of different sizes",
+                     firstCursor.size(), secondCursor.size());
+        assert("Items is at position: " + secondCursor.getPosition() +
+               ". It should be before the first position",
+               secondCursor.isBeforeFirst());
+
+        firstCursor.close();
+        secondCursor.close();
+    }
+
+    DataAssociation getLineItems() {
         return (DataAssociation) m_orderAssoc.getOrder().get("items");
     }
 
@@ -246,9 +244,9 @@ public class DataAssociationImplTest extends PersistenceTestCase {
         order.set("id", new BigDecimal(OrderAssociation.NUM_ITEMS+1));
         order.set("buyer", "Michael Bryzek");
         order.set("shippingAddress",
-                    "2036 Shattuck Ave.\nBerkeley, CA 94704");
+                  "2036 Shattuck Ave.\nBerkeley, CA 94704");
         order.set("shippingDate",
-                    new java.sql.Date(System.currentTimeMillis()));
+                  new java.sql.Date(System.currentTimeMillis()));
         order.set("hasShipped", Boolean.FALSE);
 
         DataObject other = getSession().create("examples.OtherItem");
@@ -271,9 +269,9 @@ public class DataAssociationImplTest extends PersistenceTestCase {
         order2.set("id", new BigDecimal(OrderAssociation.NUM_ITEMS+3));
         order2.set("buyer", "theBuyer");
         order2.set("shippingAddress",
-                    "theAddress");
+                   "theAddress");
         order2.set("shippingDate",
-                    new java.sql.Date(System.currentTimeMillis()));
+                   new java.sql.Date(System.currentTimeMillis()));
         order2.set("hasShipped", Boolean.FALSE);
         order2.save();
 
@@ -288,7 +286,7 @@ public class DataAssociationImplTest extends PersistenceTestCase {
         order.save();
         DataObject orderObject = (DataObject)other.get("order");
         assertNotNull(orderObject);
-        assert("The retrieved object should be the first order", 
+        assert("The retrieved object should be the first order",
                order.equals(orderObject));
         items.remove(other);
         order.save();
@@ -311,7 +309,7 @@ public class DataAssociationImplTest extends PersistenceTestCase {
     }
     /**
      * Main method needed to make a self runnable class
-     * 
+     *
      * @param args This is required for main method
      **/
     public static void main(String[] args) {

@@ -17,7 +17,7 @@
 -- tests to run.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #3 $ $Date: 2002/07/30 $
+-- @version $Revision: #4 $ $Date: 2002/08/14 $
 --
 
 create table t_orders (

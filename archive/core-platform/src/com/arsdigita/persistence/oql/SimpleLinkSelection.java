@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.redhat.com/licenses/ccmpl.html
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
+
 package com.arsdigita.persistence.oql;
 
 import com.arsdigita.persistence.metadata.Mapping;
@@ -11,12 +26,12 @@ import com.arsdigita.persistence.metadata.Property;
  * (link attriubtes of type Integer, String, etc).
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/08/06 $
+ * @version $Revision: #2 $ $Date: 2002/08/14 $
  **/
 
 class SimpleLinkSelection extends Selection {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/SimpleLinkSelection.java#1 $ by $Author: randyg $, $DateTime: 2002/08/06 18:07:28 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/SimpleLinkSelection.java#2 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     SimpleLinkSelection(Node node, Property property) {
         super(node, property);

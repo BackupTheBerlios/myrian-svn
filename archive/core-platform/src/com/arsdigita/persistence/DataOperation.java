@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -26,16 +26,16 @@ import org.apache.log4j.Logger;
 
 
 /**
- * Used to allow the user to control execution of a named DML event (a 
+ * Used to allow the user to control execution of a named DML event (a
  * data operation, in PDL).
- * 
+ *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
  * @since 4.5
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#4 $
  */
 public class DataOperation extends AbstractDataOperation {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataOperation.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private Session m_session;
     private DataOperationType m_type;
@@ -44,7 +44,7 @@ public class DataOperation extends AbstractDataOperation {
     // This is used to hold the variables, in order, for a CallableStatement
     private ArrayList variables;
 
-    private static final Logger s_cat = 
+    private static final Logger s_cat =
         Logger.getLogger(DataOperation.class);
 
     /**
@@ -64,7 +64,7 @@ public class DataOperation extends AbstractDataOperation {
      * Executes the query.  If this is a "callable" event, that is
      * the user expects results back from the event, only one
      * operation ("do" block) can be declared.  If more than that
-     * are declared, they are all executed but the results are 
+     * are declared, they are all executed but the results are
      * only available for the last one.
      */
     public void execute() {
@@ -76,7 +76,7 @@ public class DataOperation extends AbstractDataOperation {
                 m_callableStatement = dataStore.fireCallableOperation
                     (op, m_source, variables);
             } else {
-                dataStore.fireOperation(op, m_source); 
+                dataStore.fireOperation(op, m_source);
                 m_callableStatement = null;
                 variables = null;
             }
@@ -86,10 +86,10 @@ public class DataOperation extends AbstractDataOperation {
 
     /**
      * Explicitly closes this DataOperation if it was used to
-     * execute a PL/SQL function (CallableStatement).  
+     * execute a PL/SQL function (CallableStatement).
      * It should be called after your program is finished calling
      * {@link get(String parameterName)}
-     */    
+     */
     public synchronized void close() {
         if (m_callableStatement != null) {
             try {

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -58,12 +58,12 @@ import org.apache.log4j.Priority;
  * a single XML file (the first command line argument).
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #10 $ $Date: 2002/08/14 $
+ * @version $Revision: #11 $ $Date: 2002/08/14 $
  */
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#10 $ by $Author: dan $, $DateTime: 2002/08/14 06:58:38 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/PDL.java#11 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private static final Logger s_log = Logger.getLogger(PDL.class);
 
@@ -264,8 +264,8 @@ public class PDL {
                 String[] parts = StringUtils.split(dot, ':');
                 if (parts.length > 2) {
                     throw new PDLException(
-                        "Badly formated specification: " + dot
-                    );
+                                           "Badly formated specification: " + dot
+                                           );
                 }
                 MetadataRoot root = MetadataRoot.getMetadataRoot();
                 ObjectType type = root.getObjectType(parts[0]);
@@ -400,8 +400,8 @@ public class PDL {
                         files.add(path);
                     } catch (IOException e) {
                         throw new UncheckedWrapperException(
-                            "cannot get file path", e
-                        );
+                                                            "cannot get file path", e
+                                                            );
                     }
                 }
             }
@@ -437,8 +437,8 @@ public class PDL {
                                           new java.io.File(s_debugDirectory));
                 } catch (java.io.IOException ex) {
                     s_log.error(
-                        "There was a problem generating debugging output", ex
-                    );
+                                "There was a problem generating debugging output", ex
+                                );
                 }
             }
         } else {

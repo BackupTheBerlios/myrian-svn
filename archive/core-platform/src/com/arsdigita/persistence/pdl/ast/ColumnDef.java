@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -27,15 +27,15 @@ import java.io.StringWriter;
 
 
 /**
- * Defines a database column, including the table name, column name, and 
+ * Defines a database column, including the table name, column name, and
  * data type.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #6 $ $Date: 2002/08/13 $
+ * @version $Revision: #7 $ $Date: 2002/08/14 $
  */
 public class ColumnDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ColumnDef.java#6 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ColumnDef.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private static int count = 0;
     private static final Logger s_log =
@@ -53,7 +53,7 @@ public class ColumnDef extends Element {
     /**
      * Create a new ColumnDef for the specified table and column.
      *
-     * @param table the table name 
+     * @param table the table name
      * @param column the column name
      * @param type the column type
      */
@@ -66,7 +66,7 @@ public class ColumnDef extends Element {
     /**
      * Create a new ColumnDef for the specified table and column.
      *
-     * @param table the table name 
+     * @param table the table name
      * @param column the column name
      */
     public ColumnDef(String table, String column) {
@@ -83,7 +83,7 @@ public class ColumnDef extends Element {
 
     /**
      * Get the column name.
-     *  
+     *
      * @return the column name (and table if applicable)
      */
     public String getName() {
@@ -162,7 +162,7 @@ public class ColumnDef extends Element {
     /**
      *  This validates that the column has the correct properties,
      *  including a jdbc type that was set by the PDL.
-     * 
+     *
      *  @param beginningMessage This value will show up in the message
      *  at the beginning of the description to help users debug.  This
      *  is used, for instance, by PropertyDef to pass in the name of the
@@ -174,7 +174,7 @@ public class ColumnDef extends Element {
             if (beginningMessage == null) {
                 beginningMessage = "";
             }
-            String warning = 
+            String warning =
                 ("Warning: The following Column does not have a SQL " +
                  " type specified.  For backwards compatibility, we " +
                  " are going to try to guess the type.  The type " +
@@ -182,7 +182,7 @@ public class ColumnDef extends Element {
                  Utilities.LINE_BREAK +
                  beginningMessage + count + "Column: " + getName());
             s_log.warn(warning);
-        } 
+        }
     }
 
 

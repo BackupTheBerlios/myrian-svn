@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -24,17 +24,17 @@ import java.util.Iterator;
  * General static utility methods for the metadata classes. These
  * methods are not intended to be used outside of the metadata
  * package.
- * 
+ *
  * @since 2001-04-02
  * @version 1.0
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
  **/
 public class Utilities  {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Utilities.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Utilities.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-    public final static String LINE_BREAK = 
-                                 System.getProperty("line.separator", "\n\r");
+    public final static String LINE_BREAK =
+        System.getProperty("line.separator", "\n\r");
 
     /**
      * It makes neo sense to instantiate this Utilities class. Hide
@@ -71,39 +71,39 @@ public class Utilities  {
         // Kinda ugly to have one big case, but it's actually the
         // fastest lookup.
         switch (type) {
-            case Types.ARRAY:
-            case Types.BIGINT:
-            case Types.BINARY:
-            case Types.BIT:
-            case Types.BLOB:
-            case Types.CHAR:
-            case Types.CLOB:
-            case Types.DATE:
-            case Types.DECIMAL:
-            case Types.DISTINCT:
-            case Types.DOUBLE:
-            case Types.FLOAT:
-            case Types.INTEGER:
-            case Types.JAVA_OBJECT:
-            case Types.LONGVARBINARY:
-            case Types.LONGVARCHAR:
-            case Types.NULL:
-            case Types.NUMERIC:
-            case Types.OTHER:
-            case Types.REAL:
-            case Types.REF:
-            case Types.SMALLINT:
-            case Types.STRUCT:
-            case Types.TIME:
-            case Types.TIMESTAMP:
-            case Types.TINYINT:
-            case Types.VARBINARY:
-            case Types.VARCHAR:
-                return true;
-            default:
-                return false;
+        case Types.ARRAY:
+        case Types.BIGINT:
+        case Types.BINARY:
+        case Types.BIT:
+        case Types.BLOB:
+        case Types.CHAR:
+        case Types.CLOB:
+        case Types.DATE:
+        case Types.DECIMAL:
+        case Types.DISTINCT:
+        case Types.DOUBLE:
+        case Types.FLOAT:
+        case Types.INTEGER:
+        case Types.JAVA_OBJECT:
+        case Types.LONGVARBINARY:
+        case Types.LONGVARCHAR:
+        case Types.NULL:
+        case Types.NUMERIC:
+        case Types.OTHER:
+        case Types.REAL:
+        case Types.REF:
+        case Types.SMALLINT:
+        case Types.STRUCT:
+        case Types.TIME:
+        case Types.TIMESTAMP:
+        case Types.TINYINT:
+        case Types.VARBINARY:
+        case Types.VARCHAR:
+            return true;
+        default:
+            return false;
         }
-        
+
     }
 
     /**
@@ -117,7 +117,7 @@ public class Utilities  {
 
         if (!key.hasNext()) {
             if (type.getSupertype() == null) {
-//                s_log.warn(type.getName() + " has no object key defined!");
+                //                s_log.warn(type.getName() + " has no object key defined!");
             }
 
             return null;
@@ -131,16 +131,16 @@ public class Utilities  {
 
             while (iter.hasNext()) {
                 prop = (Property)iter.next();
-    
+
                 if (prop.isAttribute() && (prop.getColumn() != null)) {
                     error = true;
                 }
             }
-    
+
             if (error) {
-//                s_log.warn(type.getName() + " does not have a key column " +
-//                           "defined even though some properties do have " +
-//                           "columns specified.");
+                //                s_log.warn(type.getName() + " does not have a key column " +
+                //                           "defined even though some properties do have " +
+                //                           "columns specified.");
             }
 
             return null;
@@ -149,21 +149,21 @@ public class Utilities  {
         if (key.hasNext()) {
             return null;
         }
-    
-        return prop;
-    }       
 
-    /** 
+        return prop;
+    }
+
+    /**
      * Returns the Column that stores the key for this object, either the
      * reference key or the object key.
      */
     public static Column getColumn(ObjectType type) {
         Column retval = type.getReferenceKey();
-        
-        if (retval == null) {
-            Property prop = getKeyProperty(type); 
 
-            if (prop == null) { 
+        if (retval == null) {
+            Property prop = getKeyProperty(type);
+
+            if (prop == null) {
                 return null;
             }
 
@@ -174,7 +174,7 @@ public class Utilities  {
     }
 
     /**
-     * "join" a List of Strings into a single string, with each string 
+     * "join" a List of Strings into a single string, with each string
      * separated by a defined separator string.
      * @deprecated use {@link com.arsdigita.util.StringUtilities}
      *
@@ -202,4 +202,3 @@ public class Utilities  {
         return sb.toString();
     }
 }
-

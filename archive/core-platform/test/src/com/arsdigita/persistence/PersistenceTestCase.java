@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -30,12 +30,12 @@ import java.io.InputStream;
  * PersistenceTestCase
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/08/14 $
+ * @version $Revision: #8 $ $Date: 2002/08/14 $
  */
 
 public class PersistenceTestCase extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#7 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/PersistenceTestCase.java#8 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     // Prevent loading the same PDL file twice
     private static Set s_loadedPDLResources = new HashSet();
@@ -43,8 +43,8 @@ public class PersistenceTestCase extends TestCase {
     /**
      *  This loads the passed in resource.  It also checks for the existence
      *  of files with the same name for the specific database that is being
-     *  used.  It does that by locating the substring "testpdl" and 
-     *  replacing it with "testpdl/<database-here>" such as 
+     *  used.  It does that by locating the substring "testpdl" and
+     *  replacing it with "testpdl/<database-here>" such as
      *  "testpdl/oracle-se"
      *  @param outputPDL If true and if the value of "outputPDLDir" within
      *  the source code itself has been changed then it will output
@@ -106,8 +106,8 @@ public class PersistenceTestCase extends TestCase {
     /**
      *  This loads the passed in resource.  It also checks for the existence
      *  of files with the same name for the specific database that is being
-     *  used.  It does that by locating the substring "testpdl" and 
-     *  replacing it with "testpdl/<database-here>" such as 
+     *  used.  It does that by locating the substring "testpdl" and
+     *  replacing it with "testpdl/<database-here>" such as
      *  "testpdl/oracle-se"
      */
     protected static void load(String resource) {

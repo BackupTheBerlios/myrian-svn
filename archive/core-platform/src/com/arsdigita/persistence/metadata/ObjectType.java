@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -31,12 +31,12 @@ import com.arsdigita.util.StringUtils;
  * be marked as special "key" properties.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/09 $
+ * @version $Revision: #6 $ $Date: 2002/08/14 $
  **/
 
 public class ObjectType extends CompoundType {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#5 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private static boolean m_optimizeDefault = true;
 
@@ -113,7 +113,7 @@ public class ObjectType extends CompoundType {
         return m_super;
     }
 
-    
+
     /**
      * Returns the base type of this ObjectType (which may simply be the
      * current ObjectType).
@@ -148,23 +148,23 @@ public class ObjectType extends CompoundType {
     public void addKeyProperty(String name) {
         if (m_super != null) {
             throw new IllegalStateException(
-                "Only base object types may contain keys."
-                );
+                                            "Only base object types may contain keys."
+                                            );
         }
 
         if (!hasDeclaredProperty(name)) {
             throw new IllegalArgumentException(
-                "No such property: " + name
-                );
+                                               "No such property: " + name
+                                               );
         }
 
         Property prop = getDeclaredProperty(name);
 
         if (prop.isCollection()) {
             throw new IllegalArgumentException(
-                "Property " + prop.getName() + " cannot be part of the " +
-                "object key because it has multiplicity [0..n]"
-                );
+                                               "Property " + prop.getName() + " cannot be part of the " +
+                                               "object key because it has multiplicity [0..n]"
+                                               );
         }
 
         m_keys.add(prop);
@@ -181,13 +181,13 @@ public class ObjectType extends CompoundType {
         if( m_super != null ) {
             return m_super.isKeyProperty(p);
         } else {
-            return m_keys.contains(p);    
+            return m_keys.contains(p);
         }
-        
+
     }
 
     /**
-     *  Returns true if the given Property name belongs to this Object type, 
+     *  Returns true if the given Property name belongs to this Object type,
      *  and is one of the key Properties.
      *
      *  @param name The name of a property to check.
@@ -200,9 +200,9 @@ public class ObjectType extends CompoundType {
             Property p = getDeclaredProperty(name);
             if ( null == p ) {
                 return false;
-            } 
+            }
             return m_keys.contains(p);
-           
+
         }
     }
 
@@ -527,39 +527,39 @@ public class ObjectType extends CompoundType {
      * is not a subtype of the <code>ObjectType</code> specified by
      * <code>baseType</code>.
      **/
-    public static void verifySubtype(ObjectType baseType, 
+    public static void verifySubtype(ObjectType baseType,
                                      ObjectType extendedType) {
         if (!extendedType.isSubtypeOf(baseType)) {
             throw new RuntimeException(
-                "The object type '" + extendedType.getQualifiedName() + 
-                "' is not a subtype of the object type '" +
-                baseType.getQualifiedName() + "'"
-                );
+                                       "The object type '" + extendedType.getQualifiedName() +
+                                       "' is not a subtype of the object type '" +
+                                       baseType.getQualifiedName() + "'"
+                                       );
         }
     }
 
     public static void verifySubtype(String baseType,
                                      String extendedType) {
         verifySubtype(
-            MetadataRoot.getMetadataRoot().getObjectType(baseType),
-            MetadataRoot.getMetadataRoot().getObjectType(extendedType)
-            );
+                      MetadataRoot.getMetadataRoot().getObjectType(baseType),
+                      MetadataRoot.getMetadataRoot().getObjectType(extendedType)
+                      );
     }
 
     public static void verifySubtype(String baseType,
                                      ObjectType extendedType) {
-		ObjectType baseObjectType = MetadataRoot.getMetadataRoot().getObjectType(baseType);
-		Assert.assertTrue(baseObjectType != null, "Could not find the ObjectType for the " +
-						  "base type.  The base type was: " + baseType + ".");
-		verifySubtype(baseObjectType, extendedType);
+        ObjectType baseObjectType = MetadataRoot.getMetadataRoot().getObjectType(baseType);
+        Assert.assertTrue(baseObjectType != null, "Could not find the ObjectType for the " +
+                          "base type.  The base type was: " + baseType + ".");
+        verifySubtype(baseObjectType, extendedType);
     }
 
     public static void verifySubtype(ObjectType baseType,
                                      String extendedType) {
         verifySubtype(
-            baseType,
-            MetadataRoot.getMetadataRoot().getObjectType(extendedType)
-            );
+                      baseType,
+                      MetadataRoot.getMetadataRoot().getObjectType(extendedType)
+                      );
     }
 
 
@@ -749,8 +749,8 @@ public class ObjectType extends CompoundType {
                 cols[i] = props[i].getKeyColumn();
                 if (cols[i] == null) {
                     props[i].error(
-                        "Cannot apply unique constraint to this column."
-                        );
+                                   "Cannot apply unique constraint to this column."
+                                   );
                 }
             }
 
@@ -762,9 +762,9 @@ public class ObjectType extends CompoundType {
         }
 
         /*for (Iterator it = getProperties(); it.hasNext(); ) {
-            Property prop = (Property) it.next();
-            prop.generateUniqueKeys();
-            }*/
+          Property prop = (Property) it.next();
+          prop.generateUniqueKeys();
+          }*/
     }
 
     void generateForeignKeys() {

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -39,24 +39,24 @@ import org.apache.log4j.Logger;
  * the SessionManager of them.
  *
  * @author Archit Shah (ashah@arsdigita.com)
- * @version $Revision: #5 $ $Date: 2002/08/14 $
+ * @version $Revision: #6 $ $Date: 2002/08/14 $
  **/
 
 public class Initializer
     implements com.arsdigita.initializer.Initializer {
 
     private static final Logger s_log =
-         Logger.getLogger(Initializer.class.getName());
+        Logger.getLogger(Initializer.class.getName());
 
     private Configuration m_conf = new Configuration();
 
-    public static final String PDL_DIRECTORY = 
+    public static final String PDL_DIRECTORY =
         "pdlDirectory";
-    public static final String AGGRESSIVE_CONNECTION_CLOSE = 
+    public static final String AGGRESSIVE_CONNECTION_CLOSE =
         "aggressiveConnectionClose";
-    public static final String OPTIMIZE_BY_DEFAULT = 
+    public static final String OPTIMIZE_BY_DEFAULT =
         "optimizeByDefault";
-    public static final String METADATA_XML_FILE_NAMES = 
+    public static final String METADATA_XML_FILE_NAMES =
         "metadataXmlFileNames";
 
     public Initializer() throws InitializationException {
@@ -109,17 +109,17 @@ public class Initializer
             DbHelper.unsupportedDatabaseError("SQL Utilities");
         }
         ObjectType.setOptimizeDefault(
-            m_conf.getParameter(OPTIMIZE_BY_DEFAULT).equals(Boolean.TRUE)
-        );
+                                      m_conf.getParameter(OPTIMIZE_BY_DEFAULT).equals(Boolean.TRUE)
+                                      );
 
         if (database == DbHelper.DB_ORACLE) {
             MDSQLGeneratorFactory.setMDSQLGenerator(
-                MDSQLGeneratorFactory.ORACLE_GENERATOR
-            );
+                                                    MDSQLGeneratorFactory.ORACLE_GENERATOR
+                                                    );
         } else if (database == DbHelper.DB_POSTGRES) {
             MDSQLGeneratorFactory.setMDSQLGenerator(
-                MDSQLGeneratorFactory.POSTGRES_GENERATOR
-            );
+                                                    MDSQLGeneratorFactory.POSTGRES_GENERATOR
+                                                    );
         } else {
             DbHelper.unsupportedDatabaseError("MDSQL generator");
         }
@@ -129,8 +129,8 @@ public class Initializer
         if ((m_conf.getParameter(METADATA_XML_FILE_NAMES) != null) &&
             (pdlDir == null)) {
             throw new InitializationException(
-                "Invalid persistence configuration.  Please replace " +
-                "metadataXmlFileNames with pdlDirectory.");
+                                              "Invalid persistence configuration.  Please replace " +
+                                              "metadataXmlFileNames with pdlDirectory.");
         }
 
         Boolean aggressiveClose =

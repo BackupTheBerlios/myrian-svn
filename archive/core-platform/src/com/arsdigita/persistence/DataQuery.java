@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -54,12 +54,12 @@ import java.util.Map;
  * </pre>
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/14 $
  */
 
 public interface DataQuery extends RowSequence {
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQuery.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQuery.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     /**
      * Returns the type of this data query.
@@ -84,7 +84,7 @@ public interface DataQuery extends RowSequence {
 
 
     /**
-     * Moves the cursor to the first row in the query. 
+     * Moves the cursor to the first row in the query.
      * <font color=red>Not implemented yet.</font>
      *
      * @return true if the cursor is on a valid row; false if there are no
@@ -125,7 +125,7 @@ public interface DataQuery extends RowSequence {
      * Note: Calling the method isLast may be expensive because the
      * JDBC driver might need to fetch ahead one row in order to
      * determine whether the current row is the last row in the result
-     * set.  
+     * set.
      * <p>
      * If the query has not yet been executed, it executes the query.
      * <p>
@@ -222,7 +222,7 @@ public interface DataQuery extends RowSequence {
      * <code>"priority < 8 and priority > 8"</code>
      * which is clearly not what the developer wants.
      * <p>
-     * The following will work.  
+     * The following will work.
      * <pre>
      * <code>
      * Filter filter = query.addFilter("priority > :lowerBound");
@@ -231,10 +231,10 @@ public interface DataQuery extends RowSequence {
      * filter.set("upperBound", new Integer(8));
      * </code>
      * </pre>
-     * It is actually the same as 
+     * It is actually the same as
      * <pre>
      * <code>
-     * Filter filter = query.addFilter("priority > :lowerBound 
+     * Filter filter = query.addFilter("priority > :lowerBound
      *                                  and priority < :uperBound");
      * filter.set("upperBound", new Integer(8));
      * filter.set("lowerBound", new Integer(3));
@@ -256,25 +256,25 @@ public interface DataQuery extends RowSequence {
      *        &lt;data query here&gt;)
      *        [where | or] &lt;conditions here&gt;
      *        </code></pre>
-     *        It should normally take the form of 
+     *        It should normally take the form of
      *        <pre><code>
      *        &lt;attribute_name&gt; &lt;condition&gt; &lt;attribute bind variable&gt;
      *        </code></pre>
      *        where the "condition" is something like "=", "&lt;", "&gt;", or
      *        "!=".  The "bind variable" should be a colon followed by
-     *        some attribute name that will later be set with a call to 
-     *        {@link com.arsdigita.persistence.Filter#set(java.lang.String, 
+     *        some attribute name that will later be set with a call to
+     *        {@link com.arsdigita.persistence.Filter#set(java.lang.String,
      *               java.lang.Object)}
      *        <p>
      *        It is possible to set multiple conditions with a single
      *        addFilter statement by combining the conditions with an "and"
      *        or an "or".  Conditions may be grouped by using parentheses.
-     *        Consecutive calls to addFilter append the filters using 
+     *        Consecutive calls to addFilter append the filters using
      *        "and".
      *        <p>
      *        If there is already a filter that exists for this query
      *        then the passed in conditions are added to the current
-     *        conditions with an AND like <code>(&lt;current conditions&gt;) 
+     *        conditions with an AND like <code>(&lt;current conditions&gt;)
      *        and (&lt; passed in conditions&gt;)</code>
      *
      * @return The filter that has just been added to the query
@@ -293,7 +293,7 @@ public interface DataQuery extends RowSequence {
      * Removes the passed in filter from this query if it was directly
      * added to the query.  To remove a filter that was added to a
      * CompoundFilter, you must call CompoundFilter.removeFilter().
-     * 
+     *
      */
     boolean removeFilter(Filter filter);
 
@@ -315,8 +315,8 @@ public interface DataQuery extends RowSequence {
      * @return The Filter object associated with this filter.
      **/
     Filter addInSubqueryFilter( String propertyName,
-				String subQueryProperty,
-				String queryName );
+                                String subQueryProperty,
+                                String queryName );
 
     /**
      * <font color=red>Experimental</font>.
@@ -340,10 +340,10 @@ public interface DataQuery extends RowSequence {
      *  </code>
      *
      *  @param attribute The name of the attribute to bind with the value
-     *  @param value The value for the specified attribute 
+     *  @param value The value for the specified attribute
      */
     Filter addEqualsFilter(String attribute, Object value);
-     
+
 
     /**
      *  This creates the appropriate SQL for the given attribute and
@@ -362,7 +362,7 @@ public interface DataQuery extends RowSequence {
      *  </code>
      *
      *  @param attribute The name of the attribute to bind with the value
-     *  @param value The value for the specified attribute 
+     *  @param value The value for the specified attribute
      */
     Filter addNotEqualsFilter(String attribute, Object value);
 
@@ -413,23 +413,23 @@ public interface DataQuery extends RowSequence {
      *              addOrder("creationDate");
      *              addOrder("creationUser");
      *              </code></pre>
-     *              is the same as 
+     *              is the same as
      *              <pre><code>
      *              addOrder("creationDate, creationUser");
      *              </code></pre>
-     *              
+     *
      *              <p>
      *              If the items should be ordered in ascending order,
      *              the attribute name should be followed by the word "asc"
      *              If the items should be ordered in descending order,
      *              the attribute should be followed by the word "desc"
      *              For instance, or order by ascending date and descending
-     *              user (for users created with the same date), you would 
+     *              user (for users created with the same date), you would
      *              use the following:
      *              <pre><code>
      *              addOrder("creationDate asc, creationUser desc");
      *              </code></pre>
-     *              
+     *
      **/
     void addOrder(String order) throws PersistenceException;
 
@@ -472,7 +472,7 @@ public interface DataQuery extends RowSequence {
     /**
      *  This sets whether or not the query should be wrapped
      *  in the standard view before filtering
-     *  
+     *
      *  @param isNoView This determines whether or not the
      *                  query should be wrapped in a view before
      *                  applying filters.  true means it should
@@ -484,7 +484,7 @@ public interface DataQuery extends RowSequence {
     /**
      *  This method allows the developer to set the range of
      *  rows desired.  Thus, the DataQuery will only return the
-     *  rows between beginIndex and endIndex.  The range begins 
+     *  rows between beginIndex and endIndex.  The range begins
      *  at the specified beginIndex and returns all rows after that.
      *  Thus, if a query returns 30 rows and the beginIndex is set
      *  to 6, the last 25 rows of the query will be returned.
@@ -499,20 +499,20 @@ public interface DataQuery extends RowSequence {
     /**
      *  This method allows the developer to set the range of
      *  rows desired.  Thus, the DataQuery will only return the
-     *  rows between beginIndex and endIndex.  The range begins 
-     *  at the specified beginIndex and extends to the row at index 
-     *  endIndex - 1. Thus the number of rows returned is 
-     *  endIndex-beginIndex.  
+     *  rows between beginIndex and endIndex.  The range begins
+     *  at the specified beginIndex and extends to the row at index
+     *  endIndex - 1. Thus the number of rows returned is
+     *  endIndex-beginIndex.
      *
      *  @param beginIndex This is the number of the first row that
      *                    should be returned by this query.  Setting
      *                    beginIndex to 1 returns the rows from the
      *                    beginning.  This is inclusive.
-     *  @param endIndex This is the number of the row after the last 
+     *  @param endIndex This is the number of the row after the last
      *                  row that should be returned.  That is, this
      *                  is exclusive (specifying beginIndex = 1 and
      *                  endIndex = 10 returns 9 rows);
-     *  @exception A PersistenceException is thrown if 
+     *  @exception A PersistenceException is thrown if
      *             endIndex <= beginIndex
      */
     void setRange(Integer beginIndex, Integer endIndex);
@@ -531,7 +531,7 @@ public interface DataQuery extends RowSequence {
      */
     public void setReturnsUpperBound(int upperBound);
 
-    
+
     /**
      *  This sets the lower bound on the number of rows that can be
      *  returned by this query
@@ -550,12 +550,12 @@ public interface DataQuery extends RowSequence {
     public void alias(String fromPrefix, String toPrefix);
 
     /**
-     * Explicitly closes this DataQuery.  
+     * Explicitly closes this DataQuery.
      * Query should automatically be closed when next
-     * returns false, but this method should be 
-     * explicitly called in the case where all of the data in a query 
+     * returns false, but this method should be
+     * explicitly called in the case where all of the data in a query
      * is not needed (e.g. a "while (next())" loop is exited early or
      * only one value is retrieved with if (next()) {...}).
-     */    
+     */
     void close();
 }

@@ -17,7 +17,7 @@
 -- tests to run.
 --
 -- @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
--- @version $Revision: #5 $ $Date: 2002/07/25 $
+-- @version $Revision: #6 $ $Date: 2002/08/14 $
 --
 
 -- Right now this is duplicated from the individual files. This should

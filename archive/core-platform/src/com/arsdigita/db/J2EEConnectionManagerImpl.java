@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -22,45 +22,45 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 
 /**
- * 
+ *
  *
  * @author David Dao (<a href="mailto:david@arsdigita.com"></a>)
- * @version $Revision: #3 $ $Date: 2002/08/13 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  * @since 4.5
- * 
+ *
  */
 
 public class J2EEConnectionManagerImpl implements DatabaseConnectionPool {
 
-    public static final String versionId = "$Author: dennis $ - $Date: 2002/08/13 $ $Id: //core-platform/dev/src/com/arsdigita/db/J2EEConnectionManagerImpl.java#3 $";
+    public static final String versionId = "$Author: dennis $ - $Date: 2002/08/14 $ $Id: //core-platform/dev/src/com/arsdigita/db/J2EEConnectionManagerImpl.java#4 $";
 
     private static final Logger cat = Logger.getLogger(J2EEConnectionManagerImpl.class.getName());
 
     private String defaultDataSource = "jdbc/db";
 
     public void setConnectionInfo(String url, String username, String password)
-            throws java.sql.SQLException {
+        throws java.sql.SQLException {
         return;
     }
 
-	public String getUrl() {
-		return "";
-	}			  
+    public String getUrl() {
+        return "";
+    }
 
-	public String getUserName() {
-		return "";
-	}			  
+    public String getUserName() {
+        return "";
+    }
 
-	public String getPassword() {
-		return "";
-	}
+    public String getPassword() {
+        return "";
+    }
 
-	public void freeConnections() {
-		return;
-	}
+    public void freeConnections() {
+        return;
+    }
 
-    public java.sql.Connection getConnection() 
-            throws java.sql.SQLException {
+    public java.sql.Connection getConnection()
+        throws java.sql.SQLException {
         try {
             Context ctx = new InitialContext();
 
@@ -80,12 +80,8 @@ public class J2EEConnectionManagerImpl implements DatabaseConnectionPool {
         cat.warn("Ignoring set connection pool size " + num + "; this is not a pooled driver.");
     }
 
-    public void setDriverSpecificParameter(String name, String value) 
-            throws java.sql.SQLException {
+    public void setDriverSpecificParameter(String name, String value)
+        throws java.sql.SQLException {
         cat.warn("Ignoring driver specific parameter " + name);
     }
 }
-
-
-
-

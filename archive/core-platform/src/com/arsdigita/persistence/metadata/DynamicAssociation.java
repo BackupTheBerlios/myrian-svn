@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -46,7 +46,7 @@ import java.util.HashMap;
  *
  * @deprecated Use com.arsdigita.metadata.DynamicAssociation instead.
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #4 $ $Date: 2002/08/06 $ 
+ * @version $Revision: #5 $ $Date: 2002/08/14 $
  */
 
 public class DynamicAssociation {
@@ -63,21 +63,21 @@ public class DynamicAssociation {
     // null indicates a new association
     private DataObject m_dataObject = null;
 
-    private static final String objectTypeString = 
-                               "com.arsdigita.persistence.DynamicAssociation";
+    private static final String objectTypeString =
+        "com.arsdigita.persistence.DynamicAssociation";
 
     /**
-     * Load a pre-existing DynamicAssociation for editing.  Note this is 
+     * Load a pre-existing DynamicAssociation for editing.  Note this is
      * rather useless right now since we don't support link attributes.
      *
      * @param modelName the fully-qualified model name for this association
-     * @param objectType1 the fully-qualified name of the datatype of the 
+     * @param objectType1 the fully-qualified name of the datatype of the
      *                    first property
      * @param property1 the name of the first property
-     * @param objectType2 the fully-qualified name of the datatype of the 
+     * @param objectType2 the fully-qualified name of the datatype of the
      *                    second property
      * @param property2 the name of the second property
-     * @throws PersistenceException if either ObjectType is null or if they 
+     * @throws PersistenceException if either ObjectType is null or if they
      *                              do not contain the correct property
      */
     public DynamicAssociation(String modelName,
@@ -108,14 +108,14 @@ public class DynamicAssociation {
 
         if ((prop1 == null) || (prop2 == null)) {
             throw new PersistenceException(
-                "Either " + property1 + " or " + property2 + " is null");
+                                           "Either " + property1 + " or " + property2 + " is null");
         }
 
         if ((prop1.getAssociation() == null) ||
             (prop2.getAssociation() == null)) {
             throw new PersistenceException(
-                "Either " + property1 + " or " + property2 + " does not " + 
-                "belong to an association");
+                                           "Either " + property1 + " or " + property2 + " does not " +
+                                           "belong to an association");
         }
 
         if (!prop1.getAssociation().equals(prop2.getAssociation())) {
@@ -128,7 +128,7 @@ public class DynamicAssociation {
         m_model = model;
 
         DataCollection collection = SessionManager.getSession()
-                                                  .retrieve(objectTypeString);
+            .retrieve(objectTypeString);
         Filter f1 = collection.addFilter("lower(modelName) = :modelName");
         f1.set("modelName", model.getName().toLowerCase());
 
@@ -137,7 +137,7 @@ public class DynamicAssociation {
 
         Filter f3 = collection.addFilter("lower(objectType1) = :objectType1");
         f3.set("objectType1", prop1.getType().getQualifiedName().toLowerCase());
-        
+
         Filter f4 = collection.addFilter("lower(property2) = :property2");
         f4.set("property2", prop2.getName().toLowerCase());
 
@@ -147,8 +147,8 @@ public class DynamicAssociation {
         try {
             if (!collection.next()) {
                 throw new PersistenceException(
-                    "The association you have requsted is static, and thus " +
-                    "cannot be used as a dynamic association");
+                                               "The association you have requsted is static, and thus " +
+                                               "cannot be used as a dynamic association");
             }
 
             m_dataObject = collection.getDataObject();
@@ -162,13 +162,13 @@ public class DynamicAssociation {
      * be created with the given datatypes and multiplicities.
      *
      * @param modelName the fully-qualified model name for this association
-     * @param objectType1 the fully-qualified name of the datatype of the 
+     * @param objectType1 the fully-qualified name of the datatype of the
      *                    first property
      * @param property1 the name of the first property
-     * @param objectType2 the fully-qualified name of the datatype of the 
+     * @param objectType2 the fully-qualified name of the datatype of the
      *                    second property
      * @param property2 the name of the second property
-     * @throws PersistenceException if either ObjectType is null or if they 
+     * @throws PersistenceException if either ObjectType is null or if they
      *                              do not contain the correct property
      */
     public DynamicAssociation(String modelName,
@@ -201,7 +201,7 @@ public class DynamicAssociation {
 
         if ((prop1 != null) || (prop2 != null)) {
             throw new PersistenceException(
-                "Either " + property1 + " or " + property2 + " is not null");
+                                           "Either " + property1 + " or " + property2 + " is not null");
         }
 
         prop1 = new Property(property1, type1, multiplicity1);
@@ -230,8 +230,8 @@ public class DynamicAssociation {
         // this is an add, so we need to do stuff
         if (m_dataObject == null) {
             Table mappingTable = new Table(
-                generator.generateMappingTableName(type1, m_prop2.getName())
-                );
+                                           generator.generateMappingTableName(type1, m_prop2.getName())
+                                           );
 
             Column type1Key = Utilities.getColumn(type1);
             Column type2Key = Utilities.getColumn(type2);
@@ -272,14 +272,14 @@ public class DynamicAssociation {
 
             try {
                 java.sql.Statement statement = SessionManager.getSession()
-                                                             .getConnection()
-                                                             .createStatement();
+                    .getConnection()
+                    .createStatement();
 
                 statement.executeUpdate(ddl);
             } catch (SQLException e) {
                 throw PersistenceException.newInstance(e.getMessage() +
-                                               Utilities.LINE_BREAK +
-                                               "SQL for ADD: " + ddl, e);
+                                                       Utilities.LINE_BREAK +
+                                                       "SQL for ADD: " + ddl, e);
             }
 
             assoc = new Association(m_prop1, m_prop2);
@@ -296,7 +296,7 @@ public class DynamicAssociation {
         try {
             if (m_dataObject == null) {
                 m_dataObject = SessionManager.getSession()
-                                             .create(objectTypeString);
+                    .create(objectTypeString);
 
                 m_dataObject.set("id", Sequences.getNextValue());
                 m_dataObject.set("objectType", objectTypeString);
@@ -315,8 +315,8 @@ public class DynamicAssociation {
         }
 
         MDSQLGenerator sqlgenerator = MDSQLGeneratorFactory.getInstance();
-	
-	// XXX link attributes
+
+        // XXX link attributes
         for (int i = 0; i < Property.NUM_EVENT_TYPES; i++) {
             sqlgenerator.generateEvent((ObjectType)m_prop1.getType(),
                                        m_prop2, i, null);

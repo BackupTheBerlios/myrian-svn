@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -23,19 +23,19 @@ import java.math.BigDecimal;
 import org.apache.log4j.Logger;
 
 /**
- * 
+ *
  * This class performs unit tests on com.arsdigita.persistence.metadata.OracleMDSQLGenerator </p>
  *
  * author <a href="mailto:jorriarsdigita.com">jorriarsdigita.com</a>
- * version $Revision: #5 $ $Date: 2002/08/13 $
- * 
+ * version $Revision: #6 $ $Date: 2002/08/14 $
+ *
  */
 
-public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {  
+public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/OracleMDSQLGeneratorTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/metadata/OracleMDSQLGeneratorTest.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-    private static Logger s_log = 
+    private static Logger s_log =
         Logger.getLogger(OracleMDSQLGeneratorTest.class.getName());
 
     public OracleMDSQLGeneratorTest(String name) {
@@ -76,7 +76,7 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
             Operation op = (Operation) iter.next();
             checkRetrieveOperation(op, type);
         }
-        
+
     }
 
     private void checkRetrieveOperation(Operation op, ObjectType type) {
@@ -85,7 +85,7 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
         checkSelect(op, type);
         checkWhere(op, type);
         checkMappings(op.getMappings(), type);
-            
+
     }
 
 
@@ -103,7 +103,7 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
             Operation op = (Operation) iter.next();
             checkRetrieveAllOperation(op, type);
         }
-        
+
     }
 
     private void checkRetrieveAllOperation(Operation op, ObjectType type) {
@@ -112,14 +112,14 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
         checkSelect(op, type);
         checkMappings(op.getMappings(), type);
         final String sql = op.getSQL();
-//        assertEquals(sql, -1, sql.indexOf("where"));
-        
+        //        assertEquals(sql, -1, sql.indexOf("where"));
+
     }
 
     public void testInsert() {
         ObjectType type = makeDefaultObjectType();
         checkInsert(type);
-        
+
     }
 
     private void checkInsert(ObjectType type) {
@@ -132,7 +132,7 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
             Operation op = (Operation) iter.next();
             checkInsertOperation(op, type);
         }
-        
+
     }
 
     private void checkInsertOperation(Operation op, ObjectType type) {
@@ -158,7 +158,7 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
             assertEquals(column.getColumnName(), columns[idx].trim());
         }
     }
-    
+
     public void testDelete() {
         ObjectType type = makeDefaultObjectType();
         checkDelete(type);
@@ -174,14 +174,14 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
             Operation op = (Operation) iter.next();
             checkDeleteOperation(op, type);
         }
-        
+
     }
 
     private void checkDeleteOperation(Operation op, ObjectType type) {
         s_log.info("Operation: " + op);
 
         checkWhere(op, type);
-        assertTrue("No delete!", op.getSQL().indexOf("delete from") != -1);    
+        assertTrue("No delete!", op.getSQL().indexOf("delete from") != -1);
     }
 
     public void testUpdate() {
@@ -196,7 +196,7 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
         Event e = gen.generateUpdate(type);
         s_log.info("Update!");
         s_log.info(e);
-        
+
     }
 
     public void testAggressiveLoading() {
@@ -299,7 +299,7 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
         assertAttributeValue(user3, "referer.referer.name", "David Eison");
         assert("referer.name not null in user 1", user1.get("referer") == null);
     }
-    
+
     /**
      * Makes an ObjectType with properties for every SimpleType in MetadataRoot.
      *
@@ -323,23 +323,23 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
         addProperty(type, "prop13", MetadataRoot.BLOB, "theTable", "column13");
         addProperty(type, "prop14", MetadataRoot.CLOB, "theTable", "column14");
         addRoleReference(
-            type,
-            "rr1",
-            MetadataRoot.getMetadataRoot()
-                        .getObjectType("com.arsdigita.kernel.ACSObject"),
-            "theTable",
-            "theColumn");
+                         type,
+                         "rr1",
+                         MetadataRoot.getMetadataRoot()
+                         .getObjectType("com.arsdigita.kernel.ACSObject"),
+                         "theTable",
+                         "theColumn");
 
         type.addAggressiveLoad(new String[] {"rr1", "displayName"});
 
         type.addKeyProperty("prop1");
 
         return type;
-        
+
     }
 
-    private void addProperty(ObjectType type, 
-                             String propertyName, 
+    private void addProperty(ObjectType type,
+                             String propertyName,
                              SimpleType dataType,
                              String tableName,
                              String columnName) {
@@ -349,9 +349,9 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
                                   dataType.getJDBCtype());
         prop.setColumn(column);
         type.addProperty(prop);
-                                    
+
     }
-    
+
     private Column getColumn(Table table, String columnName, int type) {
         Column column = table.getColumn(columnName);
         if (column == null) {
@@ -420,7 +420,7 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
         final String whereClause = sql.substring(whereIdx);
         Iterator keyProperties = type.getKeyProperties();
         checkForColumnNames( whereClause, keyProperties );
-        
+
     }
 
     /**
@@ -433,16 +433,16 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
      */
     private void checkForColumnNames(String sql, Iterator iter) {
         while (iter.hasNext()) {
-            Property prop = (Property) iter.next(); 
+            Property prop = (Property) iter.next();
             if( prop.isAttribute() ) {
                 Column column = prop.getColumn();
                 if (null == column) {
                     fail("no column for property: " + prop.getName());
-                
+
                 }
                 final boolean statementContainsColumn = (sql.indexOf(column.getColumnName()) != -1);
-                assertTrue( sql, statementContainsColumn ); 
-                
+                assertTrue( sql, statementContainsColumn );
+
             }
         }
 
@@ -457,27 +457,27 @@ public class OracleMDSQLGeneratorTest extends BaseMDSQLGeneratorTest {
      *  doesn't work anymore.
      */
     private void checkMappings(Iterator mappings, ObjectType type) {
-/*
-        while(mappings.hasNext()) {
-            Mapping map = (Mapping) mappings.next();
-            final String fullPropertyName = StringUtils.join(map.getPath(),'.');
-            Column column = map.getColumn();
-            Property property = type.getProperty(fullPropertyName);
+        /*
+          while(mappings.hasNext()) {
+          Mapping map = (Mapping) mappings.next();
+          final String fullPropertyName = StringUtils.join(map.getPath(),'.');
+          Column column = map.getColumn();
+          Property property = type.getProperty(fullPropertyName);
 
-            // skip anything that's aggressively loaded
-            if (property == null) {
-                continue;
-            }
+          // skip anything that's aggressively loaded
+          if (property == null) {
+          continue;
+          }
 
-            assertEquals( property.getColumn(), column );
-            final String pdlStatement = map.toString();
-            assertTrue( pdlStatement + "\ndoes not contain " + fullPropertyName,
-                 pdlStatement.indexOf(fullPropertyName) != -1 );
-            final String fullColumnName = column.getTableName() + "." + column.getColumnName();
-            assertTrue( pdlStatement + "\ndoes not contain " + fullColumnName,
-                 pdlStatement.indexOf(fullColumnName) != -1 ); 
+          assertEquals( property.getColumn(), column );
+          final String pdlStatement = map.toString();
+          assertTrue( pdlStatement + "\ndoes not contain " + fullPropertyName,
+          pdlStatement.indexOf(fullPropertyName) != -1 );
+          final String fullColumnName = column.getTableName() + "." + column.getColumnName();
+          assertTrue( pdlStatement + "\ndoes not contain " + fullColumnName,
+          pdlStatement.indexOf(fullColumnName) != -1 );
 
-        }
-*/        
+          }
+        */
     }
 }

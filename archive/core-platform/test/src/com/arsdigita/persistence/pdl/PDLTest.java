@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -25,14 +25,14 @@ import org.apache.log4j.Logger;
  * PDLTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/08/13 $
+ * @version $Revision: #5 $ $Date: 2002/08/14 $
  */
 
 public class PDLTest extends TestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/pdl/PDLTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/pdl/PDLTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-    private static Logger s_log = 
+    private static Logger s_log =
         Logger.getLogger(PDLTest.class.getName());
 
     static final String PDL_FILE_ROOT_DIR = "com/arsdigita/persistence/pdl/";
@@ -40,7 +40,7 @@ public class PDLTest extends TestCase {
     // along with an optional error strings that should be in the exception thrown
     // by the PDL parser. The file name should not contain the .pdl extension. Ex:
     // foo,BAD
-    // bar,Bad,Type2 
+    // bar,Bad,Type2
     // gronk
     static final String BAD_PDL_FILE_INDEX = PDL_FILE_ROOT_DIR + "badpdl.csv";
 
@@ -52,38 +52,38 @@ public class PDLTest extends TestCase {
         MetadataRoot r = MetadataRoot.getMetadataRoot();
         PDL m = new PDL();
         try
-        {
-            m.loadResource("com/arsdigita/persistence/pdl/test1.pdl");            
-            m.loadResource("com/arsdigita/persistence/pdl/test2.pdl");
-        }
+            {
+                m.loadResource("com/arsdigita/persistence/pdl/test1.pdl");
+                m.loadResource("com/arsdigita/persistence/pdl/test2.pdl");
+            }
         catch(PDLException p)
-        {
-            fail("Error loading pdl files. Should not fail. " + p.getMessage());
-        }
+            {
+                fail("Error loading pdl files. Should not fail. " + p.getMessage());
+            }
 
 
         s_log.debug(m.getAST());
 
         try
-        {
-            m.generateMetadata(r);
-            //s_log.debug(r);
+            {
+                m.generateMetadata(r);
+                //s_log.debug(r);
 
-        } catch(Exception me)
-        {
-            fail("Error generating meta data. Should not fail. " + me.getMessage());   
-        }
+            } catch(Exception me)
+                {
+                    fail("Error generating meta data. Should not fail. " + me.getMessage());
+                }
 
         try
-        {
-            PDL bad = new PDL();
-            bad.loadResource("com/arsdigita/persistence/pdl/bad1.pdl");
-            fail("PDL Failed to throw an exception on bad1.pdl!");
-        }
+            {
+                PDL bad = new PDL();
+                bad.loadResource("com/arsdigita/persistence/pdl/bad1.pdl");
+                fail("PDL Failed to throw an exception on bad1.pdl!");
+            }
         catch(PDLException p)
-        {
-            s_log.debug(p);
-        }
+            {
+                s_log.debug(p);
+            }
     }
 
     // this should fail now due to object type/super type check
@@ -101,15 +101,15 @@ public class PDLTest extends TestCase {
         return pdl;
     }
 
-    /*  Loads the given PDL file, parses it, and checks to see if there are 
+    /*  Loads the given PDL file, parses it, and checks to see if there are
      *  any errors. If there is an error, it must also contain any error
      *  codes in errorKeywords.
      *
      */
     private void checkErrorMessage(String basePDLName,
-        Collection errorKeywords,
-        Collection failures)
-    throws Exception
+                                   Collection errorKeywords,
+                                   Collection failures)
+        throws Exception
     {
         s_log.info("Checking bad pdl: " + basePDLName);
         try {
@@ -125,11 +125,11 @@ public class PDLTest extends TestCase {
             String s = e.toString();
             Iterator iter = errorKeywords.iterator();
             while(iter.hasNext())  {
-                final String errorString = (String)iter.next(); 
+                final String errorString = (String)iter.next();
                 if (s.indexOf(errorString) < 0) {
                     failures.add("error message for " + basePDLName +
-                        " does not contain \"" + errorString
-                        + "\"; error message:\n" + s);
+                                 " does not contain \"" + errorString
+                                 + "\"; error message:\n" + s);
                 }
             }
             return;
@@ -150,11 +150,11 @@ public class PDLTest extends TestCase {
      */
     public void testBadPDLFiles() throws Exception {
         // File input reader for the list of bad pdl files.
-        // Using LineNumberReader for convenience in reporting problems in 
+        // Using LineNumberReader for convenience in reporting problems in
         // the file
         LineNumberReader reader = null;
         try {
-            InputStream is = getClass().getClassLoader().getResourceAsStream(BAD_PDL_FILE_INDEX); 
+            InputStream is = getClass().getClassLoader().getResourceAsStream(BAD_PDL_FILE_INDEX);
             reader = new LineNumberReader(new InputStreamReader(is));
 
             LinkedList failures = new LinkedList();
@@ -162,13 +162,13 @@ public class PDLTest extends TestCase {
             while( (line = reader.readLine()) != null ) {
                 final boolean lineIsCommented = line.startsWith("//");
                 if( lineIsCommented ) {
-                    continue;   
+                    continue;
                 }
                 StringTokenizer tokenizer = new StringTokenizer(line, ",");
                 final boolean formatIsBad = (tokenizer.countTokens() < 1);
                 if (formatIsBad) {
-                    s_log.info("Warning: Incorrect format at line " + reader.getLineNumber() 
-                        + ". Line will not be parsed. Value is: " + line);
+                    s_log.info("Warning: Incorrect format at line " + reader.getLineNumber()
+                               + ". Line will not be parsed. Value is: " + line);
                 } else {
                     final String fileName = tokenizer.nextToken().trim();
                     // optional list of error keywords that should be in an error message.
@@ -190,7 +190,7 @@ public class PDLTest extends TestCase {
                 }
             }
         }
-        
+
     }
 
     public void testIncrementalLoad() throws Exception {
@@ -198,20 +198,20 @@ public class PDLTest extends TestCase {
             MetadataRoot root = MetadataRoot.getMetadataRoot();
             PDL pdl = new PDL();
             pdl.loadResource(
-                "com/arsdigita/persistence/pdl/IncrementalLoadPart1.pdl"
-                );
+                             "com/arsdigita/persistence/pdl/IncrementalLoadPart1.pdl"
+                             );
             pdl.generateMetadata(root);
 
             pdl = new PDL();
             pdl.loadResource(
-                "com/arsdigita/persistence/pdl/IncrementalLoadPart2.pdl"
-                );
+                             "com/arsdigita/persistence/pdl/IncrementalLoadPart2.pdl"
+                             );
             pdl.generateMetadata(root);
 
             pdl = new PDL();
             pdl.loadResource(
-                "com/arsdigita/persistence/pdl/IncrementalLoadPart3.pdl"
-                );
+                             "com/arsdigita/persistence/pdl/IncrementalLoadPart3.pdl"
+                             );
             pdl.generateMetadata(root);
 
             //root.getModel("incrementalLoad").outputPDL(System.out);
@@ -227,4 +227,3 @@ public class PDLTest extends TestCase {
     }
 
 }
-

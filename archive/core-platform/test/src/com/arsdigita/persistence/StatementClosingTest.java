@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -40,14 +40,14 @@ import org.apache.log4j.varia.StringMatchFilter;
 
 /**
  * This test verifies that the Statements which are created by Persistence
- * are closed when their ResultSet is closed, by looking for appropriate 
+ * are closed when their ResultSet is closed, by looking for appropriate
  * log statements.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
  */
 public class StatementClosingTest extends Log4jBasedTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/StatementClosingTest.java#3 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/StatementClosingTest.java#4 $";
 
     private Session ssn;
 
@@ -112,12 +112,12 @@ public class StatementClosingTest extends Log4jBasedTestCase {
         dt = ssn.retrieve(new OID("examples.Datatype", BigInteger.ZERO));
         assertLogContains(rsEventString);
         assertLogContains(closeString);
-        
-    }    
+
+    }
 
     /**
-     * The point of this test is to see if making a data association and 
-     * calling cursor on it requires one to close the data association 
+     * The point of this test is to see if making a data association and
+     * calling cursor on it requires one to close the data association
      * explicitly.
      */
     public void testDataAssociationClosing() {
@@ -142,11 +142,11 @@ public class StatementClosingTest extends Log4jBasedTestCase {
         while (cursor.next()) {
             i++;
         }
-        assertTrue("Iterations should match cursor size but did not, " + i + 
-                   " vs " + cursor.size(), 
+        assertTrue("Iterations should match cursor size but did not, " + i +
+                   " vs " + cursor.size(),
                    cursor.size() == i);
-        assertTrue("Sizes should match but did not, only found " + i + 
-                   " line items", 
+        assertTrue("Sizes should match but did not, only found " + i +
+                   " line items",
                    OrderAssociation.NUM_ITEMS == i);
         items = null;
         cursor = null;

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -38,16 +38,16 @@ import org.apache.log4j.Logger;
  * {@link com.arsdigita.persistence.metadata.DynamicObjectType}.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#4 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#5 $
  * @since 4.6.3 */
 
 abstract class BaseDDLGenerator implements DDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#4 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/BaseDDLGenerator.java#5 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private static final Logger s_log =
         Logger.getLogger(BaseDDLGenerator.class);
-    
+
     // this is used to keep track of which tables have been
     // returned.  This helps avoid duplicate tables between
     // when the user asks for the table and when the table
@@ -72,7 +72,7 @@ abstract class BaseDDLGenerator implements DDLGenerator {
         "SHARE", "SIZE", "SMALLINT", "START", "SUCCESSFUL", "SYNONYM",
         "SYSDATE", "TABLE", "THEN", "TO", "TRIGGER", "UID", "UNION",
         "UNIQUE", "UPDATE", "USER", "VALIDATE", "VALUES", "VARCHAR",
-        "VARCHAR2", "VIEW", "WHENEVER", "WHERE", "WITH" 
+        "VARCHAR2", "VIEW", "WHENEVER", "WHERE", "WITH"
     };
 
     // add SQL reserved words to the list of unavailable table names
@@ -82,7 +82,7 @@ abstract class BaseDDLGenerator implements DDLGenerator {
         }
         tables.addAll(s_reservedWords);
     }
-        
+
     // used to keep track of which columns have been returned.
     private static Map columns = new HashMap();
 
@@ -127,14 +127,14 @@ abstract class BaseDDLGenerator implements DDLGenerator {
      *  in the table then this returns false.  If the column is already
      *  part of the table then this returns true.
      */
-    protected abstract boolean columnExists(String tableName, 
+    protected abstract boolean columnExists(String tableName,
                                             String proposedColumnName);
 
     /**
      *  This takes and object type and generates a table name that
      *  can be used to store the information about the object type
      *
-     *  @param modelName This is the name of the model.  This will 
+     *  @param modelName This is the name of the model.  This will
      *                   typically be used as the prefix of the table name.
      *  @param objectName This is the name of the object type that
      *                    the system is storing.  This will typically
@@ -147,7 +147,7 @@ abstract class BaseDDLGenerator implements DDLGenerator {
             modelName = modelName.substring(14);
         }
 
-        String proposedName = alterStringForSQL(modelName) + "_" + 
+        String proposedName = alterStringForSQL(modelName) + "_" +
             objectName.toLowerCase();
 
         if (proposedName.length() > getMaxColumnNameLength()) {
@@ -159,16 +159,16 @@ abstract class BaseDDLGenerator implements DDLGenerator {
 
 
     /**
-     * Determines a unique name for a mapping table for a particular 
+     * Determines a unique name for a mapping table for a particular
      * role reference and object type.
-     * 
+     *
      * @param type the objecttype that owns the property
      * @param name the property name
      * @return a unique name for a mapping table
      */
     public String generateMappingTableName(ObjectType type, String name) {
         String proposedName = type.getName().toLowerCase() + "_" +
-                              name.toLowerCase();
+            name.toLowerCase();
 
         if (proposedName.length() > getMaxColumnNameLength()) {
             proposedName = proposedName.substring(0, getMaxColumnNameLength() - 1);
@@ -179,7 +179,7 @@ abstract class BaseDDLGenerator implements DDLGenerator {
 
 
     /**
-     *  This takes in the tableName and a proposedName and returns 
+     *  This takes in the tableName and a proposedName and returns
      *  a name that can be used for a new column name
      *
      *  @param objectType The type for this column to be added to.  This
@@ -194,7 +194,7 @@ abstract class BaseDDLGenerator implements DDLGenerator {
         proposedName = alterStringForSQL(proposedName.toLowerCase());
 
         Column key = Utilities.getColumn(objectType);
-        if (key == null) { 
+        if (key == null) {
             throw new PersistenceException(objectType.getName() + " does not "+
                                            "support MDSQL.");
         }
@@ -221,20 +221,20 @@ abstract class BaseDDLGenerator implements DDLGenerator {
                     conflictingProperty = true;
                 } else {
                     Iterator prop = objectType.getProperties();
-                    
+
                     if (!prop.hasNext()) {
                         break;
                     }
-                    
+
                     int detectStop = 0;
-                    
+
                     while (prop.hasNext()) {
                         Property property = (Property)prop.next();
-                        
+
                         if (!property.isAttribute()) {
                             continue;
                         }
-                        
+
                         Column col = property.getColumn();
                         if (col != null) {
                             if (proposedName.equalsIgnoreCase(col.getColumnName())) {
@@ -249,14 +249,14 @@ abstract class BaseDDLGenerator implements DDLGenerator {
                             detectStop++;
                             if (objectType.getSupertype() != null) {
                                 ObjectType st = objectType.getSupertype();
-                                
+
                                 if (st.hasProperty(property.getName())) {
                                     throw new PersistenceException(
-                                        objectType.getName() +
-                                        " is not MDSQL-ready and " +
-                                        "therefore cannot be extended " +
-                                        "dynamically.  " + property.getName() +
-                                        " has no defined column");
+                                                                   objectType.getName() +
+                                                                   " is not MDSQL-ready and " +
+                                                                   "therefore cannot be extended " +
+                                                                   "dynamically.  " + property.getName() +
+                                                                   " has no defined column");
                                 }
                             }
                         }
@@ -280,9 +280,9 @@ abstract class BaseDDLGenerator implements DDLGenerator {
     }
 
 
-    /** 
+    /**
      *  This takes a string and increments the name to be a new,
-     *  hopefully unique, string.  
+     *  hopefully unique, string.
      *
      *  @param nameToIncrement The name to slightly alter
      *  @param count The key to help the string be altered
@@ -291,8 +291,8 @@ abstract class BaseDDLGenerator implements DDLGenerator {
         if (count > 0) {
             // we assume the string has been through before so lets remove
             // the final three characters
-            nameToIncrement = nameToIncrement.substring(0, 
-                                                   nameToIncrement.length() -3);
+            nameToIncrement = nameToIncrement.substring(0,
+                                                        nameToIncrement.length() -3);
         }
 
         if (nameToIncrement.length() > 23) {
@@ -311,19 +311,19 @@ abstract class BaseDDLGenerator implements DDLGenerator {
 
     /**
      *  This takes a column and returns a string representing the type
-     *  of the column.  For instance, it may return "integer" or 
+     *  of the column.  For instance, it may return "integer" or
      *  "varchar(30)".  It uses getTypeDeclaration() for the conversion
      */
     protected String getJDBCTypeString(Property property, Column column) {
         int size = column.getSize();
         int jdbcType;
-        
+
         jdbcType = column.getType();
-        if (property.getType() instanceof SimpleType && 
+        if (property.getType() instanceof SimpleType &&
             jdbcType == Integer.MIN_VALUE) {
             jdbcType = ((SimpleType)property.getType()).getJDBCtype();
         }
-                    
+
         return getTypeDeclaration(jdbcType, size);
     }
 
@@ -355,12 +355,12 @@ abstract class BaseDDLGenerator implements DDLGenerator {
      *  sb.append(")");
      *  statement.executeUpdate(sb.toString());
      *  </code></pre>
-     *  
+     *
      *  @param property The property to use to generate the DDL
      *  @param defaultValue The default for this column.  This may be null
      *  @pre property != null
      */
-    protected String generateColumnToAdd(Property property, 
+    protected String generateColumnToAdd(Property property,
                                          Object defaultValue) {
         Column propCol;
 
@@ -368,7 +368,7 @@ abstract class BaseDDLGenerator implements DDLGenerator {
             propCol = property.getColumn();
         } else {
             propCol = ((JoinElement)property.getJoinPath().getPath().get(0))
-                        .getFrom();
+                .getFrom();
         }
 
         StringBuffer sb = new StringBuffer();
@@ -380,7 +380,7 @@ abstract class BaseDDLGenerator implements DDLGenerator {
 
         if (property.getMultiplicity() == Property.REQUIRED) {
             sb.append(" not null");
-        } 
+        }
 
         if (!property.isAttribute()) {
             sb.append(getReferenceString(property) + " ");
@@ -421,26 +421,26 @@ abstract class BaseDDLGenerator implements DDLGenerator {
     protected String getReferenceString(Property property) {
         Column foreignKey =
             ((JoinElement)property.getJoinPath().getPath().get(0)).getTo();
-        
+
         return " references " + foreignKey.getTableName() +
             "(" + foreignKey.getColumnName() + ") ";
     }
 
 
     /**
-     *  This takes a string and replaces any/all characters 
+     *  This takes a string and replaces any/all characters
      *  not allowed by SQL with "_"
      *
      *  @param stringToAlter This is the string that is used as the
      *                       input to this system
      */
     protected String alterStringForSQL(String stringToAlter) {
-        StringTokenizer tokens = new StringTokenizer(stringToAlter, 
+        StringTokenizer tokens = new StringTokenizer(stringToAlter,
                                                      ". ;()", true);
         StringBuffer sb = new StringBuffer();
         while (tokens.hasMoreTokens()) {
             String token = tokens.nextToken();
-            if (token.equals(".") || token.equals(" ") || 
+            if (token.equals(".") || token.equals(" ") ||
                 token.equals("(") || token.equals(")")) {
                 sb.append("_");
             } else {
@@ -455,8 +455,8 @@ abstract class BaseDDLGenerator implements DDLGenerator {
 
     /**
      * Takes an object type, a primary key property, and a collection of
-     * additional properties.  Returns either a collection of "create table" 
-     * or a collection of "alter table" statements to add the properties 
+     * additional properties.  Returns either a collection of "create table"
+     * or a collection of "alter table" statements to add the properties
      * to the object type's table.  If there is nothing to modify, this
      * returns null.
      *
@@ -481,13 +481,13 @@ abstract class BaseDDLGenerator implements DDLGenerator {
                 Column superKey = Utilities.getColumn(type.getSupertype());
 
                 ddl.append(" ")
-                   .append(getTypeDeclaration(superKey.getType(),
-                                              superKey.getSize()))
-                   .append(" primary key references ")
-                   .append(superKey.getTableName())
-                   .append("(")
-                   .append(superKey.getColumnName())
-                   .append(")");
+                    .append(getTypeDeclaration(superKey.getType(),
+                                               superKey.getSize()))
+                    .append(" primary key references ")
+                    .append(superKey.getTableName())
+                    .append("(")
+                    .append(superKey.getColumnName())
+                    .append(")");
             } else {
                 ddl.append(" integer primary key");
             }
@@ -528,7 +528,7 @@ abstract class BaseDDLGenerator implements DDLGenerator {
         }
 
         ddl.append(StringUtils.join(statements, ",\n"))
-           .append(")\n");
+            .append(")\n");
 
         ArrayList listToReturn = new ArrayList();
         listToReturn.add(ddl.toString());
@@ -548,40 +548,40 @@ abstract class BaseDDLGenerator implements DDLGenerator {
      * @return a DDL statement to create or alter the object type table
      */
     public Collection generateTable(ObjectType type,
-                                Column keyColumn,
-                                Collection properties) {
+                                    Column keyColumn,
+                                    Collection properties) {
         return generateTable(type, keyColumn, properties, null);
     }
 
 
     /**
-     * Takes an object type and a collection of additional properties. 
+     * Takes an object type and a collection of additional properties.
      * Returns either a "create table" or an "alter table" statement to add
      * the properties to the object type's table.
-     *                              
+     *
      * @param type the ObjectType
      * @param properties additional properties to add
      * @return a DDL statement to create or alter the object type table
      */
     public Collection generateTable(ObjectType type,
-                                Collection properties) {
+                                    Collection properties) {
         return generateTable(type, null, properties, null);
     }
 
 
     /**
-     * Takes an object type and a collection of additional properties. 
+     * Takes an object type and a collection of additional properties.
      * Returns either a "create table" or an "alter table" statement to add
      * the properties to the object type's table.
-     *                              
+     *
      * @param type the ObjectType
      * @param properties additional properties to add
      * @param defaultValueMap mapping from property name to default value
      * @return a DDL statement to create or alter the object type table
      */
     public Collection generateTable(ObjectType type,
-                                Collection properties,
-                                Map defaultValueMap) {
+                                    Collection properties,
+                                    Map defaultValueMap) {
         return generateTable(type, null, properties, defaultValueMap);
     }
 
@@ -594,7 +594,7 @@ abstract class BaseDDLGenerator implements DDLGenerator {
      * @param property the role reference
      * @return the DDL statement to create the mapping table
      */
-    public String generateMappingTable(ObjectType type, 
+    public String generateMappingTable(ObjectType type,
                                        Property property) {
         StringBuffer ddl = new StringBuffer();
 
@@ -608,31 +608,31 @@ abstract class BaseDDLGenerator implements DDLGenerator {
         JoinElement je1 = (JoinElement)property.getJoinPath().getPath().get(1);
 
         ddl.append("create table ")
-           .append(je0.getTo().getTableName())
-           .append(" ( \n")
-           .append(je0.getTo().getColumnName())
-           .append(" ")
-           .append(getTypeDeclaration(je0.getFrom().getType(),
-                                      je0.getFrom().getSize()))
-           .append(" references ")
-           .append(je0.getFrom().getTableName())
-           .append("(")
-           .append(je0.getFrom().getColumnName())
-           .append("),\n")
-           .append(je1.getFrom().getColumnName())
-           .append(" ")
-           .append(getTypeDeclaration(je1.getTo().getType(),
-                                      je1.getTo().getSize()))
-           .append(" references ")
-           .append(je1.getTo().getTableName())
-           .append("(")
-           .append(je1.getTo().getColumnName())
-           .append("),\n")
-           .append("primary key (")
-           .append(je0.getTo().getColumnName())
-           .append(", ")
-           .append(je1.getFrom().getColumnName())
-           .append(")\n)\n");
+            .append(je0.getTo().getTableName())
+            .append(" ( \n")
+            .append(je0.getTo().getColumnName())
+            .append(" ")
+            .append(getTypeDeclaration(je0.getFrom().getType(),
+                                       je0.getFrom().getSize()))
+            .append(" references ")
+            .append(je0.getFrom().getTableName())
+            .append("(")
+            .append(je0.getFrom().getColumnName())
+            .append("),\n")
+            .append(je1.getFrom().getColumnName())
+            .append(" ")
+            .append(getTypeDeclaration(je1.getTo().getType(),
+                                       je1.getTo().getSize()))
+            .append(" references ")
+            .append(je1.getTo().getTableName())
+            .append("(")
+            .append(je1.getTo().getColumnName())
+            .append("),\n")
+            .append("primary key (")
+            .append(je0.getTo().getColumnName())
+            .append(", ")
+            .append(je1.getFrom().getColumnName())
+            .append(")\n)\n");
 
         return ddl.toString();
     }

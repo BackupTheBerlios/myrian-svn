@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -24,12 +24,12 @@ import java.io.PrintStream;
  * link.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2002/08/09 $
+ * @version $Revision: #8 $ $Date: 2002/08/14 $
  **/
 
 public class Association extends ModelElement {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Association.java#7 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/Association.java#8 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
 
     /**
@@ -50,7 +50,7 @@ public class Association extends ModelElement {
      *
      * @param roleOne The first end of the association.
      * @param roleTwo The second end of the association.
-     * 
+     *
      * @pre roleOne.isRole() && roleTwo.isRole()
      * @pre roleOne.getAssociation() == null && roleTwo.getAssociation() == null
      *
@@ -65,39 +65,39 @@ public class Association extends ModelElement {
     public Association(Property roleOne, Property roleTwo) {
         if (roleOne == null) {
             throw new IllegalArgumentException(
-                "The roleOne parameter must be non null."
-                );
+                                               "The roleOne parameter must be non null."
+                                               );
         }
 
         if (roleTwo == null) {
             throw new IllegalArgumentException(
-                "The roleTwo parameter must be non null."
-                );
+                                               "The roleTwo parameter must be non null."
+                                               );
         }
 
         if (!roleOne.isRole()) {
             throw new IllegalArgumentException(
-                "The roleOne parameter must be a role."
-                );
+                                               "The roleOne parameter must be a role."
+                                               );
         }
 
         if (!roleTwo.isRole()) {
             throw new IllegalArgumentException(
-                "The roleTwo parameter must be a role."
-                );
+                                               "The roleTwo parameter must be a role."
+                                               );
         }
         if ( roleOne.getAssociation() != null ) {
             throw new IllegalArgumentException(
-                "The roleOne parameter is already joined to an Association!"
-                );
-   
-        }        
+                                               "The roleOne parameter is already joined to an Association!"
+                                               );
+
+        }
         if ( roleTwo.getAssociation() != null ) {
             throw new IllegalArgumentException(
-                "The roleTwo parameter is already joined to an Association!"
-                );
-   
-        }        
+                                               "The roleTwo parameter is already joined to an Association!"
+                                               );
+
+        }
         m_roles[0] = roleOne;
         m_roles[1] = roleTwo;
         m_roles[0].setAssociation(this);
@@ -130,11 +130,11 @@ public class Association extends ModelElement {
         }
 
         Property prop = new Property(
-            m_roles[0].getName(), m_roles[0].getType(),
-            Property.REQUIRED, m_roles[0].isComponent(),
-            m_roles[0].isComposite());
+                                     m_roles[0].getName(), m_roles[0].getType(),
+                                     Property.REQUIRED, m_roles[0].isComponent(),
+                                     m_roles[0].isComposite());
         prop.setLineInfo(m_roles[0]);
-        m_linkType.addProperty(prop);            
+        m_linkType.addProperty(prop);
         m_linkType.addKeyProperty(m_roles[0].getName());
 
         prop = new Property(m_roles[1].getName(), m_roles[1].getType(),
@@ -184,7 +184,7 @@ public class Association extends ModelElement {
     }
 
     /**
-     * Gets the first role property.    
+     * Gets the first role property.
      *
      * @returns the first role property
      */
@@ -192,7 +192,7 @@ public class Association extends ModelElement {
         return m_roles[0];
     }
     /**
-     * Gets the second role property.    
+     * Gets the second role property.
      *
      * @returns the second role property
      */
@@ -228,7 +228,7 @@ public class Association extends ModelElement {
         if (m_linkType != null) {
             out.println();
 
-        outer:
+            outer:
             for (Iterator it = m_linkType.getProperties(); it.hasNext(); ) {
                 Property p = (Property) it.next();
                 for (int i = 0; i < m_roles.length; i++) {

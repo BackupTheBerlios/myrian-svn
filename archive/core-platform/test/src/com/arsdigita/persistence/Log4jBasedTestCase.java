@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -43,7 +43,7 @@ import org.apache.log4j.varia.StringMatchFilter;
 /**
  * A base JUnit test class useful for writing junit test cases
  * that rely on Log4j.
- * Automatically adds/removes a new Log object that 
+ * Automatically adds/removes a new Log object that
  * will log to a member StringWriter variable,
  * turns on all debugging on setup, and restores
  * debugging to original values on teardown.
@@ -63,12 +63,12 @@ import org.apache.log4j.varia.StringMatchFilter;
  * assertLogDoesNotContain(holdString);
  * ...
  * </pre>
- * 
+ *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
  */
 public class Log4jBasedTestCase extends PersistenceTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/Log4jBasedTestCase.java#4 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/Log4jBasedTestCase.java#5 $";
 
     /**
      * The log object.  Should be modified
@@ -89,7 +89,7 @@ public class Log4jBasedTestCase extends PersistenceTestCase {
 
     /**
      * Turns on all logging so that the desired log messages will be found.
-     * Adds a new logger, by default logging everything except for 
+     * Adds a new logger, by default logging everything except for
      * secure messages to the member stringwriter variable.
      */
     public void setUp() throws Exception {
@@ -133,7 +133,7 @@ public class Log4jBasedTestCase extends PersistenceTestCase {
 
         root.removeAppender(log);
         log.close();
-    }    
+    }
 
     /**
      * String of messages that have been logged since creation or
@@ -144,14 +144,14 @@ public class Log4jBasedTestCase extends PersistenceTestCase {
     }
 
     /**
-     * Asserts that log contains given message 
+     * Asserts that log contains given message
      * (case sensitive, exact match).
      */
     public void assertLogContains(String msg) {
-        assertTrue("Log messages should contain " + msg + 
-                   " but did not.  Log was:" + Utilities.LINE_BREAK + 
-                   "'" + getLogMessage() + "'", 
-                   getLogMessage().indexOf(msg) >= 0);        
+        assertTrue("Log messages should contain " + msg +
+                   " but did not.  Log was:" + Utilities.LINE_BREAK +
+                   "'" + getLogMessage() + "'",
+                   getLogMessage().indexOf(msg) >= 0);
     }
 
     /**
@@ -159,10 +159,10 @@ public class Log4jBasedTestCase extends PersistenceTestCase {
      * (case sensitive, exact match).
      */
     public void assertLogDoesNotContain(String msg) {
-        assertTrue("Log messages should not contain " + msg + 
+        assertTrue("Log messages should not contain " + msg +
                    " but did.  Log was:" + Utilities.LINE_BREAK +
-                   "'" + getLogMessage() + "'", 
-                   getLogMessage().indexOf(msg) < 0);        
+                   "'" + getLogMessage() + "'",
+                   getLogMessage().indexOf(msg) < 0);
     }
 
     /**
@@ -171,8 +171,8 @@ public class Log4jBasedTestCase extends PersistenceTestCase {
      */
     public void clearLog() {
         logSW.getBuffer().setLength(0);
-        assertTrue("Log should be empty after reset, instead contained:" + 
-                   Utilities.LINE_BREAK + "'" + getLogMessage() + "'", 
+        assertTrue("Log should be empty after reset, instead contained:" +
+                   Utilities.LINE_BREAK + "'" + getLogMessage() + "'",
                    getLogMessage().length() == 0);
     }
 }

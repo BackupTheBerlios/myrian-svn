@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -27,15 +27,15 @@ import java.io.PrintStream;
  * particular columns to join, and in what order.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#6 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#7 $
  * @since 4.6
  *
- * @invariant getPath() != null 
+ * @invariant getPath() != null
  **/
 
 public class JoinPath extends Element {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#6 $ by $Author: rhs $, $DateTime: 2002/08/09 15:10:37 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinPath.java#7 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private List m_path;
     // a List of JoinElements
@@ -167,7 +167,7 @@ public class JoinPath extends Element {
                                    cascade);
                 }
             }
-                
+
 
             // Set up unique keys
             if (isCollection) {

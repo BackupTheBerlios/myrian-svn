@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -20,32 +20,32 @@ package com.arsdigita.persistence;
  * FilterFactoryImpl actually hands out the requested filters
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/14 $
  */
 
 class FilterFactoryImpl implements FilterFactory {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterFactoryImpl.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterFactoryImpl.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
 
     /**
      *
      *  @param sql The conditions for the filter.  This is a string
      *        that should represent part of a SQL "where" clause.  Specifically,
-     *        it should normally take the form of 
+     *        it should normally take the form of
      *        <pre><code>
      *        &lt;column_name&gt; &lt;condition&gt; &lt;attribute bind variable&gt;
      *        </code></pre>
      *        where the "condition" is something like "=", "&lt;", "&gt;", or
      *        "!=".  The "bind variable" should be a colon followed by
-     *        some attribute name that will later be set with a call to 
-     *        {@link com.arsdigita.persistence.Filter#set(java.lang.String, 
+     *        some attribute name that will later be set with a call to
+     *        {@link com.arsdigita.persistence.Filter#set(java.lang.String,
      *               java.lang.Object)}
      *        <p>
      *        It is possible to set multiple conditions with a single
      *        addFilter statement by combining the conditions with an "and"
      *        or an "or".  Conditions may be grouped by using parentheses.
-     *        Consecutive calls to addFilter append the filters using 
+     *        Consecutive calls to addFilter append the filters using
      *        "and".
      */
     public Filter simple(String sql) {
@@ -97,7 +97,7 @@ class FilterFactoryImpl implements FilterFactory {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     public Filter lessThan(String attribute, Object value,
@@ -117,12 +117,12 @@ class FilterFactoryImpl implements FilterFactory {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     public Filter lessThanEquals(String attribute, Object value,
-                           boolean trueForAllIfValueIsNull) {
-        return FilterImpl.lessThanEquals(attribute, value, 
+                                 boolean trueForAllIfValueIsNull) {
+        return FilterImpl.lessThanEquals(attribute, value,
                                          trueForAllIfValueIsNull);
     }
 
@@ -138,7 +138,7 @@ class FilterFactoryImpl implements FilterFactory {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     public Filter greaterThan(String attribute, Object value,
@@ -146,7 +146,7 @@ class FilterFactoryImpl implements FilterFactory {
         return FilterImpl.greaterThan(attribute, value, trueForAllIfValueIsNull);
     }
 
-    
+
     /**
      *  This creates the appropriate SQL for the given attribute and
      *  passed in value.  It creates a filter for "<code>attributeName
@@ -158,12 +158,12 @@ class FilterFactoryImpl implements FilterFactory {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     public Filter greaterThanEquals(String attribute, Object value,
                                     boolean trueForAllIfValueIsNull) {
-        return FilterImpl.greaterThanEquals(attribute, value, 
+        return FilterImpl.greaterThanEquals(attribute, value,
                                             trueForAllIfValueIsNull);
     }
 
@@ -179,7 +179,7 @@ class FilterFactoryImpl implements FilterFactory {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     public Filter startsWith(String attribute, String value,
@@ -199,7 +199,7 @@ class FilterFactoryImpl implements FilterFactory {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     public Filter endsWith(String attribute, String value,
@@ -219,7 +219,7 @@ class FilterFactoryImpl implements FilterFactory {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     public Filter contains(String attribute, String value,
@@ -236,7 +236,7 @@ class FilterFactoryImpl implements FilterFactory {
      *  <code><pre>
      *  ((&lt;expressionOne&gt; &lt;comparator&gt; &lt;expressionTwo&gt;)
      *    or
-     *   (&lt;expressionOne&gt; is [not] null 
+     *   (&lt;expressionOne&gt; is [not] null
      *     and &lt;expressionTwo&gt; is [not] null))
      *  </pre></code>
      *  <p>
@@ -255,7 +255,7 @@ class FilterFactoryImpl implements FilterFactory {
      *                       be something as simple as a bind variable or
      *                       as complex as a call to a PL/SQL function.
      */
-    public Filter compare(String expressionOne, int comparator, 
+    public Filter compare(String expressionOne, int comparator,
                           String expressionTwo) {
         String stringComparator = null;
         SQLUtilities util = SessionManager.getSession().getSQLUtilities();
@@ -288,8 +288,8 @@ class FilterFactoryImpl implements FilterFactory {
         case ENDS_WITH:
             return simple(expressionOne + " like '%' || " + expressionTwo);
         case CONTAINS:
-            return simple(expressionOne + " like '%' || " + 
-                              expressionTwo + " || '%'");
+            return simple(expressionOne + " like '%' || " +
+                          expressionTwo + " || '%'");
         default:
             throw new PersistenceException("The comparator that you have " +
                                            "passed in is not value");
@@ -297,21 +297,21 @@ class FilterFactoryImpl implements FilterFactory {
 
         String expressionOneNotNull =
             util.createNullString(stringComparator, expressionOne);
-        String expressionTwoNotNull = 
+        String expressionTwoNotNull =
             util.createNullString(stringComparator, expressionTwo);
 
         if (notEqualsValue) {
             // in this case, we have to make sure that they are not equal
-            return simple("(" + expressionOne + " " + stringComparator + " " 
-                          + expressionTwo + 
-                          " or (" + expressionOneNotNull + " and not " + 
+            return simple("(" + expressionOne + " " + stringComparator + " "
+                          + expressionTwo +
+                          " or (" + expressionOneNotNull + " and not " +
                           expressionTwoNotNull + ") or (" +
                           expressionTwoNotNull + " and not " +
                           expressionOneNotNull + "))");
         } else {
             return simple("(" + expressionOne + " " + stringComparator + " " +
-                          expressionTwo + " or (" + 
-                          expressionOneNotNull + " and " + 
+                          expressionTwo + " or (" +
+                          expressionOneNotNull + " and " +
                           expressionTwoNotNull + "))");
         }
     }
@@ -328,17 +328,17 @@ class FilterFactoryImpl implements FilterFactory {
 
 
     /**
-    * This creates a filter that constructs an "in" style subquery with the
-    * given property to be filtered on and subquery. subQueryProperty is the 
-    * property in the subquery which relates to the property being filtered 
-    * on. The subquery must be a fully qualified query name of a query defined
-    * in a PDL file somewhere. 
-    **/
-    
+     * This creates a filter that constructs an "in" style subquery with the
+     * given property to be filtered on and subquery. subQueryProperty is the
+     * property in the subquery which relates to the property being filtered
+     * on. The subquery must be a fully qualified query name of a query defined
+     * in a PDL file somewhere.
+     **/
+
     public Filter in( String property,
-		      String subQueryProperty,
-		      String queryName ) {
-	return FilterImpl.in( property, subQueryProperty, queryName );
+                      String subQueryProperty,
+                      String queryName ) {
+        return FilterImpl.in( property, subQueryProperty, queryName );
     }
 
 
@@ -352,32 +352,24 @@ class FilterFactoryImpl implements FilterFactory {
     }
 
 
-    /** 
+    /**
      *  This creates and returns a filter that can be used to AND
      *  existing filters together.  Whenever addFilter is called
      *  on the filters that is returned, it ANDs the passed in
      *  Filters with the existing filter
      */
     public CompoundFilter and() {
-        return CompoundFilterImpl.and();   
+        return CompoundFilterImpl.and();
     }
 
 
-    /** 
+    /**
      *  This creates and returns a filter that can be used to OR
      *  existing filters together.  Whenever addFilter is called
      *  on the filters that is returned, it ORs the passed in
      *  Filters with the existing filter
      */
     public CompoundFilter or() {
-        return CompoundFilterImpl.or();   
+        return CompoundFilterImpl.or();
     }
 }
-
-
-
-
-
-
-
-

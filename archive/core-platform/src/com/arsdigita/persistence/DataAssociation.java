@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -28,18 +28,18 @@ import com.arsdigita.persistence.metadata.ObjectType;
  *
  * It is important to note that when the deprecated methods in this class
  * are removed, <font color="red"><b>this class will no long extend
- * DataCollection</b></font>.  If you want something that extends 
+ * DataCollection</b></font>.  If you want something that extends
  * DataCollection, use DataAssociationCursor instead.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $ */
+ * @version $Revision: #3 $ $Date: 2002/08/14 $ */
 
 public interface DataAssociation extends DataCollection {
     // when this no longer extends DataCollection, make sure it
     // still has get/set Query and get/set Source
 
-    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociation.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociation.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     /**
      * Adds <i>object</i> to the persistent association.
@@ -76,7 +76,7 @@ public interface DataAssociation extends DataCollection {
     /**
      * Returns a data association iterator that allows users to iterate
      * through all of the data associations
-     *  
+     *
      * This is a convenience method for getDataAssociationCursor()
      */
     DataAssociationCursor cursor();
@@ -103,10 +103,10 @@ public interface DataAssociation extends DataCollection {
     /**
      * Calls get("link." + name).
      *
-     * @param name The name of the link property.  
+     * @param name The name of the link property.
      *
      * @deprecated Use {@link #cursor()}.getLinkProperty
-     * @return The property value.  
+     * @return The property value.
      */
     Object getLinkProperty(String name);
 
@@ -114,7 +114,7 @@ public interface DataAssociation extends DataCollection {
     /**
      * Removes the object associated with the current position in the
      * collection.
-     * @deprecated Use {@link #remove(DataObject object)} or 
+     * @deprecated Use {@link #remove(DataObject object)} or
      * {@link #cursor()}, loop through the object
      * and then call remove()
      */
@@ -140,7 +140,7 @@ public interface DataAssociation extends DataCollection {
      * save() is called on the association's parent object. This means, for
      * example, that cursor() will return the same cursor that it did before
      * any objects are added.
-     * @param oid The OID of the object to remove.   
+     * @param oid The OID of the object to remove.
      */
     void remove(OID oid);
 
@@ -177,7 +177,7 @@ public interface DataAssociation extends DataCollection {
 
 
     /**
-     * Moves the cursor to the first row in the query. 
+     * Moves the cursor to the first row in the query.
      * <font color=red>Not implemented yet.</font>
      *
      * @return true if the cursor is on a valid row; false if there are no
@@ -233,14 +233,14 @@ public interface DataAssociation extends DataCollection {
      * Note: Calling the method isLast may be expensive because the
      * JDBC driver might need to fetch ahead one row in order to
      * determine whether the current row is the last row in the result
-     * set.  
+     * set.
      * <p>
      * If the query has not yet been executed, it executes the query.
      * <p>
      * This is similar to {@link com.arsdigita.db.ResultSet#isLast()}
      * <p>
      *
-     * @deprecated use {@link #cursor()}.isLast() 
+     * @deprecated use {@link #cursor()}.isLast()
      *
      * @return True if the cursor is on the last row, false otherwise.
      **/
@@ -322,7 +322,7 @@ public interface DataAssociation extends DataCollection {
      * <code>"priority < 3 and priority > 3"</code>
      * which is clearly now what the developer wants.
      * <p>
-     * The following will work.  
+     * The following will work.
      * <pre>
      * <code>
      * Filter filter = query.addFilter("priority < :lowerBound");
@@ -331,10 +331,10 @@ public interface DataAssociation extends DataCollection {
      * filter.set("upperBound", new Integer(8));
      * </code>
      * </pre>
-     * It is actually the same as 
+     * It is actually the same as
      * <pre>
      * <code>
-     * Filter filter = query.addFilter("priority < :lowerBound 
+     * Filter filter = query.addFilter("priority < :lowerBound
      *                                  and priority > :uperBound");
      * filter.set("upperBound", new Integer(8));
      * filter.set("lowerBound", new Integer(3));
@@ -343,25 +343,25 @@ public interface DataAssociation extends DataCollection {
      *
      * @param conditions The conditions for the filter.  This is a string
      *        that should represent part of a SQL "where" clause.  Specifically,
-     *        it should normally take the form of 
+     *        it should normally take the form of
      *        <pre><code>
      *        &lt;column_name&gt; &lt;condition&gt; &lt;attribute bind variable&gt;
      *        </code></pre>
      *        where the "condition" is something like "=", "&lt;", "&gt;", or
      *        "!=".  The "bind variable" should be a colon followed by
-     *        some attribute name that will later be set with a call to 
-     *        {@link com.arsdigita.persistence.Filter#set(java.lang.String, 
+     *        some attribute name that will later be set with a call to
+     *        {@link com.arsdigita.persistence.Filter#set(java.lang.String,
      *               java.lang.Object)}
      *        <p>
      *        It is possible to set multiple conditions with a single
      *        addFilter statement by combining the conditions with an "and"
      *        or an "or".  Conditions may be grouped by using parentheses.
-     *        Consecutive calls to addFilter append the filters using 
+     *        Consecutive calls to addFilter append the filters using
      *        "and".
      *        <p>
      *        If there is already a filter that exists for this query
      *        then the passed in conditions are added to the current
-     *        conditions with an AND like <code>(&lt;current conditions&gt;) 
+     *        conditions with an AND like <code>(&lt;current conditions&gt;)
      *        and (&lt; passed in conditions&gt;)</code>
      *
      * @return The filter that has just been added to the query
@@ -412,23 +412,23 @@ public interface DataAssociation extends DataCollection {
      *              addOrder("creationDate");
      *              addOrder("creationUser");
      *              </code></pre>
-     *              is the same as 
+     *              is the same as
      *              <pre><code>
      *              addOrder("creationDate, creationUser");
      *              </code></pre>
-     *              
+     *
      *              <p>
      *              If the items should be ordered in ascending order,
      *              the attribute name should be followed by the word "asc"
      *              If the items should be ordered in descending order,
      *              the attribute should be followed by the word "desc"
      *              For instance, or order by ascending date and descending
-     *              user (for users created with the same date), you would 
+     *              user (for users created with the same date), you would
      *              use the following:
      *              <pre><code>
      *              addOrder("creationDate asc, creationUser desc");
      *              </code></pre>
-     *              
+     *
      * @deprecated use {@link #cursor()}.addOrder(String order)
      **/
     void addOrder(String order) throws PersistenceException;
@@ -456,7 +456,7 @@ public interface DataAssociation extends DataCollection {
      * @param value The value to assign to the parameter
      *
      * @deprecated use {@link #cursor()}.setParameter(Strin
-     * parameterName, Object value)} 
+     * parameterName, Object value)}
      */
     void setParameter(String parameterName, Object value);
 
@@ -475,14 +475,14 @@ public interface DataAssociation extends DataCollection {
 
 
     /**
-     * Explicitly closes this DataQuery.  
+     * Explicitly closes this DataQuery.
      * Query should automatically be closed when next
-     * returns false, but this method should be 
-     * explicitly called in the case where all of the data in a query 
+     * returns false, but this method should be
+     * explicitly called in the case where all of the data in a query
      * is not needed (e.g. a "while (next())" loop is exited early or
      * only one value is retrieved with if (next()) {...}).
      * @deprecated use {@link #cursor()}.close()
-     */    
+     */
     void close();
 
 

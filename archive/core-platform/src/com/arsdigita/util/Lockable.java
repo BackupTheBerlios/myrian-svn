@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -51,25 +51,25 @@ package com.arsdigita.util;
  * attempt is made to modify it.
  *
  * @author David Lutterkort (lutter@arsdigita.com)
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/Lockable.java#2 $ */
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/Lockable.java#3 $ */
 
 public interface Lockable {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Lockable.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
-  /**
-   * Lock an object. Locked objects are to be considered immutable. Any
-   * attempt to modify them, e.g., through a <code>setXXX</code> method 
-   * should lead to an exception.
-   * 
-   * <p> Most lockable Bebop classes throw an {@link
-   * java.lang.IllegalStateException} if an attempt is made to modify a
-   * locked instance.
-   */
-  void lock();
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/util/Lockable.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    /**
+     * Lock an object. Locked objects are to be considered immutable. Any
+     * attempt to modify them, e.g., through a <code>setXXX</code> method
+     * should lead to an exception.
+     *
+     * <p> Most lockable Bebop classes throw an {@link
+     * java.lang.IllegalStateException} if an attempt is made to modify a
+     * locked instance.
+     */
+    void lock();
 
-  /**
-   * Return whether an object is locked and thus immutable, or can still be
-   * modified.
-   */
-  boolean isLocked();
+    /**
+     * Return whether an object is locked and thus immutable, or can still be
+     * modified.
+     */
+    boolean isLocked();
 }

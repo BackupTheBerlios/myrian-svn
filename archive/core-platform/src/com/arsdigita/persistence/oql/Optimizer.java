@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.redhat.com/licenses/ccmpl.html
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
+
 package com.arsdigita.persistence.oql;
 
 import com.arsdigita.util.*;
@@ -8,12 +23,12 @@ import java.util.*;
  * Optimizer
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  **/
 
 class Optimizer extends Actor {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Optimizer.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Optimizer.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     public void act(Table table) {
         Query query = table.getQuery();
@@ -54,9 +69,9 @@ class Optimizer extends Actor {
                 if (added != null) {
                     table.remove();
                     query.modify(
-                        "Added join from '" + added.getTail() + "' to '" +
-                        added.getHead() + "' and removed '" + table + "'."
-                        );
+                                 "Added join from '" + added.getTail() + "' to '" +
+                                 added.getHead() + "' and removed '" + table + "'."
+                                 );
                 }
             }
         } else if (canShiftSelections(table)) {
@@ -64,9 +79,9 @@ class Optimizer extends Actor {
             Assert.assertEquals(0, table.getSelections().size());
             table.remove();
             query.modify(
-                "Shifted selections from '" + table + "' to '" + other +
-                "' and removed '" + table + "'."
-                );
+                         "Shifted selections from '" + table + "' to '" + other +
+                         "' and removed '" + table + "'."
+                         );
         }
     }
 
@@ -83,16 +98,16 @@ class Optimizer extends Actor {
                 other = cond.getHead().getTable();
             }
         }
-        
+
         for (Iterator it = table.getSelections().iterator(); it.hasNext(); ) {
             Selection sel = (Selection) it.next();
             Column col = (Column) columns.get(sel.getColumn());
             if (col == null) {
                 throw new IllegalStateException(
-                    "Couldn't map " + sel.getColumn() + " using " + columns +
-                    " derived from " + table.getConditions() + ", " +
-                    table.getSelections()
-                    );
+                                                "Couldn't map " + sel.getColumn() + " using " + columns +
+                                                " derived from " + table.getConditions() + ", " +
+                                                table.getSelections()
+                                                );
             }
             sel.setColumn(col);
         }

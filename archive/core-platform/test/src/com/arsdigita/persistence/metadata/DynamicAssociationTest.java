@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -32,11 +32,11 @@ import org.apache.log4j.Logger;
 
 /**
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Revision: #3 $ $Date: 2002/08/13 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  */
 
 public class DynamicAssociationTest extends PersistenceTestCase {
-    private static Logger s_log = 
+    private static Logger s_log =
         Logger.getLogger(DynamicAssociationTest.class.getName());
 
     private MetadataRoot m_root = MetadataRoot.getMetadataRoot();
@@ -61,15 +61,15 @@ public class DynamicAssociationTest extends PersistenceTestCase {
                     statement.executeUpdate("drop table " + table);
                 } catch (Exception e) {
                     s_log.info("Error executing statement " +
-                                       "'drop table " + table + "': " + e);
-                }        
+                               "'drop table " + table + "': " + e);
+                }
             }
         } catch (Exception e) {
             s_log.info("Error creating statement: " + e.getMessage());
         } finally {
             try {
                 statement.close();
-            } catch (Exception e) { 
+            } catch (Exception e) {
                 //ignore
             }
         }
@@ -80,14 +80,14 @@ public class DynamicAssociationTest extends PersistenceTestCase {
         iter = m_assocs.iterator();
         while (iter.hasNext()) {
             DataOperation operation = SessionManager.getSession()
-                                                    .retrieveDataOperation
+                .retrieveDataOperation
                 ("examples.DataOperationToDeleteTestDynamicAssociations");
             Association assoc = (Association)iter.next();
             String model = assoc.getModel().getName();
             String type1 = ((ObjectType)assoc.getRoleOne().getType())
-                                .getQualifiedName();
+                .getQualifiedName();
             String type2 = ((ObjectType)assoc.getRoleTwo().getType())
-                                .getQualifiedName();
+                .getQualifiedName();
             String prop1 = assoc.getRoleOne().getName();
             String prop2 = assoc.getRoleTwo().getName();
 
@@ -98,7 +98,7 @@ public class DynamicAssociationTest extends PersistenceTestCase {
             operation.setParameter("property2", prop2);
             operation.execute();
         }
-        // this is here so that the "delete" operation above takes 
+        // this is here so that the "delete" operation above takes
         getSession().getTransactionContext().commitTxn();
         getSession().getTransactionContext().beginTxn();
 
@@ -108,18 +108,18 @@ public class DynamicAssociationTest extends PersistenceTestCase {
 
     public void testCreation() throws Exception {
         DynamicAssociation dass = new DynamicAssociation(
-            "teststuff.foo",
-            "com.arsdigita.kernel.ACSObject",
-            "owned",
-            Property.COLLECTION,
-            "com.arsdigita.kernel.User",
-            "owner",
-            Property.REQUIRED);
+                                                         "teststuff.foo",
+                                                         "com.arsdigita.kernel.ACSObject",
+                                                         "owned",
+                                                         Property.COLLECTION,
+                                                         "com.arsdigita.kernel.User",
+                                                         "owner",
+                                                         Property.REQUIRED);
 
         Association assoc = dass.save();
         ObjectType object =
             m_root.getObjectType("com.arsdigita.kernel.ACSObject");
-        ObjectType user = 
+        ObjectType user =
             m_root.getObjectType("com.arsdigita.kernel.User");
 
         assert("Property not found in User",
@@ -128,22 +128,22 @@ public class DynamicAssociationTest extends PersistenceTestCase {
                object.getProperty("owner") != null);
 
         DynamicAssociation dass2 = new DynamicAssociation(
-            "teststuff.foo",
-            "com.arsdigita.kernel.ACSObject",
-            "owned",
-            "com.arsdigita.kernel.User",
-            "owner");
+                                                          "teststuff.foo",
+                                                          "com.arsdigita.kernel.ACSObject",
+                                                          "owned",
+                                                          "com.arsdigita.kernel.User",
+                                                          "owner");
 
         Association assoc2 = dass2.save();
         assert("Saved associations are different", assoc.equals(assoc2));
 
         try {
             dass2 = new DynamicAssociation(
-                "teststuff.foo",
-                "com.arsdigita.kernel.ACSObject",
-                "container",
-                "com.arsdigita.kernel.User",
-                "owner");
+                                           "teststuff.foo",
+                                           "com.arsdigita.kernel.ACSObject",
+                                           "container",
+                                           "com.arsdigita.kernel.User",
+                                           "owner");
 
             fail("No error thrown on bad association");
         } catch (Exception e) {
@@ -216,10 +216,10 @@ public class DynamicAssociationTest extends PersistenceTestCase {
 
         // clean up
         String tableName = ((JoinElement)assoc
-                                .getRoleOne()
-                                .getJoinPath()
-                                .getJoinElements()
-                                .next()).getTo().getTableName();
+                            .getRoleOne()
+                            .getJoinPath()
+                            .getJoinElements()
+                            .next()).getTo().getTableName();
         m_tables.add(tableName);
         m_assocs.add(assoc);
     }

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -28,14 +28,14 @@ import org.w3c.dom.Attr;
  * <code>org.jdom.Element</code> using <code>org.w3c.dom.Element</code>.
  *
  * @author Patrick McNeill (pmcneill@arsdigita.com)
- * @version $Revision: #5 $ $Date: 2002/08/13 $
+ * @version $Revision: #6 $ $Date: 2002/08/14 $
  * @since ACS 4.5a
  */
 public class Element {
-    public static final String versionId = 
-        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#5 $" +
+    public static final String versionId =
+        "$Id: //core-platform/dev/src/com/arsdigita/xml/Element.java#6 $" +
         "$Author: dennis $" +
-        "$DateTime: 2002/08/13 11:53:00 $";
+        "$DateTime: 2002/08/14 23:39:40 $";
 
     private static final Logger s_log = Logger.getLogger
         (Element.class.getName());
@@ -46,29 +46,29 @@ public class Element {
     /**
      * owner document
      */
-    private org.w3c.dom.Document m_doc; 
-        
+    private org.w3c.dom.Document m_doc;
+
     private static ThreadLocal s_localDocument = new ThreadLocal() {
-        public Object initialValue() {
-            try {
-                DocumentBuilderFactory builder = 
-                    DocumentBuilderFactory.newInstance();
-                builder.setNamespaceAware(true);
-                return builder.newDocumentBuilder().newDocument();
-            } catch ( ParserConfigurationException e ) {
-                s_log.error(e);
-                throw new UncheckedWrapperException
-                ("INTERNAL: Could not create thread local DOM document.", e);
+            public Object initialValue() {
+                try {
+                    DocumentBuilderFactory builder =
+                        DocumentBuilderFactory.newInstance();
+                    builder.setNamespaceAware(true);
+                    return builder.newDocumentBuilder().newDocument();
+                } catch ( ParserConfigurationException e ) {
+                    s_log.error(e);
+                    throw new UncheckedWrapperException
+                        ("INTERNAL: Could not create thread local DOM document.", e);
+                }
             }
-        }
         };
-                
-        private static org.w3c.dom.Document getDocument() {
-                return (org.w3c.dom.Document) s_localDocument.get();
-        }
-        
+
+    private static org.w3c.dom.Document getDocument() {
+        return (org.w3c.dom.Document) s_localDocument.get();
+    }
+
     //private static org.w3c.dom.Document s_document;
-        //static {
+    //static {
     //    try {
     //        DocumentBuilderFactory builder = DocumentBuilderFactory.newInstance();
     //        builder.setNamespaceAware(true);
@@ -76,8 +76,8 @@ public class Element {
     //    } catch ( ParserConfigurationException e ) {
     //        s_log.error(e);
     //    }
-        //}
-        
+    //}
+
     /*
      * We keep this document internally so that we can create DOM elements
      * appropriately.  When they're assigned to a document, the node will be
@@ -90,7 +90,7 @@ public class Element {
      * create a new element.  Used if we are programatically setting the
      * m_element field later.
      */
-    protected Element() { 
+    protected Element() {
     }
 
     /**
@@ -104,7 +104,7 @@ public class Element {
     }
 
     /**
-     * Creates a new element with the given name, and assigns it to the 
+     * Creates a new element with the given name, and assigns it to the
      * namespace defined at <code>uri</code>.  The namespace prefix is
      * automatically determined.
      *
@@ -116,20 +116,20 @@ public class Element {
     }
 
     /**
-     * Creates a new element and adds it as a child to this 
+     * Creates a new element and adds it as a child to this
      * element.  <code>elt.newChildElement("newElt")</code> is
      *  equivalent to
      * <pre>
      * Element newElt = new Element("newElt");
      * elt.addChild(newElt);
      * </pre>
-     * 
+     *
      * @param name the name of the element
      * @return the created child element.
      * @pre m_element != null
      */
-    public Element newChildElement(String name) { 
-        if (m_doc == null) { 
+    public Element newChildElement(String name) {
+        if (m_doc == null) {
             m_doc = this.m_element.getOwnerDocument();
         }
 
@@ -148,14 +148,14 @@ public class Element {
      * Element newElt = new Element("newElt", namespace);
      * elt.addChild(newElt);
      * </pre>
-     * 
+     *
      * @param name the name of the Element
      * @param uri the URI for the namespace definition
      * @return the created child element.
      * @pre m_element != null
      */
-    public Element newChildElement(String name, String uri) { 
-        if (m_doc == null) { 
+    public Element newChildElement(String name, String uri) {
+        if (m_doc == null) {
             m_doc = this.m_element.getOwnerDocument();
         }
 
@@ -170,7 +170,7 @@ public class Element {
      * Element.
      */
     public Element newChildElement(Element copyFrom) {
-        if (m_doc == null) { 
+        if (m_doc == null) {
             m_doc = this.m_element.getOwnerDocument();
         }
 
@@ -180,11 +180,11 @@ public class Element {
         this.m_element.appendChild(copyTo.m_element);
 
         copyTo.setText(copyFrom.getText());
-        
+
         NamedNodeMap nnm = copyFrom.m_element.getAttributes();
 
-        if (nnm != null) { 
-            for (int i = 0; i < nnm.getLength(); i++) { 
+        if (nnm != null) {
+            for (int i = 0; i < nnm.getLength(); i++) {
                 Attr attr = (org.w3c.dom.Attr) nnm.item(i);
                 copyTo.addAttribute(attr.getName(), attr.getValue());
             }
@@ -210,7 +210,7 @@ public class Element {
     public Element addAttribute( String name, String value ) {
         m_element.setAttribute( name, value );
 
-                return this;
+        return this;
     }
 
     /**
@@ -227,7 +227,7 @@ public class Element {
     }
 
     /**
-     * Sets the text value of the current element (the part between the 
+     * Sets the text value of the current element (the part between the
      * tags).  If the passed in text is null then it is converted to
      * the empty string.
      *
@@ -235,9 +235,9 @@ public class Element {
      * @return this element.
      */
     public Element setText( String text ) {
-        if (text == null) { 
+        if (text == null) {
             // This converts the null to the empty string because
-            // org.w3c.dom does not like null and HTML does not 
+            // org.w3c.dom does not like null and HTML does not
             // differentiate between "" and null.  The other option
             // is to throw the NPE which causes other problems
             text = "";
@@ -258,7 +258,7 @@ public class Element {
 
         org.w3c.dom.NodeList nl = m_element.getChildNodes();
 
-        for (int i = 0; i < nl.getLength(); i++) { 
+        for (int i = 0; i < nl.getLength(); i++) {
             org.w3c.dom.Node n = nl.item(i);
 
             if (n.getNodeType() == org.w3c.dom.Node.TEXT_NODE) {
@@ -275,8 +275,8 @@ public class Element {
         if (cdata == null) {
             cdata = "";
         }
-        
-        org.w3c.dom.CDATASection cdataSection = 
+
+        org.w3c.dom.CDATASection cdataSection =
             m_element.getOwnerDocument().createCDATASection(cdata);
 
         m_element.appendChild(cdataSection);
@@ -289,7 +289,7 @@ public class Element {
 
         org.w3c.dom.NodeList nl = m_element.getChildNodes();
 
-        for (int i = 0; i < nl.getLength(); i++) { 
+        for (int i = 0; i < nl.getLength(); i++) {
             org.w3c.dom.Node n = nl.item(i);
 
             if (n.getNodeType() == org.w3c.dom.Node.CDATA_SECTION_NODE) {
@@ -308,12 +308,12 @@ public class Element {
      * Returns a <code>List</code> of all the child elements nested
      * directly (one level deep) within this element, as <code>Element</code>
      * objects. If this target element has no nested elements, an empty
-     * <code>List</code> is returned. The returned list is "live", so 
-     * changes to it affect the element's actual contents. 
+     * <code>List</code> is returned. The returned list is "live", so
+     * changes to it affect the element's actual contents.
      * <p>
-     * 
-     * This performs no recursion, so elements nested two levels deep would 
-     * have to be obtained with: 
+     *
+     * This performs no recursion, so elements nested two levels deep would
+     * have to be obtained with:
      * <pre>
      * Iterator itr = currentElement.getChildren().iterator();
      * while (itr.hasNext()) {
@@ -324,10 +324,10 @@ public class Element {
      * </pre>
      * @return list of child <code>Element</code> objects for this element.
      */
-    public java.util.List getChildren() { 
+    public java.util.List getChildren() {
         java.util.List retval = new java.util.ArrayList();
         org.w3c.dom.NodeList nl = m_element.getChildNodes();
-        for (int i = 0; i < nl.getLength(); i++) { 
+        for (int i = 0; i < nl.getLength(); i++) {
             org.w3c.dom.Node n = nl.item(i);
             if (n instanceof org.w3c.dom.Element) {
                 Element elt = new Element();
@@ -343,48 +343,48 @@ public class Element {
         // Retrieve the attributes of the DOM Element
         org.w3c.dom.NamedNodeMap attributeNodeMap =
             m_element.getAttributes();
-        
+
         // Create the HashMap that we will return the attributes
         // in
         java.util.HashMap returnMap = new java.util.HashMap();
-        
+
         // Copy the attribute values in the NamedNodeMap to the
         // HashMap
         for (int i = 0; i < attributeNodeMap.getLength(); ++i) {
             // Get the Node
             org.w3c.dom.Node attributeNode = attributeNodeMap.item(i);
             // Copy the name and value to the map
-            returnMap.put(attributeNode.getNodeName(), 
+            returnMap.put(attributeNode.getNodeName(),
                           attributeNode.getNodeValue());
         }
-        
+
         // Return the HashMap
         return returnMap;
     }
-    
+
     /**
      * Retrieves an attribute value by name.
      * @param name The name of the attribute to retrieve
-     * @return The Attr value as a string, 
-     * or the empty string if that attribute does not have a specified 
+     * @return The Attr value as a string,
+     * or the empty string if that attribute does not have a specified
      * or default value.
      */
     public String getAttribute(String name) {
         return m_element.getAttribute(name);
     }
-    
+
     public boolean hasAttribute(String name) {
         return m_element.hasAttribute(name);
     }
-    
+
     public String getName() {
         return m_element.getTagName();
     }
 
 
     /**
-     * Functions to allow this class to interact appropriately with the 
-     * Document class (for example, allows nodes to be moved around, 
+     * Functions to allow this class to interact appropriately with the
+     * Document class (for example, allows nodes to be moved around,
      * and so on).
      *
      * @return the internal DOM Element.
@@ -402,36 +402,36 @@ public class Element {
      */
     protected void importInto( org.w3c.dom.Document doc ) {
         /*
-        Exception e = new Exception();
-        java.io.StringWriter sw = new java.io.StringWriter();
-        e.printStackTrace(new java.io.PrintWriter(sw));
-        System.out.println(sw.toString().substring(0, 300));
+          Exception e = new Exception();
+          java.io.StringWriter sw = new java.io.StringWriter();
+          e.printStackTrace(new java.io.PrintWriter(sw));
+          System.out.println(sw.toString().substring(0, 300));
         */
         visitAllAttributes(m_element);
         m_element = (org.w3c.dom.Element)doc.importNode(m_element, true);
     }
 
     /**
-     * Workaround for bug in some versions of Xerces.  
+     * Workaround for bug in some versions of Xerces.
      * For some reason, importNode doesn't also copy attribute
-     * values unless you call getValue() on them first.  This may 
+     * values unless you call getValue() on them first.  This may
      * be fixed in a later version of Xerces.  In the meantime,
-     * calling visitAllAttributes(node) before importNode should 
+     * calling visitAllAttributes(node) before importNode should
      * help.
      * @author Bill Schneider (bschneid@arsdigita.com)
      * @param node the org.w3c.dom.Node about to be imported
      */
     public static void visitAllAttributes(org.w3c.dom.Node node) {
         org.w3c.dom.NamedNodeMap nnm = node.getAttributes();
-        if (nnm != null) { 
-            for (int i = 0; i < nnm.getLength(); i++) { 
+        if (nnm != null) {
+            for (int i = 0; i < nnm.getLength(); i++) {
                 org.w3c.dom.Attr attr = (org.w3c.dom.Attr)nnm.item(i);
                 attr.getValue();
             }
         }
         org.w3c.dom.NodeList nl = node.getChildNodes();
         if (nl != null) {
-            for (int i = 0; i < nl.getLength() ; i++) { 
+            for (int i = 0; i < nl.getLength() ; i++) {
                 visitAllAttributes(nl.item(i));
             }
         }

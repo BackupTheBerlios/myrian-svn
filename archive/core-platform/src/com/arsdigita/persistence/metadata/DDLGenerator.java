@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -24,18 +24,18 @@ import java.util.Map;
  * this class is to provide DDL to create and alter tables used by
  * {@link com.arsdigita.persistence.metadata.DynamicObjectType}.
  *
- * Note that the DDLGenerator does not support dropping tables and 
+ * Note that the DDLGenerator does not support dropping tables and
  * columns.  This is to avoid data loss and allow rolling back of UDCT
  * operations.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
  * @author <a href="mailto:randyg@arsdigita.com">Randy Graebner</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGenerator.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGenerator.java#4 $
  * @since 4.6.3 */
 
 public interface DDLGenerator {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGenerator.java#3 $ by $Author: randyg $, $DateTime: 2002/07/30 10:05:06 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DDLGenerator.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
     /**
      * This takes an ObjectType name and model, and generates a unique
      * table name that can be used to store the object type.
@@ -48,10 +48,10 @@ public interface DDLGenerator {
     String generateTableName(String model, String name);
 
     /**
-     * This takes a table name and a Property to generate a unique 
+     * This takes a table name and a Property to generate a unique
      * column name.
-     * 
-     * @param objectType the objecttype that will contain the property 
+     *
+     * @param objectType the objecttype that will contain the property
      * @param proposedName the proposed name of the property
      * @return a unique column name that will be used to store this property
      */
@@ -102,7 +102,7 @@ public interface DDLGenerator {
                              Collection properties);
 
     /**
-     * Takes an object type and a collection of additional properties. 
+     * Takes an object type and a collection of additional properties.
      * Returns either a "create table" or an "alter table" statement to add
      * the properties to the object type's table.
      *
@@ -114,9 +114,9 @@ public interface DDLGenerator {
                              Collection properties);
 
     /**
-     * Determines a unique name for a mapping table for a particular 
+     * Determines a unique name for a mapping table for a particular
      * role reference and object type.
-     * 
+     *
      * @param type the objecttype that owns the property
      * @param name the property name
      * @return a unique name for a mapping table
@@ -131,7 +131,7 @@ public interface DDLGenerator {
      * @param property the role reference
      * @return the DDL statement to create the mapping table
      */
-    String generateMappingTable(ObjectType type, 
+    String generateMappingTable(ObjectType type,
                                 Property property);
 
     /**

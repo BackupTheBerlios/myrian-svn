@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -25,52 +25,52 @@ import junit.framework.TestSuite;
  * XML file at initialization
  *
  * </p>
- * 
+ *
  * <p> Copyright 2001 ArsDigita Corporation</p>
- * 
+ *
  * @author <a href="mbryzek@arsdigita.com">Michael Bryzek</a>
- * @date $Date: 2002/07/18 $
- * @version $Revision: #2 $
- * 
+ * @date $Date: 2002/08/14 $
+ * @version $Revision: #3 $
+ *
  * @see com.arsdigita.persistence.Initializer
  **/
 
 public class InitializerTest extends TestCase
 {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/InitializerTest.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/InitializerTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     /**
      * Constructor (needed for JTest)
      * @param name    Name of Object
      **/
     public InitializerTest(String name) {
-	super(name);
+        super(name);
     }
-    
+
     /**
      * Test method: void addFile(String)
      **/
     public void testStartupXML() {
-	MetadataRoot root = SessionManager.getMetadataRoot();
-	if (root == null) {
-	    fail("Metadata root not loaded");
-	}
+        MetadataRoot root = SessionManager.getMetadataRoot();
+        if (root == null) {
+            fail("Metadata root not loaded");
+        }
         // Make sure we have at least one schema or model
         if (!root.getModels().hasNext()) {
-	    fail("Metadata root has no schema or model. Check that you have " +
+            fail("Metadata root has no schema or model. Check that you have " +
                  "correctly specified the file paths in the xmlFiles parameter " +
                  "in the init script you are using.");
-	}
+        }
     }
 
 
     /**
      * Main method needed to make a self runnable class
-     * 
+     *
      * @param args This is required for main method
      **/
     public static void main(String[] args) {
-	junit.textui.TestRunner.run( new TestSuite(InitializerTest.class) );
+        junit.textui.TestRunner.run( new TestSuite(InitializerTest.class) );
     }
 }

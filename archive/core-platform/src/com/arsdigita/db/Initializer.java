@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -30,7 +30,7 @@ public class Initializer
 
     private Configuration m_conf = new Configuration();
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#7 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/db/Initializer.java#8 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     public static final String JDBC_URL = "jdbcUrl";
     public static final String DB_USERNAME = "dbUsername";
@@ -90,31 +90,31 @@ public class Initializer
         try {
             if (database == DbHelper.DB_ORACLE) {
                 SQLExceptionHandler.setDbExceptionHandlerImplName(
-                    OracleDbExceptionHandlerImpl.class.getName()
-                );
+                                                                  OracleDbExceptionHandlerImpl.class.getName()
+                                                                  );
             } else if (database == DbHelper.DB_POSTGRES) {
                 SQLExceptionHandler.setDbExceptionHandlerImplName(
-                    PostgresDbExceptionHandlerImpl.class.getName()
-                );
-            } else { 
+                                                                  PostgresDbExceptionHandlerImpl.class.getName()
+                                                                  );
+            } else {
                 DbHelper.unsupportedDatabaseError("SQL Exception Handler");
             }
         } catch (Exception ex) {
             throw new InitializationException(
-                "Cannot set database exception handler", ex
-            );
+                                              "Cannot set database exception handler", ex
+                                              );
         }
 
 
 
         if (database == DbHelper.DB_ORACLE) {
             Sequences.setSequenceImplName(
-                OracleSequenceImpl.class.getName()
-            );
+                                          OracleSequenceImpl.class.getName()
+                                          );
         } else if (database == DbHelper.DB_POSTGRES) {
             Sequences.setSequenceImplName(
-                PostgresSequenceImpl.class.getName()
-            );
+                                          PostgresSequenceImpl.class.getName()
+                                          );
         } else {
             DbHelper.unsupportedDatabaseError("Sequences");
         }
@@ -122,12 +122,12 @@ public class Initializer
 
         if (database == DbHelper.DB_ORACLE) {
             ConnectionManager.setDatabaseConnectionPoolName(
-                OracleConnectionPoolImpl.class.getName()
-            );
+                                                            OracleConnectionPoolImpl.class.getName()
+                                                            );
         } else if (database == DbHelper.DB_POSTGRES) {
             ConnectionManager.setDatabaseConnectionPoolName(
-                PostgresConnectionPoolImpl.class.getName()
-            );
+                                                            PostgresConnectionPoolImpl.class.getName()
+                                                            );
         } else {
             DbHelper.unsupportedDatabaseError("Connection Pool");
         }
@@ -135,10 +135,10 @@ public class Initializer
 
         if (DbHelper.getDatabase() == DbHelper.DB_ORACLE) {
             String useFixForOracle901 = (String) m_conf.getParameter(
-                USE_FIX_FOR_ORACLE_901
-            );
+                                                                     USE_FIX_FOR_ORACLE_901
+                                                                     );
 
-            if (null != useFixForOracle901 &&  
+            if (null != useFixForOracle901 &&
                 useFixForOracle901.equals("true")) {
                 com.arsdigita.db.oracle.OracleConnectionPoolImpl.setUseFixFor901(true);
             }
@@ -167,24 +167,24 @@ public class Initializer
         ConnectionManager.setConnectionPoolSize(maxConnections.intValue());
 
         s_log.info("Setting ConnectionManager default connection info...");
-        
+
         String dbUsername = (String)m_conf.getParameter(DB_USERNAME);
         String dbPassword = (String)m_conf.getParameter(DB_PASSWORD);
         try {
             ConnectionManager.setDefaultConnectionInfo(
-                jdbcUrl, dbUsername, dbPassword
-            );
+                                                       jdbcUrl, dbUsername, dbPassword
+                                                       );
         } catch (java.sql.SQLException e) {
             throw new InitializationException(
-                "SQLException initializing " +
-                "dbapi " + e.getMessage());
+                                              "SQLException initializing " +
+                                              "dbapi " + e.getMessage());
         }
 
         String driverSpecificParam1 =
             (String)m_conf.getParameter(DRIVER_SPECIFIC_PARAM1);
         if (driverSpecificParam1 != null) {
             ConnectionManager.setDriverSpecificParameter(
-                "param1", driverSpecificParam1);
+                                                         "param1", driverSpecificParam1);
         }
 
         s_log.warn("Database initializer finished.");

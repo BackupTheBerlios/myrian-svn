@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 
 
 /**
- * <b><font color="red">Experimental</font></b> DataAssociationCursor - 
+ * <b><font color="red">Experimental</font></b> DataAssociationCursor -
  * This is used to allow developers to iterate through the objects
  * within an association and get properties for those objects.
  * This does not implement java.util.Iterator because it is a cursor,
@@ -43,37 +43,37 @@ import org.apache.log4j.Logger;
  * the objects within an association.  In the sample of code below,
  * the method gets the cursor from the association, filters the cursor
  * so that it only returns the first N articles and then puts those N
- * articles, into a list to be returned.  </p> 
+ * articles, into a list to be returned.  </p>
  *
  * <pre><code>
  * public Collection getArticles(int numberOfArticles) {
  *     LinkedList articles = new LinkedList();
  *     DataAssociationCursor cursor = ((DataAssociation) get("articles")).cursor();
- *     cursor.addFilter(cursor.getFilterFactory().lessThan("rownum", 
+ *     cursor.addFilter(cursor.getFilterFactory().lessThan("rownum",
  *                                                         numberOfArticles, true));
  *     while (cursor.next()) {
  *         articles.addLast(cursor.getDataObject());
  *     }
  *
  *     cursor.close();
- *     return children;            
+ *     return children;
  * }
  *</code></pre>
  * <p>
- * Note that it is important to close the cursor explicitly to return 
+ * Note that it is important to close the cursor explicitly to return
  * the proper database resources as soon as possible.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/13 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  */
 
 class DataAssociationCursorImpl extends DataCollectionImpl
-      implements DataAssociationCursor {
+    implements DataAssociationCursor {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationCursorImpl.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-    private static final Logger s_cat = 
+    private static final Logger s_cat =
         Logger.getLogger(DataAssociationImpl.class);
 
     private GenericDataObject m_parent;
@@ -85,9 +85,9 @@ class DataAssociationCursorImpl extends DataCollectionImpl
      *  Create a new DataAssociationImpl
      *
      *  @param parent The parent GenericDataObject for the Association
-     *  @param role The role that is being created 
+     *  @param role The role that is being created
      */
-    DataAssociationCursorImpl(GenericDataObject parent, 
+    DataAssociationCursorImpl(GenericDataObject parent,
                               String role, DataAssociation data,
                               Operation op) {
         super(queryType(parent.getObjectType(), role), op);
@@ -145,7 +145,7 @@ class DataAssociationCursorImpl extends DataCollectionImpl
     public DataAssociation getDataAssociation() {
         return m_dataAssociation;
     }
-    
+
     /**
      *  This returns the Link that represents the actual association between
      *  the two objects within the association
@@ -158,8 +158,8 @@ class DataAssociationCursorImpl extends DataCollectionImpl
         } else {
             DataObject link = super.getDataObject();
             ((GenericDataObject) link).getDataContainer().initProperty(
-                associated.getName(), m_parent
-                );
+                                                                       associated.getName(), m_parent
+                                                                       );
             m_dataAssociation.addFetched(link);
             return link;
         }
@@ -213,7 +213,7 @@ class DataAssociationCursorImpl extends DataCollectionImpl
 
     /**
      *  This is a simple string representation of DataAssociationCursorImpl.
-     *  For something more involved, you should use 
+     *  For something more involved, you should use
      *  {@link #toString(Set s, int level)}
      *
      *  This is not complex because if it were, it could be possible
@@ -223,8 +223,8 @@ class DataAssociationCursorImpl extends DataCollectionImpl
      *  it prints out both toStrings
      */
     public String toString() {
-        return "DataAssociationCursorImpl: " + Utilities.LINE_BREAK + 
-            super.toString() + Utilities.LINE_BREAK + 
+        return "DataAssociationCursorImpl: " + Utilities.LINE_BREAK +
+            super.toString() + Utilities.LINE_BREAK +
             getDataAssociation().toString();
     }
 

@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.redhat.com/licenses/ccmpl.html
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
+
 package com.arsdigita.persistence.oql;
 
 import com.arsdigita.persistence.metadata.Mapping;
@@ -17,12 +32,12 @@ import java.util.Iterator;
  * (link attriubtes of type Integer, String, etc).
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/08/13 $
+ * @version $Revision: #3 $ $Date: 2002/08/14 $
  **/
 
 class CompoundLinkSelection extends Selection {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/CompoundLinkSelection.java#2 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/CompoundLinkSelection.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private static final Logger s_log =
         Logger.getLogger(CompoundLinkSelection.class);
@@ -40,13 +55,13 @@ class CompoundLinkSelection extends Selection {
                 keyUsed = keyProperty.getName();
                 Iterator joinPath = property.getJoinPath()
                     .getJoinElements();
-                // we want the second of the first 
+                // we want the second of the first
                 // element of the path
                 Column from = ((JoinElement)joinPath.next()).getFrom();
                 setProperty(new Property(property.getName() + "." +
-                                     keyProperty.getName(), property.getType(),
-                                     property.getMultiplicity(),
-                                     property.isComponent()));
+                                         keyProperty.getName(), property.getType(),
+                                         property.getMultiplicity(),
+                                         property.isComponent()));
                 getProperty().setColumn(from);
                 m_path = new String[2];
                 m_path[0] = property.getName();
@@ -58,7 +73,7 @@ class CompoundLinkSelection extends Selection {
                 // may not work so we warn.
                 s_log.warn
                     ("There are multiple keys for " +
-                     "object type " + 
+                     "object type " +
                      ((ObjectType)property.getType()).getName() +
                      ".  We are using key " + keyUsed + "." +
                      " This may or may not be appropriate. " +

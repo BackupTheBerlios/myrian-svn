@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -27,34 +27,34 @@ import org.apache.log4j.Logger;
 
 
 /**
- * Filter is used to restrict the results of a query.  Filters can 
- * be combined and manipulated to create complex queries.  
+ * Filter is used to restrict the results of a query.  Filters can
+ * be combined and manipulated to create complex queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/13 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  */
 
 class FilterImpl implements Filter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterImpl.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/FilterImpl.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-    private static final Logger m_log = 
+    private static final Logger m_log =
         Logger.getLogger(Filter.class.getName());
 
     private String m_conditions;
     private Map m_bindings = new HashMap();
-    private static SQLUtilities m_util = 
+    private static SQLUtilities m_util =
         SessionManager.getSession().getSQLUtilities();
 
     /**
      *  Creates a new filter with no conditions.  This is only meant
-     *  to be called by this class an any class that extends it.  It is 
+     *  to be called by this class an any class that extends it.  It is
      *  NOT meant to be used as a constructor outside of these classes
      *  @param isAnd indicates if this is an AND filter or an OR filter
      */
     protected FilterImpl(String conditions) {
         // note that it is possible for conditions to be null
-        // if we actually want a NO-OP filter or if we want to 
+        // if we actually want a NO-OP filter or if we want to
         // set the conditons later with setConditions()
         m_conditions = conditions;
     }
@@ -86,8 +86,8 @@ class FilterImpl implements Filter {
 
         return result.toString();
     }
-    
-    
+
+
     /**
      *  Creates a new filter with the given conditions
      *
@@ -109,7 +109,7 @@ class FilterImpl implements Filter {
      *  This takes an attribute and returns a filter that is guranteed to
      *  return false
      */
-    private static Filter filterForNullValue(String attribute, 
+    private static Filter filterForNullValue(String attribute,
                                              boolean trueForAllIfValueIsNull) {
         // we do not want to return null so we return something
         // that is either always true or always false
@@ -134,7 +134,7 @@ class FilterImpl implements Filter {
      *  "<code>attribute is null</code>".
      *
      *  @param attribute The name of the attribute to bind with the value
-     *  @param value The value for the specified attribute 
+     *  @param value The value for the specified attribute
      */
     protected static Filter equals(String attribute, Object value) {
         String conditions;
@@ -183,12 +183,12 @@ class FilterImpl implements Filter {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     protected static Filter lessThan(String attribute, Object value,
                                      boolean trueForAllIfValueIsNull) {
-        return createComparisonFilter(attribute, value, 
+        return createComparisonFilter(attribute, value,
                                       trueForAllIfValueIsNull, "<");
     }
 
@@ -204,12 +204,12 @@ class FilterImpl implements Filter {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     protected static Filter lessThanEquals(String attribute, Object value,
-                                     boolean trueForAllIfValueIsNull) {
-        return createComparisonFilter(attribute, value, 
+                                           boolean trueForAllIfValueIsNull) {
+        return createComparisonFilter(attribute, value,
                                       trueForAllIfValueIsNull, "<=");
     }
 
@@ -230,7 +230,7 @@ class FilterImpl implements Filter {
      */
     protected static Filter greaterThan(String attribute, Object value,
                                         boolean trueForAllIfValueIsNull) {
-        return createComparisonFilter(attribute, value, 
+        return createComparisonFilter(attribute, value,
                                       trueForAllIfValueIsNull, ">");
     }
 
@@ -251,22 +251,22 @@ class FilterImpl implements Filter {
      */
     protected static Filter greaterThanEquals(String attribute, Object value,
                                               boolean trueForAllIfValueIsNull) {
-        return createComparisonFilter(attribute, value, 
+        return createComparisonFilter(attribute, value,
                                       trueForAllIfValueIsNull, ">=");
     }
 
 
-    /** 
+    /**
      *  This actually creates the filter for lessThan, lessThanEquals,
      *  greaterThan, and greaterThanEquals
      */
     private static Filter createComparisonFilter
-        (String attribute, Object value, boolean trueForAllIfValueIsNull, 
+        (String attribute, Object value, boolean trueForAllIfValueIsNull,
          String comparator) {
         if (value == null) {
             return filterForNullValue(attribute, trueForAllIfValueIsNull);
         } else {
-            Filter filter = simple(attribute + " " + comparator + " :" + 
+            Filter filter = simple(attribute + " " + comparator + " :" +
                                    bindName(attribute));
             filter.set(bindName(attribute), value);
             return filter;
@@ -286,7 +286,7 @@ class FilterImpl implements Filter {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     protected static Filter startsWith(String attribute, String value,
@@ -313,7 +313,7 @@ class FilterImpl implements Filter {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     protected static Filter endsWith(String attribute, String value,
@@ -327,7 +327,7 @@ class FilterImpl implements Filter {
             return filter;
         }
     }
-    
+
 
     /**
      *  This creates the appropriate SQL for the given attribute and
@@ -340,7 +340,7 @@ class FilterImpl implements Filter {
      *  @param attribute The name of the attribute to bind with the value
      *  @param value The value for the specified attribute
      *  @param trueForAllIfValueIsNull This specifies whether a value
-     *         of null should be the equivalent of 1==1 (true) 
+     *         of null should be the equivalent of 1==1 (true)
      *         or 1==2 (false)
      */
     protected static Filter contains(String attribute, String value,
@@ -366,8 +366,8 @@ class FilterImpl implements Filter {
         if (propertyName == null || propertyName.equals("") ||
             queryName == null || queryName.equals("")) {
             throw new IllegalArgumentException(
-                "The propertyName and queryName must be non empty."
-                );
+                                               "The propertyName and queryName must be non empty."
+                                               );
         }
 
         return new FilterImpl(propertyName + " in (" + queryName + ")");
@@ -375,26 +375,26 @@ class FilterImpl implements Filter {
 
     /**
      * This creates a filter that constructs an "in" style subquery with the
-     * given property to be filtered on and subquery. subQueryProperty is the 
-     * property in the subquery which relates to the property being filtered 
+     * given property to be filtered on and subquery. subQueryProperty is the
+     * property in the subquery which relates to the property being filtered
      * on. The subquery must be a fully qualified query name of a query defined
-     * in a PDL file somewhere. 
+     * in a PDL file somewhere.
      **/
 
     protected static Filter in( String property,
-				String subQueryProperty,
-				String queryName ) {
-	if( property == null || property.equals( "" ) ||
-	    subQueryProperty == null || subQueryProperty.equals( "" ) ||
-	    queryName == null || queryName.equals( "" ) ) {
+                                String subQueryProperty,
+                                String queryName ) {
+        if( property == null || property.equals( "" ) ||
+            subQueryProperty == null || subQueryProperty.equals( "" ) ||
+            queryName == null || queryName.equals( "" ) ) {
             throw new IllegalArgumentException
-		( "The property, subQueryProperty and queryName must be " +
-		  "non empty." );
-	}
+                ( "The property, subQueryProperty and queryName must be " +
+                  "non empty." );
+        }
 
-	return new FilterImpl
-	    ( property + " in ( select " + subQueryProperty +
-	      " from ( " + queryName + " ) )" );
+        return new FilterImpl
+            ( property + " in ( select " + subQueryProperty +
+              " from ( " + queryName + " ) )" );
     }
 
     /**
@@ -407,8 +407,8 @@ class FilterImpl implements Filter {
         if (propertyName == null || propertyName.equals("") ||
             queryName == null || queryName.equals("")) {
             throw new IllegalArgumentException(
-                "The propertyName and querName must be non empty."
-                );
+                                               "The propertyName and querName must be non empty."
+                                               );
         }
 
         return new FilterImpl(propertyName + " not in (" + queryName + ")");
@@ -432,7 +432,7 @@ class FilterImpl implements Filter {
                        "named \"" + parameterName + "\".  Overwriting the" +
                        " the old value " + m_bindings.get(parameterName) +
                        " with " + value);
-        } 
+        }
         m_bindings.put(parameterName, value);
         return this;
     }
@@ -447,13 +447,13 @@ class FilterImpl implements Filter {
      *
      *  If you are executing a Fitler, you should get the SQL to
      *  pass in to the execute method using this method and then
-     *  you should set your source variables using 
+     *  you should set your source variables using
      *  {@link #setFilterSource(com.arsdigita.persistence.SQLSource)}
      */
     public String getSQL(DataQuery query) {
         String conditions = getConditions();
 
-        // if there are not any conditions then it does not make 
+        // if there are not any conditions then it does not make
         // sense to return any SQL
         if (conditions == null) {
             return null;
@@ -495,9 +495,9 @@ class FilterImpl implements Filter {
 
 
     /**
-     *  This adds an item to the bindings.  <b>This should ONLY be used 
+     *  This adds an item to the bindings.  <b>This should ONLY be used
      *  by classes extending FilterImpl</b>
-     *  
+     *
      *  @param key The key (attribute name) for the new binding
      *  @param value the value for the new binding
      */
@@ -507,7 +507,7 @@ class FilterImpl implements Filter {
 
 
     /**
-     *  This a Map to the bindings.  <b>This should ONLY be used 
+     *  This a Map to the bindings.  <b>This should ONLY be used
      *  by classes extending FilterImpl</b>
      *  @param bindings A map of attribute/value pairs to add to the
      *  bindings of the filter
@@ -540,14 +540,9 @@ class FilterImpl implements Filter {
      * This prints out a string representation of the filter
      */
     public String toString() {
-        return "Filter:" + Utilities.LINE_BREAK + 
-            " Conditions: " + getConditions() + 
+        return "Filter:" + Utilities.LINE_BREAK +
+            " Conditions: " + getConditions() +
             Utilities.LINE_BREAK + "  Values: " + getBindings();
     }
 
 }
-
-
-
-
-

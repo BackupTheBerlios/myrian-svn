@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.redhat.com/licenses/ccmpl.html
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
+
 package com.arsdigita.persistence;
 
 import java.math.*;
@@ -7,12 +22,12 @@ import org.apache.log4j.Logger;
  * RefetchTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/13 $
+ * @version $Revision: #6 $ $Date: 2002/08/14 $
  **/
 
 public class RefetchTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/RefetchTest.java#5 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/RefetchTest.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private static final Logger s_log =
         Logger.getLogger(RefetchTest.class);
@@ -63,23 +78,23 @@ public class RefetchTest extends PersistenceTestCase {
         DataCollection nodes = ssn.retrieve(REFETCH_TEST);
         try {
             nodes.addEqualsFilter(ID, NODE_ID);
-         //   s_log.warn("Node size: " + nodes.size());
-             if (nodes.next()) {
-                 node = nodes.getDataObject();
-             } else {
-                 fail("Node wasn't saved properly.");
-             }
+            //   s_log.warn("Node size: " + nodes.size());
+            if (nodes.next()) {
+                node = nodes.getDataObject();
+            } else {
+                fail("Node wasn't saved properly.");
+            }
 
-             DataObject newParent = ssn.retrieve(NODE_OID);
+            DataObject newParent = ssn.retrieve(NODE_OID);
 
-             BigInteger preID = (BigInteger) newParent.get(ID);
+            BigInteger preID = (BigInteger) newParent.get(ID);
 
-             node.set(PARENT, newParent);
-             node.get(NAME);
+            node.set(PARENT, newParent);
+            node.get(NAME);
 
-             BigInteger postID = (BigInteger) newParent.get(ID);
+            BigInteger postID = (BigInteger) newParent.get(ID);
 
-             assertEquals(preID, postID);
+            assertEquals(preID, postID);
 
         } finally {
             try {

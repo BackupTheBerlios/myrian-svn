@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -63,7 +63,7 @@ import org.apache.log4j.Logger;
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@arsdigita.com">randyg@arsdigita.com</a>
  * @author <a href="mailto:deison@arsdigita.com">deison@arsdigita.com</a>
- * @version $Revision: #9 $ $Date: 2002/08/14 $
+ * @version $Revision: #10 $ $Date: 2002/08/14 $
  */
 // NOTE if we ever support anything other than forward-only,
 // we'll need to shut off the auto-closing functionality
@@ -71,7 +71,7 @@ import org.apache.log4j.Logger;
 // results and general confusion.
 class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#9 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryImpl.java#10 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private static final Logger log =
         Logger.getLogger(DataQueryImpl.class);
@@ -205,7 +205,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
             log.warn(w);
         }
 
-        try { 
+        try {
             close();
         }
         finally {
@@ -215,13 +215,13 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
 
     /**
-     * Explicitly closes this DataQuery.  
+     * Explicitly closes this DataQuery.
      * Query will automatically be closed when next
-     * returns false, but this method should be 
-     * explicitly called in the case where all of the data in a query 
+     * returns false, but this method should be
+     * explicitly called in the case where all of the data in a query
      * is not needed (e.g. a "while (next())" loop is exited early or
      * only one value is retrieved with if (next()) {...}).
-     */    
+     */
     public synchronized void close() {
         if (m_rs != null) {
             try {
@@ -260,7 +260,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
 
     /**
-     * Moves the cursor to the first row in the query.  
+     * Moves the cursor to the first row in the query.
      *
      * @return True if the cursor is on a valid row, false if there are no
      *         rows in the query.
@@ -268,7 +268,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
     public boolean first() throws PersistenceException {
         // this will error-out due to forward-only cursor,
         // but the only correct alternative would be to close and re-open the
-        // query, which may lead to the data changing and being 
+        // query, which may lead to the data changing and being
         // generally confusing.
         checkResultSet();
         m_data.clear();
@@ -299,13 +299,13 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
      **/
     public Object get(String propertyName) {
         if (m_afterEnd || !m_notEmpty) {
-            throw new PersistenceException("Unable to retrieve value for " + 
-                                           propertyName + " because " + 
+            throw new PersistenceException("Unable to retrieve value for " +
+                                           propertyName + " because " +
                                            "current row is not valid");
         }
 
         String[] newPath = unalias(StringUtils.split(propertyName, '.'));
-        
+
         return getUnalias(newPath);
 
     }
@@ -406,7 +406,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
      * Note: Calling the method isLast may be expensive because the
      * JDBC driver might need to fetch ahead one row in order to
      * determine whether the current row is the last row in the result
-     * set.  
+     * set.
      * <p>
      * If the query has not yet been executed, it executes the query.
      * <p>
@@ -422,7 +422,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
         // a) don't want to have an annoying sometimes-it-might-throw
         // invalid-operation-exception condition
         // b) re-executing the query should result in returning false,
-        // which is correct behavior even if it wasn't obtained 
+        // which is correct behavior even if it wasn't obtained
         // correctly.  Annoying side-effect of re-opening an auto-closed
         // query, but hopefully people won't do this much.
         try {
@@ -489,12 +489,12 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
                     populate();
                     m_notEmpty = true;
                     if (getPosition() == m_upperBound) {
-                        // if there is another row available we 
+                        // if there is another row available we
                         // throw an error
                         if (m_rs.next()) {
                             close();
                             throw new PersistenceException
-                                ("Query returned more than " + m_upperBound + 
+                                ("Query returned more than " + m_upperBound +
                                  " rows.");
                         }
                         close();
@@ -506,8 +506,8 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
                     if (getPosition() < m_lowerBound) {
                         close();
                         throw new PersistenceException
-                            ("The query only returned " + getPosition() + 
-                             "rows when it should have returned at least " + 
+                            ("The query only returned " + getPosition() +
+                             "rows when it should have returned at least " +
                              m_lowerBound + " rows.");
                     }
                     // we're done with this resultset.
@@ -586,7 +586,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
      * <code>"priority < 8 and priority > 8"</code>
      * which is clearly not what the developer wants.
      * <p>
-     * The following will work.  
+     * The following will work.
      * <pre>
      * <code>
      * Filter filter = query.addFilter("priority > :lowerBound");
@@ -595,10 +595,10 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
      * filter.set("upperBound", new Integer(8));
      * </code>
      * </pre>
-     * It is actually the same as 
+     * It is actually the same as
      * <pre>
      * <code>
-     * Filter filter = query.addFilter("priority > :lowerBound 
+     * Filter filter = query.addFilter("priority > :lowerBound
      *                                  and priority < :uperBound");
      * filter.set("upperBound", new Integer(8));
      * filter.set("lowerBound", new Integer(3));
@@ -620,25 +620,25 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
      *        &lt;data query here&gt;)
      *        [where | or] &lt;conditions here&gt;
      *        </code></pre>
-     *        It should normally take the form of 
+     *        It should normally take the form of
      *        <pre><code>
      *        &lt;attribute_name&gt; &lt;condition&gt; &lt;attribute bind variable&gt;
      *        </code></pre>
      *        where the "condition" is something like "=", "&lt;", "&gt;", or
      *        "!=".  The "bind variable" should be a colon followed by
-     *        some attribute name that will later be set with a call to 
-     *        {@link com.arsdigita.persistence.Filter#set(java.lang.String, 
+     *        some attribute name that will later be set with a call to
+     *        {@link com.arsdigita.persistence.Filter#set(java.lang.String,
      *               java.lang.Object)}
      *        <p>
      *        It is possible to set multiple conditions with a single
      *        addFilter statement by combining the conditions with an "and"
      *        or an "or".  Conditions may be grouped by using parentheses.
-     *        Consecutive calls to addFilter append the filters using 
+     *        Consecutive calls to addFilter append the filters using
      *        "and".
      *        <p>
      *        If there is already a filter that exists for this query
      *        then the passed in conditions are added to the current
-     *        conditions with an AND like <code>(&lt;current conditions&gt;) 
+     *        conditions with an AND like <code>(&lt;current conditions&gt;)
      *        and (&lt; passed in conditions&gt;)</code>
      *
      * @return The filter that has just been added to the query
@@ -646,10 +646,10 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
     public Filter addFilter(String conditions) {
         if (m_rs != null) {
             throw new PersistenceException(
-                "The filter cannot be set on an active data query. " +
-                "Data query must be rewound.");
-        } 
-        
+                                           "The filter cannot be set on an active data query. " +
+                                           "Data query must be rewound.");
+        }
+
         return m_filter.addFilter(conditions);
     }
 
@@ -661,9 +661,9 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
     public Filter addFilter(Filter filter) {
         if (m_rs != null) {
             throw new PersistenceException(
-                "The filter cannot be set on an active data query. " +
-                "Data query must be rewound.");
-        } 
+                                           "The filter cannot be set on an active data query. " +
+                                           "Data query must be rewound.");
+        }
 
         return m_filter.addFilter(filter);
     }
@@ -672,14 +672,14 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
      * Removes the passed in filter from this query if it was directly
      * added to the query.  To remove a filter that was added to a
      * CompoundFilter, you must call CompoundFilter.removeFilter().
-     * 
+     *
      */
     public boolean removeFilter(Filter filter) {
         if (m_rs != null) {
             throw new PersistenceException(
-                "The filter cannot be removed on an active data query. " +
-                "Data query must be rewound.");
-        } 
+                                           "The filter cannot be removed on an active data query. " +
+                                           "Data query must be rewound.");
+        }
 
         return m_filter.removeFilter(filter);
     }
@@ -705,11 +705,11 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
      * @return The Filter object associated with this filter.
      **/
     public Filter addInSubqueryFilter( String propertyName,
-				       String subQueryProperty,
-				       String queryName ) {
+                                       String subQueryProperty,
+                                       String queryName ) {
         return addFilter( getFilterFactory().in( propertyName,
-						 subQueryProperty,
-						 queryName ) );
+                                                 subQueryProperty,
+                                                 queryName ) );
     }
 
     /**
@@ -737,12 +737,12 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
      *  </code>
      *
      *  @param attribute The name of the attribute to bind with the value
-     *  @param value The value for the specified attribute 
+     *  @param value The value for the specified attribute
      */
     public Filter addEqualsFilter(String attribute, Object value) {
         return addFilter(getFilterFactory().equals(attribute, value));
     }
-     
+
 
     /**
      *  This creates the appropriate SQL for the given attribute and
@@ -761,7 +761,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
      *  </code>
      *
      *  @param attribute The name of the attribute to bind with the value
-     *  @param value The value for the specified attribute 
+     *  @param value The value for the specified attribute
      */
     public Filter addNotEqualsFilter(String attribute, Object value) {
         return addFilter(getFilterFactory().notEquals(attribute, value));
@@ -774,8 +774,8 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
     public void clearFilter() {
         if (m_rs != null) {
             throw new PersistenceException(
-                "Cannot clear the filter on an active data query. " +
-                "Data query must be rewound.");
+                                           "Cannot clear the filter on an active data query. " +
+                                           "Data query must be rewound.");
         }
         m_filter = getFilterFactory().and();
     }
@@ -822,29 +822,29 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
      *              addOrder("creationDate");
      *              addOrder("creationUser");
      *              </code></pre>
-     *              is the same as 
+     *              is the same as
      *              <pre><code>
      *              addOrder("creationDate, creationUser");
      *              </code></pre>
-     *              
+     *
      *              <p>
      *              If the items should be ordered in ascending order,
      *              the attribute name should be followed by the word "asc"
      *              If the items should be ordered in descending order,
      *              the attribute should be followed by the word "desc"
      *              For instance, or order by ascending date and descending
-     *              user (for users created with the same date), you would 
+     *              user (for users created with the same date), you would
      *              use the following:
      *              <pre><code>
      *              addOrder("creationDate asc, creationUser desc");
      *              </code></pre>
-     *              
+     *
      **/
     public void addOrder(String order) throws PersistenceException {
         if (m_rs != null) {
             throw new PersistenceException(
-                "The order cannot be set on an active data query. " +
-                "Data query must be rewound.");
+                                           "The order cannot be set on an active data query. " +
+                                           "Data query must be rewound.");
         }
         if (m_order == null) {
             m_order = order;
@@ -860,8 +860,8 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
     public synchronized void clearOrder() {
         if (m_rs != null) {
             throw new PersistenceException(
-                "Cannot clear the order on an active data query. " +
-                "Data query must be rewound.");
+                                           "Cannot clear the order on an active data query. " +
+                                           "Data query must be rewound.");
         }
         m_order = null;
     }
@@ -888,8 +888,8 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
                 result = rs.getLong(1);
             } else {
                 throw new IllegalStateException(
-                    "count(*) returned no rows"
-                    );
+                                                "count(*) returned no rows"
+                                                );
             }
         } catch (SQLException e) {
             try {
@@ -915,7 +915,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
     /**
      *  This method allows the developer to set the range of
      *  rows desired.  Thus, the DataQuery will only return the
-     *  rows between beginIndex and endIndex.  The range begins 
+     *  rows between beginIndex and endIndex.  The range begins
      *  at the specified beginIndex and returns all rows after that.
      *  Thus, if a query returns 30 rows and the beginIndex is set
      *  to 6, the last 25 rows of the query will be returned.
@@ -933,16 +933,16 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
     /**
      *  This method allows the developer to set the range of
      *  rows desired.  Thus, the DataQuery will only return the
-     *  rows between beginIndex and endIndex.  The range begins 
-     *  at the specified beginIndex and extends to the row at index 
-     *  endIndex - 1. Thus the number of rows returned is 
-     *  endIndex-beginIndex. 
+     *  rows between beginIndex and endIndex.  The range begins
+     *  at the specified beginIndex and extends to the row at index
+     *  endIndex - 1. Thus the number of rows returned is
+     *  endIndex-beginIndex.
      *
      *  @param beginIndex This is the number of the first row that
      *                    should be returned by this query.  Setting
      *                    beginIndex to 1 returns the rows from the
      *                    beginning.  This is inclusive.
-     *  @param endIndex This is the number of the row after the last 
+     *  @param endIndex This is the number of the row after the last
      *                  row that should be returned.  That is, this
      *                  is exclusive (specifying beginIndex = 1 and
      *                  endIndex = 10 returns 9 rows);
@@ -960,7 +960,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
     /**
      *  This makes sure that the member ResultSet is not null
-     *  and if it is null, it retrieves a ResultSet and puts it in 
+     *  and if it is null, it retrieves a ResultSet and puts it in
      *  the meber variable.
      *
      * @return true if it had to execute the query.
@@ -995,8 +995,8 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
             .fireOperation(operation, m_source);
         if (rs == null) {
             throw new PersistenceException
-                ("Error executing query: Result Set is Null. " + 
-                 Utilities.LINE_BREAK + "Query is " + 
+                ("Error executing query: Result Set is Null. " +
+                 Utilities.LINE_BREAK + "Query is " +
                  operation.getSQL() + Utilities.LINE_BREAK +
                  "Object is " + toString());
         } else {
@@ -1018,7 +1018,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
     /**
      *  This sets whether or not the query should be wrapped
      *  in the standard view before filtering
-     *  
+     *
      *  @param isNoView This determines whether or not the
      *                  query should be wrapped in a view before
      *                  applying filters.  true means it should
@@ -1043,9 +1043,9 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
             //select *
             //from (select outerResults.*, rownum as fakeRownum
             //      from (" + <specified sql> + ") outerResults
-            //      where rownum < :endIndex) 
+            //      where rownum < :endIndex)
             // where fakeRownum >= :beginIndex"
-            // --- If this is a count, we wrap the above in 
+            // --- If this is a count, we wrap the above in
             // select count(*) from (<above>)
             // down towards the end of this proc
 
@@ -1055,22 +1055,22 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
                            "rownum as fakeRownum from (");
                 if (m_wrap) {
                     sql.append("select * ");
-                } 
-                
-                rangeSuffix = new StringBuffer(") outerResults" + 
+                }
+
+                rangeSuffix = new StringBuffer(") outerResults" +
                                                Utilities.LINE_BREAK);
-                
+
                 if (getParameter("endFakeRowNum") != null) {
                     rangeSuffix.append("where rownum < :endFakeRowNum");
                 }
-                
+
                 rangeSuffix.append(") where fakeRownum >= :beginFakeRowNum)");
             } else {
                 // it is postgres so we use "limit" and "offset"
                 int begin = ((Integer)getParameter("beginFakeRowNum")).intValue();
                 if (m_wrap) {
                     sql.append("select * ");
-                } 
+                }
                 rangeSuffix = new StringBuffer(" offset " + (begin - 1));
 
                 if (getParameter("endFakeRowNum") != null) {
@@ -1084,7 +1084,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
             } else if (m_wrap) {
                 sql.append("select *" + Utilities.LINE_BREAK);
             }
-            
+
         }
 
         boolean foundWhere = false;
@@ -1151,12 +1151,12 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
         // to count the number of rows we get back after all of the
         // restrictions as opposed to before (we want to have
         // select count(*) from (<restrict query by rownum>)
-        // instead of 
+        // instead of
         // select * from (<restrict query by rownum after count(*)>)
         // and we cannot just return endIndex - beginIndex because
         // we don't know if the system has endIndex rows
         if (count && getParameter("beginFakeRowNum") != null) {
-            sql = new StringBuffer("select count(*) from ( " + 
+            sql = new StringBuffer("select count(*) from ( " +
                                    sql.toString());
             if (rangeSuffix != null) {
                 sql.append(rangeSuffix.toString());
@@ -1231,19 +1231,19 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
         }
         return values;
     }
-        
+
 
     /**
      *  This sets the upper bound on the number of rows that can be
      *  returned by this query.  If more than <code>upperBound</code>
      *  rows are returned than an error is thrown when trying
-     *  to retrieve the row <code>upperBound + 1</code> 
+     *  to retrieve the row <code>upperBound + 1</code>
      */
     public void setReturnsUpperBound(int upperBound) {
         m_upperBound = upperBound;
     }
 
-    
+
     /**
      *  This sets the lower bound on the number of rows that can be
      *  returned by this query.  If less than <code>lowerBound</code>
@@ -1253,7 +1253,7 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
     public void setReturnsLowerBound(int lowerBound) {
         if (lowerBound > 1 || lowerBound < 0) {
             throw new PersistenceException("The lower bound for a given query " +
-                                           "must be 0 or 1 [query " + 
+                                           "must be 0 or 1 [query " +
                                            m_type.getName() + "]");
         }
         m_lowerBound = lowerBound;
@@ -1303,8 +1303,8 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
             Mapping mapping = (Mapping) it.next();
             if (Arrays.equals(mapping.getPath(), newPath)) {
                 return Identifier.getInstance(
-                    new String[] {mapping.getColumn()}
-                    );
+                                              new String[] {mapping.getColumn()}
+                                              );
             }
         }
 
@@ -1324,8 +1324,8 @@ class DataQueryImpl extends AbstractDataOperation implements DataQuery {
 
         return "DataQuery: " + m_type + Utilities.LINE_BREAK +
             " - Order = " + m_order + Utilities.LINE_BREAK +
-            " - Filter = " + m_filter + Utilities.LINE_BREAK + 
-            " - Operation = " + m_op + Utilities.LINE_BREAK + 
+            " - Filter = " + m_filter + Utilities.LINE_BREAK +
+            " - Operation = " + m_op + Utilities.LINE_BREAK +
             " - Data = " + m_data + Utilities.LINE_BREAK +
             " - Aliases = " + aliases.toString() + Utilities.LINE_BREAK +
             " End DataQuery";

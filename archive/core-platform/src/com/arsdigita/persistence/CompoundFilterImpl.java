@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -23,18 +23,18 @@ import com.arsdigita.util.Assert;
 import org.apache.log4j.Logger;
 
 /**
- * CompoundFilters are used to AND or OR multiple filters together. 
+ * CompoundFilters are used to AND or OR multiple filters together.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/08/13 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  */
 
 class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/CompoundFilterImpl.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/CompoundFilterImpl.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
-    private static final Logger m_log = 
-      Logger.getLogger(CompoundFilterImpl.class);
+    private static final Logger m_log =
+        Logger.getLogger(CompoundFilterImpl.class);
 
     private String m_combineWith;
     private Collection m_filters = new ArrayList();
@@ -50,19 +50,19 @@ class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
         } else {
             m_combineWith = "or";
         }
-        
+
     }
 
 
     /**
      *  Creates a filter that will AND together all filters passed in to it
-     *  For instance, if developers want to combine two filters in to one, 
+     *  For instance, if developers want to combine two filters in to one,
      *  they can write
      *  <pre><code>
      *  CompoundFilter.and().addFilter(Filter.string("lastName", lname))
-                            .addFilter(Filter.string("firstName", fname))
+     .addFilter(Filter.string("firstName", fname))
      *  </code></pre>
-     *  
+     *
      */
     public static CompoundFilter and() {
         return new CompoundFilterImpl(true);
@@ -71,17 +71,17 @@ class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
 
     /**
      *  Creates a filter that will AND together all filters passed in to it
-     *  For instance, if developers want to combine two filters in to one, 
+     *  For instance, if developers want to combine two filters in to one,
      *  they can write
      *  <pre><code>
      *  CompountFilter.or().addFilter(Filter.string("lastName", keyword))
-                           .addFilter(Filter.string("firstName", keyword))
+     .addFilter(Filter.string("firstName", keyword))
      *  </code></pre>
-     *  
+     *
      */
     public static CompoundFilter or() {
-        return new CompoundFilterImpl(false);        
-    };   
+        return new CompoundFilterImpl(false);
+    };
 
     /**
      *  This provides a mechanism for adding conditions to the existing
@@ -98,7 +98,7 @@ class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
 
 
     /**
-     *  This adds the passed in filter to this query and adds it 
+     *  This adds the passed in filter to this query and adds it
      *  according to the type of filter this is (if it was created
      *  using Filter.or() then it ORs this filter with the existing
      *  ones; otherwise it ANDs it);
@@ -119,11 +119,11 @@ class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
             if (getBindings().size() < numberBindings) {
                 // there was name overlapping so log a warning
                 m_log.warn(
-                    "When the filter was added, there was a naming" +
-                    " conflict with the variables." + Utilities.LINE_BREAK +
-                    "Filter 1: " + filter.toString() + Utilities.LINE_BREAK +
-                    "Filter 2: " + toString()
-                    );
+                           "When the filter was added, there was a naming" +
+                           " conflict with the variables." + Utilities.LINE_BREAK +
+                           "Filter 1: " + filter.toString() + Utilities.LINE_BREAK +
+                           "Filter 2: " + toString()
+                           );
             }
         }
 
@@ -155,8 +155,8 @@ class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
     protected void setConditions() {
         Assert.fail("CompoundFilterImpl.setConditions() is unsupported");
     }
-    
-    private String combineConditions(String currentConditions, 
+
+    private String combineConditions(String currentConditions,
                                      String newConditions) {
         // do nothing if the conditions passed in are null or the empty string
         if (newConditions == null || newConditions.equals("")) {
@@ -164,9 +164,9 @@ class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
         }
         if (currentConditions == null) {
             return newConditions;
-        } 
-        return 
-            "(" + currentConditions + ") " + m_combineWith + 
+        }
+        return
+            "(" + currentConditions + ") " + m_combineWith +
             " (" + newConditions + ")";
     }
 
@@ -174,13 +174,7 @@ class CompoundFilterImpl extends FilterImpl implements CompoundFilter {
      *  This outputs a string representation of the CompoundFilter
      */
     public String toString() {
-        return super.toString() + Utilities.LINE_BREAK + " Compound Type: " + 
+        return super.toString() + Utilities.LINE_BREAK + " Compound Type: " +
             m_combineWith.toUpperCase();
     }
 }
-
-
-
-
-
-

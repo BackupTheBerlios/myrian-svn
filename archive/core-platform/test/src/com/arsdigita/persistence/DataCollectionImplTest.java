@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -28,12 +28,12 @@ import org.apache.log4j.Logger;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:jorris@arsdigita.com">Jon Orris</a>
- * @version $Revision: #3 $ $Date: 2002/08/13 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  */
 public class DataCollectionImplTest extends DataCollectionTest
 {
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataCollectionImplTest.java#3 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
-    private static Logger s_log = 
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DataCollectionImplTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    private static Logger s_log =
         Logger.getLogger(DataCollectionImplTest.class.getName());
     private ObjectType m_nodeType;
 
@@ -58,12 +58,12 @@ public class DataCollectionImplTest extends DataCollectionTest
     {
         DataCollection allItems = getDefaultCollection();
         int count = 0;
-        while (allItems.next()) 
-        {
-            DataObject obj = allItems.getDataObject();
-            assertEquals( "Somehow failed to retrieve a Node?", "Node", obj.getObjectType().getName());
-            count++;
-        }
+        while (allItems.next())
+            {
+                DataObject obj = allItems.getDataObject();
+                assertEquals( "Somehow failed to retrieve a Node?", "Node", obj.getObjectType().getName());
+                count++;
+            }
         assertTrue( "No data objects?", count > 0);
     }
 
@@ -72,13 +72,13 @@ public class DataCollectionImplTest extends DataCollectionTest
 
         DataCollection allItems = getDefaultCollection();
         int count = 0;
-        while (allItems.next()) 
-        {
-            ObjectType type = allItems.getObjectType();
-            s_log.info("Type: " + type.getQualifiedName());
-            assertEquals( "Somehow failed to retrieve a Node?", "Node", type.getName());
-            count++;
-        } 
+        while (allItems.next())
+            {
+                ObjectType type = allItems.getObjectType();
+                s_log.info("Type: " + type.getQualifiedName());
+                assertEquals( "Somehow failed to retrieve a Node?", "Node", type.getName());
+                count++;
+            }
 
         assertTrue( "No data objects?", count > 0);
     }
@@ -97,14 +97,14 @@ public class DataCollectionImplTest extends DataCollectionTest
 
         while ( collection.next() ) {
             final BigDecimal currentValue = (BigDecimal) collection.get(ORDER_FIELD);
-            assert("Query was retrieved out of order.", 
-                priorValue.compareTo( currentValue ) < 0 );
-        
+            assert("Query was retrieved out of order.",
+                   priorValue.compareTo( currentValue ) < 0 );
+
             priorValue = currentValue;
 
         }
         collection.close();
-        
+
         collection = getDefaultCollection();
         collection.setOrder("id desc");
         assert( "Should be several items in this query set!", collection.next() );
@@ -112,33 +112,33 @@ public class DataCollectionImplTest extends DataCollectionTest
 
         while ( collection.next() ) {
             final BigDecimal currentValue = (BigDecimal) collection.get(ORDER_FIELD);
-            assert("Query was retrieved out of order.", 
-                priorValue.compareTo( currentValue ) > 0 );
-            
+            assert("Query was retrieved out of order.",
+                   priorValue.compareTo( currentValue ) > 0 );
+
             priorValue = currentValue;
 
         }
-         
+
         collection.close();
 
         collection = getOrderCollection();
         collection.setOrder("buyer desc, seller asc");
-        assert("Should be several items in this query set!", 
+        assert("Should be several items in this query set!",
                collection.next() );
-        
+
         String priorBuyer = (String) collection.get("buyer");
         String priorSeller = (String) collection.get("seller");
-        
+
         while (collection.next()) {
-            final String currentBuyer = 
-                               (String) collection.get("buyer");
+            final String currentBuyer =
+                (String) collection.get("buyer");
             final String currentSeller = (String) collection.get("seller");
-            assert("Buyer order wrong!", 
+            assert("Buyer order wrong!",
                    priorBuyer.compareTo( currentBuyer ) >= 0 );
             if( priorBuyer.equals(currentBuyer) ) {
-                assert("Seller order wrong! " + priorSeller + " " + currentSeller, 
-                    priorSeller.compareTo( currentSeller) <= 0);
-                
+                assert("Seller order wrong! " + priorSeller + " " + currentSeller,
+                       priorSeller.compareTo( currentSeller) <= 0);
+
             }
 
             priorBuyer = currentBuyer;
@@ -146,7 +146,7 @@ public class DataCollectionImplTest extends DataCollectionTest
 
         }
 
-                
+
 
     }
 
@@ -156,14 +156,14 @@ public class DataCollectionImplTest extends DataCollectionTest
      *
      */
     public  void testAddOrder() {
-        
+
     }
-    
-     /**
+
+    /**
      *  This tests the ability to add multiple filters to a data query
      */
     public  void testAddFilter() {
-        
+
     }
 
     protected void setUp()
@@ -175,17 +175,17 @@ public class DataCollectionImplTest extends DataCollectionTest
         parent.save();
 
         for(int i = 1; i < 10; i++)
-        {
-            DataObject child = getSession().create("examples.Node");
-            child.set("id", new BigDecimal(i));
-            child.set("name", "child" + i);
-            child.set("parent", parent);
-            child.save();
-            parent.save();
-            
-            parent = child;
-        }
-        
+            {
+                DataObject child = getSession().create("examples.Node");
+                child.set("id", new BigDecimal(i));
+                child.set("name", "child" + i);
+                child.set("parent", parent);
+                child.save();
+                parent.save();
+
+                parent = child;
+            }
+
     }
 
     protected DataQuery getDefaultQuery() {
@@ -198,7 +198,7 @@ public class DataCollectionImplTest extends DataCollectionTest
     }
 
     protected ObjectType getDefaultObjectType() {
-        return m_nodeType;    
+        return m_nodeType;
     }
 
     private DataCollection getOrderCollection() {
@@ -215,7 +215,7 @@ public class DataCollectionImplTest extends DataCollectionTest
         order.set("shippingDate", now.getTime());
         order.set("hasShipped", Boolean.FALSE);
         order.save();
-        
+
         now.set(Calendar.DAY_OF_YEAR, ++currentDay);
 
         order = getSession().create("examples.Order");
@@ -280,5 +280,3 @@ public class DataCollectionImplTest extends DataCollectionTest
         junit.textui.TestRunner.run(new TestSuite(DataCollectionImplTest.class));
     }
 }
-
-    

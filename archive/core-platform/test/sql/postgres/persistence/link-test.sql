@@ -16,7 +16,7 @@
 -- This file contains the data model for the party test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #4 $ $Date: 2002/08/02 $
+-- @version $Revision: #5 $ $Date: 2002/08/14 $
 --
 
 create table t_articles (

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -30,12 +30,12 @@ import java.util.Collection;
  * Defines the Model of a particular object type.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2002/07/26 $
+ * @version $Revision: #5 $ $Date: 2002/08/14 $
  */
 
 public class ModelDef extends Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ModelDef.java#4 $ by $Author: randyg $, $DateTime: 2002/07/26 15:26:35 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/pdl/ast/ModelDef.java#5 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     // the model name
     private String m_name;
@@ -164,7 +164,7 @@ public class ModelDef extends Element {
 
             if (qd instanceof QueryDef) {
                 ((QueryDef)qd).validateMappings();
-            } 
+            }
         }
     }
 
@@ -173,7 +173,7 @@ public class ModelDef extends Element {
     }
 
     /**
-     * Creates in metadata the Model. 
+     * Creates in metadata the Model.
      *
      * @param root the metadata root
      */
@@ -192,7 +192,7 @@ public class ModelDef extends Element {
 
     /**
      * Creates in metadata for the associations contained by this ModelDef
-     * 
+     *
      * @param root the metadata root
      */
     void generateLogicalModel() {
@@ -226,7 +226,7 @@ public class ModelDef extends Element {
         }
 
         for (Iterator it = m_assns.iterator(); it.hasNext(); ) {
-            result.append(Utilities.LINE_BREAK + it.next() + 
+            result.append(Utilities.LINE_BREAK + it.next() +
                           Utilities.LINE_BREAK);
         }
 

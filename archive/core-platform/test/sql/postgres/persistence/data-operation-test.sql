@@ -16,7 +16,7 @@
 -- This file contains the data model for the data query test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #4 $ $Date: 2002/07/26 $
+-- @version $Revision: #5 $ $Date: 2002/08/14 $
 --
 
 create or replace function DataOperationProcedure() returns integer 

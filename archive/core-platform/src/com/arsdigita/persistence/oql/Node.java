@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.redhat.com/licenses/ccmpl.html
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
+
 package com.arsdigita.persistence.oql;
 
 import com.arsdigita.util.StringUtils;
@@ -18,12 +33,12 @@ import org.apache.log4j.Logger;
  * Node
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2002/08/13 $
+ * @version $Revision: #12 $ $Date: 2002/08/14 $
  **/
 
 abstract class Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#11 $ by $Author: dennis $, $DateTime: 2002/08/13 11:53:00 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Node.java#12 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private static final Logger s_log = Logger.getLogger(Node.class);
 
@@ -75,21 +90,21 @@ abstract class Node {
     }
 
     /**
-     *  This returns the selection corresponding to the given 
+     *  This returns the selection corresponding to the given
      *  node/property pair.
      *  It returns null if no such selection exists.
      */
     /*
-    Selection getSelection(Node node, Property property) {
-        // right now, we ignore the node parameter but we have it in 
-        // the UI to reserve the right to use it later
-        return (Selection)m_selections.get(property.getName())
-    }
+      Selection getSelection(Node node, Property property) {
+      // right now, we ignore the node parameter but we have it in
+      // the UI to reserve the right to use it later
+      return (Selection)m_selections.get(property.getName())
+      }
     */
 
     void addSelection(Node node, Property property) {
         if (m_selections.get(property.getName()) == null) {
-            m_selections.put(property.getName(), 
+            m_selections.put(property.getName(),
                              new Selection(node, property));
         }
     }
@@ -97,10 +112,10 @@ abstract class Node {
     void addLinkSelection(Node node, Property property) {
         if (m_selections.get(property.getName()) == null) {
             if (property.isAttribute()) {
-                m_selections.put(property.getName(), 
+                m_selections.put(property.getName(),
                                  new SimpleLinkSelection(node, property));
             } else {
-                m_selections.put(property.getName(), 
+                m_selections.put(property.getName(),
                                  new CompoundLinkSelection(node, property));
             }
         }
@@ -196,12 +211,12 @@ abstract class Node {
         if (prop.isAttribute()) {
             if (prop.getColumn() == null) {
                 throw new NoMetadataException(
-                    prop.getFilename() + ": " + prop.getLineNumber() +
-                    ": No metadata found for property " + prop.getName() +
-                    " while generating SQL for query: " + getQuery()
-                    );
+                                              prop.getFilename() + ": " + prop.getLineNumber() +
+                                              ": No metadata found for property " + prop.getName() +
+                                              " while generating SQL for query: " + getQuery()
+                                              );
             }
-            
+
             addSelection(this, prop);
         } else {
             Node child = (Node) m_children.get(first);
@@ -265,8 +280,8 @@ abstract class Node {
             if (to.equals(from)) {
                 Set sources = from.getSources();
                 StringBuffer msg = new StringBuffer(
-                    "Duplicate columns: "
-                    );
+                                                    "Duplicate columns: "
+                                                    );
                 for (Iterator iter = sources.iterator(); iter.hasNext(); ) {
                     com.arsdigita.persistence.metadata.Column col =
                         (com.arsdigita.persistence.metadata.Column) iter.next();
@@ -346,9 +361,9 @@ abstract class Node {
             for (Iterator it = m_conditions.iterator(); it.hasNext(); ) {
                 Condition cond = (Condition) it.next();
                 msg.append(
-                    cond.getTail().getFullName() + " = " +
-                    cond.getHead().getFullName()
-                    );
+                           cond.getTail().getFullName() + " = " +
+                           cond.getHead().getFullName()
+                           );
             }
 
             error(msg.toString());
@@ -364,14 +379,14 @@ abstract class Node {
 
     private final Column getFrom(JoinElement je) {
         return getTable(je.getFrom().getTableName()).getColumn(
-            je.getFrom().getColumnName()
-            );
+                                                               je.getFrom().getColumnName()
+                                                               );
     }
 
     private final Column getTo(JoinElement je) {
         return getTable(je.getTo().getTableName()).getColumn(
-            je.getTo().getColumnName()
-            );
+                                                             je.getTo().getColumnName()
+                                                             );
     }
 
     Table defineTable(String name) {

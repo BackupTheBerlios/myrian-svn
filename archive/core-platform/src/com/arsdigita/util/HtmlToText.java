@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -45,7 +45,7 @@ import org.apache.oro.text.perl.Perl5Util;
  * </pre>
  *
  * @author ron@arsdigita.com
- * @version $Id: //core-platform/dev/src/com/arsdigita/util/HtmlToText.java#2 $ 
+ * @version $Id: //core-platform/dev/src/com/arsdigita/util/HtmlToText.java#3 $
  */
 
 public class HtmlToText {
@@ -62,7 +62,7 @@ public class HtmlToText {
 
     private int m_maxlen = 70;
 
-    // For maintaining the internal state of the parser 
+    // For maintaining the internal state of the parser
 
     private int m_linelen;
     private int m_pre;
@@ -89,9 +89,9 @@ public class HtmlToText {
      * ignored.  Must be set prior to calling convert().
      *
      * @param maxlen the maximum number of character in an output
-     * line. 
+     * line.
      */
-    
+
     public void setMaxLength(int maxlen) {
         if (maxlen > 0) {
             m_maxlen = maxlen;
@@ -134,7 +134,7 @@ public class HtmlToText {
 
     /**
      * Writes a newline to the output buffer followed by enough
-     * whitespace to correctly indent to the current blockquote level.  
+     * whitespace to correctly indent to the current blockquote level.
      */
 
     private void putNewline() {
@@ -144,7 +144,7 @@ public class HtmlToText {
     }
 
     /**
-     * Expands special HTML codes into regular character sequences. 
+     * Expands special HTML codes into regular character sequences.
      */
 
     private static String expandEntities(String s) {
@@ -182,8 +182,8 @@ public class HtmlToText {
             if (text.equals("")) {
                 return;
             }
-            
-            // if the first character is a space, set the space bit 
+
+            // if the first character is a space, set the space bit
             if (text.charAt(0) == ' ') {
                 m_space = 1;
                 text = StringUtils.trimleft(text);
@@ -194,10 +194,10 @@ public class HtmlToText {
             text = s_re.substitute("s/\r/\n/g", text);
             text = s_re.substitute("s/\t/    /g", text);
         }
-        
+
         // output any pending paragraph breaks, line breaks or spaces,  as
         // long as we're not at the beginning of the document
-        
+
         if (m_p != 0 || m_br != 0 || m_space != 0) {
             if (!text.equals("")) {
 
@@ -209,12 +209,12 @@ public class HtmlToText {
                 else if (m_br > 0) {
                     putNewline();
                 }
-                
+
                 else {
-                    
+
                     // Don't add the space if we're at the beginning of a
                     // line, unless we're in a PRE
-                    
+
                     if (m_pre > 0 || m_linelen != 0) {
                         m_output.append(' ');
                         m_linelen++;
@@ -222,12 +222,12 @@ public class HtmlToText {
                 }
             }
         }
-        
+
         m_p = 0;
         m_br = 0;
         m_space = 0;
 
-        // if the last character is a space, save it until the next 
+        // if the last character is a space, save it until the next
         // time
         if (s_re.match("/^(.*) $/",text)) {
             m_space = 1;
@@ -249,11 +249,11 @@ public class HtmlToText {
             word = s_re.toString();
             text = s_re.postMatch();
 
-            // convert &nbsp;'s 
+            // convert &nbsp;'s
             // We do this now, so that they're displayed, but not
             // treated, whitespace.
 
-            word = s_re.substitute("s/&nbsp;/ /g", word); 
+            word = s_re.substitute("s/&nbsp;/ /g", word);
 
             if (word.equals("\n")) {
                 if (m_output.length() > 0) {
@@ -267,7 +267,7 @@ public class HtmlToText {
             }
 
             else {
-                if (m_maxlen > 0 && 
+                if (m_maxlen > 0 &&
                     m_linelen + word.length() > m_maxlen) {
                     putNewline();
                 }
@@ -283,11 +283,11 @@ public class HtmlToText {
      *
      * The HashMap uses the attribute name as a key and maps it to
      * either the attribue value or null if the attribute has no
-     * value.  The attribute names are all converted to lowercase.  
+     * value.  The attribute names are all converted to lowercase.
      */
 
     private static final HashMap parseAttributes(String html) {
-        
+
         HashMap attrs = new HashMap();
 
         String name;
@@ -295,7 +295,7 @@ public class HtmlToText {
 
         // Loop over the attributes.
         // We maintain counter is so that we don't accidentally enter
-        // an infinite loop 
+        // an infinite loop
 
         int i = 0;
         int count = 0;
@@ -323,7 +323,7 @@ public class HtmlToText {
 
                 s_re.match("/[\\s=]*/", html.substring(i));
                 i += s_re.end(0);
-            
+
             } else {
 
                 name = s_re.group(1).toLowerCase();
@@ -332,22 +332,22 @@ public class HtmlToText {
                 i += s_re.end(0);
 
                 // If there is an equal sign, we're expecting the next
-                // token to be a value 
+                // token to be a value
                 if (s_re.group(2) == "") {
                     // No equal sign, no value
                     attrs.put(name,null);
                 } else {
-                
+
                     // is there a single or double quote sign as the
                     // first character?
 
                     String exp;
                     if (html.charAt(i) == '"') {
                         exp = "/\"([^\"]*)\"\\s*/";
-                    } 
+                    }
                     else if (html.charAt(i) == '\'') {
                         exp = "/\'([^\']*)\'\\s*/";
-                    } 
+                    }
                     else {
                         exp = "/([^\\s>]*)\\s*/";
                     }
@@ -389,15 +389,15 @@ public class HtmlToText {
         while (i != -1) {
 
             // append everything up to and not including the
-            // tag-opening < 
-    
+            // tag-opening <
+
             put(input.substring(lastTagEnd, i));
 
             // we're inside a tag now. Find the end of it. Make i
             // point to the char after the <
 
             int tagStart = ++i;
-            
+
             int count = 0;
             while (true) {
 
@@ -407,29 +407,29 @@ public class HtmlToText {
                 }
 
                 // Find the positions of the first quote, apostrophe
-                // and greater-than sign 
+                // and greater-than sign
 
                 int quoteIdx = input.indexOf('"',i);
                 int apostropheIdx = input.indexOf('\'', i);
                 int gtIdx = input.indexOf('>',i);
 
                 // If there is no greater-than sign, then the tag
-                // isn't closed. 
+                // isn't closed.
 
                 if (gtIdx == -1) {
                     i = input.length();
                     break;
                 }
 
-                // Find the first of the quote and the apostrophe 
+                // Find the first of the quote and the apostrophe
 
-                int stringDelimiterIdx = Math.min(quoteIdx, apostropheIdx); 
+                int stringDelimiterIdx = Math.min(quoteIdx, apostropheIdx);
 
                 // If the greater than sign appears before any of the
                 // string delimters, we've found the tag end.
 
                 if (gtIdx < stringDelimiterIdx ||
-                    stringDelimiterIdx == -1) { 
+                    stringDelimiterIdx == -1) {
                     // we found the tag end
                     i = gtIdx;
                     break;
@@ -448,13 +448,13 @@ public class HtmlToText {
                 }
                 i++;
             }
-        
+
             String fullTag = input.substring(tagStart,i);
 
             if (!s_re.match("/(\\/?)([^\\s]+)/", fullTag)) {
                 // A malformed tag -- just delete it
             } else {
-                
+
                 String slash      = s_re.group(1);
                 String tagname    = s_re.group(2);
                 String attributes = s_re.postMatch();
@@ -467,17 +467,17 @@ public class HtmlToText {
                     tagname.equals("table")) {
                     m_p = 1;
                 }
-                
+
                 else if (tagname.equals("br")) {
                     putNewline();
                 }
-                
+
                 else if (tagname.equals("tr") ||
                          tagname.equals("td") ||
                          tagname.equals("th")) {
                     m_br = 1;
                 }
-                
+
                 else if (tagname.equals("h1") ||
                          tagname.equals("h2") ||
                          tagname.equals("h3") ||
@@ -491,26 +491,26 @@ public class HtmlToText {
                         put(StringUtils.repeat("*", level));
                     }
                 }
-                
+
                 else if (tagname.equals("li")) {
                     m_br = 1;
                     if (slash.equals("")) {
                         put("- ");
                     }
                 }
-                
+
                 else if (tagname.equals("strong") ||
                          tagname.equals("b")) {
                     put("*");
                 }
-                
+
                 else if (tagname.equals("em") ||
                          tagname.equals("i") ||
                          tagname.equals("cite") ||
                          tagname.equals("u")) {
                     put("_");
                 }
-                
+
                 else if (tagname.equals("a")) {
                     if (slash.equals("")) {
                         HashMap attrs = parseAttributes(attributes);
@@ -541,7 +541,7 @@ public class HtmlToText {
                     }
                 }
 
-                else if (tagname.equals("pre")) {                        
+                else if (tagname.equals("pre")) {
                     m_p = 1;
                     if (slash.equals("")) {
                         m_pre++;
@@ -549,7 +549,7 @@ public class HtmlToText {
                         m_pre--;
                     }
                 }
-                
+
                 else if (tagname.equals("blockquote")) {
                     m_p = 1;
                     if (slash.equals("")) {
@@ -560,17 +560,17 @@ public class HtmlToText {
                         m_maxlen += 5;
                     }
                 }
-                
+
                 else if (tagname.equals("hr")) {
                     m_p = 1;
                     put(StringUtils.repeat('-',m_maxlen));
                     m_p = 1;
                 }
-                
+
                 else if (tagname.equals("q")) {
                     put("\"");
                 }
-                
+
                 else if (tagname.equals("img")) {
                     if (slash.equals("")) {
                         HashMap attrs = parseAttributes(attributes);
@@ -591,7 +591,7 @@ public class HtmlToText {
                         }
                     }
                 }
-                
+
                 else {
                     // Other tag
                     if (m_showtags == true) {
@@ -604,17 +604,17 @@ public class HtmlToText {
             lastTagEnd = ++i;
             i = input.indexOf('<',i);
         }
-            
+
         // append everything after the last tag
         put(input.substring(lastTagEnd));
-            
+
         // Close any unclosed tags
         m_pre = 0;
         while (m_blockquote > 0) {
             m_blockquote--;
             m_maxlen += 4;
         }
-        
+
         // write out URLs, if necessary:
 
         if (hrefURLs.size() > 0) {
@@ -634,7 +634,7 @@ public class HtmlToText {
         return m_output.toString();
     }
 
-    /** 
+    /**
      * Returns HTML text, converted from the following:
      * <ul>
      *  <li>HTML -- returns the input

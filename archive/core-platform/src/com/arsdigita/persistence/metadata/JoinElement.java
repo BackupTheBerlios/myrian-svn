@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -24,12 +24,12 @@ import java.io.PrintStream;
  * complete path from one object type or table to another.
  *
  * @author <a href="mailto:pmcneill@arsdigita.com">Patrick McNeill</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinElement.java#3 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinElement.java#4 $
  * @since 4.6
  **/
 public class JoinElement extends Element {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinElement.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/JoinElement.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
     private Column m_from = null;
     // column belonging to the start table, or closest to it
 
@@ -55,7 +55,7 @@ public class JoinElement extends Element {
     }
 
     /**
-     * Create a new JoinElement, deferring specification of the columns to 
+     * Create a new JoinElement, deferring specification of the columns to
      * later.
      **/
     public JoinElement() {}
@@ -69,10 +69,10 @@ public class JoinElement extends Element {
         return m_from;
     }
 
-    /** 
+    /**
      * Sets the "from" column.
-     * 
-     * @param from the new "from" column  
+     *
+     * @param from the new "from" column
      * @pre from != null
      **/
     public void setFrom(Column from) {
@@ -107,14 +107,14 @@ public class JoinElement extends Element {
      **/
 
     void outputPDL(PrintStream out) {
-        out.print("join " + m_from.getTableName() + "." + 
-                  m_from.getColumnName() + " to " + 
+        out.print("join " + m_from.getTableName() + "." +
+                  m_from.getColumnName() + " to " +
                   m_to.getTableName() + "." + m_to.getColumnName());
     }
 
     /**
      * Is this JoinElement equivalent to another JoinEleemnt?
-     * 
+     *
      * @param object the object to compare
      * @return true if the object is equal to this JoinElement, false otherwise
      **/
@@ -137,7 +137,7 @@ public class JoinElement extends Element {
 
     /**
      * Returns a hashcode for this joinelement.
-     * 
+     *
      * @pre getTo() != null && getFrom() != null
      * @return a hashcode for this joinelement
      **/
@@ -145,7 +145,7 @@ public class JoinElement extends Element {
         int result = 17;
         result = 37*result + m_from.hashCode();
         result = 37*result + m_to.hashCode();
-        return result; 
+        return result;
     }
 
 

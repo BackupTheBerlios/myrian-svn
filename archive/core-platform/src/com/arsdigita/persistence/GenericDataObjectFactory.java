@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -27,26 +27,26 @@ import java.lang.reflect.Constructor;
  * Company:     ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #2 $ $Date: 2002/07/18 $
+ * @version $Revision: #3 $ $Date: 2002/08/14 $
  */
 
 public class GenericDataObjectFactory {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObjectFactory.java#2 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObjectFactory.java#3 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
 
     /**
      * Creates a new data object using the appropriate java class
      * name as defined by the passed in object type. The returned
      * Object can then be cast to the more specific class associated
-     * with the object type. 
+     * with the object type.
      *
-     * @see com.arsdigita.persistence.metadata.ObjectType#getClassName() 
+     * @see com.arsdigita.persistence.metadata.ObjectType#getClassName()
      */
-    public static GenericDataObject createObject(ObjectType type, 
+    public static GenericDataObject createObject(ObjectType type,
                                                  Session session,
                                                  boolean isNew) {
-	try {
+        try {
             GenericDataObject result;
 
             // XXX: String name = type.getClassName();
@@ -66,8 +66,8 @@ public class GenericDataObjectFactory {
 
             return result;
         } catch (Exception e) {
-            throw new Error("Exception of type: " + e.getClass().getName() + 
-                            "while creating a data object of type " + 
+            throw new Error("Exception of type: " + e.getClass().getName() +
+                            "while creating a data object of type " +
                             type.getName() + ": " + e.getMessage());
         }
     }

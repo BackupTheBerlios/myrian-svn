@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -47,16 +47,16 @@ import java.util.HashMap;
  * well as perform many other tasks related to the new object type.
  * When the application is done creating the object type, it should
  * call {@link #save()} to persist the information about the newly created
- * object type.  
+ * object type.
  *
  * @deprecated Use com.arsdigita.metadata.DynamicObjectType instead.
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #5 $ $Date: 2002/08/06 $ 
+ * @version $Revision: #6 $ $Date: 2002/08/14 $
  */
 
 public class DynamicObjectType {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DynamicObjectType.java#5 $ by $Author: rhs $, $DateTime: 2002/08/06 16:54:58 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/DynamicObjectType.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     // The DDL generator used
     private static DDLGenerator m_generator = DDLGeneratorFactory.getInstance();
@@ -64,8 +64,8 @@ public class DynamicObjectType {
     // the contained ObjectType
     private ObjectType m_objectType;
 
-    private static final String objectTypeString = 
-                               "com.arsdigita.persistence.DynamicObjectType";
+    private static final String objectTypeString =
+        "com.arsdigita.persistence.DynamicObjectType";
 
     // This is used for updating any information about the given DataObject.
     private DataObject m_dataObject;
@@ -78,7 +78,7 @@ public class DynamicObjectType {
     private StringBuffer m_ddlToAdd = null;
 
     // this shows if the item is new or not which is used to
-    // determine if the ddlToAdd should be wrapped with a 
+    // determine if the ddlToAdd should be wrapped with a
     // "create table" or an "alter table"
     private boolean m_isNew = true;
 
@@ -97,17 +97,17 @@ public class DynamicObjectType {
         1. The name should be short
     */
     /*  TODO
-      Items needed that we do not yet have:
-      3. We need to force the user to specify a Refernce Key
-      4. We need to restrict the possible parent types to types
-         with only a single key
-      5. When adding a RoleReference to each object type,
-         we need to make sure to not create the mapping table twice
-     */
+        Items needed that we do not yet have:
+        3. We need to force the user to specify a Refernce Key
+        4. We need to restrict the possible parent types to types
+        with only a single key
+        5. When adding a RoleReference to each object type,
+        we need to make sure to not create the mapping table twice
+    */
 
 
     /**
-     *  This procedures allows developers to dynamically create 
+     *  This procedures allows developers to dynamically create
      *  object types that subtype existing object types.
      *  The model.name string must be unique
      *
@@ -119,10 +119,10 @@ public class DynamicObjectType {
      *  @param name This is the name of the new object type.  This
      *              should only be the name and should not contain
      *              and "."  The fully qualified name (which is
-     *              required by the other constructor) is the 
+     *              required by the other constructor) is the
      *              model of the supertype followed by a "."
-     *              followed by the passed in name.  This can 
-     *              be retrieved by calling 
+     *              followed by the passed in name.  This can
+     *              be retrieved by calling
      *  {@link com.arsdigita.persistence.metadata.DataType#getQualifiedName()}.
      *              The name must not be null.
      *
@@ -139,7 +139,7 @@ public class DynamicObjectType {
      *  types that may or may not subtype an object.  The
      *  model.name string must be unique and either the model or the
      *  supertype must not be null.  If the model is null, the model
-     *  from the supertype is used.  
+     *  from the supertype is used.
      *
      *  @param supertype This is the existing ObjectType that should
      *                   be extended to create this ObjectType.
@@ -149,10 +149,10 @@ public class DynamicObjectType {
      *  @param name This is the name of the new object type.  This
      *              should only be the name and should not contain
      *              and "."  The fully qualified name (which is
-     *              required by the other constructor) is the 
+     *              required by the other constructor) is the
      *              model of the supertype followed by a "."
-     *              followed by the passed in name.  This can 
-     *              be retrieved by calling 
+     *              followed by the passed in name.  This can
+     *              be retrieved by calling
      *  {@link com.arsdigita.persistence.metadata.DataType#getQualifiedName()}.
      *              The name must not be null and must only contain
      *              alpha-numeric characters.
@@ -161,7 +161,7 @@ public class DynamicObjectType {
      *               as the object type.
      *
      *  @pre name != null
-     *  @pre supertype != null || model != null 
+     *  @pre supertype != null || model != null
      */
     public DynamicObjectType(String name, ObjectType supertype, Model model) {
         // the name can only contains letters and numbers.  We throw
@@ -184,11 +184,11 @@ public class DynamicObjectType {
 
         // set up the table name and the reference key
         m_table = new Table(m_generator.generateTableName(
-            m_objectType.getModel().getName(), 
-            name));
+                                                          m_objectType.getModel().getName(),
+                                                          name));
         MetadataRoot.getMetadataRoot().addTable(m_table);
 
-        // now we try to create a reference key 
+        // now we try to create a reference key
         String columnName = m_objectType.getName() + "_id";
         Column key = new Column(m_table, columnName,
                                 java.sql.Types.INTEGER, 32);
@@ -200,8 +200,8 @@ public class DynamicObjectType {
             // in this case, there is not parent type so we have to
             // create the primary key
             String propertyName = "id";
-            Property property = new Property(propertyName, 
-                                             MetadataRoot.BIGDECIMAL, 
+            Property property = new Property(propertyName,
+                                             MetadataRoot.BIGDECIMAL,
                                              Property.REQUIRED);
             property.setColumn(key);
             m_objectType.addProperty(property);
@@ -222,7 +222,7 @@ public class DynamicObjectType {
      *                  This needs to be the fully qualified name
      *                  such as "com.arsdigita.cms.metadata.Hotel"
      *                  This is the same name that is returned by
-     *                  calling 
+     *                  calling
      *  {@link com.arsdigita.persistence.metadata.DataType#getQualifiedName()}
      *
      *  @exception PersistenceException thrown if the requested
@@ -276,15 +276,15 @@ public class DynamicObjectType {
         // get the DataObject from the DataBase to make sure that it is
         // a modifiable type.
         DataCollection collection = SessionManager.getSession()
-                                                  .retrieve(objectTypeString);
+            .retrieve(objectTypeString);
         collection.addEqualsFilter("dynamicType", typeName);
 
         try {
             if (!collection.next()) {
                 throw new PersistenceException(
-                            "The Object Type you have requested (" + typeName +
-                            ") cannot be used as a Dynamic Object because it " +
-                            "has been defined as read-only");
+                                               "The Object Type you have requested (" + typeName +
+                                               ") cannot be used as a Dynamic Object because it " +
+                                               "has been defined as read-only");
             }
 
             m_dataObject = collection.getDataObject();
@@ -311,11 +311,11 @@ public class DynamicObjectType {
      *
      *  @param name The name of the new attribute
      *  @param propertyType The type of the Property.  This should be
-     *                      one of the SimpleTypes specified in 
+     *                      one of the SimpleTypes specified in
      *         {@link com.arsdigita.persistence.metadata.MetadataRoot}
      *  @param size This is the size of the attribute.  This is an
      *              optional argument but is important for Strings.
-     *              Specifically, if the String size > 4000 then a 
+     *              Specifically, if the String size > 4000 then a
      *              Clob is used.  Otherwise, a varchar is used.
      *  @return This returns the Attribute that has been added to this
      *          DynamicObjectType
@@ -334,11 +334,11 @@ public class DynamicObjectType {
      *
      *  @param name The name of the new attribute
      *  @param propertyType The type of the Property.  This should be
-     *                      one of the SimpleTypes specified in 
+     *                      one of the SimpleTypes specified in
      *         {@link com.arsdigita.persistence.metadata.MetadataRoot}
      *  @param size This is the size of the attribute.  This is an
      *              optional argument but is important for Strings.
-     *              Specifically, if the String size > 4000 then a 
+     *              Specifically, if the String size > 4000 then a
      *              Clob is used.  Otherwise, a varchar is used.
      *  @return This returns the Attribute that has been added to this
      *          DynamicObjectType
@@ -361,7 +361,7 @@ public class DynamicObjectType {
      *
      *  @param name The name of the new attribute
      *  @param propertyType The type of the Property.  This should be
-     *                      one of the SimpleTypes specified in 
+     *                      one of the SimpleTypes specified in
      *         {@link com.arsdigita.persistence.metadata.MetadataRoot}
      *  @param defaultValue This is the default value for this column.  This
      *                 is required to be "not null" because it is used to
@@ -375,7 +375,7 @@ public class DynamicObjectType {
      *             already in use for this object type or the default
      *             value is null
      */
-    public Property addRequiredAttribute(String name, SimpleType propertyType, 
+    public Property addRequiredAttribute(String name, SimpleType propertyType,
                                          Object defaultValue) {
         return addRequiredAttribute(name, propertyType, -1, defaultValue);
     }
@@ -391,11 +391,11 @@ public class DynamicObjectType {
      *
      *  @param name The name of the new attribute
      *  @param propertyType The type of the Property.  This should be
-     *                      one of the SimpleTypes specified in 
+     *                      one of the SimpleTypes specified in
      *         {@link com.arsdigita.persistence.metadata.MetadataRoot}
      *  @param size This is the size of the attribute.  This is an
      *              optional argument but is important for Strings.
-     *              Specifically, if the String size > 4000 then a 
+     *              Specifically, if the String size > 4000 then a
      *              Clob is used.  Otherwise, a varchar is used.
      *  @param default This is the default value for this column.  This
      *                 is required to be "not null" because it is used to
@@ -406,7 +406,7 @@ public class DynamicObjectType {
      *  @return This returns the Attribute that has been added to this
      *          DynamicObjectType
      *  @exception PersistenceException if the name is
-     *             already in use for this object type or the provided 
+     *             already in use for this object type or the provided
      *             default is null.
      */
     public Property addRequiredAttribute(String name, SimpleType propertyType,
@@ -417,11 +417,11 @@ public class DynamicObjectType {
                  "must not be null");
         }
 
-        return addAttribute(name, propertyType, Property.REQUIRED, size, 
+        return addAttribute(name, propertyType, Property.REQUIRED, size,
                             defaultValue);
     }
-    
-    
+
+
     /**
      *  This actually adds the attribute to this object type by
      *  creating the actual Attribute object for use by the supertype
@@ -432,7 +432,7 @@ public class DynamicObjectType {
      *              out of the set of current attributes and rolereferences
      *              within this object type
      *  @param propertyType The type of the Property.  This should be
-     *                      one of the SimpleTypes specified in 
+     *                      one of the SimpleTypes specified in
      *         {@link com.arsdigita.persistence.metadata.MetadataRoot}
      *  @param defaultValue This is the default value for this column.  This
      *                 is required to be "not null" because it is used to
@@ -445,8 +445,8 @@ public class DynamicObjectType {
      *  @exception PersistenceException if the name is
      *             already in use for this object type
      */
-    private Property addAttribute(String name, SimpleType propertyType, 
-                                   int multiplicity, int size, 
+    private Property addAttribute(String name, SimpleType propertyType,
+                                  int multiplicity, int size,
                                   Object defaultValue) {
         // the name can only contains letters and numbers.  We throw
         // an exceptions if it contains anything else.
@@ -493,7 +493,7 @@ public class DynamicObjectType {
 
         if (defaultValue != null) {
             m_defaultValueMap.put(name, defaultValue);
-        } 
+        }
 
         return property;
     }
@@ -511,14 +511,14 @@ public class DynamicObjectType {
      *  recovered
      *  <p>
      *  You must call {@link #save()} for the changes to be permanent
-     *       
+     *
      *  @param name the name of the attribute to remove
      *  @exception ModelException if the name passed
      *             in is not an Attribute that can be removed
      */
     public void removeAttribute(String name) {
-    // XXX: set a flag here to say that save() needs to regenerate all subtypes
-    //      as well
+        // XXX: set a flag here to say that save() needs to regenerate all subtypes
+        //      as well
         Property property = m_objectType.getDeclaredProperty(name);
         if (property == null) {
             // we are going to throw an error so let's figure out which one
@@ -536,15 +536,15 @@ public class DynamicObjectType {
             m_objectType.removeProperty(property);
         }
     }
-    
+
 
 
     /**
      *  This adds an association between this DynamicObjectType
-     *  and the passed in object type.  The only way to retrieve 
-     *  information about the RoleReference is to call 
-     *  <code>get(name)</code> using a DataObject of this 
-     *  DynamicObjectType.  
+     *  and the passed in object type.  The only way to retrieve
+     *  information about the RoleReference is to call
+     *  <code>get(name)</code> using a DataObject of this
+     *  DynamicObjectType.
      *  <p>
      *  You must call {@link #save()} for the changes to be permanent
      *  <font color="red">This will change when the metadata changes</font>
@@ -558,13 +558,13 @@ public class DynamicObjectType {
      *             in is not unique
      */
     /*    public RoleReference addRoleReference(String name, ObjectType objectType) {
-        throw new PersistenceException("This has not yet been implemented");
-        if (getPropertyTypesAsCollection().contains(name)) {
-            throw new PersistenceException("The name [" + name + "] already " +
-                                           "exists in this ObjectType");
-        }
-    }
-*/
+          throw new PersistenceException("This has not yet been implemented");
+          if (getPropertyTypesAsCollection().contains(name)) {
+          throw new PersistenceException("The name [" + name + "] already " +
+          "exists in this ObjectType");
+          }
+          }
+    */
 
     /**
      * Adds an optional one-way association (a role reference) to this Dynamic
@@ -669,8 +669,8 @@ public class DynamicObjectType {
         } else {
             // we need to create a mapping table here
             Table table = new Table(
-                m_generator.generateMappingTableName(m_objectType, name)
-                );
+                                    m_generator.generateMappingTableName(m_objectType, name)
+                                    );
 
             Column baseKey = Utilities.getColumn(m_objectType);
             Column foreignKey = Utilities.getColumn(type);
@@ -713,7 +713,7 @@ public class DynamicObjectType {
      *  new Attributes or RoleReferences before this is called because
      *  this generates the Events that need to be executed.
      *
-     *  Specifically, this 
+     *  Specifically, this
      *  <ol>
      *  <li>creates the DDL that must be executed to bring the
      *      database in sync with the events and prepare the
@@ -727,7 +727,7 @@ public class DynamicObjectType {
      *  </ul>
      */
     public ObjectType save() {
-        // 1. Create the DDL that needs to be executed and prepare for 
+        // 1. Create the DDL that needs to be executed and prepare for
         //    the object events
         Collection ddlToAdd = m_generator.generateTable(m_objectType,
                                                         m_keyColumn,
@@ -764,8 +764,8 @@ public class DynamicObjectType {
         // 4. execute the DDL
         try {
             java.sql.Statement statement = SessionManager.getSession()
-                                                         .getConnection()
-                                                         .createStatement();
+                .getConnection()
+                .createStatement();
 
             if (ddlToAdd != null) {
                 Iterator iterator = ddlToAdd.iterator();
@@ -774,29 +774,29 @@ public class DynamicObjectType {
                     statement.executeUpdate(ddl);
                 }
             }
-            
+
             Iterator it = m_mappingTables.iterator();
 
             while (it.hasNext()) {
                 Property prop = (Property)it.next();
 
                 statement.executeUpdate(
-                    m_generator.generateMappingTable(m_objectType, prop));
+                                        m_generator.generateMappingTable(m_objectType, prop));
             }
 
         } catch (SQLException e) {
             StringBuffer ddl = new StringBuffer();
             Iterator iterator = ddlToAdd.iterator();
             while (iterator.hasNext()) {
-                ddl.append((String)iterator.next() + 
+                ddl.append((String)iterator.next() +
                            com.arsdigita.persistence.Utilities.LINE_BREAK);
             }
 
-            throw PersistenceException.newInstance(e.getMessage() + 
-                                           Utilities.LINE_BREAK +
-                                           "SQL for ADD: " + ddl.toString(), e);
+            throw PersistenceException.newInstance(e.getMessage() +
+                                                   Utilities.LINE_BREAK +
+                                                   "SQL for ADD: " + ddl.toString(), e);
         }
-            
+
 
         // 5. if DDL executing is successful, update the database to
         //    reflect the new syntax
@@ -808,7 +808,7 @@ public class DynamicObjectType {
                 m_dataObject.set("dynamicType", m_objectType.getQualifiedName());
                 m_dataObject.set("displayName", objectTypeString);
             }
-                   
+
             m_dataObject.set("pdlFile", pdl);
             m_dataObject.save();
         } catch (SQLException e) {
@@ -819,7 +819,7 @@ public class DynamicObjectType {
         //    that are descendents of this object type so that they, and any
         //    associations of their type, can be regenerated.
         Collection objectTypes = MetadataRoot.getMetadataRoot()
-                                             .getObjectTypes();
+            .getObjectTypes();
         Collection affected = new ArrayList();
         Iterator it;
         boolean oneMore;
@@ -919,7 +919,7 @@ public class DynamicObjectType {
     public String toString() {
         String appendString = "";
         if (m_ddlToAdd.length() > 0) {
-            appendString = Utilities.LINE_BREAK + "The following will be " + 
+            appendString = Utilities.LINE_BREAK + "The following will be " +
                 "added to the table:" + m_ddlToAdd.toString();
         }
 
@@ -932,10 +932,10 @@ public class DynamicObjectType {
      *  data object type x
      *  <p>
      *  This is only meant to be called from the command line.
-     *  the usage is 
+     *  the usage is
      *  <code>
-     *  java com.arsdigita.persistence.metadataDyanmicObjectType 
-     *  &lt;[import | export]&gt; &lt;DynamicObjectType&gt; &lt;FileLocation&gt; 
+     *  java com.arsdigita.persistence.metadataDyanmicObjectType
+     *  &lt;[import | export]&gt; &lt;DynamicObjectType&gt; &lt;FileLocation&gt;
      *  &lt;StartupScript&gt; &lt;WebAppRoot&gt;
      *  </code>
      *  <p>
@@ -945,11 +945,11 @@ public class DynamicObjectType {
      *  a file in the database into the file system.</li>
      *
      *  <li>The DynamicObjectType is the fully qualified name of the
-     *      object type.  An example is 
+     *      object type.  An example is
      *      <code>com.arsdigita.cms.MyDynamicType</code>
      *  </li>
      *
-     *  <li>The FileLocation is location in the file system where 
+     *  <li>The FileLocation is location in the file system where
      *      the file should be read from or written to.  For example
      *      /home/tomcat/webapps/enterprise/dynamictypes/cms/MyDynamicType.pdl
      *  </li>
@@ -971,9 +971,9 @@ public class DynamicObjectType {
      *  So, to export the dynamic type MyDynamicType from the database to
      *  the file system, you can type
      *  <code>
-     *  java com.arsdigita.persistence.metadata.DynamicObjectType export 
-     *  com.arsdigita.cms.MyDynamicType /tmp/MyDynamicType.pdl 
-     *  /home/tomcat/webapps/enterprise/WEB-INF/resources/enterprise.init 
+     *  java com.arsdigita.persistence.metadata.DynamicObjectType export
+     *  com.arsdigita.cms.MyDynamicType /tmp/MyDynamicType.pdl
+     *  /home/tomcat/webapps/enterprise/WEB-INF/resources/enterprise.init
      *  /home/tomcat/webapps/enterprise
      *  </code>
      *  <p>
@@ -1010,7 +1010,7 @@ public class DynamicObjectType {
         startup.init();
 
         TransactionContext txn = SessionManager.getSession()
-                                               .getTransactionContext();
+            .getTransactionContext();
         // open the transaction
         if (! txn.inTxn()) {
             txn.beginTxn();
@@ -1019,7 +1019,7 @@ public class DynamicObjectType {
         // get the data object we will be working with
         DataObject dataObject;
         DataCollection collection = SessionManager.getSession()
-                                                  .retrieve(objectTypeString);
+            .retrieve(objectTypeString);
         collection.addEqualsFilter("dynamicType", objectType);
         if (collection.next()) {
             dataObject = collection.getDataObject();
@@ -1028,7 +1028,7 @@ public class DynamicObjectType {
             try {
                 dataObject.set("id", Sequences.getNextValue());
             } catch (SQLException e) {
-                System.err.println("Unable to create sequence:" + 
+                System.err.println("Unable to create sequence:" +
                                    Utilities.LINE_BREAK + e.getMessage());
                 txn.commitTxn();
                 System.exit(1);
@@ -1054,7 +1054,7 @@ public class DynamicObjectType {
                 } catch (IOException e) {
                     String suffix = "";
                     if (!"".equals(pdlFile.toString())) {
-                        suffix = "We were able read the following" + 
+                        suffix = "We were able read the following" +
                             pdlFile.toString();
                     }
                     System.err.println("There was an error reading the file [" +
@@ -1072,7 +1072,7 @@ public class DynamicObjectType {
                 txn.commitTxn();
                 System.exit(1);
             }
-            
+
         } else {
             String pdlFile = (String)dataObject.get("pdlFile");
             if (pdlFile == null) {
@@ -1080,7 +1080,7 @@ public class DynamicObjectType {
                                    objectType + "] cannot be found.  Please " +
                                    "check the type and try again.");
                 txn.commitTxn();
-                System.exit(1);                
+                System.exit(1);
             }
 
             // write the PDL to the file system
@@ -1099,5 +1099,3 @@ public class DynamicObjectType {
         startup.destroy();
     }
 }
-
-

@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -26,7 +26,7 @@ import com.arsdigita.persistence.metadata.ObjectType;
  * query ItemsInFolder {
  *   ContentItem item;
  *   ContentType type;
- *   do { 
+ *   do {
  *     select i.item_id, i.name, i.version,
  *            t.type_id, t.label
  *     from cms_items i, content_types t
@@ -45,7 +45,7 @@ import com.arsdigita.persistence.metadata.ObjectType;
  * <pre><code>
  *    new DataQueryDataCollectionAdapter(dq, "item");
  * </code></pre>
- * and a new data collection of content types through 
+ * and a new data collection of content types through
  * <pre><code>
  *    new DataQueryDataCollectionAdapter(dq, "type");
  * </code></pre>
@@ -55,14 +55,14 @@ import com.arsdigita.persistence.metadata.ObjectType;
  * cursor, it just wraps the data query that was passed in.
  *
  * @author <a href="mailto:lutter@arsdigita.com">David Lutterkort</a>
- * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDataCollectionAdapter.java#2 $
+ * @version $Id: //core-platform/dev/src/com/arsdigita/persistence/DataQueryDataCollectionAdapter.java#3 $
  */
 public class DataQueryDataCollectionAdapter extends DataQueryDecorator
     implements DataCollection {
 
     private ObjectType m_type;
     private String m_dataObjectProperty;
-  
+
     /**
      * Create a data collection that uses the objects with name
      * <code>dataObjectProperty</code> from the data query as its data
@@ -71,7 +71,7 @@ public class DataQueryDataCollectionAdapter extends DataQueryDecorator
      * @param dq the data query from which data objects are taken
      * @param dataObjectProperty the name of the data objects in the query
      */
-    public DataQueryDataCollectionAdapter(DataQuery dq, 
+    public DataQueryDataCollectionAdapter(DataQuery dq,
                                           String dataObjectProperty) {
         super(dq);
         m_dataObjectProperty = dataObjectProperty;
@@ -91,7 +91,7 @@ public class DataQueryDataCollectionAdapter extends DataQueryDecorator
      * are taken
      * @param dataObjectProperty the name of the data objects in the query
      */
-    public DataQueryDataCollectionAdapter(String queryName, 
+    public DataQueryDataCollectionAdapter(String queryName,
                                           String dataObjectProperty) {
         super(queryName);
         m_dataObjectProperty = dataObjectProperty;
@@ -105,16 +105,16 @@ public class DataQueryDataCollectionAdapter extends DataQueryDecorator
         return (DataObject) ((DataQueryImpl) getDataQuery()).getUnalias(m_dataObjectProperty);
     }
 
-     public ObjectType getObjectType() {
-         // FIXME: This is lame and will fail horribly if called before the
-         // first call to next(). But I am not master of the metdata system
-         // enough to figure out how we could get the object type directly
-         // from the data query ...
-         if ( m_type == null ) {
-             m_type = getDataObject().getObjectType();
-         }
-         return m_type;
-     }
+    public ObjectType getObjectType() {
+        // FIXME: This is lame and will fail horribly if called before the
+        // first call to next(). But I am not master of the metdata system
+        // enough to figure out how we could get the object type directly
+        // from the data query ...
+        if ( m_type == null ) {
+            m_type = getDataObject().getObjectType();
+        }
+        return m_type;
+    }
 
     /**
      * Retrieve an attribute of the underlying query. Typically,
@@ -142,12 +142,12 @@ public class DataQueryDataCollectionAdapter extends DataQueryDecorator
     public Filter addFilter(String conditions) {
         return super.addFilter(conditions);
     }
-    
+
     public Filter addFilter(Filter filter) {
         return super.addFilter(filter);
     }
 
-    public Filter addInSubqueryFilter(String propertyName, 
+    public Filter addInSubqueryFilter(String propertyName,
                                       String subqueryName) {
         return super.addInSubqueryFilter(propertyName, subqueryName);
     }
@@ -169,14 +169,14 @@ public class DataQueryDataCollectionAdapter extends DataQueryDecorator
     }
 
     public String toString() {
-        return "DataQueryDataCollectionAdapter for {" + super.toString() + "}"; 
+        return "DataQueryDataCollectionAdapter for {" + super.toString() + "}";
     }
 
-	public boolean contains(OID oid) {
-		throw new UnsupportedOperationException();
-	}
+    public boolean contains(OID oid) {
+        throw new UnsupportedOperationException();
+    }
 
-	public boolean contains(DataObject dobj) {
-		throw new UnsupportedOperationException();
-	}
+    public boolean contains(DataObject dobj) {
+        throw new UnsupportedOperationException();
+    }
 }

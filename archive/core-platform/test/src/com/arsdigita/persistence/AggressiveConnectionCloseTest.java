@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -39,14 +39,14 @@ import org.apache.log4j.varia.DenyAllFilter;
 import org.apache.log4j.varia.StringMatchFilter;
 
 /**
- * This test verifies the aggressive connection closing functionality 
+ * This test verifies the aggressive connection closing functionality
  * by looking for appropriate log statements.
  *
  * @author <A HREF="mailto:eison@arsdigita.com">David Eison</A>
  */
 public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
 
-    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/AggressiveConnectionCloseTest.java#3 $";
+    public static final String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/AggressiveConnectionCloseTest.java#4 $";
 
     private Session ssn;
 
@@ -107,7 +107,7 @@ public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
 
         clearLog();
 
-        // abort prev transaction, start a new one, so that we can have a 
+        // abort prev transaction, start a new one, so that we can have a
         // clean connection
         ssn.getTransactionContext().commitTxn();
         ssn.getTransactionContext().beginTxn();
@@ -118,31 +118,28 @@ public class AggressiveConnectionCloseTest extends Log4jBasedTestCase {
         try {
             assertLogDoesNotContain(holdString);
             assertLogContains(returnString);
-            
+
             ssn.getTransactionContext().setAggressiveClose(false);
-            
-            // abort prev transaction, start a new one, so that we can have a 
+
+            // abort prev transaction, start a new one, so that we can have a
             // clean connection
             ssn.getTransactionContext().abortTxn();
             ssn.getTransactionContext().beginTxn();
-            
+
             // test w/ aggressive closing off, shouldn't result in either message
             clearLog();
-            
+
             dt = ssn.retrieve(new OID("examples.Datatype", BigInteger.ZERO));
             dt.set("date", new java.util.Date(1000));
             dt.save();
 
             assertLogDoesNotContain(holdString);
-            assertLogDoesNotContain(returnString);            
+            assertLogDoesNotContain(returnString);
         } finally {
             // delete, since we had to commit earlier.
             dt.delete();
             ssn.getTransactionContext().commitTxn();
-            ssn.getTransactionContext().beginTxn();        
+            ssn.getTransactionContext().beginTxn();
         }
     }
 }
-
-
-

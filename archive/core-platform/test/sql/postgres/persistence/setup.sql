@@ -17,7 +17,7 @@
 -- tests to run.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #11 $ $Date: 2002/07/30 $
+-- @version $Revision: #12 $ $Date: 2002/08/14 $
 --
 
 @@ order-test.sql

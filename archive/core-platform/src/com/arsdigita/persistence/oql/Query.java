@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.redhat.com/licenses/ccmpl.html
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
+
 package com.arsdigita.persistence.oql;
 
 import com.arsdigita.db.DbHelper;
@@ -13,12 +28,12 @@ import org.apache.log4j.Logger;
  * specified in a PDL file to generate sql queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2002/08/14 $
+ * @version $Revision: #15 $ $Date: 2002/08/14 $
  **/
 
 public class Query extends Node {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#14 $ by $Author: dan $, $DateTime: 2002/08/14 05:45:56 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/oql/Query.java#15 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private static final Logger s_log = Logger.getLogger(Query.class);
 
@@ -38,7 +53,7 @@ public class Query extends Node {
      **/
     public Query(ObjectType type) {
         super(null, type);
-        fetchKey();   
+        fetchKey();
     }
 
     /**
@@ -52,14 +67,14 @@ public class Query extends Node {
             for (Iterator it = link.getProperties(); it.hasNext(); ) {
                 Property property = (Property) it.next();
                 if (!link.isKeyProperty(property)) {
-                    if (property.isAttribute() && 
+                    if (property.isAttribute() &&
                         property.getColumn() == null) {
                         throw new NoMetadataException
-                            (property.getFilename() + ": " + 
+                            (property.getFilename() + ": " +
                              property.getLineNumber() +
-                             ": No metadata found for property " + 
+                             ": No metadata found for property " +
                              property.getName() +
-                             " while generating SQL for query: " + 
+                             " while generating SQL for query: " +
                              getQuery());
                     }
                     Node parent = getChildNode(parentProperty);
@@ -175,7 +190,7 @@ public class Query extends Node {
 
                 if (result.length() >= 30) {
                     int begin = result.length() - 29;
-                loop:
+                    loop:
                     while (begin < result.length()) {
                         switch (result.charAt(begin)) {
                         case '0':
@@ -255,19 +270,19 @@ public class Query extends Node {
             dumpDot(file);
             ObjectType type = getObjectType();
             throw new OQLException(
-                type.getFilename() + ": " + type.getLineNumber() +
-                " column " + type.getColumnNumber() +
-                ": Encountered an error while generating a query for " +
-                type.getQualifiedName() + ".\nThe following errors were " + 
-                "reported:\n  " + join(m_errors, "\n  ") +
-                "\nAfter making the following modifications:\n  " +
-                join(m_modifications, "\n  ") +
-                "\nA dot representation of the query after each stage of " +
-                " modification has been written to  the file '" + path +
-                "'. If you think this message is the result of a bug then " +
-                "please include the contents of the above file in any bug " +
-                "report."
-                );
+                                   type.getFilename() + ": " + type.getLineNumber() +
+                                   " column " + type.getColumnNumber() +
+                                   ": Encountered an error while generating a query for " +
+                                   type.getQualifiedName() + ".\nThe following errors were " +
+                                   "reported:\n  " + join(m_errors, "\n  ") +
+                                   "\nAfter making the following modifications:\n  " +
+                                   join(m_modifications, "\n  ") +
+                                   "\nA dot representation of the query after each stage of " +
+                                   " modification has been written to  the file '" + path +
+                                   "'. If you think this message is the result of a bug then " +
+                                   "please include the contents of the above file in any bug " +
+                                   "report."
+                                   );
         } catch (IOException e) {
             s_log.error(e);
         }
@@ -308,17 +323,17 @@ public class Query extends Node {
         String dot = toDot();
         String op = getOperation().toString();
         if (!s_written.contains(op)) {
-            try {
-                FileWriter writer = new FileWriter(
-                    "/tmp/dmp/" + s_written.size() + ".dot"
-                    );
-                writer.write(dot);
-                writer.close();
-                s_written.add(op);
-            } catch (IOException e) {
-                s_log.error(e.getMessage());
-            }
-            }*/
+        try {
+        FileWriter writer = new FileWriter(
+        "/tmp/dmp/" + s_written.size() + ".dot"
+        );
+        writer.write(dot);
+        writer.close();
+        s_written.add(op);
+        } catch (IOException e) {
+        s_log.error(e.getMessage());
+        }
+        }*/
     }
 
     public String toSQL() {
@@ -438,14 +453,14 @@ public class Query extends Node {
 
     public String getSQL() {
         final StringBuffer result = new StringBuffer();
-	int database = DbHelper.getDatabase();
+        int database = DbHelper.getDatabase();
         if (database == DbHelper.DB_POSTGRES) {
             writePostgresSQL(result);
         } else if (database == DbHelper.DB_ORACLE) {
             writeOracleSQL(result);
         } else {
-	    DbHelper.unsupportedDatabaseError("optimizing query generator");
-	}
+            DbHelper.unsupportedDatabaseError("optimizing query generator");
+        }
 
         return result.toString();
     }
@@ -539,12 +554,12 @@ public class Query extends Node {
         for (Iterator it = m_conditions.iterator(); it.hasNext(); ) {
             Condition cond = (Condition) it.next();
             result.append(
-                "    " + env.get(cond.getTail().getTable()) + ":" +
-                env.get(cond.getTail()) +
-                " -> " +
-                env.get(cond.getHead().getTable()) + ":" +
-                env.get(cond.getHead())
-                );
+                          "    " + env.get(cond.getTail().getTable()) + ":" +
+                          env.get(cond.getTail()) +
+                          " -> " +
+                          env.get(cond.getHead().getTable()) + ":" +
+                          env.get(cond.getHead())
+                          );
             if (cond.isOuter()) { result.append(" [color=blue]"); }
             result.append(";\n");
         }

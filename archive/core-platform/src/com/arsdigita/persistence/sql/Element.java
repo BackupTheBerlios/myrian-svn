@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
+ *
+ * The contents of this file are subject to the CCM Public
+ * License (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of
+ * the License at http://www.redhat.com/licenses/ccmpl.html
+ *
+ * Software distributed under the License is distributed on an "AS
+ * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ */
+
 package com.arsdigita.persistence.sql;
 
 import com.arsdigita.persistence.PersistenceException;
@@ -9,12 +24,12 @@ import java.io.*;
  * Element
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/18 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  **/
 
 public abstract class Element {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Element.java#3 $ by $Author: dennis $, $DateTime: 2002/07/18 13:18:21 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/sql/Element.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private static final Map s_cache = new HashMap();
 
@@ -27,12 +42,12 @@ public abstract class Element {
                 result = p.sql();
             } catch (TokenMgrError e) {
                 throw PersistenceException.newInstance(
-                    "Bad SQL: " + sql, e
-                    );
+                                                       "Bad SQL: " + sql, e
+                                                       );
             } catch (ParseException e) {
                 throw PersistenceException.newInstance(
-                    "Bad SQL: " + sql, e
-                    );
+                                                       "Bad SQL: " + sql, e
+                                                       );
             }
             s_cache.put(sql, result);
         }
@@ -59,41 +74,41 @@ public abstract class Element {
     public boolean isUpdate() {
         if (isStatement()) {
             Statement stmt = (Statement) this;
-	    Clause first = stmt.getFirstClause();
-	    return first != null && first.isUpdate();
+            Clause first = stmt.getFirstClause();
+            return first != null && first.isUpdate();
         } else {
             return false;
         }
     }
 
     public boolean isInsert() {
-	if (isStatement()) {
-	    Statement stmt = (Statement) this;
-	    Clause first = stmt.getFirstClause();
-	    return first != null && first.isInsert();
-	} else {
-	    return false;
-	}
+        if (isStatement()) {
+            Statement stmt = (Statement) this;
+            Clause first = stmt.getFirstClause();
+            return first != null && first.isInsert();
+        } else {
+            return false;
+        }
     }
 
     public boolean isSelect() {
-	if (isStatement()) {
-	    Statement stmt = (Statement) this;
-	    Clause first = stmt.getFirstClause();
-	    return first != null && first.isSelect();
-	} else {
-	    return false;
-	}
+        if (isStatement()) {
+            Statement stmt = (Statement) this;
+            Clause first = stmt.getFirstClause();
+            return first != null && first.isSelect();
+        } else {
+            return false;
+        }
     }
 
     public boolean isSelectForUpdate() {
-	if (isStatement()) {
-	    Statement stmt = (Statement) this;
-	    Clause last = stmt.getLastClause();
-	    return isSelect() && last.isForUpdate();
-	} else {
-	    return false;
-	}
+        if (isStatement()) {
+            Statement stmt = (Statement) this;
+            Clause last = stmt.getLastClause();
+            return isSelect() && last.isForUpdate();
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -116,14 +131,14 @@ public abstract class Element {
     }
 
     public boolean isDDL() {
-	List elements = getLeafElements();
-	if (elements.size() > 0) {
-	    return s_DDLKeywords.contains(
-		elements.get(0).toString().toLowerCase()
-		);
-	} else {
-	    return false;
-	}
+        List elements = getLeafElements();
+        if (elements.size() > 0) {
+            return s_DDLKeywords.contains(
+                                          elements.get(0).toString().toLowerCase()
+                                          );
+        } else {
+            return false;
+        }
     }
 
     public abstract boolean isLeaf();

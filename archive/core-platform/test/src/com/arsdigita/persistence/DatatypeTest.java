@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2001 ArsDigita Corporation. All Rights Reserved.
+ * Copyright (C) 2001, 2002 Red Hat Inc. All Rights Reserved.
  *
- * The contents of this file are subject to the ArsDigita Public 
+ * The contents of this file are subject to the CCM Public
  * License (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of
- * the License at http://www.arsdigita.com/ADPL.txt
+ * the License at http://www.redhat.com/licenses/ccmpl.html
  *
  * Software distributed under the License is distributed on an "AS
  * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
@@ -26,12 +26,12 @@ import java.io.*;
  * DatatypeTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #3 $ $Date: 2002/07/29 $
+ * @version $Revision: #4 $ $Date: 2002/08/14 $
  */
 
 public class DatatypeTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DatatypeTest.java#3 $ by $Author: randyg $, $DateTime: 2002/07/29 16:44:42 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/DatatypeTest.java#4 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
 
     private Session ssn;
 
@@ -78,7 +78,7 @@ public class DatatypeTest extends PersistenceTestCase {
         }
 
         dt.set("blob", bytes);
-        
+
         StringBuffer charBuf = new StringBuffer(LOB_SIZE);
         for (int i = 0; i < LOB_SIZE; i++) {
             charBuf.append('a' + (i % 26));
@@ -95,7 +95,7 @@ public class DatatypeTest extends PersistenceTestCase {
         assertEquals("Clob was not retrieved correctly.",
                      chars,
                      dt.get("clob"));
-        
+
     }
 
     public void testDate() {
@@ -126,50 +126,50 @@ public class DatatypeTest extends PersistenceTestCase {
         dt.set("long", new Long(1000000000000L));
         dt.set("short", new Short((short)30));
         dt.set("string", "This is a string.");
-	dt.save();
+        dt.save();
 
-	DataQuery dq = ssn.retrieveQuery("examples.TypedQuery");
-	while (dq.next()) {
-	    assertEquals("incorrect 'id'",
-                     BigInteger.ZERO,
-                     dq.get("id"));
-	    assertEquals("incorrect 'bigInteger'",
-                     BigInteger.ONE,
-                     dq.get("bigInteger"));
-	    assertEquals("incorrect 'bigDecimal'",
-                     new BigDecimal(0),
-                     dq.get("bigDecimal"));
-	    assertEquals("incorrect 'boolean'",
-                     Boolean.TRUE,
-                     dq.get("boolean"));
-	    assertEquals("incorrect 'byte'",
-                     new Byte((byte)42),
-                     dq.get("byte"));
-	    assertEquals("incorrect 'character'",
-                     new Character('c'),
-                     dq.get("character"));
-	    assertEquals("incorrect 'date'",
-                     new java.util.Date(0),
-                     dq.get("date"));
-	    assertEquals("incorrect 'double'",
-                     new Double(75),
-                     dq.get("double"));
-	    assertEquals("incorrect 'float'",
-                     new Float(3.14159),
-                     dq.get("float"));
-	    assertEquals("incorrect 'integer'",
-                     new Integer(100),
-                     dq.get("integer"));
-	    assertEquals("incorrect 'long'",
-                     new Long(1000000000000L),
-                     dq.get("long"));
-	    assertEquals("incorrect 'short'",
-                     new Short((short)30),
-                     dq.get("short"));
-	    assertEquals("incorrect 'string'",
-                     "This is a string.",
-                     dq.get("string"));
-	}
-    dq.close();
+        DataQuery dq = ssn.retrieveQuery("examples.TypedQuery");
+        while (dq.next()) {
+            assertEquals("incorrect 'id'",
+                         BigInteger.ZERO,
+                         dq.get("id"));
+            assertEquals("incorrect 'bigInteger'",
+                         BigInteger.ONE,
+                         dq.get("bigInteger"));
+            assertEquals("incorrect 'bigDecimal'",
+                         new BigDecimal(0),
+                         dq.get("bigDecimal"));
+            assertEquals("incorrect 'boolean'",
+                         Boolean.TRUE,
+                         dq.get("boolean"));
+            assertEquals("incorrect 'byte'",
+                         new Byte((byte)42),
+                         dq.get("byte"));
+            assertEquals("incorrect 'character'",
+                         new Character('c'),
+                         dq.get("character"));
+            assertEquals("incorrect 'date'",
+                         new java.util.Date(0),
+                         dq.get("date"));
+            assertEquals("incorrect 'double'",
+                         new Double(75),
+                         dq.get("double"));
+            assertEquals("incorrect 'float'",
+                         new Float(3.14159),
+                         dq.get("float"));
+            assertEquals("incorrect 'integer'",
+                         new Integer(100),
+                         dq.get("integer"));
+            assertEquals("incorrect 'long'",
+                         new Long(1000000000000L),
+                         dq.get("long"));
+            assertEquals("incorrect 'short'",
+                         new Short((short)30),
+                         dq.get("short"));
+            assertEquals("incorrect 'string'",
+                         "This is a string.",
+                         dq.get("string"));
+        }
+        dq.close();
     }
 }
