@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #1 $ $Date: 2003/05/12 $
+ * @version $Revision: #2 $ $Date: 2003/05/15 $
  **/
 
 class DataObjectImpl implements DataObject {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#1 $ by $Author: ashah $, $DateTime: 2003/05/12 18:19:45 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataObjectImpl.java#2 $ by $Author: ashah $, $DateTime: 2003/05/15 11:17:18 $";
 
     private final static Logger s_log = Logger.getLogger(DataObjectImpl.class);
 
@@ -317,10 +317,15 @@ class DataObjectImpl implements DataObject {
                 throw new PersistenceException("can't save a deleted object");
             }
 
-            DataEvent e = new BeforeSaveEvent(this);
-            getSession().m_beforeFP.fireNow(e);
-            m_ssn.flush();
-            m_ssn.assertFlushed(this);
+            getSession().m_beforeFP.fireNow(new BeforeSaveEvent(this));
+
+            if (!m_ssn.isFlushed(this)) {
+                m_ssn.flush();
+                m_ssn.assertFlushed(this);
+            } else {
+                // with no changes on the object fire after save directly
+                getSession().m_afterFP.fireNow(new AfterSaveEvent(this));
+            }
         } catch (ProtoException pe) {
             throw new PersistenceException(pe);
         }
