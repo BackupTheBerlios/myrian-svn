@@ -76,9 +76,11 @@ define MODULE_TEMPLATE
 
 @M_enhance:=java -classpath $(@M_CLASSPATH) com.sun.jdori.enhancer.Main
 
-.PHONY: @M
+.PHONY: @M @M.jar
 
 @M: $(@M_TIMESTAMP)
+
+@M.jar: $(@M_JAR)
 
 $(@M_JAR): $(@M_TIMESTAMP) $(@M_RESOURCES)
 	@echo building $(@M_JAR)
