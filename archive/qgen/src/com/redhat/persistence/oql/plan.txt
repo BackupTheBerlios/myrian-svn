@@ -35,8 +35,8 @@
  * Expand OQL to support necessary primitives
    - retrieve all
    - order (100 LOC) done
-   - range (100 LOC)
-   - size (100 LOC)
+   - range (100 LOC) done
+   - size (100 LOC) done
    - simple ------------------. (250) done
                               |----> (Opaque expression with optional metadata)
  * Static SQL in OQL -> SQL --'
@@ -58,3 +58,4 @@
      + Profiler
      + MemoryEngine
      + Cursor/DataSet
+   - Link attributes code in PDL.java
