@@ -15,8 +15,8 @@
 
 package com.arsdigita.persistence.metadata;
 
+import com.arsdigita.persistence.PersistenceException;
 import com.arsdigita.util.*;
-
 import java.util.*;
 import java.io.*;
 
@@ -27,12 +27,12 @@ import java.io.*;
  * be marked as special "key" properties.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #14 $ $Date: 2003/08/15 $
+ * @version $Revision: #15 $ $Date: 2003/09/10 $
  **/
 
 public class ObjectType extends CompoundType {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#14 $ by $Author: dennis $, $DateTime: 2003/08/15 13:46:34 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/metadata/ObjectType.java#15 $ by $Author: ashah $, $DateTime: 2003/09/10 00:21:05 $";
 
     static ObjectType
 	wrap(com.redhat.persistence.metadata.ObjectType type) {
@@ -247,14 +247,14 @@ public class ObjectType extends CompoundType {
      *
      * @pre extendedType.isSubtypeOf(baseType)
      *
-     * @exception RuntimeException Thrown if <code>extendedType</code>
+     * @exception PersistenceException Thrown if <code>extendedType</code>
      * is not a subtype of the <code>ObjectType</code> specified by
      * <code>baseType</code>.
      **/
     public static void verifySubtype(ObjectType baseType,
                                      ObjectType extendedType) {
         if (!extendedType.isSubtypeOf(baseType)) {
-            throw new RuntimeException
+            throw new PersistenceException
 		("The object type '" + extendedType.getQualifiedName() +
 		 "' is not a subtype of the object type '" +
 		 baseType.getQualifiedName() + "'");
