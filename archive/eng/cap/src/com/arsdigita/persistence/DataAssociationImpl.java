@@ -24,7 +24,6 @@ import org.myrian.persistence.ProtoException;
  * DataAssociationImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/10/04 $
  **/
 
 class DataAssociationImpl extends DataAssociationCursorImpl

@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
  * PooledConnectionSource
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/10/04 $
  **/
 
 public class PooledConnectionSource implements ConnectionSource {

@@ -30,7 +30,6 @@ import java.util.Iterator;
  * manifest file that lists resources located in the java classpath.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 public class ManifestSource implements PDLSource {

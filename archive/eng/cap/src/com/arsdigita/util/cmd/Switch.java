@@ -23,7 +23,6 @@ import java.util.List;
 /**
  * @deprecated Use CLI (http://jakarta.apache.org/commons/cli/index.html) instead.
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 public abstract class Switch {

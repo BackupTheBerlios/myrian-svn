@@ -30,8 +30,6 @@ import org.apache.log4j.Logger;
  *
  *
  * @author Michael Bryzek
- * @date $Date: 2004/10/04 $
- * @version $Revision: #4 $
  *
  * @see com.arsdigita.persistence.OID
  **/

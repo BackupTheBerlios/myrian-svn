@@ -39,7 +39,6 @@ import org.apache.log4j.Logger;
  * DataObjectImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #8 $ $Date: 2004/10/04 $
  **/
 
 class DataObjectImpl implements DataObject {

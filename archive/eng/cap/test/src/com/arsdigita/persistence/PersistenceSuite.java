@@ -23,7 +23,6 @@ import junit.framework.*;
  * PersistenceSuite
  *
  * @author Jon Orris
- * @version $Revision: #7 $ $Date: 2004/10/04 $
  */
 public class PersistenceSuite extends TestSuite {
 

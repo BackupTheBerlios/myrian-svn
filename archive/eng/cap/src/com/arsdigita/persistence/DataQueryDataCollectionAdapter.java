@@ -57,7 +57,6 @@ import com.arsdigita.persistence.metadata.ObjectType;
  * cursor, it just wraps the data query that was passed in.
  *
  * @author David Lutterkort
- * @version $Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataQueryDataCollectionAdapter.java#3 $
  */
 public class DataQueryDataCollectionAdapter extends DataQueryDecorator
     implements DataCollection {

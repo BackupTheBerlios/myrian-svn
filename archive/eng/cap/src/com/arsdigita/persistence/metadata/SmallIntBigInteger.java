@@ -26,7 +26,6 @@ import java.math.BigInteger;
  *  This class is intended to be used within MetadataRoot when instantiating
  *  values from the database.
  *
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  *
  */
 class SmallIntBigInteger extends BigInteger {

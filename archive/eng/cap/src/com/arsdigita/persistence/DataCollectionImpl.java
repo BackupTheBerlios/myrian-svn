@@ -25,7 +25,6 @@ import org.myrian.persistence.common.Path;
  * DataCollectionImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/10/04 $
  **/
 
 class DataCollectionImpl extends DataQueryImpl implements DataCollection {

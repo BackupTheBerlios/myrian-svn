@@ -26,7 +26,6 @@ import java.util.Iterator;
  * property contained in a CompoundType has an associated DataType.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/10/04 $
  */
 
 abstract public class CompoundType extends DataType {

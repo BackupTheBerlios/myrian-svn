@@ -29,7 +29,6 @@ import java.util.Map;
  * C
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 final class C {

@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author Jon Orris
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  */
 public class DataCollectionImplTest extends DataCollectionTest
 {

@@ -43,7 +43,6 @@ import org.apache.log4j.Logger;
  *
  * @see Initializer
  * @author Archit Shah
- * @version $Revision: #6 $ $Date: 2004/10/04 $
  */
 
 public class SessionManager {

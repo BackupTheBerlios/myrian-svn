@@ -31,8 +31,6 @@ import org.apache.log4j.Logger;
  *     com.arsdigita.persistence.DataAssociation </p>
  *
  * @author Michael Bryzek
- * @date $Date: 2004/10/04 $
- * @version $Revision: #4 $
  *
  * @see com.arsdigita.persistence.DataAssociationImpl
  **/

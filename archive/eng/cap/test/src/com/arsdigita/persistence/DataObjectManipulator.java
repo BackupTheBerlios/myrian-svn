@@ -45,7 +45,6 @@ import java.util.Map;
  * DataObjectManipulator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #6 $ $Date: 2004/10/04 $
  */
 public class DataObjectManipulator {
 

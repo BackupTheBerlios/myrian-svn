@@ -20,14 +20,13 @@
 -- This file contains the data model for the data query test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #3 $ $Date: 2004/09/01 $
 --
 
-create or replace function DataOperationProcedure() returns integer 
+create or replace function DataOperationProcedure() returns integer
 as '
 begin
    insert into t_data_query (entry_id, action, priority, action_time)
-   select entry_id + 1, action, priority, action_time from t_data_query 
+   select entry_id + 1, action, priority, action_time from t_data_query
    where entry_id = (select max(entry_id) from t_data_query);
    return 1;
 end;
@@ -40,9 +39,9 @@ declare
   toReturn varchar(300);
 begin
    insert into t_data_query (entry_id, action, priority, action_time)
-   select entry_id + 1, action, priority, action_time from t_data_query 
+   select entry_id + 1, action, priority, action_time from t_data_query
    where entry_id = (select max(entry_id) from t_data_query);
-   select max(entry_id) into toReturn from t_data_query;   
+   select max(entry_id) into toReturn from t_data_query;
    return toReturn;
 end;
 ' LANGUAGE 'plpgsql';
@@ -53,9 +52,9 @@ as '
 declare v_new_id varchar;
 begin
    insert into t_data_query (entry_id, action, priority, action_time)
-   select entry_id + 1, action, priority, action_time from t_data_query 
+   select entry_id + 1, action, priority, action_time from t_data_query
    where entry_id = (select max(entry_id) from t_data_query);
-   select max(entry_id) into v_new_id from t_data_query;   
+   select max(entry_id) into v_new_id from t_data_query;
    return v_new_id;
 end;
 ' LANGUAGE 'plpgsql';
@@ -63,13 +62,13 @@ end;
 
 create or replace function DataOperationProcWithInOut(integer) returns varchar
 as '
-declare 
+declare
     v_new_id varchar;
 begin
    insert into t_data_query (entry_id, action, priority, action_time)
-   select $1, action, priority, action_time from t_data_query 
+   select $1, action, priority, action_time from t_data_query
    where entry_id = (select max(entry_id) from t_data_query);
-   select cast(max(entry_id) as varchar) into v_new_id from t_data_query;   
+   select cast(max(entry_id) as varchar) into v_new_id from t_data_query;
    return v_new_id;
 end;
 ' LANGUAGE 'plpgsql';
@@ -77,13 +76,13 @@ end;
 
 create or replace function DataOperationProcWithInOutInt(integer) returns integer
 as '
-declare 
+declare
     v_new_id integer;
 begin
    insert into t_data_query (entry_id, action, priority, action_time)
-   select $1, action, priority, action_time from t_data_query 
+   select $1, action, priority, action_time from t_data_query
    where entry_id = (select max(entry_id) from t_data_query);
-   select max(entry_id) into v_new_id from t_data_query;   
+   select max(entry_id) into v_new_id from t_data_query;
    return v_new_id;
 end;
 ' LANGUAGE 'plpgsql';
@@ -92,12 +91,12 @@ end;
 create or replace function DataOperationProcWithDates(integer, timestamp)
        returns timestamp
 as '
-declare 
+declare
    v_new_date timestamp;
 begin
    update t_data_query set action_time = $2
    where entry_id = $1;
-   select max(action_time) into v_new_date from t_data_query;   
+   select max(action_time) into v_new_date from t_data_query;
    return v_new_date;
 end;
 ' LANGUAGE 'plpgsql';
@@ -107,7 +106,7 @@ create or replace function DataOperationProcedureWithArgs(integer) returns integ
 as '
 begin
    insert into t_data_query (entry_id, action, priority, action_time)
-   select entry_id + 1, action, $1, action_time from t_data_query 
+   select entry_id + 1, action, $1, action_time from t_data_query
    where entry_id = (select max(entry_id) from t_data_query);
    return 1;
 end;
@@ -119,7 +118,7 @@ as '
 begin
    insert into t_data_query (entry_id, action, priority, action_time, description)
    select entry_id + 1, action, priority, action_time, $1
-   from t_data_query 
+   from t_data_query
    where entry_id = (select max(entry_id) from t_data_query);
    return 1;
 end;
@@ -129,8 +128,8 @@ end;
 create or replace function PLSQLWithArbitraryArgs(integer, integer, integer, integer, integer) returns integer
 as '
 begin
-        insert into PLSQLTestTable 
-        values 
+        insert into PLSQLTestTable
+        values
         ($1, $2, $3, $4, $5);
         return 1;
 end;

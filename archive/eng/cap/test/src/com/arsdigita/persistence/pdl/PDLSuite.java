@@ -23,7 +23,6 @@ import junit.framework.*;
  * PDLSuite
  *
  * @author Jon Orris
- * @version $Revision: #7 $ $Date: 2004/10/04 $
  */
 public class PDLSuite extends TestSuite {
 

@@ -23,7 +23,6 @@ package com.arsdigita.persistence;
  * an event, such as a property retrieve event, which is undefined.
  *
  * @author Jon Orris
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  */
 
 public class UndefinedEventException extends PersistenceException {

@@ -25,7 +25,6 @@ import java.io.Reader;
  * PDL files, and emit it into a MetadataRoot.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 public class PDLCompiler {

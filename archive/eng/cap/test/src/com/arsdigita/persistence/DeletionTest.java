@@ -23,7 +23,6 @@ import java.math.*;
  * DeletionTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  **/
 
 public class DeletionTest extends PersistenceTestCase {

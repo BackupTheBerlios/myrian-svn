@@ -1,7 +1,6 @@
 -*- outline-layout: (-1 : *) -*-
 
 # Author:  Vadim Nasardinov (vadimn@redhat.com)
-# Version: $Id: //eng/persistence/dev/doc/connection-factory.txt#1 $
 # Since:   2004-08-16
 
 * Quotes from the JDO Spec

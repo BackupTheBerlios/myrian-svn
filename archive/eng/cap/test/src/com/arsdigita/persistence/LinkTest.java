@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
  * LinkTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  **/
 
 public abstract class LinkTest extends PersistenceTestCase {

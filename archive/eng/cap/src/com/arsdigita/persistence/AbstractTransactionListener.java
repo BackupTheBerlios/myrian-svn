@@ -26,7 +26,6 @@ package com.arsdigita.persistence;
  * @see TransactionContext
  * @see TransactionListener
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  **/
 
 public class AbstractTransactionListener implements TransactionListener {

@@ -34,7 +34,6 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #7 $ $Date: 2004/10/04 $
  **/
 
 public class QueryTest extends PersistenceTestCase {

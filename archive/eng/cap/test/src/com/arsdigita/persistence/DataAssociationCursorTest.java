@@ -29,7 +29,6 @@ import java.util.*;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author Jon Orris
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  */
 public class DataAssociationCursorTest extends DataCollectionTest {
 

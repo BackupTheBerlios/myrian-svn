@@ -20,7 +20,6 @@ package com.arsdigita.persistence;
 /**
  * StaticLinkTest
  *
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  **/
 
 public class StaticLinkTest extends LinkTest {

@@ -36,7 +36,6 @@ import org.apache.log4j.Logger;
  * LobTest - for testing Blob and Clob datatype.
  *
  * @author Jeff Teeters
- * @version $Revision: #6 $ $Date: 2004/10/04 $
  */
 
 public class LobTest extends PersistenceTestCase {

@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
  * InFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 class InFilter extends SimpleFilter implements Filter {

@@ -24,7 +24,6 @@ package com.arsdigita.persistence;
  * and turn them into soft deletes under certain circumstances.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  **/
 
 public abstract class DataHandler {

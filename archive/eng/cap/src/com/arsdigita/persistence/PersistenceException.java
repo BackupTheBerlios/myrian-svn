@@ -23,7 +23,6 @@ package com.arsdigita.persistence;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #6 $ $Date: 2004/10/04 $
  */
 
 public class PersistenceException extends RuntimeException {

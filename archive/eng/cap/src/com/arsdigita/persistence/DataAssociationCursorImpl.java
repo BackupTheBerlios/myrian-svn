@@ -27,7 +27,6 @@ import org.myrian.persistence.metadata.ObjectType;
  * DataAssociationCursorImpl
  *
  * @author Archit Shah &lt;ashah@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 class DataAssociationCursorImpl extends DataCollectionImpl

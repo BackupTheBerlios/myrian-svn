@@ -27,7 +27,6 @@ import java.sql.SQLException;
  * Test
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  */
 
 public abstract class OrderTest extends PersistenceTestCase {

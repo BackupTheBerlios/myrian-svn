@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
  * AssociationMetadataTest
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 public class AssociationMetadataTest extends TestCase {

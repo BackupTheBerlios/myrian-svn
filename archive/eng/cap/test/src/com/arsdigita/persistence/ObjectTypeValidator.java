@@ -30,7 +30,6 @@ import java.util.Iterator;
  * ObjectTypeValidator
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #5 $ $Date: 2004/10/04 $
  */
 
 public class ObjectTypeValidator  {

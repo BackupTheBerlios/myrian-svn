@@ -26,7 +26,6 @@ import org.myrian.persistence.oql.Static;
  * SimpleFilter
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 class SimpleFilter extends FilterImpl {

@@ -24,7 +24,6 @@ import org.myrian.persistence.metadata.Root;
  * a Model.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 abstract public class ModelElement extends Element {

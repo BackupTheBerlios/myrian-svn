@@ -23,7 +23,6 @@ package com.arsdigita.persistence;
  * factories to hand out filters
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  */
 
 public interface FilterFactory {

@@ -59,7 +59,6 @@ import org.apache.log4j.Logger;
  * DataQueryImpl
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #6 $ $Date: 2004/10/04 $
  **/
 
 class DataQueryImpl implements DataQuery {

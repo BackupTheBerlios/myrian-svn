@@ -23,7 +23,6 @@ import junit.framework.TestSuite;
  * MetadataSuite - Suite of tests for persistence.metadata
  *
  * @author Jon Orris
- * @version $Revision: #5 $ $Date: 2004/10/04 $
  */
 public class MetadataxSuite extends TestSuite {
 

@@ -25,7 +25,6 @@ import java.io.FileReader;
  * An implementation of PDLSource that loads an individual file.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 public class FileSource implements PDLSource {

@@ -31,7 +31,6 @@ import java.util.Collections;
  * GenericDataQuery
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2004/10/04 $
  */
 
 public class GenericDataQuery extends DataQueryImpl {

@@ -30,7 +30,6 @@ import junit.framework.TestCase;
  * NameFilterTest
  *
  * @author <a href="mailto:ashah@redhat.com">ashah@redhat.com</a>
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  **/
 
 public class NameFilterTest extends TestCase {

@@ -22,7 +22,6 @@ package com.arsdigita.persistence;
  * This manipulates SQL in a way that is specific to Postgres.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  */
 
 class PostgresSQLUtilities implements SQLUtilities  {

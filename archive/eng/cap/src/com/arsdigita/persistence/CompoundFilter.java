@@ -22,7 +22,6 @@ package com.arsdigita.persistence;
  * CompoundFilters are used to AND or OR multiple filters together.
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  */
 
 public interface CompoundFilter extends Filter {

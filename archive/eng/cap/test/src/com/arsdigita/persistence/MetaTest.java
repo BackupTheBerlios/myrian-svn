@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
  * MetaTest
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  */
 
 public class MetaTest extends PersistenceTestCase {

@@ -20,7 +20,6 @@
 -- This file contains the data model for the data query test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #3 $ $Date: 2004/09/01 $
 --
 
 create table t_data_query (
@@ -33,7 +32,7 @@ create table t_data_query (
 
 insert into t_data_query
     (entry_id, action, description, priority, action_time)
-    values  
+    values
     (0, 'read', 'Read item 0', 1, '1976-12-24'::timestamp);
 
     insert into t_data_query
@@ -134,10 +133,10 @@ insert into t_data_query
 
 create or replace function DataOperationProcWithReturn(integer) returns integer
 as '
-declare 
+declare
    v_priority integer;
 begin
-   select priority into v_priority from t_data_query 
+   select priority into v_priority from t_data_query
     where entry_id = $1;
    return v_priority;
 end;

@@ -24,7 +24,6 @@ package com.arsdigita.persistence;
  * value of null with "is null" or "is not null"
  *
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  */
 
 class OracleSQLUtilities implements SQLUtilities  {

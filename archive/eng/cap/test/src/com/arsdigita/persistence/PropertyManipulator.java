@@ -41,7 +41,6 @@ import org.apache.log4j.*;
  * for common cases as Attribute Properties, Key Properties, etc.
  *
  * @author <a href="mailto:jorris@arsdigita.com"Jon Orris</a>
- * @version $Revision: #7 $ $Date: 2004/10/04 $
  */
 public class PropertyManipulator {
 

@@ -1,5 +1,4 @@
 # Since:   2004-06-29
-# Version: $Id: //eng/persistence/dev/doc/bugs.txt#4 $
 
 * Opened
 .. PersistenceManager.makePersistent(Object) fails silently (rather

@@ -30,7 +30,6 @@ import java.math.BigInteger;
  *  This class is intended to be used within MetadataRoot when instantiating
  *  values from the database.
  *
- * @version $Revision: #3 $ $Date: 2004/09/01 $
  *
  */
 class SmallIntBigDecimal extends BigDecimal {

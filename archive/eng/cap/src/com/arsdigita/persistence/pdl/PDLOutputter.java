@@ -35,7 +35,6 @@ import java.util.Iterator;
  * file being named after the fully qualified model name.
  *
  * @author Patrick McNeill
- * @version $Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/pdl/PDLOutputter.java#4 $
  */
 public class PDLOutputter {
     /**

@@ -25,7 +25,6 @@ import java.util.Map;
  * methods can be added to a stock data query.
  *
  * @author David Lutterkort
- * @version $Id: //eng/persistence/dev/cap/src/com/arsdigita/persistence/DataQueryDecorator.java#4 $
  */
 public class DataQueryDecorator implements DataQuery {
 

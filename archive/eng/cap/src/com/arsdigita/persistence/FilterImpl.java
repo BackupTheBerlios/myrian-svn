@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
  * be combined and manipulated to create complex queries.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/10/04 $
  */
 
 abstract class FilterImpl implements Filter {

@@ -30,7 +30,6 @@ import org.myrian.db.DbHelper;
  *  This data must be loaded as a precondition of this test running.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/10/04 $
  */
 public class DataOperationTest extends PersistenceTestCase {
 

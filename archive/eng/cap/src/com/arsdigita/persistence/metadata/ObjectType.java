@@ -30,7 +30,6 @@ import java.util.Iterator;
  * be marked as special "key" properties.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 public class ObjectType extends CompoundType {

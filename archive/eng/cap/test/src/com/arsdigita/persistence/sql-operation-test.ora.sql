@@ -20,7 +20,6 @@
 -- This file contains the data model for the data query test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #3 $ $Date: 2004/09/01 $
 --
 
 create table t_sql_operation (
@@ -43,40 +42,40 @@ create table t_sql_operation (
 
 begin
 	insert into t_sql_operation values(
-42, 
-139.93213, 
-1, 
+42,
+139.93213,
+1,
 7,
-'a', 
-'bcd', 
+'a',
+'bcd',
 TO_DATE('January 15, 1989, 11:00 A.M.','Month dd, YYYY, HH:MI A.M.'),
-8883951.12341, 
-739.31431, 
+8883951.12341,
+739.31431,
 5026,
-99999999, 
-100, 
-'clob column!', 
-'normal', 
-'12345', 
+99999999,
+100,
+'clob column!',
+'normal',
+'12345',
 'normal array');
 
 
 insert into t_sql_operation values(
-null, 
-null, 
-0, 
 null,
-null, 
-null, 
 null,
-null, 
-null, 
+0,
 null,
-null, 
-null, 
-null, 
-null, 
-null, 
+null,
+null,
+null,
+null,
+null,
+null,
+null,
+null,
+null,
+null,
+null,
 null);
 
 

@@ -33,7 +33,6 @@ import java.util.zip.ZipInputStream;
  * zip or jar file.
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #5 $ $Date: 2004/10/04 $
  **/
 
 class ZipSource implements PDLSource {

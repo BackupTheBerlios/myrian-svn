@@ -2,7 +2,6 @@
 
 # Author:  Vadim Nasardinov (vadimn@redhat.com)
 # Since:   2004-09-28
-# Version: $Id: //eng/persistence/dev/bin/rename-package.py#6 $
 
 import sys
 import os

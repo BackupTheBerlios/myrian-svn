@@ -34,7 +34,6 @@ package org.myrian.util;
  * <tt>new RuntimeException(e.getMessage(), e);</tt>
  *
  * @author David Eison
- * @version $Id: //eng/persistence/dev/cap/test/src/org/myrian/util/CheckedWrapperException.java#2 $
  */
 public class CheckedWrapperException extends Exception {
 

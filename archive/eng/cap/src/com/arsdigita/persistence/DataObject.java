@@ -23,7 +23,6 @@ import com.arsdigita.persistence.metadata.ObjectType;
  * Defines the public methods of Data Objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  */
 
 public interface DataObject {

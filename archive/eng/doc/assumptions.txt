@@ -1,5 +1,4 @@
 # Since: 2004-06-29
-# Version: $Id: //eng/persistence/dev/doc/assumptions.txt#2 $
 
 * The fully-qualifed class name and object type name of a JDO instance
   have to match.  We rely on this when we write code like this:

@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
  * PartyTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2004/10/04 $
  */
 
 abstract public class PartyTest extends PersistenceTestCase {

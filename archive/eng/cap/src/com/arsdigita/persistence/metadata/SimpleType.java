@@ -24,7 +24,6 @@ package com.arsdigita.persistence.metadata;
  * the atoms from which compound types are built.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2004/10/04 $
  */
 
 public class SimpleType extends DataType {

@@ -40,7 +40,6 @@ import org.apache.log4j.Logger;
  *
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  */
 public class DataQueryImplTest extends DataQueryTest {
 

@@ -20,7 +20,6 @@
 -- This file contains the data model for the data query test cases.
 --
 -- @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
--- @version $Revision: #3 $ $Date: 2004/09/01 $
 --
 
 create table PLSQLTestTable (

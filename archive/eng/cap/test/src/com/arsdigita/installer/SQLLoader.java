@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
  * SQLLoader
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2004/10/04 $
  **/
 
 public abstract class SQLLoader {
