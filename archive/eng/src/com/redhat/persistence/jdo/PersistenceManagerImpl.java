@@ -354,11 +354,15 @@ public class PersistenceManagerImpl implements PersistenceManager {
                         (cls, C.componentPropertyField(prop));
 
                     if (value instanceof Map) {
-                        Map m = (Map) smi.getObjectField(pc, index);
-                        m.putAll((Map) value);
+                    	if (((Map) value).size() > 0) {              
+                        	Map m = (Map) smi.getObjectField(pc, index);
+                        	m.putAll((Map) value);
+                    	}
                     } else if (value instanceof List) {
-                        List l = (List) smi.getObjectField(pc, index);
-                        l.addAll((List) value);
+                    	if (((List) value).size() > 0) {
+                        	List l = (List) smi.getObjectField(pc, index);
+                        	l.addAll((List) value);
+                    	}
                     } else {
                         // non persistence capable, non collection components
                         throw new IllegalStateException
