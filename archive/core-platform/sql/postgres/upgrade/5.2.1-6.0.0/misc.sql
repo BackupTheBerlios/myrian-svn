@@ -11,8 +11,8 @@
 -- implied. See the License for the specific language governing
 -- rights and limitations under the License.
 --
--- $Id: //core-platform/dev/sql/postgres/upgrade/5.2.1-6.0.0/misc.sql#3 $
--- $DateTime: 2003/08/14 19:42:42 $
+-- $Id: //core-platform/dev/sql/postgres/upgrade/5.2.1-6.0.0/misc.sql#4 $
+-- $DateTime: 2003/08/15 00:21:06 $
 
 drop function last_attr_value(varchar,integer);
 
@@ -78,4 +78,33 @@ update pg_class set relname = 'cw_tas_dep_dep_tas_id__p_hdzws' where relname = '
 
 update pg_constraint set conname = 'cw_tas_use_ass_tas_id__p_vsdyq' where UPPER(conname) = UPPER('task_user_assignees_pk');
 update pg_class set relname = 'cw_tas_use_ass_tas_id__p_vsdyq' where relname = 'task_user_assignees_pk';
+
+-- oracle compatibility
+
+-- Replacements for PG's special operators that cause persistence's
+-- SQL parser to barf
+
+create or replace function bitand(integer, integer) returns integer as '
+begin
+    return $1 & $2;
+end;
+' language 'plpgsql';
+
+create or replace function bitor(integer, integer) returns integer as '
+begin
+    return $1 | $2;
+end;
+' language 'plpgsql';
+
+create or replace function bitxor(integer, integer) returns integer as '
+begin
+    return $1 # $2;
+end;
+' language 'plpgsql';
+
+create or replace function bitneg(integer) returns integer as '
+begin
+    return ~$1;
+end;
+' language 'plpgsql';
 
