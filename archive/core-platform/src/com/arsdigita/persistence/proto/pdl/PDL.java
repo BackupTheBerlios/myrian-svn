@@ -17,12 +17,12 @@ import org.apache.log4j.Logger;
  * PDL
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #7 $ $Date: 2003/06/11 $
+ * @version $Revision: #8 $ $Date: 2003/06/13 $
  **/
 
 public class PDL {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#7 $ by $Author: rhs $, $DateTime: 2003/06/11 15:51:24 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/proto/pdl/PDL.java#8 $ by $Author: rhs $, $DateTime: 2003/06/13 15:36:06 $";
     private final static Logger LOG = Logger.getLogger(PDL.class);
 
     private AST m_ast = new AST();
@@ -31,6 +31,7 @@ public class PDL {
     private HashMap m_properties = new HashMap();
     private HashSet m_links = new HashSet();
     private HashSet m_fks = new HashSet();
+    private HashMap m_fkNds = new HashMap();
 
     public PDL() {}
 
@@ -729,17 +730,29 @@ public class PDL {
         Column to = lookup(tond);
 
         ForeignKey fk = from.getTable().getForeignKey(new Column[] {from});
-        if (fk != null) {
-            return fk;
-        }
-
         UniqueKey uk = to.getTable().getUniqueKey(new Column[] {to});
         if (uk == null) {
             m_errors.warn(tond, "not a unique key");
             return null;
         }
 
-	return fk(new Column[] {from}, uk);
+        if (fk != null) {
+            if (uk.equals(fk.getUniqueKey())) {
+                return fk;
+            } else {
+                Node prev = (Node) m_fkNds.get(fk);
+                m_errors.fatal
+                    (fromnd,
+                     "foreign key incompatible with previous definition: " +
+                     prev.getLocation());
+                return null;
+            }
+        }
+
+        fk = fk(new Column[] {from}, uk);
+        m_fkNds.put(fk, fromnd);
+
+	return fk;
     }
 
     private ForeignKey fk(Column[] cols, UniqueKey uk) {
