@@ -11,18 +11,17 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/versioning/VersionedACSObject.pdl#8 $ 
-// $DateTime: 2003/05/23 16:47:26 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/versioning/VersionedACSObject.pdl#9 $ 
+// $DateTime: 2003/06/18 16:02:35 $
 
 model com.arsdigita.versioning;
 
 import com.arsdigita.kernel.*;
 
 versioned object type VersionedACSObject extends ACSObject {
+    Boolean[1..1]             isDeleted = vc_objects.is_deleted CHAR(1);
+    VersionedACSObject[0..1]  master = join vc_objects.master_id 
+                                         to vc_objects.object_id;
 
-  Boolean[1..1]             isDeleted = vc_objects.is_deleted CHAR(1);
-  VersionedACSObject[0..1]  master = join vc_objects.master_id 
-                                       to vc_objects.object_id;
-
-  reference key (vc_objects.object_id);
+    reference key (vc_objects.object_id);
 }

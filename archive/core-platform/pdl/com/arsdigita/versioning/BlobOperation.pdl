@@ -10,13 +10,13 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/versioning/BlobOperation.pdl#8 $ 
-// $DateTime: 2003/06/12 16:01:01 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/versioning/BlobOperation.pdl#9 $ 
+// $DateTime: 2003/06/18 16:02:35 $
 
 model com.arsdigita.versioning;
 
 object type BlobOperation extends Operation {
-  Blob[0..1]    value = vcx_blob_operations.value BLOB;
+    Blob[0..1]    value = vcx_blob_operations.value BLOB;
 
-  reference key (vcx_blob_operations.operation_id);
+    reference key (vcx_blob_operations.operation_id);
 }

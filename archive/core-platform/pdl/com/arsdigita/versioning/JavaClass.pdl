@@ -10,15 +10,15 @@
 // implied. See the License for the specific language governing
 // rights and limitations under the License.
 //
-// $Id: //core-platform/dev/pdl/com/arsdigita/versioning/JavaClass.pdl#1 $ 
-// $DateTime: 2003/06/12 16:01:01 $
+// $Id: //core-platform/dev/pdl/com/arsdigita/versioning/JavaClass.pdl#2 $ 
+// $DateTime: 2003/06/18 16:02:35 $
 
 model com.arsdigita.versioning;
 
 object type JavaClass {
-  BigInteger[1..1] id = vcx_java_classes.id INTEGER;
+    BigInteger[1..1] id = vcx_java_classes.id INTEGER;
 
-  String[1..1]   name = vcx_java_classes.name VARCHAR(400);
+    String[1..1]   name = vcx_java_classes.name VARCHAR(400);
 
-  object key (id);
+    object key (id);
 }
