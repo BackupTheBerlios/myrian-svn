@@ -4,6 +4,7 @@ import com.redhat.persistence.Session;
 import com.redhat.persistence.jdo.PersistenceManagerImpl;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -15,7 +16,7 @@ import org.apache.log4j.Logger;
  * ListTest
  *
  * @since 2004-07-13
- * @version $Revision: #4 $ $Date: 2004/07/27 $
+ * @version $Revision: #5 $ $Date: 2004/07/27 $
  **/
 public class ListTest extends WithTxnCase {
     private final static Logger s_log = Logger.getLogger(ListTest.class);
@@ -198,5 +199,38 @@ public class ListTest extends WithTxnCase {
         List notASubset = new LinkedList(EMAILS);
         notASubset.add(NO_SUCH_EMAIL);
         assertFalse("contains sublist", auxEmails.containsAll(notASubset));
+    }
+
+    public void testRemoveAll() {
+        List auxEmails = addEmails();
+        assertFalse("removed at least one",
+                    auxEmails.removeAll(Collections.EMPTY_LIST));
+
+        final Collection coll1 = new LinkedList();
+        coll1.add(NO_SUCH_EMAIL);
+        assertFalse("removed at least one",
+                    auxEmails.removeAll(coll1));
+
+        final Collection coll2 =
+            new LinkedList(EMAILS.subList(1, EMAILS.size()));
+        coll2.add(NO_SUCH_EMAIL);
+        assertTrue("removed at least one",
+                    auxEmails.removeAll(coll2));
+
+        assertEquals("remaining size", 1, auxEmails.size());
+        assertEquals("remaining element", EMAILS.get(0), auxEmails.get(0));
+    }
+
+    public void testRetainAll() {
+        List auxEmails = addEmails();
+        assertFalse("removed at least one", auxEmails.retainAll(EMAILS));
+
+        final Collection coll =
+            new LinkedList(EMAILS.subList(1, EMAILS.size()));
+        coll.add(NO_SUCH_EMAIL);
+
+        assertTrue("removed all but one", auxEmails.retainAll(coll));
+        assertEquals("remaining size", 1, auxEmails.size());
+        assertEquals("remaining element", EMAILS.get(0), auxEmails.get(0));
     }
 }

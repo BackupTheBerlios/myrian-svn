@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
  * CRPList
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #18 $ $Date: 2004/07/27 $
+ * @version $Revision: #19 $ $Date: 2004/07/27 $
  **/
 
 class CRPList implements List {
@@ -340,11 +340,24 @@ class CRPList implements List {
     }
 
     public boolean removeAll(Collection coll) {
-        throw new UnsupportedOperationException();
+        boolean modified = false;
+        for (Iterator it=coll.iterator(); it.hasNext(); ) {
+            modified |= remove(it.next());
+        }
+        return modified;
     }
 
     public boolean retainAll(Collection coll) {
-        throw new UnsupportedOperationException();
+        boolean modified = false;
+        Iterator entries = elements.entrySet().iterator();
+        while (entries.hasNext()) {
+            Map.Entry entry = (Map.Entry) entries.next();
+            if (!coll.contains(entry.getValue())) {
+                modified = true;
+                m_remove((Integer) entry.getKey());
+            }
+        }
+        return modified;
     }
 
     public Iterator iterator() {
