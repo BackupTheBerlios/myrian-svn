@@ -42,12 +42,12 @@ import java.lang.ref.WeakReference;
  * {@link com.arsdigita.persistence.SessionManager#getSession()} method.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #6 $ $Date: 2002/08/14 $
+ * @version $Revision: #7 $ $Date: 2002/08/15 $
  * @see com.arsdigita.persistence.SessionManager
  */
 public class Session {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/Session.java#6 $ by $Author: dennis $, $DateTime: 2002/08/14 23:39:40 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/Session.java#7 $ by $Author: richardl $, $DateTime: 2002/08/15 14:49:17 $";
 
     private static final Logger s_cat =
         Logger.getLogger(Session.class);
@@ -303,7 +303,7 @@ public class Session {
     public DataObject retrieve(OID oid)
         throws PersistenceException {
         GenericDataObject dObj =
-            GenericDataObjectFactory.createObject(oid.getDataObjectType(),
+            GenericDataObjectFactory.createObject(oid.getObjectType(),
                                                   this, false);
         if (dObj.doRetrieve(oid)) {
             return dObj;
