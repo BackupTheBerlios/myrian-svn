@@ -49,12 +49,12 @@ import org.apache.log4j.Logger;
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
  * @author <a href="mailto:randyg@alum.mit.edu">randyg@alum.mit.edu</a>
- * @version $Revision: #10 $ $Date: 2002/10/16 $
+ * @version $Revision: #11 $ $Date: 2002/10/17 $
  */
 
 class DataAssociationImpl extends DataCollectionImpl implements DataAssociation {
 
-    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#10 $ by $Author: dennis $, $DateTime: 2002/10/16 14:12:35 $";
+    public final static String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/DataAssociationImpl.java#11 $ by $Author: rhs $, $DateTime: 2002/10/17 11:45:15 $";
 
     private static final Logger s_cat =
         Logger.getLogger(DataAssociationImpl.class);
@@ -224,6 +224,10 @@ class DataAssociationImpl extends DataCollectionImpl implements DataAssociation 
             link = SessionManager.getSession().create(m_linkType);
             link.set(prop.getName(), object);
             link.set(ass.getName(), m_parent);
+
+            if (!ass.isCollection()) {
+                object.set(ass.getName(), m_parent);
+            }
 
             object = link;
         }
