@@ -46,12 +46,12 @@ import java.util.ArrayList;
  * Company:      ArsDigita
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #1 $ $Date: 2002/05/12 $
+ * @version $Revision: #2 $ $Date: 2002/05/30 $
  */
 
 public class GenericDataObject implements DataObject {
 
-    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#1 $ by $Author: dennis $, $DateTime: 2002/05/12 18:23:13 $";
+    public static final String versionId = "$Id: //core-platform/dev/src/com/arsdigita/persistence/GenericDataObject.java#2 $ by $Author: rhs $, $DateTime: 2002/05/30 17:04:17 $";
 
     private ObjectType    m_type;
     private Session       m_session;
@@ -127,6 +127,11 @@ public class GenericDataObject implements DataObject {
         if (observer == null) {
             throw new IllegalArgumentException("Can't add a null observer.");
         }
+        if (m_firing) {
+            throw new IllegalStateException(
+                "Can't add an observer from within an observer."
+                );
+        }
         m_observers.add(new ObserverEntry(observer, m_observers.size()));
     }
 
@@ -138,6 +143,7 @@ public class GenericDataObject implements DataObject {
 
     private int[] m_count = new int[NUM_METHODS];
     private BitSet[] m_fired = new BitSet[NUM_METHODS];
+    private boolean m_firing = false;
 
     private void fireObserver(int method, boolean errorOnSave) {
         if (m_count[method] == 0) {
@@ -145,6 +151,8 @@ public class GenericDataObject implements DataObject {
         }
 
         m_count[method]++;
+        boolean old = m_firing;
+        m_firing = true;
 
         try {
             for (Iterator it = m_observers.iterator(); it.hasNext(); ) {
@@ -169,6 +177,7 @@ public class GenericDataObject implements DataObject {
             }
         } finally {
             m_count[method]--;
+            m_firing = old;
         }
 
         if (m_count[method] == 0) {
