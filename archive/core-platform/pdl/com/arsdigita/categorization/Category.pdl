@@ -134,7 +134,7 @@ object type Category extends ACSObject {
         } map {
             childObjectAssociations.id = cat_object_category_map.object_category_map_id;
             childObjectAssociations.parentCategory.id = cat_object_category_map.category_id;
-            childObjectAssociations.object.ID = cat_object_category_map.object_id;
+            childObjectAssociations.object.id = cat_object_category_map.object_id;
             childObjectAssociations.isDefault = cat_object_category_map.default_p;
             childObjectAssociations.sortKey = cat_object_category_map.sort_key;
         }
