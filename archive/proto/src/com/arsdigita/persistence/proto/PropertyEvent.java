@@ -7,12 +7,12 @@ import java.io.*;
  * PropertyEvent
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #5 $ $Date: 2003/01/02 $
+ * @version $Revision: #6 $ $Date: 2003/01/10 $
  **/
 
 public abstract class PropertyEvent extends Event {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyEvent.java#5 $ by $Author: rhs $, $DateTime: 2003/01/02 15:38:03 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/PropertyEvent.java#6 $ by $Author: rhs $, $DateTime: 2003/01/10 18:29:26 $";
 
     private Property m_prop;
     private Object m_arg;
@@ -33,6 +33,10 @@ public abstract class PropertyEvent extends Event {
 
     public Object getArgument() {
         return m_arg;
+    }
+
+    void setPropertyData(PropertyData pdata) {
+        m_pdata = pdata;
     }
 
     PropertyData getPropertyData() {

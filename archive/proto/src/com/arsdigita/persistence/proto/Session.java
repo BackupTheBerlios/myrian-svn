@@ -13,12 +13,12 @@ import org.apache.log4j.Logger;
  * with persistent objects.
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #11 $ $Date: 2003/01/10 $
+ * @version $Revision: #12 $ $Date: 2003/01/10 $
  **/
 
 public class Session {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#11 $ by $Author: rhs $, $DateTime: 2003/01/10 17:10:28 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/Session.java#12 $ by $Author: rhs $, $DateTime: 2003/01/10 18:29:26 $";
 
     private static final Logger LOG = Logger.getLogger(Session.class);
 
@@ -125,7 +125,7 @@ public class Session {
                     }
                 }
 
-                addEvent(new DeleteEvent(this, oid), od);
+                addEvent(new DeleteEvent(this, oid));
                 result = true;
             }
             od.setVisiting(false);
@@ -209,8 +209,7 @@ public class Session {
                         old = get(oid, role);
                     }
 
-                    PropertyData pd = fetchPropertyData(oid, role);
-                    addEvent(new SetEvent(Session.this, oid, role, value), pd);
+                    addEvent(new SetEvent(Session.this, oid, role, value));
 
                     if (role.isComponent()) {
                         PersistentObject po = (PersistentObject) old;
@@ -322,8 +321,7 @@ public class Session {
 
         prop.dispatch(new Property.Switch() {
                 public void onRole(Role role) {
-                    PropertyData pd = fetchPropertyData(oid, role);
-                    addEvent(new AddEvent(Session.this, oid, role, value), pd);
+                    addEvent(new AddEvent(Session.this, oid, role, value));
                     if (role.isReversable()) {
                         PersistentObject me = retrieve(oid);
                         Role rev = role.getReverse();
@@ -369,9 +367,7 @@ public class Session {
 
         prop.dispatch(new Property.Switch() {
                 public void onRole(Role role) {
-                    PropertyData pd = fetchPropertyData(oid, role);
-                    addEvent(new RemoveEvent(Session.this, oid, role, value),
-                             pd);
+                    addEvent(new RemoveEvent(Session.this, oid, role, value));
 
                     if (role.isComponent()) {
                         PersistentObject po = (PersistentObject) value;
@@ -535,7 +531,7 @@ public class Session {
         }
     }
 
-    private void addEvent(Event ev) {
+    private void appendEvent(Event ev) {
         if (m_head == null) {
             m_head = ev;
             m_tail = ev;
@@ -544,13 +540,20 @@ public class Session {
         }
     }
 
+    private void addEvent(ObjectEvent ev) {
+        addEvent(ev, fetchObjectData(ev.getOID()));
+    }
+
     private void addEvent(ObjectEvent ev, ObjectData od) {
-        this.addEvent(ev);
+        ev.setObjectData(od);
+        appendEvent(ev);
         od.addEvent(ev);
     }
 
-    private void addEvent(PropertyEvent ev, PropertyData pd) {
-        this.addEvent(ev);
+    private void addEvent(PropertyEvent ev) {
+        PropertyData pd = fetchPropertyData(ev.getOID(), ev.getProperty());
+        ev.setPropertyData(pd);
+        appendEvent(ev);
         pd.addEvent(ev);
     }
 
