@@ -29,12 +29,12 @@ import java.util.*;
  * QueryTest
  *
  * @author <a href="mailto:rhs@mit.edu">rhs@mit.edu</a>
- * @version $Revision: #12 $ $Date: 2003/03/20 $
+ * @version $Revision: #13 $ $Date: 2003/03/20 $
  **/
 
 public class QueryTest extends PersistenceTestCase {
 
-    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#12 $ by $Author: jorris $, $DateTime: 2003/03/20 11:57:08 $";
+    public final static String versionId = "$Id: //core-platform/dev/test/src/com/arsdigita/persistence/oql/QueryTest.java#13 $ by $Author: rhs $, $DateTime: 2003/03/20 15:12:57 $";
 
     private static final Logger s_log =
         Logger.getLogger(QueryTest.class);
@@ -102,16 +102,17 @@ public class QueryTest extends PersistenceTestCase {
         StringTokenizer expectedTokens = new StringTokenizer(expected, "\n\r");
         StringTokenizer actualTokens = new StringTokenizer(actual, "\n\r");
 
-        int lineNumber = 1;
+        int lineNumber = 0;
         while (expectedTokens.hasMoreTokens()) {
+	    lineNumber++;
+	    String expectedLine = stripWhitespace(expectedTokens.nextToken());
             if (actualTokens.hasMoreTokens()) {
-                String expectedLine = stripWhitespace(expectedTokens.nextToken());
                 String actualLine = stripWhitespace(actualTokens.nextToken());
                 if(!expectedLine.equals(actualLine)) {
-                    fail(expectedLine, actualLine, lineNumber);
+                    fail(expectedLine, actualLine, lineNumber, actual);
                 }
             } else {
-                fail(expected, actual, lineNumber);
+                fail(expectedLine, null, lineNumber, actual);
             }
 
         }
@@ -143,9 +144,11 @@ public class QueryTest extends PersistenceTestCase {
         return result.toString().trim();
     }
 
-    private static final void fail(String expected, String actual, int lineNumber) {
-
-        fail("Failed at line " + lineNumber + " Expected: \n" + expected + "\n\nActual:\n" + actual);
+    private static final void fail(String expected, String actual,
+				   int lineNumber, String output) {
+        fail("Diff failed at line " + lineNumber +
+	     "\nExpected line:\n" + expected + "\n\nActual line:\n" + actual +
+	     "\n\nTest output:\n" + output);
     }
 
     /**
