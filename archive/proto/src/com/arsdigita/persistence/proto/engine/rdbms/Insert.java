@@ -9,12 +9,12 @@ import java.util.*;
  * Insert
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #4 $ $Date: 2003/02/07 $
+ * @version $Revision: #5 $ $Date: 2003/02/13 $
  **/
 
 class Insert extends DML {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Insert.java#4 $ by $Author: rhs $, $DateTime: 2003/02/07 12:50:17 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/Insert.java#5 $ by $Author: rhs $, $DateTime: 2003/02/13 18:36:15 $";
 
     public Insert(Table table) {
         super(table);
@@ -34,7 +34,8 @@ class Insert extends DML {
             }
         }
         return "insert into " + getTable() +
-            "\n(" + cols + ")\nvalues\n(" + vals + ")";
+            "\n(" + cols + ")\nvalues\n(" + vals + ")" + "\n\nparams = " +
+            getParams();
     }
 
 }

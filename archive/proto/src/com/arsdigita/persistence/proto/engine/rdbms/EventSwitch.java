@@ -10,12 +10,12 @@ import java.util.*;
  * EventSwitch
  *
  * @author Rafael H. Schloming &lt;rhs@mit.edu&gt;
- * @version $Revision: #2 $ $Date: 2003/02/12 $
+ * @version $Revision: #3 $ $Date: 2003/02/13 $
  **/
 
 class EventSwitch extends Event.Switch {
 
-    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#2 $ by $Author: rhs $, $DateTime: 2003/02/12 14:21:42 $";
+    public final static String versionId = "$Id: //core-platform/proto/src/com/arsdigita/persistence/proto/engine/rdbms/EventSwitch.java#3 $ by $Author: rhs $, $DateTime: 2003/02/13 18:36:15 $";
 
     private static final Path KEY = Path.get("__key__");
     private static final Path KEY_FROM = Path.get("__key_from__");
@@ -37,13 +37,24 @@ class EventSwitch extends Event.Switch {
         return Path.get(column.toString());
     }
 
+    private Object getKeyValue(Object obj) {
+        if (obj == null) { return null; }
+        Adapter ad = Adapter.getAdapter(obj.getClass());
+        ObjectType type = ad.getObjectType(obj);
+        Collection keys = type.getKeyProperties();
+        if (keys.size() != 1) {
+            throw new Error("not implemented");
+        }
+        return ad.getProperties(obj).get((Property) keys.iterator().next());
+    }
+
     private DML findOperation(Object obj, Table table) {
         DML op = m_engine.getOperation(obj, table);
         if (op != null) { return op; }
 
         DML result =
             new Update(table, new EqualsCondition(getKey(table), KEY));
-        result.set(KEY, obj);
+        result.set(KEY, getKeyValue(obj));
         m_engine.addOperation(obj, result);
         return result;
     }
@@ -58,7 +69,7 @@ class EventSwitch extends Event.Switch {
             } else if (e instanceof DeleteEvent) {
                 DML del = new Delete
                     (table, new EqualsCondition(getKey(table), KEY));
-                del.set(KEY, obj);
+                del.set(KEY, getKeyValue(obj));
                 m_engine.addOperation(obj, del);
             } else {
                 throw new IllegalArgumentException
@@ -89,14 +100,14 @@ class EventSwitch extends Event.Switch {
                 public void onValue(ValueMapping vm) {
                     Column col = vm.getColumn();
                     DML op = findOperation(obj, col.getTable());
-                    op.set(col, e.getArgument());
+                    op.set(col, arg);
                 }
 
                 public void onReference(ReferenceMapping rm) {
                     if (rm.isJoinFrom()) {
                         Column col = rm.getJoin(0).getTo();
                         DML op = findOperation(arg, col.getTable());
-                        op.set(col, arg);
+                        op.set(col, getKeyValue(obj));
                     } else if (rm.isJoinThrough()) {
                         Column from = rm.getJoin(0).getTo();
                         Column to = rm.getJoin(1).getFrom();
@@ -104,8 +115,8 @@ class EventSwitch extends Event.Switch {
                         if (e instanceof AddEvent ||
                             e instanceof SetEvent) {
                             op = new Insert(from.getTable());
-                            op.set(from, obj);
-                            op.set(to, arg);
+                            op.set(from, getKeyValue(obj));
+                            op.set(to, getKeyValue(arg));
                         } else if (e instanceof RemoveEvent) {
                             op = new Delete
                                 (from.getTable(), new AndCondition
@@ -113,8 +124,8 @@ class EventSwitch extends Event.Switch {
                                                          KEY_FROM),
                                      new EqualsCondition(getPath(to),
                                                          KEY_TO)));
-                            op.set(KEY_FROM, obj);
-                            op.set(KEY_TO, arg);
+                            op.set(KEY_FROM, getKeyValue(obj));
+                            op.set(KEY_TO, getKeyValue(arg));
                         } else {
                             throw new IllegalArgumentException
                                 ("not a set, add, or remove");
@@ -123,7 +134,7 @@ class EventSwitch extends Event.Switch {
                     } else if (rm.isJoinTo()) {
                         Column col = rm.getJoin(0).getFrom();
                         DML op = findOperation(obj, col.getTable());
-                        op.set(col, e.getArgument());
+                        op.set(col, getKeyValue(arg));
                     } else {
                         throw new IllegalArgumentException
                             ("not a join from, to, or through");
